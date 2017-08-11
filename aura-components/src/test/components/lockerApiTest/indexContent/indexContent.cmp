@@ -1,0 +1,28 @@
+<aura:component>
+    <div class="slds-tabs_default">
+        <ul class="slds-tabs_default__nav slds-align_absolute-center" role="tablist">
+            <li aura:id="button" class="slds-tabs_default__item slds-is-active" title="Secure Window" role="presentation">
+                <a class="slds-tabs_default__link" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-default-1" aura:id="tab-default-1__item" onclick="{!c.button}" data-id="0">
+                    Secure Window
+                </a>
+            </li>
+            <li aura:id="button" class="slds-tabs_default__item" title="Secure Document" role="presentation">
+                <a class="slds-tabs_default__link" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-2" aura:id="tab-default-2__item" onclick="{!c.button}" data-id="1">    Secure Document
+                </a>
+            </li>
+            <li aura:id="button" class="slds-tabs_default__item" title="Secure Element" role="presentation">
+                <a class="slds-tabs_default__link" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-3" aura:id="tab-default-3__item" onclick="{!c.button}" data-id="2">    Secure Element
+                </a>
+            </li>
+        </ul>
+        <div aura:id="tab" class="slds-show" role="tabpanel" aria-labelledby="tab-default-1__item">
+             <lockerApiTest:secureWindow systemAPI="Window" secureAPI="SecureWindow"/>
+        </div>
+        <div aura:id="tab" class="slds-hide" role="tabpanel" aria-labelledby="tab-default-2__item">
+            <lockerApiTest:secureDocument systemAPI="Document" secureAPI="SecureDocument"/>
+        </div>
+        <div aura:id="tab" class="slds-hide" role="tabpanel" aria-labelledby="tab-default-3__item">
+            <lockerApiTest:secureElement systemAPI="Element" secureAPI="SecureElement"/>
+        </div>
+    </div>
+</aura:component>

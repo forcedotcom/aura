@@ -1,41 +1,22 @@
 ({
     init: function(cmp, event, helper) {
-        helper.utils.tester.initTests(helper.testName, helper.testPlan);
-
         var key = $A.lockerService.getKeyForNamespace("apiviewer");
         var secureWindow = $A.lockerService.getEnv(key);
-        var sdoc = secureWindow.document;
+        var secureDocument = secureWindow.document;
 
-        function handleIFrame(doc, e) {
-            // We need to insure that iframe is added to the document because contentWindow is null for iframe elements not in a live document
-            if (e.tagName === "IFRAME") {
-                e.style.display = "none";
-                doc.body.appendChild(e);
-            }
-        }
+        var report = helper.utils.tester.testObject(document.createTextNode("TEST"), secureDocument.createTextNode("TEST"));
 
         function test(tagName) {
-        	var ns = this && this.namespace;
-
-        	var raw = ns ? document.createElementNS(ns, tagName) : document.createElement(tagName);
-        	handleIFrame(document, raw);
-
-            helper.utils.tester.testSystem(raw);
-
-            var se = ns ? sdoc.createElementNS(ns, tagName) : sdoc.createElement(tagName);
-            handleIFrame(sdoc, se);
-
-            helper.utils.tester.testSecure(se, raw);
+            helper.utils.tester.testObject(document.createElement(tagName), secureDocument.createElement(tagName), report);
         }
 
         helper.tagNames.forEach(test);
-        helper.svgTagNames.forEach(test, { namespace: "http://www.w3.org/2000/svg" });
+        helper.svgTagNames.forEach(test);
+        helper.utils.tester.sortReport(report);
+        cmp.set("v.report", report);
 
-        // Test text node
-        var text = document.createTextNode("TEST");
-        helper.utils.tester.testSystem(text);
-        helper.utils.tester.testSecure(sdoc.createTextNode("TEST"), text);
-
-        helper.utils.tester.showResults(cmp);
+        window.__secureElementTesterReport = report;
     }
 })
+
+        

@@ -37,22 +37,17 @@ import com.google.common.collect.Lists;
 // DCHASMAN TODO Get this running with FF, SAFARI, IE11 and IOS
 @TargetBrowsers({ BrowserType.GOOGLECHROME })
 public class LockerServiceAPIShapeUITest extends WebDriverTestCase {
-    private static final String WORK_IN_PROGRESS = "@wip";
-	private static final String SUPPORT = "support";
-	private static final String PLAN = "plan";
+    private static final String PROTOS = "protos";
+    private static final String PROTO = "proto";
 	private static final String PROPS = "props";
-	private static final String LOCKER = "locker";
-	private static final String NAME = "name";
-	private static final String TYPE = "type";
-	private static final String PROTOS = "protos";
-	private static final String SYSTEM = "system";
-	private static final String STATUS = "status";
-	private static final String VALUE = "value";
-	private static final String FAIL = "fail";
-	private static final String NOVALUE = "@novalue";
-	private static final String WARN = "warn";
-	private static final String PASS = "pass";
-	private static final String NOT_TO_BE_SUPPORTED = "Not To Be Supported";
+    private static final String OBJ = "object";
+	private static final String OBJTYPE = "objectType";
+    private static final String SECUREOBJTYPE = "secureObjectType";
+    private static final String STATUS = "status";
+    private static final String PASS = "pass";
+    private static final String FAIL = "fail";
+    private static final String WARNING = "warning";
+    private static final String UNDEFINED = "Undefined";
 
 	@Test
     public void testSecureDocument() throws Exception {
@@ -75,92 +70,69 @@ public class LockerServiceAPIShapeUITest extends WebDriverTestCase {
     		value = source.get(property);
     	}
     	
-    	return value != null ? value.toString() : NOVALUE;
+    	return value != null ? value.toString() : UNDEFINED;
     }
     
     @SuppressWarnings("unchecked")
 	void testSecureObject(String className) throws Exception {
-    	// Get the report object from /lockerApiTest/secureDocument.app
-        openNoAura("/lockerApiTest/" + className + ".app");
+        openNoAura("/lockerApiTest/" + className + ".cmp");
 
         AuraUITestingUtil auraUITestingUtil = getAuraUITestingUtil();
         
 		auraUITestingUtil.waitForDocumentReady();
         auraUITestingUtil.waitForAuraFrameworkReady(getAuraErrorsExpectedDuringInit());
         
-        waitForCondition("return window.__lsTesterReport !== undefined;");
-        
-        Map<String, Object> raw = (Map<String, Object>) auraUITestingUtil.getEval("return window.__lsTesterReport;");
+        // Value set on /lockerApiTest/[className]Controller.js file. //
+        waitForCondition("return window.__" + className + "TesterReport !== undefined;");
+        Map<String, Object> raw = (Map<String, Object>) auraUITestingUtil.getEval("return window.__" + className + "TesterReport;");
 
         contextService.startContext(Mode.FTEST, Format.JSON, Authentication.UNAUTHENTICATED);
         JsonSerializationContext jsonSerializationContext = getJsonSerializationContext();
         
-        // Convert from map to json string and then back again to end up with a mutable map (the map returned from getEval() is immutable)
+        // Convert Map --> JSON String --> Map to end up with a mutable map because the map returned from getEval() is immutable. //
         StringBuilder json = new StringBuilder();
 		JsonEncoder.serialize(raw, json, jsonSerializationContext);
 
         Map<String, Object> report = (Map<String, Object>) new JsonReader().read(json.toString());
         List<Map<String, Object>> protos = (List<Map<String, Object>>) report.get(PROTOS);
-    	
-    	// Key the file with the browser name to account for browser differences
         
-        // Create one goldfile per interface to keep things manageable
+        // Create one goldfile per secureObject. //
         List<String> errors = Lists.newArrayList();
         for (Map<String, Object> proto : protos) {
         	List<String> protoErrors = Lists.newArrayList();   	
         	List<Map<String, Object>> props = (List<Map<String, Object>>) proto.get(PROPS);
     		for (Map<String, Object> prop : props) {
-    			// Only goldfile props in the test plan (another test will deal with unplanned props)
-    			Map<String, Object> plan = (Map<String, Object>) prop.get(PLAN);
-    			if (plan != null) {
-        			Map<String, Object> system = (Map<String, Object>) prop.get(SYSTEM);
-        			Map<String, Object> systemType = system != null ? (Map<String, Object>) system.get(TYPE) : Collections.emptyMap();
-        			Map<String, Object> locker = (Map<String, Object>) prop.get(LOCKER);
-        			Map<String, Object> lockerType = locker != null ? (Map<String, Object>) locker.get(TYPE) : Collections.emptyMap();
-        			
-        			String name = value(prop, NAME);
-        			String expectedType = value(plan, TYPE);
-        			String support = value(plan, SUPPORT);
-        			
-        			String systemTypeValue = value(systemType, VALUE);
-        			String systemStatus = value(systemType, STATUS);
-        			
-        			String lockerTypeValue = value(lockerType, VALUE);
-        			String lockerStatus = value(lockerType, STATUS);
-        			
-        			// We allow warnings currently since these represent known inconsistencies that are being worked on
-        			if (systemStatus.equals(PASS) && (lockerStatus.equals(PASS) || lockerStatus.equals(WARN))) {
-        				continue;
-        			}
-        			
-        			// Not supported
-    				if (systemTypeValue.equals(NOT_TO_BE_SUPPORTED) && (lockerTypeValue.equals(NOT_TO_BE_SUPPORTED) || lockerTypeValue.equals(NOVALUE))) {
-    					continue;
-    				}
-    				
-    				// support == @wip
-    				if (support.equals(WORK_IN_PROGRESS)) {
-    					continue;
-    				}
-    				
-    				// Expected inconsistency that we're working on
-    				if (systemStatus.equals(FAIL) && lockerStatus.equals(WARN)) {
-    					continue;
-    				}
-    				
-    				// Browser does not support the feature
-    				if (systemStatus.equals(NOVALUE) && lockerStatus.equals(NOVALUE)) {
-    					continue;
-    				}
-    				
-    				if (protoErrors.isEmpty()) {
-    					protoErrors.add(String.format("\nErrors in prototype %s", value(proto, NAME)));
-    				}
-    				
-    				protoErrors.add(String.format("\t%s: %s, %s, %s, %s, %s", name, expectedType, systemTypeValue, 
-        					systemStatus, lockerTypeValue, lockerStatus));
-    			}
-    		}
+    			String object = value(prop, OBJ);
+                String objectType = value(prop, OBJTYPE);
+                String secureObjectType = value(prop, SECUREOBJTYPE);
+                String status = value(prop, STATUS);
+
+                if (!object.equals(UNDEFINED) && !objectType.equals(UNDEFINED) && !status.equals(UNDEFINED)) {
+                    continue;
+                }
+
+                if (status.equals(PASS) && objectType.equals(secureObjectType)) {
+                    continue;
+                }
+
+                if (status.equals(FAIL) && secureObjectType.equals(UNDEFINED)) {
+                    continue;
+                }
+
+                if (status.equals(WARNING) && !objectType.equals(secureObjectType)) {
+                    continue;
+                }
+
+                if (status.equals(PASS) || status.equals(FAIL) || status.equals(WARNING)) {
+                    continue;
+                }
+
+				if (protoErrors.isEmpty()) {
+					protoErrors.add(String.format("\nErrors in prototype %s", value(proto, PROTO)));
+				}
+				
+				protoErrors.add(String.format("\t%s: %s, %s, %s, %s", proto, object, objectType, secureObjectType, status));
+    	   }
     		
 			if (!protoErrors.isEmpty()) {
 				errors.add(Joiner.on("\n").join(protoErrors));

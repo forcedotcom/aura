@@ -1,0 +1,60 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" abstract="true">
+
+    <aura:import library="lockerApiTest:utils" property="utils"/>
+
+    <aura:attribute name="secureAPI" type="String"/>
+    <aura:attribute name="systemAPI" type="String"/>
+    <aura:attribute name="report" type="Object"/>
+
+    <div aura:id="report">
+        <div class="slds-page-header">
+            <div class="slds-media__body slds-align_absolute-center">
+                <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!v.systemAPI} vs {!v.secureAPI} Compatibility Table</h1>
+            </div>
+        </div>
+        <div class="slds-align_absolute-center">
+            <table class="slds-container_large slds-border_left slds-border_right slds-table slds-no-row-hover slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                <thead>
+                    <tr class="slds-text-title_caps">
+                        <th scope="col"><div class="slds-truncate" title="Method">Method</div></th>
+                        <th scope="col"><div class="slds-truncate" title="Browser API (Actual)">Browser API (Actual)</div></th>
+                        <th scope="col"><div class="slds-truncate" title="Locker API (Actual)">Locker API (Actual)</div></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.report.protos}" var="proto">
+                        <tr>
+                            <td colspan="4" class="slds-theme_offline">Proto: {!proto.proto}</td>
+                        </tr>
+                        <aura:iteration items="{!proto.props}" var="prop">
+                            <lockerApiTest:propertyRow prop="{!prop}"/>
+                        </aura:iteration>
+                    </aura:iteration>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- This is where any components used by tests are placed. -->
+        <div aura:id="test">
+            {!v.body}
+        </div>
+    </div>
+
+</aura:component>

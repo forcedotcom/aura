@@ -1,3 +1,4 @@
 <aura:component isTemplate="true" extensible="true" extends="aura:template">
+	<link rel="stylesheet" href="/css/locker-service-SLDS.css" />
 	<aura:set attribute="title" value="Locker Service API"/>
 </aura:component>

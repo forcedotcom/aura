@@ -15,13 +15,6 @@
     limitations under the License.
 
 -->
-<aura:application>
-  	<link rel="stylesheet" href="/css/style.css" />
-
-	<header>Locker Service API Viewer</header>
-	<ul>
-		<li class="docs"><a href="/lockerApiTest/secureDocument.app?aura.mode=DEV">Secure Document</a></li>
-		<li class="docs"><a href="/lockerApiTest/secureElement.app?aura.mode=DEV">Secure Element</a></li>
-		<li class="docs"><a href="/lockerApiTest/secureWindow.app?aura.mode=DEV">Secure Window</a></li>
-	</ul>
+<aura:application template="lockerApiTest:template">
+    <lockerApiTest:indexContent/>
 </aura:application>

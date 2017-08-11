@@ -1,13 +1,12 @@
 ({
     init: function(cmp, event, helper) {
-        helper.utils.tester.initTests(helper.testName, helper.testPlan);
-
         var key = $A.lockerService.getKeyForNamespace("apiviewer");
         var secureWindow = $A.lockerService.getEnv(key);
 
-        helper.utils.tester.testSystem(document);
-        helper.utils.tester.testSecure(secureWindow.document, document);
+        var report = helper.utils.tester.testObject(document, secureWindow.document);
+        helper.utils.tester.sortReport(report);
+        cmp.set("v.report", report);
 
-        helper.utils.tester.showResults(cmp);
+        window.__secureDocumentTesterReport = report;
     }
 })

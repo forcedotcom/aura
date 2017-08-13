@@ -2545,7 +2545,7 @@ function callNodeSlot(node, slot) {
     if (!isUndefined(node[slot])) {
         node[slot]();
     }
-    return node;
+    return node; // for convenience
 }
 // monkey patching Node methods to be able to detect the insertions and removal of
 // root elements created via createElement.
@@ -2681,4 +2681,4 @@ exports.unwrap = unwrap;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.13.2 */
+/** version: 0.13.3 */

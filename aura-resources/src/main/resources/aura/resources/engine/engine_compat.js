@@ -82,6 +82,7 @@ var setPrototypeOf = Object.setPrototypeOf;
 var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 var getOwnPropertyNames = Object.getOwnPropertyNames;
 var defineProperties = Object.defineProperties;
+var getOwnPropertySymbols = Object.getOwnPropertySymbols;
 var hasOwnProperty = Object.hasOwnProperty;
 var isArray = Array.isArray;
 var _a$1 = Array.prototype;
@@ -918,12 +919,30 @@ function deleteKeyCompat(replicaOrAny, key) {
     // non-profixied delete
     delete replicaOrAny[key];
 }
+var inOperator = typeof Symbol() === 'object' ? function inOperatorCompat(obj, key) {
+    // proto chain check because this is using a broken polyfill
+    // https://github.com/Financial-Times/polyfill-service/blob/master/polyfills/Symbol/
+    // In this case, because this polyfill is assing all the stuff to Object.prototype to keep
+    // all the other invariants of Symbols, we need to do some manual checks here for the slow patch.
+    if (key && key.constructor === Symbol) {
+        while (obj) {
+            if (getOwnPropertySymbols(obj).indexOf(key) !== -1) {
+                return true;
+            }
+            obj = getPrototypeOf(obj);
+        }
+        return false;
+    }
+    return key in obj;
+} : function inOperator(obj, key) {
+    return key in obj;
+};
 function inKeyCompat(replicaOrAny, key) {
     var membrane = getLinkedMembrane(replicaOrAny);
     if (membrane) {
         return membrane.has(unwrap(replicaOrAny), key);
     }
-    return key in replicaOrAny;
+    return inOperator(replicaOrAny, key);
 }
 function iterableKeyCompat(replicaOrAny) {
     var membrane = getLinkedMembrane(replicaOrAny);
@@ -3322,10 +3341,11 @@ var replaceChild = _b.replaceChild;
 var ConnectingSlot = Symbol();
 var DisconnectingSlot = Symbol();
 function callNodeSlot(node, slot) {
+    assert.isTrue(node, "callNodeSlot() should not be called for a non-object");
     if (!isUndefined(node[slot])) {
         node[slot]();
     }
-    return node;
+    return node; // for convenience
 }
 // monkey patching Node methods to be able to detect the insertions and removal of
 // root elements created via createElement.
@@ -3476,4 +3496,4 @@ exports.unwrap = unwrap;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.13.2 */
+/** version: 0.13.3 */

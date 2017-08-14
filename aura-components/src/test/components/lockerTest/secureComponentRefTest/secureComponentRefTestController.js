@@ -123,7 +123,8 @@
         var secureComponentRef = cmp.find("module-cmp");
 
         testUtils.assertStartsWith("SecureComponentRef", secureComponentRef.toString());
-        secureComponentRef.test();
+        var methodRet = secureComponentRef.test();
+        testUtils.assertEquals("Test method!", methodRet, "Module method did not return expected value");
     },
 
     onFooDynamic: function(cmp) {

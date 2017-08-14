@@ -31,6 +31,6 @@ export default class Simple extends Element {
     }
 
     test() {
-        window.console.log('Test method!');
+        return 'Test method!';
     }
 }

@@ -180,7 +180,7 @@ InteropComponent.prototype.setupMethods = function () {
                 return $A.warning('Methods are not available until the component is rendered');
             }
             var elmt = this.getElement();
-            elmt[m].apply(null, arguments);
+            return elmt[m].apply(null, arguments);
         };
     });
 };

@@ -40,7 +40,7 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
     private static final By BY_M_EXPR = By.cssSelector(".m-expr");
 
     @Test
-    @ExcludeBrowsers({BrowserType.IE11, BrowserType.SAFARI}) // non-compat will fail in unsupported browsers
+    @TargetBrowsers({BrowserType.GOOGLECHROME}) // non-compat will fail in unsupported browsers
     public void testInteropMinified() throws Exception {
         open("/moduletest/bootstrap.app?aura.compat=0", Mode.SELENIUM);
         doInteropTest();
@@ -53,7 +53,7 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
     }
 
     @Test
-    @ExcludeBrowsers({BrowserType.IE11, BrowserType.SAFARI}) // non-compat will fail in unsupported browsers
+    @TargetBrowsers({BrowserType.GOOGLECHROME}) // non-compat will fail in unsupported browsers
     public void testInteropDev() throws Exception {
         open("/moduletest/bootstrap.app?aura.compat=0", Mode.DEV);
         doInteropTest();

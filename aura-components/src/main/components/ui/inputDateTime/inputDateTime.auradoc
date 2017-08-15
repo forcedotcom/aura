@@ -35,7 +35,7 @@
  var today = new Date(); 
 // Convert the date to an ISO string
 component.set("v.today", today.toISOString());</pre>
-        <p><code>displayDatePicker="true"</code> displays a date picker icon in the field. Clicking in the date field displays the date picker, even if <code>displayDatePicker="false"</code>.</p>
+        
         <h4>Selecting A Date and Time on Mobile Devices</h4>
         <p>When viewed on a mobile or tablet, the <code>ui:inputDateTime</code> component uses the native date and time picker, and the <code>format</code> attribute is not supported in this case.
         We recommend using the value change handler to retrieve date and time value change on the input field. On iOS devices, selecting a date and time on the date picker triggers the change handler on the component but the value is bound only on the blur event.

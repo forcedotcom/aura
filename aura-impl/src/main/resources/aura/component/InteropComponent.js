@@ -26,7 +26,7 @@ function InteropComponent(config) {
     this.containerComponentId = config["containerComponentId"];
     this.componentDef = cmpDef;
     this.interopClass = cmpDef.interopClass;
-    this.interopDef = window["Engine"]['getComponentDef'](cmpDef.interopClass);
+    this.interopDef = $A.componentService.moduleEngine['getComponentDef'](cmpDef.interopClass);
     
     this.rendered = false;
     this.inUnrender = false;
@@ -333,19 +333,17 @@ InteropComponent.prototype.set = function (key, value) {
     var expr = path.join('.');
     var attrValue = this.attributes[expr];
 
-    if (attrValue) {
-        if ($A.util.isExpression(attrValue.value)) {
-            $A.warning('Component ' + this.componentDef.interopClassName
-                + ' is not the owner of property "' + expr
-                + '" and should not change it directly'
-            );
-            attrValue.value.set(value);
-        } else if (attrValue.getExpression) { // PRV
-            attrValue.set(value);
-        }
-    } else {
-        // set in case attribute was not explicitly set in markup
+    if (attrValue && $A.util.isExpression(attrValue.value)) {
+        $A.warning('Component ' + this.componentDef.interopClassName
+            + ' is not the owner of property "' + expr
+            + '" and should not change it directly'
+        );
+        attrValue.value.set(value);
+    } else if (attrValue && attrValue.getExpression) { // PRV
+        attrValue.set(value);
+    } else { // set in case attribute was not explicitly set in markup
         this.attributes[expr] = value;
+        this.attributeChange(expr, value);
     }
 };
 
@@ -371,7 +369,7 @@ InteropComponent.prototype.attachOnChangeToElement = function (element) {
  */
 InteropComponent.prototype.render = function () {
     var Ctor = this.interopClass;
-    var element = window['Engine']['createElement'](this.componentDef.elementName, { 'is': Ctor });
+    var element = $A.componentService.moduleEngine['createElement'](this.componentDef.elementName, { 'is': Ctor });
     var cmp = this;
     element.__customElement = 1;
     this.attachOnChangeToElement(element);

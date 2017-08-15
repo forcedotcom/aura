@@ -95,7 +95,7 @@
         <div class="logo"/>
         <div class="spinner"/>
         <span>{!v.loadingText}</span>
-      </div>
+    </div>
     <div aura:id="auraErrorMask" class="{!( v.forceError ? ' auraForcedErrorBox' : '' )}" >
         <div class="auraErrorBox" aura:id="auraError">
             <span><a class="close" id="dismissError">&times;</a>{!v.errorTitle}</span>

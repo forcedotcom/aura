@@ -39,7 +39,6 @@ function tester() {
                 });
             });
         }
-
         return report;
     }
 

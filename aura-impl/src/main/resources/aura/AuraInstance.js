@@ -945,11 +945,6 @@ AuraInstance.prototype.getCallback = function(callback) {
     $A.assert($A.util.isFunction(callback),"$A.getCallback(): 'callback' must be a valid Function");
     var context=$A.clientService.currentAccess;
     function callbackWrapper(){
-        var inAuraLoop = $A.clientService.inAuraLoop();
-        var callbackStartTime;
-        if (!inAuraLoop) {
-            callbackStartTime = $A.metricsService.time();
-        }
         $A.clientService.setCurrentAccess(context);
         $A.clientService.pushStack("$A.getCallback()");
         try {
@@ -995,9 +990,6 @@ AuraInstance.prototype.getCallback = function(callback) {
         } finally {
             $A.clientService.popStack("$A.getCallback()");
             $A.clientService.releaseCurrentAccess();
-            if (!inAuraLoop) {
-                $A.metricsService.mark('bpt', 'callbackWrapper', {'duration': $A.metricsService.time() - callbackStartTime});
-            }
         }
     }
     if(callback.reference&&callback.toString()===callbackWrapper.toString()){ // don't double-wrap

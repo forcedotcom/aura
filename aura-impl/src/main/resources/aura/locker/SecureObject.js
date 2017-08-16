@@ -460,11 +460,11 @@ function getArrayLikeThingProxyHandler(key) {
                                             var value = filtered[nextIndex];
                                             nextIndex++;
                                             return {
-                                                value: value ? SecureObject.filterEverything(handler, value) : value,
-                                                done: false
+                                                "value": value ? SecureObject.filterEverything(handler, value) : value,
+                                                "done": false
                                             };
                                         } else {
-                                            return {done: true};
+                                            return {"done": true};
                                         }
                                     }
                                 };
@@ -745,9 +745,9 @@ function getArrayProxyHandler(key) {
                                         if(nextIndex < filtered.length) {
                                             var value = filtered[nextIndex]["rawValue"];
                                             nextIndex++;
-                                            return {value: value ? SecureObject.filterEverything(handler, value) : value, done: false};
+                                            return {"value": value ? SecureObject.filterEverything(handler, value) : value, "done": false};
                                         } else {
-                                            return {done: true};
+                                            return {"done": true};
                                         }
                                     }
                                 };
@@ -989,9 +989,9 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
                                     if(nextIndex < filtered.length) {
                                         var value = filtered[nextIndex];
                                         nextIndex++;
-                                        return {value: value ? SecureObject.filterEverything(handler, value) : value, done: false};
+                                        return {"value": value ? SecureObject.filterEverything(handler, value) : value, "done": false};
                                     } else {
-                                        return {done: true};
+                                        return {"done": true};
                                     }
                                 }
                             };

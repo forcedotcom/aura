@@ -38,6 +38,7 @@
         expectedIds.forEach(function(id){
             testUtils.assertEquals(id, valuesIterator.next().value.id, "Unexpected node when iterating");
         });
+        testUtils.assertTrue(valuesIterator.next().done, "Expected iterator to be done");
     },
 
     // Automation for W-3235081

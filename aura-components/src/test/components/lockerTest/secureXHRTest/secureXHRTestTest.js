@@ -31,10 +31,33 @@
     },
 
     testResponseXML: {
-        // Remove UnAdaptableTest label when test is updated to use content guaranteed to be XML (via mock or actual asset)
-        labels: ["UnAdaptableTest"],
         test: function(cmp) {
+
+            function StubXMLHttpRequest() {}
+            function noop() {}
+            Object.assign(StubXMLHttpRequest.prototype, {
+                open: noop,
+                setRequestHeader: noop,
+                getResponseHeader: noop,
+                send: function() {
+                    this.readyState = 4;
+                    this.status = 200;
+                    this.responseText = '<?xml version="1.0"?><catalog><book id="bk101"/><book id="bk102"/></catalog>';
+                    this.responseXML = (new DOMParser()).parseFromString(this.responseText,"text/xml");
+                },
+                abort: noop,
+                getAllResponseHeaders: noop,
+                overrideMimeType: noop,
+                readyState: null,
+                status: null,
+                responseText: null,
+                responseXML: null
+            });
+            StubXMLHttpRequest.DONE = XMLHttpRequest.DONE;
+
+            var override = $A.test.overrideFunction(window, "XMLHttpRequest", StubXMLHttpRequest);
             cmp.testResponseXML();
+            $A.test.addCleanup(function() { override.restore(); });
         }
     }
 })

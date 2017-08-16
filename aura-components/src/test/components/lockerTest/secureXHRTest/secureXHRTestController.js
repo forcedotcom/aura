@@ -35,13 +35,18 @@
         testUtils.addWaitFor(true, function() { return cmp.get("v.completed") });
     },
 
-    testResponseXML: function(cmp, event, helper) {
+    testResponseXML: function(cmp, event) {
         var testUtils = cmp.get("v.testUtils");
 
-        helper.testCallback(cmp, function(xhr, testUtils) {
-            xhr.onreadystatechange = helper.createXHRHandler(cmp, testUtils, true);
-        }, true);
+        var client = new XMLHttpRequest();
+        client.open("GET", "https://localhost/document.xml");
+        client.send();
 
-        testUtils.addWaitFor(true, function() { return cmp.get("v.completed") });
+        testUtils.addWaitFor(true, function() {
+          return client.readyState === 4;
+        }, function() {
+            testUtils.assertEquals(200, client.status, "XHR Response should be 200");
+            testUtils.assertStartsWith("[object XMLDocument]", client.responseXML + '', "XHR Response should be XMLDocument");
+        });
     }
 })

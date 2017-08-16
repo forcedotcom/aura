@@ -79,5 +79,25 @@
                     testUtils.assertEquals(true, window.testScript, "Global variable set by loaded script not showing up");
                     testUtils.assertEquals(script, eventThrownTarget, "window.top expected be a SecureIFrameContentWindow");
                 });
+    },
+
+    testScriptURL: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var hack = "function $globalEvalIIFE$() { arguments[0].testScript = true; arguments[0].testHack = window + ''; }";
+
+        var script = document.createElement("script");
+        script.src = "/auraFW/resources/qa/testScript.js"+ "?\n" + hack;
+        document.body.appendChild(script);
+
+        testUtils.addWaitFor(
+            true,
+            function() {
+                return window.testScript;
+            },
+            function(){
+                testUtils.assertUndefined(window.testHack, "JS code was executed via a sourceURL");
+            }
+        );
     }
 })

@@ -34,5 +34,11 @@
         test: function(cmp) {
             cmp.testLoadScript();
         }
+    },
+
+    testScriptURL: {
+        test: function(cmp) {
+            cmp.testScriptURL();
+        }
     }
 })

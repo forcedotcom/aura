@@ -66,8 +66,16 @@
 	              src = 'with(arguments[' + i + ']||{}){' + src + '}';
 	          }
 	          var code = 'function ' + hookFn + '(){' + src + '}';
-	          if (options.sourceURL) {
-	              code += '\n//# sourceURL=' + options.sourceURL;
+
+            // sanitize the URL
+            var sourceURL = options.sourceURL;
+            if (sourceURL) {
+                var a = document.createElement("a");
+                a.href = sourceURL;
+                sourceURL = a.href;
+            }
+	          if (sourceURL) {
+	              code += '\n//# sourceURL=' + sourceURL;
 	          }
 	          return code;
 	      }

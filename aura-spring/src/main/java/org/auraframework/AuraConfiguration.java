@@ -41,6 +41,7 @@ public class AuraConfiguration {
             "Array.prototype.keys",
             "Array.prototype.includes",
             "Array.from",
+            "Array.prototype.@@iterator",
             "CustomEvent",
             "Date.now",
             "Event",

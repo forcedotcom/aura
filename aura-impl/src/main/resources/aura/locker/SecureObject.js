@@ -1691,7 +1691,7 @@ SecureObject.isUnfilteredType = function(raw, key) {
     var namespace = key["namespace"];
     // Special previlege for RTC, TODO:RJ remove it once we have SecureMediaStream
     if ((namespace === "runtime_rtc_spark" || namespace === "runtime_rtc")
-        && $A.lockerService.instanceOf(raw, window["MediaStream"])) {
+        && window["MediaStream"] && $A.lockerService.instanceOf(raw, window["MediaStream"])) {
         return true;
     }
     // Do not filter ArrayBufferView types. https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView

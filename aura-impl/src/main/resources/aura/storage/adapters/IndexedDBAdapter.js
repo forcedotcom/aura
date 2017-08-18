@@ -346,6 +346,24 @@ IndexedDBAdapter.prototype.initializeComplete = function(ready, error) {
     delete this.initializePromiseReject;
 };
 
+/**
+ * Remove customer information from keys (action params). Used prior to logging.
+ * @param {String[]} keys The keys to be cleansed
+ * @private
+ */
+IndexedDBAdapter.prototype.cleanseKeys = function(keys) {
+    var cleansed = [];
+    for (var k = 0; k < keys.length; k++) {
+        var key = keys[k];
+        if (typeof key === 'string') {
+            // strip any json in the keys (action params) as they may
+            // include sensitive information
+            key = key.replace(/{.*}/, 'PARAMS_REMOVED');
+        }
+        cleansed.push(key);
+    }
+    return cleansed;
+};
 
 /**
  * Retrieves items from storage.
@@ -374,8 +392,7 @@ IndexedDBAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
         collected++;
         if (collected === keys.length) {
             transactionTimer.end({
-                "name"      : key,
-                "keys"      : keys,
+                "keys"      : that.cleanseKeys(keys),
                 "collected" : collected
             });
             resolve(results);
@@ -488,7 +505,7 @@ IndexedDBAdapter.prototype.setItems = function(tuples) {
         function collector() {
             collected++;
             if (collected === tuples.length) {
-                transactionTimer.end({'collected':collected, 'storables': storables.length, 'first_key': tuples[0][0]});
+                transactionTimer.end({'collected':collected, 'storables': storables.length, 'first_key': that.cleanseKeys(tuples[0])[0]});
                 // transaction is done so update size then resolve.
                 that.updateSize(sizes/2, sizes/2);
                 resolve();
@@ -537,7 +554,7 @@ IndexedDBAdapter.prototype.removeItems = function(keys) {
         function collector() {
             collected++;
             if (collected === keys.length) {
-                transactionTimer.end({'collected':collected, 'keys': keys});
+                transactionTimer.end({'collected':collected, 'keys': that.cleanseKeys(keys)});
                 // transaction is done so update size then resolve
                 that.updateSize(-sizeAvg, sizeAvg);
                 resolve();

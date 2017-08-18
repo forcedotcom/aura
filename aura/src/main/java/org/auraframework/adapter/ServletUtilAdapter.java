@@ -124,7 +124,7 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * @param sb the string builder to use.
      * @param beforeBootstrap string to put into sb before writing bootstrap.js
      */
-    void writeScriptUrls(AuraContext context, BaseComponentDef def, Map<String, Object> componentAttributes, StringBuilder sb, String beforeBootstrap) throws QuickFixException, IOException;
+    void writeScriptUrls(AuraContext context, BaseComponentDef def, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException;
 
     /**
      * Get bootstrap url.
@@ -275,6 +275,15 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * @return
      */
     List<String> getJsPrefetchUrls(AuraContext context) throws QuickFixException;
+    
+    /**
+     * Get all the urls to include in the Prefetch block of the page.
+     * You would want to prefetch something that you expect COULD be used on this page or another page the user could visit.
+     * 
+     * @param context
+     * @return
+     */
+    List<String> getCssPreloadUrls(AuraContext context) throws QuickFixException;
     
     /**
      * Get all the urls to include as Preloads. 

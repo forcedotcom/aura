@@ -19,6 +19,7 @@ package org.auraframework.impl.adapter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -444,6 +445,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
     
 	@Override
+	public List<String> getCssPreloadUrls(AuraContext context) throws QuickFixException {
+		return Arrays.asList(this.getAppCssUrl(context));
+	}
+    
+	@Override
 	public List<String> getJsPreloadUrls(AuraContext context) throws QuickFixException {
 		final List<String> urls = Lists.newArrayList();
 		if(context.isAppJsSplitEnabled()) {
@@ -458,11 +464,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     @Override
     @Deprecated
     public void writeScriptUrls(AuraContext context, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException {
-            writeScriptUrls(context, null, componentAttributes, sb, null);
+            writeScriptUrls(context, null, componentAttributes, sb);
     }
 
     @Override
-    public void writeScriptUrls(AuraContext context, BaseComponentDef def, Map<String, Object> componentAttributes, StringBuilder sb, String beforeBootstrap) throws QuickFixException, IOException {
+    public void writeScriptUrls(AuraContext context, BaseComponentDef def, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException {
         templateUtil.writeHtmlScripts(context, this.getJsClientLibraryUrls(context), Script.LAZY, sb);
 
         if (cspInliningService.getInlineMode() != InlineScriptMode.UNSUPPORTED && def != null) {
@@ -477,9 +483,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         }
 
         templateUtil.writeHtmlScript(context, this.getAppJsUrl(context, null), Script.SYNC, sb);
-        if (beforeBootstrap != null) {
-            sb.append(beforeBootstrap);
-        }
         templateUtil.writeHtmlScript(context, this.getBootstrapUrl(context, componentAttributes), Script.SYNC, sb);
     }
 
@@ -1081,5 +1084,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     private static final String SAFE_EVAL_HTML_URI = "/lockerservice/safeEval.html";
+
 
 }

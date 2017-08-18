@@ -252,6 +252,13 @@
 
     {!v.bootstrapInlineJs}
 
+    var auraCss = document.getElementsByClassName('auraCss');
+    var current;
+    for (var c=0,length=auraCss.length;c&lt;length;c++) {
+      current = auraCss[c];
+      current.href = current.getAttribute("data-href");
+    }
+
 }());
 
     </script>

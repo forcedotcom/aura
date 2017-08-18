@@ -35,7 +35,35 @@ function InteropComponentDef(config) {
     this.elementName      = this.moduleName;
     this.interopClassName = this.descriptor.getNamespace() + "$" + this.descriptor.getName();
     this.minVersion       = config.minVersion;
+
+    if (typeof this.interopClass === 'function') {
+        this.interopDef = $A.componentService.moduleEngine['getComponentDef'](this.interopClass);
+        this.setupPropAttrMap(this.interopClass['interopMap'], this.interopDef['props']);
+    }
 }
+
+/**
+ * This method cant be initialized @construnction time because we dont have this.interopDef["props"] (window["Engine"]['getComponentDef'](interopClass)) for libraries
+ *
+ * @param interopMap in 'props' contains a mapping in the form 'prop' => 'attr' ( (raptor name) => (aura name) )
+ * @param props
+ */
+InteropComponentDef.prototype.setupPropAttrMap = function (interopMap, props) {
+    var propNames = Object.keys(props);
+    var interopPropOverride = interopMap && $A.util.isObject(interopMap['props']) ? interopMap['props'] : {};
+    var propName, attrName;
+
+    this.attrNameToPropMap = {};
+    this.propNameToAttrMap = {};
+
+    for (var i = 0; i < propNames.length; i++) {
+        propName = propNames[i];
+        attrName = interopPropOverride[propName] || propName;
+
+        this.attrNameToPropMap[attrName] = propName;
+        this.propNameToAttrMap[propName] = attrName;
+    }
+};
 
 InteropComponentDef.prototype.hasInit = function() {
    

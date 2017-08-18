@@ -1,0 +1,5 @@
+<aura:component>
+    <aura:attribute name="style" type="String" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    <moduleTest:mappedAttrTests aura:id="simple" style="{!v.style}" message="{!v.message}" />
+</aura:component>

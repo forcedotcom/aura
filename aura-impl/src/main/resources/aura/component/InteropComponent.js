@@ -26,8 +26,8 @@ function InteropComponent(config) {
     this.containerComponentId = config["containerComponentId"];
     this.componentDef = cmpDef;
     this.interopClass = cmpDef.interopClass;
-    this.interopDef = $A.componentService.moduleEngine['getComponentDef'](cmpDef.interopClass);
-    
+    this.interopDef = cmpDef.interopDef;
+
     this.rendered = false;
     this.inUnrender = false;
     this.shouldAutoDestroy = true;
@@ -37,6 +37,9 @@ function InteropComponent(config) {
     this.attributeValueProvider = config['attributes']['valueProvider'];
     this.owner = $A.clientService.currentAccess;
     this.currentClassMap = {};
+
+    this.attrNameToPropMap = this.componentDef.attrNameToPropMap;
+    this.propNameToAttrMap = this.componentDef.propNameToAttrMap;
 
     this.setupGlobalId(config['globalId']);
 
@@ -48,13 +51,11 @@ function InteropComponent(config) {
 
     this.attributes = this.setupAttributes(config['attributes']);
     this.setupMethods();
-    
 }
 
 // Prototype chain (instanceOf)
 InteropComponent.prototype = Object.create(Component.prototype);
 InteropComponent.prototype.constructor = InteropComponent;
-
 
 InteropComponent.prototype.bridgeAction = function (prv, isEvent) {
     var component = this;
@@ -120,22 +121,23 @@ InteropComponent.prototype.setupAttributes = function(config) {
                 } else {
                     valueConfig.addChangeHandler(this, attribute, changeHandlerPRVFactory(this, attribute));
                 }
-            // FCV attribute
+                // FCV attribute
             } else {
                 valueConfig.addChangeHandler(this, attribute, changeHandlerFCV.bind(self, attribute, valueConfig));
             }
         }
 
 
-        // Check is attribute is in the definition or is an HTML Global attribute then
+        // Check if attribute is in the definition, its mapped or is an HTML Global attribute then
         // assign it as an attribute
-        var isAttrInDefinition =  attribute in this.interopDef["props"];
+        var isAttrInDefinition = this.attrNameToPropMap[attribute] in this.interopDef["props"];
+
         var assertionMessage = '"' + attribute  + '" must either be a public property of ' + this.getName() + ' or a global HTML attribute';
 
         $A.assert(isEvent || isAttrInDefinition || this.isHtmlGlobalAttr(attribute), assertionMessage);
         attributes[attribute] = valueConfig;
     }
-    
+
     return attributes;
 };
 
@@ -193,11 +195,13 @@ InteropComponent.prototype.setupMethods = function () {
 InteropComponent.prototype.attributeChange = function (key, value) {
     if (this.rendered) {
         var element = this.getElement();
+        var propName = this.attrNameToPropMap[key];
 
-        if (this.isHtmlGlobalAttr(key)) {
+        // we should first ask about propName, usually we have aura versions using a global attr, like style.
+        if (!propName && this.isHtmlGlobalAttr(key)) {
             this.setGlobalAttribute(element, key, value);
         } else {
-            element[key] =  value;
+            element[propName] =  value;
         }
     }
 };
@@ -254,7 +258,7 @@ InteropComponent.prototype.getMapFromClassName = function (className) {
 InteropComponent.prototype.updateClassAttribute = function (element, value) {
     var currentClassMap = this.currentClassMap;
     $A.assert(currentClassMap !== null && (typeof currentClassMap === 'object'), 'Current Class Map must be an object.');
-    
+
     var classMap = this.getMapFromClassName(value);
 
     Object.keys(currentClassMap).forEach(function (className) {
@@ -352,14 +356,15 @@ InteropComponent.prototype.attachOnChangeToElement = function (element) {
     function handleInteropChange(event) {
         var detail = event.detail;
         if (detail && event.target === element) {
-            Object.keys(detail).forEach(function (attrName) {
+            Object.keys(detail).forEach(function (propName) {
+                var attrName = self.propNameToAttrMap[propName];
                 if (self.attributes[attrName]) {
-                    self.set('v.' + attrName, detail[attrName]);
+                    self.set('v.' + attrName, detail[propName]);
                 }
             });
         }
     }
-    
+
     element.addEventListener('change', handleInteropChange);
 };
 
@@ -376,14 +381,15 @@ InteropComponent.prototype.render = function () {
 
     Object.keys(this.attributes).forEach(function (attrName) {
         var value = cmp.get('v.' + attrName);
+        var propName = this.attrNameToPropMap[attrName];
 
         if (attrName.indexOf('on') === 0) {
             element.addEventListener(attrName.substring(2), value, false);
-        } else if (this.isHtmlGlobalAttr(attrName)) {
+        } else if (!propName && this.isHtmlGlobalAttr(attrName)) { // first check we are not overriding this attrName
             this.setGlobalAttribute(element, attrName, value);
         } else {
             if (value !== undefined) {
-                element[attrName] = value;
+                element[propName] = value;
             }
         }
     }.bind(this));
@@ -466,7 +472,7 @@ InteropComponent.prototype.findInstanceOf = function(){
 };
 
 /**
- * 
+ *
  * @private
  */
 InteropComponent.prototype.getSuperest = function(){

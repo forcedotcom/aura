@@ -189,6 +189,22 @@
         this.lib.panelLibCore.hide(cmp, config);
     },
 
+    _setMaskOpacity: function(mask, value, delay) {
+        var setOpacity = function (target, opacity) {
+            if (target && target.style) {
+                target.style.opacity = opacity;
+            } 
+        };
+
+        if (delay > 0) {
+            setTimeout(function() {
+                setOpacity(mask, value);
+            }, delay);
+        } else {
+            setOpacity(mask, value);
+        }
+    },
+
     mask: function(cmp) {
         var useTransition = $A.util.getBooleanValue(cmp.get('v.useTransition'));
         var mask = this._findContainedComponent(cmp, 'modal-glass').getElement();
@@ -200,32 +216,26 @@
             document.body.style.overflow = 'hidden';
         }
 
-        var toAdd = ['fadein', $A.getToken('uiModal.backdropOpen')];
-        $A.util.swapClass(mask, 'hidden', toAdd);
+        $A.util.swapClass(mask, 'hidden', ['fadein', $A.getToken('uiModal.backdropOpen')]);
+        
+        this._setMaskOpacity(mask,
+                            useTransition ? 0.8 : 1, 
+                            useTransition ? 10 : 0);
+    },
 
-        if(useTransition) {
-            setTimeout(function() {
-                mask.style.opacity = 0.8;
-            },10);
-        } else {
-            mask.style.opacity = 1;
-        }
-    },
-    scopeScrollables: function (cmp) {
-        this.lib.panelLibCore.scopeScrollables(cmp);
-    },
-    
     unmask: function(cmp, useTransition, panel) {
         var mask = this._findContainedComponent(cmp, 'modal-glass').getElement();
         
         if(useTransition) {
             panel.style.opacity = '0';
-            setTimeout(function() {
-                 mask.style.opacity = '0';
-            }, 50);
+            this._setMaskOpacity(mask, 0, 50);            
         }
         
         this.unsetOverflow(cmp);
+    },    
+
+    scopeScrollables: function (cmp) {
+        this.lib.panelLibCore.scopeScrollables(cmp);
     },
     
     unsetOverflow: function() {

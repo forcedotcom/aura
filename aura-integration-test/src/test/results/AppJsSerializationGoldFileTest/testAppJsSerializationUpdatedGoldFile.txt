@@ -13,7 +13,7 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
       return null
     }
     var overflow = computedStyle["overflow-y"];
-    if(overflow === "auto") {
+    if(overflow === "auto" || overflow === "scroll") {
       return elem
     }
     return getScrollableParent(elem.parentNode)

@@ -18,7 +18,6 @@ function lib() { //eslint-disable-line no-unused-vars
 	'use strict';
 
 	function getScrollableParent(elem, stopEl) {
-
         // document.body is not necessarily a body tag, because of the (very rare) 
         // case of a frameset. 
         if(!elem || elem === stopEl || elem === document.body) {
@@ -42,11 +41,9 @@ function lib() { //eslint-disable-line no-unused-vars
 
         var overflow = computedStyle['overflow-y'];
 
-        //
-        if(overflow === 'auto') {
+        if(overflow === 'auto' || overflow === 'scroll') {
             return elem;
         }
-
 
         return getScrollableParent(elem.parentNode);
 	}

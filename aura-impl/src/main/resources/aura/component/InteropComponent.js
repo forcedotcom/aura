@@ -57,16 +57,16 @@ function InteropComponent(config) {
 InteropComponent.prototype = Object.create(Component.prototype);
 InteropComponent.prototype.constructor = InteropComponent;
 
-InteropComponent.prototype.bridgeAction = function (prv, isEvent) {
+InteropComponent.prototype.bridgeAction = function (prv, isEvent, hasNativeAPIExposed) {
     var component = this;
 
     return $A.getCallback(function callbackBridge(params) {
         var action = prv.evaluate();
-        var event = new Aura.Event.Event({ 'component' : component , 'sourceEvent': isEvent && params });
-
-        event.params = isEvent
-            ? params['detail'] || {}
-            : params;
+        var event = new Aura.Event.InteropEvent(component, {
+            'isEvent': isEvent,
+            'params': params,
+            'exposeNativeAPI': !!hasNativeAPIExposed
+        });
 
         $A.run(function () {
             action.runDeprecated(event);
@@ -74,6 +74,14 @@ InteropComponent.prototype.bridgeAction = function (prv, isEvent) {
     });
 
 };
+
+InteropComponent.prototype.hasNativeAPIExposed = function (eventName) {
+    var interopMap = this.interopClass['interopMap'];
+    var exposeNativeAPI = interopMap && interopMap['exposeNativeEvent'];
+
+    return exposeNativeAPI && exposeNativeAPI[eventName];
+};
+
 
 InteropComponent.prototype.setupAttributes = function(config) {
     var configValues = config && config['values'] || {};
@@ -116,8 +124,12 @@ InteropComponent.prototype.setupAttributes = function(config) {
                 if (provider === 'v') {
                     valueConfig.addChangeHandler(this, attribute, changeHandlerPRVFactory(this));
                 } else if (provider === 'c') {
-                    isEvent = value['descriptor'].indexOf('on') === 0;
-                    valueConfig = this.bridgeAction(valueConfig, isEvent);
+                    var definedAttribute = !!this.interopDef["props"][value['descriptor']];
+                    var startsWithOn = value['descriptor'].indexOf('on') === 0;
+                    $A.assert(definedAttribute || startsWithOn, 'Attribute not defined in the component');
+                    isEvent = !definedAttribute;
+                    var hasNativeAPIExposed = startsWithOn && this.hasNativeAPIExposed(value['descriptor'].substr(2));
+                    valueConfig = this.bridgeAction(valueConfig, isEvent, hasNativeAPIExposed);
                 } else {
                     valueConfig.addChangeHandler(this, attribute, changeHandlerPRVFactory(this, attribute));
                 }
@@ -127,10 +139,8 @@ InteropComponent.prototype.setupAttributes = function(config) {
             }
         }
 
-
-        // Check if attribute is in the definition, its mapped or is an HTML Global attribute then
-        // assign it as an attribute
-        var isAttrInDefinition = this.attrNameToPropMap[attribute] in this.interopDef["props"];
+        // The mapping will have all public properties
+        var isAttrInDefinition = !!this.attrNameToPropMap[attribute];
 
         var assertionMessage = '"' + attribute  + '" must either be a public property of ' + this.getName() + ' or a global HTML attribute';
 
@@ -383,7 +393,7 @@ InteropComponent.prototype.render = function () {
         var value = cmp.get('v.' + attrName);
         var propName = this.attrNameToPropMap[attrName];
 
-        if (attrName.indexOf('on') === 0) {
+        if (attrName.indexOf('on') === 0 && !propName) {
             element.addEventListener(attrName.substring(2), value, false);
         } else if (!propName && this.isHtmlGlobalAttr(attrName)) { // first check we are not overriding this attrName
             this.setGlobalAttribute(element, attrName, value);

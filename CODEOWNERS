@@ -1,0 +1,40 @@
+# Lines starting with '#' are comments.
+# Each line is a file pattern followed by one or more owners.
+# Documentation on codeowners format
+# https://help.github.com/articles/about-codeowners/
+
+# Order is important. The last matching pattern has the most precedence.
+# So if a pull request only touches javascript files, only these owners
+# will be requested to review.
+
+# Framework
+# Listing these all out vs just doing the whole directory so Im not a reviewer for locker
+aura-impl/src/main/resources/aura/*              @kgray
+aura-impl/src/main/resources/aura/attribute/     @kgray
+aura-impl/src/main/resources/aura/component/     @kgray
+aura-impl/src/main/resources/aura/context/       @kgray
+aura-impl/src/main/resources/aura/controller/    @kgray
+aura-impl/src/main/resources/aura/error/         @kgray @yungcheng-chen
+aura-impl/src/main/resources/aura/event/         @kgray
+aura-impl/src/main/resources/aura/flavors/       @kgray
+aura-impl/src/main/resources/aura/l10n/          @kgray
+aura-impl/src/main/resources/aura/library/       @kgray
+aura-impl/src/main/resources/aura/method/        @kgray
+aura-impl/src/main/resources/aura/metrics/       @kgray @mrafique
+aura-impl/src/main/resources/aura/model/         @kgray
+aura-impl/src/main/resources/aura/provider/      @kgray
+aura-impl/src/main/resources/aura/requiredVersion/     @kgray
+aura-impl/src/main/resources/aura/storage/       @kgray
+aura-impl/src/main/resources/aura/style/         @kgray
+aura-impl/src/main/resources/aura/system/        @kgray
+aura-impl/src/main/resources/aura/test/          @kgray
+aura-impl/src/main/resources/aura/type/          @kgray
+aura-impl/src/main/resources/aura/util/          @kgray
+aura-impl/src/main/resources/aura/value/         @kgray
+
+# Modules
+aura-impl/src/main/resources/aura/modules/       @dval
+aura-impl/src/main/resources/aura/polyfill/      @dval
+
+# Locker Service
+aura-impl/src/main/resources/aura/locker/        @jparadis @ravi-jayaramappa

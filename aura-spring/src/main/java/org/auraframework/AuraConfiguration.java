@@ -56,7 +56,8 @@ public class AuraConfiguration {
             "WeakSet",
             "Symbol",
             "compat.classList",
-            "compat.freeze"
+            "compat.freeze",
+            "Set"
     );
 
     @Primary

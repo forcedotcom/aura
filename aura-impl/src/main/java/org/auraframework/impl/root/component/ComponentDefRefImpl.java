@@ -144,10 +144,7 @@ public class ComponentDefRefImpl extends DefinitionReferenceImpl<ComponentDef> i
             ComponentDef def = descriptor.getDef();
 
             json.writeMapBegin();
-            json.writeMapKey("componentDef");
-        	json.writeMapBegin();
-        	json.writeMapEntry("descriptor", def.getDescriptor());
-        	json.writeMapEnd();
+            json.writeMapEntry("componentDef", def);
             json.writeMapEntry("localId", localId);
 
             if (load != Load.DEFAULT) {

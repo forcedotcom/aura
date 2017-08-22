@@ -1,6 +1,91 @@
 {
   "componentDef":{
-    "descriptor":"markup://test:text"
+    "xs":"I",
+    "descriptor":"markup://test:text",
+    "ad":[
+      ["body","aura://Aura.Component[]","G",false,[]],
+      ["value","aura://String","I",false]
+    ],
+    "fa":[
+      {
+        "descriptor":"body",
+        "value":[
+          {
+            "componentDef":{
+              "descriptor":"markup://aura:text"
+            },
+            "attributes":{
+              "values":{
+                "value":{
+                  "descriptor":"value",
+                  "value":"\n    First Text\n    "
+                }
+              }
+            }
+          },
+          {
+            "componentDef":{
+              "descriptor":"markup://test:parent"
+            }
+          },
+          {
+            "componentDef":{
+              "descriptor":"markup://aura:text"
+            },
+            "attributes":{
+              "values":{
+                "value":{
+                  "descriptor":"value",
+                  "value":"\n        Second Text\n\n        Third Text\n    "
+                }
+              }
+            }
+          },
+          {
+            "componentDef":{
+              "descriptor":"markup://test:parent"
+            },
+            "attributes":{
+              "values":{
+                "body":{
+                  "descriptor":"body",
+                  "value":[
+                    {
+                      "componentDef":{
+                        "descriptor":"markup://aura:text"
+                      },
+                      "attributes":{
+                        "values":{
+                          "value":{
+                            "descriptor":"value",
+                            "value":"\n        yo\n    "
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "componentDef":{
+              "descriptor":"markup://aura:text"
+            },
+            "attributes":{
+              "values":{
+                "value":{
+                  "descriptor":"value",
+                  "value":"\n    Fourth Text\n"
+                }
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "hs":true,
+    "cc":"$A.componentService.addComponentClass(\"markup://test:text\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"test$text\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\n});\n"
   },
   "attributes":{
     "values":{
@@ -9,7 +94,92 @@
         "value":[
           {
             "componentDef":{
-              "descriptor":"markup://test:text"
+              "xs":"I",
+              "descriptor":"markup://test:text",
+              "ad":[
+                ["body","aura://Aura.Component[]","G",false,[]],
+                ["value","aura://String","I",false]
+              ],
+              "fa":[
+                {
+                  "descriptor":"body",
+                  "value":[
+                    {
+                      "componentDef":{
+                        "descriptor":"markup://aura:text"
+                      },
+                      "attributes":{
+                        "values":{
+                          "value":{
+                            "descriptor":"value",
+                            "value":"\n    First Text\n    "
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "componentDef":{
+                        "descriptor":"markup://test:parent"
+                      }
+                    },
+                    {
+                      "componentDef":{
+                        "descriptor":"markup://aura:text"
+                      },
+                      "attributes":{
+                        "values":{
+                          "value":{
+                            "descriptor":"value",
+                            "value":"\n        Second Text\n\n        Third Text\n    "
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "componentDef":{
+                        "descriptor":"markup://test:parent"
+                      },
+                      "attributes":{
+                        "values":{
+                          "body":{
+                            "descriptor":"body",
+                            "value":[
+                              {
+                                "componentDef":{
+                                  "descriptor":"markup://aura:text"
+                                },
+                                "attributes":{
+                                  "values":{
+                                    "value":{
+                                      "descriptor":"value",
+                                      "value":"\n        yo\n    "
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "componentDef":{
+                        "descriptor":"markup://aura:text"
+                      },
+                      "attributes":{
+                        "values":{
+                          "value":{
+                            "descriptor":"value",
+                            "value":"\n    Fourth Text\n"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ],
+              "hs":true,
+              "cc":"$A.componentService.addComponentClass(\"markup://test:text\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"test$text\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\n});\n"
             }
           }
         ]

@@ -88,7 +88,6 @@
     },
 
     testArbitrarySchemes: {
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testArbitrarySchemes();
         }

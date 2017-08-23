@@ -56,7 +56,7 @@ script:
 # container, the commands in the script: section will be executed. No Zen-specific content
 # can be added.
 build:
-  image: ops0-artifactrepo1-0-prd.data.sfdc.net/dci/centos-aura-tools:aura0.6000@sha256:202bf39687fcee3f9175cd4741025b5af62c30396e7dc0a3d01e97d6b0ec9247
+  image: ops0-artifactrepo1-0-prd.data.sfdc.net/aura/aura-build-base:cb4cd61@sha256:3a18286179f891c59f3031199d057cfe71ffb25f14740d3c3649a9b8455c5e15
   auth_config:
     username: $$DOCKER_USERNAME
     password: $$DOCKER_PASSWORD
@@ -65,12 +65,12 @@ build:
     MAVEN_ARGS: $$MAVEN_ARGS
     LOCAL_DEPLOY_DIR: $$LOCAL_DEPLOY_DIR
   extra_hosts:
-    - external-tools
+    - external-deps
   commands:
     - ./.zenbuild.sh
 compose:
-  external-tools:
-    image: ops0-artifactrepo1-0-prd.data.sfdc.net/dci/alpine-aura-tools-external:0.6000@sha256:60374665ad5f5fa36f17aa80902d6649a7122daed2c0c29dbb477b036a809410
+  external-deps:
+    image: ops0-artifactrepo1-0-prd.data.sfdc.net/aura/aura-build-external-deps:bd6ddb0@sha256:d024d12df6b15324e647cff3c3939082307289bd36f6297085f683c9cdd66871
     auth_config:
       username: $$DOCKER_USERNAME
       password: $$DOCKER_PASSWORD

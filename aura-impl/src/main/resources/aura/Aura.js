@@ -175,7 +175,6 @@ function noop() {}
 // -- Event --------------------------------------------------------------
 // #include aura.event.EventDef
 // #include aura.event.Event
-// #include aura.event.InteropEvent
 
 // -- Controller ---------------------------------------------------------
 // #include aura.controller.ActionDef

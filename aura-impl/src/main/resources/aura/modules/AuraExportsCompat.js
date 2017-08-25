@@ -88,6 +88,17 @@ Aura.ExportsModule = {
         } finally {
             $A.clientService.releaseCurrentAccess();
         }
+    },
+    "logInteraction": function (target, scope, context, eventSource) {
+        $A.metricsService.transaction("ltng", "interaction", { "context": {
+            "eventSource" : eventSource || "click",
+            "eventType"   : "user",
+            "locator"     : {
+                    "target"  : target,
+                    "scope"   : scope,
+                    "context" : context
+            }
+        }});
     }
 };
 

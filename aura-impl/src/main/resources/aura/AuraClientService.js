@@ -743,7 +743,24 @@ AuraClientService.prototype.loadClientLibrary = function(name, callback) {
     }
 
     lib.script.onload = afterLoad;
-    lib.script.onerror = afterLoad;
+    // this only gets called when script fails to be loaded.
+    // errors during script execution are handled by global error handler.
+    lib.script.onerror = function(event) {
+        var message = "Failed to load client library: " + lib.script.getAttribute("data-src");
+        if (event && event.message) {
+            message += ". Caused by: " + event.message;
+        }
+
+        var error = new $A.auraError(message, event && event.error);
+        // stacktrace id is 0 if there's no component
+        error.setComponent(name);
+
+        // warning and report the error
+        $A.warning(message, error);
+        $A.logger.reportError(error);
+
+        afterLoad(error);
+    };
 
     $A.metricsService.transactionStart("aura", "performance:loadClientLibrary", {
             "context": {

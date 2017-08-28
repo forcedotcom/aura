@@ -135,7 +135,7 @@ Logger.prototype.error = function(msg, e){
  * @param {boolean} [foreground] don't set the report action as a caboose, should only be used for catastrophic failures where no futher actions will be called.
  * @private
  */
-Logger.prototype.reportError = function(e, action, foreground){
+Logger.prototype.reportError = function(e, action, foreground) {
     if (!e || e["reported"]) {
         return;
     }
@@ -172,7 +172,7 @@ Logger.prototype.reportError = function(e, action, foreground){
         "clientError": e.toString(),
         // Note that stack is non-standard, and even if present, may be obfuscated
         // Also we only take the first 25k characters because stacks can get very large
-        // and our parser on the server will gack on more than a million characters 
+        // and our parser on the server will gack on more than a million characters
         // for the entire json package.
         "clientStack": (e.stackTrace || e.stack || "").toString().substr(0, Aura.Utils.Logger.MAX_STACKTRACE_SIZE),
         "componentStack": e["componentStack"] || "",
@@ -207,6 +207,8 @@ Logger.prototype.isExternalError = function(e) {
             fileName.match("engine.min.js") === null &&      // not from module engine PROD
             fileName.indexOf('/components/') === -1 &&       // not from components
             fileName.indexOf('/libraries/') === -1 &&        // not from libraries
+            fileName.indexOf('/jslibrary/') === -1 &&        // not from client libraries
+            fileName.indexOf('/auraFW/resources/') === -1 && // not from client libraries
             fileName.match("appcore.js") === null &&         // not from appcore.js
             fileName.match("app.js") === null) {             // not from app.js
             count += 1;

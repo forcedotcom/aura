@@ -12268,6 +12268,16 @@ return {
     }
   },
   "helper":{
+    "allowedSchemes":[
+      "http",
+      "https",
+      "ftp",
+      "mailto"
+    ],
+    "allowedSchemesByTag":{
+
+    },
+    "allowProtocolRelative":true,
     "getImageElement":function(cmp) {
         var imageElement = cmp.find("body").getElement().firstChild;
 
@@ -12291,7 +12301,8 @@ return {
 
             var href = cmp.get("v.href");
 
-            if (!$A.util.isEmpty(href)) {
+            
+            if (!$A.util.isEmpty(href) && !this.isNaughtyHref('a', href)) {
                 var link = $A.util.createHtmlElement("a", {
                     "href": href,
                     "class": cmp.get("v.linkClass"),
@@ -12300,6 +12311,7 @@ return {
 
                 link.appendChild(image);
                 bodyElement.appendChild(link);
+            
             } else {
                 bodyElement.appendChild(image);
             }
@@ -12307,9 +12319,16 @@ return {
 
     },
     "buildImageElement":function(cmp) {
+        var imgSrc = cmp.get("v.src");
+        
+        
+        if (this.isNaughtyHref('img', imgSrc)) {
+            imgSrc = '/auraFW/resources/aura/s.gif';
+        }
+
         var image = $A.util.createHtmlElement("img", {
             "data-aura-rendered-by": cmp.getGlobalId(),
-            "src": cmp.get("v.src"),
+            "src": imgSrc,
             "class": cmp.get("v.class"),
             "alt": cmp.get("v.alt"),
             "title": cmp.get("v.title")
@@ -12328,6 +12347,42 @@ return {
         });
 
         return image;
+    },
+    "has":function(obj, key) {
+        return Object.prototype.hasOwnProperty.call(obj, key);
+    },
+    "isNaughtyHref":function(name, href) {
+        
+        
+        
+        
+
+        href = href.replace(new RegExp('[\x00-\x20]+', 'g'), '');
+        
+
+        
+        
+        
+        href = href.replace(new RegExp('<\!\-\-.*?\-\-\>', 'g'), '');
+        
+        var matches = href.match(new RegExp('^([a-zA-Z]+)\:'));
+        
+        if (!matches) {
+            
+            if (href.match(new RegExp('^\/\/'))) {
+                return !this.allowProtocolRelative;
+            }
+
+            
+            return false;
+        }
+        var scheme = matches[1].toLowerCase();
+
+        if (this.has(this.allowedSchemesByTag, name)) {
+            return this.allowedSchemesByTag[name].indexOf(scheme) === -1;
+        }
+
+        return !this.allowedSchemes || this.allowedSchemes.indexOf(scheme) === -1;
     }
   },
   "renderer":{

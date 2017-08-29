@@ -1,5 +1,3 @@
-package org.auraframework.test.perf.util;
-
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
@@ -15,31 +13,7 @@ package org.auraframework.test.perf.util;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.integration.test.util.WebDriverTestCase;
-import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.perf.PerfWebDriverUtil;
-import org.auraframework.test.util.WebDriverUtil.BrowserType;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraFiles;
-import org.auraframework.util.json.JsonEncoder;
-import org.auraframework.util.test.annotation.PerfCmpTest;
-import org.auraframework.util.test.perf.metrics.PerfMetrics;
-import org.auraframework.util.test.perf.metrics.PerfRunsCollector;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.WebDriverWait;
+package org.auraframework.test.perf.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +29,32 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.perf.PerfWebDriverUtil;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.util.test.annotation.PerfCmpTest;
+import org.auraframework.util.test.perf.metrics.PerfMetrics;
+import org.auraframework.util.test.perf.metrics.PerfRunsCollector;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
 
 @PerfCmpTest
 @TargetBrowsers({ BrowserType.GOOGLECHROME })
@@ -121,7 +121,7 @@ public class PerfExecutorTestCase extends WebDriverTestCase {
             if(fileName.contains("/core/")){
                 componentsDir = moduleDir.toString();
             } else {
-                componentsDir =  AuraFiles.Core.getPath() + "/aura-components/src/test/components";
+                componentsDir =  AuraUtil.getAuraHome() + "/aura-components/src/test/components";
             }
         } catch (QuickFixException e1) {
             // TODO Auto-generated catch block

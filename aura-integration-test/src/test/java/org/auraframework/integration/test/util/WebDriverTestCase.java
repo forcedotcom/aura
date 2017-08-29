@@ -40,7 +40,7 @@ import org.auraframework.test.util.WebDriverProvider;
 import org.auraframework.test.util.WebDriverUtil;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.throwable.AuraExceptionUtil;
-import org.auraframework.util.AuraUtil;
+import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.annotation.FreshBrowserInstance;
 import org.auraframework.util.test.annotation.WebDriverTest;
 import org.auraframework.util.test.perf.PerfUtil;
@@ -812,7 +812,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     public WebDriver getDriver() {
         if (currentDriver == null) {
-            WebDriverProvider provider = AuraUtil.get(WebDriverProvider.class);
+            WebDriverProvider provider = ServiceLocator.get().get(WebDriverProvider.class);
             DesiredCapabilities capabilities;
             if (SauceUtil.areTestsRunningOnSauce()) {
                 capabilities = SauceUtil.getCapabilities(currentBrowserType, this);

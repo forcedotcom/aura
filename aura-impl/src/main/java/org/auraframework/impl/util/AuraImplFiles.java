@@ -17,7 +17,6 @@ package org.auraframework.impl.util;
 
 import java.io.File;
 
-import org.auraframework.util.AuraFiles;
 import org.auraframework.util.AuraTextUtil;
 
 /**
@@ -28,7 +27,7 @@ public enum AuraImplFiles {
     /**
      * Aura-Impl Module Root dir
      */
-    AuraImplModuleDirectory(AuraFiles.Core.getPath(), "aura-impl"),
+    AuraImplModuleDirectory(AuraUtil.getAuraHome(), "aura-impl"),
     /**
      * Aura-Impl-Test Module Root dir
      */
@@ -41,7 +40,7 @@ public enum AuraImplFiles {
     /**
      * aura-resources Module Root dir
      */
-    AuraResourcesModuleDirectory(AuraFiles.Core.getPath(), "aura-resources"),
+    AuraResourcesModuleDirectory(AuraUtil.getAuraHome(), "aura-resources"),
 
     AuraResourcesSrcGenDirectory(AuraResourcesModuleDirectory.getPath(), "target", "src-gen", "main",
             "resources", "aura"),

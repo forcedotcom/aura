@@ -17,7 +17,7 @@ package org.auraframework.modules.impl.source;
 
 import java.io.File;
 
-import org.auraframework.util.AuraFiles;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.util.AuraTextUtil;
 
 /**
@@ -25,7 +25,7 @@ import org.auraframework.util.AuraTextUtil;
  */
 public enum AuraModulesFiles {
 
-    MODULES_MODULE_DIR(AuraFiles.Core.getPath(), "aura-modules"),
+    MODULES_MODULE_DIR(AuraUtil.getAuraHome(), "aura-modules"),
 
     MODULES_DIR(MODULES_MODULE_DIR.getPath(), "src", "main", "modules"),
     

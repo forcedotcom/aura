@@ -32,7 +32,7 @@ import junit.framework.TestCase;
 import junit.framework.TestResult;
 
 import org.auraframework.test.util.WebDriverProvider;
-import org.auraframework.util.AuraUtil;
+import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.springframework.test.context.TestContextManager;
 
@@ -80,7 +80,7 @@ public class TestExecutor {
      * tasks may submit while we are running cleanup code.
      */
     private synchronized void onExecutorEmpty() {
-        WebDriverProvider provider = AuraUtil.get(WebDriverProvider.class);
+        WebDriverProvider provider = ServiceLocator.get().get(WebDriverProvider.class);
         if (provider != null) {
             provider.release();
         }

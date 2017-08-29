@@ -19,11 +19,12 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
-import org.auraframework.util.AuraFiles;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.util.FileMonitor;
 import org.junit.Test;
 
 import javax.inject.Inject;
+
 import java.io.File;
 import java.util.Set;
 
@@ -41,7 +42,7 @@ public final class ValidationFileSourceLoaderTest extends AuraValidationTestCase
         if (skipTestIfNotRunningWithAuraSource()) {
             return;
         }
-        String basepath = AuraFiles.Core.getPath() + "/aura-components/";
+        String basepath = AuraUtil.getAuraHome() + "/aura-components/";
         String main_components = basepath+"src/main/components/";
         String test_components = basepath+"src/test/components/";
 

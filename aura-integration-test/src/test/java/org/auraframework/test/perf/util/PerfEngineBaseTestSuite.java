@@ -22,21 +22,21 @@ import java.util.logging.Logger;
 
 import javax.inject.Inject;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.auraframework.AuraDeprecated;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.util.AuraFiles;
 import org.auraframework.util.test.annotation.PerfTestSuite;
 import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
 
 import com.google.common.collect.ImmutableList;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 @PerfTestSuite
 public abstract class PerfEngineBaseTestSuite extends TestSuite implements PerfTestFramework {
@@ -124,7 +124,7 @@ public abstract class PerfEngineBaseTestSuite extends TestSuite implements PerfT
     }
     
     private String resolveGoldFilePath(PerfExecutorTestCase test) {
-        String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/";
+        String path = AuraUtil.getAuraHome() + "/aura-components/src/test/components/";
         String componentPath = test.getComponentDef().getNamespace() + "/" + test.getComponentDef().getName();
         String fullPath = path + componentPath;
         return fullPath;

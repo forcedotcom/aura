@@ -15,26 +15,26 @@
  */
 package org.auraframework.integration.test.validation;
 
-import com.google.common.base.Charsets;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
-import org.auraframework.util.AuraFiles;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.validation.ValidationError;
 import org.auraframework.util.validation.ValidationTestUtil;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.List;
+import com.google.common.base.Charsets;
 
 /**
  * Testing validation tool functionality. UnAdaptableTest because requires source to check present in file system.
@@ -58,7 +58,7 @@ public final class AuraValidationServletHttpTest extends AuraHttpTestCase {
 
     @Test
     public void testServlet() throws Exception {
-        String path = AuraFiles.Core.getPath() + "/aura-components/src/test/negativeComponents/validationTest/basic";
+        String path = AuraUtil.getAuraHome() + "/aura-components/src/test/negativeComponents/validationTest/basic";
         assertTrue(path, new File(path).exists());
         method = obtainGetMethod("/qa/auraValidation?path=" + path);
         HttpResponse response = perform(method);
@@ -79,7 +79,7 @@ public final class AuraValidationServletHttpTest extends AuraHttpTestCase {
      */
     @Test
     public void testServletStandalone() throws Exception {
-        String path = AuraFiles.Core.getPath() + "/aura-components/src/test/negativeComponents/validationTest/basic";
+        String path = AuraUtil.getAuraHome() + "/aura-components/src/test/negativeComponents/validationTest/basic";
         assertTrue(path, new File(path).exists());
         String url = getTestServletConfig().getBaseUrl().toURI().resolve("/qa/auraValidation?path=" + path).toString();
 

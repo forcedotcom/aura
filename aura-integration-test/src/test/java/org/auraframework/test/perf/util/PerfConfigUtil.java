@@ -15,21 +15,6 @@
  */
 package org.auraframework.test.perf.util;
 
-import com.google.gson.Gson;
-
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.service.ContextService;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.util.AuraFiles;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -43,6 +28,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
+
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
+
+import com.google.gson.Gson;
 
 @ServiceComponent
 public final class PerfConfigUtil {
@@ -115,7 +115,7 @@ public final class PerfConfigUtil {
             if(fileName.contains("/core/")){
                 componentsDir = moduleDir.toString();
             } else {
-                componentsDir =  AuraFiles.Core.getPath() + "/aura-components/src/test/components";
+                componentsDir =  AuraUtil.getAuraHome() + "/aura-components/src/test/components";
             }
         } catch (Exception e) {
         	LOG.log(Level.WARNING, "Error finding component dir path for component: " + def.getNamespace() + "/" + def.getName());

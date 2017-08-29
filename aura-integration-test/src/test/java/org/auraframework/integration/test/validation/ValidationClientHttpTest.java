@@ -15,20 +15,20 @@
  */
 package org.auraframework.integration.test.validation;
 
-import com.google.common.collect.Lists;
-
-import org.auraframework.integration.test.util.AuraHttpTestCase;
-import org.auraframework.util.AuraFiles;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
-import org.auraframework.util.validation.ValidationClient;
-import org.auraframework.util.validation.ValidationTestUtil;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
+
+import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.validation.ValidationClient;
+import org.auraframework.util.validation.ValidationTestUtil;
+import org.junit.Test;
+
+import com.google.common.collect.Lists;
 
 /**
  * Testing validation tool functionality. UnAdaptableTest because requires source to check present in file system.
@@ -42,13 +42,13 @@ public final class ValidationClientHttpTest extends AuraHttpTestCase {
     @Test
     public void testCanRunStandalone() throws Exception {
         URL url = getTestServletConfig().getBaseUrl();
-        String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/validationTest/basic";
+        String path = AuraUtil.getAuraHome() + "/aura-components/src/test/components/validationTest/basic";
         List<String> command = Lists.newArrayList();
         command.add("java");
         command.add("-Djetty.host=" + url.getHost());
         command.add("-Djetty.port=" + url.getPort());
         command.add("-classpath");
-        command.add(AuraFiles.Core.getPath() + "/aura-util/target/classes");
+        command.add(AuraUtil.getAuraHome() + "/aura-util/target/classes");
         command.add("org.auraframework.util.validation.ValidationClient");
         command.add(path);
         ProcessBuilder builder = new ProcessBuilder(command);
@@ -85,7 +85,7 @@ public final class ValidationClientHttpTest extends AuraHttpTestCase {
     @Test
     public void testValidate() throws Exception {
         getTestServletConfig().getBaseUrl(); // make sure the jetty server is started
-        String path = AuraFiles.Core.getPath() + "/aura-components/src/test/negativeComponents/validationTest/basic";
+        String path = AuraUtil.getAuraHome() + "/aura-components/src/test/negativeComponents/validationTest/basic";
         List<String> errors = ValidationClient.validate(path);
         ValidationTestUtil.verifyValidationTestBasicErrors(errors);
     }

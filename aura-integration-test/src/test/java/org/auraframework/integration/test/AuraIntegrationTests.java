@@ -34,7 +34,6 @@ import org.auraframework.integration.test.util.TestExecutor;
 import org.auraframework.integration.test.util.TestExecutor.TestRun;
 import org.auraframework.test.util.WebDriverProvider;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.util.AuraUtil;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.perf.PerfUtil;
 import org.auraframework.util.test.util.TestInventory;
@@ -120,7 +119,7 @@ public class AuraIntegrationTests extends TestSuite {
             throw new AuraRuntimeException("TEST RUN INTERRUPTED", e);
         } finally {
             executor.shutdown();
-            WebDriverProvider provider = AuraUtil.get(WebDriverProvider.class);
+            WebDriverProvider provider = ServiceLocator.get().get(WebDriverProvider.class);
             if (provider != null) {
                 logger.info("Releasing WebDriver resources");
                 provider.release();

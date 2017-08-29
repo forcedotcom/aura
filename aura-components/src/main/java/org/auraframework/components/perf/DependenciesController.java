@@ -61,6 +61,7 @@ import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.http.resource.AppJs;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
@@ -72,7 +73,6 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraFiles;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -462,7 +462,7 @@ public class DependenciesController implements Controller {
 
             Gson gson = new Gson();
             String json = gson.toJson(dependencies);
-            String path = AuraFiles.Core.getPath() + "/aura-resources/src/main/resources/aura/resources/";
+            String path = AuraUtil.getAuraHome() + "/aura-resources/src/main/resources/aura/resources/";
             try(PrintWriter out = new PrintWriter( path + file )) {
                 out.println(json);
             } catch (FileNotFoundException e) {

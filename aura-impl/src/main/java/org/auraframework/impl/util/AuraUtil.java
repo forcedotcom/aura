@@ -15,6 +15,10 @@
  */
 package org.auraframework.impl.util;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.security.CodeSource;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -149,5 +153,73 @@ public class AuraUtil {
         }
 
         return result;
+    }
+
+    private static final String TARGET_DIR = "/target/";
+    private static final String FILE_PROTOCOL = "file";
+    private static boolean auraHomeFound = false;
+    private static String auraHome = null;
+
+    private static String stripTarget(String original) {
+        String path = original;
+
+        if (path.indexOf(TARGET_DIR) != -1) {
+            path = path.substring(0, path.lastIndexOf(TARGET_DIR));
+            // and strip the module off as well.
+            return path.substring(0, path.lastIndexOf("/"));
+        }
+        return null;
+    }
+
+    public static String buildAuraHome() {
+        String providedPath = System.getProperty("aura.home");
+        if (providedPath != null) {
+            try {
+                // try to clean up any provided path
+                File canonical = new File(providedPath).getCanonicalFile();
+                if (canonical.exists() && canonical.isDirectory()) {
+                    return canonical.getPath();
+                }
+            } catch (IOException e) {
+            }
+        }
+        Class<?> clazz = AuraUtil.class;
+
+        try {
+            CodeSource source = clazz.getProtectionDomain().getCodeSource();
+            if (source != null) {
+                URL url = source.getLocation();
+                if (FILE_PROTOCOL.equalsIgnoreCase(url.getProtocol())) {
+                    String path = stripTarget(url.getPath());
+                    if (path != null) {
+                        return path;
+                    }
+                }
+            }
+        } catch (SecurityException se) {
+            // ignore, we can't read it, try again with the class below.
+        }
+        String clazzPath = "/" + clazz.getName().replace('.', '/') + ".class";
+        URL clazzUrl = clazz.getResource(clazzPath);
+        System.out.println(clazzUrl);
+        if (FILE_PROTOCOL.equalsIgnoreCase(clazzUrl.getProtocol())) {
+            String path = clazzUrl.getPath();
+            if (path.endsWith(clazzPath)) {
+                path = path.substring(0, path.lastIndexOf(clazzPath));
+                path = stripTarget(path);
+                if (path != null) {
+                    return path;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static synchronized String getAuraHome() {
+        if (!auraHomeFound) {
+            auraHome = buildAuraHome();
+            auraHomeFound = true;
+        }
+        return auraHome;
     }
 }

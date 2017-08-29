@@ -15,17 +15,19 @@
  */
 package org.auraframework.components;
 
+import java.nio.file.Paths;
+
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.impl.util.AuraUtil;
 import org.springframework.context.annotation.Lazy;
-//import org.springframework.context.annotation.Profile;
 
-//@Profile("auraTestProfile")
 @Lazy
 @ServiceComponent
 public class AuraComponentsNegativeTestComponentLocationAdapter extends ComponentLocationAdapter.Impl {
 
     public AuraComponentsNegativeTestComponentLocationAdapter() {
-        super(AuraComponentsFiles.NegativeTestComponents.asFile(), null, "components_aura_components_test_negative");
+        super(Paths.get(AuraUtil.getAuraHome(), "aura-components", "src", "test", "negativeComponents").toFile(),
+                null, "components_aura_components_test_negative");
     }
 }

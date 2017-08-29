@@ -1,0 +1,29 @@
+<aura:component>
+    <aura:attribute name="method" type="String" default=""/>
+    <aura:attribute name="methodCallError" type="String" default=""/>
+    <aura:attribute name="ids" type="Object" default=""/>
+    <aura:attribute name="evtName" type="String" default=""/>
+    <aura:attribute name="errorAction" type="Integer" default="0"/>
+
+    <span aura:id="evt-propagated">false</span>
+    <span aura:id="remove-callback-executed">false</span>
+    <div onremove="{!c.handleBubbledRemove}">
+        <moduleTest:interopEvent aura:id="simple" onremove="{!c.handleRemove}" />
+    </div>
+
+    <moduleTest:interopEvent aura:id="errorTest" onremove="{!c.callMethodWithThrow}" />
+
+    <aura:if isTrue="{!v.errorAction == 1}">
+        <moduleTest:interopEvent nonExistingProp="{!c.handleBubbledRemove}"  />
+    </aura:if>
+
+    <aura:if isTrue="{!v.errorAction == 2}">
+        <moduleTest:interopEvent class="{!c.handleBubbledRemove}"  />
+    </aura:if>
+
+    <moduleTest:interopEvent aura:id="paramTests"
+                             onremove="{!c.handleRemoveCustomEvent}"
+                             removeCallback="{!c.handleRemoveCallback}"
+                             onClickHandler="{!c.handleRemoveCallback}"
+    />
+</aura:component>

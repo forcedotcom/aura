@@ -18,6 +18,7 @@ package org.auraframework.impl.source.file;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Reader;
+import java.util.Collection;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -28,8 +29,9 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.system.BundleSource;
+import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -37,24 +39,27 @@ import org.auraframework.util.FileMonitor;
 import org.auraframework.util.IOUtil;
 import org.junit.Test;
 
-public class FileSourceLoaderTest extends AuraImplTestCase {
+public class FileBundleSourceLoaderTest extends AuraImplTestCase {
     @Inject
     private DefinitionService definitionService;
 
     @Inject
     private FileMonitor fileMonitor;
 
+    @Inject
+    private Collection<FileBundleSourceBuilder> builders;
+
     @Test
     public void testFileSourceLoaderSanity() {
         File tmpDir = new File(IOUtil.newTempDir("fileSourceLoaderTest"));
-        assertNotNull(new FileSourceLoader(tmpDir, fileMonitor));
+        assertNotNull(new FileBundleSourceLoader(tmpDir, fileMonitor, builders));
     }
 
     @Test
     public void testFileSourceLoaderWithNonExistentFile() {
         Exception expected = null;
         try {
-            new FileSourceLoader(new File("this_probably_doesnt_exist"), fileMonitor);
+            new FileBundleSourceLoader(new File("this_probably_doesnt_exist"), fileMonitor, builders);
         } catch (Exception e) {
             expected = e;
         }
@@ -66,7 +71,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
     public void testFileSourceLoaderWithNullFile() {
         Exception expected = null;
         try {
-            new FileSourceLoader(null, fileMonitor);
+            new FileBundleSourceLoader((File)null, fileMonitor, builders);
         } catch (Exception e) {
             expected = e;
         }
@@ -84,7 +89,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         }
     }
 
-    private FileSourceLoader createLoaderWithContents() throws Exception {
+    private FileBundleSourceLoader createLoaderWithContents() throws Exception {
         File tmpDir = new File(IOUtil.newTempDir("fileSourceLoaderTest"));
 
         File testNamespace = new File(tmpDir, "test");
@@ -93,12 +98,12 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         makeFile(testNamespace, "anevent", ".evt", "<event />");
         makeFile(testNamespace, "aninterface", ".intf", "<interface />");
 
-        return new FileSourceLoader(tmpDir, fileMonitor);
+        return new FileBundleSourceLoader(tmpDir, fileMonitor, builders);
     }
     
     @Test
     public void testGetMissingComponentSource() throws Exception {
-        FileSourceLoader loader = createLoaderWithContents();
+        FileBundleSourceLoader loader = createLoaderWithContents();
 
         // We should not find something that isn't there.
         DefDescriptor<ComponentDef> nonDescriptor = definitionService.getDefDescriptor("test:nonExistent",
@@ -109,11 +114,13 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
 
     @Test
     public void testGetComponentSource() throws Exception {
-        FileSourceLoader loader = createLoaderWithContents();
+        FileBundleSourceLoader loader = createLoaderWithContents();
 
         DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor("test:parent", ComponentDef.class);
-        TextSource<?> src = loader.getSource(descriptor);
-        assertNotNull(src);
+        BundleSource<?> bundleSource = (BundleSource<?>)loader.getSource(descriptor);
+        assertNotNull("Our bundle must exist", bundleSource);
+        TextSource<?> src = (TextSource<?>)bundleSource.getBundledParts().get(descriptor);
+        assertNotNull("Our component must be in the bundle", src);
         assertEquals(Format.XML, src.getFormat());
         assertTrue(src.getSystemId().endsWith("parent.cmp"));
         try (Reader reader = src.getHashingReader()) {
@@ -131,11 +138,14 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
 
     @Test
     public void testGetEventSource() throws Exception {
-        FileSourceLoader loader = createLoaderWithContents();
+        FileBundleSourceLoader loader = createLoaderWithContents();
 
         DefDescriptor<EventDef> descriptor = definitionService.getDefDescriptor("test:anevent", EventDef.class);
-        TextSource<EventDef> src = loader.getSource(descriptor);
-        assertNotNull(src);
+        BundleSource<?> bundleSource = (BundleSource<?>)loader.getSource(descriptor);
+        assertNotNull("Our bundle must exist", bundleSource);
+        @SuppressWarnings("unchecked")
+        TextSource<EventDef> src = (TextSource<EventDef>)bundleSource.getBundledParts().get(descriptor);
+        assertNotNull("Our event must be in the bundle", src);
         assertEquals(Format.XML, src.getFormat());
         assertTrue(src.getSystemId().endsWith("anevent.evt"));
         try (Reader reader = src.getHashingReader()) {
@@ -153,14 +163,14 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
 
     @Test
     public void testGetNamespaces() throws Exception {
-        FileSourceLoader loader = createLoaderWithContents();
+        FileBundleSourceLoader loader = createLoaderWithContents();
         Set<String> namespaces = loader.getNamespaces();
         assertTrue(namespaces.contains("test"));
     }
 
     @Test
     public void testFindRegex() throws Exception {
-        FileSourceLoader loader = createLoaderWithContents();
+        FileBundleSourceLoader loader = createLoaderWithContents();
         Set<DefDescriptor<?>> found;
 
         found = loader.find(new DescriptorFilter("markup://test:parent"));
@@ -177,14 +187,14 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
     }
     
     /**
-     * All namespaces loaded by FileSourceLoader are internal, verify that FileSourceLoader says so.
+     * All namespaces loaded by FileBundleSourceLoader are internal, verify that FileBundleSourceLoader says so.
      */
     @Test
     public void testIsInternalNamespace() throws Exception {
-        FileSourceLoader loader = createLoaderWithContents();
-        assertTrue("All namespaces loaded by FileSourceLoader are to be intenal",
+        FileBundleSourceLoader loader = createLoaderWithContents();
+        assertTrue("All namespaces loaded by FileBundleSourceLoader are to be intenal",
                 loader.isInternalNamespace(null));
-        assertTrue("All namespaces loaded by FileSourceLoader are to be internal," +
+        assertTrue("All namespaces loaded by FileBundleSourceLoader are to be internal," +
         		"Regardless of the namespace.", loader.isInternalNamespace("fooBared"));
         assertTrue(loader.isInternalNamespace("aura"));
     }

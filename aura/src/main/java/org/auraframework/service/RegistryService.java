@@ -44,7 +44,7 @@ public interface RegistryService {
     /**
      * Get a registry set based on a single directory.
      *
-     * This is intended for use in compiling modes wehre we want to limit our registry set to just
+     * This is intended for use in compiling modes where we want to limit our registry set to just
      * the local namespaces.
      *
      * @param directory the directory to scan.

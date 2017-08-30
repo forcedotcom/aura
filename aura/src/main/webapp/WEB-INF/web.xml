@@ -171,18 +171,6 @@
     	<servlet-class>org.auraframework.http.CSPReporterServlet</servlet-class>
     </servlet>
     
-    <!--  Begin Aura Validation Servlet -->
-    
-    <servlet>
-        <servlet-name>AuraValidationServlet</servlet-name>
-        <servlet-class>org.auraframework.impl.validation.AuraValidationServlet</servlet-class>
-    </servlet>
-    
-    <servlet-mapping>
-        <servlet-name>AuraValidationServlet</servlet-name>
-        <url-pattern>/qa/auraValidation/*</url-pattern> <!-- same pattern as SFDC servlet -->
-    </servlet-mapping>
-
     <!--  Begin Content Security Policy Servlet -->
 
     <servlet-mapping>

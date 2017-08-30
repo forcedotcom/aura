@@ -210,7 +210,7 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
             String name = matcher.getNameMatch().toString();
             String lookup = ns + ":" + name;
             DefDescriptor<?> descriptor = getDescriptor(fileMap.get(lookup.toLowerCase()));
-            if (matcher.matchDescriptor(descriptor)) {
+            if (descriptor != null && matcher.matchDescriptor(descriptor)) {
                 ret.add(descriptor);
             }
         } else {

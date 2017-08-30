@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
@@ -49,6 +50,8 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 public class FileBundleSourceLoader implements BundleSourceLoader, InternalNamespaceSourceLoader, SourceListener {
 
+    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+
     protected class FileEntry {
         public File file;
         public String namespace;
@@ -68,26 +71,24 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
     private final Collection<FileBundleSourceBuilder> builders;
 
     private void updateFileMap() {
-        synchronized (this) {
-            Set<String> tnamespaces = Sets.newHashSet();
-            Map<String,FileEntry> tfileMap = new ConcurrentHashMap<String,FileEntry>();
-            for (File namespace : base.listFiles()) {
-                if (namespace.isDirectory()) {
-                    tnamespaces.add(namespace.getName());
-                    for (File file : namespace.listFiles()) {
-                        FileEntry entry = new FileEntry();
-                        entry.namespace = namespace.getName();
-                        entry.name = file.getName();
-                        entry.qualified = entry.namespace+":"+entry.name;
-                        entry.file = file;
-                        entry.source = null;
-                        tfileMap.put(entry.qualified.toLowerCase(), entry);
-                    }
+        Set<String> tnamespaces = Sets.newHashSet();
+        Map<String,FileEntry> tfileMap = new ConcurrentHashMap<String,FileEntry>();
+        for (File namespace : base.listFiles()) {
+            if (namespace.isDirectory()) {
+                tnamespaces.add(namespace.getName());
+                for (File file : namespace.listFiles()) {
+                    FileEntry entry = new FileEntry();
+                    entry.namespace = namespace.getName();
+                    entry.name = file.getName();
+                    entry.qualified = entry.namespace+":"+entry.name;
+                    entry.file = file;
+                    entry.source = null;
+                    tfileMap.put(entry.qualified.toLowerCase(), entry);
                 }
             }
-            namespaces = tnamespaces;
-            fileMap = tfileMap;
         }
+        namespaces = tnamespaces;
+        fileMap = tfileMap;
     }
 
     /**
@@ -123,39 +124,49 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
     @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
-        BundleSource<?> provisional = getBundle(descriptor);
-        Source<D> bundledProvisional;
-        if (provisional == null) {
-            return null;
-        }
-        // If the provisional source matches the descriptor, we are done.
-        if (provisional.getDescriptor().equals(descriptor)) {
-            return (Source<D>)provisional;
-        }
-        // Blindly try to get the descriptor from the parts.
-        bundledProvisional = (Source<D>)provisional.getBundledParts().get(descriptor);
-        if (bundledProvisional != null) {
-            return bundledProvisional;
-        }
-        if (descriptor.getPrefix().equals(DefDescriptor.TEMPLATE_CSS_PREFIX)
-                && descriptor.getDefType() == DefType.STYLE) {
-            // try harder.
-            for (Source<?> part : provisional.getBundledParts().values()) {
-                // this violates a pile of rules, but then, the caller is as well.
-                if (part.getDescriptor().getDefType() == DefType.STYLE
-                        && part.getDescriptor().getDescriptorName().equals(descriptor.getDescriptorName())) {
-                    return (Source<D>)part;
+        rwLock.readLock().lock();
+        try {
+            BundleSource<?> provisional = getBundle(descriptor);
+            Source<D> bundledProvisional;
+            if (provisional == null) {
+                return null;
+            }
+            // If the provisional source matches the descriptor, we are done.
+            if (provisional.getDescriptor().equals(descriptor)) {
+                return (Source<D>)provisional;
+            }
+            // Blindly try to get the descriptor from the parts.
+            bundledProvisional = (Source<D>)provisional.getBundledParts().get(descriptor);
+            if (bundledProvisional != null) {
+                return bundledProvisional;
+            }
+            if (descriptor.getPrefix().equals(DefDescriptor.TEMPLATE_CSS_PREFIX)
+                    && descriptor.getDefType() == DefType.STYLE) {
+                // try harder.
+                for (Source<?> part : provisional.getBundledParts().values()) {
+                    // this violates a pile of rules, but then, the caller is as well.
+                    if (part.getDescriptor().getDefType() == DefType.STYLE
+                            && part.getDescriptor().getDescriptorName().equals(descriptor.getDescriptorName())) {
+                        return (Source<D>)part;
+                    }
                 }
             }
+            return null;
+        } finally {
+            rwLock.readLock().unlock();
         }
-        return null;
     }
 
     @Override
     public BundleSource<?> getBundle(DefDescriptor<?> descriptor) {
-        String lookup = BundleSourceLoader.getBundleName(descriptor);
+        rwLock.readLock().lock();
+        try {
+            String lookup = BundleSourceLoader.getBundleName(descriptor);
 
-        return createSource(fileMap.get(lookup));
+            return createSource(fileMap.get(lookup));
+        } finally {
+            rwLock.readLock().unlock();
+        }
     }
 
     /**
@@ -166,7 +177,12 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
      */
     @Override
     public Set<String> getNamespaces() {
-        return namespaces;
+        rwLock.readLock().lock();
+        try {
+            return namespaces;
+        } finally {
+            rwLock.readLock().unlock();
+        }
     }
 
     private BundleSource<?> createSource(FileEntry entry) {
@@ -204,35 +220,40 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
 
     @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
-        Set<DefDescriptor<?>> ret = Sets.newHashSet();
-        if (matcher.getNamespaceMatch().isConstant() && matcher.getNameMatch().isConstant()) {
-            String ns = matcher.getNamespaceMatch().toString();
-            String name = matcher.getNameMatch().toString();
-            String lookup = ns + ":" + name;
-            DefDescriptor<?> descriptor = getDescriptor(fileMap.get(lookup.toLowerCase()));
-            if (descriptor != null && matcher.matchDescriptor(descriptor)) {
-                ret.add(descriptor);
-            }
-        } else {
-            for (FileEntry entry : fileMap.values()) {
-                if (matcher.matchNamespace(entry.namespace) && matcher.matchName(entry.name)) {
-                    BundleSource<?> source = createSource(entry);
-                    if (source != null) {
-                        if (matcher.matchDescriptor(source.getDescriptor())) {
-                           ret.add(source.getDescriptor());
-                        }
-                        /*
-                        for (DefDescriptor<?> descriptor : source.getBundledParts().keySet()) {
-                            if (matcher.matchDescriptor(descriptor)) {
-                               ret.add(descriptor);
+        rwLock.readLock().lock();
+        try {
+            Set<DefDescriptor<?>> ret = Sets.newHashSet();
+            if (matcher.getNamespaceMatch().isConstant() && matcher.getNameMatch().isConstant()) {
+                String ns = matcher.getNamespaceMatch().toString();
+                String name = matcher.getNameMatch().toString();
+                String lookup = ns + ":" + name;
+                DefDescriptor<?> descriptor = getDescriptor(fileMap.get(lookup.toLowerCase()));
+                if (descriptor != null && matcher.matchDescriptor(descriptor)) {
+                    ret.add(descriptor);
+                }
+            } else {
+                for (FileEntry entry : fileMap.values()) {
+                    if (matcher.matchNamespace(entry.namespace) && matcher.matchName(entry.name)) {
+                        BundleSource<?> source = createSource(entry);
+                        if (source != null) {
+                            if (matcher.matchDescriptor(source.getDescriptor())) {
+                               ret.add(source.getDescriptor());
                             }
+                            /*
+                            for (DefDescriptor<?> descriptor : source.getBundledParts().keySet()) {
+                                if (matcher.matchDescriptor(descriptor)) {
+                                   ret.add(descriptor);
+                                }
+                            }
+                            */
                         }
-                        */
                     }
                 }
             }
+            return ret;
+        } finally {
+            rwLock.readLock().unlock();
         }
-        return ret;
     }
 
     @Override
@@ -269,8 +290,11 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
 
     @Override
     public void reset() {
-        synchronized (this) {
+        rwLock.writeLock().lock();
+        try {
             updateFileMap();
+        } finally {
+            rwLock.writeLock().unlock();
         }
     }
 

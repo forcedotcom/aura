@@ -1218,7 +1218,7 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
         var message = "AuraLocalizationService.UTCToWallTime(): moment-timezone lib is missing on moment. " +
                       "It could be overridden by another version of moment-js in userland code. Current moment-js version: " + this.moment["version"];
         $A.warning(message);
-        $A.logger.reportError(new $A.auraError(message));
+        $A.logger.reportError(new $A.auraError(message), null, "WARNING");
 
         callback(date);
         return;
@@ -1276,7 +1276,7 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
         var message = "AuraLocalizationService.WallTimeToUTC(): moment-timezone lib is missing on moment. " +
                       "It could be overridden by another version of moment-js in userland code. Current moment-js version: " + this.moment["version"];
         $A.warning(message);
-        $A.logger.reportError(new $A.auraError(message));
+        $A.logger.reportError(new $A.auraError(message), null, "WARNING");
 
         callback(date);
         return;

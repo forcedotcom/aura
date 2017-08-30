@@ -82,6 +82,7 @@ public class ExceptionAdapterImplTest extends AuraImplTestCase {
                 JsStacktrace,
                 CmpStack,
                 stacktraceIdGen,
+                AuraClientException.Level.ERROR,
                 instanceService,
                 exceptionAdapter,
                 configAdapter,

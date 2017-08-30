@@ -1123,7 +1123,7 @@ AuraClientService.prototype.showErrorDialogWithReload = function(e, additionalLo
             if (additionalLoggedMessage) {
                 e.message = e.message + " " + additionalLoggedMessage;
             }
-            $A.logger.reportError(e, undefined, true);
+            $A.logger.reportError(e, undefined, "ERROR", true);
         } catch (e2) {
             // we've failed utterly. One possible scenario is if inline.js failed to load, since it defines the context / fwuid, which reportError relies upon
             // Let's try to manually send an XHR down, since we don't care about the response format
@@ -1143,7 +1143,8 @@ AuraClientService.prototype.showErrorDialogWithReload = function(e, additionalLo
                             "clientError": e.message,
                             "clientStack": (e.stackTrace || e.stack || "").toString().substr(0, Aura.Utils.Logger.MAX_STACKTRACE_SIZE),
                             "componentStack": "",
-                            "stacktraceIdGen": e["stacktraceIdGen"]
+                            "stacktraceIdGen": e["stacktraceIdGen"],
+                            "level": "ERROR"
                         },
                         "version": null
                     }]

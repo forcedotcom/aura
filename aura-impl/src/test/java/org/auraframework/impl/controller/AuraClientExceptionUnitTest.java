@@ -31,7 +31,7 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
     public void testCreateAuraClientExceptionWithQualifiedName() {
         String descriptor = "foo:bar";
 
-        AuraClientException ace = new AuraClientException(descriptor, null, null, null, null, null, null, null, null, null, null);
+        AuraClientException ace = new AuraClientException(descriptor, null, null, null, null, null, null, null, null, null, null, null);
 
         String expectedNamespace = "foo";
         String expectedComponent = "bar";
@@ -43,7 +43,7 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
     public void testCreateAuraClientExceptionWithActionName() {
         String descriptor = "foo:bar$controller$doSomething";
 
-        AuraClientException ace = new AuraClientException(descriptor, null, null, null, null, null, null, null, null, null, null);
+        AuraClientException ace = new AuraClientException(descriptor, null, null, null, null, null, null, null, null, null, null, null);
 
         String expectedNamespace = "foo";
         String expectedComponent = "bar";
@@ -61,7 +61,7 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
                 "value [as get]()@https://customers.sage.com/s/sfsites/auraFW/javascript/9vevg4v6I80p1u_pT1V5VQ/aura_prod.js:548:194\n" +
                 "Object.next@components/c/UICarousel.js:57:36";
 
-        AuraClientException ace = new AuraClientException(null, null, null, stacktrace, null, null, null, null, null, null, null);
+        AuraClientException ace = new AuraClientException(null, null, null, stacktrace, null, null, null, null, null, null, null, null);
 
         String expectedNamespace = "c";
         String expectedComponent = "UICarousel";
@@ -78,7 +78,7 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
          "handleEvent()@http://errortest.lightning.localhost.soma.force.com:6109/auraFW/resources/tl_W7omHGRGQiu-tfZgpug/engine/engine.js:2853:5\n"+
          "HTMLAnchorElement.handler()@http://errortest.lightning.localhost.soma.force.com:6109/auraFW/resources/tl_W7omHGRGQiu-tfZgpug/engine/engine.js:2859:5";
 
-        AuraClientException ace = new AuraClientException(null, null, null, stacktrace, null, null, null, null, Mockito.mock(ConfigAdapter.class), Mockito.mock(ContextService.class), Mockito.mock(DefinitionService.class));
+        AuraClientException ace = new AuraClientException(null, null, null, stacktrace, null, null, null, null, null, Mockito.mock(ConfigAdapter.class), Mockito.mock(ContextService.class), Mockito.mock(DefinitionService.class));
 
         String expectedNamespace = "one";
         String expectedComponent = "appNavBarItem";

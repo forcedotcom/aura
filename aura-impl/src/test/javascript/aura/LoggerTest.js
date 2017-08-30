@@ -195,7 +195,7 @@ Test.Aura.LoggerTest = function() {
             var expectedLevel = "ERROR",
                 expectedMsg = "expectedMsg";
             logger.subscribe(expectedLevel, function(level, message, error){actual = level;});
-            
+
             mockGlobal(function() {
                 logger.error(expectedMsg);
             });
@@ -208,7 +208,7 @@ Test.Aura.LoggerTest = function() {
             var actual;
             var expected = "expectedMsg";
             logger.subscribe("ERROR", function(level, message, error){actual = message;});
-            
+
             mockGlobal(function() {
                 logger.error(expected);
             });
@@ -256,21 +256,66 @@ Test.Aura.LoggerTest = function() {
     }
 
     [Fixture]
-    function subscribe() {
-
-        var logger = new Aura.Utils.Logger(),
-            level, message, error;
-        var cb = function(l, m, e) {
-            level = l;
-            message = m;
-            error = e;
-        };
+    function hasSubscriptions() {
 
         [Fact]
-        function LoggerSubscibe() {
-            logger.subscribe("INFO", cb);
+        function IgnoresCaseForLevelParam() {
+            var logger = new Aura.Utils.Logger();
+
+            logger.subscribe("INFO", function(){});
+
             // case insensitive
-            Assert.True(logger.hasSubscriptions("iNFo"));
+            var actual = logger.hasSubscriptions("info");
+            Assert.True(actual);
+        }
+
+    }
+
+    [Fixture]
+    function subscribe() {
+
+        [Fact]
+        function AddsSubscriber() {
+            var logger = new Aura.Utils.Logger();
+            var level = "INFO";
+            var expected = function(){};
+
+            logger.subscribe(level, expected);
+
+            var actual = logger.subscribers[0]["fn"];
+            Assert.True(actual === expected);
+        }
+
+        [Fact]
+        function IncreasesSubscriptionNumberForGivenLevel() {
+            var logger = new Aura.Utils.Logger();
+            var level = "INFO";
+
+            logger.subscribe(level, function(){});
+
+            Assert.True(logger.hasSubscriptions(level));
+        }
+
+        [Fact]
+        function ThrowsErrorIfLevelIsInvalid() {
+            var logger = new Aura.Utils.Logger();
+            try {
+                logger.subscribe("invalidLevel", function(){});
+                Assert.Fail("Should have thrown error for invalid level");
+            } catch (e) {
+                Assert.Equal("Please specify valid log level: 'INFO', 'WARNING', 'ASSERT', 'ERROR'", e);
+            }
+        }
+
+        [Fact]
+        function ThrowsErrorIfCallbackIsInvalid() {
+            var logger = new Aura.Utils.Logger();
+            try {
+                logger.subscribe("INFO", "NonFunction");
+                Assert.Fail("Should have thrown error for invalid callback");
+            } catch (e) {
+                Assert.Equal("Logging callback must be a function", e);
+            }
         }
     }
 
@@ -287,23 +332,31 @@ Test.Aura.LoggerTest = function() {
 
         [Fact]
         function SubscriberRemoved() {
-            logger.subscribe("INFO", cb);
-            logger.unsubscribe("INFO", cb);
+            var logger = new Aura.Utils.Logger();
+            var callback = function() {};
+            var level = "INFO";
+            logger.subscribe(level, callback);
 
-            Assert.False(logger.hasSubscriptions("INFO"));
+            logger.unsubscribe(level, callback);
+
+            var actual = logger.subscribers.length;
+            Assert.Equal(0, actual);
         }
 
         [Fact]
-        function SubscriberForLevelRemoved() {
-            logger.subscribe("INFO", cb);
-            logger.subscribe("WARNING", cb);
-            logger.unsubscribe("INFO", cb);
+        function DecreasesSubscriptionNumberForGivenLevel() {
+            var logger = new Aura.Utils.Logger();
+            var callback = function() {};
+            var level = "INFO";
+            logger.subscribe(level, callback);
 
-            Assert.False(logger.hasSubscriptions("INFO"));
+            logger.unsubscribe(level, callback);
+
+            Assert.False(logger.hasSubscriptions(level));
         }
 
         [Fact] // splice makes iteration dependent on traversal direction
-        function OlderSubscriberRemoved() {
+        function RemovesOlderSubscriber() {
             logger.subscribe("INFO", cb);
             logger.subscribe("WARNING", cb);
 
@@ -327,14 +380,14 @@ Test.Aura.LoggerTest = function() {
 
             Assert.True(logger.hasSubscriptions("InFo"));
         }
-        
+
         [Fact]
         function NonSubscriberNotRemoved() {
             var expectedMsg = "expectedMsg";
 
             logger.subscribe("INFO", cb);
             logger.unsubscribe("INFO", function(){});
-            
+
             Assert.True(logger.hasSubscriptions("INFO"));
         }
 
@@ -344,182 +397,229 @@ Test.Aura.LoggerTest = function() {
 
             logger.subscribe("INFO", cb);
             logger.unsubscribe("WARNING", cb);
-            
+
             Assert.True(logger.hasSubscriptions("INFO"));
         }
     }
 
     [Fixture]
-    function validation() {
-
-        var logger = new Aura.Utils.Logger(),
-            level, message, error;
-        var cb = function(l, m, e) {
-            level = l;
-            message = m;
-            error = e;
-        };
-
-        [Fact]
-        function InvalidLevel() {
-            try {
-                logger.subscribe("WRONG", cb);
-                Assert.Fail("Should have thrown error for invalid level");
-            } catch (e) {
-                Assert.Equal("Please specify valid log level: 'INFO', 'WARNING', 'ASSERT', 'ERROR'", e);
-            }
-        }
-
-        [Fact]
-        function InvalidCallback() {
-            try {
-                logger.subscribe("INFO", true);
-                Assert.Fail("Should have thrown error for invalid callback");
-            } catch (e) {
-                Assert.Equal("Logging callback must be a function", e);
-            }
-        }
-    }
-
-    [Fixture]
     function reportError() {
-        var logger = new Aura.Utils.Logger();
-        var called = false;
-        var clientStackLength = -1;
-        var mockAction = {
-                params : {},
-                setParams: function(config) { 
-                    if(config) {
-                        for ( var key in config) {
-                            this.params[key] = config[key];
-                        }
+
+        var mockAura = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                get: function() {
+                    return this.mockAction;
+                },
+                clientService: {
+                    enqueueAction: function(){}
+                },
+                auraError: function(msg, e) {
+                    e.name = "AuraError";
+                    if (!e.findComponentFromStackTrace) {
+                        e.findComponentFromStackTrace = function() {};
                     }
+
+                    if (!e.setComponent) {
+                        e.setComponent = function() {};
+                    }
+
+                    return e;
+                },
+                // to inject mocked reporting action
+                injectMockAction: function(mockAction) {
+                    this.mockAction = mockAction;
+                }
+            },
+            Aura:{
+                Utils:{
+                    Logger: Aura.Utils.Logger
+                }
+            }
+        });
+
+        function createMockAction() {
+            return {
+                // store param for testing
+                params : {},
+                setParams: function(params) {
+                    this.params = params;
                 },
                 getParam: function(name) {
-                    if(name) { 
-                        return this.params[name];
-                    }
+                    return name && this.params[name];
                 },
                 setCallback: function() {},
                 setCaboose: function() {}
             };
-
-        var mockDeps = Mocks.GetMocks(Object.Global(), {"$A": {
-                get: function() { return mockAction; },
-                clientService: {
-                    enqueueAction: function(reportAction) {
-                        called = true;
-                        var clientStack = reportAction.getParam('clientStack');
-                        if(clientStack) {
-                            clientStackLength = clientStack.length;
-                        }
-                    }
-                },
-                auraError: function(msg, e) {
-                    e.name = "AuraError";
-                    e.findComponentFromStackTrace = function() {};
-                    e.setComponent = function() {
-                        this["setComponentCalled"] = true;
-                    };
-                    return e;
-                }
-            }, Aura:{Utils:{Logger:{MAX_STACKTRACE_SIZE:25000}}}
-        });
-
-        [Fact]
-        function earlyReturnsIfReported() {
-            var target = new Error();
-            target["reported"] = true;
-
-            mockDeps(function() {
-                logger.reportError(target, "testAction", "testId");
-            });
-
-            Assert.False(called);
         }
 
         [Fact]
-        function enqueuesAction() {
-            var target = new Error();
+        function SetsLevelToActionParams() {
+            var expected = "ERROR";
+            var target = new Aura.Utils.Logger();
+            var error = new Error("Test Error");
+            var mockAction = createMockAction();
 
-            mockDeps(function() {
-                logger.reportError(target, "testAction", "testId");
+            mockAura(function() {
+                $A.injectMockAction(mockAction);
+                target.reportError(error, null, expected);
             });
 
-            Assert.True(called);
+            var actual = mockAction.getParam("level");
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
-        function setsErrorReported() {
-            var target = new Error();
+        function SetsLevelToErrorByDefault() {
+            var target = new Aura.Utils.Logger();
+            var error = new Error("Test Error");
+            var mockAction = createMockAction();
 
-            mockDeps(function() {
-                logger.reportError(target, "testAction", "testId");
+            mockAura(function() {
+                $A.injectMockAction(mockAction);
+                target.reportError(error);
             });
 
-            Assert.True(target["reported"]);
+            var actual = mockAction.getParam("level");
+            Assert.Equal("ERROR", actual);
         }
-        
+
         [Fact]
-        function noLongerThan25000Charactors() {
+        function SetsLevelToErrorIfLevelIsInvalid() {
+            var target = new Aura.Utils.Logger();
+            var error = new Error("Test Error");
+            var mockAction = createMockAction();
+
+            mockAura(function() {
+                $A.injectMockAction(mockAction);
+                target.reportError(error, null, "invalidLevel");
+            });
+
+            var actual = mockAction.getParam("level");
+            Assert.Equal("ERROR", actual);
+        }
+
+        [Fact]
+        function IgnoresReportedError() {
+            var target = new Aura.Utils.Logger();
+            var error = new Error("Test Error");
+            error["reported"] = true;
+            var mockEnqueueAction = Stubs.GetMethod();
+
+            mockAura(function() {
+                $A.clientService.enqueueAction = mockEnqueueAction;
+                target.reportError(error);
+            });
+
+            // verify $A.clientService.enqueueAction never gets called
+            Assert.Equal(0, mockEnqueueAction.Calls.length);
+        }
+
+        [Fact]
+        function EnqueuesActionToReportError() {
+            var target = new Aura.Utils.Logger();
+            var error = new Error("Test Error");
+            var mockEnqueueAction = Stubs.GetMethod();
+
+            mockAura(function() {
+                $A.clientService.enqueueAction = mockEnqueueAction;
+                target.reportError(error);
+            });
+
+            Assert.Equal(1, mockEnqueueAction.Calls.length);
+        }
+
+        [Fact]
+        function SetsErrorReportedAfterReporting() {
+            var target = new Aura.Utils.Logger();
+            var error = new Error("Test Error");
+
+            mockAura(function() {
+                target.reportError(error);
+            });
+
+            Assert.True(error["reported"]);
+        }
+
+        [Fact]
+        function KeepsMaxNumOfCharsForClientStack() {
+            var expected = Aura.Utils.Logger.MAX_STACKTRACE_SIZE;
             var mockError = {
-                'stackTrace' : Array(25010).join('x'),
-                'reported' : false,
-                toString : function() { }
+                "stackTrace" : Array(expected + 10).join("x"),
             }
 
-            mockDeps(function() {
-                logger.reportError(mockError, "testAction", "testId");
+            var target = new Aura.Utils.Logger();
+            var mockAction = createMockAction();
+
+            mockAura(function() {
+                $A.injectMockAction(mockAction);
+                target.reportError(mockError);
             });
-            
-            Assert.True(clientStackLength === 25000);
+
+            var actual = mockAction.getParam("clientStack").length;
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
-        function wrapsErrorInAuraError() {
-            var target = new Error();
+        function WrapsErrorIntoAuraError() {
+            var target = new Aura.Utils.Logger();
+            var error = new Error("Test Error");
 
-            mockDeps(function() {
-                logger.reportError(target);
+            mockAura(function() {
+                target.reportError(error);
             });
 
-            Assert.Equal("AuraError", target.name);
+            Assert.Equal("AuraError", error.name);
         }
 
         [Fact]
-        function callsSetComponentWhenNoComponent() {
-            var target = new Error();
+        function SetsComponentForErrorWithoutComponent() {
+            var target = new Aura.Utils.Logger();
+            var expected = "component";
+            var actual;
 
-            mockDeps(function() {
-                logger.reportError(target);
+            var error = new Error("Test Error");
+            error.findComponentFromStackTrace = function() { return expected; };
+            error.setComponent = function(cmp) { actual = cmp; };
+
+            mockAura(function() {
+                target.reportError(error);
             });
 
-            Assert.True(target["setComponentCalled"]);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
-        function callsSetComponentWhenNoStacktraceIdGen() {
-            var target = new Error();
-            target["component"] = "test";
+        function SetsComponentForErrorWithoutStacktraceIdGen() {
+            var target = new Aura.Utils.Logger();
+            var expected = "component";
+            var actual;
 
-            mockDeps(function() {
-                logger.reportError(target);
+            var error = new Error("Test Error");
+            error.component = "old-component";
+            error.findComponentFromStackTrace = function() { return expected; };
+            error.setComponent = function(cmp) { actual = cmp; };
+
+            mockAura(function() {
+                target.reportError(error);
             });
 
-            Assert.True(target["setComponentCalled"]);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
-        function notCallSetComponentWhenHasComponentAndStacktraceIdGen() {
-            var target = new Error();
-            target["component"] = "test";
-            target["stacktraceIdGen"] = "gen";
+        function DoesNotSetComponentWhenHasComponentAndStacktraceIdGen() {
+            var target = new Aura.Utils.Logger();
 
-            mockDeps(function() {
-                logger.reportError(target);
+            var error = new Error("Test Error");
+            error.component = "component";
+            error.stacktraceIdGen = "stacktraceIdGen";
+            error.setComponent = Stubs.GetMethod();
+
+            mockAura(function() {
+                target.reportError(error);
             });
 
-            Assert.Undefined(target["setComponentCalled"]);
+            Assert.Equal(0, error.setComponent.Calls.length);
         }
     }
 

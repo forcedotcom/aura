@@ -22,7 +22,9 @@ import org.auraframework.def.ActionDef;
 import org.auraframework.impl.java.controller.JavaAction;
 import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
 import org.auraframework.instance.Action;
-import org.auraframework.service.*;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
 
 /**
  * A Java exception representing a <em>Javascript</em> error condition, as
@@ -30,6 +32,10 @@ import org.auraframework.service.*;
  */
 public class AuraClientException extends Exception {
     private static final long serialVersionUID = -5884312216684971013L;
+
+    public enum Level {
+        ERROR, WARNING, INFO;
+    }
 
     private final Action action;
     private final String jsStack;
@@ -41,6 +47,7 @@ public class AuraClientException extends Exception {
     private String cmpStack;
     private String sourceCode;
     private final String stacktraceIdGen;
+    private final Level level;
 
     public AuraClientException(
             String desc,
@@ -49,6 +56,7 @@ public class AuraClientException extends Exception {
             String jsStack,
             String cmpStack,
             String stacktraceIdGen,
+            Level level,
             InstanceService instanceService,
             ExceptionAdapter exceptionAdapter,
             ConfigAdapter configAdapter,
@@ -58,6 +66,7 @@ public class AuraClientException extends Exception {
         Action action = null;
         this.causeDescriptor = null;
         this.errorId = id;
+        this.level = level;
         if (!StringUtils.isEmpty(desc)) {
             try {
                 action = instanceService.getInstance(desc, ActionDef.class);
@@ -150,5 +159,9 @@ public class AuraClientException extends Exception {
 
     public String getStackTraceIdGen() {
         return this.stacktraceIdGen;
+    }
+
+    public Level getLevel() {
+        return this.level;
     }
 }

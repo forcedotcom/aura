@@ -15426,6 +15426,10 @@ $A.componentService.initControllerDefs([
           {
             "name":"stacktraceIdGen",
             "type":"java://java.lang.String"
+          },
+          {
+            "name":"level",
+            "type":"java://java.lang.String"
           }
         ]
       }

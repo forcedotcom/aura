@@ -132,12 +132,17 @@ Logger.prototype.error = function(msg, e){
  *
  * @param {AuraError} e exception to report upon.
  * @param {Action} [action] the action being performed when the exception occurred.
+ * @param {string} [level] error reporting level. The default value is "ERROR". Options: ["INFO", "WARNING", "ERROR"]
  * @param {boolean} [foreground] don't set the report action as a caboose, should only be used for catastrophic failures where no futher actions will be called.
  * @private
  */
-Logger.prototype.reportError = function(e, action, foreground) {
+Logger.prototype.reportError = function(e, action, level, foreground) {
     if (!e || e["reported"]) {
         return;
+    }
+
+    if (!level || !this.isValidLevel(level)) {
+        level = this.ERROR;
     }
 
     // get action from AuraError
@@ -176,7 +181,8 @@ Logger.prototype.reportError = function(e, action, foreground) {
         // for the entire json package.
         "clientStack": (e.stackTrace || e.stack || "").toString().substr(0, Aura.Utils.Logger.MAX_STACKTRACE_SIZE),
         "componentStack": e["componentStack"] || "",
-        "stacktraceIdGen": e["stacktraceIdGen"]
+        "stacktraceIdGen": e["stacktraceIdGen"],
+        "level": level
     });
     reportAction.setCallback(this, function() { /* do nothing */ });
     $A.clientService.enqueueAction(reportAction);
@@ -328,13 +334,13 @@ Logger.prototype.stringVersion = function(logMsg, error, trace) {
  */
 Logger.prototype.subscribe = function(level, callback) {
     level = level.toUpperCase();
-    if (this.isValidSubscriber(level, callback)) {
-        this.subscribers.push({
-            level: level,
-            fn: callback
-        });
-        this.adjustSubscriptions(level, 1);
-    }
+    this.validateSubscriber(level, callback);
+
+    this.subscribers.push({
+        level: level,
+        fn: callback
+    });
+    this.subscriptions[level] += 1;
 };
 
 /**
@@ -346,40 +352,16 @@ Logger.prototype.subscribe = function(level, callback) {
  */
 Logger.prototype.unsubscribe = function(level, callback) {
     level = level.toUpperCase();
-    if (this.isValidSubscriber(level, callback)) {
-        var subsLength = this.subscribers.length;
-        for (var i = subsLength - 1; i >= 0; i--) {
-            var sub = this.subscribers[i];
-            if (sub.level === level && sub.fn === callback) {
-                this.subscribers.splice(i, 1);
-                this.adjustSubscriptions(level, -1);
-            }
+    this.validateSubscriber(level, callback);
+
+    var subsLength = this.subscribers.length;
+    for (var i = subsLength - 1; i >= 0; i--) {
+        var sub = this.subscribers[i];
+        if (sub.level === level && sub.fn === callback) {
+            this.subscribers.splice(i, 1);
+            this.subscriptions[level] -= 1;
         }
     }
-};
-
-/**
- * Adjust log level subscription numbers
- *
- * @param {String} level level to adjust
- * @param {Number} adjustment Number to adjust subscription
- */
-Logger.prototype.adjustSubscriptions = function(level, adjustment) {
-    this.subscriptions[level] += adjustment;
-};
-
-/**
- * Checks and throws Error if not valid subscriber
- *
- * @param {String} level log level
- * @param {Function} callback function
- * @returns {boolean} Valid subscriber
- */
-Logger.prototype.isValidSubscriber = function(level, callback) {
-    if (this.isValidLevel(level) && typeof callback === "function") {
-        return true;
-    }
-    throw new Error("Logging callback must be a function");
 };
 
 /**
@@ -388,13 +370,27 @@ Logger.prototype.isValidSubscriber = function(level, callback) {
  * @returns {boolean}
  */
 Logger.prototype.isValidLevel = function(level) {
-    if (level === this.INFO ||
-        level === this.WARNING ||
-        level === this.ASSERT ||
-        level === this.ERROR) {
-        return true;
+    return level === this.INFO ||
+           level === this.WARNING ||
+           level === this.ASSERT ||
+           level === this.ERROR;
+};
+
+/**
+ * Checks and throws Error if not valid subscriber
+ *
+ * @param {String} level log level
+ * @param {Function} callback function
+ * @throws Throws an error if the level is not valid or callback is not a function.
+ */
+Logger.prototype.validateSubscriber = function(level, callback) {
+    if (!this.isValidLevel(level)) {
+        throw new Error("Please specify valid log level: 'INFO', 'WARNING', 'ASSERT', 'ERROR'");
     }
-    throw new Error("Please specify valid log level: 'INFO', 'WARNING', 'ASSERT', 'ERROR'");
+
+    if (typeof callback !== "function") {
+        throw new Error("Logging callback must be a function");
+    }
 };
 
 /**
@@ -402,13 +398,10 @@ Logger.prototype.isValidLevel = function(level) {
  *
  * @param {String} level
  * @returns {boolean} Whether there are subscriptions to given level
- * @export
  */
 Logger.prototype.hasSubscriptions = function(level) {
     level = level.toUpperCase();
-    if (this.isValidLevel(level)) {
-        return this.subscriptions[level] > 0;
-    }
+    return this.isValidLevel(level) && this.subscriptions[level] > 0;
 };
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

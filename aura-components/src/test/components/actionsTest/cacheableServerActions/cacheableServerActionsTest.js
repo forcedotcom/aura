@@ -1,4 +1,8 @@
 ({
+    // mark these tests unadaptable for core because core has specific rules for enabling publicly cacheable actions
+    // that are tested separately there
+    labels: ['UnAdaptableTest'],
+
     /*
      * Make sure publicly cacheable actions are sent as GET requests
      */

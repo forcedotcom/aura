@@ -573,7 +573,7 @@ public class AuraTestFilter {
             testDef = getTestCase(suiteDef, testName);
             testDef.validateDefinition();
         } catch (QuickFixException e) {
-            out.append(String.format("$A.test.run('%s',{},1,'%s');", testName, e.getMessage()));
+            out.append(String.format("$A.test.run('%s',{},1,{'message':'%s'}});", testName, e.getMessage()));
             return;
         }
         
@@ -585,7 +585,7 @@ public class AuraTestFilter {
                                     "var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
                                     "sessionStorage.setItem('TestRunStatus',(oldStatus?oldStatus:'')+'Run '+testName+', timeStamp#'+$A.test.time()+'.'); \n"+
                                 "}\n"+
-                                "$A.test.run(testName, suiteProps, testTimeout); \n"+
+                                "$A.test.run(testName, suiteProps, testTimeout, Aura['appBootstrap'] && Aura['appBootstrap']['error']); \n"+
                             "} else {\n"+
                                 "if(window.sessionStorage) {\n"+
                                     "var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+

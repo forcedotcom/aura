@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    init: function (component) {
+    init: function (component, event, helper) {
         var descriptor = component.get('v.descriptor');
         $A.getDefinition(descriptor, function(foundDefinition){
             if (foundDefinition){
@@ -25,5 +25,13 @@
                 });
             }
         });
+
+        var description = component.get("v.description");
+        component.set("v.description", helper.sanitize(description));
+    },
+
+    valueChange: function(component, event, helper) {
+        var description = component.get("v.description");
+        component.set("v.description", helper.sanitize(description));
     }
 });

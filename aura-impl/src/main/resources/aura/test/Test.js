@@ -2028,7 +2028,7 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
     this.name = name;
 
     if (quickFixException) {
-        this.logError(quickFixException);
+        this.logError(quickFixException["message"]);
         this.doTearDown();
         return;
     }

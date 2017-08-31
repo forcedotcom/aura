@@ -1365,6 +1365,11 @@ AuraLocalizationService.prototype.normalizeToMomentLocale = function(locale) {
     var normalized = this.normalizeLocale(locale);
     var tokens = normalized.split("-", 2);
 
+    // momentJs uses 'nb' as Norwegian
+    if (tokens[0] === "no") {
+        tokens[0] = "nb";
+    }
+
     if (tokens.length > 1) {
         momentLocale = tokens.join("-");
         if (locales.indexOf(momentLocale) > -1) {

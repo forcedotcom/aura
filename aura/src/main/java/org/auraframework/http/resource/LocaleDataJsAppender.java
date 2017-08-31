@@ -38,19 +38,25 @@ import java.util.regex.Pattern;
 @ServiceComponent
 public class LocaleDataJsAppender implements InlineJSAppender{
 
-    Map<String, String> localeData;
-    LocalizationAdapter localizationAdapter;
-    ConfigAdapter configAdapter;
-    ExceptionAdapter exceptionAdapter;
+    private Map<String, String> localeData;
+    private LocalizationAdapter localizationAdapter;
+    private ConfigAdapter configAdapter;
+    private ExceptionAdapter exceptionAdapter;
 
     @Inject
-    public void setLocalizationAdapter(LocalizationAdapter localizationAdapter){this.localizationAdapter = localizationAdapter;}
+    public void setLocalizationAdapter(LocalizationAdapter localizationAdapter) {
+        this.localizationAdapter = localizationAdapter;
+    }
 
     @Inject
-    public void setConfigAdapter(ConfigAdapter configAdapter){this.configAdapter = configAdapter;}
+    public void setConfigAdapter(ConfigAdapter configAdapter) {
+        this.configAdapter = configAdapter;
+    }
 
     @Inject
-    public void setExceptionAdapter(ExceptionAdapter exceptionAdapter){this.exceptionAdapter  = exceptionAdapter;}
+    public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
+        this.exceptionAdapter  = exceptionAdapter;
+    }
 
     @PostConstruct
     public void initialize() {
@@ -133,7 +139,7 @@ public class LocaleDataJsAppender implements InlineJSAppender{
         return Collections.unmodifiableMap(localeData);
     }
 
-    private String getMomentLocale(String locale) {
+    public String getMomentLocale(String locale) {
         if(locale == null) {
             return "en";
         }
@@ -141,6 +147,12 @@ public class LocaleDataJsAppender implements InlineJSAppender{
         // normalize Java locale string to moment locale
         String normalized = locale.toLowerCase().replace("_", "-");
         String[] tokens = normalized.split("-");
+
+        // special case for converting Java locale to momentJs Locale
+        // momentJs use "nb" as Norwegian
+        if ("no".equals(tokens[0])) {
+            tokens[0] = "nb";
+        }
 
         String momentLocale = null;
         if (tokens.length > 1) {

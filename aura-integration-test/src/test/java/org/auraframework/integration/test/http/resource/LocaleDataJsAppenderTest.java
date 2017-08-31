@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import javax.inject.Inject;
 
-public class LocaleDataAppendTest extends AuraImplTestCase {
+public class LocaleDataJsAppenderTest extends AuraImplTestCase {
 
     @Inject
     private ConfigAdapter configAdapter;
@@ -53,5 +53,21 @@ public class LocaleDataAppendTest extends AuraImplTestCase {
     public void testInitializeLoadsAllMomentLocaleData() {
         LocaleDataJsAppender appender = getInlineJs();
         assertEquals(108, appender.getMomentLocales().size());
+    }
+
+    /**
+     * In Java 8, locale for norwegian(Norway) uses no-NO.
+     * http://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+     * 
+     * However, momentJs only supports Norwegian Bokmål [nb], see locales.js.
+     * Hard code conversion is needed for the locale.
+     */
+    @Test
+    public void testGetMomentLocaleForNorwegian() {
+        LocaleDataJsAppender appender = getInlineJs();
+        String actual = appender.getMomentLocale("no_NO");
+
+        String expected = "nb";
+        assertEquals(expected, actual);
     }
 }

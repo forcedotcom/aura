@@ -2294,6 +2294,24 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             Assert.Equal(expected, actual);
         }
 
+        [Fact]
+        function ReturnsNbForNorNorwegian(){
+            // Arrange
+            var expected = "nb";
+            var targetService = new Aura.Services.AuraLocalizationService();
+
+            targetService.moment = {
+                locales: function(){
+                    return [expected];
+                }
+            };
+
+            // Act
+            var actual = targetService.normalizeToMomentLocale("no_No");
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
     }
 
     [Fixture]

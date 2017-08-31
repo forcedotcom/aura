@@ -1512,6 +1512,14 @@ public class DefinitionServiceImpl implements DefinitionService {
         DefRegistry registry = currentCC.registries.getRegistryFor(compiling.descriptor);
         if (registry == null) {
             currentCC.context.addLocalDef(compiling.descriptor, null);
+            StringBuffer message = new StringBuffer(
+                    "Registry not found for " + compiling.descriptor + " in registry set: ");
+            currentCC.registries.getAllRegistries().stream().forEach((currentRegistry) -> {
+                message.append(currentRegistry.getClass().getSimpleName());
+                message.append(currentRegistry.getNamespaces());
+                message.append(", ");
+            });
+            loggingService.warn(message.toString());
             return false;
         }
 
@@ -1534,6 +1542,12 @@ public class DefinitionServiceImpl implements DefinitionService {
         //
         compiling.def = registry.getDef(compiling.descriptor);
         if (compiling.def == null) {
+            StringBuffer message = new StringBuffer(compiling.descriptor + " not found in registry " + registry);
+            registry.find(new DescriptorFilter("*")).stream().forEach((currentDescriptor)->{
+                message.append(currentDescriptor);
+                message.append(", ");
+            });
+            loggingService.warn(message.toString());
             return false;
         }
         compiling.built = true;

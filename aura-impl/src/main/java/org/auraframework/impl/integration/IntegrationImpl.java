@@ -52,7 +52,6 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
-import org.auraframework.system.Message;
 import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
@@ -246,10 +245,12 @@ public class IntegrationImpl implements Integration {
                         labelSetup = true;
                         labelAction.run();
 
-                        Message message = new Message(Lists.newArrayList(action));
-
                         init.append("var config = ");
-                        serializationService.write(message, null, Message.class, init);
+
+                        Map<String, Object> messageMap = Maps.newHashMap();
+                        messageMap.put("actions", Lists.newArrayList(action));
+                        messageMap.put("context", context);
+                        JsonEncoder.serialize(messageMap, init, context.getJsonSerializationContext());
                         init.append(";\n");
 
                         if (!actionEventHandlers.isEmpty()) {

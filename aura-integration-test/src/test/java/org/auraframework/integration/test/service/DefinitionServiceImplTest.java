@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
+import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -50,6 +51,7 @@ import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -77,6 +79,17 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
+    }
+
+    @Test
+    public void testDefDescriptorForActionWithNoName() throws Exception {
+        AuraRuntimeException expected = null;
+        try {
+            definitionService.getDefDescriptor(null, ActionDef.class);
+        } catch (AuraRuntimeException are) {
+            expected = are;
+        }
+        assertNotNull("Should get an exception", expected);
     }
 
     @Test

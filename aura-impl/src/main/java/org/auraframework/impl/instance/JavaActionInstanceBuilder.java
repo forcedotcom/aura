@@ -15,6 +15,10 @@
  */
 package org.auraframework.impl.instance;
 
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ActionDef;
@@ -30,12 +34,10 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
-import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import javax.inject.Inject;
-import java.util.Map;
 
 /**
  * Provide an interface for an injectable builder of an instance.
@@ -83,8 +85,8 @@ public class JavaActionInstanceBuilder implements InstanceBuilder<Action, Action
             try {
                 controllerBean = instanceBuilderProvider.get(controllerClass);
             } catch (Throwable t) {
-                throw new AuraRuntimeException(
-                        "Failed to retrieve controller instance for " + controllerDef.getDescriptor(), t);
+                throw new InvalidDefinitionException("Failed to retrieve controller instance",
+                        new Location(controllerDef.getDescriptor().getQualifiedName(), 0), t);
             }
 
             return new JavaAction(controllerDesc, (JavaActionDef) def, controllerBean, attributes,

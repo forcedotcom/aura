@@ -108,17 +108,19 @@ public class DefinitionServiceImpl implements DefinitionService {
         return getDefDescriptor(qualifiedName, defClass, null);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T extends Definition, B extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName,
-            Class<T> defClass, DefDescriptor<B> bundle) {
+    @CheckForNull
+    public <T extends Definition, B extends Definition> DefDescriptor<T> getDefDescriptor(
+            @CheckForNull String qualifiedName, @CheckForNull Class<T> defClass,
+            @CheckForNull DefDescriptor<B> bundle) {
+
+        if (qualifiedName == null || defClass == null) {
+            //FIXME: we should not throw here.
+            throw new AuraRuntimeException("descriptor is null");
+        }
         if (defClass == ActionDef.class) {
             return SubDefDescriptorImpl.getInstance(qualifiedName, defClass, ControllerDef.class);
         }
-        if (qualifiedName == null || defClass == null) {
-            throw new AuraRuntimeException("descriptor is null");
-        }
-
         DescriptorKey dk = new DescriptorKey(qualifiedName, defClass, bundle);
 
         Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache = null;
@@ -128,6 +130,7 @@ public class DefinitionServiceImpl implements DefinitionService {
 
         DefDescriptor<T> result = null;
         if (cache != null) {
+            @SuppressWarnings("unchecked")
             DefDescriptor<T> cachedResult = (DefDescriptor<T>) cache.getIfPresent(dk);
             result = cachedResult;
         }
@@ -135,7 +138,9 @@ public class DefinitionServiceImpl implements DefinitionService {
             if (defClass == TypeDef.class && qualifiedName.indexOf("://") == -1) {
                 TypeDef typeDef = AuraStaticTypeDefRegistry.INSTANCE.getInsensitiveDef(qualifiedName);
                 if (typeDef != null) {
-                    return (DefDescriptor<T>) typeDef.getDescriptor();
+                    @SuppressWarnings("unchecked")
+                    DefDescriptor<T> typeDescriptor = (DefDescriptor<T>) typeDef.getDescriptor();
+                    return typeDescriptor;
                 }
             }
             result = new DefDescriptorImpl<>(qualifiedName, defClass, bundle);
@@ -147,6 +152,7 @@ public class DefinitionServiceImpl implements DefinitionService {
             if (!dk.getName().equals(result.getQualifiedName())) {
                 DescriptorKey fullDK = new DescriptorKey(result.getQualifiedName(), defClass, result.getBundle());
 
+                @SuppressWarnings("unchecked")
                 DefDescriptor<T> fullResult = (DefDescriptor<T>) cache.getIfPresent(fullDK);
                 if (fullResult == null) {
                     cache.put(fullDK, result);
@@ -1209,6 +1215,7 @@ public class DefinitionServiceImpl implements DefinitionService {
      * @param descriptor the descriptor, used for both global and local cache lookups.
      * @return the DependencyEntry or null if none present.
      */
+    @CheckForNull
     private DependencyEntry getDE(@CheckForNull String uid, @Nonnull DefDescriptor<?> descriptor) {
         // See localDependencies comment
         AuraContext context = contextService.getCurrentContext();

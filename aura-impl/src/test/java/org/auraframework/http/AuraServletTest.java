@@ -26,6 +26,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.Action;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
 import org.auraframework.service.SerializationService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
@@ -36,6 +37,8 @@ import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -50,9 +53,11 @@ import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.GenericWebApplicationContext;
+
 import test.org.auraframework.impl.adapter.ConfigAdapterImpl;
 
 import javax.inject.Inject;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -64,7 +69,11 @@ public class AuraServletTest extends UnitTestCase {
     @Mock
     private ServerService serverService;
 
+    private AuraServlet originalServlet;
+
     private AuraServlet servlet;
+
+    private AnnotationConfigApplicationContext appContext;
 
     @Mock
     private ServletUtilAdapter servletUtilAdapter;
@@ -80,26 +89,28 @@ public class AuraServletTest extends UnitTestCase {
         MockServletContext servletContext = new MockServletContext();
         MockServletConfig servletConfig = new MockServletConfig(servletContext);
 
-        AnnotationConfigApplicationContext appContext = new AnnotationConfigApplicationContext(AuraConfiguration.class, ConfigAdapterImpl.class);
+        appContext = new AnnotationConfigApplicationContext(AuraConfiguration.class, ConfigAdapterImpl.class);
         DefaultListableBeanFactory dlbf = new DefaultListableBeanFactory(appContext.getBeanFactory());
         GenericWebApplicationContext gwac = new GenericWebApplicationContext(dlbf);
         servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, gwac);
         gwac.setServletContext(servletContext);
         gwac.refresh();
 
-        servlet = new AuraServlet();
-        servlet.init(servletConfig);
-        servlet.setServletUtilAdapter(servletUtilAdapter);
-        servlet.setSerializationService(serializationService);
-        servlet.setConfigAdapter(configAdapter);
-        servlet.setDefinitionService(definitionService);
-        servlet.setServerService(serverService);
-        
+        originalServlet = new AuraServlet();
+        originalServlet.init(servletConfig);
+        originalServlet.setServletUtilAdapter(servletUtilAdapter);
+        originalServlet.setSerializationService(serializationService);
+        originalServlet.setConfigAdapter(configAdapter);
+        originalServlet.setDefinitionService(definitionService);
+        originalServlet.setServerService(serverService);
+        originalServlet.setInstanceService(instanceService);
+        servlet = Mockito.spy(originalServlet);
     }
 
     @Override
     public void tearDown() throws Exception {
         contextService.endContext();
+        appContext.close();
         super.tearDown();
     }
 
@@ -131,9 +142,22 @@ public class AuraServletTest extends UnitTestCase {
     }
     
     /*
+     * Returns a mock action with the given name
+     */
+    @SuppressWarnings("unchecked")
+    private static ActionDef getActionDef(String name) {
+        DefDescriptor<ActionDef> actionDescriptor = Mockito.mock(DefDescriptor.class);
+        ActionDef actionDef = Mockito.mock(ActionDef.class);
+        Mockito.when(actionDef.getDescriptor()).thenReturn(actionDescriptor);
+        Mockito.when(actionDescriptor.getQualifiedName()).thenReturn(name);
+        return actionDef;
+    }
+    
+    /*
      * Starts authenticated context and sets framework UID. 
      */
     private AuraContext startContext() {
+        @SuppressWarnings("unchecked")
         DefDescriptor<ApplicationDef> applicationDescriptor = Mockito.mock(DefDescriptor.class);
         Mockito.when(applicationDescriptor.getDefType()).thenReturn(DefDescriptor.DefType.APPLICATION);
         contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, applicationDescriptor);
@@ -158,15 +182,88 @@ public class AuraServletTest extends UnitTestCase {
     private DefinitionService definitionService;
     @Mock
     private SerializationService serializationService;
+    @Mock
+    private InstanceService instanceService;
     
+    @Test
+    public void testReadMessageNull() throws Exception {
+        Message test = originalServlet.readMessage(null);
+        assertNull("Null message should result in a null", test);
+    }
+
+    @Test
+    public void testReadMessageEmpty() throws Exception {
+        Message test = originalServlet.readMessage("");
+        assertNull("Empty message should result in a null", test);
+    }
+
+    @Test
+    public void testReadMessageEmptyObject() throws Exception {
+        Message test = originalServlet.readMessage("{}");
+        assertNotNull("Empty message object should result in a message", test);
+        assertEquals(test.getActions().size(), 0);
+    }
+
+    @Test
+    public void testReadMessageEmptyActions() throws Exception {
+        Message test = originalServlet.readMessage("{actions:[]}");
+        assertNotNull("Empty message actions should result in a message");
+        assertEquals(test.getActions().size(), 0);
+    }
+
+    @Test
+    public void testReadMessageBadJSON() throws Exception {
+        JsonParseException expected = null;
+        try {
+            originalServlet.readMessage("{actions:[}");
+        } catch (JsonParseException jpe) {
+            expected = jpe;
+        }
+        assertNotNull("Bad JSON should result in an exception", expected);
+    }
+
+    @Test
+    public void testReadMessageActionQFE() throws Exception {
+        String actionName = "myAction";
+        QuickFixException expected = Mockito.mock(QuickFixException.class);
+        QuickFixException actual = null;
+        Message message = null;
+        Mockito.doThrow(expected).when(definitionService).getDefinition(actionName, ActionDef.class);
+        try {
+            message = originalServlet.readMessage("{'actions':[{'descriptor':'"+actionName+"'}]}");
+        } catch (QuickFixException qfe) {
+            actual = qfe;
+        }
+        assertNull("should get no exception", actual);
+        assertNotNull(message);
+        assertEquals(0, message.getActions().size());
+    }
+
+    @Test
+    public void testReadMessageActionInstanceQFE() throws Exception {
+        String actionName = "myAction";
+        QuickFixException expected = Mockito.mock(QuickFixException.class);
+        QuickFixException actual = null;
+        ActionDef myActionDef = getActionDef(actionName);
+        Mockito.doReturn(myActionDef).when(definitionService).getDefinition(actionName, ActionDef.class);
+        Mockito.doThrow(expected).when(instanceService).getInstance(Mockito.eq(myActionDef), Mockito.any());
+        try {
+            originalServlet.readMessage("{'actions':[{'descriptor':'"+actionName+"'}]}");
+        } catch (QuickFixException qfe) {
+            actual = qfe;
+        }
+        assertSame("should get expected exception", expected, actual);
+    }
+
     /*
-     * This test verify that we do definitionService.updateLoaded before serializationService.read, 
+     * This test verify that we do definitionService.updateLoaded before message read, 
      * when action from client arrives, if the client is running out-dated code, we will throw COOS to force it reload, 
      * before the fix we always do de-serialization first, it could give us QFE, which leads to tons of Gack every release) 
      * automation for W-3360478.
      */
     @Test
     public void testDoPost_CoosBeforeQFE() throws Exception {
+        @SuppressWarnings("unchecked")
         DefDescriptor<ApplicationDef> applicationDescriptor = Mockito.mock(DefDescriptor.class);
         Mockito.when(applicationDescriptor.getDefType()).thenReturn(DefDescriptor.DefType.APPLICATION);
         contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, applicationDescriptor);
@@ -192,16 +289,16 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.doThrow(coos).when(definitionService).updateLoaded(Mockito.any());        
         
         DefinitionNotFoundException qfe = Mockito.mock(DefinitionNotFoundException.class);
-        Mockito.doThrow(qfe).when(serializationService).read(Mockito.any(), Mockito.any());
+        Mockito.doThrow(qfe).when(servlet).readMessage(Mockito.any());
         
         servlet.doPost(request, response);
         
-        Mockito.verify(servletUtilAdapter).handleServletException(coos, false, auracontext, request, response, false);  
-        Mockito.verify(serializationService, Mockito.never()).read(Mockito.any(), Mockito.any());
+        Mockito.verify(servletUtilAdapter).handleServletException(coos, false, auracontext, request, response, false);
     }
 
     @Test
     public void testDoPost_WithNoBodyThrowsAuraHandledException() throws Exception {
+        @SuppressWarnings("unchecked")
         DefDescriptor<ApplicationDef> applicationDescriptor = Mockito.mock(DefDescriptor.class);
         Mockito.when(applicationDescriptor.getDefType()).thenReturn(DefDescriptor.DefType.APPLICATION);
         contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, applicationDescriptor);
@@ -486,7 +583,7 @@ public class AuraServletTest extends UnitTestCase {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         Message message = new Message(Arrays.asList(getAction("someAction")));
-        Mockito.doReturn(message).when(serializationService).read(Mockito.any(), Mockito.eq(Message.class));
+        Mockito.doReturn(message).when(servlet).readMessage(Mockito.any());
 
         // Act
         servlet.doPost(request, response);
@@ -508,7 +605,7 @@ public class AuraServletTest extends UnitTestCase {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         Message message = new Message(Arrays.asList(getAction("someAction")));
-        Mockito.doReturn(message).when(serializationService).read(Mockito.any(), Mockito.eq(Message.class));
+        Mockito.doReturn(message).when(servlet).readMessage(Mockito.any());
 
         Mockito.when(configAdapter.isActionPublicCachingEnabled()).thenReturn(true);
 
@@ -532,7 +629,7 @@ public class AuraServletTest extends UnitTestCase {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         Message message = new Message(Arrays.asList(getAction("someAction")));
-        Mockito.doReturn(message).when(serializationService).read(Mockito.any(), Mockito.eq(Message.class));
+        Mockito.doReturn(message).when(servlet).readMessage(Mockito.any());
 
         Mockito.when(configAdapter.isActionPublicCachingEnabled()).thenReturn(false);
 
@@ -556,7 +653,7 @@ public class AuraServletTest extends UnitTestCase {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         Message message = new Message(Arrays.asList(getAction("someAction")));
-        Mockito.doReturn(message).when(serializationService).read(Mockito.any(), Mockito.eq(Message.class));
+        Mockito.doReturn(message).when(servlet).readMessage(Mockito.anyString());
 
         Mockito.when(configAdapter.isActionPublicCachingEnabled()).thenReturn(true);
         Mockito.when(servletUtilAdapter.isPubliclyCacheableAction(message)).thenReturn(true);
@@ -584,13 +681,14 @@ public class AuraServletTest extends UnitTestCase {
         
         MockHttpServletResponse response = new MockHttpServletResponse();
 
+        @SuppressWarnings("unchecked")
         DefDescriptor<ActionDef> actionDescriptor = Mockito.mock(DefDescriptor.class);
         Action action = Mockito.mock(Action.class);
         Mockito.when(action.getDescriptor()).thenReturn(actionDescriptor);
         Mockito.when(actionDescriptor.getQualifiedName()).thenReturn("someName");
 
         Message message = new Message(Arrays.asList(action));
-        Mockito.doReturn(message).when(serializationService).read(Mockito.any(), Mockito.eq(Message.class));
+        Mockito.doReturn(message).when(servlet).readMessage(Mockito.any());
 
         Mockito.when(configAdapter.isActionPublicCachingEnabled()).thenReturn(true);
         Mockito.when(servletUtilAdapter.isPubliclyCacheableAction(message)).thenReturn(true);
@@ -621,13 +719,14 @@ public class AuraServletTest extends UnitTestCase {
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
+        @SuppressWarnings("unchecked")
         DefDescriptor<ActionDef> actionDescriptor = Mockito.mock(DefDescriptor.class);
         Action action = Mockito.mock(Action.class);
         Mockito.when(action.getDescriptor()).thenReturn(actionDescriptor);
         Mockito.when(actionDescriptor.getQualifiedName()).thenReturn("someName");
 
         Message message = new Message(Arrays.asList(action));
-        Mockito.doReturn(message).when(serializationService).read(Mockito.any(), Mockito.eq(Message.class));
+        Mockito.doReturn(message).when(servlet).readMessage(Mockito.any());
 
         context.setActionPublicCacheKey("someKey");
         Mockito.when(configAdapter.getActionPublicCacheKey()).thenReturn("someOtherKey");

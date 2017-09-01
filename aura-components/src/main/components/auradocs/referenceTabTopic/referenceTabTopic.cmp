@@ -19,8 +19,9 @@
     <aura:set attribute="title" value="Reference Overview"/>
 
     <p>The Reference tab enables you to browse API information as well as source code for all the definitions, such as components, in Aura.</p>
-    <p>If you're a Salesforce developer or simply looking for documentation on Base Lightning Components, refer to the <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/aura_compref.htm" target="_blank">Lightning Components Developer Guide</a>.</p>
-
+    <p>If you're a Salesforce developer, there's also more documentation for components, events, and interfaces in the <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/aura_compref.htm" target="_blank">Lightning Components Developer Guide</a>.</p>
+    <p>The component documentation is getting a new look for Salesforce developers in Winter '18. While you can continue to use this site, we recommend that you explore the new Component Library (BETA) at https://&lt;myDomain&gt;/componentReference/suite.app, where &lt;myDomain&gt; is the name of your custom Salesforce domain.</p>
+    
     <h2>APIs</h2>
 
     <p>Click <b>JavaScript API</b> to see the publicly accessible methods for each JavaScript object. The <code>$A</code> namespace is the entry point for using the framework in JavaScript code.</p>

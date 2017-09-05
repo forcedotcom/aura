@@ -42,6 +42,7 @@ import com.google.common.collect.Sets;
 public class RegistryTrie implements RegistrySet {
 
     private final Collection<DefRegistry> allRegistries;
+    private final String stringValue;
 
     // a map of map of maps
     private final Map<DefType, Map<String, PrefixNode>> root = new EnumMap<>(DefType.class);
@@ -76,6 +77,7 @@ public class RegistryTrie implements RegistrySet {
 
     public RegistryTrie(Collection<DefRegistry> registries) {
         allRegistries = Collections.unmodifiableCollection(registries);
+        stringValue = allRegistries.toString();
         initializeHashes();
     }
 
@@ -145,6 +147,11 @@ public class RegistryTrie implements RegistrySet {
             }
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return stringValue;
     }
 
     /**

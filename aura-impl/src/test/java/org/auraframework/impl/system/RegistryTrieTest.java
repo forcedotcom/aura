@@ -210,7 +210,8 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry reg = new MockRegistry().setNamespaces("testNamespace");
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg));
 
-        DefDescriptor<ComponentDef> descriptor = new DefDescriptorImpl("js://*:*", ComponentDef.class);
+        DefDescriptor<ComponentDef> descriptor = new DefDescriptorImpl<>("js", "testNamespace", "xxx",
+                ComponentDef.class);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         assertEquals(null, actual);
     }
@@ -505,5 +506,14 @@ public class RegistryTrieTest extends AuraTestCase {
         Collection<DefRegistry> actual = trie.getRegistries(matcher);
         assertEquals(1, actual.size());
         assertEquals(true, actual.contains(reg2));
+    }
+
+    @Test
+    public void testToString() {
+        MockRegistry reg1 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("markup");
+        MockRegistry reg2 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("js");
+        RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg1, reg2));
+        assertTrue(trie.toString().contains(reg1.toString()));
+        assertTrue(trie.toString().contains(reg2.toString()));
     }
 }

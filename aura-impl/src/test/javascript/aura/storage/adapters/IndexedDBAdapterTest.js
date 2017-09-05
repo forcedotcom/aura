@@ -205,4 +205,28 @@ Test.Aura.Storage.Adapters.IndexedDBAdapterTest = function(){
         }
     }
 
+    [Fixture]
+    function cleanseKeys() {
+
+        var mockAura = Mocks.GetMocks(Object.Global(), {
+            $A: { getContext: function() {} },
+            window: { location: {} }
+        });
+
+        [Fact]
+        function ReplacesParamsInfo() {
+            var key = "serviceComponent://ui.force.components.controllers.lists.listViewManagerGrid.ListViewManagerGridController/ACTION$getRecordLayoutComponent:{'param': 'value'}";
+            // the action part in key should be preserved
+            var expected = "serviceComponent://ui.force.components.controllers.lists.listViewManagerGrid.ListViewManagerGridController/ACTION$getRecordLayoutComponent:PARAMS_REMOVED";
+
+            var cleansedKeys;
+            mockAura(function() {
+                var adapter = new Aura.Storage.IndexedDBAdapter({});
+                cleansedKeys = adapter.cleanseKeys([key]);
+            });
+
+            var actual = cleansedKeys[0];
+            Assert.Equal(expected, actual);
+        }
+    }
 }

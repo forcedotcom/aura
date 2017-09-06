@@ -541,6 +541,57 @@ Test.Aura.LoggerTest = function() {
         }
 
         [Fact]
+        function ReportsActionDescriptorForActionAsArgument() {
+            var target = new Aura.Utils.Logger();
+            var error = new Error("Test Error");
+            var reportingAction = createMockAction();
+            var expected = "actionDescriptor";
+            var mockErrorAction = {
+                getDef: function() {
+                    return {
+                        getDescriptor: function() {
+                            return expected;
+                        }
+                    }
+                }
+            }
+
+            mockAura(function() {
+                $A.injectMockAction(reportingAction);
+                target.reportError(error, mockErrorAction);
+            });
+
+            var actual = reportingAction.getParam("failedAction");
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReportsActionDescriptorForActionPropertyInError() {
+            var target = new Aura.Utils.Logger();
+            var error = new Error("Test Error");
+            var reportingAction = createMockAction();
+            var expected = "actionDescriptor";
+            var mockErrorAction = {
+                getDef: function() {
+                    return {
+                        getDescriptor: function() {
+                            return expected;
+                        }
+                    }
+                }
+            }
+            error["action"] = mockErrorAction;
+
+            mockAura(function() {
+                $A.injectMockAction(reportingAction);
+                target.reportError(error);
+            });
+
+            var actual = reportingAction.getParam("failedAction");
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         function KeepsMaxNumOfCharsForClientStack() {
             var expected = Aura.Utils.Logger.MAX_STACKTRACE_SIZE;
             var mockError = {

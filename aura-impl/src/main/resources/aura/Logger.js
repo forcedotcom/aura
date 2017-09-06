@@ -147,10 +147,11 @@ Logger.prototype.reportError = function(e, action, level, foreground) {
 
     // get action from AuraError
     var errorAction = action || e.action;
-    var actionName = undefined;
-    if (errorAction) {
-        if (errorAction.getDef && errorAction.getDef()) {
-            actionName = errorAction.getDef().getDescriptor();
+    var actionDescriptor = undefined;
+    if (errorAction && errorAction.getDef) {
+        var actionDef = errorAction.getDef();
+        if (actionDef) {
+            actionDescriptor = actionDef.getDescriptor();
         }
     }
 
@@ -172,7 +173,7 @@ Logger.prototype.reportError = function(e, action, level, foreground) {
         reportAction.setCaboose();
     }
     reportAction.setParams({
-        "failedAction": action || actionName || e["component"],
+        "failedAction": actionDescriptor || e["component"],
         "failedId": e.id && e.id.toString(),
         "clientError": e.toString(),
         // Note that stack is non-standard, and even if present, may be obfuscated

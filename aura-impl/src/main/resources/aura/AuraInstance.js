@@ -581,6 +581,7 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
  * @private
  */
 AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices) {
+    Aura.bootstrapMark("AuraFrameworkEPT");
     if (!$A["hasErrors"]) {
         $A.addTearDownHandler();
         $A.clientService.initializeClientLibraries();

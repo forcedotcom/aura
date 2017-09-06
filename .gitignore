@@ -15,6 +15,7 @@ pom.xml.releaseBackup
 *.iml
 *.ipr
 *.iws
+.vscode/*
 version.properties
 *~
 tags

@@ -232,7 +232,7 @@ AuraComponentService.prototype.getAttributeProviderForElement = function(element
  * @return {Object}
  * @private
  */
-AuraComponentService.prototype.contains = (function() {
+AuraComponentService.prototype.containsComponent = (function() {
 
     function contains(container, cmp, visited, isOwner) {
         if(container === cmp) {
@@ -1145,9 +1145,9 @@ AuraComponentService.prototype.getComponentConfigs = function(config, attributeV
 
 /**
  * Indexes the component using its global Id, which is uniquely generated across pageloads.
- * @private
+ * @public
  */
-AuraComponentService.prototype.index = function(component){
+AuraComponentService.prototype.indexComponent = function(component){
     this.indexes.globalId[component.globalId] = component;
 };
 

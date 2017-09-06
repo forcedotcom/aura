@@ -20,7 +20,7 @@
  * @export
  */
 function AuraStyleService() {
-    this.style = new Aura.Utils.Style(); // util for adding and removing <style> elements
+    this.styleUtil = new Aura.Utils.Style(); // util for adding and removing <style> elements
     this.added = []; // keep track of <style> elements added to head
 }
 
@@ -187,7 +187,7 @@ AuraStyleService.prototype.applyAllTokens = function(descriptors, config) {
                     return;
                 }
 
-                var node = that.style.apply(a.getReturnValue());
+                var node = that.styleUtil.apply(a.getReturnValue());
 
                 // default is to replace existing unless specified false
                 if ($A.util.isUndefinedOrNull(config["replaceExisting"]) || $A.util.getBooleanValue(config["replaceExisting"]) === true) {
@@ -232,7 +232,7 @@ AuraStyleService.prototype.applyAllTokens = function(descriptors, config) {
  * @export
  */
 AuraStyleService.prototype.removeTokens = function() {
-    var head = this.style.getHead();
+    var head = this.styleUtil.getHead();
     for (var i = 0, len = this.added.length; i < len; i++) {
         head.removeChild(this.added[i]);
     }

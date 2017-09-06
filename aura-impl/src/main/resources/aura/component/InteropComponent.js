@@ -43,7 +43,7 @@ function InteropComponent(config) {
 
     this.setupGlobalId(config['globalId']);
 
-    $A.componentService.index(this);
+    $A.componentService.indexComponent(this);
 
     if (this.localId) {
         this.doIndex(this);

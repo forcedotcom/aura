@@ -123,7 +123,7 @@ Test.Aura.Component.ComponentTest=function(){
                             hasInit:function(){}
                         };
                     },
-                    index:function(){},
+                    indexComponent:function(){},
                     deIndex:function(){}
                 },
                 eventService: {

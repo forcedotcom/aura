@@ -83,7 +83,7 @@ PropertyReferenceValue.prototype.set = function(value) {
  */
 PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method, rebind) {
     if(this.isGlobal){
-        $A.expressionService.addListener(this,key,cmp);
+        $A.expressionService.addExpressionListener(this,key,cmp);
         return;
     }
     var valueProvider=this.valueProvider;
@@ -117,7 +117,7 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method, reb
  */
 PropertyReferenceValue.prototype.removeChangeHandler=function(cmp, key){
     if(this.isGlobal){
-        $A.expressionService.removeListener(this,key,cmp);
+        $A.expressionService.removeExpressionListener(this,key,cmp);
         return;
     }
     var valueProvider=this.valueProvider;

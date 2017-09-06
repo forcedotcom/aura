@@ -823,7 +823,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
                             }
                             if(rootCmp) {
                                 // check if the cmp is contained within the rootCmp
-                                var containsResult = $A.componentService.contains(rootCmp, cmp);
+                                var containsResult = $A.componentService.containsComponent(rootCmp, cmp);
                                 if(!containsResult.result) {
                                     // the component hierarchy for the cmp does not include the rootCmp
                                     // so don't include these handlers in the result set for the iterator

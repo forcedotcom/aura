@@ -168,7 +168,7 @@ function AuraClientService () {
 
     // Access Control
     this.accessStack=[];
-    this.namespaces={internal:{},privileged:{}};
+    this.registeredNamespaces={internal:{},privileged:{}};
     this.currentAccess=null;
     this.enableAccessChecks=true;
     this.logAccessFailures= true
@@ -1744,7 +1744,7 @@ AuraClientService.prototype.areActionsWaiting = function() {
  * @private
  */
 AuraClientService.prototype.setNamespacePrivileges = function(sentNs) {
-    var namespaces = { "internal" : this.namespaces.internal, "privileged" : this.namespaces.privileged };
+    var namespaces = { "internal" : this.registeredNamespaces.internal, "privileged" : this.registeredNamespaces.privileged };
 
     if (sentNs) {
         for (var x in namespaces) {
@@ -3960,11 +3960,11 @@ AuraClientService.prototype.invalidateAction = function(descriptor, params, succ
 
 // ACCESS CONTROL
 AuraClientService.prototype.isInternalNamespace = function(namespace) {
-    return this.namespaces.internal.hasOwnProperty(namespace);
+    return this.registeredNamespaces.internal.hasOwnProperty(namespace);
 };
 
 AuraClientService.prototype.isPrivilegedNamespace = function(namespace) {
-    return this.namespaces.privileged.hasOwnProperty(namespace);
+    return this.registeredNamespaces.privileged.hasOwnProperty(namespace);
 };
 
 AuraClientService.prototype.getAccessStackHierarchy=function(){
@@ -4045,11 +4045,11 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
                 var accessFacetNamespace=accessFacetDescriptor&&accessFacetDescriptor.getNamespace();
 
                 var allowProtocol=this.protocols.hasOwnProperty(accessDescriptor&&accessDescriptor.getPrefix()) || this.protocols.hasOwnProperty(accessFacetDescriptor&&accessFacetDescriptor.getPrefix());
-                var isInternal=allowProtocol || this.namespaces.internal.hasOwnProperty(accessNamespace) || this.namespaces.internal.hasOwnProperty(accessFacetNamespace);
+                var isInternal=allowProtocol || this.registeredNamespaces.internal.hasOwnProperty(accessNamespace) || this.registeredNamespaces.internal.hasOwnProperty(accessFacetNamespace);
 
                 if(definition.access==='PP') {
                     // PRIVILEGED means accessible to namespaces marked PRIVILEGED, as well as to INTERNAL
-                    var isPrivileged=this.namespaces.privileged.hasOwnProperty(accessNamespace) || this.namespaces.privileged.hasOwnProperty(accessFacetNamespace);
+                    var isPrivileged=this.registeredNamespaces.privileged.hasOwnProperty(accessNamespace) || this.registeredNamespaces.privileged.hasOwnProperty(accessFacetNamespace);
                     if(isPrivileged || isInternal){
                         // Privileged Namespace
                         return true;

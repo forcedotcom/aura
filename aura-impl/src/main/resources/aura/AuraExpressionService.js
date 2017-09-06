@@ -145,7 +145,7 @@ AuraExpressionService.prototype.updateGlobalReferences = function (type, newValu
     updateNestedValue(type, gvpValues, newValues);
 };
 
-AuraExpressionService.prototype.addListener = function (reference, expression, valueProvider) {
+AuraExpressionService.prototype.addExpressionListener = function (reference, expression, valueProvider) {
     expression = $A.expressionService.normalize(expression);
     var consumers=null;
     if(reference.valueProvider){
@@ -160,7 +160,7 @@ AuraExpressionService.prototype.addListener = function (reference, expression, v
     consumers[globalId][expression]=true;
 };
 
-AuraExpressionService.prototype.removeListener = function (reference, expression, valueProvider) {
+AuraExpressionService.prototype.removeExpressionListener = function (reference, expression, valueProvider) {
     expression = $A.expressionService.normalize(expression);
     var consumers = null;
     if (reference.valueProvider) {

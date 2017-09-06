@@ -55,7 +55,7 @@ function TextComponent(config, localCreation) {
     }
 
     // add this component to the global index
-    $A.componentService.index(this);
+    $A.componentService.indexComponent(this);
 
     // sets this components definition, preferring partialconfig if it exists
     this.setupComponentDef(config);

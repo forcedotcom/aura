@@ -137,7 +137,10 @@ public class CachingServiceImplTest extends AuraImplTestCase {
         cachingService.initializeCaches();
         cachingService.notifyDependentSourceChange(listeners, event, filePath);
         for (WeakReference<SourceListener> ref : listeners) {
-            Mockito.verify(ref.get(), Mockito.times(1)).onSourceChanged(event, filePath);
+            SourceListener item = ref.get();
+            if (item != null) {
+                Mockito.verify(item, Mockito.times(1)).onSourceChanged(event, filePath);
+            }
         }
     }
 

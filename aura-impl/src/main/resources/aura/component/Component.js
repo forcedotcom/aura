@@ -291,14 +291,27 @@ Component.prototype.getDef = function() {
  * @export
  */
 Component.prototype.index = function(localId, globalId) {
-
     var index = this.localIndex;
     var existing = index[localId];
     if (existing) {
         if (!$A.util.isArray(existing)) {
-            index[localId] = [ existing, globalId ];
+            if(existing!==globalId){
+                index[localId] = [ existing, globalId ];
+            }else{
+                $A.warning("Component.index():'Invalid redundant use of component.index().'");
+            }
         } else {
-            existing.push(globalId);
+            var found=false;
+            for(var i=0;i<existing.length;i++){
+                if(existing[i]===globalId){
+                    found=true;
+                    $A.warning("Component.index():'Invalid redundant use of component.index().'");
+                    break;
+                }
+            }
+            if(!found){
+                existing.push(globalId);
+            }
         }
     } else {
         index[localId] = globalId;
@@ -2645,7 +2658,7 @@ Component.prototype.setupFlavors = function(config, configAttributes) {
 
 Component.prototype.doIndex = function(cmp) {
     var localId = this.localId;
-    if (localId) {
+    if (!$A.util.isUndefinedOrNull(localId)) {
         // JBUCH: HALO: TODO: MOVE THIS INTO PASSTHROUGHVALUE.
         var valueProvider=cmp.getAttributeValueProvider();
         if(valueProvider instanceof PassthroughValue){
@@ -2655,6 +2668,17 @@ Component.prototype.doIndex = function(cmp) {
         if(!valueProvider) {
             throw new Error("No attribute value provider defined for component " + cmp);
         }
+        // JBUCH: HACK: TEMPORARY FIX FOR DYNAMICALLY CREATED COMPONENTS
+        if(valueProvider===this){
+            valueProvider=this.getOwner();
+        }
+        if(valueProvider instanceof PassthroughValue){
+            valueProvider=valueProvider.getComponent();
+        }
+        if(!valueProvider) {
+            throw new Error("No owner specified for component " + cmp);
+        }
+
         valueProvider.index(localId, this.globalId);
     }
 };
@@ -2663,6 +2687,13 @@ Component.prototype.doDeIndex = function() {
     var localId = this.localId;
     if (localId) {
         var valueProvider=this.getAttributeValueProvider();
+        if(valueProvider instanceof PassthroughValue){
+            valueProvider=valueProvider.getComponent();
+        }
+        // JBUCH: HACK: TEMPORARY FIX FOR DYNAMICALLY CREATED COMPONENTS
+        if(valueProvider===this){
+            valueProvider=this.getOwner();
+        }
         if(valueProvider instanceof PassthroughValue){
             valueProvider=valueProvider.getComponent();
         }

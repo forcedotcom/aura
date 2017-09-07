@@ -60,6 +60,7 @@ import org.auraframework.system.Client;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.json.JsonStreamReader;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import com.google.common.collect.Maps;
@@ -338,7 +339,12 @@ public class AuraContextFilter implements Filter {
                 // Decode encoded context json. Serialized AuraContext json always starts with "{"
                 config = AuraTextUtil.urldecode(config);
             }
-            configMap = (Map<String, Object>) new JsonReader().read(config);
+            try {
+                configMap = (Map<String, Object>) new JsonReader().read(config);
+            } catch (Throwable throwable){
+                //config map was invalid. log the bad json and move on. Callers are protected against null.
+                LOG.info("aura.config was invalid JSON:" + config, throwable);
+            }
         }
         return configMap;
     }

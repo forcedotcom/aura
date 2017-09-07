@@ -43,6 +43,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
@@ -136,6 +137,20 @@ public class AuraContextFilterTest extends AuraTestCase {
             AuraPrivateAccessor.invoke(filter, "endContext");
         }
 
+    }
+
+    @Test
+    public void testStartContextIgnoresInvalidConfigJson() throws Exception {
+        // Arrange
+        Mode expected = configAdapter.getDefaultMode();
+        Mockito.when(request.getParameter(AuraServlet.AURA_PREFIX + "config")).thenReturn("Scooby Dooby Doo");
+
+        // Act
+        AuraContext context = AuraPrivateAccessor.invoke(filter, "startContext", request, null, null);
+        Mode actual = context.getMode();
+
+        // Assert
+        assertEquals(expected, actual);
     }
     
     @Test

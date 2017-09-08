@@ -49,6 +49,7 @@ import org.auraframework.http.RequestParam.InvalidParamException;
 import org.auraframework.http.RequestParam.MissingParamException;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.instance.Action;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
@@ -602,6 +603,9 @@ public class AuraServlet extends AuraBaseServlet {
                 written = true;
             }
             out.write(CSRF_PROTECT);
+                
+            // Remove the Browser GVP as we don't want browser-specific in the cache.
+            context.getGlobalProviders().remove(AuraValueProviderType.BROWSER.getPrefix());
             serverService.run(message, context, out, attributes);
 
             if (publiclyCacheable) {

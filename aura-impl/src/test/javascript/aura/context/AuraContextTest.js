@@ -46,7 +46,14 @@ Test.Aura.Context.AuraContextTest = function() {
     var mock$A = function(events) {
         return Mocks.GetMock(Object.Global(), '$A', Stubs.GetObject({}, {
             util: {
-                apply: function() {},
+                apply: function(baseObject, members) {
+                    for (var key in members) {
+                        if (members.hasOwnProperty(key)) {
+                            baseObject[key] = members[key];
+                        }
+                    }
+                    return baseObject;
+                },
                 applyNotFromPrototype: function() {},
                 isArray: function(obj) { return obj instanceof Array; },
                 json: {
@@ -86,22 +93,20 @@ Test.Aura.Context.AuraContextTest = function() {
     [Fixture]
     function EncodeForServer() {
 
-        var config = {
-            mode: 'mode',
-            fwuid: 'fwuid',
-            app: 'app',
-            loaded: 'loaded',
-            apce: true,
-            apck: 'actionPublicCacheKey'
-        };
-
         [Fact]
         function IncludesDefaultConfig() {
             var mocks = [mock$A(), mockAura()], 
+                config = {
+                    mode: 'mode',
+                    fwuid: 'fwuid',
+                    app: 'app',
+                    loaded: { loadedOriginal: 'loadedOriginal' }
+                },
                 expected = {
                     mode: 'mode',
                     fwuid: 'fwuid',
-                    app: 'app'
+                    app: 'app',
+                    loaded: { loadedOriginal: 'loadedOriginal' }
                 }, 
                 actual;
 
@@ -115,18 +120,26 @@ Test.Aura.Context.AuraContextTest = function() {
         [Fact]
         function IncludesDynamic() {
             var mocks = [mock$A(), mockAura()], 
+                config = {
+                    mode: 'mode',
+                    fwuid: 'fwuid',
+                    app: 'app',
+                    loaded: { loadedOriginal: 'loadedOriginal' }
+                },
                 expected = {
                     mode: 'mode',
                     fwuid: 'fwuid',
                     app: 'app',
-                    loaded: 'loaded',
+                    loaded: { loadedOriginal: 'loadedOriginal', loaded: 'loaded' },
                     dn: 'dn',
                     globals: '$Global'
                 }, 
                 actual;
 
             withMocks(mocks, function() {
-                actual = new Aura.Context.AuraContext(config).encodeForServer(true);
+                var context = new Aura.Context.AuraContext(config);
+                context.addLoaded({ key: 'loaded', value: 'loaded' });
+                actual = context.encodeForServer(true);
             });
 
             Assert.Equal(expected, actual);
@@ -135,16 +148,27 @@ Test.Aura.Context.AuraContextTest = function() {
         [Fact]
         function IncludeCacheKeyForCacheableXHR() {
             var mocks = [mock$A(), mockAura()], 
+                config = {
+                    mode: 'mode',
+                    fwuid: 'fwuid',
+                    app: 'app',
+                    loaded: { loadedOriginal: 'loadedOriginal' },
+                    apce: true,
+                    apck: 'actionPublicCacheKey'
+                },
                 expected = {
                     mode: 'mode',
                     fwuid: 'fwuid',
                     app: 'app',
+                    loaded: { loadedOriginal : 'loadedOriginal' },
                     apck: 'actionPublicCacheKey'
                 }, 
                 actual;
 
             withMocks(mocks, function() {
-                actual = new Aura.Context.AuraContext(config).encodeForServer(false, true);
+                var context = new Aura.Context.AuraContext(config);
+                context.addLoaded({ key: 'loaded', value: 'loaded' });
+                actual = context.encodeForServer(false, true);
             });
 
             Assert.Equal(expected, actual);

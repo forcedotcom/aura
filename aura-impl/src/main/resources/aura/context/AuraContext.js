@@ -213,6 +213,8 @@ Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic, in
         contextToSend["loaded"] = this.loaded;
         contextToSend["dn"] = $A.services.component.getDynamicNamespaces();
         contextToSend["globals"] = this.globalValueProviders.getValueProvider("$Global").serializeForServer();
+    } else {
+        contextToSend["loaded"] = this.loadedOriginal;
     }
     if (includeCacheKeyForCacheableXHR) {
         contextToSend["apck"] = this.actionPublicCacheKey;

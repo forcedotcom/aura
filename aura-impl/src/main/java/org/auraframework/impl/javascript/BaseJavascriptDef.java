@@ -17,14 +17,15 @@ package org.auraframework.impl.javascript;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.auraframework.builder.JavascriptCodeBuilder;
-import org.auraframework.def.RemotableDefinition;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DependencyDef;
+import org.auraframework.def.RemotableDefinition;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -51,8 +52,8 @@ public abstract class BaseJavascriptDef<T extends Definition> extends Definition
     }
 
     @Override
-    public void retrieveLabels() throws QuickFixException {
-        retrieveLabels(expressionRefs);
+    public Collection<PropertyReference> getPropertyReferences() {
+        return expressionRefs;
     }
 
     @Override

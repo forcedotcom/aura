@@ -36,8 +36,8 @@ import com.google.common.collect.Maps;
  * A simple ModelDef that provides a MockModel instance.
  */
 public class MockModelDef extends MockDefinition<ModelDef> implements ModelDef {
-	private static final long serialVersionUID = 8237818157530284425L;
-	private final Map<String, ValueDef> members;
+    private static final long serialVersionUID = 8237818157530284425L;
+    private final Map<String, ValueDef> members;
     private final List<Answer<Model>> instances;
 
     public MockModelDef(DefDescriptor<ModelDef> descriptor, Set<ValueDef> members, List<Answer<Model>> instances) {

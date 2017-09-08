@@ -23,7 +23,6 @@ import static org.mockito.Mockito.verify;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Vector;
 
 import javax.inject.Inject;
@@ -45,7 +44,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.AuraTestCase;
-import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
 import org.mockito.Mock;

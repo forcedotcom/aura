@@ -13,26 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.throwable.quickfix;
+package org.auraframework.impl.visitor;
 
-import org.auraframework.system.Location;
+import java.util.function.Supplier;
 
 /**
- * A validation exception.
+ * A visitor class to extract labels from a set of definitions.
  */
-public abstract class AuraValidationException extends QuickFixException {
-    private static final long serialVersionUID = -7041778809350433164L;
-
-    public AuraValidationException(String message, Location l) {
-        super(message, l);
+public class UsageMapSupplier<T> implements Supplier<UsageMap<T>> {
+    @Override
+    public UsageMap<T> get() {
+        return new UsageMap<>();
     }
-
-    public AuraValidationException(String message, Location l, Throwable cause) {
-        super(message, l, cause);
-    }
-
-    public AuraValidationException(String msg) {
-        this(msg, null);
-    }
-
 }

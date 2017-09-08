@@ -28,11 +28,13 @@ import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -104,15 +106,24 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
     }
 
     @Override
-    public void retrieveLabels() throws QuickFixException {
-        super.retrieveLabels();
+    public Collection<PropertyReference> getPropertyReferences() {
+        List<PropertyReference> references = null;
+        Collection<PropertyReference> tmp;
+
         if (bundledDefs != null) {
             for (Definition def : bundledDefs.values()) {
                 if (def != null) {
-                    def.retrieveLabels();
+                    if (references == null) {
+                        references = Lists.newArrayList();
+                    }
+                    tmp = def.getPropertyReferences();
+                    if (tmp != null) {
+                        references.addAll(tmp);
+                    }
                 }
             }
         }
+        return references;
     }
 
     @Override

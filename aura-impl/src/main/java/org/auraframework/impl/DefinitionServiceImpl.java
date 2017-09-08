@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
@@ -48,12 +49,18 @@ import org.auraframework.def.ParentedDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.module.ModuleDef;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
 import org.auraframework.impl.system.BundleAwareDefRegistry;
 import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
+import org.auraframework.impl.visitor.GlobalReferenceVisitor;
+import org.auraframework.impl.visitor.UsageMap;
+import org.auraframework.impl.visitor.UsageMapCombiner;
+import org.auraframework.impl.visitor.UsageMapSupplier;
+import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -70,7 +77,9 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
+import org.auraframework.throwable.quickfix.CompositeValidationException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.text.GlobMatcher;
@@ -1840,4 +1849,51 @@ public class DefinitionServiceImpl implements DefinitionService {
         } while (compiling.size() < cc.compiled.size());
     }
 
+    private UsageMap<PropertyReference> getReferenceUsageMap(String root,
+            Map<DefDescriptor<? extends Definition>, Definition> defs) {
+        return defs.entrySet().stream().collect(
+                Collector.of(new UsageMapSupplier<PropertyReference>(),
+                    new GlobalReferenceVisitor(root),
+                    new UsageMapCombiner<PropertyReference>()));
+    }
+
+    @Override
+    public Set<String> getGlobalReferences(String root, Map<DefDescriptor<? extends Definition>, Definition> defs)
+            throws QuickFixException {
+        GlobalValueProvider provider = contextService.getCurrentContext().getGlobalProviders().get(root);
+        Map<Throwable, Collection<Location>> errors = Maps.newLinkedHashMap();
+        Set<String> result = Sets.newHashSet();
+        UsageMap<PropertyReference> refs = getReferenceUsageMap(root, defs);
+        for (Map.Entry<PropertyReference, Set<Location>> entry: refs.entrySet()) {
+            try {
+                provider.validate(entry.getKey());
+                result.add(entry.getKey().toString());
+            } catch (InvalidExpressionException iee) {
+                errors.put(iee, entry.getValue());
+            }
+        }
+        if (errors.size() > 0) {
+            throw new CompositeValidationException("Unable to load values for "+root, errors);
+        }
+        return result;
+    }
+
+    @Override
+    public void populateGlobalValues(String root, Map<DefDescriptor<? extends Definition>, Definition> defs)
+            throws QuickFixException {
+        GlobalValueProvider provider = contextService.getCurrentContext().getGlobalProviders().get(root);
+        Map<Throwable, Collection<Location>> errors = Maps.newLinkedHashMap();
+        UsageMap<PropertyReference> refs = getReferenceUsageMap(root, defs);
+        for (Map.Entry<PropertyReference, Set<Location>> entry: refs.entrySet()) {
+            try {
+                provider.validate(entry.getKey());
+                provider.getValue(entry.getKey());
+            } catch (InvalidExpressionException iee) {
+                errors.put(iee, entry.getValue());
+            }
+        }
+        if (errors.size() > 0) {
+            throw new CompositeValidationException("Unable to load values for "+root, errors);
+        }
+    }
 }

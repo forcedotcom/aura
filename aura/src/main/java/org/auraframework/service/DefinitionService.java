@@ -16,6 +16,7 @@
 package org.auraframework.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
@@ -233,6 +234,32 @@ public interface DefinitionService extends AuraService {
      * @throws QuickFixException if the reference is not allowed
      */
     <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, DefDescriptor<?> accessDescriptor) throws QuickFixException;
+
+    /**
+     * Populate a global value provider from references in a set of definitions.
+     *
+     * This routine will populate the global value provider, and capture any errors during the process. If
+     * errors occur, it will throw an exception which will be a composite exception of all errors.
+     *
+     * @param root the root name of the GVP.
+     * @param definitionMap A map of descriptor to definition that defines the set of definitions to use.
+     * @throws QuickFixException if any errors occurred, the exception will be thrown after the entire set is processed
+     */
+    void populateGlobalValues(String root, Map<DefDescriptor<? extends Definition>, Definition> definitionMap)
+        throws QuickFixException;
+
+    /**
+     * Retrieve a set of references to a global value provider, validating them.
+     *
+     * This routine will fetch the set of global value provider references for a given root, validating each one,
+     * and throwing a composite error if validation fails.
+     *
+     * @param root the root name of the GVP.
+     * @param definitionMap A map of descriptor to definition that defines the set of definitions to use.
+     * @throws QuickFixException if any errors occurred, the exception will be thrown after the entire set is processed
+     */
+    Set<String> getGlobalReferences(String root, Map<DefDescriptor<? extends Definition>, Definition> definitionMap)
+        throws QuickFixException;
 
     /**
      * Returns null if the referencingDescriptor has access to the definition otherwise a specific access violation reason.

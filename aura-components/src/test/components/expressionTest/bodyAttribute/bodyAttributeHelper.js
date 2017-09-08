@@ -21,6 +21,7 @@
         $A.createComponent(
             "ui:button",
             {
+                "aura:id":"newButton",
                 label : "New Button"
             },
             function(newCmp){
@@ -33,6 +34,7 @@
         $A.createComponent(
             "ui:button",
             {
+                "aura:id":"addButton",
                 label : "Added Button"
             },
             function(newCmp){

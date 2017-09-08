@@ -200,9 +200,9 @@
             var created = false;
             $A.createComponent("uitest:inputErrorComponent", {}, function(errorCmp) {
                 $A.createComponent("ui:inputText", {
+                    "aura:id":"clientCreatedInvalid",
                     "errorComponent" : [ errorCmp ]
                 }, function(inputCmp){
-                    cmp.index("clientCreatedInvalid", inputCmp.getGlobalId());
                     var newBody = cmp.getSuper().get("v.body");
                     newBody.unshift(inputCmp);
                     cmp.set("v.body", newBody);
@@ -234,11 +234,11 @@
         attributes: {"caseToRender" : "clientCreated"},
         test : [function(cmp) {
             var created = false;
-            $A.createComponent("ui:inputDefaultError", { value : ["one","two"] }, function(errorCmp) {
+            $A.createComponent("ui:inputDefaultError", {"value" : ["one","two"] }, function(errorCmp) {
                 $A.createComponent("ui:inputText", {
+                    "aura:id":"clientCreatedInvalid",
                     "errorComponent" : [ errorCmp ]
                 }, function(inputCmp){
-                    cmp.index("clientCreatedInvalid", inputCmp.getGlobalId());
                     var newBody = cmp.getSuper().get("v.body");
                     newBody.unshift(inputCmp);
                     cmp.set("v.body", newBody);

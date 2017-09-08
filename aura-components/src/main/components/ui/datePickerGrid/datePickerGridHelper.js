@@ -131,12 +131,6 @@
     },
 
     addRowComponents: function (component, rowComponents, calendarBody) {
-        //need to explicitly index components due to W-2529066
-        for (var i = 0; i < rowComponents.length; i++) {
-            var rowComponent = rowComponents[i];
-            component.index(rowComponent.getLocalId(), rowComponent.getGlobalId());
-        }
-
         var trNode = rowComponents[0];
         trNode.set("v.body", rowComponents.splice(1));
         calendarBody.push(trNode);

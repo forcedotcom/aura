@@ -326,7 +326,7 @@ Test.Aura.Component.ComponentTest=function(){
 
     [Fixture]
     function Index() {
-        //this cover when index[locaid] does not exist
+        //this cover when index[localid] does not exist
         [Fact]
         function InitLocalIdWithGlobalId() {
             //Arrange
@@ -371,7 +371,7 @@ Test.Aura.Component.ComponentTest=function(){
             Assert.Equal(expected, actual);
         }
 
-        //this cover when index[locaid] is already an array
+        //this cover when index[localid] is already an array
         [Fact]
         function AppendLocalIdArrayWithGlobalId() {
             //Arrange

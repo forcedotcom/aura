@@ -18,7 +18,6 @@ package org.auraframework.throwable.quickfix;
 import org.auraframework.system.Location;
 
 /**
- * A validation exception.
  */
 public abstract class AuraValidationException extends QuickFixException {
     private static final long serialVersionUID = -7041778809350433164L;

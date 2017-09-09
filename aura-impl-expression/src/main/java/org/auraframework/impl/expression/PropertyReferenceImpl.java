@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.ExpressionType;
 import org.auraframework.expression.PropertyReference;
@@ -46,7 +46,6 @@ public class PropertyReferenceImpl implements PropertyReference {
     private final List<String> pieces;
     private final Location l;
     private boolean byValue=false;
-    private final String stringValue;
     private DefDescriptor<? extends BaseComponentDef> target;
 
     public PropertyReferenceImpl(String expr, Location l) {
@@ -61,7 +60,6 @@ public class PropertyReferenceImpl implements PropertyReference {
     protected PropertyReferenceImpl(List<String> pieces, Location l) {
         this.pieces = pieces;
         this.l = l;
-        this.stringValue = String.join(".", pieces);
     }
 
     @Override
@@ -104,7 +102,12 @@ public class PropertyReferenceImpl implements PropertyReference {
         out.append(root.startsWith("$") ? JS_GLOBAL_GET : JS_LOCAL_GET);        
         out.append("(");
         out.append('"');
-        out.append(stringValue);
+		for (int index = 0; index < pieces.size(); index++) {
+			if (index > 0) {
+	        	out.append(".");
+			}
+        	out.append(pieces.get(index));
+		}
         out.append('"');
         out.append(")");
     }
@@ -160,16 +163,12 @@ public class PropertyReferenceImpl implements PropertyReference {
 
     @Override
     public String toString() {
-        return stringValue;
+        return toString(false);
     }
 
-    // FIXME: W-4296360 - delete this routine
     public String toString(boolean curlies) {
-        if (!curlies) {
-            return stringValue;
-        } else {
-            return "{"+(this.byValue?'#':'!')+stringValue+"}";
-        }
+        char curlyType=this.byValue?'#':'!';
+        return AuraTextUtil.collectionToString(pieces, ".", null, curlies ? "{" + curlyType : null, curlies ? "}" : null);
     }
 
     @Override
@@ -182,14 +181,14 @@ public class PropertyReferenceImpl implements PropertyReference {
     @Override
     public boolean equals(Object o) {
         if (o instanceof PropertyReferenceImpl) {
-            return stringValue.equals(((PropertyReferenceImpl) o).stringValue);
+            return pieces.equals(((PropertyReferenceImpl) o).pieces);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return stringValue.hashCode();
+        return pieces.hashCode();
     }
 
     public static final Serializer SERIALIZER = new Serializer();

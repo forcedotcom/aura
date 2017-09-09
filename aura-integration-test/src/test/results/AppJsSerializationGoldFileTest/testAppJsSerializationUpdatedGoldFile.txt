@@ -4353,13 +4353,13 @@ return {
                       "exprType":"PROPERTY",
                       "byValue":false,
                       "target":"ui:inputDefaultError",
-                      "path":"v.errors"
+                      "path":"v.value"
                     },
                     {
                       "exprType":"PROPERTY",
                       "byValue":false,
                       "target":"ui:inputDefaultError",
-                      "path":"v.value"
+                      "path":"v.errors"
                     }
                   ],
                   "byValue":false
@@ -6691,13 +6691,13 @@ return {
                         "exprType":"PROPERTY",
                         "byValue":false,
                         "target":"ui:button",
-                        "path":"v.variant"
+                        "path":"v.selected"
                       },
                       {
                         "exprType":"PROPERTY",
                         "byValue":false,
                         "target":"ui:button",
-                        "path":"v.class"
+                        "path":"v.variant"
                       },
                       {
                         "exprType":"PROPERTY",
@@ -6709,7 +6709,7 @@ return {
                         "exprType":"PROPERTY",
                         "byValue":false,
                         "target":"ui:button",
-                        "path":"v.selected"
+                        "path":"v.class"
                       }
                     ],
                     "byValue":false
@@ -8340,7 +8340,7 @@ return {
                         "exprType":"PROPERTY",
                         "byValue":false,
                         "target":"ui:tabItem",
-                        "path":"v.hidden"
+                        "path":"v.class"
                       },
                       {
                         "exprType":"PROPERTY",
@@ -8352,7 +8352,7 @@ return {
                         "exprType":"PROPERTY",
                         "byValue":false,
                         "target":"ui:tabItem",
-                        "path":"v.class"
+                        "path":"v.hidden"
                       }
                     ],
                     "byValue":false
@@ -9700,13 +9700,13 @@ return {
                         "exprType":"PROPERTY",
                         "byValue":false,
                         "target":"ui:tab",
-                        "path":"v.active"
+                        "path":"v.class"
                       },
                       {
                         "exprType":"PROPERTY",
                         "byValue":false,
                         "target":"ui:tab",
-                        "path":"v.class"
+                        "path":"v.active"
                       }
                     ],
                     "byValue":false
@@ -10969,12 +10969,6 @@ return {
                                   "exprType":"PROPERTY",
                                   "byValue":false,
                                   "target":"ui:treeNode",
-                                  "path":"v.href"
-                                },
-                                {
-                                  "exprType":"PROPERTY",
-                                  "byValue":false,
-                                  "target":"ui:treeNode",
                                   "path":"v.item.href"
                                 },
                                 {
@@ -10982,6 +10976,12 @@ return {
                                   "byValue":false,
                                   "target":"ui:treeNode",
                                   "path":"v.class"
+                                },
+                                {
+                                  "exprType":"PROPERTY",
+                                  "byValue":false,
+                                  "target":"ui:treeNode",
+                                  "path":"v.href"
                                 }
                               ],
                               "byValue":false
@@ -11017,13 +11017,13 @@ return {
                                           "exprType":"PROPERTY",
                                           "byValue":false,
                                           "target":"ui:treeNode",
-                                          "path":"v.href"
+                                          "path":"v.item.href"
                                         },
                                         {
                                           "exprType":"PROPERTY",
                                           "byValue":false,
                                           "target":"ui:treeNode",
-                                          "path":"v.item.href"
+                                          "path":"v.href"
                                         }
                                       ],
                                       "byValue":false
@@ -11171,13 +11171,13 @@ return {
                                                       "exprType":"PROPERTY",
                                                       "byValue":false,
                                                       "target":"ui:treeNode",
-                                                      "path":"v.href"
+                                                      "path":"v.item.href"
                                                     },
                                                     {
                                                       "exprType":"PROPERTY",
                                                       "byValue":false,
                                                       "target":"ui:treeNode",
-                                                      "path":"v.item.href"
+                                                      "path":"v.href"
                                                     }
                                                   ],
                                                   "byValue":false

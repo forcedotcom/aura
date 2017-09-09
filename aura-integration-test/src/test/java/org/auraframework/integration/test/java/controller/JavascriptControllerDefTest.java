@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.factory;
+package org.auraframework.integration.test.java.controller;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
-import java.util.Collection;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -39,6 +38,7 @@ import org.auraframework.instance.Action;
 import org.auraframework.service.CompilerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.TextSource;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
@@ -61,25 +61,20 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testGetPropertyReferencesWithNull() throws QuickFixException {
-        // the label expression is missing a part, "name"
-        JavascriptControllerDef.Builder builder = new JavascriptControllerDef.Builder();
-        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.INTERNAL));
-        ControllerDef controllerDef = builder.build();
-        assertNull(controllerDef.getPropertyReferences());
-    }
-
-    @Test
     public void testRetrieveLabelsWithInvalidLabelExpression() throws QuickFixException {
+        // the label expression is missing a part, "name"
         PropertyReference propertyReference = new PropertyReferenceImpl("$Label.section", null);
         JavascriptControllerDef.Builder builder = new JavascriptControllerDef.Builder();
         builder.addExpressionRef(propertyReference);
         builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.INTERNAL));
         ControllerDef controllerDef = builder.build();
 
-        Collection<PropertyReference> properties = controllerDef.getPropertyReferences();
-        assertEquals(1, properties.size());
-        assertSame(propertyReference, properties.iterator().next());
+        try {
+            controllerDef.retrieveLabels();
+        } catch(Exception e) {
+            String expectMessage = "Labels should have a section and a name";
+            checkExceptionContains(e, InvalidExpressionException.class, expectMessage);
+        }
     }
 
     @Test
@@ -163,8 +158,6 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
 
     /**
      * Verify JavascriptControllerDef creates an JavascriptPseudoAction object on server side.
-     *
-     * This should probably be an integration test.
      */
     @Test
     public void testCreateAction() throws Exception {
@@ -183,15 +176,22 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
         assertThat(action, instanceOf(JavascriptPseudoAction.class));
     }
 
+    /**
+     *  TODO: Created in master but not yet compilable in UI-tier
+     *  FIXME: this should be an integration test.
     @Test
-    public void testFindsLabels() throws Exception {
-        AuraTestingUtil util = getAuraTestingUtil();
-        String controllerJs = "({ function1: function(arg) { $Label.section.name; } })";
-        TextSource<ControllerDef> source = util.buildTextSource(util.getInternalNamespace(), ControllerDef.class,
-                controllerJs);
-        ControllerDef controllerDef = compilerService.compile(source.getDescriptor(), source);
-        Collection<PropertyReference> properties = controllerDef.getPropertyReferences();
-        assertEquals(1, properties.size());
-        assertEquals("$Label.section.name", properties.iterator().next().toString());
+    public void testCreateActionThrowsExceptionWhenCreatingNonExsitingAction() throws Exception {
+        String controllerJs = "({ function1: function(arg) {} })";
+        DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
+        ControllerDef controllerDef = definitionService.getDefinition(controllerDesc);
+
+        try {
+            controllerDef.createAction("nonExistingAction", new HashMap<String, Object>());
+            fail("Should not be able to create an instance of the non-existing client action");
+        } catch (Exception e) {
+            String expectMessage = String.format("No ACTION named %s/ACTION$nonExistingAction found", controllerDesc.getQualifiedName());
+            checkExceptionFull(e, DefinitionNotFoundException.class, expectMessage);
+        }
     }
+    */
 }

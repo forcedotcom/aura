@@ -20,6 +20,9 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.service.CSPInliningService;
 import org.auraframework.system.AuraContext;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * common location to maintain state for a given evaluation of inlining rules
  */

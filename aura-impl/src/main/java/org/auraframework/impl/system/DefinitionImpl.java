@@ -15,9 +15,7 @@
  */
 package org.auraframework.impl.system;
 
-import java.io.Serializable;
-import java.util.Map;
-
+import com.google.common.collect.Maps;
 import org.auraframework.Aura;
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
@@ -31,7 +29,8 @@ import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceScope;
 import org.auraframework.util.json.Serialization.ReferenceType;
 
-import com.google.common.collect.Maps;
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * The implementation for a definition.

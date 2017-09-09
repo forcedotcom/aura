@@ -32,7 +32,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.module.ModuleDef;
-import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
@@ -131,11 +130,6 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             List<Definition> libraryDefs = Lists.newArrayList();
             List<Definition> moduleDefs = Lists.newArrayList();
 
-            try {
-                definitionService.populateGlobalValues(AuraValueProviderType.LABEL.getPrefix(), defMap);
-            } catch (QuickFixException qfe) {
-                // this should not throw a QFE
-            }
             for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
                 DefDescriptor<? extends Definition> desc = entry.getKey();
                 DefType dt = desc.getDefType();
@@ -145,6 +139,11 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
                 // that the MDR should have done when filtering.
                 //
                 if (d != null) {
+                    try {
+                        d.retrieveLabels();
+                    } catch (QuickFixException qfe) {
+                        // this should not throw a QFE
+                    }
                     if (DefType.COMPONENT.equals(dt) || DefType.APPLICATION.equals(dt)) {
                         componentDefs.add(d);
                     } else if (DefType.EVENT.equals(dt)) {

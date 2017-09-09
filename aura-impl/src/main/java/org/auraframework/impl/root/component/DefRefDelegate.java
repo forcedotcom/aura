@@ -16,7 +16,6 @@
 package org.auraframework.impl.root.component;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +31,6 @@ import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDefRef;
-import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.component.ModuleDefRefImpl.Builder;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Location;
@@ -222,6 +220,11 @@ public class DefRefDelegate implements DefinitionReference {
     }
 
     @Override
+    public void retrieveLabels() throws QuickFixException {
+        select().retrieveLabels();
+    }
+
+    @Override
     public String getDescription() {
         return select().getDescription();
     }
@@ -271,10 +274,5 @@ public class DefRefDelegate implements DefinitionReference {
             return this.moduleDefRef;
         }
         return this.componentDefRef;
-    }
-
-    @Override
-    public Collection<PropertyReference> getPropertyReferences() {
-        return select().getPropertyReferences();
     }
 }

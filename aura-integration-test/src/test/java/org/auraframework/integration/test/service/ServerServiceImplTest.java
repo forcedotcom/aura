@@ -15,9 +15,9 @@
  */
 package org.auraframework.integration.test.service;
 
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -128,6 +128,10 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         @Override
         public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> descriptor) {
             return null;
+        }
+
+        @Override
+        public void retrieveLabels() throws QuickFixException {
         }
 
         @Override

@@ -78,7 +78,8 @@ public class BootstrapUnitTest extends UnitTestCase {
             }
 
             @Override
-            protected void loadLabels(AuraContext context) {
+            public Boolean loadLabels() {
+                return true;
             }
         };
 
@@ -139,7 +140,8 @@ public class BootstrapUnitTest extends UnitTestCase {
             }
 
             @Override
-            protected void loadLabels(AuraContext context) {
+            public Boolean loadLabels() {
+                return true;
             }
         };
 
@@ -192,7 +194,8 @@ public class BootstrapUnitTest extends UnitTestCase {
             }
 
             @Override
-            protected void loadLabels(AuraContext context) {
+            public Boolean loadLabels() {
+                return true;
             }
         };
 

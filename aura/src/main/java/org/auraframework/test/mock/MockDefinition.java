@@ -87,6 +87,10 @@ public abstract class MockDefinition<D extends Definition> implements Definition
     }
 
     @Override
+    public void retrieveLabels() throws QuickFixException {
+    }
+
+    @Override
     public void validateDefinition() throws QuickFixException {
     }
 

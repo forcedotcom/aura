@@ -16,15 +16,11 @@
 
 package org.auraframework.def;
 
-import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
 
-import java.util.Collection;
 import java.util.Set;
-
-import javax.annotation.CheckForNull;
 
 /**
  * Define something.
@@ -65,18 +61,5 @@ public interface Definition extends JsonSerializable, BaseXmlElement {
      * @param descriptor the descriptor for the sub-definition.
      * @return the definition that matches the descriptor.
      */
-    @CheckForNull
     <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> descriptor);
-
-    /**
-     * Get the set of property references for this definition.
-     *
-     * By default, we simply return null, implying that there are no property references.
-     *
-     * @return the set of property references or null if none
-     */
-    @CheckForNull
-    default Collection<PropertyReference> getPropertyReferences() {
-        return null;
-    }
 }

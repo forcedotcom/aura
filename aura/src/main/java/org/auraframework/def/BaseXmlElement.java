@@ -112,6 +112,13 @@ public interface BaseXmlElement extends Serializable {
     DefinitionAccess getAccess();
 
     /**
+     * retrieve all labels needed by this definition. FIXME: this should be more
+     * like append dependencies so that we can build a set before retrieving
+     * any. that way we'd be much more efficient.
+     */
+    void retrieveLabels() throws QuickFixException;
+
+    /**
      * Get a readable description of this definition.
      */
     String getDescription();

@@ -15,17 +15,8 @@
  */
 package org.auraframework.http.cspinlining;
 
-import static org.auraframework.service.CSPInliningService.InlineScriptMode.NONCE;
-
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
-
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.ContextService;
@@ -33,8 +24,13 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.collect.ImmutableList;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
+
+import static org.auraframework.service.CSPInliningService.InlineScriptMode.NONCE;
 
 @ServiceComponent
 public class AuraCSPInliningService implements CSPInliningService {

@@ -590,14 +590,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     @Override
-    public Collection<PropertyReference> getPropertyReferences() {
-        Collection<PropertyReference> superRefs = super.getPropertyReferences();
-        if (superRefs != null) {
-            superRefs.addAll(expressionRefs);
-            return superRefs;
-        } else {
-            return expressionRefs;
-        }
+    public void retrieveLabels() throws QuickFixException {
+        super.retrieveLabels();
+        retrieveLabels(expressionRefs);
     }
 
     @Override

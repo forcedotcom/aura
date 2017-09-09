@@ -43,7 +43,7 @@
         </section>
         
         <aura:if isTrue="{!v.branch}">
-            <section class="aura" aura:id="container">
+            <section class="aura simple" aura:id="container">
                 <moduleTest:simpleCmp
                     aura:id="simple" 
                     literal="Hi!"

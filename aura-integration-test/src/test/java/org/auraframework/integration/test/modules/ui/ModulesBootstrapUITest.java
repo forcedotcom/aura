@@ -34,7 +34,7 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
     private static final By BY_A_RES2 = By.cssSelector(".a-res2");
     private static final By BY_A_RES3 = By.cssSelector(".a-res3");
     private static final By BY_A_EXPR = By.cssSelector(".a-expr");
-    private static final By BY_M_LITERAL = By.cssSelector(".m-literal");
+    private static final By BY_M_LITERAL = By.cssSelector(".simple .m-literal");
     private static final By BY_M_BOUND = By.cssSelector(".m-bound");
     private static final By BY_M_UNBOUND = By.cssSelector(".m-unbound");
     private static final By BY_M_EXPR = By.cssSelector(".m-expr");

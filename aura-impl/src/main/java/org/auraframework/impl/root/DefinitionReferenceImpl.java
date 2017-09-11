@@ -27,6 +27,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.AuraContext;
@@ -89,7 +90,7 @@ public abstract class DefinitionReferenceImpl<T extends Definition> extends Defi
 
     @Override
     public AttributeDefRef getAttributeDefRef(String name) {
-        return getAttributeValues().get(Aura.getDefinitionService().getDefDescriptor(name, AttributeDef.class));
+        return getAttributeValues().get(new DefDescriptorImpl<>(null, null, name, AttributeDef.class));
     }
 
     @Override

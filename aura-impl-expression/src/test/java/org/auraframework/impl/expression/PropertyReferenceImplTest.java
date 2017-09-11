@@ -61,7 +61,6 @@ public class PropertyReferenceImplTest extends UnitTestCase {
     public void testToString() throws Exception {
         Location loc = new Location("expressionism", 92);
         PropertyReferenceImpl pr = new PropertyReferenceImpl("test.yo.self", loc);
-        assertEquals("{!test.yo.self}", pr.toString(true));
         assertEquals("test.yo.self", pr.toString());
     }
 }

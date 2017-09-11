@@ -159,17 +159,13 @@ public class PropertyReferenceImpl implements PropertyReference {
     }
 
     @Override
-    public String toString() {
-        return stringValue;
+    public boolean isByValue(){
+        return this.byValue;
     }
 
-    // FIXME: W-4296360 - delete this routine
-    public String toString(boolean curlies) {
-        if (!curlies) {
-            return stringValue;
-        } else {
-            return "{"+(this.byValue?'#':'!')+stringValue+"}";
-        }
+    @Override
+    public String toString() {
+        return stringValue;
     }
 
     @Override

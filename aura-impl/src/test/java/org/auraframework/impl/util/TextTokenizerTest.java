@@ -15,36 +15,25 @@
  */
 package org.auraframework.impl.util;
 
-import org.auraframework.adapter.DefinitionParserAdapter;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.AttributeDefRef;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.expression.LiteralImpl;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
-import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
+import org.auraframework.impl.root.parser.handler.ExpressionContainerHandler;
 import org.auraframework.impl.util.TextTokenizer.Token;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
-import javax.inject.Inject;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
-
-public class TextTokenizerTest extends AuraImplTestCase {
-    private static final String[] testText = new String[] { "this is text", "{!this.is.an.expression}",
-            "\n\nOther text\n\n" };
-
-    private static final String wholeText = String.format("%s%s%s", testText[0], testText[1], testText[2]);
-
-    private static final String testWhitespace = "     {!true}     {!false}     five spaces";
-
-    @Inject
-    private DefinitionParserAdapter definitionParserAdapter;
-
+public class TextTokenizerTest extends UnitTestCase {
     @Test
     public void testUnwrap() {
         assertEquals("ab.cab", TextTokenizer.unwrap("{!ab.cab}"));
@@ -57,111 +46,183 @@ public class TextTokenizerTest extends AuraImplTestCase {
      * Test method for {@link TextTokenizer#tokenize(String, Location)}.
      */
     @Test
-    public void testTextTokenizer() throws AuraValidationException {
-        TextTokenizer.TokenType[] testTypes = new TextTokenizer.TokenType[] { TextTokenizer.TokenType.PLAINTEXT,
-                TextTokenizer.TokenType.EXPRESSION, TextTokenizer.TokenType.PLAINTEXT };
+    public void testTextTokenizerString() throws AuraValidationException {
+        String theText = "some text";
+        TextTokenizer tokenizer = TextTokenizer.tokenize(theText, null);
+        assertEquals("Wrong number of TextTokenizer tokens returned", 1, tokenizer.size());
+        Token token = tokenizer.iterator().next();
+        assertEquals(TextTokenizer.TokenType.PLAINTEXT, token.getType());
+        assertEquals(theText, token.getRawValue());
+    }
 
-        TextTokenizer tokenizer = TextTokenizer.tokenize(wholeText, null);
-        assertEquals("Wrong number of TextTokenizer tokens returned", 3, tokenizer.size());
-        int i = 0;
-        for (Token token : tokenizer) {
-            assertEquals("Wrong Type", testTypes[i], token.getType());
-            assertEquals("Wrong Value", testText[i], token.getRawValue());
-            i++;
-        }
+    /**
+     * Test method for {@link TextTokenizer#tokenize(String, Location)}.
+     */
+    @Test
+    public void testTextTokenizerExpr() throws AuraValidationException {
+        String theText = "{!an.expression}";
+        TextTokenizer tokenizer = TextTokenizer.tokenize(theText, null);
+        assertEquals("Wrong number of TextTokenizer tokens returned", 1, tokenizer.size());
+        Token token = tokenizer.iterator().next();
+        assertEquals(TextTokenizer.TokenType.EXPRESSION, token.getType());
+        assertEquals(theText, token.getRawValue());
     }
 
     @Test
-    public void testAsValues() throws Exception {
-        TextTokenizer tokenizer = TextTokenizer.tokenize(wholeText, null);
-        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null, true, definitionService, contextService,
-                configAdapter, definitionParserAdapter);
+    public void testTextTokenizerStringExpr() throws AuraValidationException {
+        String text1 = "some text";
+        String text2 = "{!an.expression}";
+        TextTokenizer tokenizer = TextTokenizer.tokenize(text1+text2, null);
+        assertEquals("Wrong number of TextTokenizer tokens returned", 2, tokenizer.size());
+        Iterator<Token> iter = tokenizer.iterator();
+        Token token1 = iter.next();
+        Token token2 = iter.next();
+        assertEquals(TextTokenizer.TokenType.PLAINTEXT, token1.getType());
+        assertEquals(text1, token1.getRawValue());
+        assertEquals(TextTokenizer.TokenType.EXPRESSION, token2.getType());
+        assertEquals(text2, token2.getRawValue());
+    }
+
+    @Test
+    public void testAsValueFailsWithTwo() throws Exception {
+        TextTokenizer tokenizer = TextTokenizer.tokenize("text{!an.expression}", null);
+        InvalidExpressionException expected = null;
+
         try {
-            tokenizer.asValue(cdh);
-            fail("Should have failed because of mixed expression and text");
-        } catch (Exception e) {
-            checkExceptionStart(e, InvalidExpressionException.class,
-                    "Cannot mix expression and literal string in attribute value");
+            tokenizer.asValue(null);
+        } catch (InvalidExpressionException e) {
+            expected = e;
         }
+        assertNotNull(expected);
+        assertTrue(expected.getMessage().startsWith("Cannot mix expression and literal string in attribute value"));
     }
 
     @Test
-    public void testSingleAsValue() throws Exception {
-        TextTokenizer tokenizer = TextTokenizer.tokenize(testText[0], null);
-        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null, true, definitionService, contextService,
-                configAdapter, definitionParserAdapter);
-        Object o = tokenizer.asValue(cdh);
+    public void testTextAsValue() throws Exception {
+        ExpressionContainerHandler valueHolder = Mockito.mock(ExpressionContainerHandler.class);
+        String input = "some text";
+        TextTokenizer tokenizer = TextTokenizer.tokenize(input, null);
+        Object o = tokenizer.asValue(valueHolder);
         assertTrue("Token value is of wrong type", o instanceof String);
-        assertEquals("Incorrect value returned from asValue()", testText[0], o.toString());
+        assertEquals("Incorrect value returned from asValue()", input, o.toString());
+        Mockito.verifyNoMoreInteractions(valueHolder);
+    }
 
-        tokenizer = TextTokenizer.tokenize(testText[1], null);
-        o = tokenizer.asValue(cdh);
-        assertTrue("Token value is of wrong type", o instanceof PropertyReferenceImpl);
-        PropertyReferenceImpl e = (PropertyReferenceImpl) o;
-        assertEquals("Incorrect value returned from asValue()", testText[1], e.toString(true));
+    @Test
+    @SuppressWarnings({"rawtypes","unchecked"})
+    public void testRefExprAsValue() throws Exception {
+        ExpressionContainerHandler valueHolder = Mockito.mock(ExpressionContainerHandler.class);
+        String reference = "an.expr";
+        String input = "{!"+reference+"}";
+        TextTokenizer tokenizer = TextTokenizer.tokenize(input, null);
+        Object o = tokenizer.asValue(valueHolder);
+        assertTrue("Token value is of wrong type", o instanceof PropertyReference);
+        assertEquals("Incorrect value returned from asValue()", reference, o.toString());
+        PropertyReference pr = (PropertyReference)o;
+        assertFalse(pr.isByValue());
+        ArgumentCaptor<Set> captor = ArgumentCaptor.forClass(Set.class);
+        Mockito.verify(valueHolder, Mockito.times(1)).addExpressionReferences(captor.capture());
+        Set arg = captor.getValue();
+        assertEquals(1, arg.size());
+        assertTrue(arg.contains(pr));
+    }
+
+    @Test
+    @SuppressWarnings({"rawtypes","unchecked"})
+    public void testByValueExprAsValue() throws Exception {
+        ExpressionContainerHandler valueHolder = Mockito.mock(ExpressionContainerHandler.class);
+        String reference = "an.expr";
+        String input = "{#"+reference+"}";
+        TextTokenizer tokenizer = TextTokenizer.tokenize(input, null);
+        Object o = tokenizer.asValue(valueHolder);
+        assertTrue("Token value is of wrong type", o instanceof PropertyReference);
+        assertEquals("Incorrect value returned from asValue()", reference, o.toString());
+        PropertyReference pr = (PropertyReference)o;
+        assertTrue(pr.isByValue());
+        ArgumentCaptor<Set> captor = ArgumentCaptor.forClass(Set.class);
+        Mockito.verify(valueHolder, Mockito.times(1)).addExpressionReferences(captor.capture());
+        Set arg = captor.getValue();
+        assertEquals(1, arg.size());
+        assertTrue(arg.contains(pr));
     }
 
     @Test
     public void testAsComponentDefRefs() throws Exception {
-        TextTokenizer tokenizer = TextTokenizer.tokenize(wholeText, null);
-        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null, true, definitionService, contextService,
-                configAdapter, definitionParserAdapter);
-        List<ComponentDefRef> l = tokenizer.asComponentDefRefs(cdh);
+        ExpressionContainerHandler valueHolder = Mockito.mock(ExpressionContainerHandler.class);
+        String first = "stuff and nonsense ";
+        String secondReference = "an.expression";
+        String second = "{!"+secondReference+"}";
+        String third = " more text";
+
+        TextTokenizer tokenizer = TextTokenizer.tokenize(first+second+third, null);
+        List<ComponentDefRef> l = tokenizer.asComponentDefRefs(valueHolder);
+
         assertEquals("Wrong number of ComponentDefRefs returned", 3, l.size());
+
         ComponentDefRef c = l.get(0);
         assertEquals("Incorrect ComponentDefRef type", "text", c.getDescriptor().getName());
-        assertEquals("Incorrect ComponentDefRef value", testText[0], c.getAttributeDefRef("value").getValue());
+        assertEquals("Incorrect ComponentDefRef value", first, c.getAttributeDefRef("value").getValue());
 
         c = l.get(1);
         assertEquals("Incorrect ComponentDefRef type", "expression", c.getDescriptor().getName());
         Object o = c.getAttributeDefRef("value").getValue();
         assertTrue("ComponentDefRef value is of wrong type", o instanceof PropertyReferenceImpl);
-        assertEquals("Incorrect ComponentDefRef value", testText[1], ((PropertyReferenceImpl) o).toString(true));
+        assertEquals("Incorrect ComponentDefRef value", secondReference, o.toString());
 
         c = l.get(2);
         assertEquals("Incorrect ComponentDefRef type", "text", c.getDescriptor().getName());
-        assertEquals("Incorrect ComponentDefRef value", testText[2], c.getAttributeDefRef("value").getValue());
+        assertEquals("Incorrect ComponentDefRef value", third, c.getAttributeDefRef("value").getValue());
     }
 
     @Test
     public void testWhitespaceOptimize() throws Exception {
-        String[] descNames = new String[] { "expression", "expression", "text" };
-        String[] testResults = new String[] { "[value=org.auraframework.impl.expression.LiteralImpl",
-                "[value=org.auraframework.impl.expression.LiteralImpl", "[value=     five spaces]" };
+        ExpressionContainerHandler valueHolder = Mockito.mock(ExpressionContainerHandler.class);
+        String testWhitespace = "     {!true}     {!false}     five spaces";
 
-        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null, true, definitionService, contextService,
-                configAdapter, definitionParserAdapter);
-        List<ComponentDefRef> compList = TextTokenizer.tokenize(testWhitespace, null).asComponentDefRefs(cdh);
-        assertEquals("Wrong number of ComponentDefRefs returned", descNames.length, compList.size());
-        int i = 0;
-        for (ComponentDefRef cdf : compList) {
-            assertEquals("Wrong Token Type", descNames[i], cdf.getName());
-            Set<Entry<DefDescriptor<AttributeDef>, AttributeDefRef>> attributes = cdf.getAttributeValues().entrySet();
-            // Truncate at expected result size
-            String test = attributes.toString().substring(0, testResults[i].length());
-            assertEquals("Did not optimize whitespace", testResults[i], test);
-            i++;
-        }
+        List<ComponentDefRef> compList = TextTokenizer.tokenize(testWhitespace, null).asComponentDefRefs(valueHolder);
+        assertEquals("Wrong number of ComponentDefRefs returned", 3, compList.size());
+
+        ComponentDefRef c = compList.get(0);
+        assertEquals("Incorrect ComponentDefRef type", "expression", c.getDescriptor().getName());
+        assertEquals("Incorrect ComponentDefRef class", LiteralImpl.class,
+                    c.getAttributeDefRef("value").getValue().getClass());
+
+        c = compList.get(1);
+        assertEquals("Incorrect ComponentDefRef type", "expression", c.getDescriptor().getName());
+        assertEquals("Incorrect ComponentDefRef class", LiteralImpl.class,
+                    c.getAttributeDefRef("value").getValue().getClass());
+
+        c = compList.get(2);
+        assertEquals("Incorrect ComponentDefRef type", "text", c.getName());
+        assertEquals("Incorrect ComponentDefRef value",
+                "     five spaces",
+                c.getAttributeDefRef("value").getValue());
     }
 
     @Test
     public void testIncompleteExpressionQuickFix() throws Exception {
+        InvalidExpressionException expected = null;
+
         try {
             TextTokenizer.tokenize("{!incompleteExpression", null);
-            fail("Expected InvalidExpressionException");
-        } catch (Exception e) {
-            checkExceptionFull(e, InvalidExpressionException.class, "Unterminated expression");
+        } catch (InvalidExpressionException e) {
+            expected = e;
         }
+        assertNotNull("Expected InvalidExpressionException", expected);
+        assertEquals("Unexpected message", "Unterminated expression", expected.getMessage());
     }
 
     @Test
     public void testCurlyBangInversionQuickFix() throws Exception {
+        InvalidExpressionException expected = null;
+
         try {
             TextTokenizer.tokenize("!{malformed}", null);
-            fail("Expected InvalidExpressionException");
-        } catch (Exception e) {
-            checkExceptionFull(e, InvalidExpressionException.class,
-                    "Found an expression starting with '!{' but it should be '{!'");
+        } catch (InvalidExpressionException e) {
+            expected = e;
         }
+        assertNotNull("Expected InvalidExpressionException", expected);
+        assertEquals("Unexpected message",
+                "Found an expression starting with '!{' but it should be '{!'", expected.getMessage());
     }
 }

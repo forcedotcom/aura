@@ -54,8 +54,12 @@ public interface PropertyReference extends Expression {
     String getLeaf();
 
     /**
+     * @return true if this is a 'by value' reference.
+     */
+    boolean isByValue();
+
+    /**
      * @return size of this PropertyReference path
      */
     int size();
-
 }

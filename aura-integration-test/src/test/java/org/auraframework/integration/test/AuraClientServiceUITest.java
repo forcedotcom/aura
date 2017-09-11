@@ -22,8 +22,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
+import org.auraframework.http.cspinlining.CSPInliningMockRule;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.service.CSPInliningService;
 import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.throwable.InvalidSessionException;
@@ -38,17 +40,33 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSUPPORTED;
+
 // CSRF is only stored in persistent storage. indexedDB is not supported on Safari,
 // so persistent storage is not able to be created on Safari.
 @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IE9, BrowserType.IE10, BrowserType.IE11 })
 public class AuraClientServiceUITest extends WebDriverTestCase {
 	@Inject
 	private MockConfigAdapter configAdapter;
-	
-	@FreshBrowserInstance
+	@Inject
+    private CSPInliningMockRule inlineMockRule;
+
+
+    @Override
+    public void tearDown() throws Exception {
+        inlineMockRule.setIsRelevent(false);
+        inlineMockRule.setMode(null);
+	    super.tearDown();
+    }
+
+    @FreshBrowserInstance
     @ThreadHostileTest("ConfigAdapter modified, can't tolerate other tests.")
     @Test
     public void testCsrfTokenSetOnInit() throws Exception {
+        //test relies on multiple XHRs. These won't happen if CSP2 inlining is enabled
+        inlineMockRule.setIsRelevent(true);
+        inlineMockRule.setMode(UNSUPPORTED);
+
 		String target = "/clientServiceTest/csrfTokenStorage.app";
 		
 		AtomicLong counter = new AtomicLong();
@@ -56,7 +74,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
 		configAdapter.setCSRFToken(() -> {
 			return expectedBase + counter.incrementAndGet();
 		});
-		
+
         open(target);
         
 		// .app generates a token internally since the HTML write is part 1, and
@@ -129,8 +147,13 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
         CountDownLatch latch = new CountDownLatch(1);
 		AtomicReference<String> receivedToken = new AtomicReference<>();
 		configAdapter.setValidateCSRFToken((token)->{
-			receivedToken.set(token);
-			latch.countDown();
+		    //we should stop capturing after latch has released
+		    synchronized(this) {
+		        if (latch.getCount() == 1) {
+		            receivedToken.set(token);
+		            latch.countDown();
+		        }
+		    }
 		});
 		
         WebElement trigger = getDriver().findElement(By.className("trigger"));

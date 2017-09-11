@@ -16,11 +16,11 @@
 package org.auraframework.impl.root.component;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
@@ -40,6 +40,8 @@ import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Json.ApplicationKey;
+
+import com.google.common.collect.Sets;
 
 /**
  * ModuleDef holds compiled code and serializes for client
@@ -113,8 +115,8 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     }
 
     @Override
-    public void retrieveLabels() throws QuickFixException {
-        retrieveLabels(this.labelReferences);
+    public Collection<PropertyReference> getPropertyReferences() {
+        return labelReferences;
     }
 
     /**

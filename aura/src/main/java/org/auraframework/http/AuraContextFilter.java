@@ -57,7 +57,6 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
-import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader;

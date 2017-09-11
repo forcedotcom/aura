@@ -34,6 +34,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.ds.servicecomponent.GlobalController;
 import org.auraframework.instance.Application;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.Instance;
@@ -72,12 +73,7 @@ public class ComponentController implements GlobalController {
 
         definitionService.getDefinition(ctx.getApplicationDescriptor());
         defMap = ctx.filterLocalDefs(null);
-        for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
-            Definition def = entry.getValue();
-            if (def != null) {
-                def.retrieveLabels();
-            }
-        }
+        definitionService.populateGlobalValues(AuraValueProviderType.LABEL.getPrefix(), defMap);
         return Boolean.TRUE;
     }
 

@@ -267,10 +267,6 @@ public class AuraImplUnitTestingUtil {
             }
 
             @Override
-            public void retrieveLabels() {
-            }
-
-            @Override
             public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
             }
 

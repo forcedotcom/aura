@@ -20,7 +20,6 @@ import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +30,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.Instance;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
@@ -67,21 +66,6 @@ public class Bootstrap extends AuraResourceImpl {
             "    }\n" +
             "}());";
 
-    public Boolean loadLabels() throws QuickFixException {
-        AuraContext ctx = contextService.getCurrentContext();
-        Map<DefDescriptor<? extends Definition>, Definition> defMap;
-
-        definitionService.getDefinition(ctx.getApplicationDescriptor());
-        defMap = ctx.filterLocalDefs(null);
-        for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
-            Definition def = entry.getValue();
-            if (def != null) {
-                def.retrieveLabels();
-            }
-        }
-        return Boolean.TRUE;
-    }
-
     protected void setCacheHeaders(HttpServletResponse response, DefDescriptor<? extends BaseComponentDef> appDesc)
             throws QuickFixException {
         Integer cacheExpiration = null;
@@ -95,6 +79,10 @@ public class Bootstrap extends AuraResourceImpl {
         } else {
             servletUtilAdapter.setNoCache(response);
         }
+    }
+
+    protected void loadLabels(AuraContext context) throws QuickFixException {
+        definitionService.populateGlobalValues(AuraValueProviderType.LABEL.getPrefix(), context.filterLocalDefs(null));
     }
 
     @Override
@@ -117,7 +105,7 @@ public class Bootstrap extends AuraResourceImpl {
             setCacheHeaders(response, app);
             Instance<?> appInstance = instanceService.getInstance(desc, getComponentAttributes(request));
             definitionService.updateLoaded(desc);
-            loadLabels();
+            loadLabels(context);
 
             JsonSerializationContext serializationContext = context.getJsonSerializationContext();
 

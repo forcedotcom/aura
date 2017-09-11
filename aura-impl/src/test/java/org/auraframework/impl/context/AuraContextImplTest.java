@@ -244,10 +244,6 @@ public class AuraContextImplTest extends AuraImplTestCase {
         }
 
         @Override
-        public void retrieveLabels() throws QuickFixException {
-        }
-
-        @Override
         public String getDescription() {
             return null;
         }

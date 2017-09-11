@@ -16,8 +16,44 @@
 function lib(scrollUtil) { //eslint-disable-line no-unused-vars
     'use strict';
 
-    var lib = { //eslint-disable-line no-shadow, no-unused-vars
+    function createTransitionEvent(cmp, isEndEvent) {
+        var TRANSITION_EVENT = {
+            Begin: "markup://ui:panelTransitionBegin",
+            End:   "markup://ui:panelTransitionEnd"
+        };
+        
+        function hasModalClass(element) {
+            var target = element || document;
+            return target.querySelector(".modal-glass") !== null;
+        }
 
+        var event;
+        if (isEndEvent) {
+            event = $A.getEvt(TRANSITION_EVENT.End);
+            return {
+                fireEndEvent: function (action) {
+                    return event.setParams({
+                        action: action, 
+                        panelId: cmp.getGlobalId(),
+                        hasGlassBackground: hasModalClass(cmp.getElement())
+                    }).fire();
+                }
+            };
+        } else {
+            event = $A.getEvt(TRANSITION_EVENT.Begin);
+            return {
+                fireBeginEvent: function (isOpening) {
+                    return event.setParams({ 
+                        panel: cmp, 
+                        isOpening: isOpening,
+                        hasGlassBackground: hasModalClass(cmp.getElement())
+                    });
+                }
+            };
+        }        
+    }    
+
+    var lib = { //eslint-disable-line no-shadow, no-unused-vars
         validateAnimationName: function(animName) {
         	if(animName && animName.match(/^move(to|from)(bottom|top|left|right|center|pop)$/)) {
                 return true;
@@ -170,7 +206,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 }
             };
         },
-
+        
         /**
          * show panel based on the config
          * @param cmp
@@ -186,7 +222,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 panel = cmp.getElement(),
                 useTransition = config.useTransition,
                 closeButton,
-                endEvent = $A.getEvt("markup://ui:panelTransitionEnd"),
+                endEvent = createTransitionEvent(cmp, true),
                 animEl = config.animationEl || panel;
 
             //make sure animation name is valid 
@@ -195,28 +231,25 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
             }
             //need to notify panel manager to de-activate other panels;
             cmp.getEvent('notify').setParams({
-                action: 'beforeShow',
-                typeOf: 'ui:panel',
-                payload: { panelInstance: cmp.getGlobalId() }
-            }).fire();
+                    action: 'beforeShow',
+                    typeOf: 'ui:panel',
+                    payload: { 
+                        panelInstance: cmp.getGlobalId() 
+                    }
+                }).fire();
 
-            $A.getEvt("markup://ui:panelTransitionBegin").setParams(
-                { 
-                    panel: cmp, 
-                    isOpening: true
-                }
-            ).fire();
-
+                
+            createTransitionEvent(cmp).fireBeginEvent(true);
 
             //endAnimationHandler: cleanup all classes and events
-            var finishHandler = $A.getCallback(function () {
+            var endAnimationHandler = $A.getCallback(function () {
                 if(!cmp.isValid()) {
                     return;
                 }
                 
                 if (animEl) {
                     $A.util.removeClass(animEl, 'transitioning ' + animName);
-                    animEl.removeEventListener(animEnd, finishHandler);
+                    animEl.removeEventListener(animEnd, endAnimationHandler);
                 }
                 $A.util.addClass(panel, 'active');
                 
@@ -225,7 +258,6 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 if (config.autoFocus) {
                     me.setFocus(cmp);
                 } else {
-
                     // If auto focus is false attempt to focus
                     // on the close button.
                     closeButton = cmp.getElement().querySelector('.closeBtn');
@@ -235,10 +267,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     }
                 }
 
-                endEvent.setParams({
-                    action: 'show', 
-                    panelId: cmp.getGlobalId()
-                }).fire();
+                endEvent.fireEndEvent("show");
 
                 config.onFinish && config.onFinish();
             });
@@ -248,7 +277,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
             }
 
             if (useTransition) {
-                animEl.addEventListener(animEnd, finishHandler, false);
+                animEl.addEventListener(animEnd, endAnimationHandler, false);
 
                 setTimeout(function() {
                      $A.util.addClass(panel, 'open');
@@ -257,9 +286,8 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
 
             } else {
                 $A.util.addClass(panel, 'open');
-                finishHandler();
-            }
-            
+                endAnimationHandler();
+            }            
         },
 
         /**
@@ -271,9 +299,8 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
             var animEnd    = this.getAnimationEndEventName(),
                 animName   = config.animationName,
                 panel = cmp.getElement(),
-                panelId = cmp.getGlobalId(),
                 useTransition = config.useTransition,
-                endEvent = $A.getEvt("markup://ui:panelTransitionEnd"),
+                endEvent =createTransitionEvent(cmp, true),
                 animEl = config.animationEl || panel;
 
             //make sure animation name is valid 
@@ -282,41 +309,33 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
             }
             
             cmp.set('v.visible', false);
-            $A.getEvt("markup://ui:panelTransitionBegin").setParams({ panel: cmp, isOpening: false }).fire();
-
+            createTransitionEvent(cmp).fireBeginEvent(false);
 
             //endAnimationHandler: cleanup all classes and events
-            var finishHandler = $A.getCallback(function () {
-
+            var endAnimationHandler = $A.getCallback(function () {
                 // make sure the compoment is valid befdore  
                 // doining anything with it, because
                 // this is asynchronous
-                if(cmp.isValid()) {
-
-                    if (config.useTransition) {
-                        animEl.removeEventListener(animEnd, finishHandler);
-                    }
-
-
-                    endEvent.setParams({
-                        action: 'hide', 
-                        panelId: panelId
-                    }).fire();
-                    cmp._transitionEndFired = true;
-
-
-                    
+                if(!cmp.isValid()) {
                     config.onFinish && config.onFinish();
-                    setTimeout(function() {
-                        $A.util.removeClass(panel, 'open');
-                        $A.util.removeClass(panel, 'active');
-                        $A.util.removeClass(animEl, 'transitioning ' + animName);
-                    }, 1000); //make sure all transitions are finished
-
-                } else {
-                    config.onFinish && config.onFinish();
+                    return;
                 }
 
+                if (config.useTransition) {
+                    animEl.removeEventListener(animEnd, endAnimationHandler);
+                }
+
+                endEvent.fireEndEvent("hide");
+
+                cmp._transitionEndFired = true;        
+
+                config.onFinish && config.onFinish();
+
+                setTimeout(function() {
+                    $A.util.removeClass(panel, 'open');
+                    $A.util.removeClass(panel, 'active');
+                    $A.util.removeClass(animEl, 'transitioning ' + animName);
+                }, 1000); //make sure all transitions are finished
                 
             });
 
@@ -325,10 +344,10 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
             }
 
             if (useTransition) {
-                animEl.addEventListener(animEnd, finishHandler, false);
+                animEl.addEventListener(animEnd, endAnimationHandler, false);
                 $A.util.addClass(animEl,  'transitioning ' + animName);
             } else {
-                finishHandler();
+                endAnimationHandler();
             }
         },
 
@@ -405,6 +424,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
 	                break;
 	        }
         },
+
         /**
          * Activate or de-activate the panel
          * @param cmp
@@ -544,9 +564,11 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
         scopeScroll: function (dom) {
             scrollUtil.scope(dom);
         },
+
         unscopeScroll: function (dom) {
             scrollUtil.unscope(dom);
         },
+        
         ANIMATION_END_EVENT_NAMES : {
             webkit : 'webkitAnimationEnd',
             o : 'oAnimationEnd',

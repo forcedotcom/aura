@@ -17,185 +17,306 @@ package org.auraframework.impl.source.file;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.Reader;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
-
-import javax.inject.Inject;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
-import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.service.DefinitionService;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.FileBundleSourceBuilder;
-import org.auraframework.system.Parser.Format;
+import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.IOUtil;
+import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
 
-public class FileBundleSourceLoaderTest extends AuraImplTestCase {
-    @Inject
-    private DefinitionService definitionService;
+import com.google.common.collect.Sets;
 
-    @Inject
-    private FileMonitor fileMonitor;
-
-    @Inject
-    private Collection<FileBundleSourceBuilder> builders;
+public class FileBundleSourceLoaderTest {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+    
+    private File workingDirectory;
+    
+    @Test
+    public void testConstructor_WithNonExistentFile_Throws() {
+        File testFile = new File("this_probably_doesnt_exist");
+        thrown.expect(AuraRuntimeException.class);
+        thrown.expectMessage("Base directory " + testFile.getAbsolutePath() + " does not exist");
+        
+        new FileBundleSourceLoader(testFile, null, null);
+    }
 
     @Test
-    public void testFileSourceLoaderSanity() {
+    public void testConstructor_WithNullFile_Throws() {
+        thrown.expect(AuraRuntimeException.class);
+        thrown.expectMessage("Base directory null does not exist");
+
+        new FileBundleSourceLoader((File)null, null, null);
+    }
+
+    @Test
+    public void testConstructor_WithFileMonitor_SubscribesToChangeNotifications() {
         File tmpDir = new File(IOUtil.newTempDir("fileSourceLoaderTest"));
-        assertNotNull(new FileBundleSourceLoader(tmpDir, fileMonitor, builders));
-    }
-
-    @Test
-    public void testFileSourceLoaderWithNonExistentFile() {
-        Exception expected = null;
-        try {
-            new FileBundleSourceLoader(new File("this_probably_doesnt_exist"), fileMonitor, builders);
-        } catch (Exception e) {
-            expected = e;
-        }
-        assertNotNull("Should have thrown AuraException(Base directory does not exist)", expected);
-        checkExceptionRegex(expected, AuraRuntimeException.class, "Base directory.*.does not exist");
-    }
-
-    @Test
-    public void testFileSourceLoaderWithNullFile() {
-        Exception expected = null;
-        try {
-            new FileBundleSourceLoader((File)null, fileMonitor, builders);
-        } catch (Exception e) {
-            expected = e;
-        }
-        assertNotNull("Should have thrown AuraException(Base directory does not exist)", expected);
-        checkExceptionRegex(expected, AuraRuntimeException.class, "Base directory.*.does not exist");
-    }
-
-    private void makeFile(File namespace, String name, String extension, String contents) throws Exception {
-        File dir = new File(namespace, name);
-        File file = new File(dir, name+extension);
-        dir.mkdirs();
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(contents.getBytes("UTF-8"));
-            fos.close();
-        }
-    }
-
-    private FileBundleSourceLoader createLoaderWithContents() throws Exception {
-        File tmpDir = new File(IOUtil.newTempDir("fileSourceLoaderTest"));
-
-        File testNamespace = new File(tmpDir, "test");
-
-        makeFile(testNamespace, "parent", ".cmp", "<component />");
-        makeFile(testNamespace, "anevent", ".evt", "<event />");
-        makeFile(testNamespace, "aninterface", ".intf", "<interface />");
-
-        return new FileBundleSourceLoader(tmpDir, fileMonitor, builders);
+        FileMonitor fileMonitor = Mockito.mock(FileMonitor.class);
+        new FileBundleSourceLoader(tmpDir, fileMonitor, null);
+        Mockito.verify(fileMonitor, Mockito.times(1)).subscribeToChangeNotification(Mockito.any());
     }
     
     @Test
-    public void testGetMissingComponentSource() throws Exception {
-        FileBundleSourceLoader loader = createLoaderWithContents();
-
-        // We should not find something that isn't there.
-        DefDescriptor<ComponentDef> nonDescriptor = definitionService.getDefDescriptor("test:nonExistent",
-                ComponentDef.class);
-        assertNull(loader.getSource(nonDescriptor));
+    public void testGetBundle_WithNullDescriptor_ReturnsNull() throws Exception {
+        makeFile("test", "component", ".cmp", "<aura:component/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        Assert.assertNull(loader.getBundle(null));
+    }
+    
+    @Test
+    public void testGetBundle_WithNamespaceNotFound_ReturnsNull() throws Exception {
+        makeFile("test", "component", ".cmp", "<aura:component/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("markup", "notfound", "component", ComponentDef.class);
+        Assert.assertNull(loader.getBundle(descriptor));
+    }
+    
+    @Test
+    public void testGetBundle_WithNameNotFound_ReturnsNull() throws Exception {
+        makeFile("test", "component", ".cmp", "<aura:component/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("markup", "test", "notfound", ComponentDef.class);
+        Assert.assertNull(loader.getBundle(descriptor));
+    }
+    
+    @Test
+    public void testGetBundle_WithMatchingDescriptor() throws Exception {
+        makeFile("test", "component", ".cmp", "<aura:component/>");
+        makeFile("test", "otherComponent", ".cmp", "<aura:component/>");
+        makeFile("otherNamespace", "component", ".cmp", "<aura:component/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("markup", "test", "component", ComponentDef.class);
+        BundleSource<?> bundleSource = loader.getBundle(descriptor);
+        Assert.assertEquals("markup://test:component", bundleSource.getDescriptor().getQualifiedName());
+        Map<DefDescriptor<?>, Source<?>> bundleParts = bundleSource.getBundledParts();
+        Assert.assertEquals(1, bundleParts.size());
+        Assert.assertEquals("<aura:component/>", ((TextSource<?>)bundleParts.values().iterator().next()).getContents());
+    }
+    
+    @Test
+    public void testGetSource_WithNullDescriptor_ReturnsNull() throws Exception {
+        makeFile("test", "component", ".cmp", "<aura:component/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        Assert.assertNull(loader.getBundle(null));
+    }
+    
+    @Test
+    public void testGetSource_WithNamespaceNotFound_ReturnsNull() throws Exception {
+        makeFile("test", "component", ".cmp", "<aura:component/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("markup", "notfound", "component", ComponentDef.class);
+        Assert.assertNull(loader.getSource(descriptor));
+    }
+    
+    @Test
+    public void testGetSource_WithNameNotFound_ReturnsNull() throws Exception {
+        makeFile("test", "component", ".cmp", "<aura:component/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("markup", "test", "notfound", ComponentDef.class);
+        Assert.assertNull(loader.getSource(descriptor));
     }
 
-
     @Test
-    public void testGetComponentSource() throws Exception {
-        FileBundleSourceLoader loader = createLoaderWithContents();
-
-        DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor("test:parent", ComponentDef.class);
-        BundleSource<?> bundleSource = (BundleSource<?>)loader.getSource(descriptor);
-        assertNotNull("Our bundle must exist", bundleSource);
-        TextSource<?> src = (TextSource<?>)bundleSource.getBundledParts().get(descriptor);
-        assertNotNull("Our component must be in the bundle", src);
-        assertEquals(Format.XML, src.getFormat());
-        assertTrue(src.getSystemId().endsWith("parent.cmp"));
-        try (Reader reader = src.getHashingReader()) {
-            assertNotNull(reader);
-            IllegalStateException expected = null;
-            try {
-                reader.close();
-            } catch (IllegalStateException ise) {
-                expected = ise;
-            }
-            assertNotNull("Did not get an exception for not reading the entire file", expected);
-            checkExceptionFull(expected,IllegalStateException.class,"Closed a hashing file without reading the entire thing");
-        }
+    public void testGetSource_WithMatchingDescriptor() throws Exception {
+        makeFile("test", "component", ".cmp", "<aura:component/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("markup", "test", "component", ComponentDef.class);
+        BundleSource<?> bundleSource = (BundleSource<?>) loader.getSource(descriptor);
+        Assert.assertEquals("markup://test:component", bundleSource.getDescriptor().getQualifiedName());
+        Map<DefDescriptor<?>, Source<?>> bundleParts = bundleSource.getBundledParts();
+        Assert.assertEquals(1, bundleParts.size());
+        Assert.assertEquals("<aura:component/>", ((TextSource<?>)bundleParts.values().iterator().next()).getContents());
     }
-
+    
     @Test
-    public void testGetEventSource() throws Exception {
-        FileBundleSourceLoader loader = createLoaderWithContents();
-
-        DefDescriptor<EventDef> descriptor = definitionService.getDefDescriptor("test:anevent", EventDef.class);
-        BundleSource<?> bundleSource = (BundleSource<?>)loader.getSource(descriptor);
-        assertNotNull("Our bundle must exist", bundleSource);
-        @SuppressWarnings("unchecked")
-        TextSource<EventDef> src = (TextSource<EventDef>)bundleSource.getBundledParts().get(descriptor);
-        assertNotNull("Our event must be in the bundle", src);
-        assertEquals(Format.XML, src.getFormat());
-        assertTrue(src.getSystemId().endsWith("anevent.evt"));
-        try (Reader reader = src.getHashingReader()) {
-            assertNotNull(reader);
-            IllegalStateException expected = null;
-            try {
-                reader.close();
-            } catch (IllegalStateException ise) {
-                expected = ise;
-            }
-            assertNotNull("Did not get an exception for not reading the entire file", expected);
-            checkExceptionFull(expected,IllegalStateException.class,"Closed a hashing file without reading the entire thing");
-        }
-    }
-
-    @Test
-    public void testGetNamespaces() throws Exception {
-        FileBundleSourceLoader loader = createLoaderWithContents();
+    public void testGetNamespaces_Empty() throws Exception {
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
         Set<String> namespaces = loader.getNamespaces();
-        assertTrue(namespaces.contains("test"));
+        Assert.assertEquals(0, namespaces.size());
     }
 
     @Test
-    public void testFindRegex() throws Exception {
-        FileBundleSourceLoader loader = createLoaderWithContents();
-        Set<DefDescriptor<?>> found;
+    public void testGetNamespaces_WithMultipleBuilders() throws Exception {
+        makeFile("cmp1", "component", ".cmp", "<aura:component/>");
+        makeFile("cmp2", "component", ".cmp", "<aura:component/>");
+        makeFile("intf1", "interface", ".intf", "<aura:interface/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder(),
+                new EventDefFileBundleBuilder(), new InterfaceDefFileBundleBuilder(), new FlavorBundleFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        Set<String> namespaces = loader.getNamespaces();
+        Assert.assertEquals(3, namespaces.size());
+        Assert.assertTrue(namespaces.contains("cmp1"));
+        Assert.assertTrue(namespaces.contains("cmp2"));
+        Assert.assertTrue(namespaces.contains("intf1"));
+    }
 
-        found = loader.find(new DescriptorFilter("markup://test:parent"));
-        assertEquals("Should have found a single component", 1, found.size());
-        assertTrue(found.contains(definitionService.getDefDescriptor("markup://test:parent", ComponentDef.class)));
-
-        found = loader.find(new DescriptorFilter("markup://test:an*"));
-        assertEquals("Should have found multiple components", found.size(), 2);
-        assertTrue(found.contains(definitionService.getDefDescriptor("markup://test:anevent", EventDef.class)));
-        assertTrue(found.contains(definitionService.getDefDescriptor("markup://test:aninterface", InterfaceDef.class)));
-
-        found = loader.find(new DescriptorFilter("markup://test:doesntexist"));
-        assertEquals("Should not have found any components", 0, found.size());
+    @Test
+    public void testFind_WithNamespaceNotFound_ReturnsEmpty() throws Exception {
+        makeFile("test", "component", ".cmp", "<aura:component/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        DescriptorFilter filter = new DescriptorFilter("markup://notFound:component");
+        Set<DefDescriptor<?>> descriptors = loader.find(filter);
+        Assert.assertEquals(0, descriptors.size());
+    }
+    
+    @Test
+    public void testFind_WithNameNotFound_ReturnsEmpty() throws Exception {
+        makeFile("test", "component", ".cmp", "<aura:component/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        DescriptorFilter filter = new DescriptorFilter("markup://test:notFound");
+        Set<DefDescriptor<?>> descriptors = loader.find(filter);
+        Assert.assertEquals(0, descriptors.size());
+    }
+    
+    @Test
+    public void testFind_WithConstant_MatchesSingle() throws Exception {
+        makeFile("test", "component", ".cmp", "<aura:component/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        DescriptorFilter filter = new DescriptorFilter("markup://test:component");
+        Set<DefDescriptor<?>> descriptors = loader.find(filter);
+        Assert.assertEquals(1, descriptors.size());
+    }
+    
+    @Test
+    public void testFind_WithNameGlob_MatchesMultiple() throws Exception {
+        makeFile("test", "matchingComponent", ".cmp", "<aura:component/>");
+        makeFile("test", "matchingEvent", ".evt", "<aura:event/>");
+        makeFile("test", "matchingInterface", ".intf", "<aura:interface/>");
+        makeFile("test", "otherComponent", ".cmp", "<aura:component/>");
+        makeFile("test", "otherEvent", ".evt", "<aura:event/>");
+        makeFile("test", "otherInterface", ".intf", "<aura:interface/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder(),
+                new EventDefFileBundleBuilder(), new InterfaceDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        DescriptorFilter filter = new DescriptorFilter("markup://test:matching*");
+        Set<DefDescriptor<?>> descriptors = loader.find(filter);
+        Assert.assertEquals(3, descriptors.size());
+        Assert.assertTrue(descriptors
+                .contains(new DefDescriptorImpl<>("markup", "test", "matchingComponent", ComponentDef.class)));
+        Assert.assertTrue(descriptors
+                .contains(new DefDescriptorImpl<>("markup", "test", "matchingEvent", EventDef.class)));
+        Assert.assertTrue(descriptors
+                .contains(new DefDescriptorImpl<>("markup", "test", "matchingInterface", InterfaceDef.class)));
+    }
+    
+    @Test
+    public void testFind_WithNamespaceGlob_MatchesMultiple() throws Exception {
+        makeFile("matchingNamespace1", "component", ".cmp", "<aura:component/>");
+        makeFile("matchingNamespace2", "event", ".evt", "<aura:event/>");
+        makeFile("matchingNamespace3", "interface", ".intf", "<aura:interface/>");
+        makeFile("otherNamespace1", "component", ".cmp", "<aura:component/>");
+        makeFile("otherNamespace2", "event", ".evt", "<aura:event/>");
+        makeFile("otherNamespace3", "interface", ".intf", "<aura:interface/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder(),
+                new EventDefFileBundleBuilder(), new InterfaceDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        DescriptorFilter filter = new DescriptorFilter("markup://matching*:*");
+        Set<DefDescriptor<?>> descriptors = loader.find(filter);
+        Assert.assertEquals(3, descriptors.size());
+        Assert.assertTrue(descriptors
+                .contains(new DefDescriptorImpl<>("markup", "matchingNamespace1", "component", ComponentDef.class)));
+        Assert.assertTrue(descriptors
+                .contains(new DefDescriptorImpl<>("markup", "matchingNamespace2", "event", EventDef.class)));
+        Assert.assertTrue(descriptors
+                .contains(new DefDescriptorImpl<>("markup", "matchingNamespace3", "interface", InterfaceDef.class)));
     }
     
     /**
      * All namespaces loaded by FileBundleSourceLoader are internal, verify that FileBundleSourceLoader says so.
      */
     @Test
-    public void testIsInternalNamespace() throws Exception {
-        FileBundleSourceLoader loader = createLoaderWithContents();
-        assertTrue("All namespaces loaded by FileBundleSourceLoader are to be intenal",
+    public void testIsInternalNamespace_WithNull_ReturnsTrue() throws Exception {
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, null);
+        Assert.assertTrue("All namespaces loaded by FileBundleSourceLoader are to be intenal",
                 loader.isInternalNamespace(null));
-        assertTrue("All namespaces loaded by FileBundleSourceLoader are to be internal," +
-        		"Regardless of the namespace.", loader.isInternalNamespace("fooBared"));
-        assertTrue(loader.isInternalNamespace("aura"));
+    }
+    
+    @Test
+    public void testIsInternalNamespace_WithString_ReturnsTrue() throws Exception {
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, null);
+        Assert.assertTrue("All namespaces loaded by FileBundleSourceLoader are to be internal," +
+                "Regardless of the namespace.", loader.isInternalNamespace("fooBared"));
+    }
+
+    @Test
+    public void testReset_WithFileAdditions() throws Exception {
+        makeFile("test", "component1", ".cmp", "<aura:component/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        Set<DefDescriptor<?>> descriptors = loader.find(new DescriptorFilter("markup://test:*"));
+        Assert.assertEquals(1,  descriptors.size());
+
+        makeFile("test", "component2", ".cmp", "<aura:component/>");
+        descriptors = loader.find(new DescriptorFilter("markup://test:*"));
+        Assert.assertEquals(1,  descriptors.size());
+        
+        loader.reset();
+        descriptors = loader.find(new DescriptorFilter("markup://test:*"));
+        Assert.assertEquals(2,  descriptors.size());
+    }
+    
+    @Test
+    public void testReset_WithFileDeletions() throws Exception {
+        makeFile("test", "component1", ".cmp", "<aura:component/>");
+        File fileToDelete = makeFile("test", "component2", ".cmp", "<aura:component/>");
+        Collection<FileBundleSourceBuilder> builders = Sets.newHashSet(new ComponentDefFileBundleBuilder());
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(getWorkingDirectory(), null, builders);
+        Set<DefDescriptor<?>> descriptors = loader.find(new DescriptorFilter("markup://test:*"));
+        Assert.assertEquals(2,  descriptors.size());
+
+        fileToDelete.delete();
+        descriptors = loader.find(new DescriptorFilter("markup://test:*"));
+        Assert.assertEquals(2,  descriptors.size());
+        
+        loader.reset();
+        descriptors = loader.find(new DescriptorFilter("markup://test:*"));
+        Assert.assertEquals(1,  descriptors.size());
+    }
+    
+    private File getWorkingDirectory() {
+        if (workingDirectory == null){
+            workingDirectory = new File(IOUtil.newTempDir(getClass().getSimpleName()));
+        }
+        return workingDirectory;
+    }
+    
+    private File makeFile(String namespace, String name, String extension, String contents) throws Exception {
+        File namespaceDirectory = new File(getWorkingDirectory(), namespace);
+        File bundleDirectory = new File(namespaceDirectory, name);
+        bundleDirectory.mkdirs();
+        File file = new File(bundleDirectory, name + extension);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(contents.getBytes("UTF-8"));
+        }
+        return file;
     }
 }

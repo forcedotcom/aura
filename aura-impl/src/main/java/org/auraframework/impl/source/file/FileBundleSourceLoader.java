@@ -41,6 +41,8 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.FileMonitor;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Sets;
 
 import org.auraframework.util.IOUtil;
@@ -65,17 +67,17 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
         }
     }
 
-    protected final File base;
-    protected Set<String> namespaces;
+    private final File base;
+    private Set<String> namespaces;
     protected Map<String,FileEntry> fileMap;
     private final Collection<FileBundleSourceBuilder> builders;
 
     private void updateFileMap() {
-        Set<String> tnamespaces = Sets.newHashSet();
+    	Builder<String> namespacesBuilder = ImmutableSet.builder();
         Map<String,FileEntry> tfileMap = new ConcurrentHashMap<String,FileEntry>();
         for (File namespace : base.listFiles()) {
             if (namespace.isDirectory()) {
-                tnamespaces.add(namespace.getName());
+            	namespacesBuilder.add(namespace.getName());
                 for (File file : namespace.listFiles()) {
                     FileEntry entry = new FileEntry();
                     entry.namespace = namespace.getName();
@@ -87,7 +89,7 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
                 }
             }
         }
-        namespaces = tnamespaces;
+        namespaces = namespacesBuilder.build();
         fileMap = tfileMap;
     }
 
@@ -159,6 +161,9 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
 
     @Override
     public BundleSource<?> getBundle(DefDescriptor<?> descriptor) {
+        if (descriptor == null) {
+            return null;
+        }
         rwLock.readLock().lock();
         try {
             String lookup = BundleSourceLoader.getBundleName(descriptor);

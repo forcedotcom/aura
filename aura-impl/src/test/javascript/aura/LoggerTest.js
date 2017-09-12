@@ -28,7 +28,7 @@ Test.Aura.LoggerTest = function() {
 
     var messageCalled = false,
         showErrors    = true,
-        mockGlobal      = Mocks.GetMock(Object.Global(), "$A", {
+        mockGlobal    = Mocks.GetMock(Object.Global(), "$A", {
             util: {
                 isString: function (obj) {
                     return typeof obj === 'string';
@@ -60,9 +60,7 @@ Test.Aura.LoggerTest = function() {
 
     [Fixture]
     function info() {
-        var logger = new Aura.Utils.Logger(),
-            level, message, error;
-
+        var logger = new Aura.Utils.Logger();
 
         [Fact]
         function InfoLogsWithINFOLevel() {
@@ -117,7 +115,7 @@ Test.Aura.LoggerTest = function() {
                 logger.info(expected);
             });
 
-            Assert.Undefined(error);
+            Assert.Undefined(actual);
         }
     }
 
@@ -146,7 +144,7 @@ Test.Aura.LoggerTest = function() {
     }
 
     [Fixture]
-    function assertion() {
+    function assert() {
 
         var logger = new Aura.Utils.Logger(),
             level, message, error;
@@ -185,8 +183,7 @@ Test.Aura.LoggerTest = function() {
     [Fixture]
     function error() {
 
-        var logger = new Aura.Utils.Logger(),
-            level, message, error;
+        var logger = new Aura.Utils.Logger();
 
         [Fact]
         function ErrorsLoggedToSubscriberUseERRORLevel() {
@@ -726,11 +723,25 @@ Test.Aura.LoggerTest = function() {
                 at Object._unload (https://firstdata--prodcopy.cs42.my.salesforce.com/EXT/ext-3.3.3/ext.js:114:420)\n\
                 at _unload (https://firstdata--prodcopy.cs42.my.salesforce.com/EXT/ext-3.3.3/ext.js:21:3823)";
 
-            var expected;
+            var actual;
             getAuraMock(function() {
-                expected = logger.isExternalError(e);
+                actual = logger.isExternalError(e);
             });
-            Assert.True(expected);
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnTrueIfErrorIsFromChromeExtension() {
+            var e = new TypeError("Cannot read property shouldWeDropAction of undefined");
+            e.stack = "onDecode()@chrome-extension://hmoenmfdbkbjcpiibpfakppdpahlfnpo/SfdcInspectorInjectedScript.js:667:35\n\
+                AuraInspector.ClientService_OnDecode()@chrome-extension://pfaglkajfeiladkdkcfmdccancbjbbbc/AuraInspectorInjectedScript.js:430:37\n\
+                Object.onXHRReceived()@https://na7.lightning.blitz04.soma.force.com/components/instrumentation/beacon.js:6:163\n";
+
+            var actual;
+            getAuraMock(function() {
+                actual = logger.isExternalError(e);
+            });
+            Assert.True(actual);
         }
 
         [Fact]
@@ -742,11 +753,11 @@ Test.Aura.LoggerTest = function() {
                 at Object.d.update (https://adminlightningbsodf16.lightning.force.com/resource/infografx__ammap_3_14_1_sfdc:11:190)\n\
                 at https://adminlightningbsodf16.lightning.force.com/resource/infografx__ammap_3_14_1_sfdc:3:167";
 
-            var expected;
+            var actual;
             getAuraMock(function() {
-                expected = logger.isExternalError(e);
+                actual = logger.isExternalError(e);
             });
-            Assert.True(expected);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -758,12 +769,12 @@ Test.Aura.LoggerTest = function() {
                 at Object._unload (https://firstdata--prodcopy.cs42.my.salesforce.com/EXT/ext-3.3.3/ext.js:114:420)\n\
                 at _unload (https://firstdata--prodcopy.cs42.my.salesforce.com/EXT/ext-3.3.3/ext.js:21:3823)";
 
-            var expected;
+            var actual;
             getAuraMock(function() {
                 var ae = new $A.auraError(null, e);
-                expected = logger.isExternalError(ae);
+                actual = logger.isExternalError(ae);
             });
-            Assert.True(expected);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -774,12 +785,12 @@ Test.Aura.LoggerTest = function() {
                 at eval (http://bah.lightning.localhost.force.com:6109/components/c/testErrors.js:15:35)\n\
                 at http://bah.lightning.localhost.force.com:6109/auraFW/javascript/0A2soY7cB16nI8uLh9j3sA/aura_dev.js:19185:23";
 
-            var expected;
+            var actual;
             getAuraMock(function() {
                 var ae = new $A.auraError(null, e);
-                expected = logger.isExternalError(ae);
+                actual = logger.isExternalError(ae);
             });
-            Assert.False(expected);
+            Assert.False(actual);
         }
 
         [Fact]
@@ -798,12 +809,12 @@ Test.Aura.LoggerTest = function() {
     at Object.catchAndFireEvent (http://localhost:9090/components/ui/button.js:90:33)\n\
     at press (http://localhost:9090/components/ui/button.js:34:16)";
 
-            var expected;
+            var actual;
             getAuraMock(function() {
                 var ae = new $A.auraError(null, e);
-                expected = logger.isExternalError(ae);
+                actual = logger.isExternalError(ae);
             });
-            Assert.False(expected);
+            Assert.False(actual);
         }
     }
 };

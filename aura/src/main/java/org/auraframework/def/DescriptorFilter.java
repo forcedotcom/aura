@@ -93,17 +93,17 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
         try {
             this.prefixMatch = new GlobMatcher(prefix);
         } catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException("Illegal prefix in " + matcher);
+            throw new IllegalArgumentException("Invalid prefix of " + prefix + " in " + matcher);
         }
         try {
             this.namespaceMatch = new GlobMatcher(namespace);
         } catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException("Illegal namespace in " + matcher);
+            throw new IllegalArgumentException("Invalid namespace of " + namespace + " in " + matcher);
         }
         try {
             this.nameMatch = new GlobMatcher(name);
         } catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException("Illegal name in " + matcher);
+            throw new IllegalArgumentException("Invalid name of " + name + " in " + matcher);
         }
         if (defTypes != null) {
             this.defTypes = Lists.newArrayList(defTypes);
@@ -131,7 +131,11 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
             List<DefType> accum = Lists.newArrayList();
 
             for (String t : types) {
-                accum.add(DefType.valueOf(t));
+                try {
+                    accum.add(DefType.valueOf(t));
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid type: "+t);
+                }
             }
             return Collections.unmodifiableList(accum);
         } else {

@@ -1204,7 +1204,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "", "<aura:dependency resource=\"*://auratest.*\"/>");
             fail("Should not be able to load resource, bad DefDescriptor format");
         } catch (QuickFixException e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Illegal namespace in *://auratest.*");
+            checkExceptionFull(e, InvalidDefinitionException.class, "Invalid namespace of auratest.* in *://auratest.*");
         }
 
         // Another invalid descriptor pattern
@@ -1212,7 +1212,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "", "<aura:dependency resource=\"*:auratest:*\"/>");
             fail("Should not be able to load resource, bad DefDescriptor format");
         } catch (QuickFixException e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Illegal name in *:auratest:*");
+            checkExceptionFull(e, InvalidDefinitionException.class, "Invalid name of auratest:* in *:auratest:*");
         }
     }
 

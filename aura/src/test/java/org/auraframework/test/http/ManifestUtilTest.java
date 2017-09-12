@@ -30,12 +30,14 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.DummyHttpServletResponse;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
-public class ManifestUtilTest extends UnitTestCase {
+public class ManifestUtilTest {
     @Mock
     ConfigAdapter configAdapter;
 
@@ -58,13 +60,18 @@ public class ManifestUtilTest extends UnitTestCase {
     @Mock
     DefinitionService definitionService;
 
+    @Before
+    public void initMocks() {
+        MockitoAnnotations.initMocks(this);
+    }
+
     //public boolean isManifestEnabled()
     @Test
     public void testIsManifestEnabledWhenClientAppcacheDisabled() {
         Mockito.when(configAdapter.isClientAppcacheEnabled()).thenReturn(false);
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).isManifestEnabled();
-        assertFalse(value);
+        Assert.assertFalse(value);
     }
 
     @SuppressWarnings("unchecked")
@@ -80,7 +87,7 @@ public class ManifestUtilTest extends UnitTestCase {
         Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).isManifestEnabled();
-        assertTrue(value);
+        Assert.assertTrue(value);
     }
 
     @SuppressWarnings("unchecked")
@@ -96,7 +103,7 @@ public class ManifestUtilTest extends UnitTestCase {
         Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).isManifestEnabled();
-        assertFalse(value);
+        Assert.assertFalse(value);
     }
 
     @SuppressWarnings("unchecked")
@@ -112,7 +119,7 @@ public class ManifestUtilTest extends UnitTestCase {
         Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).isManifestEnabled();
-        assertFalse(value);
+        Assert.assertFalse(value);
     }
 
     @SuppressWarnings("unchecked")
@@ -128,7 +135,7 @@ public class ManifestUtilTest extends UnitTestCase {
         Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(null);
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).isManifestEnabled();
-        assertFalse(value);
+        Assert.assertFalse(value);
     }
 
     @SuppressWarnings("unchecked")
@@ -143,7 +150,7 @@ public class ManifestUtilTest extends UnitTestCase {
         Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).isManifestEnabled();
-        assertFalse(value);
+        Assert.assertFalse(value);
     }
 
     @Test
@@ -156,7 +163,7 @@ public class ManifestUtilTest extends UnitTestCase {
         Mockito.when(auraContext.getMode()).thenReturn(Mode.PROD);
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).checkManifestCookie(request, response);
-        assertTrue(value);
+        Assert.assertTrue(value);
     }
 
     @Test
@@ -186,10 +193,10 @@ public class ManifestUtilTest extends UnitTestCase {
         
         ManifestUtil manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
         boolean value = manifestUtil.checkManifestCookie(request, dummyResponse);
-        assertFalse(value);
+        Assert.assertFalse(value);
 
         Cookie cookie = dummyResponse.getCookie("ns_name_lm");
-        assertEquals(cookie.getValue(), "error");
+        Assert.assertEquals(cookie.getValue(), "error");
     }
 
     @Test
@@ -222,8 +229,8 @@ public class ManifestUtilTest extends UnitTestCase {
         };
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).checkManifestCookie(request, dummyResponse);
-        assertFalse(value);
+        Assert.assertFalse(value);
 
-        assertEquals(dummyResponse.getCookie("ns_name_lm").getValue(), "");
+        Assert.assertEquals(dummyResponse.getCookie("ns_name_lm").getValue(), "");
     }
 }

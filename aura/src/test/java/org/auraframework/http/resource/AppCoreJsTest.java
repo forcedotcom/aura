@@ -43,7 +43,7 @@ import org.auraframework.http.resource.AuraResourceImpl.AuraResourceException;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -53,13 +53,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
  * friendly to getting a context service, and I think changing that may impact other tests, so I'm leaving it at least
  * for now.
  */
-public class AppCoreJsTest extends UnitTestCase {
+public class AppCoreJsTest {
     /**
      * Name is API!.
      */
     @Test
     public void testName() {
-        assertEquals("appcore.js", new AppCoreJs().getName());
+        Assert.assertEquals("appcore.js", new AppCoreJs().getName());
     }
 
     /**
@@ -67,7 +67,7 @@ public class AppCoreJsTest extends UnitTestCase {
      */
     @Test
     public void testFormat() {
-        assertEquals(Format.JS, new AppCoreJs().getFormat());
+        Assert.assertEquals(Format.JS, new AppCoreJs().getFormat());
     }
 
     /**
@@ -167,6 +167,6 @@ public class AppCoreJsTest extends UnitTestCase {
 
         appCoreJs.setContentType(response);
 
-        assertEquals("text/javascript", response.getContentType());
+        Assert.assertEquals("text/javascript", response.getContentType());
     }
 }

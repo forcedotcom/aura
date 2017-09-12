@@ -23,10 +23,10 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
 import org.junit.Test;
 
-public class DescriptorFilterTest extends UnitTestCase {
+public class DescriptorFilterTest {
     private String getLabel(DescriptorFilter dm, boolean expected, String what, String value) {
         String match;
 
@@ -39,46 +39,71 @@ public class DescriptorFilterTest extends UnitTestCase {
     }
 
     private void checkPrefix(DescriptorFilter dm, String prefix, boolean value) {
-        assertEquals(getLabel(dm, value, "prefix", prefix), value, dm.matchPrefix(prefix));
+        Assert.assertEquals(getLabel(dm, value, "prefix", prefix), value, dm.matchPrefix(prefix));
     }
 
     private void checkNamespace(DescriptorFilter dm, String namespace, boolean value) {
-        assertEquals(getLabel(dm, value, "namespace", namespace), value, dm.matchNamespace(namespace));
+        Assert.assertEquals(getLabel(dm, value, "namespace", namespace), value, dm.matchNamespace(namespace));
     }
 
     private void checkName(DescriptorFilter dm, String name, boolean value) {
-        assertEquals(getLabel(dm, value, "name", name), value, dm.matchName(name));
+        Assert.assertEquals(getLabel(dm, value, "name", name), value, dm.matchName(name));
     }
 
     private void checkType(DescriptorFilter dm, DefType type, boolean value) {
-        assertEquals(getLabel(dm, value, "type", type.toString()), value, dm.matchType(type));
+        Assert.assertEquals(getLabel(dm, value, "type", type.toString()), value, dm.matchType(type));
     }
 
     @Test
-    public void testInvalid() throws Exception {
+    public void testInvalidPrefix() throws Exception {
+        IllegalArgumentException expected = null;
         try {
             new DescriptorFilter("bah.humbug://a:b");
-            fail("should have gotten an exception");
-        } catch (IllegalArgumentException expected) {
-            assertTrue("exception should name prefix", expected.getMessage().contains("prefix"));
+        } catch (IllegalArgumentException e) {
+            expected = e;
         }
+        Assert.assertNotNull("should have gotten an exception", expected);
+        Assert.assertTrue("Unexpected exception message: "+expected.getMessage(),
+                expected.getMessage().startsWith("Invalid prefix"));
+    }
+
+    @Test
+    public void testInvalidNamespace() throws Exception {
+        IllegalArgumentException expected = null;
         try {
             new DescriptorFilter("a://bah.humbug:b");
-            fail("should have gotten an exception");
-        } catch (IllegalArgumentException expected) {
-            assertTrue("exception should name namespace", expected.getMessage().contains("namespace"));
+        } catch (IllegalArgumentException e) {
+            expected = e;
         }
+        Assert.assertNotNull("should have gotten an exception", expected);
+        Assert.assertTrue("Unexpected exception message: "+expected.getMessage(),
+                expected.getMessage().startsWith("Invalid namespace"));
+    }
+
+    @Test
+    public void testInvalidName() throws Exception {
+        IllegalArgumentException expected = null;
         try {
             new DescriptorFilter("a://b:bah.humbug");
-            fail("should have gotten an exception");
-        } catch (IllegalArgumentException expected) {
-            assertTrue("exception should name name", expected.getMessage().contains(" name "));
+        } catch (IllegalArgumentException e) {
+            expected = e;
         }
+        Assert.assertNotNull("should have gotten an exception", expected);
+        Assert.assertTrue("Unexpected exception message: "+expected.getMessage(),
+                expected.getMessage().startsWith("Invalid name"));
+    }
+
+    @Test
+    public void testInvalidType() throws Exception {
+        IllegalArgumentException expected = null;
         try {
             new DescriptorFilter("a://b:c", "bah.humbug");
-            fail("should have gotten an exception");
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException e) {
+            expected = e;
         }
+        Assert.assertNotNull("should have gotten an exception", expected);
+        Assert.assertTrue("Unexpected exception message: "+expected.getMessage(),
+                expected.getMessage().startsWith("Invalid type"));
     }
 
     @Test
@@ -368,38 +393,56 @@ public class DescriptorFilterTest extends UnitTestCase {
     }
 
     @Test
-    public void testDescriptor() {
+    public void testExactMatchDescriptor() {
         DescriptorFilter dm;
         FakeDefDescriptor dd;
 
         dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", "APPLICATION");
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.APPLICATION);
-        assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.COMPONENT);
-        assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
+    }
+
+    @Test
+    public void testExactMatchDescriptorTwoTypes() {
+        DescriptorFilter dm;
+        FakeDefDescriptor dd;
 
         dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", "APPLICATION,COMPONENT");
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.APPLICATION);
-        assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.COMPONENT);
-        assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.STYLE);
-        assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
+    }
+
+    @Test
+    public void testExactMatchDescriptorAllTypes() {
+        DescriptorFilter dm;
+        FakeDefDescriptor dd;
 
         dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", "*");
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.APPLICATION);
-        assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.COMPONENT);
-        assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.STYLE);
-        assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+    }
+
+    @Test
+    public void testExactMatchDescriptorDefaultTypes() {
+        DescriptorFilter dm;
+        FakeDefDescriptor dd;
 
         dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", (String)null);
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.APPLICATION);
-        assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.COMPONENT);
-        assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.STYLE);
-        assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
     }
 }

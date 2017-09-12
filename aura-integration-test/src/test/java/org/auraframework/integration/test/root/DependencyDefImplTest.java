@@ -63,8 +63,8 @@ public class DependencyDefImplTest extends AuraImplTestCase {
             testDependencyDef.validateDefinition();
             fail("Should have thrown QuickFixException for invalid type in DependencyDef's");
         } catch (Exception e) {
-            checkExceptionRegex(e, InvalidDefinitionException.class,
-                    "No enum const(ant)? (class )?org\\.auraframework\\.def\\.DefDescriptor.DefType\\.WhatAmI", "f1");
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "Invalid type: WhatAmI", "f1");
         }
     }
 

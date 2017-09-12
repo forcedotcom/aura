@@ -24,7 +24,7 @@ import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -33,7 +33,7 @@ import org.junit.Test;
  * 
  * @since 0.0.210
  */
-public class AuraExceptionUtilTest extends UnitTestCase {
+public class AuraExceptionUtilTest {
     /**
      * An internal class to create quick fix exceptions.
      */
@@ -52,9 +52,9 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     @Test
     public void testAddLocationWithFileAndLine() throws Exception {
         Throwable t = new Throwable();
-        AuraExceptionUtil.addLocation(new Location(getName(), 22, 0, 0), t);
-        assertEquals("Expected StackTraceElement not inserted at top", new StackTraceElement("", "", getName(), 22),
-                t.getStackTrace()[0]);
+        AuraExceptionUtil.addLocation(new Location("test", 22, 0, 0), t);
+        Assert.assertEquals("Expected StackTraceElement not inserted at top",
+                new StackTraceElement("", "", "test", 22), t.getStackTrace()[0]);
     }
 
     /**
@@ -64,8 +64,8 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     @Test
     public void testAddLocationWithoutLine() throws Exception {
         Throwable t = new Throwable();
-        AuraExceptionUtil.addLocation(new Location(getName(), 33), t);
-        assertEquals("Expected StackTraceElement not inserted at top", new StackTraceElement("", "", getName(), -1),
+        AuraExceptionUtil.addLocation(new Location("test", 33), t);
+        Assert.assertEquals("Expected StackTraceElement not inserted at top", new StackTraceElement("", "", "test", -1),
                 t.getStackTrace()[0]);
     }
 
@@ -77,7 +77,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     public void testAddLocationWithoutFile() throws Exception {
         Throwable t = new Throwable();
         AuraExceptionUtil.addLocation(new Location(null, 33, 0, 0), t);
-        assertEquals("Expected StackTraceElement not inserted at top", new StackTraceElement("", "", null, 33),
+        Assert.assertEquals("Expected StackTraceElement not inserted at top", new StackTraceElement("", "", null, 33),
                 t.getStackTrace()[0]);
     }
 
@@ -89,7 +89,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
         Throwable t = new Throwable();
         StackTraceElement expected = t.getStackTrace()[0];
         AuraExceptionUtil.addLocation(null, t);
-        assertEquals("Expected StackTraceElement not inserted at top", expected, t.getStackTrace()[0]);
+        Assert.assertEquals("Expected StackTraceElement not inserted at top", expected, t.getStackTrace()[0]);
     }
 
     /**
@@ -97,8 +97,8 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     @Test
     public void testWrapExecutionExceptionInstanceOfQuickFixException() throws Exception {
-        Exception t = new TestQuickFixException(getName());
-        assertEquals("Did not get the original QuickFixException", t,
+        Exception t = new TestQuickFixException("test");
+        Assert.assertEquals("Did not get the original QuickFixException", t,
                 AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0)));
     }
 
@@ -109,13 +109,15 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     public void testWrapExecutionExceptionInstanceOfAuraUnhandledException() throws Exception {
         Throwable start = new Exception("start");
         Throwable child = new AuraUnhandledException("child", start);
-        Exception t = new AuraUnhandledException(getName(), child);
+        Exception t = new AuraUnhandledException("test", child);
+        AuraExecutionException expected = null;
         try {
             AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0));
-            fail("Expected the AuraRuntimeException to get rethrown");
         } catch (AuraExecutionException e) {
-            assertEquals("Topmost AuraRuntimeException was not wrapped", t, e.getCause());
+            expected = e;
         }
+        Assert.assertNotNull("Expected the AuraRuntimeException to get rethrown", expected);
+        Assert.assertEquals("Topmost AuraRuntimeException was not wrapped", t, expected.getCause());
     }
 
     /**
@@ -126,12 +128,14 @@ public class AuraExceptionUtilTest extends UnitTestCase {
         Throwable start = new Exception("start");
         Throwable child = new AuraUnhandledException("child", start);
         Exception t = new AuraExecutionException(child, new Location("there", 0));
+        AuraExecutionException expected = null;
         try {
             AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0));
-            fail("Expected the AuraRuntimeException to get rethrown");
         } catch (AuraExecutionException e) {
-            assertEquals("Topmost AuraRuntimeException was not wrapped", t, e.getCause());
+            expected = e;
         }
+        Assert.assertNotNull("Expected the AuraRuntimeException to get rethrown", expected);
+        Assert.assertEquals("Topmost AuraRuntimeException was not wrapped", t, expected.getCause());
     }
 
     /**
@@ -141,13 +145,15 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     public void testWrapExecutionExceptionInstanceOfAuraHandledException() throws Exception {
         Throwable start = new Exception("start");
         Throwable child = new AuraHandledException(start);
-        Exception t = new AuraUnhandledException(getName(), child);
+        Exception t = new AuraUnhandledException("test", child);
+        AuraHandledException expected = null;
         try {
             AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0));
-            fail("Expected the AuraRuntimeException to get rethrown");
         } catch (AuraHandledException e) {
-            assertEquals("Topmost AuraHandledException was not unwrapped", child, e);
+            expected = e;
         }
+        Assert.assertNotNull("Expected the AuraRuntimeException to get rethrown", expected);
+        Assert.assertEquals("Topmost AuraHandledException was not unwrapped", child, expected);
     }
 
     /**
@@ -155,22 +161,26 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     @Test
     public void testWrapExecutionExceptionInstanceOfError() throws Exception {
-        Throwable child = new TestQuickFixException(getName());
+        Throwable child = new TestQuickFixException("test");
         Throwable error = new IOError(child);
         Exception t = new Exception(error);
 
+        IOError expected = null;
         try {
             AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0));
-            fail("Expected the Error to get rethrown");
         } catch (IOError e) {
-            assertEquals("Topmost Error was not rethrown", error, e);
+            expected = e;
         }
+        Assert.assertNotNull("Expected the Error to get rethrown", expected);
+        Assert.assertEquals("Topmost Error was not rethrown", error, expected);
+        expected = null;
         try {
             AuraExceptionUtil.wrapExecutionException(error, new Location("here", 0));
-            fail("Expected the Error to get rethrown");
         } catch (IOError e) {
-            assertEquals("Topmost Error was not rethrown", error, e);
+            expected = e;
         }
+        Assert.assertNotNull("Expected the Error to get rethrown", expected);
+        Assert.assertEquals("Topmost Error was not rethrown", error, expected);
     }
 
     /**
@@ -178,12 +188,12 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     @Test
     public void testWrapExecutionExceptionNestedQuickFixException() throws Exception {
-        Throwable t4 = new TestQuickFixException(getName());
+        Throwable t4 = new TestQuickFixException("test");
         Throwable t3 = new RuntimeException("intermediate3", t4);
         Throwable t2 = new RuntimeException("intermediate2", t3);
         Throwable t1 = new AuraUnhandledException("intermediate1", t2);
         Exception t = new RuntimeException("top", t1);
-        assertEquals("Did not get the original nested QuickFixException", t4,
+        Assert.assertEquals("Did not get the original nested QuickFixException", t4,
                 AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0)));
     }
 
@@ -197,12 +207,14 @@ public class AuraExceptionUtilTest extends UnitTestCase {
         Throwable t2 = new AuraUnhandledException("intermediate2", t3);
         Throwable t1 = new AuraUnhandledException("intermediate1", t2);
         Exception t = new RuntimeException("top", t1);
+        AuraExecutionException expected = null;
         try {
             AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0));
-            fail("Expected the topmost nested AuraRuntimeException to get rethrown");
         } catch (AuraExecutionException e) {
-            assertEquals("Topmost exception was not wrapped", t, e.getCause());
+            expected = e;
         }
+        Assert.assertNotNull("Expected the topmost nested AuraRuntimeException to get rethrown", expected);
+        Assert.assertEquals("Topmost exception was not wrapped", t, expected.getCause());
     }
 
     /**
@@ -210,17 +222,19 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     @Test
     public void testWrapExecutionExceptionNestedError() throws Exception {
-        Throwable t4 = new TestQuickFixException(getName());
+        Throwable t4 = new TestQuickFixException("test");
         Throwable t3 = new IOError(t4);
         Throwable t2 = new RuntimeException("intermediate2", t3);
         Throwable t1 = new RuntimeException("intermediate3", t2);
         Exception t = new RuntimeException("top", t1);
+        IOError expected = null;
         try {
             AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0));
-            fail("Expected the nested Error to get rethrown");
         } catch (IOError e) {
-            assertEquals("Topmost nested Error was not rethrown", t3, e);
+            expected = e;
         }
+        Assert.assertNotNull("Expected the nested Error to get rethrown", expected);
+        Assert.assertEquals("Topmost nested Error was not rethrown", t3, expected);
     }
 
     /**
@@ -229,18 +243,20 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     @Test
     public void testWrapExecutionExceptionNestedTooDeep() throws Exception {
-        Throwable t4 = new TestQuickFixException(getName());
+        Throwable t4 = new TestQuickFixException("test");
         Throwable t3 = new RuntimeException("intermediate3", t4);
         Throwable t2 = new RuntimeException("intermediate2", t3);
         Throwable t1 = new RuntimeException("intermediate1", t2);
         Throwable t0 = new RuntimeException("intermediate1", t1);
         Exception t = new RuntimeException("top", t0);
+        AuraRuntimeException expected = null;
         try {
             AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0));
-            fail("Expected the original Throwable to get wrapped in a new AuraRuntimeException");
         } catch (AuraRuntimeException e) {
-            assertEquals("Original Throwable was not wrapped", t, e.getCause());
+            expected = e;
         }
+        Assert.assertNotNull("Expected the original Throwable to get wrapped in a new AuraRuntimeException", expected);
+        Assert.assertEquals("Original Throwable was not wrapped", t, expected.getCause());
     }
 
     /**
@@ -248,13 +264,15 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     @Test
     public void testWrapExecutionExceptionWithoutMatching() throws Exception {
-        Exception t = new RuntimeException(getName());
+        Exception t = new RuntimeException("test");
+        AuraRuntimeException expected = null;
         try {
             AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0));
-            fail("Expected the original Throwable to get wrapped in a new AuraRuntimeException");
         } catch (AuraRuntimeException e) {
-            assertEquals("Original Throwable was not wrapped", t, e.getCause());
+            expected = e;
         }
+        Assert.assertNotNull("Expected the original Throwable to get wrapped in a new AuraRuntimeException", expected);
+        Assert.assertEquals("Original Throwable was not wrapped", t, expected.getCause());
     }
 
     /**
@@ -262,8 +280,8 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     @Test
     public void testPassQuickFixInstanceOfQuickFixException() throws Exception {
-        Throwable t = new TestQuickFixException(getName());
-        assertEquals("Did not get the original QuickFixException", t, AuraExceptionUtil.passQuickFix(t));
+        Throwable t = new TestQuickFixException("test");
+        Assert.assertEquals("Did not get the original QuickFixException", t, AuraExceptionUtil.passQuickFix(t));
     }
 
     /**
@@ -271,14 +289,16 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     @Test
     public void testPassQuickFixInstanceOfAuraRuntimeException() throws Exception {
-        Throwable child = new AuraRuntimeException(getName());
-        Throwable t = new AuraRuntimeException(getName(), null, child);
+        Throwable child = new AuraRuntimeException("test");
+        Throwable t = new AuraRuntimeException("test", null, child);
+        AuraRuntimeException expected = null;
         try {
             AuraExceptionUtil.passQuickFix(t);
-            fail("Expected the AuraRuntimeException to get rethrown");
         } catch (AuraRuntimeException e) {
-            assertEquals("Topmost AuraRuntimeException was not rethrown", t, e);
+            expected = e;
         }
+        Assert.assertNotNull("Expected the AuraRuntimeException to get rethrown", expected);
+        Assert.assertEquals("Topmost AuraRuntimeException was not rethrown", t, expected);
     }
 
     /**
@@ -286,14 +306,16 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     @Test
     public void testPassQuickFixInstanceOfError() throws Exception {
-        Throwable child = new TestQuickFixException(getName());
+        Throwable child = new TestQuickFixException("test");
         Throwable t = new IOError(child);
+        IOError expected = null;
         try {
             AuraExceptionUtil.passQuickFix(t);
-            fail("Expected the Error to get rethrown");
         } catch (IOError e) {
-            assertEquals("Topmost Error was not rethrown", t, e);
+            expected = e;
         }
+        Assert.assertNotNull("Expected the Error to get rethrown", expected);
+        Assert.assertEquals("Topmost Error was not rethrown", t, expected);
     }
 
     /**
@@ -301,12 +323,12 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     @Test
     public void testPassQuickFixNestedQuickFixException() throws Exception {
-        Throwable t4 = new TestQuickFixException(getName());
+        Throwable t4 = new TestQuickFixException("test");
         Throwable t3 = new RuntimeException("intermediate3", t4);
         Throwable t2 = new RuntimeException("intermediate2", t3);
         Throwable t1 = new AuraRuntimeException("intermediate1", t2);
         Throwable t = new RuntimeException("top", t1);
-        assertEquals("Did not get the original nested QuickFixException", t4, AuraExceptionUtil.passQuickFix(t));
+        Assert.assertEquals("Did not get the original nested QuickFixException", t4, AuraExceptionUtil.passQuickFix(t));
     }
 
     /**
@@ -319,12 +341,14 @@ public class AuraExceptionUtilTest extends UnitTestCase {
         Throwable t2 = new AuraUnhandledException("intermediate2", t3);
         Throwable t1 = new AuraUnhandledException("intermediate1", t2);
         Throwable t = new RuntimeException("top", t1);
+        AuraRuntimeException expected = null;
         try {
             AuraExceptionUtil.passQuickFix(t);
-            fail("Expected the topmost nested AuraRuntimeException to get rethrown");
         } catch (AuraRuntimeException e) {
-            assertEquals("Topmost nested AuraRuntimeException was not rethrown", t1, e);
+            expected = e;
         }
+        Assert.assertNotNull("Expected the topmost nested AuraRuntimeException to get rethrown", expected);
+        Assert.assertEquals("Topmost nested AuraRuntimeException was not rethrown", t1, expected);
     }
 
     /**
@@ -332,17 +356,19 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     @Test
     public void testPassQuickFixNestedError() throws Exception {
-        Throwable t4 = new TestQuickFixException(getName());
+        Throwable t4 = new TestQuickFixException("test");
         Throwable t3 = new IOError(t4);
         Throwable t2 = new RuntimeException("intermediate2", t3);
         Throwable t1 = new RuntimeException("intermediate3", t2);
         Throwable t = new RuntimeException("top", t1);
+        IOError expected = null;
         try {
             AuraExceptionUtil.passQuickFix(t);
-            fail("Expected the nested Error to get rethrown");
         } catch (IOError e) {
-            assertEquals("Topmost nested Error was not rethrown", t3, e);
+            expected = e;
         }
+        Assert.assertNotNull("Expected the nested Error to get rethrown", expected);
+        Assert.assertEquals("Topmost nested Error was not rethrown", t3, expected);
     }
 
     /**
@@ -351,18 +377,20 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     @Test
     public void testPassQuickFixNestedTooDeep() throws Exception {
-        Throwable t4 = new TestQuickFixException(getName());
+        Throwable t4 = new TestQuickFixException("test");
         Throwable t3 = new RuntimeException("intermediate3", t4);
         Throwable t2 = new RuntimeException("intermediate2", t3);
         Throwable t1 = new RuntimeException("intermediate1", t2);
         Throwable t0 = new RuntimeException("intermediate1", t1);
         Throwable t = new RuntimeException("top", t0);
+        AuraRuntimeException expected = null;
         try {
             AuraExceptionUtil.passQuickFix(t);
-            fail("Expected the original Throwable to get wrapped in a new AuraRuntimeException");
         } catch (AuraRuntimeException e) {
-            assertEquals("Original Throwable was not wrapped", t, e.getCause());
+            expected = e;
         }
+        Assert.assertNotNull("Expected the original Throwable to get wrapped in a new AuraRuntimeException", expected);
+        Assert.assertEquals("Original Throwable was not wrapped", t, expected.getCause());
     }
 
     /**
@@ -370,13 +398,14 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     @Test
     public void testPassQuickFixWithoutMatching() throws Exception {
-        Throwable t = new RuntimeException(getName());
+        Throwable t = new RuntimeException("test");
+        AuraRuntimeException expected = null;
         try {
             AuraExceptionUtil.passQuickFix(t);
-            fail("Expected the original Throwable to get wrapped in a new AuraRuntimeException");
         } catch (AuraRuntimeException e) {
-            assertEquals("Original Throwable was not wrapped", t, e.getCause());
+            expected = e;
         }
+        Assert.assertNotNull("Expected the original Throwable to get wrapped in a new AuraRuntimeException", expected);
+        Assert.assertEquals("Original Throwable was not wrapped", t, expected.getCause());
     }
-
 }

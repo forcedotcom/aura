@@ -23,15 +23,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.service.LoggingService;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * Simple (non-integration) test case for {@link CSPReporterServlet}.
  */
-public class CSPReporterServletUnitTest extends UnitTestCase {
+public class CSPReporterServletUnitTest {
 
     @Mock
     HttpServletRequest request;
@@ -41,6 +42,11 @@ public class CSPReporterServletUnitTest extends UnitTestCase {
 
     @Mock
     LoggingService loggingService;
+
+    @Before
+    public void initMocks() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @SuppressWarnings("serial")
     private static class CSPReporterServletExtender extends CSPReporterServlet {

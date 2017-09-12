@@ -202,7 +202,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
             try {
                 parsed = DescriptorFilter.parseDefTypes(type);
             } catch (Throwable t) {
-                setParseError(new InvalidDefinitionException("Invalid type: "+t.getMessage(), getLocation(), t));
+                setParseError(new InvalidDefinitionException(t.getMessage(), getLocation(), t));
             }
             if (parsed != null) {
                 this.types.addAll(parsed);

@@ -32,9 +32,9 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
@@ -42,17 +42,19 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Lists;
 
 /**
  * Unit tests for AuraTestFilter
  */
-public class AuraTestFilterUnitTest extends UnitTestCase {
+public class AuraTestFilterUnitTest {
     private abstract class SimpleTestRequestDispatcher implements RequestDispatcher {
         @Override
         public void include(ServletRequest request, ServletResponse response) throws ServletException, IOException {
@@ -100,6 +102,11 @@ public class AuraTestFilterUnitTest extends UnitTestCase {
     
     @Mock
     private RequestDispatcher dispatcher;
+
+    @Before
+    public void initMocks() {
+        MockitoAnnotations.initMocks(this);
+    }
     
     @Test
     public void testDoFilterInjectsTestScriptAtEndByDefault() throws Exception {
@@ -157,9 +164,9 @@ public class AuraTestFilterUnitTest extends UnitTestCase {
         filter.doFilter(request, response, chain);
 
         String responseString = writer.toString();
-        assertEquals(true, responseString.startsWith(renderedTargetComponent));
+        Assert.assertEquals(true, responseString.startsWith(renderedTargetComponent));
         responseString = responseString.substring(renderedTargetComponent.length());
-        assertEquals(true, responseString.contains("<script src='/aura?aura.tag=namespace%3Aname&aura.deftype=APPLICATION&aura.mode=AUTOJSTEST&aura.format=JS&aura.access=AUTHENTICATED&aura.jstestrun=someTest"));
+        Assert.assertEquals(true, responseString.contains("<script src='/aura?aura.tag=namespace%3Aname&aura.deftype=APPLICATION&aura.mode=AUTOJSTEST&aura.format=JS&aura.access=AUTHENTICATED&aura.jstestrun=someTest"));
     }
 
     @Test

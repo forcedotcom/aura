@@ -35,21 +35,21 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.util.json.DefaultJsonSerializationContext;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Maps;
 
-public class BootstrapUnitTest extends UnitTestCase {
+public class BootstrapUnitTest {
     @Test
     public void testName() {
-        assertEquals("bootstrap.js", new Bootstrap().getName());
+        Assert.assertEquals("bootstrap.js", new Bootstrap().getName());
     }
 
     @Test
     public void testFormat() {
-        assertEquals(Format.JS, new Bootstrap().getFormat());
+        Assert.assertEquals(Format.JS, new Bootstrap().getFormat());
     }
 
     @Test
@@ -125,7 +125,7 @@ public class BootstrapUnitTest extends UnitTestCase {
         bootstrap.write(request, response, context);
 
         if (!writer.toString().contains("\"token\":\"" + csrfToken + "\"")) {
-            fail("Missing CSRF token in payload: " + writer.toString());
+            Assert.fail("Missing CSRF token in payload: " + writer.toString());
         }
         Mockito.verify(configAdapter, Mockito.times(1)).getCSRFToken();
     }
@@ -177,7 +177,7 @@ public class BootstrapUnitTest extends UnitTestCase {
         bootstrap.write(request, response, context);
 
         if (writer.toString().contains("\"token\":")) {
-            fail("CSRF token should not be in payload: " + writer.toString());
+            Assert.fail("CSRF token should not be in payload: " + writer.toString());
         }
         Mockito.verify(configAdapter, Mockito.never()).getCSRFToken();
     }

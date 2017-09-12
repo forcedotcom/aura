@@ -20,18 +20,18 @@ import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.util.DummyHttpServletResponse;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class ResourceSvgTest extends UnitTestCase {
+public class ResourceSvgTest {
 
 	/**
      * Unit Test, Name is API!.
      */
     @Test
     public void testName() {
-        assertEquals("resources.svg", new ResourceSvg().getName());
+        Assert.assertEquals("resources.svg", new ResourceSvg().getName());
     }
 
     /**
@@ -39,7 +39,7 @@ public class ResourceSvgTest extends UnitTestCase {
      */
     @Test
     public void testFormat() {
-        assertEquals(Format.SVG, new ResourceSvg().getFormat());
+        Assert.assertEquals(Format.SVG, new ResourceSvg().getFormat());
     }
     
     /**
@@ -69,6 +69,6 @@ public class ResourceSvgTest extends UnitTestCase {
     	
     	resourceSvg.setContentType(response);
     	
-    	assertEquals("image/svg+xml", response.getContentType());
+    	Assert.assertEquals("image/svg+xml", response.getContentType());
     }
 }

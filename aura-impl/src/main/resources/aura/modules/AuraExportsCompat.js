@@ -70,8 +70,11 @@ Aura.ExportsModule = {
         $A.componentService.initModuleDefs([module]);
         return module["descriptor"];
     },
+    /**
+     * @see {@link AuraComponentService.prototype.hasModuleDefinition}
+     */
     "hasModule": function(moduleName) {
-        return $A.componentService.getComponentDef($A.componentService.createDescriptorConfig(moduleName));
+        return $A.componentService.hasModuleDefinition(moduleName);
     },
     "getModule": function(moduleName) {
         return $A.componentService.evaluateModuleDef(moduleName);

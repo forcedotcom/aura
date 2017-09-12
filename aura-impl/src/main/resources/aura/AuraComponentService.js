@@ -1255,6 +1255,20 @@ AuraComponentService.prototype.hasDefinition = function(descriptor) {
 };
 
 /**
+ * Whether module definition exist in registry
+ *
+ * moduleName may be in module format ie custom-web-component or
+ * Aura descriptor format ie markup://custom:webComponent
+ *
+ * @param moduleName name in module format or Aura descriptor
+ * @returns {boolean} whether module definition exists
+ * @private
+ */
+AuraComponentService.prototype.hasModuleDefinition = function(moduleName) {
+    return !!this.moduleDefRegistry[moduleName];
+};
+
+/**
  * Gets the component definition from the registry.
  * Does not go to the server if the definition is not available.
  *

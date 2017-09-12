@@ -78,5 +78,18 @@
                 $A.test.assertTrue(typeof method === "function");
             }
         ]
+    },
+
+    testHasModule: {
+        test: [
+            function(cmp) {
+                var simpleLib = cmp.find("simple-lib");
+                $A.test.assertTrue(simpleLib.hasModuleDefinition("aura"), "'aura' module definition should be available");
+                $A.test.assertTrue(simpleLib.hasModuleDefinition("markup://moduleTest:simpleCmp"), "'markup://moduleTest:simpleCmp' module definition as descriptor should exist");
+                $A.test.assertTrue(simpleLib.hasModuleDefinition("moduletest-simple-cmp"), "'moduletest-simple-cmp' module definition as module naming should exist");
+                $A.test.assertFalse(simpleLib.hasModuleDefinition("nonexistent-module-name"), "nonexistent module definition should not exist");
+                $A.test.assertFalse(simpleLib.hasModuleDefinition("markup://aura:component"), "aura definition should not exist in module registry");
+            }
+        ]
     }
 })

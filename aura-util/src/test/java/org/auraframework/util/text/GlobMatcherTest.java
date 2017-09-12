@@ -19,10 +19,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
 import org.junit.Test;
 
-public class GlobMatcherTest extends UnitTestCase {
+public class GlobMatcherTest {
     private static class GMTSet {
         public final String pattern;
         public final boolean constant;
@@ -48,11 +48,11 @@ public class GlobMatcherTest extends UnitTestCase {
     @Test
     public void testAll() {
         GlobMatcher gm = new GlobMatcher("*");
-        assertTrue("* should be 'all'", gm.isAll());
-        assertFalse("* should not be constant", gm.isConstant());
-        assertTrue("* matches null", gm.match(null));
-        assertTrue("* matches everything", gm.match("abcd"));
-        assertTrue("* matches everything", gm.match("AbCd"));
+        Assert.assertTrue("* should be 'all'", gm.isAll());
+        Assert.assertFalse("* should not be constant", gm.isConstant());
+        Assert.assertTrue("* matches null", gm.match(null));
+        Assert.assertTrue("* matches everything", gm.match("abcd"));
+        Assert.assertTrue("* matches everything", gm.match("AbCd"));
     }
 
     private static String[] ILLEGALS = new String[] { "bah@", "bah.", };
@@ -60,12 +60,14 @@ public class GlobMatcherTest extends UnitTestCase {
     @Test
     public void testIllegals() {
         for (String x : ILLEGALS) {
+            IllegalArgumentException expected = null;
+
             try {
                 new GlobMatcher(x);
-                fail("Expected illegal argument exception for " + x);
             } catch (IllegalArgumentException iae) {
-                // expected, don't worry about text.
+                expected = iae;
             }
+            Assert.assertNotNull("Expected illegal argument exception for " + x, expected);
         }
     }
 
@@ -73,18 +75,18 @@ public class GlobMatcherTest extends UnitTestCase {
         for (GMTSet gmt : theSet) {
             GlobMatcher gm = new GlobMatcher(gmt.pattern);
 
-            assertEquals("toString should give us the original", gm.toString(), gmt.pattern);
+            Assert.assertEquals("toString should give us the original", gm.toString(), gmt.pattern);
             if (gmt.constant) {
-                assertTrue(gm.toString() + ": must be constant", gm.isConstant());
+                Assert.assertTrue(gm.toString() + ": must be constant", gm.isConstant());
             } else {
-                assertFalse(gm.toString() + ": must NOT be constant", gm.isConstant());
+                Assert.assertFalse(gm.toString() + ": must NOT be constant", gm.isConstant());
             }
-            assertFalse(gm.toString() + ": must not be all", gm.isAll());
+            Assert.assertFalse(gm.toString() + ": must not be all", gm.isAll());
             for (String m : gmt.matches) {
-                assertTrue(gm.toString() + " should match " + m, gm.match(m));
+                Assert.assertTrue(gm.toString() + " should match " + m, gm.match(m));
             }
             for (String m : gmt.fails) {
-                assertFalse(gm.toString() + " should NOT match " + m, gm.match(m));
+                Assert.assertFalse(gm.toString() + " should NOT match " + m, gm.match(m));
             }
         }
     }

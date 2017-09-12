@@ -16,6 +16,10 @@
 
 package org.auraframework.impl.adapter;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.logging.Level;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.auraframework.impl.test.util.LoggingTestAppender;
@@ -23,22 +27,17 @@ import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.GenericEventException;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.logging.Level;
-
-public class ServerErrorUtilAdapterImplUnitTest extends UnitTestCase {
+public class ServerErrorUtilAdapterImplUnitTest {
 
     private static final String SERVER_ERROR_EVENT = "aura:serverActionError";
 
     private ServerErrorUtilAdapterImpl serverErrorUtilAdapter = new ServerErrorUtilAdapterImpl();
 
-    @Override
     @Before
     public void setUp() {
         ContextService mockContextSerivce = Mockito.mock(ContextService.class);
@@ -52,9 +51,9 @@ public class ServerErrorUtilAdapterImplUnitTest extends UnitTestCase {
     public void handleException() throws Exception {
         try {
             serverErrorUtilAdapter.handleException("err");
-            fail("Expected exception not thrown");
+            Assert.fail("Expected exception not thrown");
         } catch (GenericEventException gee) {
-            assertTrue(gee.getMessage().equals(SERVER_ERROR_EVENT) && gee.getCause() == null);
+            Assert.assertTrue(gee.getMessage().equals(SERVER_ERROR_EVENT) && gee.getCause() == null);
         }
     }
 
@@ -63,9 +62,9 @@ public class ServerErrorUtilAdapterImplUnitTest extends UnitTestCase {
         RuntimeException re = new RuntimeException();
         try {
             serverErrorUtilAdapter.handleCustomException("err", re);
-            fail("Expected exception not thrown");
+            Assert.fail("Expected exception not thrown");
         } catch (GenericEventException gee) {
-            assertTrue(gee.getMessage().equals(SERVER_ERROR_EVENT) && gee.getCause().equals(re));
+            Assert.assertTrue(gee.getMessage().equals(SERVER_ERROR_EVENT) && gee.getCause().equals(re));
         }
     }
 
@@ -83,6 +82,6 @@ public class ServerErrorUtilAdapterImplUnitTest extends UnitTestCase {
         UUID.fromString(errorId);
 
         String logMessage = logs.get(0).getMessage().toString();
-        assertTrue(logMessage.equals(message));
+        Assert.assertTrue(logMessage.equals(message));
     }
 }

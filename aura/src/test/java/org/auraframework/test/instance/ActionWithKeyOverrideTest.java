@@ -17,54 +17,54 @@ package org.auraframework.test.instance;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 
 import org.auraframework.instance.Action;
 import org.auraframework.instance.ActionWithKeyOverride;
 import org.auraframework.util.json.JsonEncoder;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
-public class ActionWithKeyOverrideTest extends UnitTestCase {
+public class ActionWithKeyOverrideTest {
     @Test
     public void testConstructingWithNullActionAsKey() {
         try {
             new ActionWithKeyOverride(null, null);
         } catch (IllegalArgumentException iae) {
-            assertEquals(ActionWithKeyOverride.ERROR_ACTIONASKEY_MISSING, iae.getMessage());
+            Assert.assertEquals(ActionWithKeyOverride.ERROR_ACTIONASKEY_MISSING, iae.getMessage());
         }
     }
 
     @Test
     public void testConstructingWithNullActionToExecute() {
-        final Action actionAsKey = mock(Action.class);
+        final Action actionAsKey = Mockito.mock(Action.class);
 
         try {
             new ActionWithKeyOverride(actionAsKey, null);
         } catch (IllegalArgumentException iae) {
-            assertEquals(ActionWithKeyOverride.ERROR_ACTIONTOEXECUTE_MISSING, iae.getMessage());
+            Assert.assertEquals(ActionWithKeyOverride.ERROR_ACTIONTOEXECUTE_MISSING, iae.getMessage());
         }
     }
 
     @Test
     public void testConstruction() {
-        final Action actionAsKey = mock(Action.class);
-        final Action actionToExecute = mock(Action.class);
+        final Action actionAsKey = Mockito.mock(Action.class);
+        final Action actionToExecute = Mockito.mock(Action.class);
 
         Action action = new ActionWithKeyOverride(actionAsKey, actionToExecute);
 
         // Verify
-        verify(actionAsKey, times(1)).setStorable();
-        verify(actionToExecute, times(1)).setStorable();
-        assertNotNull("ActionWithKeyOverride was not properly created.", action);
+        Mockito.verify(actionAsKey, Mockito.times(1)).setStorable();
+        Mockito.verify(actionToExecute, Mockito.times(1)).setStorable();
+        Assert.assertNotNull("ActionWithKeyOverride was not properly created.", action);
     }
 
     @Test
     public void testDelegations() throws Exception {
-        final Action actionAsKey = mock(Action.class);
-        final Action actionToExecute = mock(Action.class);
+        final Action actionAsKey = Mockito.mock(Action.class);
+        final Action actionToExecute = Mockito.mock(Action.class);
 
         Action action = new ActionWithKeyOverride(actionAsKey, actionToExecute);
 
@@ -90,31 +90,31 @@ public class ActionWithKeyOverrideTest extends UnitTestCase {
 
         // Verify
         // Delegates to actionAsKey
-        verify(actionAsKey, times(1)).getParams();
-        verify(actionAsKey, times(1)).getDescriptor();
-        verify(actionAsKey, times(1)).isStorable();
+        Mockito.verify(actionAsKey, Mockito.times(1)).getParams();
+        Mockito.verify(actionAsKey, Mockito.times(1)).getDescriptor();
+        Mockito.verify(actionAsKey, Mockito.times(1)).isStorable();
         // 2 because ActionWithKeyOverride constructor sets this on actionAsKey.
-        verify(actionAsKey, times(2)).setStorable();
-        verify(actionAsKey, times(1)).getId();
-        verify(actionAsKey, times(1)).setId(any(String.class));
+        Mockito.verify(actionAsKey, Mockito.times(2)).setStorable();
+        Mockito.verify(actionAsKey, Mockito.times(1)).getId();
+        Mockito.verify(actionAsKey, Mockito.times(1)).setId(any(String.class));
 
         //
         // These delegate to both.
         //
-        verify(actionToExecute, times(1)).setId(any(String.class));
-        verify(actionToExecute, times(1)).getInstanceStack();
-        verify(actionToExecute, times(2)).setStorable();
+        Mockito.verify(actionToExecute, Mockito.times(1)).setId(any(String.class));
+        Mockito.verify(actionToExecute, Mockito.times(1)).getInstanceStack();
+        Mockito.verify(actionToExecute, Mockito.times(2)).setStorable();
 
         // Delegates to actionToExecute
-        verify(actionToExecute, times(1)).run();
-        verify(actionToExecute, times(1)).add(anyListOf(Action.class));
-        verify(actionToExecute, times(1)).getActions();
-        verify(actionToExecute, times(1)).getReturnValue();
-        verify(actionToExecute, times(1)).getState();
-        verify(actionToExecute, times(1)).getErrors();
-        verify(actionToExecute, times(1)).serialize(any(JsonEncoder.class));
+        Mockito.verify(actionToExecute, Mockito.times(1)).run();
+        Mockito.verify(actionToExecute, Mockito.times(1)).add(anyListOf(Action.class));
+        Mockito.verify(actionToExecute, Mockito.times(1)).getActions();
+        Mockito.verify(actionToExecute, Mockito.times(1)).getReturnValue();
+        Mockito.verify(actionToExecute, Mockito.times(1)).getState();
+        Mockito.verify(actionToExecute, Mockito.times(1)).getErrors();
+        Mockito.verify(actionToExecute, Mockito.times(1)).serialize(any(JsonEncoder.class));
 
-        verifyNoMoreInteractions(actionAsKey);
-        verifyNoMoreInteractions(actionToExecute);
+        Mockito.verifyNoMoreInteractions(actionAsKey);
+        Mockito.verifyNoMoreInteractions(actionToExecute);
     }
 }

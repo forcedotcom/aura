@@ -15,18 +15,18 @@
  */
 package org.auraframework.impl.cache;
 
-import org.auraframework.cache.Cache;
-import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Test;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mockito;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
-public class CacheImplTest extends UnitTestCase {
+import org.auraframework.cache.Cache;
+import org.junit.Assert;
+import org.junit.Test;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Mockito;
+
+public class CacheImplTest {
 
     private <K, T> com.google.common.cache.Cache<K, T> getMockCache() {
         com.google.common.cache.Cache<K, T> cache = com.google.common.cache.CacheBuilder
@@ -59,7 +59,7 @@ public class CacheImplTest extends UnitTestCase {
         Mockito.doReturn(expected).when(backingCache).getIfPresent(key);
 
         Object actual = cache.getIfPresent(key);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -113,7 +113,7 @@ public class CacheImplTest extends UnitTestCase {
                 backingCache);
 
         Set<Object> actualKeySet = cache.getKeySet();
-        assertEquals(backingCache.asMap().keySet(), actualKeySet);
+        Assert.assertEquals(backingCache.asMap().keySet(), actualKeySet);
     }
 
     @Test

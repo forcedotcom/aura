@@ -20,11 +20,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.text.Hash.StringBuilder;
+import org.junit.Assert;
 import org.junit.Test;
 
-public class HashTest extends UnitTestCase {
+public class HashTest {
 
     public static class ExposedHash extends Hash {
         // expose the default c'tor
@@ -37,10 +37,10 @@ public class HashTest extends UnitTestCase {
     public void testAsPromise() {
         byte[] bytes = { 12, 34, 56, 78, 90 };
         Hash hash = new ExposedHash();
-        assertFalse(hash.isSet());
+        Assert.assertFalse(hash.isSet());
         hash.setHash(bytes);
-        assertTrue(hash.isSet());
-        assertEquals(new Hash(bytes), hash);
+        Assert.assertTrue(hash.isSet());
+        Assert.assertEquals(new Hash(bytes), hash);
     }
 
     private String findNonPrint(String val) {
@@ -73,23 +73,23 @@ public class HashTest extends UnitTestCase {
         Hash hash = new Hash(bytes);
         String val = hash.toString();
 
-        assertTrue(val.length() > 1);
-        assertEquals("Bad character in string", "", findNonPrint(val));
+        Assert.assertTrue(val.length() > 1);
+        Assert.assertEquals("Bad character in string", "", findNonPrint(val));
 
         hash = new Hash(new StringReader("a test for all eternity"));
         val = hash.toString();
-        assertTrue(val.length() > 1);
-        assertEquals("Bad character in string", "", findNonPrint(val));
+        Assert.assertTrue(val.length() > 1);
+        Assert.assertEquals("Bad character in string", "", findNonPrint(val));
 
         hash = new Hash(new StringReader("a different test for all eternity"));
         val = hash.toString();
-        assertTrue(val.length() > 1);
-        assertEquals("Bad character in string", "", findNonPrint(val));
+        Assert.assertTrue(val.length() > 1);
+        Assert.assertEquals("Bad character in string", "", findNonPrint(val));
 
         hash = new Hash(new StringReader("why are you looking at this anyway"));
         val = hash.toString();
-        assertTrue(val.length() > 1);
-        assertEquals("Bad character in string", "", findNonPrint(val));
+        Assert.assertTrue(val.length() > 1);
+        Assert.assertEquals("Bad character in string", "", findNonPrint(val));
     }
 
     @Test
@@ -98,29 +98,29 @@ public class HashTest extends UnitTestCase {
         byte[] bytes2 = { 12, 43, 56, 78, 90 };
         Hash hash1 = new Hash(bytes1);
         Hash hash2 = new Hash(bytes2);
-        assertTrue(hash1.isSet());
-        assertTrue(hash2.isSet());
-        assertFalse(hash1.equals(hash2));
-        assertFalse(hash2.equals(hash1));
+        Assert.assertTrue(hash1.isSet());
+        Assert.assertTrue(hash2.isSet());
+        Assert.assertFalse(hash1.equals(hash2));
+        Assert.assertFalse(hash2.equals(hash1));
     }
 
     @Test
     public void testFromBytecode() throws Exception {
         Hash hash = new Hash(HashTest.class.getName());
-        assertTrue(hash.isSet());
+        Assert.assertTrue(hash.isSet());
     }
 
     @Test
     public void testFromReader() throws Exception {
         String text = "Some text to be read by the reader and hashed";
         Hash readerHash = new Hash(new StringReader(text));
-        assertTrue(readerHash.isSet());
+        Assert.assertTrue(readerHash.isSet());
         Hash setHash = new ExposedHash();
         MessageDigest digest = MessageDigest.getInstance("MD5");
         digest.update(text.getBytes());
         setHash.setHash(digest.digest());
-        assertEquals(readerHash, setHash);
-        assertEquals(readerHash.hashCode(), setHash.hashCode());
+        Assert.assertEquals(readerHash, setHash);
+        Assert.assertEquals(readerHash.hashCode(), setHash.hashCode());
     }
 
     @Test
@@ -128,19 +128,23 @@ public class HashTest extends UnitTestCase {
         byte[] bytes = { 12, 34, 56, 78, 90 };
         Hash hash = new ExposedHash();
         hash.setHash(bytes);
-        assertTrue(hash.isSet());
+        IllegalStateException expected = null;
+
+        Assert.assertTrue(hash.isSet());
         try {
             hash.setHash(bytes);
-            fail("Hash shouldn't accept a second setHash() call");
         } catch (IllegalStateException e) {
-            // expected.
+            expected = e;
         }
+        Assert.assertNotNull("Hash shouldn't accept a second setHash() call", expected);
+
+        expected = null;
         try {
             hash.setHash(new StringReader("foo"));
-            fail("Hash shouldn't accept a second setHash() call");
         } catch (IllegalStateException e) {
-            // expected.
+            expected = e;
         }
+        Assert.assertNotNull("Hash shouldn't accept a second setHash() call", expected);
     }
 
     @Test
@@ -151,10 +155,10 @@ public class HashTest extends UnitTestCase {
         Hash hash2 = new Hash(bytes2);
         Hash hash3 = new Hash(bytes1);
 
-        assertEquals(hash1, hash3);
-        assertEquals(hash1.hashCode(), hash3.hashCode());
-        assertFalse(hash1.equals(hash2));
-        assertFalse(hash1.hashCode() == hash2.hashCode());
+        Assert.assertEquals(hash1, hash3);
+        Assert.assertEquals(hash1.hashCode(), hash3.hashCode());
+        Assert.assertFalse(hash1.equals(hash2));
+        Assert.assertFalse(hash1.hashCode() == hash2.hashCode());
     }
 
     private int getHashCode(String string) throws NoSuchAlgorithmException {
@@ -162,8 +166,8 @@ public class HashTest extends UnitTestCase {
     }
 
     private void assertHash(Hash hash, boolean isSet, int hashCode) throws Exception {
-        assertEquals(isSet, hash.isSet());
-        assertEquals(hashCode, hash.hashCode());
+        Assert.assertEquals(isSet, hash.isSet());
+        Assert.assertEquals(hashCode, hash.hashCode());
     }
 
     private void assertStringBuilderHash(String toHash) throws Exception {
@@ -210,5 +214,4 @@ public class HashTest extends UnitTestCase {
         builder.addString(null);
         assertHash(builder.build(), true, expected);
     }
-
 }

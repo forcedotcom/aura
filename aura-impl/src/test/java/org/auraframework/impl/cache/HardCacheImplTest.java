@@ -19,24 +19,24 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.Semaphore;
 
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.common.cache.CacheStats;
 import com.google.common.collect.Lists;
 
-public class HardCacheImplTest extends UnitTestCase {
+public class HardCacheImplTest {
     @Test
     public void testGetIfPresentStartsWithNull() {
         HardCacheImpl<String,String> cache = new HardCacheImpl.Builder<String,String>().build();
 
-        assertNull(cache.getIfPresent("notHere"));
+        Assert.assertNull(cache.getIfPresent("notHere"));
 
         CacheStats stats = cache.getStats();
-        assertEquals(1, stats.missCount());
-        assertEquals(0, stats.hitCount());
-        assertEquals(0, stats.loadCount());
-        assertEquals(0, stats.loadExceptionCount());
+        Assert.assertEquals(1, stats.missCount());
+        Assert.assertEquals(0, stats.hitCount());
+        Assert.assertEquals(0, stats.loadCount());
+        Assert.assertEquals(0, stats.loadExceptionCount());
     }
 
     @Test
@@ -46,13 +46,13 @@ public class HardCacheImplTest extends UnitTestCase {
         String expected = "value";
 
         cache.put(key, expected);
-        assertEquals(expected, cache.getIfPresent(key));
+        Assert.assertEquals(expected, cache.getIfPresent(key));
 
         CacheStats stats = cache.getStats();
-        assertEquals(0, stats.missCount());
-        assertEquals(1, stats.hitCount());
-        assertEquals(0, stats.loadCount());
-        assertEquals(0, stats.loadExceptionCount());
+        Assert.assertEquals(0, stats.missCount());
+        Assert.assertEquals(1, stats.hitCount());
+        Assert.assertEquals(0, stats.loadCount());
+        Assert.assertEquals(0, stats.loadExceptionCount());
     }
 
     @Test
@@ -63,13 +63,13 @@ public class HardCacheImplTest extends UnitTestCase {
         Callable<String> function = () -> { return expected; };
 
         String actual = cache.get(key, function);
-        assertEquals(expected, actual);
-        assertEquals(expected, cache.getIfPresent(key));
+        Assert.assertEquals(expected, actual);
+        Assert.assertEquals(expected, cache.getIfPresent(key));
         CacheStats stats = cache.getStats();
-        assertEquals(1, stats.missCount());
-        assertEquals(1, stats.hitCount());
-        assertEquals(1, stats.loadCount());
-        assertEquals(0, stats.loadExceptionCount());
+        Assert.assertEquals(1, stats.missCount());
+        Assert.assertEquals(1, stats.hitCount());
+        Assert.assertEquals(1, stats.loadCount());
+        Assert.assertEquals(0, stats.loadExceptionCount());
     }
 
     @Test
@@ -111,13 +111,13 @@ public class HardCacheImplTest extends UnitTestCase {
         //
         // Now no one should be finished.
         //
-        assertFalse(firstFuture.isDone());
-        assertFalse(secondFuture.isDone());
+        Assert.assertFalse(firstFuture.isDone());
+        Assert.assertFalse(secondFuture.isDone());
 
         blocker.release();
 
-        assertEquals(expected, secondFuture.get());
-        assertEquals(expected, firstFuture.get());
+        Assert.assertEquals(expected, secondFuture.get());
+        Assert.assertEquals(expected, firstFuture.get());
     }
 
     @Test
@@ -129,24 +129,24 @@ public class HardCacheImplTest extends UnitTestCase {
         Callable<String> function = () -> { return expected; };
 
         String actual = cache.get(key, function);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
 
         CacheStats stats = cache.getStats();
-        assertEquals(1, stats.missCount());
-        assertEquals(0, stats.hitCount());
-        assertEquals(1, stats.loadCount());
-        assertEquals(0, stats.loadExceptionCount());
+        Assert.assertEquals(1, stats.missCount());
+        Assert.assertEquals(0, stats.hitCount());
+        Assert.assertEquals(1, stats.loadCount());
+        Assert.assertEquals(0, stats.loadExceptionCount());
 
         final String unexpected = "unexpected";
         Callable<String> function2 = () -> { return unexpected; };
         actual = cache.get(key, function2);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
 
         stats = cache.getStats();
-        assertEquals(1, stats.missCount());
-        assertEquals(1, stats.hitCount());
-        assertEquals(1, stats.loadCount());
-        assertEquals(0, stats.loadExceptionCount());
+        Assert.assertEquals(1, stats.missCount());
+        Assert.assertEquals(1, stats.hitCount());
+        Assert.assertEquals(1, stats.loadCount());
+        Assert.assertEquals(0, stats.loadExceptionCount());
     }
 
     @Test
@@ -156,9 +156,9 @@ public class HardCacheImplTest extends UnitTestCase {
         final String expected = "value";
 
         cache.put(key, expected);
-        assertEquals(expected, cache.getIfPresent(key));
+        Assert.assertEquals(expected, cache.getIfPresent(key));
         cache.invalidate(key);
-        assertNull(cache.getIfPresent(key));
+        Assert.assertNull(cache.getIfPresent(key));
     }
 
     @Test
@@ -176,15 +176,15 @@ public class HardCacheImplTest extends UnitTestCase {
         cache.put(key2, expected2);
         cache.put(key3, expected3);
 
-        assertEquals(expected1, cache.getIfPresent(key1));
-        assertEquals(expected2, cache.getIfPresent(key2));
-        assertEquals(expected3, cache.getIfPresent(key3));
+        Assert.assertEquals(expected1, cache.getIfPresent(key1));
+        Assert.assertEquals(expected2, cache.getIfPresent(key2));
+        Assert.assertEquals(expected3, cache.getIfPresent(key3));
 
         cache.invalidate(keys);
 
-        assertEquals(null, cache.getIfPresent(key1));
-        assertEquals(null, cache.getIfPresent(key2));
-        assertEquals(expected3, cache.getIfPresent(key3));
+        Assert.assertEquals(null, cache.getIfPresent(key1));
+        Assert.assertEquals(null, cache.getIfPresent(key2));
+        Assert.assertEquals(expected3, cache.getIfPresent(key3));
     }
 
     @Test
@@ -198,19 +198,19 @@ public class HardCacheImplTest extends UnitTestCase {
         cache.put(key1, expected1);
         cache.put(key2, expected2);
 
-        assertEquals(expected1, cache.getIfPresent(key1));
-        assertEquals(expected2, cache.getIfPresent(key2));
+        Assert.assertEquals(expected1, cache.getIfPresent(key1));
+        Assert.assertEquals(expected2, cache.getIfPresent(key2));
 
         cache.invalidateAll();
 
-        assertEquals(null, cache.getIfPresent(key1));
-        assertEquals(null, cache.getIfPresent(key2));
+        Assert.assertEquals(null, cache.getIfPresent(key1));
+        Assert.assertEquals(null, cache.getIfPresent(key2));
     }
 
     @Test
     public void testGetKeySet() {
         HardCacheImpl<String,String> cache = new HardCacheImpl.Builder<String,String>().build();
-        assertNotNull(cache.getKeySet());
+        Assert.assertNotNull(cache.getKeySet());
     }
 
     @Test
@@ -224,13 +224,13 @@ public class HardCacheImplTest extends UnitTestCase {
         cache.put(key1, expected1);
         cache.put(key2, expected2);
 
-        assertEquals(expected1, cache.getIfPresent(key1));
-        assertEquals(expected2, cache.getIfPresent(key2));
+        Assert.assertEquals(expected1, cache.getIfPresent(key1));
+        Assert.assertEquals(expected2, cache.getIfPresent(key2));
 
         cache.invalidatePartial(null);
 
-        assertEquals(null, cache.getIfPresent(key1));
-        assertEquals(null, cache.getIfPresent(key2));
+        Assert.assertEquals(null, cache.getIfPresent(key1));
+        Assert.assertEquals(null, cache.getIfPresent(key2));
     }
 
     @Test
@@ -244,13 +244,13 @@ public class HardCacheImplTest extends UnitTestCase {
         cache.put(key1, expected1);
         cache.put(key2, expected2);
 
-        assertEquals(expected1, cache.getIfPresent(key1));
-        assertEquals(expected2, cache.getIfPresent(key2));
+        Assert.assertEquals(expected1, cache.getIfPresent(key1));
+        Assert.assertEquals(expected2, cache.getIfPresent(key2));
 
         cache.invalidatePartial("");
 
-        assertEquals(null, cache.getIfPresent(key1));
-        assertEquals(null, cache.getIfPresent(key2));
+        Assert.assertEquals(null, cache.getIfPresent(key1));
+        Assert.assertEquals(null, cache.getIfPresent(key2));
     }
 
     @Test
@@ -264,13 +264,13 @@ public class HardCacheImplTest extends UnitTestCase {
         cache.put(key1, expected1);
         cache.put(key2, expected2);
 
-        assertEquals(expected1, cache.getIfPresent(key1));
-        assertEquals(expected2, cache.getIfPresent(key2));
+        Assert.assertEquals(expected1, cache.getIfPresent(key1));
+        Assert.assertEquals(expected2, cache.getIfPresent(key2));
 
         cache.invalidatePartial(" ");
 
-        assertEquals(expected1, cache.getIfPresent(key1));
-        assertEquals(expected2, cache.getIfPresent(key2));
+        Assert.assertEquals(expected1, cache.getIfPresent(key1));
+        Assert.assertEquals(expected2, cache.getIfPresent(key2));
     }
 
     @Test
@@ -284,13 +284,13 @@ public class HardCacheImplTest extends UnitTestCase {
         cache.put(key1, expected1);
         cache.put(key2, expected2);
 
-        assertEquals(expected1, cache.getIfPresent(key1));
-        assertEquals(expected2, cache.getIfPresent(key2));
+        Assert.assertEquals(expected1, cache.getIfPresent(key1));
+        Assert.assertEquals(expected2, cache.getIfPresent(key2));
 
         cache.invalidatePartial("key");
 
-        assertEquals(null, cache.getIfPresent(key1));
-        assertEquals(expected2, cache.getIfPresent(key2));
+        Assert.assertEquals(null, cache.getIfPresent(key1));
+        Assert.assertEquals(expected2, cache.getIfPresent(key2));
     }
 
     @Test
@@ -307,14 +307,14 @@ public class HardCacheImplTest extends UnitTestCase {
         cache.put(key2, expected2);
         cache.put(key3, expected3);
 
-        assertEquals(expected1, cache.getIfPresent(key1));
-        assertEquals(expected2, cache.getIfPresent(key2));
-        assertEquals(expected3, cache.getIfPresent(key3));
+        Assert.assertEquals(expected1, cache.getIfPresent(key1));
+        Assert.assertEquals(expected2, cache.getIfPresent(key2));
+        Assert.assertEquals(expected3, cache.getIfPresent(key3));
 
         cache.invalidatePartial("key");
 
-        assertEquals(null, cache.getIfPresent(key1));
-        assertEquals(null, cache.getIfPresent(key2));
-        assertEquals(expected3, cache.getIfPresent(key3));
+        Assert.assertEquals(null, cache.getIfPresent(key1));
+        Assert.assertEquals(null, cache.getIfPresent(key2));
+        Assert.assertEquals(expected3, cache.getIfPresent(key3));
     }
 }

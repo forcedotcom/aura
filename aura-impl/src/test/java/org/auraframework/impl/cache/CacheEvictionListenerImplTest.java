@@ -17,15 +17,16 @@ package org.auraframework.impl.cache;
 
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.system.LoggingContext;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheStats;
 
-public class CacheEvictionListenerImplTest extends UnitTestCase {
+public class CacheEvictionListenerImplTest {
     @Mock
     private LoggingAdapter loggingAdapter;
 
@@ -34,6 +35,11 @@ public class CacheEvictionListenerImplTest extends UnitTestCase {
 
     @Mock
     private Cache<String,String> cache;
+
+    @Before
+    public void initMocks() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
     public void testOnRemovalCallsLogOnMaxTime() throws Exception {

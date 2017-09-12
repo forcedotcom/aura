@@ -20,7 +20,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
-import java.util.Date;
 import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +43,7 @@ import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -55,7 +54,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
+public class ServletUtilAdapterImplUnitTest {
     @Test
     public void testHandleServletExceptionSetsNoCacheForOKBeforeThrowing() throws Exception {
         ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
@@ -79,7 +78,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
         Mockito.verify(sua, Mockito.times(1)).setNoCache(response);
         Mockito.verify(contextService, Mockito.times(1)).endContext();
-        assertEquals(expected, t);
+        Assert.assertEquals(expected, t);
     }
 
     @Test
@@ -108,11 +107,11 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         ArgumentCaptor<Integer> statusCaptor = ArgumentCaptor.forClass(Integer.class);
         Mockito.verify(response, Mockito.atLeastOnce()).setStatus(statusCaptor.capture());
         List<Integer> statuses = statusCaptor.getAllValues();
-        assertEquals("Must end up with 'SERVER_ERROR'",
+        Assert.assertEquals("Must end up with 'SERVER_ERROR'",
                 Integer.valueOf(HttpStatus.SC_INTERNAL_SERVER_ERROR), statuses.get(statuses.size()-1));
 
         Mockito.verify(contextService, Mockito.times(1)).endContext();
-        assertEquals(t, expected);
+        Assert.assertEquals(t, expected);
     }
 
     @Test
@@ -141,7 +140,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         ArgumentCaptor<Integer> statusCaptor = ArgumentCaptor.forClass(Integer.class);
         Mockito.verify(response, Mockito.times(1)).setStatus(statusCaptor.capture());
         List<Integer> statuses = statusCaptor.getAllValues();
-        assertEquals("Must end up with 'SERVER_ERROR'",
+        Assert.assertEquals("Must end up with 'SERVER_ERROR'",
                 Integer.valueOf(HttpStatus.SC_INTERNAL_SERVER_ERROR), statuses.get(0));
         Mockito.verify(contextService, Mockito.times(1)).endContext();
     }
@@ -180,7 +179,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         ArgumentCaptor<Integer> statusCaptor = ArgumentCaptor.forClass(Integer.class);
         Mockito.verify(response, Mockito.times(1)).setStatus(statusCaptor.capture());
         List<Integer> statuses = statusCaptor.getAllValues();
-        assertEquals("Must end up with 'OK' ", Integer.valueOf(HttpStatus.SC_OK), statuses.get(0));
+        Assert.assertEquals("Must end up with 'OK' ", Integer.valueOf(HttpStatus.SC_OK), statuses.get(0));
         Mockito.verify(contextService, Mockito.times(1)).endContext();
     }
 
@@ -205,8 +204,8 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.verifyNoMoreInteractions(contextService);
 
         String output = sw.getBuffer().toString();
-        assertTrue("Output should start with '404 Not Found'", output.startsWith("404 Not Found"));
-        assertTrue("Output should be longer than 256 bytes", output.length() > 256);
+        Assert.assertTrue("Output should start with '404 Not Found'", output.startsWith("404 Not Found"));
+        Assert.assertTrue("Output should be longer than 256 bytes", output.length() > 256);
     }
 
     @Test
@@ -226,7 +225,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
         List<String> result = sua.getScripts(context, true, false, attributes);
 
-        assertEquals(expected, result);
+        Assert.assertEquals(expected, result);
     }
 
     @Test
@@ -248,7 +247,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
         List<String> result = sua.getScripts(context, false, true, attributes);
 
-        assertEquals(expected, result);
+        Assert.assertEquals(expected, result);
     }
 
     @Test
@@ -264,7 +263,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
         List<String> result = sua.getStyles(context);
 
-        assertEquals(expected, result);
+        Assert.assertEquals(expected, result);
     }
 
     @Test
@@ -280,7 +279,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn(returned).when(clientLibraryService).getUrls(context, ClientLibraryDef.Type.CSS);
 
         actual = sua.getCssClientLibraryUrls(context);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -295,7 +294,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn(expectedURL).when(configAdapter).getAuraJSURL();
 
         actual = sua.getBaseScripts(null, null);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -314,7 +313,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn("bootstrap").when(sua).getBootstrapUrl(context, attributes);
 
         actual = sua.getFrameworkScripts(context, true, true, attributes);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -333,7 +332,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn("bootstrap").when(sua).getBootstrapUrl(context, attributes);
 
         actual = sua.getFrameworkScripts(context, false, true, attributes);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -352,7 +351,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn("bootstrap").when(sua).getBootstrapUrl(context, attributes);
 
         actual = sua.getFrameworkScripts(context, false, false, attributes);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -374,7 +373,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         sua.setCspInliningService(inliningService);
 
         actual = sua.getFrameworkScripts(context, true, false, attributes);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -389,7 +388,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn("bootstrap").when(sua).getBootstrapUrl(context, attributes);
 
         actual = sua.getFrameworkFallbackScripts(context, true, attributes);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -404,7 +403,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn("bootstrap").when(sua).getBootstrapUrl(context, attributes);
 
         actual = sua.getFrameworkFallbackScripts(context, false, attributes);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -420,7 +419,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn(returned).when(clientLibraryService).getUrls(context, ClientLibraryDef.Type.JS);
 
         actual = sua.getJsClientLibraryUrls(context);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -441,7 +440,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn(returned).when(clientLibraryService).getUrls(context, ClientLibraryDef.Type.CSS);
 
         actual = sua.getCssClientLibraryUrls(context);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -455,7 +454,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn(expected).when(configAdapter).getAuraJSURL();
 
         actual = sua.getFrameworkUrl();
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -477,7 +476,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
         sua.createManifestUtil(); // Post-construct step
         actual = sua.getBootstrapUrl(context, attributes);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -496,7 +495,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
         sua.createManifestUtil(); // Post-construct step
         actual = sua.getBootstrapUrl(context, attributes);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
 
@@ -520,7 +519,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
         sua.createManifestUtil(); // Post-construct step
         actual = sua.getInlineJsUrl(context, attributes);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -539,7 +538,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
         sua.createManifestUtil(); // Post-construct step
         actual = sua.getInlineJsUrl(context, attributes);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -559,7 +558,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn("nonce").when(context).getEncodedURL(AuraContext.EncodingStyle.AppResource);
 
         actual = sua.getAppJsUrl(context, attributes);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -579,7 +578,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn("nonce").when(context).getEncodedURL(AuraContext.EncodingStyle.Css);
 
         actual = sua.getAppCssUrl(context);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -607,11 +606,11 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
             expires = 1;
             lastModified = 0;
         }
-        assertEquals("Expires header should be 'EXPIRES'", HttpHeaders.EXPIRES, names.get(expires));
-        assertTrue("Expires should be in the future at least the timeout",
+        Assert.assertEquals("Expires header should be 'EXPIRES'", HttpHeaders.EXPIRES, names.get(expires));
+        Assert.assertTrue("Expires should be in the future at least the timeout",
                 dates.get(expires).longValue() < now - 60*1000);
-        assertEquals("Expires header should be 'LAST_MODIFIED'", HttpHeaders.LAST_MODIFIED, names.get(lastModified));
-        assertTrue("LastModified should be in the past", dates.get(lastModified).longValue() < now);
+        Assert.assertEquals("Expires header should be 'LAST_MODIFIED'", HttpHeaders.LAST_MODIFIED, names.get(lastModified));
+        Assert.assertTrue("LastModified should be in the past", dates.get(lastModified).longValue() < now);
 
         Mockito.verifyNoMoreInteractions(response);
     }
@@ -620,7 +619,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
     public void testIsProductionModeModeProd() throws Exception {
         ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
 
-        assertTrue(sua.isProductionMode(Mode.PROD));
+        Assert.assertTrue(sua.isProductionMode(Mode.PROD));
     }
 
     @Test
@@ -630,7 +629,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn(true).when(configAdapter).isProduction();
         sua.setConfigAdapter(configAdapter);
 
-        assertTrue(sua.isProductionMode(Mode.DEV));
+        Assert.assertTrue(sua.isProductionMode(Mode.DEV));
     }
 
     @Test
@@ -640,7 +639,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn(false).when(configAdapter).isProduction();
         sua.setConfigAdapter(configAdapter);
 
-        assertFalse(sua.isProductionMode(Mode.DEV));
+        Assert.assertFalse(sua.isProductionMode(Mode.DEV));
     }
 
     @Test
@@ -656,9 +655,9 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         servletUtilAdapter.setLongCache(response);
 
         String expectedVary = Arrays.asList("Accept-Encoding").toString();
-        assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
+        Assert.assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
         String expectedCacheControl = Arrays.asList("max-age=3888000", "public", "immutable").toString();
-        assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
+        Assert.assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
     }
 
     @Test
@@ -669,9 +668,9 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         servletUtilAdapter.setShortCache(response);
 
         String expectedVary = Arrays.asList("Accept-Encoding").toString();
-        assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
+        Assert.assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
         String expectedCacheControl = Arrays.asList("max-age=86400", "public").toString();
-        assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
+        Assert.assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
     }
 
     @Test
@@ -685,18 +684,18 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
         // Assert
         String expectedVary = Arrays.asList("Accept-Encoding").toString();
-        assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
+        Assert.assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
         String expectedCacheControl = Arrays.asList("max-age=100", "public", "immutable").toString();
-        assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
+        Assert.assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
 
         // Expires header loses ms precision, so adding in a slight buffer.
         long buffer = 1000;
         long now = System.currentTimeMillis();
         long expires = response.getDateHeader(HttpHeaders.EXPIRES) + buffer;
-        assertTrue("Expires should be at least the expiration time", expires >= now + expiration);
+        Assert.assertTrue("Expires should be at least the expiration time", expires >= now + expiration);
 
         long lastModified = response.getDateHeader(HttpHeaders.LAST_MODIFIED);
-        assertTrue("LastModified should be in the past", lastModified < now);
+        Assert.assertTrue("LastModified should be in the past", lastModified < now);
     }
 
     @Test
@@ -711,9 +710,9 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
         // Assert
         String expectedVary = Arrays.asList("Accept-Encoding").toString();
-        assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
+        Assert.assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
         String expectedCacheControl = Arrays.asList("max-age=10000000", "public", "immutable").toString();
-        assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
+        Assert.assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
     }
 
     /**
@@ -827,7 +826,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         ArgumentCaptor<Throwable> handledException = ArgumentCaptor.forClass(Throwable.class);
         Mockito.verify(mockExceptionAdapter, Mockito.times(2)).handleException(handledException.capture());
 
-        assertTrue("Should handle EmptyStackException", handledException.getAllValues().get(1) instanceof EmptyStackException);
+        Assert.assertTrue("Should handle EmptyStackException", handledException.getAllValues().get(1) instanceof EmptyStackException);
 
         Mockito.verify(mockResponse, Mockito.atLeastOnce()).setStatus(HttpStatus.SC_OK);
         Mockito.verify(mockContextService, Mockito.atLeastOnce()).endContext();
@@ -874,7 +873,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         ArgumentCaptor<String> exceptionMessage = ArgumentCaptor.forClass(String.class);
         Mockito.verify(writer, Mockito.times(1)).println(exceptionMessage.capture());
 
-        assertEquals(ccmeMsg, exceptionMessage.getValue());
+        Assert.assertEquals(ccmeMsg, exceptionMessage.getValue());
         // in this case we return SC_OK, and we set non-cacheable.
         Mockito.verify(mockResponse, Mockito.atLeastOnce()).setStatus(HttpStatus.SC_OK);
         Mockito.verify(mockContextService, Mockito.atLeastOnce()).endContext();

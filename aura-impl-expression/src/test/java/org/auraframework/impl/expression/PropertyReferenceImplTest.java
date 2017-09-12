@@ -15,52 +15,52 @@
  */
 package org.auraframework.impl.expression;
 
+import java.util.List;
+
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.Location;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.List;
 
 /**
  * expressiony test
  */
-public class PropertyReferenceImplTest extends UnitTestCase {
+public class PropertyReferenceImplTest {
 
     @Test
     public void testExpression() throws Exception {
         Location loc = new Location("expressionism", 456);
         PropertyReferenceImpl pr = new PropertyReferenceImpl("test.yo.self", loc);
-        assertSame(loc, pr.getLocation());
-        assertEquals("root was not correct", "test", pr.getRoot());
-        assertEquals(3, pr.size());
+        Assert.assertSame(loc, pr.getLocation());
+        Assert.assertEquals("root was not correct", "test", pr.getRoot());
+        Assert.assertEquals(3, pr.size());
         List<String> l = pr.getList();
-        assertEquals("test", l.get(0));
-        assertEquals("yo", l.get(1));
-        assertEquals("self", l.get(2));
+        Assert.assertEquals("test", l.get(0));
+        Assert.assertEquals("yo", l.get(1));
+        Assert.assertEquals("self", l.get(2));
         PropertyReference pr2 = pr.getStem();
-        assertSame(loc, pr2.getLocation());
-        assertEquals("root was not correct", "yo", pr2.getRoot());
+        Assert.assertSame(loc, pr2.getLocation());
+        Assert.assertEquals("root was not correct", "yo", pr2.getRoot());
         PropertyReference pr3 = pr2.getStem();
-        assertSame(loc, pr3.getLocation());
-        assertEquals("root was not correct", "self", pr3.getRoot());
-        assertEquals(1, pr3.size());
+        Assert.assertSame(loc, pr3.getLocation());
+        Assert.assertEquals("root was not correct", "self", pr3.getRoot());
+        Assert.assertEquals(1, pr3.size());
     }
 
     @Test
     public void testSimpleExpression() throws Exception {
         Location loc = new Location("expressionism", 92);
         PropertyReferenceImpl pr = new PropertyReferenceImpl("inohaveanydots", loc);
-        assertSame(loc, pr.getLocation());
-        assertEquals("root was not correct", "inohaveanydots", pr.getRoot());
-        assertEquals(1, pr.size());
-        assertNull("stem should have been null", pr.getStem());
+        Assert.assertSame(loc, pr.getLocation());
+        Assert.assertEquals("root was not correct", "inohaveanydots", pr.getRoot());
+        Assert.assertEquals(1, pr.size());
+        Assert.assertNull("stem should have been null", pr.getStem());
     }
 
     @Test
     public void testToString() throws Exception {
         Location loc = new Location("expressionism", 92);
         PropertyReferenceImpl pr = new PropertyReferenceImpl("test.yo.self", loc);
-        assertEquals("test.yo.self", pr.toString());
+        Assert.assertEquals("test.yo.self", pr.toString());
     }
 }

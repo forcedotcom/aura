@@ -28,14 +28,14 @@ import org.auraframework.instance.InstanceStack;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public class AbstractActionImplTest extends UnitTestCase {
+public class AbstractActionImplTest {
     //
     // A class to remove the 'abstract'
     //
@@ -75,13 +75,13 @@ public class AbstractActionImplTest extends UnitTestCase {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
 
-        assertEquals("id should be initialized to null", null, test.getId());
+        Assert.assertEquals("id should be initialized to null", null, test.getId());
         test.setId("a");
-        assertEquals("setId should work the first time.", "a", test.getId());
+        Assert.assertEquals("setId should work the first time.", "a", test.getId());
         test.setId("b");
-        assertEquals("setId should work a second time.", "b", test.getId());
+        Assert.assertEquals("setId should work a second time.", "b", test.getId());
         test.setId(null);
-        assertEquals("setId should work a third time.", null, test.getId());
+        Assert.assertEquals("setId should work a third time.", null, test.getId());
     }
 
     private Action getActionWithId(String id) {
@@ -97,26 +97,26 @@ public class AbstractActionImplTest extends UnitTestCase {
         Action test = new MyAction(null, def, null);
 
         List<Action> actions = test.getActions();
-        assertNotNull("Actions should never be null", actions);
-        assertEquals("Actions should empty", 0, actions.size());
+        Assert.assertNotNull("Actions should never be null", actions);
+        Assert.assertEquals("Actions should empty", 0, actions.size());
 
         List<Action> newActions = Lists.newArrayList(getActionWithId("a"), getActionWithId("b"));
         test.add(newActions);
         actions = test.getActions();
-        assertNotNull("Actions should never be null", actions);
-        assertEquals("Actions should be length 2", 2, actions.size());
-        assertEquals("Action 'a' should be first", "a", actions.get(0).getId());
-        assertEquals("Action 'b' should be first", "b", actions.get(1).getId());
+        Assert.assertNotNull("Actions should never be null", actions);
+        Assert.assertEquals("Actions should be length 2", 2, actions.size());
+        Assert.assertEquals("Action 'a' should be first", "a", actions.get(0).getId());
+        Assert.assertEquals("Action 'b' should be first", "b", actions.get(1).getId());
 
         newActions = Lists.newArrayList(getActionWithId("c"), getActionWithId("d"));
         test.add(newActions);
         actions = test.getActions();
-        assertNotNull("Actions should never be null", actions);
-        assertEquals("Actions should be length 4", 4, actions.size());
-        assertEquals("Action 'a' should be first", "a", actions.get(0).getId());
-        assertEquals("Action 'b' should be first", "b", actions.get(1).getId());
-        assertEquals("Action 'c' should be first", "c", actions.get(2).getId());
-        assertEquals("Action 'd' should be first", "d", actions.get(3).getId());
+        Assert.assertNotNull("Actions should never be null", actions);
+        Assert.assertEquals("Actions should be length 4", 4, actions.size());
+        Assert.assertEquals("Action 'a' should be first", "a", actions.get(0).getId());
+        Assert.assertEquals("Action 'b' should be first", "b", actions.get(1).getId());
+        Assert.assertEquals("Action 'c' should be first", "c", actions.get(2).getId());
+        Assert.assertEquals("Action 'd' should be first", "d", actions.get(3).getId());
     }
 
     @Test
@@ -124,9 +124,9 @@ public class AbstractActionImplTest extends UnitTestCase {
         ActionDef def = Mockito.mock(ActionDef.class);
         MyAction test = new MyAction(null, def, null);
 
-        assertEquals("state should be initialized to new", Action.State.NEW, test.getState());
+        Assert.assertEquals("state should be initialized to new", Action.State.NEW, test.getState());
         test.setState(Action.State.RUNNING);
-        assertEquals("state should be able to change", Action.State.RUNNING, test.getState());
+        Assert.assertEquals("state should be able to change", Action.State.RUNNING, test.getState());
     }
 
     @Test
@@ -134,14 +134,14 @@ public class AbstractActionImplTest extends UnitTestCase {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
 
-        assertEquals("isStorable should be initialized to false", false, test.isStorable());
+        Assert.assertEquals("isStorable should be initialized to false", false, test.isStorable());
         test.setStorable();
-        assertEquals("isStorable should change on setStorable", true, test.isStorable());
-        assertEquals("id should change on setStorable", "s", test.getId());
+        Assert.assertEquals("isStorable should change on setStorable", true, test.isStorable());
+        Assert.assertEquals("id should change on setStorable", "s", test.getId());
         test.setId("x");
         test.setStorable();
-        assertEquals("isStorable should not change on second setStorable", true, test.isStorable());
-        assertEquals("id should not change on second setStorable", "x", test.getId());
+        Assert.assertEquals("isStorable should not change on second setStorable", true, test.isStorable());
+        Assert.assertEquals("id should not change on second setStorable", "x", test.getId());
     }
 
     @Test
@@ -152,7 +152,7 @@ public class AbstractActionImplTest extends UnitTestCase {
         DefDescriptor<ActionDef> expectedDesc = Mockito.mock(DefDescriptor.class);
         Mockito.when(def.getDescriptor()).thenReturn(expectedDesc);
 
-        assertSame("descriptor should work", expectedDesc, test.getDescriptor());
+        Assert.assertSame("descriptor should work", expectedDesc, test.getDescriptor());
     }
 
     @Test
@@ -162,7 +162,7 @@ public class AbstractActionImplTest extends UnitTestCase {
         Action test = new MyAction(null, def, params);
         LoggingContext.KeyValueLogger logger = Mockito.mock(LoggingContext.KeyValueLogger.class);
 
-        assertSame("params should be initialized", params, test.getParams());
+        Assert.assertSame("params should be initialized", params, test.getParams());
 
         params.put("a", "b");
         test.logParams(logger);
@@ -178,7 +178,7 @@ public class AbstractActionImplTest extends UnitTestCase {
         test = new MyAction(null, def, null);
         // Rebuild logger to check the logging correctly.
         logger = Mockito.mock(LoggingContext.KeyValueLogger.class);
-        assertEquals("null params results in empty params", 0, test.getParams().size());
+        Assert.assertEquals("null params results in empty params", 0, test.getParams().size());
         test.logParams(logger);
         Mockito.verify(logger, Mockito.times(1)).log("a", "null");
         Mockito.verify(logger, Mockito.times(1)).log("b", "null");
@@ -190,8 +190,8 @@ public class AbstractActionImplTest extends UnitTestCase {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
         InstanceStack iStack = test.getInstanceStack();
-        assertEquals("Instance stack should be initialized without action ID as path", "/*[0]", iStack.getPath());
-        assertEquals("Subsequent calls to getInstanceStack should return same InstanceStack", iStack,
+        Assert.assertEquals("Instance stack should be initialized without action ID as path", "/*[0]", iStack.getPath());
+        Assert.assertEquals("Subsequent calls to getInstanceStack should return same InstanceStack", iStack,
                 test.getInstanceStack());
     }
 

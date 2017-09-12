@@ -15,23 +15,23 @@
  */
 package org.auraframework.test.instance;
 
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.instance.Action;
-import org.auraframework.instance.ActionDelegate;
-import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import com.google.common.collect.Maps;
+import static org.mockito.Mockito.mock;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import static org.mockito.Mockito.mock;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.instance.Action;
+import org.auraframework.instance.ActionDelegate;
+import org.junit.Assert;
+import org.junit.Test;
+import org.mockito.Mockito;
 
-public class ActionDelegateTest extends UnitTestCase {
+import com.google.common.collect.Maps;
+
+public class ActionDelegateTest {
     //
     // A class to remove the 'abstract'
     //
@@ -65,7 +65,7 @@ public class ActionDelegateTest extends UnitTestCase {
         DefDescriptor<ComponentDef> componentDescriptor = mock(DefDescriptor.class);
 
         for (Method m : Action.class.getMethods()) {
-            assertFalse("Duplicate method name "+m.getName(), methodMap.containsKey(m.getName()));
+            Assert.assertFalse("Duplicate method name "+m.getName(), methodMap.containsKey(m.getName()));
             methodMap.put(m.getName(), m);
             calledMap.put(m.getName(), Boolean.FALSE);
         }
@@ -97,7 +97,7 @@ public class ActionDelegateTest extends UnitTestCase {
         oneCall(methodMap, calledMap, "setCallerVersion", new String("version"));
 
         for (Method m : Action.class.getMethods()) {
-            assertTrue(m.getName()+"was not called", calledMap.get(m.getName()));
+            Assert.assertTrue(m.getName()+"was not called", calledMap.get(m.getName()));
         }
     }
 }

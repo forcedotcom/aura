@@ -15,15 +15,6 @@
  */
 package org.auraframework.integration.test.util;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -40,6 +31,7 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.integration.test.configuration.JettyTestServletConfig;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -47,11 +39,12 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.IntegrationTest;
 import org.auraframework.util.test.configuration.TestServletConfig;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.stereotype.Component;
-import org.springframework.web.WebApplicationInitializer;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.context.ContextLoader;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 
 /**
  * Base class for all Aura integration tests.
@@ -60,17 +53,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @IntegrationTest
 public abstract class IntegrationTestCase extends AuraImplTestCase {
 
-	private static ServletContext servletContext;
-	
-	@Component
-	public static class ServletContextInitializer implements WebApplicationInitializer {
-		@Override
-		public void onStartup(ServletContext servletContext) throws ServletException {
-			IntegrationTestCase.servletContext = servletContext;
-		}
-	}
-	
-    @Inject
     private TestServletConfig testServletConfig;
     
     private HttpClient httpClient = null;
@@ -80,26 +62,32 @@ public abstract class IntegrationTestCase extends AuraImplTestCase {
     }
 
     @Override
+    protected void establishSpringContext() {
+        if (applicationContext == null) {
+            if (ContextLoader.getCurrentWebApplicationContext() == null) {
+                try {
+                    synchronized (IntegrationTestCase.class) {
+                        // the test servlet starts up the jetty web server
+                        testServletConfig = new JettyTestServletConfig();
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            applicationContext = ContextLoader.getCurrentWebApplicationContext();
+        }
+    }
+
+    @Override
     protected void injectBeans() throws Exception {
-		if (servletContext == null) {
-	    	// Tests may be created before the server is brought up
-			return;
-		}
-		
-		if (testServletConfig == null) {
-			// Already injected
-			return;
-		}
-		
-		WebApplicationContext webAppContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
-		AutowireCapableBeanFactory beanFactory = webAppContext.getAutowireCapableBeanFactory();
-		beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_NO, false);
+        super.injectBeans();
+        if (testServletConfig == null) {
+            // we are likely running from test/runner.app and the web app context already existed
+            // this will not start up a server, but assume defaults
+            testServletConfig = new JettyTestServletConfig();
+        }
     }
-    
-    public ServletContext getServletContext() {
-    	return servletContext;
-    }
-    
+
     @Override
     public void tearDown() throws Exception {
         if (httpClient != null) {
@@ -139,7 +127,7 @@ public abstract class IntegrationTestCase extends AuraImplTestCase {
      * @throws URISyntaxException
      */
     protected HttpGet obtainGetMethod(String path, boolean followRedirects,
-            Header[] headers) throws MalformedURLException, URISyntaxException {
+            Header[] headers) throws Exception {
         String url = getTestServletConfig().getBaseUrl().toURI().resolve(path)
                 .toString();
 
@@ -249,7 +237,10 @@ public abstract class IntegrationTestCase extends AuraImplTestCase {
                 DefType.APPLICATION.equals(desc.getDefType()) ? "app" : "cmp");
     }
 
-    protected TestServletConfig getTestServletConfig() {
+    protected TestServletConfig getTestServletConfig() throws Exception {
+        if (testServletConfig == null) {
+            injectBeans();
+        }
         return testServletConfig;
     }
 }

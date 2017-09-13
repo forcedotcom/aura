@@ -15,8 +15,6 @@
  */
 package org.auraframework.integration.test.util;
 
-import java.io.File;
-
 import org.auraframework.Aura;
 import org.auraframework.util.IOUtil;
 import org.eclipse.jetty.server.Connector;
@@ -24,6 +22,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.openqa.selenium.net.PortProber;
+
+import java.io.File;
 
 /**
  * A Jetty server configured with default Aura descriptor and resources.
@@ -60,14 +60,15 @@ public class AuraJettyServer extends Server {
         setConnectors(new Connector[] { connector });
 
         WebAppContext context = new WebAppContext();
-            context.setDefaultsDescriptor(Aura.class.getResource("/aura/webapp/WEB-INF/webdefault.xml").toString());
+        context.setDefaultsDescriptor(Aura.class.getResource("/aura/webapp/WEB-INF/webdefault.xml").toString());
         context.setDescriptor(Aura.class.getResource("/aura/webapp/WEB-INF/web.xml").toString());
         context.setContextPath(contextPath);
         context.setParentLoaderPriority(true);
         context.setTempDirectory(tmpDir);
+        context.setClassLoader(Thread.currentThread().getContextClassLoader());
 
         String resources = System.getProperty("jetty.resources",
-                AuraJettyServer.class.getResource("/org/auraframework/test").toString());
+                Aura.class.getResource("/aura/webapp").toString());
         context.setResourceBase(resources);
 
         setHandler(context);

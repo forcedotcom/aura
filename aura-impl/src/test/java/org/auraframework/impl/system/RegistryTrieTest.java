@@ -115,6 +115,11 @@ public class RegistryTrieTest extends AuraTestCase {
         }
 
         @Override
+        public long getCreationTime() {
+            return 0;
+        }
+
+        @Override
         public String toString() {
             return "{" + defTypes + "/" + prefixes + "/" + namespaces + "}";
         }

@@ -17,9 +17,7 @@ package org.auraframework.integration.test.util;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
 import junit.framework.AssertionFailedError;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpGet;
@@ -50,6 +48,8 @@ import org.auraframework.util.test.perf.rdp.RDPNotification;
 import org.eclipse.jetty.util.log.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.After;
+import org.junit.Before;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
@@ -121,6 +121,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     private WebDriver currentDriver = null;
     private BrowserType currentBrowserType = null;
     private AuraUITestingUtil auraUITestingUtil;
+    private Boolean needsFreshBrowser = null;
 
     protected PerfWebDriverUtil perfWebDriverUtil;
 
@@ -150,6 +151,28 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     @Target({ ElementType.TYPE, ElementType.METHOD })
     @Inherited
     public @interface Flapper {
+    }
+
+    /**
+     * @Before is called when running from your IDE, running from test/runner.app will invoke "runBare"
+     * and does not call Before methods
+     */
+    @Before
+    public void beforeWebDriverTestCase() {
+        currentBrowserType = BrowserType.GOOGLECHROME;
+        needsFreshBrowser = true;
+    }
+
+    @After
+    public void afterWebDriverTestCase() {
+        if (currentDriver != null && needsFreshBrowser) {
+            try {
+                currentDriver.quit();
+            } catch (Exception e) {
+                // if the driver is dead or already quit, we just want to ignore the exception
+            }
+            currentDriver = null;
+        }
     }
 
     public String getBrowserTypeString() {
@@ -224,25 +247,29 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * Checks if the current test is marked with the flapper annotation.
      */
     private boolean needsFreshBrowser() {
+        if (needsFreshBrowser != null) {
+            return needsFreshBrowser;
+        }
+
         Class<?> testClass = getClass();
 
         if (testClass.getAnnotation(FreshBrowserInstance.class) != null) {
-            return true;
+            return needsFreshBrowser = true;
         }
         try {
             if (testClass.getMethod(getName()).getAnnotation(FreshBrowserInstance.class) != null) {
-                return true;
+                return needsFreshBrowser = true;
             }
         } catch (NoSuchMethodException e) {
             // ignore
         }
         if (getTestLabels().contains("freshBrowserInstance")) {
-            return true;
+            return needsFreshBrowser = true;
         }
         if (isPerfTest()) {
-            return true;
+            return needsFreshBrowser = true;
         }
-        return false;
+        return needsFreshBrowser = false;
     }
 
     @SuppressWarnings("serial")
@@ -602,7 +629,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @param isClient Should we use client or server rendering.
      */
     protected void loadComponent(String namePrefix, String componentText, boolean isClient)
-            throws MalformedURLException, URISyntaxException {
+            throws Exception {
         String appText;
         String render;
 
@@ -623,8 +650,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @param namePrefix the application name.
      * @param appText the actual text of the application
      */
-    protected void loadApplication(String namePrefix, String appText, boolean isClient) throws MalformedURLException,
-            URISyntaxException {
+    protected void loadApplication(String namePrefix, String appText, boolean isClient) throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, appText, namePrefix);
         String openPath = String.format("/%s/%s.app", appDesc.getNamespace(), appDesc.getName());
         if (isClient) {
@@ -820,8 +846,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 capabilities = currentBrowserType.getCapability();
             }
 
-            boolean reuseBrowser = !needsFreshBrowser();
-            capabilities.setCapability(WebDriverProvider.REUSE_BROWSER_PROPERTY, reuseBrowser);
+            capabilities.setCapability(WebDriverProvider.REUSE_BROWSER_PROPERTY, !needsFreshBrowser());
             addPerfCapabilities(capabilities);
 
             /*
@@ -884,7 +909,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }
     }
 
-    protected URI getAbsoluteURI(String url) throws MalformedURLException, URISyntaxException {
+    protected URI getAbsoluteURI(String url) throws Exception {
         return getTestServletConfig().getBaseUrl().toURI().resolve(url);
     }
 
@@ -944,21 +969,21 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * Open a URI without any additional handling. This will, however, add a nonce to the URL to prevent caching of the
      * page.
      */
-    protected void openRaw(String url) throws MalformedURLException, URISyntaxException {
+    protected void openRaw(String url) throws Exception {
         openRaw(getAbsoluteURI(url));
     }
 
     /**
      * Open a url without any additional handling, not even a browser.nonce
      */
-    protected void openTotallyRaw(String url) throws MalformedURLException, URISyntaxException {
+    protected void openTotallyRaw(String url) throws Exception {
         getDriver().get(getAbsoluteURI(url).toString());
     }
 
     /**
      * Open a URL without the usual waitForAuraInit().
      */
-    protected void openNoAura(String url) throws MalformedURLException, URISyntaxException {
+    protected void openNoAura(String url) throws Exception {
         open(url, getAuraModeForCurrentBrowser(), false);
     }
 
@@ -969,7 +994,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    protected void open(String url) throws MalformedURLException, URISyntaxException {
+    protected void open(String url) throws Exception {
         open(url, getAuraModeForCurrentBrowser(), true);
     }
 
@@ -980,7 +1005,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         return Mode.SELENIUM;
     }
 
-    public void open(DefDescriptor<? extends BaseComponentDef> dd) throws MalformedURLException, URISyntaxException {
+    public void open(DefDescriptor<? extends BaseComponentDef> dd) throws Exception {
         open(getUrl(dd));
     }
 
@@ -990,11 +1015,11 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    protected void open(String url, Mode mode) throws MalformedURLException, URISyntaxException {
+    protected void open(String url, Mode mode) throws Exception {
         open(url, mode, true);
     }
 
-    protected void open(String url, Mode mode, boolean waitForInit) throws MalformedURLException, URISyntaxException {
+    protected void open(String url, Mode mode, boolean waitForInit) throws Exception {
         Map<String, String> params = new HashMap<>();
         params.put("aura.mode", mode.name());
         params.put("aura.test", getQualifiedName());
@@ -1013,7 +1038,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }
     }
 
-    private void openAndWait(String url, boolean waitForInit) throws MalformedURLException, URISyntaxException {
+    private void openAndWait(String url, boolean waitForInit) throws Exception {
         getAuraUITestingUtil().getRawEval("document._waitingForReload = true;");
         openRaw(url);
         getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {

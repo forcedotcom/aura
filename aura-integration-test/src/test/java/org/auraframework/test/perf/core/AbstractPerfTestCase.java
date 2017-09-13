@@ -17,7 +17,6 @@ package org.auraframework.test.perf.core;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -37,8 +36,6 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.logging.Level;
@@ -122,8 +119,7 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
         }
     }
 
-    private void loadComponent(String url, DefDescriptor<ComponentDef> descriptor) throws MalformedURLException,
-            URISyntaxException {
+    private void loadComponent(String url, DefDescriptor<ComponentDef> descriptor) throws Exception {
         openTotallyRaw(url);
 
         // wait for component loaded or aura error message

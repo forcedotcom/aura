@@ -37,11 +37,13 @@ public class PassThroughDefRegistry implements DefRegistry {
     private final Set<String> prefixes;
     private final boolean cacheable;
     private final CompilerService compilerService;
+    private final long creationTime;
 
     public PassThroughDefRegistry(SourceLoader sourceLoader, Set<DefType> defTypes, Set<String> prefixes,
             boolean cacheable, CompilerService compilerService) {
         this.sourceLoader = sourceLoader;
         this.prefixes = Sets.newHashSet();
+        this.creationTime = System.currentTimeMillis();
         for (String prefix : prefixes) {
             this.prefixes.add(prefix.toLowerCase());
         }
@@ -93,6 +95,11 @@ public class PassThroughDefRegistry implements DefRegistry {
     @Override
     public Set<String> getNamespaces() {
         return sourceLoader.getNamespaces();
+    }
+
+    @Override
+    public long getCreationTime() {
+        return creationTime;
     }
 
     @Override

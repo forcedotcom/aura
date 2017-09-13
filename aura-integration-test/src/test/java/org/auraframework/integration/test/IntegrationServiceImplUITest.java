@@ -18,7 +18,6 @@ package org.auraframework.integration.test;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -37,12 +36,9 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
 
 /**
  * UI test for usage of Integration Service.
@@ -257,7 +253,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         verifySimpleComponentWithExtension(stub);
     }
 
-    private void verifySimpleComponentWithExtension(DefDescriptor<ComponentDef> stub) throws MalformedURLException, URISyntaxException {
+    private void verifySimpleComponentWithExtension(DefDescriptor<ComponentDef> stub) throws Exception {
         DefDescriptor<ComponentDef> cmpToInject = setupSimpleComponentWithExtension();
         Map<String, Object> attributes = Maps.newHashMap();
 
@@ -793,7 +789,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      */
     private void openIntegrationStub(DefDescriptor<ComponentDef> stub, DefDescriptor<ComponentDef> toInject,
             Map<String, Object> attributeMap, String placeholder)
-            throws MalformedURLException, URISyntaxException {
+            throws Exception {
         String url = String.format("/%s/%s.cmp", stub.getNamespace(), stub.getName());
         url = url + "?desc=" + String.format("%s:%s", toInject.getNamespace(), toInject.getName());
 
@@ -815,12 +811,12 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
     private void openIntegrationStub(DefDescriptor<ComponentDef> stub, DefDescriptor<ComponentDef> toInject,
             Map<String, Object> attributeMap)
-            throws MalformedURLException, URISyntaxException {
+            throws Exception {
         openIntegrationStub(stub, toInject, attributeMap, null);
     }
 
     private void openIntegrationStub(DefDescriptor<ComponentDef> toInject, Map<String, Object> attributeMap)
-            throws MalformedURLException, URISyntaxException {
+            throws Exception {
         openIntegrationStub(defaultStubCmp, toInject, attributeMap, null);
     }
 }

@@ -26,8 +26,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 @ExcludeBrowsers({BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD,
@@ -97,8 +95,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
         verifyCloseOnEsc(panelType, autoFocus);
     }
 
-    private void verifyCloseOnEsc(String panelType, Boolean autoFocus) throws MalformedURLException,
-            URISyntaxException, InterruptedException {
+    private void verifyCloseOnEsc(String panelType, Boolean autoFocus) throws Exception {
         String url = APP;
         boolean isPanel = panelType.contains("panel");
         if (isPanel) {
@@ -221,8 +218,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
         verifyScrollbarPresent(false, MAKE_NONSCROLLABLE);
     }
 
-    private void verifyScrollbarPresent(boolean hasScrollbar, String locator) throws MalformedURLException,
-            URISyntaxException, InterruptedException {
+    private void verifyScrollbarPresent(boolean hasScrollbar, String locator) throws Exception {
         open(APP);
         String errorMessage = "Scroller should not be present for Modal body";
         WebElement makeScrollable = findDomElement(By.cssSelector(locator));
@@ -262,7 +258,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     }
 
     private void verifyPressingEscOnMultipleModalDestorysModal(String locator, boolean autoFocus)
-            throws MalformedURLException, URISyntaxException, InterruptedException {
+            throws Exception {
         String url = APP;
         boolean isPanel = locator.contains(PANEL_DIALOG);
         String errorMessage = "modal";

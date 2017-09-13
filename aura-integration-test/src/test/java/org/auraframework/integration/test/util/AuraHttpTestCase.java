@@ -18,7 +18,6 @@ package org.auraframework.integration.test.util;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -54,15 +53,12 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraExecutionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 
 import javax.inject.Inject;
-
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -369,7 +365,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @throws URISyntaxException
      */
     protected HttpPost obtainPostMethod(String path, Map<String, String> params)
-            throws MalformedURLException, URISyntaxException, UnsupportedEncodingException {
+            throws Exception {
 
         HttpPost post = new HttpPost(getTestServletConfig().getBaseUrl().toURI().resolve(path).toString());
 
@@ -431,16 +427,16 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @throws MalformedURLException if the path is invalid.
      * @throws URISyntaxException
      */
-    protected HttpGet obtainGetMethod(String path) throws MalformedURLException, URISyntaxException {
+    protected HttpGet obtainGetMethod(String path) throws Exception {
         return obtainGetMethod(path, true, null);
     }
 
     protected HttpGet obtainGetMethod(String path, boolean followRedirects)
-            throws MalformedURLException, URISyntaxException {
+            throws Exception {
         return obtainGetMethod(path, followRedirects, null);
     }
 
-    protected HttpGet obtainGetMethod(String path, Header[] headers) throws MalformedURLException, URISyntaxException {
+    protected HttpGet obtainGetMethod(String path, Header[] headers) throws Exception {
         return obtainGetMethod(path, true, headers);
     }
 
@@ -470,7 +466,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      */
     protected HttpGet obtainAuraGetMethod(Mode mode, Format format, String desc, Class<? extends BaseComponentDef> type,
             Map<String, String> params, Header[] headers)
-                    throws QuickFixException, MalformedURLException, URISyntaxException {
+                    throws Exception {
         return obtainAuraGetMethod(mode, format, definitionService
                 .getDefDescriptor(desc, type), params, headers);
     }
@@ -500,7 +496,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      */
     protected HttpGet obtainAuraGetMethod(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc,
             Map<String, String> params, Header[] headers)
-                    throws QuickFixException, MalformedURLException, URISyntaxException {
+                    throws Exception {
         List<NameValuePair> urlparams = Lists.newArrayList();
         urlparams.add(new BasicNameValuePair("aura.tag", String.format("%s:%s", desc.getNamespace(), desc.getName())));
         urlparams.add(new BasicNameValuePair("aura.defType", desc.getDefType().toString()));

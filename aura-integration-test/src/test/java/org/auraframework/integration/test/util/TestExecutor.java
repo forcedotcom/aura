@@ -15,6 +15,13 @@
  */
 package org.auraframework.integration.test.util;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+import org.auraframework.test.util.WebDriverProvider;
+import org.auraframework.util.ServiceLocator;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -26,15 +33,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-
-import org.auraframework.test.util.WebDriverProvider;
-import org.auraframework.util.ServiceLocator;
-import org.auraframework.util.test.annotation.ThreadHostileTest;
-import org.springframework.test.context.TestContextManager;
 
 /**
  * This executor handles the execution of test cases
@@ -145,10 +143,6 @@ public class TestExecutor {
             lock.lock();
             long start = System.nanoTime();
             try {
-        		// The Spring Test Context framework is currently not thread safe: https://jira.spring.io/browse/SPR-5863
-        		// Create an instance of TestContextManager per test run.
-            	TestContextManager testContextManager = new TestContextManager(IntegrationTestCase.class);
-                testContextManager.prepareTestInstance(test);
                 test.run(result);
                 return result;
             } finally {

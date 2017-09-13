@@ -56,6 +56,7 @@ public class BundleAwareDefRegistry implements DefRegistry {
     private final CompilerService compilerService;
     private final boolean cacheable;
     private String name;
+    private final long creationTime;
 
     private static class DefHolder {
         public DefHolder(DefDescriptor<RootDefinition> descriptor) {
@@ -79,6 +80,7 @@ public class BundleAwareDefRegistry implements DefRegistry {
         this.sourceLoader = sourceLoader;
         this.registry = Maps.newHashMap();
         this.prefixes = Sets.newHashSet();
+        this.creationTime = System.currentTimeMillis();
         for (String prefix : prefixes) {
             this.prefixes.add(prefix.toLowerCase());
         }
@@ -254,6 +256,11 @@ public class BundleAwareDefRegistry implements DefRegistry {
     @Override
     public Set<String> getNamespaces() {
         return namespaces;
+    }
+
+    @Override
+    public long getCreationTime() {
+        return creationTime;
     }
 
     @Override

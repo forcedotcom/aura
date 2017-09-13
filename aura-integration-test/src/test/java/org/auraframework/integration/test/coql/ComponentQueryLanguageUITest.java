@@ -17,7 +17,6 @@ package org.auraframework.integration.test.coql;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
@@ -25,15 +24,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
-import javax.inject.Inject;
-
 /**
  * Automation for COQL (Component Query Language). COQL is available in all modes except PRODUCTION
  */
 public class ComponentQueryLanguageUITest extends WebDriverTestCase {
-
-    @Inject
-    MockConfigAdapter mockConfigAdapter;
 
     /**
      * Verify that query language is not available in PROD mode.
@@ -41,7 +35,7 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
     @ThreadHostileTest("PRODUCTION")
     @Test
     public void testQueryLanguageNotAvailableInprodMode() throws Exception {
-        mockConfigAdapter.setIsProduction(true);
+        getMockConfigAdapter().setIsProduction(true);
         open("/test/laxSecurity.app", Mode.PROD);
         Object query = getAuraUITestingUtil().getEval("return window.$A.getQueryStatement");
         assertNull("Query language should not be available in PROD mode.", query);

@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.util;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Collection;
@@ -774,5 +776,27 @@ public class AuraTestingUtil {
     public <D extends Definition> BundleSource<D> buildBundleSource(String namespace, Class<D> defClass,
             Collection<BundleEntryInfo> contents) {
         return buildBundleSource(namespace, "name"+random.nextLong(), defClass, contents);
+    }
+
+    /**
+     * Creates a bundle-like folder structure with file as specified
+     *
+     * will create a file and make directories in the format:
+     *   <directory>/<name>/<name><extension>
+     *
+     * @param directory directory to create the folder / file
+     * @param name name of folder and file
+     * @param extension file extension of the file
+     * @param contents stuff for the file
+     * @throws Exception
+     */
+    public void makeFile(File directory, String name, String extension, String contents) throws Exception {
+        File dir = new File(directory, name);
+        File file = new File(dir, name+extension);
+        dir.mkdirs();
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(contents.getBytes("UTF-8"));
+            fos.close();
+        }
     }
 }

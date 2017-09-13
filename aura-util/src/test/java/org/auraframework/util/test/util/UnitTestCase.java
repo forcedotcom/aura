@@ -15,21 +15,9 @@
  */
 package org.auraframework.util.test.util;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.Stack;
-import java.util.logging.Logger;
-
-import javax.inject.Inject;
-
+import com.google.common.collect.Sets;
+import configuration.TestConfig;
+import junit.framework.TestCase;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.adapter.SourceControlAdapter;
 import org.auraframework.util.json.JsonEncoder;
@@ -47,26 +35,38 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestContextManager;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.web.context.ContextLoader;
 
-import com.google.common.collect.Sets;
-
-import junit.framework.TestCase;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.Stack;
+import java.util.logging.Logger;
 
 /**
  * Base class for all aura tests.
  */
 @RunWith(AuraUnitTestRunner.class)
-@ContextConfiguration(locations = {"/applicationContext.xml"})
 @TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class})
 @ActiveProfiles("auraTest")
 public abstract class UnitTestCase extends TestCase {
-    @Inject
-    private ApplicationContext applicationContext;
+
+    protected static ApplicationContext applicationContext;
 
     @Inject
     protected SourceControlAdapter sourceControlAdapter;
@@ -94,6 +94,7 @@ public abstract class UnitTestCase extends TestCase {
      */
     @Before
     public void legacySetUp() throws Exception {
+        establishSpringContext();
     	injectBeans(); // for JUnit4 runners
         setUp();
     }
@@ -107,7 +108,8 @@ public abstract class UnitTestCase extends TestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-    	injectBeans(); // for custom legacy runners
+        establishSpringContext();
+        injectBeans(); // for custom legacy runners
         MockitoAnnotations.initMocks(this);
     }
 
@@ -133,7 +135,8 @@ public abstract class UnitTestCase extends TestCase {
 
     @Override
     public void runBare() throws Throwable {
-    	injectBeans(); // for standard legacy runners
+        establishSpringContext();
+        injectBeans(); // for standard legacy runners
         logger.info(String.format("Running: %s.%s", getClass().getName(), getName()));
         super.runBare();
     }
@@ -403,11 +406,33 @@ public abstract class UnitTestCase extends TestCase {
         }
         return labels;
     }
-    
-    protected void injectBeans() throws Exception {
+
+    protected void establishSpringContext() {
+        // if applicationContext is not defined, we haven't created a context yet
         if (applicationContext == null) {
-            TestContextManager testContextManager = new TestContextManager(getClass());
-            testContextManager.prepareTestInstance(this);
+            // we first want to use any currently running application context
+            if (ContextLoader.getCurrentWebApplicationContext() != null) {
+                // if we are running from an already running jetty container, use that one
+                applicationContext = ContextLoader.getCurrentWebApplicationContext();
+            } else {
+                // otherwise we need to create a new context to use for this class
+                applicationContext = new ClassPathXmlApplicationContext(TestConfig.APPLICATION_CONTEXT_XML);
+            }
+        }
+    }
+
+    protected void injectBeans() throws Exception {
+        // sourceControlAdapter is an Injected bean, if it isn't here yet, we haven't autowired yet
+        if (sourceControlAdapter == null) {
+            applicationContext.getAutowireCapableBeanFactory().autowireBean(this);
+            // need to call 'postConstruct' now that the beans are in place
+            Arrays.stream(this.getClass().getMethods()).filter(x -> x.getAnnotation(PostConstruct.class) != null)
+                    .forEach(m -> {
+                        try {
+                            m.invoke(this);
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                        }
+                    });
         }
     }
 }

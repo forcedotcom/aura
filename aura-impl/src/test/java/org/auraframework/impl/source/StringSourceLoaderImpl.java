@@ -15,19 +15,12 @@
  */
 package org.auraframework.impl.source;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
@@ -59,14 +52,17 @@ import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.util.FileMonitor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This source loader allows tests to load and unload source from strings.
@@ -79,18 +75,8 @@ import com.google.common.collect.Sets;
  * or provide descriptors via find that aura will not be able to find because it has a fixed idea of the namespaces
  * represented. This could be fixed by providing a fixed view into the namespaces provided.
  */
+@ServiceComponent
 public final class StringSourceLoaderImpl implements StringSourceLoader {
-    
-    @Configuration
-    public static class BeanConfiguration {
-        private static final StringSourceLoaderImpl INSTANCE = new StringSourceLoaderImpl();
-
-        @Lazy
-        @Bean
-        public StringSourceLoader stringSourceLoaderImpl() {
-            return INSTANCE;
-        }
-    }
     
     @Inject
     private DefinitionService definitionService;

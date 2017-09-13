@@ -46,7 +46,7 @@ public class AuraJavascriptGroup extends DirectiveBasedJavascriptGroup implement
         this(ROOT_DIR);
         if (monitor) {
             fileMonitor.subscribeToChangeNotification(this);
-            fileMonitor.addDirectory(ROOT_DIR.getPath());
+            fileMonitor.addDirectory(ROOT_DIR.getPath(), null);
         }
     }
 

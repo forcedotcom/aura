@@ -15,21 +15,8 @@
  */
 package org.auraframework.test.perf.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -53,8 +40,17 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
+import java.io.File;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @PerfCmpTest
 @TargetBrowsers({ BrowserType.GOOGLECHROME })
@@ -133,8 +129,7 @@ public class PerfExecutorTestCase extends WebDriverTestCase {
         return componentsDir;
     }
 
-    private void loadComponent(String url, DefDescriptor<BaseComponentDef> descriptor) throws MalformedURLException,
-            URISyntaxException {
+    private void loadComponent(String url, DefDescriptor<BaseComponentDef> descriptor) throws Exception {
 
         openTotallyRaw(url);
 
@@ -174,7 +169,7 @@ public class PerfExecutorTestCase extends WebDriverTestCase {
         return condition;
     }
 
-    private String generateUrl (DefDescriptor<BaseComponentDef> descriptor, Mode mode, String customUrl) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+    private String generateUrl (DefDescriptor<BaseComponentDef> descriptor, Mode mode, String customUrl) throws Exception {
         // If descriptor is application type, then build the url with .app extension
         if (descriptor.getDefType() == DefType.APPLICATION) {
             return new StringBuilder().append("/").append(descriptor.getNamespace())

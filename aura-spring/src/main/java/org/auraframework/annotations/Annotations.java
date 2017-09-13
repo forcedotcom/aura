@@ -124,4 +124,5 @@ public interface Annotations {
     @Scope(BeanDefinition.SCOPE_SINGLETON)
     @interface ServiceComponentRenderer {
     }
+
 }

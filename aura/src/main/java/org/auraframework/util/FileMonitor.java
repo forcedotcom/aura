@@ -28,7 +28,7 @@ public interface FileMonitor extends SourceListener {
      *
      * @param dirPath name of a root directory to monitor
      */
-    void addDirectory(String dirPath);
+    void addDirectory(String dirPath, Long registryCreationTime);
 
     /**
      * Start monitor when aura services are ready

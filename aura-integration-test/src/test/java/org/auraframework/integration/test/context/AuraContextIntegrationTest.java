@@ -15,11 +15,10 @@
  */
 package org.auraframework.integration.test.context;
 
-import java.io.IOException;
-import java.util.*;
-
-import javax.inject.Inject;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
@@ -47,7 +46,6 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.GlobalValue;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.RegistrySet;
-import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -62,10 +60,12 @@ import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class AuraContextIntegrationTest extends AuraImplTestCase {
 
@@ -816,8 +816,7 @@ public class AuraContextIntegrationTest extends AuraImplTestCase {
      */
     @Test
     public void testSerializeWithActionPublicCaching() throws Exception {
-        MockConfigAdapter mockConfigAdapter = getMockConfigAdapter();
-        mockConfigAdapter.setActionPublicCachingEnabled(true);
+        getMockConfigAdapter().setActionPublicCachingEnabled(true);
 
         AuraContext ctx = contextService.startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
         ctx.setActionPublicCacheKey("someKey");

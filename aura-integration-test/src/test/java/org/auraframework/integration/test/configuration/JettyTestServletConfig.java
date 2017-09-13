@@ -22,15 +22,14 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.integration.test.util.AuraJettyServer;
 import org.auraframework.test.util.SauceUtil;
 import org.auraframework.util.test.configuration.TestServletConfig;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
+import org.springframework.web.context.ContextLoader;
 
-import javax.inject.Inject;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -40,12 +39,8 @@ import java.util.logging.Logger;
 /**
  * @since 0.0.59
  */
-@SuppressWarnings("deprecation")
 @ServiceComponent
 public class JettyTestServletConfig implements TestServletConfig {
-
-    @Inject
-    ConfigAdapter configAdapter;
 
     private static final Logger LOG = Logger.getLogger(JettyTestServletConfig.class.getSimpleName());
 
@@ -54,7 +49,7 @@ public class JettyTestServletConfig implements TestServletConfig {
     public JettyTestServletConfig() throws Exception {
         String host;
         int port;
-        boolean spawnJetty = Boolean.parseBoolean(System.getProperty("jetty.spawn", "false"));
+        boolean spawnJetty = Boolean.parseBoolean(System.getProperty("jetty.spawn", String.valueOf(ContextLoader.getCurrentWebApplicationContext() == null)));
         if (spawnJetty) {
             Server server = AuraJettyServer.getInstance();
             Connector connector = server.getConnectors()[0];
@@ -68,8 +63,11 @@ public class JettyTestServletConfig implements TestServletConfig {
                     host = "localhost";
                 }
             }
-            LOG.info(String.format("Starting Jetty on %s:%s", host, port));
-            server.start();
+
+            if (!server.isRunning()) {
+                LOG.info(String.format("Starting Jetty on %s:%s", host, port));
+                server.start();
+            }
         } else {
             port = Integer.parseInt(System.getProperty("jetty.port", "9090"));
             host = System.getProperty("jetty.host");
@@ -98,6 +96,7 @@ public class JettyTestServletConfig implements TestServletConfig {
         return baseUrl;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public HttpClient getHttpClient() {
         /*

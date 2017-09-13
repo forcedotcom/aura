@@ -32,6 +32,8 @@ public interface ConfigAdapter extends AuraAdapter {
 
     boolean isProduction();
 
+    boolean isFileMonitorEnabled();
+
     Set<Mode> getAvailableModes();
 
     Mode getDefaultMode();

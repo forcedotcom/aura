@@ -22,7 +22,6 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.impl.adapter.format.html.BaseComponentDefHTMLFormatAdapterTest;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
@@ -37,8 +36,6 @@ import java.util.regex.Pattern;
  * @since 0.0.224
  */
 public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFormatAdapterTest<ApplicationDef> {
-    @Inject
-    MockConfigAdapter mockConfigAdapter;
 
     @Inject
     DefinitionService definitionService;
@@ -55,7 +52,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
     @Test
     public void testWriteManifestWithConfigDisabled() throws Exception {
         AuraContext context = contextService.getCurrentContext();
-        mockConfigAdapter.setIsClientAppcacheEnabled(false);
+        getMockConfigAdapter().setIsClientAppcacheEnabled(false);
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application useAppcache='true' render='client'></aura:application>");
         context.setApplicationDescriptor(desc);

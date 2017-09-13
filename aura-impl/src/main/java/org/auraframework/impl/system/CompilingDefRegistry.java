@@ -41,6 +41,7 @@ public class CompilingDefRegistry implements DefRegistry {
     private final Map<DefDescriptor<?>, DefHolder> registry;
     private final CompilerService compilerService;
     private String name;
+    private final long creationTime;
 
     private static class DefHolder {
         public DefHolder(DefDescriptor<?> descriptor) {
@@ -58,6 +59,7 @@ public class CompilingDefRegistry implements DefRegistry {
         this.namespaces = Sets.newHashSet();
         this.registry = Maps.newHashMap();
         this.prefixes = Sets.newHashSet();
+        this.creationTime = System.currentTimeMillis();
         for (String prefix : prefixes) {
             this.prefixes.add(prefix.toLowerCase());
         }
@@ -161,6 +163,11 @@ public class CompilingDefRegistry implements DefRegistry {
     @Override
     public boolean isStatic() {
         return true;
+    }
+
+    @Override
+    public long getCreationTime() {
+        return creationTime;
     }
 
     @Override

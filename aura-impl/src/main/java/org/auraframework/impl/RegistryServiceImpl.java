@@ -269,7 +269,11 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                     throw new AuraRuntimeException("unable to get canonical path", ioe);
                 }
                 if (fileMonitor != null) {
-                    fileMonitor.addDirectory(canonical);
+                    Long creationTime = null;
+                    if (staticRegs != null && staticRegs.length > 0) {
+                        creationTime = staticRegs[0].getCreationTime();
+                    }
+                    fileMonitor.addDirectory(canonical, creationTime);
                 }
                 if (!modules) {
                     markupLoader = new FileBundleSourceLoader(components, fileMonitor, builders);

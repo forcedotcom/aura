@@ -15,17 +15,7 @@
  */
 package org.auraframework.impl;
 
-import java.lang.ref.WeakReference;
-import java.util.Collection;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
+import com.google.common.base.Optional;
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.builder.CacheBuilder;
@@ -39,12 +29,24 @@ import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.RegistrySet;
 import org.auraframework.system.RegistrySet.RegistrySetKey;
 import org.auraframework.system.SourceListener;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-import com.google.common.base.Optional;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.lang.ref.WeakReference;
+import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+@Lazy
+@Component
+@Scope(BeanDefinition.SCOPE_SINGLETON)
 public class CachingServiceImpl implements CachingService {
     private static final long serialVersionUID = -3311707270226573084L;
 
@@ -66,17 +68,6 @@ public class CachingServiceImpl implements CachingService {
     
     /** Default size of registry sets, in number of entries */
     private final static int REGISTRY_SET_CACHE_SIZE = 100;
-
-    @Configuration
-    public static class BeanConfiguration {
-        private static final CachingServiceImpl INSTANCE  = new CachingServiceImpl();
-            
-        @Lazy
-        @Bean
-        public CachingService cachingServiceImpl() {
-            return INSTANCE;
-        }
-    }
     
     private LoggingAdapter loggingAdapter;
 

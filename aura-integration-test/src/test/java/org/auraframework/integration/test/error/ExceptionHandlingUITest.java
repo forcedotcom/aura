@@ -16,7 +16,6 @@
 package org.auraframework.integration.test.error;
 
 import com.google.common.base.Function;
-
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -24,7 +23,6 @@ import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
@@ -34,10 +32,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import javax.inject.Inject;
-
 /**
- * What should you see when something goes wrong. {@link ThreadHostile} due to setProdConfig and friends.
+ * What should you see when something goes wrong. {@link ThreadHostileTest} due to setProdConfig and friends.
  */
 @UnAdaptableTest
 public class ExceptionHandlingUITest extends WebDriverTestCase {
@@ -46,11 +42,8 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
 
     private static final String errorBoxPath = "div.auraForcedErrorBox div#auraErrorMessage";
 
-    @Inject
-    MockConfigAdapter mockConfigAdapter;
-
     private void setProdConfig() throws Exception {
-        mockConfigAdapter.setIsProduction(true);
+        getMockConfigAdapter().setIsProduction(true);
         contextService.endContext();
         contextService.startContext(Mode.DEV, Format.HTML, Authentication.AUTHENTICATED);
     }

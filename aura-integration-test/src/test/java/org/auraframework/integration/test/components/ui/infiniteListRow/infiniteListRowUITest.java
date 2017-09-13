@@ -15,10 +15,6 @@
  */
 package org.auraframework.integration.test.components.ui.infiniteListRow;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.util.List;
-
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
@@ -26,6 +22,10 @@ import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.util.List;
 
 @UnAdaptableTest
 @TargetBrowsers({ BrowserType.IPHONE })
@@ -56,7 +56,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws InterruptedException
 	 */
     @Test
-	public void testHorizontolSwipeLogs () throws MalformedURLException, URISyntaxException, InterruptedException {
+	public void testHorizontolSwipeLogs () throws Exception {
 		open(TEST_APP);
 		setViewPortVariable();
 		
@@ -102,7 +102,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws InterruptedException
 	 */
     @Test
-	public void testHorizontalSwipeGesturesDefaultBehavior() throws MalformedURLException, URISyntaxException, InterruptedException{
+	public void testHorizontalSwipeGesturesDefaultBehavior() throws Exception{
 		open(TEST_APP);
 		setViewPortVariable();
 		verifyOnlyOneSwipeBodyIsOpen(null, false);
@@ -126,7 +126,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws InterruptedException
 	 */
     @Test
-	public void testHorizontalLeftSwipeBehavior() throws MalformedURLException, URISyntaxException, InterruptedException{
+	public void testHorizontalLeftSwipeBehavior() throws Exception{
 		open(TEST_APP);
 		setViewPortVariable();
 		verifyOnlyOneSwipeBodyIsOpen(null, false);
@@ -150,7 +150,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	
 	/**
 	 * Click on any row to close the open Listrow
-	 * @param element
+	 * @param listRow
 	 * @throws InterruptedException
 	 */
 	private void clickOnListRowAndWait(WebElement listRow) throws InterruptedException {
@@ -166,7 +166,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws URISyntaxException
 	 * @throws InterruptedException
 	 */
-	public void _testShowMoreListRowsClosesOpenSwipeBody() throws MalformedURLException, URISyntaxException, InterruptedException{
+	public void _testShowMoreListRowsClosesOpenSwipeBody() throws Exception{
 		verifyListRowAfterRefreshOrShowMoreAction("showMore");
 	}
 	
@@ -177,12 +177,12 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws InterruptedException
 	 */
     @Test
-	public void testRefreshOnListRowsClosesOpenSwipeBody() throws MalformedURLException, URISyntaxException, InterruptedException{
+	public void testRefreshOnListRowsClosesOpenSwipeBody() throws Exception{
         verifyListRowAfterRefreshOrShowMoreAction("refresh");
 	}
 	
     @Test
-	public void testScrollingAnyVerifyDefaultSwipeBehavior() throws MalformedURLException, URISyntaxException, InterruptedException {
+	public void testScrollingAnyVerifyDefaultSwipeBehavior() throws Exception {
 		open(TEST_APP);
         setViewPortVariable();
         clickOnShowMore();
@@ -197,7 +197,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
     }
 	
 	
-	private void verifyListRowAfterRefreshOrShowMoreAction(String action) throws MalformedURLException, URISyntaxException, InterruptedException {
+	private void verifyListRowAfterRefreshOrShowMoreAction(String action) throws Exception {
 		open(TEST_APP);
 		setViewPortVariable();
 		verifyOnlyOneSwipeBodyIsOpen(null, false);
@@ -230,7 +230,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * Bug: W-2257072
 	 */
     @Test
-	public void testVerticalSwipeClosesOpenSwipeBody() throws MalformedURLException, URISyntaxException, InterruptedException{
+	public void testVerticalSwipeClosesOpenSwipeBody() throws Exception{
 		open(TEST_APP);
 		setViewPortVariable();
 		verifyOnlyOneSwipeBodyIsOpen(null, false);
@@ -251,7 +251,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws InterruptedException
 	 */
     @Test
-	public void testTapOnNonActiveRowClosesActiveRow() throws MalformedURLException, URISyntaxException, InterruptedException{
+	public void testTapOnNonActiveRowClosesActiveRow() throws Exception{
 		open(TEST_APP);
 		setViewPortVariable();
 		verifyOnlyOneSwipeBodyIsOpen(null, false);
@@ -311,7 +311,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	/**
 	 * Swipe and then verify if the element is within or outside of the viewport depending
 	 * on the swipe gesture performed
-	 * @param elem
+	 * @param elmRow
 	 * @param swipeOption
 	 * @throws InterruptedException
 	 */

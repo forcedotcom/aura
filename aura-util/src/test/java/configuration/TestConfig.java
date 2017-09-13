@@ -207,4 +207,9 @@ public class TestConfig {
     public static NamedService impl18() {
         return new NamedServiceImpl2();
     }
+
+    /**
+     * Specify where the Spring application context to be used is, mainly used for tests
+     */
+    public static final String APPLICATION_CONTEXT_XML = "/applicationContext.xml";
 }

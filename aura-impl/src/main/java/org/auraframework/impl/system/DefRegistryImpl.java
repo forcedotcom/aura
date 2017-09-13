@@ -28,10 +28,12 @@ public abstract class DefRegistryImpl implements DefRegistry, Serializable {
     private final Set<DefType> defTypes;
     private final Set<String> prefixes;
     private final Set<String> namespaces;
+    private final long creationTime;
 
     public DefRegistryImpl(Set<DefType> defTypes, Set<String> prefixes, Set<String> namespaces) {
         this.defTypes = defTypes;
         this.prefixes = Sets.newHashSet();
+        this.creationTime = System.currentTimeMillis();
         for (String prefix : prefixes) {
             this.prefixes.add(prefix.toLowerCase());
         }
@@ -55,6 +57,11 @@ public abstract class DefRegistryImpl implements DefRegistry, Serializable {
     @Override
     public Set<String> getNamespaces() {
         return namespaces;
+    }
+
+    @Override
+    public long getCreationTime() {
+        return creationTime;
     }
 
     @Override

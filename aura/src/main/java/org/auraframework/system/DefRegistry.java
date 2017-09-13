@@ -122,4 +122,9 @@ public interface DefRegistry extends Serializable {
      * by the implementation.
      */
     boolean isStatic();
+
+    /**
+     * @return time since epoch of when this registry was created
+     */
+    long getCreationTime();
 }

@@ -54,7 +54,7 @@ public class AuraResourcesHashingGroup extends HashingGroup implements SourceLis
         super(GROUP_NAME, ROOT_DIR, FILE_FILTER);
         if (monitor) {
             fileMonitor.subscribeToChangeNotification(this);
-            fileMonitor.addDirectory(ROOT_DIR.getPath());
+            fileMonitor.addDirectory(ROOT_DIR.getPath(), null);
         }
     }
 

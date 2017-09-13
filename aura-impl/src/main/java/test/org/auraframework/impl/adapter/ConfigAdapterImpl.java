@@ -218,12 +218,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
         contextService.registerGlobal("isVoiceOver", true, false);
         contextService.registerGlobal("dynamicTypeSize", true, "");
-
-        if (!isProduction()) {
-            fileMonitor.start();
-        }
-        contextService.registerGlobal("isVoiceOver", true, false);
-        contextService.registerGlobal("dynamicTypeSize", true, "");
     }
 
     private JavascriptGroup getJSGroup() {
@@ -506,6 +500,14 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public boolean isProduction() {
         return Boolean.parseBoolean(System.getProperty("aura.production"));
+    }
+
+    public boolean isFileMonitorEnabled() {
+        String enableFileWatcher = System.getProperty("aura.enableFileMonitor");
+        if (enableFileWatcher == null) {
+            return !isProduction();
+        }
+        return Boolean.parseBoolean(enableFileWatcher);
     }
 
     @Override

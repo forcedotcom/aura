@@ -15,13 +15,8 @@
  */
 package org.auraframework.test.util;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-
-import org.auraframework.AuraDeprecated;
+import junit.framework.AssertionFailedError;
+import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.service.ContextService;
@@ -30,12 +25,14 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.test.TestContextAdapter;
-import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.test.util.UnitTestCase;
 
-import junit.framework.AssertionFailedError;
+import javax.inject.Inject;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * Base class for unit tests referencing the Aura framework.
@@ -45,9 +42,6 @@ import junit.framework.AssertionFailedError;
 public abstract class AuraTestCase extends UnitTestCase {
     protected final static String baseApplicationTag = "<aura:application %s>%s</aura:application>";
     protected final static String baseComponentTag = "<aura:component %s>%s</aura:component>";
-
-    @Inject
-    AuraDeprecated aura;
 
     @Inject
     protected TestContextAdapter testContextAdapter;
@@ -80,6 +74,14 @@ public abstract class AuraTestCase extends UnitTestCase {
     }
 
     @Override
+    protected void injectBeans() throws Exception {
+        super.injectBeans();
+        if (Aura.getConfigAdapter() == null) {
+            applicationContext.getAutowireCapableBeanFactory().autowireBean(new Aura());
+        }
+    }
+
+    @Override
     public void tearDown() throws Exception {
         if (loggingService != null) {
             loggingService.release();
@@ -97,15 +99,7 @@ public abstract class AuraTestCase extends UnitTestCase {
         super.tearDown();
     }
 
-    public MockConfigAdapter getMockConfigAdapter() {
-        if (configAdapter instanceof MockConfigAdapter) {
-            return (MockConfigAdapter) configAdapter;
-        }
-        throw new Error("MockConfigAdapter is not configured!");
-    }
-
     public void resetMocks() throws Exception {
-        getMockConfigAdapter().reset();
     }
 
     public String getQualifiedName() {

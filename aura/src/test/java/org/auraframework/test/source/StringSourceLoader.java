@@ -23,6 +23,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.system.BundleSourceLoader;
 import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.Source;
+import org.auraframework.util.FileMonitor;
 
 /**
  * This source loader allows tests to load and unload source from strings.

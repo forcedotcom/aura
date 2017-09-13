@@ -15,14 +15,6 @@
  */
 package org.auraframework.integration.test.http;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-
-import javax.inject.Inject;
-
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -34,20 +26,22 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
+
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Automation to verify the functioning of AuraResourceServlet. AuraResourceServlet is used to preload definitions of
  * components in a given namespace. It is also used to load CSS
  */
 public class AuraResourceServletHttpTest extends AuraHttpTestCase {
-    @Inject
-    private MockConfigAdapter configAdapter;
-
     /**
      * Verify style def ordering for components included as facets. Create a chain of components as facet and verify the
      * order of css(Style Defs)
@@ -285,7 +279,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
 
     @Test
     public void testInlineJSNoCacheHeaders() throws Exception {
-        String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, false)) + "/inline.js?jwt=" + configAdapter.generateJwtToken();
+        String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, false)) + "/inline.js?jwt=" + getMockConfigAdapter().generateJwtToken();
 
         HttpGet get = obtainGetMethod(url);
         HttpResponse httpResponse = perform(get);
@@ -310,7 +304,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     @Test
     public void testInlineJSExceptionCode() throws Exception {
         // modified uid url
-        String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, true)) + "/inline.js?jwt=" + configAdapter.generateJwtToken();
+        String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, true)) + "/inline.js?jwt=" + getMockConfigAdapter().generateJwtToken();
 
         HttpGet get = obtainGetMethod(url);
         HttpResponse httpResponse = perform(get);

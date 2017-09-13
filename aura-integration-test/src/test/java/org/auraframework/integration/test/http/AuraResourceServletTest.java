@@ -30,19 +30,15 @@ import org.auraframework.system.SourceListener;
 import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.test.util.DummyHttpServletRequest;
 import org.auraframework.test.util.DummyHttpServletResponse;
-import org.auraframework.util.FileMonitor;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.context.TestContextManager;
 
 import javax.inject.Inject;
-import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -53,8 +49,6 @@ import java.util.List;
  * for now.
  */
 public class AuraResourceServletTest extends AuraTestCase {
-    @Inject
-    private FileMonitor fileMonitor;
 
     @Inject
     DefinitionService definitionService;
@@ -69,13 +63,9 @@ public class AuraResourceServletTest extends AuraTestCase {
         private static final long serialVersionUID = 411181168049748986L;
     }
 
-    @Mock
-    private ServletConfig servletConfig;
-
     private AuraResourceServlet getAuraResourceServlet() throws Exception {
         AuraResourceServlet servlet = new AuraResourceServlet();
-        TestContextManager testContextManager = new TestContextManager(getClass());
-        testContextManager.prepareTestInstance(servlet);
+        applicationContext.getAutowireCapableBeanFactory().autowireBean(servlet);
         return servlet;
     }
 

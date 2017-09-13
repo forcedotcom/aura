@@ -15,14 +15,6 @@
  */
 package org.auraframework.impl;
 
-import java.io.StringWriter;
-import java.io.Writer;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -39,9 +31,17 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Source;
+import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.util.json.JsonSerializationContext;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 
 /**
  * Base class for Aura unit tests that establishes a AuraTestContext that looks up components in the
@@ -72,6 +72,19 @@ public abstract class AuraImplTestCase extends AuraTestCase {
 
     protected void setShouldSetupContext(boolean setupContext) {
         this.shouldSetupContext = setupContext;
+    }
+
+    public MockConfigAdapter getMockConfigAdapter() {
+        if (configAdapter instanceof MockConfigAdapter) {
+            return (MockConfigAdapter) configAdapter;
+        }
+        throw new Error("MockConfigAdapterImpl is not configured!");
+    }
+
+    @Override
+    public void resetMocks() throws Exception {
+        super.resetMocks();
+        getMockConfigAdapter().reset();
     }
 
     @Override

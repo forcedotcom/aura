@@ -15,18 +15,9 @@
  */
 package org.auraframework.integration.test;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-
-import javax.inject.Inject;
-
 import org.auraframework.http.cspinlining.CSPInliningMockRule;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
-import org.auraframework.service.CSPInliningService;
-import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.throwable.InvalidSessionException;
 import org.auraframework.util.test.annotation.FreshBrowserInstance;
@@ -40,17 +31,21 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import javax.inject.Inject;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+
 import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSUPPORTED;
 
 // CSRF is only stored in persistent storage. indexedDB is not supported on Safari,
 // so persistent storage is not able to be created on Safari.
 @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IE9, BrowserType.IE10, BrowserType.IE11 })
 public class AuraClientServiceUITest extends WebDriverTestCase {
-	@Inject
-	private MockConfigAdapter configAdapter;
-	@Inject
-    private CSPInliningMockRule inlineMockRule;
 
+    @Inject
+    private CSPInliningMockRule inlineMockRule;
 
     @Override
     public void tearDown() throws Exception {
@@ -71,7 +66,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
 		
 		AtomicLong counter = new AtomicLong();
     	String expectedBase = "expectedTestToken";
-		configAdapter.setCSRFToken(() -> {
+		getMockConfigAdapter().setCSRFToken(() -> {
 			return expectedBase + counter.incrementAndGet();
 		});
 
@@ -89,7 +84,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
     @Test
     public void testCsrfTokenLoadedFromStorageOnInit() throws Exception {
 		String target = "/clientServiceTest/csrfTokenStorage.app";
-		configAdapter.setCSRFToken("initialToken");
+        getMockConfigAdapter().setCSRFToken("initialToken");
 
 		open(target);
 		
@@ -119,7 +114,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
         String expectedToken = "errorToken";
         Throwable cause = new RuntimeException("intentional");
 		RuntimeException expectedException = new InvalidSessionException(cause, expectedToken);
-		configAdapter.setValidateCSRFTokenException(expectedException );		
+        getMockConfigAdapter().setValidateCSRFTokenException(expectedException );
 		
         WebElement trigger = getDriver().findElement(By.className("trigger"));
         trigger.click();
@@ -146,7 +141,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
 		// Look only at requests coming from this client
         CountDownLatch latch = new CountDownLatch(1);
 		AtomicReference<String> receivedToken = new AtomicReference<>();
-		configAdapter.setValidateCSRFToken((token)->{
+		getMockConfigAdapter().setValidateCSRFToken((token)->{
 		    //we should stop capturing after latch has released
 		    synchronized(this) {
 		        if (latch.getCount() == 1) {

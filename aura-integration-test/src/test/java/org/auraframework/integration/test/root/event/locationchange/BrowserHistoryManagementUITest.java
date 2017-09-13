@@ -40,7 +40,7 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
      * @exception Changes the URL to the location specified in the client action but nothing else.
      */
     @Test
-    public void testNoHandlerForLocationChange() throws MalformedURLException, URISyntaxException {
+    public void testNoHandlerForLocationChange() throws Exception {
         open("/test/test_LocChng_NoHandler.app");
         String content = getBodyText();
         findByCssSelector(".identifier").click();
@@ -59,7 +59,7 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
      * that the handler was evoked when aura.historyService.set()
      */
     @Test
-    public void testBrowserHistoryInteractionInSimpleComponent() throws MalformedURLException, URISyntaxException {
+    public void testBrowserHistoryInteractionInSimpleComponent() throws Exception {
         open("/test/test_LocChng_SimpleComponent.app");
         findByCssSelector(".SimpleComponent").click();
         assertTrue(
@@ -79,7 +79,7 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
      * that all handlers registered for the location change event are invoked.
      */
     @Test
-    public void testBrowserHistoryInteractionInComplexComponent() throws MalformedURLException, URISyntaxException {
+    public void testBrowserHistoryInteractionInComplexComponent() throws Exception {
         open("/test/test_LocChng_CompositeComponent.app");
         String compositeCmp = ".CompositeComponent";
         findByCssSelector(compositeCmp).click();
@@ -101,7 +101,7 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
      */
     @Test
     @Ignore
-    public void testBrowserHistoryInteractionInComplexComponent2() throws MalformedURLException, URISyntaxException {
+    public void testBrowserHistoryInteractionInComplexComponent2() throws Exception {
         /*
          * This verifies that even though the Inner component has its own location change event, in the context of
          * another bigger component, only the root component's location change event is fired. In this case

@@ -187,6 +187,7 @@ SecureObject.filterEverything = function(st, raw, options) {
                 swallowed = SecureIFrameElement.SecureIFrameContentWindow(raw, key);
                 SecureObject.addMethodIfSupported(swallowed, raw, "close");
                 SecureObject.addPropertyIfSupported(swallowed, raw, "opener");
+                SecureObject.addPropertyIfSupported(swallowed, raw, "closed", { writable : false });
 
                 mutated = true;
             } else if (raw instanceof CanvasRenderingContext2D) {

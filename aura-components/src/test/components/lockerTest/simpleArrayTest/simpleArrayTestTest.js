@@ -53,6 +53,11 @@
             cmp.testArraySplice();
         }
     },
+    testArrayConcat : {
+        test: function(cmp) {
+            cmp.testArrayConcat();
+        }
+    },
     testArrayUnshift : {
         test: function(cmp) {
             cmp.testArrayUnshift();

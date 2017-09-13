@@ -28,10 +28,11 @@
     <aura:method name="testArrayShift"/>
     <aura:method name="testArraySort"/>
     <aura:method name="testArraySplice"/>
+    <aura:method name="testArrayConcat"/>
     <aura:method name="testArrayUnshift"/>
     <aura:method name="testArrayAccessorMethods"/>
     <aura:method name="testArrayForEach"/>
     <aura:method name="testArrayForIn"/>
     <aura:method name="testArrayAssociativeArray"/>
     <aura:method name="testArrayProxyTraps"/>
-    </aura:component>
+</aura:component>

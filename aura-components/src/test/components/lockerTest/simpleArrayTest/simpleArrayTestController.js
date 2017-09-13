@@ -47,14 +47,14 @@
         component.set("v.wrapUnwrapTestObj", obj1);
         var testObj = component.get("v.wrapUnwrapTestObj");
         testUtils.assertTrue(Array.isArray(testObj.arr), "Proxy failed to pass Array.isArray() test");
-        testUtils.assertEquals(0, testObj.arr.length);
+        testUtils.assertEquals(0, testObj.arr.length, "Array length should be 0");
 
         var obj2 = {
             arr: [11, 12, 13]
         };
         component.set("v.wrapUnwrapTestObj", obj2);
         testObj = component.get("v.wrapUnwrapTestObj");
-        testUtils.assertEquals(3, testObj.arr.length);
+        testUtils.assertEquals(3, testObj.arr.length, "Array length should be 3");
 
         testObj.arr = [1, 2, 3];
         helper.verifyArrayElements(testUtils, [1, 2, 3], testObj.arr);
@@ -202,7 +202,7 @@
         helper.verifyArrayElements(testUtils, [], testObj.arr.splice(2, 0, 'z'));
         helper.verifyArrayElements(testUtils, ['a', 'b', 'z', 'c', 'd'], testObj.arr);
 
-        resetArray()
+        resetArray();
         helper.verifyArrayElements(testUtils, [], testObj.arr.splice(0, 0, 'y'));
         helper.verifyArrayElements(testUtils, ['y', 'a', 'b', 'c', 'd'], testObj.arr);
 
@@ -227,7 +227,7 @@
         helper.verifyArrayElements(testUtils, ['c'], testObj.arr.splice(2, 1));
         helper.verifyArrayElements(testUtils, ['a', 'b', 'd'], testObj.arr);
 
-        resetArray()
+        resetArray();
         helper.verifyArrayElements(testUtils, ['a'], testObj.arr.splice(0, 1));
         helper.verifyArrayElements(testUtils, ['b', 'c', 'd'], testObj.arr);
 
@@ -256,7 +256,7 @@
         helper.verifyArrayElements(testUtils, ['c'], testObj.arr.splice(2, 1, 'z'));
         helper.verifyArrayElements(testUtils, ['a', 'b', 'z', 'd'], testObj.arr);
 
-        resetArray()
+        resetArray();
         helper.verifyArrayElements(testUtils, ['a'], testObj.arr.splice(0, 1, 'y'));
         helper.verifyArrayElements(testUtils, ['y', 'b', 'c', 'd'], testObj.arr);
 
@@ -283,6 +283,56 @@
         resetArray();
         helper.verifyArrayElements(testUtils, ['a', 'b', 'c', 'd'], testObj.arr.splice(0, 4, 'x', 'y'));
         helper.verifyArrayElements(testUtils, ['x', 'y'], testObj.arr);
+    },
+
+    testArrayConcat: function (component, event, helper) {
+        var testUtils = component.get("v.testUtils");
+
+
+        component.set("v.wrapUnwrapTestObj", { a: [], b: [1], c: ['x', 'y'] });
+        var o = component.get("v.wrapUnwrapTestObj");
+        var a = o.a;
+        var b = o.b;
+        var c = o.c;
+debugger;
+        helper.verifyArrayElements(testUtils, [], a);
+        helper.verifyArrayElements(testUtils, [1], b);
+        helper.verifyArrayElements(testUtils, ['x', 'y'], c);
+
+
+        helper.verifyArrayElements(testUtils, [], a.concat([]));
+        helper.verifyArrayElements(testUtils, [], a.concat(a));
+
+        helper.verifyArrayElements(testUtils, [1], a.concat([1]));
+        helper.verifyArrayElements(testUtils, [1], a.concat(b));
+
+        helper.verifyArrayElements(testUtils, ['x', 'y'], a.concat(['x', 'y']));
+        helper.verifyArrayElements(testUtils, ['x', 'y'], a.concat(c));
+
+
+        helper.verifyArrayElements(testUtils, [1], b.concat([]));
+        helper.verifyArrayElements(testUtils, [1], b.concat(a));
+
+        helper.verifyArrayElements(testUtils, [1, 1], b.concat([1]));
+        helper.verifyArrayElements(testUtils, [1, 1], b.concat(b));
+
+        helper.verifyArrayElements(testUtils, [1, 'x', 'y'], b.concat(['x', 'y']));
+        helper.verifyArrayElements(testUtils, [1, 'x', 'y'], b.concat(c));
+
+
+        helper.verifyArrayElements(testUtils, ['x', 'y'], c.concat([]));
+        helper.verifyArrayElements(testUtils, ['x', 'y'], c.concat(a));
+
+        helper.verifyArrayElements(testUtils, ['x', 'y', 1], c.concat([1]));
+        helper.verifyArrayElements(testUtils, ['x', 'y', 1], c.concat(b));
+
+        helper.verifyArrayElements(testUtils, ['x', 'y', 'x', 'y'], c.concat(['x', 'y']));
+        helper.verifyArrayElements(testUtils, ['x', 'y', 'x', 'y'], c.concat(c));
+
+
+        helper.verifyArrayElements(testUtils, [], a);
+        helper.verifyArrayElements(testUtils, [1], b);
+        helper.verifyArrayElements(testUtils, ['x', 'y'], c);
     },
 
     testArrayAccessorMethods: function (component, event, helper) {

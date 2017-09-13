@@ -20,4 +20,5 @@
     <aura:attribute name="panelId" type="String" description="Global id of Component that this event is triggered for"/>
     <aura:attribute name="action" type="String" description="Action that triggered the transition of the panel [open/close]"/>
     <aura:attribute name="isTransient" type="Boolean" description="True if panel should be destroyed when hidden"/>
+    <aura:attribute name="hasGlassBackground" type="Boolean" required="true" description="True if modal-glass is present, false if not"/>
 </aura:event>

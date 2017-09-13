@@ -248,11 +248,13 @@
         // this will happen if a panel is destroyed
         // without being closed first
 
-        if(!panelObj.panel._transitionEndFired) {
+        if(!panelObj.panel._transitionEndFired) {            
+            var element = panelObj.panel && panelObj.panel.isValid() ? panelObj.panel.getElement() : null;
             // listeners still need to know the panel is gone
             $A.getEvt("markup://ui:panelTransitionEnd").setParams({
                 action: 'hide', 
-                panelId: panelId
+                panelId: panelId,
+                hasGlassBackground: (element || document).querySelector(".modal-glass") !== null
             }).fire();
         }
 

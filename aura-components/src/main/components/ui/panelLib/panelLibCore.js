@@ -47,7 +47,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                         panel: cmp, 
                         isOpening: isOpening,
                         hasGlassBackground: hasModalClass(cmp.getElement())
-                    });
+                    }).fire();
                 }
             };
         }        

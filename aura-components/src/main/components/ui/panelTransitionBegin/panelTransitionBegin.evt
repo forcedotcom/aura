@@ -18,4 +18,5 @@
 <aura:event type="APPLICATION">
     <aura:attribute name="panel" type="Aura.Component[]" required="true" description="The panel that is transitioning"/>
     <aura:attribute name="isOpening" type="Boolean" required="true" description="True if panel is opening, false if closing"/>
+    <aura:attribute name="hasGlassBackground" type="Boolean" required="true" description="True if modal-glass is present, false if not"/>
 </aura:event>

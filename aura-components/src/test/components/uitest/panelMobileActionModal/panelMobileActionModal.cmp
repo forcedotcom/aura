@@ -1,0 +1,21 @@
+<aura:component>
+	<ui:panelManager2 aura:id="pm">
+			<aura:set attribute="registeredPanels">
+                    <ui:modal alias="modal"/>
+            </aura:set>
+	</ui:panelManager2>
+	<aura:dependency resource="markup://ui:createPanel" type="EVENT"/>
+	
+	<aura:attribute name="tansitionBeginEventCount" type="Integer" default="0"/>
+	<aura:attribute name="tansitionEndEventCount" type="Integer" default="0"/>
+	<aura:attribute name="tansitionBeginEventHasGlassCount" type="Integer" default="0"/>
+	<aura:attribute name="tansitionEndEventHasGlassCount" type="Integer" default="0"/>
+	<aura:attribute name="closeAfterCreate" type="Boolean" default="false"/>
+	<aura:handler event="ui:panelTransitionBegin" action="{!c.incrementTrasitionBeginCount}"/>
+	<aura:handler event="ui:panelTransitionEnd" action="{!c.incrementTrasitionEndCount}"/>
+	
+	<div class="container">
+		<ui:button aura:id="createPanelBtn" label="Create Modal" press="{!c.createModal}"/>
+	</div>
+	
+</aura:component>

@@ -41,15 +41,6 @@ public interface SourceLoader {
     Set<String> getNamespaces();
     
     /**
-     * Returns a list of prefixes (java/js/apex) for which this loader is
-     * authoritative within the namespaces returned by getNamespaces.
-     * 
-     * @return List of prefixes that this SourceLoader handles.
-     */
-    @Nonnull
-    Set<String> getPrefixes();
-
-    /**
      * Returns a list of DefTypes for which this loader is authoritative within
      * the namespaces returned by getNamespaces and the prefixes returned by
      * getPrefixes.

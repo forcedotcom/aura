@@ -284,11 +284,6 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
     }
 
     @Override
-    public Set<String> getPrefixes() {
-        return Sets.newHashSet("markup:");
-    }
-
-    @Override
     public Set<DefType> getDefTypes() {
         return BundleSource.bundleDefTypes;
     }

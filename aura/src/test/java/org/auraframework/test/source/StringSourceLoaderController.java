@@ -98,11 +98,6 @@ public class StringSourceLoaderController implements Controller {
     }
 
     @AuraEnabled
-    public Set<String> getPrefixes() {
-        return stringSourceLoader.getPrefixes();
-    }
-
-    @AuraEnabled
     public Set<DefType> getDefTypes() {
         return stringSourceLoader.getDefTypes();
     }

@@ -40,11 +40,6 @@ public class JavaSourceLoader implements SourceLoader {
     }
 
     @Override
-    public Set<String> getPrefixes() {
-        return null;
-    }
-
-    @Override
     public Set<DefType> getDefTypes() {
         return null;
     }

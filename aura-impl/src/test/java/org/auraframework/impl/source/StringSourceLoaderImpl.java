@@ -88,12 +88,6 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
     private FileMonitor fileMonitor;
 
     private static final String DEFAULT_NAME_PREFIX = "thing";
-    private static final Set<String> PREFIXES = ImmutableSet.of(
-            DefDescriptor.MARKUP_PREFIX.toLowerCase(),
-            DefDescriptor.JAVASCRIPT_PREFIX.toLowerCase(),
-            DefDescriptor.CSS_PREFIX.toLowerCase(),
-            DefDescriptor.TEMPLATE_CSS_PREFIX.toLowerCase(),
-            DefDescriptor.CUSTOM_FLAVOR_PREFIX.toLowerCase());
     private static final Set<DefType> DEFTYPES = ImmutableSet.of(
             DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT, DefType.LIBRARY,
             DefType.INCLUDE, DefType.INTERFACE, DefType.CONTROLLER,
@@ -460,11 +454,6 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
     @Override
     public Set<String> getNamespaces() {
         return new HashSet<>(namespaces.keySet());
-    }
-
-    @Override
-    public Set<String> getPrefixes() {
-        return PREFIXES;
     }
 
     @Override

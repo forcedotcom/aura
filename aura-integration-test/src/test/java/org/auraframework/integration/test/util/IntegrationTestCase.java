@@ -39,6 +39,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.IntegrationTest;
 import org.auraframework.util.test.configuration.TestServletConfig;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.ContextLoader;
 
 import java.io.IOException;
@@ -78,13 +79,17 @@ public abstract class IntegrationTestCase extends AuraImplTestCase {
         }
     }
 
+    public void setApplicationContext(ApplicationContext appContext) {
+        applicationContext = appContext;
+    }
+
     @Override
     protected void injectBeans() throws Exception {
         super.injectBeans();
         if (testServletConfig == null) {
             // we are likely running from test/runner.app and the web app context already existed
             // this will not start up a server, but assume defaults
-            testServletConfig = new JettyTestServletConfig();
+            testServletConfig = applicationContext.getAutowireCapableBeanFactory().getBean(TestServletConfig.class);
         }
     }
 

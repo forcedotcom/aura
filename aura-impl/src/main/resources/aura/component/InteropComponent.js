@@ -446,20 +446,6 @@ InteropComponent.prototype.destroy = function(){
 };
 
 /**
- * @protected
- * @export
- */
-InteropComponent.prototype.index = function() {
-    this.raiseInvalidInteropApi('index', arguments);
-};
-
-/**
- * @protected
- * @export
- */
-InteropComponent.prototype.deIndex = function(){};
-
-/**
  * @public
  * @export
  */

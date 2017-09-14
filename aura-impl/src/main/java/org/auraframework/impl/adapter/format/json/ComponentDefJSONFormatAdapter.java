@@ -16,7 +16,6 @@
 package org.auraframework.impl.adapter.format.json;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Map;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -40,13 +39,6 @@ public class ComponentDefJSONFormatAdapter extends JSONFormatAdapter<BaseCompone
         return BaseComponentDef.class;
     }
 
-    @Override
-    public void writeCollection(Collection<? extends BaseComponentDef> values, Appendable out) throws IOException,
-            QuickFixException {
-        AuraContext context = contextService.getCurrentContext();
-        JsonEncoder.serialize(values, out, context.getJsonSerializationContext());
-    }
-    
     @Override
     public void write(BaseComponentDef value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {

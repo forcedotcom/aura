@@ -59,7 +59,6 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
-import org.auraframework.util.json.JsonStreamReader;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import com.google.common.collect.Maps;

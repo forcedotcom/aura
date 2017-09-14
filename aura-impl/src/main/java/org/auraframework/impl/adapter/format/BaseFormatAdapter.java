@@ -20,8 +20,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Collection;
 import java.util.Map;
 
 @ThreadSafe
@@ -32,18 +30,5 @@ public abstract class BaseFormatAdapter<T> implements FormatAdapter<T> {
             QuickFixException {
         throw new UnsupportedOperationException(String.format("write() not implemented for '%s' in '%s' Format",
                 getType().getName(), getFormatName()));
-    }
-
-    @Override
-    public void writeBinary(T value, Map<String, Object> attributes, OutputStream out) throws IOException,
-            QuickFixException {
-        throw new UnsupportedOperationException(String.format("writeBinary() not implemented for '%s' in '%s' Format",
-                getType().getName(), getFormatName()));
-    }
-
-    @Override
-    public void writeCollection(Collection<? extends T> values, Appendable out) throws IOException, QuickFixException {
-        throw new UnsupportedOperationException(String.format(
-                "writeCollection() not implemented for '%s' in '%s' Format", getType().getName(), getFormatName()));
     }
 }

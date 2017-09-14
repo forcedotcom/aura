@@ -31,7 +31,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -123,31 +122,10 @@ public class SerializationServiceImpl implements SerializationService {
     }
 
     @Override
-    public <T> void write(T value, Map<String, Object> attributes, Class<T> type, Appendable out)
-            throws IOException, QuickFixException {
-        contextService.assertEstablished();
-        getFormatAdapter(type).write(value, attributes, out);
-    }
-
-    @Override
     public <T> void write(T value, Map<String, Object> attributes, Class<T> type, Appendable out, String format)
             throws IOException, QuickFixException {
         contextService.assertEstablished();
         innerGetFormatAdapter(format, type).write(value, attributes, out);
-    }
-
-    @Override
-    public <T> void writeCollection(Collection<? extends T> values, Class<T> type, Appendable out) throws IOException,
-            QuickFixException {
-        contextService.assertEstablished();
-        getFormatAdapter(type).writeCollection(values, out);
-    }
-
-    @Override
-    public <T> void writeCollection(Collection<? extends T> values, Class<T> type, Appendable out, String format)
-            throws IOException, QuickFixException {
-        contextService.assertEstablished();
-        innerGetFormatAdapter(format, type).writeCollection(values, out);
     }
 
     private <T> FormatAdapter<T> getFormatAdapter(Class<T> type) throws QuickFixException {

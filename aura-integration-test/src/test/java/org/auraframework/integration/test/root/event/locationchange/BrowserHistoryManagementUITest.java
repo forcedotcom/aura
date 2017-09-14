@@ -15,9 +15,6 @@
  */
 package org.auraframework.integration.test.root.event.locationchange;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;

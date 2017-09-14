@@ -15,21 +15,20 @@
  */
 package org.auraframework.impl.root.component;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.DefinitionReference.Load;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefinitionReference.Load;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.root.component.ComponentDefRefImpl.Builder;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
-import org.auraframework.system.Location;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import java.util.Map;
-import java.util.Map.Entry;
 
 public class ComponentDefRefImplUnitTest extends
         DefinitionImplUnitTest<ComponentDefImpl, ComponentDef, ComponentDefRef, Builder> {

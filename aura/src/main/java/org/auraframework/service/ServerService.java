@@ -90,11 +90,4 @@ public interface ServerService extends AuraService {
      * This generates a complete set of definitions for an app in JS+JSON.
      */
     void writeDefinitions(Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex) throws IOException, QuickFixException;
-
-    /**
-     * Write out a set of components in JSON.
-     * 
-     * This writes out the entire set of components from the namespaces in JSON.
-     */
-    void writeComponents(Set<DefDescriptor<?>> dependencies, Writer out) throws IOException, QuickFixException;
 }

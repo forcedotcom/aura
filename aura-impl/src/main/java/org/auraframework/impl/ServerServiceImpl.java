@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.cache.Cache;
 import org.auraframework.css.StyleContext;
@@ -47,6 +48,7 @@ import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.http.ManifestUtil;
+import org.auraframework.impl.css.StyleDefWriter;
 import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
@@ -306,10 +308,14 @@ public class ServerServiceImpl implements ServerService {
         }
     }
 
+    @Inject
+    private StyleAdapter styleAdapter;
+
     private String getAppCssString(Set<DefDescriptor<?>> dependencies) throws QuickFixException, IOException {
         Collection<BaseStyleDef> orderedStyleDefs = filterAndLoad(BaseStyleDef.class, dependencies, null);
         StringBuffer sb = new StringBuffer();
-        serializationService.writeCollection(orderedStyleDefs, BaseStyleDef.class, sb, "CSS");
+        new StyleDefWriter(definitionService, styleAdapter, contextService.getCurrentContext())
+            .writeStyleDefs(orderedStyleDefs, sb);
         return sb.toString();
     }
 
@@ -450,12 +456,12 @@ public class ServerServiceImpl implements ServerService {
         // Append event definitions
         sb.append("$A.componentService.initEventDefs(");
         Collection<EventDef> events = filterAndLoad(EventDef.class, dependencies, null);
-        serializationService.writeCollection(events, EventDef.class, sb, "JSON");
+        JsonEncoder.serialize(events, sb, context.getJsonSerializationContext());
         sb.append(");\n");
 
         // Append library definitions
         sb.append("$A.componentService.initLibraryDefs(");
-        serializationService.writeCollection(libraryDefs, LibraryDef.class, sb, "JSON");
+        JsonEncoder.serialize(libraryDefs, sb, context.getJsonSerializationContext());
         sb.append(");\n");
 
         // Append controller definitions
@@ -464,25 +470,15 @@ public class ServerServiceImpl implements ServerService {
         // the namespace but did not use it. This ends up just getting a single controller.
         sb.append("$A.componentService.initControllerDefs(");
         Collection<ControllerDef> controllers = filterAndLoad(ControllerDef.class, dependencies, ACF);
-        serializationService.writeCollection(controllers, ControllerDef.class, sb, "JSON");
+        JsonEncoder.serialize(controllers, sb, context.getJsonSerializationContext());
         sb.append(");\n");
 
         sb.append("$A.componentService.initModuleDefs(");
         Collection<ModuleDef> modules = filterAndLoad(ModuleDef.class, dependencies, null);
-        serializationService.writeCollection(modules, ModuleDef.class, sb, "JSON");
+        JsonEncoder.serialize(modules, sb, context.getJsonSerializationContext());
         sb.append(");\n");
 
         return sb.toString();
-    }
-
-    @Override
-    public void writeComponents(Set<DefDescriptor<?>> dependencies, Writer out)
-            throws IOException, QuickFixException {
-        AuraContext context = contextService.getCurrentContext();
-
-        context.setPreloading(true);
-        serializationService.writeCollection(filterAndLoad(BaseComponentDef.class, dependencies, null),
-                BaseComponentDef.class, out);
     }
 
     /**

@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.adapter.format.css;
+package org.auraframework.impl.css;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.concurrent.ThreadSafe;
-import javax.inject.Inject;
-
 import org.auraframework.adapter.StyleAdapter;
-import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -33,7 +29,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.parser.plugin.FlavorOverridePlugin;
-import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -41,24 +36,19 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import com.google.common.collect.ImmutableList;
 import com.salesforce.omakase.plugin.Plugin;
 
-@ThreadSafe
-@ServiceComponent
-public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<BaseStyleDef> {
-    @Inject
-    private DefinitionService definitionService;
+public class StyleDefWriter {
+    private final DefinitionService definitionService;
+    private final StyleAdapter styleAdapter;
+    private final AuraContext context;
 
-    @Inject
-    private ContextService contextService;
-
-    private StyleAdapter styleAdapter;
-
-    @Override
-    public Class<BaseStyleDef> getType() {
-        return BaseStyleDef.class;
+    public StyleDefWriter(DefinitionService definitionService, StyleAdapter styleAdapter, AuraContext context) {
+        this.definitionService = definitionService;
+        this.styleAdapter = styleAdapter;
+        this.context = context;
     }
 
-    @Override
-    public void writeCollection(Collection<? extends BaseStyleDef> values, Appendable out) throws IOException, QuickFixException {
+    public void writeStyleDefs(Collection<? extends BaseStyleDef> values, Appendable out)
+            throws IOException, QuickFixException {
         // get the list of plugins that should be run contextually, e.g., where the plugins have access to the full
         // set of StyleDefs to be combined together. This is important for plugins that need to make decisions based on
         // the aggregate, e.g., a validator that allows at most one occurrence of a particular thing.
@@ -87,8 +77,7 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<BaseStyleDef> {
     }
 
     private FlavorOverrideLocator getFlavorOverrides() throws QuickFixException {
-        AuraContext ctx = contextService.getCurrentContext();
-        DefDescriptor<? extends BaseComponentDef> top = ctx.getLoadingApplicationDescriptor();
+        DefDescriptor<? extends BaseComponentDef> top = context.getLoadingApplicationDescriptor();
         if (top != null && top.getDefType() == DefType.APPLICATION) {
             FlavorsDef flavors = ((ApplicationDef)definitionService.getDefinition(top)).getFlavorOverridesDef();
             if (flavors != null) {
@@ -99,10 +88,5 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<BaseStyleDef> {
             }
         }
         return null;
-    }
-
-    @Inject
-    public void setStyleAdapter(StyleAdapter adapter) {
-        this.styleAdapter = adapter;
     }
 }

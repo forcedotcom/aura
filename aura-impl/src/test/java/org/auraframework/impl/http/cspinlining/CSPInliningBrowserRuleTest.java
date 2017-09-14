@@ -15,22 +15,19 @@
  */
 package org.auraframework.impl.http.cspinlining;
 
-import org.auraframework.http.BrowserCompatibilityService;
-import org.auraframework.http.cspinlining.CSPInliningCriteria;
-import org.auraframework.service.CSPInliningService;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.Client;
-import org.junit.Test;
+import static org.auraframework.service.CSPInliningService.InlineScriptMode.NONCE;
+import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSUPPORTED;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.auraframework.service.CSPInliningService.InlineScriptMode.NONCE;
-import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSUPPORTED;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.auraframework.http.cspinlining.CSPInliningCriteria;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.Client;
+import org.junit.Test;
 
 public class CSPInliningBrowserRuleTest {
      @Test

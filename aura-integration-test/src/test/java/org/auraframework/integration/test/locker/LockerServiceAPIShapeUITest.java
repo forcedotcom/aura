@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.locker;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 

@@ -16,8 +16,6 @@
 package org.auraframework.adapter;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Collection;
 import java.util.Map;
 
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -35,9 +33,4 @@ public interface FormatAdapter<T> {
     Class<?> getType();
 
     void write(T value, Map<String, Object> attributes, Appendable out) throws IOException, QuickFixException;
-
-    void writeBinary(T value, Map<String, Object> attributes, OutputStream out) throws IOException,
-            QuickFixException;
-
-    void writeCollection(Collection<? extends T> values, Appendable out) throws IOException, QuickFixException;
 }

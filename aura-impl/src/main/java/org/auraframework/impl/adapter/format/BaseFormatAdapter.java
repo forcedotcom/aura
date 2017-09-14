@@ -21,24 +21,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.util.Collection;
 import java.util.Map;
 
 @ThreadSafe
 public abstract class BaseFormatAdapter<T> implements FormatAdapter<T> {
-
-    @Override
-    public T read(Reader in) throws IOException, QuickFixException {
-        throw new UnsupportedOperationException(String.format("read() not implemented for '%s' in '%s' Format",
-                getType().getName(), getFormatName()));
-    }
-
-    @Override
-    public Collection<T> readCollection(Reader in) throws IOException, QuickFixException {
-        throw new UnsupportedOperationException(String.format(
-                "readCollection() not implemented for '%s' in '%s' Format", getType().getName(), getFormatName()));
-    }
 
     @Override
     public void write(T value, Map<String, Object> attributes, Appendable out) throws IOException,

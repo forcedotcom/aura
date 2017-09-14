@@ -15,18 +15,26 @@
  */
 package org.auraframework.impl.java.controller;
 
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ActionDef;
 import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.instance.Action;
 import org.auraframework.service.ContextService;
-import org.auraframework.service.SerializationService;
+import org.auraframework.service.InstanceService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsonReader;
 
-import javax.inject.Inject;
-import java.io.StringReader;
-import java.util.Collection;
+import com.google.common.collect.Lists;
 
 @ServiceComponent
 public class ActionChainingController implements Controller {
@@ -35,17 +43,36 @@ public class ActionChainingController implements Controller {
     private ContextService contextService;
 
     @Inject
-    private SerializationService serializationService;
+    private InstanceService instanceService;
 
     private int i = 0;
+
+    private List<Action> readActions(Reader in) throws IOException, QuickFixException {
+        Map<?, ?> message = (Map<?, ?>) new JsonReader().read(in);
+        List<?> actions = (List<?>) message.get("actions");
+        List<Action> ret = Lists.newArrayList();
+        for (Object action : actions) {
+            Map<?, ?> map = (Map<?, ?>) action;
+
+            // FIXME: ints are getting translated into BigDecimals here.
+            @SuppressWarnings("unchecked")
+            Map<String, Object> params = (Map<String, Object>) map.get("params");
+
+            Action instance = (Action) instanceService.getInstance((String) map.get("descriptor"),
+                    ActionDef.class, params);
+            instance.setId((String) map.get("id"));
+            ret.add(instance);
+        }
+        return ret;
+    }
+
 
     @AuraEnabled
     public int add(@Key("a") Integer a, @Key("b") Integer b, @Key("actions") String chainedActions)
             throws Exception {
         Action currentAction = contextService.getCurrentContext().getCurrentAction();
         if (chainedActions != null && chainedActions.length() > 0) {
-            Collection<Action> actions = serializationService.readCollection(new StringReader(chainedActions),
-                    Action.class);
+            List<Action> actions = readActions(new StringReader(chainedActions));
             currentAction.add(Lists.newArrayList(actions));
         }
         i = a + b;
@@ -73,8 +100,7 @@ public class ActionChainingController implements Controller {
     @AuraEnabled
     public void doNothing(@Key("actions") String chainedActions) throws Exception {
         Action currentAction = contextService.getCurrentContext().getCurrentAction();
-        Collection<Action> actions = serializationService.readCollection(new StringReader(chainedActions),
-                Action.class);
+        List<Action> actions = readActions(new StringReader(chainedActions));
         currentAction.add(Lists.newArrayList(actions));
     }
 }

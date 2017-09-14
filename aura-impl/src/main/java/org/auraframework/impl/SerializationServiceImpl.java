@@ -31,8 +31,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Reader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -116,30 +114,6 @@ public class SerializationServiceImpl implements SerializationService {
     }
 
     @Override
-    public <T> T read(Reader in, Class<T> type) throws IOException, QuickFixException {
-        contextService.assertEstablished();
-        return getFormatAdapter(type).read(in);
-    }
-
-    @Override
-    public <T> T read(Reader in, Class<T> type, String format) throws IOException, QuickFixException {
-        contextService.assertEstablished();
-        return innerGetFormatAdapter(format, type).read(in);
-    }
-
-    @Override
-    public <T> Collection<T> readCollection(Reader in, Class<T> type) throws IOException, QuickFixException {
-        return readCollection(in, type, null);
-    }
-
-    @Override
-    public <T> Collection<T> readCollection(Reader in, Class<T> type, String format) throws IOException,
-            QuickFixException {
-        contextService.assertEstablished();
-        return innerGetFormatAdapter(format, type).readCollection(in);
-    }
-
-    @Override
     public <T> void write(T value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {
         contextService.assertEstablished();
@@ -160,20 +134,6 @@ public class SerializationServiceImpl implements SerializationService {
             throws IOException, QuickFixException {
         contextService.assertEstablished();
         innerGetFormatAdapter(format, type).write(value, attributes, out);
-    }
-
-    @Override
-    public <T> void writeBinary(T value, Map<String, Object> attributes, Class<T> type, OutputStream out)
-            throws IOException, QuickFixException {
-        contextService.assertEstablished();
-        getFormatAdapter(type).writeBinary(value, attributes, out);
-    }
-
-    @Override
-    public <T> void writeBinary(T value, Map<String, Object> attributes, Class<T> type, OutputStream out,
-            String format) throws IOException, QuickFixException {
-        contextService.assertEstablished();
-        innerGetFormatAdapter(format, type).writeBinary(value, attributes, out);
     }
 
     @Override

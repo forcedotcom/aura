@@ -15,64 +15,27 @@
  */
 package org.auraframework.impl.adapter.format.json;
 
-import com.google.common.collect.Lists;
-import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.def.ActionDef;
-import org.auraframework.instance.Action;
-import org.auraframework.service.ContextService;
-import org.auraframework.service.InstanceService;
-import org.auraframework.system.AuraContext;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.JsonEncoder;
-import org.auraframework.util.json.JsonReader;
-
-import javax.inject.Inject;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.instance.Action;
+import org.auraframework.service.ContextService;
+import org.auraframework.system.AuraContext;
+import org.auraframework.util.json.JsonEncoder;
 
 @ServiceComponent
 public class ActionJSONFormatAdapter extends JSONFormatAdapter<Action> {
     @Inject
     private ContextService contextService;
 
-    @Inject
-    private InstanceService instanceService;
-
     @Override
     public Class<Action> getType() {
         return Action.class;
-    }
-
-    @Override
-    public Collection<Action> readCollection(Reader in) throws IOException, QuickFixException {
-        Map<?, ?> message = (Map<?, ?>) new JsonReader().read(in);
-        List<?> actions = (List<?>) message.get("actions");
-        List<Action> ret = Lists.newArrayList();
-        for (Object action : actions) {
-            Map<?, ?> map = (Map<?, ?>) action;
-
-            // FIXME: ints are getting translated into BigDecimals here.
-            @SuppressWarnings("unchecked")
-            Map<String, Object> params = (Map<String, Object>) map.get("params");
-
-            Action instance = (Action) instanceService.getInstance((String) map.get("descriptor"),
-                    ActionDef.class, params);
-            instance.setId((String) map.get("id"));
-            ret.add(instance);
-        }
-        return ret;
-    }
-
-    @Override
-    public Action read(Reader in) throws IOException, QuickFixException {
-        Map<?, ?> map = (Map<?, ?>) new JsonReader().read(in);
-        @SuppressWarnings("unchecked")
-        Map<String, Object> params = (Map<String, Object>) map.get("params");
-        return (Action) instanceService.getInstance((String) map.get("descriptor"), ActionDef.class, params);
     }
 
     @Override

@@ -99,6 +99,11 @@ InteropComponent.prototype.setupAttributes = function(config) {
     };
 
     for (var attribute in configValues) {
+        if (attribute.indexOf('aura:') === 0) {
+            // Ignore aura:id, aura:flavor, etc
+            continue;
+        }
+
         var isEvent = false;
         var value = configValues[attribute];
         var valueConfig = value;

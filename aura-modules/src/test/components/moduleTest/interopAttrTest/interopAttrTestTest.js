@@ -1,10 +1,11 @@
 ({
+    browsers: ['GOOGLECHROME'],
+
     selector: {
         literal: '.m-literal span'
     },
 
     testFalsy: {
-        browsers: ['GOOGLECHROME'],
         test: [
             function(cmp) {
                 var expected = 'false';
@@ -20,8 +21,33 @@
         ]
     },
 
+    testProgrammaticInstantiation: {
+        test: [
+            function (cmp) {
+                var done = false;
+
+                $A.createComponent('markup://moduleTest:simpleCmp', {
+                    'aura:id': 'programmatic'
+                }, $A.getCallback(function (simpleCmp) {
+                    cmp.set('v.programmatic', simpleCmp);
+                    done = true;
+                }));
+
+                $A.test.addWaitFor(true, function () {
+                    return done;
+                });
+            },
+            function (cmp) {
+                var el = document
+                    .querySelector('.programmatic')
+                    .querySelector('moduletest-simple-cmp');
+                var message = 'Should be able to find the component using its class';
+                $A.test.assertTrue(el !== null, message);
+            }
+        ]
+    },
+
     testAttributesAreReflectedOnInteropComponent: {
-        browsers: ['GOOGLECHROME'],
         test: [
             function defaultProps(cmp) {
                 var list = cmp.find('list');
@@ -69,7 +95,6 @@
     },
 
     testDoesntReturnDefaultFromInteropComponent: {
-        browsers: ['GOOGLECHROME'],
         test: [
             function defaultProps(cmp) {
                 var list = cmp.find('list-without-items');
@@ -90,7 +115,6 @@
     },
 
     testUpdateAttributeWhenNotBoundInTheTemplate: {
-        browsers: ['GOOGLECHROME'],
         test: [
             function updateProps(cmp) {
                 var list = cmp.find('list-without-items');

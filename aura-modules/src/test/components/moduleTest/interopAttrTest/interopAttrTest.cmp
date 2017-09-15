@@ -1,9 +1,12 @@
 <aura:component>
     <aura:attribute name="bool" type="Boolean" default="false"/>
     <aura:attribute name="items" type="List" default="[]"/>
+    <aura:attribute name="programmatic" type="Aura.Component"/>
 
     <moduleTest:simpleCmp aura:id="main" literal="{!v.bool}" />
 
     <moduleTest:list aura:id="list" items="{!v.items}" />
     <moduleTest:list aura:id="list-without-items" />
+
+    <div class="programmatic">{! v.programmatic }</div>
 </aura:component>

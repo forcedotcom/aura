@@ -353,7 +353,11 @@ public class IntegrationImpl implements Integration {
             attributes.put("auraStyleTags", sb.toString());
 
             sb.setLength(0);
-            templateUtil.writeInlineHtmlScripts(context, servletUtilAdapter.getScripts(context, false, false, null), sb);
+            // client libraries need to use lazy load tags to get registered on client side
+            templateUtil.writeHtmlScripts(context, servletUtilAdapter.getJsClientLibraryUrls(context), Script.LAZY, sb);
+            templateUtil.writeInlineHtmlScripts(context, servletUtilAdapter.getBaseScripts(context, attributes), sb);
+            templateUtil.writeInlineHtmlScripts(context, servletUtilAdapter.getFrameworkScripts(context, false, false, null), sb);
+
             //inline.js is not included with AIS but the non-templated scripts associated with inline are still required
             templateUtil.writeUnsafeInlineHtmlScripts(context, Lists.newArrayList(servletUtilAdapter.getInlineJs(context, appDef)), sb);
 

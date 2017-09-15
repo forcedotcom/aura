@@ -56,7 +56,7 @@ function lib() { //eslint-disable-line no-unused-vars
     // -- Private internal methods
     function getStackingCtx(el) {
         var parentNode = el.parentNode;
-        while (!isStackingCtx(parentNode)) {
+        while (parentNode && !isStackingCtx(parentNode)) {
             parentNode = parentNode.parentNode;
         }
         return parentNode;

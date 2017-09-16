@@ -24,7 +24,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import com.google.gson.Gson;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
@@ -48,6 +47,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.base.CharMatcher;
+import com.google.gson.Gson;
 
 /**
  * Provides ModuleDef implementation
@@ -154,6 +154,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setModuleDependencies(compilerData.bundleDependencies);
         builder.setLabels(compilerData.labels);
         builder.setOwnHash(calculateOwnHash(descriptor, codes));
+        builder.setExternalReferences(compilerData.externalReferences);
         return builder.build();
     }
 

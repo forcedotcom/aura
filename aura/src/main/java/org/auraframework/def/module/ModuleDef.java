@@ -42,4 +42,9 @@ public interface ModuleDef extends Definition {
     String getPath();
 
     Double getMinVersion();
+    
+    /**
+     * @return serialized JSONObject with references to custom metadata
+     */
+    String getExternalReferences();
 }

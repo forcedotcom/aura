@@ -125,7 +125,7 @@ public final class ModulesCompilerUtil {
         for (int i = 0; i < v8BundleLabels.length(); i++) {
             bundleLabels.add(v8BundleLabels.getString(i));
         }
-        return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels);
+        return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels, "TODO: external-references");
     }
 
     static ModulesCompilerData parseCompilerOutput(JSONObject result) {
@@ -157,6 +157,6 @@ public final class ModulesCompilerUtil {
         for (int i = 0; i < bundleLabelsArray.length(); i++) {
             bundleLabels.add(bundleLabelsArray.getString(i));
         }
-        return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels);
+        return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels, "TODO: external-references");
     }
 }

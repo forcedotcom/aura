@@ -28,11 +28,13 @@ public final class ModulesCompilerData {
     public final Map<CodeType, String> codes;
     public final Set<String> bundleDependencies;
     public final Set<String> labels;
+    public final String externalReferences;
     
     public ModulesCompilerData(Map<CodeType, String> codes, Set<String> bundleDependencies,
-                               Set<String> labels) {
+                               Set<String> labels, String externalReferences) {
         this.codes = codes;
         this.bundleDependencies = bundleDependencies;
         this.labels = labels;
+        this.externalReferences = externalReferences;
     }
 }

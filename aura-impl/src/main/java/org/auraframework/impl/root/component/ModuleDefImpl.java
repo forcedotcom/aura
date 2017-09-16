@@ -56,6 +56,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     private Map<CodeType, String> codes;
     private final Set<PropertyReference> labelReferences;
     private Double minVersion;
+    private String externalReferences;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
@@ -65,6 +66,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         this.customElementName = builder.customElementName;
         this.labelReferences = builder.labelReferences;
         this.minVersion = builder.minVersion;
+        this.externalReferences = builder.externalReferences;
     }
 
     @Override
@@ -80,6 +82,11 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     @Override
     public Double getMinVersion() {
         return this.minVersion;
+    }
+    
+    @Override
+    public String getExternalReferences() {
+        return externalReferences;
     }
 
     @Override
@@ -221,6 +228,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         private String customElementName;
         private Set<PropertyReference> labelReferences = new HashSet<>();
         private Double minVersion = null;
+        private String externalReferences;
 
         public Builder() {
             super(ModuleDef.class);
@@ -254,6 +262,10 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
 
         public void setMinVersion(double minVersion) {
             this.minVersion = minVersion;
+        }
+        
+        public void setExternalReferences(String externalReferences) {
+            this.externalReferences = externalReferences;
         }
 
         @Override

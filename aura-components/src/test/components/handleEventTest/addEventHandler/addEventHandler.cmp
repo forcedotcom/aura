@@ -1,0 +1,41 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:registerEvent name="compEvent" type="handleEventTest:event"/>
+    <aura:dependency resource="handleEventTest:applicationEvent" type="EVENT"/>
+
+    <aura:attribute type="String" name="output"/>
+
+    <h1>Add dynamic handler for event</h1>
+    <br/>
+    <h2>Component Event</h2>
+    <p>
+        <ui:button aura:id="fireComponentEvent" label="Fire component event" press="{!c.fireEvent}" />
+        <ui:button label="Add dynamic event handler for component event" press="{!c.addEventHandler}" />
+    </p>
+    <br/>
+    <h2>Application Event</h2>
+    <p>
+        <ui:button aura:id="fireApplicationEvent" label="Fire application event" press="{!c.fireAppEvent}" />
+        <ui:button label="Add dynamic event handler for application event" press="{!c.addAppEventHandler}" />
+    </p>
+
+    <br/>
+    <ui:button aura:id="button" label="Dynamically Attach to this button" />
+
+</aura:component>

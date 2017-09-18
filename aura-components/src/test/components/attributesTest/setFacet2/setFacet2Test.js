@@ -73,7 +73,7 @@
 		}
 	},
 	
-	_testSetting_setFacet2_DefaultFacet: {
+	testSetting_setFacet2_DefaultFacet: {
 		test: function(cmp) {
 			var expected = "[setFacet2_DefaultFacet][setFacet2_DefaultString][/setFacet2_DefaultFacet]";
 
@@ -83,7 +83,7 @@
 		}
 	},
 	
-	_testSetting_setFacet2_DefaultDefRef: {
+	testSetting_setFacet2_DefaultDefRef: {
 		test: function(cmp) {
 			var expected = "[setFacet2_DefaultDefRef][setFacet2_DefaultString][/setFacet2_DefaultDefRef]";
 

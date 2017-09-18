@@ -13,18 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-	_testSelfReferencingFunctionCallValueIncludesDefaultValue: {
-		test: function(cmp) {
-			var expected = "[setFacet1_DefaultString]:setFacetFunctionCallValue";
-
-			var actual = cmp.get("v.setFacet1_DefaultString");
-
-			$A.test.assertEquals(expected, actual);
-		}
-	},
-	
-	_testSelfReferencingFunctionCallValueIncludesDefaultValue: {
+({	
+	testSelfReferencingFunctionCallValueIncludesDefaultValue: {
 		test: function(cmp) {
 			var expected = "[setFacet1_DefaultString]:setFacetFunctionCallValue";
 	

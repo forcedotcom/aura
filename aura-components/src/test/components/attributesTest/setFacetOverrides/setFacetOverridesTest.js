@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	_testSetting_setFacet1_String: {
+	testSetting_setFacet1_String: {
 		test: function(cmp) {
 			var expected = "[setFacet3_String]";
 
@@ -24,7 +24,7 @@
 		}
 	},
 	
-	_testSetting_setFacet1_Facet: {
+	testSetting_setFacet1_Facet: {
 		test: function(cmp) {
 			var expected = "[setFacet3_Facet][setFacet3_String][/setFacet3_Facet]";
 
@@ -34,7 +34,7 @@
 		}
 	},
 	
-	_testSetting_setFacet1_DefRef: {
+	testSetting_setFacet1_DefRef: {
 		test: function(cmp) {
 			var expected = "[setFacet3_DefRef][setFacet3_String][/setFacet3_DefRef]";
 
@@ -44,7 +44,7 @@
 		}
 	},
 
-	_testSetting_setFacet2_String: {
+	testSetting_setFacet2_String: {
 		test: function(cmp) {
 			var expected = "[setFacet3_String]";
 
@@ -54,7 +54,7 @@
 		}
 	},
 	
-	_testSetting_setFacet2_Facet: {
+	testSetting_setFacet2_Facet: {
 		test: function(cmp) {
 			var expected = "[setFacet3_Facet][setFacet3_String][/setFacet3_Facet]";
 
@@ -64,7 +64,7 @@
 		}
 	},
 	
-	_testSetting_setFacet2_DefRef: {
+	testSetting_setFacet2_DefRef: {
 		test: function(cmp) {
 			var expected = "[setFacet3_DefRef][setFacet3_String][/setFacet3_DefRef]";
 
@@ -104,7 +104,7 @@
 		}
 	},
 
-	_testSetting_setFacet1_DefaultString: {
+	testSetting_setFacet1_DefaultString: {
 		test: function(cmp) {
 			var expected = "[setFacet3_String]";
 
@@ -114,7 +114,7 @@
 		}
 	},
 	
-	_testSetting_setFacet1_DefaultFacet: {
+	testSetting_setFacet1_DefaultFacet: {
 		test: function(cmp) {
 			var expected = "[setFacet3_Facet][setFacet3_String][/setFacet3_Facet]";
 
@@ -124,7 +124,7 @@
 		}
 	},
 	
-	_testSetting_setFacet1_DefaultDefRef: {
+	testSetting_setFacet1_DefaultDefRef: {
 		test: function(cmp) {
 			var expected = "[setFacet3_DefRef][setFacet3_String][/setFacet3_DefRef]";
 
@@ -134,7 +134,7 @@
 		}
 	},
 
-	_testSetting_setFacet2_DefaultString: {
+	testSetting_setFacet2_DefaultString: {
 		test: function(cmp) {
 			var expected = "[setFacet3_String]";
 
@@ -144,7 +144,7 @@
 		}
 	},
 	
-	_testSetting_setFacet2_DefaultFacet: {
+	testSetting_setFacet2_DefaultFacet: {
 		test: function(cmp) {
 			var expected = "[setFacet3_Facet][setFacet3_String][/setFacet3_Facet]";
 
@@ -154,7 +154,7 @@
 		}
 	},
 	
-	_testSetting_setFacet2_DefaultDefRef: {
+	testSetting_setFacet2_DefaultDefRef: {
 		test: function(cmp) {
 			var expected = "[setFacet3_DefRef][setFacet3_String][/setFacet3_DefRef]";
 
@@ -174,7 +174,7 @@
 		}
 	},
 	
-	_testSetting_setFacet3_DefaultFacet: {
+	testSetting_setFacet3_DefaultFacet: {
 		test: function(cmp) {
 			var expected = "[setFacet3_Facet][setFacet3_String][/setFacet3_Facet]";
 
@@ -184,7 +184,7 @@
 		}
 	},
 	
-	_testSetting_setFacet3_DefaultDefRef: {
+	testSetting_setFacet3_DefaultDefRef: {
 		test: function(cmp) {
 			var expected = "[setFacet3_DefRef][setFacet3_String][/setFacet3_DefRef]";
 

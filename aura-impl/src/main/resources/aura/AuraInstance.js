@@ -753,6 +753,8 @@ AuraInstance.prototype.handleError = function(message, e) {
         } else {
             // wrap the error with auraError so that systemError event handlers can get it
             e = new $A.auraError(null, e);
+            var component = e.findComponentFromStackTrace();
+            e.setComponent(component);
             evtArgs = {"message":dispMsg,"error":null,"auraError":e};
         }
     }

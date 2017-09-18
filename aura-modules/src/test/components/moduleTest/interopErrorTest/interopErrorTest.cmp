@@ -1,0 +1,4 @@
+<aura:component>
+    <aura:handler event="aura:systemError" action="{!c.handleSystemError}"/>
+    <moduleTest:simpleCmp aura:id="main" />
+</aura:component>

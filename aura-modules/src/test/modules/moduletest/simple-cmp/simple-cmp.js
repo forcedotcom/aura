@@ -30,6 +30,10 @@ export default class Simple extends Element {
         this.dispatchEvent(event);
     }
 
+    handleThrowError() {
+        throw new Error('boom!');
+    }
+
     test() {
         return 'Test method!';
     }

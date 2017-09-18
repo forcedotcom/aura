@@ -59,7 +59,6 @@ public class IntegrationImplTest {
         ComponentDefDescriptor componentDefDescriptor = mock(ComponentDefDescriptor.class);
         ApplicationDefDescriptor defaultAppDescriptor = mock(ApplicationDefDescriptor.class);
         ComponentDef componentDef = mock(ComponentDef.class);
-        SerializationService serializationService = mock(SerializationService.class);
         ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
         RenderContext renderContext = mock(RenderContext.class);
         ClientLibraryService clientLibraryService = mock(ClientLibraryService.class);
@@ -99,7 +98,7 @@ public class IntegrationImplTest {
 
         //ACT
         IntegrationImpl target = new IntegrationImpl(contextPath, mode, initializeAura, userAgent,
-                            application, instanceService, definitionService, serializationService,
+                            application, instanceService, definitionService,
                             contextService, configAdapter, renderingService, servletUtilAdapter,
                             clientLibraryService, browserCompatibilityService);
         target.injectComponent(tag, attributes, localId, locatorDomId, renderContext, useAsync);

@@ -46,7 +46,6 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
-import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -83,7 +82,6 @@ public class IntegrationImpl implements Integration {
 
     private InstanceService instanceService;
     private DefinitionService definitionService;
-    private SerializationService serializationService;
     private ContextService contextService;
     private ConfigAdapter configAdapter;
     private RenderingService renderingService;
@@ -93,7 +91,7 @@ public class IntegrationImpl implements Integration {
 
     public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent,
                            String application, InstanceService instanceService,
-                           DefinitionService definitionService, SerializationService serializationService,
+                           DefinitionService definitionService,
                            ContextService contextService, ConfigAdapter configAdapter,
                            RenderingService renderingService, ServletUtilAdapter servletUtilAdapter,
                            ClientLibraryService clientLibraryService,
@@ -106,7 +104,6 @@ public class IntegrationImpl implements Integration {
         this.application = application != null ? application : DEFAULT_APPLICATION;
         this.instanceService = instanceService;
         this.definitionService = definitionService;
-        this.serializationService = serializationService;
         this.contextService = contextService;
         this.configAdapter = configAdapter;
         this.renderingService = renderingService;
@@ -385,7 +382,7 @@ public class IntegrationImpl implements Integration {
 
             StringBuilder contextWriter = new StringBuilder();
 
-            serializationService.write(context, null, AuraContext.class, contextWriter, "JSON");
+            JsonEncoder.serialize(context, contextWriter, context.getJsonSerializationContext());
 
             auraInit.put("context", new Literal(contextWriter.toString()));
 

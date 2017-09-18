@@ -34,7 +34,6 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
-import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -59,9 +58,6 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
 
     @Inject
     private RenderingService renderingService;
-
-    @Inject
-    private SerializationService serializationService;
 
     @Inject
     private ConfigAdapter configAdapter;
@@ -143,7 +139,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
                 auraInit.put("token", configAdapter.getCSRFToken());
 
                 StringBuilder contextWriter = new StringBuilder();
-                serializationService.write(context, null, AuraContext.class, contextWriter, "JSON");
+                JsonEncoder.serialize(context, contextWriter, context.getJsonSerializationContext());
                 auraInit.put("context", new Literal(contextWriter.toString()));
 
                 attributes.put("auraInitSync", JsonEncoder.serialize(auraInit));

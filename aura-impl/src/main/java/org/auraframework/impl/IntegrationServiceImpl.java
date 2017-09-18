@@ -27,7 +27,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.IntegrationService;
 import org.auraframework.service.RenderingService;
-import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -40,7 +39,6 @@ public class IntegrationServiceImpl implements IntegrationService {
     // Needed to run action
     private InstanceService instanceService;
     private DefinitionService definitionService;
-    private SerializationService serializationService;
     private ContextService contextService;
     private RenderingService renderingService;
     private ConfigAdapter configAdapter;
@@ -52,7 +50,7 @@ public class IntegrationServiceImpl implements IntegrationService {
     public Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent,
                                          String application, Object dummy) throws QuickFixException {
         return new IntegrationImpl(contextPath, mode, initializeAura, userAgent, application, instanceService,
-                definitionService, serializationService, contextService, configAdapter,
+                definitionService, contextService, configAdapter,
                 renderingService, servletUtilAdapter, clientLibraryService, browserCompatibilityService);
     }
 
@@ -64,11 +62,6 @@ public class IntegrationServiceImpl implements IntegrationService {
     @Inject
     public void setDefinitionService(DefinitionService definitionService) {
         this.definitionService = definitionService;
-    }
-
-    @Inject
-    public void setSerializationService(SerializationService serializationService) {
-        this.serializationService = serializationService;
     }
 
     @Inject

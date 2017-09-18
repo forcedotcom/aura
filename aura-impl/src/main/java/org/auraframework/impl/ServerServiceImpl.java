@@ -63,7 +63,6 @@ import org.auraframework.service.MetricsService;
 import org.auraframework.service.SerializationService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
@@ -359,9 +358,11 @@ public class ServerServiceImpl implements ServerService {
     }
 
     private String getAppSvgString(SVGDef svgDef) throws QuickFixException, IOException {
-        StringBuffer sb = new StringBuffer();
-        serializationService.write(svgDef, null, SVGDef.class, sb, Format.SVG.name());
-        return sb.toString();
+        if (svgDef != null) {
+            return svgDef.getContents();
+        } else {
+            return "";
+        }
     }
 
     @Override
@@ -447,7 +448,7 @@ public class ServerServiceImpl implements ServerService {
 
             // Component definition
             sb.append("return ");
-            serializationService.write(def, null, BaseComponentDef.class, sb, "JSON");
+            JsonEncoder.serialize(def, sb, context.getJsonSerializationContext());
             sb.append(";");
 
             sb.append("*/}));\n");

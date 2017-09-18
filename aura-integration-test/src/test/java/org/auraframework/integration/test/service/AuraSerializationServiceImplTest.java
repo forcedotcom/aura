@@ -20,7 +20,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.SerializationServiceImpl;
@@ -49,7 +48,6 @@ public class AuraSerializationServiceImplTest extends AuraImplTestCase {
     }
 
     private final List<Findable> findable = new ImmutableList.Builder<Findable>()
-        .add(new Findable("JSON", BaseComponentDef.class))
         .add(new Findable("HTML", ApplicationDef.class))
         .add(new Findable("HTML", ComponentDef.class))
         .build();

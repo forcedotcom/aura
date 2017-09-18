@@ -25,16 +25,15 @@ import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.TestSuiteDef;
-
 import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.instance.Component;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
-import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsonEncoder;
 
 import com.google.common.collect.Maps;
 
@@ -49,9 +48,6 @@ public class TestSuiteDefHTMLFormatAdapter extends HTMLFormatAdapter<TestSuiteDe
 
     @Inject
     private RenderingService renderingService;
-
-    @Inject
-    private SerializationService serializationService;
 
     @Inject
     private ServletUtilAdapter servletUtilAdapter;
@@ -78,7 +74,7 @@ public class TestSuiteDefHTMLFormatAdapter extends HTMLFormatAdapter<TestSuiteDe
         attribs.put("auraScriptTags", sb.toString());
 
         sb = new StringBuilder();
-        serializationService.write(value, attributes, getType(), sb, "JSON");
+        JsonEncoder.serialize(value, sb, context.getJsonSerializationContext());
         attribs.put("auraInitBlock", String.format("<script>$A.runAfterInit(function() {aura.test.init(%s);});</script>", sb.toString()));
 
         try {

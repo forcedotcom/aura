@@ -16,12 +16,17 @@
 package org.auraframework.impl.adapter.format.js;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.service.SerializationService;
+import org.auraframework.service.ContextService;
 import org.auraframework.throwable.ClientSideEventException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.util.json.JsonSerializationContext;
+
+import com.google.common.collect.Maps;
 
 import javax.annotation.concurrent.ThreadSafe;
 import javax.inject.Inject;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
@@ -48,7 +53,7 @@ public class ClientSideEventExceptionJSFormatAdapter extends JSFormatAdapter<Cli
             "}})();";
 
     @Inject
-    private SerializationService serializationService;
+    private ContextService contextService;
 
     @Override
     public Class<ClientSideEventException> getType() {
@@ -59,7 +64,18 @@ public class ClientSideEventExceptionJSFormatAdapter extends JSFormatAdapter<Cli
     public void write(ClientSideEventException value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {
         StringWriter stringWriter = new StringWriter();
-        serializationService.write(value, attributes, getType(), stringWriter, "JSON");
+        JsonSerializationContext jsonCxt = contextService.getCurrentContext().getJsonSerializationContext();
+
+        Map<String, Object> serialized = Maps.newHashMap();
+        serialized.put("exceptionEvent", Boolean.TRUE);
+        serialized.put("event", value.getEvent());
+        if (jsonCxt != null && jsonCxt.format()) {
+            serialized.put("defaultHandler", value.getDefaultHandler());
+        } else {
+            serialized.put("defaultHandler", value.getDefaultHandler() == null ? null : value.getDefaultHandler().toString());
+        }
+        JsonEncoder.serialize(serialized, stringWriter, jsonCxt);
+
         out.append(String.format(FRAMEWORK_INIT_FORMAT, stringWriter.toString()));
     }
 }

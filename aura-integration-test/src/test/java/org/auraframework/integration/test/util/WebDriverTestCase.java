@@ -163,6 +163,14 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         needsFreshBrowser = true;
     }
 
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        if (currentBrowserType == null) {
+            beforeWebDriverTestCase();
+        }
+    }
+
     @After
     public void afterWebDriverTestCase() {
         if (currentDriver != null && needsFreshBrowser) {

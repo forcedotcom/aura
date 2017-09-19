@@ -40,7 +40,10 @@
 
         	if (!$A.util.isEmpty(gId)) {
         		//update dom element directly
-            	cmp.getElement().setAttribute("for", gId);
+                var elm = cmp.getElement();
+                if (elm) {
+                    elm.setAttribute("for", gId);
+                }
             }
         }
     }

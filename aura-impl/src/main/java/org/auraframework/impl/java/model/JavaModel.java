@@ -152,7 +152,7 @@ public class JavaModel implements Model {
                 }
             } else if(root instanceof JavascriptMockHandler.Returns) {
                 try {
-                    Object answer = ((JavascriptMockHandler.Returns)root).answer();
+                    Object answer = ((JavascriptMockHandler<?>.Returns<?>)root).answer();
                     return getValue(answer, key, def);
                 } catch (Throwable e) {
                     // The answer was an exception

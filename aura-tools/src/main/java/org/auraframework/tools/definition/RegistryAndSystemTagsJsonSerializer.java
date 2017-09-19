@@ -83,12 +83,11 @@ public class RegistryAndSystemTagsJsonSerializer {
      *
      * This routine is rather bogus, but will work until we have a better way.
      */
-    @SuppressWarnings("unchecked")
     private static XMLHandler<? extends Definition> getHandler(@Nonnull String tag) {
         if (tag.equals(ApplicationDefHandler.TAG)) {
             return new ApplicationDefHandler();
         } else if (tag.equals(AttributeDefHandler.TAG)) {
-            return new AttributeDefHandler();
+            return new AttributeDefHandler<>();
         } else if (tag.equals(ComponentDefHandler.TAG)) {
             return new ComponentDefHandler();
         } else if (tag.equals(EventDefHandler.TAG)) {
@@ -100,13 +99,13 @@ public class RegistryAndSystemTagsJsonSerializer {
         } else if (tag.equals(LibraryDefRefHandler.TAG)) {
             return new LibraryDefRefHandler();
         } else if (tag.equals(MethodDefHandler.TAG)) {
-            return new MethodDefHandler();
+            return new MethodDefHandler<>();
         } else if (tag.equals(RegisterEventHandler.TAG)) {
-            return new RegisterEventHandler();
+            return new RegisterEventHandler<>();
         } else if (tag.equals(AttributeDefRefHandler.TAG)) {
-            return new AttributeDefRefHandler();
+            return new AttributeDefRefHandler<>();
         } else if (tag.equals(DependencyDefHandler.TAG)) {
-            return new DependencyDefHandler();
+            return new DependencyDefHandler<>();
         } else if (tag.equals(TokensDefHandler.TAG)) {
             return new TokensDefHandler();
         } else if (tag.equals(DesignDefHandler.TAG)) {
@@ -122,9 +121,9 @@ public class RegistryAndSystemTagsJsonSerializer {
         } else if (tag.equals(IncludeDefRefHandler.TAG)) {
             return new IncludeDefRefHandler();
         } else if (tag.equals(LocatorDefHandler.TAG)) {
-            return new LocatorDefHandler();
+            return new LocatorDefHandler<>();
         } else if (tag.equals(LocatorContextDefHandler.TAG)) {
-            return new LocatorContextDefHandler();
+            return new LocatorContextDefHandler<>();
         }
         return null;
     }

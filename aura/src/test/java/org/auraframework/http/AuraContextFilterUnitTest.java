@@ -99,7 +99,8 @@ public class AuraContextFilterUnitTest {
         assertFalse("modules should not be enabled with config map without modules value", isModulesEnabledSetup(false, "1", new HashMap<String, Object>(), Mode.PROD));
     }
 
-    private boolean isModulesEnabledSetup(boolean configAdapterValue, String urlParamValue, Object configMapValue, Mode mode) {
+    @SuppressWarnings("unchecked")
+	private boolean isModulesEnabledSetup(boolean configAdapterValue, String urlParamValue, Object configMapValue, Mode mode) {
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
 

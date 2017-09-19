@@ -60,7 +60,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.MetricsService;
-import org.auraframework.service.SerializationService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
@@ -97,9 +96,6 @@ public class ServerServiceImpl implements ServerService {
 
     @Inject
     private ExceptionAdapter exceptionAdapter;
-
-    @Inject
-    private SerializationService serializationService;
 
     @Inject
     private CachingService cachingService;

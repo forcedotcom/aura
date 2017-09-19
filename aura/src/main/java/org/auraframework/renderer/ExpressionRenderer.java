@@ -72,8 +72,8 @@ public class ExpressionRenderer implements Renderer {
                 } else if (kid instanceof DefinitionReference) {
                     DefinitionReference defRef = ((DefinitionReference) kid).get();
                     if (defRef.type() == DefType.COMPONENT) {
-                        BaseComponent cmp = (BaseComponent) this.instanceService.getInstance((ComponentDefRef) defRef,
-                                component);
+						BaseComponent<?, ?> cmp = (BaseComponent<?, ?>) this.instanceService
+								.getInstance((ComponentDefRef) defRef, component);
                         this.renderingService.render(cmp, rc);
                     }
                 }

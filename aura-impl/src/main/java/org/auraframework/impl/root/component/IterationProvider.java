@@ -53,7 +53,8 @@ public class IterationProvider implements ComponentConfigProvider {
         AuraContext context = contextService.getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
         ComponentConfig cc = new ComponentConfig();
-        List<Instance> components = Lists.newArrayList();
+        @SuppressWarnings("rawtypes")
+		List<Instance> components = Lists.newArrayList();
         InstanceStack iStack = context.getInstanceStack();
         Map<String, Object> m = Maps.newHashMapWithExpectedSize(1);
         m.put("body", components);

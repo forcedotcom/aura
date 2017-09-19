@@ -19,8 +19,9 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class CircularReferenceException extends QuickFixException {
+	private static final long serialVersionUID = 5761382119540146097L;
 
-    public CircularReferenceException(String msg, Location l) {
+	public CircularReferenceException(String msg, Location l) {
         super(msg, l);
     }
 

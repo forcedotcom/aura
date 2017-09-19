@@ -361,7 +361,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      * Terminology: "remote" - a JavaScript provider or renderer "local" - a Java/Apex/server provider, renderer, or
      * model
      */
-    private synchronized void computeLocalDependencies() throws QuickFixException {
+    @SuppressWarnings("unchecked")
+	private synchronized void computeLocalDependencies() throws QuickFixException {
         if (localDeps != null) {
             return;
         }
@@ -385,7 +386,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         // Walk the super component tree applying slightly different dependency rules.
         // For super defs, we only check for renderer or model dependencies.
         // This should die, somehow.
-        @SuppressWarnings("unchecked")
         BaseComponentDefImpl<T> superDef = (BaseComponentDefImpl<T>)getSuperDef();
         while (superDef != null) {
             if (superDef.modelDescriptor != null || superDef.clientModelDef != null
@@ -1686,7 +1686,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             return found;
         }
 
-        @Override
+        @SuppressWarnings("unchecked")
+		@Override
         public void finish() {
             if (render == null) {
                 this.renderType = RenderType.AUTO;

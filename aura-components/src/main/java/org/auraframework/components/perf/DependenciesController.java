@@ -291,7 +291,7 @@ public class DependenciesController implements Controller {
         String specifiedDefType = null;
 
         // Allows specifying what type you want, since descriptor isn't enough.
-        @SuppressWarnings("serial")
+        @SuppressWarnings({ "serial", "rawtypes" })
         final Map<String, Class> prefixToTypeMap = new HashMap<String, Class>() {{
             put("templatecss", StyleDef.class);
             put("js@helper", HelperDef.class);
@@ -392,7 +392,7 @@ public class DependenciesController implements Controller {
         String specifiedDefType = null;
 
         // Allows specifying what type you want, since descriptor isn't enough.
-        @SuppressWarnings("serial")
+        @SuppressWarnings({ "serial", "rawtypes" })
         final Map<String, Class> prefixToTypeMap = new HashMap<String, Class>() {
             {
                 put("templatecss", StyleDef.class);
@@ -642,7 +642,8 @@ public class DependenciesController implements Controller {
 
         HttpResponse response;
         try {
-            HttpClient client = new DefaultHttpClient();
+            @SuppressWarnings("resource")
+			HttpClient client = new DefaultHttpClient();
             HttpGet request = new HttpGet(url);
 
             // add request header

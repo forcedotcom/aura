@@ -35,7 +35,8 @@ import com.google.gson.Gson;
  */
 public class ModuleDefRefImplTest extends AuraImplTestCase {
 
-    @Test
+    @SuppressWarnings("unchecked")
+	@Test
     public void testModuleDefRefSerialization() throws Exception {
         Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = new HashMap<>();
         String attributeName = "testAttribute";

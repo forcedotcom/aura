@@ -41,7 +41,8 @@ public class IfProviderUnitTest {
     private AttributeSet attributeSet;
     private IfProvider ifProvider;
 
-    @Before
+    @SuppressWarnings("unchecked")
+	@Before
     public void setup() {
         ifProvider = new IfProvider();
         ContextService mockContextService = mock(ContextService.class);
@@ -51,7 +52,8 @@ public class IfProviderUnitTest {
         Mockito.when(mockContext.getInstanceStack()).thenReturn(mock(InstanceStack.class));
 
         attributeSet = mock(AttributeSet.class);
-        BaseComponent component = mock(BaseComponent.class);
+        @SuppressWarnings("rawtypes")
+		BaseComponent component = mock(BaseComponent.class);
         Mockito.when(component.getAttributes()).thenReturn(attributeSet);
         Mockito.when(mockContext.getCurrentComponent()).thenReturn(component);
 

@@ -47,7 +47,7 @@ public class ModuleDefRefHandlerTest extends AuraImplTestCase {
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService, contextService,
                 configAdapter, definitionParserAdapter);
-        ModuleDefRefHandler handler = new ModuleDefRefHandler<>(cdh, xmlReader, source, true, definitionService, configAdapter, definitionParserAdapter);
+        ModuleDefRefHandler<?> handler = new ModuleDefRefHandler<>(cdh, xmlReader, source, true, definitionService, configAdapter, definitionParserAdapter);
         assertEquals("module reference", handler.getHandledTag());
     }
 

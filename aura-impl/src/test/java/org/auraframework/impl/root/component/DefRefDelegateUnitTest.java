@@ -87,7 +87,7 @@ public class DefRefDelegateUnitTest {
                 .thenReturn(moduleDefDescriptor);
 
         // set up componentDefRef mocks for building ModuleDefRef
-        when(mockComponentDefRef.getAttributeValues()).thenReturn(Collections.EMPTY_MAP);
+        when(mockComponentDefRef.getAttributeValues()).thenReturn(Collections.emptyMap());
         when(mockComponentDefRef.getLocation()).thenReturn(new Location("file", 1234324));
 
         moduleNamespaces.clear();

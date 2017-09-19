@@ -50,7 +50,7 @@ public abstract class DefinitionReferenceImpl<T extends Definition> extends Defi
     protected final boolean hasFlavorableChild;
     protected final Object flavor;
 
-    protected DefinitionReferenceImpl(Builder builder) {
+    protected DefinitionReferenceImpl(Builder<? extends DefinitionReference, T> builder) {
         super(builder);
         this.attributeValues = AuraUtil.immutableMap(builder.attributeValues);
         this.hashCode = AuraUtil.hashCode(descriptor, location);

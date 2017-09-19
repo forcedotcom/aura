@@ -111,7 +111,8 @@ public class IntegrationImplTest {
 
 
     interface ApplicationDefDescriptor extends DefDescriptor<ApplicationDef>{}
-    interface HashMapSerializer extends JsonSerializer<HashMap> {}
+    @SuppressWarnings("rawtypes")
+	interface HashMapSerializer extends JsonSerializer<HashMap> {}
     interface ComponentDefDescriptor extends DefDescriptor<ComponentDef>{}
 
 }

@@ -159,7 +159,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             writeDefs(json, "eventDefs", eventDefs);
             writeDefs(json, "libraryDefs", libraryDefs);
             writeDefs(json, "componentDefs", componentDefs);
-            writeDefs(json, "moduleDefs", moduleDefs);
+            writeDefs(json, "moduleDefs", moduleDefs);           
         }
 
         try {
@@ -231,6 +231,10 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         
         if (ctx.isModulesEnabled()) {
             json.writeMapEntry("m", 1);
+            Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
+            if (!moduleNamespaceAliases.isEmpty()) {
+                json.writeMapEntry("mna", moduleNamespaceAliases);
+            }
         }
         
         if (ctx.useCompatSource()) {

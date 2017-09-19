@@ -889,12 +889,7 @@ public class AuraContextImpl implements AuraContext {
                     // serialize servlet context path for html component to prepend for client created components
                     json.writeMapEntry("contextPath", contextPath);
                 }
-
-                Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
-                if (!moduleNamespaceAliases.isEmpty()) {
-                    json.writeMapEntry("mna", moduleNamespaceAliases);
-                }
-            }
+            }           
             
             String currentPathPrefix = getPathPrefix();
 
@@ -919,6 +914,13 @@ public class AuraContextImpl implements AuraContext {
 
             if (this.isModulesEnabled()) {
                 json.writeMapEntry("m", 1);
+                
+                if (style == EncodingStyle.Full) {
+                    Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
+                    if (!moduleNamespaceAliases.isEmpty()) {
+                        json.writeMapEntry("mna", moduleNamespaceAliases);
+                    }	
+                }
             }
 
             if (this.useCompatSource()) {

@@ -80,7 +80,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
         Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
         DefinitionService definitionService = Mockito.mock(DefinitionService.class);
-        DefDescriptor<ModuleDef> expectedDescriptor = new DefDescriptorImpl<ModuleDef>(expectedLibrary, ModuleDef.class, null);
+        DefDescriptor<ModuleDef> expectedDescriptor = new DefDescriptorImpl<ModuleDef>("markup", "myModule", "Lib", ModuleDef.class, null);
         Mockito.doReturn(expectedDescriptor).when(definitionService).getDefDescriptor(expectedLibrary, ModuleDef.class);
         Mockito.doReturn(true).when(definitionService).exists(expectedDescriptor);
         LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source, definitionService);

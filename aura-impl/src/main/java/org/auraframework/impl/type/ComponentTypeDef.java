@@ -70,7 +70,7 @@ public class ComponentTypeDef extends DefinitionImpl<TypeDef> implements TypeDef
 
         public Builder() {
             super(TypeDef.class);
-            setDescriptor(new DefDescriptorImpl<>("aura://Aura.Component", TypeDef.class, null));
+            setDescriptor(new DefDescriptorImpl<>("aura", "Aura", "Component", TypeDef.class, null));
             setLocation(getDescriptor().getQualifiedName(), -1);
             setAccess(new DefinitionAccessImpl(AuraContext.Access.GLOBAL));
         };

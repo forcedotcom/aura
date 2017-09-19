@@ -51,7 +51,7 @@ public class ComponentDefRefArrayTypeDef extends DefinitionImpl<TypeDef> impleme
 
         public Builder() {
             super(TypeDef.class);
-            setDescriptor(new DefDescriptorImpl<>("aura://Aura.ComponentDefRef[]", TypeDef.class, null));
+            setDescriptor(new DefDescriptorImpl<>("aura", "Aura", "ComponentDefRef[]", TypeDef.class, null));
             setLocation(getDescriptor().getQualifiedName(), -1);
             setAccess(new DefinitionAccessImpl(AuraContext.Access.GLOBAL));
         };

@@ -62,7 +62,7 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
 
         public Builder() {
             super(TypeDef.class);
-            setDescriptor(new DefDescriptorImpl<>("aura://Aura.Component[]", TypeDef.class, null));
+            setDescriptor(new DefDescriptorImpl<>("aura", "Aura", "Component[]", TypeDef.class, null));
             setLocation(getDescriptor().getQualifiedName(), -1);
             setAccess(new DefinitionAccessImpl(AuraContext.Access.GLOBAL));
         };

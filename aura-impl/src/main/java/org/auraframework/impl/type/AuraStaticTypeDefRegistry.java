@@ -53,7 +53,7 @@ public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl {
         TypeDef def;
         DefDescriptor<TypeDef> descriptor;
         
-        descriptor = new DefDescriptorImpl<>(String.format("aura://%s", name), TypeDef.class, null);
+        descriptor = new DefDescriptorImpl<>("aura", null, name, TypeDef.class, null);
         JavaSourceImpl<TypeDef> source = loader.getSource(descriptor);
         def = factory.getDefinition(source.getDescriptor(), source);
         putAuraType(name, def);

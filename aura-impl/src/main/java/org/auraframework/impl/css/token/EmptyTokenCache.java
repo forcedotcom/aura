@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.css.token;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,14 +31,13 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterators;
 
 final class EmptyTokenCache implements TokenCache {
     static final EmptyTokenCache INSTANCE = new EmptyTokenCache();
 
     @Override
     public Iterator<DefDescriptor<TokensDef>> iterator() {
-        return Iterators.emptyIterator();
+        return Collections.emptyIterator();
     }
 
     @Override

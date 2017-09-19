@@ -38,7 +38,7 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -642,8 +642,7 @@ public class DependenciesController implements Controller {
 
         HttpResponse response;
         try {
-            @SuppressWarnings("resource")
-			HttpClient client = new DefaultHttpClient();
+            HttpClient client = HttpClientBuilder.create().build();
             HttpGet request = new HttpGet(url);
 
             // add request header

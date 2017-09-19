@@ -599,13 +599,15 @@ public class AuraServlet extends AuraBaseServlet {
                 // so that we can then check the action status and set any cache headers before writing
                 // the response body.
                 out = new StringWriter();
+
+                // Remove the Browser GVP as we don't want browser-specific in the cache.
+                context.getGlobalProviders().remove(AuraValueProviderType.BROWSER.getPrefix());
             } else {
                 written = true;
             }
+
             out.write(CSRF_PROTECT);
-                
-            // Remove the Browser GVP as we don't want browser-specific in the cache.
-            context.getGlobalProviders().remove(AuraValueProviderType.BROWSER.getPrefix());
+
             serverService.run(message, context, out, attributes);
 
             if (publiclyCacheable) {
@@ -615,7 +617,7 @@ public class AuraServlet extends AuraBaseServlet {
                     servletUtilAdapter.setCacheTimeout(response,
                             servletUtilAdapter.getPubliclyCacheableActionExpiration(message) * 1000, false);
                 }
-                
+
                 // Write the response body after we are done writing cache headers
                 written = true;
                 servletOut.write(out.toString());

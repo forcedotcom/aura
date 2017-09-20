@@ -484,7 +484,7 @@ AuraComponentService.prototype.createComponents = function(components, callback)
  * @export
  */
 AuraComponentService.prototype.newComponent = function(config, attributeValueProvider, localCreation, doForce){
-    $A.deprecated("$A.newCmp and $A.componentService.newComponent are no longer supported.","Use '$A.createComponent();'.","2017/01/06","2017/02/17");
+    $A.deprecated("$A.newCmp and $A.componentService.newComponent are no longer supported.","Use '$A.createComponent();'.","2017/01/06","2017/02/17", "AuraComponentService.newComponent");
     return this.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
 };
 
@@ -501,7 +501,7 @@ AuraComponentService.prototype.newComponent = function(config, attributeValuePro
  * @export
  */
 AuraComponentService.prototype.newComponentDeprecated = function(config, attributeValueProvider, localCreation, doForce){
-    $A.deprecated("$A.newCmpDeprecated and $A.componentService.newComponentDeprecated are not supported.","Use '$A.createComponent();'.","2017/01/06","2017/02/17");
+    $A.deprecated("$A.newCmpDeprecated and $A.componentService.newComponentDeprecated are not supported.","Use '$A.createComponent();'.","2017/01/06","2017/02/17", "AuraComponentService.newComponentDeprecated");
 
     $A.assert(config, "config is required in ComponentService.newComponentDeprecated(config)");
 
@@ -865,7 +865,7 @@ AuraComponentService.prototype.hasComponentClass = function(descriptor) {
  * @export
  */
 AuraComponentService.prototype.newComponentAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer) {
-    $A.deprecated("$A.newCmpAsync and $A.componentService.newComponentAsync are not supported.","Use '$A.createComponent();'.","2017/01/06","2017/02/17");
+    $A.deprecated("$A.newCmpAsync and $A.componentService.newComponentAsync are not supported.","Use '$A.createComponent();'.","2017/01/06","2017/02/17","AuraComponentService.newComponentAsync");
 
     $A.assert(config, "ComponentService.newComponentAsync(): 'config' must be a valid Object.");
     $A.assert($A.util.isFunction(callback),"ComponentService.newComponentAsync(): 'callback' must be a Function pointer.");
@@ -1810,7 +1810,7 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
                 minVersionValidationError.setComponent(currentAccessCmpDef.getDescriptor().getQualifiedName());
                 throw minVersionValidationError;
             }
-            
+
             var classConstructor = this.getComponentClass(descriptor, def);
 
             if (!classConstructor) {

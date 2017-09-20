@@ -516,8 +516,10 @@ Test.Aura.LoggerTest = function() {
             var target = new Aura.Utils.Logger();
             var error = new Error("Test Error");
             var mockEnqueueAction = Stubs.GetMethod();
+            var mockAction = createMockAction();
 
             mockAura(function() {
+                $A.injectMockAction(mockAction);
                 $A.clientService.enqueueAction = mockEnqueueAction;
                 target.reportError(error);
             });

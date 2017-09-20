@@ -3771,7 +3771,7 @@ AuraClientService.prototype.enqueueAction = function(action, background) {
     $A.assert($A.util.isAction(action), "Cannot call EnqueueAction() with a non Action parameter.");
 
     if (background) {
-        $A.deprecated("Do not use the deprecated background parameter",null,"2017/03/08","2018/03/08");
+        $A.deprecated("Do not use the deprecated background parameter",null,"2017/03/08","2018/03/08", "AuraClientService.enqueueAction(action, background)");
     }
 
     if (this.allowFlowthrough) {
@@ -3826,7 +3826,7 @@ AuraClientService.prototype.isActionAbsentFromStorage = function(action) {
  * @deprecated
  */
 AuraClientService.prototype.deferAction = function (action) {
-    $A.deprecated("$A.deferAction is broken, do not use it.","Use '$A.enqueueAction(action);'.","2017/01/06","2017/02/17");
+    $A.deprecated("$A.deferAction is broken, do not use it.","Use '$A.enqueueAction(action);'.","2017/01/06","2017/02/17","AuraClientService.deferAction");
     var self = this;
     var promise = new Promise(function(success, error) {
 

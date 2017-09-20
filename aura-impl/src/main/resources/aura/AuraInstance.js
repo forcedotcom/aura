@@ -29,6 +29,7 @@
  */
 function AuraInstance () {
     this.globalValueProviders = {};
+    this.deprecationUsages    = {};
     this.displayErrors        = true;
 
     this.logger               = new Aura.Utils.Logger();
@@ -1294,17 +1295,23 @@ AuraInstance.prototype.trace = function() {
  * Called from methods that have entered or are entering the deprecation pipeline. Provides first warnings, then errors to developers.
  * When possible, includes a workaround for the behavior or method being deprecated.
  *
- * @param {String} message The message to provide the developer indicating the method or behavior which has been or is being deprecated.
- * @param {String} workaround Any known or suggested workaround to accomplish the behavior being deprecated.
- * @param {Date} sinceDate The date since when the calling method has entered the deprecation pipeline. If omitted, deprecation is considered immediate.
- * @param {Date} dueDate The date at which the calling method is considered deprecated, and becomes an error. If omitted, deprecation is considered due upon the elapse of a default time period after 'sinceDate'.
+ * It reports the deprecation usages to server if reportSignature is provided.
+ *
+ * @param {String} message - The message to provide the developer indicating the method or behavior which has been or is being deprecated.
+ * @param {String} workaround - Any known or suggested workaround to accomplish the behavior being deprecated.
+ * @param {Date} sinceDate - The date since when the calling method has entered the deprecation pipeline. If omitted, deprecation is considered immediate.
+ * @param {Date} dueDate - The date at which the calling method is considered deprecated, and becomes an error. If omitted, deprecation is considered due upon the elapse of a default time period after 'sinceDate'.
+ * @param {String} reportSignature - The deprecated function name if deprecating an API, or function signature if deprecating a function signature.
+ *
  * @private
  * */
-AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDate){
+AuraInstance.prototype.deprecated = function(message, workaround, sinceDate, dueDate, reportSignature) {
+
     //#if {"excludeModes" : ["PRODUCTION"]}
     // This should be moved out to a constant, once we decide on the actual value.
     var DEFAULT_DEPRECATION=1000*60*60*24*28; // Four weeks
     var TEST_BUFFER=1000*60*60*24*14; // Two weeks
+
     var testDueDate;
     if(!dueDate){
         if(!sinceDate){
@@ -1334,17 +1341,18 @@ AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDat
             caller=e;
         }
     }
-    caller=(caller.stack||'').split('\n')[3]||'at unknown location';
+    caller=$A.util.trim((caller.stack||'').split('\n')[3])||'at unknown location';
     message=$A.util.format("DEPRECATED (as of {0}, unusable on {1}): {2}\n\t{3}\n{4}",
         $A.localizationService.formatDate(sinceDate),
         $A.localizationService.formatDate(dueDate),
         message,
-        $A.util.trim(caller),
+        caller,
         workaround?"Workaround: "+workaround:"No known workaround."
     );
 
     // JBUCH: TEMPORARILY IGNORE CALLS BY FRAMEWORK.
     // REMOVE WHEN ALL @public METHODS HAVE BEEN ADDRESSED.
+    // TODO: This filter may have false positive when a function is installed a override
     if(caller.indexOf("/aura_")>-1) {
         // $A.log("Framework use of deprecated method: " + message);
         return;
@@ -1364,12 +1372,46 @@ AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDat
         $A.warning(message);
     }
     //#end
+
     //#if {modes:["TESTING", "TESTINGDEBUG", "AUTOTESTING", "AUTOTESTINGDEBUG"]}
     // BREAK EARLY IN TESTS
     if(Date.now()>=testDueDate){
         $A.warning(message);
         // JBUCH: TODO: REACTIVATE ONCE CRUC IS IN PLACE
         //throw new Error(message);
+    }
+    //#end
+
+    //#if {modes: ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    // skip reporting, if there's no reporting signature.
+    if (reportSignature) {
+        var reporting = false;
+        var callers = this.deprecationUsages[reportSignature];
+        if (callers === undefined) {
+            callers = [];
+            this.deprecationUsages[reportSignature] = callers;
+            // reporting when the deprecated API gets called for the first time
+            reporting = true;
+        }
+
+        // if there's no current access, sending info from stacktrace instead
+        var callingCmp = $A.clientService.currentAccess ;
+        callers.push(callingCmp? callingCmp.getType() : "UNKNOWN");
+
+        // reporting when a deprecated API gets called 5 times
+        if (reporting || callers.length === 5) {
+            // Caboose action
+            var reportAction = $A.get("c.aura://ComponentController.reportDeprecationUsages");
+            reportAction.setParams({
+                "usages": $A.util.apply({}, this.deprecationUsages)
+            });
+
+            $A.clientService.enqueueAction(reportAction);
+
+            for (var api in this.deprecationUsages) {
+                this.deprecationUsages[api] = [];
+            }
+        }
     }
     //#end
 };

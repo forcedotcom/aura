@@ -41,7 +41,9 @@ import org.auraframework.instance.Instance;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
+import org.auraframework.service.LoggingService;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.CabooseAction;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
@@ -60,6 +62,7 @@ public class ComponentController implements GlobalController {
     private DefinitionService definitionService;
     private ContextService contextService;
     private ConfigAdapter configAdapter;
+    private LoggingService loggingService;
 
     @Override
     public String getQualifiedName() {
@@ -128,9 +131,9 @@ public class ComponentController implements GlobalController {
      *
      * @param desc - The name of the client action failing
      * @param id - The id of the client error
-     * @param error - The javascript error message of the failure
+     * @param error - The JavaScript error message of the failure
      * @param stack - Not always available (it's browser dependent), but if present, a browser-dependent
-     *      string describing the Javascript stack for the error.  Some frames may be obfuscated,
+     *      string describing the JavaScript stack for the error.  Some frames may be obfuscated,
      *      anonymous, omitted after inlining, etc., but it may help diagnosis.
      * @param componentStack - Not always available (it's context dependent), but if present, a
      *      string describing the component hierarchy stack for the error.
@@ -227,6 +230,22 @@ public class ComponentController implements GlobalController {
         return ret;
     }
 
+    @CabooseAction
+    @AuraEnabled
+    public void reportDeprecationUsages(@Key("usages") Map<String, List<String>> usages) {
+        if (usages == null) {
+            return;
+        }
+
+        for (Map.Entry<String, List<String>> entry : usages.entrySet()) {
+            String api = entry.getKey();
+            for (String caller : entry.getValue()) {
+                String message = String.format("Aura API Deprecation Usages: api=%s, caller=%s", api, caller);
+                this.loggingService.warn(message);
+            }
+        }
+    }
+
     @Inject
     public void setInstanceService(InstanceService instanceService) {
         this.instanceService = instanceService;
@@ -250,5 +269,10 @@ public class ComponentController implements GlobalController {
     @Inject
     public void setConfigAdapter(ConfigAdapter configAdapter) {
         this.configAdapter = configAdapter;
+    }
+
+    @Inject
+    public void setLoggingService(LoggingService loggingService) {
+        this.loggingService = loggingService;
     }
 }

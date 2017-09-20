@@ -15399,6 +15399,20 @@ $A.componentService.initControllerDefs([
         ]
       },
       {
+        "n":"reportDeprecationUsages",
+        "descriptor":"aura://ComponentController/ACTION$reportDeprecationUsages",
+        "at":"SERVER",
+        "rt":"java://void",
+        "b":false,
+        "ca":true,
+        "pa":[
+          {
+            "name":"usages",
+            "type":"java://java.util.Map\u003Cjava.lang.String,java.util.List\u003Cjava.lang.String\u003E\u003E"
+          }
+        ]
+      },
+      {
         "n":"reportFailedAction",
         "descriptor":"aura://ComponentController/ACTION$reportFailedAction",
         "at":"SERVER",

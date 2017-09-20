@@ -19,8 +19,8 @@
 	<aura:description>
 		<p>
 			A <code>ui:inputEmail</code> component represents an email input field, which is rendered as an HTML <code>input</code> tag of type <code>email</code>.
-			To render the output from a <code>ui:inputEmail</code> component, use the <code>ui:outputEmail</code> component. 
-		</p>
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="email"</code> instead of <code>ui:inputEmail</code>.
+        </p> 
 		<p>This is a basic set up of an email field.</p>
 		<pre>&lt;ui:inputEmail aura:id="email" label="Email" placeholder="abc@email.com"/></pre>
 		<p>This example results in the following HTML.</p>
@@ -35,5 +35,7 @@
 	</aura:description>	
 	<aura:example name="email" ref="uiExamples:email" label="Using ui:inputEmail">
     		This example retrieves the value of a <code>ui:inputEmail</code> component and displays it using <code>ui:outputEmail</code>.
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="email"</code> instead of <code>ui:inputEmail</code>.
+            Similarly, we recommend using <code>lightning:formattedEmail</code> instead of <code>ui:outputEmail</code>.
     </aura:example>	
 </aura:documentation>

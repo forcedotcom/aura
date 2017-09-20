@@ -18,7 +18,11 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			A <code>ui:menu</code> component contains a trigger and list items. You can wire up list items to actions in a client-side controller so that selection of the item triggers an action.
+			A <code>ui:menu</code> component contains a trigger and list items. 
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:buttonMenu</code> instead of <code>ui:menu</code>.
+        </p>
+        <p>
+            You can wire up list items to actions in a client-side controller so that selection of the item triggers an action.
 			This example shows a menu with list items, which when pressed updates the label on the trigger.
 		</p>
 <pre>&lt;ui:menu>
@@ -57,6 +61,7 @@
 		</p>
 	</aura:description>
 	<aura:example name="menu" ref="auradocs:demoMenu" label="Using ui:menu">
-    	<p>This example shows several ways to create a menu.</p>
+    	<p>This example shows several ways to create a menu.
+           To apply Lightning Design System styling, we recommend that you use <code>lightning:buttonMenu</code> instead of <code>ui:menu</code>.</p>
 	</aura:example>
 </aura:documentation>

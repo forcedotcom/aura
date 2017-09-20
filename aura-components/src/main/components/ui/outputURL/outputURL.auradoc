@@ -19,7 +19,13 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputURL</code> component represents a URL that is wrapped in an HTML <code>a</code> tag.
-			This component can be used with <code>ui:inputURL</code>, which takes in a URL input. 
+            We recommend using <code>lightning:formattedUrl</code> instead of <code>ui:outputURL</code>.
+        </p>
+        <p>
+			<code>ui:outputURL</code> can be used with <code>ui:inputURL</code>, which takes in a URL input. 
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="url"</code> instead of <code>ui:inputURL</code>.
+        </p>
+        <p>
 			To display a URL, you can use an attribute value and bind it to the <code>ui:outputURL</code> component.
 		</p>
 		<pre>&lt;aura:attribute name="myURL" type="String" default="http://www.google.com"/>

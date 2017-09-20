@@ -19,7 +19,13 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputText</code> component represents text output that is wrapped in an HTML <code>span</code> tag.
-			This component can be used with <code>ui:inputText</code>, which takes in a text input. 
+            We recommend using <code>lightning:formattedText</code> instead of <code>ui:outputText</code>.
+        </p>
+		<p>
+        	<code>ui:outputText</code> can be used with <code>ui:inputText</code>, which takes in a text input. 
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> instead of <code>ui:inputText</code>.
+        </p>
+        <p>
 			To display text, you can use an attribute value and bind it to the <code>ui:outputText</code> component.
 		</p>
 		<pre>&lt;aura:attribute name="myText" type="String" default="some string"/>
@@ -31,7 +37,10 @@
 		
 	</aura:description>	
 		<aura:example name="text" ref="uiExamples:text" label="Using the ui:outputText Component">
-    	<p>This example shows how you can bind data from an <code>ui:inputText</code> component.</p>
+    	<p>This example shows how you can bind data from an <code>ui:inputText</code> component.
+           To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> instead of <code>ui:inputText</code>.
+        </p>
+        
 	</aura:example>
 	
 </aura:documentation>

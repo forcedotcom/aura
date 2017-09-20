@@ -19,7 +19,7 @@
 	<aura:description>
 		<p>
 			A <code>ui:inputTextArea</code> component represents a multi-line text input control, which is rendered as an HTML <code>textarea</code> tag.
-			To render the output from a <code>ui:inputTextArea</code> component, use the <code>ui:outputTextArea</code> component.
+			To apply Lightning Design System styling, we recommend that you use <code>lightning:textarea</code> instead of <code>ui:inputTextArea</code>.
 		</p>
 		<p>This is a basic set up of a <code>ui:inputTextArea</code> component.</p>
 		<pre>&lt;ui:inputTextArea aura:id="comments" label="Comments" value="My comments" rows="5"/></pre>
@@ -33,7 +33,8 @@
 &lt;/div></pre>
 	</aura:description>	
 		<aura:example name="textarea" ref="uiExamples:textarea" label="Using ui:inputTextArea">
-    	<p>This example retrieves the value of a <code>ui:inputTextArea</code> component and displays it using <code>ui:outputTextArea</code>.</p>
+    	<p>This example retrieves the value of a <code>ui:inputTextArea</code> component and displays it using <code>ui:outputTextArea</code>.
+        To apply Lightning Design System styling, we recommend that you use <code>lightning:textarea</code> instead of <code>ui:inputTextArea</code>.</p>
 	</aura:example>
 	
 </aura:documentation>

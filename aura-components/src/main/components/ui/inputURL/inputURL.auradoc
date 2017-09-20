@@ -19,7 +19,7 @@
 	<aura:description>
 		<p>
 			A <code>ui:inputURL</code> component represents an input field for a URL, which is rendered as an HTML <code>input</code> tag of type <code>url</code>.
-			To render the output from a <code>ui:inputURL</code> component, use the <code>ui:outputURL</code> component.
+			To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="url"</code> instead of <code>ui:inputURL</code>.
 		</p>
 		<p>This is a basic set up of a <code>ui:inputURL</code> component.</p>
 		<pre>&lt;ui:inputURL aura:id="url" label="Venue URL" class="field" value="http://www.myURL.com"/></pre>
@@ -32,7 +32,8 @@
 &lt;/div></pre>
 	</aura:description>	
 		<aura:example name="url" ref="uiExamples:url" label="Using ui:inputURL">
-    	<p>This example retrieves the value of a <code>ui:inputURL</code> component and displays it using <code>ui:outputURL</code>.</p>
+    	<p>This example retrieves the value of a <code>ui:inputURL</code> component and displays it using <code>ui:outputURL</code>.
+        To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="url"</code> instead of <code>ui:inputURL</code>.</p>
 	</aura:example>
 	
 </aura:documentation>

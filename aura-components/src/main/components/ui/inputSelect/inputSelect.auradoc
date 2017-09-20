@@ -18,7 +18,11 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			 A <code>ui:inputSelect</code> component is rendered as an HTML <code>select</code> element. It contains options, represented by the <code>ui:inputSelectOption</code> components. To enable multiple selections, set <code>multiple="true"</code>.
+			 A <code>ui:inputSelect</code> component is rendered as an HTML <code>select</code> element.
+             To apply Lightning Design System styling, we recommend that you use <code>lightning:select</code> instead of <code>ui:inputSelect</code>.
+        </p>
+        <p>     
+             <code>ui:inputSelect</code> contains options, represented by the <code>ui:inputSelectOption</code> components. To enable multiple selections, set <code>multiple="true"</code>.
 			 To wire up any client-side logic when an input value is selected, use the <code>change</code> event. 
 		</p>
 <pre>&lt;ui:inputSelect multiple="true">
@@ -81,7 +85,8 @@ HTML <code>value</code> attribute.</p>
 		
 	</aura:description>	
 		<aura:example name="inputselect" ref="auradocs:demoSelect" label="Using ui:inputSelect">
-    	<p>This example displays a drop-down list with single and multiple selection enabled, and another with dynamically generated list options. It retrieves the selected value of a <code>ui:inputSelect</code> component.</p>
+    	<p>This example displays a drop-down list with single and multiple selection enabled, and another with dynamically generated list options. It retrieves the selected value of a <code>ui:inputSelect</code> component.
+        To apply Lightning Design System styling, we recommend that you use <code>lightning:select</code> instead of <code>ui:inputSelect</code>.</p>
     	
 	</aura:example>
 	

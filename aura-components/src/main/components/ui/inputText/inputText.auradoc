@@ -19,8 +19,8 @@
 	<aura:description>
 		<p>
 			A <code>ui:inputText</code> component represents a text input field, which is rendered as an HTML <code>input</code> tag of type <code>text</code>.
-			To render the output from a <code>ui:inputText</code> component, use the <code>ui:outputText</code> component.
-		</p>
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> instead of <code>ui:inputText</code>.
+        </p>
 		<p>This is a basic set up of a text field.</p>
 		<pre>&lt;ui:inputText label="Expense Name" value="My Expense" required="true"/></pre>
 		<p>This example results in the following HTML.</p>
@@ -33,7 +33,8 @@
 &lt;/div></pre>
 	</aura:description>	
 		<aura:example name="text" ref="uiExamples:text" label="Using ui:inputText">
-    	<p>This example binds the value of a <code>ui:inputText</code> component to <code>ui:outputText</code>.</p>
+    	<p>This example binds the value of a <code>ui:inputText</code> component to <code>ui:outputText</code>.
+           To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> instead of <code>ui:inputText</code>.</p>
 	</aura:example>
 	
 </aura:documentation>

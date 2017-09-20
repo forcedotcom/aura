@@ -19,6 +19,9 @@
 	<aura:description>
 		<p>
 			A <code>ui:inputRadio</code> component represents a radio button whose state is controlled by the <code>value</code> and <code>disabled</code> attributes. It's rendered as an HTML <code>input</code> tag of type <code>radio</code>.
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:radioGroup</code> instead of <code>ui:inputRadio</code>.
+        </p>
+        <p>
 			To group your radio buttons together, specify the <code>name</code> attribute with a unique name.
 		</p>
 		<p>This is a basic set up of a radio button.</p>		
@@ -33,5 +36,6 @@
 	</aura:description>
 	<aura:example name="radio" ref="uiExamples:radio" label="Using ui:inputRadio">
     	This example retrieves the value of a selected <code>ui:inputRadio</code> component.
+        To apply Lightning Design System styling, we recommend that you use <code>lightning:radioGroup</code> instead of <code>ui:inputRadio</code>.
     </aura:example>		
 </aura:documentation>

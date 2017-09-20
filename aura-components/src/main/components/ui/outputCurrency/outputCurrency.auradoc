@@ -19,7 +19,13 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputCurrency</code> component represents a number as a currency that is wrapped in an HTML <code>span</code> tag.
+            We recommend using <code>lightning:formattedNumber</code> with <code>style="currency"</code> instead of <code>ui:outputCurrency</code>.
+        </p>
+        <p>
 			This component can be used with <code>ui:inputCurrency</code>, which takes in a number as a currency. 
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="number"</code> and <code>formatter="currency"</code> instead of <code>ui:inputCurrency</code>.
+        </p>
+        <p>
 			To display a currency, you can use an attribute value and bind it to the <code>ui:outputCurrency</code> component. 
 		</p>
 <pre>&lt;aura:attribute name="myCurr" type="Decimal" default="50000"/>
@@ -33,7 +39,8 @@
 curr.set("v.format", '£#,###.00');</pre>	    
 	</aura:description>	
 		<aura:example name="currency" ref="uiExamples:currency" label="Using the ui:outputCurrency Component">
-    	<p>This example shows how you can bind data from a <code>ui:inputCurrency</code> component.</p>
+    	<p>This example shows how you can bind data from a <code>ui:inputCurrency</code> component.
+           We recommend using <code>lightning:formattedNumber </code> with <code>style="currency"</code> instead of <code>ui:outputCurrency</code>.</p>
 	</aura:example>
 	
 </aura:documentation>

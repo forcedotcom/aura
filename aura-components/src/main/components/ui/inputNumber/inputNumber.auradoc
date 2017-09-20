@@ -20,6 +20,11 @@
 		<p>
 			A <code>ui:inputNumber</code> component represents a number input field, which is rendered as an HTML <code>input</code> element of type <code>text</code>.
 			It uses JavaScript's Number type to determine the supported number of digits.
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="number"</code> instead of <code>ui:inputNumber</code>.
+        </p>
+        <p>
+            To render the output from a <code>ui:inputNumber</code> component, use the <code>ui:outputEmail</code> component. 
+            Similarly, we recommend using <code>lightning:formattedNumber</code> instead of <code>ui:outputNumber</code>.
 	   </p>
 	   <p>
 			This example shows a number field, which displays a value of <code>10</code>.
@@ -49,5 +54,7 @@
 	</aura:description>		
 	<aura:example name="inputExample" ref="uiExamples:inputNumberExample" label="Using ui:inputNumber">
     		This example binds the value of a <code>ui:inputNumber</code> component to <code>ui:outputNumber</code>.
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="number"</code> instead of <code>ui:inputNumber</code>.
+            Similarly, we recommend using <code>lightning:formattedNumber</code> instead of <code>ui:outputNumber</code>.
     </aura:example>
 </aura:documentation>

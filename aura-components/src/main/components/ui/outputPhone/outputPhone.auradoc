@@ -19,7 +19,14 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputPhone</code> component represents a phone number output that is wrapped in an HTML <code>span</code> tag.
-			This component can be used with <code>ui:inputPhone</code>, which takes in a phone number input. The following example is
+            We recommend using <code>lightning:formattedPhone</code> instead of <code>ui:outputPhone</code>.
+        </p>
+        <p>
+			<code>ui:outputPhone</code> can be used with <code>ui:inputPhone</code>, which takes in a phone number input. 
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="tel"</code> instead of <code>ui:inputPhone</code>.
+        </p>
+        <p>
+            The following example is
 			a simple set up of a <code>ui:outputPhone</code> component.
 		</p>
 		<pre>&lt;ui:outputPhone value="415-123-4567"/></pre>
@@ -32,5 +39,6 @@
 	</aura:description>	
 	<aura:example name="phone" ref="uiExamples:phone" label="Using ui:outputPhone">
     	This example shows how you can bind data from a <code>ui:inputPhone</code> component.
+        To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="tel"</code> instead of <code>ui:inputPhone</code>.
 	</aura:example>
 </aura:documentation>

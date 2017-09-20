@@ -19,7 +19,13 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputTextArea</code> component represents text output that is wrapped in an HTML <code>span</code> tag.
-			This component can be used with <code>ui:inputTextArea</code>, which takes in a multiline text input. 
+            We recommend using <code>lightning:formattedText</code> instead of <code>ui:outputText</code>.
+        </p>
+        <p>
+			<code>ui:outputTextArea</code> can be used with <code>ui:inputTextArea</code>, which takes in a multiline text input. 
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:textarea</code> instead of <code>ui:inputTextArea</code>.
+        </p>
+        <p>
 			To display text, you can use an attribute value and bind it to the <code>ui:outputTextArea</code> component. A <code>ui:outputTextArea</code> component displays URLs and email addresses as hyperlinks.
 		</p>
 		<pre>&lt;aura:attribute name="myTextArea" type="String" default="some string"/>
@@ -29,7 +35,8 @@
 		
 	</aura:description>	
 		<aura:example name="textarea" ref="uiExamples:textarea" label="Using ui:outputTextArea">
-    	<p>This example shows how you can bind data from the <code>ui:inputTextArea</code> component.</p>
+    	<p>This example shows how you can bind data from the <code>ui:inputTextArea</code> component.
+         To apply Lightning Design System styling, we recommend that you use <code>lightning:textarea</code> instead of <code>ui:inputTextArea</code>.</p>
 	</aura:example>
 	
 </aura:documentation>

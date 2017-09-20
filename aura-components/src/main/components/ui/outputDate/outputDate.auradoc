@@ -19,7 +19,14 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputDate</code> component represents a date output in the YYYY-MM-DD format and is wrapped in an HTML <code>span</code> tag.
-			This component can be used with <code>ui:inputDate</code>, which takes in a date input. <code>ui:outputDate</code> retrieves the browser's locale information and displays 
+            We recommend using <code>lightning:formattedDateTime</code> instead of <code>ui:outputDate</code>.
+        </p>
+        <p>
+			<code>ui:outputDate</code> can be used with <code>ui:inputDate</code>, which takes in a date input. 
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="date"</code> instead of <code>ui:inputDate</code>.
+        </p>
+        <p>
+            <code>ui:outputDate</code> retrieves the browser's locale information and displays 
 			the date accordingly. To display a date, you can use an attribute value and bind it to the <code>ui:outputDate</code> component.
 		</p>
 		<pre>&lt;aura:attribute name="myDate" type="Date" default="2014-09-29"/>
@@ -29,5 +36,6 @@
 	</aura:description>	
 	<aura:example name="outputExample" ref="uiExamples:date" label="Using ui:outputDate">
     	This example shows how you can bind data from the <code>ui:inputDate</code> component.
+        To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="date"</code> instead of <code>ui:inputDate</code>.
 	</aura:example>
 </aura:documentation>

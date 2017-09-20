@@ -18,8 +18,11 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			A <code>ui:button</code> component represents a button element that executes an action defined by a controller. Clicking the button triggers the client-side controller method set for the <code>press</code> event.
-			The button can be created in several ways.
+			A <code>ui:button</code> component represents a button element that executes an action defined by a controller.
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:button</code> instead of <code>ui:button</code>.
+		</p>
+        <p>	
+            Clicking the button triggers the client-side controller method set for the <code>press</code> event. The button can be created in several ways.
 		</p>
 		<p>A text-only button has only the <code>label</code> attribute set on it.</p>
 		<pre>&lt;ui:button label="Find"/></pre>
@@ -49,7 +52,7 @@ background: url(/path/to/img) no-repeat;
 	</aura:description>	
 
     <aura:example name="buttonExample" ref="uiExamples:buttonExample" label="Using ui:button">
-        <p>This example shows a button that displays the input value you enter.</p>
+        <p>This example shows a button that displays the input value you enter. To apply Lightning Design System styling, we recommend that you use <code>lightning:button</code> instead of <code>ui:button</code>.</p>
     </aura:example>
 
 </aura:documentation>

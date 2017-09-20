@@ -19,7 +19,13 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputNumber</code> component represents a number output that is rendered as an HTML <code>span</code> tag.
-			This component can be used with <code>ui:inputNumber</code>, which takes in a number input. 
+            We recommend using <code>lightning:formattedNumber</code> instead of <code>ui:outputNumber</code>.
+        </p>
+        <p>
+			<code>ui:outputNumber</code> can be used with <code>ui:inputNumber</code>, which takes in a number input. 
+             To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="number"</code> instead of <code>ui:inputNumber</code>.
+        </p>
+        <p>
 			<code>ui:outputNumber</code> retrieves the locale information and displays the number in the given decimal format. 
 			To display a number, you can use an attribute value and bind it to the <code>ui:outputNumber</code> component.
 		</p>
@@ -29,6 +35,8 @@
 		<pre>&lt;span class="uiOutputNumber">10.10&lt;/span></pre>
 	</aura:description>	
 	<aura:example name="number" ref="uiExamples:inputNumberExample" label="Using ui:outputNumber">
-    	<p>This example retrieves the value of a <code>ui:intputNumber</code> component, validates the input, and displays it using <code>ui:outputNumber</code>.</p>
+    	<p>This example retrieves the value of a <code>ui:intputNumber</code> component, validates the input, and displays it using <code>ui:outputNumber</code>.
+        To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="number"</code> instead of <code>ui:inputNumber</code>.
+        Similarly, we recommend using <code>lightning:formattedNumber</code> instead of <code>ui:outputNumber</code>.</p>
 	</aura:example>
 </aura:documentation>

@@ -19,8 +19,15 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputDateTime</code> component represents a date and time output that is wrapped in an HTML <code>span</code> tag.
-			This component can be used with <code>ui:inputDateTime</code>, which takes in a date input. <code>ui:outputDateTime</code> retrieves the browser's locale information and displays 
-			the date accordingly.
+            We recommend using <code>lightning:formattedDateTime</code> instead of <code>ui:outputDateTime</code>.
+        </p>    
+        <p>
+			This component can be used with <code>ui:inputDateTime</code>, which takes in a date input. 
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="datetime-local"</code> instead of <code>ui:inputDateTime</code>.
+        </p>
+        <p>
+            <code>ui:outputDateTime</code> retrieves the browser's locale information and displays 
+            the date accordingly.
 			To display a date and time, you can use an attribute value and bind it to the <code>ui:outputDateTime</code> component.
 		</p>
 		<pre>&lt;aura:attribute name="myDateTime" type="Date" default="2014-09-29T00:17:08z"/>

@@ -19,7 +19,8 @@
 	<aura:description>
 		<p>
 			The <code>severity</code> attribute indicates a message's severity level and determines the style to use when displaying the message. 
-	If the <code>closable</code> attribute is set to true, the message can be dismissed by pressing the &times; symbol.  
+	        If the <code>closable</code> attribute is set to true, the message can be dismissed by pressing the &times; symbol.  
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:notificationsLibrary</code> instead of <code>ui:message</code>.
     	</p>
     	<p>This example shows a confirmation message that can be dismissed.</p>
 <pre>&lt;ui:message title="Confirmation" severity="confirm" closable="true">
@@ -27,7 +28,8 @@
   &lt;/ui:message></pre>
 	</aura:description>	
 		<aura:example name="message" ref="auradocs:demoMessage" label="Using ui:message">
-    	<p>This example shows messages in varying severity levels.</p>
+    	<p>This example shows messages in varying severity levels.
+        To apply Lightning Design System styling, we recommend that you use <code>lightning:notificationsLibrary</code> instead of <code>ui:message</code>.</p>
 	   </aura:example>
 	   
 	

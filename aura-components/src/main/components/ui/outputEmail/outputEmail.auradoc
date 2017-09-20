@@ -19,7 +19,13 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputEmail</code> component represents an email output that is wrapped in an HTML <code>span</code> tag.
-			This component can be used with <code>ui:inputEmail</code>, which takes in an email input. 
+            We recommend using <code>lightning:formattedEmail</code> instead of <code>ui:outputEmail</code>.
+        </p>
+        <p>
+			<code>ui:outputEmail</code> can be used with <code>ui:inputEmail</code>, which takes in an email input. 
+            To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="email"</code> instead of <code>ui:inputEmail</code>.
+        </p>
+        <p>
 			The email output is wrapped in an HTML anchor element and <code>mailto</code> is automatically appended to it.
 			This is a simple set up of a <code>ui:outputEmail</code> component.
 		</p>
@@ -28,6 +34,7 @@
 		<pre>&lt;span>&lt;a href="mailto:abc@email.com" class="uiOutputEmail">abc@email.com&lt;/a>&lt;/span></pre>
 	</aura:description>	
 	<aura:example name="email" ref="uiExamples:email" label="Using ui:outputEmail">
-    	<p>This example shows how you can bind data from a <code>ui:inputEmail</code> component.</p>
+    	<p>This example shows how you can bind data from a <code>ui:inputEmail</code> component.
+        To apply Lightning Design System styling, we recommend that you use <code>lightning:input</code> with <code>type="email"</code> instead of <code>ui:inputEmail</code>.</p>
 	</aura:example>
 </aura:documentation>

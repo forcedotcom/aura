@@ -325,28 +325,39 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     @Override
     public boolean hasLocalDependencies() throws QuickFixException {
         if (localDeps == null) {
-            computeLocalDependencies();
+            hasLocalDependencies(Sets.newHashSet());
         }
-
         return localDeps == Boolean.TRUE;
     }
 
-    // JBUCH: TODO: This is sub-optimal and the entire concern needs to be revisited. Note the impl cast.
-    public boolean hasFacetLocalDependencies() throws QuickFixException {
-        if (!facets.isEmpty()) {
-            for (AttributeDefRef facet : facets) {
-                Object v = facet.getValue();
-                if (v instanceof ArrayList) {
-                    for (Object fl : ((ArrayList<?>) v)) {
-                        if (fl instanceof DefinitionReference) {
-                            DefinitionReference cdr = (DefinitionReference) fl;
-                            DefType defType = cdr.getDescriptor().getDefType();
-                            if (defType == DefType.APPLICATION || defType == DefType.COMPONENT) {
-                                BaseComponentDefImpl<?> def = (BaseComponentDefImpl<?>) cdr.getDescriptor().getDef();
-                                if (def.hasLocalDependencies() || def.hasFacetLocalDependencies()) {
-                                    return true;
-                                }
+    private boolean hasLocalDependencies(Set<DefDescriptor<?>> visited) throws QuickFixException {
+        if (localDeps == null) {
+            computeLocalDependencies(visited);
+        }
+        return localDeps == Boolean.TRUE;
+    }
+
+    private boolean probeReferenceLocalDependencies(AttributeDefRef facet, Set<DefDescriptor<?>> processed)
+            throws QuickFixException {
+        Object v = facet.getValue();
+        if (v instanceof ArrayList) {
+            for (Object fl : ((ArrayList<?>) v)) {
+                if (fl instanceof DefinitionReference) {
+                    DefinitionReference cdr = (DefinitionReference) fl;
+                    DefDescriptor<?> descriptor = cdr.getDescriptor();
+                    DefType defType = descriptor.getDefType();
+                    if (defType == DefType.APPLICATION || defType == DefType.COMPONENT) {
+                        if (!processed.contains(descriptor)) {
+                            processed.add(descriptor);
+                            BaseComponentDefImpl<?> def = (BaseComponentDefImpl<?>) descriptor.getDef();
+                            if (def.hasLocalDependencies(processed)) {
+                                return true;
                             }
+                        }
+                    }
+                    for (AttributeDefRef attrValue : cdr.getAttributeValueList()) {
+                        if (probeReferenceLocalDependencies(attrValue, processed)) {
+                            return true;
                         }
                     }
                 }
@@ -362,7 +373,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      * model
      */
     @SuppressWarnings("unchecked")
-	private synchronized void computeLocalDependencies() throws QuickFixException {
+    private synchronized void computeLocalDependencies(Set<DefDescriptor<?>> processed) throws QuickFixException {
         if (localDeps != null) {
             return;
         }
@@ -396,6 +407,15 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             superDef = (BaseComponentDefImpl<T>)superDef.getSuperDef();
         }
 
+        if (localDeps == null) {
+            if (!facets.isEmpty()) {
+                for (AttributeDefRef facet : facets) {
+                    if (probeReferenceLocalDependencies(facet, processed)) {
+                        localDeps = Boolean.TRUE;
+                    }
+                }
+            }
+        }
         if (localDeps == null) {
             localDeps = Boolean.FALSE;
         }
@@ -1058,11 +1078,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 }
 
                 boolean local = hasLocalDependencies();
-                // For the client, hasRemoteDeps is true if the current definition or
-                // a definition in any of its facets has a local dependency.
-                if (!local) {
-                    local = hasFacetLocalDependencies();
-                }
 
                 if (local) {
                     json.writeMapEntry(ApplicationKey.HASSERVERDEPENDENCIES, true);

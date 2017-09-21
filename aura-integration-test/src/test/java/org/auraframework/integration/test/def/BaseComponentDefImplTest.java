@@ -37,7 +37,7 @@ public class BaseComponentDefImplTest extends AuraImplTestCase{
 
         // Act
         BaseComponentDefImpl<ComponentDef> def = (BaseComponentDefImpl<ComponentDef>) definitionService.getDefinition(desc);
-        boolean actual = def.hasFacetLocalDependencies();
+        boolean actual = def.hasLocalDependencies();
 
         // Assert
         assertTrue(actual);

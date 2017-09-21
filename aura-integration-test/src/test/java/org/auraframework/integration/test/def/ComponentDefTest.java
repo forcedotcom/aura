@@ -339,4 +339,40 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         assertEquals("java://org.auraframework.components.test.java.model.TestModel", def.getModelDef().getDescriptor()
                 .getQualifiedName());
     }
+
+    /**
+     * hasLocalDependencies is true if component only has serverside provider. Test method for
+     * {@link BaseComponentDef#hasLocalDependencies()}.
+     */
+    @Test
+    public void testHasLocalDependenciesWithServersideProviderNested() throws Exception {
+        ComponentDef baseComponentDef = define(baseTag,
+                "abstract='true' provider='java://org.auraframework.impl.java.provider.TestProviderAbstractBasic'", "");
+        ComponentDef nextLevelDef = define(baseTag,
+                "", String.format("<div><%s:%s /></div>",
+                    baseComponentDef.getDescriptor().getNamespace(),
+                    baseComponentDef.getDescriptor().getName()));
+        assertTrue("Component containing abstract components with serverside providers have server dependecies.",
+                nextLevelDef.hasLocalDependencies());
+    }
+
+    /**
+     * hasLocalDependencies is true if component only has serverside provider. Test method for
+     * {@link BaseComponentDef#hasLocalDependencies()}.
+     */
+    @Test
+    public void testHasLocalDependenciesWithServersideProviderNestedDeeply() throws Exception {
+        ComponentDef baseComponentDef = define(baseTag,
+                "abstract='true' provider='java://org.auraframework.impl.java.provider.TestProviderAbstractBasic'", "");
+        ComponentDef nextLevelDef = define(baseTag,
+                "", String.format("<div><div /><div><%s:%s /></div></div>",
+                    baseComponentDef.getDescriptor().getNamespace(),
+                    baseComponentDef.getDescriptor().getName()));
+        ComponentDef topLevelDef = define(baseTag,
+                "", String.format("<div><%s:%s /></div>",
+                    nextLevelDef.getDescriptor().getNamespace(),
+                    nextLevelDef.getDescriptor().getName()));
+        assertTrue("Component containing abstract components with serverside providers have server dependecies.",
+                topLevelDef.hasLocalDependencies());
+    }
 }

@@ -1433,6 +1433,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertTrue("Abstract Component with serverside providers have server dependecies.", definitionService
                 .getDefinition(baseComponentDef.getDescriptor()).hasLocalDependencies());
     }
+    
 
     /**
      * hasLocalDependencies is true if super has local model dependency. Test method for

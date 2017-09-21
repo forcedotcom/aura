@@ -223,7 +223,7 @@ AuraRenderingService.prototype.afterRender = function(components) {
                 // The after render routine threw an error, so we should
                 //  (a) log the error
                 if (e instanceof $A.auraError && e["component"]) {
-                        throw e;
+                    throw e;
                 } else {
                     var ae = new $A.auraError("afterRender threw an error in '" + cmp.getType() + "'", e);
                     $A.lastKnownError = ae;
@@ -277,20 +277,20 @@ AuraRenderingService.prototype.unrender = function(components) {
             cmp.setUnrendering(true);
             $A.clientService.setCurrentAccess(cmp);
 
-                // Use the container to check if we're in the middle of unrendering a parent component.
-                // Sometimes that is not available, so otherwise move to considering the owner.
-                container = cmp.getContainer() || cmp.getOwner();
+            // Use the container to check if we're in the middle of unrendering a parent component.
+            // Sometimes that is not available, so otherwise move to considering the owner.
+            container = cmp.getContainer() || cmp.getOwner();
 
-                // If the parent is NOT unrendering, then remove these and unrender it's children.
-                // In the unrenderFacets function, those elements won't be removed from the DOM since their parents here
-                // are getting removed.
-                if(container && !container.getConcreteComponent().isUnrendering()) {
-                    // This is the top of the unrendering tree.
-                    // Save the elements we want to remove, so they can be deleted after the unrender is called.
-                    beforeUnrenderElements = cmp.getElements();
-                } else {
-                    beforeUnrenderElements = null;
-                }
+            // If the parent is NOT unrendering, then remove these and unrender it's children.
+            // In the unrenderFacets function, those elements won't be removed from the DOM since their parents here
+            // are getting removed.
+            if(container && !container.getConcreteComponent().isUnrendering()) {
+                // This is the top of the unrendering tree.
+                // Save the elements we want to remove, so they can be deleted after the unrender is called.
+                beforeUnrenderElements = cmp.getElements();
+            } else {
+                beforeUnrenderElements = null;
+            }
 
             try {
                 cmp["unrender"]();
@@ -340,17 +340,19 @@ AuraRenderingService.prototype.unrender = function(components) {
  * @memberOf AuraRenderingService
  *
  * @param {Component} component the component for which we are storing the facet.
- * @param {Object} facet the component or array of components to store.
+ * @param {Component|Array} facet the component or array of components to store.
  */
 AuraRenderingService.prototype.storeFacetInfo = function(component, facet) {
     if(!$A.util.isComponent(component)) {
-        throw new $A.auraError("Aura.RenderingService.storeFacet: 'component' must be a valid Component. Found '" + component + "'.", null, $A.severity.QUIET);
+        throw new $A.auraError("AuraRenderingService.storeFacetInfo: 'component' must be a valid Component. Found '" + component + "'.",
+                null, $A.severity.QUIET);
     }
     if($A.util.isComponent(facet)){
         facet=[facet];
     }
-    if(!$A.util.isArray(facet)) {
-        throw new $A.auraError("Aura.RenderingService.storeFacet: 'facet' must be a valid Array. Found '" + facet + "'.", null, $A.severity.QUIET);
+    if (!$A.util.isArray(facet)) {
+        $A.warning("AuraRenderingService.storeFacetInfo: 'facet' must be a Component or an Array. Found '" + facet + "' in '" + component.getType() + "'.");
+        facet = [];
     }
     component._facetInfo=facet.slice(0);
 };
@@ -361,16 +363,14 @@ AuraRenderingService.prototype.storeFacetInfo = function(component, facet) {
  */
 AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) {
     if(!$A.util.isComponent(component)) {
-        throw new $A.auraError("Aura.RenderingService.getUpdatedFacetInfo: 'component' must be a valid Component. Found '" + component + "'.", null, $A.severity.QUIET);
+        throw new $A.auraError("AuraRenderingService.getUpdatedFacetInfo: 'component' must be a valid Component. Found '" + component + "'.",
+                null, $A.severity.QUIET);
     }
     if($A.util.isComponent(facet)){
         facet=[facet];
     }
     if(!$A.util.isArray(facet)){
-        //#if {"excludeModes" : ["PRODUCTION"}
-        $A.warning("Aura.RenderingService.getUpdatedFacetInfo: 'facet' should be a valid Array. Found '" +
-            facet + "' in '" + component + "'.");
-        //#end
+        $A.warning("AuraRenderingService.getUpdatedFacetInfo: 'facet' must be a Component or an Array. Found '" + facet + "' in '" + component.getType() + "'.");
         facet = [];
     }
     var updatedFacet={
@@ -999,7 +999,7 @@ AuraRenderingService.prototype.getElements = function(component) {
 };
 
 /**
- * Includes all the DOM elements the component output as part of its rendering cycle. 
+ * Includes all the DOM elements the component output as part of its rendering cycle.
  * This method also returns the comment markers output as part of the component rendering cycle.
  * If you do not want the comment nodes returned to you (your known set of dom nodes), use cmp.getElements() or renderingService.getElements(component)
  */
@@ -1009,7 +1009,7 @@ AuraRenderingService.prototype.getAllElements = function(component) {
 
 /**
  * Similar to getAllElements, but this method will copy the allElements collection and return it. This allows you to modify the collection for processing
- * during the renderingService without worring about mutating the component elements collection. 
+ * during the renderingService without worring about mutating the component elements collection.
  */
 AuraRenderingService.prototype.getAllElementsCopy = function(component) {
     return component.getConcreteComponent().allElements.slice(0) || [];

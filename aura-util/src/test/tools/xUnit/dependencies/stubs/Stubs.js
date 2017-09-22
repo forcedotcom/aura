@@ -74,7 +74,7 @@ Test.Tools.Aura.Stubs.Aura=new function(){
         Object.ForEach(children||{},function(value,context){stubbedChildren[context.Name]=value&&(Object.IsType(_stubAura.GetComponent,value)||Object.IsType(Array,value))&&value||_stubAura.GetComponent(value);});
         var stubbedAttributeDefs=Stubs.GetList(attributes&&Object.keys(attributes)||[], {each:function(value){return this.Source_Value;}});
         var stubbedDescriptor=Stubs.GetObject({getQualifiedName:function(){return descriptor;}});
-        var stubbedDef=Stubs.GetObject({getAttributeDefs:{returnValue:stubbedAttributeDefs}, getDescriptor:stubbedDescriptor});
+        var stubbedDef=Stubs.GetObject({getAttributeDefs:{returnValue:stubbedAttributeDefs}, getDescriptor:stubbedDescriptor, getMethodDefs:function(){}});
         var globalId = (Math.random() * 10000000).toString();
 
 		var get = function(expression){return stubbedAttributes[expression]};

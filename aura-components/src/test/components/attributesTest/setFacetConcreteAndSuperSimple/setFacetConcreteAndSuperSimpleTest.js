@@ -102,9 +102,37 @@
 
 			$A.test.assertEquals(expected, actual);
 		}
-	}
+	},
 
-	
+    testSettingRenderedInFcv_setFacet1_PrivateString: {
+        test: function(cmp) {
+            // verifying fix for W-3686136
+            var expected = "[setFacet1_PrivateString]";
+            var actual = $A.test.getText(cmp.getSuper().getSuper().find("setFacet1_PrivateString_Output").getElement()).trim();
+            $A.test.assertEquals(expected, actual);
+        }
+    },
 
+    testCannotAccessSetting_setFacet1_PrivateString: {
+        test: function(cmp) {
+            // verifying fix for W-3686136
+            $A.test.expectAuraError("Access Check Failed!");
+            cmp.get("v.setFacet1_PrivateString");
+            $A.test.addWaitForWithFailureMessage(true,
+                function(){
+                    var element = document.getElementById('auraErrorMask');
+                    var style = $A.test.getStyle(element, 'display');
+                    return style === 'block';
+                },
+                "Error Modal didn't show up.", null,
+                function() {
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),
+                        "\' is not visible to \'",
+                        "Access Check Failed! AttributeSet.get():\'attribute 'setFacet1_PrivateString'",
+                        "markup://attributesTest:setFacetConcreteAndSuperSimple");
+                }
+            );
+        }
+    }
 
 })

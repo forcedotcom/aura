@@ -19,8 +19,11 @@
 	<aura:description>
 		<p>
 		  A <code>ui:outputRichText</code> component represents formatted text and can be used to display input from a <code>lightning:inputRichText</code> or <code>ui:inputRichText</code> component. 
-		  Using <code>lightning:inputRichText</code> is recommended since <code>ui:inputRichText</code> is no longer supported when LockerService is enabled.
-		  <code>ui:outputRichText</code> renders formatted text. For example, URLs and email addresses enclosed by anchor tags are displayed as hyperlinks.
+	      Using <code>lightning:inputRichText</code> is recommended since <code>ui:inputRichText</code> is no longer supported when LockerService is enabled. 
+          Similarly, we recommend that you use <code>lightning:formattedRichText</code> instead of <code>ui:outputRichText</code>.
+        </p>
+        <p>
+           <code>ui:outputRichText</code> renders formatted text. For example, URLs and email addresses enclosed by anchor tags are displayed as hyperlinks.
 		</p>
 		<p>
 		  This example sets bold text and bind the value to a <code>lightning:inputRichText</code> and <code>ui:outputRichText</code> component.

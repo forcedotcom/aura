@@ -492,7 +492,7 @@ public class AuraServlet extends AuraBaseServlet {
 
         try {
             if (context.getFormat() != Format.JSON) {
-                throw new AuraRuntimeException("Invalid request, post must use JSON");
+                throw new AuraHandledException("Invalid request, post must use JSON");
             }
 
             response.setContentType(servletUtilAdapter.getContentType(Format.JSON));

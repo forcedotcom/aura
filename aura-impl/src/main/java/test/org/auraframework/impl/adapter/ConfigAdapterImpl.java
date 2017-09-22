@@ -78,11 +78,11 @@ import org.auraframework.util.resource.FileGroup;
 import org.auraframework.util.resource.ResourceLoader;
 import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Sets;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceComponent
 public class ConfigAdapterImpl implements ConfigAdapter {

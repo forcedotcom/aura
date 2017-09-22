@@ -127,7 +127,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     // used during parsing, should be clear for storing in memory
     private DirectiveParser parser;
 
-    private ResourceLoader resourceLoader = null;
+    protected ResourceLoader resourceLoader = null;
 
     public DirectiveBasedJavascriptGroup(String name, File root, String start) throws IOException {
         this(name, root, start, DirectiveTypes.DEFAULT_TYPES, EnumSet.of(JavascriptGeneratorMode.DEVELOPMENT,
@@ -290,6 +290,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         if (this.resourceLoader == null) {
             this.resourceLoader = new ResourceLoader(LIB_CACHE_TEMP_DIR, true);
         }
+
         URL lib = this.resourceLoader.getResource(path);
         String source = null;
         if (lib != null) {
@@ -315,7 +316,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
         for (File file : filesToWrite) {
             if (file.exists()) {
-                if (file.lastModified() < getLastMod()) {
+                if (file.lastModified() < getLastMod() || mode == JavascriptGeneratorMode.DEVELOPMENT) {
                     file.delete();
                 } else {
                     // its up to date already, skip

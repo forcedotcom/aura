@@ -78,7 +78,9 @@ public enum AuraImplFiles {
      * aura-resources source directory
      */
     AuraResourcesSourceDirectory(AuraResourcesModuleDirectory.getPath(), "src", "main", "resources",
-            "aura", "resources");
+            "aura", "resources"),
+
+    EngineSourceDirectory(AuraResourcesSourceDirectory.getPath(), "engine");
 
     private final String path;
 

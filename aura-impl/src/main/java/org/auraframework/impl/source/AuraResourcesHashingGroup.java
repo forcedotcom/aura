@@ -23,6 +23,7 @@ import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.resource.HashingGroup;
+import org.auraframework.util.resource.ResourceLoader;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -77,7 +78,7 @@ public class AuraResourcesHashingGroup extends HashingGroup implements SourceLis
      *
      * @param updatedFile path of updated file
      */
-    private static synchronized void updateResource(File updatedFile) {
+    public static synchronized void updateResource(File updatedFile, ResourceLoader loader) {
         String path = updatedFile.getPath();
         String relativePath = path.substring(ROOT_DIR.getPath().length(), path.length());
         String classFilePath = AuraImplFiles.AuraResourcesClassDirectory.getPath() + relativePath;
@@ -85,8 +86,8 @@ public class AuraResourcesHashingGroup extends HashingGroup implements SourceLis
         try {
             FileUtils.copyFile(updatedFile, destination, false);
             String refresh = path.substring(path.indexOf("aura/resources"), path.length());
-            Aura.getConfigAdapter().getResourceLoader().refreshCache(refresh);
-            LOG.info("Updated resource file: " + relativePath);
+            loader.refreshCache(refresh);
+            LOG.info("ResourceLoader [" + loader.toString() + "] has updated resource file: " + relativePath);
         } catch (IOException ioe) {
             throw new AuraRuntimeException("Unable to refresh aura resources", ioe);
         }
@@ -98,7 +99,7 @@ public class AuraResourcesHashingGroup extends HashingGroup implements SourceLis
             File updatedFile = new File(filePath);
             if (FILE_FILTER.accept(updatedFile)) {
                 isStale = true;
-                updateResource(updatedFile);
+                updateResource(updatedFile, Aura.getConfigAdapter().getResourceLoader());
             }
         }
     }

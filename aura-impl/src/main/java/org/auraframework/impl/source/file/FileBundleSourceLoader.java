@@ -52,7 +52,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 public class FileBundleSourceLoader implements BundleSourceLoader, InternalNamespaceSourceLoader, SourceListener {
 
-    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+    protected final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
 
     protected class FileEntry {
         public File file;

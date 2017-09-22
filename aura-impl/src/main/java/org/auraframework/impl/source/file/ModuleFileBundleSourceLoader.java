@@ -15,15 +15,15 @@
  */
 package org.auraframework.impl.source.file;
 
-import com.google.common.collect.Maps;
+import java.io.File;
+import java.util.Collection;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.FileMonitor;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.Map;
+import com.google.common.collect.Maps;
 
 /**
  * Module file bundle loader requires support for camel cased component names
@@ -44,28 +44,31 @@ public class ModuleFileBundleSourceLoader extends FileBundleSourceLoader {
 
     @Override
     public void reset() {
-        super.reset();
-        updateFileMap();
+        rwLock.writeLock().lock();
+        try {
+            super.reset();
+            updateFileMap();
+        } finally {
+            rwLock.writeLock().unlock();
+        }
     }
 
     /**
      * Updates file map to include not hyphenated names so that it matches Aura names during BundleSource lookup
      */
     private void updateFileMap() {
-        synchronized (this) {
-            Map<String, FileEntry> temp = Maps.newConcurrentMap();
-            this.fileMap.forEach( (qualified, entry) -> {
-                if (qualified.contains("-")) {
-                    String withoutHyphen = StringUtils.replace(qualified, "-", "");
-                    temp.put(withoutHyphen, entry);
-                }
-            });
-            temp.forEach( (name, entry) -> {
-                if (this.fileMap.get(name) != null) {
-                    throw new AuraRuntimeException(name + " already exists as hyphenated name. Please use another name");
-                }
-                this.fileMap.put(name, entry);
-            });
-        }
+        Map<String, FileEntry> temp = Maps.newConcurrentMap();
+        this.fileMap.forEach( (qualified, entry) -> {
+            if (qualified.contains("-")) {
+                String withoutHyphen = StringUtils.replace(qualified, "-", "");
+                temp.put(withoutHyphen, entry);
+            }
+        });
+        temp.forEach( (name, entry) -> {
+            if (this.fileMap.get(name) != null) {
+                throw new AuraRuntimeException(name + " already exists as hyphenated name. Please use another name");
+            }
+            this.fileMap.put(name, entry);
+        });
     }
 }

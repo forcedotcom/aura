@@ -20,7 +20,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.auraframework.modules.ModulesCompilerData;
-import org.auraframework.tools.node.*;
+import org.auraframework.tools.node.api.Lambda;
+import org.auraframework.tools.node.api.NodeLambdaFactory;
 import org.json.JSONObject;
 
 /**
@@ -28,38 +29,30 @@ import org.json.JSONObject;
  */
 final class ModulesCompilerNode implements ModulesCompiler {
 
-    private static final int POOL_SIZE = 4;
-    private static final long INVOKE_TIMEOUT_1_MINUTE = 60 * 1000;
-    private static final long NODE_RESTART_HALF_DAY = 12 * 60 * 60 * 1000;
-
     private static final Logger logger = Logger.getLogger(ModulesCompilerNode.class.getName());
 
-    private static JSFunction compileFunction = null;
+    private final Lambda compileLambda;
 
-    public synchronized static JSFunction getCompileFunction() {
-        if (compileFunction == null) {
-            compileFunction = new NodeServerPool("node-tool", NodeToolInstaller.installDir(), ModulesCompilerUtil.INVOKE_COMPILE_JS_PATH,
-                    POOL_SIZE, INVOKE_TIMEOUT_1_MINUTE, NODE_RESTART_HALF_DAY);
-        }
-        return compileFunction;
+    ModulesCompilerNode(NodeLambdaFactory factory) throws Exception {
+        compileLambda = factory.get(ModulesCompilerUtil.getCompilerBundle(), ModulesCompilerUtil.COMPILER_HANDLER);
     }
 
     @Override
     public ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
         JSONObject input = ModulesCompilerUtil.generateCompilerInput(entry, sources);
-        input.put("pathToCompilerJs", ModulesCompilerUtil.COMPILER_JS_PATH);
-        JSFunction compile = getCompileFunction();
         JSONObject output;
 
         try {
-            output = compile.invoke(input);
+            output = compileLambda.invoke(input);
         } catch (Exception x) {
             // an error at this level may be due to env (i.e. node process died), retry once
-            logger.log(Level.SEVERE, "ModulesCompilerNode: exception compiling (will retry once) " + entry + ": " + x, x);
+            logger.log(Level.SEVERE, "ModulesCompilerNode: exception compiling (will retry once) " + entry + ": " + x,
+                    x);
             try {
-                output = compile.invoke(input);
+                output = compileLambda.invoke(input);
             } catch (Exception xr) {
-                logger.log(Level.SEVERE, "ModulesCompilerNode: exception compiling (retry failed) " + entry + ": " + xr, xr);
+                logger.log(Level.SEVERE, "ModulesCompilerNode: exception compiling (retry failed) " + entry + ": " + xr,
+                        xr);
                 throw xr;
             }
         }

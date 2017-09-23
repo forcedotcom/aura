@@ -20,6 +20,8 @@ import java.util.Map;
 
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompilerData;
+import org.auraframework.tools.node.api.NodeLambdaFactory;
+import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -33,9 +35,12 @@ import com.google.common.io.Files;
  */
 public class ModulesCompilerTest extends UnitTestCase {
 
+    // NOTE: use to specify which service type to use when running tests
+    private static final NodeLambdaFactory FACTORY = NodeLambdaFactorySidecar.INSTANCE;
+
     @Test
     public void testModulesCompilerNode() throws Exception {
-        testModulesCompiler(new ModulesCompilerNode());
+        testModulesCompiler(new ModulesCompilerNode(FACTORY));
     }
 
     @Test
@@ -64,7 +69,7 @@ public class ModulesCompilerTest extends UnitTestCase {
 
     @Test
     public void testModulesCompilerNodeErrorInHtml() throws Exception {
-        testModulesCompilerErrorInHtml(new ModulesCompilerNode());
+        testModulesCompilerErrorInHtml(new ModulesCompilerNode(FACTORY));
     }
 
     @Test
@@ -90,14 +95,14 @@ public class ModulesCompilerTest extends UnitTestCase {
         } catch (Exception e) {
             e.printStackTrace();
             String message = Throwables.getRootCause(e).getMessage();
-            assertTrue(message,
-                    message.contains("Invalid HTML syntax: non-void-html-element-start-tag-with-trailing-solidus. For more information, please visit https://html.spec.whatwg.org/multipage/parsing.html#parse-error-non-void-html-element-start-tag-with-trailing-solidus"));
+            assertTrue(message, message.contains(
+                    "Invalid HTML syntax: non-void-html-element-start-tag-with-trailing-solidus. For more information, please visit https://html.spec.whatwg.org/multipage/parsing.html#parse-error-non-void-html-element-start-tag-with-trailing-solidus"));
         }
     }
 
     @Test
     public void testModulesCompilerNodeErrorInJs() throws Exception {
-        testModulesCompilerErrorInJs(new ModulesCompilerNode());
+        testModulesCompilerErrorInJs(new ModulesCompilerNode(FACTORY));
     }
 
     @Test

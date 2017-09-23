@@ -25,9 +25,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompilerData;
+import org.auraframework.tools.node.api.NodeBundle;
+import org.auraframework.tools.node.impl.NodeBundleBuilder;
+import org.auraframework.tools.node.impl.NodeTool;
 import org.auraframework.util.IOUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,7 +43,34 @@ import com.eclipsesource.v8.V8Object;
 public final class ModulesCompilerUtil {
 
     static final String COMPILER_JS_PATH = pathToLocalTempFile("modules/compiler.min.js");
-    static final String INVOKE_COMPILE_JS_PATH = pathToLocalTempFile("modules/invokeCompile.js");
+    static final String COMPILER_HANDLER = "src/lwc/invokeCompile.js";
+
+    private static NodeBundle COMPILER_BUNDLE;
+
+    public static synchronized NodeBundle getCompilerBundle() throws Exception {
+        return (COMPILER_BUNDLE != null)? COMPILER_BUNDLE : (COMPILER_BUNDLE = createCompilerBundle());
+    }
+
+    /**
+     * Dynamically create the bundle for the lwc compiler by adding the compiler files
+     * to the plain nodejs bundle.
+     */
+    static NodeBundle createCompilerBundle() throws Exception {
+        NodeBundleBuilder builder = new NodeBundleBuilder(NodeTool.BUNDLE, "lwc-compiler");
+        builder.add("src/lwc/compiler.min.js", new Supplier<InputStream>() {
+            @Override
+            public InputStream get() {
+                return ModulesCompilerUtil.class.getResourceAsStream("/modules/compiler.min.js");
+            }
+        });
+        builder.add(COMPILER_HANDLER, new Supplier<InputStream>() {
+            @Override
+            public InputStream get() {
+                return ModulesCompilerUtil.class.getResourceAsStream("/modules/invokeCompile.js");
+            }
+        });
+        return builder.build();
+    }
 
     public static String pathToLocalTempFile(String classpathResource) {
         return pathToLocalTempFile(ModulesCompilerUtil.class.getClassLoader(), classpathResource);

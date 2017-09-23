@@ -25,6 +25,7 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.tools.node.api.NodeLambdaFactory;
 import org.auraframework.util.resource.ResourceLoader;
 
 public interface ConfigAdapter extends AuraAdapter {
@@ -242,4 +243,9 @@ public interface ConfigAdapter extends AuraAdapter {
      * @return Cache key to add to the context for action public caching.
      */
     String getActionPublicCacheKey();
+    
+    /**
+     * @return factory for the nodejs service
+     */
+    NodeLambdaFactory nodeServiceFactory();
 }

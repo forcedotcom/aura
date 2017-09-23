@@ -18,6 +18,7 @@ package org.auraframework.modules.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.auraframework.tools.node.api.NodeBundle;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
@@ -25,6 +26,12 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 public class ModulesCompilerUtilTest extends UnitTestCase {
+
+    @Test
+    public void createCompilerBundle() throws Exception {
+        NodeBundle bundle = ModulesCompilerUtil.createCompilerBundle();
+        assertNotNull(bundle.id());
+    }
 
     @Test
     public void testGenerateCompilerInput() throws Exception {

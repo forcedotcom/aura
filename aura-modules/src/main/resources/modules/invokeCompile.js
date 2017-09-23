@@ -15,6 +15,6 @@
  */
 
 module.exports = function(input) {
-    const compiler = require(input.pathToCompilerJs);
+    const compiler = require('./compiler.min.js');
     return compiler.compile(input.entry, input.options);;
 }

@@ -38,8 +38,6 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
@@ -58,8 +56,8 @@ import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.BrowserInfo;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.modules.ModuleNamespaceAlias;
-import org.auraframework.service.ContextService;
 import org.auraframework.service.CSPInliningService;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
@@ -68,6 +66,8 @@ import org.auraframework.system.DefRegistry;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.tools.node.api.NodeLambdaFactory;
+import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.FileMonitor;
@@ -80,8 +80,10 @@ import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 @ServiceComponent
@@ -924,5 +926,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public String getActionPublicCacheKey() {
         return "";
+    }
+
+    @Override
+    public NodeLambdaFactory nodeServiceFactory() {
+        return NodeLambdaFactorySidecar.INSTANCE;
     }
 }

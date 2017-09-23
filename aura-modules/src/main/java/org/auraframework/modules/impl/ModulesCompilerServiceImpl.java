@@ -19,21 +19,30 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.ModulesCompilerService;
+import org.auraframework.tools.node.api.NodeLambdaFactory;
 
 @ServiceComponent
 public class ModulesCompilerServiceImpl implements ModulesCompilerService {
-    
-    private static final ModulesCompiler compiler = new ModulesCompilerNode();
+
+    private ModulesCompiler compiler;
+    private NodeLambdaFactory nodeServiceFactory;
 
     private LoggingService loggingService;
-    
+
     @Inject
     public void setLoggingService(LoggingService loggingService) {
         this.loggingService = loggingService;
+    }
+
+    @Inject
+    public void setConfigAdapter(ConfigAdapter configAdapter) throws Exception {
+        nodeServiceFactory = configAdapter.nodeServiceFactory();
+        compiler = new ModulesCompilerNode(nodeServiceFactory);
     }
 
     @Override
@@ -41,7 +50,8 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
         long startNanos = System.nanoTime();
         ModulesCompilerData data = compiler.compile(entry, sources);
         long elapsedMillis = (System.nanoTime() - startNanos) / 1000000;
-        loggingService.info("[node-tool] ModulesCompilerServiceImpl: entry=" + entry + ", elapsedMs=" + elapsedMillis);
+        loggingService.info("[node-tool] ModulesCompilerServiceImpl: entry=" + entry + ", elapsedMs=" + elapsedMillis
+                + ", nodeServiceType=" + nodeServiceFactory);
         return data;
     }
 }

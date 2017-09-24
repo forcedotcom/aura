@@ -42,16 +42,24 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
     @Inject
     public void setConfigAdapter(ConfigAdapter configAdapter) throws Exception {
         nodeServiceFactory = configAdapter.nodeServiceFactory();
-        compiler = new ModulesCompilerNode(nodeServiceFactory);
     }
 
     @Override
     public final ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
+        // need to create compiler lazily to avoid the core modularity enforcer
+        compiler = getCompiler();
         long startNanos = System.nanoTime();
         ModulesCompilerData data = compiler.compile(entry, sources);
         long elapsedMillis = (System.nanoTime() - startNanos) / 1000000;
         loggingService.info("[node-tool] ModulesCompilerServiceImpl: entry=" + entry + ", elapsedMs=" + elapsedMillis
                 + ", nodeServiceType=" + nodeServiceFactory);
         return data;
+    }
+
+    private synchronized ModulesCompiler getCompiler() throws Exception {
+        if (compiler == null) {
+            compiler = new ModulesCompilerNode(nodeServiceFactory);
+        }
+        return compiler;
     }
 }

@@ -15,9 +15,10 @@
  */
 package org.auraframework.impl.factory;
 
-import java.util.Set;
-
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import org.auraframework.Aura;
+import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
@@ -33,8 +34,8 @@ import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import javax.inject.Inject;
+import java.util.Set;
 
 /**
  * Basic CSS style parser.
@@ -43,6 +44,9 @@ public abstract class StyleParser implements DefinitionFactory<TextSource<StyleD
     public static final Set<String> ALLOWED_CONDITIONS;
 
     private final boolean validate;
+
+    @Inject
+    StyleAdapter styleAdapter;
 
     // build list of conditional permutations and allowed conditionals
     static {
@@ -84,7 +88,7 @@ public abstract class StyleParser implements DefinitionFactory<TextSource<StyleD
         
         String className = Styles.buildClassName(descriptor);
 
-        ParserResult result = CssPreprocessor.initial()
+        ParserResult result = CssPreprocessor.initial(styleAdapter)
                 .source(source.getContents())
                 .resourceName(source.getSystemId())
                 .allowedConditions(Iterables.concat(ALLOWED_CONDITIONS, Aura.getStyleAdapter().getExtraAllowedConditions()))

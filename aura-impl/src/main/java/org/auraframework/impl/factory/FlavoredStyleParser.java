@@ -15,9 +15,9 @@
  */
 package org.auraframework.impl.factory;
 
-import static org.auraframework.impl.factory.StyleParser.ALLOWED_CONDITIONS;
-
+import com.google.common.collect.Iterables;
 import org.auraframework.Aura;
+import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
@@ -31,18 +31,24 @@ import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.Iterables;
+import javax.inject.Inject;
+
+import static org.auraframework.impl.factory.StyleParser.ALLOWED_CONDITIONS;
 
 /**
  * Flavored CSS style parser.
  */
 @ServiceComponent
 public final class FlavoredStyleParser implements DefinitionFactory<TextSource<FlavoredStyleDef>, FlavoredStyleDef> {
+
+    @Inject
+    StyleAdapter styleAdapter;
+
     @Override
     public FlavoredStyleDef getDefinition(DefDescriptor<FlavoredStyleDef> descriptor, TextSource<FlavoredStyleDef> source)
             throws QuickFixException {
 
-        ParserResult result = CssPreprocessor.initial()
+        ParserResult result = CssPreprocessor.initial(styleAdapter)
                 .source(source.getContents())
                 .resourceName(source.getSystemId())
                 .allowedConditions(Iterables.concat(ALLOWED_CONDITIONS, Aura.getStyleAdapter().getExtraAllowedConditions()))

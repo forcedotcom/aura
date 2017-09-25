@@ -60,10 +60,10 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
      * @param strategy The indication of how token resolution is being handled (if in doubt about this, use
      *            {@link ResolveStrategy#RESOLVE_NORMAL}).
      */
-    public TokenValueProviderImpl(DefDescriptor<? extends BaseStyleDef> style, TokenCache overrides, ResolveStrategy strategy) {
-        checkNotNull(style, "style cannot be null");
+    public TokenValueProviderImpl(DefDescriptor<TokensDef> namespaceDefault, TokenCache overrides, ResolveStrategy strategy) {
+        checkNotNull(namespaceDefault, "namespaceDefault cannot be null");
         this.overrides = overrides;
-        this.namespaceDefault = Tokens.namespaceDefaultDescriptor(style);
+        this.namespaceDefault = namespaceDefault;
         this.strategy = strategy;
     }
 

@@ -15,13 +15,20 @@
  */
 package org.auraframework.impl.css.parser;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
+import com.salesforce.omakase.Omakase;
+import com.salesforce.omakase.PluginRegistry;
+import com.salesforce.omakase.plugin.Plugin;
+import com.salesforce.omakase.plugin.conditionals.Conditionals;
+import com.salesforce.omakase.plugin.conditionals.ConditionalsValidator;
+import com.salesforce.omakase.plugin.core.AutoRefine;
+import com.salesforce.omakase.plugin.core.AutoRefine.Match;
+import com.salesforce.omakase.plugin.core.StandardValidation;
+import com.salesforce.omakase.plugin.prefixer.PrefixCleaner;
+import com.salesforce.omakase.plugin.prefixer.Prefixer;
+import com.salesforce.omakase.plugin.syntax.UnquotedIEFilterPlugin;
+import com.salesforce.omakase.writer.StyleWriter;
 import org.auraframework.Aura;
+import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.css.FlavorAnnotation;
 import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.StyleContext;
@@ -37,26 +44,18 @@ import org.auraframework.impl.css.parser.plugin.TokenPropertyValidationPlugin;
 import org.auraframework.impl.css.parser.plugin.TokenSecurityPlugin;
 import org.auraframework.impl.css.parser.plugin.UrlCacheBustingPlugin;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.Client;
 import org.auraframework.throwable.quickfix.StyleParserException;
 
-import com.salesforce.omakase.Omakase;
-import com.salesforce.omakase.PluginRegistry;
-import com.salesforce.omakase.plugin.Plugin;
-import com.salesforce.omakase.plugin.conditionals.Conditionals;
-import com.salesforce.omakase.plugin.conditionals.ConditionalsValidator;
-import com.salesforce.omakase.plugin.core.AutoRefine;
-import com.salesforce.omakase.plugin.core.AutoRefine.Match;
-import com.salesforce.omakase.plugin.core.StandardValidation;
-import com.salesforce.omakase.plugin.prefixer.PrefixCleaner;
-import com.salesforce.omakase.plugin.prefixer.Prefixer;
-import com.salesforce.omakase.plugin.syntax.UnquotedIEFilterPlugin;
-import com.salesforce.omakase.writer.StyleWriter;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Parses CSS source code.
  *
- * Use either {@link #initial()} or {@link #runtime(Client.Type)} to get started.
+ * Use either {@link #initial(StyleAdapter)} or {@link #runtime()} to get started.
  */
 public final class CssPreprocessor {
     /** Use one of the constructor methods */
@@ -64,8 +63,8 @@ public final class CssPreprocessor {
     }
 
     /** For the initial preprocessing of css, this includes all syntax validations and static rework */
-    public static ParserConfiguration initial() {
-        return new ParserConfiguration(false);
+    public static ParserConfiguration initial(StyleAdapter styleAdapter) {
+        return new ParserConfiguration(styleAdapter, false);
     }
 
     /** For parsing contextual css, skips syntax validations and static rework, uses current {@link StyleContext} */
@@ -75,12 +74,16 @@ public final class CssPreprocessor {
 
     /** For parsing contextual css, skips syntax validations and static rework, uses given {@link StyleContext} */
     public static ParserConfiguration runtime(StyleContext styleContext) {
-        return new ParserConfiguration(true).styleContext(styleContext);
+        return runtime(styleContext, Aura.getStyleAdapter());
+    }
+
+    public static ParserConfiguration runtime(StyleContext styleContext, StyleAdapter styleAdapter) {
+        return new ParserConfiguration(styleAdapter, true).styleContext(styleContext);
     }
 
     /** For parsing css without any of the default plugins */
     public static ParserConfiguration raw() {
-        return new ParserConfiguration();
+        return new ParserConfiguration(Aura.getStyleAdapter());
     }
 
     /** Configuration for the css parser */
@@ -89,13 +92,16 @@ public final class CssPreprocessor {
         private String resourceName;
         private final boolean runtime;
         private final Set<Plugin> plugins = new LinkedHashSet<>();
+        private StyleAdapter styleAdapter;
 
-        public ParserConfiguration() {
+        public ParserConfiguration(StyleAdapter styleAdapter) {
             this.runtime = false;
+            this.styleAdapter = styleAdapter;
         }
 
-        public ParserConfiguration(boolean runtime) {
+        public ParserConfiguration(StyleAdapter styleAdapter, boolean runtime) {
             this.runtime = runtime;
+            this.styleAdapter = styleAdapter;
 
             if (!runtime) {                
                 plugins.addAll(Aura.getStyleAdapter().getCompilationPlugins());
@@ -134,7 +140,7 @@ public final class CssPreprocessor {
         public ParserConfiguration tokens(DefDescriptor<? extends BaseStyleDef> style) {
             if (runtime) {
                 // this will resolve all token function references
-                TokenValueProvider tvp = Aura.getStyleAdapter().getTokenValueProvider(style, ResolveStrategy.RESOLVE_NORMAL);
+                TokenValueProvider tvp = styleAdapter.getTokenValueProvider(style, ResolveStrategy.RESOLVE_NORMAL);
                 plugins.add(new TokenFunctionPlugin(tvp));
                 
                 // in runtime mode refine all at-rules, so that tokens inside of them are not missed
@@ -142,7 +148,7 @@ public final class CssPreprocessor {
                 plugins.add(AutoRefine.only(Match.AT_RULES));
             } else {
                 // this will collect all token function references but will leave them unevaluated in the CSS
-                TokenValueProvider tvp = Aura.getStyleAdapter().getTokenValueProvider(style, ResolveStrategy.PASSTHROUGH);
+                TokenValueProvider tvp = styleAdapter.getTokenValueProvider(style, ResolveStrategy.PASSTHROUGH);
                 plugins.add(new TokenFunctionPlugin(tvp));
 
                 // validate tokens are used with allowed properties

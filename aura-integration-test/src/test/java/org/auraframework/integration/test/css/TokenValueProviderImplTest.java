@@ -17,6 +17,7 @@ package org.auraframework.integration.test.css;
 
 import com.google.common.collect.ImmutableList;
 import org.auraframework.Aura;
+import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.DefDescriptor;
@@ -46,6 +47,9 @@ public class TokenValueProviderImplTest extends StyleTestCase {
 
     @Inject
     DefinitionService definitionService;
+
+    @Inject
+    StyleAdapter styleAdapter;
 
     @Override
     public void setUp() throws Exception {
@@ -125,7 +129,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
         String prov = "java://" + TmpProvider.class.getName();
         DefDescriptor<TokensDef> override = addSeparateTokens(tokens().descriptorProvider(prov));
 
-        assertEquals("blue", setupOverride(style, override).getValue("color", null));
+        assertEquals("blue", setupOverride(styleAdapter.getNamespaceDefaultDescriptor(style), override).getValue("color", null));
     }
 
     /** check that we get an error if the namespace default doesn't exist */
@@ -279,24 +283,24 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     private TokenValueProvider setup(DefDescriptor<StyleDef> def) throws QuickFixException {
-        return new TokenValueProviderImpl(def, null, ResolveStrategy.RESOLVE_NORMAL);
+        return new TokenValueProviderImpl(styleAdapter.getNamespaceDefaultDescriptor(def), null, ResolveStrategy.RESOLVE_NORMAL);
     }
 
     private TokenValueProvider setupOverride(DefDescriptor<TokensDef> override) throws QuickFixException {
-        return setupOverride(def, override);
+        return setupOverride(styleAdapter.getNamespaceDefaultDescriptor(def), override);
     }
 
     private TokenValueProvider setupOverride(List<DefDescriptor<TokensDef>> overrides) throws QuickFixException {
-        return setupOverride(def, overrides);
+        return setupOverride(styleAdapter.getNamespaceDefaultDescriptor(def), overrides);
     }
 
-    private TokenValueProvider setupOverride(DefDescriptor<StyleDef> def, DefDescriptor<TokensDef> override)
+    private TokenValueProvider setupOverride(DefDescriptor<TokensDef> namespace, DefDescriptor<TokensDef> override)
             throws QuickFixException {
-        return setupOverride(def, ImmutableList.of(override));
+        return setupOverride(namespace, ImmutableList.of(override));
     }
 
-    private TokenValueProvider setupOverride(DefDescriptor<StyleDef> def, List<DefDescriptor<TokensDef>> overrides)
+    private TokenValueProvider setupOverride(DefDescriptor<TokensDef> namespace, List<DefDescriptor<TokensDef>> overrides)
             throws QuickFixException {
-        return new TokenValueProviderImpl(def, new TokenCacheImpl(definitionService, overrides), ResolveStrategy.RESOLVE_NORMAL);
+        return new TokenValueProviderImpl(namespace, new TokenCacheImpl(definitionService, overrides), ResolveStrategy.RESOLVE_NORMAL);
     }
 }

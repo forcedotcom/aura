@@ -33,6 +33,7 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
     private NodeLambdaFactory nodeServiceFactory;
 
     private LoggingService loggingService;
+    private ConfigAdapter configAdapter;
 
     @Inject
     public void setLoggingService(LoggingService loggingService) {
@@ -41,7 +42,7 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
 
     @Inject
     public void setConfigAdapter(ConfigAdapter configAdapter) throws Exception {
-        nodeServiceFactory = configAdapter.nodeServiceFactory();
+        this.configAdapter = configAdapter;
     }
 
     @Override
@@ -58,6 +59,7 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
 
     private synchronized ModulesCompiler getCompiler() throws Exception {
         if (compiler == null) {
+            nodeServiceFactory = configAdapter.nodeServiceFactory();
             compiler = new ModulesCompilerNode(nodeServiceFactory);
         }
         return compiler;

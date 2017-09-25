@@ -3503,6 +3503,7 @@ AuraClientService.prototype.resetToken = function(newToken) {
  * @export
  */
 AuraClientService.prototype.runActions = function(actions, scope, callback) {
+    $A.deprecated("AuraClientService.runActions has been deprecated, do not use it", null, "2017/09/20", "2017/10/20", "AuraClientService.runActions");
     var i;
     var count = actions.length;
     var completion = function() {

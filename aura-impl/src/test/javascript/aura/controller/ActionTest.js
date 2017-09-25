@@ -76,7 +76,8 @@ Test.Aura.Controller.ActionTest = function() {
                     },
                     isObject: function(obj) {}
                 },
-                assert: function() {}
+                assert: function() {},
+                deprecated: function(){}
             },
             "Action": Aura.Controller.Action
     });
@@ -996,7 +997,8 @@ Test.Aura.Controller.ActionTest = function() {
                     enqueueAction : function(param) {
                         actual = param;
                     }
-                }
+                },
+                deprecated: function(){}
             });
             var target = newAction();
             var action = {
@@ -2335,7 +2337,7 @@ Test.Aura.Controller.ActionTest = function() {
     [Fixture]
     function IsPubliclyCacheable() {
 
-        var getDef = function(isPublicCachingEnabled, publicCachingExpiration) { 
+        var getDef = function(isPublicCachingEnabled, publicCachingExpiration) {
             return {
                 isPublicCachingEnabled: function() {
                     return isPublicCachingEnabled;
@@ -2346,7 +2348,7 @@ Test.Aura.Controller.ActionTest = function() {
             };
         };
 
-        var getAuraMock = function(isActionPublicCachingEnabled) { 
+        var getAuraMock = function(isActionPublicCachingEnabled) {
             return Mocks.GetMock(Object.Global(), "$A", {
                 getContext: function() {
                     return {

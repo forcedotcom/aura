@@ -397,23 +397,6 @@ function AuraInstance () {
 }
 
 /**
- * Does nothing.
- *
- * @public
- * @deprecated
- */
-AuraInstance.prototype.setCurrentTransactionId = function() { };
-
-/**
- * Does nothing.
- *
- * @returns undefined
- * @public
- * @deprecated
- */
-AuraInstance.prototype.getCurrentTransactionId = function() { return undefined; };
-
-/**
  * Initializes Aura with context info about the app that should be loaded.
  * @param {Object} config
  *
@@ -1307,7 +1290,33 @@ AuraInstance.prototype.trace = function() {
  * */
 AuraInstance.prototype.deprecated = function(message, workaround, sinceDate, dueDate, reportSignature) {
 
+    // JBUCH: TEMPORARILY IGNORE CALLS BY ui: and aura: NAMESPACES.
+    // REMOVE WHEN VIEW LOGIC IS COMPILED WITH FRAMEWORK.
+    var callingCmp = $A.clientService.currentAccess&&$A.clientService.currentAccess.getType();
+    if(/^(ui|aura):\w+$/.test(callingCmp)){
+        // $A.log("Framework component use of deprecated method: "+message);
+        return;
+    }
+
     //#if {"excludeModes" : ["PRODUCTION"]}
+    var caller=new Error();
+    if(!caller.stack){
+        try {
+            throw caller;
+        } catch(e) {
+            caller=e;
+        }
+    }
+    caller=$A.util.trim((caller.stack||'').split('\n')[3])||'at unknown location';
+
+    // JBUCH: TEMPORARILY IGNORE CALLS BY FRAMEWORK.
+    // REMOVE WHEN ALL @public METHODS HAVE BEEN ADDRESSED.
+    // TODO: This filter may have false positive when a function is installed a override
+    if(caller.indexOf("/aura_")>-1) {
+        // $A.log("Framework use of deprecated method: " + message);
+        return;
+    }
+
     // This should be moved out to a constant, once we decide on the actual value.
     var DEFAULT_DEPRECATION=1000*60*60*24*28; // Four weeks
     var TEST_BUFFER=1000*60*60*24*14; // Two weeks
@@ -1316,7 +1325,7 @@ AuraInstance.prototype.deprecated = function(message, workaround, sinceDate, due
     if(!dueDate){
         if(!sinceDate){
             dueDate=testDueDate=new Date();
-        }else {
+        } else {
             sinceDate=new Date(sinceDate);
             dueDate=new Date(sinceDate);
             dueDate.setTime(dueDate.getTime() + DEFAULT_DEPRECATION);
@@ -1333,16 +1342,8 @@ AuraInstance.prototype.deprecated = function(message, workaround, sinceDate, due
             sinceDate=new Date(sinceDate);
         }
     }
-    var caller=new Error();
-    if(!caller.stack){
-        try{
-            throw caller;
-        }catch(e){
-            caller=e;
-        }
-    }
-    caller=$A.util.trim((caller.stack||'').split('\n')[3])||'at unknown location';
-    message=$A.util.format("DEPRECATED (as of {0}, unusable on {1}): {2}\n\t{3}\n{4}",
+
+    message = $A.util.format("DEPRECATED (as of {0}, unusable on {1}): {2}\n\t{3}\n{4}",
         $A.localizationService.formatDate(sinceDate),
         $A.localizationService.formatDate(dueDate),
         message,
@@ -1350,20 +1351,6 @@ AuraInstance.prototype.deprecated = function(message, workaround, sinceDate, due
         workaround?"Workaround: "+workaround:"No known workaround."
     );
 
-    // JBUCH: TEMPORARILY IGNORE CALLS BY FRAMEWORK.
-    // REMOVE WHEN ALL @public METHODS HAVE BEEN ADDRESSED.
-    // TODO: This filter may have false positive when a function is installed a override
-    if(caller.indexOf("/aura_")>-1) {
-        // $A.log("Framework use of deprecated method: " + message);
-        return;
-    }
-
-    // JBUCH: TEMPORARILY IGNORE CALLS BY ui: and aura: NAMESPACES.
-    // REMOVE WHEN VIEW LOGIC IS COMPILED WITH FRAMEWORK.
-    if(/^(ui|aura):\w+$/.test($A.clientService.currentAccess&&$A.clientService.currentAccess.getType())){
-        // $A.log("Framework component use of deprecated method: "+message);
-        return;
-    }
     if(Date.now()>=dueDate){
         $A.warning(message);
         // JBUCH: TODO: REACTIVATE ONCE CRUC IS IN PLACE
@@ -1394,9 +1381,7 @@ AuraInstance.prototype.deprecated = function(message, workaround, sinceDate, due
             reporting = true;
         }
 
-        // if there's no current access, sending info from stacktrace instead
-        var callingCmp = $A.clientService.currentAccess ;
-        callers.push(callingCmp? callingCmp.getType() : "UNKNOWN");
+        callers.push(callingCmp? callingCmp : "UNKNOWN");
 
         // reporting when a deprecated API gets called 5 times
         if (reporting || callers.length === 5) {

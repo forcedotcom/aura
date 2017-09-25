@@ -800,6 +800,7 @@ Action.prototype.setBackground = function() {
  * @export
  */
 Action.prototype.runAfter = function(action) {
+    $A.deprecated("Action.runAfter is no longer supported.","Use '$A.enqueueAction'.","2017/09/20","2017/10/20", "Action.runAfter");
     $A.clientService.enqueueAction(action);
 };
 
@@ -1107,6 +1108,7 @@ Action.prototype.setAbortable = function() {
  * @deprecated
  */
 Action.prototype.getAbortableId = function() {
+    $A.deprecated("Action.getAbortableId is no longer supported.", null, "2017/09/20","2017/10/20", "Action.getAbortableId");
     return undefined;
 };
 
@@ -1138,6 +1140,7 @@ Action.prototype.isAbortable = function() {
  * @deprecated
  */
 Action.prototype.setExclusive = function() {
+    $A.deprecated("Action.setExclusive is no longer supported.", null, "2017/09/20","2017/10/20", "Action.setExclusive");
     return false;
 };
 
@@ -1150,6 +1153,7 @@ Action.prototype.setExclusive = function() {
  * @deprecated
  */
 Action.prototype.isExclusive = function() {
+    $A.deprecated("Action.isExclusive is no longer supported.", null, "2017/09/20","2017/10/20", "Action.isExclusive");
     return false;
 };
 

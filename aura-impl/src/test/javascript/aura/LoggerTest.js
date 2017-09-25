@@ -55,7 +55,8 @@ Test.Aura.LoggerTest = function() {
             },
             auraError: function(message) {
                 return Error(message);
-            }
+            },
+            deprecated: function(){}
         });
 
     [Fixture]

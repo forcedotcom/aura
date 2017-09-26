@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.util.Set;
 
 public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> implements DesignAttributeDef {
-    private static final Set<String> VALID_DESIGN_ATTRIBUTE_TYPES = Sets.newHashSet("string", "integer", "boolean");
     private static final Set<String> VALID_DESIGN_ATTRIBUTE_TYPES_FOR_FACET = Sets.newHashSet("object[]", "aura.component[]", "aura.componentdefref[]");
     private static final Set<String> VALID_DATASOURCE_ATTRIBUTE_TYPES = Sets.newHashSet("string");
     private static final long serialVersionUID = 3290806856269872853L;
@@ -183,10 +182,6 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
                     attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())){
                 throw new InvalidDefinitionException("Only String attributes may have a datasource in the design file.", getLocation());
             }
-
-        } else if(!isInInternalNamespace && !VALID_DESIGN_ATTRIBUTE_TYPES.contains(
-                attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())){
-            throw new InvalidDefinitionException("Only Boolean, Integer or String attributes may be exposed in design files.", getLocation());
         }
 
         if (getAttributeDefault() != null &&

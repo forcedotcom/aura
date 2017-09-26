@@ -145,5 +145,84 @@
             imgElement = cmp.getElement();
             $A.test.assertEquals("Help Accessibility", imgElement.alt, "Expected alt text for the image element.");
         }
+    },
+
+    testImageWithNaughtyLink: {
+        attributes: {
+            src: '/auraFW/resources/aura/auralogo.png',
+            /* eslint-disable no-script-url */
+            href: 'javascript:alert(document.domain)', 
+            /* eslint-enable no-script-url */
+            imageType: 'decorative'
+        },
+        test: function (cmp) {
+            var element = cmp.find("body").getElement().firstChild;
+            $A.test.assertFalse($A.test.isInstanceOfAnchorElement(element), "Expected NOT to see an anchor element.");
+
+            $A.test.assertTrue($A.test.isInstanceOfImageElement(element), "Expected to see an image element only.");
+            $A.test.assertTrue($A.util.stringEndsWith(element.src, '/auraFW/resources/aura/auralogo.png'), "Failed to display specified image source.");
+        }
+    },
+    
+    testImageWithEmptyLink: {
+        attributes: {
+            src: '/auraFW/resources/aura/auralogo.png',
+            /* eslint-disable no-script-url */
+            href: '', 
+            /* eslint-enable no-script-url */
+            imageType: 'decorative'
+        },
+        test: function (cmp) {
+            var element = cmp.find("body").getElement().firstChild;
+            $A.test.assertFalse($A.test.isInstanceOfAnchorElement(element), "Expected NOT to see an anchor element.");
+
+            $A.test.assertTrue($A.test.isInstanceOfImageElement(element), "Expected to see an image element only.");
+            $A.test.assertTrue($A.util.stringEndsWith(element.src, '/auraFW/resources/aura/auralogo.png'), "Failed to display specified image source.");
+        }
+    },
+
+    testImageWithNaughtySrc: {
+        attributes: {
+            /* eslint-disable no-script-url */
+            src: 'javascript:alert(document.domain)', 
+            /* eslint-enable no-script-url */
+            imageType: 'decorative'
+        },
+        test: function (cmp) {
+            var element = cmp.find("body").getElement().firstChild;
+            $A.test.assertTrue($A.test.isInstanceOfImageElement(element), "Expected to see an image element only.");
+            $A.test.assertTrue($A.util.stringEndsWith(element.src, '/auraFW/resources/aura/s.gif'), "Expected src to be '/auraFW/resources/aura/s.gif'.");
+        }
+    },
+
+    testImageWithUndefinedSrc: {
+        attributes: {
+            imageType: 'decorative'
+        },
+        test: function (cmp) {
+            var element = cmp.find("body").getElement().firstChild;
+            $A.test.assertTrue($A.test.isInstanceOfImageElement(element), "Expected to see an image element only.");
+            $A.test.assertTrue($A.util.stringEndsWith(element.src, '/auraFW/resources/aura/s.gif'), "Expected src to be '/auraFW/resources/aura/s.gif'.");
+        }
+    },
+
+    testImageWithRelativeLink: {
+        attributes: {
+            src: '/auraFW/resources/aura/auralogo.png',
+            href: '/about/contact',
+            imageType: 'decorative'
+        },
+        test: function (cmp) {
+            var linkElement = cmp.find("body").getElement().firstChild;
+            $A.test.assertTrue($A.test.isInstanceOfAnchorElement(linkElement), "Expected to see a anchor element.");
+            $A.test.assertTrue($A.test.contains(linkElement.href, '/about/contact'), linkElement.href + " Expected a link with specified address.");
+            $A.test.assertEquals('_self', linkElement.target, "Expected target to be _self by default.");
+
+            $A.test.assertEquals(1, linkElement.childElementCount || linkElement.children.length); //IE8 and below don't have childElementCount
+
+            var imgElement = linkElement.children[0];
+            $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element embedded in the anchor tag.");
+            $A.test.assertTrue($A.util.stringEndsWith(imgElement.src, '/auraFW/resources/aura/auralogo.png'), "Failed to display specified image source.");
+        }
     }
 })// eslint-disable-line semi

@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 ({
+    allowedSchemes: [
+        'http', 'https', 'ftp', 'mailto'
+    ],
+    allowedSchemesByTag: {},
+    allowProtocolRelative: true,
+
+
     /**
      * Returns the img tag in this component.
      */
@@ -42,7 +49,8 @@
 
             var href = cmp.get("v.href");
 
-            if (!$A.util.isEmpty(href)) {
+            // if the href value isn't naughty or empty return a linked image
+            if (!$A.util.isEmpty(href) && !this.isNaughtyHref('a', href)) {
                 var link = $A.util.createHtmlElement("a", {
                     "href": href,
                     "class": cmp.get("v.linkClass"),
@@ -51,6 +59,7 @@
 
                 link.appendChild(image);
                 bodyElement.appendChild(link);
+            // return only image
             } else {
                 bodyElement.appendChild(image);
             }
@@ -59,9 +68,16 @@
     },
 
     buildImageElement: function (cmp) {
+        var imgSrc = cmp.get("v.src");
+        
+        // if image source value is naughty reset it to the default value
+        if (this.isNaughtyHref('img', imgSrc)) {
+            imgSrc = '/auraFW/resources/aura/s.gif';
+        }
+
         var image = $A.util.createHtmlElement("img", {
             "data-aura-rendered-by": cmp.getGlobalId(),
-            "src": cmp.get("v.src"),
+            "src": imgSrc,
             "class": cmp.get("v.class"),
             "alt": cmp.get("v.alt"),
             "title": cmp.get("v.title")
@@ -80,6 +96,48 @@
         });
 
         return image;
+    },
+
+    // Avoid false positives with .__proto__, .hasOwnProperty, etc.
+    has: function (obj, key) {
+        return Object.prototype.hasOwnProperty.call(obj, key);
+    },
+
+    isNaughtyHref: function (name, href) {
+        // if href is undefined set it to an empty string
+        if (typeof href === 'undefined') {
+            return false;
+        }
+        
+        // Browsers ignore character codes of 32 (space) and below in a surprising
+        // number of situations. Start reading here:
+        // https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet#Embedded_tab
+        /* eslint-disable no-control-regex */
+        href = href.replace(new RegExp('[\x00-\x20]+', 'g'), '');
+        /* eslint-enable no-control-regex */
+        // Clobber any comments in URLs, which the browser might
+        // interpret inside an XML data island, allowing
+        // a javascript: URL to be snuck through
+        href = href.replace(new RegExp('<\!\-\-.*?\-\-\>', 'g'), '');
+        // Case insensitive so we don't get faked out by JAVASCRIPT #1
+        var matches = href.match(new RegExp('^([a-zA-Z]+)\:'));
+        
+        if (!matches) {
+            // Protocol-relative URL: "//some.evil.com/nasty"
+            if (href.match(new RegExp('^\/\/'))) {
+                return !this.allowProtocolRelative;
+            }
+
+            // No scheme
+            return false;
+        }
+        var scheme = matches[1].toLowerCase();
+
+        if (this.has(this.allowedSchemesByTag, name)) {
+            return this.allowedSchemesByTag[name].indexOf(scheme) === -1;
+        }
+
+        return !this.allowedSchemes || this.allowedSchemes.indexOf(scheme) === -1;
     }
 
 });

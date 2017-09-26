@@ -94,9 +94,12 @@ function AuraError(message, innerError, severity) {
     this["id"] = "";
 
     // Access Stack defaults - takes dependency on $A.clientService
-    if((typeof $A)!=="undefined"&&$A.clientService&&$A.clientService.currentAccess){
-        this.setComponent($A.clientService.currentAccess.getType());
-        this["componentStack"]=$A.clientService.getAccessStackHierarchy();
+    if ((typeof $A) !== "undefined" && $A.clientService) {
+        var currentAcess = $A.clientService.getCurrentAccessName();
+        if (currentAcess) {
+            this.setComponent(currentAcess);
+            this["componentStack"] = $A.clientService.getAccessStackHierarchy();
+        }
     }
 
 }

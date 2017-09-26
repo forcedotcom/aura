@@ -1664,6 +1664,20 @@ AuraClientService.prototype.init = function(config, token, container) {
     return component;
 };
 
+AuraClientService.prototype.getCurrentAccessName = function() {
+    if (!this.currentAccess) {
+        return null;
+    }
+
+    // current access can be a component or a component def
+    if (this.currentAccess.getType) {
+        return this.currentAccess.getType();
+    } else {
+        return this.currentAccess.getDescriptor().getFullName();
+    }
+
+};
+
 /**
  * Return the number of inFlightXHRs
  *

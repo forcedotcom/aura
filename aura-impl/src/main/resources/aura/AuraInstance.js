@@ -1292,7 +1292,7 @@ AuraInstance.prototype.deprecated = function(message, workaround, sinceDate, due
 
     // JBUCH: TEMPORARILY IGNORE CALLS BY ui: and aura: NAMESPACES.
     // REMOVE WHEN VIEW LOGIC IS COMPILED WITH FRAMEWORK.
-    var callingCmp = $A.clientService.currentAccess&&$A.clientService.currentAccess.getType();
+    var callingCmp = $A.clientService.getCurrentAccessName();
     if(/^(ui|aura):\w+$/.test(callingCmp)){
         // $A.log("Framework component use of deprecated method: "+message);
         return;

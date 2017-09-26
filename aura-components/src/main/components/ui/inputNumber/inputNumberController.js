@@ -16,5 +16,9 @@
 ({
     initialize : function (cmp, event, helper) {
         helper.setDefaultAttrs(cmp);
+    },
+    handleChange : function (cmp, event) {
+        event.stopPropagation();
+        cmp.getEvent('change').fire();
     }
 });

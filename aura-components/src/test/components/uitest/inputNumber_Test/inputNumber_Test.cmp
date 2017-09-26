@@ -18,9 +18,25 @@
 <aura:component model="java://org.auraframework.components.test.java.model.TestJavaModel">
 
     <aura:attribute name="testCmpName" type="string" default="Number"/>
+    <aura:attribute name="eventSource" type="string" />
+    <aura:attribute name="eventValue" type="string" />
 
-    <ui:inputNumber aura:id="Number" value="{!m.number}" updateOn="keyup" label="Number" labelPosition="top" />
-
+    <ui:inputNumber
+            aura:id="Number"
+            value="{!m.number}"
+            updateOn="keyup"
+            label="Number"
+            labelPosition="top"
+    />
     <auratest:baseInputTest cmpType="{!v.testCmpName}" ref="{!m.number}"/>
+
+    <ui:inputNumber
+            aura:id="Number2"
+            value="{ !v.n2value }"
+            updateOn="input"
+            label="Number"
+            labelPosition="top"
+            change="{! c.handleChange }"
+    />
 
 </aura:component>

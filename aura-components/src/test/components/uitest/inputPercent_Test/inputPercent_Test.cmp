@@ -20,12 +20,12 @@
     <aura:attribute name="eventSource" type="string" />
     <aura:attribute name="eventValue" type="string" />
 
-    <ui:inputCurrency aura:id="input" value="{! v.value }" label="Input" updateOn="keyup" change="{!c.handleChange}"/>
-    <p>v.value: <span class="vvalue">{!v.value}</span></p>
+    <ui:inputPercent
+            aura:id="input"
+            value="{! v.value }"
+            label="Percent"
+            updateOn="keyup"
+            change="{!c.handleChange}"
+    />
 
-    <hr/>
-    <ui:button label="Set number - 1234" press="{! c.setNewValueAsNumber }"></ui:button>
-    <ui:button label="Set string number - '5678'" press="{! c.setNewValueAsString }"></ui:button>
-    <ui:button label="Set a well formatted string number '$5,678.00'" press="{! c.setNewValueAsWellFormatted }"></ui:button>
-    <ui:button label="Set incorrent  '35Aai#i'" press="{! c.setNewValueIncorrect }"></ui:button>
 </aura:component>

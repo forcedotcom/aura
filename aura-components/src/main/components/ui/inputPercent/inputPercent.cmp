@@ -24,6 +24,7 @@
             aura:id="smart"
             value="{! v.value }"
             updateOn="{! v.updateOn }"
+            change="{! c.handleChange }"
             style="percent"
             valueScale="{! v.valueScale }"
             format="{! v.format }"

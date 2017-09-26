@@ -193,20 +193,16 @@ Logger.prototype.reportError = function(e, action, level, foreground) {
 };
 
 /**
- * @private
+ * Check if an error is external. 'external' means every stackframe isn't from framework nor framework consumers.
+ *
+ * @param {Error} e - The error object to check
  */
 Logger.prototype.isExternalError = function(e) {
     if (!e) {
         return false;
     }
 
-    var errorframes;
-    if (e instanceof $A.auraError) {
-        errorframes = e.stackFrames;
-    } else {
-        errorframes = Aura.Errors.StackParser.parse(e);
-    }
-
+    var errorframes = this.generateStackFrames(e);
     for (var i = 0, len = errorframes.length; i < len; i++) {
         var fileName = errorframes[i].fileName;
         if (!fileName) {
@@ -218,21 +214,62 @@ Logger.prototype.isExternalError = function(e) {
             return true;
         }
 
-        // external means every stackframe isn't from framework nor framework consumers
-        if (fileName.match(/aura_[^\.]+\.js$/gi) ||         // includes aura
-            fileName.match("engine.js") ||                  // includes module engine
-            fileName.match("engine.min.js") ||              // includes module engine PROD
-            fileName.indexOf('/components/') > -1  ||       // includes components
-            fileName.indexOf('/libraries/') > -1 ||         // includes libraries
-            fileName.indexOf('/jslibrary/') > -1 ||         // includes client libraries
-            fileName.indexOf('/auraFW/resources/') > -1 ||  // includes client libraries
-            fileName.match("appcore.js") ||                 // includes appcore.js
-            fileName.match("app.js")) {                     // includes app.js
+        if (this.isAuraFile(fileName)) {
             return false;
         }
     }
 
     return true;
+};
+
+/**
+ * Check if an error is raised from external code
+ *
+ * @param {Error} e - The error object to check
+ */
+Logger.prototype.isExternalRaisedError = function(e) {
+    if (!e) {
+        return false;
+    }
+
+    var errorframes = this.generateStackFrames(e);
+    var fileName = errorframes[0] && errorframes[0].fileName;
+
+    return !this.isAuraFile(fileName);
+};
+
+/**
+ * Generate stack frames from an error.
+ *
+ * @private
+ */
+Logger.prototype.generateStackFrames = function(e) {
+    if (e instanceof $A.auraError) {
+        return e.stackFrames;
+    }
+
+    return Aura.Errors.StackParser.parse(e);
+};
+
+/**
+ * Check if a file belongs to Aura file. The file name string needs to be full path.
+ *
+ * @private
+ */
+Logger.prototype.isAuraFile = function(fileName) {
+    if (!fileName) {
+        return false;
+    }
+
+    return fileName.match(/aura_[^\.]+\.js$/gi) ||         // includes aura
+           fileName.match("engine.js") ||                  // includes module engine
+           fileName.match("engine.min.js") ||              // includes module engine PROD
+           fileName.indexOf('/components/') > -1  ||       // includes components
+           fileName.indexOf('/libraries/') > -1 ||         // includes libraries
+           fileName.indexOf('/jslibrary/') > -1 ||         // includes client libraries
+           fileName.indexOf('/auraFW/resources/') > -1 ||  // includes client libraries
+           fileName.match("appcore.js") ||                 // includes appcore.js
+           fileName.match("app.js");
 };
 
 /**

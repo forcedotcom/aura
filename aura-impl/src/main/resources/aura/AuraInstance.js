@@ -847,12 +847,14 @@ AuraInstance.prototype.reportError = function(message, error) {
             if (error && message) {
                 // if there's extra info in the message that's not in error.message, include it for report.
                 if (message !== error.message && message.indexOf(error.message) > -1) {
-                    error.message = message;
+                    error.message = message + ". Caused by: " + error.message;
                 }
             }
-            $A.logger.reportError(error);
+            // if error is raised from external code, logging only
+            var reportingLevel = $A.logger.isExternalRaisedError(error) ? "WARNING" : "ERROR";
+            $A.logger.reportError(error, null, reportingLevel);
         })();
-        $A.services.client.postProcess();
+        $A.clientService.postProcess();
     }
 
     this.lastKnownError = null;

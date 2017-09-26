@@ -820,4 +820,79 @@ Test.Aura.LoggerTest = function() {
             Assert.False(actual);
         }
     }
+
+    [Fixture]
+    function isExternalRaisedError() {
+
+        var logger = new Aura.Utils.Logger();
+
+        var _AuraError;
+        var _StackFrame;
+        var _ErrorStackParser;
+
+        Mocks.GetMocks(Object.Global(), {
+            "Aura": {Errors: {}},
+        })(function() {
+            Import("aura-impl/src/main/resources/aura/polyfill/stackframe.js");
+            Import("aura-impl/src/main/resources/aura/polyfill/error-stack-parser.js");
+            Import("aura-impl/src/main/resources/aura/error/AuraError.js");
+            _StackFrame = StackFrame;
+            _ErrorStackParser = ErrorStackParser;
+            _AuraError = AuraError;
+            delete StackFrame;
+            delete ErrorStackParser;
+            delete AuraError;
+        });
+
+        function getAuraMock(during) {
+            return Mocks.GetMocks(Object.Global(), {
+                Aura: {
+                    Errors: {
+                        AuraError: _AuraError,
+                        StackFrame: _StackFrame,
+                        StackParser: _ErrorStackParser
+                    }
+                },
+                $A: {
+                    auraError: _AuraError
+                }
+            })(during);
+        }
+
+        [Fact]
+        function ReturnFalseIfErrorIsFalsy() {
+            var actual = logger.isExternalError();
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnTrueIfErrorIsRaisedFromExternalScript() {
+            var error = new TypeError("Cannot read property tasks of undefined");
+            error.stack = "onDecode()@chrome-extension://hmoenmfdbkbjcpiibpfakppdpahlfnpo/SfdcInspectorInjectedScript.js:667:35\n\
+            AuraInspector.ClientService_OnDecode()@chrome-extension://pfaglkajfeiladkdkcfmdccancbjbbbc/AuraInspectorInjectedScript.js:430:37\n\
+            Object.onXHRReceived()@https://na7.lightning.blitz04.soma.force.com/components/instrumentation/beacon.js:6:163\n";
+
+            var actual;
+            getAuraMock(function() {
+                actual = logger.isExternalRaisedError(error);
+            });
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnFalseIfErrorIsRaisedFromAuraScript() {
+            var error = new Error("Error from app client controller");
+            error.stack = "Error: Error from app client controller\n\
+    at throwErrorFromClientController (http://localhost:9090/components/auratest/errorHandlingApp.js:42:15)\n\
+    at Action.$runDeprecated$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8469:36)\n\
+    at Object.Component$getActionCaller [as $handler$] (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:6695:20)\n";
+
+            var actual;
+            getAuraMock(function() {
+                actual = logger.isExternalRaisedError(error);
+            });
+            Assert.False(actual);
+        }
+    }
 };

@@ -27,7 +27,7 @@
 function ComponentDef(config) {
     var descriptor = new DefDescriptor(config[Json.ApplicationKey.DESCRIPTOR]);
     this.descriptor = descriptor;
-    this.hasRemoteDeps = config[Json.ApplicationKey.HASSERVERDEPENDENCIES] || false;
+    this.hasRemoteDeps = descriptor.toString().indexOf("layout://") !== 0 && (config[Json.ApplicationKey.HASSERVERDEPENDENCIES] || false);
     this.access = config[Json.ApplicationKey.ACCESS];
 
     this.styleDef = config[Json.ApplicationKey.STYLEDEF] ? new StyleDef(config[Json.ApplicationKey.STYLEDEF]) : undefined;

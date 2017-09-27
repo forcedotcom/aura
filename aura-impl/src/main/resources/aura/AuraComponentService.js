@@ -69,7 +69,7 @@ function AuraComponentService() {
  * @export
  */
 AuraComponentService.prototype.get = function(globalId) {
-    $A.deprecated("AuraComponentService.get is no longer supported.","Use '$A.getComponent();'.","2017/09/20","2017/10/20", "AuraComponentService.get");
+    // $A.deprecated("AuraComponentService.get is no longer supported.","Use '$A.getComponent();'.","2017/09/20","2017/10/20", "AuraComponentService.get");
     return this.indexes.globalId[globalId];
 };
 

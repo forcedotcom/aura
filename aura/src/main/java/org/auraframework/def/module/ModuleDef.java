@@ -16,12 +16,15 @@
 package org.auraframework.def.module;
 
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
+import org.auraframework.def.RootDefinition;
 
 /**
  * Module Definition
+ *
+ * Extending RootDefinition in order to be used in BundleAwareDefRegistry.
+ * However, RootDefinition API needs to be refactored to remove unnecessary APIs.
  */
-public interface ModuleDef extends Definition {
+public interface ModuleDef extends RootDefinition {
 
     enum CodeType {
         DEV, PROD, COMPAT, PROD_COMPAT

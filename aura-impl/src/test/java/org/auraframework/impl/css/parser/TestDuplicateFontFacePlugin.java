@@ -278,15 +278,15 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
             return plugins;
         }
 
-        @SuppressWarnings("unused")
-        public static TestStyleAdapter compilation(Plugin... plugins) {
-            return new TestStyleAdapter(Lists.newArrayList(plugins), null, null);
-        }
-
-        @SuppressWarnings("unused")
-        public static TestStyleAdapter runtime(Plugin... plugins) {
-            return new TestStyleAdapter(null, Lists.newArrayList(plugins), null);
-        }
+//        @SuppressWarnings("unused")
+//        public static TestStyleAdapter compilation(Plugin... plugins) {
+//            return new TestStyleAdapter(Lists.newArrayList(plugins), null, null);
+//        }
+//
+//        @SuppressWarnings("unused")
+//        public static TestStyleAdapter runtime(Plugin... plugins) {
+//            return new TestStyleAdapter(null, Lists.newArrayList(plugins), null);
+//        }
 
         public static TestStyleAdapter contextual(Plugin... plugins) {
             return new TestStyleAdapter(null, null, Lists.newArrayList(plugins));

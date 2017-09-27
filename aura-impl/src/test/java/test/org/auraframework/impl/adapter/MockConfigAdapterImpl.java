@@ -15,8 +15,17 @@
  */
 package test.org.auraframework.impl.adapter;
 
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
 import org.auraframework.Aura;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.DefaultContentSecurityPolicy;
@@ -32,15 +41,8 @@ import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.source.StringSourceLoader;
 import org.springframework.context.annotation.Primary;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Sets;
 
 /**
  * ConfigAdapter for Aura tests.
@@ -189,6 +191,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         super();
     }
 
+    @Override
     public void reset() {
         isClientAppcacheEnabled = null;
         isProduction = null;
@@ -201,6 +204,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         isActionPublicCachingEnabled = null;
     }
 
+    @Override
     public void setIsClientAppcacheEnabled(boolean isClientAppcacheEnabled) {
         this.isClientAppcacheEnabled = isClientAppcacheEnabled;
     }
@@ -210,6 +214,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         return (isClientAppcacheEnabled == null) ? super.isClientAppcacheEnabled() : isClientAppcacheEnabled;
     }
 
+    @Override
     public void setIsProduction(boolean isProduction) {
         this.isProduction = isProduction;
     }
@@ -219,6 +224,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         return (isProduction == null) ? super.isProduction() : isProduction;
     }
 
+    @Override
     public void setIsAuraJSStatic(boolean isAuraJSStatic) {
         this.isAuraJSStatic = isAuraJSStatic;
     }
@@ -228,6 +234,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         return (isAuraJSStatic == null) ? super.isAuraJSStatic() : isAuraJSStatic;
     }
 
+    @Override
     public void setValidateCss(boolean validateCss) {
         this.validateCss = validateCss;
     }
@@ -237,6 +244,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         return (validateCss == null) ? super.validateCss() : validateCss;
     }
 
+    @Override
     public void setContentSecurityPolicy(ContentSecurityPolicy csp) {
         this.csp = csp;
     }
@@ -325,33 +333,37 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         super.validateCSRFToken(token);
     }
 
+    @Override
     public void setValidateCSRFTokenException(RuntimeException exception) {
-    	if(exception == null){
-    		this.csrfValidationFunction = null;
-    		return;
-    	}
-    	TestContext expectedTestContext = this.testContextAdapter.getTestContext();
-		if (expectedTestContext != null) {
-	    	this.setValidateCSRFToken((token)->{
-	        	TestContext testContext = this.testContextAdapter.getTestContext();
-				if (testContext != null && testContext.equals(expectedTestContext)) {
-					// Throw only once, since the app should reload and we don't
-					// want to throw again on the next calls.
-					this.csrfValidationFunction = null;
-					throw exception;
-				}
-	    	});
-		}
+        if (exception == null) {
+            this.csrfValidationFunction = null;
+            return;
+        }
+        TestContext expectedTestContext = this.testContextAdapter.getTestContext();
+        if (expectedTestContext != null) {
+            this.setValidateCSRFToken((token) -> {
+                TestContext testContext = this.testContextAdapter.getTestContext();
+                if (testContext != null && testContext.equals(expectedTestContext)) {
+                    // Throw only once, since the app should reload and we don't
+                    // want to throw again on the next calls.
+                    this.csrfValidationFunction = null;
+                    throw exception;
+                }
+            });
+        }
     }
 
-	public void setValidateCSRFToken(Consumer<String> validationFunction) {
-		this.csrfValidationFunction = validationFunction;
-	}
+    @Override
+    public void setValidateCSRFToken(Consumer<String> validationFunction) {
+        this.csrfValidationFunction = validationFunction;
+    }
 
+    @Override
     public void setCSRFToken(String token) {
         this.csrfTokenFunction = () -> token;
     }
 
+    @Override
     public void setCSRFToken(Supplier<String> tokenFunction) {
         this.csrfTokenFunction = tokenFunction;
     }
@@ -374,10 +386,12 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     	}
     }
 
+    @Override
     public void setJwtToken(Supplier<String> tokenFunction) {
     	this.jwtTokenFunction = tokenFunction;
     }
 
+    @Override
     public void setLockerServiceEnabled(boolean enabled) {
 		isLockerServiceEnabledGlobally = enabled;
     }
@@ -387,6 +401,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         return (isLockerServiceEnabledGlobally == null) ? super.isLockerServiceEnabled() : isLockerServiceEnabledGlobally;
     }
 
+    @Override
     public void setActionPublicCachingEnabled(boolean enabled) {
         isActionPublicCachingEnabled = enabled;
     }

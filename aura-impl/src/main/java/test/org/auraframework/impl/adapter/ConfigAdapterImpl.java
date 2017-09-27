@@ -504,6 +504,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         return Boolean.parseBoolean(System.getProperty("aura.production"));
     }
 
+    @Override
     public boolean isFileMonitorEnabled() {
         String enableFileWatcher = System.getProperty("aura.enableFileMonitor");
         if (enableFileWatcher == null) {

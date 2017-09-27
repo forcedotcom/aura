@@ -17,15 +17,24 @@ package org.auraframework.impl.root.component;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.LibraryDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
@@ -218,6 +227,81 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
                 }
             }
         }
+    }
+
+    @Override
+    public Map<DefDescriptor<AttributeDef>, AttributeDef> getDeclaredAttributeDefs() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public AttributeDef getAttributeDef(String name) throws QuickFixException {
+        return null;
+    }
+
+    @Override
+    public RequiredVersionDef getRequiredVersion(String namespace) {
+        return null;
+    }
+
+    @Override
+    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
+        return false;
+    }
+
+    @Override
+    public DefDescriptor<? extends ProviderDef> getProviderDescriptor() throws QuickFixException {
+        return null;
+    }
+
+    @Override
+    public ProviderDef getProviderDef() throws QuickFixException {
+        return null;
+    }
+
+    @Override
+    public List<DefDescriptor<?>> getBundle() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public ProviderDef getLocalProviderDef() throws QuickFixException {
+        return null;
+    }
+
+    @Override
+    public SupportLevel getSupport() {
+        return SupportLevel.PROTO;
+    }
+
+    @Override
+    public DocumentationDef getDocumentationDef() throws QuickFixException {
+        return null;
+    }
+
+    @Override
+    public Map<DefDescriptor<?>, Definition> getBundledDefs() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public <X extends Definition> X getBundledDefinition(DefDescriptor<X> descriptor) {
+        return null;
     }
 
     public static final class Builder extends DefinitionImpl.BuilderImpl<ModuleDef> {

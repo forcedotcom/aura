@@ -50,55 +50,55 @@ public class LockerServiceAPIShapeUITest extends WebDriverTestCase {
 
 	@Test
     public void testSecureDocument() throws Exception {
-    	testSecureObject("secureDocument");
+    	testSecureObject("secureDocumentTab");
     }
 
     @Test
     public void testSecureElement() throws Exception {
-    	testSecureObject("secureElement");
+    	testSecureObject("secureElementTab");
     }
-    
+
     @Test
     public void testSecureWindow() throws Exception {
-    	testSecureObject("secureWindow");
+    	testSecureObject("secureWindowTab");
     }
-    
+
     private String value(Map<String, Object> source, String property) {
     	Object value = null;
     	if (source != null) {
     		value = source.get(property);
     	}
-    	
+
     	return value != null ? value.toString() : UNDEFINED;
     }
-    
+
     @SuppressWarnings("unchecked")
 	void testSecureObject(String className) throws Exception {
         openNoAura("/lockerApiTest/" + className + ".cmp");
 
         AuraUITestingUtil auraUITestingUtil = getAuraUITestingUtil();
-        
+
 		auraUITestingUtil.waitForDocumentReady();
         auraUITestingUtil.waitForAuraFrameworkReady(getAuraErrorsExpectedDuringInit());
-        
+
         // Value set on /lockerApiTest/[className]Controller.js file. //
         waitForCondition("return window.__" + className + "TesterReport !== undefined;");
         Map<String, Object> raw = (Map<String, Object>) auraUITestingUtil.getEval("return window.__" + className + "TesterReport;");
 
         contextService.startContext(Mode.FTEST, Format.JSON, Authentication.UNAUTHENTICATED);
         JsonSerializationContext jsonSerializationContext = getJsonSerializationContext();
-        
+
         // Convert Map --> JSON String --> Map to end up with a mutable map because the map returned from getEval() is immutable. //
         StringBuilder json = new StringBuilder();
 		JsonEncoder.serialize(raw, json, jsonSerializationContext);
 
         Map<String, Object> report = (Map<String, Object>) new JsonReader().read(json.toString());
         List<Map<String, Object>> protos = (List<Map<String, Object>>) report.get(PROTOS);
-        
+
         // Create one goldfile per secureObject. //
         List<String> errors = Lists.newArrayList();
         for (Map<String, Object> proto : protos) {
-        	List<String> protoErrors = Lists.newArrayList();   	
+        	List<String> protoErrors = Lists.newArrayList();
         	List<Map<String, Object>> props = (List<Map<String, Object>>) proto.get(PROPS);
     		for (Map<String, Object> prop : props) {
     			String object = value(prop, OBJ);
@@ -129,15 +129,15 @@ public class LockerServiceAPIShapeUITest extends WebDriverTestCase {
 				if (protoErrors.isEmpty()) {
 					protoErrors.add(String.format("\nErrors in prototype %s", value(proto, PROTO)));
 				}
-				
+
 				protoErrors.add(String.format("\t%s: %s, %s, %s, %s", proto, object, objectType, secureObjectType, status));
     	   }
-    		
+
 			if (!protoErrors.isEmpty()) {
 				errors.add(Joiner.on("\n").join(protoErrors));
 			}
         }
-        
+
         if (!errors.isEmpty()) {
         	fail(String.format("\n%s\n\n", Joiner.on("\n").join(errors)));
         }

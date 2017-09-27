@@ -16,13 +16,13 @@
             </li>
         </ul>
         <div aura:id="tab" class="slds-show" role="tabpanel" aria-labelledby="tab-default-1__item">
-             <lockerApiTest:secureWindow systemAPI="Window" secureAPI="SecureWindow"/>
+             <lockerApiTest:secureWindowTab systemAPI="Window" secureAPI="SecureWindow"/>
         </div>
         <div aura:id="tab" class="slds-hide" role="tabpanel" aria-labelledby="tab-default-2__item">
-            <lockerApiTest:secureDocument systemAPI="Document" secureAPI="SecureDocument"/>
+            <lockerApiTest:secureDocumentTab systemAPI="Document" secureAPI="SecureDocument"/>
         </div>
         <div aura:id="tab" class="slds-hide" role="tabpanel" aria-labelledby="tab-default-3__item">
-            <lockerApiTest:secureElement systemAPI="Element" secureAPI="SecureElement"/>
+            <lockerApiTest:secureElementTab systemAPI="Element" secureAPI="SecureElement"/>
         </div>
     </div>
 </aura:component>

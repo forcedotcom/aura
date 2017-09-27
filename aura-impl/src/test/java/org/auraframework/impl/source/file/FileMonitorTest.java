@@ -40,7 +40,7 @@ public class FileMonitorTest extends AuraImplTestCase {
 
         ((FileMonitorImpl)fileMonitor).listener = listenerMock;
 
-        fileMonitor.addDirectory(tmpDir.toString(), System.currentTimeMillis() - 100000);
+        fileMonitor.addDirectory(tmpDir.toString(), 0L);
 
         Mockito.verify(listenerMock, Mockito.atLeastOnce()).fileChanged(Mockito.anyObject());
     }

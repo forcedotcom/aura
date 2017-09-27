@@ -186,6 +186,7 @@ SecureObject.filterEverything = function(st, raw, options) {
                 // Cross realm window instances (window.open() and iframe.contentWindow)
                 swallowed = SecureIFrameElement.SecureIFrameContentWindow(raw, key);
                 SecureObject.addMethodIfSupported(swallowed, raw, "close");
+                SecureObject.addMethodIfSupported(swallowed, raw, "focus");
                 SecureObject.addPropertyIfSupported(swallowed, raw, "opener");
                 SecureObject.addPropertyIfSupported(swallowed, raw, "closed", { writable : false });
 

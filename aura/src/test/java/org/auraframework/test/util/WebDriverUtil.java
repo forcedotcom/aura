@@ -147,7 +147,7 @@ public final class WebDriverUtil {
                 if (extra.getCapabilityName().equals(ExtraCapability.DISABLE_NATIVE_EVENTS.getCapabilityName())
                         && this.capability.getBrowserName().equals("firefox")) {
                     FirefoxProfile firefoxProfile = new FirefoxProfile();
-                    firefoxProfile.setEnableNativeEvents(Boolean.parseBoolean(extra.getValue()));
+                    firefoxProfile.setPreference("webdriver_enable_native_events", Boolean.parseBoolean(extra.getValue()));
                     this.capability.setCapability("firefox_profile", firefoxProfile);
                 } else if (extra.equals(ExtraCapability.DISABLE_POPUP_BLOCKING)
                         && this.capability.getBrowserName().equals("chrome")
@@ -238,7 +238,7 @@ public final class WebDriverUtil {
         return SELENIUM_VERSION;
     }
 
-    public static synchronized ChromeOptions addChromeOptions(DesiredCapabilities capabilities, Dimension windowSize) {
+    public static synchronized ChromeOptions addChromeOptions(DesiredCapabilities capabilities, Dimension windowSize, Boolean runHeadless) {
         ChromeOptions options = new ChromeOptions();
         List<String> arguments = Lists.newArrayList();
         arguments.add("--ignore-gpu-blacklist");
@@ -248,6 +248,9 @@ public final class WebDriverUtil {
         }
         if (windowSize != null) {
             arguments.add("window-size=" + windowSize.width + ',' + windowSize.height);
+        }
+        if (runHeadless) {
+            arguments.add("--headless");
         }
         options.addArguments(arguments);
         // To remove message "You are using an unsupported command-line flag: --ignore-certificate-errors.

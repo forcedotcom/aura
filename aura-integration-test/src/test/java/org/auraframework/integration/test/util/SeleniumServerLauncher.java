@@ -15,19 +15,15 @@
  */
 package org.auraframework.integration.test.util;
 
-import java.net.Socket;
-
 import org.apache.log4j.Logger;
-import org.openqa.grid.selenium.GridLauncher;
+import org.openqa.grid.selenium.GridLauncherV3;
+
+import java.net.Socket;
 
 /**
  * Get WebDriver instances for Aura tests.
  */
 public class SeleniumServerLauncher {
-    /**
-     * Browser settings for each node. See https://code.google.com/p/selenium/wiki/Grid2 for more information.
-     */
-    private static String browsers = "-browser browserName=chrome,maxInstances=%1$s -browser browserName=firefox,maxInstances=%1$s";
 
     /**
      * How long, in seconds, the browser is allowed to hang before timing out. The Selenium default is 3 hours, which is
@@ -46,8 +42,7 @@ public class SeleniumServerLauncher {
         Logger logger = Logger.getLogger(SeleniumServerLauncher.class.getName());
 
         logger.info("Launching Selenium server on port " + serverPort);
-        GridLauncher.main(String.format("-port %s -browserTimeout %s %s", serverPort, browserTimeout,
-                String.format(browsers, TestExecutor.NUM_THREADS + 2))
+        GridLauncherV3.main(String.format("-port %s -browserTimeout %s", serverPort, browserTimeout)
                 .split(" "));
         logger.info("Waiting for server to open port");
         waitForServer(host, serverPort);

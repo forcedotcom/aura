@@ -20,6 +20,7 @@ import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.PerfTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -495,6 +496,7 @@ public class MenuUITest extends WebDriverTestCase {
     @UnAdaptableTest
     @Flapper
     @Test
+    @Ignore //test ignored in autobuilds and now oss builds are having issues most likely due to browser resizing logic, this needs to be revisited
     public void testMenuPositionWhenMenuItemAttachToBody() throws Exception {
         open(MENUTEST_ATTACHTOBODY_APP);
         WebDriver driver = this.getDriver();

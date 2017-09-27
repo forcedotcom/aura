@@ -124,6 +124,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     private Boolean needsFreshBrowser = null;
 
     protected PerfWebDriverUtil perfWebDriverUtil;
+    protected static final String DEFAULT_PROTOCOL = "http://";
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ ElementType.TYPE, ElementType.METHOD })
@@ -862,10 +863,11 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
              * WebDriverUtil.addChromeOptions(capabilities, windowSize); }
              */
 
-	    logger.info(String.format("Requesting: %s", capabilities));
-            if(currentBrowserType == BrowserType.GOOGLECHROME) {
-		WebDriverUtil.addChromeOptions(capabilities, null);
-	    }
+            logger.info(String.format("Requesting: %s", capabilities));
+            if (currentBrowserType == BrowserType.GOOGLECHROME) {
+                boolean runHeadless = Boolean.parseBoolean(System.getProperty(WebDriverProvider.BROWSER_RUN_HEADLESS_PROPERTY));
+                WebDriverUtil.addChromeOptions(capabilities, null, runHeadless);
+            }
 
             currentDriver = provider.get(capabilities);
 

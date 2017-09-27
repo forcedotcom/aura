@@ -26,8 +26,8 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.integration.test.util.AuraJettyServer;
 import org.auraframework.test.util.SauceUtil;
 import org.auraframework.util.test.configuration.TestServletConfig;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.springframework.web.context.ContextLoader;
 
 import java.net.InetAddress;
@@ -52,7 +52,7 @@ public class JettyTestServletConfig implements TestServletConfig {
         boolean spawnJetty = Boolean.parseBoolean(System.getProperty("jetty.spawn", String.valueOf(ContextLoader.getCurrentWebApplicationContext() == null)));
         if (spawnJetty) {
             Server server = AuraJettyServer.getInstance();
-            Connector connector = server.getConnectors()[0];
+            ServerConnector connector = (ServerConnector)server.getConnectors()[0];
             port = connector.getPort();
             host = connector.getHost();
             if (host == null) {

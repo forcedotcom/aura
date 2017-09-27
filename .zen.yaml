@@ -56,7 +56,7 @@ script:
 # container, the commands in the script: section will be executed. No Zen-specific content
 # can be added.
 build:
-  image: ops0-artifactrepo1-0-prd.data.sfdc.net/aura/aura-build-base:cb4cd61@sha256:3a18286179f891c59f3031199d057cfe71ffb25f14740d3c3649a9b8455c5e15
+  image: ops0-artifactrepo1-0-prd.data.sfdc.net/aura/aura-build-base:2f8866b@sha256:cc0a0cca152dba916ea7e87644e902bf2a89ac37229141c3c3461c0ffbe4d2fe
   auth_config:
     username: $$DOCKER_USERNAME
     password: $$DOCKER_PASSWORD

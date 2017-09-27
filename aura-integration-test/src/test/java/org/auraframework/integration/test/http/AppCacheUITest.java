@@ -44,7 +44,7 @@ public class AppCacheUITest extends WebDriverTestCase {
 
         script = "return location.hostname + (location.port? ':' + location.port : '')";
         String domain = getAuraUITestingUtil().getEval(script).toString();
-        manifestUrl = domain + manifestUrl;
+        manifestUrl = DEFAULT_PROTOCOL + domain + manifestUrl;
 
         this.getDriver().get(manifestUrl);
         getAuraUITestingUtil().waitForDocumentReady();

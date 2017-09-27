@@ -65,7 +65,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         contentType = AuraTextUtil.arrayToString(contentType.split(";\\s+"), ";", -1, false);
         assertEquals(String.format(
                 "Received wrong Content-Type header%nURL(or Action): %s%nContent:%s%nRequest type:%s", url,
-                getResponseBody(response), method.getMethod()), FORMAT_CONTENTTYPE.get(format), contentType);
+                getResponseBody(response), method.getMethod()), FORMAT_CONTENTTYPE.get(format).toLowerCase(), contentType.toLowerCase());
         assertDefaultAntiClickjacking(response, expectHeaders, true);
     }
 

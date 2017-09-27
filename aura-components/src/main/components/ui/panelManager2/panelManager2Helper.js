@@ -27,7 +27,7 @@
         this.containerManager = sharedContainer ? containerManager.getSharedInstance() : containerManager.createInstance(cmp.find('container'));
         this.initializeRegisteredPanels(cmp);
     },
-
+    
     /*
     * Store internal defs
     * @private
@@ -152,6 +152,10 @@
     * @private
     */
     createPanelInstance: function (cmp, config) {
+        // Internal usage of panel will rely on AVP to work properly, and no access check issue.
+        // but if panel is created by overlayLibrary, it means the body could be custom component
+        // for example c:modalContent which can't access ui namespace.
+        var isCustomPanel = config.panelConfig && config.panelConfig.isCustomPanel;
         var panel = this.containerManager.createContainer({
                 containerType          : config.panelType,
                 containerConfig        : config.panelConfig,
@@ -161,13 +165,15 @@
         var header  = panel.get('v.header'),
             body    = panel.get('v.body'),
             footer  = panel.get('v.footer'),
-            avp, i, length;
+            avp     = panel, 
+            i, length;
 
         if (!$A.util.isEmpty(body)) {
             body[0].setAttributeValueProvider(panel);
-            avp = body[0];
-        } else {
-            avp = panel;
+            // if panel isn't created by overlayLibrary, set AVP to body[0], otherwise keep with panel.
+            if (isCustomPanel !== true) {
+                avp = body[0];
+            }            
         }
 
         if (!$A.util.isEmpty(header)) {

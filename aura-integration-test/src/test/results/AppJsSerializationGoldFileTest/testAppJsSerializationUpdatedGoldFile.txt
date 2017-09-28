@@ -12356,7 +12356,7 @@ return {
     },
     "isNaughtyHref":function(name, href) {
         
-        if (typeof href === 'undefined') {
+        if (!href) {
             return false;
         }
         

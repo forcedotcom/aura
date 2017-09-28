@@ -105,7 +105,7 @@
 
     isNaughtyHref: function (name, href) {
         // if href is undefined set it to an empty string
-        if (typeof href === 'undefined') {
+        if (!href) {
             return false;
         }
         

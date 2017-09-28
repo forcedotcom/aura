@@ -92,17 +92,19 @@ public final class WebDriverUtil {
         IPAD(DesiredCapabilities.ipad()),
         IPHONE(DesiredCapabilities.iphone());
         private final DesiredCapabilities capability;
+        private final ExtraCapability[] extraCapabilities;
         private final String version;
 
         private BrowserType(DesiredCapabilities capabilities, String version, ExtraCapability... extraCapabilities) {
             this.capability = capabilities;
             this.version = version;
-            initExtraCapabilities(extraCapabilities);
+            this.extraCapabilities = extraCapabilities;
         }
 
         private BrowserType(DesiredCapabilities capabilities, ExtraCapability... extraCapabilities) {
             this.capability = capabilities;
             this.version = "";
+            this.extraCapabilities = extraCapabilities;
 
             String browser = capabilities.getBrowserName();
             if (browser.equalsIgnoreCase("iphone") || browser.equalsIgnoreCase("ipad")) {
@@ -121,8 +123,6 @@ public final class WebDriverUtil {
                     SauceUtil.setIOSAppiumCapabilities(this.capability, "Safari", deviceName, platformVersion);
                 }
             }
-
-            initExtraCapabilities(extraCapabilities);
         }
 
         private BrowserType(DesiredCapabilities capabilities, String version, String platform,
@@ -164,6 +164,9 @@ public final class WebDriverUtil {
         }
 
         public DesiredCapabilities getCapability() {
+            if (extraCapabilities != null) {
+                initExtraCapabilities(extraCapabilities);
+            }
             return new DesiredCapabilities(this.capability);
         }
 

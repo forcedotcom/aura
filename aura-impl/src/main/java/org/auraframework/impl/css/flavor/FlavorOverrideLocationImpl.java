@@ -15,13 +15,14 @@
  */
 package org.auraframework.impl.css.flavor;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.auraframework.css.FlavorOverrideLocation;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 
 public final class FlavorOverrideLocationImpl implements FlavorOverrideLocation {
     private final DefDescriptor<FlavoredStyleDef> descriptor;
@@ -48,7 +49,7 @@ public final class FlavorOverrideLocationImpl implements FlavorOverrideLocation 
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
+        return Objects.toStringHelper(this)
                 .add("descriptor", descriptor)
                 .add("condition", condition)
                 .toString();

@@ -17,12 +17,13 @@ package org.auraframework.integration.test.util;
 
 import org.auraframework.Aura;
 import org.auraframework.util.IOUtil;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.openqa.selenium.net.PortProber;
 
 import java.io.File;
-import java.net.InetSocketAddress;
 
 /**
  * A Jetty server configured with default Aura descriptor and resources.
@@ -31,7 +32,7 @@ import java.net.InetSocketAddress;
  * @since 0.0.302
  */
 public class AuraJettyServer extends Server {
-    private static AuraJettyServer instance = null;
+    private static Server instance = null;
 
     public static Server getInstance() {
         if (instance == null) {
@@ -43,26 +44,20 @@ public class AuraJettyServer extends Server {
                 port = PortProber.findFreePort();
             }
             String host = System.getProperty("jetty.host");
-            if (host != null) {
-                instance = new AuraJettyServer(new InetSocketAddress(host, port));
-            } else {
-                instance = new AuraJettyServer(port);
-            }
-            instance.setup("/");
+            instance = new AuraJettyServer(host, port, "/");
         }
         return instance;
     }
 
-    public AuraJettyServer(InetSocketAddress address) {
-        super(address);
-    }
-
-    public AuraJettyServer(int port) {
-        super(port);
-    }
-
-    private void setup(String contextPath) {
+    private AuraJettyServer(String host, int port, String contextPath) {
         File tmpDir = new File(IOUtil.newTempDir("webcache"));
+
+        Connector connector = new SelectChannelConnector();
+        if (host != null) {
+            connector.setHost(host);
+        }
+        connector.setPort(port);
+        setConnectors(new Connector[] { connector });
 
         WebAppContext context = new WebAppContext();
         context.setDefaultsDescriptor(Aura.class.getResource("/aura/webapp/WEB-INF/webdefault.xml").toString());

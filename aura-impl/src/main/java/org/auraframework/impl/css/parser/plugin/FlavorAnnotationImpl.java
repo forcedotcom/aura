@@ -15,15 +15,16 @@
  */
 package org.auraframework.impl.css.parser.plugin;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Splitter;
-import com.salesforce.omakase.ast.Comment;
-import org.auraframework.css.FlavorAnnotation;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
 import java.util.Optional;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.auraframework.css.FlavorAnnotation;
+
+import com.google.common.base.Objects;
+import com.google.common.base.Splitter;
+import com.salesforce.omakase.ast.Comment;
 
 /**
  * Represents a CSS annotation (comment) with metadata about a flavor.
@@ -83,7 +84,7 @@ public final class FlavorAnnotationImpl implements FlavorAnnotation {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
+        return Objects.toStringHelper(this)
                 .add("flavorName", flavorName)
                 .add("optionExtends", optionExtends)
                 .add("optionOverridesIf", optionOverridesIf)

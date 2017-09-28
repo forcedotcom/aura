@@ -120,8 +120,7 @@
         <webdriver.chrome.driver>${aura.home}/aura-integration-test/bin/chromedriverlauncher</webdriver.chrome.driver>
         <webdriver.reusebrowser>true</webdriver.reusebrowser>
         <webdriver.browser.type>GOOGLECHROME</webdriver.browser.type> <!-- refer to org.auraframework.test.WebDriverUtil.BrowserType enums for valid values -->
-        <webdriver.browser.runheadless>true</webdriver.browser.runheadless>
-        <webdriver.timeout>60</webdriver.timeout>
+		<webdriver.timeout>60</webdriver.timeout>
         <sauce.record.video>false</sauce.record.video>
         <sauce.record.screenshots>false</sauce.record.screenshots>
         <screenshots.directory>${project.build.directory}/screenshots</screenshots.directory>
@@ -131,7 +130,7 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.eclipse.jetty</groupId>
+                <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <configuration>
                     <connectors>
@@ -184,10 +183,6 @@
                         <systemProperty>
                             <name>webdriver.browser.type</name>
                             <value>${webdriver.browser.type}</value>
-                        </systemProperty>
-                        <systemProperty>
-                            <name>webdriver.browser.runheadless</name>
-                            <value>${webdriver.browser.runheadless}</value>
                         </systemProperty>
                         <systemProperty>
                             <name>webdriver.timeout</name>

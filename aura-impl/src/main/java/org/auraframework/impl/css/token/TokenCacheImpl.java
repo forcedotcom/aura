@@ -15,10 +15,16 @@
  */
 package org.auraframework.impl.css.token;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.*;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.auraframework.Aura;
 import org.auraframework.css.TokenCache;
 import org.auraframework.def.DefDescriptor;
@@ -30,10 +36,16 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
-import java.util.*;
-import java.util.Map.Entry;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Objects;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableTable;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 
 public final class TokenCacheImpl implements TokenCache {
     private final Multimap<DefDescriptor<TokensDef>, DefDescriptor<TokensDef>> originals;
@@ -204,6 +216,6 @@ public final class TokenCacheImpl implements TokenCache {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this).add("tokens", descriptors).add("dynamicTokens", activeDynamicTokens()).toString();
+        return Objects.toStringHelper(this).add("tokens", descriptors).add("dynamicTokens", activeDynamicTokens()).toString();
     }
 }

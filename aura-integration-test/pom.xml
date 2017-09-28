@@ -121,7 +121,7 @@
     </dependencies>
     <properties>
         <chromedriver.download.root.url>http://chromedriver.storage.googleapis.com</chromedriver.download.root.url>
-        <chromedriver.version>2.31</chromedriver.version>
+        <chromedriver.version>2.25</chromedriver.version>
         <jetty.spawn>true</jetty.spawn>
         <jetty.resources>${basedir}/../aura/src/main/webapp</jetty.resources>
         <aura.build.id />
@@ -139,7 +139,6 @@
         <webdriver.reusebrowser>true</webdriver.reusebrowser>
         <webdriver.browser.type>GOOGLECHROME</webdriver.browser.type> <!-- refer to org.auraframework.test.WebDriverUtil.BrowserType enums for valid values -->
 		<webdriver.timeout>60</webdriver.timeout>
-        <webdriver.browser.runheadless>true</webdriver.browser.runheadless>
         <sauce.record.video>false</sauce.record.video>
         <sauce.record.screenshots>false</sauce.record.screenshots>
         <xdisplay.exec>Xvfb</xdisplay.exec>
@@ -248,7 +247,6 @@
                                     <webdriver.reusebrowser>${webdriver.reusebrowser}</webdriver.reusebrowser>
                                     <webdriver.browser.type>${webdriver.browser.type}</webdriver.browser.type>
                                     <webdriver.timeout>${webdriver.timeout}</webdriver.timeout>
-                                    <webdriver.browser.runheadless>${webdriver.browser.runheadless}</webdriver.browser.runheadless>
                                     <skipIntTests>${skipIntTests}</skipIntTests>
                                 </systemPropertyVariables>
                             </configuration>
@@ -656,7 +654,6 @@
                                 <webdriver.browser.type>${webdriver.browser.type}</webdriver.browser.type>
                                 <webdriver.device.name>${webdriver.device.name}</webdriver.device.name>
                                 <webdriver.platform.version>${webdriver.platform.version}</webdriver.platform.version>
-                                <webdriver.browser.runheadless>${webdriver.browser.runheadless}</webdriver.browser.runheadless>
                                 <skipIntTests>${skipIntTests}</skipIntTests>
                             </systemPropertyVariables>
                             <environmentVariables>

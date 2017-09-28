@@ -27,17 +27,32 @@ public class AdaptiveWebElementDriver extends RemoteWebDriver {
 
     public static String DEFAULT_CAPABILITY = "org.auraframework.webdriver.flexible.default";
 
-    public AdaptiveWebElementDriver(CommandExecutor executor, Capabilities desiredCapabilities) {
-        super(executor, desiredCapabilities);
+    public AdaptiveWebElementDriver(CommandExecutor executor, Capabilities desiredCapabilities,
+            Capabilities requiredCapabilities) {
+        super(executor, desiredCapabilities, requiredCapabilities);
 
         // Unless you explicitly request a "default" driver, return a driver that returns AdaptiveWebElements
-        if (!(desiredCapabilities != null && desiredCapabilities.is(DEFAULT_CAPABILITY))) {
+        if (!((desiredCapabilities != null && desiredCapabilities.is(DEFAULT_CAPABILITY)) || (requiredCapabilities != null && requiredCapabilities
+                .is(DEFAULT_CAPABILITY)))) {
             this.setElementConverter(new AdaptiveWebElement.JsonConverter(this));
         }
     }
 
+    public AdaptiveWebElementDriver(CommandExecutor executor, Capabilities desiredCapabilities) {
+        this(executor, desiredCapabilities, null);
+    }
+
+    public AdaptiveWebElementDriver(Capabilities desiredCapabilities) {
+        this((URL) null, desiredCapabilities);
+    }
+
+    public AdaptiveWebElementDriver(URL remoteAddress, Capabilities desiredCapabilities,
+            Capabilities requiredCapabilities) {
+        this(new HttpCommandExecutor(remoteAddress), desiredCapabilities, requiredCapabilities);
+    }
+
     public AdaptiveWebElementDriver(URL remoteAddress, Capabilities desiredCapabilities) {
-        this(new HttpCommandExecutor(remoteAddress), desiredCapabilities);
+        this(new HttpCommandExecutor(remoteAddress), desiredCapabilities, null);
     }
 
 }

@@ -165,7 +165,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         System.out.println("expectedContentType:"+expectedContentType+", contentTypeHeaders:");
         for (Header header : contentTypeHeaders) {
         	System.out.println("header:"+header.getValue());
-            if (expectedContentType.toLowerCase().equals(header.getValue().replaceAll("\\s", "").toLowerCase())) {
+            if (expectedContentType.equals(header.getValue().replaceAll("\\s", ""))) {
                 return;
             }
         }

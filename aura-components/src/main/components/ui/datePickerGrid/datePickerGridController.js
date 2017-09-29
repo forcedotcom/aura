@@ -19,12 +19,8 @@
     },
 
     changeCalendar: function (component, event, helper) {
-        var date = component.get("v.date");
-        if (!date) {
-            date = 1;
-        }
         var params = event.getParam('arguments');
-        helper.changeMonthYear(component, params.monthChange, params.yearChange, date);
+        helper.changeMonthYear(component, params.monthChange, params.yearChange, 1);
     },
 
     dateCellSelected: function (component, event, helper) {

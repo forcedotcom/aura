@@ -39,7 +39,7 @@
         <debug>true</debug>
         <skipUnitTests>false</skipUnitTests>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <selenium.version>2.45.0</selenium.version>
+        <selenium.version>2.53.1</selenium.version>
         <!-- xUnit properties:
           xunit.js.testPath the path to an individual test to run
           xunit.js.engine the engine to use.
@@ -294,7 +294,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>18.0</version>
+                <version>21.0</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>

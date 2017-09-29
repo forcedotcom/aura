@@ -37,7 +37,7 @@ final class EmptyTokenCache implements TokenCache {
 
     @Override
     public Iterator<DefDescriptor<TokensDef>> iterator() {
-        return Collections.emptyIterator();
+        return ImmutableSet.<DefDescriptor<TokensDef>>of().iterator();
     }
 
     @Override

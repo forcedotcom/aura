@@ -105,7 +105,7 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
     [Fixture]
     function setupDefinitionStorage() {
         var initStorageCalled = false; //we set this to true in storageService.initStorage() below
-        var mockStorageService = function (persistent, secure, withComponentDefStorage, actionStorageIsPersistent) {
+        var mockStorageService = function (persistent, secure, withComponentDefStorage, actionStorageIsPersistent, saveEventConfig) {
             return Mocks.GetMocks(Object.Global(), {
                 "$A": {
                     storageService: {
@@ -116,7 +116,7 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
                                     return persistent;
                                 },
                                 isSecure: function() {
-                                    return secure
+                                    return secure;
                                 },
                                 suspendSweeping: function() {}
                             }
@@ -142,6 +142,10 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
                             };
                         }
                     },
+                    eventService: {
+                        getEventDef: function() { return false; },
+                        saveEventConfig: saveEventConfig
+                    },
                     getContext: function() {
                         return {
                             getApp: function() {
@@ -149,9 +153,38 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
                             }
                         }
                     }
+                },
+                Json: {
+                    ApplicationKey: {
+                        TYPE: "type",
+                        ATTRIBUTES: "attributes"
+                    }
                 }
             });
         };
+
+        [Fact]
+        function RestoresEventDefWithoutAttributes() {
+            var target = new Aura.Component.ComponentDefStorage();
+            target.getAll = function() {
+                return ResolvePromise({
+                    "markup://test:event": {
+                        descriptor: "markup://test:event",
+                        type: "APPLICATION"
+                        // omit attributes
+                    }
+                });
+            };
+
+            var eventStored = false;
+            var saveEventConfig = function(value) {
+                eventStored = value.descriptor === "markup://test:event";
+            };
+            mockStorageService(false, false, false, true, saveEventConfig)(function () {
+                target.restoreAll();
+                Assert.True(eventStored);
+            });
+        }
 
         [Fact]
         function ShouldNotUseNotPersistentStorage() {

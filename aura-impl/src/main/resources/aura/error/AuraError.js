@@ -95,9 +95,9 @@ function AuraError(message, innerError, severity) {
 
     // Access Stack defaults - takes dependency on $A.clientService
     if ((typeof $A) !== "undefined" && $A.clientService) {
-        var currentAcess = $A.clientService.getCurrentAccessName();
-        if (currentAcess) {
-            this.setComponent(currentAcess);
+        var currentAccess = $A.clientService.getCurrentAccessName();
+        if (currentAccess) {
+            this.setComponent(currentAccess);
             this["componentStack"] = $A.clientService.getAccessStackHierarchy();
         }
     }

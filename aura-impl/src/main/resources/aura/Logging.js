@@ -27,8 +27,15 @@
      * $A.warning() will log to console in proddebug
      */
     $A.logger.subscribe("WARNING", function(level, message, error) {
-        if(window["console"]){
-            window["console"].warn(level+": "+(message||error&&error.message));
+        if (window["console"]) {
+            if (error && error.message) {
+                if (message) {
+                    message += ". Caused by: " + error.message;
+                } else {
+                    message = error.message;
+                }
+            }
+            window["console"].warn(level + ": " + message);
         }
     });
     //#end

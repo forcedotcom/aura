@@ -1309,66 +1309,20 @@ AuraInstance.prototype.deprecated = function(message, workaround, sinceDate, due
             caller=e;
         }
     }
-    caller=$A.util.trim((caller.stack||'').split('\n')[3])||'at unknown location';
+    caller = (caller.stack||'').split('\n')[3] || 'at unknown location';
 
     // JBUCH: TEMPORARILY IGNORE CALLS BY FRAMEWORK.
     // REMOVE WHEN ALL @public METHODS HAVE BEEN ADDRESSED.
     // TODO: This filter may have false positive when a function is installed a override
-    if(caller.indexOf("/aura_")>-1) {
+    if (caller.indexOf("/aura_")>-1) {
         // $A.log("Framework use of deprecated method: " + message);
         return;
     }
 
-    // This should be moved out to a constant, once we decide on the actual value.
-    var DEFAULT_DEPRECATION=1000*60*60*24*28; // Four weeks
-    var TEST_BUFFER=1000*60*60*24*14; // Two weeks
-
-    var testDueDate;
-    if(!dueDate){
-        if(!sinceDate){
-            dueDate=testDueDate=new Date();
-        } else {
-            sinceDate=new Date(sinceDate);
-            dueDate=new Date(sinceDate);
-            dueDate.setTime(dueDate.getTime() + DEFAULT_DEPRECATION);
-            testDueDate=new Date(dueDate.getTime() - TEST_BUFFER);
-        }
-    }else{
-        dueDate=new Date(dueDate);
-        testDueDate=new Date(dueDate);
-        testDueDate.setTime(testDueDate.getTime() - TEST_BUFFER);
-        if(!sinceDate) {
-            sinceDate = new Date(dueDate);
-            sinceDate.setTime(sinceDate.getTime() - DEFAULT_DEPRECATION);
-        }else{
-            sinceDate=new Date(sinceDate);
-        }
+    if (workaround) {
+        message += ". Workaround: " + workaround;
     }
-
-    message = $A.util.format("DEPRECATED (as of {0}, unusable on {1}): {2}\n\t{3}\n{4}",
-        $A.localizationService.formatDate(sinceDate),
-        $A.localizationService.formatDate(dueDate),
-        message,
-        caller,
-        workaround?"Workaround: "+workaround:"No known workaround."
-    );
-
-    if(Date.now()>=dueDate){
-        $A.warning(message);
-        // JBUCH: TODO: REACTIVATE ONCE CRUC IS IN PLACE
-        //throw new Error(message);
-    }else{
-        $A.warning(message);
-    }
-    //#end
-
-    //#if {modes:["TESTING", "TESTINGDEBUG", "AUTOTESTING", "AUTOTESTINGDEBUG"]}
-    // BREAK EARLY IN TESTS
-    if(Date.now()>=testDueDate){
-        $A.warning(message);
-        // JBUCH: TODO: REACTIVATE ONCE CRUC IS IN PLACE
-        //throw new Error(message);
-    }
+    $A.warning(message);
     //#end
 
     //#if {modes: ["PRODUCTION", "PRODUCTIONDEBUG"]}

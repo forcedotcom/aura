@@ -866,7 +866,7 @@ AuraComponentService.prototype.hasComponentClass = function(descriptor) {
  * @export
  */
 AuraComponentService.prototype.newComponentAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer) {
-    $A.deprecated("$A.newCmpAsync and $A.componentService.newComponentAsync are not supported.","Use '$A.createComponent();'.","2017/01/06","2017/02/17","AuraComponentService.newComponentAsync");
+    $A.deprecated("$A.newCmpAsync and $A.componentService.newComponentAsync are not supported.","Use '$A.createComponent();'.","2017/01/06","2017/02/17");
 
     $A.assert(config, "ComponentService.newComponentAsync(): 'config' must be a valid Object.");
     $A.assert($A.util.isFunction(callback),"ComponentService.newComponentAsync(): 'callback' must be a Function pointer.");

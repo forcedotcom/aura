@@ -18,7 +18,6 @@ package org.auraframework.impl.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +38,8 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.DefinitionServiceImpl;
 import org.auraframework.impl.context.AuraContextImpl;
 import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
+import org.auraframework.instance.AuraValueProviderType;
+import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -104,11 +105,14 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
     DefRegistry registry2;
     
     private AuraContext setupContext(DefinitionService service, Mode mode, Authentication access) {
+        GlobalValueProvider labels = Mockito.mock(GlobalValueProvider.class);
+        Map<String, GlobalValueProvider> gvps = Maps.newHashMap();
+        gvps.put(AuraValueProviderType.LABEL.getPrefix(), labels);
         AuraContext context = new AuraContextImpl(mode, registries,
                 null /* defaultPrefixes */,
                 Format.JSON, access,
                 null /* jsonContext */,
-                null /* globalProviders */,
+                gvps /* globalProviders */,
                 configAdapter,
                 service,
                 null /* testContextAdapter */);
@@ -698,9 +702,9 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
     public void testGetClientLibraries() {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
         
-        Set<DefDescriptor<? extends Definition>> dependencies = new HashSet<>();
+        Map<DefDescriptor<? extends Definition>, Definition> dependencies = Maps.newHashMap();
         List<ClientLibraryDef> clientLibraries = new ArrayList<>();
-        DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries, false);
+        DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries, false, null);
         AuraContext context = new AuraContextImpl(Mode.DEV, registries,
                 null /* defaultPrefixes */,
                 Format.JSON, Authentication.AUTHENTICATED,
@@ -730,9 +734,9 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
     public void testGetDependencies() {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
         
-        Set<DefDescriptor<? extends Definition>> dependencies = new HashSet<>();
+        Map<DefDescriptor<? extends Definition>, Definition> dependencies = Maps.newHashMap();
         List<ClientLibraryDef> clientLibraries = new ArrayList<>();
-        DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries, false);
+        DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries, false, null);
         AuraContext context = new AuraContextImpl(Mode.DEV, registries,
                 null /* defaultPrefixes */,
                 Format.JSON, Authentication.AUTHENTICATED,
@@ -745,8 +749,8 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         Mockito.when(mockedContext.getLocalDependencyEntry("testUID")).thenReturn(de);
         Mockito.when(contextService.getCurrentContext()).thenReturn(mockedContext);     
         
-        assertEquals("we should return DependencyEntry's clientLibraries when getting dependencies with valid uid", 
-                dependencies, definitionService.getDependencies("testUID"));
+        assertEquals("We should get the set of def descriptors for dependencies",
+                dependencies.keySet(), definitionService.getDependencies("testUID"));
     }
     
     /*

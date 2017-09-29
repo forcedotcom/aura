@@ -17,11 +17,13 @@ package org.auraframework.system;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 
@@ -36,26 +38,34 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 public class DependencyEntry {
     public final String uid;
-    public final Set<DefDescriptor<?>> dependencies;
+    public final Map<DefDescriptor<? extends Definition>, Definition> dependencyMap;
     public final List<ClientLibraryDef> clientLibraries;
+    public final Map<String, Set<PropertyReference>> globalReferencesMap;
     public final QuickFixException qfe;
     public final boolean cacheable;
 
-    public DependencyEntry(String uid, Set<DefDescriptor<? extends Definition>> dependencies,
-                           List<ClientLibraryDef> clientLibraries, boolean cacheable) {
+    public DependencyEntry(String uid, Map<DefDescriptor<? extends Definition>, Definition> dependencyMap,
+                           List<ClientLibraryDef> clientLibraries, boolean cacheable,
+                           Map<String,Set<PropertyReference>> globalReferencesMap) {
         this.uid = uid;
-        this.dependencies = dependencies;
+        this.dependencyMap = Collections.unmodifiableMap(dependencyMap);
         this.clientLibraries = Collections.unmodifiableList(clientLibraries);
         this.qfe = null;
         this.cacheable = cacheable;
+        if (globalReferencesMap != null) {
+            this.globalReferencesMap = Collections.unmodifiableMap(globalReferencesMap);
+        } else {
+            this.globalReferencesMap = null;
+        }
     }
 
     public DependencyEntry(QuickFixException qfe) {
         this.uid = null;
-        this.dependencies = null;
+        this.dependencyMap = null;
         this.clientLibraries = null;
         this.qfe = qfe;
         this.cacheable = false;
+        this.globalReferencesMap = null;
     }
 
     @Override
@@ -70,7 +80,7 @@ public class DependencyEntry {
         if (qfe != null) {
             sb.append(qfe);
         } else {
-            sb.append(dependencies);
+            sb.append(dependencyMap);
         }
         return sb.toString();
     }

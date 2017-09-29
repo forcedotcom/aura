@@ -393,7 +393,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
     @Override
     public void setLockerServiceEnabled(boolean enabled) {
-		isLockerServiceEnabledGlobally = enabled;
+        isLockerServiceEnabledGlobally = enabled;
     }
 
     @Override

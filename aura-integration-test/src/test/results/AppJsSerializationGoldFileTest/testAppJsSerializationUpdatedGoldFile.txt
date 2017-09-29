@@ -696,27 +696,7 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
 }
 
 );
-*/}));$A.componentService.addComponent("markup://aura:html", (function (){/*$A.componentService.addComponentClass("markup://aura:html",function() {
-return {
-  "meta":{
-    "name":"aura$html"
-  }
-};
-});
-return {
-  "xs":"G",
-  "descriptor":"markup://aura:html",
-  "css":true,
-  "ad":[
-    ["body","aura://Aura.Component[]","G",false,[]],
-    ["tag","aura://String","G",false],
-    ["HTMLAttributes","aura://Map","G",false,null]
-  ],
-  "i":[
-    "markup://aura:rootComponent"
-  ]
-};*/}));
-$A.componentService.addComponent("markup://aura:text", (function (){/*$A.componentService.addComponentClass("markup://aura:text",function() {
+*/}));$A.componentService.addComponent("markup://aura:text", (function (){/*$A.componentService.addComponentClass("markup://aura:text",function() {
 return {
   "meta":{
     "name":"aura$text"
@@ -948,6 +928,26 @@ return {
     "markup://aura:rootComponent"
   ]
 };*/}));
+$A.componentService.addComponent("markup://aura:html", (function (){/*$A.componentService.addComponentClass("markup://aura:html",function() {
+return {
+  "meta":{
+    "name":"aura$html"
+  }
+};
+});
+return {
+  "xs":"G",
+  "descriptor":"markup://aura:html",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["tag","aura://String","G",false],
+    ["HTMLAttributes","aura://Map","G",false,null]
+  ],
+  "i":[
+    "markup://aura:rootComponent"
+  ]
+};*/}));
 $A.componentService.addComponent("markup://aura:if", (function (){/*$A.componentService.addComponentClass("markup://aura:if",function() {
 return {
   "meta":{
@@ -1020,6 +1020,266 @@ return {
         "path":"v.isTrue"
       },
       "n":"change"
+    }
+  ]
+};*/}));
+$A.componentService.addComponent("markup://ui:actionMenuItem", (function (){/*$A.componentService.addComponentClass("markup://ui:actionMenuItem",function() {
+return {
+  "meta":{
+    "name":"ui$actionMenuItem",
+    "extends":"markup://ui:menuItem"
+  },
+  "controller":{
+    "init":function(cmp) {
+        var bodyAttribute = cmp.get("v.body");
+        var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
+        if (hasBodyAttribute) {
+            cmp.find("anchor").set("v.body", bodyAttribute);
+        }
+    },
+    "onClick":function(cmp, event) {
+        if (cmp.isValid()) {
+            $A.util.squash(event, true);
+            cmp.getConcreteComponent().select();
+        }
+    }
+  },
+  "helper":{
+    "buildBody":function(cmp) {
+        var anchorElement = cmp.find("anchor").getElement();
+        var label = cmp.get("v.label");
+        var isDisabled = cmp.get("v.disabled");
+
+        var role = cmp.get("v.role");
+        if (role) {
+            anchorElement.setAttribute("role", role);
+        }
+
+        anchorElement.setAttribute("aria-disabled", isDisabled);
+        anchorElement.setAttribute("tabindex", isDisabled ? "-1" : "0");
+        anchorElement.setAttribute("title", label);
+
+        var bodyAttribute = cmp.get("v.body");
+        var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
+
+        if (!hasBodyAttribute) {
+            $A.util.clearNode(anchorElement);
+            anchorElement.appendChild(document.createTextNode(label));
+        }
+    }
+  },
+  "renderer":{
+    "render":function(cmp, helper) {
+        var ret = cmp.superRender();
+
+        helper.buildBody(cmp);
+
+        return ret;
+    },
+    "rerender":function(cmp, helper) {
+        cmp.superRerender();
+
+        helper.buildBody(cmp);
+    }
+  }
+};
+});
+return {
+  "xs":"G",
+  "descriptor":"markup://ui:actionMenuItem",
+  "su":"markup://ui:menuItem",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["class","aura://String","G",false],
+    ["dir","aura://String","I",false,"ltr"],
+    ["namespaceOverride","aura://String","I",false],
+    ["actionable","aura://Boolean","I",false,true],
+    ["role","aura://String","I",false,"menuitem"],
+    ["ariaDescribedBy","aura://String","PP",false,""],
+    ["value","aura://Object","PP",false,null],
+    ["visible","aura://Boolean","I",false,true],
+    ["selected","aura://Boolean","G",false,false],
+    ["type","aura://String","G",false],
+    ["label","aura://String","G",false],
+    ["hideMenuAfterSelected","aura://Boolean","G",false,true],
+    ["disabled","aura://Boolean","G",false,false],
+    ["id","aura://String","I",false]
+  ],
+  "med":[
+    {
+      "name":"ui:select",
+      "xs":"I",
+      "action":"{!c.select}"
+    },
+    {
+      "name":"ui:setFocus",
+      "xs":"I",
+      "action":"{!c.setFocus}"
+    }
+  ],
+  "re":[
+    {
+      "ed":"markup://ui:select",
+      "n":"select",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:blur",
+      "n":"blur",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:focus",
+      "n":"focus",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:keypress",
+      "n":"keypress",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:keyup",
+      "n":"keyup",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:keydown",
+      "n":"keydown",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:dblclick",
+      "n":"dblclick",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseover",
+      "n":"mouseover",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseout",
+      "n":"mouseout",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseup",
+      "n":"mouseup",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mousemove",
+      "n":"mousemove",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:click",
+      "n":"click",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mousedown",
+      "n":"mousedown",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:menuSelect",
+      "n":"menuSelect",
+      "xs":"PP"
+    }
+  ],
+  "hd":[
+    {
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.init"
+      },
+      "v":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"this"
+      },
+      "n":"init"
+    }
+  ],
+  "ld":{
+    "anchor":{
+      "description":"Action item button",
+      "context":{
+        "devNameOrId":{
+          "exprType":"PROPERTY",
+          "byValue":false,
+          "target":"ui:actionMenuItem",
+          "path":"v.id"
+        }
+      },
+      "alias":"menu-item",
+      "isPrimitive":true
+    }
+  },
+  "fa":[
+    {
+      "descriptor":"body",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "class":{
+                    "exprType":"PROPERTY",
+                    "byValue":false,
+                    "target":"ui:actionMenuItem",
+                    "path":"v.class"
+                  },
+                  "role":"presentation"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"li"
+              },
+              "body":{
+                "descriptor":"body",
+                "value":[
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://aura:html"
+                    },
+                    "localId":"anchor",
+                    "attributes":{
+                      "values":{
+                        "HTMLAttributes":{
+                          "descriptor":"HTMLAttributes",
+                          "value":{
+                            "onclick":{
+                              "exprType":"PROPERTY",
+                              "byValue":false,
+                              "target":"ui:actionMenuItem",
+                              "path":"c.onClick"
+                            }
+                          }
+                        },
+                        "tag":{
+                          "descriptor":"tag",
+                          "value":"a"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
     }
   ]
 };*/}));
@@ -3966,266 +4226,6 @@ return {
                               }
                             }
                           ]
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
-    }
-  ]
-};*/}));
-$A.componentService.addComponent("markup://ui:actionMenuItem", (function (){/*$A.componentService.addComponentClass("markup://ui:actionMenuItem",function() {
-return {
-  "meta":{
-    "name":"ui$actionMenuItem",
-    "extends":"markup://ui:menuItem"
-  },
-  "controller":{
-    "init":function(cmp) {
-        var bodyAttribute = cmp.get("v.body");
-        var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
-        if (hasBodyAttribute) {
-            cmp.find("anchor").set("v.body", bodyAttribute);
-        }
-    },
-    "onClick":function(cmp, event) {
-        if (cmp.isValid()) {
-            $A.util.squash(event, true);
-            cmp.getConcreteComponent().select();
-        }
-    }
-  },
-  "helper":{
-    "buildBody":function(cmp) {
-        var anchorElement = cmp.find("anchor").getElement();
-        var label = cmp.get("v.label");
-        var isDisabled = cmp.get("v.disabled");
-
-        var role = cmp.get("v.role");
-        if (role) {
-            anchorElement.setAttribute("role", role);
-        }
-
-        anchorElement.setAttribute("aria-disabled", isDisabled);
-        anchorElement.setAttribute("tabindex", isDisabled ? "-1" : "0");
-        anchorElement.setAttribute("title", label);
-
-        var bodyAttribute = cmp.get("v.body");
-        var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
-
-        if (!hasBodyAttribute) {
-            $A.util.clearNode(anchorElement);
-            anchorElement.appendChild(document.createTextNode(label));
-        }
-    }
-  },
-  "renderer":{
-    "render":function(cmp, helper) {
-        var ret = cmp.superRender();
-
-        helper.buildBody(cmp);
-
-        return ret;
-    },
-    "rerender":function(cmp, helper) {
-        cmp.superRerender();
-
-        helper.buildBody(cmp);
-    }
-  }
-};
-});
-return {
-  "xs":"G",
-  "descriptor":"markup://ui:actionMenuItem",
-  "su":"markup://ui:menuItem",
-  "css":true,
-  "ad":[
-    ["body","aura://Aura.Component[]","G",false,[]],
-    ["class","aura://String","G",false],
-    ["dir","aura://String","I",false,"ltr"],
-    ["namespaceOverride","aura://String","I",false],
-    ["actionable","aura://Boolean","I",false,true],
-    ["role","aura://String","I",false,"menuitem"],
-    ["ariaDescribedBy","aura://String","PP",false,""],
-    ["value","aura://Object","PP",false,null],
-    ["visible","aura://Boolean","I",false,true],
-    ["selected","aura://Boolean","G",false,false],
-    ["type","aura://String","G",false],
-    ["label","aura://String","G",false],
-    ["hideMenuAfterSelected","aura://Boolean","G",false,true],
-    ["disabled","aura://Boolean","G",false,false],
-    ["id","aura://String","I",false]
-  ],
-  "med":[
-    {
-      "name":"ui:select",
-      "xs":"I",
-      "action":"{!c.select}"
-    },
-    {
-      "name":"ui:setFocus",
-      "xs":"I",
-      "action":"{!c.setFocus}"
-    }
-  ],
-  "re":[
-    {
-      "ed":"markup://ui:select",
-      "n":"select",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:blur",
-      "n":"blur",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:focus",
-      "n":"focus",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:keypress",
-      "n":"keypress",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:keyup",
-      "n":"keyup",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:keydown",
-      "n":"keydown",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:dblclick",
-      "n":"dblclick",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:mouseover",
-      "n":"mouseover",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:mouseout",
-      "n":"mouseout",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:mouseup",
-      "n":"mouseup",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:mousemove",
-      "n":"mousemove",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:click",
-      "n":"click",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:mousedown",
-      "n":"mousedown",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:menuSelect",
-      "n":"menuSelect",
-      "xs":"PP"
-    }
-  ],
-  "hd":[
-    {
-      "x":{
-        "exprType":"PROPERTY",
-        "byValue":false,
-        "path":"c.init"
-      },
-      "v":{
-        "exprType":"PROPERTY",
-        "byValue":false,
-        "path":"this"
-      },
-      "n":"init"
-    }
-  ],
-  "ld":{
-    "anchor":{
-      "description":"Action item button",
-      "context":{
-        "devNameOrId":{
-          "exprType":"PROPERTY",
-          "byValue":false,
-          "target":"ui:actionMenuItem",
-          "path":"v.id"
-        }
-      },
-      "alias":"menu-item",
-      "isPrimitive":true
-    }
-  },
-  "fa":[
-    {
-      "descriptor":"body",
-      "value":[
-        {
-          "componentDef":{
-            "descriptor":"markup://aura:html"
-          },
-          "attributes":{
-            "values":{
-              "HTMLAttributes":{
-                "descriptor":"HTMLAttributes",
-                "value":{
-                  "class":{
-                    "exprType":"PROPERTY",
-                    "byValue":false,
-                    "target":"ui:actionMenuItem",
-                    "path":"v.class"
-                  },
-                  "role":"presentation"
-                }
-              },
-              "tag":{
-                "descriptor":"tag",
-                "value":"li"
-              },
-              "body":{
-                "descriptor":"body",
-                "value":[
-                  {
-                    "componentDef":{
-                      "descriptor":"markup://aura:html"
-                    },
-                    "localId":"anchor",
-                    "attributes":{
-                      "values":{
-                        "HTMLAttributes":{
-                          "descriptor":"HTMLAttributes",
-                          "value":{
-                            "onclick":{
-                              "exprType":"PROPERTY",
-                              "byValue":false,
-                              "target":"ui:actionMenuItem",
-                              "path":"c.onClick"
-                            }
-                          }
-                        },
-                        "tag":{
-                          "descriptor":"tag",
-                          "value":"a"
                         }
                       }
                     }

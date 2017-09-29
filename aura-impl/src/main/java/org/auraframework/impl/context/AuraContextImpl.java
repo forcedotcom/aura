@@ -967,13 +967,13 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public DependencyEntry findLocalDependencyEntry(DefDescriptor<?> descriptor) {
         for (DependencyEntry det : userDefs.localDependencies.values()) {
-            if (det.dependencies != null && det.dependencies.contains(descriptor)) {
+            if (det.dependencyMap != null && det.dependencyMap.containsKey(descriptor)) {
                 return det;
             }
         }
         if (isSystem) {
             for (DependencyEntry det : systemDefs.localDependencies.values()) {
-                if (det.dependencies != null && det.dependencies.contains(descriptor)) {
+                if (det.dependencyMap != null && det.dependencyMap.containsKey(descriptor)) {
                     return det;
                 }
             }

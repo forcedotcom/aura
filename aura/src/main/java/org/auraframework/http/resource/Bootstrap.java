@@ -20,6 +20,9 @@ import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -30,14 +33,21 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.AuraValueProviderType;
+import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.Instance;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraJWTError;
+import org.auraframework.throwable.quickfix.CompositeValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Handles /l/{}/bootstrap.js requests to retrieve bootstrap.js.
@@ -82,18 +92,31 @@ public class Bootstrap extends AuraResourceImpl {
     }
 
     protected void loadLabels(AuraContext context) throws QuickFixException {
-        definitionService.populateGlobalValues(AuraValueProviderType.LABEL.getPrefix(), context.filterLocalDefs(null));
+        String uid = definitionService.getUid(null, context.getApplicationDescriptor());
+        String root = AuraValueProviderType.LABEL.getPrefix();
+        GlobalValueProvider provider = context.getGlobalProviders().get(root);
+        Map<Throwable, Collection<Location>> errors = Maps.newLinkedHashMap();
+        Set<PropertyReference> labels = definitionService.getGlobalReferences(uid, root);
+        if (labels != null) {
+            for (PropertyReference label : labels) {
+                try {
+                    provider.getValue(label);
+                } catch (Throwable t) {
+                    errors.put(t, Sets.newHashSet(new Location(label.toString(), 0)));
+                }
+            }
+        }
+        if (errors.size() > 0) {
+            throw new CompositeValidationException("Unable to load values for "+root, errors);
+        }
     }
 
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context)
             throws IOException {
         DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
-        DefType type = app.getDefType();
 
         try {
-            DefDescriptor<?> desc = definitionService.getDefDescriptor(app.getDescriptorName(),
-                    type.getPrimaryInterface());
             servletUtilAdapter.checkFrameworkUID(context);
 
             // need to guard bootstrap.js request because it returns user sensitive information.
@@ -103,8 +126,8 @@ public class Bootstrap extends AuraResourceImpl {
             }
 
             setCacheHeaders(response, app);
-            Instance<?> appInstance = instanceService.getInstance(desc, getComponentAttributes(request));
-            definitionService.updateLoaded(desc);
+            Instance<?> appInstance = instanceService.getInstance(app, getComponentAttributes(request));
+            definitionService.updateLoaded(app);
             loadLabels(context);
 
             JsonSerializationContext serializationContext = context.getJsonSerializationContext();

@@ -60,6 +60,7 @@ import org.auraframework.impl.visitor.GlobalReferenceVisitor;
 import org.auraframework.impl.visitor.UsageMap;
 import org.auraframework.impl.visitor.UsageMapCombiner;
 import org.auraframework.impl.visitor.UsageMapSupplier;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.ContextService;
@@ -828,8 +829,8 @@ public class DefinitionServiceImpl implements DefinitionService {
         }
         DependencyEntry de = contextService.getCurrentContext().getLocalDependencyEntry(uid);
 
-        if (de != null) {
-            return de.dependencies;
+        if (de != null && de.dependencyMap != null) {
+            return Collections.unmodifiableSet(de.dependencyMap.keySet());
         }
         return null;
     }
@@ -849,6 +850,26 @@ public class DefinitionServiceImpl implements DefinitionService {
 
         if (de != null) {
             return de.clientLibraries;
+        }
+        return null;
+    }
+
+    @Override
+    public Set<PropertyReference> getGlobalReferences(String uid, String root) {
+        if (uid == null) {
+            return null;
+        }
+        DependencyEntry de = contextService.getCurrentContext().getLocalDependencyEntry(uid);
+
+        if (de != null) {
+            Set<PropertyReference> refs = (de.globalReferencesMap != null ? de.globalReferencesMap.get(root) : null);
+            if (refs == null) {
+                try {
+                    return buildRefs(root, de.dependencyMap);
+                } catch (QuickFixException qfe) {
+                    return null;
+                }
+            }
         }
         return null;
     }
@@ -1118,6 +1139,7 @@ public class DefinitionServiceImpl implements DefinitionService {
 
             List<CompilingDef<?>> compiled = Lists.newArrayList(currentCC.compiled.values());
 
+            //
             // Sort based on descriptor only (not level) for uid calculation.
             // There are situations where components dependencies are read at different
             // levels affecting the ordering of dependencies and creates different uid.
@@ -1162,8 +1184,21 @@ public class DefinitionServiceImpl implements DefinitionService {
             if (de != null) {
                 return de;
             }
+            Map<DefDescriptor<? extends Definition>, Definition> deps = Maps.newLinkedHashMap();
+            // level sorting is important for css and aura:library dependency ordering
+            Collections.sort(compiled);
 
-            de = createDependencyEntry(compiled, uid, clientLibs, currentCC.shouldCacheDependencies);
+            compiled.stream().forEach(cd -> deps.put(cd.descriptor, cd.def));
+
+            Map<String,Set<PropertyReference>> globalRefs = null;
+            if (descriptor.getDefType() == DefType.APPLICATION) {
+                globalRefs = Maps.newHashMap();
+                Set<PropertyReference> labels = buildRefs(AuraValueProviderType.LABEL.getPrefix(), deps);
+                globalRefs.put(AuraValueProviderType.LABEL.getPrefix(), labels);
+            }
+
+
+            de = new DependencyEntry(uid, deps, clientLibs, currentCC.shouldCacheDependencies, globalRefs);
 
             currentCC.getCompiling(descriptor);
             Cache<String, DependencyEntry> depsCache = cachingService.getDepsCache();
@@ -1191,20 +1226,6 @@ public class DefinitionServiceImpl implements DefinitionService {
         } finally {
             threadContext.set(null);
         }
-    }
-
-    private DependencyEntry createDependencyEntry(List<CompilingDef<?>> compiled, String uid,
-                                                  List<ClientLibraryDef> clientLibs,
-                                                  boolean cacheable) {
-        Set<DefDescriptor<? extends Definition>> deps = Sets.newLinkedHashSet();
-        // level sorting is important for css and aura:library dependency ordering
-        Collections.sort(compiled);
-
-        for (CompilingDef<?> cd : compiled) {
-            deps.add(cd.descriptor);
-        }
-
-        return new DependencyEntry(uid, Collections.unmodifiableSet(deps), clientLibs, cacheable);
     }
 
     /**
@@ -1260,41 +1281,12 @@ public class DefinitionServiceImpl implements DefinitionService {
      */
     private <D extends Definition> void buildDE(@Nonnull DependencyEntry de, @Nonnull DefDescriptor<?> descriptor)
             throws QuickFixException {
-        CompileContext currentCC;
-        currentCC = new CompileContext(descriptor, contextService.getCurrentContext(),
-                cachingService.getDefsCache(), null);
-        threadContext.set(currentCC);
-        try {
-            validateHelper(currentCC, descriptor);
-            for (DefDescriptor<?> dd : de.dependencies) {
-                validateHelper(currentCC, dd);
-            }
-            finishValidation(currentCC);
-        } finally {
-            threadContext.set(null);
+        if (de.qfe != null) {
+            throw de.qfe;
         }
-    }
-
-    /**
-     * Typesafe helper for buildDE.
-     *
-     * This adds new definitions (unvalidated) to the list passed in. Definitions that were previously built are simply
-     * added to the local cache.
-     *
-     * The quick fix exception case is actually a race condition where we previously had a set of depenendencies, and
-     * something changed, making our set inconsistent. There are no guarantees that during a change all MDRs will have a
-     * correct set of definitions.
-     *
-     * @param descriptor the descriptor for which we need a definition.
-     * @return A compilingDef for the definition, or null if not needed.
-     * @throws QuickFixException if something has gone terribly wrong.
-     */
-    private <D extends Definition> void validateHelper(@Nonnull CompileContext currentCC,
-            @Nonnull DefDescriptor<D> descriptor) throws QuickFixException {
-        CompilingDef<D> compiling = new CompilingDef<>(descriptor);
-        currentCC.compiled.put(descriptor, compiling);
-        if (compiling.def == null && !fillCompilingDef(compiling, currentCC)) {
-            throw new DefinitionNotFoundException(compiling.descriptor);
+        AuraContext context = contextService.getCurrentContext();
+        for (Map.Entry<DefDescriptor<?>, Definition> entry : de.dependencyMap.entrySet()) {
+            context.addLocalDef(entry.getKey(), entry.getValue());
         }
     }
 
@@ -1639,7 +1631,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                     }
                 }
 
-                Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
+                Set<DefDescriptor<?>> newDeps = Sets.newLinkedHashSet();
                 cd.def.appendDependencies(newDeps);
 
                 for (DefDescriptor<?> dep : newDeps) {
@@ -1687,7 +1679,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                             // throw new
                             // AuraRuntimeException("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
                         }
-                            cd.def.validateReferences();
+                        cd.def.validateReferences();
                         cd.validated = true;
                     }
                 } finally {
@@ -1857,23 +1849,34 @@ public class DefinitionServiceImpl implements DefinitionService {
                     new UsageMapCombiner<PropertyReference>()));
     }
 
-    @Override
-    public Set<String> getGlobalReferences(String root, Map<DefDescriptor<? extends Definition>, Definition> defs)
+    private Set<PropertyReference> buildRefs(String root, Map<DefDescriptor<? extends Definition>, Definition> defs)
             throws QuickFixException {
         GlobalValueProvider provider = contextService.getCurrentContext().getGlobalProviders().get(root);
         Map<Throwable, Collection<Location>> errors = Maps.newLinkedHashMap();
-        Set<String> result = Sets.newHashSet();
+        Set<PropertyReference> result = Sets.newHashSet();
         UsageMap<PropertyReference> refs = getReferenceUsageMap(root, defs);
         for (Map.Entry<PropertyReference, Set<Location>> entry: refs.entrySet()) {
             try {
                 provider.validate(entry.getKey());
-                result.add(entry.getKey().toString());
+                result.add(entry.getKey());
             } catch (InvalidExpressionException iee) {
                 errors.put(iee, entry.getValue());
             }
         }
         if (errors.size() > 0) {
             throw new CompositeValidationException("Unable to load values for "+root, errors);
+        }
+        return result;
+    }
+
+    @Override
+    public Set<String> getGlobalReferences(String root, Map<DefDescriptor<? extends Definition>, Definition> defs)
+            throws QuickFixException {
+        Set<PropertyReference> refs = buildRefs(root, defs);
+        Set<String> result = Sets.newHashSet();
+
+        for (PropertyReference pr : refs) {
+            result.add(pr.toString());
         }
         return result;
     }

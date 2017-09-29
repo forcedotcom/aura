@@ -26,6 +26,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -206,6 +207,15 @@ public interface DefinitionService extends AuraService {
      * @return list of client libraries for uid
      */
     List<ClientLibraryDef> getClientLibraries(String uid);
+
+    /**
+     * Get a usage map for a global value provider based on the uid.
+     *
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
+     * @param root the root for the global value provider.
+     * @return a usage map.
+     */
+    Set<PropertyReference> getGlobalReferences(String uid, String root);
 
     /**
      * Check to see if the dependency set is cacheable or not.

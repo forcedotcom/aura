@@ -238,6 +238,11 @@ public final class CssPreprocessor {
                 result.flavorAnnotations = flavorCollector.get().getFlavorAnnotations();
             }
 
+            Optional<TokenPropertyValidationPlugin> tokenPropertyValidationPlugin = registry.retrieve(TokenPropertyValidationPlugin.class);
+            if (tokenPropertyValidationPlugin.isPresent()) {
+                result.tokensInCssProperties = tokenPropertyValidationPlugin.get().tokensInCssProperties;
+            }
+
             return result;
         }
     }
@@ -247,6 +252,7 @@ public final class CssPreprocessor {
         private String content;
         private Set<String> expressions;
         private Map<String, FlavorAnnotation> flavorAnnotations;
+        private Map<String, Set<String>> tokensInCssProperties;
 
         /** parsed content */
         public String content() {
@@ -261,6 +267,10 @@ public final class CssPreprocessor {
         /** all flavors metadata found in the source */
         public Map<String, FlavorAnnotation> flavorAnnotations() {
             return flavorAnnotations;
+        }
+
+        public Map<String, Set<String>> tokensInCssProperties() {
+            return tokensInCssProperties;
         }
     }
 }

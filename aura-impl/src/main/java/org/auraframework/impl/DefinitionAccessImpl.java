@@ -15,16 +15,6 @@
  */
 package org.auraframework.impl;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.system.AuraContext;
@@ -35,13 +25,23 @@ import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public class DefinitionAccessImpl implements DefinitionAccess {
     private static final long serialVersionUID = 8409052764733035151L;
     private static final String accessKey=Json.ApplicationKey.ACCESS.toString();
     private Authentication authentication = null;
     private Access access = null;
     private transient Method accessMethod = null;
-    private boolean isInternalNamespace=false;
+    protected boolean isInternalNamespace=false;
     private String methodString;
     private final String accessString;
    

@@ -63,6 +63,7 @@ public final class FlavoredStyleParser implements DefinitionFactory<TextSource<F
         builder.setContent(result.content());
         builder.setTokenExpressions(result.expressions());
         builder.setFlavorAnnotations(result.flavorAnnotations());
+        builder.setTokensInCssProperties(result.tokensInCssProperties());
         builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
 
         return builder.build();

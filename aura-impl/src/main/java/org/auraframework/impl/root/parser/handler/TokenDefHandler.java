@@ -61,6 +61,7 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         this.builder.setLocation(getLocation());
+        this.builder.setConfigAdapter(configAdapter);
     }
 
     @Override

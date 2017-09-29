@@ -15,9 +15,10 @@
  */
 package org.auraframework.builder;
 
-import java.util.Set;
-
 import org.auraframework.def.BaseStyleDef;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Base builder for styles (css files).
@@ -45,4 +46,9 @@ public interface BaseStyleDefBuilder<D extends BaseStyleDef> extends DefBuilder<
      * both "color" and "small + large + 'px'" would be token expressions.
      */
     BaseStyleDefBuilder<D> setTokenExpressions(Set<String> expressions);
+
+    /**
+     * tracks all properties that contain tokens to allow one to validate which are allowed to have tokens in them
+     */
+    BaseStyleDefBuilder<D> setTokensInCssProperties(Map<String, Set<String>> tokensInCssProperties);
 }

@@ -117,7 +117,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
                 a.validate(namespace, allowAuthenticationAttribute(), allowPrivateAttribute(), configAdapter);
             } catch (InvalidAccessValueException e) {
                 // re-throw with location
-                throw new InvalidAccessValueException(e.getMessage(), getLocation());
+                throw new InvalidAccessValueException(e.getMessage(), getLocation(), e);
             }
             return a;
         }

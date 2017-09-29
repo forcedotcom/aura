@@ -15,28 +15,28 @@
  */
 package org.auraframework.impl.css.parser.plugin;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.List;
-import java.util.Set;
-
-import org.auraframework.css.TokenValueProvider;
-import org.auraframework.def.TokenDef;
-import org.auraframework.throwable.quickfix.QuickFixException;
-
 import com.salesforce.omakase.ast.declaration.Declaration;
 import com.salesforce.omakase.broadcast.annotation.Validate;
-import com.salesforce.omakase.error.ErrorLevel;
 import com.salesforce.omakase.error.ErrorManager;
 import com.salesforce.omakase.plugin.Plugin;
+import org.auraframework.css.TokenValueProvider;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Checks that tokens are used on the correct property.
  */
 public final class TokenPropertyValidationPlugin implements Plugin {
-    private static final String MSG = "the '%s' token cannot be used with the %s property.\nAllowed properties: %s";
 
     private final TokenValueProvider tokenProvider;
+
+    public final Map<String, Set<String>> tokensInCssProperties = new HashMap<>();
 
     public TokenPropertyValidationPlugin(TokenValueProvider tokenProvider) {
         this.tokenProvider = checkNotNull(tokenProvider, "tokenProvider cannot be null");
@@ -47,15 +47,8 @@ public final class TokenPropertyValidationPlugin implements Plugin {
         Declaration declaration = function.parent().declaration();
         String property = declaration.propertyName().unprefixed();
 
-        for (List<TokenDef> defs : tokenProvider.extractTokenDefs(function.args())) {
-            for (TokenDef def : defs) {
-                Set<String> allowed = def.getAllowedProperties();
-                if (!allowed.isEmpty() && !allowed.contains(property)) {
-                    // report the violation
-                    em.report(ErrorLevel.FATAL, function,
-                            String.format(MSG, def.getName(), property, def.getAllowedPropertiesString()));
-                }
-            }
-        }
+        Set<String> propertyReferenceSet = tokensInCssProperties.getOrDefault(property, new HashSet<>());
+        propertyReferenceSet.add(function.args());
+        tokensInCssProperties.put(property, propertyReferenceSet);
     }
 }

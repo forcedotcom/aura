@@ -15,14 +15,13 @@
  */
 package org.auraframework.impl.css.token;
 
-import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.auraframework.Aura;
+import com.google.common.base.Objects;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.salesforce.omakase.data.Property;
+import com.salesforce.omakase.util.Properties;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TokenDef;
@@ -34,12 +33,12 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.salesforce.omakase.data.Property;
-import com.salesforce.omakase.util.Properties;
+import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements TokenDef {
     private static final String INVALID_NAME = "Invalid token name: '%s'";
@@ -71,6 +70,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
     private final Set<String> allowedProperties;
     private final String allowedPropertiesString;
     private final DefDescriptor<? extends RootDefinition> parentDescriptor;
+    private transient final ConfigAdapter configAdapter;
 
     private final int hashCode;
 
@@ -80,6 +80,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
         this.allowedProperties = AuraUtil.immutableSet(builder.allowedProperties);
         this.allowedPropertiesString = builder.allowedPropertiesString;
         this.parentDescriptor = builder.parentDescriptor;
+        this.configAdapter = builder.configAdapter;
 
         this.hashCode = AuraUtil.hashCode(descriptor, location, value);
     }
@@ -161,7 +162,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
         // also note that if the value does not parse as valid syntax for where the token is referenced, the value
         // will not be included in the output. This is handled by nature of how the substitution is performed.
 
-        if (!Aura.getConfigAdapter().isInternalNamespace(parentDescriptor.getNamespace())) {
+        if (configAdapter != null && !configAdapter.isInternalNamespace(parentDescriptor.getNamespace())) {
             // expressions, e.g., cross refs
             if (value instanceof Expression) {
                 // currently only a single PropertyReference is valid, but this most likely will not hold true.
@@ -216,6 +217,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
         private Set<String> allowedProperties;
         private String allowedPropertiesString;
         private DefDescriptor<? extends RootDefinition> parentDescriptor;
+        private ConfigAdapter configAdapter;
 
         public Builder setValue(Object value) {
             this.value = value;
@@ -242,6 +244,11 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
 
         public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {
             this.parentDescriptor = parentDescriptor;
+            return this;
+        }
+
+        public Builder setConfigAdapter(ConfigAdapter configAdapter) {
+            this.configAdapter = configAdapter;
             return this;
         }
 

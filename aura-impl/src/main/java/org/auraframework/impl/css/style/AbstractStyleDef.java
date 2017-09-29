@@ -36,9 +36,11 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.quickfix.StyleParserException;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -46,14 +48,17 @@ import java.util.Set;
  */
 public abstract class AbstractStyleDef<D extends BaseStyleDef> extends DefinitionImpl<D> implements BaseStyleDef {
     private static final long serialVersionUID = -7239904547091800250L;
+    private static final String TOKEN_PROPERTY_VALIDATION_ERROR_MSG = "the '%s' token cannot be used with the %s property.\nAllowed properties: %s";
 
     private final String content;
     private final Set<String> expressions;
+    private final Map<String, Set<String>> tokensInCssProperties;
 
     protected AbstractStyleDef(Builder<D> builder) {
         super(builder);
         this.content = builder.content;
         this.expressions = AuraUtil.immutableSet(builder.expressions);
+        this.tokensInCssProperties = builder.tokensInCssProperties;
     }
 
     @Override
@@ -128,12 +133,29 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
                 }
             }
         }
+
+        if (tokensInCssProperties != null && !tokensInCssProperties.isEmpty()) {
+            TokenValueProvider tvp = Aura.getStyleAdapter().getTokenValueProvider(descriptor, ResolveStrategy.PASSTHROUGH);
+            for (String property : tokensInCssProperties.keySet()) {
+                for (String tokens : tokensInCssProperties.get(property)) {
+                    for (List<TokenDef> tokenDefs : tvp.extractTokenDefs(tokens)) {
+                        for (TokenDef tokenDef : tokenDefs) {
+                            Set<String> allowed = tokenDef.getAllowedProperties();
+                            if (!allowed.isEmpty() && !allowed.contains(property)) {
+                                throw new StyleParserException(String.format(TOKEN_PROPERTY_VALIDATION_ERROR_MSG, tokenDef.getName(), property, tokenDef.getAllowedPropertiesString()), tokenDef.getLocation());
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /** common builder for style defs */
     public static abstract class Builder<D extends BaseStyleDef> extends BuilderImpl<D> implements BaseStyleDefBuilder<D> {
         private String content;
         private Set<String> expressions;
+        private Map<String, Set<String>> tokensInCssProperties;
 
         public Builder(Class<D> defClass) {
             super(defClass);
@@ -149,6 +171,12 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
         @Override
         public Builder<D> setTokenExpressions(Set<String> expressions) {
             this.expressions = expressions;
+            return this;
+        }
+
+        @Override
+        public Builder<D> setTokensInCssProperties(Map<String, Set<String>> tokensInCssProperties) {
+            this.tokensInCssProperties = tokensInCssProperties;
             return this;
         }
     }

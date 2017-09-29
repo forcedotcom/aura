@@ -27,6 +27,10 @@ public class InvalidAccessValueException extends AuraValidationException {
         super(message, l);
     }
 
+    public InvalidAccessValueException(String message, Location l, Throwable cause) {
+        super(message, l, cause);
+    }
+
     public InvalidAccessValueException(String msg) {
         super(msg);
     }

@@ -103,6 +103,7 @@ public abstract class StyleParser implements DefinitionFactory<TextSource<StyleD
         builder.setClassName(className);
         builder.setContent(result.content());
         builder.setTokenExpressions(result.expressions());
+        builder.setTokensInCssProperties(result.tokensInCssProperties());
         builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
 
         return builder.build();

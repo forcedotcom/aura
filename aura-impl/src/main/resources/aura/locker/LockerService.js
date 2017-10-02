@@ -155,13 +155,23 @@ function LockerService() {
                 var descriptor = def.getDescriptor();
                 var namespace = descriptor.getNamespace();
                 var name = descriptor.getName();
-                var descriptorDebuggableURL = "components/" + namespace + "/" + name + ".js";
+                var descriptorDebuggableURL = "/components/" + namespace + "/" + name + ".js";
                 var key = this.getKeyForNamespace(namespace);
 
                 // Key this def so we can transfer the key to component instances
                 ls_setKey(def, key);
 
                 return this.create(code, key, descriptorDebuggableURL);
+            },
+
+            createForModule : function(code, defDescriptor) {
+                var namespace = defDescriptor.getNamespace();
+                var name = defDescriptor.getName();
+                var descriptorDebuggableURL = "/modules/" + namespace + "/" + name + ".js";
+                var key = this.getKeyForNamespace(namespace);
+
+                // Lockerize the definition by providing a global scope
+                return this.createInternal(code, key, descriptorDebuggableURL, undefined, undefined, true);
             },
 
             getEnv : function(key, /* deprecated*/ doNotCreate) {
@@ -174,7 +184,6 @@ function LockerService() {
                 if (!env && !doNotCreate) {
                     env = keyToEnvironmentMap[psuedoKeySymbol] = SecureWindow(window, key, whitelist);
                 }
-
                 return env;
             },
 
@@ -210,13 +219,12 @@ function LockerService() {
                 return this.createInternal(code, key, sourceURL, skipPreprocessing);
             },
 
-            createInternal : function(code, key, sourceURL, skipPreprocessing, forceLocker) {
+            createInternal : function(code, key, sourceURL, skipPreprocessing, forceLocker, muteAuraGVP) {
                 var envRec;
 
                 if (!lockerShadows) {
                     Aura["InitSecureEval"](scriptNonce);
                 }
-
                 if (forceLocker || this.isEnabled()) {
                     envRec = this.getEnv(key);
                     if (!lockerShadows) {
@@ -236,13 +244,12 @@ function LockerService() {
                 } else {
                     // Degrade gracefully back to global window, no shadows, etc
                     envRec = window;
-
                     if (!lockerShadows) {
                         lockerShadows = {};
                     }
                 }
 
-                var returnValue = window['$$safe-eval$$'](code, sourceURL, skipPreprocessing, envRec, lockerShadows);
+                var returnValue = window['$$safe-eval$$'](code, sourceURL, skipPreprocessing, muteAuraGVP, envRec, lockerShadows);
 
                 var locker = {
                         globals : envRec,
@@ -347,6 +354,7 @@ function LockerService() {
     service["initialize"] = service.initialize;
     service["create"] = service.create;
     service["createForDef"] = service.createForDef;
+    service["createForModule"] = service.createForModule;
     service["getEnv"] = service.getEnv;
     service["getEnvForSecureObject"] = service.getEnvForSecureObject;
     service["getKeyForNamespace"] = service.getKeyForNamespace;

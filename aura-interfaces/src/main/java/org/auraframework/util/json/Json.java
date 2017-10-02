@@ -135,6 +135,7 @@ public interface Json {
         RENDERERDEF("rendererDef","rd"),
         REQUIRED("required","rq"),
         REQUIREDVERSIONDEFS("requiredVersionDefs","rv"),
+        REQUIRELOCKER("requireLocker", "rl"),
         RETURNTYPE("returnType","rt"),
         SERIAL_ID("s"/*"serId"*/,"s"),
         SERIAL_REFID("r"/*"serRefId"*/,"r"),

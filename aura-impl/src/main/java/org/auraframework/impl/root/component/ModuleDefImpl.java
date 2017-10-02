@@ -66,6 +66,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     private final Set<PropertyReference> labelReferences;
     private Double minVersion;
     private String externalReferences;
+    private Boolean requireLocker;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
@@ -76,6 +77,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         this.labelReferences = builder.labelReferences;
         this.minVersion = builder.minVersion;
         this.externalReferences = builder.externalReferences;
+        this.requireLocker = builder.requireLocker;
     }
 
     @Override
@@ -99,6 +101,9 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     }
 
     @Override
+    public Boolean getRequireLocker() { return requireLocker; }
+
+    @Override
     public void serialize(Json json) throws IOException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         boolean compat = context.useCompatSource();
@@ -115,6 +120,9 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         json.writeMapEntry(ApplicationKey.CODE, code);
         if (this.minVersion != null) {
             json.writeMapEntry(ApplicationKey.MINVERSION, this.minVersion);
+        }
+        if (this.requireLocker) {
+            json.writeMapEntry(ApplicationKey.REQUIRELOCKER, this.requireLocker);
         }
         json.writeMapEnd();
     }
@@ -313,6 +321,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         private Set<PropertyReference> labelReferences = new HashSet<>();
         private Double minVersion = null;
         private String externalReferences;
+        private Boolean requireLocker = false;
 
         public Builder() {
             super(ModuleDef.class);
@@ -350,6 +359,10 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         
         public void setExternalReferences(String externalReferences) {
             this.externalReferences = externalReferences;
+        }
+
+        public void setRequireLocker(Boolean requireLocker) {
+            this.requireLocker = requireLocker;
         }
 
         @Override

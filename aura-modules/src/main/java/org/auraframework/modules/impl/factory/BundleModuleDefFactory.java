@@ -182,6 +182,10 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                 if (expose != null && expose) {
                     builder.setAccess(new DefinitionAccessImpl(Access.GLOBAL));
                 }
+                Boolean requireLocker = result.getRequireLocker();
+                if (requireLocker != null && requireLocker) {
+                    builder.setRequireLocker(requireLocker);
+                }
             }
         }
     }

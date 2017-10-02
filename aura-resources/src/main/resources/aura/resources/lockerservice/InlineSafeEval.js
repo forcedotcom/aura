@@ -55,6 +55,11 @@
 		          }
 	    	  }
 
+			  if (options.muteAuraGVP) {
+				  // Mute $A GVP for modules, for LC use SecureAura
+				  src = 'const $A = undefined;\n' + src;
+			  }
+
 	          if (options.useStrict) {
 		          // forcing strict mode
 		          src = '"use strict";\n' + src;
@@ -100,16 +105,17 @@
 	      // adding non-configurable hooks into parent window.
 	      Object.defineProperties(parent, {
 	          '$$safe-eval$$': {
-	              value: function(src, sourceURL, skipPreprocessing) {
+	              value: function(src, sourceURL, skipPreprocessing, muteAuraGVP) {
 	                  if (!src) {
 	                	  return undefined;
 	                  }
-	                  var args = Array.prototype.slice.call(arguments, 3);
+	                  var args = Array.prototype.slice.call(arguments, 4);
 	                  var fn = evalAndReturn(addLexicalScopesToSource(src, {
 	                      levels: args.length,
 	                      useStrict: true,
 	                      sourceURL: sourceURL,
-	                      skipPreprocessing: skipPreprocessing
+	                      skipPreprocessing: skipPreprocessing,
+						  muteAuraGVP: muteAuraGVP
 	                  }));
 
 	                  if (typeof fn === 'function') {

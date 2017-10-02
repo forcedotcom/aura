@@ -33,7 +33,7 @@
         <ui:button aura:id="t2" class="button-set2" label="Set v.test2" buttonTitle="x" press="{!c.updateTest2}" />
         <ui:button aura:id="t3" class="button-set3" label="Set v.test3" buttonTitle="x" press="{!c.updateTest3}" />
         <module:marker></module:marker>
-        
+
         <section style="margin: 10px; border: 1px solid # ">
             <h3>Aura land!</h3>
             <p>[v.test]: <span class="a-res1">{!v.test}</span></p>
@@ -41,31 +41,31 @@
             <p>[v.test3]: <span class="a-res3">{!v.test3}</span></p>
             <p>[expression]: <span class="a-expr">{! v.test3 + '!!' }</span></p>
         </section>
-        
+
         <aura:if isTrue="{!v.branch}">
             <section class="aura simple" aura:id="container">
                 <moduleTest:simpleCmp
-                    aura:id="simple" 
-                    literal="Hi!"
-                    bound="{!v.test}"
-                    nested="{!v.privItems[0].label}"
-                    unbound="{#v.test2}"
-                    expression="{! v.test3 + '!!' }"
-                    callbackaction="{!c.cbAction}"
-                    onpress="{!c.cbEvent}"
+                        aura:id="simple"
+                        literal="Hi!"
+                        bound="{!v.test}"
+                        nested="{!v.privItems[0].label}"
+                        unbound="{#v.test2}"
+                        expression="{! v.test3 + '!!' }"
+                        callbackaction="{!c.cbAction}"
+                        onpress="{!c.cbEvent}"
                 />
             </section>
         </aura:if>
 
         <section class="aura">
             <moduleTest:compositeCmp
-                aura:id="composite"
-                literal="Hi2!"
-                bound="{!v.test}"
-                unbound="{#v.test2}"
-                expression="{! v.test3 + '!!' }"
-                callbackaction="{!c.cbAction}"
-                onpress="{!c.cbEvent}"
+                    aura:id="composite"
+                    literal="Hi2!"
+                    bound="{!v.test}"
+                    unbound="{#v.test2}"
+                    expression="{! v.test3 + '!!' }"
+                    callbackaction="{!c.cbAction}"
+                    onpress="{!c.cbEvent}"
 
             />
         </section>
@@ -73,14 +73,14 @@
         <p>Iteration:</p>
 
         <section class="aura">
-             <aura:iteration items="{!v.privItems}" var="item">
+            <aura:iteration items="{!v.privItems}" var="item">
                 <moduleTest:simpleCmp
-                    literal="{!item.label}" 
-                    callbackaction="{!c.cbAction}"
-                    onpress="{!c.cbEvent}"
+                        literal="{!item.label}"
+                        callbackaction="{!c.cbAction}"
+                        onpress="{!c.cbEvent}"
                 />
                 <!-- <ui:button label="{!item.label}"></ui:button> -->
-             </aura:iteration>
+            </aura:iteration>
         </section>
     </section>
 

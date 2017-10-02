@@ -22,11 +22,13 @@ public class Meta {
     private String description;
     private Double minVersion;
     private Boolean expose;
+    private Boolean requireLocker;
 
-    public Meta(String description, Double minVersion, Boolean expose) {
+    public Meta(String description, Double minVersion, Boolean expose, Boolean requireLocker) {
         this.description = description;
         this.minVersion = minVersion;
         this.expose = expose;
+        this.requireLocker = requireLocker;
     }
 
     public String getDescription() {
@@ -52,4 +54,9 @@ public class Meta {
     public void setExpose(Boolean expose) {
         this.expose = expose;
     }
+
+    public Boolean getRequireLocker() { return requireLocker; }
+
+    public void setRequireLocker(Boolean requireLocker) { this.requireLocker = requireLocker; }
+
 }

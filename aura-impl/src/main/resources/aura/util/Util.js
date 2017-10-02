@@ -165,7 +165,7 @@ Aura.Utils.Util.prototype.globalEval = function(src, optionalSourceURL) {
     var srcToEval = "return (" + src + ");";
     if (window["$$safe-eval-compat$$"]) {
         //For perf, disable pre-processing step and assume that src passed returns a value
-        return window["$$safe-eval-compat$$"](srcToEval, optionalSourceURL, true, window);
+        return window["$$safe-eval-compat$$"](srcToEval, optionalSourceURL, true, false, window);
     }
 
     // --- backward compatibility ---

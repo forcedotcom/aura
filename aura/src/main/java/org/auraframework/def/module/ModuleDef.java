@@ -50,4 +50,10 @@ public interface ModuleDef extends RootDefinition {
      * @return serialized JSONObject with references to custom metadata
      */
     String getExternalReferences();
+
+    /**
+     * Does the module require to be lockerized
+     * @return
+     */
+    Boolean getRequireLocker();
 }

@@ -38,6 +38,11 @@
               if (match) src = src.replace(match[1], 'return ');
           }
 
+          if (options.muteAuraGVP) {
+              // Mute $A GVP for modules
+              src = 'const $A = undefined;\n' + src;
+          }
+
           if (options.lockerize) {
               // forcing strict mode
               src = '"use strict";\n' + src;
@@ -105,18 +110,19 @@
           return result;
       }
 
-      function safeEval(src, sourceURL, skipPreprocessing, lockerize, originalThis, originalArguments) {
+      function safeEval(src, sourceURL, skipPreprocessing, muteAuraGVP, lockerize, originalThis, originalArguments) {
           if (!src) {
               return undefined;
           }
 
-          var args = Array.prototype.slice.call(originalArguments, 3);
+          var args = Array.prototype.slice.call(originalArguments, 4);
 
           var scoped = addLexicalScopesToSource(src, {
               levels: args.length,
               lockerize: lockerize,
               sourceURL: sourceURL,
-              skipPreprocessing: skipPreprocessing
+              skipPreprocessing: skipPreprocessing,
+              muteAuraGVP: muteAuraGVP
           });
 
           var fn = evalAndReturn(scoped, !lockerize);
@@ -133,15 +139,15 @@
       switch (id) {
           case "?id=custom":
               Object.defineProperty(parent, "$$safe-eval$$", {
-                  value: function(src, sourceURL, skipPreprocessing) {
-                      return safeEval(src, sourceURL, skipPreprocessing, true, undefined, arguments);
+                  value: function(src, sourceURL, skipPreprocessing, muteAuraGVP) {
+                      return safeEval(src, sourceURL, skipPreprocessing, muteAuraGVP, true, undefined, arguments);
                   }
               });
               break;
           case "?id=system":
               Object.defineProperty(parent, "$$safe-eval-compat$$", {
-                  value: function(src, sourceURL, skipPreprocessing) {
-                      return safeEval(src, sourceURL, skipPreprocessing, false, undefined, arguments);
+                  value: function(src, sourceURL, skipPreprocessing, muteAuraGVP) {
+                      return safeEval(src, sourceURL, skipPreprocessing, muteAuraGVP, false, undefined, arguments);
                   }
               });
               break;

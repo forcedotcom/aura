@@ -33,6 +33,7 @@ function AuraComponentService() {
     this.libraryIncludeRegistry = new Aura.Library.LibraryIncludeRegistry();
     this.componentClassRegistry = new Aura.Component.ComponentClassRegistry();
     this.componentDefStorage    = new Aura.Component.ComponentDefStorage();
+    this.moduleNameToDescriptorLookup = {};
 
     // holds ComponentDef configs to be created
     this.savedComponentConfigs = {};
@@ -674,7 +675,7 @@ AuraComponentService.prototype.initModuleDefs = function(modules) {
     var moduleDefRegistry = this.moduleDefRegistry;
 
     modules.forEach(function (module) {
-        var exporter = { "exporter": module[Json.ApplicationKey.CODE], "minVersion": module[Json.ApplicationKey.MINVERSION], "access": module[Json.ApplicationKey.ACCESS] };
+        var exporter = { "exporter": module[Json.ApplicationKey.CODE], "minVersion": module[Json.ApplicationKey.MINVERSION], "access": module[Json.ApplicationKey.ACCESS], "requireLocker": module[Json.ApplicationKey.REQUIRELOCKER] };
         moduleDefRegistry[module[Json.ApplicationKey.DESCRIPTOR]] = moduleDefRegistry[module[Json.ApplicationKey.NAME]] = exporter;
     });
 };
@@ -688,6 +689,7 @@ AuraComponentService.prototype.initModuleDefs = function(modules) {
  * @export
  */
 AuraComponentService.prototype.addModule = function(descriptor, name, dependencies, exporterClass, nsexports) {
+    this.moduleNameToDescriptorLookup[name] = descriptor;
     if (exporterClass === undefined) {
         // amd define does not include dependencies param if no dependencies.
         return this.addModule(descriptor, name, [], dependencies);
@@ -774,11 +776,28 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
         return this.evaluateModuleDef(desc);
     }, this);
 
-    var Ctor = entry.definition.apply(undefined, deps) || exportns;
+    var Ctor;
+    var defDescriptor;
+
+    if (descriptor.indexOf("markup://") !== -1) {
+        defDescriptor = new DefDescriptor(descriptor);
+    } else {
+        defDescriptor = new DefDescriptor(this.moduleNameToDescriptorLookup[descriptor]);
+    }
+    var namespace = defDescriptor.getNamespace();
+    var isInternalNamespace = $A.clientService.isInternalNamespace(namespace);
+    if (entry.definition && $A.util.isFunction(entry.definition)) {
+        // Decide wether the module should be lockerized or not
+        if ((!isInternalNamespace || (isInternalNamespace && entry["requireLocker"]))) {
+            // Eval the definition in a restricted scope
+            entry.definition = $A.lockerService.createForModule(entry.definition.toString(), defDescriptor).returnValue;
+        }
+        Ctor = entry.definition.apply(undefined, deps);
+    }
+
+    Ctor = Ctor || exportns;
     entry.ns = Ctor;
-
     return Ctor;
-
 };
 
 AuraComponentService.prototype.createInteropComponentDef = function (descriptor) {

@@ -1,0 +1,4 @@
+{
+  "requireLocker": "true",
+  "description": "simple component module which will be lockerized!"
+}

@@ -236,6 +236,7 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
     });
 
     // Add RTC related api only to specific namespaces
+    SecureObject.addRTCMediaApis(o, win, "MediaStream", key);
     SecureWindow.addRTCPeerConnection(o, win, key);
 
     var workerFrame = win.document.getElementById("safeEvalWorkerCustom");

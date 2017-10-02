@@ -1707,15 +1707,11 @@ SecureObject.isUnfilteredType = function(raw, key) {
 //FIXME(tbliss): remove this once the necessary APIs become standard and can be exposed to everyone
 SecureObject.addRTCMediaApis = function(st, raw, name, key) {
     if (raw[name]) {
+    	var namespace = key["namespace"];
         var config = {
                 enumerable: true,
-                get: function() {
-                    var namespace = key["namespace"];
-                    if (namespace === "runtime_rtc_spark" || namespace === "runtime_rtc") {
-                        return raw[name];
-                    }
-                    return undefined;
-                }
+                value: (namespace === "runtime_rtc_spark" || namespace === "runtime_rtc") ? raw[name] : undefined,
+                writable: true
         };
         Object.defineProperty(st, name, config);
     }

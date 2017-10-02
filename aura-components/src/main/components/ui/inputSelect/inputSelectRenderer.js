@@ -22,10 +22,8 @@
 
         if (!cmp.get("v.useMenu") && (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body")))) {
             var optionElements = helper.renderOptions(cmp, options);
-
             cmp.find("select").getElement().appendChild(optionElements);
         }
-
     },
 
     rerender: function(cmp, helper) {

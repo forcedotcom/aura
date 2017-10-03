@@ -25,6 +25,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 /**
  * The definition of a component. Holds all information about a given type of
@@ -65,11 +66,11 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
 
     /**
      * @throws QuickFixException
-     * @see org.auraframework.def.BaseXmlElement#validateReferences()
+     * @see org.auraframework.def.BaseXmlElement#validateReferences(ReferenceValidationContext)
      */
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
 
         // Only GLOBAL components can specify a minVersion
         if (this.getMinVersion() != null && !this.getAccess().isGlobal()) {

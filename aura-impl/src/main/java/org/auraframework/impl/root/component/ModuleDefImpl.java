@@ -49,6 +49,7 @@ import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Json.ApplicationKey;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.collect.Sets;
 
@@ -208,8 +209,8 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
         validateLabels();
     }
 

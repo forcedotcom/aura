@@ -40,6 +40,7 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 /**
  * Delegates either ComponentDefRef or ModuleDefRef based on modules enablement
@@ -192,8 +193,8 @@ public class DefRefDelegate implements DefinitionReference {
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        select().validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        select().validateReferences(validationContext);
     }
 
     @Override

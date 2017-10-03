@@ -46,6 +46,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.TokenValueNotFoundException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
@@ -258,8 +259,8 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
 
         DefinitionService definitionService = Aura.getDefinitionService();
 
@@ -315,7 +316,7 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
 
         // tokens
         for (TokenDef def : tokens.values()) {
-            def.validateReferences();
+            def.validateReferences(validationContext);
         }
 
         // verify cross references refer to something defined on this def or on a parent def.

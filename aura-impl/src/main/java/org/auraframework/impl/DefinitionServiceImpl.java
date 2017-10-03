@@ -56,6 +56,7 @@ import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
+import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.impl.visitor.GlobalReferenceVisitor;
 import org.auraframework.impl.visitor.UsageMap;
 import org.auraframework.impl.visitor.UsageMapCombiner;
@@ -85,6 +86,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
@@ -1666,8 +1668,14 @@ public class DefinitionServiceImpl implements DefinitionService {
         // This can be changed once we remove the ability to nest, as we will never allow
         // this. That way we won't have to copy our list so many times.
         //
+        // The ability to nest is nearly gone, meaning that this will get much simpler.
+        //
         do {
             compiling = Lists.newArrayList(currentCC.compiled.values());
+
+            Map<DefDescriptor<? extends Definition>,Definition> accessible = Maps.newHashMap();
+            currentCC.compiled.values().stream().forEach(cd -> accessible.put(cd.descriptor, cd.def));
+            ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(accessible);
 
             for (CompilingDef<?> cd : compiling) {
                 currentCC.context.pushCallingDescriptor(cd.descriptor);
@@ -1679,7 +1687,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                             // throw new
                             // AuraRuntimeException("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
                         }
-                        cd.def.validateReferences();
+                        cd.def.validateReferences(validationContext);
                         cd.validated = true;
                     }
                 } finally {
@@ -1811,6 +1819,9 @@ public class DefinitionServiceImpl implements DefinitionService {
         List<CompilingDef<?>> compiling = null;
         do {
             compiling = Lists.newArrayList(cc.compiled.values());
+            Map<DefDescriptor<? extends Definition>,Definition> accessible = Maps.newHashMap();
+            cc.compiled.values().stream().forEach(cd -> accessible.put(cd.descriptor, cd.def));
+            ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(accessible);
 
             for (CompilingDef<?> cd : compiling) {
                 if (cd.def == null) {
@@ -1826,7 +1837,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                             logger.warn("warmCaches: Nested add of " + cd.descriptor);
                         }
                         try {
-                            cd.def.validateReferences();
+                            cd.def.validateReferences(validationContext);
                         } catch (Throwable t) {
                             logger.error("warmCaches: Failed to validate "+cd.descriptor, t);
                         }

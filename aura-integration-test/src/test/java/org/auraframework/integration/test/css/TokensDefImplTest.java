@@ -413,7 +413,7 @@ public class TokensDefImplTest extends StyleTestCase {
     public void testValidatesGoodExtendsRef() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> child = addSeparateTokens(tokens().parent(parent));
-        definitionService.getDefinition(child).validateReferences();
+        definitionService.getDefinition(child);
     }
 
     /** errors when extends refers to nonexistent def */
@@ -421,7 +421,7 @@ public class TokensDefImplTest extends StyleTestCase {
     public void testValidatesBadExtendsRef() throws Exception {
         try {
             String src = "<aura:tokens extends=\"test:idontexist\"></aura:tokens>";
-            definitionService.getDefinition(addSeparateTokens(src)).validateReferences();
+            definitionService.getDefinition(addSeparateTokens(src));
             fail("Expected validation to fail.");
         } catch (Exception e) {
             checkExceptionContains(e, DefinitionNotFoundException.class, "No TOKENS");
@@ -436,8 +436,7 @@ public class TokensDefImplTest extends StyleTestCase {
         String contents = "<aura:tokens extends='%s'> </aura:tokens>";
         source.addOrUpdate(String.format(contents, extendsSelf.getDescriptorName()));
         try {
-            TokensDef def = definitionService.getDefinition(extendsSelf);
-            def.validateReferences();
+            definitionService.getDefinition(extendsSelf);
             fail("A tokens def should not be able to extend itself.");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "cannot extend itself");
@@ -520,8 +519,7 @@ public class TokensDefImplTest extends StyleTestCase {
     /** cross references to declared tokens should not throw an error */
     @Test
     public void testValidCrossRefDeclared() throws Exception {
-    	definitionService.getDefinition(addSeparateTokens(tokens().token("one", "one").token("two", "{!one}")))
-    	.validateReferences();
+    	definitionService.getDefinition(addSeparateTokens(tokens().token("one", "one").token("two", "{!one}")));
     }
 
     /** cross references to inherited tokens should not throw an error */
@@ -529,7 +527,7 @@ public class TokensDefImplTest extends StyleTestCase {
     public void testValidCrossRefInherited() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> child = addSeparateTokens(tokens().parent(parent).token("myColor", "{!color}"));
-        definitionService.getDefinition(child).validateReferences(); // no error
+        definitionService.getDefinition(child);
     }
 
     /** cross references to imported tokens should not throw an error */
@@ -537,7 +535,7 @@ public class TokensDefImplTest extends StyleTestCase {
     public void testValidCrossRefImported() throws Exception {
         DefDescriptor<TokensDef> imported = addSeparateTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().imported(imported).token("myColor", "{!color}"));
-        definitionService.getDefinition(desc).validateReferences(); // no error
+        definitionService.getDefinition(desc);
     }
 
     /** test imported tokens cross refs namespace-default token */
@@ -551,7 +549,7 @@ public class TokensDefImplTest extends StyleTestCase {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().imported(import1));
 
         try {
-        	definitionService.getDefinition(desc).validateReferences();
+            definitionService.getDefinition(desc);
             fail("expected exception");
         } catch (Exception e) {
             checkExceptionContains(e, TokenValueNotFoundException.class, "was not found");

@@ -221,7 +221,6 @@ public class JsonStreamReaderTest extends UnitTestCase {
 
     };
 
-    @SuppressWarnings("unchecked")
     private static final ParseSuccess [] array_successes = {
         new ParseSuccess("empty array", "[]", Lists.newArrayList()),
         new ParseSuccess("one element array", "[\"test1\"]", Lists.newArrayList("test1")),

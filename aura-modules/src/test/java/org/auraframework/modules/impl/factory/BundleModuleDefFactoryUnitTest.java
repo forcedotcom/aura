@@ -34,6 +34,7 @@ import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.impl.source.file.FileSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.modules.ModulesCompilerData;
@@ -43,6 +44,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -300,8 +302,9 @@ public class BundleModuleDefFactoryUnitTest {
         when(mockContextService.getCurrentContext()).thenReturn(mockAuraContext);
         when(mockAuraContext.getGlobalProviders()).thenReturn(mockGVPs);
 
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         ModuleDef moduleDef = moduleDefFactory.getDefinition(module, mockBundleSource);
-        moduleDef.validateReferences();
+        moduleDef.validateReferences(validationContext);
 
         assertTrue("access should be public without json file", moduleDef.getAccess().isPublic());
     }

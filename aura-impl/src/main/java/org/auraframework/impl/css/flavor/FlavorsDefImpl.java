@@ -39,6 +39,7 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
@@ -103,12 +104,12 @@ public class FlavorsDefImpl extends RootDefinitionImpl<FlavorsDef> implements Fl
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         for (FlavorIncludeDef flavorInclude : flavorIncludeDefs) {
-            flavorInclude.validateReferences();
+            flavorInclude.validateReferences(validationContext);
         }
         for (FlavorDefaultDef flavorDefaultDef : flavorDefaultDefs) {
-            flavorDefaultDef.validateReferences();
+            flavorDefaultDef.validateReferences(validationContext);
         }
     }
 

@@ -379,8 +379,6 @@ public class AuraTestFilter {
     private TestCaseDef getTestCase(TestSuiteDef suiteDef, String testCaseName) throws QuickFixException {
         for (TestCaseDef currentTestDef : suiteDef.getTestCaseDefs()) {
             if (testCaseName.equals(currentTestDef.getName())) {
-                currentTestDef.validateDefinition();
-                currentTestDef.validateReferences();
                 return currentTestDef;
             }
         }

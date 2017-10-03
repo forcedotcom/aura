@@ -84,6 +84,7 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Json.ApplicationKey;
 import org.auraframework.util.json.JsonSerializationContext;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -423,14 +424,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     @SuppressWarnings("unchecked")
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
         for (DependencyDef def : dependencies) {
-            def.validateReferences();
+            def.validateReferences(validationContext);
         }
 
         for (AttributeDef att : this.attributeDefs.values()) {
-            att.validateReferences();
+            att.validateReferences(validationContext);
         }
 
         AttributeDef facetAttributeDef;
@@ -451,7 +452,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     // }
                 }
             }
-            facet.validateReferences();
+            facet.validateReferences(validationContext);
         }
 
         DefinitionService definitionService = Aura.getDefinitionService();
@@ -518,15 +519,15 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         for (RegisterEventDef def : events.values()) {
-            def.validateReferences();
+            def.validateReferences(validationContext);
         }
 
         for (EventHandlerDef def : eventHandlers) {
-            def.validateReferences();
+            def.validateReferences(validationContext);
         }
 
         for (LibraryDefRef def : imports) {
-            def.validateReferences();
+            def.validateReferences(validationContext);
         }
 
         // have to do all sorts of craaaazy checks here for dupes and matches
@@ -534,7 +535,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         validateExpressionRefs();
 
         for (ClientLibraryDef def : this.clientLibraries) {
-            def.validateReferences();
+            def.validateReferences(validationContext);
         }
 
 

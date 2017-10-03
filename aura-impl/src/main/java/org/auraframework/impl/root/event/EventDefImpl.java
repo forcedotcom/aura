@@ -34,6 +34,7 @@ import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
 import org.auraframework.util.json.JsonSerializationContext;
+import org.auraframework.validation.ReferenceValidationContext;
 
 /**
  * The definition of an event, basically just defines shape, i.e. attributes
@@ -141,7 +142,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         if (extendsDescriptor != null) {
             EventDef extended = Aura.getDefinitionService().getDefinition(extendsDescriptor);
             if (extended == null) {
@@ -157,7 +158,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
         }
 
         for (AttributeDef att : this.attributeDefs.values()) {
-            att.validateReferences();
+            att.validateReferences(validationContext);
         }
     }
 

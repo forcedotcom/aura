@@ -29,6 +29,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 /**
  * Client Library Definition: Specifies name, url, type, and modes of client library
@@ -88,8 +89,8 @@ public final class ClientLibraryDefImpl extends DefinitionImpl<ClientLibraryDef>
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
     }
 
     @Override

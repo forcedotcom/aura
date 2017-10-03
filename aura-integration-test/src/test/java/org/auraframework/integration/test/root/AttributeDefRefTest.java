@@ -15,21 +15,25 @@
  */
 package org.auraframework.integration.test.root;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
+import java.util.Set;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
+import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.util.type.ConversionException;
+import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.Set;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class AttributeDefRefTest extends AuraImplTestCase {
 
@@ -122,21 +126,23 @@ public class AttributeDefRefTest extends AuraImplTestCase {
 
     @Test
     public void testValidateReferencesChainsToValue() throws Exception {
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         Definition value = Mockito.mock(Definition.class);
         AttributeDefRefImpl adr = vendor.makeAttributeDefRef(testAttributeDescriptorName, value, null);
-        Mockito.verify(value, Mockito.times(0)).validateReferences();
-        adr.validateReferences();
-        Mockito.verify(value, Mockito.times(1)).validateReferences();
+        Mockito.verify(value, Mockito.times(0)).validateReferences(Mockito.any());
+        adr.validateReferences(validationContext);
+        Mockito.verify(value, Mockito.times(1)).validateReferences(validationContext);
     }
 
     @Test
     public void testValidateReferencesChainsThroughCollection() throws Exception {
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         Definition value = Mockito.mock(Definition.class);
         AttributeDefRefImpl adr = vendor
                 .makeAttributeDefRef(testAttributeDescriptorName, ImmutableList.of(value), null);
-        Mockito.verify(value, Mockito.times(0)).validateReferences();
-        adr.validateReferences();
-        Mockito.verify(value, Mockito.times(1)).validateReferences();
+        Mockito.verify(value, Mockito.times(0)).validateReferences(Mockito.any());
+        adr.validateReferences(validationContext);
+        Mockito.verify(value, Mockito.times(1)).validateReferences(validationContext);
     }
 
     @Test

@@ -29,6 +29,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements IncludeDefRef {
     private static final long serialVersionUID = 610875326950592992L;
@@ -117,8 +118,8 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
     }
 
     @Override

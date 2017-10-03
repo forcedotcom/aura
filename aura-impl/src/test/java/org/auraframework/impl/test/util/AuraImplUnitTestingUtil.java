@@ -82,6 +82,7 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -208,7 +209,7 @@ public class AuraImplUnitTestingUtil {
             }
 
             @Override
-            public void validateReferences() {
+            public void validateReferences(ReferenceValidationContext validationContext) {
             }
 
             @Override

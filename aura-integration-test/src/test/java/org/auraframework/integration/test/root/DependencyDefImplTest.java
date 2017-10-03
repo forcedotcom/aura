@@ -15,14 +15,18 @@
  */
 package org.auraframework.integration.test.root;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.google.common.collect.Maps;
 
 public class DependencyDefImplTest extends AuraImplTestCase {
     @Test
@@ -89,13 +93,14 @@ public class DependencyDefImplTest extends AuraImplTestCase {
     @Test
     public void testAppendDependenciesNoneFound() throws Exception {
         DependencyDef testDependencyDef;
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         Set<DefDescriptor<?>> deps = new HashSet<>();
         // Try to get dependency that doesn't exist, verify exception thrown
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
                 "markup://aura:iDontExist*", "COMPONENT", vendor.makeLocation("f1", 5, 5, 0));
         deps.clear();
         testDependencyDef.appendDependencies(deps);
-        testDependencyDef.validateReferences();
+        testDependencyDef.validateReferences(validationContext);
         assertEquals(0, deps.size());
     }
 
@@ -136,13 +141,14 @@ public class DependencyDefImplTest extends AuraImplTestCase {
     @Test
     public void testAppendDependenciesDifferentType() throws Exception {
         // Valid resource name but wrong type
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         DependencyDef testDependencyDef;
         Set<DefDescriptor<?>> deps = new HashSet<>();
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
                 "markup://aura:applicatio*", "COMPONENT", vendor.makeLocation("f1", 5, 5, 0));
         deps.clear();
         testDependencyDef.appendDependencies(deps);
-        testDependencyDef.validateReferences();
+        testDependencyDef.validateReferences(validationContext);
         assertEquals(0, deps.size());
 
     }
@@ -150,13 +156,14 @@ public class DependencyDefImplTest extends AuraImplTestCase {
     @Test
     public void testAppendDependenciesDisallowedType() throws Exception {
         // Valid resource name but disallowed type
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         DependencyDef testDependencyDef;
         Set<DefDescriptor<?>> deps = new HashSet<>();
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
                 "markup://aura:application", "APPLICATION", vendor.makeLocation("f1", 5, 5, 0));
         deps.clear();
         testDependencyDef.appendDependencies(deps);
-        testDependencyDef.validateReferences();
+        testDependencyDef.validateReferences(validationContext);
         assertEquals(0, deps.size());
     }
 

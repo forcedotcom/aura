@@ -47,6 +47,7 @@ import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.root.RootDefinitionTest;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.service.CompilerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
@@ -60,6 +61,7 @@ import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -67,6 +69,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends RootDefinitionTest<T> {
@@ -1928,7 +1931,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Test method for {@link Definition#validateReferences()}.
+     * Test method for {@link Definition#validateReferences(ReferenceValidationContext)}.
      */
     @Test
     public void testValidateReferencesWithNonExistentParent() throws Exception {
@@ -1936,8 +1939,9 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null,
                 null, definitionService.getDefDescriptor("test:nonExistentComponentParent", getDefClass()), null, null,
                 null, null, false, false, AuraContext.Access.INTERNAL);
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         try {
-            bcd.validateReferences();
+            bcd.validateReferences(validationContext);
             fail("Should have thrown AuraException because the parent doesn't exist.");
         } catch (DefinitionNotFoundException e) {
             checkExceptionFull(
@@ -1949,7 +1953,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Test method for {@link Definition#validateReferences()}.
+     * Test method for {@link Definition#validateReferences(ReferenceValidationContext)}.
      */
     @Test
     public void testValidateReferencesWithNonExtensibleParent() throws Exception {
@@ -1957,8 +1961,9 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null,
                 null, parentDesc, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         try {
-            bcd.validateReferences();
+            bcd.validateReferences(validationContext);
             fail("Should have thrown AuraException because the parent isn't extensible.");
         } catch (InvalidDefinitionException e) {
             checkExceptionFull(

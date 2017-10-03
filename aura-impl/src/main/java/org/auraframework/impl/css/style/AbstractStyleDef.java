@@ -37,6 +37,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import java.util.HashSet;
 import java.util.List;
@@ -111,8 +112,8 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
 
         // validate tokens
         if (!expressions.isEmpty()) {

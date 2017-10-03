@@ -32,6 +32,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import javax.annotation.concurrent.Immutable;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class LazyComponentDefRef extends ComponentDefRefImpl {
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         @SuppressWarnings("unchecked")
         ComponentDef def = ((DefDescriptor<ComponentDef>) getAttributeDefRef("refDescriptor").getValue()).getDef();
 
@@ -83,7 +84,7 @@ public class LazyComponentDefRef extends ComponentDefRefImpl {
             }
         }
 
-        super.validateReferences();
+        super.validateReferences(validationContext);
     }
 
     public static class Builder extends ComponentDefRefImpl.Builder implements LazyComponentDefRefBuilder {

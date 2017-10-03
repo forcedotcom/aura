@@ -34,6 +34,7 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import java.io.IOException;
 import java.util.List;
@@ -67,7 +68,7 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         this.mockDefs = parseMocks();
     }
 

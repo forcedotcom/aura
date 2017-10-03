@@ -18,6 +18,7 @@ package org.auraframework.def;
 
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -72,15 +73,19 @@ public interface BaseXmlElement extends Serializable {
      * Second pass validation, which validates any references to other
      * definitions which might not be in the cache yet.
      * <p>
+     * As we refactor this call, we will no longer allow recursive calls into DefinitionService.
+     * Definitions that you need should be found in the validation context.
+     * <p>
      * Any definitions needed can be fetched here, and arbitrary validation
      * may be performed. Anything referenced here must have been included
      * in the dependencies above. Note that anything in the dependencies
      * does not need a recursive call to validateReferences, since the compile
      * will take care of that.
      *
+     * @param validationContext The context for marking errors and getting definitions.
      * @throws QuickFixException if there is a problem with a reference
      */
-    void validateReferences() throws QuickFixException;
+    void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException;
 
     /**
      * Final validation marker.

@@ -27,13 +27,14 @@ import org.auraframework.impl.root.component.ComponentDefRefImpl.Builder;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 /**
  * Handles all references to other components. Note that while the reference to the other component is created here, it
- * is not validated until the {@link ComponentDefRefImpl#validateReferences()} method is called by loading registry.
+ * is not validated until the {@link ComponentDefRefImpl#validateReferences(ReferenceValidationContext)} method is called by loading registry.
  */
 public class ComponentDefRefHandler<P extends RootDefinition> extends BaseDefRefHandler<ComponentDefRef, P, ComponentDef, ComponentDefRefImpl.Builder> {
 

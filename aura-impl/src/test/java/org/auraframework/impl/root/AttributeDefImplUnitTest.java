@@ -15,7 +15,8 @@
  */
 package org.auraframework.impl.root;
 
-import com.google.common.collect.Sets;
+import java.util.Set;
+
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.def.AttributeDefRef;
@@ -25,16 +26,19 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.root.AttributeDefImpl.Builder;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
+import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import java.util.Set;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDefImpl, AttributeDef, AttributeDef, Builder> {
 
@@ -198,9 +202,10 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         Mockito.doReturn(typeDef).when(this.typeDefDescriptor).getDef();
         AttributeDef attributeDef = buildDefinition();
         Mockito.verifyZeroInteractions(this.defaultValue);
-        attributeDef.validateReferences();
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
+        attributeDef.validateReferences(validationContext);
         Mockito.verify(this.defaultValue).parseValue(typeDef);
-        Mockito.verify(this.defaultValue).validateReferences();
+        Mockito.verify(this.defaultValue).validateReferences(validationContext);
     }
 
     @Test
@@ -209,8 +214,9 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         Mockito.doThrow(t).when(this.typeDefDescriptor).getDef();
         Mockito.doReturn(DefType.ATTRIBUTE).when(this.typeDefDescriptor).getDefType();
         Mockito.doReturn("something").when(this.typeDefDescriptor).getQualifiedName();
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         try {
-            buildDefinition().validateReferences();
+            buildDefinition().validateReferences(validationContext);
             fail("Expected a DefinitionNotFoundException if class not found for a reference");
         } catch (Exception e) {
             assertExceptionMessage(e, DefinitionNotFoundException.class, "No ATTRIBUTE named something found");
@@ -221,8 +227,9 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
     public void testValidateReferencesReferenceThrowsOtherException() throws Exception {
         Throwable expected = new AuraRuntimeException("");
         Mockito.doThrow(expected).when(this.typeDefDescriptor).getDef();
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         try {
-            buildDefinition().validateReferences();
+            buildDefinition().validateReferences(validationContext);
             fail("Expected an exception for failed reference validation");
         } catch (Exception actual) {
             assertEquals(expected, actual);

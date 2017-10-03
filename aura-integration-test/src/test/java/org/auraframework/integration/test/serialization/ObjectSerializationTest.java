@@ -30,10 +30,13 @@ import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestCaseDef;
+import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.instance.Action;
+import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 public class ObjectSerializationTest extends AuraImplTestCase {
     @Test
@@ -72,7 +75,8 @@ public class ObjectSerializationTest extends AuraImplTestCase {
         assertEquals(1, newtest.getTestLabels().size());
         assertTrue(newtest.getTestLabels().contains("basic"));
 
-        newtest.validateReferences();
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
+        newtest.validateReferences(validationContext);
 
         Definition def = newtest.getLocalDefs().get(0);
         assertEquals("java://org.auraframework.components.test.java.controller.JavaTestController", def.getDescriptor()

@@ -29,6 +29,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import java.io.IOException;
 import java.util.Set;
@@ -179,13 +180,13 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
         try {
             TypeDef typeDef = typeDefDescriptor.getDef();
             if (defaultValue != null) {
                 defaultValue.parseValue(typeDef);
-                defaultValue.validateReferences();
+                defaultValue.validateReferences(validationContext);
 
             }
         } catch (AuraRuntimeException e) {

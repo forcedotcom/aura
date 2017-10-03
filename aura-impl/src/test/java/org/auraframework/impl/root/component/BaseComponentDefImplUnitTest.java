@@ -15,8 +15,13 @@
  */
 package org.auraframework.impl.root.component;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
@@ -40,6 +45,7 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.RootDefinitionImplUnitTest;
 import org.auraframework.impl.root.component.BaseComponentDefImpl.Builder;
+import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
@@ -49,15 +55,14 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImpl<D>, D extends BaseComponentDef, B extends Builder<D>>
         extends RootDefinitionImplUnitTest<I, D, B> {
@@ -125,7 +130,8 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         this.extendsDescriptor = null;
         this.modelDefDescriptor = null;
         setupTemplate(true);
-        buildDefinition().validateReferences();
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
+        buildDefinition().validateReferences(validationContext);
     }
     
     //test for W-2798390
@@ -193,8 +199,9 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         this.modelDefDescriptor = null;
         setupTemplate(false);
         Throwable expected = null;
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         try {
-            buildDefinition().validateReferences();
+            buildDefinition().validateReferences(validationContext);
         } catch (QuickFixException qfe) {
             expected = qfe;
         }

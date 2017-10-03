@@ -34,6 +34,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 /**
  * Definition of an event handler.
@@ -81,8 +82,8 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
     	EventDef event = null;
         DefinitionService definitionService = Aura.getDefinitionService();
         if (name == null && descriptor != null) {

@@ -28,6 +28,7 @@ import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
+import org.auraframework.validation.ReferenceValidationContext;
 
 /**
  * Base implementation for an element.
@@ -134,10 +135,10 @@ public abstract class BaseXmlElementImpl implements BaseXmlElement {
 
     /**
      * @throws QuickFixException
-     * @see Definition#validateReferences()
+     * @see Definition#validateReferences(ReferenceValidationContext)
      */
     @Override
-    public void validateReferences() throws QuickFixException {
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
     }
 
     @Override

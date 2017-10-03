@@ -34,6 +34,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.text.GlobMatcher;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -81,8 +82,8 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
     }
 
     @Override

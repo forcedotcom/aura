@@ -29,6 +29,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import java.io.IOException;
 import java.util.Set;
@@ -168,8 +169,8 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
 
         DefinitionService definitionService = Aura.getDefinitionService();
         ComponentDef cmp = definitionService.getDefinition(getParentDescriptor().getQualifiedName(),ComponentDef.class);
@@ -194,7 +195,7 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
                     getLocation());
         }
         if (defaultFacet != null) {
-            defaultFacet.validateReferences();
+            defaultFacet.validateReferences(validationContext);
         }
     }
 

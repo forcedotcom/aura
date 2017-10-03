@@ -32,6 +32,7 @@ import org.auraframework.impl.root.DefinitionReferenceImpl;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.collect.Lists;
 
@@ -83,7 +84,7 @@ public class ModuleDefRefImpl extends DefinitionReferenceImpl<ModuleDef> impleme
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         ModuleDef def = descriptor.getDef();
         if (def == null) {
             throw new DefinitionNotFoundException(descriptor);

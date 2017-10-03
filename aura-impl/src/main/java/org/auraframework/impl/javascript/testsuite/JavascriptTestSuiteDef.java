@@ -21,7 +21,9 @@ import java.util.List;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 public class JavascriptTestSuiteDef extends DefinitionImpl<TestSuiteDef> implements TestSuiteDef {
     private static final long serialVersionUID = -6488304738447278299L;
@@ -32,6 +34,13 @@ public class JavascriptTestSuiteDef extends DefinitionImpl<TestSuiteDef> impleme
         super(builder);
         this.code = builder.code;
         this.caseDefs = builder.caseDefs;
+    }
+
+    @Override
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        for (TestCaseDef def : caseDefs) {
+            def.validateReferences(validationContext);
+        }
     }
 
     @Override

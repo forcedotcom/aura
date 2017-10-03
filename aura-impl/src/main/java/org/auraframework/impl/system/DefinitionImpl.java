@@ -30,6 +30,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceScope;
 import org.auraframework.util.json.Serialization.ReferenceType;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.collect.Maps;
 
@@ -99,10 +100,10 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
 
     /**
      * @throws QuickFixException
-     * @see Definition#validateReferences()
+     * @see Definition#validateReferences(ReferenceValidationContext)
      */
     @Override
-    public void validateReferences() throws QuickFixException {
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         if (access != null) {
             access.validateReferences();
         }

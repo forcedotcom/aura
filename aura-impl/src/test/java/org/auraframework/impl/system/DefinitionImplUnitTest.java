@@ -15,12 +15,16 @@
  */
 package org.auraframework.impl.system;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.system.DefinitionImpl.RefBuilderImpl;
+import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
@@ -31,14 +35,14 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.text.Hash;
+import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import javax.inject.Inject;
-
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 public abstract class DefinitionImplUnitTest<I extends DefinitionImpl<D>, D extends Definition, R extends Definition, B extends RefBuilderImpl<D, R>>
 extends AuraTestCase {
@@ -214,7 +218,8 @@ extends AuraTestCase {
         testAuraContext = contextService.startContext(Mode.PROD, Format.JS, Authentication.AUTHENTICATED);
 
         setupValidateReferences();
-        buildDefinition().validateReferences();
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
+        buildDefinition().validateReferences(validationContext);
     }
 
     @Override

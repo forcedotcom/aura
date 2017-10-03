@@ -19,12 +19,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.EnumSet;
 
-import org.apache.commons.io.FileUtils;
-import org.auraframework.Aura;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.SourceListener;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
 import org.auraframework.util.javascript.directive.DirectiveTypes;

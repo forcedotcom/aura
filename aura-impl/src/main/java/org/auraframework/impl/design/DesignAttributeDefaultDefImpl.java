@@ -24,6 +24,7 @@ import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,10 +53,10 @@ public class DesignAttributeDefaultDefImpl extends DefinitionImpl<DesignAttribut
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
         for (DefinitionReference ref : defaultFacet) {
-            ref.validateReferences();
+            ref.validateReferences(validationContext);
         }
     }
 

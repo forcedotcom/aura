@@ -29,6 +29,7 @@ import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 /**
  * registerEvent tag definition.
@@ -108,8 +109,8 @@ public final class RegisterEventDefImpl extends DefinitionImpl<RegisterEventDef>
      * make sure that the event actually exists
      */
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
         
         EventDef event = Aura.getDefinitionService().getDefinition(reference);
         if (event == null) {

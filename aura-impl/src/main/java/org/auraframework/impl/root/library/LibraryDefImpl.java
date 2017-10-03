@@ -38,6 +38,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements LibraryDef {
 
@@ -106,9 +107,9 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         for (IncludeDefRef include : includes) {
-            include.validateReferences();
+            include.validateReferences(validationContext);
         }
     }
 

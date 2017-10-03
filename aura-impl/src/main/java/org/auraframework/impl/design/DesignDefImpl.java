@@ -46,6 +46,7 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
@@ -79,10 +80,10 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
         for (DesignAttributeDef attr : attributeDesignDefs.values()) {
-            attr.validateReferences();
+            attr.validateReferences(validationContext);
         }
     }
 

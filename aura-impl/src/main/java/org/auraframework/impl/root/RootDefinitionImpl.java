@@ -33,6 +33,7 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -139,10 +140,10 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
         for (Definition def : bundledDefs.values()) {
-            def.validateReferences();
+            def.validateReferences(validationContext);
         }
     }
 

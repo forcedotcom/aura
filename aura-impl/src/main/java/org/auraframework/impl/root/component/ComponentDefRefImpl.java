@@ -42,6 +42,7 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.collect.Lists;
 
@@ -72,7 +73,7 @@ public class ComponentDefRefImpl extends DefinitionReferenceImpl<ComponentDef> i
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         ComponentDef def = descriptor.getDef();
         if (def == null) {
             throw new DefinitionNotFoundException(descriptor);
@@ -89,7 +90,7 @@ public class ComponentDefRefImpl extends DefinitionReferenceImpl<ComponentDef> i
         }
 
         AuraContext context = Aura.getContextService().getCurrentContext();
-        validateAttributesValues(context.getCurrentCallingDescriptor());
+        validateAttributesValues(context.getCurrentCallingDescriptor(), validationContext);
 
         // validateMissingAttributes();
 
@@ -103,7 +104,9 @@ public class ComponentDefRefImpl extends DefinitionReferenceImpl<ComponentDef> i
      *
      * @param referencingDesc referencing descriptor
      */
-    private void validateAttributesValues(DefDescriptor<?> referencingDesc) throws QuickFixException {
+    private void validateAttributesValues(DefDescriptor<?> referencingDesc,
+            ReferenceValidationContext validationContext)
+            throws QuickFixException {
         ComponentDef def = descriptor.getDef();
         Map<DefDescriptor<AttributeDef>, AttributeDef> atts = def.getAttributeDefs();
         Map<String, RegisterEventDef> registeredEvents = def.getRegisterEventDefs();
@@ -130,7 +133,7 @@ public class ComponentDefRefImpl extends DefinitionReferenceImpl<ComponentDef> i
                 entry.getValue().parseValue(attributeDef.getTypeDef());
             }
 
-            entry.getValue().validateReferences();
+            entry.getValue().validateReferences(validationContext);
             // heres where some type validation would go
         }
     }

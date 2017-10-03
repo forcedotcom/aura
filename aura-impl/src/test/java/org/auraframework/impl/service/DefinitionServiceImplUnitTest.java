@@ -57,6 +57,7 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -242,7 +243,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         setupMockRegistryFor(descriptor, registry1, definition);
         assertEquals(definition, definitionService.getDefinition(descriptor));
         Mockito.verify(definition, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition, Mockito.times(1)).validateReferences();
+        Mockito.verify(definition, Mockito.times(1)).validateReferences(Mockito.any());
     }
 
     @Test
@@ -274,7 +275,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         DefDescriptor<Definition> descriptor = getMockDescriptor();
         Definition definition = Mockito.spy(new MockDefinition(descriptor));
 
-        Mockito.doThrow(expected).when(definition).validateReferences();
+        Mockito.doThrow(expected).when(definition).validateReferences(Mockito.any());
         setupMockRegistryFor(descriptor, registry1, definition);
         Exception actual = null;
 
@@ -303,10 +304,10 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         setupMockRegistryFor(descriptor2, registry1, definition2);
         assertEquals(definition1, definitionService.getDefinition(descriptor1));
         Mockito.verify(definition1, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition1, Mockito.times(1)).validateReferences();
+        Mockito.verify(definition1, Mockito.times(1)).validateReferences(Mockito.any());
         Mockito.verify(definition1, Mockito.times(1)).markValid();
         Mockito.verify(definition2, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition2, Mockito.times(1)).validateReferences();
+        Mockito.verify(definition2, Mockito.times(1)).validateReferences(Mockito.any());
         Mockito.verify(definition2, Mockito.times(1)).markValid();
     }
 
@@ -338,10 +339,10 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         // When we fail due to an error we should call validateDefinition(), but no validateReferences()
         //
         Mockito.verify(definition1, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition1, Mockito.times(0)).validateReferences();
+        Mockito.verify(definition1, Mockito.times(0)).validateReferences(Mockito.any());
         Mockito.verify(definition1, Mockito.times(0)).markValid();
         Mockito.verify(definition2, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition2, Mockito.times(0)).validateReferences();
+        Mockito.verify(definition2, Mockito.times(0)).validateReferences(Mockito.any());
         Mockito.verify(definition2, Mockito.times(0)).markValid();
     }
 
@@ -357,7 +358,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         unmocked1.addDependency(descriptor2);
         Definition definition1 = Mockito.spy(unmocked1);
         Definition definition2 = Mockito.spy(unmocked2);
-        Mockito.doThrow(expected).when(definition2).validateReferences();
+        Mockito.doThrow(expected).when(definition2).validateReferences(Mockito.any());
         setupMockRegistryFor(descriptor1, registry1, definition1);
         setupMockRegistryFor(descriptor2, registry1, definition2);
 
@@ -376,7 +377,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         //Mockito.verify(definition1, Mockito.times(0)).validateReferences(); - no guarantee
         Mockito.verify(definition1, Mockito.times(0)).markValid();
         Mockito.verify(definition2, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition2, Mockito.times(1)).validateReferences();
+        Mockito.verify(definition2, Mockito.times(1)).validateReferences(Mockito.any());
         Mockito.verify(definition2, Mockito.times(0)).markValid();
     }
 
@@ -402,7 +403,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         setupMockRegistryFor(descriptor1, registry1, definition1);
         assertEquals(definition1, definitionService.getUnlinkedDefinition(descriptor1));
         Mockito.verify(definition1, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition1, Mockito.times(0)).validateReferences();
+        Mockito.verify(definition1, Mockito.times(0)).validateReferences(Mockito.any());
         Mockito.verify(definition1, Mockito.times(0)).markValid();
         Mockito.verify(definition1, Mockito.times(0)).appendDependencies(Mockito.any());
     }
@@ -429,7 +430,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
 
         assertEquals(expected, actual);
         Mockito.verify(definition1, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition1, Mockito.times(0)).validateReferences();
+        Mockito.verify(definition1, Mockito.times(0)).validateReferences(Mockito.any());
         Mockito.verify(definition1, Mockito.times(0)).markValid();
         Mockito.verify(definition1, Mockito.times(0)).appendDependencies(Mockito.any());
     }
@@ -446,7 +447,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
 
         assertEquals(definition1, definitionService.getUnlinkedDefinition(descriptor1));
         Mockito.verify(definition1, Mockito.times(0)).validateDefinition();
-        Mockito.verify(definition1, Mockito.times(0)).validateReferences();
+        Mockito.verify(definition1, Mockito.times(0)).validateReferences(Mockito.any());
         Mockito.verify(definition1, Mockito.times(0)).markValid();
         Mockito.verify(definition1, Mockito.times(0)).appendDependencies(Mockito.any());
     }
@@ -868,7 +869,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         }
 
         @Override
-        public void validateReferences() throws QuickFixException {
+        public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         }
 
         @Override

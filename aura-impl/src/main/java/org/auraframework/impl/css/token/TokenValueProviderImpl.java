@@ -15,7 +15,13 @@
  */
 package org.auraframework.impl.css.token;
 
-import com.google.common.base.Optional;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.TokenCache;
 import org.auraframework.css.TokenValueProvider;
@@ -25,7 +31,6 @@ import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.css.util.Tokens;
 import org.auraframework.impl.expression.AuraExpressionBuilder;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -33,12 +38,7 @@ import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.TokenValueNotFoundException;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Optional;
 
 /**
  * Responsible for taking a String reference to a token name and finding the applicable value.

@@ -20,6 +20,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -77,7 +78,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc), ".THIS--test{}");
 
         try {
-            definitionService.getDefinition(desc).validateReferences();
+            definitionService.getDefinition(desc);
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, FlavorNameNotFoundException.class, "was not found");
@@ -94,7 +95,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
                 String.format("<aura:component extends='%s' defaultFlavor='fromParent'></aura:component>",
                         parent.getDescriptorName()));
 
-        definitionService.getDefinition(desc).validateReferences(); // no exception
+        definitionService.getDefinition(desc);
     }
 
     @Test
@@ -112,7 +113,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
                 String.format("<aura:component extends='%s' defaultFlavor='fromParent'></aura:component>",
                         parent.getDescriptorName()));
 
-        definitionService.getDefinition(desc).validateReferences(); // no exception
+        definitionService.getDefinition(desc);
     }
 
     @Test
@@ -120,7 +121,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(getDefClass(),
                 "<aura:component defaultFlavor='test, test2'><div aura:flavorable='true'></div></aura:component>");
         addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc), ".THIS--test{} .THIS--test2{}");
-        definitionService.getDefinition(desc).validateReferences(); // no exception
+        definitionService.getDefinition(desc);
     }
 
     @Test
@@ -133,7 +134,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
                 getDefClass(),
                 String.format("<aura:component extends='%s' defaultFlavor='test, test2'></aura:component>",
                         parent.getDescriptorName()));
-        definitionService.getDefinition(desc).validateReferences(); // no exception
+        definitionService.getDefinition(desc);
     }
 
     @Test
@@ -143,7 +144,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc), ".THIS--test{} .THIS--test2{}");
 
         try {
-            definitionService.getDefinition(desc).validateReferences(); // no exception
+            definitionService.getDefinition(desc); // no exception
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, FlavorNameNotFoundException.class, "was not found");
@@ -190,7 +191,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
                 String.format("<aura:component extends='%s' defaultFlavor='fromParent'></aura:component>",
                         parent.getDescriptorName()));
 
-        definitionService.getDefinition(desc).validateReferences(); // no exception
+        definitionService.getDefinition(desc);
     }
 
     @Test
@@ -209,7 +210,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
                 String.format("<aura:component extends='%s' defaultFlavor='fromParent'></aura:component>",
                         parent.getDescriptorName()));
 
-        definitionService.getDefinition(desc).validateReferences(); // no exception
+        definitionService.getDefinition(desc);
     }
 
     @Test
@@ -228,7 +229,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         Exception expected = null;
 
         try {
-            definitionService.getDefinition(desc).validateReferences();
+            definitionService.getDefinition(desc);
         } catch (Exception e) {
             expected = e;
         }

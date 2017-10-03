@@ -150,7 +150,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
 
         try {
-            definitionService.getDefinition(desc).validateReferences();
+            definitionService.getDefinition(desc);
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, DefinitionNotFoundException.class, "No TOKENS");

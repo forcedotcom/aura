@@ -15,7 +15,9 @@
  */
 package org.auraframework.integration.test.css;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -25,12 +27,15 @@ import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.flavor.FlavorOverrideLocationImpl;
 import org.auraframework.impl.css.flavor.FlavorOverrideLocatorImpl;
+import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.validation.ReferenceValidationContext;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Map;
-import java.util.Map.Entry;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 public class FlavorDefaultDefImplTest extends StyleTestCase {
     private static final FlavorOverrideLocator NO_OVERRIDES = new FlavorOverrideLocatorImpl.Builder().build();
@@ -180,12 +185,14 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         checkMatches(fmt, ImmutableMap.<DefDescriptor<ComponentDef>, String>of(), NO_OVERRIDES);
     }
 
-    /* disabled, see note in impl java file */
-    public void _testValidatesReferenceNotFlavorable() throws Exception {
+    @Test
+    @Ignore("See note in impl java file")
+    public void testValidatesReferenceNotFlavorable() throws Exception {
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         try {
             DefDescriptor<ComponentDef> cmp = addComponentDef();
             String fmt = String.format("<aura:flavor component='%s' default='foo'/>", cmp.getDescriptorName());
-            source(fmt).validateReferences();
+            source(fmt).validateReferences(validationContext);
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "must contain at least one aura:flavorable");

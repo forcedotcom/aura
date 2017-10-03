@@ -61,6 +61,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader;
+import org.auraframework.validation.ReferenceValidationContext;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
@@ -103,7 +104,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         }
 
         @Override
-        public void validateReferences() throws QuickFixException {
+        public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         }
 
         @Override

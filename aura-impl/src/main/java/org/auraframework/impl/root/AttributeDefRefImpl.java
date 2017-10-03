@@ -32,6 +32,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceType;
+import org.auraframework.validation.ReferenceValidationContext;
 
 /**
  * A reference to an attribute.
@@ -73,16 +74,16 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
+    public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        super.validateReferences(validationContext);
         Object v = this.getValue();
         if (v instanceof Definition) {
-            ((Definition) v).validateReferences();
+            ((Definition) v).validateReferences(validationContext);
         } else if (v instanceof Collection) {
             Collection<?> col = (Collection<?>) v;
             for (Object obj : col) {
                 if (obj instanceof Definition) {
-                    ((Definition) obj).validateReferences();
+                    ((Definition) obj).validateReferences(validationContext);
                 }
             }
         }

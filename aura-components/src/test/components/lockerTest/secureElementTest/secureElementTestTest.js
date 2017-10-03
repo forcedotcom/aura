@@ -638,5 +638,11 @@
         test: function(cmp) {
             cmp.testNodeApiParamUnfilter();
         }
+    },
+
+    testElementObjectProperties: {
+        test: function(cmp) {
+            cmp.testElementObjectProperties();
+        }
     }
 })

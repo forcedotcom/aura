@@ -158,7 +158,7 @@ function SecureElement(el, key) {
         var expandoCapturingHandler = {
             "get": function(target, property) {
                 if (property in basePrototype) {
-                    return propertyIsSupported(target, property) ? target[property] : undefined;
+                    return property in target ? target[property] : undefined;
                 }
 
                 // Expando - retrieve it from a private locker scoped object

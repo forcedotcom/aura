@@ -546,5 +546,18 @@
 
         testUtils.assertTrue(div.contains(insideDiv), "Expected Node.contains() to return true for <p> inside <div>");
         testUtils.assertFalse(div.contains(outsideDiv), "Expected Node.contains() to return false for <p> outsidse <div>");
+    },
+
+    testElementObjectProperties: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var div = document.getElementById("title");
+        var link = cmp.find("link").getElement();
+
+        // The method "hasOwnProperty" checks if the object which you have owns the property, but not if it has inherited a method/property from another object!
+        testUtils.assertFalse(Object.getPrototypeOf(div).hasOwnProperty("hasOwnProperty"), "Expected element <div> to return false for object having property 'hasOwnProperty'");
+        testUtils.assertTrue("hasOwnProperty" in Object.getPrototypeOf(div), "Expected element <div> to return true for object having property 'hasOwnProperty'");
+        testUtils.assertFalse(Object.getPrototypeOf(link).hasOwnProperty("propertyIsEnumerable"), "Expected element <a> to return false;se for object having property 'hasOwnProperty'");
+        testUtils.assertTrue("propertyIsEnumerable" in Object.getPrototypeOf(link), "Expected element <a> to return true for object having property 'hasOwnProperty'");
     }
 })

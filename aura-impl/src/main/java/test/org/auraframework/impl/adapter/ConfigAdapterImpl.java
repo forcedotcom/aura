@@ -153,7 +153,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     private final Set<String> CACHEABLE_PREFIXES = ImmutableSet.of("aura", "java", "compound");
 
-    private final Set<String> moduleNamespaces = Sets.newHashSet();
     private final Map<String, String> moduleNamespaceAliases = Maps.newConcurrentMap();
 
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
@@ -885,16 +884,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public boolean isModulesEnabled() {
         return true;
-    }
-
-    @Override
-    public Set<String> getModuleNamespaces() {
-        return ImmutableSet.copyOf(this.moduleNamespaces);
-    }
-
-    @Override
-    public void addModuleNamespaces(Set<String> namespaces) {
-        this.moduleNamespaces.addAll(namespaces);
     }
 
     @Override

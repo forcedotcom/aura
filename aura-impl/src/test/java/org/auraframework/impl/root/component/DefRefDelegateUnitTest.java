@@ -17,8 +17,6 @@ package org.auraframework.impl.root.component;
 
 
 import java.util.Collections;
-import java.util.Set;
-
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ComponentDef;
@@ -36,8 +34,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import com.google.common.collect.Sets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -58,7 +54,6 @@ public class DefRefDelegateUnitTest {
     private ContextService mockContextService = mock(ContextService.class);
     private AuraContext mockContext = mock(AuraContext.class);
     private ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-    private Set<String> moduleNamespaces = Sets.newHashSet();
 
     private DefDescriptor<ComponentDef> componentDefDescriptor = new DefDescriptorImpl<>("markup", "defref",
             "test", ComponentDef.class);
@@ -79,7 +74,6 @@ public class DefRefDelegateUnitTest {
         when(Aura.getContextService()).thenReturn(mockContextService);
         when(Aura.getConfigAdapter()).thenReturn(mockConfigAdapter);
         when(mockContextService.getCurrentContext()).thenReturn(mockContext);
-        when(mockConfigAdapter.getModuleNamespaces()).thenReturn(moduleNamespaces);
 
         when(mockComponentDefRef.getDescriptor()).thenReturn(componentDefDescriptor);
 
@@ -89,17 +83,12 @@ public class DefRefDelegateUnitTest {
         // set up componentDefRef mocks for building ModuleDefRef
         when(mockComponentDefRef.getAttributeValues()).thenReturn(Collections.emptyMap());
         when(mockComponentDefRef.getLocation()).thenReturn(new Location("file", 1234324));
-
-        moduleNamespaces.clear();
-
     }
 
     @Test
     public void testSwitchableReferences() throws Exception {
         when(mockDefinitionService.exists(moduleDefDescriptor)).thenReturn(true);
         when(mockDefinitionService.exists(componentDefDescriptor)).thenReturn(true);
-
-        moduleNamespaces.add("defref");
 
         DefRefDelegate defRefDelegate = new DefRefDelegate(mockComponentDefRef);
 
@@ -117,8 +106,6 @@ public class DefRefDelegateUnitTest {
         when(mockDefinitionService.exists(moduleDefDescriptor)).thenReturn(false);
         when(mockDefinitionService.exists(componentDefDescriptor)).thenReturn(true);
 
-        moduleNamespaces.add("defref");
-
         DefRefDelegate defRefDelegate = new DefRefDelegate(mockComponentDefRef);
 
         when(mockContext.isModulesEnabled()).thenReturn(true);
@@ -134,8 +121,6 @@ public class DefRefDelegateUnitTest {
     public void testModuleReference() throws Exception {
         when(mockDefinitionService.exists(moduleDefDescriptor)).thenReturn(true);
         when(mockDefinitionService.exists(componentDefDescriptor)).thenReturn(false);
-
-        moduleNamespaces.add("defref");
 
         DefRefDelegate defRefDelegate = new DefRefDelegate(mockComponentDefRef);
 

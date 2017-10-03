@@ -35,12 +35,10 @@ import com.salesforce.omakase.plugin.Plugin;
  */
 public final class TokenPropertyValidationPlugin implements Plugin {
 
-    private final TokenValueProvider tokenProvider;
-
     public final Map<String, Set<String>> tokensInCssProperties = new HashMap<>();
 
     public TokenPropertyValidationPlugin(TokenValueProvider tokenProvider) {
-        this.tokenProvider = checkNotNull(tokenProvider, "tokenProvider cannot be null");
+        checkNotNull(tokenProvider, "tokenProvider cannot be null");
     }
 
     @Validate

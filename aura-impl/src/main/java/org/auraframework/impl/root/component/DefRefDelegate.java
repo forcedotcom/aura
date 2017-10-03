@@ -61,43 +61,31 @@ public class DefRefDelegate implements DefinitionReference {
     private void processReferences() throws DefinitionNotFoundException {
         this.switchable = false;
 
-        Set<String> moduleNamespaces = Aura.getConfigAdapter().getModuleNamespaces();
+        DefinitionService definitionService = Aura.getDefinitionService();
+        DefDescriptor<ModuleDef> moduleDefDescriptor = definitionService.getDefDescriptor(this.componentDefRef.getDescriptor(),
+                DefDescriptor.MARKUP_PREFIX, ModuleDef.class);
 
-        // Only process references that have namespaces registered as modules
-        if (moduleNamespaces.contains(this.componentDefRef.getDescriptor().getNamespace().toLowerCase())) {
+        boolean moduleExists = definitionService.exists(moduleDefDescriptor);
+        boolean componentExists = definitionService.exists(this.componentDefRef.getDescriptor());
 
-            DefinitionService definitionService = Aura.getDefinitionService();
-            DefDescriptor<ModuleDef> moduleDefDescriptor = definitionService.getDefDescriptor(this.componentDefRef.getDescriptor(),
-                    DefDescriptor.MARKUP_PREFIX, ModuleDef.class);
+        if (!componentExists && !moduleExists) {
+            throw new DefinitionNotFoundException(this.componentDefRef.getDescriptor());
+        }
 
-            boolean moduleExists = definitionService.exists(moduleDefDescriptor);
-
-            if (moduleExists) {
-                this.moduleDefRef = createModuleDefRef(moduleDefDescriptor);
-            }
-
-            boolean componentExists = definitionService.exists(this.componentDefRef.getDescriptor());
-            
-            if (!componentExists && !moduleExists) {
-                throw new DefinitionNotFoundException(this.componentDefRef.getDescriptor());
-            }
-
-            if (!componentExists) {
-                // This allows NON existence of aura component of same name
-                // Remove to REQUIRE existence of aura component version
-                this.componentDefRef = this.moduleDefRef;
-            }
-
-            if (componentExists && !moduleExists) {
-                this.moduleDefRef = this.componentDefRef;
-            }
-
-            if (componentExists && moduleExists) {
-                this.switchable = true;
-            }
-
+        if (moduleExists) {
+            this.moduleDefRef = createModuleDefRef(moduleDefDescriptor);
         } else {
             this.moduleDefRef = this.componentDefRef;
+        }
+
+        if (!componentExists) {
+            // This allows NON existence of aura component of same name
+            // Remove to REQUIRE existence of aura component version
+            this.componentDefRef = this.moduleDefRef;
+        }
+
+        if (componentExists && moduleExists) {
+            this.switchable = true;
         }
     }
 

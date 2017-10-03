@@ -206,16 +206,6 @@ public interface ConfigAdapter extends AuraAdapter {
      */
     boolean isModulesEnabled();
 
-    /**
-     * @return Set of registered module namespaces
-     */
-    Set<String> getModuleNamespaces();
-
-    /**
-     * @param namespaces module namespaces
-     */
-    void addModuleNamespaces(Set<String> namespaces);
-    
     boolean cdnEnabled();
 
     /**

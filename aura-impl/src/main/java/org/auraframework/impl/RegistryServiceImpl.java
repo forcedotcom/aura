@@ -301,18 +301,12 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         if (modules && moduleBundleSourceLoader != null) {
             DefRegistry defRegistry = new BundleAwareDefRegistry(moduleBundleSourceLoader, MODULE_PREFIXES, MODULE_DEFTYPES, compilerService, true);
             markupRegistries.add(defRegistry);
-            // register namespaces to optimize processing of definition references
-            configAdapter.addModuleNamespaces(defRegistry.getNamespaces());
         }
 
         if (staticRegs != null) {
             for (DefRegistry reg : staticRegs) {
                 if (reg instanceof StaticDefRegistryImpl) {
                     ((StaticDefRegistryImpl)reg).setSourceLoader(markupLoader);
-                }
-                if (reg.getDefTypes().contains(DefType.MODULE)) {
-                    // register precompiled module registry namespaces
-                    configAdapter.addModuleNamespaces(reg.getNamespaces());
                 }
             }
         }

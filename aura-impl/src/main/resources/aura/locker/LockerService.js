@@ -39,6 +39,7 @@ function LockerService() {
     // #include aura.locker.SecurePropertyReferenceValue
     // #include aura.locker.SecureCanvasRenderingContext2D
     // #include aura.locker.SecureObject
+    // #include aura.locker.SecureEngine
 
     var lockers = [];
     var keyToEnvironmentMap = {};
@@ -347,6 +348,18 @@ function LockerService() {
                     var otherRealmType = typeToOtherRealmType && typeToOtherRealmType.get(type);
                     return otherRealmType && value instanceof otherRealmType;
                 }
+            },
+
+            getSecureEngine : function(engine, defDescriptor) {
+                if (!this.isEnabled()) {
+                   return engine;
+                }
+                if (engine) {
+                    var namespace = defDescriptor.getNamespace();
+                    var key = this.getKeyForNamespace(namespace);
+                    engine = SecureEngine(engine, key);
+                }
+                return engine;
             }
     };
 
@@ -355,6 +368,7 @@ function LockerService() {
     service["create"] = service.create;
     service["createForDef"] = service.createForDef;
     service["createForModule"] = service.createForModule;
+    service["getSecureEngine"] = service.getSecureEngine;
     service["getEnv"] = service.getEnv;
     service["getEnvForSecureObject"] = service.getEnvForSecureObject;
     service["getKeyForNamespace"] = service.getKeyForNamespace;

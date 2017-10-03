@@ -778,7 +778,6 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
 
     var Ctor;
     var defDescriptor;
-
     if (descriptor.indexOf("markup://") !== -1) {
         defDescriptor = new DefDescriptor(descriptor);
     } else {
@@ -787,14 +786,19 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
     var namespace = defDescriptor.getNamespace();
     var isInternalNamespace = $A.clientService.isInternalNamespace(namespace);
     if (entry.definition && $A.util.isFunction(entry.definition)) {
-        // Decide wether the module should be lockerized or not
+        // Decide whether the module should be lockerized or not
         if ((!isInternalNamespace || (isInternalNamespace && entry["requireLocker"]))) {
             // Eval the definition in a restricted scope
             entry.definition = $A.lockerService.createForModule(entry.definition.toString(), defDescriptor).returnValue;
+
+            // Provide SecureEngine as a dependency if "engine" was imported by the module
+            var index = entry.dependencies.indexOf("engine");
+            if (index !== -1) {
+                deps.splice(index, 1, $A.lockerService.getSecureEngine(deps[index], defDescriptor));
+            }
         }
         Ctor = entry.definition.apply(undefined, deps);
     }
-
     Ctor = Ctor || exportns;
     entry.ns = Ctor;
     return Ctor;

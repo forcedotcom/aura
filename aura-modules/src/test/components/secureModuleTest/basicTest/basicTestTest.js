@@ -22,5 +22,11 @@
         test: function (cmp) {
             cmp.testWindowIsSecure();
         }
+    },
+
+    testEngineIsSecure: {
+        test: function (cmp) {
+            cmp.testEngineIsSecure();
+        }
     }
 })

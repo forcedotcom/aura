@@ -12,5 +12,11 @@
         var testModule = cmp.find("bootstrap");
         var returnStatus = testModule.testWindowIsSecure(testUtils);
         testUtils.assertTrue(returnStatus);
+    },
+    testEngineIsSecure: function (cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var testModule = cmp.find("bootstrap");
+        var returnStatus = testModule.testEngineIsSecure(testUtils);
+        testUtils.assertTrue(returnStatus);
     }
 })

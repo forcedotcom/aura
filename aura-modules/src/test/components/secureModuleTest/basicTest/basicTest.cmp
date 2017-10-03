@@ -20,6 +20,7 @@
 
     <aura:method name="testDollarAuraNotAccessibleInModules"/>
     <aura:method name="testWindowIsSecure"/>
+    <aura:method name="testEngineIsSecure"/>
 
     <secureModuleTest:bootstrap aura:id="bootstrap"/>
 

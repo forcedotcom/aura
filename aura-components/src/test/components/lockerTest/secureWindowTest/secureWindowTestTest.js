@@ -5,8 +5,8 @@
      */
 
     // LockerService not supported on IE
-    // TODO(W-3674741,W-3674751): FF and iOS browser versions in autobuilds are too far behind
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
+    // TODO(W-3674741): FF version in autobuilds is too far behind
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX"],
 
     setUp: function(cmp) {
         cmp.set("v.testUtils", $A.test);
@@ -88,36 +88,40 @@
     },
 
     testArbitrarySchemes: {
+        // "window.open" will not open a new window for mobile autobuild runs.
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testArbitrarySchemes();
         }
     },
 
     testOpen_HttpsUrl: {
-        // window.open will not open a new window for mobile autobuild runs
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
+        // "window.open" will not open a new window for mobile autobuild runs.
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_HttpsUrl();
         }
     },
 
     testOpen_HttpUrl: {
-        // window.open will not open a new window for mobile autobuild runs
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
+        // "window.open" will not open a new window for mobile autobuild runs.
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_HttpUrl();
         }
     },
 
     testOpen_RelativeUrl:{
-        // window.open will not open a new window for mobile autobuild runs
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
+        // "window.open" will not open a new window for mobile autobuild runs.
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_RelativeUrl();
         }
     },
 
     testOpen_JavascriptIsBlocked: {
+        // "window.open" will not open a new window for mobile autobuild runs.
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_JavascriptIsBlocked();
         }
@@ -142,24 +146,20 @@
     },
 
     testFile: {
-        // window.File is not implemented correctly in iOS 9.2
-        // TODO(W-3674741): FF browser versions in autobuilds are too far behind
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD", "-FIREFOX"],
         test: function(cmp) {
             cmp.testFile();
         }
     },
 
     testFile_WithScriptTagsBlocked: {
-        // window.File is not implemented correctly in iOS 9.2
-        // TODO(W-3674741): FF browser versions in autobuilds are too far behind
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD", "-FIREFOX"],
         test: function (cmp) {
             cmp.testFile_WithScriptTagsBlocked();
         }
     },
 
     testMediaStreamBlocked: {
+        // TODO(W-3674751): Test fails on Safari!
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
         test: function (cmp) {
             cmp.testMediaStreamBlocked();
         }

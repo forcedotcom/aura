@@ -5,8 +5,8 @@
      */
 
     // LockerService not supported on IE
-    // TODO(W-3674741,W-3674751): FF and iOS browser versions in autobuilds are too far behind
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
+    // TODO(W-3674741): FF version in autobuilds is too far behind
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX"],
 
     setUp: function(cmp) {
         cmp.set("v.testUtils", $A.test);
@@ -123,8 +123,8 @@
 
     testAttemptToEvalToWindow: {
         // This exploit not covered in IE11
-        // TODO(W-3674741,W-3674751): FF and iOS browser versions in autobuilds are too far behind
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
+        // TODO(W-3674741): FF version in autobuilds is too far behind
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX"],
         test: function(cmp) {
             //Taking into account if its a manual run (which runs inside an iframe) or an auto run
             cmp.testEvalBlocking(window !== window.parent);
@@ -205,7 +205,7 @@
 
     testInstanceOf: {
         // TODO: Re-enable for Firefox and iOS when autobuilds use a version that supports all Proxy traps we implement
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPAD", "-IPHONE"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX"],
         test: function(cmp) {
             cmp.testInstanceOf(window);
         }
@@ -213,7 +213,7 @@
 
     testInstanceOf_IdentityDiscontinuitySymptoms: {
         // TODO: Re-enable for Firefox and iOS when autobuilds use a version that supports all Proxy traps we implement
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPAD", "-IPHONE"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX"],
         // TODO: Re-enable when strict CSP is on by default in core autobuilds
         labels: ["UnAdaptableTest"],
         test: function(cmp) {

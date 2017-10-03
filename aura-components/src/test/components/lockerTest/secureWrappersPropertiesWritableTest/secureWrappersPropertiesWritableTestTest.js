@@ -5,7 +5,8 @@
      */
 
     // LockerService not supported on IE
-    // TODO(W-3674741,W-3674751): FF and iOS browser versions in autobuilds are too far behind
+    // TODO(W-3674741): FF version in autobuilds is too far behind
+    // "window.open" will not open a new window for mobile autobuild runs.
     browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
 
     setUp: function(cmp) {

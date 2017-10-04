@@ -153,7 +153,7 @@ public final class CssPreprocessor {
 
                 // validate tokens are used with allowed properties
                 if (Aura.getStyleAdapter().tokenPropertyValidation(style)) {
-                    plugins.add(new TokenPropertyValidationPlugin(tvp));
+                    plugins.add(new TokenPropertyValidationPlugin());
                 }
 
                 plugins.add(new TokenSecurityPlugin());

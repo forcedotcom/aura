@@ -15,20 +15,16 @@
  */
 package org.auraframework.impl.css.parser.plugin;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.salesforce.omakase.ast.declaration.Declaration;
+import com.salesforce.omakase.broadcast.annotation.Validate;
+import com.salesforce.omakase.error.ErrorManager;
+import com.salesforce.omakase.plugin.Plugin;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.auraframework.css.TokenValueProvider;
-import org.auraframework.throwable.quickfix.QuickFixException;
-
-import com.salesforce.omakase.ast.declaration.Declaration;
-import com.salesforce.omakase.broadcast.annotation.Validate;
-import com.salesforce.omakase.error.ErrorManager;
-import com.salesforce.omakase.plugin.Plugin;
 
 /**
  * Checks that tokens are used on the correct property.
@@ -36,10 +32,6 @@ import com.salesforce.omakase.plugin.Plugin;
 public final class TokenPropertyValidationPlugin implements Plugin {
 
     public final Map<String, Set<String>> tokensInCssProperties = new HashMap<>();
-
-    public TokenPropertyValidationPlugin(TokenValueProvider tokenProvider) {
-        checkNotNull(tokenProvider, "tokenProvider cannot be null");
-    }
 
     @Validate
     public void validate(TokenFunction function, ErrorManager em) throws QuickFixException {

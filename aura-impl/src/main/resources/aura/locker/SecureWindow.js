@@ -473,7 +473,7 @@ SecureWindow.metadata = {
                 "Int8Array":                            FUNCTION,
                 "Intl":                                 DEFAULT,
                 "JSON":                                 DEFAULT,
-                "KeyboardEvent":                        FUNCTION,
+                "KeyboardEvent":                        CTOR,
                 "Location":                             FUNCTION,
                 "MIDIAccess":                           FUNCTION,
                 "MIDIConnectionEvent":                  FUNCTION,

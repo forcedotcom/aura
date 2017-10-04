@@ -15,16 +15,9 @@
  */
 package org.auraframework.modules.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import org.auraframework.def.module.ModuleDef.CodeType;
@@ -33,12 +26,7 @@ import org.auraframework.tools.node.api.NodeBundle;
 import org.auraframework.tools.node.impl.NodeBundleBuilder;
 import org.auraframework.tools.node.impl.NodeTool;
 import org.auraframework.util.IOUtil;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.eclipsesource.v8.V8Array;
-import com.eclipsesource.v8.V8Object;
+import org.json.*;
 
 public final class ModulesCompilerUtil {
 
@@ -125,38 +113,6 @@ public final class ModulesCompilerUtil {
         input.put("options", options);
 
         return input;
-    }
-
-    static ModulesCompilerData parseCompilerOutput(V8Object result) {
-        V8Object dev = result.getObject("dev");
-        V8Object prod = result.getObject("prod");
-        V8Object compat = result.getObject("compat");
-        // TODO COMPAT : update to "prod_compat" when compiler is updated
-        V8Object prodCompat = result.getObject("compat");
-
-        String devCode = dev.getString("code");
-        String prodCode = prod.getString("code");
-        String compatCode = compat.getString("code");
-        String prodCompatCode = prodCompat.getString("code");
-
-        Map<CodeType, String> codeMap = new EnumMap<>(CodeType.class);
-        codeMap.put(CodeType.DEV, devCode);
-        codeMap.put(CodeType.PROD, prodCode);
-        codeMap.put(CodeType.COMPAT, compatCode);
-        codeMap.put(CodeType.PROD_COMPAT, prodCompatCode);
-
-        V8Object metadata = prodCompat.getObject("metadata");
-        V8Array v8BundleDependencies = metadata.getArray("bundleDependencies");
-        V8Array v8BundleLabels = metadata.getArray("bundleLabels");
-        Set<String> bundleDependencies = new HashSet<>();
-        Set<String> bundleLabels = new HashSet<>();
-        for (int i = 0; i < v8BundleDependencies.length(); i++) {
-            bundleDependencies.add(v8BundleDependencies.getString(i));
-        }
-        for (int i = 0; i < v8BundleLabels.length(); i++) {
-            bundleLabels.add(v8BundleLabels.getString(i));
-        }
-        return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels, "TODO: external-references");
     }
 
     static ModulesCompilerData parseCompilerOutput(JSONObject result) {

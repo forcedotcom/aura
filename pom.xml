@@ -486,16 +486,6 @@
                 <version>1.0.16</version>
             </dependency>
             <dependency>
-                <groupId>com.eclipsesource.j2v8</groupId>
-                <artifactId>j2v8_macosx_x86_64</artifactId>
-                <version>4.6.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.salesforce.uitier.j2v8</groupId>
-                <artifactId>j2v8_linux_x86_64</artifactId>
-                <version>4.6.0-c68</version>
-            </dependency>
-            <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>node-tool</artifactId>
                 <version>0.1.4</version>

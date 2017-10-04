@@ -9,8 +9,6 @@
     </parent>
     
     <properties>
-        <j2v8.platform>macosx</j2v8.platform>
-        <j2v8.groupId>com.eclipsesource.j2v8</j2v8.groupId>
         <aura.home>${basedir}/..</aura.home>
     </properties>
     
@@ -91,10 +89,6 @@
             <artifactId>javax.inject</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>${j2v8.groupId}</groupId>
-            <artifactId>j2v8_${j2v8.platform}_x86_64</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
@@ -133,32 +127,5 @@
             </plugin>
         </plugins>
     </build>
-    
-    <profiles>
-        <profile>
-            <id>platform.linux</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                </os>
-            </activation>
-            <properties>
-                <j2v8.platform>linux</j2v8.platform>
-                <j2v8.groupId>com.salesforce.uitier.j2v8</j2v8.groupId>
-            </properties>
-        </profile>
-        <profile>
-            <id>platform.mac</id>
-            <activation>
-                <os>
-                    <family>mac</family>
-                </os>
-            </activation>
-            <properties>
-                <j2v8.platform>macosx</j2v8.platform>
-                <j2v8.groupId>com.eclipsesource.j2v8</j2v8.groupId>
-            </properties>
-        </profile>
-    </profiles>
     
 </project>

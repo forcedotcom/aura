@@ -16,6 +16,7 @@
 package org.auraframework.integration.test.modules.ui;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.Flapper;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
@@ -39,6 +40,7 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
     private static final By BY_M_UNBOUND = By.cssSelector(".m-unbound");
     private static final By BY_M_EXPR = By.cssSelector(".m-expr");
 
+    @Flapper
     @Test
     @TargetBrowsers({BrowserType.GOOGLECHROME}) // non-compat will fail in unsupported browsers
     public void testInteropMinified() throws Exception {
@@ -46,12 +48,14 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
         doInteropTest();
     }
 
+    @Flapper
     @Test
     public void testInteropMinifiedCompat() throws Exception {
         open("/moduletest/bootstrap.app?aura.compat=1", Mode.SELENIUM);
         doInteropTest();
     }
 
+    @Flapper
     @Test
     @TargetBrowsers({BrowserType.GOOGLECHROME}) // non-compat will fail in unsupported browsers
     public void testInteropDev() throws Exception {
@@ -59,6 +63,7 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
         doInteropTest();
     }
 
+    @Flapper
     @Test
     public void testInteropDevCompat() throws Exception {
         open("/moduletest/bootstrap.app?aura.compat=1", Mode.DEV);

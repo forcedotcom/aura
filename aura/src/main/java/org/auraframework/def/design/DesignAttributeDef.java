@@ -15,7 +15,11 @@
  */
 package org.auraframework.def.design;
 
+import java.util.Set;
+
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ParentedDef;
 
 public interface DesignAttributeDef extends Definition, ParentedDef{
@@ -119,4 +123,9 @@ public interface DesignAttributeDef extends Definition, ParentedDef{
      */
     boolean isTranslatable();
 
+    /**
+     * For facet attributes, gets the list of interfaces that are allowed for components being added to this facet
+     * @return
+     */
+    Set<DefDescriptor<InterfaceDef>> getAllowedInterfaces();
 }

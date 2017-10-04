@@ -15,6 +15,9 @@
  */
 package org.auraframework.integration.test.root.parser.handler.design;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignAttributeDef;
@@ -26,6 +29,8 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
     @Test
@@ -216,6 +221,105 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    private String makeAttribute(String name, String type) {
+        String output = "<aura:attribute name=\"" + name + "\"";
+        output += " type=\"" + type + "\"";
+        output += "/>";
+        return output;
+    }
+
+    private String makeAllowedInterfacesDesign(String attrName, String allowedInterfaces) {
+        String output = "<design:component>\n";
+        output += "  <design:attribute name=\"" + attrName + "\"";
+        if (allowedInterfaces != null) {
+            output += " allowedInterfaces=\"" + allowedInterfaces +"\"";
+        }
+        output += "/>\n";
+        output += "</design:component>";
+        return output;
+    }
+
+    @Test
+    public void testAllowedInterfacesWithNonFacet() {
+		String attr = "testAttribute";
+		String attrMarkup = makeAttribute(attr, "String");
+		String designMarkup = makeAllowedInterfacesDesign(attr, "foo:bar");
+        DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(attrMarkup, designMarkup, true);
+
+        try {
+            definitionService.getDefinition(cmpDesc.getQualifiedName(), ComponentDef.class);
+            fail("Should not allow adding allowed interfaces to non-facet attribute");
+        } catch (Exception e) {
+            assertExceptionMessageStartsWith(e, InvalidDefinitionException.class,
+                    "Only attributes of type Aura.Component[] or Aura.ComponentDefRef may have allowed interface list");
+        }
+    }
+
+    @Test
+    public void testEmptyAllowedInterfacesWithNonFacet() throws Exception {
+		String attr = "strAttr";
+		String attrMarkup = makeAttribute(attr, "String");
+		String designMarkup = makeAllowedInterfacesDesign(attr, "");
+        DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(attrMarkup, designMarkup, true);
+        definitionService.getDefinition(cmpDesc.getQualifiedName(), ComponentDef.class);
+    }
+
+    @Test
+    public void testAllowedInterfaceWithComponentArray() throws Exception {
+		String attr = "testAttribute";
+		String attrMarkup = makeAttribute(attr, "Aura.Component[]");
+		String designMarkup = makeAllowedInterfacesDesign(attr, "foo:bar");
+        DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(attrMarkup, designMarkup, true);
+        definitionService.getDefinition(cmpDesc.getQualifiedName(), ComponentDef.class);
+    }
+
+    @Test
+    public void testAllowedInterfaceWithDefRefArray() throws Exception {
+		String attr = "testAttribute";
+		String attrMarkup = makeAttribute(attr, "Aura.ComponentDefRef[]");
+		String designMarkup = makeAllowedInterfacesDesign(attr, "foo:bar");
+        DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(attrMarkup, designMarkup, true);
+        definitionService.getDefinition(cmpDesc.getQualifiedName(), ComponentDef.class);
+    }
+
+    @Test
+    public void testMultipleAllowedInterfaces() throws Exception {
+		String attr = "testAttribute";
+		List<String> interfaces = ImmutableList.of("foo:bar", "gee:whiz", "oh:wow");
+		String attrMarkup = makeAttribute(attr, "Aura.ComponentDefRef[]");
+		String designMarkup = makeAllowedInterfacesDesign(attr, String.join(",", interfaces));
+        DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(attrMarkup, designMarkup, true);
+
+        // Compile component
+        ComponentDef compiledDef = definitionService.getDefinition(cmpDesc.getQualifiedName(), ComponentDef.class);
+
+        // Verify that allowed interface attribute was parsed correctly
+        DesignAttributeDef designAttr = compiledDef.getDesignDef().getAttributeDesignDef(attr);
+        assertNotNull("No allowed interfaces found", designAttr.getAllowedInterfaces());
+        List<String> actualInterfaces = designAttr.getAllowedInterfaces().stream().
+                map(i -> i.getDescriptorName()).
+                collect(Collectors.toList());
+        assertEquals("Result contains incorrect number of allowed interfaces", interfaces.size(),
+                actualInterfaces.size());
+        assertTrue("Result does not contain all allowed interfaces, expected [" + String.join(",", interfaces) +
+                "] got [" + String.join(",", actualInterfaces) + "]", actualInterfaces.containsAll(interfaces));
+    }
+
+    @Test
+    public void testEmptyAllowedInterface() {
+		String attr = "testAttribute";
+		String attrMarkup = makeAttribute(attr, "Aura.ComponentDefRef[]");
+		String designMarkup = makeAllowedInterfacesDesign(attr, "foo:bar,");
+        DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(attrMarkup, designMarkup, true);
+
+        try {
+            definitionService.getDefinition(cmpDesc.getQualifiedName(), ComponentDef.class);
+            fail("Should not allow specifying empty interface in allowedInterfaces list");
+        } catch (Exception e) {
+            assertExceptionMessageStartsWith(e, InvalidDefinitionException.class,
+                    "QualifiedName is required for descriptors");
+        }
+    }
 
     private DesignAttributeDef setupAttributeDesignDef(String name, String markup) throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
@@ -237,7 +341,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
     private DefDescriptor<ComponentDef> createAuraDefinitionWithDesignFile(String cmpAttributes, String designSource, boolean isInternal) {
         NamespaceAccess access = isInternal?NamespaceAccess.INTERNAL:NamespaceAccess.CUSTOM;
         String namespace = isInternal?StringSourceLoader.DEFAULT_NAMESPACE:StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE;
-        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(namespace + ":",
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(namespace + ":testComponent",
                 ComponentDef.class, null);
         getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpAttributes), access);
         DefDescriptor<DesignDef> desc = definitionService.getDefDescriptor(cmpDesc.getQualifiedName(),

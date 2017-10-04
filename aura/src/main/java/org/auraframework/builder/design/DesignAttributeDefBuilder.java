@@ -17,6 +17,7 @@ package org.auraframework.builder.design;
 
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
@@ -55,4 +56,6 @@ public interface DesignAttributeDefBuilder extends DefBuilder<DesignAttributeDef
     DesignAttributeDefBuilder setParentDescriptor(DefDescriptor<? extends RootDefinition> parent);
 
     DesignAttributeDefBuilder setIsInternalNamespace(boolean internalNamespace);
+
+    DesignAttributeDefBuilder addAllowedInterface(DefDescriptor<InterfaceDef> allowedInterface);
 }

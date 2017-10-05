@@ -15,9 +15,7 @@
  */
 package org.auraframework.impl.source.file;
 
-import java.io.File;
-import java.util.Map;
-
+import com.google.common.collect.Maps;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorBundleDef;
@@ -29,7 +27,8 @@ import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 
-import com.google.common.collect.Maps;
+import java.io.File;
+import java.util.Map;
 
 @ServiceComponent
 public class FlavorBundleFileBundleBuilder implements FileBundleSourceBuilder {

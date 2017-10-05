@@ -15,13 +15,11 @@
  */
 package org.auraframework.impl.source.file;
 
-import java.io.File;
-import java.util.Map;
-
+import com.google.common.collect.Maps;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.TokensDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.BundleSource;
@@ -29,24 +27,15 @@ import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 
-import com.google.common.collect.Maps;
+import java.io.File;
+import java.util.Map;
 
 @ServiceComponent
 public class TokensDefFileBundleBuilder implements FileBundleSourceBuilder {
 
     @Override
-    public boolean isBundleMatch(File base) {
-        if (new File(base, base.getName()+".tokens").exists()) {
-            return true;
-        }
-        String name = base.getName()+".tokens";
-        for (File content : base.listFiles()) {
-            if (name.equalsIgnoreCase(content.getName())) {
-                // ERROR!!!
-                return true;
-            }
-        }
-        return false;
+    public String getExtension() {
+        return ".tokens";
     }
 
     @Override
@@ -61,7 +50,7 @@ public class TokensDefFileBundleBuilder implements FileBundleSourceBuilder {
             DefDescriptor<?> descriptor = null;
             Format format = null;
             String fname = file.getName();
-            if (fname.startsWith(name) || fname.toLowerCase().startsWith(name.toLowerCase())) {
+            if (fname.startsWith(name)) {
                 String postName = fname.substring(len);
                 switch (postName) {
                 case ".tokens":
@@ -83,6 +72,8 @@ public class TokensDefFileBundleBuilder implements FileBundleSourceBuilder {
                 default:
                     break;
                 }
+            } else if (fname.toLowerCase().startsWith(name.toLowerCase())) {
+                throw new RuntimeException("Files in bundle must case-sensitively match the folder they are in: " + name + "/" + fname);
             }
             if (descriptor != null) {
                 sourceMap.put(descriptor, new FileSource<>(descriptor, file, format));

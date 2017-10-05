@@ -15,16 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component implements="aura:requireLocker">
-    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
-
-    <aura:method name="testDollarAuraIsSecure"/>
-    <aura:method name="testDollarAuraNotAccessibleInModules"/>
-    <aura:method name="testWindowIsSecure"/>
-    <aura:method name="testEngineIsSecure"/>
-    <aura:method name="testOptOutOfLockerUsingMetaData"/>
-
-    <secureModuleTest:bootstrap aura:id="bootstrap"/>
-    <secureModuleTest:nonLockerizedCmp aura:id="nonLockerized"/>
-
+<aura:component>
+    <!--This component is the twin of securemoduletest/simple-cmp and its is not lockerized-->
+    I am not lockerized.
 </aura:component>

@@ -294,7 +294,7 @@
         var a = o.a;
         var b = o.b;
         var c = o.c;
-debugger;
+
         helper.verifyArrayElements(testUtils, [], a);
         helper.verifyArrayElements(testUtils, [1], b);
         helper.verifyArrayElements(testUtils, ['x', 'y'], c);

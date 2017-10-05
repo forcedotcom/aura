@@ -104,7 +104,7 @@ public final class CssPreprocessor {
             this.styleAdapter = styleAdapter;
 
             if (!runtime) {                
-                plugins.addAll(Aura.getStyleAdapter().getCompilationPlugins());
+                plugins.addAll(styleAdapter.getCompilationPlugins());
                 plugins.add(new UrlContextPathPlugin());
             }
 
@@ -113,7 +113,7 @@ public final class CssPreprocessor {
             plugins.add(new UnquotedIEFilterPlugin());
             plugins.add(Prefixer.defaultBrowserSupport().prune(true).rearrange(true));
             plugins.add(PrefixCleaner.mismatchedPrefixedUnits());
-            plugins.addAll(Aura.getStyleAdapter().getRuntimePlugins());
+            plugins.addAll(styleAdapter.getRuntimePlugins());
         }
 
         /** specify css source code */
@@ -152,7 +152,7 @@ public final class CssPreprocessor {
                 plugins.add(new TokenFunctionPlugin(tvp));
 
                 // validate tokens are used with allowed properties
-                if (Aura.getStyleAdapter().tokenPropertyValidation(style)) {
+                if (styleAdapter.tokenPropertyValidation(style)) {
                     plugins.add(new TokenPropertyValidationPlugin());
                 }
 

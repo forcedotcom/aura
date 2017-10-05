@@ -22,6 +22,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.TypeParser;
 import org.auraframework.impl.util.TypeParser.Type;
+import org.auraframework.service.ContextService;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -81,7 +82,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     }
 
     @Deprecated
-    public DefDescriptorImpl(String qualifiedName, Class<T> defClass, DefDescriptor<?> bundle) {
+    public DefDescriptorImpl(String qualifiedName, Class<T> defClass, DefDescriptor<?> bundle, ContextService contextService) {
         this.bundle = bundle;
         this.defType = DefType.getDefType(defClass);
         if (AuraTextUtil.isNullEmptyOrWhitespace(qualifiedName)) {
@@ -170,7 +171,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         }
 
         if (AuraTextUtil.isNullEmptyOrWhitespace(prefix)) {
-            prefix = Aura.getContextService().getCurrentContext().getDefaultPrefix(defType);
+            prefix = contextService.getCurrentContext().getDefaultPrefix(defType);
             if (prefix != null) {
                 qualifiedName = buildQualifiedName(prefix, namespace, name);
             }
@@ -184,8 +185,8 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         this.nameParameters = nameParameters;
     }
 
-    protected DefDescriptorImpl(String qualifiedName, Class<T> defClass) {
-        this(qualifiedName, defClass, null);
+    protected DefDescriptorImpl(String qualifiedName, Class<T> defClass, ContextService contextService) {
+        this(qualifiedName, defClass, null, contextService);
     }
 
     public static String buildQualifiedName(String prefix, String namespace, String name) {

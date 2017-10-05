@@ -15,20 +15,10 @@
  */
 package org.auraframework.impl;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
-
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -88,10 +78,18 @@ import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
 import org.auraframework.validation.ReferenceValidationContext;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * The public access to definitions inside Aura.
@@ -155,7 +153,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                     return typeDescriptor;
                 }
             }
-            result = new DefDescriptorImpl<>(qualifiedName, defClass, bundle);
+            result = new DefDescriptorImpl<>(qualifiedName, defClass, bundle, contextService);
 
             // Our input names may not be qualified, but we should ensure that
             // the fully-qualified is properly cached to the same object.

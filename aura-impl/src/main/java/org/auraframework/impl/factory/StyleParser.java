@@ -17,7 +17,7 @@ package org.auraframework.impl.factory;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
@@ -47,6 +47,9 @@ public abstract class StyleParser implements DefinitionFactory<TextSource<StyleD
 
     @Inject
     StyleAdapter styleAdapter;
+
+    @Inject
+    ConfigAdapter configAdapter;
 
     // build list of conditional permutations and allowed conditionals
     static {
@@ -84,14 +87,14 @@ public abstract class StyleParser implements DefinitionFactory<TextSource<StyleD
     public StyleDef getDefinition(DefDescriptor<StyleDef> descriptor, TextSource<StyleDef> source) throws QuickFixException {
         boolean shouldValidate = validate
                 && !descriptor.getName().toLowerCase().endsWith("template")
-                && Aura.getConfigAdapter().validateCss();
+                && configAdapter.validateCss();
         
         String className = Styles.buildClassName(descriptor);
 
         ParserResult result = CssPreprocessor.initial(styleAdapter)
                 .source(source.getContents())
                 .resourceName(source.getSystemId())
-                .allowedConditions(Iterables.concat(ALLOWED_CONDITIONS, Aura.getStyleAdapter().getExtraAllowedConditions()))
+                .allowedConditions(Iterables.concat(ALLOWED_CONDITIONS, styleAdapter.getExtraAllowedConditions()))
                 .componentClass(className, shouldValidate)
                 .tokens(descriptor)
                 .parse();

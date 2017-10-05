@@ -15,10 +15,8 @@
  */
 package org.auraframework.impl.system;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -26,6 +24,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.test.util.AuraTestCase;
@@ -34,8 +33,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import javax.inject.Inject;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 public class RegistryTrieTest extends AuraTestCase {
     class MockRegistry implements DefRegistry {
@@ -124,6 +125,9 @@ public class RegistryTrieTest extends AuraTestCase {
             return "{" + defTypes + "/" + prefixes + "/" + namespaces + "}";
         }
     }
+
+    @Inject
+    ContextService contextService;
 
     @Test
     public void testInitEmpty() {
@@ -227,7 +231,7 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry reg2 = new MockRegistry().setNamespaces("second");
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg1, reg2));
 
-        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("otherNamespace:*", ComponentDef.class);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("otherNamespace:*", ComponentDef.class, contextService);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         assertEquals(null, actual);
     }
@@ -238,7 +242,7 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry reg2 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("js");
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg1, reg2));
 
-        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("markup://otherNamespace:*", ComponentDef.class);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("markup://otherNamespace:*", ComponentDef.class, contextService);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         
         assertNull(actual);
@@ -250,7 +254,7 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry reg2 = new MockRegistry().setNamespaces("second");
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg1, reg2));
 
-        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("*", ComponentDef.class);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("*", ComponentDef.class, contextService);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         assertEquals(null, actual);
     }
@@ -262,7 +266,7 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry reg2 = new MockRegistry().setNamespaces("second").setPrefixes("markup");
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg1, reg2));
 
-        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("*", ComponentDef.class);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("*", ComponentDef.class, contextService);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         assertEquals(null, actual);
     }
@@ -273,7 +277,7 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry reg2 = new MockRegistry().setNamespaces("testNamespace").setDefTypes(DefType.COMPONENT);
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg1, reg2));
 
-        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("testNamespace:*", InterfaceDef.class);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("testNamespace:*", InterfaceDef.class, contextService);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         assertEquals(null, actual);
     }
@@ -284,7 +288,7 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry reg2 = new MockRegistry().setNamespaces("testNamespace").setDefTypes(DefType.COMPONENT, DefType.APPLICATION);
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg1, reg2));
 
-        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("testNamespace:*", ApplicationDef.class);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("testNamespace:*", ApplicationDef.class, contextService);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         
         // normally would expect null, but reg2 will ultimately return null for the specific descriptor requested anyways
@@ -296,7 +300,7 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry reg = new MockRegistry().setNamespaces("testNamespace");
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg));
 
-        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("testNamespace:*", ComponentDef.class);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("testNamespace:*", ComponentDef.class, contextService);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         assertEquals(reg, actual);
     }
@@ -307,11 +311,11 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry reg2 = new MockRegistry().setNamespaces("testNamespace").setDefTypes(DefType.COMPONENT);
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg1, reg2));
 
-        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("testNamespace:*", ComponentDef.class);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("testNamespace:*", ComponentDef.class, contextService);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         assertEquals(reg2, actual);
 
-        descriptor = new DefDescriptorImpl<>("testNamespace:*", ApplicationDef.class);
+        descriptor = new DefDescriptorImpl<>("testNamespace:*", ApplicationDef.class, contextService);
         actual = trie.getRegistryFor(descriptor);
         assertEquals(reg1, actual);
     }
@@ -326,11 +330,11 @@ public class RegistryTrieTest extends AuraTestCase {
                 .setPrefixes("js");
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg1, reg2, reg3));
 
-        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("markup://testNamespace:*", ComponentDef.class);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("markup://testNamespace:*", ComponentDef.class, contextService);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         assertEquals(reg2, actual);
 
-        descriptor = new DefDescriptorImpl<>("js://testNamespace.*", ComponentDef.class);
+        descriptor = new DefDescriptorImpl<>("js://testNamespace.*", ComponentDef.class, contextService);
         actual = trie.getRegistryFor(descriptor);
         assertEquals(reg3, actual);
     }
@@ -341,7 +345,7 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry reg2 = new MockRegistry().setNamespaces("*");
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg1, reg2));
 
-        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("*:*", ComponentDef.class);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("*:*", ComponentDef.class, contextService);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         assertEquals(reg2, actual);
     }
@@ -352,7 +356,7 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry reg2 = new MockRegistry().setNamespaces("*");
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg1, reg2));
 
-        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("testNamespace:*", ComponentDef.class);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("testNamespace:*", ComponentDef.class, contextService);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         assertEquals(reg1, actual);
     }
@@ -364,7 +368,7 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry reg3 = new MockRegistry().setNamespaces("*").setDefTypes(DefType.APPLICATION);
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg1, reg2, reg3));
 
-        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("otherNamespace:*", ComponentDef.class);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("otherNamespace:*", ComponentDef.class, contextService);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         assertEquals(reg2, actual);
     }
@@ -375,7 +379,7 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry reg2 = new MockRegistry().setNamespaces("*").setDefTypes(DefType.COMPONENT, DefType.APPLICATION);
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg1, reg2));
 
-        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("otherNamespace:*", ApplicationDef.class);
+        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("otherNamespace:*", ApplicationDef.class, contextService);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         assertEquals(reg2, actual);
     }

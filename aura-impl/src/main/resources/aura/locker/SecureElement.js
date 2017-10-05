@@ -230,7 +230,7 @@ function SecureElement(el, key) {
                 if (!desc) {
                     var raw = ls_getRef(target, key);
                     var data = ls_getData(raw, key);
-                    desc = Object.getOwnPropertyDescriptor(data,  property);
+                    desc = data ? Object.getOwnPropertyDescriptor(data,  property) : undefined;
                 }
                 return desc;
             },

@@ -554,10 +554,18 @@
         var div = document.getElementById("title");
         var link = cmp.find("link").getElement();
 
-        // The method "hasOwnProperty" checks if the object which you have owns the property, but not if it has inherited a method/property from another object!
-        testUtils.assertFalse(Object.getPrototypeOf(div).hasOwnProperty("hasOwnProperty"), "Expected element <div> to return false for object having property 'hasOwnProperty'");
-        testUtils.assertTrue("hasOwnProperty" in Object.getPrototypeOf(div), "Expected element <div> to return true for object having property 'hasOwnProperty'");
-        testUtils.assertFalse(Object.getPrototypeOf(link).hasOwnProperty("propertyIsEnumerable"), "Expected element <a> to return false;se for object having property 'hasOwnProperty'");
-        testUtils.assertTrue("propertyIsEnumerable" in Object.getPrototypeOf(link), "Expected element <a> to return true for object having property 'hasOwnProperty'");
+        // The method "hasOwnProperty" checks if the object which you have owns the property,
+        // but not if it has inherited a method/property from another object!
+        testUtils.assertFalse(Object.getPrototypeOf(div).hasOwnProperty("hasOwnProperty"),
+            "Expected element <div> to return false for object having property 'hasOwnProperty'");
+        testUtils.assertTrue("hasOwnProperty" in Object.getPrototypeOf(div),
+            "Expected element <div> to return true for object having property 'hasOwnProperty'");
+        testUtils.assertFalse(Object.getPrototypeOf(link).hasOwnProperty("propertyIsEnumerable"),
+            "Expected element <a> to return false for object having property 'hasOwnProperty'");
+        testUtils.assertTrue("propertyIsEnumerable" in Object.getPrototypeOf(link),
+            "Expected element <a> to return true for object having property 'hasOwnProperty'");
+
+        testUtils.assertFalse(link.hasOwnProperty("id"),
+            "Expected false for property lookup. Elements inherit properties and should not have any properties on their own");
     }
 })

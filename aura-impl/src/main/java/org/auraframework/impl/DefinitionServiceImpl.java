@@ -858,6 +858,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                     return null;
                 }
             }
+            return refs;
         }
         return null;
     }

@@ -530,11 +530,13 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
 
                 //JBUCH: HALO: TODO: FIND OUT WHY THIS CAN BE UNRENDERING A COMPONENTDEFREF AND FIX IT
                 if ($A.util.isComponent(info.component) && info.component.isValid()) {
-                    this.unrender(info.component);
-                    info.component.disassociateElements();
-                    this.cleanComponent(info.component.getGlobalId());
                     if(info.component.autoDestroy()){
-                       info.component.destroy();
+                        this.cleanComponent(info.component.getGlobalId());
+                        info.component.destroy();
+                    } else {
+                        this.unrender(info.component);
+                        info.component.disassociateElements();
+                        this.cleanComponent(info.component.getGlobalId());
                     }
                 }
                 break;
@@ -563,7 +565,21 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
  */
 AuraRenderingService.prototype.unrenderFacet = function(cmp,facet){
     if (cmp._facetInfo) {
-        this.unrender(cmp._facetInfo);
+        var facetInfo = [];
+        // If in the process of destroying
+        if(cmp.destroyed === -1) {
+            var existing = cmp._facetInfo;
+            for(var i=0;i<existing.length;i++) {
+                if(existing[i].autoDestroy()) {
+                    existing[i].destroy();
+                } else {
+                    facetInfo.push(existing[i]);
+                }
+            }
+        } else {
+            facetInfo = cmp._facetInfo;
+        }
+        this.unrender(facetInfo);
         cmp._facetInfo = null;
     }
 

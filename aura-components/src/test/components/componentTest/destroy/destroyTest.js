@@ -275,7 +275,7 @@
      * 3. Rerender the iteration explicitly.
      * 4. See that all the elements in the iteration have been destroyed.
      */
-    _testDestroyIterationWithIf: {
+    testDestroyIterationWithIf: {
         test: [
             function(component) {
                 var iteration = component.find("iteration");

@@ -860,7 +860,7 @@ Component.prototype.destroy = function() {
         }
         this.docLevelHandlers=undefined;
     }
-
+    
     // call unrender before setting _destroying
     // so that _destroying could be used for isValid check.
     $A.renderingService.unrender(this);
@@ -881,6 +881,9 @@ Component.prototype.destroy = function() {
             expressions[x].removeChangeHandler(this,"v."+x);
         }
     }
+
+
+
     var references=this.references;
     for(var key in references){
         if(references[key]){

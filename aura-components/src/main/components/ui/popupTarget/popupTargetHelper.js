@@ -149,7 +149,12 @@
                     var elemRect = element.getBoundingClientRect();
                     var referenceElemRect = target.getBoundingClientRect();
                     var horizontalCornerAlignment = this.rightCornerFitsInViewport(viewPort, elemRect, referenceElemRect) ? "left" : "right";
-                    var verticalCornerAlignment = this.bottomCornerFitsInViewport(viewPort, elemRect, referenceElemRect) ? "top" : "bottom";
+                    var verticalCornerAlignment;
+                    if (this.topCornerFitsInViewport(elemRect, referenceElemRect)) {
+                        verticalCornerAlignment = this.bottomCornerFitsInViewport(viewPort, elemRect, referenceElemRect) ? "top" : "bottom";
+                    } else {
+                        verticalCornerAlignment = "top";
+                    }
                     component._constraint = this.lib.panelPositioning.createRelationship({
                         element: element,
                         target: target,
@@ -185,6 +190,10 @@
     bottomCornerFitsInViewport: function (viewPort, elemRect, referenceElemRect) {
         return (viewPort.height - referenceElemRect.bottom) > elemRect.height;
 
+    },
+
+    topCornerFitsInViewport: function (elemRect, referenceElemRect) {
+        return (referenceElemRect.top > elemRect.height);
     },
 
     setAriaAttributes: function (component) {

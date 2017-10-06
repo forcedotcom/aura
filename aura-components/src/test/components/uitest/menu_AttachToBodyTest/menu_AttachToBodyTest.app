@@ -49,4 +49,185 @@
 		 </aura:set>
 	 		<div id="bodyBlockDiv">div in block body</div>
 	</ui:block>
+    <div style="margin-top:99vh;">
+        <ui:block aura:id="longList">
+            <ui:menu aura:id="uiLongMenuOpenTop" class="uiLongMenuOpenTop">
+                <ui:menuTriggerLink aura:id="triggerUILongMenuOpenTop" label="Please pick your favorite soccer club"/>
+                <ui:menuList class="actionUILongMenuOpenTop" aura:id="actionUILongMenuOpenTop" attachToBody="true">
+                    <ui:actionMenuItem label="Bayern München" />
+                    <ui:actionMenuItem label="FC Barcelona"  />
+                    <ui:actionMenuItem label="Inter Milan" />
+                    <ui:actionMenuItem label="Manchester United" />
+                    <ui:actionMenuItem label="Bayern München" />
+                    <ui:actionMenuItem label="FC Barcelona"  />
+                    <ui:actionMenuItem label="Inter Milan" />
+                    <ui:actionMenuItem label="Manchester United" />
+                    <ui:actionMenuItem label="Bayern München" />
+                    <ui:actionMenuItem label="FC Barcelona"  />
+                    <ui:actionMenuItem label="Inter Milan" />
+                </ui:menuList>
+            </ui:menu>
+        </ui:block>
+    </div>
+    <div>
+        <ui:block aura:id="longList">
+            <aura:set attribute="right">
+                <ui:menu aura:id="uiLongMenuOpenBottom" class="uiLongMenuOpenBottom">
+                    <ui:menuTriggerLink aura:id="triggerUILongMenuOpenBottom" label="Please pick your favorite soccer club"/>
+                    <ui:menuList class="actionUILongMenuOpenBottom" aura:id="actionUILongMenuOpenBottom" attachToBody="true">
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                        <ui:actionMenuItem label="Manchester United" />
+                        <ui:actionMenuItem label="Bayern München" />
+                        <ui:actionMenuItem label="FC Barcelona"  />
+                        <ui:actionMenuItem label="Inter Milan" />
+                    </ui:menuList>
+                </ui:menu>
+            </aura:set>
+        </ui:block>
+    </div>
 </aura:application>

@@ -77,6 +77,36 @@
         ]
     },
 
+    /**
+     * TODO: W-4368103
+     * Investigate why the menu top/bottom check fails in Jenkins
+     */
+    testLongMenuOpenTopPosition: {
+        test: [
+            function (cmp) {
+                var menu = cmp.find("actionUILongMenuOpenTop");
+                var menuTrigger = cmp.find("triggerUILongMenuOpenTop");
+                this.clickAnchor(menuTrigger);
+                this.waitForMenuVisible(menu, true);
+            }
+        ]
+    },
+
+    /**
+     * TODO: W-4368103
+     * Investigate why the menu top/bottom check fails in Jenkins
+     */
+    testLongMenuOpenBottomPosition: {
+        test: [
+            function (cmp) {
+                var menu = cmp.find("actionUILongMenuOpenBottom");
+                var menuTrigger = cmp.find("triggerUILongMenuOpenBottom");
+                this.clickAnchor(menuTrigger);
+                this.waitForMenuVisible(menu, true);
+            }
+        ]
+    },
+
     getAnchor: function(trigger) {
         return trigger.getElement().getElementsByTagName("a")[0];
     },
@@ -96,4 +126,5 @@
                     $A.util.hasClass(menu.getElement(), "visible") === isVisible;
         }, "Menu should" + (isVisible ? " " : " not ") + "be visible");
     }
+
 })//eslint-disable-line

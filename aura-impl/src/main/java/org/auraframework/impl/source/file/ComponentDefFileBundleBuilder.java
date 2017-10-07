@@ -15,7 +15,9 @@
  */
 package org.auraframework.impl.source.file;
 
-import com.google.common.collect.Maps;
+import java.io.File;
+import java.util.Map;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
@@ -39,15 +41,24 @@ import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 
-import java.io.File;
-import java.util.Map;
+import com.google.common.collect.Maps;
 
 @ServiceComponent
 public class ComponentDefFileBundleBuilder implements FileBundleSourceBuilder {
 
     @Override
-    public String getExtension() {
-        return ".cmp";
+    public boolean isBundleMatch(File base) {
+        if (new File(base, base.getName()+".cmp").exists()) {
+            return true;
+        }
+        String name = base.getName()+".cmp";
+        for (File content : base.listFiles()) {
+            if (name.equalsIgnoreCase(content.getName())) {
+                // ERROR!!!
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -63,66 +74,64 @@ public class ComponentDefFileBundleBuilder implements FileBundleSourceBuilder {
             DefDescriptor<?> descriptor = null;
             Format format = null;
             String fname = file.getName();
-            if (fname.startsWith(name)) {
+            if (fname.startsWith(name) || fname.toLowerCase().startsWith(name.toLowerCase())) {
                 String postName = fname.substring(len);
                 switch (postName) {
-                    case ".cmp":
-                        descriptor = cmpDesc;
-                        format = Format.XML;
-                        break;
-                    case "Test.js":
-                        descriptor = new DefDescriptorImpl<>("js", namespace, name, TestSuiteDef.class, cmpDesc);
-                        format = Format.JS;
-                        break;
-                    case "Controller.js":
-                        descriptor = new DefDescriptorImpl<>("js", namespace, name, ControllerDef.class);
-                        format = Format.JS;
-                        break;
-                    case "Renderer.js":
-                        descriptor = new DefDescriptorImpl<>("js", namespace, name, RendererDef.class);
-                        format = Format.JS;
-                        break;
-                    case "Provider.js":
-                        descriptor = new DefDescriptorImpl<>("js", namespace, name, ProviderDef.class);
-                        format = Format.JS;
-                        break;
-                    case "Helper.js":
-                        descriptor = new DefDescriptorImpl<>("js", namespace, name, HelperDef.class);
-                        format = Format.JS;
-                        break;
-                    case "Model.js":
-                        descriptor = new DefDescriptorImpl<>("js", namespace, name, ModelDef.class);
-                        format = Format.JS;
-                        break;
-                    case "Flavors.css":
-                        descriptor = new DefDescriptorImpl<>("css", namespace, name, FlavoredStyleDef.class);
-                        format = Format.CSS;
-                        break;
-                    case ".css":
-                        // FIXME: template...
-                        descriptor = new DefDescriptorImpl<>("css", namespace, name, StyleDef.class);
-                        format = Format.CSS;
-                        break;
-                    case ".auradoc":
-                        descriptor = new DefDescriptorImpl<>("markup", namespace, name, DocumentationDef.class);
-                        format = Format.XML;
-                        break;
-                    case ".design":
-                        descriptor = new DefDescriptorImpl<>("markup", namespace, name, DesignDef.class);
-                        format = Format.XML;
-                        break;
-                    case ".svg":
-                        descriptor = new DefDescriptorImpl<>("markup", namespace, name, SVGDef.class);
-                        format = Format.SVG;
-                        break;
-                    case ".flavors":
-                        descriptor = new DefDescriptorImpl<>("markup", namespace, name, FlavorsDef.class);
-                        format = Format.XML;
-                        break;
-                    default:
+                case ".cmp":
+                    descriptor = cmpDesc;
+                    format = Format.XML;
+                    break;
+                case "Test.js":
+                    descriptor = new DefDescriptorImpl<>("js", namespace, name, TestSuiteDef.class, cmpDesc);
+                    format = Format.JS;
+                    break;
+                case "Controller.js":
+                    descriptor = new DefDescriptorImpl<>("js", namespace, name, ControllerDef.class);
+                    format = Format.JS;
+                    break;
+                case "Renderer.js":
+                    descriptor = new DefDescriptorImpl<>("js", namespace, name, RendererDef.class);
+                    format = Format.JS;
+                    break;
+                case "Provider.js":
+                    descriptor = new DefDescriptorImpl<>("js", namespace, name, ProviderDef.class);
+                    format = Format.JS;
+                    break;
+                case "Helper.js":
+                    descriptor = new DefDescriptorImpl<>("js", namespace, name, HelperDef.class);
+                    format = Format.JS;
+                    break;
+                case "Model.js":
+                    descriptor = new DefDescriptorImpl<>("js", namespace, name, ModelDef.class);
+                    format = Format.JS;
+                    break;
+                case "Flavors.css":
+                    descriptor = new DefDescriptorImpl<>("css", namespace, name, FlavoredStyleDef.class);
+                    format = Format.CSS;
+                    break;
+                case ".css":
+                    // FIXME: template...
+                    descriptor = new DefDescriptorImpl<>("css", namespace, name, StyleDef.class);
+                    format = Format.CSS;
+                    break;
+                case ".auradoc":
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, DocumentationDef.class);
+                    format = Format.XML;
+                    break;
+                case ".design":
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, DesignDef.class);
+                    format = Format.XML;
+                    break;
+                case ".svg":
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, SVGDef.class);
+                    format = Format.SVG;
+                    break;
+                case ".flavors":
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, FlavorsDef.class);
+                    format = Format.XML;
+                    break;
+                default:
                 }
-            } else if (fname.toLowerCase().startsWith(name.toLowerCase())) {
-                throw new RuntimeException("Files in bundle must case-sensitively match the folder they are in: " + name + "/" + fname);
             } else if (fname.endsWith("Flavors.css")) {
                 if (flavorBundleDef == null) {
                     flavorBundleDef = new DefDescriptorImpl<>("markup", namespace, name, FlavorBundleDef.class);

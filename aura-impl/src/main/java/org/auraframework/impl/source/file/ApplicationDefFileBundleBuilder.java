@@ -15,7 +15,9 @@
  */
 package org.auraframework.impl.source.file;
 
-import com.google.common.collect.Maps;
+import java.io.File;
+import java.util.Map;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ControllerDef;
@@ -39,15 +41,24 @@ import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 
-import java.io.File;
-import java.util.Map;
+import com.google.common.collect.Maps;
 
 @ServiceComponent
 public class ApplicationDefFileBundleBuilder implements FileBundleSourceBuilder {
 
     @Override
-    public String getExtension() {
-        return ".app";
+    public boolean isBundleMatch(File base) {
+        if (new File(base, base.getName()+".app").exists()) {
+            return true;
+        }
+        String name = base.getName()+".app";
+        for (File content : base.listFiles()) {
+            if (name.equalsIgnoreCase(content.getName())) {
+                // ERROR!!!
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -63,7 +74,7 @@ public class ApplicationDefFileBundleBuilder implements FileBundleSourceBuilder 
             DefDescriptor<?> descriptor = null;
             Format format = null;
             String fname = file.getName();
-            if (fname.startsWith(name)) {
+            if (fname.startsWith(name) || fname.toLowerCase().startsWith(name.toLowerCase())) {
                 String postName = fname.substring(len);
                 switch (postName) {
                 case ".app":
@@ -121,8 +132,6 @@ public class ApplicationDefFileBundleBuilder implements FileBundleSourceBuilder 
                     break;
                 default:
                 }
-            } else if (fname.toLowerCase().startsWith(name.toLowerCase())) {
-                throw new RuntimeException("Files in bundle must case-sensitively match the folder they are in: " + name + "/" + fname);
             } else if (fname.endsWith("Flavors.css")) {
                 if (flavorBundleDef == null) {
                     flavorBundleDef = new DefDescriptorImpl<>("markup", namespace, name, FlavorBundleDef.class);

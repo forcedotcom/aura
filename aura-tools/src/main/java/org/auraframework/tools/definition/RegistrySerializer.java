@@ -299,6 +299,7 @@ public class RegistrySerializer {
         }
         descriptors = master.find(root_nsf);
         for (DefDescriptor<?> desc : descriptors) {
+            logger.debug("ENTRY: " + desc + "@" + desc.getDefType().toString());
             try {
                 Definition def = master.getDef(desc);
                 if (def == null) {
@@ -308,7 +309,6 @@ public class RegistrySerializer {
                 }
                 types.add(desc.getDefType());
                 prefixes.add(desc.getPrefix());
-                logger.debug("ENTRY: " + desc + "@" + desc.getDefType().toString());
                 filtered.put(desc, def);
                 if (def instanceof RootDefinition) {
                     RootDefinition rd = (RootDefinition) def;
@@ -379,7 +379,7 @@ public class RegistrySerializer {
             RegistrySet registries;
             if (modulesEnabled) {
                 // must get all component locations within current maven module first to register namespaces.
-                registries = registryService.getDefaultRegistrySet(Mode.DEV, Authentication.AUTHENTICATED);
+                registries = registryService.getDefaultRegistrySet(Mode.DEV, null);
                 // modules will use existing component namespaces for conversion
                 master = registryService.getModulesRegistry(componentDirectory);
             } else {

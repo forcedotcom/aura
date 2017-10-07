@@ -38,11 +38,8 @@ public class ModulesCompilerTest extends UnitTestCase {
     private static final NodeLambdaFactory FACTORY = NodeLambdaFactorySidecar.INSTANCE;
 
     @Test
-    public void testModulesCompilerNode() throws Exception {
-        testModulesCompiler(new ModulesCompilerNode(FACTORY));
-    }
-
-    private void testModulesCompiler(ModulesCompiler compiler) throws Exception {
+    public void test() throws Exception {
+        ModulesCompiler compiler = new ModulesCompilerNode(FACTORY);
         String entry = "modules/moduletest/moduletest.js";
         String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/moduletest/moduletest.html"),
                 Charsets.UTF_8);
@@ -61,11 +58,8 @@ public class ModulesCompilerTest extends UnitTestCase {
     }
 
     @Test
-    public void testModulesCompilerNodeErrorInHtml() throws Exception {
-        testModulesCompilerErrorInHtml(new ModulesCompilerNode(FACTORY));
-    }
-
-    private void testModulesCompilerErrorInHtml(ModulesCompiler compiler) throws Exception {
+    public void testErrorInHtml() throws Exception {
+        ModulesCompiler compiler = new ModulesCompilerNode(FACTORY);
         String entry = "modules/errorInHtml/errorInHtml.js";
         String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/errorInHtml/errorInHtml.html"),
                 Charsets.UTF_8);
@@ -88,12 +82,8 @@ public class ModulesCompilerTest extends UnitTestCase {
     }
 
     @Test
-    public void testModulesCompilerNodeErrorInJs() throws Exception {
-        testModulesCompilerErrorInJs(new ModulesCompilerNode(FACTORY));
-    }
-
-
-    private void testModulesCompilerErrorInJs(ModulesCompiler compiler) throws Exception {
+    public void testErrorInJs() throws Exception {
+        ModulesCompiler compiler = new ModulesCompilerNode(FACTORY);
         String entry = "modules/errorInJs/errorInJs.js";
         String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/errorInJs/errorInJs.html"),
                 Charsets.UTF_8);

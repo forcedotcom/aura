@@ -23,6 +23,8 @@
     */
     pagerClicked: function (cmp, evt, helper) {
         var carousel = helper.getCarouselInstance(cmp);
-        carousel.gotoPage(parseInt(evt.getParam('pageIndex'), 10));
+        if (carousel) {
+            carousel.gotoPage(parseInt(evt.getParam('pageIndex'), 10));
+        }
     }
 })// eslint-disable-line semi

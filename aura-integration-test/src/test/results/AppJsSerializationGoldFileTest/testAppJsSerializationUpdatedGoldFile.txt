@@ -696,27 +696,7 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
 }
 
 );
-*/}));$A.componentService.addComponent("markup://aura:html", (function (){/*$A.componentService.addComponentClass("markup://aura:html",function() {
-return {
-  "meta":{
-    "name":"aura$html"
-  }
-};
-});
-return {
-  "xs":"G",
-  "descriptor":"markup://aura:html",
-  "css":true,
-  "ad":[
-    ["body","aura://Aura.Component[]","G",false,[]],
-    ["tag","aura://String","G",false],
-    ["HTMLAttributes","aura://Map","G",false,null]
-  ],
-  "i":[
-    "markup://aura:rootComponent"
-  ]
-};*/}));
-$A.componentService.addComponent("markup://aura:text", (function (){/*$A.componentService.addComponentClass("markup://aura:text",function() {
+*/}));$A.componentService.addComponent("markup://aura:text", (function (){/*$A.componentService.addComponentClass("markup://aura:text",function() {
 return {
   "meta":{
     "name":"aura$text"
@@ -943,6 +923,26 @@ return {
   "css":true,
   "ad":[
     ["value","aura://String","G",false]
+  ],
+  "i":[
+    "markup://aura:rootComponent"
+  ]
+};*/}));
+$A.componentService.addComponent("markup://aura:html", (function (){/*$A.componentService.addComponentClass("markup://aura:html",function() {
+return {
+  "meta":{
+    "name":"aura$html"
+  }
+};
+});
+return {
+  "xs":"G",
+  "descriptor":"markup://aura:html",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["tag","aura://String","G",false],
+    ["HTMLAttributes","aura://Map","G",false,null]
   ],
   "i":[
     "markup://aura:rootComponent"
@@ -9455,6 +9455,163 @@ return {
   ],
   "df":"default, input"
 };*/}));
+$A.componentService.addComponent("markup://ui:stamp", (function (){/*$A.componentService.addComponentClass("markup://ui:stamp",function() {
+return {
+  "meta":{
+    "name":"ui$stamp",
+    "extends":"markup://aura:component"
+  }
+};
+});
+return {
+  "xs":"I",
+  "descriptor":"markup://ui:stamp",
+  "st":{
+    "descriptor":"css://ui.stamp",
+    "cl":"uiStamp"
+  },
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["class","aura://String","G",false],
+    ["dir","aura://String","I",false,"ltr"],
+    ["namespaceOverride","aura://String","I",false],
+    ["actionable","aura://Boolean","I",false,true],
+    ["role","aura://String","I",false],
+    ["ariaDescribedBy","aura://String","PP",false,""],
+    ["value","aura://Object","PP",false,null],
+    ["visible","aura://Boolean","I",false,true],
+    ["severity","aura://String","I",false],
+    ["title","aura://String","I",false],
+    ["onclick","aura://Aura.Action","I",false,null]
+  ],
+  "i":[
+    "markup://ui:visible"
+  ],
+  "re":[
+    {
+      "ed":"markup://ui:dblclick",
+      "n":"dblclick",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseover",
+      "n":"mouseover",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseout",
+      "n":"mouseout",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseup",
+      "n":"mouseup",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mousemove",
+      "n":"mousemove",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:click",
+      "n":"click",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mousedown",
+      "n":"mousedown",
+      "xs":"G"
+    }
+  ],
+  "ld":{
+    "uiStamp":{
+      "description":"Decorated Stamp Label",
+      "alias":"stamp-label"
+    }
+  },
+  "fa":[
+    {
+      "descriptor":"body",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "localId":"uiStamp",
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "class":{
+                    "exprType":"FUNCTION",
+                    "code":function(cmp, fn) { return fn.add(fn.add(fn.add("stamp-",cmp.get("v.severity"))," "),cmp.get("v.class")); },
+                    "args":[
+                      {
+                        "exprType":"PROPERTY",
+                        "byValue":false,
+                        "target":"ui:stamp",
+                        "path":"v.severity"
+                      },
+                      {
+                        "exprType":"PROPERTY",
+                        "byValue":false,
+                        "target":"ui:stamp",
+                        "path":"v.class"
+                      }
+                    ],
+                    "byValue":false
+                  },
+                  "onclick":{
+                    "exprType":"PROPERTY",
+                    "byValue":false,
+                    "target":"ui:stamp",
+                    "path":"v.onclick"
+                  },
+                  "title":{
+                    "exprType":"PROPERTY",
+                    "byValue":false,
+                    "target":"ui:stamp",
+                    "path":"v.title"
+                  }
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"a"
+              },
+              "body":{
+                "descriptor":"body",
+                "value":[
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://aura:expression"
+                    },
+                    "attributes":{
+                      "values":{
+                        "value":{
+                          "descriptor":"value",
+                          "value":{
+                            "exprType":"PROPERTY",
+                            "byValue":false,
+                            "target":"ui:stamp",
+                            "path":"v.body"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+};*/}));
 $A.componentService.addComponent("markup://ui:tab", (function (){/*$A.componentService.addComponentClass("markup://ui:tab",function() {
 return {
   "meta":{
@@ -12279,163 +12436,6 @@ return {
     }
   ]
 };*/}));
-$A.componentService.addComponent("markup://ui:stamp", (function (){/*$A.componentService.addComponentClass("markup://ui:stamp",function() {
-return {
-  "meta":{
-    "name":"ui$stamp",
-    "extends":"markup://aura:component"
-  }
-};
-});
-return {
-  "xs":"I",
-  "descriptor":"markup://ui:stamp",
-  "st":{
-    "descriptor":"css://ui.stamp",
-    "cl":"uiStamp"
-  },
-  "css":true,
-  "ad":[
-    ["body","aura://Aura.Component[]","G",false,[]],
-    ["class","aura://String","G",false],
-    ["dir","aura://String","I",false,"ltr"],
-    ["namespaceOverride","aura://String","I",false],
-    ["actionable","aura://Boolean","I",false,true],
-    ["role","aura://String","I",false],
-    ["ariaDescribedBy","aura://String","PP",false,""],
-    ["value","aura://Object","PP",false,null],
-    ["visible","aura://Boolean","I",false,true],
-    ["severity","aura://String","I",false],
-    ["title","aura://String","I",false],
-    ["onclick","aura://Aura.Action","I",false,null]
-  ],
-  "i":[
-    "markup://ui:visible"
-  ],
-  "re":[
-    {
-      "ed":"markup://ui:dblclick",
-      "n":"dblclick",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:mouseover",
-      "n":"mouseover",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:mouseout",
-      "n":"mouseout",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:mouseup",
-      "n":"mouseup",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:mousemove",
-      "n":"mousemove",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:click",
-      "n":"click",
-      "xs":"G"
-    },
-    {
-      "ed":"markup://ui:mousedown",
-      "n":"mousedown",
-      "xs":"G"
-    }
-  ],
-  "ld":{
-    "uiStamp":{
-      "description":"Decorated Stamp Label",
-      "alias":"stamp-label"
-    }
-  },
-  "fa":[
-    {
-      "descriptor":"body",
-      "value":[
-        {
-          "componentDef":{
-            "descriptor":"markup://aura:html"
-          },
-          "localId":"uiStamp",
-          "attributes":{
-            "values":{
-              "HTMLAttributes":{
-                "descriptor":"HTMLAttributes",
-                "value":{
-                  "class":{
-                    "exprType":"FUNCTION",
-                    "code":function(cmp, fn) { return fn.add(fn.add(fn.add("stamp-",cmp.get("v.severity"))," "),cmp.get("v.class")); },
-                    "args":[
-                      {
-                        "exprType":"PROPERTY",
-                        "byValue":false,
-                        "target":"ui:stamp",
-                        "path":"v.severity"
-                      },
-                      {
-                        "exprType":"PROPERTY",
-                        "byValue":false,
-                        "target":"ui:stamp",
-                        "path":"v.class"
-                      }
-                    ],
-                    "byValue":false
-                  },
-                  "onclick":{
-                    "exprType":"PROPERTY",
-                    "byValue":false,
-                    "target":"ui:stamp",
-                    "path":"v.onclick"
-                  },
-                  "title":{
-                    "exprType":"PROPERTY",
-                    "byValue":false,
-                    "target":"ui:stamp",
-                    "path":"v.title"
-                  }
-                }
-              },
-              "tag":{
-                "descriptor":"tag",
-                "value":"a"
-              },
-              "body":{
-                "descriptor":"body",
-                "value":[
-                  {
-                    "componentDef":{
-                      "descriptor":"markup://aura:expression"
-                    },
-                    "attributes":{
-                      "values":{
-                        "value":{
-                          "descriptor":"value",
-                          "value":{
-                            "exprType":"PROPERTY",
-                            "byValue":false,
-                            "target":"ui:stamp",
-                            "path":"v.body"
-                          }
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
-    }
-  ]
-};*/}));
 $A.componentService.addComponent("markup://ui:tabset", (function (){/*$A.componentService.addComponentClass("markup://ui:tabset",function() {
 return {
   "meta":{
@@ -15237,19 +15237,19 @@ $A.componentService.initEventDefs([
     }
   },
   {
-    "descriptor":"markup://ui:response",
-    "t":"COMPONENT",
-    "xs":"I",
-    "a":{
-      "value":["value","aura://Object","I",false,null]
-    }
-  },
-  {
     "descriptor":"markup://auraStorage:modified",
     "t":"APPLICATION",
     "xs":"I",
     "a":{
       "name":["name","aura://String","I",false]
+    }
+  },
+  {
+    "descriptor":"markup://ui:response",
+    "t":"COMPONENT",
+    "xs":"I",
+    "a":{
+      "value":["value","aura://Object","I",false,null]
     }
   },
   {

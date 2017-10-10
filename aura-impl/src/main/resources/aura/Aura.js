@@ -39,6 +39,9 @@ Aura.bootstrapMark = function (mark, value) {
 // before aura.js is loaded/executed, so verifyBootstrap() is never invoked.
 //#if {"excludeModes" : ["DOC","TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
 (function bootstrapRobustness() {
+    // Run once a second, so 10 seconds total wait.
+    var max_retries = 10;
+    var retryCount = 0;
     function verifyBootstrap() {
         document.removeEventListener('DOMContentLoaded', verifyBootstrap);
 
@@ -63,13 +66,29 @@ Aura.bootstrapMark = function (mark, value) {
         // inline.js will always be set to true as long as inline.js was actually loaded and didn't 404 or 5XX
         //  if inline.js failed to load, we're really screwed and we'll need to attempt a reload.
         var appCacheProgress = state["appcache"];
+        var allFilesLoaded;
+        if (appCacheProgress === -1) {
+            allFilesLoaded = Object.keys(state).reduce(function(prev, curr) {
+                return prev && state[curr];
+            }, true);
+            if (!allFilesLoaded) {
+                if(retryCount < max_retries) {
+                    retryCount++;
+                    setTimeout(verifyBootstrap, 1000);
+                } else {
+                    $A.clientService.dumpCachesAndReload(true, {"cause": "Aura.verifyBootstrap: Failed bootstrap state: " + JSON.stringify(state)});
+                }
+            }
+            
+            return;
+        }
         if ((state["inline.js"] && ($A.clientService.gvpsFromStorage === undefined || ($A.clientService.gvpsFromStorage && Aura["appBootstrapCacheStatus"] === undefined))) ||
             (typeof appCacheProgress !== "undefined" && appCacheProgress >= 0 && appCacheProgress < 100)) {
             setTimeout(verifyBootstrap, 1000);
             return;
         }
 
-        var allFilesLoaded = Object.keys(state).reduce(function(prev, curr) {
+        allFilesLoaded = Object.keys(state).reduce(function(prev, curr) {
             return prev && state[curr];
         }, true);
         if (!allFilesLoaded) {

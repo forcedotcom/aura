@@ -24,8 +24,6 @@
 		<p>This is a basic set up of an email field.</p>
 		<pre>&lt;ui:inputEmail aura:id="email" label="Email" placeholder="abc@email.com"/></pre>
 		<p>This example results in the following HTML.</p>
-			<pre>&lt;ui:inputEmail aura:id="email" label="Email" placeholder="abc@email.com"/></pre>
-		<p>This example results in the following HTML.</p>
 		<pre>&lt;div class="uiInput uiInputEmail uiInput--default uiInput--input">
   &lt;label class="uiLabel-left form-element__label uiLabel">
     &lt;span>Email&lt;/span>

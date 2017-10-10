@@ -40,11 +40,14 @@
     focusDate: function (component) {
         //TODO make sure the datepicker is actually visible
         window.requestAnimationFrame($A.getCallback(function () {
+        	if (!component.find("grid").isValid()) {
+                return;
+            }
             component.find("grid").focus();
         }));
 
     },
-
+    
     goToPrevMonth: function (component) {
         this.changeCalendar(component, -1, 0);
     },

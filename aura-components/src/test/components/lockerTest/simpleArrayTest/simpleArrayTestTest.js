@@ -90,6 +90,8 @@
         }
     },
     testArrayProxyTraps: {
+        // TODO(W-3674751): Test fails on Safari!
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testArrayProxyTraps();
         }

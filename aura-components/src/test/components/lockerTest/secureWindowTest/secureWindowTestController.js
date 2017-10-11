@@ -235,13 +235,7 @@
 
     testMediaStreamBlocked: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-        testUtils.assertUndefined(window["MediaStream"]);
-        try {
-            new MediaStream();
-            testUtils.fail("Should not be able to create MediaStream object");
-        }catch (e) {
-            // Expected, do nothing
-            testUtils.assertStartsWith("TypeError: MediaStream is not a constructor", e.toString());
-        }
+        testUtils.assertUndefined(window["MediaStream"], "Expected 'undefined' on window['MediaStream'].");
+        testUtils.assertTrue(typeof MediaStream === "undefined", "Expected 'undefined' on typeof MediaStream.");
     }
 })

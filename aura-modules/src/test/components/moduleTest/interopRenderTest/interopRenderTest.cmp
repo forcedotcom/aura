@@ -1,0 +1,5 @@
+<aura:component>
+    <moduleTest:navContainer aura:id="nav">
+        <moduleTest:navItem/>
+    </moduleTest:navContainer>
+</aura:component>

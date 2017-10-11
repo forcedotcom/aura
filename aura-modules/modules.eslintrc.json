@@ -16,7 +16,8 @@
                         "raptor/no-aura" : [ "**/aura-modules/src/test/modules/securemoduletest/bootstrap/bootstrap.js",
                             "**/aura-modules/src/test/modules/securemoduletest/simple-cmp/simple-cmp.js"],
                         "no-undef" : [ "**/aura-modules/src/test/modules/securemoduletest/bootstrap/bootstrap.js",
-                            "**/aura-modules/src/test/modules/securemoduletest/simple-cmp/simple-cmp.js"]
+                            "**/aura-modules/src/test/modules/securemoduletest/simple-cmp/simple-cmp.js"],
+                        "no-script-url" : [ "**/aura-modules/src/test/modules/moduletest/nav-item/nav-item.js"]
                     }
                 } ]
     }

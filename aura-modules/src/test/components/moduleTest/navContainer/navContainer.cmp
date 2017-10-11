@@ -1,0 +1,6 @@
+<aura:component>
+    <aura:attribute name="isRegistered" type="boolean" default="false"/>
+    <nav onitemregister="{! c.handleItemRegister }">
+        {! v.body }
+    </nav>
+</aura:component>

@@ -17,7 +17,9 @@ package org.auraframework.service;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.function.Predicate;
 
+import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
@@ -40,6 +42,16 @@ public interface RegistryService {
      * @return a RegistrySet that can be used and is thread safe.
      */
     RegistrySet getDefaultRegistrySet(Mode mode, Authentication access);
+    
+    /**
+     * Build RegistrySet
+     * 
+     * @param mode Mode for the current context
+     * @param access access level for the current context
+     * @param filterIn if non-null build only the location adapters that match the filter
+     * @return RegistrySet for build adapters
+     */
+    RegistrySet buildRegistrySet(Mode mode, Authentication access, Predicate<ComponentLocationAdapter> filterIn);
 
     /**
      * Get a registry set based on a single directory.

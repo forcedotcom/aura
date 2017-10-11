@@ -24,12 +24,14 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -42,8 +44,8 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.RegistryService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.RegistrySet;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -335,7 +337,7 @@ public class RegistrySerializer {
 
     public static final String ERR_ARGS_REQUIRED = "Component and Output Directory are both required";
 
-    public void execute() throws RegistrySerializerException {
+    public void execute() throws RegistrySerializerException, IOException {
         if (componentDirectory == null || outputDirectory == null) {
             throw new RegistrySerializerException(ERR_ARGS_REQUIRED);
         }
@@ -378,8 +380,26 @@ public class RegistrySerializer {
             DefRegistry master;
             RegistrySet registries;
             if (modulesEnabled) {
-                // must get all component locations within current maven module first to register namespaces.
-                registries = registryService.getDefaultRegistrySet(Mode.DEV, null);
+                String parentProjectPath = componentDirectory.getParentFile().getCanonicalPath();
+                // only process registers for namespaces in the current project
+                Predicate<ComponentLocationAdapter> filterIn = new Predicate<ComponentLocationAdapter>() {
+                    @Override
+                    public boolean test(ComponentLocationAdapter adapter) {
+                        try {
+                            File componentSourceDir = adapter.getComponentSourceDir();
+                            if (componentSourceDir != null && !componentSourceDir.getCanonicalPath().startsWith(parentProjectPath)) {
+                                logger.info("skipping: " + componentSourceDir.getCanonicalPath());
+                                return false;
+                            }
+                            return true;
+                        } catch (IOException x) {
+                            logger.error(x);
+                            return false;
+                        }
+                    }
+                };
+                // must get all component locations within current maven module first to register namespaces
+                registries = registryService.buildRegistrySet(Mode.DEV, null, filterIn);
                 // modules will use existing component namespaces for conversion
                 master = registryService.getModulesRegistry(componentDirectory);
             } else {

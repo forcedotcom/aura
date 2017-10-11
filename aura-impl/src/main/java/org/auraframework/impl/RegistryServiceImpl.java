@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -324,9 +325,11 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     }
 
     /**
-     * Get the component location adapter registries.
+     * Get the component location adapter registries
+     * 
+     * @param filterIn if non-null get only the location adapters that match the filter
      */
-    private List<DefRegistry> getCLARegistries() {
+    private List<DefRegistry> getCLARegistries(Predicate<ComponentLocationAdapter> filterIn) {
         Collection<ComponentLocationAdapter> markupLocations = getLocationAdapters();
         List<DefRegistry> regBuild = Lists.newArrayList();
 
@@ -336,11 +339,13 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         if (markupLocations != null) {
             for (ComponentLocationAdapter location : markupLocations) {
                 if (location != null) {
-                    SourceLocationInfo sli = getSourceLocationInfo(location);
-                    if (!sli.isChanged() && sli.staticLocationRegistries != null) {
-                        regBuild.addAll(sli.staticLocationRegistries);
-                    } else {
-                        regBuild.addAll(sli.markupRegistries);
+                    if (filterIn == null || filterIn.test(location)) {
+                        SourceLocationInfo sli = getSourceLocationInfo(location);
+                        if (!sli.isChanged() && sli.staticLocationRegistries != null) {
+                            regBuild.addAll(sli.staticLocationRegistries);
+                        } else {
+                            regBuild.addAll(sli.markupRegistries);
+                        }
                     }
                 }
             }
@@ -401,10 +406,10 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             throw new Error(e.getCause());
         }
     }
-
-    // test accessible
-    RegistrySet buildDefaultRegistrySet(Mode mode, Authentication access) {
-        List<DefRegistry> registries = getCLARegistries();
+    
+    @Override
+    public RegistrySet buildRegistrySet(Mode mode, Authentication access, Predicate<ComponentLocationAdapter> filterIn) {
+        List<DefRegistry> registries = getCLARegistries(filterIn);
         for (RegistryAdapter adapter : adapters) {
             DefRegistry[] provided = adapter.getRegistries(mode, access, null);
             if (registries != null && provided != null) {
@@ -412,6 +417,11 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             }
         }
         return new RegistryTrie(registries);
+    }
+
+    // test accessible
+    RegistrySet buildDefaultRegistrySet(Mode mode, Authentication access) {
+        return buildRegistrySet(mode, access, null);
     }
 
     @Override

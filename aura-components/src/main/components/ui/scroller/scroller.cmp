@@ -104,7 +104,7 @@
     <ui:resizeObserver onresize="{!c.refresh}"/>
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     
-    <div aura:id="scrollWrapper" class="{!v.class}" style="{! (v.width ? ('width: ' + v.width + 'px;'): '') + (v.height? ('height: ' + v.height + 'px') : '') }">
+    <div tabindex="-1" aura:id="scrollWrapper" class="{!v.class}" style="{! (v.width ? ('width: ' + v.width + 'px;'): '') + (v.height? ('height: ' + v.height + 'px') : '') }">
         <div aura:id="scrollContent" class="{!v.scrollContentClass}">
             {!v.body}
             {!v.infiniteLoadingTemplate}

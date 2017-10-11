@@ -572,7 +572,7 @@ AuraComponentService.prototype.newComponentDeprecated = function(config, attribu
         }
     }
 
-    return this.createComponentInstance(config, localCreation);
+    return this.createComponentInstance(config, localCreation, def);
 };
 
 /**
@@ -580,7 +580,7 @@ AuraComponentService.prototype.newComponentDeprecated = function(config, attribu
  * @param {Object} config Config is the same object you would pass to the constructor $A.Component to create a component. This method will use that information to further configure the component class that is created.
  * @param {Boolean} localCreation See documentation on Component.js constructor for documentation on the localCreation property.
  */
-AuraComponentService.prototype.createComponentInstance = function(config, localCreation) {
+AuraComponentService.prototype.createComponentInstance = function(config, localCreation, def) {
     if (!config["skipCreationPath"]) {
         var context = $A.getContext();
         var creationPath;
@@ -621,8 +621,8 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
     }
 
     // See if there is a component specific class
-    var def = config["componentDef"];
-    var desc = def[Json.ApplicationKey.DESCRIPTOR] || def;
+    var componentDef = config["componentDef"];
+    var desc = componentDef[Json.ApplicationKey.DESCRIPTOR] || componentDef;
     // Not sure why you would pass in the ComponentDef as the descriptor, but it's being done.
     if(desc.getDescriptor) {
         desc = desc.getDescriptor().getQualifiedName();
@@ -647,7 +647,7 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
         this.createFromSavedComponentConfigs(desc);
     }
 
-    var classConstructor = this.getComponentClass(desc);
+    var classConstructor = this.getComponentClass(desc, def);
     if (!classConstructor) {
         throw new $A.auraError("Component class not found: " + desc, null, $A.severity.QUIET);
     }
@@ -1381,7 +1381,7 @@ AuraComponentService.prototype.createFromSavedComponentConfigs = function(config
     var alreadyHasConstructor = this.componentClassRegistry.classConstructors[descriptor] || this.componentClassRegistry.classExporter[descriptor];
 
     // Definitions that come back from the server in the context have their component class on the definition.
-    var hasBuiltInConstructor = cmpConfig.hasOwnProperty(Json.ApplicationKey.COMPONENTCLASS);
+    var hasBuiltInConstructor = cmpConfig && cmpConfig.hasOwnProperty(Json.ApplicationKey.COMPONENTCLASS);
     if (alreadyHasConstructor || hasBuiltInConstructor) {
         var def = new ComponentDef(definition);
         this.componentDefRegistry[descriptor] = def;
@@ -1861,7 +1861,7 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
                     $A.warning(message);
                 }
                 if(def) {
-                    cmp = new (this.getComponentClass(descriptor))(config);
+                    cmp = new (this.getComponentClass(descriptor, def))(config);
                 }
             }
         }

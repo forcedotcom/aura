@@ -1,0 +1,7 @@
+<aura:component>
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <aura:attribute name="myList" type="List"/>
+    <aura:iteration items="{!v.myList}" var="item">
+        <moduleTest:simpleCmp literal="{!item}" />
+    </aura:iteration>
+</aura:component>

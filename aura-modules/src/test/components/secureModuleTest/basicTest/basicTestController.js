@@ -13,6 +13,12 @@
         testUtils.assertTrue(returnStatus);
     },
 
+    testMiscGlobalsNotAccessibleInModules: function (cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var testModule = cmp.find("bootstrap");
+        testModule.testMiscGlobalsNotAccessibleInModules();
+    },
+
     testWindowIsSecure: function (cmp) {
         var testUtils = cmp.get("v.testUtils");
         // Sanity check: make sure the component is lockerized and its global scope is SecureWindow

@@ -23,6 +23,7 @@
     <aura:method name="testWindowIsSecure"/>
     <aura:method name="testEngineIsSecure"/>
     <aura:method name="testOptOutOfLockerUsingMetaData"/>
+    <aura:method name="testMiscGlobalsNotAccessibleInModules"/>
 
     <secureModuleTest:bootstrap aura:id="bootstrap"/>
     <secureModuleTest:nonLockerizedCmp aura:id="nonLockerized"/>

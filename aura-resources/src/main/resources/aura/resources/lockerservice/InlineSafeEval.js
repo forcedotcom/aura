@@ -55,9 +55,9 @@
 		          }
 	    	  }
 
-			  if (options.muteAuraGVP) {
-				  // Mute $A GVP for modules, for LC use SecureAura
-				  src = 'const $A = undefined;\n' + src;
+			  if (options.mutedGlobals) {
+				  // Mute $A, aura, sforce, Sfdc etc for modules
+				  src = 'const {' + options.mutedGlobals + '} = {};\n' + src;
 			  }
 
 	          if (options.useStrict) {
@@ -105,7 +105,7 @@
 	      // adding non-configurable hooks into parent window.
 	      Object.defineProperties(parent, {
 	          '$$safe-eval$$': {
-	              value: function(src, sourceURL, skipPreprocessing, muteAuraGVP) {
+	              value: function(src, sourceURL, skipPreprocessing, mutedGlobals) {
 	                  if (!src) {
 	                	  return undefined;
 	                  }
@@ -115,7 +115,7 @@
 	                      useStrict: true,
 	                      sourceURL: sourceURL,
 	                      skipPreprocessing: skipPreprocessing,
-						  muteAuraGVP: muteAuraGVP
+						  mutedGlobals: mutedGlobals
 	                  }));
 
 	                  if (typeof fn === 'function') {

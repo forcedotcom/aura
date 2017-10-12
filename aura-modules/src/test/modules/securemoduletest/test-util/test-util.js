@@ -23,3 +23,7 @@ export function assertNotUndefinedOrNull(condition, message) {
 export function assertStartsWith(start, full, message) {
     assert(full && full.indexOf && full.indexOf(start) === 0, message);
 }
+
+export function assertEquals(expected, actual, message) {
+    assert(expected === actual, message);
+}

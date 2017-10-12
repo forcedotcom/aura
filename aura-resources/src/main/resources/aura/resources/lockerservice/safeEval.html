@@ -38,9 +38,9 @@
               if (match) src = src.replace(match[1], 'return ');
           }
 
-          if (options.muteAuraGVP) {
-              // Mute $A GVP for modules
-              src = 'const $A = undefined;\n' + src;
+          if (options.mutedGlobals) {
+              // Mute $A, aura, sforce, Sfdc etc for modules
+              src = 'const {'+ options.mutedGlobals +'} = {};\n' + src;
           }
 
           if (options.lockerize) {
@@ -110,7 +110,7 @@
           return result;
       }
 
-      function safeEval(src, sourceURL, skipPreprocessing, muteAuraGVP, lockerize, originalThis, originalArguments) {
+      function safeEval(src, sourceURL, skipPreprocessing, mutedGlobals, lockerize, originalThis, originalArguments) {
           if (!src) {
               return undefined;
           }
@@ -122,7 +122,7 @@
               lockerize: lockerize,
               sourceURL: sourceURL,
               skipPreprocessing: skipPreprocessing,
-              muteAuraGVP: muteAuraGVP
+              mutedGlobals: mutedGlobals
           });
 
           var fn = evalAndReturn(scoped, !lockerize);
@@ -139,15 +139,15 @@
       switch (id) {
           case "?id=custom":
               Object.defineProperty(parent, "$$safe-eval$$", {
-                  value: function(src, sourceURL, skipPreprocessing, muteAuraGVP) {
-                      return safeEval(src, sourceURL, skipPreprocessing, muteAuraGVP, true, undefined, arguments);
+                  value: function(src, sourceURL, skipPreprocessing, mutedGlobals) {
+                      return safeEval(src, sourceURL, skipPreprocessing, mutedGlobals, true, undefined, arguments);
                   }
               });
               break;
           case "?id=system":
               Object.defineProperty(parent, "$$safe-eval-compat$$", {
-                  value: function(src, sourceURL, skipPreprocessing, muteAuraGVP) {
-                      return safeEval(src, sourceURL, skipPreprocessing, muteAuraGVP, false, undefined, arguments);
+                  value: function(src, sourceURL, skipPreprocessing, mutedGlobals) {
+                      return safeEval(src, sourceURL, skipPreprocessing, mutedGlobals, false, undefined, arguments);
                   }
               });
               break;

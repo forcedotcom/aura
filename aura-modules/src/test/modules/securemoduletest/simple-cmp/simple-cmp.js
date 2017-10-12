@@ -11,7 +11,7 @@ export default class Simple extends Element {
 
     @api
     testDollarAuraNotAccessibleInModules() {
-        testUtil.assertUndefined($A, "Expected $A to be not accessible in module"); // eslint-disable-line raptor/no-aura, no-undef
+        testUtil.assertEquals("undefined", typeof $A, "Expected $A to be not accessible in module"); // eslint-disable-line raptor/no-aura
         return true;
     }
 

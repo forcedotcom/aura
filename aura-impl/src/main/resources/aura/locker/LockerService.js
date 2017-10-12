@@ -156,7 +156,7 @@ function LockerService() {
                 var descriptor = def.getDescriptor();
                 var namespace = descriptor.getNamespace();
                 var name = descriptor.getName();
-                var descriptorDebuggableURL = "/components/" + namespace + "/" + name + ".js";
+                var descriptorDebuggableURL = "components/" + namespace + "/" + name + ".js";
                 var key = this.getKeyForNamespace(namespace);
 
                 // Key this def so we can transfer the key to component instances
@@ -168,11 +168,12 @@ function LockerService() {
             createForModule : function(code, defDescriptor) {
                 var namespace = defDescriptor.getNamespace();
                 var name = defDescriptor.getName();
-                var descriptorDebuggableURL = "/modules/" + namespace + "/" + name + ".js";
+                var descriptorDebuggableURL = "modules/" + namespace + "/" + name + ".js";
                 var key = this.getKeyForNamespace(namespace);
 
                 // Lockerize the definition by providing a global scope
-                return this.createInternal(code, key, descriptorDebuggableURL, undefined, undefined, true);
+                var mutedGlobals = "$A, aura, Sfdc, sforce";
+                return this.createInternal(code, key, descriptorDebuggableURL, undefined, undefined, mutedGlobals);
             },
 
             getEnv : function(key, /* deprecated*/ doNotCreate) {
@@ -220,7 +221,7 @@ function LockerService() {
                 return this.createInternal(code, key, sourceURL, skipPreprocessing);
             },
 
-            createInternal : function(code, key, sourceURL, skipPreprocessing, forceLocker, muteAuraGVP) {
+            createInternal : function(code, key, sourceURL, skipPreprocessing, forceLocker, mutedGlobals) {
                 var envRec;
 
                 if (!lockerShadows) {
@@ -250,7 +251,7 @@ function LockerService() {
                     }
                 }
 
-                var returnValue = window['$$safe-eval$$'](code, sourceURL, skipPreprocessing, muteAuraGVP, envRec, lockerShadows);
+                var returnValue = window['$$safe-eval$$'](code, sourceURL, skipPreprocessing, mutedGlobals, envRec, lockerShadows);
 
                 var locker = {
                         globals : envRec,

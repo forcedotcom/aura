@@ -25,6 +25,15 @@
         }
     },
 
+    /**
+     * Verify that miscellaneous globals like aura, Sfdc, sforce
+     */
+    testMiscGlobalsNotAccessibleInModules: {
+        test: function (cmp) {
+            cmp.testMiscGlobalsNotAccessibleInModules();
+        }
+    },
+
     testWindowIsSecure: {
         test: function (cmp) {
             cmp.testWindowIsSecure();

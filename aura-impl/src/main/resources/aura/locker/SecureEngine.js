@@ -15,33 +15,25 @@
  */
 
 /**
- * Secure wrapper around engine
+ * Simple wrapper around engine.
+ * This is done to limit the exports available on the raw engine.
+ * Since this is a simple wrapper and the behavior is independent of namespace, only one instance of SecureEngine is sufficient
  * @param engine The Web Components engine
- * @param key
  */
-function SecureEngine(engine, key) {
+function SecureEngine(engine) {
     "use strict";
 
-    var o = ls_getFromCache(engine, key);
-    if (o) {
-        return o;
-    }
-
-    o = Object.create(null, {
+    var o = Object.create(null, {
         "Element": {
             enumerable: true,
             value: engine["Element"]
         },
         toString: {
             value: function() {
-                return "SecureEngine: " + engine + "{ key: " + JSON.stringify(key) + " }";
+                return "SecureEngine";
             }
         }
     });
-
-    ls_setRef(o, engine, key);
-    ls_addToCache(engine, o, key);
-    ls_registerProxy(o);
-
+    Object.freeze(o);
     return o;
 }

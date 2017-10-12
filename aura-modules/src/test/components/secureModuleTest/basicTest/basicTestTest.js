@@ -46,9 +46,21 @@
         }
     },
 
+    testEngineIsImmutable: {
+        test: function (cmp) {
+            cmp.testEngineIsImmutable();
+        }
+    },
+
     testOptOutOfLockerUsingMetaData: {
         test: function (cmp) {
             cmp.testOptOutOfLockerUsingMetaData();
+        }
+    },
+
+    testElementIsImmutable: {
+        test: function (cmp) {
+            cmp.testElementIsImmutable();
         }
     }
 })

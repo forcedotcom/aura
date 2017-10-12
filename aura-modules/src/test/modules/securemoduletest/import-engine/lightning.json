@@ -1,0 +1,4 @@
+{
+  "requireLocker": "true",
+  "description": "library module which imports the whole engine"
+}

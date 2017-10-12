@@ -23,6 +23,8 @@
 function AuraComponentService() {
     // Def registries
     this.moduleEngine           = window["Engine"];
+    // Will hold a reference to a wrapped engine, will be used for custom modules(LockerService)
+    this.wrappedEngine          = undefined;
     this.moduleDefRegistry      = {};
     this.moduleRegistry         = {};
     this.componentDefRegistry   = {};
@@ -794,7 +796,10 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
             // Provide SecureEngine as a dependency if "engine" was imported by the module
             var index = entry.dependencies.indexOf("engine");
             if (index !== -1) {
-                deps.splice(index, 1, $A.lockerService.getSecureEngine(deps[index], defDescriptor));
+                deps.splice(
+                    index,
+                    1,
+                    this.wrappedEngine || (this.wrappedEngine = $A.lockerService.wrapEngine(deps[index])));
             }
         }
         Ctor = entry.definition.apply(undefined, deps);

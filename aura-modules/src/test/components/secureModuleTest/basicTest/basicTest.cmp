@@ -24,8 +24,11 @@
     <aura:method name="testEngineIsSecure"/>
     <aura:method name="testOptOutOfLockerUsingMetaData"/>
     <aura:method name="testMiscGlobalsNotAccessibleInModules"/>
+    <aura:method name="testEngineIsImmutable"/>
+    <aura:method name="testElementIsImmutable"/>
 
     <secureModuleTest:bootstrap aura:id="bootstrap"/>
     <secureModuleTest:nonLockerizedCmp aura:id="nonLockerized"/>
-
+    <secureModuleTest:importEngine aura:id="importEngine"/>
+    <secureModuleTest:importElement aura:id="importElement"/>
 </aura:component>

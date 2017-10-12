@@ -28,7 +28,7 @@ export default class Bootstrap extends Element {
         testUtil.assertDefined(Element, "SecureEngine is preventing access to Element in interop component");
         testUtil.assertUndefined(createElement, "SecureEngine is leaking properties in interop component");
         const simpleCmp = this.root.querySelector("#securemoduletest-simple-cmp");
-        return simpleCmp.testEngineIsSecure();
+        return simpleCmp.testEngineIsSecure() && simpleLib.testEngineIsSecure();
     }
 
     @api

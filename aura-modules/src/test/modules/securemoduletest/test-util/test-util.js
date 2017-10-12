@@ -27,3 +27,7 @@ export function assertStartsWith(start, full, message) {
 export function assertEquals(expected, actual, message) {
     assert(expected === actual, message);
 }
+
+export function fail(message) {
+    assert(false, message);
+}

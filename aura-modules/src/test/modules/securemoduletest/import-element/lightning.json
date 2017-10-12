@@ -1,0 +1,4 @@
+{
+  "requireLocker": "true",
+  "description": "component module which imports Element from engine"
+}

@@ -351,14 +351,12 @@ function LockerService() {
                 }
             },
 
-            getSecureEngine : function(engine, defDescriptor) {
+            wrapEngine : function(engine) {
                 if (!this.isEnabled()) {
                    return engine;
                 }
                 if (engine) {
-                    var namespace = defDescriptor.getNamespace();
-                    var key = this.getKeyForNamespace(namespace);
-                    engine = SecureEngine(engine, key);
+                    engine = SecureEngine(engine);
                 }
                 return engine;
             }
@@ -369,7 +367,7 @@ function LockerService() {
     service["create"] = service.create;
     service["createForDef"] = service.createForDef;
     service["createForModule"] = service.createForModule;
-    service["getSecureEngine"] = service.getSecureEngine;
+    service["wrapEngine"] = service.wrapEngine;
     service["getEnv"] = service.getEnv;
     service["getEnvForSecureObject"] = service.getEnvForSecureObject;
     service["getKeyForNamespace"] = service.getKeyForNamespace;

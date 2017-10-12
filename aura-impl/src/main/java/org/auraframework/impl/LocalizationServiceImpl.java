@@ -16,7 +16,9 @@
 package org.auraframework.impl;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -31,8 +33,8 @@ import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.number.AuraNumberFormat;
 
-import com.ibm.icu.text.DateFormat;
 import com.ibm.icu.text.DecimalFormat;
+import com.ibm.icu.text.DecimalFormatSymbols;
 import com.ibm.icu.text.NumberFormat;
 import com.ibm.icu.util.Currency;
 import org.springframework.stereotype.Component;
@@ -816,6 +818,104 @@ public class LocalizationServiceImpl implements LocalizationService {
         nf.setMaximumFractionDigits(maxFractionDigits);
         return nf.format(number);
     }
+
+    @Override
+    public String getDateFormatPattern() {
+        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
+        // Extracted from LocaleValueProvider
+        // Why do we use java.text.DateFormat for date, time, but ICU for numbers
+        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, auraLocale.getDateLocale());
+        SimpleDateFormat sdf = (SimpleDateFormat) dateFormat;
+        return sdf.toPattern();
+    }
+
+    @Override
+    public String getDateTimeFormatPattern() {
+        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
+        DateFormat datetimeFormat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, auraLocale.getDateLocale());
+        SimpleDateFormat sdf = (SimpleDateFormat) datetimeFormat;
+        return sdf.toPattern();
+    }
+
+    @Override
+    public String getTimeFormatPattern() {
+        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
+        DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.DEFAULT, auraLocale.getDateLocale());
+        SimpleDateFormat sdf = (SimpleDateFormat) timeFormat;
+        return sdf.toPattern();
+    }
+
+    @Override
+    public String getNumberFormatPattern() {
+        return getDecimalFormatForNumber().toPattern();
+    }
+
+    @Override
+    public String getDecimalSeparator() {
+        DecimalFormatSymbols dfs = getDecimalFormatSymbolsForNumber();
+        return String.valueOf(dfs.getDecimalSeparator());
+    }
+
+    @Override
+    public String getGroupingSeparator() {
+        DecimalFormatSymbols dfs = getDecimalFormatSymbolsForNumber();
+        return String.valueOf(dfs.getGroupingSeparator());
+    }
+
+    @Override
+    public String getZeroDigit() {
+        DecimalFormatSymbols dfs = getDecimalFormatSymbolsForNumber();
+        return String.valueOf(dfs.getZeroDigit());
+    }
+
+    @Override
+    public String getPercentFormatPattern() {
+        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
+        DecimalFormat pdf = (DecimalFormat) DecimalFormat.getPercentInstance(auraLocale.getNumberLocale());
+        return pdf.toPattern();
+    }
+
+    @Override
+    public String getCurrencyFormatPattern() {
+        DecimalFormat cdf = getDecimalFormatForCurrency();
+        return cdf.toPattern();
+    }
+
+    @Override
+    public String getCurrencyCode() {
+        DecimalFormatSymbols cdfs = getDecimalFormatSymbolsForCurrency();
+        Currency cur = cdfs.getCurrency();
+        return cur != null ? cur.getCurrencyCode() : "";
+    }
+
+    @Override
+    public String getCurrencySymbol() {
+        DecimalFormatSymbols cdfs = getDecimalFormatSymbolsForCurrency();
+        return cdfs.getCurrencySymbol();
+    }
+
+
+    private DecimalFormat getDecimalFormatForNumber() {
+        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
+        // Why do we use ICU for numbers and java for Dates ?
+        return (DecimalFormat) DecimalFormat.getNumberInstance(auraLocale.getNumberLocale());
+    }
+
+    private DecimalFormatSymbols getDecimalFormatSymbolsForNumber() {
+        DecimalFormat df = getDecimalFormatForNumber();
+        return df.getDecimalFormatSymbols();
+    }
+
+    private DecimalFormat getDecimalFormatForCurrency() {
+        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
+        return (DecimalFormat) DecimalFormat.getCurrencyInstance(auraLocale.getCurrencyLocale());
+    }
+
+    private DecimalFormatSymbols getDecimalFormatSymbolsForCurrency() {
+        DecimalFormat cdf = getDecimalFormatForCurrency();
+        return cdf.getDecimalFormatSymbols();
+    }
+
 
     @Inject
     public void setLocalizationAdapter(LocalizationAdapter adapter) {

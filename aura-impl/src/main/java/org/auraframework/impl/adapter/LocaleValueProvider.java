@@ -17,11 +17,7 @@ package org.auraframework.impl.adapter;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
-import com.ibm.icu.text.DecimalFormat;
-import com.ibm.icu.text.DecimalFormatSymbols;
-import com.ibm.icu.util.Currency;
 
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
@@ -30,6 +26,7 @@ import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.service.LocalizationService;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraLocale;
@@ -37,9 +34,7 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -76,16 +71,12 @@ public class LocaleValueProvider implements GlobalValueProvider {
     public static String CURRENCY = "currency";
     public static String ZERO_DIGIT = "zero";
 
-    public static String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
-    public static String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm";
-    public static String DEFAULT_TIME_FORMAT = "HH:mm";
-
     public static String IS_EASTERN_NAME_STYLE = "isEasternNameStyle";
 
     private final Map<String, Object> data;
     private final DefinitionService definitionService;
 
-    public LocaleValueProvider(ConfigAdapter configAdapter, LocalizationAdapter localizationAdapter, DefinitionService definitionService) {
+    public LocaleValueProvider(LocalizationService localizationService, LocalizationAdapter localizationAdapter, DefinitionService definitionService) {
         this.definitionService = definitionService;
 
         Builder<String, Object> builder = ImmutableMap.builder();
@@ -94,7 +85,6 @@ public class LocaleValueProvider implements GlobalValueProvider {
 
         Locale userLocale = auraLocale.getLocale();
         Locale lang = auraLocale.getLanguageLocale();
-        Locale dateLocale = auraLocale.getDateLocale();
 
         builder.put(USER_LOCALE_LANGUAGE, userLocale.getLanguage());
         builder.put(USER_LOCALE_COUNTRY, userLocale.getCountry());
@@ -113,53 +103,28 @@ public class LocaleValueProvider implements GlobalValueProvider {
 
         builder.put(FIRST_DAY_OF_WEEK, Calendar.getInstance(auraLocale.getTimeZone(), userLocale).getFirstDayOfWeek());
 
-        // using java DateFormat because the year pattern "MMM d, y" (although valid) isn't understood by moment.js
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, dateLocale);
-        DateFormat datetimeFormat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, dateLocale);
-        DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.DEFAULT, dateLocale);
-        try {
-            SimpleDateFormat sdf = (SimpleDateFormat) dateFormat;
-            builder.put(DATE_FORMAT, sdf.toPattern());
-
-            SimpleDateFormat sdtf = (SimpleDateFormat) datetimeFormat;
-            builder.put(DATETIME_FORMAT, sdtf.toPattern());
-
-            SimpleDateFormat stf = (SimpleDateFormat) timeFormat;
-            builder.put(TIME_FORMAT, stf.toPattern());
-        } catch (ClassCastException cce) {
-            builder.put(DATE_FORMAT, DEFAULT_DATE_FORMAT);
-            builder.put(DATETIME_FORMAT, DEFAULT_DATETIME_FORMAT);
-            builder.put(TIME_FORMAT, DEFAULT_TIME_FORMAT);
-        }
-
         String timezoneId = auraLocale.getTimeZone().getID();
         builder.put(TIME_ZONE, timezoneId);
 
         builder.put(IS_EASTERN_NAME_STYLE, auraLocale.isEasternNameStyle());
 
-        // DecimalFormat is expected
-        DecimalFormat df = (DecimalFormat) DecimalFormat.getNumberInstance(auraLocale.getNumberLocale());
+        // FORMAT PATTERNS
 
-        // Patterns are not localized; the "." means "locale decimal" not "dot"
-        builder.put(NUMBER_FORMAT, df.toPattern());
-        DecimalFormatSymbols dfs = df.getDecimalFormatSymbols();
-        builder.put(DECIMAL, dfs.getDecimalSeparator());
-        builder.put(GROUPING, dfs.getGroupingSeparator());
-        builder.put(ZERO_DIGIT, dfs.getZeroDigit());
+        builder.put(DATE_FORMAT, localizationService.getDateFormatPattern());
+        builder.put(DATETIME_FORMAT, localizationService.getDateTimeFormatPattern());
+        builder.put(TIME_FORMAT, localizationService.getTimeFormatPattern());
 
-        df = (DecimalFormat) DecimalFormat.getPercentInstance(auraLocale.getNumberLocale());
+        builder.put(NUMBER_FORMAT, localizationService.getNumberFormatPattern());
+        builder.put(DECIMAL, localizationService.getDecimalSeparator());
+        builder.put(GROUPING, localizationService.getGroupingSeparator());
+        builder.put(ZERO_DIGIT, localizationService.getZeroDigit());
 
-        // Don't localize the patterns
-        builder.put(PERCENT_FORMAT, df.toPattern());
-
-        df = (DecimalFormat) DecimalFormat.getCurrencyInstance(auraLocale.getCurrencyLocale());
+        builder.put(PERCENT_FORMAT, localizationService.getPercentFormatPattern());
 
         // Don't localize the patterns
-        builder.put(CURRENCY_FORMAT, df.toPattern());
-        DecimalFormatSymbols cdfs = df.getDecimalFormatSymbols();
-        Currency cur = cdfs.getCurrency();
-        builder.put(CURRENCY_CODE, cur != null ? cur.getCurrencyCode() : "");
-        builder.put(CURRENCY, cdfs.getCurrencySymbol());
+        builder.put(CURRENCY_FORMAT, localizationService.getCurrencyFormatPattern());
+        builder.put(CURRENCY_CODE, localizationService.getCurrencyCode());
+        builder.put(CURRENCY, localizationService.getCurrencySymbol());
 
         data = builder.build();
     }

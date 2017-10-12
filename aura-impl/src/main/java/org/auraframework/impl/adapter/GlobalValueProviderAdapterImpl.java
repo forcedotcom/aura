@@ -25,6 +25,7 @@ import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.service.LocalizationService;
 
 import javax.inject.Inject;
 import java.util.LinkedList;
@@ -37,9 +38,6 @@ import java.util.Set;
 public class GlobalValueProviderAdapterImpl implements GlobalValueProviderAdapter {
 
     @Inject
-    private ConfigAdapter configAdapter;
-
-    @Inject
     private LocalizationAdapter localizationAdapter;
 
     @Inject
@@ -47,6 +45,9 @@ public class GlobalValueProviderAdapterImpl implements GlobalValueProviderAdapte
 
     @Inject
     private ContextService contextService;
+
+    @Inject
+    private LocalizationService localizationService;
     
     @Override
     public List<GlobalValueProvider> createValueProviders() {
@@ -56,7 +57,7 @@ public class GlobalValueProviderAdapterImpl implements GlobalValueProviderAdapte
         l.add(new LabelValueProvider(localizationAdapter, definitionService));
 
         // $Locale
-        l.add(new LocaleValueProvider(configAdapter, localizationAdapter, definitionService));
+        l.add(new LocaleValueProvider(localizationService, localizationAdapter, definitionService));
 
         // $Browser
         l.add(new BrowserValueProvider(contextService));

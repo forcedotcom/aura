@@ -383,17 +383,14 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         final RegistrySetKey registrySetCacheKey = new RegistrySetKey(mode, access, sessionCacheKey);
 
         try {
-            return cache.get(registrySetCacheKey, new Callable<RegistrySet>() {
-                @Override
-                public RegistrySet call() throws Exception {
-                    RegistrySet res = buildDefaultRegistrySet(mode, access);
+            return cache.get(registrySetCacheKey, () -> {
+                RegistrySet res = buildDefaultRegistrySet(mode, access);
 
-                    if (res == null) {
-                        // see com.google.common.cache.Cache#get; this method may never return null.
-                        throw new NullPointerException("null RegistrySet for key=" + registrySetCacheKey);
-                    }
-                    return res;
+                if (res == null) {
+                    // see com.google.common.cache.Cache#get; this method may never return null.
+                    throw new NullPointerException("null RegistrySet for key=" + registrySetCacheKey);
                 }
+                return res;
             });
         } catch (UncheckedExecutionException e) {
             // thrown if a unchecked exception was thrown in call

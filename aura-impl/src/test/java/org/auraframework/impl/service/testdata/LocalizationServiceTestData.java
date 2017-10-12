@@ -189,8 +189,7 @@ public final class LocalizationServiceTestData {
     public static final BigDecimal[] CURRENCY_BIGDECIMALS = { new BigDecimal("0.0"), new BigDecimal("-5.10"),
             new BigDecimal("10.99"), new BigDecimal("1234567.89"), new BigDecimal("-12345.6789") };
     public static final String[] PASS_CURRENCY_STRINGS = { "$100,000,000.00", "($0.000001)" };
-    public static final String[] FAIL_CURRENCY_STRINGS = { "\n100000000000", "1K", "1.00", "100,000,000.1000",
-            "￥9,990.00" };
+    public static final String[] FAIL_CURRENCY_STRINGS = { "￥9,990.00" };
 
     // List of currency codes: http://en.wikipedia.org/wiki/ISO_4217
     public static final String[] CURRENCY_TYPES = { "USD", "GBP", "EUR", "JPY" };

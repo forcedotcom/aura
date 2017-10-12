@@ -1197,4 +1197,27 @@ public interface LocalizationService extends AuraService {
      */
     String formatNumber(Number number, Locale locale, int minFractionDigits, int maxFractionDigits);
 
+    // Format patterns
+
+    String getDateFormatPattern();
+
+    String getDateTimeFormatPattern();
+
+    String getTimeFormatPattern();
+
+    String getNumberFormatPattern();
+
+    String getDecimalSeparator();
+
+    String getGroupingSeparator();
+
+    String getZeroDigit();
+
+    String getPercentFormatPattern();
+
+    String getCurrencyFormatPattern();
+
+    String getCurrencyCode();
+
+    String getCurrencySymbol();
 }

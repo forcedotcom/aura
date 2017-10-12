@@ -24,7 +24,10 @@
     <aura:attribute name="cmpAttribute" type="Aura.Component"/>
     <aura:attribute name="cmpArrayAttribute" type="Aura.Component[]"/>
     <aura:attribute name="objWithDestroy" type="Object"/>
+    <aura:attribute name="component1" type="Aura.Component"/>
+    <aura:attribute name="showComponent1" type="Boolean" default="true"/>
     <aura:attribute name="list" type="List" default="[1, 2, 3]"/>
+
 
     <div aura:id="team" class="team">
         <componentTest:hasBody aura:id="outerFacet">
@@ -54,4 +57,9 @@
             <aura:if isTrue="{!v.list.length != 0}"><div aura:id="div">{!item}</div></aura:if>
         </b>
     </aura:iteration>
+
+    <!-- Used to toggle showComponent1, and see that whats inside v.component1 isn't destroyed, just the direct contents of the aura:if -->
+    <aura:if isTrue="{!v.showComponent1}">
+        component1: {!v.component1}
+    </aura:if>
 </aura:component>

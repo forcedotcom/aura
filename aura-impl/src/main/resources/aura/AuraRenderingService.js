@@ -567,7 +567,7 @@ AuraRenderingService.prototype.unrenderFacet = function(cmp,facet){
     if (cmp._facetInfo) {
         var facetInfo = [];
         // If in the process of destroying
-        if(cmp.destroyed === -1) {
+        if(cmp.destroyed === -1 && cmp.getType()!=="aura:expression") {
             var existing = cmp._facetInfo;
             for(var i=0;i<existing.length;i++) {
                 if(existing[i].autoDestroy()) {

@@ -261,6 +261,17 @@ Aura.OverrideMap = function OverrideMap() {
             function(orig) {
                 HtmlComponent.prototype["helper"].dispatchAction = orig;
             }
+        ),
+
+        "ComponentService.indexComponent" : new Aura.Utils.Override($A.componentService, $A.componentService.indexComponent,
+            false,
+            function(bound) {
+                $A.componentService.indexComponent = bound;
+            },
+            function(orig) {
+                $A.componentService.indexComponent = orig;
+            }
         )
+
     };
 };

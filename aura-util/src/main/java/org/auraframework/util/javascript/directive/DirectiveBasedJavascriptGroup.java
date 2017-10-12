@@ -257,8 +257,8 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
             engineProdDebugSource = getSource("aura/resources/engine/engine_debug.js");
             engineCompatProdDebugSource = getSource("aura/resources/engine/engine_compat_debug.js");
 
-            compatHelpersSource = getSource("aura/resources/compat-helpers/compat-helpers.js");
-            compatHelpersMinSource = getSource("aura/resources/compat-helpers/compat-helpers.min.js");
+            compatHelpersSource = getSource("aura/resources/compat-helpers/compat.js");
+            compatHelpersMinSource = getSource("aura/resources/compat-helpers/compat.min.js");
         }  catch (MalformedURLException e) {}
 
         if (engineSource != null) {
@@ -270,11 +270,11 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         }
 
         if (compatHelpersSource != null && engineCompatSource != null) {
-            this.engineCompat = "try {\n" + engineCompatSource + "\n" + compatHelpersSource + "\n} catch (e) {}";
+            this.engineCompat = "try {\n" + compatHelpersSource + "\n" + engineCompatSource + "\n} catch (e) {}";
         }
 
         if (compatHelpersMinSource != null && engineCompatMinSource != null) {
-            this.engineCompatMin = "try { " + engineCompatMinSource + "\n" + compatHelpersMinSource + " } catch (e) {}";
+            this.engineCompatMin = "try { " + compatHelpersMinSource + "\n" + engineCompatMinSource + " } catch (e) {}";
         }
 
         if (engineProdDebugSource != null) {
@@ -282,7 +282,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         }
 
         if (compatHelpersSource != null && engineCompatProdDebugSource != null) {
-            this.engineCompatProdDebug = "try {\n" + engineCompatProdDebugSource + "\n" + compatHelpersSource + "\n} catch (e) {}";
+            this.engineCompatProdDebug = "try {\n" + compatHelpersSource + "\n" + engineCompatProdDebugSource + "\n} catch (e) {}";
         }
     }
 

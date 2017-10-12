@@ -127,8 +127,8 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
         // mock out getSource for engine to test compat
         Mockito.when(jg.getSource("aura/resources/engine/engine_compat.js")).thenReturn(mockEngineCompat);
         Mockito.when(jg.getSource("aura/resources/engine/engine_compat.min.js")).thenReturn(mockEngineCompat);
-        Mockito.when(jg.getSource("aura/resources/compat-helpers/compat-helpers.js")).thenReturn("");
-        Mockito.when(jg.getSource("aura/resources/compat-helpers/compat-helpers.min.js")).thenReturn("");
+        Mockito.when(jg.getSource("aura/resources/compat-helpers/compat.js")).thenReturn("");
+        Mockito.when(jg.getSource("aura/resources/compat-helpers/compat.min.js")).thenReturn("");
 
         File dir = getResourceFile("/testdata/javascript/generated/");
 

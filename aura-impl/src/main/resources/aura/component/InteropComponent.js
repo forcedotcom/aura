@@ -27,6 +27,7 @@ function InteropComponent(config) {
     this.componentDef = cmpDef;
     this.interopClass = cmpDef.interopClass;
     this.interopDef = cmpDef.interopDef;
+    this._customElement = null;
 
     this.rendered = false;
     this.inUnrender = false;
@@ -197,7 +198,7 @@ InteropComponent.prototype.setupMethods = function () {
                 return $A.warning('Methods are not available until the component is rendered');
             }
             var elmt = this.getElement();
-            return elmt[m].apply(null, arguments);
+            return elmt[m].apply(elmt, arguments);
         };
     });
 };
@@ -384,10 +385,20 @@ InteropComponent.prototype.attachOnChangeToElement = function (element) {
 };
 
 /**
- * Invoke the render method defined on the component.
+ * Render method for Interop components
+ * In order to match the lifecycles in Aura and Interop, we need to create a dummy element
+ * so the hook for DOM insertion do not get called yet.
+ * On the after render we will swap the original version
+ *
  * @export
  */
 InteropComponent.prototype.render = function () {
+    var element = document.createElement(this.componentDef.elementName);
+    this._customElement = this.setupInteropInstance();
+    return [element];
+};
+
+InteropComponent.prototype.setupInteropInstance = function () {
     var Ctor = this.interopClass;
     var element = $A.componentService.moduleEngine['createElement'](this.componentDef.elementName, { 'is': Ctor });
     var cmp = this;
@@ -409,9 +420,59 @@ InteropComponent.prototype.render = function () {
         }
     }.bind(this));
 
-
-    return [element];
+    return element;
 };
+
+/*
+ * In order to make lifecycle events match we need to swap the element in the afterRender
+ * so the insertion hooks get called once the element is on the DOM.
+*/
+InteropComponent.prototype.swapInteropElement = function (currentElement, newElement) {
+    this.disassociateElements();
+    currentElement.parentElement.replaceChild(newElement, currentElement);
+    this.associateElement(newElement);
+    var container = this.getContainer();
+    var parentCmp = container && container.getConcreteComponent();
+
+    if (parentCmp && parentCmp.elements && parentCmp.elements[0] === currentElement) {
+        parentCmp.elements[0] = newElement;
+        $A.renderingService.setMarker(parentCmp, newElement);
+    }
+
+};
+
+/**
+ * Invoke the afterRender method
+ * Most of the time the element will be in the DOM in the afterRender so we will swap the real one there
+ * For weird corner cases, we will wait til the parent its rendered.
+ * @export
+ */
+InteropComponent.prototype.afterRender = function () {
+    if (this.destroyed || this.elements === undefined) {
+        return;
+    }
+
+    var element = this.elements[0];
+    if (document.body.contains(element)) {
+        this.swapInteropElement(element, this._customElement);
+    } else {
+        this.owner.addEventHandler('markup://aura:valueRender', this.afterParentRender, 'default');
+    }
+};
+
+InteropComponent.prototype.afterParentRender = function () {
+    this.swapInteropElement(this.elements[0], this._customElement);
+    this.owner.removeEventHandler('markup://aura:valueRender', this.afterParentRender, 'default');
+};
+
+/**
+ * Invoke the unrender method
+ * @export
+ */
+ InteropComponent.prototype.getElement = function () {
+    return this._customElement;
+ };
+
 
 /**
  * Invoke the unrender method

@@ -1,6 +1,6 @@
 try {
-var mock='engine compat';console.log(mock);
 
+var mock='engine compat';console.log(mock);
 } catch (e) {}
 
 new function() {

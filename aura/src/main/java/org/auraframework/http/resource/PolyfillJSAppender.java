@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.auraframework.annotations.Annotations.ServiceComponent;
+//import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.http.BrowserCompatibilityService;
 import org.auraframework.system.AuraContext;
@@ -31,7 +31,8 @@ import org.polyfillservice.api.interfaces.UserAgentParserService;
 
 import javax.inject.Inject;
 
-@ServiceComponent
+// Disable polyfill injection since we include all of them (ES5+)
+// @ServiceComponent
 public class PolyfillJSAppender implements InlineJSAppender {
     private static final Map<String, String> POLYFILL_CACHE = new ConcurrentHashMap<>();
     private PolyfillService polyfillService;

@@ -22,26 +22,25 @@
 
 var freeze = Object.freeze;
 var seal = Object.seal;
-var keys = Object.keys;
 var create = Object.create;
 var assign = Object.assign;
 var defineProperty = Object.defineProperty;
 var getPrototypeOf = Object.getPrototypeOf;
-var setPrototypeOf = Object.setPrototypeOf;
 var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 var getOwnPropertyNames = Object.getOwnPropertyNames;
 var defineProperties = Object.defineProperties;
-var getOwnPropertySymbols = Object.getOwnPropertySymbols;
 var hasOwnProperty = Object.hasOwnProperty;
+var preventExtensions = Object.preventExtensions;
+var isExtensible = Object.isExtensible;
 var isArray = Array.isArray;
-var _a$1 = Array.prototype;
-var ArrayFilter = _a$1.filter;
-var ArraySlice = _a$1.slice;
-var ArraySplice = _a$1.splice;
-var ArrayIndexOf = _a$1.indexOf;
-var ArrayPush = _a$1.push;
-var ArrayMap = _a$1.map;
-var forEach = _a$1.forEach;
+var _a$2 = Array.prototype;
+var ArrayFilter = _a$2.filter;
+var ArraySlice = _a$2.slice;
+var ArraySplice = _a$2.splice;
+var ArrayIndexOf = _a$2.indexOf;
+var ArrayPush = _a$2.push;
+var ArrayMap = _a$2.map;
+var forEach = _a$2.forEach;
 function isUndefined(obj) {
     return obj === undefined;
 }
@@ -52,15 +51,9 @@ function isNull(obj) {
 function isFunction(obj) {
     return typeof obj === 'function';
 }
-function isObject(obj) {
-    return typeof obj === 'object';
-}
+
 function isString(obj) {
     return typeof obj === 'string';
-}
-
-function isPromise(obj) {
-    return typeof obj === 'object' && obj === Promise.resolve(obj);
 }
 
 // Few more execptions that are using the attribute name to match the property in lowercase.
@@ -90,107 +83,6 @@ var HTMLPropertyNamesWithLowercasedReflectiveAttributes = [
 // TODO: complete this list with Node properties
 // https://developer.mozilla.org/en-US/docs/Web/API/Node
 
-function getLinkedElement$1(classList) {
-    return classList[ViewModelReflection].vnode.elm;
-}
-// This needs some more work. ClassList is a weird DOM api because it
-// is a TokenList, but not an Array. For now, we are just implementing
-// the simplest one.
-// https://www.w3.org/TR/dom/#domtokenlist
-function ClassList(vm) {
-    defineProperty(this, ViewModelReflection, {
-        value: vm,
-        writable: false,
-        enumerable: false,
-        configurable: false,
-    });
-}
-ClassList.prototype = {
-    add: function () {
-        var vm = this[ViewModelReflection];
-        var cmpClasses = vm.cmpClasses;
-        var elm = getLinkedElement$1(this);
-        // Add specified class values. If these classes already exist in attribute of the element, then they are ignored.
-        forEach.call(arguments, function (className) {
-            className = className + '';
-            if (!cmpClasses[className]) {
-                cmpClasses[className] = true;
-                // this is not only an optimization, it is also needed to avoid adding the same
-                // class twice when the initial diffing algo kicks in without an old vm to track
-                // what was already added to the DOM.
-                if (vm.idx) {
-                    // we intentionally make a sync mutation here and also keep track of the mutation
-                    // for a possible rehydration later on without having to rehydrate just now.
-                    elm.classList.add(className);
-                }
-            }
-        });
-    },
-    remove: function () {
-        var vm = this[ViewModelReflection];
-        var cmpClasses = vm.cmpClasses;
-        var elm = getLinkedElement$1(this);
-        // Remove specified class values.
-        forEach.call(arguments, function (className) {
-            className = className + '';
-            if (cmpClasses[className]) {
-                cmpClasses[className] = false;
-                // this is not only an optimization, it is also needed to avoid removing the same
-                // class twice when the initial diffing algo kicks in without an old vm to track
-                // what was already added to the DOM.
-                if (vm.idx) {
-                    // we intentionally make a sync mutation here when needed and also keep track of the mutation
-                    // for a possible rehydration later on without having to rehydrate just now.
-                    var ownerClass = vm.vnode.data.class;
-                    // This is only needed if the owner is not forcing that class to be present in case of conflicts.
-                    if (isUndefined(ownerClass) || !ownerClass[className]) {
-                        elm.classList.remove(className);
-                    }
-                }
-            }
-        });
-    },
-    item: function (index) {
-        var vm = this[ViewModelReflection];
-        var cmpClasses = vm.cmpClasses;
-        // Return class value by index in collection.
-        return getOwnPropertyNames(cmpClasses)
-            .filter(function (className) { return cmpClasses[className + '']; })[index] || null;
-    },
-    toggle: function (className, force) {
-        var vm = this[ViewModelReflection];
-        var cmpClasses = vm.cmpClasses;
-        // When only one argument is present: Toggle class value; i.e., if class exists then remove it and return false, if not, then add it and return true.
-        // When a second argument is present: If the second argument evaluates to true, add specified class value, and if it evaluates to false, remove it.
-        if (arguments.length > 1) {
-            if (force) {
-                this.add(className);
-            }
-            else if (!force) {
-                this.remove(className);
-            }
-            return !!force;
-        }
-        if (cmpClasses[className]) {
-            this.remove(className);
-            return false;
-        }
-        this.add(className);
-        return true;
-    },
-    contains: function (className) {
-        var vm = this[ViewModelReflection];
-        var cmpClasses = vm.cmpClasses;
-        // Checks if specified class value exists in class attribute of the element.
-        return !!cmpClasses[className];
-    },
-    toString: function () {
-        var vm = this[ViewModelReflection];
-        var cmpClasses = vm.cmpClasses;
-        return getOwnPropertyNames(cmpClasses).filter(function (className) { return cmpClasses[className + '']; }).join(' ');
-    }
-};
-
 var topLevelContextSymbol = Symbol('Top Level Context');
 var currentContext = {};
 currentContext[topLevelContextSymbol] = true;
@@ -198,9 +90,61 @@ function establishContext(ctx) {
     currentContext = ctx;
 }
 
+function insert(vnode) {
+    var vm = vnode.vm;
+    if (vm.idx > 0) {
+        destroy(vnode); // moving the element from one place to another is observable via life-cycle hooks
+    }
+    addInsertionIndex(vm);
+    if (vm.isDirty) {
+        // this code path guarantess that when patching the custom element for the first time,
+        // the body is computed only after the element is in the DOM, otherwise the hooks
+        // for any children's vnode are not going to be useful.
+        rehydrate(vm);
+    }
+}
+function update(oldVnode, vnode) {
+    var vm = vnode.vm;
+    // TODO: we don't really need this block anymore, but it will require changes
+    // on many tests that are just patching the element directly.
+    if (vm.idx === 0 && !vnode.isRoot) {
+        // when inserting a root element, or when reusing a DOM element for a new
+        // component instance, the insert() hook is never called because the element
+        // was already in the DOM before creating the instance, and diffing the
+        // vnode, for that, we wait until the patching process has finished, and we
+        // use the postpatch() hook to trigger the connectedCallback logic.
+        insert(vnode);
+        // Note: we don't have to worry about destroy() hook being called before this
+        // one because they never happen in the same patching mechanism, only one
+        // of them is called. In the case of the insert() hook, we use the value of `idx`
+        // to dedupe the calls since they both can happen in the same patching process.
+    }
+    if (vm.isDirty) {
+        // this code path guarantess that when patching the custom element the body is computed only after the element is in the DOM
+        rehydrate(vm);
+    }
+}
+function destroy(vnode) {
+    var vm = vnode.vm;
+    removeInsertionIndex(vm);
+    // just in case it comes back, with this we guarantee re-rendering it
+    vm.isDirty = true;
+    clearListeners(vm);
+    // At this point we need to force the removal of all children because
+    // we don't have a way to know that children custom element were removed
+    // from the DOM. Once we move to use realm custom elements, we can remove this.
+    patchShadowRoot(vm, []);
+}
+var lifeCycleHooks = {
+    insert: insert,
+    update: update,
+    destroy: destroy,
+};
+
 var nextTickCallbackQueue = [];
 var SPACE_CHAR = 32;
 var EmptyObject = seal(create(null));
+var EmptyArray = seal([]);
 function flushCallbackQueue() {
     var callbacks = nextTickCallbackQueue;
     nextTickCallbackQueue = []; // reset to a new queue
@@ -215,17 +159,7 @@ function addCallbackToNextTick(callback) {
     // TODO: eventually, we might want to have priority when inserting callbacks
     ArrayPush.call(nextTickCallbackQueue, callback);
 }
-var CAMEL_REGEX = /-([a-z])/g;
-var attrNameToPropNameMap = create(null);
-function getPropNameFromAttrName(attrName) {
-    var propName = attrNameToPropNameMap[attrName];
-    if (!propName) {
-        propName = attrName.replace(CAMEL_REGEX, function (g) { return g[1].toUpperCase(); });
-        attrNameToPropNameMap[attrName] = propName;
-    }
-    return propName;
-}
-var CAPS_REGEX = /[A-Z]/g;
+
 /**
  * This dictionary contains the mapping between property names
  * and the corresponding attribute name. This helps to trigger observable attributes.
@@ -239,14 +173,7 @@ var propNameToAttributeNameMap = {
 HTMLPropertyNamesWithLowercasedReflectiveAttributes.forEach(function (propName) {
     propNameToAttributeNameMap[propName] = propName.toLowerCase();
 });
-function getAttrNameFromPropName(propName) {
-    var attrName = propNameToAttributeNameMap[propName];
-    if (!attrName) {
-        attrName = propName.replace(CAPS_REGEX, function (match) { return '-' + match.toLowerCase(); });
-        propNameToAttributeNameMap[propName] = attrName;
-    }
-    return attrName;
-}
+
 function toAttributeValue(raw) {
     // normalizing attrs from compiler into HTML global attributes
     if (raw === true) {
@@ -255,7 +182,7 @@ function toAttributeValue(raw) {
     else if (raw === false) {
         raw = null;
     }
-    return raw !== null ? raw + '' : null;
+    return raw != null ? raw + '' : null; // null and undefined should always produce null
 }
 function noop() { }
 var classNameToClassMap = create(null);
@@ -282,91 +209,12 @@ function getMapFromClassName(className) {
     return map;
 }
 
-var hooks = ['wiring', 'rehydrated', 'connected', 'disconnected', 'piercing'];
-/* eslint-enable */
-var Services = create(null);
-function register(service) {
-    for (var i = 0; i < hooks.length; ++i) {
-        var hookName = hooks[i];
-        if (hookName in service) {
-            var l = Services[hookName];
-            if (isUndefined(l)) {
-                Services[hookName] = l = [];
-            }
-            l.push(service[hookName]);
-        }
-    }
-}
-function invokeServiceHook(vm, cbs) {
-    var component = vm.component, data = vm.vnode.data, def = vm.def, context = vm.context;
-    for (var i = 0, len = cbs.length; i < len; ++i) {
-        cbs[i].call(undefined, component, data, def, context);
-    }
-}
-
-function insert(vnode) {
-    var vm = vnode.vm;
-    if (vm.idx > 0) {
-        destroy(vnode); // moving the element from one place to another is observable via life-cycle hooks
-    }
-    addInsertionIndex(vm);
-    var isDirty = vm.isDirty, connectedCallback = vm.component.connectedCallback;
-    if (isDirty) {
-        // this code path guarantess that when patching the custom element for the first time,
-        // the body is computed only after the element is in the DOM, otherwise the hooks
-        // for any children's vnode are not going to be useful.
-        rehydrate(vm);
-    }
-    var connected = Services.connected;
-    if (connected) {
-        addCallbackToNextTick(function () { return invokeServiceHook(vm, connected); });
-    }
-    if (connectedCallback && connectedCallback !== noop) {
-        addCallbackToNextTick(function () { return invokeComponentMethod(vm, 'connectedCallback'); });
-    }
-}
-function destroy(vnode) {
-    var vm = vnode.vm;
-    removeInsertionIndex(vm);
-    // just in case it comes back, with this we guarantee re-rendering it
-    vm.isDirty = true;
-    var disconnected = Services.disconnected;
-    var disconnectedCallback = vm.component.disconnectedCallback;
-    clearListeners(vm);
-    if (disconnected) {
-        addCallbackToNextTick(function () { return invokeServiceHook(vm, disconnected); });
-    }
-    if (disconnectedCallback && disconnectedCallback !== noop) {
-        addCallbackToNextTick(function () { return invokeComponentMethod(vm, 'disconnectedCallback'); });
-    }
-}
-function postpatch(oldVnode, vnode) {
-    // TODO: we don't really need this anymore, but it will require changes
-    // on many tests that are just patching the element directly.
-    if (vnode.vm.idx === 0 && !vnode.isRoot) {
-        // when inserting a root element, or when reusing a DOM element for a new
-        // component instance, the insert() hook is never called because the element
-        // was already in the DOM before creating the instance, and diffing the
-        // vnode, for that, we wait until the patching process has finished, and we
-        // use the postpatch() hook to trigger the connectedCallback logic.
-        insert(vnode);
-        // Note: we don't have to worry about destroy() hook being called before this
-        // one because they never happen in the same patching mechanism, only one
-        // of them is called. In the case of the insert() hook, we use the value of `idx`
-        // to dedupe the calls since they both can happen in the same patching process.
-    }
-}
-var lifeCycleHooks = {
-    insert: insert,
-    destroy: destroy,
-    postpatch: postpatch,
-};
-
 var CHAR_S = 115;
 var CHAR_V = 118;
 var CHAR_G = 103;
 var EmptyData = create(null);
 var NamespaceAttributeForSVG = 'http://www.w3.org/2000/svg';
+var SymbolIterator = Symbol.iterator;
 function addNS(data, children, sel) {
     data.ns = NamespaceAttributeForSVG;
     if (isUndefined(children) || sel === 'foreignObject') {
@@ -416,24 +264,36 @@ function c(sel, Ctor, data) {
     data = { hook: lifeCycleHooks, key: key, slotset: slotset, attrs: attrs, on: on, _props: _props };
     data.class = classMap || (className && getMapFromClassName(className));
     data.style = styleMap || (style && style + '');
-    return v(sel, data, [], undefined, undefined, Ctor);
+    return v(sel, data, EmptyArray, undefined, undefined, Ctor);
 }
 // [i]terable node
-function i(items, factory) {
-    var len = (items && items.length) || 0; // supporting arrays and objects alike
-    var last = len ? (len - 1) : 0;
+function i(iterable, factory) {
     var list = [];
-    var _loop_1 = function (i_2) {
-        var vnode = factory(items[i_2], i_2, i_2 === 0, i_2 === last);
+    if (isUndefined(iterable) || iterable === null) {
+        return list;
+    }
+    var iterator = iterable[SymbolIterator]();
+    var next = iterator.next();
+    var i = 0;
+    var value = next.value, last = next.done;
+    var _loop_1 = function () {
+        // implementing a look-back-approach because we need to know if the element is the last
+        next = iterator.next();
+        last = next.done;
+        // template factory logic based on the previous collected value
+        var vnode = factory(value, i, i === 0, last);
         if (isArray(vnode)) {
             ArrayPush.apply(list, vnode);
         }
         else {
             ArrayPush.call(list, vnode);
         }
+        // preparing next value
+        i += 1;
+        value = next.value;
     };
-    for (var i_2 = 0; i_2 < len; i_2 += 1) {
-        _loop_1(i_2);
+    while (last === false) {
+        _loop_1();
     }
     return list;
 }
@@ -443,8 +303,8 @@ function i(items, factory) {
 function f(items) {
     var len = items.length;
     var flattened = [];
-    for (var i_3 = 0; i_3 < len; i_3 += 1) {
-        var item = items[i_3];
+    for (var i_2 = 0; i_2 < len; i_2 += 1) {
+        var item = items[i_2];
         if (isArray(item)) {
             ArrayPush.apply(flattened, item);
         }
@@ -489,322 +349,6 @@ var api = Object.freeze({
 	b: b
 });
 
-function compat(fn) {
-    fn();
-}
-
-/*eslint-enable*/
-var TargetSlot = Symbol();
-var MembraneSlot = Symbol();
-function isReplicable(value) {
-    var type = typeof value;
-    return value && (type === 'object' || type === 'function');
-}
-function getReplica(membrane, value) {
-    if (isNull(value)) {
-        return value;
-    }
-    value = unwrap(value);
-    if (!isReplicable(value)) {
-        return value;
-    }
-    var cells = membrane.cells;
-    var r = cells.get(value);
-    if (r) {
-        return r;
-    }
-    var replica = new XProxy(value, membrane); // eslint-disable-line no-undef
-    cells.set(value, replica);
-    return replica;
-}
-var Membrane = (function () {
-    function Membrane(handler) {
-        this.handler = handler;
-        this.cells = new WeakMap();
-    }
-    Membrane.prototype.get = function (target, key) {
-        if (key === TargetSlot) {
-            return target;
-        }
-        else if (key === MembraneSlot) {
-            return this;
-        }
-        return this.handler.get(this, target, key);
-    };
-    Membrane.prototype.set = function (target, key, newValue) {
-        return this.handler.set(this, target, key, newValue);
-    };
-    Membrane.prototype.deleteProperty = function (target, key) {
-        if (key === TargetSlot) {
-            return false;
-        }
-        return this.handler.deleteProperty(this, target, key);
-    };
-    Membrane.prototype.apply = function (target, thisArg, argumentsList) {
-        thisArg = unwrap(thisArg);
-        argumentsList = unwrap(argumentsList);
-        if (isArray(argumentsList)) {
-            argumentsList = ArrayMap.call(argumentsList, unwrap);
-        }
-        return this.handler.apply(this, target, thisArg, argumentsList);
-    };
-    Membrane.prototype.construct = function (target, argumentsList, newTarget) {
-        argumentsList = unwrap(argumentsList);
-        if (isArray(argumentsList)) {
-            argumentsList = ArrayMap.call(argumentsList, unwrap);
-        }
-        return this.handler.construct(this, target, argumentsList, newTarget);
-    };
-    return Membrane;
-}());
-function unwrap(replicaOrAny) {
-    return (replicaOrAny && replicaOrAny[TargetSlot]) || replicaOrAny;
-}
-
-/*eslint-enable*/
-function getLinkedMembrane(replicaOrAny) {
-    var target = unwrap(replicaOrAny);
-    if (target !== replicaOrAny) {
-        return replicaOrAny[MembraneSlot];
-    }
-}
-var lastRevokeFn;
-var ProxyCompat = function Proxy(target, handler) {
-    var targetIsFunction = isFunction(target);
-    var targetIsArray = isArray(target);
-    var get = handler.get, set = handler.set, apply = handler.apply, construct = handler.construct;
-    // Construct revoke function, and set lastRevokeFn so that Proxy.revocable can steal it.
-    // The caller might get the wrong revoke function if a user replaces or wraps XProxy
-    // to call itself, but that seems unlikely especially when using the polyfill.
-    var throwRevoked = function (trap) { }; // eslint-disable-line no-unused-vars
-    lastRevokeFn = function () {
-        throwRevoked = function (trap) {
-            throw new TypeError("Cannot perform '" + trap + "' on a proxy that has been revoked");
-        };
-    };
-    // Define proxy as Object, or Function (if either it's callable, or apply is set).
-    var proxy = this; // reusing the already created object, eventually the prototype will be resetted
-    if (targetIsFunction) {
-        proxy = function Proxy() {
-            var usingNew = (this && this.constructor === proxy);
-            var args = ArraySlice.call(arguments);
-            throwRevoked(usingNew ? 'construct' : 'apply');
-            if (usingNew) {
-                return construct.call(handler, target, args, this);
-            }
-            else {
-                return apply.call(handler, target, this, args);
-            }
-        };
-    }
-    function linkProperty(target, handler, key, enumerable) {
-        // arrays are usually mutable, but objects are not... normally, in compat mode they will use the accessor keys
-        // instead of interacting with the object directly, but if they bypass that for some reason, having the right
-        // value for configurable helps to detect those early errors.
-        var configurable = targetIsArray;
-        var desc = {
-            enumerable: enumerable,
-            configurable: configurable,
-            get: function () {
-                throwRevoked('get');
-                return get.call(handler, target, key);
-            },
-            set: function (value) {
-                throwRevoked('set');
-                var result = set.call(handler, target, key, value);
-                if (result === false) {
-                    throw new TypeError("'set' on proxy: trap returned falsish for property '" + key + "'");
-                }
-            },
-        };
-        Object.defineProperty(proxy, key, desc);
-    }
-    // Clone enumerable properties
-    for (var key in target) {
-        linkProperty(target, handler, key, true);
-    }
-    // Set the prototype, or clone all prototype methods (always required if a getter is provided).
-    var proto = getPrototypeOf(target);
-    setPrototypeOf(proxy, proto);
-    if (targetIsArray) {
-        linkProperty(target, handler, 'length', false);
-    }
-    linkProperty(target, handler, MembraneSlot, false);
-    linkProperty(target, handler, TargetSlot, false);
-    return proxy;
-};
-ProxyCompat.revocable = function (target, handler) {
-    var p = new XProxy(target, handler);
-    return {
-        proxy: p,
-        revoke: lastRevokeFn,
-    };
-};
-function getKeyCompat(replicaOrAny, key) {
-    var membrane = getLinkedMembrane(replicaOrAny);
-    return membrane ? membrane.get(unwrap(replicaOrAny), key) : replicaOrAny[key];
-}
-function callKeyCompat(replicaOrAny, key) {
-    var args = [];
-    for (var _i = 2; _i < arguments.length; _i++) {
-        args[_i - 2] = arguments[_i];
-    }
-    var membrane = getLinkedMembrane(replicaOrAny);
-    var context = membrane ? unwrap(replicaOrAny) : replicaOrAny;
-    var fn = membrane ? membrane.get(context, key) : replicaOrAny[key];
-    return fn.apply(replicaOrAny, args);
-}
-function setKeyCompat(replicaOrAny, key, newValue, originalReturnValue) {
-    var membrane = getLinkedMembrane(replicaOrAny);
-    if (membrane) {
-        membrane.set(unwrap(replicaOrAny), key, newValue);
-    }
-    else {
-        // non-proxified assignment
-        replicaOrAny[key] = newValue;
-    }
-    return arguments.length === 4 ? originalReturnValue : newValue;
-}
-function deleteKeyCompat(replicaOrAny, key) {
-    var membrane = getLinkedMembrane(replicaOrAny);
-    if (membrane) {
-        membrane.deleteProperty(unwrap(replicaOrAny), key);
-        return;
-    }
-    // non-profixied delete
-    delete replicaOrAny[key];
-}
-var inOperator = typeof Symbol() === 'object' ? function inOperatorCompat(obj, key) {
-    // proto chain check because this is using a broken polyfill
-    // https://github.com/Financial-Times/polyfill-service/blob/master/polyfills/Symbol/
-    // In this case, because this polyfill is assing all the stuff to Object.prototype to keep
-    // all the other invariants of Symbols, we need to do some manual checks here for the slow patch.
-    if (key && key.constructor === Symbol) {
-        while (obj) {
-            if (getOwnPropertySymbols(obj).indexOf(key) !== -1) {
-                return true;
-            }
-            obj = getPrototypeOf(obj);
-        }
-        return false;
-    }
-    return key in obj;
-} : function inOperator(obj, key) {
-    return key in obj;
-};
-function inKeyCompat(replicaOrAny, key) {
-    var membrane = getLinkedMembrane(replicaOrAny);
-    if (membrane) {
-        return membrane.has(unwrap(replicaOrAny), key);
-    }
-    return inOperator(replicaOrAny, key);
-}
-function iterableKeyCompat(replicaOrAny) {
-    var membrane = getLinkedMembrane(replicaOrAny);
-    var target = membrane ? unwrap(replicaOrAny) : replicaOrAny;
-    var keyedObj = create(null);
-    for (var i in target) {
-        keyedObj[i] = void 0;
-    }
-    return keyedObj;
-}
-// transpilation
-// 1. member expressions e.g.: `obj.x.y.z` => `getKey(obj, 'x', 'y', 'z')`
-// 2. assignment of member expressions e.g.: `obj.x.y.z = 1;` => `setKey(getKey(obj, 'x', 'y'), 'z', 1)`
-// 3. delete operator e.g.: `delete obj.x.y.z` => `deleteKey(getKey(obj, 'x', 'y'), 'z')`
-// 4. in operator e.g.: `"z" in obj.x.y` => `inKey(getKey(obj, 'x', 'y'), 'z')`
-// 5. for in operator `for (let i in obj)` => `for (let i in iterableKey(obj))`
-// patches
-// [*] Object.prototype.hasOwnProperty should be patched as a general rule
-// [ ] Object.propertyIsEnumerable should be patched
-// [*] Array.isArray
-function compatIsArray(replicaOrAny) {
-    return isArray(unwrap(replicaOrAny));
-}
-function compatKeys(replicaOrAny) {
-    return keys(unwrap(replicaOrAny));
-}
-function compatGetOwnPropertyNames(replicaOrAny) {
-    return getOwnPropertyNames(unwrap(replicaOrAny));
-}
-function compatHasOwnProperty(key) {
-    var replicaOrAny = this;
-    return hasOwnProperty.call(unwrap(replicaOrAny), key);
-}
-function compatAssign(replicaOrAny) {
-    if (replicaOrAny == null) {
-        throw new TypeError('Cannot convert undefined or null to object');
-    }
-    var to = Object(unwrap(replicaOrAny));
-    for (var index = 1; index < arguments.length; index++) {
-        var nextSource = arguments[index];
-        if (nextSource != null) {
-            var iterator = unwrap(nextSource);
-            for (var nextKey in iterator) {
-                // Avoid bugs when hasOwnProperty is shadowed
-                if (hasOwnProperty.call(iterator, nextKey)) {
-                    exports.setKey(to, nextKey, exports.getKey(nextSource, nextKey));
-                }
-            }
-        }
-    }
-    return to;
-}
-// trap `preventExtensions` can be covered by a patched version of:
-// [ ] Object.preventExtensions()
-// [ ] Reflect.preventExtensions()
-// trap `getOwnPropertyDescriptor` can be covered by a patched version of:
-// [ ] Object.getOwnPropertyDescriptor()
-// [ ] Reflect.getOwnPropertyDescriptor()
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/defineProperty
-// trap `defineProperty` can be covered by a patched version of:
-// [ ] Object.defineProperty()
-// [ ] Reflect.defineProperty()
-// trap `deleteProperty` can be covered by the transpilation and the patched version of:
-// [ ] Reflect.deleteProperty()
-// trap `ownKeys` can be covered by a patched version of:
-// [*] Object.getOwnPropertyNames()
-// [ ] Object.getOwnPropertySymbols()
-// [*] Object.keys()
-// [ ] Reflect.ownKeys()
-// trap `isExtensible` can be covered by a patched version of:
-// [ ] Object.isExtensible()
-// [ ] Reflect.isExtensible()
-// trap `setPrototypeOf` can be covered by a patched version of:
-// [ ] Object.setPrototypeOf()
-// [ ] Reflect.setPrototypeOf()
-var XProxy = typeof Proxy !== "undefined" ? Proxy : undefined;
-
-
-
-
-
-
-// enable/disable is meant to be used by our test infrastructure only
-function enableCompatMode() {
-    XProxy = ProxyCompat;
-    exports.getKey = getKeyCompat;
-    exports.callKey = callKeyCompat;
-    exports.setKey = setKeyCompat;
-    exports.deleteKey = deleteKeyCompat;
-    exports.inKey = inKeyCompat;
-    exports.iterableKey = iterableKeyCompat;
-    Array.isArray = compatIsArray;
-    assign(Object, {
-        keys: compatKeys,
-        getOwnPropertyNames: compatGetOwnPropertyNames,
-        assign: compatAssign,
-    });
-    assign(Object.prototype, {
-        hasOwnProperty: compatHasOwnProperty,
-    });
-}
-
-// initialization
-compat(function () {
-    enableCompatMode();
-});
-
 var EmptySlots = create(null);
 function getSlotsetValue(slotset, slotName) {
     // TODO: mark slotName as reactive
@@ -831,42 +375,10 @@ function evaluateTemplate(vm, html) {
         context.tplCache = create(null);
         vm.cmpTemplate = html;
     }
-    var _b = XProxy.revocable(cmpSlots, slotsetProxyHandler), slotset = _b.proxy, slotsetRevoke = _b.revoke;
+    var _b = Proxy.revocable(cmpSlots, slotsetProxyHandler), slotset = _b.proxy, slotsetRevoke = _b.revoke;
     var vnodes = html.call(undefined, api, component, slotset, context.tplCache);
     slotsetRevoke();
     return vnodes;
-}
-
-function attemptToEvaluateResolvedTemplate(vm, html, originalPromise) {
-    var context = vm.context;
-    if (originalPromise !== context.tplPromise) {
-        // resolution of an old promise that is not longer relevant, ignoring it.
-        return;
-    }
-    if (isFunction(html)) {
-        context.tplResolvedValue = html;
-        // forcing the vm to be dirty so it can render its content.
-        vm.isDirty = true;
-        rehydrate(vm);
-    }
-    else if (!isUndefined(html)) {
-    }
-    // if the promise resolves to `undefined`, do nothing...
-}
-function deferredTemplate(vm, html) {
-    var context = vm.context;
-    var tplResolvedValue = context.tplResolvedValue, tplPromise = context.tplPromise;
-    if (html !== tplPromise) {
-        context.tplPromise = html;
-        context.tplResolvedValue = undefined;
-        html.then(function (fn) { return attemptToEvaluateResolvedTemplate(vm, fn, html); });
-    }
-    else if (tplResolvedValue) {
-        // if multiple invokes to render() return the same promise, we can rehydrate using the
-        // underlaying resolved value of that promise.
-        return evaluateTemplate(vm, tplResolvedValue);
-    }
-    return [];
 }
 
 var isRendering = false;
@@ -924,9 +436,6 @@ function invokeComponentRenderMethod(vm) {
         if (isFunction(html)) {
             result = evaluateTemplate(vm, html);
         }
-        else if (isPromise(html)) {
-            result = deferredTemplate(vm, html);
-        }
         else if (!isUndefined(html)) {
         }
     }
@@ -951,7 +460,7 @@ function invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValu
     establishContext(context);
     var error;
     try {
-        component.attributeChangedCallback(attrName, oldValue, newValue);
+        component.attributeChangedCallback(attrName, toAttributeValue(oldValue), toAttributeValue(newValue));
     }
     catch (e) {
         error = e;
@@ -962,106 +471,98 @@ function invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValu
     }
 }
 
-var TargetToReactiveRecordMap = new WeakMap();
-function notifyListeners(target, key) {
-    var reactiveRecord = TargetToReactiveRecordMap.get(target);
-    if (reactiveRecord) {
-        var value = reactiveRecord[key];
-        if (value) {
-            var len = value.length;
-            for (var i = 0; i < len; i += 1) {
-                var vm = value[i];
-                if (!vm.isDirty) {
-                    markComponentAsDirty(vm);
-                    scheduleRehydration(vm);
-                }
+var hooks = ['wiring', 'rehydrated', 'connected', 'disconnected', 'piercing'];
+/* eslint-enable */
+var Services = create(null);
+function register(service) {
+    for (var i = 0; i < hooks.length; ++i) {
+        var hookName = hooks[i];
+        if (hookName in service) {
+            var l = Services[hookName];
+            if (isUndefined(l)) {
+                Services[hookName] = l = [];
             }
+            l.push(service[hookName]);
         }
     }
 }
-function subscribeToSetHook(vm, target, key) {
-    var reactiveRecord = TargetToReactiveRecordMap.get(target);
-    if (isUndefined(reactiveRecord)) {
-        var newRecord = create(null);
-        reactiveRecord = newRecord;
-        TargetToReactiveRecordMap.set(target, newRecord);
-    }
-    var value = reactiveRecord[key];
-    if (isUndefined(value)) {
-        value = [];
-        reactiveRecord[key] = value;
-    }
-    else if (value[0] === vm) {
-        return; // perf optimization considering that most subscriptions will come from the same vm
-    }
-    if (ArrayIndexOf.call(value, vm) === -1) {
-        ArrayPush.call(value, vm);
-        // we keep track of the sets that vm is listening from to be able to do some clean up later on
-        ArrayPush.call(vm.deps, value);
+function invokeServiceHook(vm, cbs) {
+    var component = vm.component, data = vm.vnode.data, def = vm.def, context = vm.context;
+    for (var i = 0, len = cbs.length; i < len; ++i) {
+        cbs[i].call(undefined, component, data, def, context);
     }
 }
 
 /*eslint-enable*/
-var ReplicableToReplicaMap = new WeakMap();
-function propertyGetter(target, key) {
-    if (key === TargetSlot) {
-        return target;
-    }
-    else if (key === MembraneSlot) {
-        return propertyProxyHandler;
-    }
-    var value = target[key];
-    if (isRendering && vmBeingRendered) {
-        subscribeToSetHook(vmBeingRendered, target, key);
-    }
-    return (value && isObject(value)) ? getPropertyProxy(value) : value;
+var TargetSlot = Symbol();
+var MembraneSlot = Symbol();
+function isReplicable(value) {
+    var type = typeof value;
+    return value && (type === 'object' || type === 'function');
 }
-function propertySetter(target, key, value) {
-    if (isRendering) {
-        return false;
-    }
-    var oldValue = target[key];
-    if (oldValue !== value) {
-        target[key] = value;
-        notifyListeners(target, key);
-    }
-    else if (key === 'length' && isArray(target)) {
-        // fix for issue #236: push will add the new index, and by the time length
-        // is updated, the internal length is already equal to the new length value
-        // therefore, the oldValue is equal to the value. This is the forking logic
-        // to support this use case.
-        notifyListeners(target, key);
-    }
-    return true;
-}
-function propertyDelete(target, key) {
-    delete target[key];
-    notifyListeners(target, key);
-    return true;
-}
-var propertyProxyHandler = {
-    get: propertyGetter,
-    set: propertySetter,
-    deleteProperty: propertyDelete,
-    apply: function (target /*, thisArg: any, argArray?: any*/) {
-    },
-    construct: function (target /*, argArray: any, newTarget?: any*/) {
-    },
-};
-function getPropertyProxy(value) {
-    // TODO: Provide a holistic way to deal with built-ins, right now we just care ignore Date
-    if (isNull(value) || value.constructor === Date) {
+function getReplica(membrane, value) {
+    if (isNull(value)) {
         return value;
     }
     value = unwrap(value);
-    var proxy = ReplicableToReplicaMap.get(value);
-    if (proxy) {
-        return proxy;
+    if (!isReplicable(value)) {
+        return value;
     }
-    proxy = new XProxy(value, propertyProxyHandler);
-    ReplicableToReplicaMap.set(value, proxy);
-    return proxy;
+    var cells = membrane.cells;
+    var r = cells.get(value);
+    if (r) {
+        return r;
+    }
+    var replica = new Proxy(value, membrane); // eslint-disable-line no-undef
+    cells.set(value, replica);
+    return replica;
 }
+var Membrane = (function () {
+    function Membrane(handler) {
+        this.handler = handler;
+        this.cells = new WeakMap();
+    }
+    Membrane.prototype.get = function (target, key) {
+        if (key === TargetSlot) {
+            return target;
+        }
+        else if (key === MembraneSlot) {
+            return this;
+        }
+        return this.handler.get(this, target, key);
+    };
+    Membrane.prototype.set = function (target, key, newValue) {
+        return this.handler.set(this, target, key, newValue);
+    };
+    Membrane.prototype.deleteProperty = function (target, key) {
+        if (key === TargetSlot) {
+            return false;
+        }
+        return this.handler.deleteProperty(this, target, key);
+    };
+    Membrane.prototype.apply = function (target, thisArg, argumentsList) {
+        thisArg = unwrap(thisArg);
+        argumentsList = unwrap(argumentsList);
+        if (isArray(argumentsList)) {
+            argumentsList = ArrayMap.call(argumentsList, unwrap);
+        }
+        return this.handler.apply(this, target, thisArg, argumentsList);
+    };
+    Membrane.prototype.construct = function (target, argumentsList, newTarget) {
+        argumentsList = unwrap(argumentsList);
+        if (isArray(argumentsList)) {
+            argumentsList = ArrayMap.call(argumentsList, unwrap);
+        }
+        return this.handler.construct(this, target, argumentsList, newTarget);
+    };
+    return Membrane;
+}());
+// TODO: we are using a funky and leaky abstraction here to try to identify if
+// the proxy is a compat proxy, and define the unwrap method accordingly.
+var getKey = Proxy.getKey;
+var unwrap = getKey ?
+    function (replicaOrAny) { return (replicaOrAny && getKey(replicaOrAny, TargetSlot)) || replicaOrAny; }
+    : function (replicaOrAny) { return (replicaOrAny && replicaOrAny[TargetSlot]) || replicaOrAny; };
 
 /* eslint-enable */
 function piercingHook(membrane, target, key, value) {
@@ -1131,53 +632,6 @@ function createComponent(vm, Ctor) {
     vmBeingConstructed = vmBeingConstructedInception;
 }
 function linkComponent(vm) {
-    var elm = vm.vnode.elm, component = vm.component, _a = vm.def, publicMethodsConfig = _a.methods, publicProps = _a.props;
-    var descriptors = {};
-    var _loop_1 = function (key) {
-        var getter = (function (component, key) {
-            var args = [];
-            for (var _i = 2; _i < arguments.length; _i++) {
-                args[_i - 2] = arguments[_i];
-            }
-            return component[key].apply(component, args);
-        }).bind(undefined, component, key);
-        descriptors[key] = {
-            get: function () { return getter; }
-        };
-    };
-    // expose public methods as props on the Element
-    for (var key in publicMethodsConfig) {
-        _loop_1(key);
-    }
-    for (var key in publicProps) {
-        var getter = publicProps[key].getter;
-        if (isUndefined(getter)) {
-            // default getter
-            getter = (function runGetter(vm, key) {
-                return this[key];
-            }).bind(component, vm, key);
-        }
-        else {
-            // original getter
-            getter = getter.bind(component);
-        }
-        var setter = (function runSetter(vm, key, value) {
-            if (vm.vnode.isRoot) {
-                // logic for setting new properties of the element directly from the DOM
-                // will only be allowed for root elements created via createElement()
-                // proxifying before storing it is a must for public props
-                value = isObject(value) ? getPropertyProxy(value) : value;
-                updateComponentProp(vm, key, value);
-            }
-            else {
-            }
-        }).bind(component, vm, key);
-        descriptors[key] = {
-            get: getter,
-            set: setter,
-        };
-    }
-    defineProperties(elm, descriptors);
     // wiring service
     var wire = vm.def.wire;
     if (wire) {
@@ -1199,58 +653,13 @@ function clearListeners(vm) {
         deps.length = 0;
     }
 }
-function updateComponentProp(vm, propName, newValue) {
-    var cmpProps = vm.cmpProps, _a = vm.def, publicProps = _a.props, observedAttrs = _a.observedAttrs;
-    var propDef = publicProps[propName];
-    if (isUndefined(propDef)) {
-        // TODO: this should never really happen because the compiler should always validate
-        return;
-    }
-    var setter = propDef.setter;
-    if (setter) {
-        setter.call(vm.component, newValue);
-        return;
-    }
-    var oldValue = cmpProps[propName];
-    if (oldValue !== newValue) {
-        cmpProps[propName] = newValue;
-        var attrName = getAttrNameFromPropName(propName);
-        if (attrName in observedAttrs) {
-            invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
-        }
-        notifyListeners(cmpProps, propName);
-    }
-}
-function resetComponentProp(vm, propName) {
-    var cmpProps = vm.cmpProps, _a = vm.def, publicPropsConfig = _a.props, observedAttrs = _a.observedAttrs;
-    var propDef = publicPropsConfig[propName];
-    if (isUndefined(propDef)) {
-        // not need to log the error here because we will do it on updateComponentProp()
-        return;
-    }
-    var newValue = undefined;
-    var setter = propDef.setter;
-    if (setter) {
-        setter.call(vm.component, newValue);
-        return;
-    }
-    var oldValue = cmpProps[propName];
-    if (oldValue !== newValue) {
-        cmpProps[propName] = newValue;
-        var attrName = getAttrNameFromPropName(propName);
-        if (attrName in observedAttrs) {
-            invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
-        }
-        notifyListeners(cmpProps, propName);
-    }
-}
 function createComponentListener() {
     return function handler(event) {
         dispatchComponentEvent(handler.vm, event);
     };
 }
 function addComponentEventListener(vm, eventName, newHandler) {
-    var cmpEvents = vm.cmpEvents, cmpListener = vm.cmpListener;
+    var cmpEvents = vm.cmpEvents, cmpListener = vm.cmpListener, vmIdx = vm.idx;
     if (isUndefined(cmpEvents)) {
         // this piece of code must be in sync with modules/component-events
         vm.cmpEvents = cmpEvents = create(null);
@@ -1262,7 +671,7 @@ function addComponentEventListener(vm, eventName, newHandler) {
         // this is not only an optimization, it is also needed to avoid adding the same
         // listener twice when the initial diffing algo kicks in without an old vm to track
         // what was already added to the DOM.
-        if (!vm.isDirty) {
+        if (!vm.isDirty || vmIdx > 0) {
             // if the element is already in the DOM and rendered, we intentionally make a sync mutation
             // here and also keep track of the mutation for a possible rehydration later on without having
             // to rehydrate just now.
@@ -1335,35 +744,441 @@ function renderComponent(vm) {
     clearListeners(vm);
     var vnodes = invokeComponentRenderMethod(vm);
     vm.isDirty = false;
-    vm.fragment = vnodes;
-    var renderedCallback = vm.component.renderedCallback;
-    if (renderedCallback && renderedCallback !== noop) {
-        addCallbackToNextTick(function () { return invokeComponentMethod(vm, 'renderedCallback'); });
-    }
     var rehydrated = Services.rehydrated;
     if (rehydrated) {
         addCallbackToNextTick(function () { return invokeServiceHook(vm, rehydrated); });
     }
+    return vnodes;
 }
 function markComponentAsDirty(vm) {
     vm.isDirty = true;
 }
 
-var _a$2 = Element.prototype;
-var querySelector = _a$2.querySelector;
-var querySelectorAll = _a$2.querySelectorAll;
+var TargetToReactiveRecordMap = new WeakMap();
+function notifyListeners(target, key) {
+    var reactiveRecord = TargetToReactiveRecordMap.get(target);
+    if (reactiveRecord) {
+        var value = reactiveRecord[key];
+        if (value) {
+            var len = value.length;
+            for (var i = 0; i < len; i += 1) {
+                var vm = value[i];
+                if (!vm.isDirty) {
+                    markComponentAsDirty(vm);
+                    scheduleRehydration(vm);
+                }
+            }
+        }
+    }
+}
+function subscribeToSetHook(vm, target, key) {
+    var reactiveRecord = TargetToReactiveRecordMap.get(target);
+    if (isUndefined(reactiveRecord)) {
+        var newRecord = create(null);
+        reactiveRecord = newRecord;
+        TargetToReactiveRecordMap.set(target, newRecord);
+    }
+    var value = reactiveRecord[key];
+    if (isUndefined(value)) {
+        value = [];
+        reactiveRecord[key] = value;
+    }
+    else if (value[0] === vm) {
+        return; // perf optimization considering that most subscriptions will come from the same vm
+    }
+    if (ArrayIndexOf.call(value, vm) === -1) {
+        ArrayPush.call(value, vm);
+        // we keep track of the sets that vm is listening from to be able to do some clean up later on
+        ArrayPush.call(vm.deps, value);
+    }
+}
+
+/*eslint-enable*/
+var ReactiveMap = new WeakMap();
+var ObjectDotPrototype = Object.prototype;
+function lockShadowTarget(shadowTarget, originalTarget) {
+    var targetKeys = getOwnPropertyNames(originalTarget);
+    targetKeys.forEach(function (key) {
+        var descriptor = getOwnPropertyDescriptor(originalTarget, key);
+        // We do not need to wrap the descriptor if not configurable
+        // Because we can deal with wrapping it when user goes through
+        // Get own property descriptor. There is also a chance that this descriptor
+        // could change sometime in the future, so we can defer wrapping
+        // until we need to
+        if (!descriptor.configurable) {
+            descriptor = wrapDescriptor(descriptor);
+        }
+        defineProperty(shadowTarget, key, descriptor);
+    });
+    preventExtensions(shadowTarget);
+}
+function wrapDescriptor(descriptor) {
+    if ('value' in descriptor) {
+        descriptor.value = isObservable(descriptor.value) ? getReactiveProxy(descriptor.value) : descriptor.value;
+    }
+    return descriptor;
+}
+function isObservable(value) {
+    if (!value) {
+        return false;
+    }
+    if (isArray(value)) {
+        return true;
+    }
+    var proto = getPrototypeOf(value);
+    return (proto === ObjectDotPrototype || proto === null || getPrototypeOf(proto) === null);
+}
+// Unwrap property descriptors
+// We only need to unwrap if value is specified
+function unwrapDescriptor(descriptor) {
+    if ('value' in descriptor) {
+        descriptor.value = unwrap(descriptor.value);
+    }
+    return descriptor;
+}
+var ReactiveProxyHandler = (function () {
+    function ReactiveProxyHandler(value) {
+        this.originalTarget = value;
+    }
+    ReactiveProxyHandler.prototype.get = function (shadowTarget, key) {
+        if (key === MembraneSlot) {
+            return this;
+        }
+        var originalTarget = this.originalTarget;
+        if (key === TargetSlot) {
+            return originalTarget;
+        }
+        var value = originalTarget[key];
+        if (isRendering && vmBeingRendered) {
+            subscribeToSetHook(vmBeingRendered, originalTarget, key); // eslint-disable-line no-undef
+        }
+        var observable = isObservable(value);
+        return observable ? getReactiveProxy(value) : value;
+    };
+    ReactiveProxyHandler.prototype.set = function (shadowTarget, key, value) {
+        var originalTarget = this.originalTarget;
+        if (isRendering) {
+            return false;
+        }
+        var oldValue = originalTarget[key];
+        if (oldValue !== value) {
+            originalTarget[key] = value;
+            notifyListeners(originalTarget, key);
+        }
+        else if (key === 'length' && isArray(originalTarget)) {
+            // fix for issue #236: push will add the new index, and by the time length
+            // is updated, the internal length is already equal to the new length value
+            // therefore, the oldValue is equal to the value. This is the forking logic
+            // to support this use case.
+            notifyListeners(originalTarget, key);
+        }
+        return true;
+    };
+    ReactiveProxyHandler.prototype.deleteProperty = function (shadowTarget, key) {
+        var originalTarget = this.originalTarget;
+        delete originalTarget[key];
+        notifyListeners(originalTarget, key);
+        return true;
+    };
+    ReactiveProxyHandler.prototype.apply = function (target /*, thisArg: any, argArray?: any*/) {
+    };
+    ReactiveProxyHandler.prototype.construct = function (target, argArray, newTarget) {
+    };
+    ReactiveProxyHandler.prototype.has = function (shadowTarget, key) {
+        var originalTarget = this.originalTarget;
+        return key in originalTarget;
+    };
+    ReactiveProxyHandler.prototype.ownKeys = function (shadowTarget) {
+        var originalTarget = this.originalTarget;
+        return getOwnPropertyNames(originalTarget);
+    };
+    ReactiveProxyHandler.prototype.isExtensible = function (shadowTarget) {
+        var shadowIsExtensible = isExtensible(shadowTarget);
+        if (!shadowIsExtensible) {
+            return shadowIsExtensible;
+        }
+        var originalTarget = this.originalTarget;
+        var targetIsExtensible = isExtensible(originalTarget);
+        if (!targetIsExtensible) {
+            lockShadowTarget(shadowTarget, originalTarget);
+        }
+        return targetIsExtensible;
+    };
+    ReactiveProxyHandler.prototype.setPrototypeOf = function (shadowTarget, prototype) {
+    };
+    ReactiveProxyHandler.prototype.getPrototypeOf = function (shadowTarget) {
+        var originalTarget = this.originalTarget;
+        return getPrototypeOf(originalTarget);
+    };
+    ReactiveProxyHandler.prototype.getOwnPropertyDescriptor = function (shadowTarget, key) {
+        var originalTarget = this.originalTarget;
+        var desc = getOwnPropertyDescriptor(originalTarget, key);
+        if (!desc) {
+            return desc;
+        }
+        if (!desc.configurable && !hasOwnProperty.call(shadowTarget, key)) {
+            // If descriptor from original target is not configurable,
+            // We must copy the wrapped descriptor over to the shadow target.
+            // Otherwise, proxy will throw an invariant error.
+            // This is our last chance to lock the value.
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/getOwnPropertyDescriptor#Invariants
+            desc = wrapDescriptor(desc);
+            defineProperty(shadowTarget, key, desc);
+        }
+        return desc;
+    };
+    ReactiveProxyHandler.prototype.preventExtensions = function (shadowTarget) {
+        var originalTarget = this.originalTarget;
+        lockShadowTarget(shadowTarget, originalTarget);
+        preventExtensions(originalTarget);
+        return true;
+    };
+    ReactiveProxyHandler.prototype.defineProperty = function (shadowTarget, key, descriptor) {
+        var originalTarget = this.originalTarget;
+        var configurable = descriptor.configurable;
+        var unwrappedDescriptor = unwrapDescriptor(descriptor);
+        if (configurable === false) {
+            defineProperty(shadowTarget, key, unwrappedDescriptor);
+        }
+        defineProperty(originalTarget, key, unwrappedDescriptor);
+        return true;
+    };
+    return ReactiveProxyHandler;
+}());
+function getReactiveProxy(value) {
+    value = unwrap(value);
+    var proxy = ReactiveMap.get(value);
+    if (proxy) {
+        return proxy;
+    }
+    var handler = new ReactiveProxyHandler(value);
+    var shadowTarget = isArray(value) ? [] : {};
+    proxy = new Proxy(shadowTarget, handler);
+    ReactiveMap.set(value, proxy);
+    return proxy;
+}
+
+// TODO: how to allow symbols as property keys?
+function createTrackedPropertyDescriptor(proto, key, descriptor) {
+    defineProperty(proto, key, {
+        get: function () {
+            var vm = this[ViewModelReflection];
+            if (isRendering) {
+                // this is needed because the proxy used by template is not sufficient
+                // for public props accessed from within a getter in the component.
+                subscribeToSetHook(vmBeingRendered, this, key);
+            }
+            return vm.cmpTrack[key];
+        },
+        set: function (newValue) {
+            var vm = this[ViewModelReflection];
+            var observable = isObservable(newValue);
+            newValue = observable ? getReactiveProxy(newValue) : newValue;
+            if (newValue !== vm.cmpTrack[key]) {
+                vm.cmpTrack[key] = newValue;
+                if (vm.idx > 0) {
+                    // perf optimization to skip this step if not in the DOM
+                    notifyListeners(this, key);
+                }
+            }
+        },
+        enumerable: descriptor ? descriptor.enumerable : true,
+        configurable: false,
+    });
+}
+
+// TODO: how to allow symbols as property keys?
+function createWiredPropertyDescriptor(proto, key, descriptor) {
+    createTrackedPropertyDescriptor(proto, key, descriptor);
+}
+
+var vmBeingUpdated = null;
+function prepareForPropUpdate(vm) {
+    vmBeingUpdated = vm;
+}
+// TODO: how to allow symbols as property keys?
+function createPublicPropertyDescriptor(proto, key, descriptor) {
+    defineProperty(proto, key, {
+        get: function () {
+            var vm = this[ViewModelReflection];
+            if (isBeingConstructed(vm)) {
+                return;
+            }
+            if (isRendering) {
+                // this is needed because the proxy used by template is not sufficient
+                // for public props accessed from within a getter in the component.
+                subscribeToSetHook(vmBeingRendered, this, key);
+            }
+            return vm.cmpProps[key];
+        },
+        set: function (newValue) {
+            var vm = this[ViewModelReflection];
+            if (vmBeingUpdated === vm) {
+                // not need to wrap or check the value since that is happening somewhere else
+                vmBeingUpdated = null; // releasing the lock
+                vm.cmpProps[key] = newValue;
+                // avoid notification of observability while constructing the instance
+                if (vm.idx > 0) {
+                    // perf optimization to skip this step if not in the DOM
+                    notifyListeners(this, key);
+                }
+            }
+            else if (isBeingConstructed(vm)) {
+                var observable_1 = isObservable(newValue);
+                newValue = observable_1 ? getReactiveProxy(newValue) : newValue;
+                vm.cmpProps[key] = newValue;
+            }
+            else {
+            }
+        },
+        enumerable: descriptor ? descriptor.enumerable : true,
+    });
+}
+function createPublicAccessorDescriptor(proto, key, descriptor) {
+    var _a = descriptor || EmptyObject, get = _a.get, set = _a.set, enumerable = _a.enumerable;
+    defineProperty(proto, key, {
+        get: function () {
+            var vm = this[ViewModelReflection];
+            if (get) {
+                return get.call(this);
+            }
+        },
+        set: function (newValue) {
+            var vm = this[ViewModelReflection];
+            if (!isBeingConstructed(vm) && vmBeingUpdated !== vm) {
+                return;
+            }
+            vmBeingUpdated = null; // releasing the lock
+            if (set) {
+                set.call(this, newValue);
+            }
+            else {
+            }
+        },
+        enumerable: enumerable,
+    });
+}
+
+function getLinkedElement$1(classList) {
+    return classList[ViewModelReflection].vnode.elm;
+}
+// This needs some more work. ClassList is a weird DOM api because it
+// is a TokenList, but not an Array. For now, we are just implementing
+// the simplest one.
+// https://www.w3.org/TR/dom/#domtokenlist
+function ClassList(vm) {
+    defineProperty(this, ViewModelReflection, {
+        value: vm,
+        writable: false,
+        enumerable: false,
+        configurable: false,
+    });
+}
+ClassList.prototype = {
+    add: function () {
+        var vm = this[ViewModelReflection];
+        var cmpClasses = vm.cmpClasses;
+        var elm = getLinkedElement$1(this);
+        // Add specified class values. If these classes already exist in attribute of the element, then they are ignored.
+        forEach.call(arguments, function (className) {
+            className = className + '';
+            if (!cmpClasses[className]) {
+                cmpClasses[className] = true;
+                // this is not only an optimization, it is also needed to avoid adding the same
+                // class twice when the initial diffing algo kicks in without an old vm to track
+                // what was already added to the DOM.
+                if (vm.idx || vm.vnode.isRoot) {
+                    // we intentionally make a sync mutation here and also keep track of the mutation
+                    // for a possible rehydration later on without having to rehydrate just now.
+                    elm.classList.add(className);
+                }
+            }
+        });
+    },
+    remove: function () {
+        var vm = this[ViewModelReflection];
+        var cmpClasses = vm.cmpClasses, vnode = vm.vnode;
+        var elm = getLinkedElement$1(this);
+        // Remove specified class values.
+        forEach.call(arguments, function (className) {
+            className = className + '';
+            if (cmpClasses[className]) {
+                cmpClasses[className] = false;
+                // this is not only an optimization, it is also needed to avoid removing the same
+                // class twice when the initial diffing algo kicks in without an old vm to track
+                // what was already added to the DOM.
+                if (vm.idx || vnode.isRoot) {
+                    // we intentionally make a sync mutation here when needed and also keep track of the mutation
+                    // for a possible rehydration later on without having to rehydrate just now.
+                    var ownerClass = vnode.data.class;
+                    // This is only needed if the owner is not forcing that class to be present in case of conflicts.
+                    if (isUndefined(ownerClass) || !ownerClass[className]) {
+                        elm.classList.remove(className);
+                    }
+                }
+            }
+        });
+    },
+    item: function (index) {
+        var vm = this[ViewModelReflection];
+        var cmpClasses = vm.cmpClasses;
+        // Return class value by index in collection.
+        return getOwnPropertyNames(cmpClasses)
+            .filter(function (className) { return cmpClasses[className + '']; })[index] || null;
+    },
+    toggle: function (className, force) {
+        var vm = this[ViewModelReflection];
+        var cmpClasses = vm.cmpClasses;
+        // When only one argument is present: Toggle class value; i.e., if class exists then remove it and return false, if not, then add it and return true.
+        // When a second argument is present: If the second argument evaluates to true, add specified class value, and if it evaluates to false, remove it.
+        if (arguments.length > 1) {
+            if (force) {
+                this.add(className);
+            }
+            else if (!force) {
+                this.remove(className);
+            }
+            return !!force;
+        }
+        if (cmpClasses[className]) {
+            this.remove(className);
+            return false;
+        }
+        this.add(className);
+        return true;
+    },
+    contains: function (className) {
+        var vm = this[ViewModelReflection];
+        var cmpClasses = vm.cmpClasses;
+        // Checks if specified class value exists in class attribute of the element.
+        return !!cmpClasses[className];
+    },
+    toString: function () {
+        var vm = this[ViewModelReflection];
+        var cmpClasses = vm.cmpClasses;
+        return getOwnPropertyNames(cmpClasses).filter(function (className) { return cmpClasses[className + '']; }).join(' ');
+    }
+};
+
+var _a$3 = Element.prototype;
+var querySelector = _a$3.querySelector;
+var querySelectorAll = _a$3.querySelectorAll;
 function getLinkedElement$2(root) {
     return root[ViewModelReflection].vnode.elm;
 }
 function shadowRootQuerySelector(shadowRoot, selector) {
     var vm = shadowRoot[ViewModelReflection];
     var elm = getLinkedElement$2(shadowRoot);
-    return pierce(vm, elm).querySelector(selector);
+    pierce(vm, elm);
+    var querySelector = piercingHook(vm.membrane, elm, 'querySelector', elm.querySelector);
+    return querySelector.call(elm, selector);
 }
 function shadowRootQuerySelectorAll(shadowRoot, selector) {
     var vm = shadowRoot[ViewModelReflection];
     var elm = getLinkedElement$2(shadowRoot);
-    return pierce(vm, elm).querySelectorAll(selector);
+    pierce(vm, elm);
+    var querySelectorAll = piercingHook(vm.membrane, elm, 'querySelectorAll', elm.querySelectorAll);
+    return querySelectorAll.call(elm, selector);
 }
 function Root(vm) {
     defineProperty(this, ViewModelReflection, {
@@ -1447,92 +1262,12 @@ register({
     }
 });
 
-var ViewModelReflection = Symbol('internal');
 function getLinkedElement(cmp) {
     return cmp[ViewModelReflection].vnode.elm;
 }
 function querySelectorAllFromComponent(cmp, selectors) {
     var elm = getLinkedElement(cmp);
     return elm.querySelectorAll(selectors);
-}
-function createPublicPropertyDescriptor(propName, originalPropertyDescriptor) {
-    function getter() {
-        var vm = this[ViewModelReflection];
-        var propName = getter.propName, origGetter = getter.origGetter;
-        if (isBeingConstructed(vm)) {
-            return;
-        }
-        if (origGetter) {
-            return origGetter.call(vm.component);
-        }
-        var cmpProps = vm.cmpProps;
-        if (isRendering) {
-            // this is needed because the proxy used by template is not sufficient
-            // for public props accessed from within a getter in the component.
-            subscribeToSetHook(vmBeingRendered, cmpProps, propName);
-        }
-        return cmpProps[propName];
-    }
-    getter.propName = propName;
-    getter.origGetter = originalPropertyDescriptor && originalPropertyDescriptor.get;
-    function setter(value) {
-        var vm = this[ViewModelReflection];
-        var propName = setter.propName, origSetter = setter.origSetter;
-        if (!isBeingConstructed(vm)) {
-            return;
-        }
-        if (origSetter) {
-            origSetter.call(vm.component, value);
-            return;
-        }
-        var cmpProps = vm.cmpProps;
-        // proxifying before storing it is a must for public props
-        cmpProps[propName] = isObject(value) ? getPropertyProxy(value) : value;
-    }
-    setter.propName = propName;
-    setter.origSetter = originalPropertyDescriptor && originalPropertyDescriptor.set;
-    var descriptor = {
-        get: getter,
-        set: setter,
-        enumerable: true,
-        configurable: true,
-    };
-    return descriptor;
-}
-function createWiredPropertyDescriptor(propName) {
-    function getter() {
-        var vm = this[ViewModelReflection];
-        var cmpWired = vm.cmpWired;
-        if (isUndefined(cmpWired)) {
-            cmpWired = vm.cmpWired = getPropertyProxy(create(null)); // lazy creation of the value
-        }
-        var value = cmpWired[propName];
-        if (isRendering) {
-            // this is needed because the proxy used by template is not sufficient
-            // for public props accessed from within a getter in the component.
-            subscribeToSetHook(vmBeingRendered, cmpWired, propName);
-        }
-        return value;
-    }
-    function setter(value) {
-        var vm = this[ViewModelReflection];
-        if (!value || !isObject(value)) {
-            return;
-        }
-        var cmpWired = vm.cmpWired;
-        if (isUndefined(cmpWired)) {
-            cmpWired = vm.cmpWired = getPropertyProxy(create(null)); // lazy creation of the value
-        }
-        cmpWired[propName] = isObject(value) ? getPropertyProxy(value) : value;
-        notifyListeners(cmpWired, propName);
-    }
-    var descriptor = {
-        get: getter,
-        set: setter,
-        enumerable: true,
-        configurable: true,
-    };
-    return descriptor;
 }
 // This should be as performant as possible, while any initialization should be done lazily
 function ComponentElement() {
@@ -1641,16 +1376,16 @@ ComponentElement.prototype = {
         var vm = this[ViewModelReflection];
         var cmpState = vm.cmpState;
         if (isUndefined(cmpState)) {
-            cmpState = vm.cmpState = getPropertyProxy(create(null)); // lazy creation of the cmpState
+            cmpState = vm.cmpState = getReactiveProxy(create(null)); // lazy creation of the cmpState
         }
         return cmpState;
     },
     set state(newState) {
         var vm = this[ViewModelReflection];
-        if (!newState || !isObject(newState) || isArray(newState)) {
+        if (isArray(newState) || !isObservable(newState)) {
             return;
         }
-        vm.cmpState = getPropertyProxy(newState); // lazy creation of the cmpState
+        vm.cmpState = getReactiveProxy(newState); // lazy creation of the cmpState
     },
     toString: function () {
         var vm = this[ViewModelReflection];
@@ -1671,6 +1406,8 @@ seal(ComponentElement.prototype);
  * This structure can be used to synthetically create proxies, and understand the
  * shape of a component. It is also used internally to apply extra optimizations.
  */
+/*eslint-enable*/
+var ViewModelReflection = Symbol('internal');
 var CtorToDefMap = new WeakMap();
 var COMPUTED_GETTER_MASK = 1;
 var COMPUTED_SETTER_MASK = 2;
@@ -1680,30 +1417,46 @@ function createComponentDef(Ctor) {
     var methods = getPublicMethodsHash(Ctor);
     var observedAttrs = getObservedAttributesHash(Ctor);
     var wire = getWireHash(Ctor);
+    var track = getTrackHash(Ctor);
     var proto = Ctor.prototype;
-    for (var propName in props) {
+    var _loop_1 = function (propName) {
         var propDef = props[propName];
         // initializing getters and setters for each public prop on the target prototype
         var descriptor = getOwnPropertyDescriptor(proto, propName);
-        var isComputed = descriptor && (isFunction(descriptor.get) || isFunction(descriptor.set));
         var config = propDef.config;
-        if (COMPUTED_GETTER_MASK & config) {
-            propDef.getter = descriptor.get;
+        if (COMPUTED_SETTER_MASK & config || COMPUTED_GETTER_MASK & config) {
+            createPublicAccessorDescriptor(proto, propName, descriptor);
         }
-        if (COMPUTED_SETTER_MASK & config) {
-            propDef.setter = descriptor.set;
+        else {
+            createPublicPropertyDescriptor(proto, propName, descriptor);
         }
-        defineProperty(proto, propName, createPublicPropertyDescriptor(propName, descriptor));
+    };
+    for (var propName in props) {
+        _loop_1(propName);
     }
     if (wire) {
-        for (var propName in wire) {
-            var descriptor = getOwnPropertyDescriptor(proto, propName);
-            // for decorated methods we need to do nothing
-            if (isUndefined(wire[propName].method)) {
-                // initializing getters and setters for each public prop on the target prototype
-                var isComputed = descriptor && (isFunction(descriptor.get) || isFunction(descriptor.set));
-                defineProperty(proto, propName, createWiredPropertyDescriptor(propName));
+        var _loop_2 = function (propName) {
+            if (wire[propName].method) {
+                return "continue";
             }
+            var descriptor = getOwnPropertyDescriptor(proto, propName);
+            // TODO: maybe these conditions should be always applied.
+            // initializing getters and setters for each public prop on the target prototype
+            createWiredPropertyDescriptor(proto, propName, descriptor);
+        };
+        for (var propName in wire) {
+            _loop_2(propName);
+        }
+    }
+    if (track) {
+        var _loop_3 = function (propName) {
+            var descriptor = getOwnPropertyDescriptor(proto, propName);
+            // TODO: maybe these conditions should be always applied.
+            // initializing getters and setters for each public prop on the target prototype
+            createTrackedPropertyDescriptor(proto, propName, descriptor);
+        };
+        for (var propName in track) {
+            _loop_3(propName);
         }
     }
     var superProto = getPrototypeOf(Ctor);
@@ -1713,14 +1466,112 @@ function createComponentDef(Ctor) {
         methods = assign(create(null), superDef.methods, methods);
         wire = (superDef.wire || wire) ? assign(create(null), superDef.wire, wire) : undefined;
     }
+    var descriptors = createDescriptorMap(props, methods);
     var def = {
         name: name,
         wire: wire,
+        track: track,
         props: props,
         methods: methods,
         observedAttrs: observedAttrs,
+        descriptors: descriptors,
     };
     return def;
+}
+function createGetter(key) {
+    return function () {
+        var vm = this[ViewModelReflection];
+        return vm.component[key];
+    };
+}
+function createSetter(key) {
+    return function (newValue) {
+        var vm = this[ViewModelReflection];
+        // logic for setting new properties of the element directly from the DOM
+        // will only be allowed for root elements created via createElement()
+        if (!vm.vnode.isRoot) {
+            return;
+        }
+        var observable = isObservable(newValue);
+        newValue = observable ? getReactiveProxy(newValue) : newValue;
+        prepareForPropUpdate(vm);
+        vm.component[key] = newValue;
+    };
+}
+function createMethodCaller(key) {
+    return function () {
+        var vm = this[ViewModelReflection];
+        return vm.component[key].apply(vm.component, ArraySlice.call(arguments));
+    };
+}
+var _a$1 = Element.prototype;
+var getAttribute = _a$1.getAttribute;
+var setAttribute = _a$1.setAttribute;
+var removeAttribute = _a$1.removeAttribute;
+function getAttributePatched(attrName) {
+    var vm = this[ViewModelReflection];
+    return getAttribute.call(this, attrName);
+}
+function setAttributePatched(attrName, newValue) {
+    var vm = this[ViewModelReflection];
+    var _a = vm.def, propsConfig = _a.props, observedAttrs = _a.observedAttrs;
+    attrName = attrName.toLocaleLowerCase();
+    var oldValue = getAttribute.call(this, attrName);
+    setAttribute.call(this, attrName, newValue);
+    newValue = getAttribute.call(this, attrName);
+    if (attrName in observedAttrs && oldValue !== newValue) {
+        invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
+    }
+}
+function removeAttributePatched(attrName) {
+    var vm = this[ViewModelReflection];
+    var _a = vm.def, propsConfig = _a.props, observedAttrs = _a.observedAttrs;
+    attrName = attrName.toLocaleLowerCase();
+    var oldValue = getAttribute.call(this, attrName);
+    removeAttribute.call(this, attrName);
+    var newValue = getAttribute.call(this, attrName);
+    if (attrName in observedAttrs && oldValue !== newValue) {
+        invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
+    }
+}
+function createDescriptorMap(publicProps, publicMethodsConfig) {
+    // replacing mutators and accessors on the element itself to catch any mutation
+    var descriptors = {
+        getAttribute: {
+            value: getAttributePatched,
+            configurable: true,
+        },
+        setAttribute: {
+            value: setAttributePatched,
+            configurable: true,
+        },
+        removeAttribute: {
+            value: removeAttributePatched,
+            configurable: true,
+        },
+    };
+    // expose getters and setters for each public props on the Element
+    for (var key in publicProps) {
+        descriptors[key] = {
+            get: createGetter(key),
+            set: createSetter(key),
+        };
+    }
+    // expose public methods as props on the Element
+    for (var key in publicMethodsConfig) {
+        descriptors[key] = {
+            value: createMethodCaller(key),
+            configurable: true,
+        };
+    }
+    return descriptors;
+}
+function getTrackHash(target) {
+    var track = target.track;
+    if (!track || !getOwnPropertyNames(track).length) {
+        return;
+    }
+    return assign(create(null), track);
 }
 function getWireHash(target) {
     var wire = target.wire;
@@ -1774,12 +1625,28 @@ var uid = 0;
 var OwnerKey = Symbol('key');
 function addInsertionIndex(vm) {
     vm.idx = ++idx;
+    var connectedCallback = vm.component.connectedCallback;
+    if (connectedCallback && connectedCallback !== noop) {
+        invokeComponentMethod(vm, 'connectedCallback');
+    }
+    var connected = Services.connected;
+    if (connected) {
+        addCallbackToNextTick(function () { return invokeServiceHook(vm, connected); });
+    }
 }
 function removeInsertionIndex(vm) {
     vm.idx = 0;
+    var disconnectedCallback = vm.component.disconnectedCallback;
+    if (disconnectedCallback && disconnectedCallback !== noop) {
+        invokeComponentMethod(vm, 'disconnectedCallback');
+    }
+    var disconnected = Services.disconnected;
+    if (disconnected) {
+        addCallbackToNextTick(function () { return invokeServiceHook(vm, disconnected); });
+    }
 }
 function createVM(vnode) {
-    var Ctor = vnode.Ctor;
+    var elm = vnode.elm, Ctor = vnode.Ctor;
     var def = getComponentDef(Ctor);
     uid += 1;
     var vm = {
@@ -1790,7 +1657,7 @@ function createVM(vnode) {
         def: def,
         context: {},
         cmpProps: {},
-        cmpWired: undefined,
+        cmpTrack: {},
         cmpState: undefined,
         cmpSlots: undefined,
         cmpEvents: undefined,
@@ -1801,12 +1668,14 @@ function createVM(vnode) {
         classListObj: undefined,
         component: undefined,
         vnode: vnode,
-        // used to store the latest result of the render method
-        fragment: [],
+        shadowVNode: createShadowRootVNode(elm, []),
         // used to track down all object-key pairs that makes this vm reactive
         deps: [],
     };
     vnode.vm = vm;
+    // linking elm with VM before creating the instance
+    elm[ViewModelReflection] = vm;
+    defineProperties(elm, def.descriptors);
     createComponent(vm, Ctor);
     linkComponent(vm);
     return vm;
@@ -1818,16 +1687,14 @@ function relinkVM(vm, vnode) {
 function rehydrate(vm) {
     if (vm.idx && vm.isDirty) {
         var vnode = vm.vnode;
-        // when patch() is invoked from within the component life-cycle due to
-        // a dirty state, we create a new VNode (oldVnode) with the exact same data was used
-        // to patch this vnode the last time, mimic what happen when the
-        // owner re-renders, but we do so by keeping the vnode originally used by parent
-        // as the source of true, in case the parent tries to rehydrate against that one.
-        var oldVnode = assign({}, vnode);
-        vnode.children = [];
-        patch(oldVnode, vnode);
+        var children = renderComponent(vm);
+        vm.isScheduled = false;
+        patchShadowRoot(vm, children);
+        var renderedCallback = vm.component.renderedCallback;
+        if (renderedCallback && renderedCallback !== noop) {
+            invokeComponentMethod(vm, 'renderedCallback');
+        }
     }
-    vm.isScheduled = false;
 }
 var rehydrateQueue = [];
 function flushRehydrationQueue() {
@@ -1855,6 +1722,23 @@ function wasNodePassedIntoVM(vm, node) {
     // TODO: we need to walk the parent path here as well, in case they passed it via slots multiple times
     // @ts-ignore
     return node[OwnerKey] === ownerUid;
+}
+function createShadowRootVNode(elm, children) {
+    var sel = elm.tagName.toLocaleLowerCase();
+    var vnode = {
+        sel: sel,
+        data: EmptyObject,
+        children: children,
+        elm: elm,
+        key: undefined,
+        text: undefined,
+    };
+    return vnode;
+}
+function patchShadowRoot(vm, children) {
+    var oldShadowVNode = vm.shadowVNode;
+    var shadowVNode = createShadowRootVNode(vm.vnode.elm, children);
+    vm.shadowVNode = patch(oldShadowVNode, shadowVNode);
 }
 
 // this hook will set up the component instance associated to the new vnode,
@@ -1885,6 +1769,7 @@ function syncProps(oldVnode, vnode) {
     if (isUndefined(vm)) {
         return;
     }
+    var component = vm.component, publicProps = vm.def.props;
     var oldProps = oldVnode.data._props;
     var newProps = vnode.data._props;
     // infuse key-value pairs from _props into the component
@@ -1895,14 +1780,20 @@ function syncProps(oldVnode, vnode) {
         // removed props should be reset in component's props
         for (key in oldProps) {
             if (!(key in newProps)) {
-                resetComponentProp(vm, key);
+                prepareForPropUpdate(vm);
+                component[key] = undefined;
             }
         }
         // new or different props should be set in component's props
         for (key in newProps) {
             cur = newProps[key];
             if (!(key in oldProps) || oldProps[key] != cur) {
-                updateComponentProp(vm, key, cur);
+                if (isUndefined(publicProps[key])) {
+                    // TODO: this should never really happen because the compiler should always validate
+                    return;
+                }
+                prepareForPropUpdate(vm);
+                component[key] = cur;
             }
         }
     }
@@ -2038,7 +1929,7 @@ var componentClasses = {
     update: syncClassNames,
 };
 
-function update(oldVnode, vnode) {
+function update$1(oldVnode, vnode) {
     var vm = vnode.vm;
     if (isUndefined(vm)) {
         return;
@@ -2071,33 +1962,12 @@ function update(oldVnode, vnode) {
     }
 }
 var componentSlotset = {
-    create: update,
-    update: update,
-};
-
-function rerender(oldVnode, vnode) {
-    var vm = vnode.vm;
-    if (isUndefined(vm)) {
-        return;
-    }
-    var children = vnode.children;
-    // if diffing is against an inserted VM, it means the element is already
-    // in the DOM and we can compute its body.
-    if (vm.idx && vm.isDirty) {
-        renderComponent(vm);
-    }
-    // replacing the vnodes in the children array without replacing the array itself
-    // because the engine has a hard reference to the original array object.
-    children.length = 0;
-    ArrayPush.apply(children, vm.fragment);
-}
-var componentChildren = {
-    create: rerender,
-    update: rerender,
+    create: update$1,
+    update: update$1,
 };
 
 // TODO: eventually use the one shipped by snabbdom directly
-function update$1(oldVnode, vnode) {
+function update$2(oldVnode, vnode) {
     var oldProps = oldVnode.data.props;
     var props = vnode.data.props;
     if (isUndefined(oldProps) && isUndefined(props)) {
@@ -2112,16 +1982,7 @@ function update$1(oldVnode, vnode) {
     var elm = vnode.elm;
     for (key in oldProps) {
         if (!(key in props)) {
-            if (vnode.isRoot) {
-                // custom elements created programatically prevent you from
-                // deleting the property because it has a set/get to update
-                // the corresponding component, in this case, we just set it
-                // to undefined, which has the same effect.
-                elm[key] = undefined;
-            }
-            else {
-                delete elm[key];
-            }
+            delete elm[key];
         }
     }
     for (key in props) {
@@ -2136,8 +1997,8 @@ function update$1(oldVnode, vnode) {
     }
 }
 var props = {
-    create: update$1,
-    update: update$1,
+    create: update$2,
+    update: update$2,
 };
 
 var array = Array.isArray;
@@ -2149,10 +2010,10 @@ var createElement$1 = document.createElement;
 var createElementNS = document.createElementNS;
 var createTextNode = document.createTextNode;
 var createComment = document.createComment;
-var _a$3 = Node.prototype;
-var insertBefore$1 = _a$3.insertBefore;
-var removeChild$1 = _a$3.removeChild;
-var appendChild$1 = _a$3.appendChild;
+var _a$4 = Node.prototype;
+var insertBefore$1 = _a$4.insertBefore;
+var removeChild$1 = _a$4.removeChild;
+var appendChild$1 = _a$4.appendChild;
 function parentNode(node) {
     return node.parentNode;
 }
@@ -2513,6 +2374,10 @@ var xlinkNS = 'http://www.w3.org/1999/xlink';
 var xmlNS = 'http://www.w3.org/XML/1998/namespace';
 var ColonCharCode = 58;
 var XCharCode = 120;
+var _a$5 = Element.prototype;
+var setAttribute$1 = _a$5.setAttribute;
+var removeAttribute$1 = _a$5.removeAttribute;
+var setAttributeNS = _a$5.setAttributeNS;
 function updateAttrs(oldVnode, vnode) {
     var oldAttrs = oldVnode.data.attrs;
     var attrs = vnode.data.attrs;
@@ -2532,25 +2397,25 @@ function updateAttrs(oldVnode, vnode) {
         var old = oldAttrs[key];
         if (old !== cur) {
             if (cur === true) {
-                elm.setAttribute(key, "");
+                setAttribute$1.call(elm, key, "");
             }
             else if (cur === false) {
-                elm.removeAttribute(key);
+                removeAttribute$1.call(elm, key);
             }
             else {
                 if (key.charCodeAt(0) !== XCharCode) {
-                    elm.setAttribute(key, cur);
+                    setAttribute$1.call(elm, key, cur);
                 }
                 else if (key.charCodeAt(3) === ColonCharCode) {
                     // Assume xml namespace
-                    elm.setAttributeNS(xmlNS, key, cur);
+                    setAttributeNS.call(elm, xmlNS, key, cur);
                 }
                 else if (key.charCodeAt(5) === ColonCharCode) {
                     // Assume xlink namespace
-                    elm.setAttributeNS(xlinkNS, key, cur);
+                    setAttributeNS.call(elm, xlinkNS, key, cur);
                 }
                 else {
-                    elm.setAttribute(key, cur);
+                    setAttribute$1.call(elm, key, cur);
                 }
             }
         }
@@ -2558,7 +2423,7 @@ function updateAttrs(oldVnode, vnode) {
     // remove removed attributes
     for (key in oldAttrs) {
         if (!(key in attrs)) {
-            elm.removeAttribute(key);
+            removeAttribute$1.call(elm, key);
         }
     }
 }
@@ -2711,9 +2576,9 @@ var patch = init([
     componentSlotset,
     componentProps,
     componentAttrs,
+    // from this point on, we do a series of DOM mutations
     eventListenersModule,
     componentClasses,
-    componentChildren,
     props,
     attributesModule,
     classes,
@@ -2722,15 +2587,11 @@ var patch = init([
     uidModule,
 ]);
 
-var _a = Element.prototype;
-var getAttribute = _a.getAttribute;
-var setAttribute = _a.setAttribute;
-var removeAttribute = _a.removeAttribute;
-var _b = Node.prototype;
-var removeChild = _b.removeChild;
-var appendChild = _b.appendChild;
-var insertBefore = _b.insertBefore;
-var replaceChild = _b.replaceChild;
+var _a = Node.prototype;
+var removeChild = _a.removeChild;
+var appendChild = _a.appendChild;
+var insertBefore = _a.insertBefore;
+var replaceChild = _a.replaceChild;
 var ConnectingSlot = Symbol();
 var DisconnectingSlot = Symbol();
 function callNodeSlot(node, slot) {
@@ -2761,62 +2622,6 @@ assign(Node.prototype, {
         return replacedNode;
     }
 });
-function linkAttributes(element, vm) {
-    var _a = vm.def, propsConfig = _a.props, observedAttrs = _a.observedAttrs;
-    // replacing mutators and accessors on the element itself to catch any mutation
-    element.getAttribute = function (attrName) {
-        attrName = attrName.toLocaleLowerCase();
-        var propName = getPropNameFromAttrName(attrName);
-        if (propsConfig[propName]) {
-            return;
-        }
-        return getAttribute.call(element, attrName);
-    };
-    element.setAttribute = function (attrName, newValue) {
-        attrName = attrName.toLocaleLowerCase();
-        var propName = getPropNameFromAttrName(attrName);
-        if (propsConfig[propName]) {
-            return;
-        }
-        var oldValue = getAttribute.call(element, attrName);
-        setAttribute.call(element, attrName, newValue);
-        newValue = getAttribute.call(element, attrName);
-        if (attrName in observedAttrs && oldValue !== newValue) {
-            invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
-        }
-    };
-    element.removeAttribute = function (attrName) {
-        attrName = attrName.toLocaleLowerCase();
-        var propName = getPropNameFromAttrName(attrName);
-        if (propsConfig[propName]) {
-            return;
-        }
-        var oldValue = getAttribute.call(element, attrName);
-        removeAttribute.call(element, attrName);
-        var newValue = getAttribute.call(element, attrName);
-        if (attrName in observedAttrs && oldValue !== newValue) {
-            invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
-        }
-    };
-}
-function getInitialProps(element, Ctor) {
-    var config = getComponentDef(Ctor).props;
-    var props = {};
-    for (var propName in config) {
-        if (propName in element) {
-            props[propName] = element[propName];
-        }
-    }
-    return props;
-}
-function getInitialSlots(element, Ctor) {
-    var slotNames = getComponentDef(Ctor).slotNames;
-    if (isUndefined(slotNames)) {
-        return;
-    }
-    // TODO: implement algo to resolve slots
-    return undefined;
-}
 /**
  * This algo mimics 2.5 of web component specification somehow:
  * https://www.w3.org/TR/custom-elements/#upgrades
@@ -2825,23 +2630,30 @@ function upgradeElement(element, Ctor) {
     if (isUndefined(Ctor)) {
         throw new TypeError("Invalid Component Definition: " + Ctor + ".");
     }
-    var props = getInitialProps(element, Ctor);
-    var slotset = getInitialSlots(element, Ctor);
     var tagName = element.tagName.toLowerCase();
-    var vnode = c(tagName, Ctor, { props: props, slotset: slotset, className: element.className || undefined });
+    var vnode = c(tagName, Ctor, { className: element.className || undefined });
     vnode.isRoot = true;
-    // TODO: eventually after updating snabbdom we can use toVNode(element)
-    // as the first argument to reconstruct the vnode that represents the
-    // current state.
-    var vm = patch(element, vnode).vm;
-    linkAttributes(element, vm);
+    patch(element, vnode);
     // providing the hook to detect insertion and removal
     element[ConnectingSlot] = function () {
         insert(vnode);
     };
     element[DisconnectingSlot] = function () {
-        destroy(vnode);
+        forceDisconnection(vnode);
     };
+}
+// this could happen for two reasons:
+// * it is a root, and was removed manually
+// * the element was appended to another container which requires disconnection to happen first
+function forceDisconnection(vnode) {
+    var vm = vnode.vm;
+    vm.isDirty = true;
+    removeInsertionIndex(vm);
+    clearListeners(vm);
+    // At this point we need to force the removal of all children because
+    // we don't have a way to know that children custom element were removed
+    // from the DOM. Once we move to use realm custom elements, we can remove this.
+    patchShadowRoot(vm, []);
 }
 /**
  * This method is almost identical to document.createElement
@@ -2863,7 +2675,6 @@ function createElement(tagName, options) {
     }
     return element;
 }
-// TODO: how can a user dismount a component and kick in the destroy mechanism?
 
 exports.createElement = createElement;
 exports.getComponentDef = getComponentDef;
@@ -2874,4 +2685,4 @@ exports.unwrap = unwrap;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.13.3 */
+/** version: 0.14.10 */

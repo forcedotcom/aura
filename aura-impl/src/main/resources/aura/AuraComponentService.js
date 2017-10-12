@@ -77,8 +77,8 @@ AuraComponentService.prototype.get = function(globalId) {
 };
 
 AuraComponentService.prototype.initCoreModules = function () {
-    var Engine = this.moduleEngine;
-    var compat = Engine && Engine["compat"];
+    var babelHelpers = window["Proxy"] && window["Proxy"]["babelHelpers"];
+
     this.addModule("markup://engine", "engine", [], null, this.moduleEngine);
     this.addModule("markup://assert", "assert", [], null, Aura.ExportsAssert);
     this.addModule("markup://logger", "logger", [], null, Aura.ExportsLogger);
@@ -86,17 +86,15 @@ AuraComponentService.prototype.initCoreModules = function () {
     this.addModule("markup://aura-storage", "aura-storage", [], null, Aura.ExportsStorage);
 
     // Register compat modules
-    if (compat) {
-        // Helpers
-        var helpers = compat["helpers"];
-        var prefix = "compat/helpers/";
-        Object.keys(helpers).forEach(function (helper) {
+    if (babelHelpers) {
+        var prefix = "babel/helpers/";
+        Object.keys(babelHelpers).forEach(function (helper) {
             var moduleName = prefix + helper;
-            this.addModule("markup://" + moduleName, moduleName, [], null, helpers[helper]);
+            this.addModule("markup://" + moduleName, moduleName, [], null, babelHelpers[helper]);
         }.bind(this));
 
         // Regenerator (for transpiling async stuff)
-        this.addModule("markup://compat/regeneratorRuntime", "compat/regenerator", [], null, compat["regeneratorRuntime"]);
+        this.addModule("markup://babel/regeneratorRuntime", "babel/regenerator", [], null, babelHelpers["regeneratorRuntime"]);
     }
 
 };

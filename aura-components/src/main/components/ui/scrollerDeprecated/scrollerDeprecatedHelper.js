@@ -1645,7 +1645,7 @@
 
 					that.stop();
 
-					if (!step.length) {
+					if (!step || !step.length) {
 						step = [ {
 							x : x,
 							y : y,

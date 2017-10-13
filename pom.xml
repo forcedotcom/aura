@@ -39,7 +39,7 @@
         <debug>true</debug>
         <skipUnitTests>false</skipUnitTests>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <selenium.version>2.53.1</selenium.version>
+        <selenium.version>3.6.0</selenium.version>
         <!-- xUnit properties:
           xunit.js.testPath the path to an individual test to run
           xunit.js.engine the engine to use.

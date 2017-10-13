@@ -16,20 +16,27 @@
 
 package org.auraframework.test.util;
 
-import java.net.URL;
-
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.net.URL;
+
 public class AdaptiveWebElementDriver extends RemoteWebDriver {
 
     public static String DEFAULT_CAPABILITY = "org.auraframework.webdriver.flexible.default";
 
+    /**
+     * @deprecated Use {@link AdaptiveWebElementDriver(CommandExecutor, Capabilities)}.
+     * @param executor
+     * @param desiredCapabilities
+     * @param requiredCapabilities
+     */
+    @Deprecated
     public AdaptiveWebElementDriver(CommandExecutor executor, Capabilities desiredCapabilities,
             Capabilities requiredCapabilities) {
-        super(executor, desiredCapabilities, requiredCapabilities);
+        super(executor, desiredCapabilities.merge(requiredCapabilities));
 
         // Unless you explicitly request a "default" driver, return a driver that returns AdaptiveWebElements
         if (!((desiredCapabilities != null && desiredCapabilities.is(DEFAULT_CAPABILITY)) || (requiredCapabilities != null && requiredCapabilities
@@ -39,20 +46,27 @@ public class AdaptiveWebElementDriver extends RemoteWebDriver {
     }
 
     public AdaptiveWebElementDriver(CommandExecutor executor, Capabilities desiredCapabilities) {
-        this(executor, desiredCapabilities, null);
+        super(executor, desiredCapabilities);
     }
 
     public AdaptiveWebElementDriver(Capabilities desiredCapabilities) {
-        this((URL) null, desiredCapabilities);
+        super(desiredCapabilities);
     }
 
+    /**
+     * @deprecated Use {@link AdaptiveWebElementDriver(URL, Capabilities)}.
+     * @param remoteAddress
+     * @param desiredCapabilities
+     * @param requiredCapabilities
+     */
+    @Deprecated
     public AdaptiveWebElementDriver(URL remoteAddress, Capabilities desiredCapabilities,
             Capabilities requiredCapabilities) {
         this(new HttpCommandExecutor(remoteAddress), desiredCapabilities, requiredCapabilities);
     }
 
     public AdaptiveWebElementDriver(URL remoteAddress, Capabilities desiredCapabilities) {
-        this(new HttpCommandExecutor(remoteAddress), desiredCapabilities, null);
+        super(remoteAddress, desiredCapabilities);
     }
 
 }

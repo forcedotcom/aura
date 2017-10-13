@@ -15,20 +15,18 @@
  */
 package org.auraframework.test.util;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.internal.BuildInfo;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.google.common.collect.Lists;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Utility methods related to WebDriver
@@ -143,13 +141,7 @@ public final class WebDriverUtil {
 
         private void initExtraCapabilities(ExtraCapability... extraCapabilities) {
             for (ExtraCapability extra : extraCapabilities) {
-                // newer versions of firefox no longer support native events
-                if (extra.getCapabilityName().equals(ExtraCapability.DISABLE_NATIVE_EVENTS.getCapabilityName())
-                        && this.capability.getBrowserName().equals("firefox")) {
-                    FirefoxProfile firefoxProfile = new FirefoxProfile();
-                    firefoxProfile.setEnableNativeEvents(Boolean.parseBoolean(extra.getValue()));
-                    this.capability.setCapability("firefox_profile", firefoxProfile);
-                } else if (extra.equals(ExtraCapability.DISABLE_POPUP_BLOCKING)
+                if (extra.equals(ExtraCapability.DISABLE_POPUP_BLOCKING)
                         && this.capability.getBrowserName().equals("chrome")
                         && extra.getValue().equals("true")) {
                     // Disable pop-up blocking in google chrome

@@ -23,8 +23,10 @@ import java.util.function.Supplier;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.tools.node.api.NodeBundle;
+import org.auraframework.tools.node.api.NodeLambdaFactory;
 import org.auraframework.tools.node.impl.NodeBundleBuilder;
 import org.auraframework.tools.node.impl.NodeTool;
+import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
 import org.auraframework.util.IOUtil;
 import org.json.*;
 
@@ -35,15 +37,15 @@ public final class ModulesCompilerUtil {
 
     private static NodeBundle COMPILER_BUNDLE;
 
-    public static synchronized NodeBundle getCompilerBundle() throws Exception {
-        return (COMPILER_BUNDLE != null)? COMPILER_BUNDLE : (COMPILER_BUNDLE = createCompilerBundle());
+    public static synchronized NodeBundle getCompilerBundle(NodeLambdaFactory consumingFactory) throws Exception {
+        return (COMPILER_BUNDLE != null)? COMPILER_BUNDLE : (COMPILER_BUNDLE = createCompilerBundle(consumingFactory));
     }
 
     /**
      * Dynamically create the bundle for the lwc compiler by adding the compiler files
      * to the plain nodejs bundle.
      */
-    static NodeBundle createCompilerBundle() throws Exception {
+    static NodeBundle createCompilerBundle(NodeLambdaFactory consumingFactory) throws Exception {
         NodeBundleBuilder builder = new NodeBundleBuilder(NodeTool.BUNDLE, "lwc-compiler");
         builder.add("src/lwc/compiler.min.js", new Supplier<InputStream>() {
             @Override
@@ -57,7 +59,9 @@ public final class ModulesCompilerUtil {
                 return ModulesCompilerUtil.class.getResourceAsStream("/modules/invokeCompile.js");
             }
         });
-        return builder.build();
+        // sidecar services don't need node-env.zip, they use the existing ~/tools installation directly
+        boolean createNodeEnvZip = !(consumingFactory instanceof NodeLambdaFactorySidecar);
+        return builder.build(createNodeEnvZip);
     }
 
     public static String pathToLocalTempFile(String classpathResource) {

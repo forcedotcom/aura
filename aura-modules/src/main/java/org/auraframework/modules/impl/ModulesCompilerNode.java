@@ -34,7 +34,7 @@ final class ModulesCompilerNode implements ModulesCompiler {
     private final Lambda compileLambda;
 
     ModulesCompilerNode(NodeLambdaFactory factory) throws Exception {
-        compileLambda = factory.get(ModulesCompilerUtil.getCompilerBundle(), ModulesCompilerUtil.COMPILER_HANDLER);
+        compileLambda = factory.get(ModulesCompilerUtil.getCompilerBundle(factory), ModulesCompilerUtil.COMPILER_HANDLER);
     }
 
     @Override

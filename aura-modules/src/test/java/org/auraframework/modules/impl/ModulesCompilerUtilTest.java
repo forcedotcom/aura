@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.auraframework.tools.node.api.NodeBundle;
+import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
@@ -29,7 +30,7 @@ public class ModulesCompilerUtilTest extends UnitTestCase {
 
     @Test
     public void createCompilerBundle() throws Exception {
-        NodeBundle bundle = ModulesCompilerUtil.createCompilerBundle();
+        NodeBundle bundle = ModulesCompilerUtil.createCompilerBundle(NodeLambdaFactorySidecar.INSTANCE);
         assertNotNull(bundle.id());
     }
 

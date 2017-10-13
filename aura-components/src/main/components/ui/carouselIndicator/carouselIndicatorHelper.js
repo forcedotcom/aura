@@ -112,13 +112,14 @@
     */
     changeActivePage: function (cmp, evt) {
         var pageIndex   = parseInt(evt.pageIndex, 10),
+            initialRender = evt.initialRender,
             container   = cmp.getElement(),
             pages       = container.getElementsByClassName('tab'),
             activePage  = cmp._activePage,
             selClass    = 'selected',
             currentPage = pages[activePage],
             newPage     = pages[pageIndex];
-        
+
         if (newPage) {
             $A.util.removeClass(currentPage, selClass);
             currentPage.setAttribute('tabindex', "-1");
@@ -126,7 +127,7 @@
             $A.util.addClass(newPage, selClass);
             newPage.setAttribute('aria-selected',true);
             newPage.setAttribute('tabindex', "0");
-            if ($A.get('$Browser.isDesktop')) {
+            if ($A.get('$Browser.isDesktop') && !initialRender) {
                 newPage.focus(); // this causes a perf issue (extra paints) on android
             }
             cmp._activePage = pageIndex;

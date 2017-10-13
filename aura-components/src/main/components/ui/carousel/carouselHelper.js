@@ -270,7 +270,7 @@
     		pages       = cmp.get('v.body');
 
     	carousel._updatePagesSize(cmp, carousel);
-        indicator.get('c.changeActivePage').run({pageIndex: initialPage});
+        indicator.get('c.changeActivePage').run({pageIndex: initialPage, initialRender: true});
 
     	carousel.on('pageChange', function (page) {
     		self.onPageChange.call(self, cmp, page);

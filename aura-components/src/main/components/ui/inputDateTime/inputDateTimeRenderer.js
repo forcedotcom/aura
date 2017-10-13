@@ -34,5 +34,13 @@
         _helper.togglePickerIcon(component);
 
         return this.superRerender();
+    }, 
+    
+    unrender: function (component) {        
+        // When work with DatepickerManger, DatePicker isn't be destroyed when modal is destroyed, since it's not inside inputDateTime.
+        // Notify DatepickerManger to hide the date picker when inputDateTime is destroyed.
+        var _helper = component.getConcreteComponent().getDef().getHelper();
+        _helper.closeDatepickerWithManager(component);
+        return this.superUnrender();
     }
 })// eslint-disable-line semi

@@ -254,6 +254,14 @@
         });
     },
 
+    closeDatepickerWithManager: function(component) {
+        var useManager = component.get("v.useManager"),
+        managerExists = component.get("v.managerExists");
+        if (useManager && managerExists) {         
+            $A.getEvt('markup://ui:hideDatePicker').fire();
+        }    
+    },
+
     handleDateSelectionByManager: function (component, event) {
         var dateValue = event.getParam("arguments").value;
         if (dateValue) {

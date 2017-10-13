@@ -26,6 +26,14 @@
 		}
 	},
 
+	handleHideDatePicker: function (cmp) {		
+		var datePicker = cmp.find('datePicker');
+		if (datePicker) {
+			// Hide the date picker.
+			datePicker.set("v.visible", false);
+		}
+	},
+
 	handleShowDatePicker: function (cmp, evt) {
 		if (!cmp.get("v.loadDatePicker")) {
 			cmp.set("v.loadDatePicker", true);
@@ -33,7 +41,6 @@
 
 		var datePicker = cmp.find('datePicker'),
 			params = evt.getParams();
-
 		// if the datepicker for the same source component is still being displayed, then just re-focus if necessary
 		var isSameSourceComponent = cmp._sourceComponentId === params.sourceComponentId;
 		if (datePicker.get("v.visible") === true && isSameSourceComponent && params.focusDatePicker) {

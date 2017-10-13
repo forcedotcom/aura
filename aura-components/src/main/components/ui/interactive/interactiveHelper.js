@@ -70,7 +70,7 @@
      * Get the unique ID on the dom element. Does not add a unique ID if one does not exist.
      */
     getUid: function(element) {
-        return element.getAttribute(this.DATA_UID_KEY);
+        return element ? element.getAttribute(this.DATA_UID_KEY) : null;
     },
 
     /**

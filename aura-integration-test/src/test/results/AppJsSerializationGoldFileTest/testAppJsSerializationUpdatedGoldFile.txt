@@ -1611,7 +1611,7 @@ return {
         this.domEventMap[elementId][event] = handler;
     },
     "getUid":function(element) {
-        return element.getAttribute(this.DATA_UID_KEY);
+        return element ? element.getAttribute(this.DATA_UID_KEY) : null;
     },
     "newUid":function(element) {
         var nextUid = ++this.interactiveUid;

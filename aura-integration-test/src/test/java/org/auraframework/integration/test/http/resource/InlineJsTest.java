@@ -85,6 +85,10 @@ public class InlineJsTest extends AuraImplTestCase {
     @Inject
     private LocaleDataJsAppender localeDataJsAppender;
 
+    public InlineJsTest() {
+        setShouldSetupContext(false);
+    }
+
     private InlineJs getInlineJs() {
         InlineJs inlineJs = new InlineJs();
         inlineJs.setServletUtilAdapter(servletUtilAdapter);
@@ -103,9 +107,6 @@ public class InlineJsTest extends AuraImplTestCase {
     @Test
     public void testInlineScriptIsWrittenIntoInlineJs() throws Exception {
         // Arrange
-        if (contextService.isEstablished()) {
-            contextService.endContext();
-        }
 
         String script = "var foo = null;";
         String templateMarkup = String.format(baseComponentTag, "isTemplate='true'", String.format("<script>%s</script>", script));
@@ -137,9 +138,6 @@ public class InlineJsTest extends AuraImplTestCase {
     @Test
     public void testMultipleInlineScriptOnSameTemplate() throws Exception {
         // Arrange
-        if (contextService.isEstablished()) {
-            contextService.endContext();
-        }
 
         String script = "var foo = null;";
         String templateMarkup = String.format(baseComponentTag, "isTemplate='true'", String.format("<script>%s</script><script>%s</script>", script, script));
@@ -175,9 +173,6 @@ public class InlineJsTest extends AuraImplTestCase {
     @Test
     public void testMultipleInlineScriptOnTemplateInheritance() throws Exception {
         // Arrange
-        if (contextService.isEstablished()) {
-            contextService.endContext();
-        }
 
         String script = "var foo = null;";
         String baseCmpTagAttributes = "isTemplate='true' extensible='true'";
@@ -221,9 +216,6 @@ public class InlineJsTest extends AuraImplTestCase {
      */
     public void testInlineScriptInAuraTemplate() throws Exception {
         // Arrange
-        if (contextService.isEstablished()) {
-            contextService.endContext();
-        }
 
         String appMarkup = String.format(baseApplicationTag, "template='aura:template'", "");
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, appMarkup);
@@ -249,9 +241,6 @@ public class InlineJsTest extends AuraImplTestCase {
     @Test
     public void testInlineScriptInTemplateWhichExtendsAuraTemplate() throws Exception {
         // Arrange
-        if (contextService.isEstablished()) {
-            contextService.endContext();
-        }
 
         String script = "var foo = null;";
         String cmpTagAttributes = String.format("isTemplate='true' extends='aura:template'");
@@ -282,9 +271,6 @@ public class InlineJsTest extends AuraImplTestCase {
     @Test
     public void testResponseWith404WhenTokenValidationFails() throws Exception {
         // Arrange
-        if (contextService.isEstablished()) {
-            contextService.endContext();
-        }
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application></aura:application>");
         AuraContext context = contextService.startContext(AuraContext.Mode.PROD, AuraContext.Format.MANIFEST,
@@ -312,9 +298,6 @@ public class InlineJsTest extends AuraImplTestCase {
 //    @Test
 //    public void testPolyfillsForIE11() throws Exception {
 //        // Arrange
-//        if (contextService.isEstablished()) {
-//            contextService.endContext();
-//        }
 //
 //        String templateMarkup = String.format(baseComponentTag, "isTemplate='true'", "");
 //        DefDescriptor<ComponentDef> templateDesc = addSourceAutoCleanup(ComponentDef.class, templateMarkup);

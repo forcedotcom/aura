@@ -111,7 +111,11 @@ public class InlineJs extends AuraResourceImpl {
                 }
             }
             DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getLoadingApplicationDescriptor();
-            internalWrite(request, response, appDefDesc, context);
+            if (appDefDesc != null) {
+                internalWrite(request, response, appDefDesc, context);
+            } else {
+                servletUtilAdapter.send404(request.getServletContext(), request, response);
+            }
         } catch (Throwable t) {
             if (t instanceof AuraJWTError) {
                 // If jwt validation fails, just 404. Do not gack.

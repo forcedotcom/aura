@@ -48,7 +48,7 @@ import javax.inject.Inject;
 @Component("org.auraframework.impl.LocalizationServiceImpl")
 public class LocalizationServiceImpl implements LocalizationService {
 
-    private LocalizationAdapter localizationAdapter;
+    protected LocalizationAdapter localizationAdapter;
 
     // make pluggable in the future?
     private final DateService dateService = DateServiceImpl.get();

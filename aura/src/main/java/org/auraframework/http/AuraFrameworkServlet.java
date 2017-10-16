@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -59,8 +60,10 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             return;
         }
         long ifModifiedSince = request.getDateHeader(HttpHeaders.IF_MODIFIED_SINCE);
-
-        servletUtilAdapter.setCSPHeaders(null, request, response);
+        
+        if (isAuthenticatedAppRequest(request)) {
+            servletUtilAdapter.setCSPHeaders(null, request, response);
+        }
 
         InputStream in = null;
         try {
@@ -212,5 +215,18 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
     @Inject
     public void setConfigAdapter(ConfigAdapter configAdapter) {
         this.configAdapter = configAdapter;
+    }
+    
+    public boolean isAuthenticatedAppRequest(HttpServletRequest request) {
+        Cookie[] requestCookies = request.getCookies();
+        if (requestCookies != null) {
+            for (Cookie cookie: requestCookies) {
+                String cookieName = cookie.getName();
+                if (cookieName.equals("sid") && !(request.getPathInfo() != null && (request.getPathInfo().contains("/l/") || request.getPathInfo().contains("/auraFW/")))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

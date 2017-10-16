@@ -46,6 +46,7 @@ public class RegistryTrie implements RegistrySet {
 
     // a map of map of maps
     private final Map<DefType, Map<String, PrefixNode>> root = new EnumMap<>(DefType.class);
+    private final Map<String, Map<String, Map<DefType, DefRegistry>>> namespaceRoot = new HashMap<>();
     
     private static String getNamespaceKey(String namespace) {
         // W-3676967: temporarily allow a case-sensitive "duplicate" namespace, should be lower-cased otherwise
@@ -69,6 +70,28 @@ public class RegistryTrie implements RegistrySet {
                     }
                     for (String namespace : reg.getNamespaces()) {
                         pn.put(namespace, reg);
+                    }
+                }
+            }
+            for (String namespace : reg.getNamespaces()) {
+                if (namespace.equals("*")) {
+                    // ignore
+                    continue;
+                }
+                Map<String, Map<DefType,DefRegistry>> prefixRoot = namespaceRoot.get(getNamespaceKey(namespace));
+                if (prefixRoot == null) {
+                    prefixRoot = new HashMap<>();
+                    namespaceRoot.put(getNamespaceKey(namespace), prefixRoot);
+                }
+
+                for (String prefix : reg.getPrefixes()) {
+                    Map<DefType,DefRegistry> defTypeRoot = prefixRoot.get(prefix.toLowerCase());
+                    if (defTypeRoot == null) {
+                        defTypeRoot = new EnumMap<>(DefType.class);
+                        prefixRoot.put(prefix.toLowerCase(), defTypeRoot);
+                    }
+                    for (DefType dt : reg.getDefTypes()) {
+                        defTypeRoot.put(dt, reg);
                     }
                 }
             }
@@ -100,6 +123,28 @@ public class RegistryTrie implements RegistrySet {
     @Override
     public Collection<DefRegistry> getRegistries(DescriptorFilter matcher) {
         Set<DefRegistry> matched = Sets.newHashSet();
+
+        if (matcher.getPrefixMatch().isConstant() && matcher.getNamespaceMatch().isConstant()) {
+            Map<String, Map<DefType,DefRegistry>> prefixRoot;
+            prefixRoot = namespaceRoot.get(getNamespaceKey(matcher.getNamespaceMatch().toString()));
+            if (prefixRoot != null) {
+                Map<DefType,DefRegistry> defTypeRoot;
+                defTypeRoot = prefixRoot.get(matcher.getPrefixMatch().toString().toLowerCase());
+                if (defTypeRoot != null) {
+                    if (matcher.getDefTypes() != null) {
+                        for (DefType defType : matcher.getDefTypes()) {
+                            DefRegistry reg = defTypeRoot.get(defType);
+                            if (reg != null) {
+                                matched.add(reg);
+                            }
+                        }
+                    } else {
+                        matched.addAll(defTypeRoot.values());
+                    }
+                    return matched;
+                }
+            }
+        }
 
         for (DefRegistry reg : this.allRegistries) {
             boolean found = false;

@@ -67,17 +67,5 @@
         test: function(cmp) {
             cmp.testDestroy();
         }
-    },
-
-    testModuleLibrary: {
-        test: function(cmp) {
-            cmp.testModuleLibrary();
-        }
-    },
-
-    testModulePublicMethod: {
-        test: function(cmp) {
-            cmp.testModulePublicMethod();
-        }
-    },
+    }
 })

@@ -99,13 +99,20 @@ function SecureComponent(component, key) {
     });
 
     // The shape of the component depends on the methods exposed in the definitions:
-    var defs = component.getDef().methodDefs;
-    if (defs) {
-        defs.forEach(function(method) {
+    var methodsNames = [];
+    if (component instanceof Aura.Component.InteropComponent) {
+        methodsNames = component.getPublicMethodNames();
+    } else {
+        var defs = component.getDef().methodDefs || [];
+        methodsNames = defs.map(function(method) {
             var descriptor = new DefDescriptor(method.name);
-            SecureObject.addMethodIfSupported(o, component, descriptor.getName(), { defaultKey: key });
-        }, o);
+            return descriptor.getName();
+        });
     }
+
+    methodsNames.forEach(function(methodName) {
+        SecureObject.addMethodIfSupported(o, component, methodName, { defaultKey: key });
+    });
 
     ls_setRef(o, component, key);
     ls_addToCache(component, o, key); // backpointer

@@ -173,7 +173,10 @@ function LockerService() {
 
                 // Lockerize the definition by providing a global scope
                 var mutedGlobals = "$A, aura, Sfdc, sforce";
-                return this.createInternal(code, key, descriptorDebuggableURL, undefined, undefined, mutedGlobals);
+                var locker = this.createInternal(code, key, descriptorDebuggableURL, undefined, undefined, mutedGlobals);
+                // Key the sanitized definition so we can transfer the key to interop component instances
+                ls_setKey(locker.returnValue, key);
+                return locker;
             },
 
             getEnv : function(key, /* deprecated*/ doNotCreate) {

@@ -1,0 +1,5 @@
+{
+    "requireLocker": "true",
+    "description": "library module which will be lockerized!",
+    "expose": true
+}

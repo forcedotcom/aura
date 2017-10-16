@@ -45,7 +45,8 @@ function InteropComponent(config) {
     this.setupGlobalId(config['globalId']);
 
     $A.componentService.indexComponent(this);
-
+    // Make locker service aware of interop component instance, transfer key from sanitized def
+    $A.lockerService.trust(cmpDef.definition, this);
     if (this.localId) {
         this.doIndex(this);
     }

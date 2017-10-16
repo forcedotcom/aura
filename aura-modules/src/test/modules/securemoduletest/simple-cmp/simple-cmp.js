@@ -23,4 +23,9 @@ export default class Simple extends Element {
         testUtil.assertUndefined(createElement, "SecureEngine is leaking properties in module");
         return true;
     }
+
+    @api
+    subtract(a, b) {
+        return a - b;
+    }
 }

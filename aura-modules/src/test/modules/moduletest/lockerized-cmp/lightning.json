@@ -1,0 +1,5 @@
+{
+    "requireLocker": "true",
+    "description": "component module which will be lockerized!",
+    "expose": true
+}

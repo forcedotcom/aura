@@ -17,3 +17,7 @@ export function testEngineIsSecure() {
         "SecureEngine in library");
     return true;
 }
+
+export function addition(a, b) {
+    return a + b;
+}

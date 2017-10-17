@@ -340,6 +340,26 @@
         }]
     },
 
+    testDateInputChangeFormat: {
+        browsers: ['DESKTOP'],
+        attributes: {value: "2016-01-22T01:00:00.000Z", timezone: 'America/Toronto', format: 'MM-DD-YYYY'},
+        test: [function (cmp) {
+            var inputDateTimeCmp = cmp.find("datePickerTestCmp");
+            var inputDateElement = inputDateTimeCmp.find("inputText").getElement();
+            $A.test.addWaitFor(true, function () {
+                return inputDateElement.value == "01-21-2016";
+            });
+        }, function (cmp) {
+            cmp.set("v.format", "MMM DD, YYYY")
+        }, function (cmp) {
+            var inputDateTimeCmp = cmp.find("datePickerTestCmp");
+            var inputDateElement = inputDateTimeCmp.find("inputText").getElement();
+            $A.test.addWaitFor(true, function () {
+                return inputDateElement.value == "Jan 21, 2016";
+            });
+        }]
+    },
+
     testDateInputWithDefaultTime: {
         browsers: ['DESKTOP'],
         attributes: {value: "2017-03-16T00:00:00.000Z", timezone: 'America/Toronto', format: 'MM-DD-YYYY'},

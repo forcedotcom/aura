@@ -2371,17 +2371,6 @@ Aura.Utils.Util.prototype.isExpression = function (obj) {
 };
 
 /**
- * Checks if the object is an Aura Action.
- *
- * @param {Object} obj The object to check for.
- * @returns {Boolean} True if the object type is a controller action, or false otherwise.
- * @private
- */
-Aura.Utils.Util.prototype.isAction = function(obj) {
-    return obj instanceof Action;
-};
-
-/**
  * Checks if the object is an Aura value object.
  *
  * @param {Object} obj The object to check for.

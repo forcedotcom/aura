@@ -37,9 +37,8 @@ import com.ibm.icu.text.DecimalFormat;
 import com.ibm.icu.text.DecimalFormatSymbols;
 import com.ibm.icu.text.NumberFormat;
 import com.ibm.icu.util.Currency;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.inject.Inject;
 
 /**
  * Default implementation for the Localization Service
@@ -917,7 +916,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
 
-    @Inject
+    @Autowired
     public void setLocalizationAdapter(LocalizationAdapter adapter) {
         this.localizationAdapter = adapter;
     }

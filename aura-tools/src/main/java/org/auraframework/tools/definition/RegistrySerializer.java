@@ -381,7 +381,7 @@ public class RegistrySerializer {
             RegistrySet registries;
             if (modulesEnabled) {
                 String parentProjectPath = componentDirectory.getParentFile().getCanonicalPath();
-                // only process registers for namespaces in the current project
+                // skip namespaces not in the current project (BUTC module-enforcer will fail otherwise)
                 Predicate<ComponentLocationAdapter> filterIn = new Predicate<ComponentLocationAdapter>() {
                     @Override
                     public boolean test(ComponentLocationAdapter adapter) {
@@ -400,7 +400,14 @@ public class RegistrySerializer {
                 };
                 // must get all component locations within current maven module first to register namespaces
                 registries = registryService.buildRegistrySet(Mode.DEV, null, filterIn);
-                // modules will use existing component namespaces for conversion
+                // need to add components namespaces to perform correct namespace case conversion for module namespaces
+                File auraComponentsDirectory = new File (componentDirectory.getParentFile(), "components");
+                if (auraComponentsDirectory.exists()) {
+                    for (String namespace: registryService.getRegistry(auraComponentsDirectory).getNamespaces()) {
+                        configAdapter.addInternalNamespace(namespace);
+                    }
+                }
+                // modules will use existing internal namespaces for conversion
                 master = registryService.getModulesRegistry(componentDirectory);
             } else {
                 master = registryService.getRegistry(componentDirectory);

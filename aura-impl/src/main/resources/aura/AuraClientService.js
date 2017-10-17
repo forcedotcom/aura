@@ -2167,10 +2167,10 @@ AuraClientService.prototype.initializeApplication = function() {
         });
     });
 };
+
 /**
- * Initializes injected services
- *
- * Initializes module services defined in the application
+ * Initializes injected services defined in the application.
+ * @param {String[]} services Service descriptors to initialize.
  * @memberOf AuraClientService
  * @private
  */
@@ -2178,15 +2178,10 @@ AuraClientService.prototype.initializeInjectedServices = function(services) {
     if (services) {
         var serviceRegistry = this.moduleServices;
         services.forEach(function (serviceDefinition) {
-            try {
-                var serviceConstructor = $A.componentService.evaluateModuleDef(serviceDefinition);
-                var service = serviceConstructor(Aura.ServiceApi, $A.componentService.moduleEngine);
-                $A.assert(service.name, 'Unknown service name');
-                serviceRegistry[service.name] = service;
-            } catch (e) {
-                // TODO W-4060924 revert making service initialization a soft error
-                console.warn('Failed to initialize service ', serviceDefinition, e); //eslint-disable-line no-console
-            }
+            var serviceConstructor = $A.componentService.evaluateModuleDef(serviceDefinition);
+            var service = serviceConstructor(Aura.ServiceApi, $A.componentService.moduleEngine);
+            $A.assert(service.name, 'Unknown service name');
+            serviceRegistry[service.name] = service;
         });
     }
 };

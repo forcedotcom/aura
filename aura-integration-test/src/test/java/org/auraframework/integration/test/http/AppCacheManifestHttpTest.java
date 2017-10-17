@@ -159,7 +159,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
             fail("Missing cache control header values in: " + cacheControlHeader);
         }
 
-        String expectedContentType = String.format("%s;charset=%s", AuraBaseServlet.MANIFEST_CONTENT_TYPE,
+        String expectedContentType = String.format("%s;charset=%s", "text/cache-manifest",
                 AuraBaseServlet.UTF_ENCODING);
         Header[] contentTypeHeaders = response.getHeaders(HttpHeaders.CONTENT_TYPE);
         System.out.println("expectedContentType:"+expectedContentType+", contentTypeHeaders:");

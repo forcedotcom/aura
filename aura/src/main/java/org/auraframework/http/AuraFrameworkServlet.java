@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -41,9 +42,13 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
     // /required_root/optional_nonce/required_rest_of_path
     private static final Pattern RESOURCES_PATTERN = Pattern.compile("^/([^/]+)(/[-_0-9a-zA-Z]+)?(/.*)$");
 
+    public static final String JAVASCRIPT_CONTENT_TYPE = "text/javascript";
+
     public static final String RESOURCES_FORMAT = "%s/auraFW/resources/%s/%s";
 
     private ConfigAdapter configAdapter;
+
+    private MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

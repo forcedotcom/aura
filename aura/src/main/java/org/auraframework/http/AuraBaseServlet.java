@@ -17,7 +17,6 @@ package org.auraframework.http;
 
 import java.io.IOException;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.inject.Inject;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -26,9 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.adapter.ServletUtilAdapter;
-import org.auraframework.http.RequestParam.StringParam;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Mode;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 @SuppressWarnings("serial")
@@ -50,59 +46,15 @@ public abstract class AuraBaseServlet extends HttpServlet {
      */
     public static final long LONG_EXPIRE = 45 * SHORT_EXPIRE;
     public static final String UTF_ENCODING = "UTF-8";
-    public static final String HTML_CONTENT_TYPE = "text/html";
-    public static final String JAVASCRIPT_CONTENT_TYPE = "text/javascript";
-    public static final String MANIFEST_CONTENT_TYPE = "text/cache-manifest";
-    public static final String CSS_CONTENT_TYPE = "text/css";
-    public static final String SVG_CONTENT_TYPE = "image/svg+xml";
-
-    /** Clickjack protection HTTP header */
-    public static final String HDR_FRAME_OPTIONS = "X-FRAME-OPTIONS";
-    /** Baseline clickjack protection level for HDR_FRAME_OPTIONS header */
-    public static final String HDR_FRAME_SAMEORIGIN = "SAMEORIGIN";
-    /** No-framing-at-all clickjack protection level for HDR_FRAME_OPTIONS header */
-    public static final String HDR_FRAME_DENY = "DENY";
-    /** Limited access for HDR_FRAME_OPTIONS */
-    public static final String HDR_FRAME_ALLOWFROM = "ALLOW-FROM ";
-    /**
-     * Semi-standard HDR_FRAME_OPTIONS to have no restrictions.  Used because no
-     * header at all is taken as an invitation for filters to add their own ideas.
-     */
-    public static final String HDR_FRAME_ALLOWALL = "ALLOWALL";
-
-    protected static MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
-    public static final String OUTDATED_MESSAGE = "OUTDATED";
-    protected final static StringParam csrfToken = new StringParam(AURA_PREFIX + "token", 0, true);
 
     protected ServletUtilAdapter servletUtilAdapter;
-
-    public AuraBaseServlet() {
-        super();
-    }
-
-    /**
-     * Check to see if we are in production mode.
-     */
-    @Deprecated
-    protected boolean isProductionMode(Mode mode) {
-        return servletUtilAdapter.isProductionMode(mode);
-    }
-
-    @Deprecated
-    public String getContentType(AuraContext.Format format) {
-        return servletUtilAdapter.getContentType(format);
-    }
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        processInjection(config);
-    }
-    
-    public void processInjection(ServletConfig config) {
         SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
-
+    
     @Deprecated
     protected void send404(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         servletUtilAdapter.send404(getServletConfig().getServletContext(), request, response);

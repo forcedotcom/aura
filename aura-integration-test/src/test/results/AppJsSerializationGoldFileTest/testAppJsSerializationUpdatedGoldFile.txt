@@ -696,45 +696,7 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
 }
 
 );
-*/}));$A.componentService.addComponent("markup://aura:expression", (function (){/*$A.componentService.addComponentClass("markup://aura:expression",function() {
-return {
-  "meta":{
-    "name":"aura$expression"
-  }
-};
-});
-return {
-  "xs":"G",
-  "descriptor":"markup://aura:expression",
-  "css":true,
-  "ad":[
-    ["value","aura://String","G",false]
-  ],
-  "i":[
-    "markup://aura:rootComponent"
-  ]
-};*/}));
-$A.componentService.addComponent("markup://aura:html", (function (){/*$A.componentService.addComponentClass("markup://aura:html",function() {
-return {
-  "meta":{
-    "name":"aura$html"
-  }
-};
-});
-return {
-  "xs":"G",
-  "descriptor":"markup://aura:html",
-  "css":true,
-  "ad":[
-    ["body","aura://Aura.Component[]","G",false,[]],
-    ["tag","aura://String","G",false],
-    ["HTMLAttributes","aura://Map","G",false,null]
-  ],
-  "i":[
-    "markup://aura:rootComponent"
-  ]
-};*/}));
-$A.componentService.addComponent("markup://aura:text", (function (){/*$A.componentService.addComponentClass("markup://aura:text",function() {
+*/}));$A.componentService.addComponent("markup://aura:text", (function (){/*$A.componentService.addComponentClass("markup://aura:text",function() {
 return {
   "meta":{
     "name":"aura$text"
@@ -947,6 +909,44 @@ return {
     "markup://aura:rootComponent"
   ],
   "ab":true
+};*/}));
+$A.componentService.addComponent("markup://aura:expression", (function (){/*$A.componentService.addComponentClass("markup://aura:expression",function() {
+return {
+  "meta":{
+    "name":"aura$expression"
+  }
+};
+});
+return {
+  "xs":"G",
+  "descriptor":"markup://aura:expression",
+  "css":true,
+  "ad":[
+    ["value","aura://String","G",false]
+  ],
+  "i":[
+    "markup://aura:rootComponent"
+  ]
+};*/}));
+$A.componentService.addComponent("markup://aura:html", (function (){/*$A.componentService.addComponentClass("markup://aura:html",function() {
+return {
+  "meta":{
+    "name":"aura$html"
+  }
+};
+});
+return {
+  "xs":"G",
+  "descriptor":"markup://aura:html",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["tag","aura://String","G",false],
+    ["HTMLAttributes","aura://Map","G",false,null]
+  ],
+  "i":[
+    "markup://aura:rootComponent"
+  ]
 };*/}));
 $A.componentService.addComponent("markup://aura:if", (function (){/*$A.componentService.addComponentClass("markup://aura:if",function() {
 return {
@@ -14627,39 +14627,19 @@ return {
 };*/}));
 $A.componentService.initEventDefs([
   {
-    "descriptor":"markup://aura:componentEvent",
-    "t":"COMPONENT",
+    "descriptor":"markup://aura:applicationEvent",
+    "t":"APPLICATION",
     "xs":"G"
   },
   {
-    "descriptor":"markup://ui:baseDOMEvent",
+    "descriptor":"markup://aura:componentEvent",
     "t":"COMPONENT",
-    "xs":"I",
-    "a":{
-      "domEvent":["domEvent","aura://Object","I",false,null]
-    }
-  },
-  {
-    "descriptor":"markup://aura:applicationEvent",
-    "t":"APPLICATION",
     "xs":"G"
   },
   {
     "descriptor":"markup://aura:valueEvent",
     "t":"VALUE",
     "xs":"G"
-  },
-  {
-    "descriptor":"markup://ui:baseMouseEvent",
-    "t":"COMPONENT",
-    "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseDOMEvent"
-    },
-    "a":{
-      "domEvent":["domEvent","aura://Object","I",false,null],
-      "button":["button","aura://Integer","I",false]
-    }
   },
   {
     "descriptor":"markup://aura:applicationRefreshed",
@@ -14827,6 +14807,26 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://aura:waiting",
     "t":"APPLICATION",
     "xs":"G"
+  },
+  {
+    "descriptor":"markup://ui:baseDOMEvent",
+    "t":"COMPONENT",
+    "xs":"I",
+    "a":{
+      "domEvent":["domEvent","aura://Object","I",false,null]
+    }
+  },
+  {
+    "descriptor":"markup://ui:baseMouseEvent",
+    "t":"COMPONENT",
+    "xs":"I",
+    "su":{
+      "descriptor":"markup://ui:baseDOMEvent"
+    },
+    "a":{
+      "domEvent":["domEvent","aura://Object","I",false,null],
+      "button":["button","aura://Integer","I",false]
+    }
   },
   {
     "descriptor":"markup://ui:baseKeyboardEvent",

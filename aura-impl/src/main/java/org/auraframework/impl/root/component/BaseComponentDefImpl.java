@@ -690,22 +690,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             dependencies.add(templateDefDescriptor);
         }
 
-        if (externalModelDescriptor != null) {
-            dependencies.add(externalModelDescriptor);
-        }
-        if (externalRendererDescriptor != null) {
-            dependencies.add(externalRendererDescriptor);
-        }
-        if (externalControllerDescriptor != null) {
-            dependencies.add(externalControllerDescriptor);
-        }
-        if (externalHelperDescriptor != null) {
-            dependencies.add(externalHelperDescriptor);
-        }
-        if (externalProviderDescriptor != null) {
-            dependencies.add(externalProviderDescriptor);
-        }
-
         if (imports != null && !imports.isEmpty()) {
             for (LibraryDefRef imported : imports) {
                 imported.appendDependencies(dependencies);
@@ -1719,7 +1703,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         @SuppressWarnings("unchecked")
-        @Override
+		@Override
         public void finish() {
             if (render == null) {
                 this.renderType = RenderType.AUTO;

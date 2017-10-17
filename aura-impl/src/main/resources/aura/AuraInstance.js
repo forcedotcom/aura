@@ -1295,35 +1295,36 @@ AuraInstance.prototype.deprecated = function(message, workaround, sinceDate, due
     // JBUCH: TEMPORARILY IGNORE CALLS BY ui: and aura: NAMESPACES.
     // REMOVE WHEN VIEW LOGIC IS COMPILED WITH FRAMEWORK.
     var callingCmp = $A.clientService.getCurrentAccessName();
-    if(/^(ui|aura):\w+$/.test(callingCmp)){
-        // $A.log("Framework component use of deprecated method: "+message);
+    if (/^(ui|aura):\w+$/.test(callingCmp)) {
+        return;
+    }
+
+    // JBUCH: TEMPORARILY IGNORE CALLS BY FRAMEWORK.
+    // REMOVE WHEN ALL @public METHODS HAVE BEEN ADDRESSED.
+    var callStack = new Error().stack;
+    // skip if no stack info, due to perf. (IE)
+    if (!callStack) {
+        return;
+    }
+
+    // TODO: This filter may have false positive when a function is installed a override
+    // It assumes the stack strace is formatted as:
+    //      Error: error message
+    //          at AuraInstance.$deprecated$
+    //          at [The Deprecated API]
+    //          at [The Caller]
+    var caller = callStack.split('\n', 4)[3];
+    if (!caller || caller.indexOf("/aura_") > -1) {
         return;
     }
 
     //#if {"excludeModes" : ["PRODUCTION"]}
-    var caller=new Error();
-    if(!caller.stack){
-        try {
-            throw caller;
-        } catch(e) {
-            caller=e;
-        }
-    }
-    caller = (caller.stack||'').split('\n')[3] || 'at unknown location';
-
-    // JBUCH: TEMPORARILY IGNORE CALLS BY FRAMEWORK.
-    // REMOVE WHEN ALL @public METHODS HAVE BEEN ADDRESSED.
-    // TODO: This filter may have false positive when a function is installed a override
-    if (caller.indexOf("/aura_")>-1) {
-        // $A.log("Framework use of deprecated method: " + message);
-        return;
-    }
-
     if (workaround) {
         message += ". Workaround: " + workaround;
     }
-    $A.warning(message);
+    $A.warning("Deprecation warning: " + message);
     //#end
+
 
     //#if {modes: ["PRODUCTION", "PRODUCTIONDEBUG"]}
     // skip reporting, if there's no reporting signature.

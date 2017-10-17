@@ -24,7 +24,22 @@ public interface FileBundleSourceBuilder {
     /**
      * Check to see if the bundle actually matches what is expected to build one.
      */
-    boolean isBundleMatch(File base);
+    default boolean isBundleMatch(File base) {
+        if (new File(base, base.getName()+getExtension()).exists()) {
+            return true;
+        }
+        String name = base.getName()+getExtension();
+        for (File content : base.listFiles()) {
+            if (name.equalsIgnoreCase(content.getName())) {
+                throw new RuntimeException("Files in bundle must case-sensitively match the folder they are in: " + base.toString());
+            }
+        }
+        return false;
+    }
+
+    default String getExtension() {
+        return null;
+    }
 
     /**
      * Build a bundle from a source directory.

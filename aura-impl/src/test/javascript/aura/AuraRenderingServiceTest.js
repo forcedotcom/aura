@@ -97,7 +97,9 @@ Test.Aura.AuraRenderingServiceTest = function(){
                 clientService:$A.clientService,
                 util: {
                     isComponent : function() { return shouldBeComponent; },
-                    isArray : function(obj) { return obj instanceof Array; }
+                    isArray : function(obj) { return obj instanceof Array; },
+                    isUndefinedOrNull : function(obj) { return obj === undefined || obj === null; },
+                    isEmpty : function(obj) { return this.isArray(obj) && obj.length === 0; }
                 },
                 assert: function(condition, message) {
                     if (!condition) {
@@ -218,7 +220,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
                 collection.add("1:0");
                 collection.add("2:0");
                 collection.add("3:0");
-                collection.delete("1:0");
+                collection.delete("1:0", function() {});
                 actual = collection.get();
 
                 Assert.Equal(expected, actual);
@@ -233,7 +235,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
                 collection.add("1:0");
                 collection.add("2:0");
                 collection.add("3:0");
-                collection.delete("2:0");
+                collection.delete("2:0", function() {});
                 actual = collection.get();
 
                 Assert.Equal(expected, actual);
@@ -248,7 +250,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
                 collection.add("1:0");
                 collection.add("2:0");
                 collection.add("3:0");
-                collection.delete("3:0");
+                collection.delete("3:0", function() {});
                 actual = collection.get();
 
                 Assert.Equal(expected, actual);
@@ -263,7 +265,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
                 collection.add("1:0");
                 collection.add("2:0");
                 collection.add("3:0");
-                collection.delete("4:0");
+                collection.delete("4:0", function() {});
                 actual = collection.get();
 
                 Assert.Equal(expected, actual);
@@ -276,12 +278,94 @@ Test.Aura.AuraRenderingServiceTest = function(){
                 var actual;
 
                 collection.add("1:0");
-                collection.delete("1:0");
+                collection.delete("1:0", function() {});
                 actual = collection.references;
 
                 Assert.Equal(expected, actual);
             }
+
         }
+
+        [Fixture]
+            function removeMarkerFromReferenceMap() {
+
+                [Fact]
+                function bailIfNoMarkerIsPassed(){
+                    var service = new Aura.Services.AuraRenderingService();
+                    var collection = new Aura.Services.AuraRenderingService.prototype.ReferenceCollection();
+                    collection["references"] = "10:0";
+                    service.markerToReferencesMap = {"1:0": { references: collection["references"]}};
+
+                    var res = service.removeMarkerFromReferenceMap(null, null)
+
+                    //Map should not be updated
+                    Assert.Equal(service.markerToReferencesMap, { "1:0": {references: collection["references"]}});
+                }
+
+                [Fact]
+                function DeleteEntryIfRefIsNull(){
+                    var service = new Aura.Services.AuraRenderingService();
+                    var collection = new Aura.Services.AuraRenderingService.prototype.ReferenceCollection();
+                    collection["references"] = "10:0";
+                    service.markerToReferencesMap = { "1:0": { references: collection["references"]}};
+                    var mockAuraInfo = getMockAuraInfo(false);
+
+                    // Act
+                    mockAuraInfo.mock(function() {
+                        service.removeMarkerFromReferenceMap("1:0", null);
+                    });
+
+                    Assert.Equal(service.markerToReferencesMap, {});
+                }
+
+                [Fact]
+                function ShouldNotDeleteEntryIfRefIsNotNull(){
+                    var service = new Aura.Services.AuraRenderingService();
+                    var collection = new Aura.Services.AuraRenderingService.prototype.ReferenceCollection();
+                    collection["references"] = "10:0";
+                    service.markerToReferencesMap = {"1:0": { references: collection["references"]}};
+                    var mockAuraInfo = getMockAuraInfo(false);
+
+                    // Act
+                    mockAuraInfo.mock(function() {
+                        service.removeMarkerFromReferenceMap("1:0", "10:0");
+                    });
+
+                    Assert.Equal(service.markerToReferencesMap, { "1:0": { references: collection["references"]}});
+                }
+
+                [Fact]
+                function DeleteEntryIfRefIsEmpty(){
+                    var service = new Aura.Services.AuraRenderingService();
+                    var collection = new Aura.Services.AuraRenderingService.prototype.ReferenceCollection();
+                    collection["references"] = ["10:0"];
+                    service.markerToReferencesMap = {"1:0": { references: collection["references"], isCollection: true }};
+                    var mockAuraInfo = getMockAuraInfo(false);
+
+                    // Act
+                    mockAuraInfo.mock(function() {
+                        service.removeMarkerFromReferenceMap("1:0", []);
+                    });
+
+                    Assert.Equal(service.markerToReferencesMap, {});
+                }
+
+                [Fact]
+                function ShouldNotDeleteEntryIfRefIsNotEmpty(){
+                    var service = new Aura.Services.AuraRenderingService();
+                    var collection = new Aura.Services.AuraRenderingService.prototype.ReferenceCollection();
+                    collection["references"] = ["10:0"];
+                    service.markerToReferencesMap = {"1:0": { references: collection["references"], isCollection: true }};
+                    var mockAuraInfo = getMockAuraInfo(false);
+
+                    // Act
+                    mockAuraInfo.mock(function() {
+                        service.removeMarkerFromReferenceMap("1:0", ["10:0"]);
+                    });
+
+                    Assert.Equal(service.markerToReferencesMap, {"1:0": { references: collection["references"], isCollection: true }});
+                }
+            }
 
         [Fixture]
         function ReferenceCollectionHas() {

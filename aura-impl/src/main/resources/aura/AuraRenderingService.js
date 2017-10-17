@@ -1118,10 +1118,29 @@ AuraRenderingService.prototype.addMarkerReference = function(marker, globalId) {
  */
 AuraRenderingService.prototype.removeMarkerReference = function(marker, globalId) {
     if(!marker||!globalId) { return; }
-    var references = this.markerToReferencesMap[this.resolveUid(marker)];
 
-    if(references) {
-        references.delete(globalId);
+    var resolvedMarker = this.resolveUid(marker);
+    var references = this.markerToReferencesMap[resolvedMarker];
+
+
+    if(!$A.util.isUndefinedOrNull(references)) {
+        references.delete(globalId, function(refs) {
+            this.removeMarkerFromReferenceMap(resolvedMarker, refs);
+        }.bind(this));
+    }
+};
+
+/**
+ * Remove the reference marker from the markerToReferencesMap object.
+ *
+ * @private
+ */
+AuraRenderingService.prototype.removeMarkerFromReferenceMap = function(resolvedMarker, refs) {
+    if(!resolvedMarker) { return; }
+
+    if($A.util.isUndefinedOrNull(refs) || $A.util.isEmpty(refs)) {
+        this.markerToReferencesMap[resolvedMarker] = null;
+        delete this.markerToReferencesMap[resolvedMarker];
     }
 };
 
@@ -1244,7 +1263,7 @@ AuraRenderingService.prototype.ReferenceCollection.prototype.add = function(valu
     }
 };
 
-AuraRenderingService.prototype.ReferenceCollection.prototype.delete = function(value){
+AuraRenderingService.prototype.ReferenceCollection.prototype.delete = function(value, callback){
     if(typeof value !== "string") {
         return;
     }
@@ -1257,6 +1276,7 @@ AuraRenderingService.prototype.ReferenceCollection.prototype.delete = function(v
     if(this.references === value) {
         this.references = null;
     }
+    callback(this.references);
 };
 
 AuraRenderingService.prototype.ReferenceCollection.prototype.has = function(value){

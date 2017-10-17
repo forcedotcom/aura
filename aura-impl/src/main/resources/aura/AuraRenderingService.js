@@ -311,7 +311,11 @@ AuraRenderingService.prototype.unrender = function(components) {
                 // elements removed, and those elements are the ones in beforeUnrenderElements.
                 if(beforeUnrenderElements && beforeUnrenderElements.length) {
                     for(var c=0,len=beforeUnrenderElements.length;c<len;c++) {
-                        $A.util.removeElement(beforeUnrenderElements[c], container);
+                        var beforeUnrenderElement = beforeUnrenderElements[c];
+                        // InteropComponent#unrender did removeElement already
+                        if (!beforeUnrenderElement.__customElement) {
+                            $A.util.removeElement(beforeUnrenderElement);
+                        }
                     }
                 }
 

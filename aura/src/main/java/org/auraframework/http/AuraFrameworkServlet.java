@@ -224,10 +224,11 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
     
     public boolean isAuthenticatedAppRequest(HttpServletRequest request) {
         Cookie[] requestCookies = request.getCookies();
+        String requestPathInfo = request.getPathInfo();
         if (requestCookies != null) {
             for (Cookie cookie: requestCookies) {
                 String cookieName = cookie.getName();
-                if (cookieName.equals("sid") && !(request.getPathInfo() != null && (request.getPathInfo().contains("/l/") || request.getPathInfo().contains("/auraFW/")))) {
+                if (cookieName.equals("sid") && !(request.getPathInfo() != null && (requestPathInfo.endsWith(".js") || requestPathInfo.endsWith(".css")))) {
                     return true;
                 }
             }

@@ -3943,4 +3943,48 @@ Test.Aura.AuraClientServiceTest = function() {
         }
 
     }
+
+    [Fixture]
+    function getCurrentAccessGlobalId() {
+
+        [Fact]
+        function shouldReturnGlobalIdIfCurrentContextExists() {
+             // Arrange
+            var expected = "2";
+            var actual;
+
+            // Act
+            mockGlobal(function() {
+                var sendData;
+                var target = new Aura.Services.AuraClientService();
+                target.currentAccess = {
+                    globalId: "2"
+                };
+                actual = target.getCurrentAccessGlobalId();
+            });
+
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function shouldReturnNullIfCurrentContextDoesNotExist() {
+             // Arrange
+            var expected = null;
+            var actual;
+
+            // Act
+            mockGlobal(function() {
+                var sendData;
+                var target = new Aura.Services.AuraClientService();
+                actual = target.getCurrentAccessGlobalId();
+            });
+
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+    }
 }

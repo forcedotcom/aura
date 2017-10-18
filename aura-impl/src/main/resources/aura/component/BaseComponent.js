@@ -45,7 +45,7 @@ function BaseComponent(config, localCreation) {
     this.localIndex = {};
     this.destroyed=0;
     this.version = config["version"];
-    this.owner = $A.clientService.currentAccess;
+    this.owner = $A.clientService.getCurrentAccessGlobalId();
     this.name='';
     this.isRootComponent = true;
 

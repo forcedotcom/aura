@@ -34,7 +34,7 @@ function InteropModule(config) {
     this.shouldAutoDestroy = true;
     this.localId = config['localId'];
     this.attributeValueProvider = config['attributes']['valueProvider'];
-    this.owner = $A.clientService.currentAccess;
+    this.owner = $A.clientService.getCurrentAccessGlobalId();
 
     this.allElements = [];
 

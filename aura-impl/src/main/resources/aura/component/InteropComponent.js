@@ -36,7 +36,7 @@ function InteropComponent(config) {
     this.valueProviders = {};
     this.localId = config['localId'];
     this.attributeValueProvider = config['attributes']['valueProvider'];
-    this.owner = $A.clientService.currentAccess;
+    this.owner = $A.clientService.getCurrentAccessGlobalId();
     this.currentClassMap = {};
 
     this.attrNameToPropMap = this.componentDef.attrNameToPropMap;

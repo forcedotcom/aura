@@ -4251,4 +4251,20 @@ AuraClientService.prototype.getActionStorageName = function() {
     return this.actionStorage.STORAGE_NAME;
 };
 
+/**
+ * Returns the globalId for the owner component.
+ * Used on component instantiation.
+ * @return {String} GlobalId of parent component
+ * 
+ * @private
+ */
+AuraClientService.prototype.getCurrentAccessGlobalId = function () {
+    var owner = null;
+    if(!$A.util.isUndefinedOrNull(this.currentAccess)) {
+        owner = this.currentAccess.globalId;
+    }
+
+    return owner;
+};
+
 Aura.Services.AuraClientService = AuraClientService;

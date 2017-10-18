@@ -42,7 +42,7 @@ function TextComponent(config, localCreation) {
     this.localIndex = {};
     this.destroyed=false;
     this.version = config["version"];
-    this.owner = $A.clientService.currentAccess;
+    this.owner = $A.clientService.getCurrentAccessGlobalId();
     this.name='';
     this.isRootComponent = true;
 

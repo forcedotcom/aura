@@ -58,6 +58,7 @@ Test.Aura.Component.ComponentTest=function(){
     delete AuraError;
 
     function mockFramework(during){
+        var mockedCmp = Stubs.Aura.GetComponent({});
         var mock = {
             "Aura":Aura,
             "Component": Aura.Component.Component,
@@ -83,7 +84,8 @@ Test.Aura.Component.ComponentTest=function(){
                 clientService:{
                     getAccessVersion:function(){},
                     releaseCurrentAccess:function(){},
-                    setCurrentAccess: function(){}
+                    setCurrentAccess: function(){},
+                    getCurrentAccessGlobalId: function(){return mockedCmp.globalId}
                 },
                 componentService:{
                     get:function(){},
@@ -150,6 +152,7 @@ Test.Aura.Component.ComponentTest=function(){
                         return typeof(target) == "string";
                     },
                     isUndefinedOrNull:function(){
+                        return true
                     }
                 },
                 lockerService: {
@@ -161,7 +164,8 @@ Test.Aura.Component.ComponentTest=function(){
                         return component;
                     }
                 },
-                auraError: Aura.Errors.AuraError
+                auraError: Aura.Errors.AuraError,
+                getComponent: Stubs.Aura.GetComponent
             }
         };
 

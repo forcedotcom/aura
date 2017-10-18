@@ -789,7 +789,7 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
         // Decide whether the module should be lockerized or not
         if ((!isInternalNamespace || (isInternalNamespace && entry["requireLocker"]))) {
             // Eval the definition in a restricted scope
-            entry.definition = $A.lockerService.createForModule(entry.definition.toString(), defDescriptor).returnValue;
+            entry.definition = $A.lockerService.createForModule(entry.definition.toString(), defDescriptor);
 
             // Provide SecureEngine as a dependency if "engine" was imported by the module
             var index = entry.dependencies.indexOf("engine");

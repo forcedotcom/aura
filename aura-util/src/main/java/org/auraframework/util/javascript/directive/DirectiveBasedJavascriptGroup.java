@@ -114,8 +114,8 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     private String librariesContent = "";
     private String librariesContentMin = "";
 
-    private String secureEval = "";
-    private String secureEvalMin = "";
+    private String locker = "";
+    private String lockerMin = "";
 
     private String engine = "";
     private String engineMin = "";
@@ -220,22 +220,30 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
             this.librariesContentMin = "\nAura.externalLibraries = function() {\n" + libsContentMin + "\n};";
         }
 
-        // Locker Secure Evaluator
-        String secureEvalSource = null;
-        String secureEvalMinSource = null;
+        // Locker
+        String lockerSource = null;
+        String lockerMinSource = null;
+        String lockerDisabledSource = null;
+        String lockerDisabledMinSource = null;
         try {
-            secureEvalSource = getSource("aura/resources/lockerservice/InlineSafeEval.js");
-            secureEvalMinSource = getSource("aura/resources/lockerservice/InlineSafeEval.min.js");
+            lockerSource = getSource("aura/resources/lockerservice/aura-locker.js");
+            lockerMinSource = getSource("aura/resources/lockerservice/aura-locker.min.js");
+
+            lockerDisabledSource = getSource("aura/resources/lockerservice/aura-locker-disabled.js");
+            lockerDisabledMinSource = getSource("aura/resources/lockerservice/aura-locker-disabled.min.js");
         }  catch (MalformedURLException e) {}
 
-        // This must be loaded early and needs to guard against Aura not been defined yet.
-        if (secureEvalSource != null) {
-            this.secureEval = "\nwindow.Aura || (window.Aura = {}); window.Aura.InitSecureEval = function(scriptNonce) {\n" + secureEvalSource + "\n};";
+        // Both versions of locker core are always included, the selection is made at runtime.
+        if (lockerSource != null && lockerDisabledSource != null) {
+            locker =
+              "try {\n" + lockerSource + "\n} catch (e) {}\n" +
+              "try {\n" + lockerDisabledSource + "\n} catch (e) {}\n";
         }
-        if (secureEvalMinSource != null) {
-            this.secureEvalMin = "\nwindow.Aura || (window.Aura = {}); window.Aura.InitSecureEval = function(scriptNonce) {\n" + secureEvalMinSource + "\n};";
+        if (lockerMinSource != null && lockerDisabledMinSource != null) {
+            lockerMin =
+              "try {\n" + lockerMinSource + "\n} catch (e) {}\n" +
+              "try {\n" + lockerDisabledMinSource + "\n} catch (e) {}\n";
         }
-
 
         // Engine
         String engineSource = null;
@@ -334,7 +342,6 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                 JavascriptWriter jsWriter = mode.getJavascriptWriter();
                 boolean minified = jsWriter == JavascriptWriter.CLOSURE_AURA_PROD;
                 String libs = minified ? librariesContentMin : librariesContent;
-                String eval = mode.allowedInProduction() ? secureEvalMin : secureEval;
 
                 StringWriter stringWriter = new StringWriter();
                 jsWriter.compress(everything, stringWriter, modeJs.getName());
@@ -348,20 +355,25 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
                 for (File output : filesToWrite) {
                     if (writtenFiles.contains(output)) continue;
+
+                    boolean isProdDebug = mode == JavascriptGeneratorMode.PRODUCTIONDEBUG;
+                    boolean isCompat = output.getName().contains(COMPAT_SUFFIX);
+
                     try {
                         writer = new FileWriter(output);
 
                         if (mode != JavascriptGeneratorMode.DOC) {
                             // jsdoc errors when parsing engine.js
-                            boolean isProdDebug = mode == JavascriptGeneratorMode.PRODUCTIONDEBUG;
-                            boolean isCompat = output.getName().contains(COMPAT_SUFFIX);
                             String eng = minified ?
                                     (isCompat ? engineCompatMin : engineMin) :
                                     (isCompat ? ( isProdDebug ? engineCompatProdDebug : engineCompat) : ( isProdDebug ? engineProdDebug : engine));
                             writer.append(eng).append("\n");
+
+                            // jsdoc errors when parsing aura-locker.js
+                            String ls = minified ? lockerMin : locker;
+                            writer.append(ls).append("\n");
                         }
 
-                        writer.append(eval).append("\n");
                         writer.append(compressed).append("\n");
                         writer.append(libsCompressed).append("\n");
 

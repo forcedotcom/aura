@@ -89,6 +89,7 @@ public class HtmlRenderer implements Renderer {
                 // otherwise save the script to be run after necessary bootstrap files are loaded on client
                 rc.getCurrent().append(
                         "(function(customerJs, namespace) {\n" +
+                        "    customerJs = '(' + customerJs + ')()';\n" +
                         "    window.Aura || (window.Aura = {});\n" +
                         "    Aura.inlineJsLocker || (Aura.inlineJsLocker = []);\n" +
                         "    if(Aura.inlineJsReady && Aura.frameworkJsReady) {\n" +

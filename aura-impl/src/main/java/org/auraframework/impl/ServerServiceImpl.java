@@ -670,11 +670,6 @@ public class ServerServiceImpl implements ServerService {
                 auraInit.put("token", configAdapter.getCSRFToken());
             }
 
-            String lockerWorkerURL = configAdapter.getLockerWorkerURL();
-            if (configAdapter.isStrictCSPEnforced() && lockerWorkerURL != null) {
-                auraInit.put("safeEvalWorker", lockerWorkerURL);
-            }
-
             auraInit.put("MaxParallelXHRCount", configAdapter.getMaxParallelXHRCount());
             auraInit.put("XHRExclusivity", configAdapter.getXHRExclusivity());
 

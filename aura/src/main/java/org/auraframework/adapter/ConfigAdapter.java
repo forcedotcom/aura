@@ -41,8 +41,6 @@ public interface ConfigAdapter extends AuraAdapter {
 
     String getAuraJSURL();
 
-    String getLockerWorkerURL();
-
     /** Returns a string to identify this unique version of the Aura framework. */
     String getAuraFrameworkNonce();
 
@@ -67,9 +65,9 @@ public interface ConfigAdapter extends AuraAdapter {
     boolean validateCss();
 
     /**
-     * SessionCacheKey is a key that is used for caches that are based typically per customer basis. 
+     * SessionCacheKey is a key that is used for caches that are based typically per customer basis.
      * if this returns null, it mean that caches that uses this key will not be active.
-     * 
+     *
      * @return a String, may be null
      */
     String getSessionCacheKey();
@@ -109,14 +107,14 @@ public interface ConfigAdapter extends AuraAdapter {
 
     /**
      * Validate the app.encryptionkey request
-     * 
+     *
      * @return true if the request has a valid jwt token.
      */
     boolean validateGetEncryptionKey(String ssid);
 
     /**
      * Validate the inline.js request
-     * 
+     *
      * @return true if the request has a valid jwt token.
      */
     boolean validateBootstrap(String ssid);
@@ -185,17 +183,17 @@ public interface ConfigAdapter extends AuraAdapter {
 
     /**
      * Is strict CSP policy enforced:
-     *  1. No unsafe-eval
+     *  1. Allow unsafe-eval
      *  2. No unsafe-inline
      * @return
      */
     boolean isStrictCSPEnforced();
-    
+
     /**
      * @return max number of parallel XHRs used to execute server actions, must be 2 or more
      */
     int getMaxParallelXHRCount();
-    
+
     /**
      * @return whether to use one XHR to send each action (use with HTTP/2 only)
      */
@@ -233,7 +231,7 @@ public interface ConfigAdapter extends AuraAdapter {
      * @return Cache key to add to the context for action public caching.
      */
     String getActionPublicCacheKey();
-    
+
     /**
      * @return factory for the nodejs service
      */

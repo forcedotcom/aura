@@ -161,21 +161,11 @@ Aura.Utils.Util.prototype.isIOSWebView = function() {
  *
  * @private
  */
-Aura.Utils.Util.prototype.globalEval = function(src, optionalSourceURL) {
-    var srcToEval = "return (" + src + ");";
-    if (window["$$safe-eval-compat$$"]) {
-        //For perf, disable pre-processing step and assume that src passed returns a value
-        return window["$$safe-eval-compat$$"](srcToEval, optionalSourceURL, true, undefined, window);
-    }
+Aura.Utils.Util.prototype.globalEval = function(src, sourceURL) {
 
-    // --- backward compatibility ---
-    // If eval is allowed by the browser (e.g. IE11, AIS, LO), we don't load safeEvalWorker. In such cases we fallback
-    // to the old mechanism of evaluation.
-    // This evaluation occurs in the global scope.
-    var sourceURL = optionalSourceURL ? '\n//# sourceURL=' + optionalSourceURL : '';
-
-    // Force an indirect eval so it uses global context
-    return (0,eval)("(function(){"+ srcToEval +"})();" + sourceURL);
+    // Force an indirect eval so it uses the global context.
+    sourceURL = sourceURL ? '\n//# sourceURL=' + sourceURL : '';
+    return (0,eval)("(function(){ return (\n"+ src +"\n)})();" + sourceURL);
 };
 
 /**
@@ -2481,6 +2471,7 @@ Aura.Utils.Util.prototype.setText = function(node, text) {
 /**
  * Posts message to the provided window. This was done to workaround an issue where browser sets
  * event.source to be safeEvalWorker window (see W-3443540).
+ * NOTE: safeEvalWorker has been removed.
  * @param {Window} targetWindow The destination window for the message
  * @param {Array} argsArray list of arguments to be posted
  * @export

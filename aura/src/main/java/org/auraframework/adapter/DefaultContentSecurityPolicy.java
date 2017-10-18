@@ -57,7 +57,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
      * @param inline whether to allow inline script and style. It's better not to, but legacy is what legacy is.
      */
     public DefaultContentSecurityPolicy(boolean inline) {
-	this(inline, Aura.getCspInliningService()); 
+	this(inline, Aura.getCspInliningService());
     }
 
     /**
@@ -107,11 +107,9 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         if (nonCspInlineEnabled || !strictCSPEnforced) {
             list.add(CSP.UNSAFE_INLINE);
         }
-        
-		if (!strictCSPEnforced) {
-            list.add(CSP.UNSAFE_EVAL);
-        }
-        
+
+        list.add(CSP.UNSAFE_EVAL);
+
         return list;
     }
 

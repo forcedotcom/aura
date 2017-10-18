@@ -40,6 +40,8 @@ public enum ClientLibraryResolverRegistryImpl implements ClientLibraryResolverRe
         register(new AuraResourceResolver("CkEditor", ClientLibraryDef.Type.JS, "ckeditor/ckeditor-4.x/rel/ckeditor.js", "ckeditor/ckeditor-4.x/rel/ckeditor.js"));
         register(new AuraResourceResolver("DOMPurify", ClientLibraryDef.Type.JS, "DOMPurify/DOMPurify.js", "DOMPurify/DOMPurify.min.js"));
         register(new AuraResourceResolver("engine", ClientLibraryDef.Type.JS, "engine/engine.js", "engine/engine.min.js"));
+        register(new AuraResourceResolver("locker", ClientLibraryDef.Type.JS, "lockerservice/aura-locker.js", "lockerservice/aura-locker.min.js"));
+        register(new AuraResourceResolver("locker-disabled", ClientLibraryDef.Type.JS, "lockerservice/aura-locker-disabled.js", "lockerservice/aura-locker-disabled.min.js"));
     }
 
     /**

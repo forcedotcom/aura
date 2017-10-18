@@ -41,6 +41,8 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 @TargetBrowsers(BrowserType.GOOGLECHROME)
 @UnAdaptableTest("AbstractLoggingUITest has tag @ThreadHostileTest which is not supported in SFDC.")
 public class CSPReportLoggingUITest extends AbstractLoggingUITest {
+	//Account for feature detection checks in aura:template -> initLocker() to decide if safeEvalWorker is needed
+	private static int EXPECTED_VIOLATIONS_FOR_SAFE_EVAL_WORKER_FEATURE_DETECTION = 1;
 
     public CSPReportLoggingUITest(String name) {
         super(name, "LoggingContextImpl");
@@ -55,8 +57,8 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
         String uri = String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName());
 
         open(uri);
-        List<String> logs = getCspReportLogs(appender, 1);
-        String cspReport = logs.get(0);
+        List<String> logs = getCspReportLogs(appender, 1 + EXPECTED_VIOLATIONS_FOR_SAFE_EVAL_WORKER_FEATURE_DETECTION);
+        String cspReport = logs.get(0 + EXPECTED_VIOLATIONS_FOR_SAFE_EVAL_WORKER_FEATURE_DETECTION);
 
         String expectedDocumentUri = String.format("%s=%s", CSPReporterServlet.DOCUMENT_URI, getAbsoluteURI(uri));
         assertThat("Could not find expected violated directive", cspReport, containsString(expectedDocumentUri));
@@ -99,8 +101,8 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
         String uri = String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName());
 
         open(uri);
-        List<String> logs = getCspReportLogs(appender, 1);
-        String cspReport = logs.get(0);
+        List<String> logs = getCspReportLogs(appender, 1 + EXPECTED_VIOLATIONS_FOR_SAFE_EVAL_WORKER_FEATURE_DETECTION);
+        String cspReport = logs.get(0 + EXPECTED_VIOLATIONS_FOR_SAFE_EVAL_WORKER_FEATURE_DETECTION);
 
         String expectedDocumentUri = String.format("%s=%s", CSPReporterServlet.DOCUMENT_URI, getAbsoluteURI(uri));
         assertThat("Could not find expected violated directive", cspReport, containsString(expectedDocumentUri));
@@ -152,10 +154,10 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
         // trigger script violation to generate CSP logs.
         getAuraUITestingUtil().getRawEval("var s=document.createElement('script');s.type='text/javascript';s.async=true;s.src='http://expectedreport.salesforce.com/';document.getElementsByTagName('head')[0].appendChild(s);");
 
-        List<String> logs = getCspReportLogs(appender, 1);
+        List<String> logs = getCspReportLogs(appender, 1 + EXPECTED_VIOLATIONS_FOR_SAFE_EVAL_WORKER_FEATURE_DETECTION);
         // only grab the first CSP log line. if hitting fonts violation,
         // the log line will only contains fonts violation rather than script violation
-        String cspReport = logs.get(0);
+        String cspReport = logs.get(0 + EXPECTED_VIOLATIONS_FOR_SAFE_EVAL_WORKER_FEATURE_DETECTION);
 
         String expectedDocumentUri = String.format("%s=%s", CSPReporterServlet.DOCUMENT_URI, getAbsoluteURI(uri));
         assertThat("Could not find expected violated directive", cspReport, containsString(expectedDocumentUri));
@@ -186,8 +188,8 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
         String externalUri = "http://www2.sfdcstatic.com";
 
         open(uri);
-        List<String> logs = getCspReportLogs(appender, 1);
-        String cspReport = logs.get(0);
+        List<String> logs = getCspReportLogs(appender, 1 + EXPECTED_VIOLATIONS_FOR_SAFE_EVAL_WORKER_FEATURE_DETECTION);
+        String cspReport = logs.get(0 + EXPECTED_VIOLATIONS_FOR_SAFE_EVAL_WORKER_FEATURE_DETECTION);
 
         String expectedDocumentUri = String.format("%s=%s", CSPReporterServlet.DOCUMENT_URI, getAbsoluteURI(uri));
         assertThat("Could not find expected violated directive", cspReport, containsString(expectedDocumentUri));
@@ -234,8 +236,8 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
         open(uri);
         getAuraUITestingUtil().findDomElement(By.cssSelector(".button")).click();
 
-        List<String> logs = getCspReportLogs(appender, 1);
-        String cspReport = logs.get(0);
+        List<String> logs = getCspReportLogs(appender, 1 + EXPECTED_VIOLATIONS_FOR_SAFE_EVAL_WORKER_FEATURE_DETECTION);
+        String cspReport = logs.get(0 + EXPECTED_VIOLATIONS_FOR_SAFE_EVAL_WORKER_FEATURE_DETECTION);
 
         String expectedDocumentUri = String.format("%s=%s", CSPReporterServlet.DOCUMENT_URI, getAbsoluteURI(uri));
         assertThat("Could not find expected violated directive", cspReport, containsString(expectedDocumentUri));
@@ -302,14 +304,14 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
         open(cmpDesc);
         getAuraUITestingUtil().findDomElement(By.cssSelector(".button")).click();
 
-        List<String> cspLogs = getCspReportLogs(appender, 0);
-        if(cspLogs.size() != 0) {
+        List<String> cspLogs = getCspReportLogs(appender, 0 + EXPECTED_VIOLATIONS_FOR_SAFE_EVAL_WORKER_FEATURE_DETECTION);
+        if(cspLogs.size() != 0 + EXPECTED_VIOLATIONS_FOR_SAFE_EVAL_WORKER_FEATURE_DETECTION) {
             System.out.println("get these logs:");
             for(LoggingEvent le : appender.getLog()) {
                 System.out.println(le.getMessage().toString());
             }
         }
-        assertEquals("we shouldn't get any csp report, but we get "+cspLogs, 0, cspLogs.size());
+        assertEquals("we shouldn't get any csp report, but we get "+cspLogs, 0 + EXPECTED_VIOLATIONS_FOR_SAFE_EVAL_WORKER_FEATURE_DETECTION, cspLogs.size());
     }
 
     /**
@@ -350,6 +352,6 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
 
         return cspRecords;
     }
-
+    
 }
 

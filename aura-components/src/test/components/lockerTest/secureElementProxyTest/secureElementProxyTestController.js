@@ -10,7 +10,7 @@
     testSetPrototypeOfBaseElementThrowsError: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var div = document.getElementById("title");
-
+        
         try {
             // note that with the SecureElement Proxy we need to go down an extra prototype level to get to
             // HTMLDivElement. The first getPrototypeOf returns our first Proxy layer.
@@ -24,7 +24,7 @@
     testInstanceOf: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var div = document.getElementById("title");
-
+ 
         testUtils.assertTrue(div instanceof HTMLElement);
         testUtils.assertTrue(div instanceof HTMLDivElement);
     },
@@ -109,7 +109,7 @@
             delete div.expando;
             testUtils.fail("Expected error trying to delete non-configurable property");
         } catch (e) {
-            testUtils.assertEquals("Cannot delete property 'expando' of [object Object]", e.message);
+            testUtils.assertEquals("'deleteProperty' on proxy: trap returned falsish for property 'expando'", e.message);
         }
     },
 

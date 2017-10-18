@@ -645,11 +645,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         if (styleDefDescriptor != null) {
             dependencies.add(styleDefDescriptor);
         }
-
+        
         if (flavoredStyle != null) {
             dependencies.add(flavoredStyle.getDescriptor());
         }
-
+        
         for (AttributeDefRef facet : this.facets) {
             facet.appendDependencies(dependencies);
         }
@@ -1147,7 +1147,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         return js;
     }
-
+    
     /**
      * Return true if the definition is a component that needs to be locked.
      */
@@ -1199,10 +1199,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         out.append('"').append(clientDescriptor).append('"');
         out.append(");");
 
-        out.append("  return $A.lockerService.createForDef(\n\"");
+        out.append("  var locker = $A.lockerService.createForDef(\n\"");
         out.append(AuraTextUtil.escapeForJavascriptString(objectVariable));
         out.append("\", def);\n");
 
+        out.append("  return locker.returnValue;\n");
         out.append("});\n");
 
         return out.toString();
@@ -1280,7 +1281,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         if (clientModelDef != null) {
         	ret.add(clientModelDef.getDescriptor());
         }
-
+        
         if (extendsDescriptor != null) {
             ret.addAll(getSuperDef().getModelDefDescriptors());
         }
@@ -1402,7 +1403,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         private String classCode;
         private String minifiedClassCode;
         private boolean minifyEnabled;
-
+        
         @Override
         public Builder<T> setFacet(String key, Object value) {
             if (facets == null) {
@@ -1741,7 +1742,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             }
             externalRendererDef = checkForExternalJs(rendererDescriptors,
                     (clientRendererDef != null ? clientRendererDef.getDescriptor() : null));
-            if (modelDefDescriptor != null
+            if (modelDefDescriptor != null 
                     && (clientModelDef == null || !modelDefDescriptor.equals(clientModelDef.getDescriptor()))
                     && modelDefDescriptor.getPrefix() != null
                     && modelDefDescriptor.getPrefix().equals(DefDescriptor.JAVASCRIPT_PREFIX)) {
@@ -1884,7 +1885,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         boolean ret = false;
-
+        
         ret |= (clientRendererDef == null || (rendererDescriptor != null));
 
         // If we've gotten this far, let's check for remote providers

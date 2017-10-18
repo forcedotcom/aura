@@ -3,5 +3,5 @@
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]]
   ],
-  "cc":"$A.componentService.addComponentClass(\"markup://nonInternal:component\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"nonInternal$component\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\n});\n"
+  "cc":"$A.componentService.addComponentClass(\"markup://nonInternal:component\",function() {\n  var def = $A.componentService.getDef(\"markup://nonInternal:component\");  var locker = $A.lockerService.createForDef(\n\"return {\\n  \\\"meta\\\":{\\n    \\\"name\\\":\\\"nonInternal$component\\\",\\n    \\\"extends\\\":\\\"markup://aura:component\\\"\\n  }\\n};\\n\", def);\n  return locker.returnValue;\n});\n"
 }

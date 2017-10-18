@@ -79,7 +79,7 @@ Aura.bootstrapMark = function (mark, value) {
                     $A.clientService.dumpCachesAndReload(true, {"cause": "Aura.verifyBootstrap: Failed bootstrap state: " + JSON.stringify(state)});
                 }
             }
-
+            
             return;
         }
         if ((state["inline.js"] && ($A.clientService.gvpsFromStorage === undefined || ($A.clientService.gvpsFromStorage && Aura["appBootstrapCacheStatus"] === undefined))) ||
@@ -243,7 +243,7 @@ function noop() {}
 // #include {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"], "path" : "aura.AuraDevToolService"}
 
 //-- LockerService -----------------------------------------------------------
-//#include aura.lockerservice.LockerService
+//#include aura.locker.LockerService
 
 // -- $A Instance ------------------------------------------------------------
 // #include aura.AuraInstance
@@ -312,7 +312,7 @@ Aura["frameworkJsReady"] = true;
 // This should be similar to initFramework
 if (Aura["initConfig"]) {
     // LockerService must be initialized before scripts can be executed.
-    $A.lockerService.initialize(Aura["initConfig"]["context"]["ls"]);
+    $A.lockerService.initialize(Aura["initConfig"]["context"]);
 
     var scripts = Aura["inlineJsLocker"];
     if (scripts) {

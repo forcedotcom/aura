@@ -92,10 +92,8 @@ Aura.Event.InteropEvent.prototype.exposeNativeEventAPI = function (auraEvent, na
 
     for (var attrName in nativeEvent) {
         if (!(attrName in auraEvent)) {
-            // TODO: These would ideally be non-enumerable but locker completely filters out
-            // non-enumerable properties.
             Object.defineProperty(auraEvent, attrName, {
-                enumerable: true,
+                enumerable: true, // These would ideally be non-enumerable but locker completely filters out non-enumerable properties: https://git.soma.salesforce.com/aura/aura/blob/850c5cd520a6100e868119608cf41983928c4583/aura-impl/src/main/resources/aura/locker/SecureObject.js#L399
                 get: createGetter(nativeEvent, attrName)
             });
         }

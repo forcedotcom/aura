@@ -54,7 +54,6 @@ import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.BrowserInfo;
-import org.auraframework.impl.util.UserAgent;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.modules.ModuleNamespaceAlias;
 import org.auraframework.service.CSPInliningService;
@@ -90,6 +89,8 @@ import com.google.common.collect.Sets;
 @ServiceComponent
 public class ConfigAdapterImpl implements ConfigAdapter {
     Logger logger = Logger.getLogger(ConfigAdapterImpl.class);
+
+    private static final String SAFE_EVAL_HTML_URI = "/lockerservice/safeEval.html";
 
     private static final ImmutableSortedSet<String> cacheDependencyExceptions = ImmutableSortedSet.of(
             //
@@ -443,6 +444,14 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         return String.format("%s/auraFW/javascript/%s/aura_%s.js", contextPath, nonce, suffix);
     }
 
+    @Override
+    public String getLockerWorkerURL() {
+        AuraContext context = contextService.getCurrentContext();
+        String contextPath = context.getContextPath();
+        String nonce = context.getFrameworkUID();
+        return String.format("%s/auraFW/resources/%s" + SAFE_EVAL_HTML_URI, contextPath, nonce);
+    }
+
     /**
      * Returns default aura url for encryption key
      */
@@ -744,6 +753,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             if ("APPLICATION".equals(defType) || "COMPONENT".equals(defType)) {
                 allowInline = !isLockerServiceEnabled();
             }
+        } else {
+            allowInline = isSafeEvalWorkerURI(request.getRequestURI());
         }
 
         return new DefaultContentSecurityPolicy(allowInline, cspInliningService);
@@ -763,13 +774,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public boolean isLockerServiceEnabled() {
-        AuraContext context = contextService.getCurrentContext();
-        String ua = context != null ? context.getClient().getUserAgent() : null;
-        BrowserInfo bi = new BrowserInfo(ua);
-        return bi.isBrowser(UserAgent.CHROME, 56, true) ||
-            bi.isBrowser(UserAgent.FIREFOX, 53, true) ||
-            bi.isBrowser(UserAgent.EDGE, 15, true) ||
-            bi.isBrowser(UserAgent.SAFARI, 10, true);
+        return true;
     }
 
     @Override
@@ -791,6 +796,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         }
 
         return requireLocker;
+    }
+
+    protected boolean isSafeEvalWorkerURI(String uri) {
+        return uri.endsWith(SAFE_EVAL_HTML_URI);
     }
 
     /**

@@ -20,7 +20,9 @@ Test.Aura.AuraClientServiceTest = function() {
     var $A = {};
     var Aura = {Services: {}, Controller: {}, Utils: {Logger: {MAX_STACKTRACE_SIZE:100000},Util:{prototype:{on:function(){}}}}};
     var document = {
-        getElementById : function(id) {}
+        getElementById : function(id) {
+            return id === "safeEvalWorkerCustom" ? {} : undefined;
+        }
     };
     var AuraErrorMsg;
 

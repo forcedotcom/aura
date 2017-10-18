@@ -37,4 +37,4 @@ aura-impl/src/main/resources/aura/modules/       @dval
 aura-impl/src/main/resources/aura/polyfill/      @dval
 
 # Locker Service
-aura-impl/src/main/resources/aura/lockerservice/ @jparadis @ravi-jayaramappa
+aura-impl/src/main/resources/aura/locker/        @jparadis @ravi-jayaramappa

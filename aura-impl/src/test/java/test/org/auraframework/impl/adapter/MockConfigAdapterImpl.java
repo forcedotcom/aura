@@ -50,7 +50,7 @@ import com.google.common.collect.Sets;
 @ServiceComponent
 @Primary
 public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConfigAdapter {
-
+    
     @Inject
     StringSourceLoader stringLoader;
 
@@ -90,6 +90,17 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         @Override
         public Collection<String> getScriptSources() {
             List<String> list = (List<String>) baseline.getScriptSources();
+            AuraContext context = Aura.getContextService().getCurrentContext();
+            if (context != null) {
+                Mode mode = context.getMode();
+                // Webdriver's executeScript() needs unsafe-eval. We should find an alternative for
+                //our test-utils (e.g. AuraUITestingUtil.getRawEval()) and then remove this.
+                if(mode == Mode.AUTOJSTEST || mode == Mode.AUTOJSTESTDEBUG ||
+                		mode == Mode.STATS ||
+                        mode == Mode.SELENIUM || mode == Mode.SELENIUMDEBUG){
+                    list.add(CSP.UNSAFE_EVAL);
+                }
+            }
             return list;
         }
 
@@ -400,12 +411,12 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         if (isActionPublicCachingEnabled != null) {
             return isActionPublicCachingEnabled;
         }
-
+        
         if (testContextAdapter.getTestContext() != null) {
             // needed to test action caching in jstests
             return true;
         }
-
+        
         return super.isActionPublicCachingEnabled();
     }
 }

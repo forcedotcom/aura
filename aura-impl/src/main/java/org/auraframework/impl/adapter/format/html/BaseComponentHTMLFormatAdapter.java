@@ -64,7 +64,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
 
     @Inject
     private ServletUtilAdapter servletUtilAdapter;
-
+    
     @Override
     public void write(T value, Map<String, Object> componentAttributes, Appendable out) throws IOException {
         try {
@@ -123,6 +123,11 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
                 auraInit.put("deftype", def.getDescriptor().getDefType());
                 auraInit.put("host", contextPath);
                 auraInit.put("pathPrefix", pathPrefix);
+                
+                String lockerWorkerURL = configAdapter.getLockerWorkerURL();
+                if (configAdapter.isStrictCSPEnforced() && lockerWorkerURL != null) {
+                    auraInit.put("safeEvalWorker", lockerWorkerURL);
+                }
 
                 auraInit.put("MaxParallelXHRCount", configAdapter.getMaxParallelXHRCount());
                 auraInit.put("XHRExclusivity", configAdapter.getXHRExclusivity());

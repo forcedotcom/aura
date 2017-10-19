@@ -43,25 +43,10 @@ public class BrowserCompatibilityServiceImpl implements BrowserCompatibilityServ
         }
 
         BrowserInfo bi = new BrowserInfo(userAgent);
-        boolean isCompatibleSafari10 = false;
-        if (bi.isBrowser(UserAgent.SAFARI, 10)) {
-            int minor = 0;
-            int rev = 2;
-            try {
-                int minorStart = userAgent.indexOf("Version/10.") + 11;
-                int minorEnd = userAgent.indexOf(".", minorStart);
-                minor = Integer.parseInt(userAgent.substring(minorStart, minorEnd));
-                int revStart = userAgent.indexOf(".", minorEnd);
-                int revEnd = userAgent.indexOf(" ", revStart);
-                rev = Integer.parseInt(userAgent.substring(revStart + 1, revEnd));
-            } catch (NumberFormatException | IndexOutOfBoundsException ignored) {}
-            // Only 10.1.0, 10.1.1 are compatible
-            isCompatibleSafari10 = minor == 1 && rev != 2;
-        }
 
         return bi.isBrowser(UserAgent.CHROME, 56, true) ||
                 bi.isBrowser(UserAgent.FIREFOX, 53, true) ||
                 bi.isBrowser(UserAgent.EDGE, 15, true) ||
-                isCompatibleSafari10;
+                bi.isBrowser(UserAgent.SAFARI, 11, true);
     }
 }

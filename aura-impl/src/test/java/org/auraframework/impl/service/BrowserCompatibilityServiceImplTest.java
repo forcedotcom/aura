@@ -31,9 +31,7 @@ public class BrowserCompatibilityServiceImplTest {
     @Test
     public void isCompatible() throws Exception {
         List<UserAgentResult> uaTestEntries = new ArrayList<>();
-        uaTestEntries.add(new UserAgentResult("Safari 10.1.0", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/603.3.1 (KHTML, like Gecko) Version/10.1.0 Safari/603.3.1", true));
-        uaTestEntries.add(new UserAgentResult("Safari 10.1.1", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/603.3.1 (KHTML, like Gecko) Version/10.1.1 Safari/603.3.1", true));
-        uaTestEntries.add(new UserAgentResult("Safari 10.1.2", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/603.3.8 (KHTML, like Gecko) Version/10.1.2 Safari/603.3.8", false));
+        uaTestEntries.add(new UserAgentResult("Safari 11.0", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Safari/604.1.38", true));
         uaTestEntries.add(new UserAgentResult("Safari 10.0.3", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/602.4.8 (KHTML, like Gecko) Version/10.0.3 Safari/602.4.8", false));
         uaTestEntries.add(new UserAgentResult("Chrome 58", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36", true));
         uaTestEntries.add(new UserAgentResult("Chrome 55", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36", false));

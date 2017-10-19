@@ -228,7 +228,7 @@ function LockerService() {
                 var envRec;
 
                 if (!lockerShadows) {
-                    Aura["InitSecureEval"](scriptNonce);
+                    window["Aura"]["InitSecureEval"](scriptNonce);
                 }
                 if (forceLocker || this.isEnabled()) {
                     envRec = this.getEnv(key);

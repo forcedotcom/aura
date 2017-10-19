@@ -1,9 +1,14 @@
 define('modules-moduletest', ['x-test', 'engine'], function (_xTest, engine) {
 
 function tmpl($api, $cmp, $slotset, $ctx) {
-    return [$api.c("x-test", _xTest, {
+    const {
+        d: api_dynamic,
+        c: api_custom_element
+    } = $api;
+
+    return [api_custom_element("x-test", _xTest, {
         "slotset": {
-            "$default$": [$api.d($cmp.test)]
+            "$default$": [api_dynamic($cmp.test)]
         }
     })];
 }

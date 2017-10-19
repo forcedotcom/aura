@@ -77,7 +77,7 @@ AuraComponentService.prototype.get = function(globalId) {
 };
 
 AuraComponentService.prototype.initCoreModules = function () {
-    var babelHelpers = window["Proxy"] && window["Proxy"]["babelHelpers"];
+    var babelHelpers = window["EngineHelpers"] && window["EngineHelpers"]["babelHelpers"];
 
     this.addModule("markup://engine", "engine", [], null, this.moduleEngine);
     this.addModule("markup://assert", "assert", [], null, Aura.ExportsAssert);

@@ -391,7 +391,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
         {
             for (String curr : LocalizationServiceTestData.FAIL_CURRENCY_STRINGS) {
                 try {
-                    BigDecimal bd = localizationService.parseCurrency(curr, Locale.US);
+                    localizationService.parseCurrency(curr, Locale.US);
                     fail("No Exception thrown when trying to parse \'" + curr + "\' into Currency");
                 } catch (Exception e) {
                     // Expected error from AuraNumberformat.parse(...)

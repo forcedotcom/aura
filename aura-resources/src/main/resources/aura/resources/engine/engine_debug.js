@@ -377,6 +377,7 @@ function invokeComponentCallback(vm, fn, fnCtx, args) {
     }
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
     return result;
@@ -398,6 +399,7 @@ function invokeComponentConstructor(vm, Ctor) {
     }
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
     return component;
@@ -426,6 +428,7 @@ function invokeComponentRenderMethod(vm) {
     vmBeingRendered = vmBeingRenderedInception;
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
     return result || [];
@@ -447,8 +450,21 @@ function invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValu
     }
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
+}
+function getComponentStack(vm) {
+    const wcStack = [];
+    let elm = vm.vnode.elm;
+    do {
+        const vm = elm[ViewModelReflection];
+        if (!isUndefined(vm)) {
+            wcStack.push(vm.component.toString());
+        }
+        elm = elm.parentElement;
+    } while (elm);
+    return wcStack.reverse().join('\n\t');
 }
 
 const hooks = ['wiring', 'rehydrated', 'connected', 'disconnected', 'piercing'];
@@ -2630,4 +2646,4 @@ exports.unwrap = unwrap;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.14.10 */
+/** version: 0.14.11 */

@@ -676,6 +676,7 @@ function invokeComponentCallback(vm, fn, fnCtx, args) {
     }
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
     return result;
@@ -697,6 +698,7 @@ function invokeComponentConstructor(vm, Ctor) {
     }
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
     return component;
@@ -726,6 +728,7 @@ function invokeComponentRenderMethod(vm) {
     vmBeingRendered = vmBeingRenderedInception;
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
     return result || [];
@@ -747,8 +750,21 @@ function invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValu
     }
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
+}
+function getComponentStack(vm) {
+    const wcStack = [];
+    let elm = vm.vnode.elm;
+    do {
+        const vm = elm[ViewModelReflection];
+        if (!isUndefined(vm)) {
+            wcStack.push(vm.component.toString());
+        }
+        elm = elm.parentElement;
+    } while (elm);
+    return wcStack.reverse().join('\n\t');
 }
 
 const hooks = ['wiring', 'rehydrated', 'connected', 'disconnected', 'piercing'];
@@ -1179,12 +1195,12 @@ class ReactiveProxyHandler {
         }
         const observable = isObservable(value);
         assert.block(function devModeCheck() {
-            if (!observable && isObject(value)) {
+            if (!observable && value !== null && isObject(value)) {
                 if (isRendering) {
                     assert.logWarning(`Rendering a non-reactive value ${value} from member property ${key} of ${vmBeingRendered} is not common because mutations on that value will not re-render the template.`);
                 }
                 else {
-                    assert.logWarning(`Returning a non-reactive value ${value} to member property ${key} of ${originalTarget} is not common because mutations on that value cannot be observed.`);
+                    assert.logWarning(`Returning a non-reactive value ${value} to member property ${key} of ${toString$1(originalTarget)} is not common because mutations on that value cannot be observed.`);
                 }
             }
         });
@@ -1217,10 +1233,10 @@ class ReactiveProxyHandler {
         return true;
     }
     apply(target /*, thisArg: any, argArray?: any*/) {
-        assert.fail(`invalid call invocation for property proxy ${target}`);
+        assert.fail(`invalid call invocation for property proxy ${toString$1(target)}`);
     }
     construct(target, argArray, newTarget) {
-        assert.fail(`invalid construction invocation for property proxy ${target}`);
+        assert.fail(`invalid construction invocation for property proxy ${toString$1(target)}`);
     }
     has(shadowTarget, key) {
         const { originalTarget } = this;
@@ -1243,7 +1259,7 @@ class ReactiveProxyHandler {
         return targetIsExtensible;
     }
     setPrototypeOf(shadowTarget, prototype) {
-        assert.fail(`Invalid setPrototypeOf invocation for reactive proxy ${this.originalTarget}. Prototype of reactive objects cannot be changed.`);
+        assert.fail(`Invalid setPrototypeOf invocation for reactive proxy ${toString$1(this.originalTarget)}. Prototype of reactive objects cannot be changed.`);
     }
     getPrototypeOf(shadowTarget) {
         const { originalTarget } = this;
@@ -1667,10 +1683,10 @@ ComponentElement.prototype = {
             const vm = this[ViewModelReflection];
             assert.isFalse(isBeingConstructed(vm), `this.dispatchEvent() should not be called during the construction of the custom element for ${this} because no one is listening for the event "${evtName}" just yet.`);
             if (vm.idx === 0) {
-                assert.logWarning(`Unreachable event "${evtName}" dispatched from disconnected element ${this}. Events can only reach the parent element after the element is connected(via connectedCallback) and before the element is disconnected(via disconnectedCallback).`);
+                assert.logWarning(`Unreachable event "${evtName}" dispatched from disconnected element ${this}. Events can only reach the parent element after the element is connected (via connectedCallback) and before the element is disconnected(via disconnectedCallback).`);
             }
-            if (!evtName.match(/^[a-z]+$/)) {
-                assert.logWarning(`Invalid event type:${evtName} dispatched in element ${this}. Event name should only contain lowercase alphabetic characters`);
+            if (!evtName.match(/^[a-z]+([a-z0-9]+)?$/)) {
+                assert.logWarning(`Invalid event type: '${evtName}' dispatched in element ${this}. Event name should only contain lowercase alphanumeric characters.`);
             }
         });
         // custom elements will rely on the DOM dispatchEvent mechanism
@@ -3328,4 +3344,4 @@ exports.unwrap = unwrap;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.14.10 */
+/** version: 0.14.11 */

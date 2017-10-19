@@ -397,6 +397,7 @@ function invokeComponentCallback(vm, fn, fnCtx, args) {
     }
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
     return result;
@@ -418,6 +419,7 @@ function invokeComponentConstructor(vm, Ctor) {
     }
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
     return component;
@@ -446,6 +448,7 @@ function invokeComponentRenderMethod(vm) {
     vmBeingRendered = vmBeingRenderedInception;
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
     return result || [];
@@ -467,8 +470,21 @@ function invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValu
     }
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
+}
+function getComponentStack(vm) {
+    var wcStack = [];
+    var elm = vm.vnode.elm;
+    do {
+        var vm_1 = elm[ViewModelReflection];
+        if (!isUndefined(vm_1)) {
+            wcStack.push(vm_1.component.toString());
+        }
+        elm = elm.parentElement;
+    } while (elm);
+    return wcStack.reverse().join('\n\t');
 }
 
 var hooks = ['wiring', 'rehydrated', 'connected', 'disconnected', 'piercing'];
@@ -517,7 +533,7 @@ function getReplica(membrane, value) {
     cells.set(value, replica);
     return replica;
 }
-var Membrane = (function () {
+var Membrane = /** @class */ (function () {
     function Membrane(handler) {
         this.handler = handler;
         this.cells = new WeakMap();
@@ -582,7 +598,7 @@ function piercingHook(membrane, target, key, value) {
         return result_1 === value ? getReplica(membrane, result_1) : result_1;
     }
 }
-var PiercingMembraneHandler = (function () {
+var PiercingMembraneHandler = /** @class */ (function () {
     function PiercingMembraneHandler(vm) {
         this.vm = vm;
     }
@@ -836,7 +852,7 @@ function unwrapDescriptor(descriptor) {
     }
     return descriptor;
 }
-var ReactiveProxyHandler = (function () {
+var ReactiveProxyHandler = /** @class */ (function () {
     function ReactiveProxyHandler(value) {
         this.originalTarget = value;
     }
@@ -2685,4 +2701,4 @@ exports.unwrap = unwrap;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.14.10 */
+/** version: 0.14.11 */

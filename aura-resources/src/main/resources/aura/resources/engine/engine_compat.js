@@ -698,6 +698,7 @@ function invokeComponentCallback(vm, fn, fnCtx, args) {
     }
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
     return result;
@@ -719,6 +720,7 @@ function invokeComponentConstructor(vm, Ctor) {
     }
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
     return component;
@@ -748,6 +750,7 @@ function invokeComponentRenderMethod(vm) {
     vmBeingRendered = vmBeingRenderedInception;
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
     return result || [];
@@ -769,8 +772,21 @@ function invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValu
     }
     establishContext(ctx);
     if (error) {
+        error.wcStack = getComponentStack(vm);
         throw error; // rethrowing the original error after restoring the context
     }
+}
+function getComponentStack(vm) {
+    var wcStack = [];
+    var elm = vm.vnode.elm;
+    do {
+        var vm_1 = elm[ViewModelReflection];
+        if (!isUndefined(vm_1)) {
+            wcStack.push(vm_1.component.toString());
+        }
+        elm = elm.parentElement;
+    } while (elm);
+    return wcStack.reverse().join('\n\t');
 }
 
 var hooks = ['wiring', 'rehydrated', 'connected', 'disconnected', 'piercing'];
@@ -823,7 +839,7 @@ function getReplica(membrane, value) {
     cells.set(value, replica);
     return replica;
 }
-var Membrane = (function () {
+var Membrane = /** @class */ (function () {
     function Membrane(handler) {
         this.handler = handler;
         this.cells = new WeakMap();
@@ -889,7 +905,7 @@ function piercingHook(membrane, target, key, value) {
         return result_1 === value ? getReplica(membrane, result_1) : result_1;
     }
 }
-var PiercingMembraneHandler = (function () {
+var PiercingMembraneHandler = /** @class */ (function () {
     function PiercingMembraneHandler(vm) {
         assert.vm(vm);
         this.vm = vm;
@@ -1185,7 +1201,7 @@ function unwrapDescriptor(descriptor) {
     }
     return descriptor;
 }
-var ReactiveProxyHandler = (function () {
+var ReactiveProxyHandler = /** @class */ (function () {
     function ReactiveProxyHandler(value) {
         this.originalTarget = value;
     }
@@ -1203,12 +1219,12 @@ var ReactiveProxyHandler = (function () {
         }
         var observable = isObservable(value);
         assert.block(function devModeCheck() {
-            if (!observable && isObject(value)) {
+            if (!observable && value !== null && isObject(value)) {
                 if (isRendering) {
                     assert.logWarning("Rendering a non-reactive value " + value + " from member property " + key + " of " + vmBeingRendered + " is not common because mutations on that value will not re-render the template.");
                 }
                 else {
-                    assert.logWarning("Returning a non-reactive value " + value + " to member property " + key + " of " + originalTarget + " is not common because mutations on that value cannot be observed.");
+                    assert.logWarning("Returning a non-reactive value " + value + " to member property " + key + " of " + toString$1(originalTarget) + " is not common because mutations on that value cannot be observed.");
                 }
             }
         });
@@ -1241,10 +1257,10 @@ var ReactiveProxyHandler = (function () {
         return true;
     };
     ReactiveProxyHandler.prototype.apply = function (target /*, thisArg: any, argArray?: any*/) {
-        assert.fail("invalid call invocation for property proxy " + target);
+        assert.fail("invalid call invocation for property proxy " + toString$1(target));
     };
     ReactiveProxyHandler.prototype.construct = function (target, argArray, newTarget) {
-        assert.fail("invalid construction invocation for property proxy " + target);
+        assert.fail("invalid construction invocation for property proxy " + toString$1(target));
     };
     ReactiveProxyHandler.prototype.has = function (shadowTarget, key) {
         var originalTarget = this.originalTarget;
@@ -1267,7 +1283,7 @@ var ReactiveProxyHandler = (function () {
         return targetIsExtensible;
     };
     ReactiveProxyHandler.prototype.setPrototypeOf = function (shadowTarget, prototype) {
-        assert.fail("Invalid setPrototypeOf invocation for reactive proxy " + this.originalTarget + ". Prototype of reactive objects cannot be changed.");
+        assert.fail("Invalid setPrototypeOf invocation for reactive proxy " + toString$1(this.originalTarget) + ". Prototype of reactive objects cannot be changed.");
     };
     ReactiveProxyHandler.prototype.getPrototypeOf = function (shadowTarget) {
         var originalTarget = this.originalTarget;
@@ -1697,10 +1713,10 @@ ComponentElement.prototype = {
             var vm = _this[ViewModelReflection];
             assert.isFalse(isBeingConstructed(vm), "this.dispatchEvent() should not be called during the construction of the custom element for " + _this + " because no one is listening for the event \"" + evtName + "\" just yet.");
             if (vm.idx === 0) {
-                assert.logWarning("Unreachable event \"" + evtName + "\" dispatched from disconnected element " + _this + ". Events can only reach the parent element after the element is connected(via connectedCallback) and before the element is disconnected(via disconnectedCallback).");
+                assert.logWarning("Unreachable event \"" + evtName + "\" dispatched from disconnected element " + _this + ". Events can only reach the parent element after the element is connected (via connectedCallback) and before the element is disconnected(via disconnectedCallback).");
             }
-            if (!evtName.match(/^[a-z]+$/)) {
-                assert.logWarning("Invalid event type:" + evtName + " dispatched in element " + _this + ". Event name should only contain lowercase alphabetic characters");
+            if (!evtName.match(/^[a-z]+([a-z0-9]+)?$/)) {
+                assert.logWarning("Invalid event type: '" + evtName + "' dispatched in element " + _this + ". Event name should only contain lowercase alphanumeric characters.");
             }
         });
         // custom elements will rely on the DOM dispatchEvent mechanism
@@ -3385,4 +3401,4 @@ exports.unwrap = unwrap;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.14.10 */
+/** version: 0.14.11 */

@@ -370,7 +370,7 @@ AuraLocalizationService.prototype.formatDate = function(date, formatString, loca
         $A.deprecated("$A.localizationService.formatDate(date, formatString, locale) is deprecated. " +
                 "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
                 "by Locale Value Provider. It will be removed in an upcoming release.",
-                "Use $A.localizationService.formatDate(date, formatString)", "2017-02-26", "2018-03-30");
+                "Use $A.localizationService.formatDate(date, formatString)");
 
         if (!this.isAvailableLocale(locale)) {
             langLocale = $A.get("$Locale.langLocale");
@@ -417,7 +417,7 @@ AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, l
         $A.deprecated("$A.localizationService.formatDateUTC(date, formatString, locale) is deprecated. " +
                 "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
                 "by Locale Value Provider. It will be removed in an upcoming release.",
-                "Use $A.localizationService.formatDateUTC(date, formatString)", "2017-02-26", "2018-03-30");
+                "Use $A.localizationService.formatDateUTC(date, formatString)");
 
         if (!this.isAvailableLocale(locale)) {
             langLocale = $A.get("$Locale.langLocale");
@@ -464,7 +464,7 @@ AuraLocalizationService.prototype.formatDateTime = function(date, formatString, 
         $A.deprecated("$A.localizationService.formatDateTime(date, formatString, locale) is deprecated. " +
                 "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
                 "by Locale Value Provider. It will be removed in an upcoming release.",
-                "Use $A.localizationService.formatDateTime(date, formatString)", "2017-02-26", "2018-03-30");
+                "Use $A.localizationService.formatDateTime(date, formatString)");
 
         if (!this.isAvailableLocale(locale)) {
             langLocale = $A.get("$Locale.langLocale");
@@ -510,7 +510,7 @@ AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatStrin
         $A.deprecated("$A.localizationService.formatDateTimeUTC(date, formatString, locale) is deprecated. " +
                 "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
                 "by Locale Value Provider. It will be removed in an upcoming release.",
-                "Use $A.localizationService.formatDateTimeUTC(date, formatString)", "2017-02-26", "2018-03-30");
+                "Use $A.localizationService.formatDateTimeUTC(date, formatString)");
 
         if (!this.isAvailableLocale(locale)) {
             langLocale = $A.get("$Locale.langLocale");
@@ -554,12 +554,15 @@ AuraLocalizationService.prototype.formatTime = function(date, formatString, loca
 
     var langLocale = locale;
     if (locale !== undefined) {
-        $A.deprecated("$A.localizationService.formatTime(date, formatString, locale) is deprecated. " +
-                "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
-                "by Locale Value Provider. It will be removed in an upcoming release.",
-                "Use $A.localizationService.formatTime(date, formatString)", "2017-02-26", "2018-03-30");
 
         if (!this.isAvailableLocale(locale)) {
+            // temporarily suppress the warning if data is available due to perf issue W-4311258
+            // enable it once we have alternative solution for format date in user locale
+            $A.deprecated("$A.localizationService.formatTime(date, formatString, locale) is deprecated. " +
+                    "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
+                    "by Locale Value Provider. It will be removed in an upcoming release.",
+                    "Use $A.localizationService.formatTime(date, formatString)");
+
             langLocale = $A.get("$Locale.langLocale");
             $A.warning("AuraLocalizationService.formatTime(): Locale '" + locale + "' is not available. " +
                     "Falls back to the locale in $Locale.langLocale: " + langLocale);
@@ -601,12 +604,15 @@ AuraLocalizationService.prototype.formatTimeUTC = function(date, formatString, l
 
     var langLocale = locale;
     if (locale !== undefined) {
-        $A.deprecated("$A.localizationService.formatTimeUTC(date, formatString, locale) is deprecated. " +
-                "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
-                "by Locale Value Provider. It will be removed in an upcoming release.",
-                "Use $A.localizationService.formatTimeUTC(date, formatString)", "2017-02-26", "2018-03-30");
 
         if (!this.isAvailableLocale(locale)) {
+            // temporarily suppress the warning if data is available due to perf issue W-4311258.
+            // enable it once we have alternative solution for format datetime in user locale.
+            $A.deprecated("$A.localizationService.formatTimeUTC(date, formatString, locale) is deprecated. " +
+                    "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
+                    "by Locale Value Provider. It will be removed in an upcoming release.",
+                    "Use $A.localizationService.formatTimeUTC(date, formatString)");
+
             langLocale = $A.get("$Locale.langLocale");
             $A.warning("AuraLocalizationService.formatTimeUTC(): Locale '" + locale + "' is not available. " +
                     "Falls back to the locale in $Locale.langLocale: " + langLocale);
@@ -936,7 +942,7 @@ AuraLocalizationService.prototype.parseDateTime = function(dateTimeString, parse
         $A.deprecated("$A.localizationService.parseDateTime(dateTimeString, parseFormat, locale, strictParsing) is deprecated. " +
                 "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
                 "by Locale Value Provider. It will be removed in an upcoming release.",
-                "Use $A.localizationService.parseDateTime(dateTimeString, parseFormat, strictParsing)", "2017-02-26", "2018-03-30");
+                "Use $A.localizationService.parseDateTime(dateTimeString, parseFormat, strictParsing)");
 
         if (locale && !this.isAvailableLocale(locale)) {
             langLocale = $A.get("$Locale.langLocale");
@@ -1010,7 +1016,7 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, pa
         $A.deprecated("$A.localizationService.parseDateTimeUTC(dateTimeString, parseFormat, locale, strictParsing) is deprecated. " +
                 "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
                 "by Locale Value Provider. It will be removed in an upcoming release.",
-                "Use $A.localizationService.parseDateTimeUTC(dateTimeString, parseFormat, strictParsing)", "2017-02-26", "2018-03-30");
+                "Use $A.localizationService.parseDateTimeUTC(dateTimeString, parseFormat, strictParsing)");
 
         if (locale && !this.isAvailableLocale(locale)) {
             langLocale = $A.get("$Locale.langLocale");

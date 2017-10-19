@@ -92,7 +92,7 @@ public class StyleServiceImpl implements StyleService {
     public String applyTokensContextual(DefDescriptor<TokensDef> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> extraStyles)
             throws QuickFixException {
         return applyTokensContextual(ImmutableList.of(tokens), extraStyles);
-        }
+    }
 
     @Override
     public String applyTokensContextual(Iterable<DefDescriptor<TokensDef>> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> extraStyles)
@@ -100,31 +100,22 @@ public class StyleServiceImpl implements StyleService {
         AuraContext context = contextService.getCurrentContext();
         Set<DefDescriptor<? extends BaseStyleDef>> clientLoaded = new LinkedHashSet<>();
 
-            // attempt to automatically detect client-loaded styles
-            for (DefDescriptor<?> desc : context.getClientLoaded().keySet()) {
-                // include inner deps
-                clientLoaded.addAll(getStyleDependencies(desc));
+        // attempt to automatically detect client-loaded styles
+        for (DefDescriptor<?> desc : context.getClientLoaded().keySet()) {
+            // include inner deps
+            clientLoaded.addAll(getStyleDependencies(desc));
 
-                // add the client loaded style def itself, (purposely done after!)
-                DefDescriptor<StyleDef> style = definitionService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, StyleDef.class);
-                if (style.exists()) {
-                    clientLoaded.add(style);
-                }
-            DefDescriptor<FlavoredStyleDef> flavor = definitionService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, FlavoredStyleDef.class);
-                if (flavor.exists()) {
-                    clientLoaded.add(flavor);
-                }
+            // add the client loaded style def itself, (purposely done after!)
+            DefDescriptor<StyleDef> style = definitionService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, StyleDef.class);
+            if (style.exists()) {
+                clientLoaded.add(style);
             }
+            DefDescriptor<FlavoredStyleDef> flavor = definitionService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, FlavoredStyleDef.class);
+            if (flavor.exists()) {
+                clientLoaded.add(flavor);
+            }
+        }
 
-        return applyTokensContextual(tokens, extraStyles, clientLoaded);
-    }
-
-    @Override
-    public String applyTokensContextual(Iterable<DefDescriptor<TokensDef>> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> extraStyles,
-            Iterable<DefDescriptor<? extends BaseStyleDef>> clientLoaded) throws QuickFixException {
-        checkNotNull(tokens, "the 'tokens' arg cannot be null");
-
-        AuraContext context = contextService.getCurrentContext();
         Set<DefDescriptor<? extends BaseStyleDef>> styles = new LinkedHashSet<>(256);
 
         // add style def descriptors based on app dependencies
@@ -157,17 +148,10 @@ public class StyleServiceImpl implements StyleService {
         String descUid = definitionService.getUid(null, defDescriptor);
         if (descUid != null) {
             for (DefDescriptor<?> dep : definitionService.getDependencies(descUid)) {
-                DefType type = dep.getDefType();
-                if (type == DefType.COMPONENT || type == DefType.APPLICATION || type == DefType.STYLE) {
-                    DefDescriptor<StyleDef> style = definitionService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, StyleDef.class);
-                    if (style.exists()) {
-                        styles.add(style);
-                    }
-    
-                    DefDescriptor<FlavoredStyleDef> flavor = definitionService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, FlavoredStyleDef.class);
-                    if (flavor.exists()) {
-                        styles.add(flavor);
-                    }
+                if (BaseStyleDef.class.isAssignableFrom(dep.getDefType().getPrimaryInterface())) {
+                    @SuppressWarnings("unchecked") // did primary interface check above
+                    DefDescriptor<? extends BaseStyleDef> desc = (DefDescriptor<? extends BaseStyleDef>)dep;
+                    styles.add(desc);
                 }
             }
         }

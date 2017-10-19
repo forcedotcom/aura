@@ -70,14 +70,6 @@ function AuraStyleService() {
  *          option may not properly override everything depending on where in the DOM you placed
  *          the styles. Also note that the <code>replaceExisting</code> param will not handle
  *          any styles you attach to the DOM manually.
- * @param {boolean} [config.forceClientScan=false]
- *          When false (the default), the server will automatically attempt to discover any client-loaded
- *          StyleDefs (i.e., defs applied individually via server action). Specify true to force this
- *          detection on the client and the data sent to the server manually instead. Note that this option
- *          is less performant than the default, however it may be applicable when using providers (and the
- *          provided defs cannot be determined from the server). The default option is sufficient to include
- *          any defs loaded through the framework directly (e.g., via getComponent) and any inner/dependent
- *          components from those.
  * @export
  */
 AuraStyleService.prototype.applyTokens = function(descriptor, config) {
@@ -131,14 +123,6 @@ AuraStyleService.prototype.applyTokens = function(descriptor, config) {
  *          option may not properly override everything depending on where in the DOM you placed
  *          the styles. Also note that the <code>replaceExisting</code> param will not handle
  *          any styles you attach to the DOM manually.
- * @param {boolean} [config.forceClientScan=false]
- *          When false (the default), the server will automatically attempt to discover any client-loaded
- *          StyleDefs (i.e., defs applied individually via server action). Specify true to force this
- *          detection on the client and the data sent to the server manually instead. Note that this option
- *          is less performant than the default, however it may be applicable when using providers (and the
- *          provided defs cannot be determined from the server). The default option is sufficient to include
- *          any defs loaded through the framework directly (e.g., via getComponent) and any inner/dependent
- *          components from those.
  * @export
  */
 AuraStyleService.prototype.applyAllTokens = function(descriptors, config) {
@@ -147,27 +131,10 @@ AuraStyleService.prototype.applyAllTokens = function(descriptors, config) {
     config = config || {};
 
     $A.run(function() {
-
-        // scan for client-loaded style defs if necessary
-        var clientLoaded = [];
-        if (config["forceClientScan"]) {
-            var allDefs = $A.componentService.getRegisteredComponentDescriptors();
-            for (var i = 0, len = allDefs.length; i < len; i++) {
-                var cmp = $A.componentService.getDef(allDefs[i]);
-                if (!$A.util.isUndefinedOrNull(cmp)) {
-                    var styleDef = cmp.getStyleDef();
-                    if(!$A.util.isUndefinedOrNull(styleDef) && !styleDef.isPreloaded()) {
-                        clientLoaded.push(styleDef.getDescriptor().getQualifiedName());
-                    }
-                }
-            }
-        }
-
         var action = $A.get("c.aura://StyleController.applyTokens");
 
         action.setParams({
             "descriptors": descriptors,
-            "clientLoaded" : clientLoaded,
             "extraStyles": config["extraStyles"] || []
         });
 
@@ -176,10 +143,8 @@ AuraStyleService.prototype.applyAllTokens = function(descriptors, config) {
             action.setStorable();
         }
 
-
-
         action.setCallback(this, function(a) {
-        	var state = a.getState();
+            var state = a.getState();
             if (state === "SUCCESS") {
                 // if custom handler is specified, give it the CSS and do nothing else
                 if ($A.util.isFunction(config["customHandler"])) {
@@ -197,10 +162,10 @@ AuraStyleService.prototype.applyAllTokens = function(descriptors, config) {
                     that.added.push(node);
                 }
             } else if (state === "INCOMPLETE") {
-            	var offlineMessageEvt = $A.getEvt('markup://force:showOfflineMessage');
-            	if(offlineMessageEvt){
-            		offlineMessageEvt.setParams({retryAction: action}).fire();
-            	}
+                var offlineMessageEvt = $A.getEvt('markup://force:showOfflineMessage');
+                if (offlineMessageEvt) {
+                    offlineMessageEvt.setParams({retryAction: action}).fire();
+                }
             } else if (state === "ERROR") {
                 var errors = a.getError();
                 var e;
@@ -213,7 +178,6 @@ AuraStyleService.prototype.applyAllTokens = function(descriptors, config) {
                 e["reported"] = true;
                 throw e;
             }
-
 
             if ($A.util.isFunction(config["callback"])) {
                 config["callback"]();

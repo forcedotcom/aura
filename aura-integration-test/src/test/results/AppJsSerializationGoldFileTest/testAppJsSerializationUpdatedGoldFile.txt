@@ -15502,10 +15502,6 @@ $A.componentService.initControllerDefs([
             "type":"java://java.util.List\u003Cjava.lang.String\u003E"
           },
           {
-            "name":"clientLoaded",
-            "type":"java://java.util.List\u003Cjava.lang.String\u003E"
-          },
-          {
             "name":"extraStyles",
             "type":"java://java.util.List\u003Cjava.lang.String\u003E"
           }

@@ -64,21 +64,13 @@ public final class StyleController implements GlobalController {
      *
      * @param tokens
      *            Apply these descriptors.
-     * @param clientLoaded
-     *            Optional list of client-loaded style defs to be included. If null or empty, an attempt will be made to
-     *            automatically detect this via the framework. This param might be specified when the usage of providers
-     *            results in the framework alone not being able to determine this server-side (as determined by a config
-     *            option in the AuraStyleService.js call).
      * @param extraStyles
      *            Optional extra style defs to include. These are applied last.
      * @return The CSS string with the tokens applied. Only the CSS that directly references one of the tokens is
      *         returned.
      */
     @AuraEnabled
-    public String applyTokens(@Key("descriptors") List<String> tokens,
-            @Key("clientLoaded") List<String> clientLoaded, @Key("extraStyles") List<String> extraStyles)
-            throws QuickFixException {
-
+    public String applyTokens(@Key("descriptors") List<String> tokens, @Key("extraStyles") List<String> extraStyles) throws QuickFixException {
         checkNotNull(tokens, "The 'tokens' argument cannot be null");
 
         // get the token descriptors
@@ -87,30 +79,22 @@ public final class StyleController implements GlobalController {
             tokenDescs.add(definitionService.getDefDescriptor(desc, TokensDef.class));
         }
 
-        // get the extra styles descriptors
+        // get the extra styles descriptors TODO get rid of this option
         List<DefDescriptor<? extends BaseStyleDef>> extraStyleDescs = new ArrayList<>();
         if (extraStyles != null) {
-            for (String desc : extraStyles) {
-                extraStyleDescs.add(definitionService.getDefDescriptor(desc, StyleDef.class));
+            for (String name : extraStyles) {
+                DefDescriptor<StyleDef> styleDesc = definitionService.getDefDescriptor (DefDescriptor.CSS_PREFIX + "://" + name, StyleDef.class);
+                if (styleDesc.exists()) {
+                    extraStyleDescs.add(styleDesc);
+                }
+
+                DefDescriptor<FlavoredStyleDef> flavorDesc = definitionService.getDefDescriptor(DefDescriptor.CSS_PREFIX + "://" + name, FlavoredStyleDef.class);
+                if (flavorDesc.exists()) {
+                    extraStyleDescs.add(flavorDesc);
+                }
             }
         }
 
-        if (clientLoaded == null || clientLoaded.isEmpty()) {
-            return styleService.applyTokensContextual(tokenDescs, extraStyleDescs);
-        } else {
-            List<DefDescriptor<? extends BaseStyleDef>> clientLoadedDescs = new ArrayList<>(clientLoaded.size());
-            for (String name : clientLoaded) {
-                DefDescriptor<StyleDef> styleDef = definitionService.getDefDescriptor(name, StyleDef.class);
-                if (styleDef.exists()) {
-                    clientLoadedDescs.add(styleDef);
-                }
-                DefDescriptor<FlavoredStyleDef> flavorDef = definitionService.getDefDescriptor(name, FlavoredStyleDef.class);
-                if (flavorDef.exists()) {
-                    clientLoadedDescs.add(flavorDef);
-                }
-            }
-
-            return styleService.applyTokensContextual(tokenDescs, extraStyleDescs, clientLoadedDescs);
-        }
+        return styleService.applyTokensContextual(tokenDescs, extraStyleDescs);
     }
 }

@@ -947,6 +947,7 @@ Component.prototype.destroy = function() {
                 delete eventDispatcher[event];
             }
         }
+        this.eventValueProvider = null;
     }
 
     // Deindex all child components
@@ -2557,7 +2558,8 @@ Component.prototype.getActionCaller = function(valueProvider, actionExpression) 
  * Creates the e.* value provider
  */
 Component.prototype.createEventValueProvider = function() {
-    if (!this.eventValueProvider) {
+    //only create a new EVP if the compoent is live
+    if (!this.eventValueProvider && !this.destroyed) {
         this.eventValueProvider = new EventValueProvider(this);
     }
 
@@ -2572,9 +2574,13 @@ Component.prototype.createEventValueProvider = function() {
  */
 Component.prototype.getEventDispatcher = function() {
     if (!this.eventValueProvider) {
-        this.createEventValueProvider();
+        //Only fetch a fresh EVP if the component has not been destroyed
+        if(!this.destroyed){
+            this.createEventValueProvider();
+        } else {
+            return null;
+        }
     }
-
     return this.eventValueProvider.events;
 };
 

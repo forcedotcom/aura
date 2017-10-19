@@ -18,11 +18,11 @@
   */
 function EventValueProvider(component) {
 	this.events = {};
-	this.component = component;
+	this.component = component.globalId;
 }
 
 EventValueProvider.prototype.get = function(key) {
-	return this.component.getEvent(key);
+	return $A.getComponent(this.component).getEvent(key);
 };
 
 Aura.Component.EventValueProvider = EventValueProvider;

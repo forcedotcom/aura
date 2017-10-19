@@ -570,4 +570,79 @@ Test.Aura.Component.ComponentTest=function(){
             Assert.True(actual);
         }
     }
+
+    [Fixture]
+    function getEventDispatcher() {
+
+        [Fact]
+        function returnEventsIfTheyExist() {
+            // Arrange
+            var target = null;
+            var res = null;
+            var expected = { dummyEvent : function() {} };
+            mockFramework(function() {
+                target = new Aura.Component.Component({},true);
+                target.eventValueProvider = new EventValueProvider(target);
+                target.eventValueProvider.events = { dummyEvent : function() {} }
+
+                res = target.getEventDispatcher();
+            });
+
+            // Assert
+            Assert.Equal(res, expected);
+        }
+
+        [Fact]
+        function createNewEventsIfTheyDoNotExist() {
+            // Arrange
+            var target = null;
+            var res = null;
+            var expected = {};
+            mockFramework(function() {
+                target = new Aura.Component.Component({},true);
+                target.eventValueProvider = null;
+
+                res = target.getEventDispatcher();
+            });
+
+            // Assert
+            Assert.Equal(res, expected);
+        }
+
+        [Fact]
+        function returnNullIfComponentIsBeingDestroyed() {
+            // Arrange
+            var target = null;
+            var res = null;
+            var expected = null;
+            mockFramework(function() {
+                target = new Aura.Component.Component({},true);
+                target.eventValueProvider = null;
+                target.destroyed = -1;
+
+                res = target.getEventDispatcher();
+            });
+
+            // Assert
+            Assert.Equal(res, expected);
+        }
+
+        [Fact]
+        function returnNullIfComponentIsDestroyed() {
+            // Arrange
+            var target = null;
+            var res = null;
+            var expected = null;
+            mockFramework(function() {
+                target = new Aura.Component.Component({},true);
+                target.eventValueProvider = null;
+                target.destroyed = 1;
+
+                res = target.getEventDispatcher();
+            });
+
+            // Assert
+            Assert.Equal(res, expected);
+        }
+    }
 }

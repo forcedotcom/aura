@@ -938,7 +938,7 @@ AuraLocalizationService.prototype.parseDateTime = function(dateTimeString, parse
                 "by Locale Value Provider. It will be removed in an upcoming release.",
                 "Use $A.localizationService.parseDateTime(dateTimeString, parseFormat, strictParsing)", "2017-02-26", "2018-03-30");
 
-        if (!this.isAvailableLocale(locale)) {
+        if (locale && !this.isAvailableLocale(locale)) {
             langLocale = $A.get("$Locale.langLocale");
             $A.warning("AuraLocalizationService.parseDateTime(): Locale '" + locale + "' is not available. " +
                     "Falls back to the locale in $Locale.langLocale: " + langLocale);
@@ -1012,7 +1012,7 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, pa
                 "by Locale Value Provider. It will be removed in an upcoming release.",
                 "Use $A.localizationService.parseDateTimeUTC(dateTimeString, parseFormat, strictParsing)", "2017-02-26", "2018-03-30");
 
-        if (!this.isAvailableLocale(locale)) {
+        if (locale && !this.isAvailableLocale(locale)) {
             langLocale = $A.get("$Locale.langLocale");
             $A.warning("AuraLocalizationService.parseDateTimeUTC(): Locale '" + locale + "' is not available. " +
                     "Falls back to the locale in $Locale.langLocale: " + langLocale);
@@ -1224,7 +1224,11 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
         return;
     }
 
-    if (!timezone || !this.moment["tz"]["zone"](timezone)) {
+    if (!timezone) {
+        timezone = $A.get("$Locale.timezone");
+    }
+
+    if (!this.moment["tz"]["zone"](timezone)) {
         $A.warning("AuraLocalizationService.UTCToWallTime(): unsupported time zone: " +
             timezone + ". Fallback to default timezone.");
         timezone = $A.get("$Locale.timezone");
@@ -1282,7 +1286,11 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
         return;
     }
 
-    if (!timezone || !this.moment["tz"]["zone"](timezone)) {
+    if (!timezone) {
+        timezone = $A.get("$Locale.timezone");
+    }
+
+    if (!this.moment["tz"]["zone"](timezone)) {
         $A.warning("AuraLocalizationService.WallTimeToUTC(): unsupported time zone: " +
             timezone + ". Fallback to default timezone.");
         timezone = $A.get("$Locale.timezone");

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	//Test for static labels. 
+	//Test for static labels.
 	testStaticLabels: {
 		test: [
 			function(component) {
@@ -22,7 +22,7 @@
 			    $A.test.assertEquals("2007 Members", actual, "label value did not match attribute.");
 			    //change attribute
 			    component.set("v.intByReference",2015);
-			}, 
+			},
 			function(component) {
 				   $A.test.assertEquals(2015, component.get("v.intByReference"), "v.intByReference wasn't updated");
 			     var actual = $A.test.getText(component.find("staticLabelContainer").getElement());
@@ -30,8 +30,8 @@
 			}
 		]
 	},
-	
-	//Test for dynamic labels. 
+
+	//Test for dynamic labels.
 	testDynamicLabels: {
 		test: [
 			function(component) {
@@ -39,7 +39,7 @@
 			    $A.test.assertEquals("we have 2007 members", actual, "label value did not match attribute.");
 			    //change attribute
 			    component.set("v.intByReference",2015);
-			}, 
+			},
 			function(component) {
 				   $A.test.assertEquals(2015, component.get("v.intByReference"), "v.numerValue wasn't updated");
 			     var actual = $A.test.getText(component.find("dynamicLabelContainer").getElement());
@@ -47,7 +47,7 @@
 			}
 		]
 	},
-	
+
 	testHtmlAttributesPrv : {
 		test: function(component) {
 			var item = component.find("liWithPrv");
@@ -61,7 +61,7 @@
 			}, "Updating the PRV to the passthrough value never caused a markDirty and rerender.");
 		}
 	},
-	
+
     testPassingIntToFacet: {
         test: [function(cmp) {
             $A.test.assertEquals(2007, cmp.get("v.intByReference"));
@@ -120,7 +120,7 @@
         }, function(cmp){
             // Modify list on outer component, verify facet list has also changed
             var expected = ['level1a', 'level1b', ['level2a', ['level3a'], 'changedOuter2b'], 'level1c'];
-            
+
             this.assertListItems(expected, cmp.get("v.listByReference"));
             this.assertListItems(expected, cmp.find("innerCmp").get("v.listAttribute"));
             $A.test.assertEquals("level1alevel1blevel2alevel3achangedOuter2blevel1c",
@@ -137,8 +137,8 @@
         }, function(cmp){
             // Modify list on facet, verify outer cmp list has also changed
             var expected = ['level1a', 'level1b', ['level2a', ['level3a'], 'changedFacet2b'], 'level1c'];
-           
-            this.assertListItems(expected, cmp.get("v.listByReference")); 
+
+            this.assertListItems(expected, cmp.get("v.listByReference"));
             this.assertListItems(expected, cmp.find("innerCmp").get("v.listAttribute"));
             $A.test.assertEquals("level1alevel1blevel2alevel3achangedFacet2blevel1c",
                     this.getTextNoWhitespaces(cmp.find("listOutput")));
@@ -154,7 +154,7 @@
         }, function(cmp){
             // Modify list on outer component, verify facet list has also changed
             var expected = ['level1a', 'level1b', ['level2a', ['level3a'], 'level2b'], 'level1c', 'addedOuter1d'];
-           
+
             this.assertListItems(expected, cmp.get("v.listByReference"));
             this.assertListItems(expected, cmp.find("innerCmp").get("v.listAttribute"));
             $A.test.assertEquals("level1alevel1blevel2alevel3alevel2blevel1caddedOuter1d",
@@ -166,10 +166,10 @@
 
     testPassingListToFacet_AppendFacet: {
         test: [function(cmp) {
-            this.verifyInitialList(cmp);                 
+            this.verifyInitialList(cmp);
             $A.test.clickOrTouch(cmp.find("appendListFacetButton").getElement());
         }, function(cmp) {
-        	// Modify list on outer component, verify facet list has also changed   
+        	// Modify list on outer component, verify facet list has also changed
         	var expected = ['level1a', 'level1b', ['level2a', ['level3a'], 'level2b'], 'level1c', 'addedFacet1d'];
             this.assertListItems(expected, cmp.get("v.listByReference"));
             this.assertListItems(expected, cmp.find("innerCmp").get("v.listAttribute"));
@@ -247,7 +247,7 @@
                     }
                 };
 
-           
+
             this.assertMapItems(expected, cmp.get("v.mapByReference"));
             this.assertMapItems(expected, cmp.find("innerCmp").get("v.mapAttribute"));
             $A.test.assertEquals("initial1initial2changedOuter3",
@@ -273,7 +273,7 @@
                         }
                     }
                 };
-           
+
             this.assertMapItems(expected, cmp.get("v.mapByReference"));
             this.assertMapItems(expected, cmp.find("innerCmp").get("v.mapAttribute"));
             $A.test.assertEquals("initial1initial2changedFacet3",
@@ -301,7 +301,7 @@
                         }
                     }
                 };
-           
+
             this.assertMapItems(expected, cmp.get("v.mapByReference"));
             this.assertMapItems(expected, cmp.find("innerCmp").get("v.mapAttribute"));
             $A.test.assertEquals("initial1initial2\initial3addedOuter3addedOuter4",
@@ -328,7 +328,7 @@
                             newLayer: "addedFacet4"
                         }
                     }
-                };  
+                };
             this.assertMapItems(expected, cmp.get("v.mapByReference"));
             this.assertMapItems(expected, cmp.find("innerCmp").get("v.mapAttribute"));
             $A.test.assertEquals("initial1initial2\initial3addedFacet3addedFacet4",
@@ -342,7 +342,7 @@
         test: [function(cmp) {
             this.verifyInitialMap(cmp);
             $A.test.clickOrTouch(cmp.find("removeMapOuterButton").getElement());
-        }, function(cmp){           
+        }, function(cmp){
             var expected = {
                     layer1: "initial1",
                     oneDeeper: {
@@ -354,7 +354,7 @@
                 };
             this.assertMapItems(expected, cmp.get("v.mapByReference"));
             this.assertMapItems(expected, cmp.find("innerCmp").get("v.mapAttribute"));
-            
+
             $A.test.assertEquals("initial1initial2",
                     this.getTextNoWhitespaces(cmp.find("mapOutput")));
             $A.test.assertEquals("initial1initial2",
@@ -376,10 +376,10 @@
                         }
                     }
                 };
-            
+
             this.assertMapItems(expected, cmp.get("v.mapByReference"));
             this.assertMapItems(expected, cmp.find("innerCmp").get("v.mapAttribute"));
-            
+
             $A.test.assertEquals("initial1initial2",
                     this.getTextNoWhitespaces(cmp.find("mapOutput")));
             $A.test.assertEquals("initial1initial2",
@@ -389,7 +389,7 @@
 
     testFacetDestroy: {
         test: function(cmp) {
-            cmp.find("innerCmp").destroy(false);
+            cmp.find("innerCmp").destroy();
             $A.test.assertUndefined(cmp.find("innerCmp"));
 
             var expectedList = ['level1a', 'level1b', ['level2a', ['level3a'], 'level2b'], 'level1c'];

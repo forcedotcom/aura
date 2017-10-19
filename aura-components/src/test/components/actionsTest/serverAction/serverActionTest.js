@@ -327,7 +327,7 @@
             var callbackCalled = false;
             var action = cmp.get("c.executeInForeground");
 
-            cmp.destroy(false);
+            cmp.destroy();
             $A.test.assertFalse(cmp.isValid());
 
             $A.enqueueAction(action);

@@ -194,11 +194,15 @@
                       return d ? d.set : undefined;
                   }
               });
-
-              // Immutable Prototype Exotic Objects
-              // https://github.com/tc39/ecma262/issues/272
-              Object.seal(o.prototype);
           });
+          // Immutable Prototype Exotic Objects
+          // https://github.com/tc39/ecma262/issues/272
+          // W-4399874 Disabled freeze when a Symbol prolyfil is required.
+          Object.seal(Array.prototype);
+          if (typeof Symbol === "function" && window.Symbol.toString().indexOf("native code]") >= 0) {
+              Object.seal(Object.prototype);
+              Object.seal(parent.Object.prototype);
+          }
       } catch (ignoring_bleaching_errors) {
           // Ignore
       }

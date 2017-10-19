@@ -955,6 +955,9 @@ Component.prototype.destroy = function() {
     // Deindex self
     $A.componentService.deIndex(this.globalId);
 
+    //Lets clean up the components attributeValueProvider too (prevent a memory leak)
+    this.attributeValueProvider = null;
+
     // Destroy immediate parent
     if(this.superComponent){
         this.superComponent.destroy();

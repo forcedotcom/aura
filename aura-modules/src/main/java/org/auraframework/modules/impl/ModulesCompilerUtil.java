@@ -124,7 +124,7 @@ public final class ModulesCompilerUtil {
         JSONObject prod = result.getJSONObject("prod");
         JSONObject compat = result.getJSONObject("compat");
         // TODO COMPAT : update to "prod_compat" when compiler is updated
-        JSONObject prodCompat = result.getJSONObject("compat");
+        JSONObject prodCompat = result.getJSONObject("prod_compat");
 
         String devCode = dev.getString("code");
         String prodCode = prod.getString("code");

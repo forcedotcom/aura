@@ -1,16 +1,16 @@
 define('modules-moduletest', ['x-test', 'engine'], function (_xTest, engine) {
 
 function tmpl($api, $cmp, $slotset, $ctx) {
-    const {
-        d: api_dynamic,
-        c: api_custom_element
-    } = $api;
+  const {
+    d: api_dynamic,
+    c: api_custom_element
+  } = $api;
 
-    return [api_custom_element("x-test", _xTest, {
-        "slotset": {
-            "$default$": [api_dynamic($cmp.test)]
-        }
-    })];
+  return [api_custom_element("x-test", _xTest, {
+    "slotset": {
+      "$default$": [api_dynamic($cmp.test)]
+    }
+  })];
 }
 
 class Test extends engine.Element {

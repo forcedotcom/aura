@@ -36,20 +36,27 @@ function instanceOfKey(instance, Type) {
     return instance instanceof Type;
 }
 
-var mainNoop = {
-    getKey: getKey,
-    callKey: callKey,
-    setKey: setKey,
-    deleteKey: deleteKey,
-    inKey: inKey,
-    iterableKey: iterableKey,
-    instanceOfKey: instanceOfKey
-};
+var NOOP_COMPAT;
+if (typeof Proxy === 'undefined') {
+    NOOP_COMPAT = { getKey: getKey, callKey: callKey, setKey: setKey, deleteKey: deleteKey, inKey: inKey, iterableKey: iterableKey, instanceOfKey: instanceOfKey };
+}
+else {
+    // We can't use Object.assign because in IE11 does not exist (it will be polyfilled later)
+    Proxy.getKey = getKey;
+    Proxy.setKey = setKey;
+    Proxy.callKey = callKey;
+    Proxy.deleteKey = deleteKey;
+    Proxy.inKey = inKey;
+    Proxy.iterableKey = iterableKey;
+    Proxy.instanceOfKey = instanceOfKey;
+    NOOP_COMPAT = Proxy;
+}
+var NOOP_COMPAT$1 = NOOP_COMPAT;
 
-return mainNoop;
+return NOOP_COMPAT$1;
 
 })));
-/** version: 0.14.11 */
+/** version: 0.15.0 */
 
 /* Transformed Polyfills + Babel helpers */
 var __inKey = window.Proxy.inKey;
@@ -7884,7 +7891,6 @@ function instanceOfKey(instance, Type) {
     return Type[symbolHasInstance](instance);
 }
 
-var _assign = Object.assign;
 var _keys = Object.keys;
 var _getOwnPropertyNames = Object.getOwnPropertyNames;
 var _hasOwnProperty = Object.hasOwnProperty;
@@ -8030,36 +8036,35 @@ Object.getPrototypeOf = getPrototypeOf;
 // Other necessary patches:
 // [*] Object.assign
 Object.assign = assign;
-// Patching Proxy (might contain some compat expandos already)
-var OriginalProxy = typeof Proxy !== undefined ? Proxy : {};
-_assign(XProxy, OriginalProxy, {
-    getKey: getKey,
-    callKey: callKey,
-    setKey: setKey,
-    deleteKey: deleteKey,
-    inKey: inKey,
-    iterableKey: iterableKey,
-    instanceOfKey: instanceOfKey
-});
-var Proxy = /** @class */ (function (_super) {
-    __extends(Proxy, _super);
-    function Proxy() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    Proxy.getKey = getKey;
-    Proxy.callKey = callKey;
-    Proxy.setKey = setKey;
-    Proxy.deleteKey = deleteKey;
-    Proxy.inKey = inKey;
-    Proxy.iterableKey = iterableKey;
-    Proxy.instanceOfKey = instanceOfKey;
-    return Proxy;
-}(XProxy));
+function overrideProxy() {
+    return Proxy.__COMPAT__;
+}
+// At this point Proxy can be the real Proxy (function) a noop-proxy (object with noop-keys) or undefined
+var FinalProxy = typeof Proxy !== undefined ? Proxy : {};
+if (typeof FinalProxy !== 'function' || overrideProxy()) {
+    FinalProxy = (_a = /** @class */ (function (_super) {
+            __extends(Proxy, _super);
+            function Proxy() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            return Proxy;
+        }(XProxy)),
+        _a.getKey = getKey,
+        _a.callKey = callKey,
+        _a.setKey = setKey,
+        _a.deleteKey = deleteKey,
+        _a.inKey = inKey,
+        _a.iterableKey = iterableKey,
+        _a.instanceOfKey = instanceOfKey,
+        _a);
+}
+var FinalProxy$1 = FinalProxy;
+var _a;
 
-return Proxy;
+return FinalProxy$1;
 
 })));
-/** version: 0.14.11 */
+/** version: 0.15.0 */
 
 /* Overrides for proxy-compat globals */
  var __getKey = window.Proxy.getKey; var __setKey = window.Proxy.setKey; var __callKey = window.Proxy.callKey; var __iterableKey = window.Proxy.iterableKey; var __inKey = window.Proxy.inKey; var __deleteKey = window.Proxy.deleteKey; var __instanceOfKey = window.Proxy.instanceOfKey;

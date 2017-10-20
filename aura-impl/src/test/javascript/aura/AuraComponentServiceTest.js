@@ -53,7 +53,8 @@ Test.Aura.AuraComponentServiceTest = function(){
         "AuraComponentService": function(){},
         "ComponentDefStorage": function(){},
         "Aura": Aura,
-        "Engine": Engine
+        "Engine": Engine,
+        "Proxy": {},
     })(function(){
         [Import("aura-impl/src/main/resources/aura/component/ComponentDefStorage.js")]
         [Import("aura-impl/src/main/resources/aura/AuraComponentService.js")]
@@ -64,8 +65,9 @@ Test.Aura.AuraComponentServiceTest = function(){
         "$A": $A,
         "window": function(){},
         "Components": function(){},
-        Aura: Aura,
-        Engine: Engine
+        "Aura": Aura,
+        "Engine": Engine,
+        "Proxy": {},
     });
 
     var targetService;

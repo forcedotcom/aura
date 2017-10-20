@@ -78,6 +78,7 @@ AuraComponentService.prototype.get = function(globalId) {
 
 AuraComponentService.prototype.initCoreModules = function () {
     var babelHelpers = window["EngineHelpers"] && window["EngineHelpers"]["babelHelpers"];
+    var ProxyObject = window["Proxy"] || {};
 
     this.addModule("markup://engine", "engine", [], null, this.moduleEngine);
     this.addModule("markup://assert", "assert", [], null, Aura.ExportsAssert);
@@ -85,11 +86,19 @@ AuraComponentService.prototype.initCoreModules = function () {
     this.addModule("markup://aura", "aura", [], null, Aura.ExportsModule);
     this.addModule("markup://aura-storage", "aura-storage", [], null, Aura.ExportsStorage);
 
+    
+    // Register proxy-compat helpers
+    var proxyPrefix = "proxy-compat/";
+    Object.keys(ProxyObject).forEach(function (helper) {
+        var moduleName = proxyPrefix + helper;
+        this.addModule("markup://" + moduleName, moduleName, [], null, ProxyObject[helper]);
+    }.bind(this));
+
     // Register compat modules
     if (babelHelpers) {
-        var prefix = "babel/helpers/";
+        var babelHelpersPrefix = "babel/helpers/";
         Object.keys(babelHelpers).forEach(function (helper) {
-            var moduleName = prefix + helper;
+            var moduleName = babelHelpersPrefix + helper;
             this.addModule("markup://" + moduleName, moduleName, [], null, babelHelpers[helper]);
         }.bind(this));
 

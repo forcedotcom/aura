@@ -230,7 +230,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 String cookieName = cookie.getName();
                 if (cookieName.equals("sid") && !(request.getPathInfo() != null && (requestPathInfo.endsWith(".js") || requestPathInfo.endsWith(".css")))) {
                     return true;
-                }
+                } 
             }
         }
         return false;

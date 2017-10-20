@@ -38,7 +38,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
     private static String inlineHeader = null;
     private static String defaultHeader = null;
 
-    private static List<String> sameOrigin = null;
+    private List<String> sameOrigin = null;
     private final CSPInliningService cspInliningService;
 
     private boolean nonCspInlineEnabled;

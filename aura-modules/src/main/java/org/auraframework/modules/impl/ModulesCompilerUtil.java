@@ -32,7 +32,7 @@ import org.json.*;
 
 public final class ModulesCompilerUtil {
 
-    static final String COMPILER_JS_PATH = pathToLocalTempFile("modules/compiler.min.js");
+    static final String COMPILER_JS_PATH = pathToLocalTempFile("modules/compiler.js");
     static final String COMPILER_HANDLER = "src/lwc/invokeCompile.js";
 
     private static NodeBundle COMPILER_BUNDLE;
@@ -47,10 +47,10 @@ public final class ModulesCompilerUtil {
      */
     static NodeBundle createCompilerBundle(NodeLambdaFactory consumingFactory) throws Exception {
         NodeBundleBuilder builder = new NodeBundleBuilder(NodeTool.BUNDLE, "lwc-compiler");
-        builder.add("src/lwc/compiler.min.js", new Supplier<InputStream>() {
+        builder.add("src/lwc/compiler.js", new Supplier<InputStream>() {
             @Override
             public InputStream get() {
-                return ModulesCompilerUtil.class.getResourceAsStream("/modules/compiler.min.js");
+                return ModulesCompilerUtil.class.getResourceAsStream("/modules/compiler.js");
             }
         });
         builder.add(COMPILER_HANDLER, new Supplier<InputStream>() {

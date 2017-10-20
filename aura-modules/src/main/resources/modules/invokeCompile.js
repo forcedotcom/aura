@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+const fs = require('fs');
+
 module.exports = function(input) {
-    const compiler = require('./compiler.min.js');
-    return compiler.compile(input.entry, input.options);;
+    const compiler = require('./compiler.js');
+    return compiler.compile(input.entry, input.options);
 }

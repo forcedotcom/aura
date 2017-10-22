@@ -56,7 +56,7 @@ var NOOP_COMPAT$1 = NOOP_COMPAT;
 return NOOP_COMPAT$1;
 
 })));
-/** version: 0.15.0 */
+/** version: 0.15.1 */
 
 /* Transformed Polyfills + Babel helpers */
 var __inKey = window.Proxy.inKey;
@@ -7743,11 +7743,10 @@ var XProxy = /** @class */ (function () {
         });
         defineProperty$1(proxy, 'forIn', {
             value: function () {
-                var keyedObj = create(null);
-                for (var i in target) {
-                    keyedObj[i] = void 0;
-                }
-                return keyedObj;
+                return proxy.ownKeys().reduce(function (o, key) {
+                    o[key] = void 0;
+                    return o;
+                }, create(null));
             },
             configurable: false,
             enumerable: false,
@@ -8064,7 +8063,7 @@ var _a;
 return FinalProxy$1;
 
 })));
-/** version: 0.15.0 */
+/** version: 0.15.1 */
 
 /* Overrides for proxy-compat globals */
  var __getKey = window.Proxy.getKey; var __setKey = window.Proxy.setKey; var __callKey = window.Proxy.callKey; var __iterableKey = window.Proxy.iterableKey; var __inKey = window.Proxy.inKey; var __deleteKey = window.Proxy.deleteKey; var __instanceOfKey = window.Proxy.instanceOfKey;

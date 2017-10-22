@@ -755,7 +755,7 @@ function getComponentStack(vm) {
     return wcStack.reverse().join('\n\t');
 }
 
-const hooks = ['wiring', 'rehydrated', 'connected', 'disconnected', 'piercing'];
+const hooks = ['wiring', 'rendered', 'connected', 'disconnected', 'piercing'];
 /* eslint-enable */
 const Services = create(null);
 function register(service) {
@@ -1066,10 +1066,6 @@ function renderComponent(vm) {
     const vnodes = invokeComponentRenderMethod(vm);
     vm.isDirty = false;
     assert.invariant(isArray(vnodes), `${vm}.render() should always return an array of vnodes instead of ${vnodes}`);
-    const { rehydrated } = Services;
-    if (rehydrated) {
-        addCallbackToNextTick(() => invokeServiceHook(vm, rehydrated));
-    }
     return vnodes;
 }
 function markComponentAsDirty(vm) {
@@ -2243,26 +2239,26 @@ function addInsertionIndex(vm) {
     assert.vm(vm);
     assert.invariant(vm.idx === 0, `${vm} is already locked to a previously generated idx.`);
     vm.idx = ++idx;
+    const { connected } = Services;
+    if (connected) {
+        invokeServiceHook(vm, connected);
+    }
     const { component: { connectedCallback } } = vm;
     if (connectedCallback && connectedCallback !== noop) {
         invokeComponentMethod(vm, 'connectedCallback');
-    }
-    const { connected } = Services;
-    if (connected) {
-        addCallbackToNextTick(() => invokeServiceHook(vm, connected));
     }
 }
 function removeInsertionIndex(vm) {
     assert.vm(vm);
     assert.invariant(vm.idx > 0, `${vm} is not locked to a previously generated idx.`);
     vm.idx = 0;
+    const { disconnected } = Services;
+    if (disconnected) {
+        invokeServiceHook(vm, disconnected);
+    }
     const { component: { disconnectedCallback } } = vm;
     if (disconnectedCallback && disconnectedCallback !== noop) {
         invokeComponentMethod(vm, 'disconnectedCallback');
-    }
-    const { disconnected } = Services;
-    if (disconnected) {
-        addCallbackToNextTick(() => invokeServiceHook(vm, disconnected));
     }
 }
 function createVM(vnode) {
@@ -2330,6 +2326,10 @@ function rehydrate(vm) {
         const children = renderComponent(vm);
         vm.isScheduled = false;
         patchShadowRoot(vm, children);
+        const { rendered } = Services;
+        if (rendered) {
+            invokeServiceHook(vm, rendered);
+        }
         const { component: { renderedCallback } } = vm;
         if (renderedCallback && renderedCallback !== noop) {
             invokeComponentMethod(vm, 'renderedCallback');
@@ -3332,4 +3332,4 @@ exports.unwrap = unwrap;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.15.0 */
+/** version: 0.15.1 */

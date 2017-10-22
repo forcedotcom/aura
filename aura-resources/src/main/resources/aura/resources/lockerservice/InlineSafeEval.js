@@ -57,7 +57,7 @@
 
 			  if (options.mutedGlobals) {
 				  // Mute $A, aura, sforce, Sfdc etc for modules
-				  src = 'const {' + options.mutedGlobals + '} = {};\n' + src;
+				  src = 'var ' + options.mutedGlobals + ';\n' + src;
 			  }
 
 	          if (options.useStrict) {

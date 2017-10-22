@@ -121,80 +121,6 @@
 
     window.Aura.inlineJsLoaded = true;
     var auraConfig = {!v.auraInit};
-    var initSafeEvalWorker;
-    function initLocker () {
-        if (auraConfig["safeEvalWorker"] &amp;&amp; !window['$$safe-eval$$'] &amp;&amp; !/^(.*?:)?\/\//.test(auraConfig["host"])) {
-            initSafeEvalWorker = true;
-
-            // Check if strict-csp is being enforced by the browser
-            var isEvalAllowed = true;
-            try {
-                eval("(function(){})();");
-            }catch (e) {
-                isEvalAllowed = false;
-            }
-
-            var isInlineAllowed;
-            if (isEvalAllowed){
-                var inlineAllowedProp = "$unsafeInlineAllowed$";
-                var script = document.createElement("script");
-                script.type = "text/javascript";
-                script.appendChild(document.createTextNode("(function(){ window['"+inlineAllowedProp+"']=true; })();"));
-                isInlineAllowed = true;
-                document.body.appendChild(script);
-                document.body.removeChild(script);
-                isInlineAllowed = window[inlineAllowedProp] || false;
-                window[inlineAllowedProp] = undefined;
-            }
-
-            if(isEvalAllowed &amp;&amp; isInlineAllowed){
-                // No need for the worker as main frame has no restriction
-                initSafeEvalWorker = false;
-            }
-        }
-
-        if (initSafeEvalWorker) {
-            var safeEvalWorkerLoaded = {};
-
-            function rendezvousWorkersThenInitFramework() {
-                var id = this;
-
-                safeEvalWorkerLoaded[id] = true;
-
-                if (safeEvalWorkerLoaded.System &amp;&amp; safeEvalWorkerLoaded.Custom) {
-                    initFramework();
-                }
-            }
-
-            function createWorker(id) {
-                var workerId = "safeEvalWorker" + id;
-                var props = {
-                    src: auraConfig.safeEvalWorker + "?id=" + id,
-                    id: workerId, width: "0", height: "0", tabIndex: "-1", "aura-hidden": "true", title:"scripts" + id
-                };
-
-                var el = document.getElementById(workerId);
-                if (!el) {
-                    if (!auraConfig["safeEvalWorker"]) {
-                        throw new Error("Aura(): Missing 'safeEvalWorker' configuration.");
-                    }
-
-                    el = document.createElement("iframe");
-                    el.style.display = "none";
-                    for (var i in props) { el.setAttribute(i, props[i]); }
-                    document.body.appendChild(el);
-
-                    el.addEventListener('load', rendezvousWorkersThenInitFramework.bind(id));
-                    el.addEventListener("error", function () { throw new Error("Aura(): Failed to load locker worker.");});
-                }
-            }
-
-            createWorker("System");
-            createWorker("Custom");
-        } else {
-            setTimeout(initFramework, 0); // ensure async
-        }
-    }
 
     function auraPreInitBlock () {
         {!v.auraPreInitBlock}
@@ -206,17 +132,16 @@
         window.Aura.beforeFrameworkInit = Aura.beforeFrameworkInit || [];
         window.Aura.beforeFrameworkInit.push(auraPreInitBlock);
         window.Aura.inlineJsReady = time();
-        window.Aura.initSafeEvalWorker = initSafeEvalWorker;
 
         if (!window.Aura.frameworkJsReady) {
             window.Aura.initConfig = auraConfig;
         } else {
 
             // LockerService must be initialized before scripts can be executed.
-            $A.lockerService.initialize(auraConfig.context);
+            $A.lockerService.initialize(auraConfig.context.ls);
 
-            // scripts inside custom templates with Locker active are stored until now since we need FW and safeEval
-            // loaded before running
+            // scripts inside custom templates with Locker active are stored
+            // until now since we need LockerService before running
 
             var scripts = window.Aura.inlineJsLocker;
             if (scripts) {
@@ -248,7 +173,7 @@
         });
     }
 
-    initLocker();
+    setTimeout(initFramework, 0); // ensure async
 
     {!v.bootstrapInlineJs}
 

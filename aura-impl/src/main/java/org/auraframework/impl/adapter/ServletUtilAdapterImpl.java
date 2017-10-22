@@ -376,7 +376,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             throws QuickFixException {
         return new ArrayList<>(clientLibraryService.getUrls(context, type));
     }
-    
+
     /**
      * Gets all client libraries specified. Uses client library service to resolve any urls that weren't specified.
      * Returns list of non empty client library urls.
@@ -390,7 +390,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             throws QuickFixException {
         return new ArrayList<>(clientLibraryService.getPrefetchUrls(context, ClientLibraryDef.Type.JS));
     }
-    
+
     /**
      * Get the set of base scripts for a context.
      */
@@ -438,17 +438,17 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     public List <String> getJsClientLibraryUrls(AuraContext context) throws QuickFixException {
         return getClientLibraryUrls(context, ClientLibraryDef.Type.JS);
     }
-    
+
     @Override
     public List <String> getJsPrefetchUrls(AuraContext context) throws QuickFixException {
         return getClientLibraryJSPrefetchUrls(context);
     }
-    
+
 	@Override
 	public List<String> getCssPreloadUrls(AuraContext context) throws QuickFixException {
 		return Arrays.asList(this.getAppCssUrl(context));
 	}
-    
+
 	@Override
 	public List<String> getJsPreloadUrls(AuraContext context) throws QuickFixException {
 		final List<String> urls = Lists.newArrayList();
@@ -652,13 +652,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 top == null ? null : top.getQualifiedName(), req);
 
         if (csp != null) {
-            // Allow unsafe-eval if this is the system safeEval worker
-            if (req.getRequestURI().endsWith(SAFE_EVAL_HTML_URI)) {
-                String qs = req.getQueryString();
-                if (qs != null && qs.equalsIgnoreCase("id=system")) {
-                    csp = new SystemModeSafeEvalSecurityPolicy(csp);
-                }
-            }
 
             rsp.addHeader(CSP.Header.SECURE, csp.getCspHeaderValue());
             Collection<String> terms = csp.getFrameAncestors();
@@ -1008,82 +1001,5 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     public void setManifestUtil(ManifestUtil manifestUtil) {
         this.manifestUtil = manifestUtil;
     }
-
-
-    private static class SystemModeSafeEvalSecurityPolicy implements ContentSecurityPolicy {
-        SystemModeSafeEvalSecurityPolicy(ContentSecurityPolicy delegate) {
-            this.delegate = delegate;
-        }
-
-        @Override
-        public String getCspHeaderValue() {
-            return DefaultContentSecurityPolicy.buildHeaderNormally(this);
-        }
-
-        @Override
-        public Collection<String> getFrameAncestors() {
-            return delegate.getFrameAncestors();
-        }
-
-        @Override
-        public Collection<String> getFrameSources() {
-            return delegate.getFrameSources();
-        }
-
-        @Override
-        public Collection<String> getScriptSources() {
-            Collection<String> sources = Lists.newArrayList(delegate.getScriptSources());
-            sources.add(CSP.UNSAFE_EVAL);
-            return sources;
-        }
-
-        @Override
-        public Collection<String> getStyleSources() {
-            return delegate.getStyleSources();
-        }
-
-        @Override
-        public Collection<String> getFontSources() {
-            return delegate.getFontSources();
-        }
-
-        @Override
-        public Collection<String> getConnectSources() {
-            return delegate.getConnectSources();
-        }
-
-        @Override
-        public Collection<String> getDefaultSources() {
-            return delegate.getDefaultSources();
-        }
-
-        @Override
-        public Collection<String> getImageSources() {
-            return delegate.getImageSources();
-        }
-
-        @Override
-        public Collection<String> getObjectSources() {
-            return delegate.getObjectSources();
-        }
-
-        @Override
-        public Collection<String> getMediaSources() {
-            return delegate.getMediaSources();
-        }
-
-        @Override
-        public boolean isNonCspInlineEnabled() { return delegate.isNonCspInlineEnabled(); }
-
-        @Override
-        public String getReportUrl() {
-            return delegate.getReportUrl();
-        }
-
-        private final ContentSecurityPolicy delegate;
-    }
-
-    private static final String SAFE_EVAL_HTML_URI = "/lockerservice/safeEval.html";
-
 
 }

@@ -33,28 +33,27 @@ public enum AuraRequest implements HttpFilter {
 	APPCSS(equalsURI("/auraResource","app", "css")),
 	MANIFEST(equalsURI("/auraResource","app", "manifest")),
 	RESETCSS(matchesURI("/auraFW/resources/.*/aura/resetCSS.css")),
-	FRAMEWORK(matchesURI("/auraFW/javascript/.*/aura_.+\\.js")),
-	LOCKER(matchesURI("/auraFW/resources/.*/lockerservice/safeEval.html"));
-	
+	FRAMEWORK(matchesURI("/auraFW/javascript/.*/aura_.+\\.js"));
+
 	private static final StringParam FORMAT = new StringParam(AuraServlet.AURA_PREFIX + "format", 0, false);
 	private static final StringParam TYPE = new StringParam(AuraServlet.AURA_PREFIX + "type", 0, false);
 
 	private HttpFilter httpFilter;
-	
+
 	private AuraRequest(HttpFilter delegate){
 		this.httpFilter = delegate;
 	}
-	
+
 	@Override
 	public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		httpFilter.doFilter(request, response, chain);
 	}
-	
+
 	public static HttpFilter equalsURI(String uri) {
 		return equalsURI(uri, null, null);
 	}
-	
+
 	public static HttpFilter equalsURI(String uri, String type, String format) {
 		return (request, response, chain) -> {
 			if ((request != null) && (request.getRequestURI() != null) && (request.getRequestURI().equals(uri))
@@ -64,7 +63,7 @@ public enum AuraRequest implements HttpFilter {
 			}
 		};
 	}
-	
+
 	public static HttpFilter matchesURI(String uriPattern) {
 		return (request, response, chain) -> {
 			if (request != null && request.getRequestURI() != null && request.getRequestURI().matches(uriPattern)) {

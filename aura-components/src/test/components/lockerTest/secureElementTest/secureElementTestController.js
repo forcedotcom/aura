@@ -274,8 +274,9 @@
         };
 
         var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.width = 400;
-        svg.height = 400;
+        // These properties are read-only, and JS throws in strict mode.
+        // svg.width = 400;
+        // svg.height = 400;
         document.body.appendChild(svg);
 
         var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');

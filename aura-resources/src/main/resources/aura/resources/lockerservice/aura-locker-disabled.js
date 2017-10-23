@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2017-10-23
- * Version: 0.2.1
+ * Version: 0.2.2
  */
 
 (function (global, factory) {
@@ -48,7 +48,7 @@
 // DO NOT USE ES6 METHODS IN THIS FILE.
 
 
-function evaluate() {
+function evaluate(src) {
     return (0,eval)('(function(){\n' + src + '\n})()');
 }
 

@@ -879,9 +879,9 @@ Component.prototype.destroy = function() {
         for(var x in expressions){
             expressions[x].removeChangeHandler(this,"v."+x);
         }
+        //break link to AttributeSet instance once it has been destroyed
+        this.attributeSet = null;
     }
-
-
 
     var references=this.references;
     for(var key in references){
@@ -898,21 +898,6 @@ Component.prototype.destroy = function() {
     if (this.model) {
         this.model.destroy();
     }
-
-    // Destroy valueproviders
-    // JBUCH: THIS SHOULDN'T BE NECESSARY
-    // var vp = this.valueProviders;
-    // if(vp) {
-    //     for(var k in vp) {
-    //         var v = vp[k];
-    //         if (v&&v!==this) {
-    //             if ($A.util.isFunction(v.destroy)) {
-    //                 v.destroy();
-    //             }
-    //             delete vp[k];
-    //         }
-    //     }
-    // }
 
     // Detach all application event handlers
     $A.eventService.removeHandlersByComponentId(this.globalId);
@@ -964,6 +949,18 @@ Component.prototype.destroy = function() {
         this.superComponent.destroy();
     }
 
+    // Destroy valueProviders
+    // AttributeSet was leaking becasue it was tied to valueProviders
+    var vp = this.valueProviders;
+    if(vp) {
+        for(var k in vp) {
+            var v = vp[k];
+            if (v && v !== this) {
+                vp[k] = null;
+            }
+        }
+    }
+    
     // Destroyed. Mark invalid
     this.destroyed=1;
 };
@@ -1660,7 +1657,7 @@ Component.prototype.removeValueProvider=function(key){
     if(!this.destroyed) {
         $A.assert($A.util.isString(key), "Component.removeValueProvider(): 'key' must be a valid String.");
         $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf("," + key.toLowerCase() + ",") === -1, "Component.removeValueProvider(): '" + key + "' is a reserved valueProvider and can not be removed.");
-        delete this.valueProviders[key];
+        this.valueProviders[key] = null;
     }
 };
 

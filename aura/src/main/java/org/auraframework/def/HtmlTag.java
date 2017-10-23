@@ -15,6 +15,8 @@
  */
 package org.auraframework.def;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public enum HtmlTag {
     a,
     abbr,
@@ -140,6 +142,7 @@ public enum HtmlTag {
 
     private final boolean allowed;
     public static final String HTML_TAG = "aura:html";
+    private static final ConcurrentHashMap<String,HtmlTag> tagMap = new ConcurrentHashMap<>();
 
     private HtmlTag(boolean allowed) {
         this.allowed = allowed;
@@ -150,15 +153,21 @@ public enum HtmlTag {
     }
 
     public static final boolean allowed(String tag) {
-        try {
-            if (tag.equals(HTML_TAG)) {
-                return true;
+        synchronized (tagMap) {
+            if (tagMap.size() == 0) {
+                for (HtmlTag t : values()) {
+                    tagMap.put(t.toString(), t);
+                }
             }
-            HtmlTag ret = valueOf(tag.toLowerCase());
-            return ret.isAllowed();
-        } catch (Throwable e) {
+        }
+        if (tag == null) {
             return false;
         }
+        if (tag.equals(HTML_TAG)) {
+            return true;
+        }
+        HtmlTag ret = tagMap.get(tag.toLowerCase());
+        return ret != null && ret.isAllowed();
     }
 
     public boolean isAllowed() {

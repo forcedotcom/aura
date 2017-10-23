@@ -1,7 +1,8 @@
 <aura:component>
     <aura:attribute name="readyToRender" type="Boolean" default="true"/>
 
-    <ui:button aura:id="clickme" label="click me" press="{!c.clickme}"/>
+    <ui:button aura:id="show" label="show" press="{!c.show}"/>
+    <ui:button aura:id="hide" label="hide" press="{!c.hide}"/>
 
     <aura:if isTrue="{!v.readyToRender}">
         <moduleTest:simpleCmp/>

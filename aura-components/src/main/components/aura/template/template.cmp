@@ -177,11 +177,27 @@
 
     {!v.bootstrapInlineJs}
 
+    var cssLoadCount = 0
+    function onLoadStyleSheets(event) {
+        cssLoadCount--;
+        if (cssLoadCount == 0){
+            if (typeof window.Aura.bootstrap.appCssLoaded === "function") {
+                window.Aura.bootstrap.appCssLoaded();
+            }
+            window.Aura.bootstrap.appCssLoaded = true;
+        }
+    }
+
+
+
     var auraCss = document.getElementsByClassName('auraCss');
     var current;
+    window.Aura.bootstrap.appCssLoaded = !(auraCss.length &amp;&amp; auraCss.length > 0);
     for (var c=0,length=auraCss.length;c&lt;length;c++) {
-      current = auraCss[c];
-      current.href = current.getAttribute("data-href");
+        current = auraCss[c];
+        cssLoadCount++;
+        current.addEventListener('load',onLoadStyleSheets);
+        current.href = current.getAttribute("data-href");
     }
 
 }());

@@ -471,6 +471,18 @@ AuraInstance.prototype.initAsync = function(config) {
             }, reportError);
         }
 
+        // before rendering the app, we need to ensure the app.css has been loaded
+        // many applications depend upon the css existing before initialization takes place.
+        function ensureCssLoaded(){
+            return new Promise(function(resolve) {
+                if (Aura["bootstrap"]["appCssLoaded"]) {
+                    resolve();
+                } else {
+                    Aura["bootstrap"]["appCssLoaded"] = resolve;
+                }
+            });
+        }
+
         // Actions depend on defs depend on GVP (labels). so load them in dependency order and skip
         // loading depending items if anything fails to load.
 
@@ -479,13 +491,14 @@ AuraInstance.prototype.initAsync = function(config) {
 
         if (!$A.clientService.gvpsFromStorage) {
             $A.log("Aura.initAsync: GVP not loaded from storage so not loading defs or actions either");
-            $A.clientService.loadTokenFromStorage().then(initializeApp).then(undefined, reportError);
+            $A.clientService.loadTokenFromStorage().then(ensureCssLoaded).then(initializeApp).then(undefined, reportError);
         } else {
             Promise["all"]([
                 $A.clientService.loadTokenFromStorage(),
                 $A.clientService.loadBootstrapFromStorage(),
                 $A.componentService.restoreDefsFromStorage(context),
-                $A.clientService.populateActionsFilter()
+                $A.clientService.populateActionsFilter(),
+                ensureCssLoaded
             ])
                 .then(initializeApp, function (err) {
                     $A.log("Aura.initAsync: failed to load defs, get bootstrap or actions from storage", err);

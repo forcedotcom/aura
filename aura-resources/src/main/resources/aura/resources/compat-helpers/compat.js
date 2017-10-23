@@ -56,7 +56,7 @@ var NOOP_COMPAT$1 = NOOP_COMPAT;
 return NOOP_COMPAT$1;
 
 })));
-/** version: 0.15.1 */
+/** version: 0.15.2 */
 
 /* Transformed Polyfills + Babel helpers */
 var __inKey = window.Proxy.inKey;
@@ -8063,7 +8063,7 @@ var _a;
 return FinalProxy$1;
 
 })));
-/** version: 0.15.1 */
+/** version: 0.15.2 */
 
 /* Overrides for proxy-compat globals */
  var __getKey = window.Proxy.getKey; var __setKey = window.Proxy.setKey; var __callKey = window.Proxy.callKey; var __iterableKey = window.Proxy.iterableKey; var __inKey = window.Proxy.inKey; var __deleteKey = window.Proxy.deleteKey; var __instanceOfKey = window.Proxy.instanceOfKey;

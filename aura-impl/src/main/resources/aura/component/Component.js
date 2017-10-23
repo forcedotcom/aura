@@ -278,36 +278,6 @@ Component.prototype.getDef = function() {
 };
 
 /**
- * Returns the highest reference of the method in the component hierarchy
- *
- * @param {String} key The data key to look up.
- * @param {Object} component The component hierarchy to investigate
- * @returns {Object} Tuple where first element is highest reference and second is method definition
- */
-Component.getMethodDef = function(key, componentOrDef) {
-    var def = [];
-
-    while (componentOrDef) {
-        var methodDefs = componentOrDef.methodDefs || (componentOrDef.getDef && componentOrDef.getDef().methodDefs);
-        var methodDef = null;
-        for (var i = 0; methodDefs && i < methodDefs.length; i++) {
-            if (methodDefs[i].name === key) {
-                methodDef = methodDefs[i];
-                break;
-            }
-        }
-        if (!methodDef) {
-            break;
-        }
-        def[0] = componentOrDef;
-        def[1] = methodDef;
-        componentOrDef = (componentOrDef.getSuper && componentOrDef.getSuper()) || (componentOrDef.getDef && componentOrDef.getDef().getSuperDef());
-    }
-
-    return def;
-};
-
-/**
  * Indexes the given <code>globalId</code> based on the given
  * <code>localId</code>. Allows <code>cmp.find(localId)</code> to look up
  * the given <code>globalId</code>, look up the component, and return it.
@@ -2501,11 +2471,8 @@ Component.prototype.getMethodHandler = function(methodDef,methodEventDef){
             }
             methodEvent.setParams(params);
             methodEvent.fired=true;
-
-            // find the originating component/componentdef that defines the
-            // target method and use it for the access context - W-3686136
-            var defs = Component.getMethodDef(action.getType(), component);
-            action.runDeprecated(methodEvent, defs[0]);
+        
+            action.runDeprecated(methodEvent);
             return action.returnValue;
         }
         return undefined;

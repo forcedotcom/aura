@@ -63,15 +63,14 @@ AttributeSet.prototype.hasAttribute = function(name) {
 AttributeSet.getDef = function(key, component) {
     var def=[];
     var target=component.getConcreteComponent?component.getConcreteComponent():component;
-    target=target.getDef?target.getDef():target;
     while(target){
-        var tempDef=target.getAttributeDefs&&target.getAttributeDefs().getDef(key);
+        var tempDef=target.getDef?target.getDef().getAttributeDefs().getDef(key):target.getAttributeDefs().getDef(key);
         if(!tempDef){
             break;
         }
         def[0]=tempDef;
         def[1]=target;
-        target=target.getSuperDef&&target.getSuperDef();
+        target=target.getSuper?target.getSuper():target.getSuperDef();
     }
     return def;
 };

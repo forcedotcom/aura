@@ -4024,7 +4024,7 @@ AuraClientService.prototype.getAccessVersion = function(name) {
     return ret;
 };
 
-AuraClientService.prototype.allowAccess = function(definition, componentOrDef) {
+AuraClientService.prototype.allowAccess = function(definition, component) {
     if(definition&&definition.getDescriptor){
         var currentAccess=this.currentAccess;
         if(definition.access==='G'){
@@ -4032,14 +4032,11 @@ AuraClientService.prototype.allowAccess = function(definition, componentOrDef) {
             return true;
         }else if(definition.access==='p'){
             // PRIVATE means "same component only".
-            return currentAccess&&(currentAccess===componentOrDef
-                ||currentAccess.getComponentValueProvider()===componentOrDef
-                ||currentAccess.getComponentValueProvider().getDef()===componentOrDef
-                ||currentAccess.getDef()===componentOrDef);
+            return currentAccess&&(currentAccess===component||currentAccess.getComponentValueProvider()===component||currentAccess.getDef()===component);
         }else{
             // Compute PRIVILEGED, INTERNAL, PUBLIC, and default (omitted)
             if(!currentAccess){
-                currentAccess=componentOrDef;
+                currentAccess=component;
             }
             if(currentAccess){
                 var accessDef=null;
@@ -4073,7 +4070,7 @@ AuraClientService.prototype.allowAccess = function(definition, componentOrDef) {
                 if(effectiveAccess==='P') {
                     // PUBLIC means "same namespace only"
                     var targetNamespace = definition.getDescriptor().getNamespace();
-                    if (currentAccess === componentOrDef || accessNamespace === targetNamespace || accessFacetNamespace === targetNamespace) {
+                    if (currentAccess === component || accessNamespace === targetNamespace || accessFacetNamespace === targetNamespace) {
                         return true;
                     }
                 }

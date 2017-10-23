@@ -58,7 +58,6 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.allAboardCallback = undefined;
     this.abortable = false;
     this.deferred = false;
-    this.type = null;
 
     this.returnValue = undefined;
     this.returnValueUserland = undefined;
@@ -363,19 +362,6 @@ Action.prototype.getDef = function() {
 };
 
 /**
- * Returns the type (including namespace prefix) of the action
- * @returns {String}
- */
-Action.prototype.getType = function() {
-    if (!this.type) {
-        var descriptor = this.def.getDescriptor();
-        descriptor = typeof descriptor === 'string' ? new DefDescriptor(descriptor) : descriptor;
-        this.type = descriptor.getNamespace() + ":" + this.getName();
-    }
-    return this.type;
-};
-
-/**
  * Gets name of the Action.
  *
  * @platform
@@ -665,17 +651,13 @@ Action.prototype.run = function(evt) {
  * @public
  * @param {Event}
  *            evt The event that calls the Action.
- * @param {ComponentOrDef}
- *            access context to use for the invocation of the action event
  * @export
  */
-Action.prototype.runDeprecated = function(evt, accessContext) {
+Action.prototype.runDeprecated = function(evt) {
     $A.assert(this.def && this.def.isClientAction(),
              "run() cannot be called on a server action. Use $A.enqueueAction() instead.");
     this.state = "RUNNING";
-
-    $A.clientService.setCurrentAccess(accessContext || this.cmp);
-
+    $A.clientService.setCurrentAccess(this.cmp);
     try {
         var secureCmp = $A.lockerService.wrapComponent(this.cmp);
         var secureEvt = $A.lockerService.wrapComponentEvent(secureCmp, evt);

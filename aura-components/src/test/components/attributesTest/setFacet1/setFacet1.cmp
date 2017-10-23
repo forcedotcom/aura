@@ -19,7 +19,7 @@
     <aura:attribute name="setFacet1_String" type="String"/>
     <aura:attribute name="setFacet1_Facet" type="Aura.Component[]"/>
     <aura:attribute name="setFacet1_DefRef" type="Aura.ComponentDefRef[]"/>
-    <aura:attribute name="setFacet1_PrivateString" type="String" default="[setFacet1_PrivateString]" access="PRIVATE"/>
+    
     <aura:attribute name="setFacet1_DefaultString" type="String" default="[setFacet1_DefaultString]"/>
     <aura:attribute name="setFacet1_DefaultFacet" type="Aura.Component[]">
         [setFacet1_DefaultFacet]{!v.setFacet1_DefaultString}[/setFacet1_DefaultFacet]
@@ -40,14 +40,12 @@
 
     <h1>setFacet1</h1>
     <p>
-        Facet: <div aura:id="setFacet1_Facet_Output">{!v.setFacet1_Facet}</div>
-        DefRef: <div aura:id="setFacet1_DefRef_Output">{!v.setFacet1_DefRef}</div>
-        <br/>
-        DefaultFacet: <div aura:id="setFacet1_DefaultFacet_Output">{!v.setFacet1_DefaultFacet}</div>
-        DefaultDefRef: <div aura:id="setFacet1_DefaultDefRef_Output">{!v.setFacet1_DefaultDefRef}</div>
-        <br/>
-        PrivateString: <div aura:id="setFacet1_PrivateString_Output"><aura:if isTrue="{!v.setFacet1_PrivateString != null}">{!v.setFacet1_PrivateString}</aura:if></div>
+	    Facet: <div aura:id="setFacet1_Facet_Output">{!v.setFacet1_Facet}</div>
+	    DefRef: <div aura:id="setFacet1_DefRef_Output">{!v.setFacet1_DefRef}</div>
+	    <br/>
+	    DefaultFacet: <div aura:id="setFacet1_DefaultFacet_Output">{!v.setFacet1_DefaultFacet}</div>
+	    DefaultDefRef: <div aura:id="setFacet1_DefaultDefRef_Output">{!v.setFacet1_DefaultDefRef}</div>
     </p>
-
+    
     {!v.body}
 </aura:component>

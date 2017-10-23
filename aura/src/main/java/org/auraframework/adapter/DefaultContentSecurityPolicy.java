@@ -219,7 +219,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
             if (site == null) {
                 result[i] = CSP.SELF;
             } else {
-                result[i] = site;
+                result[i] = site.toLowerCase();
             }
             i++;
         }

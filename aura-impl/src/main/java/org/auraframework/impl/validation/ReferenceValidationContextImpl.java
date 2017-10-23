@@ -23,9 +23,13 @@ import org.auraframework.validation.ReferenceValidationContext;
 
 public class ReferenceValidationContextImpl extends ErrorAccumulatorImpl implements ReferenceValidationContext {
 
-    private final Map<DefDescriptor<? extends Definition>, Definition> definitionMap;
+    private Map<DefDescriptor<? extends Definition>, Definition> definitionMap;
 
     public ReferenceValidationContextImpl(Map<DefDescriptor<? extends Definition>, Definition> definitionMap) {
+        this.definitionMap = definitionMap;
+    }
+
+    public void setDefinitionMap(Map<DefDescriptor<? extends Definition>, Definition> definitionMap) {
         this.definitionMap = definitionMap;
     }
 

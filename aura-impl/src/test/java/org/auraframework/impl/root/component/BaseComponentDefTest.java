@@ -525,7 +525,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 String.format(
                         baseTag,
                         String.format(
-                                "extends='%s' implements='%s' provider='%s' model='%s' controller='%s' renderer='%s'",
+                                "extends='%s' implements='%s' provider='%s' model='%s' controller='%s' renderer='%s' helper='%s'",
                                 parentDesc.getDescriptorName(), intfDesc.getDescriptorName(), providerDesc, modelDesc,
                                 controllerDesc, rendererDesc, helperDesc),
                         String.format(
@@ -540,7 +540,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         Set<DefDescriptor<?>> dependencies = new HashSet<>();
         definitionService.getDefinition(cmpDesc).appendDependencies(dependencies);
 
-        Set<DefDescriptor<?>> expected = Sets.newHashSet(parentDesc, childDesc, intfDesc, eventDesc, styleDesc);
+        Set<DefDescriptor<?>> expected = Sets.newHashSet(parentDesc, childDesc, intfDesc, eventDesc, styleDesc,
+                providerDesc, modelDesc, controllerDesc, rendererDesc, helperDesc);
         if (!dependencies.containsAll(expected)) {
             StringBuilder msg = new StringBuilder("missing dependencies:");
             expected.removeAll(dependencies);

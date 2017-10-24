@@ -475,7 +475,8 @@ AuraInstance.prototype.initAsync = function(config) {
         // many applications depend upon the css existing before initialization takes place.
         function ensureCssLoaded(){
             return new Promise(function(resolve) {
-                if (Aura["bootstrap"]["appCssLoaded"]) {
+                //immediately resolve if inline is not present or if css already loaded
+                if (typeof Aura["bootstrap"]["appCssLoaded"] === 'undefined' || Aura["bootstrap"]["appCssLoaded"]) {
                     resolve();
                 } else {
                     Aura["bootstrap"]["appCssLoaded"] = resolve;

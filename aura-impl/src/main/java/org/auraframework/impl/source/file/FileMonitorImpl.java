@@ -15,12 +15,20 @@
  */
 package org.auraframework.impl.source.file;
 
-import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.service.CachingService;
+import org.auraframework.service.LoggingService;
+import org.auraframework.system.SourceListener;
+import org.auraframework.util.FileChangeEvent;
+import org.auraframework.util.FileListener;
+import org.auraframework.util.FileMonitor;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.file.FileSystems;
@@ -42,20 +50,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.service.CachingService;
-import org.auraframework.service.LoggingService;
-import org.auraframework.system.SourceListener;
-import org.auraframework.util.FileChangeEvent;
-import org.auraframework.util.FileListener;
-import org.auraframework.util.FileMonitor;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 /**
  * File monitor allowing to ability to add watched directory. Used to update files and clear caches on source changes
@@ -73,7 +72,7 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
     private ConfigAdapter configAdapter;
 
     @Inject
-    private LoggingService logger;
+    protected LoggingService logger;
 
     private final ConcurrentLinkedQueue<WeakReference<SourceListener>> listeners = new ConcurrentLinkedQueue<>();
 
@@ -254,7 +253,7 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
             registerAll(dir);
             logger.info("[FileMonitorImpl] Monitoring directory " + dirPath);
         } catch (Exception ex) {
-            logger.info("[FileMonitorImpl] Unable to monitor directory " + dirPath + " due to exception: " + ex.getMessage());
+            logger.error("[FileMonitorImpl] Unable to monitor directory " + dirPath + " due to exception: " + ex.getMessage());
         }
     }
 
@@ -276,7 +275,7 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
             watchServiceThread.start();
             logger.info("[FileMonitorImpl] Aura file monitor started");
         } else {
-            logger.info("[FileMonitorImpl] Aura file monitor disabled");
+            logger.warn("[FileMonitorImpl] Aura file monitor disabled");
         }
     }
 

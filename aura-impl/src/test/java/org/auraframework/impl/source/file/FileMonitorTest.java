@@ -16,12 +16,15 @@
 package org.auraframework.impl.source.file;
 
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.service.LoggingService;
 import org.auraframework.util.FileListener;
 import org.auraframework.util.IOUtil;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.io.File;
+import java.util.Arrays;
 
 /**
  * This class tests the FileMonitorImpl class... but it cheats, it relies on the base classes that do a bunch of spring setup for us.
@@ -40,7 +43,15 @@ public class FileMonitorTest extends AuraImplTestCase {
 
         ((FileMonitorImpl)fileMonitor).listener = listenerMock;
 
+        LoggingService loggingServiceMock = Mockito.mock(LoggingService.class);
+        ((FileMonitorImpl)fileMonitor).logger = loggingServiceMock;
+
         fileMonitor.addDirectory(tmpDir.toString(), 0L);
+
+        ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(loggingServiceMock, Mockito.atLeast(0)).error(argumentCaptor.capture());
+        Mockito.verify(loggingServiceMock, Mockito.atLeast(0)).warn(argumentCaptor.capture());
+        assertEquals("Should not have any errors or warnings", Arrays.asList(), argumentCaptor.getAllValues());
 
         Mockito.verify(listenerMock, Mockito.atLeastOnce()).fileChanged(Mockito.anyObject());
     }

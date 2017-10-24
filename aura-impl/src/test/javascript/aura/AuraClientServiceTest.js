@@ -3985,4 +3985,54 @@ Test.Aura.AuraClientServiceTest = function() {
         }
 
     }
+
+    [Fixture]
+    function testInitializeInjectedServices() {
+        var mockModuleDeps = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                componentService: {
+                    evaluateModuleDef: function(serviceDefinition) {
+                        return function () {
+                            return serviceDefinition;
+                        };
+                    },
+                    moduleEngine: {}
+                },
+                assert: function(condition, message) {
+                    if (!condition) {
+                        throw new Error(message);
+                    }
+                }
+            },
+            window:{},
+            "document": document,
+            "Aura": Aura,
+            "AuraClientService": Aura.Services.AuraClientService
+        });
+
+        [Fact]
+        function addServicesToRegistry() {
+            var services = [{name: 'foo'}, {name: 'bar'}];
+            var expected = {foo: {name: 'foo'}, bar: {name: 'bar'}};
+
+            mockModuleDeps(function() {
+                var target = new Aura.Services.AuraClientService();
+                target.initializeInjectedServices(services);
+                Assert.Equal(expected, target.moduleServices);
+            });
+        }
+
+        [Fact]
+        function assertsServiceHasName() {
+            mockModuleDeps(function() {
+                var target = new Aura.Services.AuraClientService();
+                try {
+                    target.initializeInjectedServices([{}]);
+                    Assert.Fail();
+                } catch(e) {
+                    Assert.Equal('Unknown service name', e.message);
+                }
+            });
+        }
+    }
 }

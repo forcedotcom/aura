@@ -98,7 +98,7 @@ public interface Action extends Instance<ActionDef> {
             // Hoo-rah.
             Object returnValue = action.getReturnValue();
             if (returnValue == null) {
-                returnValue = Literal.NULL;
+                returnValue = new Literal("null");
             }
 
             json.writeMapBegin();

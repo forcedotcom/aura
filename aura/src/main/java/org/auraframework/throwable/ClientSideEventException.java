@@ -71,7 +71,6 @@ public abstract class ClientSideEventException extends AuraHandledException impl
         json.writeMapBegin();
         json.writeMapEntry("exceptionEvent", Boolean.TRUE);
         json.writeMapEntry("event", getEvent());
-        json.writeMapEntry("defaultHandler", getDefaultHandler() == null ? null : getDefaultHandler().toString());
         json.writeMapEnd();
     }
 }

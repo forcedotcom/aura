@@ -77,7 +77,7 @@
     <expressionTest:test expression="{!v.Infinity == v.NegativeInfinity}" exprText="v.Infinity == v.NegativeInfinity" expected="false"/>
     <expressionTest:test expression="{!m.infinityFloat == m.infinity}" exprText="m.infinityFloat == m.infinity" expected="true"/>
     <expressionTest:test expression="{!m.naN == v.NaN}" exprText="m.naN == v.NaN" expected="false"/>
-    <expressionTest:test expression="{!m.naN == m.naN}" exprText="m.naN == m.naN" expected="false"/>
+    <expressionTest:test expression="{!m.naN == m.naN}" exprText="m.naN == m.naN" expected="true"/>
     <expressionTest:test expression="{!v.nullObj == null}" exprText="v.nullObj == null" expected="true"/>
     <expressionTest:test expression="{!v.nullObj == false}" exprText="v.nullObj == false" expected="false"/>
     <expressionTest:test expression="{!v.nullObj == true}" exprText="v.nullObj == true" expected="false"/>

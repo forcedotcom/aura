@@ -58,7 +58,7 @@ public class DefaultJsonSerializer implements JsonSerializer<Object> {
         // JsonSerializationContext context = json.getSerializationContext();
 
         if (value == null) {
-            Literal.NULL.serialize(json);
+            json.writeLiteral("null");
         } else if (value instanceof JsonSerializable) {
             // If you've bothered to implement JsonSerializable then you
             // probably want it called.
@@ -69,9 +69,18 @@ public class DefaultJsonSerializer implements JsonSerializer<Object> {
             json.writeArray((Collection<?>) value);
         } else if (value instanceof Object[]) {
             json.writeArray((Object[]) value);
-        } else if (value instanceof Boolean || value instanceof Number) {
+        } else if (value instanceof Boolean) {
             // Don't quote boolean or number values
             json.writeLiteral(value);
+        } else if (value instanceof Number) {
+            double doubleValue=((Number)value).doubleValue();
+            if(Double.POSITIVE_INFINITY==doubleValue
+            || Double.NEGATIVE_INFINITY==doubleValue
+            || Double.isNaN(doubleValue)){
+                json.writeString(value);
+            }else{
+                json.writeLiteral(value);                
+            }
         } else if (value instanceof Date) {
             json.writeDate((Date) value);
         } else if (value instanceof Calendar) {

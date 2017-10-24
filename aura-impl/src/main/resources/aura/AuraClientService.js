@@ -443,13 +443,13 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
     if ((status !== 200) || $A.util.stringEndsWith(text, "/*ERROR*/")) {
         if (status === 200) {
             // if we encountered an exception once the response was committed
-            // ignore the malformed JSON
-            text = "/*" + text;
+            // strip the malformed JSON
+            text = text.substring(text.indexOf("*/")+2,text.lastIndexOf("/*"));
         } else if (!noStrip === true && text.charAt(0) === "w") {
             //
             // strip off the while(1) at the beginning
             //
-            text = "//" + text;
+            text = text.substring(text.indexOf("*/")+2,text.lastIndexOf("/*"));
         }
         var resp = $A.util.json.decode(text);
 
@@ -532,7 +532,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
     // strip off the while(1) at the beginning
     //
     if (!noStrip === true && text.charAt(0) === "w") {
-        text = "//" + text;
+        text = text.substring(text.indexOf("\n")+1);
     }
 
     var responseMessage = $A.util.json.decode(text);

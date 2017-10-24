@@ -182,7 +182,7 @@
         var text = response["responseText"];
         // Strip off the while(1) at the beginning. Logic borrowed from AuraClientService.js#decode
         if (text.charAt(0) === "w") {
-            text = "//" + text;
+            text = text.substring(text.indexOf("\n")+1);
         }
         return $A.test.json.decode(text);
     },

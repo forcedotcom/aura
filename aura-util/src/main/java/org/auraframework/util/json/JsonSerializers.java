@@ -229,7 +229,16 @@ public class JsonSerializers {
         @Override
         public void serialize(Json json, Object value) throws IOException {
             if (value == null) {
-                Literal.NULL.serialize(json);
+                json.writeLiteral("null");
+            } else if (value instanceof Number) {
+                double doubleValue=((Number)value).doubleValue();
+                if(Double.POSITIVE_INFINITY==doubleValue
+                || Double.NEGATIVE_INFINITY==doubleValue
+                || Double.isNaN(doubleValue)){
+                    json.writeString(value);
+                }else{
+                    json.writeLiteral(value);                
+                }    
             } else {
                 json.writeLiteral(value);
             }

@@ -152,12 +152,6 @@ public class JsonStreamReaderTest extends UnitTestCase {
         new ParseSuccess("float", "123.456", BigDecimal.valueOf(123.456)),
         new ParseSuccess("positive float", "+123.456", BigDecimal.valueOf(123.456)),
         new ParseSuccess("negative float", "-123.456", BigDecimal.valueOf(-123.456)),
-        // Ooh! Fun!
-        new ParseSuccess("negative infinity", "-Infinity", Double.NEGATIVE_INFINITY),
-        // Ooh! Fun!
-        new ParseSuccess("positive infinity", "Infinity", Double.POSITIVE_INFINITY),
-
-        new ParseSuccess("not-a-number", "NaN", Double.NaN),
     };
     @Test
     public void testNumber() throws Exception {
@@ -596,7 +590,9 @@ public class JsonStreamReaderTest extends UnitTestCase {
             assertEquals(12345.6, ((BigDecimal) outerMap.get("otherOtherNum")).doubleValue());
             assertTrue(outerMap.get("func") instanceof JsFunction);
             
-            assertEquals(AuraTextUtil.replaceSimple(func, "/*comment\n\n\n*/", "\n"), JsonEncoder.serialize(outerMap.get("func"), true));
+//            String expected="\""+AuraTextUtil.escapeForJSONString(AuraTextUtil.replaceSimple(func, "/*comment\n\n\n*/", "\n"))+"\"";
+            String expected=AuraTextUtil.replaceSimple(func, "/*comment\n\n\n*/", "\n");
+            assertEquals(expected, JsonEncoder.serialize(outerMap.get("func"), true));
             
             assertEquals("whose's son?", outerMap.get("jsean"));
             assertEquals("за", outerMap.get("Фокс"));

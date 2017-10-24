@@ -44,11 +44,6 @@ public class ClientSideEventExceptionJSONFormatAdapter extends JSONFormatAdapter
         Map<String, Object> serialized = Maps.newHashMap();
         serialized.put("exceptionEvent", Boolean.TRUE);
         serialized.put("event", value.getEvent());
-        if (jsonCxt != null && jsonCxt.format()) {
-            serialized.put("defaultHandler", value.getDefaultHandler());
-        } else {
-            serialized.put("defaultHandler", value.getDefaultHandler() == null ? null : value.getDefaultHandler().toString());
-        }
         JsonEncoder.serialize(serialized, out, jsonCxt);
     }
 }

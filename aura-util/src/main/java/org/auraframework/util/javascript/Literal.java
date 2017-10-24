@@ -29,7 +29,6 @@ public class Literal implements JsonSerializable, Serializable {
      */
     private static final long serialVersionUID = 5779379637273004906L;
     private final String s;
-    public static final Literal NULL = new Literal("null");
 
     public Literal(String s) {
         this.s = s;

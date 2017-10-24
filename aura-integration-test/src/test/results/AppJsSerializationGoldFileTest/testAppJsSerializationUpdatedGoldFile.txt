@@ -3527,7 +3527,7 @@ return {
                 "descriptor":"isTrue",
                 "value":{
                   "exprType":"FUNCTION",
-                  "code":function(cmp, fn) { return (cmp.get("v.attachToBody")&&cmp.get("v.curtain")); },
+                  "code":"function(cmp, fn) { return (cmp.get(\"v.attachToBody\")&&cmp.get(\"v.curtain\")); }",
                   "args":[
                     {
                       "exprType":"PROPERTY",
@@ -3560,7 +3560,7 @@ return {
                           "value":{
                             "class":{
                               "exprType":"FUNCTION",
-                              "code":function(cmp, fn) { return fn.add(fn.add(fn.add(cmp.get("v.class")," popupTargetContainer "),cmp.get("v.preTransitionClass")),(fn.eq(cmp.get("v.showNubbin"),true)?" menu--nubbin-top":"")); },
+                              "code":"function(cmp, fn) { return fn.add(fn.add(fn.add(cmp.get(\"v.class\"),\" popupTargetContainer \"),cmp.get(\"v.preTransitionClass\")),(fn.eq(cmp.get(\"v.showNubbin\"),true)?\" menu--nubbin-top\":\"\")); }",
                               "args":[
                                 {
                                   "exprType":"PROPERTY",
@@ -3631,7 +3631,7 @@ return {
                           "value":{
                             "class":{
                               "exprType":"FUNCTION",
-                              "code":function(cmp, fn) { return fn.add(fn.add(cmp.get("v.class")," popupCurtain "),cmp.get("v.preTransitionClass")); },
+                              "code":"function(cmp, fn) { return fn.add(fn.add(cmp.get(\"v.class\"),\" popupCurtain \"),cmp.get(\"v.preTransitionClass\")); }",
                               "args":[
                                 {
                                   "exprType":"PROPERTY",
@@ -3995,7 +3995,7 @@ return {
                           "descriptor":"isTrue",
                           "value":{
                             "exprType":"FUNCTION",
-                            "code":function(cmp, fn) { return (cmp.get("v.trigger.length")>0); },
+                            "code":"function(cmp, fn) { return (cmp.get(\"v.trigger.length\")\u003E0); }",
                             "args":[
                               {
                                 "exprType":"PROPERTY",
@@ -4035,7 +4035,7 @@ return {
                                       "aria-haspopup":"true",
                                       "tabindex":{
                                         "exprType":"FUNCTION",
-                                        "code":function(cmp, fn) { return (cmp.get("v.disabled")? -(1):0); },
+                                        "code":"function(cmp, fn) { return (cmp.get(\"v.disabled\")? -(1):0); }",
                                         "args":[
                                           {
                                             "exprType":"PROPERTY",
@@ -4077,7 +4077,7 @@ return {
                                               "descriptor":"isTrue",
                                               "value":{
                                                 "exprType":"FUNCTION",
-                                                "code":function(cmp, fn) { return fn.ne(cmp.get("v.label"),null); },
+                                                "code":"function(cmp, fn) { return fn.ne(cmp.get(\"v.label\"),null); }",
                                                 "args":[
                                                   {
                                                     "exprType":"PROPERTY",
@@ -4355,7 +4355,7 @@ return {
                 "descriptor":"isTrue",
                 "value":{
                   "exprType":"FUNCTION",
-                  "code":function(cmp, fn) { return (!(fn.empty(cmp.get("v.value")))||!(fn.empty(cmp.get("v.errors")))); },
+                  "code":"function(cmp, fn) { return (!(fn.empty(cmp.get(\"v.value\")))||!(fn.empty(cmp.get(\"v.errors\")))); }",
                   "args":[
                     {
                       "exprType":"PROPERTY",
@@ -4387,7 +4387,7 @@ return {
                           "value":{
                             "class":{
                               "exprType":"FUNCTION",
-                              "code":function(cmp, fn) { return fn.add(cmp.get("v.class")," has-error"); },
+                              "code":"function(cmp, fn) { return fn.add(cmp.get(\"v.class\"),\" has-error\"); }",
                               "args":[
                                 {
                                   "exprType":"PROPERTY",
@@ -4649,7 +4649,7 @@ return {
                 "value":{
                   "class":{
                     "exprType":"FUNCTION",
-                    "code":function(cmp, fn) { return fn.join(" ",cmp.get("v.class"),fn.token("uiLabel.label"),(cmp.get("v.labelDisplay")?null:fn.token("uiLabel.assistive"))); },
+                    "code":"function(cmp, fn) { return fn.join(\" \",cmp.get(\"v.class\"),fn.token(\"uiLabel.label\"),(cmp.get(\"v.labelDisplay\")?null:fn.token(\"uiLabel.assistive\"))); }",
                     "args":[
                       {
                         "exprType":"PROPERTY",
@@ -4692,7 +4692,7 @@ return {
                           "value":{
                             "class":{
                               "exprType":"FUNCTION",
-                              "code":function(cmp, fn) { return (cmp.get("v.labelDisplay")?null:"assistiveText"); },
+                              "code":"function(cmp, fn) { return (cmp.get(\"v.labelDisplay\")?null:\"assistiveText\"); }",
                               "args":[
                                 {
                                   "exprType":"PROPERTY",
@@ -4850,7 +4850,7 @@ return {
                           "value":{
                             "class":{
                               "exprType":"FUNCTION",
-                              "code":function(cmp, fn) { return (cmp.get("v.labelDisplay")?null:"assistiveText"); },
+                              "code":"function(cmp, fn) { return (cmp.get(\"v.labelDisplay\")?null:\"assistiveText\"); }",
                               "args":[
                                 {
                                   "exprType":"PROPERTY",
@@ -5641,7 +5641,7 @@ return {
                           "descriptor":"isTrue",
                           "value":{
                             "exprType":"FUNCTION",
-                            "code":function(cmp, fn) { return fn.ne(cmp.get("v.headerText"),null); },
+                            "code":"function(cmp, fn) { return fn.ne(cmp.get(\"v.headerText\"),null); }",
                             "args":[
                               {
                                 "exprType":"PROPERTY",
@@ -6199,7 +6199,7 @@ return {
                             "aria-haspopup":"true",
                             "tabindex":{
                               "exprType":"FUNCTION",
-                              "code":function(cmp, fn) { return (cmp.get("v.disabled")? -(1):0); },
+                              "code":"function(cmp, fn) { return (cmp.get(\"v.disabled\")? -(1):0); }",
                               "args":[
                                 {
                                   "exprType":"PROPERTY",
@@ -6248,7 +6248,7 @@ return {
                                     "descriptor":"isTrue",
                                     "value":{
                                       "exprType":"FUNCTION",
-                                      "code":function(cmp, fn) { return fn.eq(cmp.get("v.body.length"),0); },
+                                      "code":"function(cmp, fn) { return fn.eq(cmp.get(\"v.body.length\"),0); }",
                                       "args":[
                                         {
                                           "exprType":"PROPERTY",
@@ -6387,7 +6387,7 @@ return {
                           "value":{
                             "class":{
                               "exprType":"FUNCTION",
-                              "code":function(cmp, fn) { return (cmp.get("v.labelDisplay")?null:"assistiveText"); },
+                              "code":"function(cmp, fn) { return (cmp.get(\"v.labelDisplay\")?null:\"assistiveText\"); }",
                               "args":[
                                 {
                                   "exprType":"PROPERTY",
@@ -6696,7 +6696,7 @@ return {
                 "value":{
                   "class":{
                     "exprType":"FUNCTION",
-                    "code":function(cmp, fn) { return fn.join(" ",(cmp.get("v.variant")||fn.token("uiButton.button")),(cmp.get("v.stateful")?(cmp.get("v.selected")?fn.add("is-selected ",fn.token("uiButton.is-selected")):fn.add("not-selected ",fn.token("uiButton.not-selected"))):""),cmp.get("v.class")); },
+                    "code":"function(cmp, fn) { return fn.join(\" \",(cmp.get(\"v.variant\")||fn.token(\"uiButton.button\")),(cmp.get(\"v.stateful\")?(cmp.get(\"v.selected\")?fn.add(\"is-selected \",fn.token(\"uiButton.is-selected\")):fn.add(\"not-selected \",fn.token(\"uiButton.not-selected\"))):\"\"),cmp.get(\"v.class\")); }",
                     "args":[
                       {
                         "exprType":"PROPERTY",
@@ -6733,7 +6733,7 @@ return {
                   },
                   "aria-live":{
                     "exprType":"FUNCTION",
-                    "code":function(cmp, fn) { return (cmp.get("v.stateful")?"assertive":"off"); },
+                    "code":"function(cmp, fn) { return (cmp.get(\"v.stateful\")?\"assertive\":\"off\"); }",
                     "args":[
                       {
                         "exprType":"PROPERTY",
@@ -6787,7 +6787,7 @@ return {
                           "descriptor":"isTrue",
                           "value":{
                             "exprType":"FUNCTION",
-                            "code":function(cmp, fn) { return (fn.ne(cmp.get("v.iconImgSrc"),"")||fn.ne(cmp.get("v.iconClass"),"")); },
+                            "code":"function(cmp, fn) { return (fn.ne(cmp.get(\"v.iconImgSrc\"),\"\")||fn.ne(cmp.get(\"v.iconClass\"),\"\")); }",
                             "args":[
                               {
                                 "exprType":"PROPERTY",
@@ -6819,7 +6819,7 @@ return {
                                     "value":{
                                       "class":{
                                         "exprType":"FUNCTION",
-                                        "code":function(cmp, fn) { return fn.add(cmp.get("v.iconClass")," icon bLeft"); },
+                                        "code":"function(cmp, fn) { return fn.add(cmp.get(\"v.iconClass\"),\" icon bLeft\"); }",
                                         "args":[
                                           {
                                             "exprType":"PROPERTY",
@@ -6833,7 +6833,7 @@ return {
                                       "alt":"",
                                       "src":{
                                         "exprType":"FUNCTION",
-                                        "code":function(cmp, fn) { return (fn.ne(cmp.get("v.iconImgSrc"),"")?cmp.get("v.iconImgSrc"):"/auraFW/resources/aura/s.gif"); },
+                                        "code":"function(cmp, fn) { return (fn.ne(cmp.get(\"v.iconImgSrc\"),\"\")?cmp.get(\"v.iconImgSrc\"):\"/auraFW/resources/aura/s.gif\"); }",
                                         "args":[
                                           {
                                             "exprType":"PROPERTY",
@@ -6868,7 +6868,7 @@ return {
                           "descriptor":"isTrue",
                           "value":{
                             "exprType":"FUNCTION",
-                            "code":function(cmp, fn) { return (cmp.get("v.labelDisplay")&&!(fn.empty(cmp.get("v.label")))); },
+                            "code":"function(cmp, fn) { return (cmp.get(\"v.labelDisplay\")&&!(fn.empty(cmp.get(\"v.label\")))); }",
                             "args":[
                               {
                                 "exprType":"PROPERTY",
@@ -6899,7 +6899,7 @@ return {
                                     "descriptor":"isTrue",
                                     "value":{
                                       "exprType":"FUNCTION",
-                                      "code":function(cmp, fn) { return !(fn.empty(cmp.get("v.label"))); },
+                                      "code":"function(cmp, fn) { return !(fn.empty(cmp.get(\"v.label\"))); }",
                                       "args":[
                                         {
                                           "exprType":"PROPERTY",
@@ -6979,7 +6979,7 @@ return {
                                     "value":{
                                       "class":{
                                         "exprType":"FUNCTION",
-                                        "code":function(cmp, fn) { return fn.add(cmp.get("v.labelClass")," label bBody truncate"); },
+                                        "code":"function(cmp, fn) { return fn.add(cmp.get(\"v.labelClass\"),\" label bBody truncate\"); }",
                                         "args":[
                                           {
                                             "exprType":"PROPERTY",
@@ -7681,7 +7681,7 @@ return {
               "value":{
                 "class":{
                   "exprType":"FUNCTION",
-                  "code":function(cmp, fn) { return fn.add("required ",cmp.get("v.requiredIndicatorClass")); },
+                  "code":"function(cmp, fn) { return fn.add(\"required \",cmp.get(\"v.requiredIndicatorClass\")); }",
                   "args":[
                     {
                       "exprType":"PROPERTY",
@@ -8348,7 +8348,7 @@ return {
                 "value":{
                   "class":{
                     "exprType":"FUNCTION",
-                    "code":function(cmp, fn) { return fn.add(fn.add(fn.add(cmp.get("v.class")," tabs__item"),(cmp.get("v.active")?" active":"")),(cmp.get("v.hidden")?" hidden":"")); },
+                    "code":"function(cmp, fn) { return fn.add(fn.add(fn.add(cmp.get(\"v.class\"),\" tabs__item\"),(cmp.get(\"v.active\")?\" active\":\"\")),(cmp.get(\"v.hidden\")?\" hidden\":\"\")); }",
                     "args":[
                       {
                         "exprType":"PROPERTY",
@@ -8394,7 +8394,7 @@ return {
                             "class":"tabHeader",
                             "aria-selected":{
                               "exprType":"FUNCTION",
-                              "code":function(cmp, fn) { return (cmp.get("v.active")?"true":"false"); },
+                              "code":"function(cmp, fn) { return (cmp.get(\"v.active\")?\"true\":\"false\"); }",
                               "args":[
                                 {
                                   "exprType":"PROPERTY",
@@ -8407,7 +8407,7 @@ return {
                             },
                             "data-tab-name":{
                               "exprType":"FUNCTION",
-                              "code":function(cmp, fn) { return (cmp.get("v.name")||cmp.get("v.title")); },
+                              "code":"function(cmp, fn) { return (cmp.get(\"v.name\")||cmp.get(\"v.title\")); }",
                               "args":[
                                 {
                                   "exprType":"PROPERTY",
@@ -8426,7 +8426,7 @@ return {
                             },
                             "tabindex":{
                               "exprType":"FUNCTION",
-                              "code":function(cmp, fn) { return (cmp.get("v.active")?0: -(1)); },
+                              "code":"function(cmp, fn) { return (cmp.get(\"v.active\")?0: -(1)); }",
                               "args":[
                                 {
                                   "exprType":"PROPERTY",
@@ -8585,7 +8585,7 @@ return {
                                                 "class":"close",
                                                 "tabindex":{
                                                   "exprType":"FUNCTION",
-                                                  "code":function(cmp, fn) { return (cmp.get("v.active")?0: -(1)); },
+                                                  "code":"function(cmp, fn) { return (cmp.get(\"v.active\")?0: -(1)); }",
                                                   "args":[
                                                     {
                                                       "exprType":"PROPERTY",
@@ -8861,7 +8861,7 @@ return {
                 "value":{
                   "class":{
                     "exprType":"FUNCTION",
-                    "code":function(cmp, fn) { return fn.add(cmp.get("v.class")," tabs__item"); },
+                    "code":"function(cmp, fn) { return fn.add(cmp.get(\"v.class\"),\" tabs__item\"); }",
                     "args":[
                       {
                         "exprType":"PROPERTY",
@@ -9099,7 +9099,7 @@ return {
               "value":{
                 "class":{
                   "exprType":"FUNCTION",
-                  "code":function(cmp, fn) { return fn.add("required ",cmp.get("v.requiredIndicatorClass")); },
+                  "code":"function(cmp, fn) { return fn.add(\"required \",cmp.get(\"v.requiredIndicatorClass\")); }",
                   "args":[
                     {
                       "exprType":"PROPERTY",
@@ -9299,7 +9299,7 @@ return {
                           "value":{
                             "class":{
                               "exprType":"FUNCTION",
-                              "code":function(cmp, fn) { return fn.add(cmp.get("v.class")," input"); },
+                              "code":"function(cmp, fn) { return fn.add(cmp.get(\"v.class\"),\" input\"); }",
                               "args":[
                                 {
                                   "exprType":"PROPERTY",
@@ -9408,7 +9408,7 @@ return {
                                     "descriptor":"class",
                                     "value":{
                                       "exprType":"FUNCTION",
-                                      "code":function(cmp, fn) { return (cmp.get("v.value")?"clear":"hide clear"); },
+                                      "code":"function(cmp, fn) { return (cmp.get(\"v.value\")?\"clear\":\"hide clear\"); }",
                                       "args":[
                                         {
                                           "exprType":"PROPERTY",
@@ -9547,7 +9547,7 @@ return {
                 "value":{
                   "class":{
                     "exprType":"FUNCTION",
-                    "code":function(cmp, fn) { return fn.add(fn.add(fn.add("stamp-",cmp.get("v.severity"))," "),cmp.get("v.class")); },
+                    "code":"function(cmp, fn) { return fn.add(fn.add(fn.add(\"stamp-\",cmp.get(\"v.severity\")),\" \"),cmp.get(\"v.class\")); }",
                     "args":[
                       {
                         "exprType":"PROPERTY",
@@ -9702,7 +9702,7 @@ return {
                 "value":{
                   "class":{
                     "exprType":"FUNCTION",
-                    "code":function(cmp, fn) { return fn.add(fn.add(fn.add(cmp.get("v.class")," tabs__content"),(cmp.get("v.scroll")?" scrolling":"")),(cmp.get("v.active")?" active":"")); },
+                    "code":"function(cmp, fn) { return fn.add(fn.add(fn.add(cmp.get(\"v.class\"),\" tabs__content\"),(cmp.get(\"v.scroll\")?\" scrolling\":\"\")),(cmp.get(\"v.active\")?\" active\":\"\")); }",
                     "args":[
                       {
                         "exprType":"PROPERTY",
@@ -9727,7 +9727,7 @@ return {
                   },
                   "aria-expanded":{
                     "exprType":"FUNCTION",
-                    "code":function(cmp, fn) { return (cmp.get("v.active")?"true":"false"); },
+                    "code":"function(cmp, fn) { return (cmp.get(\"v.active\")?\"true\":\"false\"); }",
                     "args":[
                       {
                         "exprType":"PROPERTY",
@@ -10951,7 +10951,7 @@ return {
                 "descriptor":"isTrue",
                 "value":{
                   "exprType":"FUNCTION",
-                  "code":function(cmp, fn) { return !(cmp.get("v.hidden")); },
+                  "code":"function(cmp, fn) { return !(cmp.get(\"v.hidden\")); }",
                   "args":[
                     {
                       "exprType":"PROPERTY",
@@ -10977,7 +10977,7 @@ return {
                           "value":{
                             "class":{
                               "exprType":"FUNCTION",
-                              "code":function(cmp, fn) { return fn.add(fn.add(((fn.ne(cmp.get("v.item.href"),null)||fn.ne(cmp.get("v.href"),null))?"file":"folder")," "),cmp.get("v.class")); },
+                              "code":"function(cmp, fn) { return fn.add(fn.add(((fn.ne(cmp.get(\"v.item.href\"),null)||fn.ne(cmp.get(\"v.href\"),null))?\"file\":\"folder\"),\" \"),cmp.get(\"v.class\")); }",
                               "args":[
                                 {
                                   "exprType":"PROPERTY",
@@ -11025,7 +11025,7 @@ return {
                                     "descriptor":"isTrue",
                                     "value":{
                                       "exprType":"FUNCTION",
-                                      "code":function(cmp, fn) { return (fn.ne(cmp.get("v.item.href"),null)||fn.ne(cmp.get("v.href"),null)); },
+                                      "code":"function(cmp, fn) { return (fn.ne(cmp.get(\"v.item.href\"),null)||fn.ne(cmp.get(\"v.href\"),null)); }",
                                       "args":[
                                         {
                                           "exprType":"PROPERTY",
@@ -11057,7 +11057,7 @@ return {
                                               "value":{
                                                 "for":{
                                                   "exprType":"FUNCTION",
-                                                  "code":function(cmp, fn) { return fn.add("node_",cmp.get("globalId")); },
+                                                  "code":"function(cmp, fn) { return fn.add(\"node_\",cmp.get(\"globalId\")); }",
                                                   "args":[
                                                     {
                                                       "exprType":"PROPERTY",
@@ -11087,7 +11087,7 @@ return {
                                                         "descriptor":"value",
                                                         "value":{
                                                           "exprType":"FUNCTION",
-                                                          "code":function(cmp, fn) { return fn.add(cmp.get("v.item.title"),cmp.get("v.title")); },
+                                                          "code":"function(cmp, fn) { return fn.add(cmp.get(\"v.item.title\"),cmp.get(\"v.title\")); }",
                                                           "args":[
                                                             {
                                                               "exprType":"PROPERTY",
@@ -11137,7 +11137,7 @@ return {
                                                 },
                                                 "id":{
                                                   "exprType":"FUNCTION",
-                                                  "code":function(cmp, fn) { return fn.add("node_",cmp.get("globalId")); },
+                                                  "code":"function(cmp, fn) { return fn.add(\"node_\",cmp.get(\"globalId\")); }",
                                                   "args":[
                                                     {
                                                       "exprType":"PROPERTY",
@@ -11179,7 +11179,7 @@ return {
                                                 },
                                                 "href":{
                                                   "exprType":"FUNCTION",
-                                                  "code":function(cmp, fn) { return fn.add(cmp.get("v.item.href"),cmp.get("v.href")); },
+                                                  "code":"function(cmp, fn) { return fn.add(cmp.get(\"v.item.href\"),cmp.get(\"v.href\")); }",
                                                   "args":[
                                                     {
                                                       "exprType":"PROPERTY",
@@ -11215,7 +11215,7 @@ return {
                                                         "descriptor":"value",
                                                         "value":{
                                                           "exprType":"FUNCTION",
-                                                          "code":function(cmp, fn) { return fn.add(cmp.get("v.item.title"),cmp.get("v.title")); },
+                                                          "code":"function(cmp, fn) { return fn.add(cmp.get(\"v.item.title\"),cmp.get(\"v.title\")); }",
                                                           "args":[
                                                             {
                                                               "exprType":"PROPERTY",
@@ -11379,7 +11379,7 @@ return {
                 "value":{
                   "href":{
                     "exprType":"FUNCTION",
-                    "code":function(cmp, fn) { return fn.add("#",cmp.get("v.location")); },
+                    "code":"function(cmp, fn) { return fn.add(\"#\",cmp.get(\"v.location\")); }",
                     "args":[
                       {
                         "exprType":"PROPERTY",
@@ -13642,7 +13642,7 @@ return {
                           "descriptor":"isTrue",
                           "value":{
                             "exprType":"FUNCTION",
-                            "code":function(cmp, fn) { return fn.ne(cmp.get("v.referenceOnly"),true); },
+                            "code":"function(cmp, fn) { return fn.ne(cmp.get(\"v.referenceOnly\"),true); }",
                             "args":[
                               {
                                 "exprType":"PROPERTY",

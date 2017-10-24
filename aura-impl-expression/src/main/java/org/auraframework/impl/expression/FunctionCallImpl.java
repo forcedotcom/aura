@@ -122,7 +122,7 @@ public class FunctionCallImpl implements FunctionCall {
             json.writeMapBegin();
             json.writeMapEntry("exprType", value.getExpressionType());
             json.writeMapKey("code");
-            json.writeLiteral(AuraTextUtil.escapeForJSONFunction(out.toString()));
+            json.writeString(out.toString());
             json.writeMapEntry("args", propRefs);
             json.writeMapEntry("byValue", value.byValue);
 

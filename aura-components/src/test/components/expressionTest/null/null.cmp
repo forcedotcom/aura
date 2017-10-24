@@ -34,7 +34,7 @@
     <expressionTest:test expression="{!null == m.naN}" exprText="null == m.naN" expected="false"/>
     <!-- Oddly, NaN != NaN -->
     <expressionTest:test expression="{!NaN == m.naN}" exprText="NaN == m.naN" expected="false"/>
-    <expressionTest:test expression="{!'NaN' == m.naN}" exprText="'NaN' == m.naN" expected="false"/>
+    <expressionTest:test expression="{!'NaN' == m.naN}" exprText="'NaN' == m.naN" expected="true"/>
     <!-- Just to be sure, check the string version -->
     <expressionTest:test expression="{!''+null/null == ''+m.naN}" exprText="NaN == m.naN" expected="true"/>
 

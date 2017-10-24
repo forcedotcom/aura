@@ -22,7 +22,7 @@
 function FunctionCallValue(config, valueProvider){
     this.valueProvider = valueProvider;
     this.byValue = config["byValue"];
-    this.code = $A.util.json.decodeString(config["code"]);
+    this.code = $A.util.globalEval(config["code"]);
     this.context = $A.clientService.currentAccess;
 
     this.args = [];

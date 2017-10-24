@@ -81,7 +81,7 @@ public class MockAction extends AbstractActionImpl<ActionDef> {
         json.writeMapBegin();
         json.writeMapEntry("id", getId());
         json.writeMapEntry("state", state);
-        json.writeMapEntry("returnValue", returnValue == null ? Literal.NULL : returnValue);
+        json.writeMapEntry("returnValue", returnValue == null ? new Literal("null") : returnValue);
         json.writeMapEntry("error", getErrors());
         this.getInstanceStack().serializeAsPart(json);
         json.writeMapEnd();

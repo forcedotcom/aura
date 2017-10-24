@@ -1656,7 +1656,7 @@ Component.prototype.getModel = function() {
  */
 Component.prototype.getEvent = function(name) {
     var eventDef = this.getDef().getEventDef(name);
-    if(!eventDef || this.destroyed){
+    if(!eventDef || this.destroyed===1){
         return null;
     }
     if (!$A.clientService.allowAccess(eventDef,this)) {

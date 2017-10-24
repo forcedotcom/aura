@@ -656,6 +656,11 @@ Action.prototype.run = function(evt) {
 Action.prototype.runDeprecated = function(evt) {
     $A.assert(this.def && this.def.isClientAction(),
              "run() cannot be called on a server action. Use $A.enqueueAction() instead.");
+
+    if(this.cmp.destroyed===1) {
+        return;
+    }
+
     this.state = "RUNNING";
     $A.clientService.setCurrentAccess(this.cmp);
     try {

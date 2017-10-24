@@ -15,9 +15,12 @@
  */
 package org.auraframework.impl.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
@@ -35,8 +38,6 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.DefinitionServiceImpl;
 import org.auraframework.impl.context.AuraContextImpl;
 import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
-import org.auraframework.impl.util.mock.MockDefinition;
-import org.auraframework.impl.util.mock.MockRegistrySet;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.CachingService;
@@ -49,23 +50,24 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.DependencyEntry;
+import org.auraframework.system.Location;
+import org.auraframework.system.RegistrySet;
 import org.auraframework.system.Source;
+import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-/**
- * Supposedly a unit test.
- *
- * This is not a unit test. FIXME!
- */
 @ThreadHostileTest("we are out of line with caches here")
 public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
 
@@ -144,6 +146,19 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         return definitionService;
     }
 
+    /**
+     * add defDescriptor desc to defRegistry reg, when we call reg.getDef(desc), it will return definition
+     * @param desc
+     * @param reg
+     * @param definition
+     * @throws Exception
+     */
+    private <T extends Definition> void setupMockRegistryFor(DefDescriptor<T> desc, DefRegistry reg, T definition)
+            throws Exception {
+        registries.addRegistryFor(desc, reg);
+        Mockito.when(reg.getDef(desc)).thenReturn(definition);
+    }
+
     private final String NAMESPACE = getClass().getSimpleName()+System.currentTimeMillis();
     private final AtomicInteger counter = new AtomicInteger(1);
 
@@ -192,7 +207,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         setupContext(definitionService);
         DefDescriptor<Definition> descriptor = getMockDescriptor();
         QuickFixException expected = null;
-        registries.setupRegistryFor(descriptor, registry1, null);
+        setupMockRegistryFor(descriptor, registry1, null);
 
         try {
             definitionService.getDefinition(descriptor);
@@ -225,7 +240,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         setupContext(definitionService);
         DefDescriptor<Definition> descriptor = getMockDescriptor();
         Definition definition = Mockito.spy(new MockDefinition(descriptor));
-        registries.setupRegistryFor(descriptor, registry1, definition);
+        setupMockRegistryFor(descriptor, registry1, definition);
         assertEquals(definition, definitionService.getDefinition(descriptor));
         Mockito.verify(definition, Mockito.times(1)).validateDefinition();
         Mockito.verify(definition, Mockito.times(1)).validateReferences(Mockito.any());
@@ -240,7 +255,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         Definition definition = Mockito.spy(new MockDefinition(descriptor));
 
         Mockito.doThrow(expected).when(definition).validateDefinition();
-        registries.setupRegistryFor(descriptor, registry1, definition);
+        setupMockRegistryFor(descriptor, registry1, definition);
         Exception actual = null;
 
         try {
@@ -261,7 +276,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         Definition definition = Mockito.spy(new MockDefinition(descriptor));
 
         Mockito.doThrow(expected).when(definition).validateReferences(Mockito.any());
-        registries.setupRegistryFor(descriptor, registry1, definition);
+        setupMockRegistryFor(descriptor, registry1, definition);
         Exception actual = null;
 
         try {
@@ -285,8 +300,8 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         unmocked2.addDependency(descriptor1);
         Definition definition1 = Mockito.spy(unmocked1);
         Definition definition2 = Mockito.spy(unmocked2);
-        registries.setupRegistryFor(descriptor1, registry1, definition1);
-        registries.setupRegistryFor(descriptor2, registry1, definition2);
+        setupMockRegistryFor(descriptor1, registry1, definition1);
+        setupMockRegistryFor(descriptor2, registry1, definition2);
         assertEquals(definition1, definitionService.getDefinition(descriptor1));
         Mockito.verify(definition1, Mockito.times(1)).validateDefinition();
         Mockito.verify(definition1, Mockito.times(1)).validateReferences(Mockito.any());
@@ -309,8 +324,8 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         Definition definition1 = Mockito.spy(unmocked1);
         Definition definition2 = Mockito.spy(unmocked2);
         Mockito.doThrow(expected).when(definition2).validateDefinition();
-        registries.setupRegistryFor(descriptor1, registry1, definition1);
-        registries.setupRegistryFor(descriptor2, registry1, definition2);
+        setupMockRegistryFor(descriptor1, registry1, definition1);
+        setupMockRegistryFor(descriptor2, registry1, definition2);
 
         QuickFixException actual = null;
         try {
@@ -344,8 +359,8 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         Definition definition1 = Mockito.spy(unmocked1);
         Definition definition2 = Mockito.spy(unmocked2);
         Mockito.doThrow(expected).when(definition2).validateReferences(Mockito.any());
-        registries.setupRegistryFor(descriptor1, registry1, definition1);
-        registries.setupRegistryFor(descriptor2, registry1, definition2);
+        setupMockRegistryFor(descriptor1, registry1, definition1);
+        setupMockRegistryFor(descriptor2, registry1, definition2);
 
         QuickFixException actual = null;
         try {
@@ -385,7 +400,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         DefDescriptor<Definition> descriptor2 = getMockDescriptor();
         unmocked1.addDependency(descriptor2);
         Definition definition1 = Mockito.spy(unmocked1);
-        registries.setupRegistryFor(descriptor1, registry1, definition1);
+        setupMockRegistryFor(descriptor1, registry1, definition1);
         assertEquals(definition1, definitionService.getUnlinkedDefinition(descriptor1));
         Mockito.verify(definition1, Mockito.times(1)).validateDefinition();
         Mockito.verify(definition1, Mockito.times(0)).validateReferences(Mockito.any());
@@ -403,7 +418,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         DefDescriptor<Definition> descriptor2 = getMockDescriptor();
         unmocked1.addDependency(descriptor2);
         Definition definition1 = Mockito.spy(unmocked1);
-        registries.setupRegistryFor(descriptor1, registry1, definition1);
+        setupMockRegistryFor(descriptor1, registry1, definition1);
         Mockito.doThrow(expected).when(definition1).validateDefinition();
 
         QuickFixException actual = null;
@@ -427,7 +442,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         DefDescriptor<Definition> descriptor1 = getMockDescriptor();
         MockDefinition unmocked1 = new MockDefinition(descriptor1);
         Definition definition1 = Mockito.spy(unmocked1);
-        registries.setupRegistryFor(descriptor1, registry1, definition1);
+        setupMockRegistryFor(descriptor1, registry1, definition1);
         context.addLocalDef(descriptor1, definition1);
 
         assertEquals(definition1, definitionService.getUnlinkedDefinition(descriptor1));
@@ -446,7 +461,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         MockDefinition unmocked1 = new MockDefinition(descriptor1);
         Definition definition1 = Mockito.spy(unmocked1);
         Mockito.when(registry1.exists(descriptor1)).thenReturn(true);
-        registries.setupRegistryFor(descriptor1, registry1, definition1);
+        setupMockRegistryFor(descriptor1, registry1, definition1);
 
         assertEquals(true, definitionService.exists(descriptor1));
         Mockito.verify(registry1, Mockito.times(1)).exists(descriptor1);
@@ -459,7 +474,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         DefDescriptor<Definition> descriptor1 = getMockDescriptor();
         MockDefinition unmocked1 = new MockDefinition(descriptor1);
         Definition definition1 = Mockito.spy(unmocked1);
-        registries.setupRegistryFor(descriptor1, registry1, definition1);
+        setupMockRegistryFor(descriptor1, registry1, definition1);
         context.addLocalDef(descriptor1, definition1);
 
         assertEquals(true, definitionService.exists(descriptor1));
@@ -477,7 +492,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         Source<Definition> source = Mockito.mock(Source.class);
         Definition definition1 = Mockito.spy(unmocked1);
         Mockito.when(registry1.getSource(descriptor1)).thenReturn(source);
-        registries.setupRegistryFor(descriptor1, registry1, definition1);
+        setupMockRegistryFor(descriptor1, registry1, definition1);
 
         assertEquals(source, definitionService.getSource(descriptor1));
         Mockito.verify(registry1, Mockito.times(1)).getSource(descriptor1);
@@ -636,7 +651,6 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
     @Test
     public void testHasAccessWithNullDef() throws QuickFixException {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
-        setupContext(definitionService, Mode.DEV, Authentication.AUTHENTICATED);
         DefDescriptor<Definition> descriptor = getMockDescriptor();
         boolean res = definitionService.hasAccess(descriptor, (Definition)null);
         assertTrue("hasAccess on null definitation should return true", res);
@@ -645,7 +659,6 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
     @Test
     public void testHasAccessWithDefNoAccessDeclaration() throws QuickFixException {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
-        setupContext(definitionService, Mode.DEV, Authentication.AUTHENTICATED);
         DefDescriptor<Definition> descriptor = getMockDescriptor();
         Definition definition = new MockDefinition(descriptor, null);
         try {
@@ -659,7 +672,6 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
     @Test
     public void testHasAcessWithDefGlobalAccess() throws QuickFixException {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
-        setupContext(definitionService, Mode.DEV, Authentication.AUTHENTICATED);
         DefDescriptor<Definition> descriptor = getMockDescriptor();
         Definition definition = new MockDefinition(descriptor);
         boolean res = definitionService.hasAccess(descriptor, definition);
@@ -669,7 +681,6 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
     @Test
     public void testHasAcessWithDefPrivateAccess() throws QuickFixException {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
-        setupContext(definitionService, Mode.DEV, Authentication.AUTHENTICATED);
         DefDescriptor<Definition> descriptor = getMockDescriptor();
         Definition definition = new MockDefinition(descriptor, AuraContext.Access.PRIVATE);
         boolean res = definitionService.hasAccess(descriptor, definition);
@@ -797,4 +808,167 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
 //        return false;
 //    }
 //
+    
+    
+    
+
+    @SuppressWarnings("serial")
+    private static class MockDefinition implements Definition {
+        public DefDescriptor<Definition> descriptor;
+        private Set<DefDescriptor<?>> localDeps;
+        private DefinitionAccess access = Mockito.mock(DefinitionAccess.class);
+
+        /**
+         * set descriptor, make access=GLOBAL
+         * @param descriptor
+         */
+        public MockDefinition(DefDescriptor<Definition> descriptor) {
+            this.descriptor = descriptor;
+            Mockito.when(this.access.isGlobal()).thenReturn(true);
+        }
+        
+        public MockDefinition(DefDescriptor<Definition> descriptor, AuraContext.Access access) {
+            this.descriptor = descriptor;
+            if(access == null) {
+                this.access = null;
+            } else {
+                switch(access) {
+                case PRIVATE:
+                    Mockito.when(this.access.isGlobal()).thenReturn(false);
+                    Mockito.when(this.access.isPrivate()).thenReturn(true);
+                    Mockito.when(this.access.requiresAuthentication()).thenReturn(true);
+                    break;
+                default:
+                    Mockito.when(this.access.isGlobal()).thenReturn(true);
+                }
+            }
+            
+        }
+
+        public void addDependency(DefDescriptor<?> descriptor) {
+            if (localDeps == null) {
+                localDeps = Sets.newHashSet(descriptor);
+            } else {
+                localDeps.add(descriptor);
+            }
+        }
+
+        @Override
+        public void serialize(Json json) throws IOException {
+        }
+
+        @Override
+        public void validateDefinition() throws QuickFixException {
+        }
+
+        @Override
+        public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+            if (localDeps != null) {
+                dependencies.addAll(localDeps);
+            }
+        }
+
+        @Override
+        public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        }
+
+        @Override
+        public void markValid() {
+        }
+
+        @Override
+        public boolean isValid() {
+            return false;
+        }
+
+        @Override
+        public String getName() {
+            return null;
+        }
+
+        @Override
+        public Location getLocation() {
+            return null;
+        }
+
+        @Override
+        public DefinitionAccess getAccess() {
+            return access;
+        }
+
+        @Override
+        public String getDescription() {
+            return null;
+        }
+
+        @Override
+        public String getAPIVersion() {
+            return null;
+        }
+
+        @Override
+        public String getOwnHash() {
+            return "";
+        }
+
+        @Override
+        public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
+
+        }
+
+        @Override
+        public DefDescriptor<? extends Definition> getDescriptor() {
+            return descriptor;
+        }
+
+        @Override
+        public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> descriptor) {
+            return null;
+        }
+    }
+
+    /**
+     * Registry sets do not lend themselves to mocking, too many generics.
+     */
+    private static class MockRegistrySet implements RegistrySet {
+        private final Map<DefDescriptor<?>,DefRegistry> registryMap = Maps.newHashMap();
+        private final Map<DescriptorFilter, Collection<DefRegistry>> filterMap = Maps.newHashMap();
+        private final List<DefRegistry> allRegistries = Lists.newArrayList();
+        
+        public void addRegistryFor(DefDescriptor<?> descriptor, DefRegistry registry) {
+            registryMap.put(descriptor, registry);
+            if (!allRegistries.contains(registry)) {
+                allRegistries.add(registry);
+            }
+        }
+
+        public void addFilterFor(DescriptorFilter matcher, Collection<DefRegistry> registries) {
+            filterMap.put(matcher, registries);
+            for (DefRegistry registry: registries) {
+                if (!allRegistries.contains(registry)) {
+                    allRegistries.add(registry);
+                }
+            }
+        }
+
+        public void addFilterFor(DescriptorFilter matcher, DefRegistry registry) {
+            addFilterFor(matcher, Lists.newArrayList(registry));
+        }
+
+
+        @Override
+        public Collection<DefRegistry> getAllRegistries() {
+            return allRegistries;
+        }
+
+        @Override
+        public Collection<DefRegistry> getRegistries(DescriptorFilter matcher) {
+            return filterMap.get(matcher);
+        }
+
+        @Override
+        public <T extends Definition> DefRegistry getRegistryFor(DefDescriptor<T> descriptor) {
+            return registryMap.get(descriptor);
+        }
+    }
 }

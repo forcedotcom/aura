@@ -696,27 +696,7 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
 }
 
 );
-*/}));$A.componentService.addComponent("markup://aura:html", (function (){/*$A.componentService.addComponentClass("markup://aura:html",function() {
-return {
-  "meta":{
-    "name":"aura$html"
-  }
-};
-});
-return {
-  "xs":"G",
-  "descriptor":"markup://aura:html",
-  "css":true,
-  "ad":[
-    ["body","aura://Aura.Component[]","G",false,[]],
-    ["tag","aura://String","G",false],
-    ["HTMLAttributes","aura://Map","G",false,null]
-  ],
-  "i":[
-    "markup://aura:rootComponent"
-  ]
-};*/}));
-$A.componentService.addComponent("markup://aura:text", (function (){/*$A.componentService.addComponentClass("markup://aura:text",function() {
+*/}));$A.componentService.addComponent("markup://aura:text", (function (){/*$A.componentService.addComponentClass("markup://aura:text",function() {
 return {
   "meta":{
     "name":"aura$text"
@@ -943,6 +923,26 @@ return {
   "css":true,
   "ad":[
     ["value","aura://String","G",false]
+  ],
+  "i":[
+    "markup://aura:rootComponent"
+  ]
+};*/}));
+$A.componentService.addComponent("markup://aura:html", (function (){/*$A.componentService.addComponentClass("markup://aura:html",function() {
+return {
+  "meta":{
+    "name":"aura$html"
+  }
+};
+});
+return {
+  "xs":"G",
+  "descriptor":"markup://aura:html",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["tag","aura://String","G",false],
+    ["HTMLAttributes","aura://Map","G",false,null]
   ],
   "i":[
     "markup://aura:rootComponent"

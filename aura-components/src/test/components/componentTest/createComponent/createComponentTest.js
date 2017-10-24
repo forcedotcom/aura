@@ -442,5 +442,22 @@
 
             $A.test.assertEquals(expected, actual);
         }
+    },
+
+    testCreatedComponentIsRetrievable:{
+        test: function(cmp){
+            var targetId = "testButtonForRetrieval";
+
+            $A.createComponent("ui:button",
+                {"aura:id":targetId, label:"label"},
+                function(targetComponent) {
+                    cmp.find("createdComponents").set("v.body",targetComponent);
+                }
+            );
+
+            $A.test.addWaitFor(true, function() {
+                return typeof cmp.find(targetId) !== "undefined";
+            });
+        }
     }
 })

@@ -47,7 +47,7 @@ public final class StyleContextImpl implements StyleContext {
     private static final String CLIENT = "c";
     private static final String EXTRA = "x";
     private static final String TOKENS = "tokens";
-    private static final String DYNAMIC_TOKENS_UID = "tuid";
+    private static final String TOKENS_UID = "tuid";
 
     private final String client;
     private final Set<String> extraTrueConditions;
@@ -103,8 +103,8 @@ public final class StyleContextImpl implements StyleContext {
             json.writeMapEntry(EXTRA, extraTrueConditions);
         }
 
-        // tokens (important for url cache-busting-- even though overrides are part of app dependencies, they may be
-        // using providers, so we need to explicitly serialize all concrete descs being used)
+        // token descriptors-- for token descriptor providers we want to serialize the exact provided
+        // descriptor to prevent ambiguity when serving css.
         if (!tokens.isEmpty()) {
             List<String> stringed = new ArrayList<>(tokens.size());
             for (DefDescriptor<TokensDef> desc : tokens) {
@@ -113,11 +113,16 @@ public final class StyleContextImpl implements StyleContext {
             json.writeMapEntry(TOKENS, stringed);
         }
 
-        // add a unique id for map-provided tokens, for client-side cache-busting
-        Optional<String> tokensUid = tokens.getActiveDynamicTokensUid();
-        if (tokensUid.isPresent()) {
-            json.writeMapEntry(DYNAMIC_TOKENS_UID, tokensUid.get());
-        }
+        // add a uid for tokens, which takes into account provided descriptors and map-provided token values.
+        Optional<String> tokensUid;
+        try {
+            tokensUid = tokens.getTokensUid();
+            if (tokensUid.isPresent()) {
+                json.writeMapEntry(TOKENS_UID, tokensUid.get());
+            }
+        } catch (QuickFixException e) {
+            throw new AuraRuntimeException("unable to generate tokens uid", e);
+        }       
 
         json.writeMapEnd();
     }
@@ -151,6 +156,8 @@ public final class StyleContextImpl implements StyleContext {
                 tokens = new TokenCacheImpl(definitionService, Iterables.concat(appOverrides, additionalTokens));
             }
         } catch (QuickFixException e) {
+            // TODO this is just wrong... the tokens provide method may throw and get drowned here
+            
             // either the app or a dependency is invalid, this isn't the place to deal with it though,
             // we have to proceed here without app overrides
         }

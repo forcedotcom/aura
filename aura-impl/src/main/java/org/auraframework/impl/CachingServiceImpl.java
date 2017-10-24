@@ -62,6 +62,7 @@ public class CachingServiceImpl implements CachingService {
     /** Default size of string caches, in number of entries */
     private final static int STRING_CACHE_SIZE = 100;
     private final static int ALT_STRINGS_CACHE_SIZE = 100;
+    private final static int CSS_STRINGS_CACHE_SIZE = 50;
 
     /** Default size of client lib caches, in number of entries */
     private final static int CLIENT_LIB_CACHE_SIZE = 30;
@@ -83,6 +84,7 @@ public class CachingServiceImpl implements CachingService {
     private Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
     private Cache<String, String> stringsCache;
     private Cache<String, String> altStringsCache;
+    private Cache<String, String> cssStringsCache;
     private Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache;
     /**
      * depsCache contains multiple entries for dependencies.
@@ -135,6 +137,15 @@ public class CachingServiceImpl implements CachingService {
                 .setRecordStats(true)
                 .setName("altStringsCache")
                 .setSoftValues(true).build();
+        
+        size = getCacheSize("aura.cache.cssStringsCacheSize", CSS_STRINGS_CACHE_SIZE);
+        cssStringsCache = this.<String, String>getCacheBuilder()
+                .setInitialSize(size)
+                .setLoggingAdapter(loggingAdapter)
+                .setMaximumSize(size)
+                .setRecordStats(true)
+                .setName("cssStringsCache")
+                .setSoftValues(true).build();      
 
         size = getCacheSize("aura.cache.filterCacheSize", FILTER_CACHE_SIZE);
         descriptorFilterCache = this
@@ -205,6 +216,11 @@ public class CachingServiceImpl implements CachingService {
     @Override
     public final Cache<String, String> getAltStringsCache() {
         return altStringsCache;
+    }
+
+    @Override
+    public Cache<String, String> getCssStringsCache() {
+        return cssStringsCache;
     }
 
     @Override

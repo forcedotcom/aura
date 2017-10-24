@@ -33,6 +33,7 @@
                     <ui:actionMenuItem label="defsCache" click="{!c.updateCache}" />
                     <ui:actionMenuItem label="altStringsCache" click="{!c.updateCache}" />
                     <ui:actionMenuItem label="stringsCache" click="{!c.updateCache}" />
+                    <ui:actionMenuItem label="cssStringsCache" click="{!c.updateCache}" />
                 </ui:menuList>
             </ui:menu>
         </span>

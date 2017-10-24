@@ -59,6 +59,14 @@ public interface CachingService extends AuraService {
     Cache<String, String> getStringsCache();
 
     Cache<String, String> getAltStringsCache();
+    
+    /**
+     * Gets the cache for css strings, e.g., app.css.
+     * <p>
+     * This allows for core to override how app.css is cached. This separation from the main strings cache can be
+     * removed once core is ready override the cache for all strings.
+     */
+    Cache<String, String> getCssStringsCache();
 
     Cache<String, Set<DefDescriptor<?>>> getDescriptorFilterCache();
 

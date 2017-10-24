@@ -104,8 +104,8 @@ public class AuraResourceServletUITest extends WebDriverTestCase {
     @Test
     @ThreadHostileTest
     public void testAltStringsCacheContainsAppCss() throws Exception {
-        openCachesAppWithRefresh("altStringsCache", "markup://performance:caches@CSS");
-        //assertEquals("There should be 1 entry in the alt strings cache for CSS", "1", getCount());
-        checkCount("There should be 1 entry in the alt strings cache for CSS", "1");
+        openCachesAppWithRefresh("cssStringsCache", "markup://performance:caches@CSS");
+        //assertEquals("There should be 1 entry in the css strings cache for CSS", "1", getCount());
+        checkCount("There should be 1 entry in the css strings cache for CSS", "1");
     }
 }

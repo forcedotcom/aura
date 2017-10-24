@@ -15,10 +15,16 @@
  */
 package org.auraframework.impl.css.token;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.*;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.auraframework.Aura;
 import org.auraframework.css.TokenCache;
 import org.auraframework.def.DefDescriptor;
@@ -30,10 +36,16 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
-import java.util.*;
-import java.util.Map.Entry;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableTable;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 
 public final class TokenCacheImpl implements TokenCache {
     private final Multimap<DefDescriptor<TokensDef>, DefDescriptor<TokensDef>> originals;
@@ -59,7 +71,7 @@ public final class TokenCacheImpl implements TokenCache {
             DefDescriptor<TokensDef> concrete = definitionService.getDefinition(descriptor).getConcreteDescriptor();
             unique.remove(concrete); // unlike the normal behavior, we want to move the position of duplicate entries
             unique.add(concrete);
-            if (descriptor != concrete) {
+            if (!concrete.equals(descriptor)) {
                 origs.put(concrete, descriptor);
             }
         }
@@ -174,31 +186,26 @@ public final class TokenCacheImpl implements TokenCache {
     }
 
     @Override
-    public Optional<String> getDescriptorsUid() {
-        if (descriptors.isEmpty()) {
+    public Optional<String> getTokensUid() throws QuickFixException {
+        if (descriptors.isEmpty() && dynamicTokens.isEmpty()) {
             return Optional.absent();
         }
 
         Hash.StringBuilder builder = new Hash.StringBuilder();
+        
         for (DefDescriptor<TokensDef> descriptor : descriptors) {
             builder.addString(descriptor.getQualifiedName());
+            
+            String uid = definitionService.getUid(null, descriptor);
+            builder.addString(uid);
         }
-        return Optional.of(builder.build().toString());
-    }
-
-    @Override
-    public Optional<String> getActiveDynamicTokensUid() {
-        if (dynamicTokens.isEmpty()) {
-            return Optional.absent();
-        }
-
+        
         Map<String, String> activeDynamicTokens = activeDynamicTokens();
-
-        Hash.StringBuilder builder = new Hash.StringBuilder();
         for (Entry<String, String> entry : activeDynamicTokens.entrySet()) {
             builder.addString(entry.getKey());
             builder.addString(entry.getValue());
         }
+        
         return Optional.of(builder.build().toString());
     }
 

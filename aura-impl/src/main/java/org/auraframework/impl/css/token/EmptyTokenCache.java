@@ -80,12 +80,7 @@ final class EmptyTokenCache implements TokenCache {
     }
 
     @Override
-    public Optional<String> getDescriptorsUid() {
-        return Optional.absent();
-    }
-
-    @Override
-    public Optional<String> getActiveDynamicTokensUid() {
+    public Optional<String> getTokensUid() throws QuickFixException {
         return Optional.absent();
     }
 }

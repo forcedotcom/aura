@@ -123,11 +123,14 @@ public class ServerServiceImpl implements ServerService {
     private Cache<String, String> stringsCache;
 
     private Cache<String, String> altStringsCache;
+    
+    private Cache<String, String> cssStringsCache;
 
     @PostConstruct
     private void setCaches() {
         this.stringsCache = cachingService.getStringsCache();
         this.altStringsCache = cachingService.getAltStringsCache();
+        this.cssStringsCache = cachingService.getCssStringsCache();
     }
 
     @Override
@@ -257,18 +260,12 @@ public class ServerServiceImpl implements ServerService {
         }
 
         // tokens uid. The app tokens are in the app dependencies and thus part of appuid, however we need
-        // a distinct uid because one of the descriptors may be provided. this can be further optimized by only adding
-        // a uid for provided descriptors only though.
-        Optional<String> tokensUid = styleContext.getTokens().getDescriptorsUid();
+        // a distinct uid because one of the descriptors may be provided or we may be using map-provided tokens
+        Optional<String> tokensUid = styleContext.getTokens().getTokensUid();
         if (tokensUid.isPresent()) {
             keyBuilder.append(":").append(tokensUid.get());
         }
-
-        // TODONM: If a tokens def uses a map-provider it will affect the css key too. Current idea is to cache a
-        // "pre-evaluated" version of the CSS (but still ordered and concatenated). Another idea is to defer cache to
-        // fileforce, etc... once a map-provider is involved. right now we skip the cache, so until this is address
-        // map-providers shouldn't be used.
-
+        
         keyBuilder.append("$");
 
         // minified or not
@@ -283,20 +280,14 @@ public class ServerServiceImpl implements ServerService {
         final String key = keyBuilder.toString();
         context.setPreloading(true);
 
-        String cached = null;
-        final boolean skipCache = styleContext.getTokens().hasDynamicTokens(); // TODONM undo this cache skipping
-        if (skipCache) {
-            cached = getAppCssString(dependencies);
-        } else {
-            cached = getAltCachedString(uid, appDesc, key,
+        String cached = getCachedString(cssStringsCache, uid, appDesc, key,
                 new Callable<String>() {
                     @Override
                     public String call() throws Exception {
                         return getAppCssString(dependencies);
                     }
-                }
-            );
-        }
+                });
+        
 
         if (out != null) {
             out.append(cached);

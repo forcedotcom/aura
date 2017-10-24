@@ -65,6 +65,8 @@ public class CacheController implements Controller {
             return cachingService.getStringsCache();
         } else if (cacheName.equals("registrySetCache")) {
             return cachingService.getRegistrySetCache();
+        } else if (cacheName.equals("cssstringscache")) {
+        	return cachingService.getCssStringsCache();
         }
         throw new AuraUnhandledException("bad cache parameter "+cacheName);
     }

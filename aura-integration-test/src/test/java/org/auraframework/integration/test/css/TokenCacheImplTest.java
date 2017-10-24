@@ -15,6 +15,7 @@
  */
 package org.auraframework.integration.test.css;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -284,5 +285,85 @@ public class TokenCacheImplTest extends StyleTestCase {
         assertEquals(2, ordered.size());
         assertEquals(ordered.get(0), mapDesc);
         assertEquals(ordered.get(1), desc1);
+    }
+    
+    @Test
+    public void testGetTokensUidNoTokens() throws Exception {
+        tokens = build();
+        assertFalse(tokens.getTokensUid().isPresent());
+    }
+    
+    @Test
+    public void testGetTokensUid() throws Exception {
+        TokenCache tokens1 = build(desc1);
+        TokenCache tokens2 = build(desc2);
+        
+        Optional<String> uid1 = tokens1.getTokensUid();
+        Optional<String> uid2 = tokens2.getTokensUid();
+        
+        assertTrue("expected tokens uid1 to be present", uid1.isPresent());
+        assertTrue("expected tokens uid2 to be present", uid2.isPresent());
+        assertFalse("expected tokens uid to differ", uid1.get().equals(uid2.get()));
+    }
+    
+    @Test
+    public void testGetTokensUidSameContent() throws Exception {
+        TokenCache tokens1 = build(desc1);
+        TokenCache tokens2 = build(desc1);
+        
+        Optional<String> uid1 = tokens1.getTokensUid();
+        Optional<String> uid2 = tokens2.getTokensUid();
+        
+        assertTrue("expected tokens uid1 to be present", uid1.isPresent());
+        assertTrue("expected tokens uid2 to be present", uid2.isPresent());
+        assertEquals("expected tokens uid to be equal", uid1.get(), uid2.get());
+    }
+    
+    // @Test TODO, I don't think aura is updating uid for the string source 
+    public void testGetTokensUidFileContentUpdated() throws Exception {
+        DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().token("num", "1"));
+        tokens = build(desc);
+        
+        String uid1 = tokens.getTokensUid().get();       
+        updateStringSource(desc, tokens().token("num", "2").toString());        
+        String uid2 = tokens.getTokensUid().get();
+        
+        assertFalse("expected updated content to result in new tokens uid", uid1.equals(uid2));      
+    }
+    
+    @Test
+    public void testGetTokensUidDynamicTokens() throws Exception {
+        TokenCache tokens1 = build(desc1);
+        String uid1 = tokens1.getTokensUid().get();
+        
+        DefDescriptor<TokensDef> mapDesc = addSeparateTokens(tokens().mapProvider(TestTokenMapProvider.REF));
+        TokenCache tokens2 = build(desc1, mapDesc);
+        String uid2 = tokens2.getTokensUid().get();
+        
+        assertFalse("dynamic tokens should be factored in uid", uid1.equals(uid2));
+    }
+    
+    @Provider
+    public static final class P6 implements TokenMapProvider {
+        private static int counter = 0;
+        
+        @Override
+        public Map<String, String> provide() throws QuickFixException {
+            counter = counter + 1;
+            return ImmutableMap.of("count", Integer.toString(counter));
+        }
+    }
+    
+    @Test
+    public void testGetTokensUidDynamicTokensContentUpdated() throws Exception {
+        DefDescriptor<TokensDef> mapDesc = addSeparateTokens(tokens().mapProvider("java://" + P6.class.getName()));
+        
+        TokenCache token1 = build(mapDesc);               
+        String uid1 = token1.getTokensUid().get();
+        
+        TokenCache token2 = build(mapDesc);
+        String uid2 = token2.getTokensUid().get();
+        
+        assertFalse("expected updated map value to result in new tokens uid", uid1.equals(uid2));      
     }
 }

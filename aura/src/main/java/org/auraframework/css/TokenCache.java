@@ -123,17 +123,19 @@ public interface TokenCache extends Iterable<DefDescriptor<TokensDef>> {
     Map<String, String> activeDynamicTokens();
 
     /**
-     * Gets a hash of all qualified descriptors.
+     * Gets a unique identifier for the tokens.
+     * <p>
+     * This is calculated based on:
+     * <p>
+     * 1) The uid's for each token definition <em>used for evaluation</em>. In the case of
+     * {@link TokenDescriptorProvider}s, the provided definition is used, not the abstract one.
+     * <p>
+     * 2) Each token name and value from <em>active</em> dynamically specified tokens (via a def utilizing
+     * {@link TokenMapProvider}). See {@link #activeDynamicTokens()} for more details on the meaning of "active".
+     * 
      *
      * @return The hash, or {@link Optional#absent()} if empty.
+     * @throws QuickFixException If there is a problem getting the uid for a TokensDef.
      */
-    Optional<String> getDescriptorsUid();
-
-    /**
-     * Gets a hash of all <em>active</em> dynamically specified tokens (via a def utilizing {@link TokenMapProvider}).
-     * See {@link #activeDynamicTokens()} for more details on the meaning of "active".
-     *
-     * @return The hash, or {@link Optional#absent()} if no dynamic tokens are specified.
-     */
-    Optional<String> getActiveDynamicTokensUid();
+    Optional<String> getTokensUid() throws QuickFixException;
 }

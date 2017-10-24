@@ -56,5 +56,11 @@
         var testModule = cmp.find("nonLockerized");
         testUtils.assertTrue(testModule.testWindowIsUnsecure());
         testUtils.assertTrue(testModule.testEngineIsUnsecure());
+    },
+
+    testSecureModulesInUnsupportedBrowsers: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var testModule = cmp.find("bootstrap");
+        testUtils.assertTrue(testModule.testSecureModulesInUnsupportedBrowsers());
     }
 })

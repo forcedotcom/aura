@@ -26,6 +26,7 @@
     <aura:method name="testMiscGlobalsNotAccessibleInModules"/>
     <aura:method name="testEngineIsImmutable"/>
     <aura:method name="testElementIsImmutable"/>
+    <aura:method name="testSecureModulesInUnsupportedBrowsers"/>
 
     <secureModuleTest:bootstrap aura:id="bootstrap"/>
     <secureModuleTest:nonLockerizedCmp aura:id="nonLockerized"/>

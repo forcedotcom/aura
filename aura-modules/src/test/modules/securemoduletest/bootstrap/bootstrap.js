@@ -37,4 +37,11 @@ export default class Bootstrap extends Element {
         testUtil.assertEquals("undefined", typeof sforce, "Expected 'sforce' to be not accessible in interop component");
         testUtil.assertEquals("undefined", typeof Sfdc, "Expected 'Sfdc' to be not accessible in interop component");
     }
+
+    @api
+    testSecureModulesInUnsupportedBrowsers() {
+        testUtil.assertStartsWith("[object Window]", window.toString(), "Expected window to"
+            + " return raw window in module for unsupported browsers");
+        return true;
+    }
 }

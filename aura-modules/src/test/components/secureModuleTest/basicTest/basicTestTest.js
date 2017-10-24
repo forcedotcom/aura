@@ -62,5 +62,16 @@
         test: function (cmp) {
             cmp.testElementIsImmutable();
         }
+    },
+
+    /**
+     * Verify that modules are evaluated in browsers where locker is gracefully degraded
+     */
+    testSecureModulesInUnsupportedBrowsers: {
+        // only run in unsupported browsers where we fallback to non-Locker mode
+        browsers: ["IE8", "IE9", "IE10", "IE11"],
+        test: function (cmp) {
+            cmp.testSecureModulesInUnsupportedBrowsers();
+        }
     }
 })

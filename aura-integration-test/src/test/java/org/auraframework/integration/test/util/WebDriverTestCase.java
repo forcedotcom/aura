@@ -738,6 +738,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                         fos.write(bytes);
                         fos.close();
                         String baseUrl = System.getProperty("screenshots.baseurl");
+                        description.append(String.format("%nScreenshot: data:image/png;base64,%s", screenshot));
                         description.append(String.format("%nScreenshot: %s/%s", baseUrl, fileName));
                     } catch (Throwable t) {
                         description.append(String.format("%nScreenshot: {save error: %s}", t.getMessage()));

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-10-23
- * Version: 0.2.3
+ * Generated: 2017-10-24
+ * Version: 0.2.4
  */
 
 (function (global, factory) {
@@ -3112,10 +3112,42 @@ function SecureElement(el, key) {
                     if (SecureElement.isSharedElement(raw)) {
                         throw new error("SecureElement.innerHTML cannot be used with " + raw.tagName + " elements!");
                     }
-
                     raw.innerHTML = DOMPurify["sanitize"](value, domPurifyConfig);
-
                     trustChildNodes(this, raw);
+                }
+            };
+        }
+
+        if ("outerHTML" in el) {
+            tagNameSpecificConfig["outerHTML"] = {
+                get: function() {
+                    return cloneFiltered(SecureObject.getRaw(this), o).outerHTML;
+                },
+                set: function(value) {
+                    var raw = SecureObject.getRaw(this);
+                    // Do not allow on shared elements (body/head)
+                    if (SecureElement.isSharedElement(raw)) {
+                        throw new error("SecureElement.outerHTML cannot be used with " + raw.tagName + " elements!");
+                    }
+
+                    var parent = raw.parentElement;
+
+                    // As per specifications, throw when there is no parent
+                    if (!parent) {
+                        throw new DOMException("Failed to set the 'outerHTML' property on " + raw.tagName + ": This element has no parent node.");
+                    }
+
+                    // Setting outerHTML on an element removes it from the document tree.
+                    // It returns no handle to trust the new elements. Here we create the
+                    // elements in a fragment then insert them in their proper location.
+
+                    var frag = document.createRange().createContextualFragment(DOMPurify["sanitize"](value, domPurifyConfig));
+                    trustChildNodes(this, frag);
+                    while (frag.childNodes.length > 0) {
+                        var node = frag.childNodes[0];
+                        parent.insertBefore(node, raw);
+                    }
+                    parent.removeChild(raw);
                 }
             };
         }

@@ -66,7 +66,9 @@ public interface CachingService extends AuraService {
      * This allows for core to override how app.css is cached. This separation from the main strings cache can be
      * removed once core is ready override the cache for all strings.
      */
-    Cache<String, String> getCssStringsCache();
+    default Cache<String, String> getCssStringsCache() {
+        return null; // FIXME remove default method...
+    }
 
     Cache<String, Set<DefDescriptor<?>>> getDescriptorFilterCache();
 

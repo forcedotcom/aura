@@ -452,9 +452,21 @@
         }
     },
 
+    testOuterHTMLForExistingElement: {
+        test: function(cmp) {
+            cmp.testOuterHTML("ExistingElement");
+        }
+    },
+
     testInnerHTMLForCreatedElement: {
         test: function(cmp) {
             cmp.testInnerHTML("CreatedElement");
+        }
+    },
+
+    testOuterHTMLForCreatedElement: {
+        test: function(cmp) {
+            cmp.testOuterHTML("CreatedElement");
         }
     },
 

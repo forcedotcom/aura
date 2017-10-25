@@ -215,6 +215,28 @@
         testUtils.assertEquals("innerHTML content", element.innerHTML);
     },
 
+    testOuterHTML: function(cmp, event) {
+        var testUtils = cmp.get("v.testUtils");
+        var targetElement = event.getParam("arguments").targetElement;
+        var element;
+        var parent = document.querySelector('.titleWrapper');
+        var expectedCount;
+        if(targetElement === "ExistingElement") {
+            element = document.querySelector('.title');
+            expectedCount = 1;
+        } else if (targetElement === "CreatedElement") {
+            element = document.createElement('div');
+            parent.appendChild(element);
+            expectedCount = 2;
+        }
+
+        element.outerHTML = "<p>outerHTML content</p>";
+
+        testUtils.assertNull(element.parentElement);
+        testUtils.assertEquals(expectedCount, parent.childNodes.length);
+        testUtils.assertEquals("<p>outerHTML content</p>", parent.querySelector(':last-child').outerHTML);
+    },
+
     testInsertAdjacentHTML: function(cmp, event) {
         var testUtils = cmp.get("v.testUtils");
         var targetElement = event.getParam("arguments").targetElement;
@@ -356,8 +378,8 @@
         var testUtils = cmp.get("v.testUtils");
 
         var title = document.getElementById("title");
-        // go up 3 levels since we will have access to first 2 levels
-        var greatGrandParentNode = title.parentNode.parentNode.parentNode.parentNode;
+        // go up 4 levels since we will have access to first 3 levels
+        var greatGrandParentNode = title.parentNode.parentNode.parentNode.parentNode.parentNode;
 
         testUtils.assertEquals(null, greatGrandParentNode, "Element.parentNode should return null when it is not accessible");
     },

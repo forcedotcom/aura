@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component support="BETA" access="GLOBAL" extensible="false" description="Creates a container that enables native scrolling in Salesforce1.">
+<aura:component support="BETA" access="GLOBAL" extensible="false" description="Creates a container that enables native scrolling in the Salesforce app.">
 
     <!-- Private Attributes -->
     <aura:attribute name="privateStartY" type="Integer" access="PRIVATE" description="Determines the user's mouse position in the vertical axis."/>

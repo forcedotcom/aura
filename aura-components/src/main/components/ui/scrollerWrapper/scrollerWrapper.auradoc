@@ -17,7 +17,7 @@
 -->
 <aura:documentation> 
     <aura:description>
-        <p>A <code>ui:scrollerWrapper</code> creates a container that enables native scrolling in Salesforce1. This component enables you to nest more than one scroller inside the container.
+        <p>A <code>ui:scrollerWrapper</code> creates a container that enables native scrolling in the Salesforce app. This component enables you to nest more than one scroller inside the container.
         Use the <code>class</code> attribute to define the height and width of the container. To enable scrolling, specify a height that's smaller than its content.</p>
         <p>This example creates a scrollable area with a height of 300px.</p>
         <pre>&lt;aura:component>

@@ -3,7 +3,7 @@
 Aura is an open-source UI framework built by Salesforce for developing dynamic web apps for mobile and desktop 
 devices. You can use open-source Aura to build apps independent of Salesforce.
 
-Salesforce uses Aura to build apps, such as Lightning Experience and Salesforce1. 
+Salesforce uses Aura to build apps, such as Lightning Experience and the Salesforce app. 
 
 Salesforce customers use the Lightning Component framework to build Lightning components. The Lightning Component framework is built on the open-source Aura framework. However, the open-source Aura framework has some features that aren't available to Salesforce customers.
 
@@ -28,7 +28,7 @@ Aura also supports a powerful expression language, embedded testing, performance
 The easiest way to build your first Aura app is from the command line, but you can easily use Aura
 with your favorite IDE too.
 
-**Note**: If you’re a Salesforce customer, we recommend that you build Lightning components or application as opposed to building an open-source Aura app. You'll greatly benefit from a lot of foundational architecture that makes it easy to customize Lightning Experience, Salesforce1, or other Lightning apps. If you're a Salesforce customer, you'll get more relevant information and learn more by starting with the [Lightning Components Basics](https://trailhead.salesforce.com/en/modules/lex_dev_lc_basics) module in Trailhead.
+**Note**: If you’re a Salesforce customer, we recommend that you build Lightning components or application as opposed to building an open-source Aura app. You'll greatly benefit from a lot of foundational architecture that makes it easy to customize Lightning Experience, the Salesforce app, or other Lightning apps. If you're a Salesforce customer, you'll get more relevant information and learn more by starting with the [Lightning Components Basics](https://trailhead.salesforce.com/en/modules/lex_dev_lc_basics) module in Trailhead.
 
 ### Prerequisites
 

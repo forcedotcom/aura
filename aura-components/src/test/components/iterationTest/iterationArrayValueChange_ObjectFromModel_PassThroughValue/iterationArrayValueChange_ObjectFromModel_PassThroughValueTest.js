@@ -116,23 +116,21 @@
 	},
 	
     testSetItemsInIteration:{
-        attributes:{ indexToChange:1 , newValueToChange:999 },
+        attributes:{ indexToChange:0 , newValueToChange:999 },
         test: [function(cmp){
         	var index = parseInt(cmp.get("v.indexToChange"), 10);
         	var newValue = cmp.get("v.newValueToChange");
         	var iter = cmp.find("iterationOnMapModelPassthrough");
             var data = iter.get("v.items");
-            data[index].label = newValue; 
-            
+            data.splice( index, 0, {"label" : newValue});
             iter.set("v.items", data);
         }, function(cmp) {
         	var iterCmpEle = cmp.find("iterationOnMapModelPassthrough").getElements();
          	var expected = [];
+            expected.push({render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "999"});
          	for( var i=0; i<26; i++ ) {
          		expected.push( {render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: ""+i});
          	}
-         	expected[1].passthrough_string = "999";
-
          	this.assertIterationCmpElements(expected, iterCmpEle);
          	
          	var m_mapdata_items = cmp.get("m.mapdata").items;
@@ -157,7 +155,6 @@
          		expected.push( {render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: ""+i});
          	}
          	expected[1].passthrough_string = "999"; expected[1].rerender_count = 0;
-
 
          	this.assertIterationCmpElements(expected, iterCmpEle);
     	}]

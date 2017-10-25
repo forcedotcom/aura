@@ -91,23 +91,23 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method, reb
     if(valueProvider.addValueHandler&&(valueProvider!==cmp||expression!==key)) {
         if(!method){
             method=function PropertyReferenceValue$changeHandler(event) {
+                var component = $A.getComponent(this.handler.cmpGlobalId);
+                var exp = this.handler.key;
             	// If not valid, don't fire change events
-            	if(!cmp.isValid()) { return; }
-                $A.renderingService.addDirtyValue(key, cmp);
-                if(rebind){
-                    cmp.set(key,event.getParam("value"),true);
+            	if(!component || !component.isValid()) { return; }
+                $A.renderingService.addDirtyValue(exp, component);
+                if(this.handler.rebind){
+                    component.set(exp,event.getParam("value"),true);
                 }
-                cmp.fireChangeEvent(key, event.getParam("oldValue"), event.getParam("value"), event.getParam("index"));
+                component.fireChangeEvent(exp, event.getParam("oldValue"), event.getParam("value"), event.getParam("index"));
             };
         }
         method.id=cmp.getGlobalId();
         method.key=key;
+        method.rebind=rebind;
+        method.cmpGlobalId=cmp.globalId;
         var config={"event": "change", "value": expression, "method": method, "cmp": cmp};
         this.valueProvider.addValueHandler(config);
-
-        // if(this.valueProvider instanceof PassthroughValue) {
-        //     this.valueProvider.addValueHandler({"event": "change", "value": this.expression, "method": method});
-        // }
     }
 };
 

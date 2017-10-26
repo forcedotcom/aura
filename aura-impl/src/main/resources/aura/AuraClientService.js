@@ -157,7 +157,10 @@ function AuraClientService () {
     this.finishedInitDefs = false;
     this.protocols={"layout":true};
     this.lastSendTime = Date.now();
+
     this.moduleServices = {};
+    this.moduleSchemas = { "label" : this.labelSchemaResolver };
+    this.moduleSchemasCache = {};
 
     // TODO: @dval We should send this from the server, but for LightningOut apps is a non-trivial change,
     // so for the time being I hard-coded the resource path here to ensure we can lazy fetch them.
@@ -2184,6 +2187,51 @@ AuraClientService.prototype.initializeInjectedServices = function(services) {
             serviceRegistry[service.name] = service;
         });
     }
+};
+
+/**
+ * Adds a schema resolver so modules can statically import from it
+ * Example: ` import url from "resource://myCustomResource" `
+ *
+ * This method needs to be exported (not platform)
+ * so it can be invoked before framework initialization
+ * @export
+ */
+
+AuraClientService.prototype.addModuleSchemaResolver = function (schema, resolver) {
+    $A.assert(typeof resolver === 'function', 'Schema resolver must be a function');
+    $A.assert(this.moduleSchemas[schema] === undefined, 'Unable to add a resolver for schema ' + schema + '. A resolver its already registered');
+    this.moduleSchemas[schema] = resolver;
+};
+
+/**
+ * Resolve a given schema `schema://resourceuri` from a module static import
+ * Schemas can be defined:
+ *   - By default in framework (like label://)
+ *   - $A.clientService.addModuleSchemaResolver
+ *   - Service injection at the app level.
+ * This method just guards and invokes a resolver for a given schema if registered.
+*/
+AuraClientService.prototype.resolveSchemaDependency = function (schema, resourceUri, fullImport) {
+    if (!this.moduleSchemasCache[fullImport]) {
+        var resolver = this.moduleSchemas[schema];
+        $A.assert(resolver, "Unknown schema for '" + schema + '://' + resourceUri + "'. Either the schema is not supported or a resolver hasn't been provided.");
+        this.moduleSchemasCache[fullImport] = resolver(resourceUri);
+    }
+
+    return this.moduleSchemasCache[fullImport];
+};
+
+
+/**
+ * Default resolver for label:// schema for module static imports
+ * @memberOf AuraClientService
+ * @private
+ */
+AuraClientService.prototype.labelSchemaResolver = function(resourceUri) {
+    var parts = resourceUri.split('.');
+    $A.assert(parts.length === 2, 'Malformed label URI. Static imports for label schema require two parts: section and key');
+    return $A.get("$Label." + resourceUri);
 };
 
 /**

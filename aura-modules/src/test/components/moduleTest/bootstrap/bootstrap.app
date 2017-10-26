@@ -15,7 +15,12 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<aura:application template="moduleTest:bootstrapTemplate" access="global" useAppcache="false">
+<aura:application
+    template="moduleTest:bootstrapTemplate"
+    access="global"
+    useAppcache="false"
+    services="schemas:importSchemaService">
+
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:attribute name="branch" type="Boolean" default="true" access="GLOBAL" />
     <aura:attribute name="test" type="String" default="I'm v.test" access="GLOBAL" />
@@ -32,7 +37,12 @@
         <ui:button aura:id="t1" class="button-set1" label="Set v.test" buttonTitle="x" press="{!c.updateTest}" />
         <ui:button aura:id="t2" class="button-set2" label="Set v.test2" buttonTitle="x" press="{!c.updateTest2}" />
         <ui:button aura:id="t3" class="button-set3" label="Set v.test3" buttonTitle="x" press="{!c.updateTest3}" />
-        <module:marker></module:marker>
+
+        <div>
+            <module:marker></module:marker>
+            <moduleTest:schemaTest></moduleTest:schemaTest>
+            <moduleTest:schemaLabel></moduleTest:schemaLabel>
+        </div>
 
         <section style="margin: 10px; border: 1px solid # ">
             <h3>Aura land!</h3>
@@ -79,7 +89,6 @@
                         callbackaction="{!c.cbAction}"
                         onpress="{!c.cbEvent}"
                 />
-                <!-- <ui:button label="{!item.label}"></ui:button> -->
             </aura:iteration>
         </section>
     </section>

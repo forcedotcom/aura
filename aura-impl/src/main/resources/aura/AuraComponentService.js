@@ -742,8 +742,13 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
 
         var desc;
         var depEntry;
-        if (name.indexOf(":") !== -1) {
-            // aura library dependency
+        var hasSchema = name[0] === '@';
+
+        if (hasSchema) {
+            var schemaParts = name.substr(1).split('/');
+            return $A.clientService.resolveSchemaDependency(schemaParts[0], schemaParts[1], name);
+        } else if (name.indexOf(":") !== -1) {
+            // If it only contains a colon, we assume is an aura library (legacy)
             desc = "markup://" + name;
         } else {
             // module dependency

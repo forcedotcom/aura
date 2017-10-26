@@ -34,6 +34,7 @@ public final class ModulesCompilerUtil {
 
     static final String COMPILER_JS_PATH = pathToLocalTempFile("modules/compiler.js");
     static final String COMPILER_HANDLER = "src/lwc/invokeCompile.js";
+    static final String LABEL_SCHEMA = "@label/";
 
     private static NodeBundle COMPILER_BUNDLE;
 
@@ -142,9 +143,17 @@ public final class ModulesCompilerUtil {
         JSONArray bundleLabelsArray = metadata.getJSONArray("bundleLabels");
         Set<String> bundleDependencies = new HashSet<>();
         Set<String> bundleLabels = new HashSet<>();
+
+        // NOTE @dval: Simplify this logic once constructor defined labels is deprecated in lwc (212)
+        // Labels should be defined and collected only from the label:// schema static imports.
         for (int i = 0; i < bundleDependenciesArray.length(); i++) {
-            bundleDependencies.add(bundleDependenciesArray.getString(i));
+            String dep = bundleDependenciesArray.getString(i);
+            if (dep.startsWith(LABEL_SCHEMA)) {
+                bundleLabels.add(dep.substring(LABEL_SCHEMA.length()));
+            }
+            bundleDependencies.add(dep);
         }
+
         for (int i = 0; i < bundleLabelsArray.length(); i++) {
             bundleLabels.add(bundleLabelsArray.getString(i));
         }

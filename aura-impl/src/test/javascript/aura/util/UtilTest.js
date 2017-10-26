@@ -1238,5 +1238,22 @@ Test.Aura.Util.UtilTest = function() {
 
             Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        function ReturnsComponentHierarchyWhenComponentHasNoOwner() {
+            var a = mockComponent("a");
+            var b = mockComponent("b");
+            var c = mockComponent("c");
+            var d = null;
+            a.setOwner(b);
+            b.setOwner(d);
+            c.setOwner(c);
+            
+            var expected = "[b]>[a]";
+
+            var actual = targetUtil.getComponentHierarchy(a);
+
+            Assert.Equal(expected, actual);
+        }
     }
 };

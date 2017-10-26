@@ -2488,16 +2488,19 @@ Aura.Utils.Util.prototype.postMessage = function(targetWindow, argsArray){
  * @private
  */
 Aura.Utils.Util.prototype.getComponentHierarchy = function(component){
-    if (!component) {
+    if (this.isUndefinedOrNull(component)) {
         return '';
     }
     var ret = ['['+component.getType()+']'];
     var owner = component.getOwner();
-    while (owner !== owner.getOwner()) {
+
+    while (!this.isUndefinedOrNull(owner) && owner !== owner.getOwner()) {
         ret.push('['+owner.getType()+']');
         owner = owner.getOwner();
     }
-    ret.push('['+owner.getType()+']');
+    if (!this.isUndefinedOrNull(owner)) {
+        ret.push('['+owner.getType()+']');
+    }
     return ret.reverse().join('>');
 };
 

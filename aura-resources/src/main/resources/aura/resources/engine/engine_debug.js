@@ -10,7 +10,7 @@
 
 const { freeze, seal, keys, create, assign, defineProperty, getPrototypeOf, setPrototypeOf, getOwnPropertyDescriptor, getOwnPropertyNames, defineProperties, getOwnPropertySymbols, hasOwnProperty, preventExtensions, isExtensible, } = Object;
 const { isArray } = Array;
-const { filter: ArrayFilter, slice: ArraySlice, splice: ArraySplice, indexOf: ArrayIndexOf, push: ArrayPush, map: ArrayMap, forEach, } = Array.prototype;
+const { concat: ArrayConcat, filter: ArrayFilter, slice: ArraySlice, splice: ArraySplice, indexOf: ArrayIndexOf, push: ArrayPush, map: ArrayMap, forEach, } = Array.prototype;
 function isUndefined(obj) {
     return obj === undefined;
 }
@@ -231,7 +231,15 @@ function c(sel, Ctor, data) {
         Ctor = Ctor();
     }
     // checking reserved internal data properties
-    const { key, slotset, styleMap, style, attrs, on, className, classMap, props: _props } = data;
+    const { key, slotset, styleMap, style, on, className, classMap, props: _props } = data;
+    let { attrs } = data;
+    // hack to allow component authors to force the usage of the "is" attribute in their components
+    const { forceTagName } = Ctor;
+    if (!isUndefined(forceTagName) && (isUndefined(attrs) || isUndefined(attrs.is))) {
+        attrs = attrs || {};
+        attrs.is = sel;
+        sel = forceTagName;
+    }
     data = { hook: lifeCycleHooks, key, slotset, attrs, on, _props };
     data.class = classMap || (className && getMapFromClassName(className));
     data.style = styleMap || (style && style + '');
@@ -775,7 +783,7 @@ function subscribeToSetHook(vm, target, key) {
 const ReactiveMap = new WeakMap();
 const ObjectDotPrototype = Object.prototype;
 function lockShadowTarget(shadowTarget, originalTarget) {
-    const targetKeys = getOwnPropertyNames(originalTarget);
+    const targetKeys = ArrayConcat.call(getOwnPropertyNames(originalTarget), getOwnPropertySymbols(originalTarget));
     targetKeys.forEach((key) => {
         let descriptor = getOwnPropertyDescriptor(originalTarget, key);
         // We do not need to wrap the descriptor if not configurable
@@ -868,7 +876,7 @@ class ReactiveProxyHandler {
     }
     ownKeys(shadowTarget) {
         const { originalTarget } = this;
-        return getOwnPropertyNames(originalTarget);
+        return ArrayConcat.call(getOwnPropertyNames(originalTarget), getOwnPropertySymbols(originalTarget));
     }
     isExtensible(shadowTarget) {
         const shadowIsExtensible = isExtensible(shadowTarget);
@@ -914,11 +922,21 @@ class ReactiveProxyHandler {
     defineProperty(shadowTarget, key, descriptor) {
         const { originalTarget } = this;
         const { configurable } = descriptor;
-        const unwrappedDescriptor = unwrapDescriptor(descriptor);
-        if (configurable === false) {
-            defineProperty(shadowTarget, key, unwrappedDescriptor);
+        // We have to check for value in descriptor
+        // because Object.freeze(proxy) calls this method
+        // with only { configurable: false, writeable: false }
+        // Additionally, method will only be called with writeable:false
+        // if the descriptor has a value, as opposed to getter/setter
+        // So we can just check if writable is present and then see if
+        // value is present. This eliminates getter and setter descriptors
+        if ('writable' in descriptor && !('value' in descriptor)) {
+            const originalDescriptor = getOwnPropertyDescriptor(originalTarget, key);
+            descriptor.value = originalDescriptor.value;
         }
-        defineProperty(originalTarget, key, unwrappedDescriptor);
+        defineProperty(originalTarget, key, unwrapDescriptor(descriptor));
+        if (configurable === false) {
+            defineProperty(shadowTarget, key, wrapDescriptor(descriptor));
+        }
         return true;
     }
 }
@@ -2568,26 +2586,6 @@ assign(Node.prototype, {
         return replacedNode;
     }
 });
-/**
- * This algo mimics 2.5 of web component specification somehow:
- * https://www.w3.org/TR/custom-elements/#upgrades
- */
-function upgradeElement(element, Ctor) {
-    if (isUndefined(Ctor)) {
-        throw new TypeError(`Invalid Component Definition: ${Ctor}.`);
-    }
-    const tagName = element.tagName.toLowerCase();
-    const vnode = c(tagName, Ctor, { className: element.className || undefined });
-    vnode.isRoot = true;
-    patch(element, vnode);
-    // providing the hook to detect insertion and removal
-    element[ConnectingSlot] = () => {
-        insert(vnode);
-    };
-    element[DisconnectingSlot] = () => {
-        forceDisconnection(vnode);
-    };
-}
 // this could happen for two reasons:
 // * it is a root, and was removed manually
 // * the element was appended to another container which requires disconnection to happen first
@@ -2614,9 +2612,28 @@ function forceDisconnection(vnode) {
  */
 function createElement(tagName, options = {}) {
     const Ctor = isFunction(options.is) ? options.is : null;
-    const element = document.createElement(tagName, Ctor ? null : options);
-    if (Ctor && element instanceof HTMLElement) {
-        upgradeElement(element, Ctor);
+    let vnode = undefined;
+    // If we have a Ctor, create our VNode
+    if (Ctor) {
+        vnode = c(tagName, Ctor, {});
+        vnode.isRoot = true;
+        // If Ctor defines forceTagName
+        // vnode.sel will be the tagname we should use
+        tagName = vnode.sel;
+    }
+    // Create element with correct tagName
+    const element = document.createElement(tagName);
+    // If we created a vnode
+    if (vnode) {
+        // patch that guy
+        patch(element, vnode); // eslint-disable-line no-undef
+        // Handle insertion and removal from the DOM
+        element[ConnectingSlot] = () => {
+            insert(vnode); // eslint-disable-line no-undef
+        };
+        element[DisconnectingSlot] = () => {
+            forceDisconnection(vnode); // eslint-disable-line no-undef
+        };
     }
     return element;
 }
@@ -2630,4 +2647,4 @@ exports.unwrap = unwrap;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.15.2 */
+/** version: 0.15.3 */

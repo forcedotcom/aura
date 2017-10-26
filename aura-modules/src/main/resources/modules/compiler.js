@@ -32746,7 +32746,7 @@ function getNormalizedName(
     };
 }
 
-const version = "0.15.2";
+const version = "0.15.3";
 /* harmony export (immutable) */ __webpack_exports__["version"] = version;
 
 
@@ -75853,8 +75853,7 @@ module.exports = function ({ types, traverse }) {
     const baseVisitor = {
         Program: {
             enter(_, state) {
-                const meta = { labels: [] };
-                state.file.metadata = state.metadata = meta;
+                state.file.metadata.labels = [];
             }
         }
     };
@@ -75932,7 +75931,7 @@ module.exports = function ({ types: t, }) {
                 checkLifecycleMethodMisspell(classBody);
 
                 const labels = getComponentLabels(classBody);
-                state.metadata.labels.push(...labels);
+                state.file.metadata.labels.push(...labels);
 
                 const isExportClass = exportDafaultNode(path);
                 const hasRenderMethod = !!findClassMethod(classBody, COMPONENT_RENDER_METHOD_NAME);

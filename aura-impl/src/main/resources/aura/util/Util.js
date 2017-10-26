@@ -49,6 +49,7 @@ Aura.Utils.Util = function Util() {
  */
 Aura.Utils.Util.prototype.isIE = (navigator.userAgent.indexOf("MSIE") !== -1) || (navigator.userAgent.indexOf("Trident/") !== -1);
 
+Promise.prototype.then = Promise.prototype['then'];
 
 /**
  * Browser check for localStorage enablement.

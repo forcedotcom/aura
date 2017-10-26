@@ -108,7 +108,6 @@ function noop() {}
 
 // -- Polyfills --------------------------------------------------------
 // #include aura.polyfill.Json
-// #include aura.polyfill.Promise
 // #include aura.polyfill.TextEncoder
 // #include aura.polyfill.stackframe
 // #include aura.polyfill.error-stack-parser

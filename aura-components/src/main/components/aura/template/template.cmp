@@ -177,14 +177,17 @@
 
     {!v.bootstrapInlineJs}
 
-    var cssLoadCount = 0
+    var appCssLoadingCount = 0;
     function onLoadStyleSheets(event) {
-        cssLoadCount--;
-        if (cssLoadCount == 0){
-            if (typeof window.Aura.bootstrap.appCssLoaded === "function") {
-                window.Aura.bootstrap.appCssLoaded();
+        var element = event.target;
+        element.removeEventListener('load',onLoadStyleSheets);
+        element.removeEventListener('error',onLoadStyleSheets);
+        window.Aura.bootstrap.appCssLoading = (--appCssLoadingCount) > 0;
+        if (!window.Aura.bootstrap.appCssLoading) {
+            if (typeof window.Aura.bootstrap.appCssLoadedCallback === "function") {
+                window.Aura.bootstrap.appCssLoadedCallback();
+                window.Aura.bootstrap.appCssLoadedCallback = undefined;
             }
-            window.Aura.bootstrap.appCssLoaded = true;
         }
     }
 
@@ -192,11 +195,12 @@
 
     var auraCss = document.getElementsByClassName('auraCss');
     var current;
-    window.Aura.bootstrap.appCssLoaded = !(auraCss.length &amp;&amp; auraCss.length > 0);
+    window.Aura.bootstrap.appCssLoading = auraCss.length > 0;
     for (var c=0,length=auraCss.length;c&lt;length;c++) {
         current = auraCss[c];
-        cssLoadCount++;
+        appCssLoadingCount++;
         current.addEventListener('load',onLoadStyleSheets);
+        current.addEventListener('error',onLoadStyleSheets);
         current.href = current.getAttribute("data-href");
     }
 

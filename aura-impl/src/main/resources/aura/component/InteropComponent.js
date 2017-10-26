@@ -429,17 +429,27 @@ InteropComponent.prototype.setupInteropInstance = function () {
  * so the insertion hooks get called once the element is on the DOM.
 */
 InteropComponent.prototype.swapInteropElement = function (currentElement, newElement) {
-    this.disassociateElements();
-    currentElement.parentElement.replaceChild(newElement, currentElement);
-    this.associateElement(newElement);
-    var container = this.getContainer();
-    var parentCmp = container && container.getConcreteComponent();
-
-    if (parentCmp && parentCmp.elements && parentCmp.elements[0] === currentElement) {
-        parentCmp.elements[0] = newElement;
-        $A.renderingService.setMarker(parentCmp, newElement);
+    // AuraRenderingService.associateElements is called in finishRender
+    // and that would add the temporary element (currentElement) to owner.elements
+    // so when swap, we need to replace the instance in parent.elements
+    var owner = $A.getCmp(this.owner);
+    var parentGetElements = owner.getElements();
+    if (parentGetElements && parentGetElements.indexOf(currentElement) >= 0) {
+        owner.disassociateElements();
+        parentGetElements.forEach(function(parentGetElement) {
+            if (parentGetElement === currentElement) {
+                owner.associateElement(newElement);
+            } else {
+                owner.associateElement(parentGetElement);
+            }
+        });
     }
 
+    this.disassociateElements();
+    // moveReferencesToMarker calls $A.util.insertBefore so it needs to be called before replaceChild to guarantee currentElement still has parent
+    $A.renderingService.moveReferencesToMarker(currentElement, newElement);
+    currentElement.parentElement.replaceChild(newElement, currentElement);
+    this.associateElement(newElement);
 };
 
 /**
@@ -457,13 +467,13 @@ InteropComponent.prototype.afterRender = function () {
     if (document.body.contains(element)) {
         this.swapInteropElement(element, this._customElement);
     } else {
-        this.owner.addEventHandler('markup://aura:valueRender', this.afterParentRender, 'default');
+        $A.getCmp(this.owner).addEventHandler('markup://aura:valueRender', this.afterParentRender.bind(this), 'default');
     }
 };
 
 InteropComponent.prototype.afterParentRender = function () {
     this.swapInteropElement(this.elements[0], this._customElement);
-    this.owner.removeEventHandler('markup://aura:valueRender', this.afterParentRender, 'default');
+    $A.getCmp(this.owner).removeEventHandler('markup://aura:valueRender', this.afterParentRender.bind(this), 'default');
 };
 
 /**

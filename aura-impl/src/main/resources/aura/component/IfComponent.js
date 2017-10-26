@@ -244,7 +244,7 @@ IfComponent.prototype["helper"] = {
             if (!cdr["attributes"]["valueProvider"]) {
                 cdr["attributes"]["valueProvider"] = cmp.getAttributeValueProvider();
             }
-            
+
             if (!cdr["containerComponentId"]) {
                 cdr["containerComponentId"] = cmp.getGlobalId();
             }

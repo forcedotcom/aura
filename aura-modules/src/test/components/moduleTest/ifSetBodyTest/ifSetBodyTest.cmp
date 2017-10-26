@@ -1,0 +1,15 @@
+<aura:component>
+    <aura:attribute name="flag" type="Boolean" default="true"/>
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+
+    <ui:button aura:id="toggleFlag" label="toggle flag" press="{!c.toggleFlag}"/>
+    <ui:button aura:id="toggleBody" label="toggle body" press="{!c.toggleBody}"/>
+    <ui:button aura:id="set" label="set a new body" press="{!c.set}"/>
+
+    <aura:if isTrue="{!v.flag}">
+        {! v.body}
+        <aura:set attribute="else">
+            {! v.body}
+        </aura:set>
+    </aura:if>
+</aura:component>

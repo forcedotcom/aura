@@ -311,11 +311,7 @@ AuraRenderingService.prototype.unrender = function(components) {
                 // elements removed, and those elements are the ones in beforeUnrenderElements.
                 if(beforeUnrenderElements && beforeUnrenderElements.length) {
                     for(var c=0,len=beforeUnrenderElements.length;c<len;c++) {
-                        var beforeUnrenderElement = beforeUnrenderElements[c];
-                        // InteropComponent#unrender did removeElement already
-                        if (!beforeUnrenderElement.__customElement) {
-                            $A.util.removeElement(beforeUnrenderElement);
-                        }
+                        $A.util.removeElement(beforeUnrenderElements[c]);
                     }
                 }
 
@@ -485,10 +481,15 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
                 }else if(renderedElements.length){
                     ret=ret.concat(renderedElements);
                     marker = this.getMarker(component);
-                    if(this.isCommentMarker(marker)){
-                        this.removeElement(marker);
+                    // if the first element is the marker then no need to do extra work
+                    if(ret[0] !== marker) {
+                        // setMarker updates the references
+                        this.setMarker(component, ret[0]);
+                        // now clean up
+                        if(this.isCommentMarker(marker)){
+                            this.removeElement(marker);
+                        }
                     }
-                    this.setMarker(component, ret[0]);
                     nextSibling=target.childNodes[calculatedPosition];
                     this.insertElements(renderedElements,nextSibling||target,nextSibling,nextSibling);
                 }
@@ -1195,9 +1196,9 @@ AuraRenderingService.prototype.removeElement = function(marker, container) {
  *
  * @private
  */
-AuraRenderingService.prototype.moveReferencesToMarker = function(marker) {
+AuraRenderingService.prototype.moveReferencesToMarker = function(marker, newMarker) {
     var references = this.getMarkerReferences(marker);
-    var newMarker = this.createMarker(null, "unrender marker: " + marker.nodeValue);
+    newMarker = newMarker || this.createMarker(null, "unrender marker: " + marker.nodeValue);
 
     if(references) {
         var collection = references.get();

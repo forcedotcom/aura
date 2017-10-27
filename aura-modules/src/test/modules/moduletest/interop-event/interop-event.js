@@ -3,9 +3,7 @@ import { Element } from "engine";
 export default class InteropEvent extends Element {
     @api removeCallback;
     @api onClickHandler;
-    state = {
-        removePrevented: ''
-    };
+    @track removePrevented = '';
 
     handleClick() {
         const customEvent = new CustomEvent('remove', {
@@ -17,7 +15,7 @@ export default class InteropEvent extends Element {
         this.dispatchEvent(customEvent);
 
         if (customEvent.defaultPrevented) {
-            this.state.removePrevented = 'true';
+            this.removePrevented = 'true';
         }
     }
 

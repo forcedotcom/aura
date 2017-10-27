@@ -2,14 +2,12 @@ import { Element, createElement, toString } from "engine";
 import * as testUtil from 'securemoduletest-test-util';
 
 export default class Simple extends Element {
-    state = {
-        message: 'Hello Locker!'
-    };
+    @track message = 'Hello Locker!';
 
     @api
     testWindowIsUnsecure() {
         if (window.toString().indexOf("SecureWindow") === -1) {
-            this.state.message = "Bye Locker!";
+            this.message = "Bye Locker!";
         }
         testUtil.assertTrue(window.toString().indexOf("SecureWindow") === -1, "Expected window to"
             + " return raw window in module");

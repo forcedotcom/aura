@@ -1,9 +1,11 @@
 import { Element } from 'engine';
 export default class Foo extends Element {
+    @track title = 'recursive test';
+    @track items;
+
     constructor() {
         super();
-        this.state.title = 'recursive test';
-        this.state.items = [
+        this.items = [
             {
                 label: 'item1',
                 items: [

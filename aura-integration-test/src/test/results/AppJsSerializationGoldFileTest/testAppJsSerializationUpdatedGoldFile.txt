@@ -638,7 +638,7 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
   }, fireEvent:function(component, event) {
     if(component.isValid()) {
       var e = component.getEvent(event.type);
-      if(!$A.util.isUndefinedOrNull(e)) {
+      if(!$A.util.isUndefinedOrNull(e) && e.getDef) {
         lib.setEventParams(e, event);
         e.fire()
       }

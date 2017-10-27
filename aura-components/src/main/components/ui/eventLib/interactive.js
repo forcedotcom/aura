@@ -224,7 +224,8 @@ function lib() { //eslint-disable-line no-unused-vars
              // this component could become invalid, so guard just in-case
              if(component.isValid()) {
                 var e = component.getEvent(event.type);
-                if (!$A.util.isUndefinedOrNull(e)) {
+                // e could be regular event, so it won't have getDef method.
+                if (!$A.util.isUndefinedOrNull(e) && e.getDef) {
                     lib.setEventParams(e, event);
                     e.fire();
                 }

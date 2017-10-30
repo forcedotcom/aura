@@ -80,7 +80,9 @@ public enum AuraImplFiles {
     AuraResourcesSourceDirectory(AuraResourcesModuleDirectory.getPath(), "src", "main", "resources",
             "aura", "resources"),
 
-    EngineSourceDirectory(AuraResourcesSourceDirectory.getPath(), "engine");
+    EngineSourceDirectory(AuraResourcesSourceDirectory.getPath(), "engine"),
+
+    AuraLockerSourceDirectory(AuraResourcesSourceDirectory.getPath(), "lockerservice");
 
     private final String path;
 

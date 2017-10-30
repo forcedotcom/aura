@@ -334,7 +334,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
         for (File file : filesToWrite) {
             if (file.exists()) {
-                if (file.lastModified() < getLastMod() || mode == JavascriptGeneratorMode.DEVELOPMENT) {
+                if (file.lastModified() < getLastMod() || !mode.allowedInProduction()) {
                     file.delete();
                 } else {
                     // its up to date already, skip

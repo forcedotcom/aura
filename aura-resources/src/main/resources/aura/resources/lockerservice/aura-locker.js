@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-10-24
- * Version: 0.2.4
+ * Generated: 2017-10-30
+ * Version: 0.2.5
  */
 
 (function (global, factory) {
@@ -297,6 +297,7 @@ const metadata$4 = {
     "compareDocumentPosition":        FUNCTION_RAW_ARGS,
     "contains":                       FUNCTION_RAW_ARGS,
     "firstChild":                     SKIP_OPAQUE,
+    "hasChildNodes":                  FUNCTION,
     "insertBefore":                   FUNCTION,
     "isDefaultNamespace":             FUNCTION,
     "isEqualNode":                    FUNCTION_RAW_ARGS,
@@ -3396,6 +3397,23 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
                 raw.textContent = value;
 
                 trustChildNodes(this, raw);
+            }
+        },
+
+        hasChildNodes: {
+            value: function() {
+                var raw = SecureObject.getRaw(this);
+                // If this is a shared element, delegate the call to the shared element, no need to check for access
+                if (SecureElement.isSharedElement(raw)) {
+                    return raw.hasChildNodes();
+                }
+                var childNodes = raw.childNodes;
+                for (var i = 0; i < childNodes.length; i++) {
+                    if (hasAccess(this, childNodes[i])) {
+                        return true;
+                    }
+                }
+                return false;
             }
         },
 
@@ -7267,6 +7285,19 @@ function create$$1(src, key, sourceURL) {
     };
 }
 
+function createForClass(src, defDescriptor) {
+    const namespace = defDescriptor.getNamespace();
+    const name = defDescriptor.getName();
+    const sourceURL = 'components/' + namespace + '/' + name + '.js';
+    const key = getKeyForNamespace(namespace);
+
+    const returnValue = evaluate(src, key, sourceURL);
+    // Key this def so we can transfer the key to component instances
+    setKey(returnValue, key);
+    return returnValue;
+}
+
+// @deprecated
 function createForDef(src, def) {
     const defDescriptor = def.getDescriptor();
     const namespace = defDescriptor.getNamespace();
@@ -7455,6 +7486,7 @@ function addRTCPeerConnection(sw, win, key) {
 }
 
 exports.create = create$$1;
+exports.createForClass = createForClass;
 exports.createForDef = createForDef;
 exports.createForModule = createForModule;
 exports.getEnv = getEnv$$1;

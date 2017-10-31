@@ -157,7 +157,15 @@ TextComponent.prototype["renderer"] = {
         
         // aura:text is syntactic sugar for document.createTextNode() and the resulting nodes need to be directly visible to the container
         // otherwise no code would be able to manipulate them
-        $A.lockerService.trust(component, textNode);
+        var owner = component.getOwner();
+        var ownerName = owner.getType();
+        // TODO: Manually checking for aura:iteration or aura:if is a hack. Ideally, getOwner() or another API would
+        //       always return the element we need to key against.
+        while (ownerName === "aura:iteration" || ownerName === "aura:if") {
+            owner = owner.getOwner();
+            ownerName = owner.getType();
+        }
+        $A.lockerService.trust(owner, textNode);
         
         $A.renderingService.setMarker(component, textNode);
         

@@ -24,7 +24,7 @@
     OtherPropertiesWhitelist: ["childNodes", "children", "ownerDocument", "parentNode", "offsetParent"],
 
     MethodsWhitelist: ["appendChild", "replaceChild", "insertBefore", "addEventListener", "removeEventListener",
-                       "dispatchEvent", "getAttribute", "setAttribute", "blur", "click", "focus", "hasAttribute",
+                       "dispatchEvent", "getAttribute", "setAttribute", "blur", "click", "focus", "hasChildNodes", "hasAttribute",
                        "hasAttributeNS", "removeAttribute", "getAttributeNS", "setAttributeNS", "removeAttributeNS"],
 
     setUp: function(cmp) {
@@ -655,6 +655,12 @@
     testElementObjectProperties: {
         test: function(cmp) {
             cmp.testElementObjectProperties();
+        }
+    },
+
+    testHasChildNodes: {
+        test: function(cmp) {
+            cmp.testHasChildNodes();
         }
     }
 })

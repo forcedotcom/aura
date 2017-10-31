@@ -86,6 +86,7 @@
     <aura:method name="testElementGetAttribute"/>
     <aura:method name="testNodeApiParamUnfilter"/>
     <aura:method name="testElementObjectProperties"/>
+    <aura:method name="testHasChildNodes"/>
 
     <lockerTest:facet/>
 

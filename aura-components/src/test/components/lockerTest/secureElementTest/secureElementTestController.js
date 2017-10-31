@@ -590,5 +590,23 @@
 
         testUtils.assertFalse(link.hasOwnProperty("id"),
             "Expected false for property lookup. Elements inherit properties and should not have any properties on their own");
+    },
+
+    testHasChildNodes: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        // positive test cases
+        testUtils.assertTrue(document.body.hasChildNodes(), "Expected shared elements to return true for hasChildNodes()");
+        var elementWithChildNodes = document.getElementById("nodeApiTester");
+        testUtils.assertTrue(elementWithChildNodes.hasChildNodes(), "Expected element to have child nodes");
+        testUtils.assertTrue(document.getElementById("insideFacet").hasChildNodes(), "Expected a deep inner facet element to have child nodes");
+
+        // negative test cases
+        var elementWOChildNodes = document.getElementById("insideDiv");
+        testUtils.assertFalse(elementWOChildNodes.hasChildNodes(), "Expected deep inner element to not have child nodes");
+        testUtils.assertFalse(document.getElementById("outsideDiv").hasChildNodes(), "Expected a root level facet element to not have child nodes");
+
+        // Root level element which includes a facet from a different namespace
+        var elementWithInaccessibleChildNodes = document.getElementById("outsideFacet");
+        testUtils.assertFalse(elementWithInaccessibleChildNodes.hasChildNodes());
     }
 })

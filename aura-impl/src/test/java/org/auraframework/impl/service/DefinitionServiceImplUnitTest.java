@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
@@ -34,6 +35,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.DefinitionServiceImpl;
 import org.auraframework.impl.context.AuraContextImpl;
@@ -764,7 +766,73 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
                 definitionService.getUid("testUID", null));
     }
     
-
+    @Test
+    public void testLabelsCacheisPopulatedForApplications() throws Exception {
+        DefinitionService definitionService = createDefinitionServiceWithMocks();
+        Mockito.when(globalControllerDefRegistry.getAll()).thenReturn(ImmutableMap.of());        
+        String name = "test_"+counter.getAndIncrement();
+        DefDescriptor<Definition> descriptor = Mockito.mock(DefDescriptor.class);
+        Mockito.when(descriptor.getDefType()).thenReturn(DefType.APPLICATION);
+        Mockito.when(descriptor.getName()).thenReturn(name);
+        Mockito.when(descriptor.getNamespace()).thenReturn(NAMESPACE);
+        Mockito.when(descriptor.getQualifiedName()).thenReturn("bah://"+NAMESPACE+":"+name);
+        Definition mockDefinition = new MockDefinition(descriptor, AuraContext.Access.PRIVATE);
+        setupMockRegistryFor(descriptor, registry1, mockDefinition);
+        AuraContext context = setupContext(definitionService);
+        AuraContext mockedContext = Mockito.spy(context);
+        Mockito.when(contextService.getCurrentContext()).thenReturn(mockedContext);
+        String uid = definitionService.getUid(null, descriptor);
+        assertNotNull(uid);
+        assertNotNull(mockedContext.getLocalDependencyEntry(uid));
+        String key = uid + "/" + descriptor.getDefType() + ":" + descriptor.getQualifiedName().toLowerCase();
+        assertNotNull(cachingService.getDepsCache().getIfPresent(key));
+        assertNotNull(definitionService.getGlobalReferences(uid, AuraValueProviderType.LABEL.getPrefix()));
+    }
+    
+    @Test
+    public void testLabelsCacheisUsedForApplications() throws Exception {
+        DefinitionService definitionService = createDefinitionServiceWithMocks();
+        Map<DefDescriptor<? extends Definition>, Definition> dependencies = Maps.newHashMap();
+        List<ClientLibraryDef> clientLibraries = new ArrayList<>();
+        Map<String,Set<PropertyReference>> globalReferencesMap = new HashMap<String, Set<PropertyReference>>();
+        Set<PropertyReference> mockSet = Mockito.mock(Set.class);
+        globalReferencesMap.put("root", mockSet);
+        DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries, false, globalReferencesMap);
+        AuraContext context = new AuraContextImpl(Mode.DEV, registries,
+                null /* defaultPrefixes */,
+                Format.JSON, Authentication.AUTHENTICATED,
+                null /* jsonContext */,
+                null /* globalProviders */,
+                configAdapter,
+                definitionService,
+                null /* testContextAdapter */);
+        AuraContext mockedContext = Mockito.spy(context);
+        Mockito.when(mockedContext.getLocalDependencyEntry("testUID")).thenReturn(de);
+        Mockito.when(contextService.getCurrentContext()).thenReturn(mockedContext);       
+        assertEquals(mockSet, definitionService.getGlobalReferences("testUID", "root"));
+    }
+    
+    @Test
+    public void testLabelsCacheisBuiltforComponents() throws Exception {
+        DefinitionService definitionService = createDefinitionServiceWithMocks();
+        Map<DefDescriptor<? extends Definition>, Definition> dependencies = Maps.newHashMap();
+        List<ClientLibraryDef> clientLibraries = new ArrayList<>();
+        DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries, false, null);
+        String name = "test_"+ counter.getAndIncrement();
+        DefDescriptor<Definition> descriptor = Mockito.mock(DefDescriptor.class);
+        Mockito.when(descriptor.getDefType()).thenReturn(DefType.COMPONENT);
+        Mockito.when(descriptor.getName()).thenReturn(name);
+        Mockito.when(descriptor.getNamespace()).thenReturn(NAMESPACE);
+        Mockito.when(descriptor.getQualifiedName()).thenReturn("bah://"+NAMESPACE+":"+name);
+        Definition mockDefinition = new MockDefinition(descriptor, AuraContext.Access.PRIVATE);
+        setupMockRegistryFor(descriptor, registry1, mockDefinition);
+        AuraContext context = setupContext(definitionService);
+        AuraContext mockedContext = Mockito.spy(context);
+        Mockito.when(mockedContext.getLocalDependencyEntry("testUID")).thenReturn(de);
+        Mockito.when(contextService.getCurrentContext()).thenReturn(mockedContext);
+        assertNotNull(definitionService.getGlobalReferences("testUID", AuraValueProviderType.LABEL.getPrefix()));
+    }
+    
 //void updateLoaded(DefDescriptor<?> loading) throws QuickFixException, ClientOutOfSyncException;
 
 //    private boolean isInDescriptorFilterCache(DescriptorFilter filter, Set<DefDescriptor<?>> results) throws Exception {

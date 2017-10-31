@@ -26,14 +26,15 @@
            <code>ui:outputRichText</code> renders formatted text. For example, URLs and email addresses enclosed by anchor tags are displayed as hyperlinks.
 		</p>
 		<p>
-		  This example sets bold text and bind the value to a <code>lightning:inputRichText</code> and <code>ui:outputRichText</code> component.
+		  This example sets bold text and binds the value to a <code>lightning:inputRichText</code> and <code>ui:outputRichText</code> component.
+          The <code>slds-text-longform</code> class adds default spacing and list styling in your output.
 		</p>
 		<pre>&lt;aura:component>
     &lt;aura:attribute name="myVal" type="String" />
     &lt;aura:handler name="init" value="{! this }" action="{! c.init }"/>
     
     &lt;lightning:inputRichText value="{!v.myVal}"/>
-    &lt;ui:outputRichText value="{!v.myVal}"/>
+    &lt;ui:outputRichText class="slds-text-longform" value="{!v.myVal}"/>
 &lt;/aura:component></pre>
 
         <p>During initialization, the value is set on both the <code>lightning:inputRichText</code> and <code>ui:outputRichText</code> component.</p>

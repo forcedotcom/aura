@@ -142,6 +142,10 @@ PropertyReferenceValue.prototype.getExpression = function() {
     return this.expression;
 };
 
+PropertyReferenceValue.prototype.getIsGlobal = function() {
+    return this.isGlobal;
+};
+
 PropertyReferenceValue.prototype.getReference = function(path) {
     if(!path) {
         return this;

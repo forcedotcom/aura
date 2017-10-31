@@ -2,7 +2,8 @@
     browsers: ['GOOGLECHROME'],
 
     selector: {
-        literal: '.m-literal span'
+        literal: '.m-literal span',
+        expression: '.m-expr span'
     },
 
     testFalsy: {
@@ -15,6 +16,22 @@
                 return new Promise(function(resolve, reject) {
                     var actual = element.textContent;
                     $A.test.assertEquals(actual, expected, 'Wrong literal');
+                    resolve();
+                });
+            }
+        ]
+    },
+
+    testGVPexpression: {
+        test: [
+            function(cmp) {
+                var expected = 'Renderer';
+                var element = cmp
+                    .getElement()
+                    .querySelector(this.selector.expression);
+                return new Promise(function(resolve, reject) {
+                    var actual = element.textContent;
+                    $A.test.assertEquals(actual, expected, 'Wrong expression result');
                     resolve();
                 });
             }
@@ -41,7 +58,7 @@
                 var el = document
                     .querySelector('.programmatic')
                     .querySelector('moduletest-simple-cmp');
-                var message = 'Should be able to find the component using its class';
+                var message = 'Should support programmatic instantiation with an aura:id';
                 $A.test.assertTrue(el !== null, message);
             }
         ]

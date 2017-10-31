@@ -1460,7 +1460,7 @@ Component.prototype.fireChangeEvent=function(key,oldValue,newValue,index){
     // FIND THE REAL REASON AND REMOVE THE EVENT HANDLER, AS WELL AS THIS SHORTSTOP NPE FIX
     if(!this.destroyed){
         var component=this.concreteComponentId?this.getConcreteComponent():this;
-        var handlers = component.handlers["change"];
+        var handlers = component.handlers && component.handlers["change"];
         var observers=[];
         var keypath = key+".";
         for(var handler in handlers){

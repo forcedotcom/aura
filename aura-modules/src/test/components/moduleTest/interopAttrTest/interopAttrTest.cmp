@@ -3,7 +3,7 @@
     <aura:attribute name="items" type="List" default="[]"/>
     <aura:attribute name="programmatic" type="Aura.Component"/>
 
-    <moduleTest:simpleCmp aura:id="main" literal="{!v.bool}" />
+    <moduleTest:simpleCmp aura:id="main" literal="{!v.bool}" expression="{! $Label.Section1.renderer }" />
 
     <moduleTest:list aura:id="list" items="{!v.items}" />
     <moduleTest:list aura:id="list-without-items" />

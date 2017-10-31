@@ -209,7 +209,7 @@ public class StyleServiceImpl implements StyleService {
 
             // second pass evaluates as normal (applies token function values, conditionals, etc...)
             List<Plugin> contextual = styleAdapter.getContextualRuntimePlugins();
-            css = CssPreprocessor.runtime()
+            css = CssPreprocessor.runtime(styleContext, styleAdapter)
                     .source(css)
                     .tokens(style.getDescriptor())
                     .extras(contextual)

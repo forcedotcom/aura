@@ -55,7 +55,7 @@ import java.util.Set;
 /**
  * Parses CSS source code.
  *
- * Use either {@link #initial(StyleAdapter)} or {@link #runtime()} to get started.
+ * Use either {@link #initial(StyleAdapter)} {@link #runtime(StyleContext,StyleAdapter)} to get started.
  */
 public final class CssPreprocessor {
     /** Use one of the constructor methods */

@@ -19,11 +19,11 @@ package org.auraframework.test.perf;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.service.InstanceService;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -37,9 +37,14 @@ import java.util.Map;
  * eg. A custom component namespaces could provide different values for white/black list attributes
  */
 public class PerfMockAttributeValueProvider {
-    public static final PerfMockAttributeValueProvider DEFAULT_INSTANCE = new PerfMockAttributeValueProvider();
     private static final Map<String, List<String>> blacklistedAttributes;
     private static final Map<String, Map<String, Object>> whitelistedAttributes;
+
+    private InstanceService instanceService;
+
+    public PerfMockAttributeValueProvider(InstanceService instanceService) {
+        this.instanceService = instanceService;
+    }
 
     static {
         Map<String, List<String>> blacklist = Maps.newHashMap();
@@ -120,7 +125,7 @@ public class PerfMockAttributeValueProvider {
             // TODO: This returns a mock data provider component,
             // It covers most of list component such ui:list, ui:autocompleteList, ui:infiniteList, ui:autocomplete
             // We may need to provide different mock Component as we expand our test.
-            return Aura.getInstanceService().getInstance("perfTest:registeredComponentsDataProvider", ComponentDef.class);
+            return instanceService.getInstance("perfTest:registeredComponentsDataProvider", ComponentDef.class);
         } else if (descriptorName.equals("Aura.ComponentDefRef")) {
             // This mock ComponentDefRef is geared toward for list/autocomplete mock components.
             // see comment in Aura.Component mock value above

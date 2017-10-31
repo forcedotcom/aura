@@ -131,22 +131,22 @@ public abstract class AuraCompiler {
         }
 
         
-		List<Class<?>> configurationClasses = Lists.newArrayList(AuraConfiguration.class, ConfigAdapterImpl.class);
-		// Look for additional configuration classes
-		String classNames = System.getProperty("additionalConfigurationClasses");
-		if(classNames!=null){
-			for(String className : classNames.split(",")){
-				try {
-					Class<?> configurationClass = Class.forName(className);
-					configurationClasses.add(configurationClass);
-				} catch (Throwable t) {
-					System.err.println("Failed to load configuration class: " + className);
-				}
-			}
-		}
-		
-		AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(
-				configurationClasses.toArray(new Class<?>[configurationClasses.size()]));
+        List<Class<?>> configurationClasses = Lists.newArrayList(AuraConfiguration.class, ConfigAdapterImpl.class);
+        // Look for additional configuration classes
+        String classNames = System.getProperty("additionalConfigurationClasses");
+        if(classNames!=null){
+            for(String className : classNames.split(",")){
+                try {
+                    Class<?> configurationClass = Class.forName(className);
+                    configurationClasses.add(configurationClass);
+                } catch (Throwable t) {
+                    System.err.println("Failed to load configuration class: " + className);
+                }
+            }
+        }
+        
+        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(
+                        configurationClasses.toArray(new Class<?>[configurationClasses.size()]));
 
         try {
             Boolean modulesEnabled = Boolean.valueOf(System.getProperty("aura.modules"));

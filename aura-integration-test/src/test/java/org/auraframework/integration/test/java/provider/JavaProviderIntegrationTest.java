@@ -17,7 +17,6 @@ package org.auraframework.integration.test.java.provider;
 
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ProviderDef;
@@ -38,7 +37,7 @@ public class JavaProviderIntegrationTest extends AuraImplTestCase {
         Map<String, Object> attributes = Maps.newHashMap();
 
         attributes.put("whatToDo", "replace");
-        Component component = Aura.getInstanceService().getInstance("test:test_Provider_Concrete", ComponentDef.class,
+        Component component = instanceService.getInstance("test:test_Provider_Concrete", ComponentDef.class,
                 attributes);
         assertEquals("Java Provider: Failed to retrieve the right implementation for the interface.",
                 component.getDescriptor().getQualifiedName(), "markup://test:test_Provider_Concrete_Sub");
@@ -49,7 +48,7 @@ public class JavaProviderIntegrationTest extends AuraImplTestCase {
         Map<String, Object> attributes = Maps.newHashMap();
 
         attributes.put("whatToDo", "label");
-        Component component = Aura.getInstanceService().getInstance("test:test_Provider_Concrete", ComponentDef.class,
+        Component component = instanceService.getInstance("test:test_Provider_Concrete", ComponentDef.class,
                 attributes);
         assertEquals("Java Provider: Failed to retrieve the right implementation for the interface.",
                 component.getDescriptor().getQualifiedName(), "markup://test:test_Provider_Concrete");
@@ -61,7 +60,7 @@ public class JavaProviderIntegrationTest extends AuraImplTestCase {
 
         attributes.put("whatToDo", "replaceBad");
         try {
-            Aura.getInstanceService().getInstance("test:test_Provider_Concrete", ComponentDef.class, attributes);
+            instanceService.getInstance("test:test_Provider_Concrete", ComponentDef.class, attributes);
             fail("expected exception for bad provider return");
         } catch (Exception e) {
             checkExceptionFull(e, AuraRuntimeException.class, "markup://test:fakeApplication is not a component");
@@ -74,7 +73,7 @@ public class JavaProviderIntegrationTest extends AuraImplTestCase {
 
         attributes.put("whatToDo", "replaceNotFound");
         try {
-            Aura.getInstanceService().getInstance("test:test_Provider_Concrete", ComponentDef.class, attributes);
+            instanceService.getInstance("test:test_Provider_Concrete", ComponentDef.class, attributes);
             fail("expected exception for bad provider return");
         } catch (Exception e) {
             checkExceptionFull(e, AuraRuntimeException.class,
@@ -87,7 +86,7 @@ public class JavaProviderIntegrationTest extends AuraImplTestCase {
      */
     @Test
     public void testJavaProviderProvidesExtentingCmpWhenAbstractCmpGetsInstantiated() throws Exception {
-        Component component = Aura.getInstanceService().getInstance("test:test_Provider_AbstractBasic",
+        Component component = instanceService.getInstance("test:test_Provider_AbstractBasic",
                 ComponentDef.class);
         String actual = component.getDescriptor().getQualifiedName();
         assertEquals("Java Provider: Failed to retrieve the component extending abstract component.",
@@ -150,7 +149,7 @@ public class JavaProviderIntegrationTest extends AuraImplTestCase {
         String resourceSource = "<aura:component provider='java://org.auraframework.impl.java.provider.TestProviderThrowsExceptionDuringProvide'></aura:component>";
         DefDescriptor<ComponentDef> cmpDefDesc = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource);
         try {
-            Aura.getInstanceService().getInstance(cmpDefDesc.getDescriptorName(), ComponentDef.class);
+            instanceService.getInstance(cmpDefDesc.getDescriptorName(), ComponentDef.class);
             fail("Should have thrown exception in provider's provide() method.");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Exception from TestProviderThrowsExceptionDuringProvide");

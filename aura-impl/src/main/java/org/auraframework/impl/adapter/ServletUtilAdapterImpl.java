@@ -991,10 +991,14 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Autowired(required = false)
-    public void setInlineJSAppenders(List<InlineJSAppender> inlineJsAppenders) { this.inlineJsAppenders = inlineJsAppenders; }
+    public void setInlineJSAppenders(List<InlineJSAppender> inlineJsAppenders) {
+        this.inlineJsAppenders = inlineJsAppenders;
+    }
 
     @Inject
-    public void setCspInliningService(CSPInliningService service) {this.cspInliningService = service;}
+    public void setCspInliningService(CSPInliningService service) {
+        this.cspInliningService = service;
+    }
     /**
      * Exposed for testing
      */

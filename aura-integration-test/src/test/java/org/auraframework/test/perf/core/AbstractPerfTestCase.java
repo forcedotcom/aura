@@ -161,17 +161,17 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
     }
 
     protected PerfMockAttributeValueProvider getMockAttributeValueProvider() {
-        return PerfMockAttributeValueProvider.DEFAULT_INSTANCE;
+        return new PerfMockAttributeValueProvider(instanceService);
     }
 
     private Map<String, Object> getComponentAttributeValues(DefDescriptor<ComponentDef> componentDefDefDescriptor)
             throws QuickFixException {
         Map<String, Object> params = Maps.newHashMap();
         Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = definitionService.getDefinition(componentDefDefDescriptor).getAttributeDefs();
+        PerfMockAttributeValueProvider valueProvider = getMockAttributeValueProvider();
 
         for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> attr : attrs.entrySet()) {
-            Object attributeValue = getMockAttributeValueProvider().getAttributeValue(componentDefDefDescriptor,
-                    attr.getValue());
+            Object attributeValue = valueProvider.getAttributeValue(componentDefDefDescriptor, attr.getValue());
             if (attributeValue != null) {
                 params.put(attr.getKey().getName(), attributeValue);
             }

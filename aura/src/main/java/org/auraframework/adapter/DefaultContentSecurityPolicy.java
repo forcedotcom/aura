@@ -55,9 +55,11 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
      * Creates a default policy.
      *
      * @param inline whether to allow inline script and style. It's better not to, but legacy is what legacy is.
+     * @deprecated use injection to get csp inlining service
      */
+    @Deprecated
     public DefaultContentSecurityPolicy(boolean inline) {
-	this(inline, Aura.getCspInliningService());
+        this(inline, Aura.getCspInliningService());
     }
 
     /**

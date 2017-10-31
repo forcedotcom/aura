@@ -29,7 +29,6 @@ import org.auraframework.def.Definition;
 import org.auraframework.instance.Instance;
 import org.auraframework.service.BuilderService;
 import org.auraframework.service.CSPInliningService;
-import org.auraframework.service.CachingService;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.ConverterService;
 import org.auraframework.service.DefinitionService;
@@ -37,9 +36,7 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.service.IntegrationService;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.service.LoggingService;
-import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.util.adapter.SourceControlAdapter;
 import org.auraframework.util.json.JsonSerializerFactory;
 
 
@@ -55,16 +52,13 @@ public class Aura implements AuraDeprecated {
     private static DefinitionService definitionService;
     private static ContextService contextService;
     private static InstanceService instanceService;
-    private static SourceControlAdapter sourceControlAdapter;
     private static ConverterService converterService;
     private static BuilderService builderService;
     private static LocalizationService localizationService;
     private static JsonSerializerFactory jsonSerializerFactory;
     private static List<JsonSerializerAdapter> jsonSerializerAdapters;
-    private static CachingService cachingService;
     private static ExceptionAdapter exceptionAdapter;
     private static LocalizationAdapter localizationAdapter;
-    private static ServerService serverService;
     private static CSPInliningService cspInliningService;
 
     @Inject
@@ -80,9 +74,8 @@ public class Aura implements AuraDeprecated {
         exceptionAdapter = adapter;
     }
 
-    @Inject
-    public void setCachingService(CachingService service) {
-        cachingService = service;
+    @Deprecated
+    public void setCachingService(Object service) {
     }
     
     @Inject
@@ -125,9 +118,8 @@ public class Aura implements AuraDeprecated {
         styleAdapter = adapter;
     }
 
-    @Inject
-    public void setSourceControlAdapter(SourceControlAdapter adapter) {
-        sourceControlAdapter = adapter;
+    @Deprecated
+    public void setSourceControlAdapter(Object adapter) {
     }
 
     @Inject
@@ -150,9 +142,8 @@ public class Aura implements AuraDeprecated {
         localizationService = service;
     }
 
-    @Inject
-    public void setServerService(ServerService service) {
-        serverService = service;
+    @Deprecated
+    public void setServerService(Object service) {
     }
 
     /**
@@ -183,7 +174,8 @@ public class Aura implements AuraDeprecated {
     /**
      * Get the Instance Service: for constructing an {@link Instance} of a {@link Definition}
      */
-    // Used by: Everybody
+    // Used by: A few places, mostly tests.
+    @Deprecated
     public static InstanceService getInstanceService() {
         return instanceService;
     }
@@ -194,14 +186,6 @@ public class Aura implements AuraDeprecated {
     // Used by: Everybody
     public static ConfigAdapter getConfigAdapter() {
         return configAdapter;
-    }
-
-    /**
-     * Get the Source Control Adapter : Allows interaction with the source control system.
-     */
-    // Used by FileSource
-    public static SourceControlAdapter getSourceControlAdapter() {
-        return sourceControlAdapter;
     }
 
     /**
@@ -254,14 +238,6 @@ public class Aura implements AuraDeprecated {
     public static List<JsonSerializerAdapter> getJsonSerializerAdapters() {
         return jsonSerializerAdapters;
     }
-    /**
-     * USE INJECTION INSTEAD
-     * @return
-     */
-    @Deprecated
-    public static CachingService getCachingService() {
-        return cachingService;
-    }
 
     /**
      * USE INJECTION INSTEAD
@@ -283,19 +259,11 @@ public class Aura implements AuraDeprecated {
 
     /**
      * USE INJECTION INSTEAD
-     * @return
-     */
-    @Deprecated
-    public static ServerService getServerService() {
-        return serverService;
-    }
-
-    /**
-     * USE INJECTION INSTEAD
      * @return the csp inline service
      *
      */
     // Used by: SFDCContentSecurityPolicy
+    @Deprecated
     public static CSPInliningService getCspInliningService() {
         return cspInliningService;
     }

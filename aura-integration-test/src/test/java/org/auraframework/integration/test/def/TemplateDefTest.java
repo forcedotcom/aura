@@ -171,8 +171,7 @@ public class TemplateDefTest extends AuraImplTestCase {
                 String.format(baseComponentTag,
                         String.format("template='%s:%s'", template.getNamespace(), template.getName()), ""));
         try {
-            //Aura.getInstanceService().getInstance(template);
-        	definitionService.getDefinition(cmp);
+            definitionService.getDefinition(cmp);
             fail("Template components cannot be abstract.");
         } catch (Exception expected) {
             checkExceptionFull(expected, InvalidDefinitionException.class,
@@ -194,7 +193,7 @@ public class TemplateDefTest extends AuraImplTestCase {
                 String.format(baseComponentTag,
                         String.format("extends='%s:%s'", parent.getNamespace(), parent.getName()), ""));
         try {
-        	definitionService.getDefinition(child);
+            definitionService.getDefinition(child);
             fail("Non-templates cannot extend template.");
         } catch (Exception expected) {
             checkExceptionFull(expected, InvalidDefinitionException.class,

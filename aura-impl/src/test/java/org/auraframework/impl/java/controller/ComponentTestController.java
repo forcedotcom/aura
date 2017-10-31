@@ -18,30 +18,35 @@ package org.auraframework.impl.java.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.auraframework.Aura;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.instance.Component;
+import org.auraframework.service.InstanceService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 
 @ServiceComponent
 public class ComponentTestController implements Controller {
+    @Inject
+    InstanceService instanceService;
 
     @AuraEnabled
-    public static List<Component> createComponentsOnServer(@Key("descriptors") List<String> descriptors) throws Exception {
+    public List<Component> createComponentsOnServer(@Key("descriptors") List<String> descriptors) throws Exception {
         List<Component> components = new ArrayList<>();
         for(String descriptor: descriptors) {
-            Component cmp = Aura.getInstanceService().getInstance(descriptor, ComponentDef.class);
+            Component cmp = instanceService.getInstance(descriptor, ComponentDef.class);
             components.add(cmp);
         }
         return components;
     }
 
     @AuraEnabled
-    public static String retrieveServerComponentGlobalId(@Key("descriptor") String descriptor) throws Exception {
-        Component cmp = Aura.getInstanceService().getInstance(descriptor, ComponentDef.class);
+    public String retrieveServerComponentGlobalId(@Key("descriptor") String descriptor) throws Exception {
+        Component cmp = instanceService.getInstance(descriptor, ComponentDef.class);
         return cmp.getGlobalId();
     }
 }

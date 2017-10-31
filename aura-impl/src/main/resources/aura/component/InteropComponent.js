@@ -446,7 +446,8 @@ InteropComponent.prototype.swapInteropElement = function (currentElement, newEle
     }
 
     this.disassociateElements();
-    // moveReferencesToMarker calls $A.util.insertBefore so it needs to be called before replaceChild to guarantee currentElement still has parent
+    // moveReferencesToMarker calls $A.util.insertBefore however we want to control dom connected here
+    // so we check for swap existence in moveReferencesToMarker and skip insertBefore call
     $A.renderingService.moveReferencesToMarker(currentElement, newElement);
     currentElement.parentElement.replaceChild(newElement, currentElement);
     this.associateElement(newElement);

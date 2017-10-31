@@ -1198,11 +1198,12 @@ AuraRenderingService.prototype.removeElement = function(marker, container) {
  */
 AuraRenderingService.prototype.moveReferencesToMarker = function(marker, newMarker) {
     var references = this.getMarkerReferences(marker);
+    var isSwap = !!newMarker;
     newMarker = newMarker || this.createMarker(null, "unrender marker: " + marker.nodeValue);
 
     if(references) {
         var collection = references.get();
-        for(var c=collection.length;c>=0;c--) {
+        for(var c=collection.length-1;c>=0;c--) {
             var cmp = $A.getComponent(collection[c]);
             if(cmp && !cmp.destroyed) {
                 this.setMarker(cmp, newMarker);
@@ -1210,8 +1211,9 @@ AuraRenderingService.prototype.moveReferencesToMarker = function(marker, newMark
         }
     }
 
+    // If this is a swap by interop, interop would take care of DOM node replacement so no need for insertBefore
     // If the marker is actually being used by others, then go ahead and put it in the dom.
-    if(this.isSharedMarker(newMarker)) {
+    if(!isSwap && this.isSharedMarker(newMarker)) {
         $A.util.insertBefore(newMarker, marker);
     }
 };

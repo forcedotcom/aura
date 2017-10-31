@@ -1,0 +1,4 @@
+<aura:component>
+    <aura:attribute name="lifeCycleLog" type="String[]" />
+    <moduleTest:lifeCycleCmp lifeCycleLog="{! v.lifeCycleLog}"></moduleTest:lifeCycleCmp>
+</aura:component>

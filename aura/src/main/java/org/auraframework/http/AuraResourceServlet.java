@@ -92,7 +92,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
         response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
         AuraContext context = contextService.getCurrentContext();
         AuraResource resource = findResource((String) request.getAttribute(ORIG_REQUEST_URI));
-        if (resource == null) {
+        if (resource == null || context.getApplicationDescriptor() == null) {
             servletUtilAdapter.send404(getServletContext(), request, response);
             return;
         }

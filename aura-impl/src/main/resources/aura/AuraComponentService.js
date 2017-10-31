@@ -85,6 +85,7 @@ AuraComponentService.prototype.initCoreModules = function () {
     this.addModule("markup://logger", "logger", [], null, Aura.ExportsLogger);
     this.addModule("markup://aura", "aura", [], null, Aura.ExportsModule);
     this.addModule("markup://aura-storage", "aura-storage", [], null, Aura.ExportsStorage);
+    this.addModule("markup://aura-instrumentation", "aura-instrumentation", [], null, Aura.ExportsMetricsService);
 
     
     // Register proxy-compat helpers

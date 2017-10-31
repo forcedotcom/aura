@@ -1,0 +1,4 @@
+<aura:component>
+	<p>Testing instrumentation bridge</p>
+    <moduleTest:instrumentation aura:id="lib" />
+</aura:component>

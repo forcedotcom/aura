@@ -49,11 +49,11 @@ public class AppJsUtilAdapterImpl implements AppJsUtilAdapter {
 
     @Override
     public Set<DefDescriptor<?>> getPartDependencies(Set<DefDescriptor<?>> dependencies, DefDescriptor<? extends BaseComponentDef> appDesc, int partIndex) {
-        String appName = appDesc.getQualifiedName();
-        if (dependencies == null) {
+        if (dependencies == null || appDesc == null) {
             return null;
         }
-    
+
+        String appName = appDesc.getQualifiedName();
         Set<DefDescriptor<?>> dependenciesPart1 = Sets.newHashSet();
         Set<DefDescriptor<?>> dependenciesPart2 = Sets.newHashSet();
         int size = dependencies.size();

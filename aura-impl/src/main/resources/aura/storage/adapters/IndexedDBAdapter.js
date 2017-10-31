@@ -135,6 +135,11 @@ IndexedDBAdapter.prototype.initializeInternal = function(version, transactionTim
     var dbRequest;
     var that = this;
 
+    if (!transactionTimer) {
+        transactionTimer = this.thresholdMetricTimer("performance:storage-indexeddb-open-transaction");
+        transactionTimer.info = {"wasBlocked":false, "wasUpgraded":false};
+    }
+
     // it's been observed that indexedDB.open() does not trigger any event when it is under significant
     // load (eg multiple frames concurrently calling open()). this hangs this adapter's init so apply
     // a maximum wait time before moving to a permanent error state.
@@ -143,14 +148,11 @@ IndexedDBAdapter.prototype.initializeInternal = function(version, transactionTim
             // setup hasn't completed so move to permanenet error state
             var message = "initializeInternal(): timed out setting up DB";
             that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-            that.initializeComplete(false, message);
+            transactionTimer.info["failureCause"] = "timedout";
+            that.initializeComplete(false, message, transactionTimer);
         }, IndexedDBAdapter.INITIALIZE_TIMEOUT);
     }
 
-    if (!transactionTimer) {
-        transactionTimer = this.thresholdMetricTimer("performance:storage-indexeddb-open-transaction");
-        transactionTimer.info = {"wasBlocked":false, "wasUpgraded":false};
-    }
     if (version) {
         // version is dynamic because it needs to be incremented when we need to create an objectStore
         // for the current app or cmp. IndexedDB only allows modifications to db or objectStore during
@@ -167,21 +169,26 @@ IndexedDBAdapter.prototype.initializeInternal = function(version, transactionTim
         that.createTables(e);
         transactionTimer.info["wasUpgraded"] = true;
     };
+
     dbRequest.onsuccess = function(e) {
         that.setupDB(e, transactionTimer);
     };
+
     dbRequest.onerror = function(e) {
         // this means we have no storage.
         var message = "initializeInternal(): error opening DB";
         message += (e.target.error && e.target.error.message) ? ": "+e.target.error.message : "";
         that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+        transactionTimer.info["failureCause"] = "error";
         // reject all pending operations
-        that.initializeComplete(false, message);
+        that.initializeComplete(false, message, transactionTimer);
         // prevent uncatchable InvalidStateError in FF private mode
         e.preventDefault && e.preventDefault();
     };
+
     dbRequest.onblocked = function(/*error*/) {
-        that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "initializeInternal(): blocked from opening DB, most likely by another open browser tab");
+        var message = "initializeInternal(): blocked from opening DB, most likely by another open browser tab";
+        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
         transactionTimer.info["wasBlocked"] = true;
     };
 };
@@ -291,8 +298,7 @@ IndexedDBAdapter.prototype.setupDB = function(event, transactionTimer) {
         db.close();
         this.initializeInternal(currentVersion + 1, transactionTimer);
     } else {
-        this.initializeComplete(true);
-        transactionTimer.end(transactionTimer.info);
+        this.initializeComplete(true, null, transactionTimer);
     }
 };
 
@@ -328,20 +334,27 @@ IndexedDBAdapter.prototype.createTables = function(event) {
 /**
  * Marks initialization of the adapter as completed successfully or not.
  * @param {Boolean} ready True if the adapter is ready; false if the adapter is in permanent error state.
- * @param {String} error If ready is false, the error message describing cause of the initialization failure.
+ * @param {String} errorMessage If ready is false, the error message describing cause of the initialization failure.
+ * @param {Object} transactionTimer measuring time taken to open/initialize db.
  * @private
  */
-IndexedDBAdapter.prototype.initializeComplete = function(ready, error) {
+IndexedDBAdapter.prototype.initializeComplete = function(ready, errorMessage, transactionTimer) {
     if (this.ready !== undefined) {
         return;
     }
+
     this.ready = !!ready;
+    transactionTimer.info["initSucceeded"] = this.ready;
+    transactionTimer.end(transactionTimer.info);
+
     clearTimeout(this.initializeTimeoutId);
+
     if (this.ready) {
         this.initializePromiseResolve();
     } else {
-        this.initializePromiseReject(new Error(error));
+        this.initializePromiseReject(new Error(errorMessage));
     }
+
     delete this.initializePromiseResolve;
     delete this.initializePromiseReject;
 };

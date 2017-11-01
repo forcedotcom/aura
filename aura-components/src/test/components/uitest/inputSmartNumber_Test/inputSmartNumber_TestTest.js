@@ -64,6 +64,28 @@
         }]
     },
 
+    testInputNumberAllowAllCharsOnComposition: {
+        attributes: {testInputCmp: "inputNumber"},
+        test: [
+            function (cmp) {
+                var elm = this.getInputElement(cmp);
+                $A.test.fireDomEvent(elm, 'compositionstart');
+                this.inputValue('10~');
+            },
+            function (cmp) {
+                var elm = this.getInputElement(cmp);
+                $A.test.assertEquals('10~', elm.value, 'Input should be allowing non number characters as well when being composed');
+            },
+            function (cmp) {
+                this.triggerUpdateCmpElmValues();
+            },
+            function (cmp) {
+                var inputElm = cmp.find('input');
+                $A.test.assertEquals(10, inputElm.get('v.value'), 'Input should have normalized non number characters and should have kept only numbers');
+            }
+        ]
+    },
+
     /**********************
      * InputCurrency Tests
      **********************/

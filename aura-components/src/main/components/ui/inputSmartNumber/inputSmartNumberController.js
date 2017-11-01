@@ -36,7 +36,7 @@
             // undo inserting composed text by keyboard or else we'll have duplicated inputs.
             helper.restoreLastInputValue(cmp);
 
-        } else if (helper.isInputValueValid(cmp)) {
+        } else if (helper.isInputValueValid(cmp) || helper.isCompositionStart(cmp)) {
             helper.updateLastInputValue(cmp);
             if (helper.weHaveToUpdate(cmp, 'input')) {
                 helper.setNewValue(cmp);

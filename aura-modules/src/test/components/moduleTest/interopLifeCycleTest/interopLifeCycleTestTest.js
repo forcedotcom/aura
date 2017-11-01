@@ -1,5 +1,6 @@
 ({
     testInteropLifeCycle: {
+        browsers: ['GOOGLECHROME'],
         test: [
             function (cmp) {
                 var expected = [

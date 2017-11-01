@@ -3,7 +3,8 @@
 
     selector: {
         literal: '.m-literal span',
-        expression: '.m-expr span'
+        expression: '.m-expr span',
+        changeValuesBtn: '#change-values'
     },
 
     testFalsy: {
@@ -160,6 +161,54 @@
                     2,
                     'Wrong number of items has been rendered'
                 );
+            }
+        ]
+    },
+    testCanReadPublicAccessors: {
+        browsers: ['GOOGLECHROME'],
+        test: [
+            function (cmp) {
+                var interopCmp = cmp.find('main');
+
+                $A.test.assertEquals('accessor-test-value', interopCmp.get('v.myAccessor'), 'should be able to read public accessor');
+            }
+        ]
+    },
+    testCanReadUpdatedAccessorValue: {
+        browsers: ['GOOGLECHROME'],
+        test: [
+            function (cmp) {
+                var interopCmp = cmp.find('main');
+                interopCmp.getElement().querySelector(this.selector.changeValuesBtn).click();
+
+                $A.test.assertEquals('modified-accessor-value', interopCmp.get('v.myAccessor'), 'should be able to read accessor modified value');
+            }
+        ]
+    },
+    testCanPassPRV: {
+        browsers: ['GOOGLECHROME'],
+        test: [
+            function (cmp) {
+                $A.test.assertEquals('accessor-test-value', cmp.get('v.accessorValue'), 'accessor value should be reflected on the PRV.');
+
+                var interopCmp = cmp.find('main');
+                interopCmp.getElement().querySelector(this.selector.changeValuesBtn).click();
+
+                $A.test.assertEquals('modified-accessor-value', cmp.get('v.accessorValue'), 'should be able to read accessor modified value from the bound template');
+            }
+        ]
+    },
+    testAccessorIgnoresPassedPrimitiveValue: {
+        browsers: ['GOOGLECHROME'],
+        test: [
+            function (cmp) {
+                var interopCmp = cmp.find('accessor-primitive-value');
+                $A.test.assertEquals('accessor-test-value', interopCmp.get('v.myAccessor'), 'accessor should ignore passed primitive value.');
+
+                var interopCmp = cmp.find('accessor-primitive-value');
+                interopCmp.getElement().querySelector(this.selector.changeValuesBtn).click();
+
+                $A.test.assertEquals('modified-accessor-value', interopCmp.get('v.myAccessor'), 'should be able to read accessor modified value');
             }
         ]
     }

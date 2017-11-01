@@ -166,6 +166,10 @@ InteropComponent.prototype.isHtmlGlobalAttr = function (attrName) {
     return InteropComponent.HTML_GLOBAL_ATTRS[attrName] || false;
 };
 
+InteropComponent.prototype.isReadOnlyProperty = function (propName) {
+    return this.interopDef['props'][propName]['config'] === 1;
+};
+
 InteropComponent.HTML_GLOBAL_ATTRS = {
     'accesskey': true,
     'class': true,
@@ -220,7 +224,7 @@ InteropComponent.prototype.attributeChange = function (key, value) {
         // we should first ask about propName, usually we have aura versions using a global attr, like style.
         if (!propName && this.isHtmlGlobalAttr(key)) {
             this.setGlobalAttribute(element, key, value);
-        } else {
+        } else if (!this.isReadOnlyProperty(propName)) { // we ignore changes on read only properties
             element[propName] =  value;
         }
     }
@@ -417,7 +421,7 @@ InteropComponent.prototype.setupInteropInstance = function () {
             element.addEventListener(attrName.substring(2), value, false);
         } else if (!propName && this.isHtmlGlobalAttr(attrName)) { // first check we are not overriding this attrName
             this.setGlobalAttribute(element, attrName, value);
-        } else {
+        } else if (!cmp.isReadOnlyProperty(propName)) { // Don't throw when they set value on the template to some read only prop
             if (value !== undefined) {
                 element[propName] = value;
             }
@@ -454,6 +458,19 @@ InteropComponent.prototype.swapInteropElement = function (currentElement, newEle
     $A.renderingService.moveReferencesToMarker(currentElement, newElement);
     currentElement.parentElement.replaceChild(newElement, currentElement);
     this.associateElement(newElement);
+
+    // only for components, not libraries
+    if (typeof this.interopClass === 'function') {
+        var cmp = this;
+        var raptorCmp = this.getElement();
+
+        // Set public accessors in attribute bag so aura land can get it.
+        Object.keys(this.interopDef['props']).forEach(function (propName) {
+            if (cmp.isReadOnlyProperty(propName)) {
+                cmp.set('v.' + cmp.propNameToAttrMap[propName], raptorCmp[propName]);
+            }
+        });
+    }
 };
 
 /**
@@ -516,7 +533,7 @@ InteropComponent.prototype.destroy = function(){
 
     Object.keys(attrs).forEach(function (attrName) {
         var attrValue = attrs[attrName];
-        if ($A.util.isExpression(attrValue.value)) {
+        if (attrValue && $A.util.isExpression(attrValue.value)) {
             attrValue.value.removeChangeHandler(cmp, attrName);
         }
     });

@@ -305,15 +305,18 @@ PassthroughValue.prototype.set = function(key, value, ignoreChanges) {
               "[primaryProviders]: " + this.primaryProviders + '\n' +
               "[falls back component]: " + this.component + '\n');
     var path = key.split('.');
+
     if (this.primaryProviders.hasOwnProperty(path[0])){
         var provider = this.primaryProviders[path[0]];
 
         var fullPath = this.getExpression(key);
         var target=this.primaryProviders;
+        var subKey = path.slice(1).join(".");
+
         key=path[path.length-1];
 
         if(path.length > 1 && $A.util.isExpression(provider)) {
-            var reference = provider.getReference(key);
+            var reference = provider.getReference(subKey);
             if(reference) {
                 reference.set(value);
                 return undefined;

@@ -70,16 +70,19 @@ public class CacheEvictionListenerImplTest {
         String expectedMessage = "evicted 1 entries for size pressure, hit rate=0.110";
         long size = 99L;
 
-        listener = new CacheEvictionListenerImpl<>("test", loggingAdapter, 5, 1000, 1);
+        // This will set the start time to about the same as our current start time.
+        listener = Mockito.spy(new CacheEvictionListenerImpl<>("test", loggingAdapter, 5, 1000, 1));
+        long startTime = listener.getLastFullTime();
         cacheStats = new CacheStats(11, 89, 100, 0, 1, 1);
         Mockito.when(cache.stats()).thenReturn(cacheStats);
         Mockito.when(cache.size()).thenReturn(size);
         Mockito.when(loggingAdapter.getLoggingContext()).thenReturn(loggingContext);
         Mockito.when(loggingAdapter.isEstablished()).thenReturn(true);
         listener.setCache(cache);
-        Thread.sleep(5);
+        Mockito.doReturn(startTime+900).when(listener).getCurrentTime();
         listener.onRemoval(true);
         Mockito.verify(loggingContext, Mockito.times(1)).logCacheInfo(name, expectedMessage, size, cacheStats);
+        Mockito.doReturn(startTime+901).when(listener).getCurrentTime();
         listener.onRemoval(true);
         Mockito.verifyNoMoreInteractions(loggingContext);
     }
@@ -93,17 +96,18 @@ public class CacheEvictionListenerImplTest {
         String expectedMessage2 = "evicted 2 entries for size pressure, hit rate=0.110";
         long size = 99L;
 
-        listener = new CacheEvictionListenerImpl<>("test", loggingAdapter, 5, 1000, 1);
+        listener = Mockito.spy(new CacheEvictionListenerImpl<>("test", loggingAdapter, 5, 1000, 1));
+        long startTime = listener.getLastFullTime();
         cacheStats = new CacheStats(11, 89, 100, 0, 1, 1);
         Mockito.when(cache.stats()).thenReturn(cacheStats);
         Mockito.when(cache.size()).thenReturn(size);
         Mockito.when(loggingAdapter.getLoggingContext()).thenReturn(loggingContext);
         Mockito.when(loggingAdapter.isEstablished()).thenReturn(true);
         listener.setCache(cache);
-        Thread.sleep(5);
+        Mockito.doReturn(startTime+10).when(listener).getCurrentTime();
         listener.onRemoval(true);
         Mockito.verify(loggingContext, Mockito.times(1)).logCacheInfo(name, expectedMessage, size, cacheStats);
-        Thread.sleep(5);
+        Mockito.doReturn(startTime+15).when(listener).getCurrentTime();
         listener.onRemoval(true);
         Mockito.verify(loggingContext, Mockito.times(1)).logCacheInfo(name, expectedMessage2, size, cacheStats);
         Mockito.verifyNoMoreInteractions(loggingContext);
@@ -125,19 +129,20 @@ public class CacheEvictionListenerImplTest {
         String expectedMessage2 = "evicted 2 entries for size pressure, hit rate=0.110";
         long size = 99L;
 
-        listener = new CacheEvictionListenerImpl<>("test", loggingAdapter, 5, 5, 1);
+        listener = Mockito.spy(new CacheEvictionListenerImpl<>("test", loggingAdapter, 5, 5, 1));
+        long startTime = listener.getLastFullTime();
         cacheStats = new CacheStats(11, 89, 100, 0, 1, 1);
         Mockito.when(cache.stats()).thenReturn(cacheStats);
         Mockito.when(cache.size()).thenReturn(size);
         Mockito.when(loggingAdapter.getLoggingContext()).thenReturn(loggingContext);
         Mockito.when(loggingAdapter.isEstablished()).thenReturn(true);
         listener.setCache(cache);
-        Thread.sleep(5);
+        Mockito.doReturn(startTime+5).when(listener).getCurrentTime();
         listener.onRemoval(true);
         Mockito.verify(loggingContext, Mockito.times(1)).logCacheInfo(name, expectedMessage, size, cacheStats);
         listener.onRemoval(true);
         Mockito.verify(loggingContext, Mockito.times(0)).logCacheInfo(name, expectedMessage2, size, cacheStats);
-        Thread.sleep(5);
+        Mockito.doReturn(startTime+10).when(listener).getCurrentTime();
         listener.onRemoval(false);
         Mockito.verify(loggingContext, Mockito.times(1)).logCacheInfo(name, expectedMessage2, size, cacheStats);
         Mockito.verifyNoMoreInteractions(loggingContext);
@@ -152,20 +157,21 @@ public class CacheEvictionListenerImplTest {
         String expectedMessage2 = "evicted 2 entries for size pressure, hit rate=0.110";
         long size = 99L;
 
-        listener = new CacheEvictionListenerImpl<>("test", loggingAdapter, 5, 5, 1);
+        listener = Mockito.spy(new CacheEvictionListenerImpl<>("test", loggingAdapter, 5, 5, 1));
+        long startTime = listener.getLastFullTime();
         cacheStats = new CacheStats(11, 89, 100, 0, 1, 1);
         Mockito.when(cache.stats()).thenReturn(cacheStats);
         Mockito.when(cache.size()).thenReturn(size);
         Mockito.when(loggingAdapter.getLoggingContext()).thenReturn(loggingContext);
         Mockito.when(loggingAdapter.isEstablished()).thenReturn(true);
         listener.setCache(cache);
-        Thread.sleep(5);
+        Mockito.doReturn(startTime+5).when(listener).getCurrentTime();
         listener.onRemoval(true);
         Mockito.verify(loggingContext, Mockito.times(1)).logCacheInfo(name, expectedMessage, size, cacheStats);
         listener.onRemoval(true);
         listener.onRemoval(false);
         Mockito.verify(loggingContext, Mockito.times(0)).logCacheInfo(name, expectedMessage2, size, cacheStats);
-        Thread.sleep(5);
+        Mockito.doReturn(startTime+10).when(listener).getCurrentTime();
         listener.onRemoval(false);
         Mockito.verify(loggingContext, Mockito.times(1)).logCacheInfo(name, expectedMessage2, size, cacheStats);
         Mockito.verifyNoMoreInteractions(loggingContext);
@@ -179,17 +185,18 @@ public class CacheEvictionListenerImplTest {
         String expectedMessage = "evicted 2 entries for size pressure, hit rate=0.110";
         long size = 99L;
 
-        listener = new CacheEvictionListenerImpl<>("test", loggingAdapter, 5, 5, 1);
+        listener = Mockito.spy(new CacheEvictionListenerImpl<>("test", loggingAdapter, 5, 5, 1));
+        long startTime = listener.getLastFullTime();
         cacheStats = new CacheStats(11, 89, 100, 0, 1, 1);
         Mockito.when(cache.stats()).thenReturn(cacheStats);
         Mockito.when(cache.size()).thenReturn(size);
         Mockito.when(loggingAdapter.getLoggingContext()).thenReturn(loggingContext);
         Mockito.when(loggingAdapter.isEstablished()).thenReturn(false);
         listener.setCache(cache);
-        Thread.sleep(5);
+        Mockito.doReturn(startTime+5).when(listener).getCurrentTime();
         listener.onRemoval(true);
         listener.onRemoval(true);
-        Thread.sleep(5);
+        Mockito.doReturn(startTime+10).when(listener).getCurrentTime();
         listener.onRemoval(false);
         Mockito.verify(loggingContext, Mockito.times(0)).logCacheInfo(name, expectedMessage, size, cacheStats);
         Mockito.when(loggingAdapter.isEstablished()).thenReturn(true);

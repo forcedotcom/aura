@@ -50,8 +50,8 @@ public class CacheEvictionListenerImpl<K, T> implements RemovalListener<K, T> {
     /** Log threshold for next actual emission to logs */
     private long nextLogThreshold;
 
-    /** Log the entire stats once a day, regardless of evictions. */
-    private long lastFull = System.currentTimeMillis();
+    /** the time we last dumped full stats.  */
+    private long lastFull;
 
     private final long minTime;
 
@@ -78,14 +78,22 @@ public class CacheEvictionListenerImpl<K, T> implements RemovalListener<K, T> {
         this.maxTime = maxTime;
         this.interval = interval;
         this.nextLogThreshold = interval;
+        this.lastFull = getCurrentTime();
     }
 
     public void setCache(com.google.common.cache.Cache<K, T> cache) {
         this.cache = cache;
     }
 
+    /**
+     * current time so that we can test in a unit test (Statics are evil)
+     */
+    long getCurrentTime() {
+        return System.currentTimeMillis();
+    }
+
     public void onRemoval(boolean isSize) {
-        long current = System.currentTimeMillis();
+        long current = getCurrentTime();
         boolean haveLogging = (loggingAdapter != null && loggingAdapter.isEstablished());
         boolean emitForPressure = false;
         boolean maxTimeHasPassed;
@@ -138,5 +146,9 @@ public class CacheEvictionListenerImpl<K, T> implements RemovalListener<K, T> {
     @Override
     public void onRemoval(RemovalNotification<K, T> notification) {
         onRemoval(notification.getCause() == RemovalCause.SIZE);
+    }
+
+    public long getLastFullTime() {
+        return lastFull;
     }
 }

@@ -385,6 +385,23 @@ AuraClientService.prototype.getSourceMapsUrl = function (descriptor, type) {
 };
 
 /**
+ * @private
+ */
+AuraClientService.prototype.uncommentExporter = function (exporter) {
+    exporter = exporter.toString();
+    var start = exporter.indexOf('/*') + 2;
+    var end = exporter.lastIndexOf('*/');
+    return start < 0 || end < start ? exporter : exporter.substr(start, end - start);
+};
+
+/**
+ * @private
+ */
+AuraClientService.prototype.evalExporter = function(script, descriptor, type) {
+    return $A.util.globalEval("function () {" + script + " }", this.getSourceMapsUrl(descriptor, type));
+};
+
+/**
  * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
  *
  * @param {XmlHttpRequest} response the XHR object.
@@ -4300,7 +4317,7 @@ AuraClientService.prototype.getActionStorageName = function() {
  * Returns the globalId for the owner component.
  * Used on component instantiation.
  * @return {String} GlobalId of parent component
- * 
+ *
  * @private
  */
 AuraClientService.prototype.getCurrentAccessGlobalId = function () {

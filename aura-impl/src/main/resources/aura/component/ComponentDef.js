@@ -59,7 +59,7 @@ function ComponentDef(config) {
     // Initialize the concrete component class if provided
     if (config.hasOwnProperty(Json.ApplicationKey.COMPONENTCLASS)) {
         try {
-            var componentClass = $A.componentService.buildComponentExporter(descriptor.toString(), config[Json.ApplicationKey.COMPONENTCLASS]);
+            var componentClass = $A.clientService.evalExporter(config[Json.ApplicationKey.COMPONENTCLASS], descriptor.toString());
             componentClass();
         } catch (e) {
             var auraError = new $A.auraError("ComponentDef initialization error", e);

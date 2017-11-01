@@ -87,7 +87,7 @@ AuraComponentService.prototype.initCoreModules = function () {
     this.addModule("markup://aura-storage", "aura-storage", [], null, Aura.ExportsStorage);
     this.addModule("markup://aura-instrumentation", "aura-instrumentation", [], null, Aura.ExportsMetricsService);
 
-    
+
     // Register proxy-compat helpers
     var proxyPrefix = "proxy-compat/";
     Object.keys(ProxyObject).forEach(function (helper) {
@@ -1355,33 +1355,22 @@ AuraComponentService.prototype.addComponent = function(descriptor, exporter) {
 
 
 AuraComponentService.prototype.hydrateComponent = function(descriptor, exporter) {
-    var tmp = exporter.toString();
-    var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
-    tmp = tmp.substr(pos[0], pos[1] - pos[0]);
-    exporter = this.buildComponentExporter(descriptor, tmp);
+
+    var script = $A.clientService.uncommentExporter(exporter);
+    exporter = $A.clientService.evalExporter(script, descriptor);
 
     if(!exporter) {
         var defDescriptor = new Aura.System.DefDescriptor(descriptor);
         var includeComponentSource = defDescriptor.getPrefix() === "layout" || $A.clientService.isInternalNamespace(defDescriptor.getNamespace());
         var errorMessage = (!includeComponentSource) ?
             "Hydrating the component" + descriptor + " failed." :
-            "Hydrating the component" + descriptor + " failed.\n Exporter code: " + tmp;
+            "Hydrating the component" + descriptor + " failed.\n Exporter code: " + script;
         var auraError = new $A.auraError(errorMessage, null, $A.severity.QUIET);
         auraError.setComponent(descriptor);
         throw auraError;
     }
 
     return exporter();
-};
-
-/**
- * Evals the script and returns the result (exporter) of the operation
- * @param {String} descriptor Uses the pattern of namespace:component
- * @param {String} script A function that when executed will return the component object literal
- * @export
- */
-AuraComponentService.prototype.buildComponentExporter = function(descriptor, script) {
-	return $A.util.globalEval("function () {" + script + " }", $A.clientService.getSourceMapsUrl(descriptor));
 };
 
 /**

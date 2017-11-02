@@ -32,11 +32,10 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import javax.inject.Inject;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-
 import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSUPPORTED;
 
 // CSRF is only stored in persistent storage. indexedDB is not supported on Safari,
@@ -136,6 +135,36 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
         String actual = getTokenReceivedAtServer();
         assertEquals(expectedToken, actual);
 	}
+
+    @FreshBrowserInstance
+    @ThreadHostileTest("ConfigAdapter modified, can't tolerate other tests.")
+    @Test
+    public void testInvalidSessionExceptionReloadsPage() throws Exception {
+        String target = "/clientServiceTest/csrfTokenStorage.app";
+        open(target);
+
+        WebDriver driver = getDriver();
+        ((JavascriptExecutor) driver).executeScript("window.someMarkerVariable='waiting for reload'");
+        
+        Throwable cause = new RuntimeException("intentional");
+        RuntimeException expectedException = new InvalidSessionException(cause);
+        getMockConfigAdapter().setValidateCSRFToken((token) -> {
+            throw expectedException;
+        });
+        
+        WebElement trigger = getDriver().findElement(By.className("trigger"));
+        trigger.click();
+        
+        WebDriverWait wait = new WebDriverWait(getDriver(), getAuraUITestingUtil().getTimeout());
+        wait.withMessage("page was not reloaded").ignoring(StaleElementReferenceException.class).until(
+            new ExpectedCondition<Boolean>() {
+                @Override
+                public Boolean apply(WebDriver d) {
+                    return (Boolean)((JavascriptExecutor) d).executeScript("return !window.someMarkerVariable");
+                }
+            }
+        );
+    }
 
 	private String getTokenReceivedAtServer() throws InterruptedException {
 		// Look only at requests coming from this client

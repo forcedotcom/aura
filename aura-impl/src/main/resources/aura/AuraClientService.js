@@ -469,7 +469,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
             //
             // strip off the while(1) at the beginning
             //
-            text = text.substring(text.indexOf("*/")+2,text.lastIndexOf("/*"));
+            text = text.substring(text.indexOf("\n") + 1);
         }
         var resp = $A.util.json.decode(text);
 

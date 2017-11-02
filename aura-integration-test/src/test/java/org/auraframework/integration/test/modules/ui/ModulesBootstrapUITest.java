@@ -43,6 +43,22 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
     @Flapper
     @Test
     @TargetBrowsers({BrowserType.GOOGLECHROME}) // non-compat will fail in unsupported browsers
+    public void testInteropProd() throws Exception {
+        open("/moduletest/bootstrap.app", Mode.PROD);
+        doInteropTest();
+    }
+
+    @Flapper
+    @Test
+    @TargetBrowsers({BrowserType.IE11}) // IE11 is the main place we care about compat
+    public void testInteropCompatProd() throws Exception {
+        open("/moduletest/bootstrap.app", Mode.PROD);
+        doInteropTest();
+    }
+
+    @Flapper
+    @Test
+    @TargetBrowsers({BrowserType.GOOGLECHROME}) // non-compat will fail in unsupported browsers
     public void testInteropMinified() throws Exception {
         open("/moduletest/bootstrap.app?aura.compat=0", Mode.SELENIUM);
         doInteropTest();

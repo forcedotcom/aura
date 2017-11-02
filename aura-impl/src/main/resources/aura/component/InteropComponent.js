@@ -446,6 +446,7 @@ InteropComponent.prototype.swapInteropElement = function (currentElement, newEle
         parentGetElements.forEach(function(parentGetElement) {
             if (parentGetElement === currentElement) {
                 owner.associateElement(newElement);
+                $A.renderingService.addAuraClass(owner, newElement);
             } else {
                 owner.associateElement(parentGetElement);
             }

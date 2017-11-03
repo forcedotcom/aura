@@ -39,12 +39,13 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
     private static final By BY_M_BOUND = By.cssSelector(".m-bound");
     private static final By BY_M_UNBOUND = By.cssSelector(".m-unbound");
     private static final By BY_M_EXPR = By.cssSelector(".m-expr");
+    protected String BOOTSTRAP_APP_URL = "/moduletest/bootstrap.app";
 
     @Flapper
     @Test
     @TargetBrowsers({BrowserType.GOOGLECHROME}) // non-compat will fail in unsupported browsers
     public void testInteropProd() throws Exception {
-        open("/moduletest/bootstrap.app", Mode.PROD);
+        open(BOOTSTRAP_APP_URL, Mode.PROD);
         doInteropTest();
     }
 
@@ -52,7 +53,7 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
     @Test
     @TargetBrowsers({BrowserType.IE11}) // IE11 is the main place we care about compat
     public void testInteropCompatProd() throws Exception {
-        open("/moduletest/bootstrap.app", Mode.PROD);
+        open(BOOTSTRAP_APP_URL, Mode.PROD);
         doInteropTest();
     }
 
@@ -60,14 +61,14 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
     @Test
     @TargetBrowsers({BrowserType.GOOGLECHROME}) // non-compat will fail in unsupported browsers
     public void testInteropMinified() throws Exception {
-        open("/moduletest/bootstrap.app?aura.compat=0", Mode.SELENIUM);
+        open(BOOTSTRAP_APP_URL + "?aura.compat=0", Mode.SELENIUM);
         doInteropTest();
     }
 
     @Flapper
     @Test
     public void testInteropMinifiedCompat() throws Exception {
-        open("/moduletest/bootstrap.app?aura.compat=1", Mode.SELENIUM);
+        open(BOOTSTRAP_APP_URL + "?aura.compat=1", Mode.SELENIUM);
         doInteropTest();
     }
 
@@ -75,14 +76,14 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
     @Test
     @TargetBrowsers({BrowserType.GOOGLECHROME}) // non-compat will fail in unsupported browsers
     public void testInteropDev() throws Exception {
-        open("/moduletest/bootstrap.app?aura.compat=0", Mode.DEV);
+        open(BOOTSTRAP_APP_URL + "?aura.compat=0", Mode.DEV);
         doInteropTest();
     }
 
     @Flapper
     @Test
     public void testInteropDevCompat() throws Exception {
-        open("/moduletest/bootstrap.app?aura.compat=1", Mode.DEV);
+        open(BOOTSTRAP_APP_URL + "?aura.compat=1", Mode.DEV);
         doInteropTest();
     }
 

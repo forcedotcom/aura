@@ -2,6 +2,12 @@ import { Element, createElement, toString } from "engine";
 import * as testUtil from 'securemoduletest-test-util';
 
 export default class Simple extends Element {
+    @api literal = "Default literal";
+    @api bound = "Default bound";
+    @api unbound = "Default unbound";
+    @api expression = 'Default expression';
+    @api nested = "Default nested";
+
     @api
     testWindowIsSecure() {
         testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"

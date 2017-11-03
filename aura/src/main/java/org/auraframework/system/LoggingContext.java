@@ -82,7 +82,7 @@ public interface LoggingContext {
      * the logs with) that arises during normal, successful operation.
      */
     void info(String message);
-    
+
     /**
      * Logs a warning message, independent of context such as action or
      * timers, for which context-sensitive methods can be provided via other
@@ -91,7 +91,9 @@ public interface LoggingContext {
      * will be followed.
      */
     void warn(String message);
-    
+
+    void warn(String message, Throwable cause);
+
     /**
      * Logs an error message, independent of context such as action or timers,
      * for which context-sensitive methods can be provided via other methods.
@@ -108,7 +110,7 @@ public interface LoggingContext {
      */
     void error(String message, Throwable cause);
 
-	void serializeActions(Json json);
+    void serializeActions(Json json);
 
     void serialize(Json json);
 }

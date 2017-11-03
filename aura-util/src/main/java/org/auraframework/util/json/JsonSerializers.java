@@ -35,7 +35,6 @@ import java.util.TreeSet;
 import org.auraframework.util.date.DateOnly;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
-import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.Serialization.ReferenceScope;
 import org.auraframework.util.json.Serialization.ReferenceType;
 

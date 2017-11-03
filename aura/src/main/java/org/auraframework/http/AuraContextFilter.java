@@ -33,8 +33,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHeaders;
 import org.auraframework.AuraDeprecated;
 import org.auraframework.adapter.ConfigAdapter;
@@ -82,8 +80,6 @@ public class AuraContextFilter implements Filter {
     protected static final BooleanParam compatParam = new BooleanParam(AuraServlet.AURA_PREFIX + "compat", false);
 
     private String componentDir = null;
-
-    private static final Log LOG = LogFactory.getLog(AuraContextFilter.class);
 
     private AuraTestFilter testFilter;
 
@@ -157,7 +153,7 @@ public class AuraContextFilter implements Filter {
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
 
         if (contextService.isEstablished()) {
-            LOG.error("Aura context was not released correctly! New context will NOT be created.");
+            loggingService.error("Aura context was not released correctly! New context will NOT be created.");
             chain.doFilter(req, res);
             return;
         }
@@ -341,7 +337,7 @@ public class AuraContextFilter implements Filter {
                 configMap = (Map<String, Object>) new JsonReader().read(config);
             } catch (Throwable throwable){
                 //config map was invalid. log the bad json and move on. Callers are protected against null.
-                LOG.info("aura.config was invalid JSON:" + config, throwable);
+                loggingService.warn("aura.config was invalid JSON:" + config, throwable);
             }
         }
         return configMap;

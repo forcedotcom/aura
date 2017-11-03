@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
-import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.Serialization.ReferenceScope;
 import org.auraframework.util.json.Serialization.ReferenceType;
 

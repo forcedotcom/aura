@@ -54,7 +54,6 @@ import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.BrowserInfo;
-import org.auraframework.impl.util.UserAgent;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.modules.ModuleNamespaceAlias;
 import org.auraframework.service.CSPInliningService;

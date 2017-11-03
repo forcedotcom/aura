@@ -15,9 +15,8 @@
  */
 package org.auraframework.http;
 
-import java.io.IOException;
+import static org.junit.Assert.assertEquals;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,37 +25,29 @@ import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.AuraHandledException;
-import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 public class AuraServletUnitTest {
-    private static class AuraServletOverride extends AuraServlet {
-        @Override
-        public void doPost(HttpServletRequest request, HttpServletResponse response) 
-                throws ServletException, IOException {
-            super.doPost(request, response);
-        }
-    }
 
     @Test
     public void testPostRequiresJson() throws Exception {
-        AuraServletOverride underTest = new AuraServletOverride();
+        AuraServlet auraServlet = new AuraServlet();
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
-        underTest.setServletUtilAdapter(servletUtilAdapter);
+        auraServlet.setServletUtilAdapter(servletUtilAdapter);
 
         ContextService contextService = Mockito.mock(ContextService.class);
         AuraContext context = Mockito.mock(AuraContext.class);
         Mockito.doReturn(context).when(contextService).getCurrentContext();
         Mockito.doReturn(Format.HTML).when(context).getFormat();
-        underTest.setContextService(contextService);
+        auraServlet.setContextService(contextService);
 
-        underTest.doPost(request, response);
+        auraServlet.doPost(request, response);
 
         ArgumentCaptor<Throwable> exceptionCaptor = ArgumentCaptor.forClass(Throwable.class);
 
@@ -64,8 +55,8 @@ public class AuraServletUnitTest {
                 Matchers.eq(Boolean.FALSE), Matchers.same(context), Matchers.same(request), Matchers.same(response),
                 Matchers.eq(Boolean.FALSE));
         // The exception should be handled to avoid blowing up in the face of the user.
-        Assert.assertEquals(AuraHandledException.class, exceptionCaptor.getValue().getClass());
+        assertEquals(AuraHandledException.class, exceptionCaptor.getValue().getClass());
         // The text is part of our API, because it hits customers.
-        Assert.assertEquals("Invalid request, post must use JSON", exceptionCaptor.getValue().getMessage());
+        assertEquals("Invalid request, post must use JSON", exceptionCaptor.getValue().getMessage());
     }
 }

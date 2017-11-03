@@ -36,7 +36,6 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;

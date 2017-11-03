@@ -15,10 +15,30 @@
  */
 package org.auraframework.http;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -40,6 +60,7 @@ import org.auraframework.http.RequestParam.IntegerParam;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -54,28 +75,8 @@ import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
-import javax.inject.Inject;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 /**
  * Supports test framework functionality, primarily for jstest mocks.
@@ -114,7 +115,6 @@ public class AuraTestFilter {
     // private static final Pattern headTagPattern = Pattern.compile("(?is).*(<\\s*head[^>]*>).*");
     // private static final Pattern bodyTagPattern = Pattern.compile("(?is).*(<\\s*body[^>]*>).*");
 
-    private final Log LOG = LogFactory.getLog(AuraTestFilter.class);;
     private final List<HttpFilter> testCaseFilters = Collections.synchronizedList(Lists.newArrayList());
 
     // TODO: DELETE this once all existing tests have been updated to have attributes.
@@ -126,10 +126,11 @@ public class AuraTestFilter {
     private ConfigAdapter configAdapter;
     private ExceptionAdapter exceptionAdapter;
     private ServletUtilAdapter servletUtilAdapter;
+    private LoggingService loggingService;
 
     private String testRunnerAppNamespace =  "aurajstest";
     private String testRunnerAppName = "jstest";
-    
+
     @Inject
     public void setTestContextAdapter(TestContextAdapter testContextAdapter) {
         this.testContextAdapter = testContextAdapter;
@@ -160,6 +161,11 @@ public class AuraTestFilter {
         this.servletUtilAdapter = servletUtilAdapter;
     }
 
+    @Inject
+    public void setLoggingService(LoggingService loggingService) {
+        this.loggingService = loggingService;
+    }
+
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException,
             IOException {
         if (testContextAdapter == null || configAdapter == null || configAdapter.isProduction()) {
@@ -186,7 +192,7 @@ public class AuraTestFilter {
 
         innerFilter(request, response, chain);
     }
-    
+
     private void innerFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest)req;
@@ -259,8 +265,9 @@ public class AuraTestFilter {
                     }
                 } else if (testToRun != null && testToRun.isEmpty()) {
                     Object origRequest = request.getAttribute(AuraResourceServlet.ORIG_REQUEST_URI);
-                    LOG.error("empty jstestrun: " + request.getRequestURL() + "?" + request.getQueryString()
-                            + " original request: " + origRequest, new Error());
+                    String message = String.format("AuraTestFilter.innerFilter(): Empty jstestrun: %s?%s original request: %s",
+                            request.getRequestURL(), request.getQueryString(), origRequest);
+                    loggingService.error(message);
                 }
 
                 // aurajstest:jstest app is invokable in the following ways:
@@ -306,7 +313,7 @@ public class AuraTestFilter {
             testContextAdapter.clear();
         } else {
             if (!contextService.isEstablished()) {
-                LOG.error("Aura context is not established! New context will NOT be created.");
+                loggingService.error("AuraTestFilter.innerFilter(): Aura context is not established! New context will NOT be created.");
                 chain.doFilter(request, response);
                 return;
             }
@@ -417,7 +424,7 @@ public class AuraTestFilter {
                 }
                 context.addDynamicDef(def);
             } catch (Throwable t) {
-                LOG.error("Failed to add mock " + def, t);
+                loggingService.error("AuraTestFilter.loadTestMocks(): Failed to add mock " + def, t);
                 error = true;
             }
         }

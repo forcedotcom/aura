@@ -174,7 +174,7 @@ public interface LoggingService extends AuraService {
      * the logs with) that arises during normal, successful operation.
      */
     void info(String message);
-    
+
     /**
      * Logs a warning message, independent of context such as action or
      * timers, for which context-sensitive methods can be provided via other
@@ -183,7 +183,16 @@ public interface LoggingService extends AuraService {
      * will be followed.
      */
     void warn(String message);
-    
+
+    /**
+     * Logs a warning message and its cause Throwable, independent of context
+     * such as action or timers, for which context-sensitive methods can be
+     * provided via other methods.  Use this method to report suspicious, but
+     * perhaps not wrong, situations, or minor problems for which a clear
+     * workaround is available and will be followed.
+     */
+    void warn(String message, Throwable cause);
+
     /**
      * Logs an error message, independent of context such as action or timers,
      * for which context-sensitive methods can be provided via other methods.
@@ -199,8 +208,8 @@ public interface LoggingService extends AuraService {
      * wrong.
      */
     void error(String message, Throwable cause);
-    
-	void serializeActions(Json json);
-    
+
+    void serializeActions(Json json);
+
     void serialize(Json json);
 }

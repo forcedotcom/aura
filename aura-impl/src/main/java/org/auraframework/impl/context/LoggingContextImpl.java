@@ -40,9 +40,9 @@ public class LoggingContextImpl implements LoggingContext {
     private final Map<String, Timer> timers = Maps.newHashMap();
     private final Map<String, Counter> counters = Maps.newHashMap();
     private final Map<String, Object> values = Maps.newHashMap();
-    
+
     private final Map<String, Map<String, Long>> actionStats = Maps.newHashMap();
-    
+
     @Override
     public void startAction(String actionName, Action action) {
         Map<String, Long> actionStatMap = Maps.newHashMap();
@@ -57,7 +57,7 @@ public class LoggingContextImpl implements LoggingContext {
         }
         startActionTimer(actionName, action);
     }
-    
+
     protected void startActionTimer(String actionName, Action action) {
         String actionId = action.getId();
         if (actionId == null) {
@@ -65,11 +65,11 @@ public class LoggingContextImpl implements LoggingContext {
         }
         startTimer(LoggingService.TIMER_ACTION + actionName, ImmutableMap.of("id", actionId));
     }
-    
+
     protected Map<String, Map<String, Long>> getActionStats() {
         return actionStats;
-    } 
-    
+    }
+
     @Override
     public void stopAction(String actionName) {
         stopActionTimer(actionName);
@@ -93,7 +93,7 @@ public class LoggingContextImpl implements LoggingContext {
             }
         }
     }
-    
+
     protected void stopActionTimer(String actionName) {
         stopTimer(LoggingService.TIMER_ACTION + actionName);
     }
@@ -112,7 +112,7 @@ public class LoggingContextImpl implements LoggingContext {
         t.start();
         return t;
     }
-    
+
     @Override
     public void startTimer(String name, Map<String, String> context) {
         Timer t = startTimerInternal(name);
@@ -203,7 +203,7 @@ public class LoggingContextImpl implements LoggingContext {
         logRequestValuesMap(loggingValues);
         logActions(loggingValues);
     }
-    
+
     protected Map<String, Object> getRequestValues () {
         Map<String, Object> requestLoggingValues = Maps.newHashMap();
         for (Map.Entry<String, Timer> entry : timers.entrySet()) {
@@ -212,7 +212,7 @@ public class LoggingContextImpl implements LoggingContext {
         for (Map.Entry<String, Counter> entry : counters.entrySet()) {
             requestLoggingValues.put(entry.getKey(), entry.getValue().get());
         }
-        
+
         return requestLoggingValues;
     }
 
@@ -227,7 +227,7 @@ public class LoggingContextImpl implements LoggingContext {
     protected void logRequestValuesMap(Map<String, Object> valueMap) {
         log(valueMap);
     }
-    
+
     protected void logActions(Map<String, Object> valueMap) {
         for (Map.Entry<String, Map<String, Long>> actionStat : actionStats.entrySet()) {
             String actionName = actionStat.getKey();
@@ -235,7 +235,7 @@ public class LoggingContextImpl implements LoggingContext {
             logAction(actionName, actionMap, valueMap);
         }
     }
-    
+
     protected void logAction(String actionName, Map<String, Long> actionMap, Map<String, Object> valueMap) {
         StringBuilder buffer = new StringBuilder(actionName);
 
@@ -246,31 +246,31 @@ public class LoggingContextImpl implements LoggingContext {
         }
         logger.info(buffer);
     }
-    
+
     private static class KVLogger implements KeyValueLogger {
         private final StringBuffer logLine;
-        
+
         KVLogger(StringBuffer logLine) {
             this.logLine = logLine;
         }
-        
+
         @Override
         public void log(String name, String value) {
             logLine.append("{").append(name).append(",").append(value).append("}");
         }
     }
-    
+
     /**
      * A simple counter class.  Used instead of an Long so that it can keep track of a names mark.
      */
     private static class Counter {
         private Map<String, Long> marks = Maps.newHashMap();
         private long count = 0;
-        
+
         public Counter(long num) {
             set(num);
         }
-        
+
         public void increment(long num) {
             count += num;
         }
@@ -278,24 +278,24 @@ public class LoggingContextImpl implements LoggingContext {
         public void set(long num) {
             count = num;
         }
-        
+
         public long get() {
             return count;
         }
-        
+
         /**
          * @param markName if the markName already exists it will be replaced
          */
         public void mark(String markName) {
             marks.put(markName, count);
         }
-        
+
         public long getCountSince(String markName) {
             Long mark = marks.get(markName);
             return (mark == null) ? 0 : count - mark;
         }
     }
-    
+
     /**
      * A simple nestable timer class.  Time is reported in milliseconds.
      * If the timer start method is nested (called more than once before stop is called
@@ -322,7 +322,7 @@ public class LoggingContextImpl implements LoggingContext {
         public void setContext(Map<String, String> context) {
             this.context = context;
         }
-        
+
         public Map<String, String> getContext() {
             return context;
         }
@@ -346,7 +346,7 @@ public class LoggingContextImpl implements LoggingContext {
                 startTime = -1;
             }
         }
-        
+
         /**
          * Like a stop watch lap time with a name, does not stop the timer.
          * @param markName if the markName already exists it will be replaced not incremented
@@ -358,7 +358,7 @@ public class LoggingContextImpl implements LoggingContext {
             }
             marks.put(markName, markTime);
         }
-        
+
         private long getTimeSince(String markName) {
             if (totalTime > 0L || startTime > 0L) {// started at least once
                 long duration = ((totalTime > 0L) ? totalTime : 0L)  + ((startTime > 0L) ? (System.nanoTime() - startTime) : 0L);
@@ -401,56 +401,61 @@ public class LoggingContextImpl implements LoggingContext {
         log(report);
     }
 
-	@Override
-	public void info(String message) {
-		logger.info(message);
-	}
+    @Override
+    public void info(String message) {
+        logger.info(message);
+    }
 
-	@Override
-	public void warn(String message) {
-		logger.warn(message);
-	}
+    @Override
+    public void warn(String message) {
+        logger.warn(message);
+    }
 
-	@Override
-	public void error(String message) {
-		logger.error(message);
-	}
+    @Override
+    public void warn(String message, Throwable cause) {
+        logger.warn(message, cause);
+    }
 
-	@Override
-	public void error(String message, Throwable cause) {
-		logger.error(message, cause);
-	}
+    @Override
+    public void error(String message) {
+        logger.error(message);
+    }
 
-	@Override
-	public void logCacheInfo(String name, String message, long size, CacheStats stats) {
-		logger.info(String.format("Cache %s: %s (size=%s, %s)", name, message, size, stats.toString()));
-	}
+    @Override
+    public void error(String message, Throwable cause) {
+        logger.error(message, cause);
+    }
 
-	@Override
-	public void serializeActions(Json json) {
-		for (Map.Entry<String, Map<String, Long>> actionStat : actionStats.entrySet()) {
+    @Override
+    public void logCacheInfo(String name, String message, long size, CacheStats stats) {
+        logger.info(String.format("Cache %s: %s (size=%s, %s)", name, message, size, stats.toString()));
+    }
+
+    @Override
+    public void serializeActions(Json json) {
+        for (Map.Entry<String, Map<String, Long>> actionStat : actionStats.entrySet()) {
             String actionName = actionStat.getKey();
             Map<String, Long> actionMap = actionStat.getValue();
             try {
-            	json.writeComma();
-	            json.writeMapBegin();
-	            json.writeMapEntry("name", actionName);
-	            
-	            for (Map.Entry<String, Long> entry : actionMap.entrySet()) {
-	                if (!entry.getKey().contains("action_") && entry.getValue() != null) {
-	                	json.writeMapEntry(entry.getKey(), String.valueOf(entry.getValue()));
-	                }
-	            }
-	            json.writeMapEnd();
+                json.writeComma();
+                json.writeMapBegin();
+                json.writeMapEntry("name", actionName);
+
+                for (Map.Entry<String, Long> entry : actionMap.entrySet()) {
+                    if (!entry.getKey().contains("action_") && entry.getValue() != null) {
+                        json.writeMapEntry(entry.getKey(), String.valueOf(entry.getValue()));
+                    }
+                }
+                json.writeMapEnd();
 
             }catch (Exception e) {
-            	e.printStackTrace();
+                e.printStackTrace();
             }
         }
-	}
+    }
 
     @Override
-    public void serialize(Json json) { 
+    public void serialize(Json json) {
         // Implement on override
     }
 }

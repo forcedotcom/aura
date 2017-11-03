@@ -16,7 +16,6 @@
 package org.auraframework.integration.test.modules.ui;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
-import org.auraframework.integration.test.util.WebDriverTestCase.Flapper;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;

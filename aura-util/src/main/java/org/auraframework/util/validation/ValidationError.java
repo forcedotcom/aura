@@ -23,8 +23,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.auraframework.util.javascript.JavascriptProcessingError.Level;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
@@ -36,8 +34,6 @@ import com.google.common.collect.Lists;
  * Base class for all ValidationError implementations
  */
 public class ValidationError implements JsonSerializable {
-
-    protected static final Log LOG = LogFactory.getLog(ValidationError.class);
 
     private String validatingTool;
     private String message;
@@ -236,18 +232,11 @@ public class ValidationError implements JsonSerializable {
         return error;
     }
 
-    //
-
     private static int toInt(Object line) {
         if (line instanceof Number) {
             return ((Number) line).intValue();
         }
         if (line instanceof String) {
-            String sLine = (String) line;
-            if ("undefined".equals(sLine)) {
-                return -1;
-            }
-            LOG.warn("unexpected line [" + sLine + ']');
             return -1;
         }
         throw new IllegalArgumentException(String.valueOf(line));

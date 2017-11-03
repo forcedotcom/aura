@@ -27,7 +27,6 @@ import org.apache.http.util.EntityUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
-import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.AuraTestLabels;

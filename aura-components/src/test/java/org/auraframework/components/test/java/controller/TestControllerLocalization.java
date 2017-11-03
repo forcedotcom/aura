@@ -46,8 +46,6 @@ public class TestControllerLocalization implements Controller {
     @Inject
     private InstanceService instanceService;
 
-    static Log log = LogFactory.getLog(TestControllerLocalization.class);
-
     @AuraEnabled
     public void noArgs() {
 
@@ -231,8 +229,6 @@ public class TestControllerLocalization implements Controller {
     @AuraEnabled
     public Component getInputNumberCmp(@Key("value") BigDecimal value, @Key("step") BigDecimal step,
                                        @Key("max") BigDecimal max, @Key("min") BigDecimal min) throws QuickFixException {
-        log.info("api:getInputNumberCmp values received on server:" + " value:" + value + " step:" + step + " max:"
-                + max + " min:" + min);
         Map<String, Object> attributes = Maps.newHashMap();
         Component inputNumCmp = null;
 
@@ -248,19 +244,16 @@ public class TestControllerLocalization implements Controller {
 
     @AuraEnabled
     public Component getOutputNumberCmp(@Key("inVar") BigDecimal inVar) throws QuickFixException {
-        log.info("getOutputNumberCmp value received on server:" + inVar);
         return getOutputComponent(inVar, "ui:outputNumber");
     }
 
     @AuraEnabled
     public Component getOutputPercentStringCmp(@Key("inVar") BigDecimal inVar) throws QuickFixException {
-        log.info("api:getOutputPercentStringCmp value received on server:" + inVar);
         return getOutputComponent(inVar, "ui:outputPercent");
     }
 
     @AuraEnabled
     public Component getOutputDateCmp(@Key("inVar") Date inVar) throws QuickFixException {
-        log.info("api:getOutputDateCmp value received on server:" + inVar);
         Map<String, Object> attributes = Maps.newHashMap();
         Component outputDateCmp = null;
 
@@ -286,13 +279,11 @@ public class TestControllerLocalization implements Controller {
 
     @AuraEnabled
     public Component getOutputCurrencyCmp(@Key("inVar") BigDecimal inVar) throws QuickFixException {
-        log.info("api:getOutputCurrencyCmp value received on server:" + inVar);
         return getOutputComponent(inVar, "ui:outputCurrency");
     }
 
     @AuraEnabled
     public Component getOutputPercentCmp(@Key("inVar") BigDecimal inVar) throws QuickFixException {
-        log.info("api:getOutputPercentCmp value received on server:" + inVar);
         return getOutputComponent(inVar, "ui:outputPercent");
     }
 
@@ -315,7 +306,6 @@ public class TestControllerLocalization implements Controller {
     }
 
     private Component getOutputDateComponent(Date inVar, String component) {
-        log.info("api:getOutputDateTimeCmp value received on server:" + inVar);
         Map<String, Object> attributes = Maps.newHashMap();
         Component outputDateCmp = null;
 

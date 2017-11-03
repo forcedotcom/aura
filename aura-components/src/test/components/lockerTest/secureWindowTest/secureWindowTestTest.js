@@ -5,8 +5,8 @@
      */
 
     // LockerService not supported on IE
-    // TODO(W-3674741): FF version in autobuilds is too far behind
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX"],
+    // TODO(W-3674741, W-4446969): FF and LockerService disabled for iOS browser in 212
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-SAFARI", "-IPHONE", "-IPAD"],
 
     setUp: function(cmp) {
         cmp.set("v.testUtils", $A.test);
@@ -89,7 +89,7 @@
 
     testArbitrarySchemes: {
         // "window.open" will not open a new window for mobile autobuild runs.
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testArbitrarySchemes();
         }
@@ -97,7 +97,7 @@
 
     testOpen_HttpsUrl: {
         // "window.open" will not open a new window for mobile autobuild runs.
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_HttpsUrl();
         }
@@ -105,7 +105,7 @@
 
     testOpen_HttpUrl: {
         // "window.open" will not open a new window for mobile autobuild runs.
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_HttpUrl();
         }
@@ -113,7 +113,7 @@
 
     testOpen_RelativeUrl:{
         // "window.open" will not open a new window for mobile autobuild runs.
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_RelativeUrl();
         }
@@ -121,7 +121,7 @@
 
     testOpen_JavascriptIsBlocked: {
         // "window.open" will not open a new window for mobile autobuild runs.
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_JavascriptIsBlocked();
         }
@@ -146,12 +146,14 @@
     },
 
     testFile: {
+        // window.File is not implemented correctly in iOS 9.2
         test: function(cmp) {
             cmp.testFile();
         }
     },
 
     testFile_WithScriptTagsBlocked: {
+        // window.File is not implemented correctly in iOS 9.2
         test: function (cmp) {
             cmp.testFile_WithScriptTagsBlocked();
         }

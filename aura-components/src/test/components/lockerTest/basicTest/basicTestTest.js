@@ -5,8 +5,8 @@
      */
 
     // LockerService not supported on IE
-    // TODO(W-3674741): FF version in autobuilds is too far behind
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX"],
+    // TODO(W-3674741, W-4446969): FF and LockerService disabled for iOS browser in 212
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-SAFARI", "-IPHONE", "-IPAD"],
 
     setUp: function(cmp) {
         cmp.set("v.testUtils", $A.test);
@@ -89,7 +89,7 @@
 
     testDefineGetterExploit: {
         // This exploit not covered in IE11
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
         // Remove UnAdaptableTest label when unsafe-eval and unsafe-inline are added back to CSP
         labels: ["UnAdaptableTest"],
         test: function(cmp) {
@@ -123,8 +123,6 @@
 
     testAttemptToEvalToWindow: {
         // This exploit not covered in IE11
-        // TODO(W-3674741): FF version in autobuilds is too far behind
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX"],
         test: function(cmp) {
             //Taking into account if its a manual run (which runs inside an iframe) or an auto run
             cmp.testEvalBlocking(window !== window.parent);
@@ -205,7 +203,6 @@
 
     testInstanceOf: {
         // TODO: Re-enable for Firefox and iOS when autobuilds use a version that supports all Proxy traps we implement
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX"],
         test: function(cmp) {
             cmp.testInstanceOf(window);
         }
@@ -213,7 +210,6 @@
 
     testInstanceOf_IdentityDiscontinuitySymptoms: {
         // TODO: Re-enable for Firefox and iOS when autobuilds use a version that supports all Proxy traps we implement
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX"],
         // TODO: Re-enable when strict CSP is on by default in core autobuilds
         labels: ["UnAdaptableTest"],
         test: function(cmp) {

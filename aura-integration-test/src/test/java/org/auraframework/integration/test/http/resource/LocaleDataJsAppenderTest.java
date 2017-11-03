@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.http.resource;
 
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.http.resource.LocaleDataJsAppender;
@@ -27,9 +26,6 @@ import javax.inject.Inject;
 public class LocaleDataJsAppenderTest extends AuraImplTestCase {
 
     @Inject
-    private ConfigAdapter configAdapter;
-
-    @Inject
     private LocalizationAdapter localizationAdapter;
 
     @Inject
@@ -38,7 +34,6 @@ public class LocaleDataJsAppenderTest extends AuraImplTestCase {
     private LocaleDataJsAppender getInlineJs() {
         LocaleDataJsAppender appender = new LocaleDataJsAppender();
         appender.setLocalizationAdapter(localizationAdapter);
-        appender.setConfigAdapter(configAdapter);
         appender.setExceptionAdapter(exceptionAdapter);
         appender.initialize();
 

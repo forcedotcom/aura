@@ -15,42 +15,39 @@
  */
 package org.auraframework.http.resource;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
 import org.apache.commons.io.IOUtils;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.system.AuraContext;
 import org.auraframework.util.AuraLocale;
-import org.auraframework.util.resource.ResourceLoader;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @ServiceComponent
 public class LocaleDataJsAppender implements InlineJSAppender{
 
     private Map<String, String> localeData;
     private LocalizationAdapter localizationAdapter;
-    private ConfigAdapter configAdapter;
     private ExceptionAdapter exceptionAdapter;
 
     @Inject
     public void setLocalizationAdapter(LocalizationAdapter localizationAdapter) {
         this.localizationAdapter = localizationAdapter;
-    }
-
-    @Inject
-    public void setConfigAdapter(ConfigAdapter configAdapter) {
-        this.configAdapter = configAdapter;
     }
 
     @Inject
@@ -109,9 +106,9 @@ public class LocaleDataJsAppender implements InlineJSAppender{
     private Map<String, String> readLocaleData() {
         String localeDataPath = "aura/resources/moment/locales.js";
 
-        ResourceLoader resourceLoader = configAdapter.getResourceLoader();
+        ClassLoader loader = LocaleDataJsAppender.class.getClassLoader();
         Map<String, String> localeData = new HashMap<>();
-        try (InputStream is = resourceLoader.getResourceAsStream(localeDataPath)) {
+        try (InputStream is = loader.getResourceAsStream(localeDataPath)) {
             if (is == null) {
                 throw new IOException("Locale file doesn't exist: " + localeDataPath);
             }

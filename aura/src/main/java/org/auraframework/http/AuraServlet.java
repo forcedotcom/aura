@@ -193,7 +193,7 @@ public class AuraServlet extends AuraBaseServlet {
                 int index = sb.indexOf("//");
                 index = sb.indexOf("/", index + 2); // find the 3rd slash, start of path
                 sb.setLength(index);
-                sb.append(uri.getPath());
+                sb.append(path);
                 if (query != null && !query.isEmpty()) {
                     sb.append("?").append(query);
                 }
@@ -203,9 +203,8 @@ public class AuraServlet extends AuraBaseServlet {
                 newLocation = sb.toString();
             }
         } catch (Exception e) {
-            // This exception should never happen.
-            // If happened: log a gack and redirect
-            exceptionAdapter.handleException(e);
+            exceptionAdapter.handleException(
+                    new AuraHandledException("Invalid redirect URL in nocache parameter: " + nocache, e));
         }
 
         servletUtilAdapter.setNoCache(response);

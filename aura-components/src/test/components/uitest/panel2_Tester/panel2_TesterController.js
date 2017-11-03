@@ -148,7 +148,12 @@
                 }
             }));
 			panelBody.push($A.createComponentFromConfig({
-			    componentDef : { descriptor: "markup://uitest:panel2_Tester"}
+				componentDef : { descriptor: "markup://uitest:panel2_Tester"},
+				attributes : {
+					values : {
+                        showFirstButton : cmp.get("v.showFirstButton")
+                    }                    
+                }
 			}));
 		}
 		config["body"] = panelBody;

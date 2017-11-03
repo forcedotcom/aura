@@ -45,6 +45,7 @@
 	<aura:attribute name="testTrapFocus"    type="Boolean" default="true"/>
 	<aura:attribute name="testCloseOnLocationChange"    type="Boolean" default="false"/>
 	<aura:attribute name="testReturnFocusElement" type="Object"/>
+	<aura:attribute name="testShowFirstButton" type="Boolean" default="false"/>
 
 	<aura:dependency resource="markup://ui:block" type="COMPONENT"/>
 	
@@ -92,7 +93,8 @@
 		customizeCloseAction="{!v.testCustomizeCloseAction}"
 		trapFocus="{!v.testTrapFocus}"
 		closeOnLocationChange="{!v.testCloseOnLocationChange}"
-		returnFocusElement="{!v.testReturnFocusElement}"/>
+		returnFocusElement="{!v.testReturnFocusElement}"
+		showFirstButton="{!v.testShowFirstButton}" />
 	
 	 <section class="managerContainers">
     <div class="manager">

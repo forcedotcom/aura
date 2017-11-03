@@ -53,6 +53,28 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
         }        
     }    
 
+    var checkButton = /button/i;
+    function isCloseButton(el, cmp) {        
+        var isButton = checkButton.test(el.type);
+        if (isButton && cmp && cmp.get("v.showCloseButton")) {
+            var closeButtons = cmp.get("v.closeButton") ? cmp.get("v.closeButton") : [];
+            closeButtons = Array.isArray(closeButtons) ? closeButtons : [closeButtons];
+            var isSameButton = function(button) {
+                return el === button;
+            };
+            for (var i = 0; i < closeButtons.length; i++) {
+                var node = closeButtons[i].getElement();
+                var buttons = checkButton.test(node.type) ? [node] : [].slice.call(node.querySelectorAll("button"));
+                
+                var result = buttons.find(isSameButton);
+                if (result) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return isButton;
+    }
     var lib = { //eslint-disable-line no-shadow, no-unused-vars
         validateAnimationName: function(animName) {
         	if(animName && animName.match(/^move(to|from)(bottom|top|left|right|center|pop)$/)) {
@@ -66,7 +88,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
          * @param containerEl
          * @returns {{initial: *, first: *, last: *}}
          */
-        getFocusables: function(containerEl) {
+        getFocusables: function(containerEl, cmp) {
             if(!containerEl) {
                 return {
                     initial: null,
@@ -78,7 +100,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 len = els.length,
                 i, el;
 
-            // The 'initial' element is the first non-button focusable element (see W-2512261)
+            // The 'initial' element is the first non-close-button focusable element (see W-2512261)
             // whereas the 'first' element is the first (button or non-button) focusable element
             var initial, first, last;
 
@@ -88,7 +110,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     if (!first) {
                         first = el;
                     }
-                    if (!/button/i.test(el.type)) {
+                    if (!isCloseButton(el, cmp)) {
                         initial = el;
                         break;
                     }
@@ -148,7 +170,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
 
                     el = cmp.getElement();
                     if(el) {
-                        focusables = me.getFocusables(cmp.getElement());
+                        focusables = me.getFocusables(cmp.getElement(), cmp);
                     }
                         
                     if (focusables && config.trapFocus) {
@@ -533,7 +555,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 // } else 
                 var returnFocusElement = cmp.getAttributeValueProvider().returnFocus;
                 if(el && el.querySelectorAll && $A.util.isUndefinedOrNull(returnFocusElement)) {
-                    var focusables = this.getFocusables(el);
+                    var focusables = this.getFocusables(el, cmp);
                     focusables.initial && focusables.initial.focus();
                 }
             }

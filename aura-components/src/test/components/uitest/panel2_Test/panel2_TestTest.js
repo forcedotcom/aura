@@ -29,6 +29,21 @@
             }, "First input element should be focused.");
         }]
     },
+
+    /**
+     * Test to verify first inputElement(type="button") is focused
+     */
+    testModalFocusOnFirstButton: {
+        test: [function(cmp) {
+            cmp.set("v.testShowFirstButton", true);
+            this.createPanel(cmp);
+        }, function(cmp) {
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var activeElement = $A.test.getActiveElement();
+                return $A.util.hasClass(activeElement, "inputTypeButtonHasFocus");
+            }, "First input element as button should be focused.");
+        }]
+    },
     
     /**
      * Verify First input is focused when autoFocus is set

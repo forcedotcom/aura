@@ -1,3 +1,4 @@
+
 <!--
 
     Copyright (C) 2013 salesforce.com, inc.
@@ -46,12 +47,17 @@
 	<aura:attribute name="trapFocus"    type="Boolean"  default="true"/>
 	<aura:attribute name="closeOnLocationChange"    type="Boolean" default="false"/>
 	<aura:attribute name="returnFocusElement"	type="Object"/>
+	<aura:attribute name="showFirstButton"	type="Boolean" default="false"/>
 	
 	<aura:dependency resource="markup://ui:createPanel" type="EVENT"/> 
 	<aura:dependency resource="markup://ui:block" type="COMPONENT"/>
 	
 	<aura:handler name="init" value="{!this}" action="{!c.init}"></aura:handler> 
-	
+	<aura:if isTrue="{!v.showFirstButton}">
+		<div>
+			<input class="inputTypeButtonHasFocus" type="button" value="Please focus on me"/>
+		</div>
+	</aura:if>
 	<div class="info">
 		<ui:outputText value="Create a panel to your liking"/> <br/><br/>
         ID of CURRENT component: <ui:outputText class="idCurrent" aura:id="idCurrent" value="{!globalId}"/> <br/>
@@ -91,6 +97,7 @@
 			<ui:inputCheckbox aura:id="inputTrapFocus"          label="Trap Focus"  value="{!v.trapFocus}"           class="inputTrapFocus"/>
 			<ui:inputCheckbox aura:id="inputCloseOnLocationChange"    label="Close on Location Change" value="{!v.closeOnLocationChange}" class="inputCloseOnLocationChange"/>
 			<ui:inputText     aura:id="inputReturnFocusElement" label="Return Focus Element" value="{!v.returnFocusElement}" class="inputReturnFocusElement"/>
+			<ui:inputCheckbox     aura:id="inputShowFirstButton" label="Show First Button" value="{!v.showFirstButton}" class="inputReturnFocusElement"/>
 			<ui:inputSelect label="inputSelectionOptions" useMenu="true" aura:id="inputSelectionOptions"/>
 			<ui:button aura:id="createPanelBtn" label="Create Panel" press="{!c.createPanel}" class="createPanelBtnClass"/>
 		</div>

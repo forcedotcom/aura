@@ -21,7 +21,6 @@ import javax.inject.Inject;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
-import org.auraframework.adapter.JsonSerializerAdapter;
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -36,8 +35,6 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.service.IntegrationService;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.service.LoggingService;
-import org.auraframework.system.AuraContext;
-import org.auraframework.util.json.JsonSerializerFactory;
 
 
 /**
@@ -55,8 +52,6 @@ public class Aura implements AuraDeprecated {
     private static ConverterService converterService;
     private static BuilderService builderService;
     private static LocalizationService localizationService;
-    private static JsonSerializerFactory jsonSerializerFactory;
-    private static List<JsonSerializerAdapter> jsonSerializerAdapters;
     private static ExceptionAdapter exceptionAdapter;
     private static LocalizationAdapter localizationAdapter;
     private static CSPInliningService cspInliningService;
@@ -76,16 +71,6 @@ public class Aura implements AuraDeprecated {
 
     @Deprecated
     public void setCachingService(Object service) {
-    }
-    
-    @Inject
-    public void setJsonSerializerFactory(JsonSerializerFactory factory) {
-        jsonSerializerFactory = factory;
-    }
-    
-    @Inject
-    public void setJsonSerializerAdapter(List<JsonSerializerAdapter> adapters) {
-        jsonSerializerAdapters = adapters;
     }
     
     @Inject
@@ -147,8 +132,7 @@ public class Aura implements AuraDeprecated {
     }
 
     /**
-     * Get the Context Service: for creating or interacting with a {@link AuraContext} A AuraContext must be started
-     * before working using any other service.
+     * Do not use!!! Use injection.
      */
     // Used by: Lots
     public static ContextService getContextService() {
@@ -219,24 +203,6 @@ public class Aura implements AuraDeprecated {
     @Deprecated
     public static LocalizationService getLocalizationService() {
         return localizationService;
-    }
-
-    /**
-     * USE INJECTION INSTEAD
-     * @return
-     */
-    @Deprecated
-    public static JsonSerializerFactory getJsonSerializerFactory() {
-        return jsonSerializerFactory;
-    }
-
-    /**
-     * USE INJECTION INSTEAD
-     * @return
-     */
-    @Deprecated
-    public static List<JsonSerializerAdapter> getJsonSerializerAdapters() {
-        return jsonSerializerAdapters;
     }
 
     /**

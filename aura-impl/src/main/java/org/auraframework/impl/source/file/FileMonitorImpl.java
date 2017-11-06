@@ -87,7 +87,6 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
     private Thread watchServiceThread;
     private boolean terminateThread;
     protected FileListener listener;
-    private Long registryCreationTime;
 
     public FileMonitorImpl() {
         this(null);
@@ -117,7 +116,7 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
     /**
      * Register the given directory, and all its sub-directories, with the WatchService.
      */
-    private void registerAll(final Path start) throws IOException {
+    private void registerAll(final Path start, Long registryCreationTime) throws IOException {
         // register directory and sub-directories
         // follow links: the uitier workspace component folders are symbolic links to the core workspace component folders
         Files.walkFileTree(start, EnumSet.of(FileVisitOption.FOLLOW_LINKS),
@@ -209,7 +208,7 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
                 // recursively add any new directories created
                 else if (kind == ENTRY_CREATE) {
                     try {
-                        registerAll(child);
+                        registerAll(child, null);
                     } catch (IOException x) {
                         // if we can't monitor it for some reason, it is not an error
                     }
@@ -247,10 +246,9 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
         if (watchService == null || monitoredDirs.contains(dir.toString())) {
             return;
         }
-        this.registryCreationTime = registryCreationTime;
 
         try {
-            registerAll(dir);
+            registerAll(dir, registryCreationTime);
             logger.info("[FileMonitorImpl] Monitoring directory " + dirPath);
         } catch (Exception ex) {
             logger.error("[FileMonitorImpl] Unable to monitor directory " + dirPath + " due to exception: " + ex.getMessage());

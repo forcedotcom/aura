@@ -18,8 +18,11 @@ package org.auraframework.modules.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompilerData;
+import org.auraframework.service.LoggingService;
 import org.auraframework.tools.node.api.NodeLambdaFactory;
 import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
 import org.auraframework.util.test.util.UnitTestCase;
@@ -36,10 +39,13 @@ public class ModulesCompilerTest extends UnitTestCase {
 
     // NOTE: use to specify which service type to use when running tests
     private static final NodeLambdaFactory FACTORY = NodeLambdaFactorySidecar.INSTANCE;
+    
+    @Inject
+    private LoggingService loggingService;
 
     @Test
     public void test() throws Exception {
-        ModulesCompiler compiler = new ModulesCompilerNode(FACTORY);
+        ModulesCompiler compiler = new ModulesCompilerNode(FACTORY, loggingService);
         String entry = "modules/moduletest/moduletest.js";
         String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/moduletest/moduletest.html"),
                 Charsets.UTF_8);
@@ -59,7 +65,7 @@ public class ModulesCompilerTest extends UnitTestCase {
 
     @Test
     public void testErrorInHtml() throws Exception {
-        ModulesCompiler compiler = new ModulesCompilerNode(FACTORY);
+        ModulesCompiler compiler = new ModulesCompilerNode(FACTORY, loggingService);
         String entry = "modules/errorInHtml/errorInHtml.js";
         String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/errorInHtml/errorInHtml.html"),
                 Charsets.UTF_8);
@@ -83,7 +89,7 @@ public class ModulesCompilerTest extends UnitTestCase {
 
     @Test
     public void testErrorInJs() throws Exception {
-        ModulesCompiler compiler = new ModulesCompilerNode(FACTORY);
+        ModulesCompiler compiler = new ModulesCompilerNode(FACTORY, loggingService);
         String entry = "modules/errorInJs/errorInJs.js";
         String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/errorInJs/errorInJs.html"),
                 Charsets.UTF_8);

@@ -60,7 +60,7 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
     private synchronized ModulesCompiler getCompiler() throws Exception {
         if (compiler == null) {
             nodeServiceFactory = configAdapter.nodeServiceFactory();
-            compiler = new ModulesCompilerNode(nodeServiceFactory);
+            compiler = new ModulesCompilerNode(nodeServiceFactory, loggingService);
         }
         return compiler;
     }

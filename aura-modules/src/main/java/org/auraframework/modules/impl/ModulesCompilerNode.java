@@ -16,10 +16,8 @@
 package org.auraframework.modules.impl;
 
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.auraframework.modules.ModulesCompilerData;
+import org.auraframework.service.LoggingService;
 import org.auraframework.tools.node.api.Lambda;
 import org.auraframework.tools.node.api.NodeLambdaFactory;
 import org.json.JSONObject;
@@ -29,12 +27,12 @@ import org.json.JSONObject;
  */
 final class ModulesCompilerNode implements ModulesCompiler {
 
-    private static final Logger logger = Logger.getLogger(ModulesCompilerNode.class.getName());
-
     private final Lambda compileLambda;
+    private final LoggingService loggingService;
 
-    ModulesCompilerNode(NodeLambdaFactory factory) throws Exception {
+    ModulesCompilerNode(NodeLambdaFactory factory, LoggingService loggingService) throws Exception {
         compileLambda = factory.get(ModulesCompilerUtil.getCompilerBundle(factory), ModulesCompilerUtil.COMPILER_HANDLER);
+        this.loggingService = loggingService;
     }
 
     @Override
@@ -46,12 +44,11 @@ final class ModulesCompilerNode implements ModulesCompiler {
             output = compileLambda.invoke(input);
         } catch (Exception x) {
             // an error at this level may be due to env (i.e. node process died), retry once
-            logger.log(Level.SEVERE, "ModulesCompilerNode: exception compiling (will retry once) " + entry + ": " + x,
-                    x);
+            loggingService.error("ModulesCompilerNode: exception compiling (will retry once) " + entry + ": " + x, x);
             try {
                 output = compileLambda.invoke(input);
             } catch (Exception xr) {
-                logger.log(Level.SEVERE, "ModulesCompilerNode: exception compiling (retry failed) " + entry + ": " + xr,
+                loggingService.error("ModulesCompilerNode: exception compiling (retry failed) " + entry + ": " + xr,
                         xr);
                 throw xr;
             }
@@ -59,7 +56,7 @@ final class ModulesCompilerNode implements ModulesCompiler {
 
         if (output.has("compilerError")) {
             String error = output.getString("compilerError");
-            logger.warning("ModulesCompilerNode: compiler error " + entry + ": " + error);
+            loggingService.warn("ModulesCompilerNode: compiler error " + entry + ": " + error);
             throw new RuntimeException(error);
         }
         return ModulesCompilerUtil.parseCompilerOutput(output);

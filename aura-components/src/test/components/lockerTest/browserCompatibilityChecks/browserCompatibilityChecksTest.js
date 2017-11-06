@@ -4,8 +4,8 @@
      * verification to the controller and helper files, which operate in user mode.
      */
 
-    // TODO(W-3674741): FF version in autobuilds is too far behind
-    browsers: ["GOOGLECHROME", "SAFARI", "IPAD", "IPHONE", "-FIREFOX"],
+    // TODO(W-3674741, W-4446969): FF version in autobuilds is too far behind, and LockerService disabled for iOS browser in 212
+    browsers: ["GOOGLECHROME", "-FIREFOX", "-SAFARI", "-IPHONE", "-IPAD"],
 
     testProxyIsNative: {
         test: function(cmp) {

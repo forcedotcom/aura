@@ -17,6 +17,7 @@
 -->
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
+    <aura:attribute name="testRenderer" type="Boolean" default="false"/>
 
     <aura:method name="testDollarAuraIsSecure"/>
     <aura:method name="testDollarAuraNotAccessibleInModules"/>
@@ -28,8 +29,15 @@
     <aura:method name="testElementIsImmutable"/>
     <aura:method name="testSecureModulesInUnsupportedBrowsers"/>
 
+    <!-- secureModuleTest:bootstrap is a test module with some basic setup and checks -->
     <secureModuleTest:bootstrap aura:id="bootstrap"/>
     <secureModuleTest:nonLockerizedCmp aura:id="nonLockerized"/>
     <secureModuleTest:importEngine aura:id="importEngine"/>
     <secureModuleTest:importElement aura:id="importElement"/>
+
+    <!--secureModuleTest:sanityChecks is a test module with extensive tests for lockerService functionality-->
+    <secureModuleTest:sanityChecks aura:id="sanityChecks" testRenderer="{!v.testRenderer}"/>
+    <aura:method name="sanityChecksTester">
+        <aura:attribute name="testCase" type="String"/>
+    </aura:method>
 </aura:component>

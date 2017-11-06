@@ -7,6 +7,7 @@ export default class Bootstrap extends Element {
     testWindowIsSecure() {
         testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
          + " return SecureWindow in interop component");
+        windowIsSecureInLocalFunc();
         const simpleCmp = this.root.querySelector("#securemoduletest-simple-cmp");
         return simpleCmp.testWindowIsSecure() && simpleLib.testWindowIsSecure();
     }
@@ -17,6 +18,7 @@ export default class Bootstrap extends Element {
         // modules can access $A through window and we are hoping to catch that while linting modules.
         // It was a conscious decision to not block $A on window for the sake of performance
         // testUtils.assertUndefined(window.$A);
+        dollarAuraNotAccessibleInLocalFunc();
         const simpleCmp = this.root.querySelector("#securemoduletest-simple-cmp");
         return simpleCmp.testDollarAuraNotAccessibleInModules() && simpleLib.testDollarAuraNotAccessibleInModules();
     }
@@ -27,6 +29,7 @@ export default class Bootstrap extends Element {
             "SecureEngine in interop component");
         testUtil.assertDefined(Element, "SecureEngine is preventing access to Element in interop component");
         testUtil.assertUndefined(createElement, "SecureEngine is leaking properties in interop component");
+        engineIsSecureInLocalFunc();
         const simpleCmp = this.root.querySelector("#securemoduletest-simple-cmp");
         return simpleCmp.testEngineIsSecure() && simpleLib.testEngineIsSecure();
     }
@@ -44,4 +47,18 @@ export default class Bootstrap extends Element {
             + " return raw window in module for unsupported browsers");
         return true;
     }
+}
+
+function windowIsSecureInLocalFunc() {
+    testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
+        + " return SecureWindow in local functions");
+}
+
+function engineIsSecureInLocalFunc() {
+    testUtil.assertStartsWith("SecureEngine", toString(), "Expected engine to return" +
+        "SecureEngine in local functions");
+}
+
+function dollarAuraNotAccessibleInLocalFunc() {
+    testUtil.assertEquals("undefined", typeof $A, "Expected $A to be not accessible in local functions"); // eslint-disable-line raptor/no-aura
 }

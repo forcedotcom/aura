@@ -1,5 +1,6 @@
 import { Element, createElement, toString } from "engine";
 import * as testUtil from 'securemoduletest-test-util';
+import simpleCmpHtml from './simple-cmp.html';
 
 export default class Simple extends Element {
     @api literal = "Default literal";
@@ -7,6 +8,20 @@ export default class Simple extends Element {
     @api unbound = "Default unbound";
     @api expression = 'Default expression';
     @api nested = "Default nested";
+    @api testRenderer = false;
+
+    render() {
+        if (this.testRenderer) {
+            // Verify that render method has access to secure wrappers when module included in another raptor module
+            testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
+                + " return SecureWindow in render method");
+            testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line raptor/no-aura
+                "Expected $A to be not accessible in render method");
+            testUtil.assertStartsWith("SecureDocument", document.toString(), "Expected document to"
+                + " return SecureDocument in render method");
+        }
+        return simpleCmpHtml;
+    }
 
     @api
     testWindowIsSecure() {
@@ -28,6 +43,11 @@ export default class Simple extends Element {
         testUtil.assertDefined(Element, "SecureEngine is preventing access to Element in module");
         testUtil.assertUndefined(createElement, "SecureEngine is leaking properties in module");
         return true;
+    }
+
+    @api
+    testContextInPublicMethod() {
+        testUtil.assertTrue(this instanceof Simple, "Expected context to be an instance of the component class in module");
     }
 
     @api

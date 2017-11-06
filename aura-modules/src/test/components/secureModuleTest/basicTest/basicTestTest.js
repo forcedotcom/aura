@@ -73,5 +73,112 @@
         test: function (cmp) {
             cmp.testSecureModulesInUnsupportedBrowsers();
         }
+    },
+
+    testCanAccessDocumentBodyFromInternalLib: {
+        test: function(cmp) {
+            cmp.sanityChecksTester("testCanAccessDocumentBodyFromInternalLib");
+        }
+    },
+
+    testCanAccessDocumentHeadFromInternalLib: {
+        test: function(cmp) {
+            cmp.sanityChecksTester("testCanAccessDocumentHeadFromInternalLib");
+        }
+    },
+
+    testWindowIsSecureInInternalLib: {
+        test: function(cmp) {
+            cmp.sanityChecksTester("testWindowIsSecureInInternalLib");
+        }
+    },
+
+    testDollarAuraNotAccessibleInInternalLib: {
+        test: function(cmp) {
+            cmp.sanityChecksTester("testDollarAuraNotAccessibleInInternalLib");
+        }
+    },
+
+    testEngineIsSecureInInternalLib: {
+        test: function(cmp) {
+            cmp.sanityChecksTester("testEngineIsSecureInInternalLib");
+        }
+    },
+
+    testSecureWrappersInRenderer: {
+        attributes: {
+            testRenderer: true
+        },
+        test: function(cmp) {
+            // Renderer will throw an error on load if anything is not Lockerized as expected, nothing to assert here.
+        }
+    },
+
+    testDocumentIsSecure: {
+        test: function(cmp) {
+            cmp.sanityChecksTester("testDocumentIsSecure");
+        }
+    },
+
+    testDocumentIsSecureInInternalLib: {
+        test: function(cmp) {
+            cmp.sanityChecksTester("testDocumentIsSecureInInternalLib");
+        }
+    },
+
+    // W-4240480: Because of LS has not fully hooked into locker-membrane, appendChild() will fail (Documented here W-4389861)
+    _testAppendDynamicallyCreatedDivToMarkup: {
+        test: function(cmp) {
+            cmp.sanityChecksTester("testAppendDynamicallyCreatedDivToMarkup");
+        }
+    },
+
+    testContextInModule: {
+        test: function(cmp) {
+            cmp.sanityChecksTester("testContextInModule");
+        }
+    },
+
+    testDefineGetterExploit: {
+        // This exploit not covered in IE11
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
+        // Remove UnAdaptableTest label when unsafe-eval and unsafe-inline are added back to CSP
+        labels: ["UnAdaptableTest"],
+        test: function(cmp) {
+            cmp.sanityChecksTester("testDefineGetterExploit");
+        }
+    },
+
+    /**
+     * See W-2974202 for original exploit.
+     */
+    testSetTimeoutNonFunctionParamExploit: {
+        test: function(cmp) {
+            cmp.sanityChecksTester("testSetTimeoutNonFunctionParamExploit");
+        }
+    },
+
+    testLocationExposed: {
+        test: function(cmp) {
+            cmp.sanityChecksTester("testLocationExposed");
+        }
+    },
+
+    testCtorAnnotation: {
+        test: function(cmp) {
+            cmp.sanityChecksTester("testCtorAnnotation");
+        }
+    },
+
+    testSecureElementPrototypeCounterMeasures: {
+        test: function(cmp) {
+            cmp.sanityChecksTester("testSecureElementPrototypeCounterMeasures");
+        }
+    },
+
+    testInstanceOf: {
+        test: function(cmp) {
+            cmp.sanityChecksTester("testInstanceOf");
+        }
     }
 })

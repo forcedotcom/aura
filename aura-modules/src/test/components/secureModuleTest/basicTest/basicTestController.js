@@ -62,5 +62,12 @@
         var testUtils = cmp.get("v.testUtils");
         var testModule = cmp.find("bootstrap");
         testUtils.assertTrue(testModule.testSecureModulesInUnsupportedBrowsers());
+    },
+
+    sanityChecksTester: function(cmp, event) {
+        var testUtils = cmp.get("v.testUtils");
+        var testModule = cmp.find("sanityChecks");
+        var params = event.getParam('arguments');
+        testModule[params.testCase]();
     }
 })

@@ -124,7 +124,7 @@
 		    helper.doTestEvalForSecureWindow(cmp, function() { return parent }, testUtils);
 	    }
 		// DCHASMAN TODO Here is where things go south: basically it looks like aura.mode=JSTESTDEBUG results in an aura doc iframed and missing the CSP header entirely
-		// so that needs to be addressed (results in failures of things that should be blocked by unsafe-inoine etc)
+		// so that needs to be addressed (results in failures of things that should be blocked by unsafe-inline etc)
 
 		//helper.doTestEvalForUndefined(cmp, function() { var evil = eval; ("indirect", evil)("this") }, testUtils);
 		//helper.doTestEvalForUndefined(cmp, function() { return ("indirect", eval)((new Function("return this"))()) }, testUtils);
@@ -218,6 +218,7 @@
         // Try to access the internal prototype of a SecureElement
         var el = cmp.find("content").getElement();
         var prototype = Object.getPrototypeOf(el);
+        // Will start failing once W-4184609 or W-4180046 or W-4274468 is fixed
         testUtils.assertTrue(prototype === HTMLDivElement.prototype);
     },
 

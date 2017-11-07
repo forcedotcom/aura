@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-10-30
- * Version: 0.2.5
+ * Generated: 2017-11-06
+ * Version: 0.2.6
  */
 
 (function (global, factory) {
@@ -914,6 +914,32 @@ const metadata$3 = {
  * limitations under the License.
  */
 
+let warn = window.console.warn;
+let error = Error;
+
+function registerReportAPI(api) {
+    if (api) {
+        warn = api.warn;
+        error = api.error;
+    }
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 function SecureLocation(loc, key) {
 
     var o = getFromCache(loc, key);
@@ -933,8 +959,30 @@ function SecureLocation(loc, key) {
         SecureObject.addPropertyIfSupported(o, loc, property);
     });
 
-    ["assign", "reload", "replace"].forEach(function(method) {
+    ["reload", "replace"].forEach(function(method) {
         SecureObject.addMethodIfSupported(o, loc, method);
+    });
+
+
+    /**
+     * When a location.assign() call is found the href provided is evaluated
+     * to ensure it is a legal scheme. 'http' and 'https' are considered
+     * legal, while other schemes will throw an error because they present a possibility for
+     * un-intended script execution.
+     */
+    SecureObject.addMethodIfSupported(o, loc, 'assign', {
+        beforeCallback: function(href) {
+            if (href && typeof href === 'string' && href.length > 1) {
+                var dummy = document.createElement('a');
+                dummy.href = href;
+
+                if (dummy.protocol === 'http:' || dummy.protocol === 'https:') {
+                    return href;
+                } else {
+                    throw new error('SecureLocation.assign only supports http://, https:// schemes.');
+                }
+            }
+        }
     });
 
     setRef(o, loc, key);
@@ -989,32 +1037,6 @@ function SecureNavigator(navigator, key) {
     registerProxy(o);
 
     return o;
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-let warn = window.console.warn;
-let error = Error;
-
-function registerReportAPI(api) {
-    if (api) {
-        warn = api.warn;
-        error = api.error;
-    }
 }
 
 /*
@@ -2648,6 +2670,34 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
         }
     };
 
+    var orignalSetAttributeNode = prototype.setAttributeNode;
+    elementOverrides["setAttributeNode"] = {
+        value: function (attr) {
+            var raw = unwrap$1(this, attr);
+            if (!raw) {
+                // this will allow the browser to throw TypeError using native error messages
+                orignalGetAttributeNode.call(this, raw);
+            }
+
+            /* We are interested in the value of the given attribute but we want
+            to avoid executing any getters so we will clone it and attach it
+            to a floating element which is not going to be a script tag.
+            According to https://dev.w3.org/html5/spec-preview/the-script-element.html section 14
+            some browsers may initiate fetching the script before it has been
+            added to the DOM. Not using a script tag will prevent that. */
+            var clone = raw.cloneNode();
+            var floatingElement = document.createElement("span");
+            floatingElement.setAttributeNode(clone);
+
+            if (floatingElement.hasAttribute("src")) {
+                raw = document.createAttribute(getAttributeName("src"));
+                raw.value = floatingElement.getAttribute("src");
+            }
+            var replacedAttr = orignalSetAttributeNode.call(this, raw);
+            return SecureObject.filterEverything(this, replacedAttr);
+        }
+    };
+
     elementOverrides["attributes"] = SecureObject.createFilteredPropertyStateless("attributes", prototype, {
         writable: false,
         afterGetCallback: function(attributes) {
@@ -2691,7 +2741,6 @@ SecureScriptElement.run = function(st) {
 
     // Get source using XHR and secure it using
     var xhr = new XMLHttpRequest();
-
     xhr.onreadystatechange = function() {
         var key = getKey(st);
         if (xhr.readyState === 4 && xhr.status === 200) {

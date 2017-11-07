@@ -112,20 +112,20 @@
         ]
     },
 
-    testDoesntReturnDefaultFromInteropComponent: {
+    testReturnsDefaultFromInteropComponent: {
         test: [
             function defaultProps(cmp) {
                 var list = cmp.find('list-without-items');
 
                 // The default value held by the InteropComponent element shouldn't be retrievable using the cmp.get
                 $A.test.assertEquals(
-                    list.get('v.items'),
-                    undefined,
+                    0,
+                    list.get('v.items').length,
                     'Wrong number of items on InteropComponent'
                 );
                 $A.test.assertEquals(
-                    list.getElement().items.length,
                     0,
+                    list.getElement().items.length,
                     'Wrong number of items on Element'
                 );
             }
@@ -140,13 +140,13 @@
                 list.set('v.items', [{ label: 'item1' }, { label: 'item2' }]);
 
                 $A.test.assertEquals(
-                    list.get('v.items').length,
                     2,
+                    list.get('v.items').length,
                     'Wrong number of items on InteropComponent'
                 );
                 $A.test.assertEquals(
-                    list.getElement().items.length,
                     2,
+                    list.getElement().items.length,
                     'Wrong number of items on Element'
                 );
             },
@@ -157,15 +157,14 @@
                     .querySelectorAll('li');
 
                 $A.test.assertEquals(
-                    itemElement.length,
                     2,
+                    itemElement.length,
                     'Wrong number of items has been rendered'
                 );
             }
         ]
     },
     testCanReadPublicAccessors: {
-        browsers: ['GOOGLECHROME'],
         test: [
             function (cmp) {
                 var interopCmp = cmp.find('main');
@@ -175,7 +174,6 @@
         ]
     },
     testCanReadUpdatedAccessorValue: {
-        browsers: ['GOOGLECHROME'],
         test: [
             function (cmp) {
                 var interopCmp = cmp.find('main');
@@ -186,7 +184,6 @@
         ]
     },
     testCanPassPRV: {
-        browsers: ['GOOGLECHROME'],
         test: [
             function (cmp) {
                 $A.test.assertEquals('accessor-test-value', cmp.get('v.accessorValue'), 'accessor value should be reflected on the PRV.');
@@ -199,7 +196,6 @@
         ]
     },
     testAccessorIgnoresPassedPrimitiveValue: {
-        browsers: ['GOOGLECHROME'],
         test: [
             function (cmp) {
                 var interopCmp = cmp.find('accessor-primitive-value');
@@ -209,6 +205,18 @@
                 interopCmp.getElement().querySelector(this.selector.changeValuesBtn).click();
 
                 $A.test.assertEquals('modified-accessor-value', interopCmp.get('v.myAccessor'), 'should be able to read accessor modified value');
+            }
+        ]
+    },
+    // Interop: Cannot get value of attribute that's not bound to parent cmp #784
+    testCanGetUnboundAttributes: {
+        test: [
+            function(cmp) {
+                var unboundChild = cmp.find('unbound');
+                var attributes = ['literal', 'bound', 'unbound', 'expression', 'nested'];
+                attributes.forEach(function(attribute) {
+                    $A.test.assertDefined(unboundChild.get('v.' + attribute), 'attribute [' + attribute + '] should be defined');
+                });
             }
         ]
     }

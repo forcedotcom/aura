@@ -87,4 +87,30 @@ public interface ServerErrorUtilAdapter extends AuraAdapter {
      * @param level         Logging level for the exception 
      */
     void handleCustomException(String message, Throwable thrown, String customMessage, Level level);
+
+    /**
+     * Results in a customized error experienced.
+     * Action error callback will be invoked.
+     * Note that this API should only be used if only custom string is desired in action callback
+     * @param message                Error message
+     * @param thrown                 Exception being handled
+     * @param data                   Custom properties for the error, available in the response.
+     * @param level                  Logging level for the exception 
+     * @param processErrorMessage    String that is passed into processError method for logging
+     */
+    void handleCustomException(String message, Throwable thrown, JsonSerializable data, Level level,
+            String processErrorMessage);
+
+    /**
+     * Results in a customized error experienced.
+     * Action error callback will be invoked.
+     * Note that this API should only be used if only custom string is desired in action callback
+     * @param message                Error message
+     * @param thrown                 Exception being handled
+     * @param customMessage          Custom string for the error, available in the contextMessage property in the response.
+     * @param level                  Logging level for the exception 
+     * @param processErrorMessage    String that is passed into processError method for logging
+     */
+    void handleCustomException(String message, Throwable thrown, String customMessage, Level level,
+            String processErrorMessage);
 }

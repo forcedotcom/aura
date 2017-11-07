@@ -59,7 +59,7 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
     @Override
     public void handleException(String message, Throwable thrown, Level level) {
         // Process the error and get its id.
-        final String errorId = processError(message, thrown, level);
+        final String errorId = processError(message, thrown, level, null);
 
         // Create a new exception for the default error experience.
         final GenericEventException gee = getDefaultException(errorId, message, thrown);
@@ -97,7 +97,7 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
     @Override
     public void handleCustomException(String message, Throwable thrown, JsonSerializable data, Level level) {
         // Process the error and get its id.
-        final String errorId = processError(message, thrown, level);
+        final String errorId = processError(message, thrown, level, null);
 
         final GenericEventException gee = getCustomException(errorId, message, thrown, data);
 
@@ -106,7 +106,22 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
 
     @Override
     public void handleCustomException(String message, Throwable thrown, String customMessage, Level level) {
-        final String errorId = processError(message, thrown, level);
+        final String errorId = processError(message, thrown, level, customMessage);
+        DefaultCustomErrorData data = new DefaultCustomErrorData(customMessage);
+        final GenericEventException gee = getCustomException(errorId, message, thrown, data);
+        throw gee;
+    }
+
+    @Override
+    public void handleCustomException(String message, Throwable thrown, JsonSerializable data, Level level, String processErrorMessage) {
+        final String errorId = processError(message, thrown, level, processErrorMessage);
+        final GenericEventException gee = getCustomException(errorId, message, thrown, data);
+        throw gee;
+    }
+    
+    @Override
+    public void handleCustomException(String message, Throwable thrown, String customMessage, Level level, String processErrorMessage) {
+        final String errorId = processError(message, thrown, level, processErrorMessage);
         DefaultCustomErrorData data = new DefaultCustomErrorData(customMessage);
         final GenericEventException gee = getCustomException(errorId, message, thrown, data);
         throw gee;
@@ -126,11 +141,12 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
      * Default implementation for processing the error (e.g. logging).
      * Context-specific implementations can override this if needed.
      *
-     * @param message   Error message
-     * @param thrown    Error thrown
-     * @return          The error's id
+     * @param message   			Error message
+     * @param thrown    			Error thrown
+     * @param customErrorDetails    Custom error context
+     * @return            			The error's id
      */
-    protected String processError(String message, Throwable thrown, Level level) {
+    protected String processError(String message, Throwable thrown, Level level, @Nullable String customErrorDetails) {
         // Log the error.
         if (level.equals(Level.INFO)) {
             logger.info(message, thrown);

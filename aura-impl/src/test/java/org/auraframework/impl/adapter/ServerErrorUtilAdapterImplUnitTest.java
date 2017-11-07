@@ -76,7 +76,7 @@ public class ServerErrorUtilAdapterImplUnitTest {
         logger.addAppender(appender);
 
         String message = "err";
-        String errorId = serverErrorUtilAdapter.processError(message, new RuntimeException(), Level.INFO);
+        String errorId = serverErrorUtilAdapter.processError(message, new RuntimeException(), Level.INFO, null);
 
         // This will throw if errorId isn't a uuid.
         UUID.fromString(errorId);

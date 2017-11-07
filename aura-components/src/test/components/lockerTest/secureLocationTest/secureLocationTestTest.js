@@ -13,7 +13,8 @@
         }
     },
 
-    testAssignJavascriptBypass: {
+    // Disabled until pull request #1851 gets in
+    _testAssignJavascriptBypass: {
         test: function(cmp) {
             cmp.testAssignJavascriptBypass();
         }

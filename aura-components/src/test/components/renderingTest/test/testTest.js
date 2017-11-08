@@ -17,9 +17,9 @@
     /**
      * Verify that simple array values are passed to facets and rendered.
      */
-    // TODO: W-1279147 user Story to render String Arrays
-    _testRenderingSimpleValueArrayInFacet : {
+    testRenderingSimpleValueArrayInFacet : {
         test : [ function(cmp) {
+
             // First level of Facet
             var arrayFacet = cmp.find("arrayFacet");
             $A.test.assertTruthy(arrayFacet);
@@ -28,9 +28,27 @@
             var simpleValueArray = arrayFacet.find("simpleValueArray");
             $A.test.assertTruthy(simpleValueArray);
             // Verify that value came down from model of top level component
-            $A.test.assertEquals("onetwothree", $A.test
-                    .getTextByComponent(simpleValueArray));
+            $A.test.assertEquals("", $A.test.getTextByComponent(simpleValueArray));
         } ]
+    },
+
+    testSkipRenderingOfNonComponents : {
+        test : [ function(cmp) {
+            cmp.set("v.stringAttribute", "non-component");
+        },
+        function(cmp) {
+            var output = cmp.find("output");
+
+            $A.test.assertEquals("non-component", $A.test.getTextByComponent(output));
+        },
+         function(cmp) {
+            cmp.set("v.stringAttribute", "non-component2");
+        },
+        function(cmp) {
+            var output = cmp.find("output");
+
+            $A.test.assertEquals("non-component2", $A.test.getTextByComponent(output));
+        }]
     },
 
     testRenderingComponentArrayInFacet : {

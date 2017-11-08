@@ -122,6 +122,20 @@ AuraComponentService.prototype.getComponent = function(identifier) {
 };
 
 /**
+ *  Validates as best it can that the config bag you specified is a ComponentDefRef that
+ *  we can use to create instances of components from.
+ */
+AuraComponentService.prototype.isComponentDefRef = function(config) {
+    if(!$A.util.isObject(config)) {
+        return false;
+    }
+
+    var descriptor = config[Json.ApplicationKey.DESCRIPTOR] || config["descriptor"] || (config["componentDef"] && config["componentDef"]["descriptor"]);
+
+    return descriptor !== null && descriptor !== undefined;
+};
+
+/**
  * Gets descriptor from the config object (for normalization)
  * @param {Object} Controller descriptor config
  * @returns {String} Descriptor

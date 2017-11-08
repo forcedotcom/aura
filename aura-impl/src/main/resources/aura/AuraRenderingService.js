@@ -59,19 +59,18 @@ AuraRenderingService.prototype.render = function(components, parent) {
 
     for (var i=0; i < components.length; i++){
         var cmp = components[i];
-        //JBUCH: HALO: FIXME: WE SHOULD REFUSE TO RENDER THINGS THAT AREN'T COMPONENTS
-        //KRIS: HALO: This might be for component configs.
-        if (!$A.util.isComponent(cmp)) {
-            // If someone passed a config in, construct it.
-            cmp = $A.componentService.createComponentPriv(cmp);
-            // And put the constructed component back into the array.
-            components[i] = cmp;
 
-            if(!$A.util.isComponent(cmp)) {
-                throw new $A.auraError("AuraRenderingService.render: 'cmp' must be a valid Component, found '" + cmp + "'.", null, $A.severity.QUIET);
+        if (!$A.util.isComponent(cmp)) {
+            if($A.componentService.isComponentDefRef(cmp)) {
+                // If someone passed a config in, construct it.
+                cmp = $A.componentService.createComponentPriv(cmp);
+                // And put the constructed component back into the array.
+                components[i] = cmp;
+            } else {
+                $A.warning("AuraRenderingService.render: 'component[" + i + "]' was not a valid component, found '" + cmp + "'.");
+                continue;
             }
         }
-        // JBUCH: HALO: TODO: END REMOVE ME
 
         if (cmp.isValid()) {
             $A.clientService.setCurrentAccess(cmp);
@@ -212,7 +211,8 @@ AuraRenderingService.prototype.afterRender = function(components) {
     for(var i=0;i<components.length;i++){
         var cmp = components[i];
         if(!$A.util.isComponent(cmp)) {
-            throw new $A.auraError("AuraRenderingService.afterRender: 'cmp' must be a valid Component, found '"+cmp+"'.", null, $A.severity.QUIET);
+            $A.warning("AuraRenderingService.afterRender: 'cmp' must be a valid Component, found '"+cmp+"'.", null, $A.severity.QUIET);
+            continue;
         }
         if(cmp.isValid()) {
             $A.clientService.setCurrentAccess(cmp);
@@ -386,6 +386,11 @@ AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) 
             var child = facet[i];
             // Guard against undefined/null facets, as these will cause troubles later.
             if (child) {
+                if(!$A.util.isComponent(child)) {
+                    $A.warning("AuraRenderingService.getUpdatedFacetInfo: all values to be rendered in an expression must be components.  Found '" + child + "' in '" + component.getType() + "'.");
+                    continue;
+                }
+
                 var found = false;
                 for (var j = 0; j < component._facetInfo.length; j++) {
                     if (child === component._facetInfo[j]) {

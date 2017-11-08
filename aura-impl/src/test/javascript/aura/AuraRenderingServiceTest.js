@@ -513,7 +513,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
     [Fixture]
     function AfterRender(){
         [Fact]
-        function ErrorOnNoComponent() {
+        function WarnAndSkipOnNoComponent() {
             var expected = "AuraRenderingService.afterRender: 'cmp' must be a valid Component, found 'bad'.";
             var target;
             mockOnLoadUtil(function(){
@@ -523,17 +523,12 @@ Test.Aura.AuraRenderingServiceTest = function(){
             var actual;
 
             // Act
-            try {
-                mockAuraInfo.mock(function() {
-                    target.afterRender("bad");
-                });
-            } catch (e) {
-                actual = e.message;
-            }
-
+            mockAuraInfo.mock(function() {
+                this.$A.warning = function(msg) { actual = msg; }
+                target.afterRender("bad");
+            });
 
             Assert.Equal(expected, actual);
-
         }
 
         [Fact]

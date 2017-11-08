@@ -27,6 +27,9 @@
     <!--Render components within my own body -->
     {!v.cmps}
 
+    <div aura:id="output">
+        {!v.stringAttribute}
+    </div>
     <renderingTest:conditionalRendering stuffToRender="{!v.flag?v.cmps:v.stringAttribute}" aura:id="conditionalRendering"/>
 
     <!--Rendering by passing components to facet-->

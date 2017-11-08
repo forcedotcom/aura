@@ -19,7 +19,7 @@
     <aura:attribute type="String[]" name="simpleValueArray"/>
     <aura:attribute type="Aura.Component[]" name="componentArray"/>
 
-    <!--div aura:id="simpleValueArray">{!v.simpleValueArray}</div-->
+    <div aura:id="simpleValueArray">{!v.simpleValueArray}</div>
     <div aura:id="componentArray">{!v.componentArray}</div>
 
 </aura:component>

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-11-06
- * Version: 0.2.6
+ * Generated: 2017-11-07
+ * Version: 0.2.7
  */
 
 (function (global, factory) {
@@ -271,2122 +271,6 @@ function getFromCache(raw, key) {
  * limitations under the License.
  */
 
-const metadata$4 = {
-    "ATTRIBUTE_NODE":                 DEFAULT,
-    "CDATA_SECTION_NODE":             DEFAULT,
-    "COMMENT_NODE":                   DEFAULT,
-    "DOCUMENT_FRAGMENT_NODE":         DEFAULT,
-    "DOCUMENT_NODE":                  DEFAULT,
-    "DOCUMENT_POSITION_CONTAINED_BY": DEFAULT,
-    "DOCUMENT_POSITION_CONTAINS":     DEFAULT,
-    "DOCUMENT_POSITION_DISCONNECTED": DEFAULT,
-    "DOCUMENT_POSITION_FOLLOWING":    DEFAULT,
-    "DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC": DEFAULT,
-    "DOCUMENT_POSITION_PRECEDING":    DEFAULT,
-    "DOCUMENT_TYPE_NODE":             DEFAULT,
-    "ELEMENT_NODE":                   DEFAULT,
-    "ENTITY_NODE":                    DEFAULT,
-    "ENTITY_REFERENCE_NODE":          DEFAULT,
-    "NOTATION_NODE":                  DEFAULT,
-    "PROCESSING_INSTRUCTION_NODE":    DEFAULT,
-    "TEXT_NODE":                      DEFAULT,
-    "appendChild":                    FUNCTION,
-    "baseURI":                        DEFAULT,
-    "childNodes":                     DEFAULT,
-    "cloneNode":                      FUNCTION,
-    "compareDocumentPosition":        FUNCTION_RAW_ARGS,
-    "contains":                       FUNCTION_RAW_ARGS,
-    "firstChild":                     SKIP_OPAQUE,
-    "hasChildNodes":                  FUNCTION,
-    "insertBefore":                   FUNCTION,
-    "isDefaultNamespace":             FUNCTION,
-    "isEqualNode":                    FUNCTION_RAW_ARGS,
-    "isSameNode":                     FUNCTION_RAW_ARGS,
-    "lastChild":                      SKIP_OPAQUE,
-    "lookupNamespaceURI":             FUNCTION,
-    "lookupPrefix":                   FUNCTION,
-    "nextSibling":                    SKIP_OPAQUE,
-    "nodeName":                       DEFAULT,
-    "nodeType":                       DEFAULT,
-    "nodeValue":                      DEFAULT,
-    "normalize":                      FUNCTION,
-    "ownerDocument":                  DEFAULT,
-    "parentElement":                  SKIP_OPAQUE,
-    "parentNode":                     SKIP_OPAQUE,
-    "previousSibling":                SKIP_OPAQUE,
-    "removeChild":                    FUNCTION,
-    "replaceChild":                   FUNCTION,
-    "textContent":                    DEFAULT
-};
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-function SecureDOMEvent(event, key) {
-
-    var o = getFromCache(event, key);
-    if (o) {
-        return o;
-    }
-
-    o = Object.create(null, {
-        toString: {
-            value: function() {
-                return "SecureDOMEvent: " + event + "{ key: " + JSON.stringify(key) + " }";
-            }
-        }
-    });
-
-    var DOMEventSecureDescriptors = {
-        // Events properties that are DOM Elements were compiled from
-        // https://developer.mozilla.org/en-US/docs/Web/Events
-        target: SecureObject.createFilteredProperty(o, event, "target"),
-        currentTarget: SecureObject.createFilteredProperty(o, event, "currentTarget"),
-
-        initEvent: SecureObject.createFilteredMethod(o, event, "initEvent"),
-        // Touch Events are special on their own:
-        // https://developer.mozilla.org/en-US/docs/Web/API/Touch
-        touches: SecureDOMEvent.filterTouchesDescriptor(o, event, "touches"),
-        targetTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, "targetTouches"),
-        changedTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, "changedTouches"),
-
-        view: {
-            get: function() {
-                var key = getKey(o);
-                var swin = getEnv$1(key);
-                var win = getRef(swin, key);
-                return win === event.view ? swin : undefined;
-            }
-        }
-    };
-
-    ["preventDefault", "stopImmediatePropagation", "stopPropagation"].forEach(function(method) {
-        SecureObject.addMethodIfSupported(o, event, method);
-    });
-
-    // non-standard properties and aliases
-    ["relatedTarget", "srcElement", "explicitOriginalTarget", "originalTarget"].forEach(function(property) {
-        SecureObject.addPropertyIfSupported(o, event, property);
-    });
-
-    // re-exposing externals
-    // TODO: we might need to include non-enumerables
-    for (var name in event) {
-        if (!(name in o)) {
-            // every DOM event has a different shape, we apply filters when possible,
-            // and bypass when no secure filter is found.
-            Object.defineProperty(o, name, DOMEventSecureDescriptors[name] || SecureObject.createFilteredProperty(o, event, name));
-        }
-    }
-
-    setRef(o, event, key);
-    addToCache(event, o, key);
-    registerProxy(o);
-
-    return o;
-}
-
-SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
-
-    var valueOverride;
-    // descriptor to produce a new collection of touches where the target of each
-    // touch is a secure element
-    return {
-        get: function() {
-            if (valueOverride) {
-                return valueOverride;
-            }
-            // perf hard-wired in case there is not a touches to wrap
-            var touches = event[propName];
-            if (!touches) {
-                return touches;
-            }
-            // touches, of type ToucheList does not implement "map"
-            return Array.prototype.map.call(touches, function(touch) {
-                // touches is normally a big big collection of touch objects,
-                // we do not want to pre-process them all, just create the getters
-                // and process the accessor on the spot. e.g.:
-                // https://developer.mozilla.org/en-US/docs/Web/Events/touchstart
-                var keys = [];
-                var touchShape = touch;
-                // Walk up the prototype chain and gather all properties
-                do {
-                    keys = keys.concat(Object.keys(touchShape));
-                } while ((touchShape = Object.getPrototypeOf(touchShape)) && touchShape !== Object.prototype);
-
-                // Create a stub object with all the properties
-                return keys.reduce(function(o, p) {
-                    return Object.defineProperty(o, p, {
-                        // all props in a touch object are readonly by spec:
-                        // https://developer.mozilla.org/en-US/docs/Web/API/Touch
-                        get: function() {
-                            return SecureObject.filterEverything(se, touch[p]);
-                        }
-                    });
-                }, {});
-            });
-        },
-        set: function(value) {
-            valueOverride = value;
-        }
-    };
-};
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-const metadata$5 = {
-    "addEventListener":               FUNCTION,
-    "dispatchEvent":                  FUNCTION,
-    "removeEventListener":            FUNCTION
-};
-
-function addEventTargetMethods(st, raw, key) {
-    Object.defineProperties(st, {
-        addEventListener: createAddEventListenerDescriptor(st, raw, key),
-        dispatchEvent: SecureObject.createFilteredMethod(st, raw, "dispatchEvent", { rawArguments: true }),
-
-        // removeEventListener() is special in that we do not want to
-        // unfilter/unwrap the listener argument or it will not match what
-        // was actually wired up originally
-        removeEventListener: {
-            writable: true,
-            value: function(type, listener, options) {
-                var sCallback = getFromCache(listener, key);
-                raw.removeEventListener(type, sCallback, options);
-            }
-        }
-    });
-}
-
-function createEventTargetMethodsStateless(config, prototype) {
-    config["addEventListener"] = createAddEventListenerDescriptorStateless(prototype);
-
-    config["dispatchEvent"] = SecureObject.createFilteredMethodStateless("dispatchEvent", prototype, { rawArguments: true });
-
-    // removeEventListener() is special in that we do not want to
-    // unfilter/unwrap the listener argument or it will not match what
-    // was actually wired up originally
-    config["removeEventListener"] = {
-        value: function(type, listener, options) {
-            var raw = SecureObject.getRaw(this);
-            var sCallback = getFromCache(listener, getKey(this));
-            raw.removeEventListener(type, sCallback, options);
-        }
-    };
-}
-
-function createAddEventListenerDescriptor(st, el, key) {
-    return {
-        writable: true,
-        value: function(event, callback, useCapture) {
-            if (!callback) {
-                return; // by spec, missing callback argument does not throw,
-                // just ignores it.
-            }
-
-            var sCallback = getFromCache(callback, key);
-            if (!sCallback) {
-                sCallback = function(e) {
-                    verifyAccess(st, callback, true);
-                    var se = SecureDOMEvent(e, key);
-                    callback.call(st, se);
-                };
-
-                // Back reference for removeEventListener() support
-                addToCache(callback, sCallback, key);
-                setKey(callback, key);
-            }
-
-            el.addEventListener(event, sCallback, useCapture);
-        }
-    };
-}
-
-function createAddEventListenerDescriptorStateless() {
-    return {
-        value: function(event, callback, useCapture) {
-            if (!callback) {
-                return; // by spec, missing callback argument does not throw,
-                // just ignores it.
-            }
-
-            var so = this;
-            var el = SecureObject.getRaw(so);
-            var key = getKey(so);
-            var sCallback = getFromCache(callback, key);
-            if (!sCallback) {
-                sCallback = function(e) {
-                    verifyAccess(so, callback, true);
-                    var se = SecureDOMEvent(e, key);
-                    callback.call(so, se);
-                };
-
-                // Back reference for removeEventListener() support
-                addToCache(callback, sCallback, key);
-                setKey(callback, key);
-            }
-
-            el.addEventListener(event, sCallback, useCapture);
-        }
-    };
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-function SecureDocument(doc, key) {
-
-    var o = getFromCache(doc, key);
-    if (o) {
-        return o;
-    }
-
-    // create prototype to allow instanceof checks against document
-    var prototype = function() {};
-    Object.freeze(prototype);
-
-    o = Object.create(prototype, {
-        toString: {
-            value: function() {
-                return "SecureDocument: " + doc + "{ key: " + JSON.stringify(key) + " }";
-            }
-        },
-        createAttribute: {
-            value: function(name) {
-                var att = doc.createAttribute(name);
-                setKey(att, key);
-                return SecureElement(att, key);
-            }
-        },
-        createElement: {
-            value: function(tag) {
-                var el = doc.createElement(tag);
-                setKey(el, key);
-                return SecureElement(el, key);
-            }
-        },
-        createElementNS: {
-            value: function(namespace, tag) {
-                var el = doc.createElementNS(namespace, tag);
-                setKey(el, key);
-                return SecureElement(el, key);
-            }
-        },
-        createDocumentFragment: {
-            value: function() {
-                var el = doc.createDocumentFragment();
-                setKey(el, key);
-                return SecureElement(el, key);
-            }
-        },
-        createTextNode: {
-            value: function(text) {
-                var el = doc.createTextNode(text);
-                setKey(el, key);
-                return SecureElement(el, key);
-            }
-        },
-        createComment: {
-            value: function(data) {
-                var el = doc.createComment(data);
-                setKey(el, key);
-                return SecureElement(el, key);
-            }
-        },
-        domain: {
-            get: function() {
-                return doc.domain;
-            },
-            set: function() {
-                throw new Error("SecureDocument does not allow setting domain property.");
-            }
-        },
-        querySelector: {
-            value: function(selector) {
-                return SecureElement.secureQuerySelector(doc, key, selector);
-            }
-        }
-    });
-
-    addEventTargetMethods(o, doc, key);
-
-    function getCookieKey() {
-        return "LSKey[" + key["namespace"] + "]";
-    }
-
-    Object.defineProperty(o, "cookie", {
-        get: function() {
-            var fullCookie = doc.cookie;
-            var entries = fullCookie.split(";");
-            var cookieKey = getCookieKey();
-            // filter out cookies that do not match current namespace
-            var nsFiltered = entries.filter(function(val) {
-                var left = val.split("=")[0].trim();
-                return left.indexOf(cookieKey) === 0;
-            });
-            // strip LockerService key before returning to user land
-            var keyFiltered = nsFiltered.map(function(val) {
-                return val.trim().substring(cookieKey.length);
-            });
-            return keyFiltered.join("; ");
-        },
-        set: function(cookie) {
-            var chunks = cookie.split(";");
-            var entry = chunks[0].split("=");
-            var newKey = getCookieKey() + entry[0];
-            chunks[0] = newKey + "=" + entry[1];
-            var newCookie = chunks.join(";");
-            doc.cookie = newCookie;
-        }
-    });
-
-    ["implementation"].forEach(function(name) {
-        // These are direct passthrough's and should never be wrapped in a SecureObject
-        Object.defineProperty(o, name, {
-            enumerable: true,
-            value: doc[name]
-        });
-    });
-
-    SecureObject.addPrototypeMethodsAndProperties(metadata$3, o, doc, key);
-
-    setRef(o, doc, key);
-    addToCache(doc, o, key);
-    registerProxy(o);
-
-    return o;
-}
-
-const metadata$3 = {
-    "prototypes": {
-        "HTMLDocument" : {
-            // Defined on Instance
-            "location":                         DEFAULT,
-            // Defined on Proto
-            "fgColor":                          DEFAULT,
-            "linkColor":                        DEFAULT,
-            "vlinkColor":                       DEFAULT,
-            "alinkColor":                       DEFAULT,
-            "bgColor":                          DEFAULT,
-            "clear":                            FUNCTION,
-            "captureEvents":                    FUNCTION,
-            "releaseEvents":                    FUNCTION
-        },
-        "Document" : {
-            "URL":                              DEFAULT,
-            "activeElement":                    DEFAULT,
-            "adoptNode":                        FUNCTION,
-            "anchors":                          DEFAULT,
-            "applets":                          DEFAULT,
-            "body":                             DEFAULT,
-            "caretRangeFromPoint":              FUNCTION,
-            "characterSet":                     DEFAULT,
-            "charset":                          DEFAULT,
-            "childElementCount":                DEFAULT,
-            "children":                         DEFAULT,
-            "close":                            FUNCTION,
-            "compatMode":                       DEFAULT,
-            "contentType":                      DEFAULT,
-            "cookie":                           DEFAULT,
-            "createAttribute":                  FUNCTION,
-            "createAttributeNS":                FUNCTION,
-            "createCDATASection":               FUNCTION,
-            "createComment":                    FUNCTION,
-            "createDocumentFragment":           FUNCTION,
-            "createElement":                    FUNCTION,
-            "createElementNS":                  FUNCTION,
-            "createEvent":                      FUNCTION,
-            "createExpression":                 FUNCTION,
-            "createNSResolver":                 FUNCTION,
-            "createNodeIterator":               FUNCTION,
-            "createProcessingInstruction":      FUNCTION,
-            "createRange":                      FUNCTION,
-            "createTextNode":                   FUNCTION,
-            "createTreeWalker":                 FUNCTION,
-            "defaultView":                      DEFAULT,
-            "designMode":                       DEFAULT,
-            "dir":                              DEFAULT,
-            "doctype":                          DEFAULT,
-            "documentElement":                  DEFAULT,
-            "documentURI":                      DEFAULT,
-            // SecureDocument does not allow setting domain property.
-            // "domain":                           DEFAULT,
-            "elementFromPoint":                 FUNCTION,
-            "elementsFromPoint":                FUNCTION,
-            "embeds":                           DEFAULT,
-            "evaluate":                         FUNCTION,
-            "execCommand":                      FUNCTION,
-            "exitPointerLock":                  FUNCTION,
-            "firstElementChild":                DEFAULT,
-            "fonts":                            DEFAULT,
-            "forms":                            DEFAULT,
-            "getElementById":                   FUNCTION,
-            "getElementsByClassName":           FUNCTION,
-            "getElementsByName":                FUNCTION,
-            "getElementsByTagName":             FUNCTION,
-            "getElementsByTagNameNS":           FUNCTION,
-            "getSelection":                     FUNCTION,
-            "hasFocus":                         FUNCTION,
-            "head":                             DEFAULT,
-            "hidden":                           DEFAULT,
-            "images":                           DEFAULT,
-            "implementation":                   DEFAULT,
-            "importNode":                       FUNCTION,
-            "inputEncoding":                    DEFAULT,
-            "lastElementChild":                 DEFAULT,
-            "lastModified":                     DEFAULT,
-            "links":                            DEFAULT,
-            "onabort":                          EVENT,
-            "onautocomplete":                   EVENT,
-            "onautocompleteerror":              EVENT,
-            "onbeforecopy":                     EVENT,
-            "onbeforecut":                      EVENT,
-            "onbeforepaste":                    EVENT,
-            "onblur":                           EVENT,
-            "oncancel":                         EVENT,
-            "oncanplay":                        EVENT,
-            "oncanplaythrough":                 EVENT,
-            "onchange":                         EVENT,
-            "onclick":                          EVENT,
-            "onclose":                          EVENT,
-            "oncontextmenu":                    EVENT,
-            "oncopy":                           EVENT,
-            "oncuechange":                      EVENT,
-            "oncut":                            EVENT,
-            "ondblclick":                       EVENT,
-            "ondrag":                           EVENT,
-            "ondragend":                        EVENT,
-            "ondragenter":                      EVENT,
-            "ondragleave":                      EVENT,
-            "ondragover":                       EVENT,
-            "ondragstart":                      EVENT,
-            "ondrop":                           EVENT,
-            "ondurationchange":                 EVENT,
-            "onemptied":                        EVENT,
-            "onended":                          EVENT,
-            "onerror":                          EVENT,
-            "onfocus":                          EVENT,
-            "oninput":                          EVENT,
-            "oninvalid":                        EVENT,
-            "onkeydown":                        EVENT,
-            "onkeypress":                       EVENT,
-            "onkeyup":                          EVENT,
-            "onload":                           EVENT,
-            "onloadeddata":                     EVENT,
-            "onloadedmetadata":                 EVENT,
-            "onloadstart":                      EVENT,
-            "onmousedown":                      EVENT,
-            "onmouseenter":                     EVENT,
-            "onmouseleave":                     EVENT,
-            "onmousemove":                      EVENT,
-            "onmouseout":                       EVENT,
-            "onmouseover":                      EVENT,
-            "onmouseup":                        EVENT,
-            "onmousewheel":                     EVENT,
-            "onpaste":                          EVENT,
-            "onpause":                          EVENT,
-            "onplay":                           EVENT,
-            "onplaying":                        EVENT,
-            "onpointerlockchange":              EVENT,
-            "onpointerlockerror":               EVENT,
-            "onprogress":                       EVENT,
-            "onratechange":                     EVENT,
-            "onreadystatechange":               EVENT,
-            "onreset":                          EVENT,
-            "onresize":                         EVENT,
-            "onscroll":                         EVENT,
-            "onsearch":                         EVENT,
-            "onseeked":                         EVENT,
-            "onseeking":                        EVENT,
-            "onselect":                         EVENT,
-            "onselectionchange":                EVENT,
-            "onselectstart":                    EVENT,
-            "onshow":                           EVENT,
-            "onstalled":                        EVENT,
-            "onsubmit":                         EVENT,
-            "onsuspend":                        EVENT,
-            "ontimeupdate":                     EVENT,
-            "ontoggle":                         EVENT,
-            "ontouchcancel":                    EVENT,
-            "ontouchend":                       EVENT,
-            "ontouchmove":                      EVENT,
-            "ontouchstart":                     EVENT,
-            "onvolumechange":                   EVENT,
-            "onwaiting":                        EVENT,
-            "onwebkitfullscreenchange":         EVENT,
-            "onwebkitfullscreenerror":          EVENT,
-            "onwheel":                          EVENT,
-            "open":                             FUNCTION,
-            "origin":                           DEFAULT,
-            "plugins":                          DEFAULT,
-            "pointerLockElement":               DEFAULT,
-            "preferredStylesheetSet":           DEFAULT,
-            "queryCommandEnabled":              FUNCTION,
-            "queryCommandIndeterm":             FUNCTION,
-            "queryCommandState":                FUNCTION,
-            "queryCommandSupported":            FUNCTION,
-            "queryCommandValue":                FUNCTION,
-            "querySelector":                    FUNCTION,
-            "querySelectorAll":                 FUNCTION,
-            "readyState":                       DEFAULT,
-            "referrer":                         DEFAULT,
-            "registerElement":                  FUNCTION,
-            "rootElement":                      DEFAULT,
-            "scripts":                          DEFAULT,
-            "scrollingElement":                 DEFAULT,
-            "selectedStylesheetSet":            DEFAULT,
-            "styleSheets":                      DEFAULT,
-            "title":                            DEFAULT,
-            "visibilityState":                  DEFAULT,
-            "webkitCancelFullScreen":           FUNCTION,
-            "webkitCurrentFullScreenElement":   DEFAULT,
-            "webkitExitFullscreen":             FUNCTION,
-            "webkitFullscreenElement":          DEFAULT,
-            "webkitFullscreenEnabled":          DEFAULT,
-            "webkitHidden":                     DEFAULT,
-            "webkitIsFullScreen":               DEFAULT,
-            "webkitVisibilityState":            DEFAULT,
-            // Blocked on purpose because of security risk
-            // "write":                            FUNCTION,
-            // "writeln":                          FUNCTION,
-            "xmlEncoding":                      DEFAULT,
-            "xmlStandalone":                    DEFAULT,
-            "xmlVersion":                       DEFAULT
-        },
-        "Node": metadata$4,
-        "EventTarget": metadata$5
-    }
-};
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-let warn = window.console.warn;
-let error = Error;
-
-function registerReportAPI(api) {
-    if (api) {
-        warn = api.warn;
-        error = api.error;
-    }
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-function SecureLocation(loc, key) {
-
-    var o = getFromCache(loc, key);
-    if (o) {
-        return o;
-    }
-
-    o = Object.create(null, {
-        toString: {
-            value: function() {
-                return loc.href;
-            }
-        }
-    });
-
-    ["href", "protocol", "host", "hostname", "port", "pathname", "search", "hash", "username", "password", "origin"].forEach(function(property) {
-        SecureObject.addPropertyIfSupported(o, loc, property);
-    });
-
-    ["reload", "replace"].forEach(function(method) {
-        SecureObject.addMethodIfSupported(o, loc, method);
-    });
-
-
-    /**
-     * When a location.assign() call is found the href provided is evaluated
-     * to ensure it is a legal scheme. 'http' and 'https' are considered
-     * legal, while other schemes will throw an error because they present a possibility for
-     * un-intended script execution.
-     */
-    SecureObject.addMethodIfSupported(o, loc, 'assign', {
-        beforeCallback: function(href) {
-            if (href && typeof href === 'string' && href.length > 1) {
-                var dummy = document.createElement('a');
-                dummy.href = href;
-
-                if (dummy.protocol === 'http:' || dummy.protocol === 'https:') {
-                    return href;
-                } else {
-                    throw new error('SecureLocation.assign only supports http://, https:// schemes.');
-                }
-            }
-        }
-    });
-
-    setRef(o, loc, key);
-    addToCache(loc, o, key);
-    registerProxy(o);
-
-    return o;
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-function SecureNavigator(navigator, key) {
-
-    var o = getFromCache(navigator, key);
-    if (o) {
-        return o;
-    }
-
-    o = Object.create(null, {
-        toString: {
-            value: function() {
-                return "SecureNavigator: " + navigator + "{ key: " + JSON.stringify(key) + " }";
-            }
-        }
-    });
-
-    ["appCodeName", "appName", "appVersion", "cookieEnabled", "geolocation",
-        "language", "onLine", "platform", "product", "userAgent"].forEach(function(name) {
-            SecureObject.addPropertyIfSupported(o, navigator, name);
-        });
-
-    ["mediaDevices", "mozGetUserMedia", "webkitGetUserMedia"].forEach(function(name) {
-        SecureObject.addRTCMediaApis(o, navigator, name, key);
-    });
-
-    setRef(o, navigator, key);
-    addToCache(navigator, o, key);
-    registerProxy(o);
-
-    return o;
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-function SecureXMLHttpRequest(key) {
-
-    // Create a new closure constructor for new XHMLHttpRequest() syntax support that captures the key
-    return function() {
-        var xhr = new XMLHttpRequest();
-
-        var o = Object.create(null, {
-            toString: {
-                value: function() {
-                    return "SecureXMLHttpRequest: " + xhr + " { key: " + JSON.stringify(key) + " }";
-                }
-            }
-        });
-
-        // Properties
-        ["readyState", "status", "statusText", "response", "responseType", "responseText",
-            "responseURL", "timeout", "withCredentials", "upload"].forEach(function(name) {
-                SecureObject.addPropertyIfSupported(o, xhr, name);
-            });
-
-        SecureObject.addPropertyIfSupported(o, xhr, "responseXML", {
-            afterGetCallback: function(value) {
-                return value;
-            }
-        });
-
-        // Event handlers
-        ["onloadstart", "onprogress", "onabort", "onerror", "onload", "ontimeout", "onloadend", "onreadystatechange"].forEach(function(name) {
-            Object.defineProperty(o, name, {
-                set: function(callback) {
-                    xhr[name] = function(e) {
-                        callback.call(o, SecureDOMEvent(e, key));
-                    };
-                }
-            });
-        });
-
-        Object.defineProperties(o, {
-            abort: SecureObject.createFilteredMethod(o, xhr, "abort"),
-
-            addEventListener: createAddEventListenerDescriptor(o, xhr, key),
-
-            open: SecureObject.createFilteredMethod(o, xhr, "open", {
-                beforeCallback: function(method, url) {
-                    var normalizer = document.createElement("a");
-                    normalizer.href = decodeURIComponent(url + "");
-                    var urlLower = normalizer.href.toLowerCase();
-                    // TODO: inject URL prefix check
-                    if (urlLower.indexOf("/aura") >= 0) {
-                        throw new error("SecureXMLHttpRequest.open cannot be used with Aura framework internal API endpoints " + url + "!");
-                    }
-                }
-            }),
-
-            send: SecureObject.createFilteredMethod(o, xhr, "send"),
-
-            getAllResponseHeaders: SecureObject.createFilteredMethod(o, xhr, "getAllResponseHeaders"),
-            getResponseHeader: SecureObject.createFilteredMethod(o, xhr, "getResponseHeader"),
-
-            setRequestHeader: SecureObject.createFilteredMethod(o, xhr, "setRequestHeader"),
-
-            overrideMimeType: SecureObject.createFilteredMethod(o, xhr, "overrideMimeType")
-        });
-
-        setRef(o, xhr, key);
-
-        return Object.freeze(o);
-    };
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-function SecureMutationObserver(key) {
-
-    function filterRecords(st, records) {
-        var filtered = [];
-
-        records.forEach(function(record) {
-            if (hasAccess(st, record.target)) {
-                filtered.push(SecureObject.filterEverything(st, record));
-            }
-        });
-
-        return filtered;
-    }
-
-    // Create a new closure constructor for new XHMLHttpRequest() syntax support that captures the key
-    return function(callback) {
-        var o = Object.create(null);
-
-        var observer = new MutationObserver(function(records) {
-            var filtered = filterRecords(o, records);
-            if (filtered.length > 0) {
-                callback(filtered);
-            }
-        });
-
-        Object.defineProperties(o, {
-            toString: {
-                value: function() {
-                    return "SecureMutationObserver: " + observer + " { key: " + JSON.stringify(key) + " }";
-                }
-            },
-
-            "observe": SecureObject.createFilteredMethod(o, observer, "observe", { rawArguments: true }),
-            "disconnect": SecureObject.createFilteredMethod(o, observer, "disconnect"),
-
-            "takeRecords": {
-                writable: true,
-                value: function() {
-                    return filterRecords(o, observer["takeRecords"]());
-                }
-            }
-        });
-
-        setRef(o, observer, key);
-
-        return Object.freeze(o);
-    };
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-function SecureNotification(key) {
-
-    // Create a new closure constructor for new Notification() syntax support that captures the key
-    return function(title, options) {
-        var notification = new Notification(title, options);
-
-        var o = Object.create(null, {
-            toString: {
-                value: function() {
-                    return "SecureNotification: " + notification + " { key: " + JSON.stringify(key) + " }";
-                }
-            }
-        });
-
-        // Properties
-        ["actions", "badge", "body", "data", "dir", "lang", "tag", "icon", "image", "requireInteraction",
-            "silent", "timestamp", "title", "vibrate", "noscreen", "renotify", "sound", "sticky"].forEach(function (name) {
-                SecureObject.addPropertyIfSupported(o, notification, name);
-            });
-
-        // Event handlers
-        ["onclick", "onerror"].forEach(function (name) {
-            Object.defineProperty(o, name, {
-                set: function(callback) {
-                    notification[name] = function(e) {
-                        callback.call(o, SecureDOMEvent(e, key));
-                    };
-                }
-            });
-        });
-
-        Object.defineProperties(o, {
-            close: SecureObject.createFilteredMethod(o, notification, "close")
-        });
-
-        setRef(o, notification, key);
-
-        return Object.freeze(o);
-    };
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-function SecureStorage(storage, type, key) {
-
-    var o = getFromCache(storage, key);
-    if (o) {
-        return o;
-    }
-
-    // Read existing key to synthetic key index from storage
-    var stringizedKey = JSON.stringify(key);
-    var nextSyntheticKey = "LSSNextSynthtic:" + type;
-    var storedIndexKey = "LSSIndex:" + type + stringizedKey;
-    var nameToSyntheticRaw;
-    try {
-      nameToSyntheticRaw = storage.getItem(storedIndexKey);
-    } catch(e) {
-      // There is a bug in google chrome where localStorage becomes inaccessible.
-      // Don't fast fail and break all applications. Defer the exception throwing to when the app actually uses localStorage
-    }
-    var nameToSynthetic = nameToSyntheticRaw ? JSON.parse(nameToSyntheticRaw) : {};
-
-    function persistSyntheticNameIndex() {
-        // Persist the nameToSynthetic index
-        var stringizedIndex = JSON.stringify(nameToSynthetic);
-        storage.setItem(storedIndexKey, stringizedIndex);
-    }
-
-    function getSynthetic(name) {
-        var synthetic = nameToSynthetic[name];
-        if (!synthetic) {
-            var nextSynthticRaw = storage.getItem(nextSyntheticKey);
-            var nextSynthetic = nextSynthticRaw ? Number(nextSynthticRaw) : 1;
-
-            synthetic = nextSynthetic++;
-
-            // Persist the next synthetic counter
-            storage.setItem(nextSyntheticKey, nextSynthetic);
-
-            nameToSynthetic[name] = synthetic;
-
-            persistSyntheticNameIndex();
-        }
-
-        return synthetic;
-    }
-
-    function forgetSynthetic(name) {
-        var synthetic = getSynthetic(name);
-        if (synthetic) {
-            delete nameToSynthetic[name];
-            persistSyntheticNameIndex();
-        }
-    }
-
-    o = Object.create(null, {
-        toString: {
-            value: function() {
-                return "SecureStorage: " + type + " { key: " + JSON.stringify(key) + " }";
-            }
-        },
-
-        length: {
-            get: function() {
-                return Object.keys(nameToSynthetic).length;
-            }
-        },
-
-        getItem: {
-            value: function(name) {
-                var synthetic = getSynthetic(name);
-                return synthetic ? storage.getItem(synthetic) : null;
-            }
-        },
-
-        setItem: {
-            value: function(name, value) {
-                var synthetic = getSynthetic(name);
-                storage.setItem(synthetic, value);
-            }
-        },
-
-        removeItem: {
-            value: function(name) {
-                var syntheticKey = getSynthetic(name);
-                if (syntheticKey) {
-                    storage.removeItem(syntheticKey);
-                    forgetSynthetic(name);
-                }
-            }
-        },
-
-        key: {
-            value: function(index) {
-                return Object.keys(nameToSynthetic)[index];
-            }
-        },
-
-        clear: {
-            value: function() {
-                Object.keys(nameToSynthetic).forEach(function(name) {
-                    var syntheticKey = getSynthetic(name);
-                    storage.removeItem(syntheticKey);
-                });
-
-                // Forget all synthetic
-                nameToSynthetic = {};
-                storage.removeItem(storedIndexKey);
-            }
-        }
-    });
-
-    setRef(o, storage, key);
-    addToCache(storage, o, key);
-    registerProxy(o);
-
-    return o;
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-// For URL, we only need to tame one static method. That method is on the
-// window.URL primordial and disappears from instances of URL. We only create
-// the secure object and we will let the deep freeze operation make it tamper
-// proof.
-
-// Taming of URL createObjectURL will not be necessary on webkit
-// "CSP rules ignored when a page navigates to a blob URL" is declassified,
-// https://bugs.webkit.org/show_bug.cgi?id=174883
-
-// and once the correct behavior on Edge is confirmed (curently in development)
-// https://developer.microsoft.com/en-us/microsoft-edge/platform/status/urlapi/
-
-// Only FireFox implements the correct behavior.
-
-function SecureURL(raw) {
-
-  var SecureURLMethods = Object.create(null,{
-    'createObjectURL': {
-      value: function(object) {
-        if (Object.prototype.toString.call(object) === '[object Blob]') {
-          if (object.type === 'text/html') {
-            // There are no relible ways to convert syncronously
-            // a blob back to a string. Disallow until
-            // <rdar://problem/33575448> is declassified
-            throw new TypeError("SecureURL does not allow creation of Object URL from blob type " + object.type);
-          }
-        }
-        // IMPORTANT: thisArg is the target of the proxy.
-        return raw.createObjectURL(object);
-      }
-    },
-    'toString': {
-      value: function() {
-        return "SecureURL: " + Object.prototype.toString.call(raw);
-      }
-    }
-  });
-
-  return new Proxy(raw, {
-    get: function (target, name) {
-      // Give priority to the overritten methods.
-      var desc = Object.getOwnPropertyDescriptor(SecureURLMethods, name);
-      if (desc === undefined) {
-        desc = Object.getOwnPropertyDescriptor(target, name);
-      }
-      if (desc === undefined || desc.value === undefined) {
-        return undefined;
-      }
-      // Properties not found the object are not static.
-      if (Object.keys(target).indexOf(name) < 0) {
-        return desc.value;
-      }
-      // Prevent static methods from executing in the context of the proxy.
-      return function() {
-        return desc.value.apply(undefined, arguments);
-      };
-    },
-    set: function () { return true; }
-  });
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-var extraAddProperty;
-function injectExtraAddProperty(addProperty) {
-    extraAddProperty = addProperty;
-}
-
-// This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
-// which, by definition, do not provide authority or access to globals.
-var whitelist = [
-    // Accessible Intrinsics (not reachable by own property name traversal)
-    // -> from ES5
-    "ThrowTypeError",
-    // -> from ES6.
-    "IteratorPrototype", "ArrayIteratorPrototype", "StringIteratorPrototype", "MapIteratorPrototype", "SetIteratorPrototype", "GeneratorFunction", "TypedArray",
-
-    // Intrinsics
-    // -> from ES5
-    "Function", "WeakMap", "StringMap",
-    // Proxy,
-    "escape", "unescape", "Object", "NaN", "Infinity", "undefined",
-    // eval,
-    "parseInt", "parseFloat", "isNaN", "isFinite", "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent", "Function", "Array", "String", "Boolean", "Number",
-    "Math", "Date", "RegExp", "Error", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "JSON",
-    // -> from ES6
-    "ArrayBuffer", "Int8Array", "Uint8Array", "Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array", "Uint32Array", "Float32Array", "Float64Array", "DataView",
-    "Promise",
-
-    // Misc
-    "Intl"
-];
-
-function SecureWindow(win, key) {
-
-    var o = getFromCache(win, key);
-    if (o) {
-        return o;
-    }
-
-    // Create prototype to allow basic object operations like hasOwnProperty etc
-    var emptyProto = {};
-    // Do not treat window like a plain object, $A.util.isPlainObject() returns true if we leave the constructor intact
-    emptyProto.constructor = null;
-    Object.freeze(emptyProto);
-
-    o = Object.create(emptyProto, {
-        document: {
-            enumerable: true,
-            value: SecureDocument(win.document, key)
-        },
-        window: {
-            enumerable: true,
-            get: function () {
-                return o;
-            }
-        },
-        localStorage: {
-            enumerable: true,
-            value: SecureStorage(win.localStorage, "LOCAL", key)
-        },
-        sessionStorage: {
-            enumerable: true,
-            value: SecureStorage(win.sessionStorage, "SESSION", key)
-        },
-        MutationObserver: {
-            enumerable: true,
-            value: SecureMutationObserver(key)
-        },
-        navigator: {
-            enumerable: true,
-            value: SecureNavigator(win.navigator, key)
-        },
-        XMLHttpRequest: {
-            enumerable: true,
-            value: SecureXMLHttpRequest(key)
-        },
-        setTimeout: {
-            enumerable: true,
-            value: function (callback) {
-                return setTimeout.apply(win, [SecureObject.FunctionPrototypeBind.call(callback, o)].concat(SecureObject.ArrayPrototypeSlice.call(arguments, 1)));
-            }
-        },
-        setInterval: {
-            enumerable: true,
-            value: function (callback) {
-                return setInterval.apply(win, [SecureObject.FunctionPrototypeBind.call(callback, o)].concat(SecureObject.ArrayPrototypeSlice.call(arguments, 1)));
-            }
-        },
-        location: {
-            enumerable: true,
-            get: function() {
-                return SecureLocation(location, key);
-            },
-            set: function(value) {
-                var ret = location.href = value;
-                return ret;
-            }
-        },
-        URL: {
-            enumerable: true,
-            value: SecureURL(win.URL)
-        },
-        toString: {
-            value: function() {
-                return "SecureWindow: " + win + "{ key: " + JSON.stringify(key) + " }";
-            }
-        }
-    });
-
-    SecureObject.addMethodIfSupported(o, win, "getComputedStyle", {
-        rawArguments: true
-    });
-
-    ["outerHeight", "outerWidth"].forEach(function(name) {
-        SecureObject.addPropertyIfSupported(o, win, name);
-    });
-
-    ["scroll", "scrollBy", "scrollTo"].forEach(function(name) {
-        SecureObject.addMethodIfSupported(o, win, name);
-    });
-
-    ["open"].forEach(function(name) {
-        SecureObject.addMethodIfSupported(o, win, name, {
-            beforeCallback  : function(url){
-                // If an url was provided to window.open()
-                if (url && typeof url === "string" && url.length > 1) {
-                    // Only allow http|https|relative urls.
-                    var schemeRegex = /^[\s]*(http:\/\/|https:\/\/|\/)/i;
-                    if (!schemeRegex.test(url)){
-                        throw new error("SecureWindow.open supports http://, https:// schemes and relative urls.");
-                    }
-                }
-            }
-        });
-    });
-
-    if ("FormData" in win) {
-        var formDataValueOverride;
-        Object.defineProperty(o, "FormData", {
-            get: function() {
-                return formDataValueOverride || function() {
-                    var args = SecureObject.ArrayPrototypeSlice.call(arguments);
-                    // make sure we have access to any <form> passed in to constructor
-                    var form;
-                    if (args.length > 0) {
-                        form = args[0];
-                        verifyAccess(o, form);
-                    }
-
-                    var rawArgs = form ? [getRef(form, getKey(form))]: [];
-                    var cls = win["FormData"];
-                    if (typeof cls === "function") {
-                        return new (Function.prototype.bind.apply(window["FormData"], [null].concat(rawArgs)));
-                    } else {
-                        return new cls(rawArgs);
-                    }
-                };
-            },
-            set: function(value) {
-                formDataValueOverride = value;
-            }
-        });
-    }
-
-    if ("Notification" in win) {
-        var notificationValueOverride;
-        Object.defineProperty(o, "Notification", {
-            get: function() {
-                if (notificationValueOverride) {
-                    return notificationValueOverride;
-                }
-                var notification = SecureNotification(key);
-                if ("requestPermission" in win["Notification"]) {
-                    Object.defineProperty(notification, "requestPermission", {
-                        enumerable: true,
-                        value: function(callback) {
-                            return Notification["requestPermission"](callback);
-                        }
-                    });
-                }
-                if ("permission" in win["Notification"]) {
-                    Object.defineProperty(notification, "permission", {
-                        enumerable: true,
-                        value: Notification["permission"]
-                    });
-                }
-                return notification;
-            },
-            set: function(value) {
-                notificationValueOverride = value;
-            }
-        });
-    }
-
-    ["Blob", "File"].forEach(function(name) {
-        if (name in win) {
-            var valueOverride;
-            Object.defineProperty(o, name, {
-                get: function() {
-                    return valueOverride || function() {
-                        var cls = win[name],
-                        result,
-                        args = Array.prototype.slice.call(arguments);
-                        var scriptTagsRegex = /<script[\s\S]*?>[\s\S]*?<\/script[\s]*?>/gi;
-                        if (scriptTagsRegex.test(args[0])) {
-                            throw new error(name + " creation failed: <script> tags are blocked");
-                        }
-                        if (typeof cls === "function") {
-                            //  Function.prototype.bind.apply is being used to invoke the constructor and to pass all the arguments provided by the caller
-                            // TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
-                            result = new (Function.prototype.bind.apply(cls, [null].concat(args)));
-                        } else {
-                            // For browsers that use a constructor that's not a function, invoke the constructor directly.
-                            // For example, on Mobile Safari window["Blob"] returns an object called BlobConstructor
-                            // Invoke constructor with specific arguments, handle up to 3 arguments(Blob accepts 2 param, File accepts 3 param)
-                            switch (args.length) {
-                                case 0:
-                                    result = new cls();
-                                    break;
-                                case 1:
-                                    result = new cls(args[0]);
-                                    break;
-                                case 2:
-                                    result = new cls(args[0], args[1]);
-                                    break;
-                                case 3:
-                                    result = new cls(args[0], args[1], args[2]);
-                                    break;
-                            }
-                        }
-                        return result;
-                    };
-                },
-                set: function(value) {
-                    valueOverride = value;
-                }
-            });
-        }
-    });
-
-    addEventTargetMethods(o, win, key);
-
-    // Has to happen last because it depends on the secure getters defined above that require the object to be keyed
-    whitelist.forEach(function(name) {
-        // These are direct passthrough's and should never be wrapped in a SecureObject
-        Object.defineProperty(o, name, {
-            enumerable: true,
-            writable: true,
-            value: win[name]
-        });
-    });
-
-    if (extraAddProperty) {
-        extraAddProperty(o, win, key);
-    }
-
-    SecureObject.addPrototypeMethodsAndProperties(metadata$2, o, win, key);
-
-    setRef(o, win, key);
-    addToCache(win, o, key);
-    registerProxy(o);
-
-    return o;
-}
-
-const metadata$2 = {
-    "prototypes": {
-        "Window" : {
-            "AnalyserNode":                         FUNCTION,
-            "AnimationEvent":                       FUNCTION,
-            "AppBannerPromptResult":                FUNCTION,
-            "ApplicationCache":                     FUNCTION,
-            "ApplicationCacheErrorEvent":           FUNCTION,
-            "Array":                                RAW,
-            "ArrayBuffer":                          RAW,
-            "Attr":                                 RAW,
-            "Audio":                                CTOR,
-            "AudioBuffer":                          FUNCTION,
-            "AudioBufferSourceNode":                FUNCTION,
-            "AudioContext":                         CTOR,
-            "AudioDestinationNode":                 FUNCTION,
-            "AudioListener":                        FUNCTION,
-            "AudioNode":                            FUNCTION,
-            "AudioParam":                           FUNCTION,
-            "AudioProcessingEvent":                 FUNCTION,
-            "AutocompleteErrorEvent":               FUNCTION,
-            "BarProp":                              FUNCTION,
-            "BatteryManager":                       FUNCTION,
-            "BeforeInstallPromptEvent":             FUNCTION,
-            "BeforeUnloadEvent":                    FUNCTION,
-            "BiquadFilterNode":                     FUNCTION,
-            "BlobEvent":                            FUNCTION,
-            "Boolean":                              FUNCTION,
-            "CDATASection":                         FUNCTION,
-            "CSS":                                  FUNCTION,
-            "CSSFontFaceRule":                      FUNCTION,
-            "CSSGroupingRule":                      FUNCTION,
-            "CSSImportRule":                        FUNCTION,
-            "CSSKeyframeRule":                      FUNCTION,
-            "CSSKeyframesRule":                     FUNCTION,
-            "CSSMediaRule":                         FUNCTION,
-            "CSSNamespaceRule":                     FUNCTION,
-            "CSSPageRule":                          FUNCTION,
-            "CSSRule":                              FUNCTION,
-            "CSSRuleList":                          FUNCTION,
-            "CSSStyleDeclaration":                  FUNCTION,
-            "CSSStyleRule":                         FUNCTION,
-            "CSSStyleSheet":                        FUNCTION,
-            "CSSSupportsRule":                      FUNCTION,
-            "CSSViewportRule":                      FUNCTION,
-            "CanvasCaptureMediaStreamTrack":        FUNCTION,
-            "CanvasGradient":                       FUNCTION,
-            "CanvasPattern":                        FUNCTION,
-            "CanvasRenderingContext2D":             RAW,
-            "ChannelMergerNode":                    FUNCTION,
-            "ChannelSplitterNode":                  FUNCTION,
-            "CharacterData":                        FUNCTION,
-            "ClientRect":                           FUNCTION,
-            "ClientRectList":                       FUNCTION,
-            "ClipboardEvent":                       FUNCTION,
-            "CloseEvent":                           FUNCTION,
-            "Comment":                              CTOR,
-            "CompositionEvent":                     FUNCTION,
-            "ConvolverNode":                        FUNCTION,
-            "Credential":                           FUNCTION,
-            "CredentialsContainer":                 FUNCTION,
-            "Crypto":                               FUNCTION,
-            "CryptoKey":                            FUNCTION,
-            "CustomEvent":                          CTOR,
-            "DOMError":                             FUNCTION,
-            "DOMException":                         FUNCTION,
-            "DOMImplementation":                    FUNCTION,
-            "DOMParser":                            RAW,
-            "DOMStringList":                        FUNCTION,
-            "DOMStringMap":                         FUNCTION,
-            "DOMTokenList":                         FUNCTION,
-            "DataTransfer":                         FUNCTION,
-            "DataTransferItem":                     FUNCTION,
-            "DataTransferItemList":                 FUNCTION,
-            "DataView":                             FUNCTION,
-            "Date":                                 RAW,
-            "DelayNode":                            FUNCTION,
-            "DeviceMotionEvent":                    FUNCTION,
-            "DeviceOrientationEvent":               FUNCTION,
-            "Document":                             FUNCTION,
-            "DocumentFragment":                     FUNCTION,
-            "DocumentType":                         FUNCTION,
-            "DragEvent":                            FUNCTION,
-            "DynamicsCompressorNode":               FUNCTION,
-            "ES6Promise":                           DEFAULT,
-            "Element":                              RAW,
-            "Error":                                FUNCTION,
-            "ErrorEvent":                           FUNCTION,
-            "EvalError":                            FUNCTION,
-            "Event":                                CTOR,
-            "EventSource":                          FUNCTION,
-            "EventTarget":                          RAW,
-            "FederatedCredential":                  FUNCTION,
-            "FileError":                            FUNCTION,
-            "FileList":                             RAW,
-            "FileReader":                           RAW,
-            "Float32Array":                         RAW,
-            "Float64Array":                         RAW,
-            "FocusEvent":                           FUNCTION,
-            "FontFace":                             FUNCTION,
-            "Function":                             FUNCTION,
-            "GainNode":                             FUNCTION,
-            "HTMLAllCollection":                    FUNCTION,
-            "HTMLAnchorElement":                    RAW,
-            "HTMLAreaElement":                      RAW,
-            "HTMLAudioElement":                     RAW,
-            "HTMLBRElement":                        RAW,
-            "HTMLBaseElement":                      RAW,
-            "HTMLBodyElement":                      RAW,
-            "HTMLButtonElement":                    RAW,
-            "HTMLCanvasElement":                    RAW,
-            "HTMLCollection":                       RAW,
-            "HTMLContentElement":                   RAW,
-            "HTMLDListElement":                     RAW,
-            "HTMLDataListElement":                  RAW,
-            "HTMLDetailsElement":                   RAW,
-            "HTMLDialogElement":                    RAW,
-            "HTMLDirectoryElement":                 RAW,
-            "HTMLDivElement":                       RAW,
-            "HTMLDocument":                         RAW,
-            "HTMLElement":                          RAW,
-            "HTMLEmbedElement":                     RAW,
-            "HTMLFieldSetElement":                  RAW,
-            "HTMLFontElement":                      RAW,
-            "HTMLFormControlsCollection":           FUNCTION,
-            "HTMLFormElement":                      RAW,
-            "HTMLFrameElement":                     RAW,
-            "HTMLFrameSetElement":                  RAW,
-            "HTMLHRElement":                        RAW,
-            "HTMLHeadElement":                      RAW,
-            "HTMLHeadingElement":                   RAW,
-            "HTMLHtmlElement":                      RAW,
-            "HTMLIFrameElement":                    RAW,
-            "HTMLImageElement":                     RAW,
-            "HTMLInputElement":                     RAW,
-            "HTMLKeygenElement":                    RAW,
-            "HTMLLIElement":                        RAW,
-            "HTMLLabelElement":                     RAW,
-            "HTMLLegendElement":                    RAW,
-            "HTMLLinkElement":                      RAW,
-            "HTMLMapElement":                       RAW,
-            "HTMLMarqueeElement":                   RAW,
-            "HTMLMediaElement":                     RAW,
-            "HTMLMenuElement":                      RAW,
-            "HTMLMetaElement":                      RAW,
-            "HTMLMeterElement":                     RAW,
-            "HTMLModElement":                       RAW,
-            "HTMLOListElement":                     RAW,
-            "HTMLObjectElement":                    RAW,
-            "HTMLOptGroupElement":                  RAW,
-            "HTMLOptionElement":                    RAW,
-            "HTMLOptionsCollection":                RAW,
-            "HTMLOutputElement":                    RAW,
-            "HTMLParagraphElement":                 RAW,
-            "HTMLParamElement":                     RAW,
-            "HTMLPictureElement":                   RAW,
-            "HTMLPreElement":                       RAW,
-            "HTMLProgressElement":                  RAW,
-            "HTMLQuoteElement":                     RAW,
-            "HTMLScriptElement":                    RAW,
-            "HTMLSelectElement":                    RAW,
-            "HTMLShadowElement":                    RAW,
-            "HTMLSourceElement":                    RAW,
-            "HTMLSpanElement":                      RAW,
-            "HTMLStyleElement":                     RAW,
-            "HTMLTableCaptionElement":              RAW,
-            "HTMLTableCellElement":                 RAW,
-            "HTMLTableColElement":                  RAW,
-            "HTMLTableElement":                     RAW,
-            "HTMLTableRowElement":                  RAW,
-            "HTMLTableSectionElement":              RAW,
-            "HTMLTemplateElement":                  RAW,
-            "HTMLTextAreaElement":                  RAW,
-            "HTMLTitleElement":                     RAW,
-            "HTMLTrackElement":                     RAW,
-            "HTMLUListElement":                     RAW,
-            "HTMLUnknownElement":                   RAW,
-            "HTMLVideoElement":                     RAW,
-            "HashChangeEvent":                      FUNCTION,
-            "IdleDeadline":                         FUNCTION,
-            "Image":                                CTOR,
-            "ImageBitmap":                          FUNCTION,
-            "ImageData":                            FUNCTION,
-            "Infinity":                             DEFAULT,
-            "InputDeviceCapabilities":              FUNCTION,
-            "Int16Array":                           FUNCTION,
-            "Int32Array":                           FUNCTION,
-            "Int8Array":                            FUNCTION,
-            "Intl":                                 DEFAULT,
-            "JSON":                                 DEFAULT,
-            "KeyboardEvent":                        FUNCTION,
-            "Location":                             FUNCTION,
-            "MIDIAccess":                           FUNCTION,
-            "MIDIConnectionEvent":                  FUNCTION,
-            "MIDIInput":                            FUNCTION,
-            "MIDIInputMap":                         FUNCTION,
-            "MIDIMessageEvent":                     FUNCTION,
-            "MIDIOutput":                           FUNCTION,
-            "MIDIOutputMap":                        FUNCTION,
-            "MIDIPort":                             FUNCTION,
-            "Map":                                  RAW,
-            "Math":                                 DEFAULT,
-            "MediaDevices":                         DEFAULT,
-            "MediaElementAudioSourceNode":          FUNCTION,
-            "MediaEncryptedEvent":                  FUNCTION,
-            "MediaError":                           FUNCTION,
-            "MediaKeyMessageEvent":                 FUNCTION,
-            "MediaKeySession":                      FUNCTION,
-            "MediaKeyStatusMap":                    FUNCTION,
-            "MediaKeySystemAccess":                 FUNCTION,
-            "MediaKeys":                            FUNCTION,
-            "MediaList":                            FUNCTION,
-            "MediaQueryList":                       FUNCTION,
-            "MediaQueryListEvent":                  FUNCTION,
-            "MediaRecorder":                        CTOR,
-            "MediaSource":                          FUNCTION,
-            "MediaStreamAudioDestinationNode":      CTOR,
-            "MediaStreamAudioSourceNode":           CTOR,
-            "MediaStreamEvent":                     CTOR,
-            "MediaStreamTrack":                     FUNCTION,
-            "MessageChannel":                       RAW,
-            "MessageEvent":                         RAW,
-            "MessagePort":                          RAW,
-            "MimeType":                             FUNCTION,
-            "MimeTypeArray":                        FUNCTION,
-            "MutationObserver":                     CTOR,
-            "MutationRecord":                       FUNCTION,
-            "MouseEvent":                           CTOR,
-            "NaN":                                  DEFAULT,
-            "NamedNodeMap":                         FUNCTION,
-            "Navigator":                            FUNCTION,
-            "Node":                                 RAW,
-            "NodeFilter":                           FUNCTION,
-            "NodeIterator":                         FUNCTION,
-            "NodeList":                             FUNCTION,
-            "Number":                               FUNCTION,
-            "Object":                               FUNCTION,
-            "OfflineAudioCompletionEvent":          FUNCTION,
-            "OfflineAudioContext":                  FUNCTION,
-            "Option":                               CTOR,
-            "OscillatorNode":                       FUNCTION,
-            "PERSISTENT":                           DEFAULT,
-            "PageTransitionEvent":                  FUNCTION,
-            "PasswordCredential":                   FUNCTION,
-            "Path2D":                               FUNCTION,
-            "Performance":                          RAW,
-            "PerformanceEntry":                     FUNCTION,
-            "PerformanceMark":                      FUNCTION,
-            "PerformanceMeasure":                   FUNCTION,
-            "PerformanceNavigation":                FUNCTION,
-            "PerformanceResourceTiming":            FUNCTION,
-            "PerformanceTiming":                    FUNCTION,
-            "PeriodicWave":                         FUNCTION,
-            "PopStateEvent":                        FUNCTION,
-            "Presentation":                         FUNCTION,
-            "PresentationAvailability":             FUNCTION,
-            "PresentationConnection":               FUNCTION,
-            "PresentationConnectionAvailableEvent": FUNCTION,
-            "PresentationConnectionCloseEvent":     FUNCTION,
-            "PresentationRequest":                  FUNCTION,
-            "ProcessingInstruction":                FUNCTION,
-            "ProgressEvent":                        FUNCTION,
-            "Promise":                              FUNCTION,
-            "PromiseRejectionEvent":                FUNCTION,
-            "RTCCertificate":                       FUNCTION,
-            "RTCIceCandidate":                      FUNCTION,
-            "RTCSessionDescription":                CTOR,
-            "RadioNodeList":                        FUNCTION,
-            "Range":                                FUNCTION,
-            "RangeError":                           FUNCTION,
-            "ReadableByteStream":                   FUNCTION,
-            "ReadableStream":                       FUNCTION,
-            "ReferenceError":                       FUNCTION,
-            "Reflect":                              DEFAULT,
-            "RegExp":                               FUNCTION,
-            "Request":                              FUNCTION,
-            "Response":                             FUNCTION,
-            "SVGAElement":                          FUNCTION,
-            "SVGAngle":                             FUNCTION,
-            "SVGAnimateElement":                    FUNCTION,
-            "SVGAnimateMotionElement":              FUNCTION,
-            "SVGAnimateTransformElement":           FUNCTION,
-            "SVGAnimatedAngle":                     FUNCTION,
-            "SVGAnimatedBoolean":                   FUNCTION,
-            "SVGAnimatedEnumeration":               FUNCTION,
-            "SVGAnimatedInteger":                   FUNCTION,
-            "SVGAnimatedLength":                    FUNCTION,
-            "SVGAnimatedLengthList":                FUNCTION,
-            "SVGAnimatedNumber":                    FUNCTION,
-            "SVGAnimatedNumberList":                FUNCTION,
-            "SVGAnimatedPreserveAspectRatio":       FUNCTION,
-            "SVGAnimatedRect":                      FUNCTION,
-            "SVGAnimatedString":                    FUNCTION,
-            "SVGAnimatedTransformList":             FUNCTION,
-            "SVGAnimationElement":                  RAW,
-            "SVGCircleElement":                     RAW,
-            "SVGClipPathElement":                   RAW,
-            "SVGComponentTransferFunctionElement":  RAW,
-            "SVGCursorElement":                     RAW,
-            "SVGDefsElement":                       RAW,
-            "SVGDescElement":                       RAW,
-            "SVGDiscardElement":                    RAW,
-            "SVGElement":                           RAW,
-            "SVGEllipseElement":                    RAW,
-            "SVGFEBlendElement":                    RAW,
-            "SVGFEColorMatrixElement":              RAW,
-            "SVGFEComponentTransferElement":        RAW,
-            "SVGFECompositeElement":                RAW,
-            "SVGFEConvolveMatrixElement":           RAW,
-            "SVGFEDiffuseLightingElement":          RAW,
-            "SVGFEDisplacementMapElement":          RAW,
-            "SVGFEDistantLightElement":             RAW,
-            "SVGFEDropShadowElement":               RAW,
-            "SVGFEFloodElement":                    RAW,
-            "SVGFEFuncAElement":                    RAW,
-            "SVGFEFuncBElement":                    RAW,
-            "SVGFEFuncGElement":                    RAW,
-            "SVGFEFuncRElement":                    RAW,
-            "SVGFEGaussianBlurElement":             RAW,
-            "SVGFEImageElement":                    RAW,
-            "SVGFEMergeElement":                    RAW,
-            "SVGFEMergeNodeElement":                RAW,
-            "SVGFEMorphologyElement":               RAW,
-            "SVGFEOffsetElement":                   RAW,
-            "SVGFEPointLightElement":               RAW,
-            "SVGFESpecularLightingElement":         RAW,
-            "SVGFESpotLightElement":                RAW,
-            "SVGFETileElement":                     RAW,
-            "SVGFETurbulenceElement":               RAW,
-            "SVGFilterElement":                     RAW,
-            "SVGForeignObjectElement":              RAW,
-            "SVGGElement":                          RAW,
-            "SVGGeometryElement":                   RAW,
-            "SVGGradientElement":                   RAW,
-            "SVGGraphicsElement":                   RAW,
-            "SVGImageElement":                      RAW,
-            "SVGLength":                            FUNCTION,
-            "SVGLengthList":                        FUNCTION,
-            "SVGLineElement":                       RAW,
-            "SVGLinearGradientElement":             RAW,
-            "SVGMPathElement":                      RAW,
-            "SVGMarkerElement":                     RAW,
-            "SVGMaskElement":                       RAW,
-            "SVGMatrix":                            RAW,
-            "SVGMetadataElement":                   RAW,
-            "SVGNumber":                            FUNCTION,
-            "SVGNumberList":                        FUNCTION,
-            "SVGPathElement":                       RAW,
-            "SVGPatternElement":                    RAW,
-            "SVGPoint":                             FUNCTION,
-            "SVGPointList":                         FUNCTION,
-            "SVGPolygonElement":                    RAW,
-            "SVGPolylineElement":                   RAW,
-            "SVGPreserveAspectRatio":               FUNCTION,
-            "SVGRadialGradientElement":             RAW,
-            "SVGRect":                              FUNCTION,
-            "SVGRectElement":                       RAW,
-            "SVGSVGElement":                        RAW,
-            "SVGScriptElement":                     RAW,
-            "SVGSetElement":                        RAW,
-            "SVGStopElement":                       RAW,
-            "SVGStringList":                        FUNCTION,
-            "SVGStyleElement":                      RAW,
-            "SVGSwitchElement":                     RAW,
-            "SVGSymbolElement":                     RAW,
-            "SVGTSpanElement":                      RAW,
-            "SVGTextContentElement":                RAW,
-            "SVGTextElement":                       RAW,
-            "SVGTextPathElement":                   RAW,
-            "SVGTextPositioningElement":            RAW,
-            "SVGTitleElement":                      RAW,
-            "SVGTransform":                         FUNCTION,
-            "SVGTransformList":                     FUNCTION,
-            "SVGUnitTypes":                         FUNCTION,
-            "SVGUseElement":                        RAW,
-            "SVGViewElement":                       RAW,
-            "SVGViewSpec":                          FUNCTION,
-            "SVGZoomEvent":                         FUNCTION,
-            "Screen":                               FUNCTION,
-            "ScreenOrientation":                    FUNCTION,
-            "SecurityPolicyViolationEvent":         FUNCTION,
-            "Selection":                            FUNCTION,
-            "Set":                                  RAW,
-            "SourceBuffer":                         FUNCTION,
-            "SourceBufferList":                     FUNCTION,
-            "SpeechSynthesisEvent":                 FUNCTION,
-            "SpeechSynthesisUtterance":             FUNCTION,
-            "String":                               RAW,
-            "StyleSheet":                           FUNCTION,
-            "StyleSheetList":                       FUNCTION,
-            "SubtleCrypto":                         FUNCTION,
-            "Symbol":                               RAW,
-            "SyntaxError":                          FUNCTION,
-            "TEMPORARY":                            DEFAULT,
-            "Text":                                 CTOR,
-            "TextDecoder":                          FUNCTION,
-            "TextEncoder":                          RAW,
-            "TextEvent":                            FUNCTION,
-            "TextMetrics":                          FUNCTION,
-            "TextTrack":                            FUNCTION,
-            "TextTrackCue":                         FUNCTION,
-            "TextTrackCueList":                     FUNCTION,
-            "TextTrackList":                        FUNCTION,
-            "TimeRanges":                           RAW,
-            "Touch":                                FUNCTION,
-            "TouchEvent":                           FUNCTION,
-            "TouchList":                            FUNCTION,
-            "TrackEvent":                           FUNCTION,
-            "TransitionEvent":                      FUNCTION,
-            "TreeWalker":                           FUNCTION,
-            "TypeError":                            FUNCTION,
-            "UIEvent":                              FUNCTION,
-            "URIError":                             FUNCTION,
-            // Replaced by SecureURL
-            // "URL":                                  RAW,
-            "URLSearchParams":                      FUNCTION,
-            "Uint16Array":                          RAW,
-            "Uint32Array":                          RAW,
-            "Uint8Array":                           RAW,
-            "Uint8ClampedArray":                    RAW,
-            "VTTCue":                               FUNCTION,
-            "ValidityState":                        FUNCTION,
-            "WaveShaperNode":                       FUNCTION,
-            "WeakMap":                              RAW,
-            "WeakSet":                              RAW,
-            "WebGLActiveInfo":                      FUNCTION,
-            "WebGLBuffer":                          FUNCTION,
-            "WebGLContextEvent":                    FUNCTION,
-            "WebGLFramebuffer":                     FUNCTION,
-            "WebGLProgram":                         FUNCTION,
-            "WebGLRenderbuffer":                    FUNCTION,
-            "WebGLRenderingContext":                FUNCTION,
-            "WebGLShader":                          FUNCTION,
-            "WebGLShaderPrecisionFormat":           FUNCTION,
-            "WebGLTexture":                         FUNCTION,
-            "WebGLUniformLocation":                 FUNCTION,
-            "WebKitAnimationEvent":                 FUNCTION,
-            "WebKitCSSMatrix":                      CTOR,
-            "WebKitTransitionEvent":                FUNCTION,
-            "WebSocket":                            RAW,
-            "WheelEvent":                           FUNCTION,
-            "Window":                               FUNCTION,
-            "XMLDocument":                          FUNCTION,
-            "XMLHttpRequest":                       CTOR,
-            "XMLHttpRequestEventTarget":            FUNCTION,
-            "XMLHttpRequestUpload":                 FUNCTION,
-            "XMLSerializer":                        CTOR,
-            "XPathEvaluator":                       FUNCTION,
-            "XPathExpression":                      FUNCTION,
-            "XPathResult":                          FUNCTION,
-            "XSLTProcessor":                        FUNCTION,
-            "alert":                                FUNCTION,
-            "atob":                                 FUNCTION,
-            "blur":                                 FUNCTION,
-            "btoa":                                 FUNCTION,
-            "cancelAnimationFrame":                 FUNCTION,
-            "cancelIdleCallback":                   FUNCTION,
-            "captureEvents":                        FUNCTION,
-            "chrome":                               DEFAULT,
-            "clearInterval":                        FUNCTION,
-            "clearTimeout":                         FUNCTION,
-            "close":                                FUNCTION,
-            "closed":                               DEFAULT,
-            "confirm":                              FUNCTION,
-            "console":                              RAW,
-            "createImageBitmap":                    FUNCTION,
-            "crypto":                               DEFAULT,
-            "decodeURI":                            FUNCTION,
-            "decodeURIComponent":                   FUNCTION,
-            "defaultStatus":                        DEFAULT,
-            "defaultstatus":                        DEFAULT,
-            "devicePixelRatio":                     DEFAULT,
-            "document":                             DEFAULT,
-            "encodeURI":                            FUNCTION,
-            "encodeURIComponent":                   FUNCTION,
-            "escape":                               FUNCTION,
-            "fetch":                                FUNCTION,
-            "find":                                 FUNCTION,
-            "focus":                                FUNCTION,
-            "frameElement":                         DEFAULT,
-            "frames":                               DEFAULT,
-            "getComputedStyle":                     FUNCTION,
-            "getMatchedCSSRules":                   FUNCTION,
-            "getSelection":                         FUNCTION,
-            "history":                              RAW,
-            "innerHeight":                          DEFAULT,
-            "innerWidth":                           DEFAULT,
-            "isFinite":                             FUNCTION,
-            "isNaN":                                FUNCTION,
-            "isSecureContext":                      DEFAULT,
-            "length":                               DEFAULT,
-            "localStorage":                         DEFAULT,
-            "locationbar":                          DEFAULT,
-            "matchMedia":                           FUNCTION,
-            "menubar":                              DEFAULT,
-            "moveBy":                               FUNCTION,
-            "moveTo":                               FUNCTION,
-            "name":                                 DEFAULT,
-            "navigator":                            DEFAULT,
-            "offscreenBuffering":                   DEFAULT,
-            "onabort":                              EVENT,
-            "onanimationend":                       EVENT,
-            "onanimationiteration":                 EVENT,
-            "onanimationstart":                     EVENT,
-            "onautocomplete":                       EVENT,
-            "onautocompleteerror":                  EVENT,
-            "onbeforeunload":                       EVENT,
-            "onblur":                               EVENT,
-            "oncancel":                             EVENT,
-            "oncanplay":                            EVENT,
-            "oncanplaythrough":                     EVENT,
-            "onchange":                             EVENT,
-            "onclick":                              EVENT,
-            "onclose":                              EVENT,
-            "oncontextmenu":                        EVENT,
-            "oncuechange":                          EVENT,
-            "ondblclick":                           EVENT,
-            "ondevicemotion":                       EVENT,
-            "ondeviceorientation":                  EVENT,
-            "ondeviceorientationabsolute":          EVENT,
-            "ondrag":                               EVENT,
-            "ondragend":                            EVENT,
-            "ondragenter":                          EVENT,
-            "ondragleave":                          EVENT,
-            "ondragover":                           EVENT,
-            "ondragstart":                          EVENT,
-            "ondrop":                               EVENT,
-            "ondurationchange":                     EVENT,
-            "onemptied":                            EVENT,
-            "onended":                              EVENT,
-            "onerror":                              EVENT,
-            "onfocus":                              EVENT,
-            "onhashchange":                         EVENT,
-            "oninput":                              EVENT,
-            "oninvalid":                            EVENT,
-            "onkeydown":                            EVENT,
-            "onkeypress":                           EVENT,
-            "onkeyup":                              EVENT,
-            "onlanguagechange":                     EVENT,
-            "onload":                               EVENT,
-            "onloadeddata":                         EVENT,
-            "onloadedmetadata":                     EVENT,
-            "onloadstart":                          EVENT,
-            "onmessage":                            EVENT,
-            "onmousedown":                          EVENT,
-            "onmouseenter":                         EVENT,
-            "onmouseleave":                         EVENT,
-            "onmousemove":                          EVENT,
-            "onmouseout":                           EVENT,
-            "onmouseover":                          EVENT,
-            "onmouseup":                            EVENT,
-            "onmousewheel":                         EVENT,
-            "onoffline":                            EVENT,
-            "ononline":                             EVENT,
-            "onpagehide":                           EVENT,
-            "onpageshow":                           EVENT,
-            "onpause":                              EVENT,
-            "onplay":                               EVENT,
-            "onplaying":                            EVENT,
-            "onpopstate":                           EVENT,
-            "onprogress":                           EVENT,
-            "onratechange":                         EVENT,
-            "onrejectionhandled":                   EVENT,
-            "onreset":                              EVENT,
-            "onresize":                             EVENT,
-            "onscroll":                             EVENT,
-            "onsearch":                             EVENT,
-            "onseeked":                             EVENT,
-            "onseeking":                            EVENT,
-            "onselect":                             EVENT,
-            "onshow":                               EVENT,
-            "onstalled":                            EVENT,
-            "onstorage":                            EVENT,
-            "onsubmit":                             EVENT,
-            "onsuspend":                            EVENT,
-            "ontimeupdate":                         EVENT,
-            "ontoggle":                             EVENT,
-            "ontransitionend":                      EVENT,
-            "ontouchcancel":                        EVENT,
-            "ontouchend":                           EVENT,
-            "ontouchmove":                          EVENT,
-            "ontouchstart":                         EVENT,
-            "onunhandledrejection":                 EVENT,
-            "onunload":                             EVENT,
-            "onvolumechange":                       EVENT,
-            "onwaiting":                            EVENT,
-            "onwheel":                              EVENT,
-            "open":                                 FUNCTION,
-            "outerHeight":                          DEFAULT,
-            "outerWidth":                           DEFAULT,
-            "pageStartTime":                        DEFAULT,
-            "pageXOffset":                          DEFAULT,
-            "pageYOffset":                          DEFAULT,
-            "parent":                               DEFAULT,
-            "parseFloat":                           FUNCTION,
-            "parseInt":                             FUNCTION,
-            "performance":                          RAW,
-            "personalbar":                          DEFAULT,
-            "postMessage":                          FUNCTION,
-            "print":                                FUNCTION,
-            "prompt":                               FUNCTION,
-            "releaseEvents":                        FUNCTION,
-            "requestAnimationFrame":                FUNCTION,
-            "requestIdleCallback":                  FUNCTION,
-            "resizeBy":                             FUNCTION,
-            "resizeTo":                             FUNCTION,
-            "screen":                               RAW,
-            "screenLeft":                           DEFAULT,
-            "screenTop":                            DEFAULT,
-            "screenX":                              DEFAULT,
-            "screenY":                              DEFAULT,
-            "scroll":                               FUNCTION,
-            "scrollBy":                             FUNCTION,
-            "scrollTo":                             FUNCTION,
-            "scrollX":                              DEFAULT,
-            "scrollY":                              DEFAULT,
-            "scrollbars":                           DEFAULT,
-            "sessionStorage":                       DEFAULT,
-            "self":                                 DEFAULT,
-            "setInterval":                          FUNCTION,
-            "setTimeout":                           FUNCTION,
-            "status":                               DEFAULT,
-            "statusbar":                            DEFAULT,
-            "stop":                                 FUNCTION,
-            "styleMedia":                           DEFAULT,
-            "toolbar":                              DEFAULT,
-            "top":                                  DEFAULT,
-            "undefined":                            DEFAULT,
-            "unescape":                             FUNCTION,
-            "window":                               DEFAULT
-        },
-        "EventTarget": metadata$5
-    }
-};
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 // Declare shorthand functions. Sharing these declarations accross modules
 // improves both consitency and minification. Unused declarations are dropped
 // by the tree shaking process.
@@ -2416,6 +300,236 @@ const {
 const objectToString = Object.prototype.toString;
 
 /*
+ * Copyright (C) 2017 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Adapted from SES/Caja
+// Copyright (C) 2011 Google Inc.
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
+
+function repairAccessors(global) {
+
+    // W-2961201 Prevent execution in the global context.
+
+    // Fixing properties of Object to comply with strict mode
+    // and ES2016 semantics, we do this by redefining them while in 'use strict'
+    // https://tc39.github.io/ecma262/#sec-object.prototype.__defineGetter__
+    defineProperties(global.Object.prototype, {
+        '__defineGetter__': {
+            value: function (prop, func) {
+                return defineProperty(this, prop, {
+                    get: func,
+                    enumerable: true,
+                    configurable: true
+                });
+            }
+        },
+        '__defineSetter__': {
+            value: function (prop, func) {
+                return defineProperty(this, prop, {
+                    set: func,
+                    enumerable: true,
+                    configurable: true
+                });
+            }
+        },
+        '__lookupGetter__': {
+            value: function (prop) {
+                let base = this;
+                let desc;
+                while (base && !(desc = getOwnPropertyDescriptor(base, prop))) {
+                    base = getPrototypeOf(base);
+                }
+                return desc && desc.get;
+            }
+        },
+        '__lookupSetter__': {
+            value: function (prop) {
+                let base = this;
+                let desc;
+                while (base && !(desc = getOwnPropertyDescriptor(base, prop))) {
+                    base = getPrototypeOf(base);
+                }
+                return desc && desc.set;
+            }
+        }
+    });
+}
+
+/*
+ * Copyright (C) 2017 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Adapted from SES/Caja
+// Copyright (C) 2011 Google Inc.
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
+
+// The code verifyStrictFunctionBody has been simplified since
+// https://bugs.webkit.org/show_bug.cgi?id=173303 is now declassified
+
+/**
+ * The unsafe* variables hold precious values that must not escape
+ * to untrusted code.
+ */
+// see startSES.js
+const unsafeFunction = Function;
+
+/**
+ * <p>We use Crock's trick of simply passing {@code funcBodySrc} to
+ * the original {@code Function} constructor, which will throw a
+ * SyntaxError if it does not parse as a FunctionBody.
+ */
+// See repairES5.js
+function verifyStrictFunctionBody(funcBodySrc) {
+    funcBodySrc = String(funcBodySrc);
+    unsafeFunction(`
+"use strict";
+${funcBodySrc}`);
+    return funcBodySrc;
+}
+
+/*
+ * Copyright (C) 2017 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Adapted from SES/Caja
+// Copyright (C) 2011 Google Inc.
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
+
+/**
+ * Fails if {@code exprSource} does not parse as a strict
+ * Expression production.
+ *
+ * <p>To verify that exprSrc parses as a strict Expression, we
+ * verify that, when surrounded by parens and followed by ";", it
+ * parses as a strict FunctionBody, and that when surrounded with
+ * double parens it still parses as a strict FunctionBody. We
+ * place a newline before the terminal token so that a "//"
+ * comment cannot suppress the close paren or parens.
+ *
+ * <p>We never check without parens because not all
+ * expressions, for example "function(){}", form valid expression
+ * statements. We check both single and double parens so there's
+ * no exprSrc text which can close the left paren(s), do
+ * something, and then provide open paren(s) to balance the final
+ * close paren(s). No one such attack will survive both tests.
+ *
+ * <p>Note that all verify*(allegedString) functions now always
+ * start by coercing the alleged string to a guaranteed primitive
+ * string, do their verification checks on that, and if it passes,
+ * returns that. Otherwise they throw. If you don't know whether
+ * something is a string before verifying, use only the output of
+ * the verifier, not the input. Or coerce it early yourself.
+ */
+// see startSES.js
+function verifyStrictExpression(exprSrc) {
+    exprSrc = String(exprSrc);
+    verifyStrictFunctionBody(`( ${exprSrc}\n);`);
+    verifyStrictFunctionBody(`(( ${exprSrc}\n));`);
+    return exprSrc;
+}
+
+/*
+ * Copyright (C) 2017 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Adapted from SES/Caja
+// Copyright (C) 2011 Google Inc.
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
+
+/**
+ * A safe form of the indirect {@code eval} function, which
+ * evaluates {@code src} as strict code that can only refer freely
+ * to the {@code sharedImports}.
+ *
+ * <p>Given our parserless methods of verifying untrusted sources,
+ * we unfortunately have no practical way to obtain the completion
+ * value of a safely evaluated Program. Instead, we adopt a
+ * compromise based on the following observation. All Expressions
+ * are valid Programs, and all Programs are valid
+ * FunctionBodys. If {@code src} parses as a strict expression,
+ * then we evaluate it as an expression and correctly return its
+ * completion value, since that is simply the value of the
+ * expression.
+ *
+ * <p>Otherwise, we evaluate {@code src} as a FunctionBody and
+ * return what that would return from its implicit enclosing
+ * function. If {@code src} is simply a Program, then it would not
+ * have an explicit {@code return} statement, and so we fail to
+ * return its completion value.
+ *
+ * <p>When SES {@code eval} is provided primitively, it should
+ * accept a Program and evaluate it to the Program's completion
+ * value. Unfortunately, this is not possible on ES5 without
+ * parsing.
+ */
+// See fakeEval in startSES.js
+function completion(src) {
+    src = String(src);
+    try {
+        return verifyStrictExpression(src);
+    } catch (err) {
+        return `
+(function(){
+  "use strict";
+  ${verifyStrictFunctionBody(src)}
+}).call(this)`;
+    }
+}
+
+/*
  * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0(the 'License');
@@ -2432,60 +546,10 @@ const objectToString = Object.prototype.toString;
  */
 let initalized = false;
 
-// TODO: improve returnable detection. `function (...` is a trick used today
-//       to return arbitrary code from actions, it should be legacy in the future.
-// var returnableEx = /^(\s*)([{(\['']|function\s*\()/;
-
-// TODO: improve first comment removal
-// var trimFirstMultilineCommentEx = /^\/\*([\s\S]*?)\*\//;
-// var trimFirstLineCommentEx = /^\/\/.*\n?/;
-
-// @W-2961201: fixing properties of Object to comply with strict mode
-// and ES2016 semantics, we do this by redefining them while in 'use strict'
-// https://tc39.github.io/ecma262/#sec-object.prototype.__defineGetter__
-function repairAccessors() {
-    defineProperties(Object.prototype, {
-        '__defineGetter__': {
-            value: function (key, fn) {
-                return defineProperty(this, key, {
-                    get: fn
-                });
-            }
-        },
-        '__defineSetter__': {
-            value: function (key, fn) {
-                return defineProperty(this, key, {
-                    set: fn
-                });
-            }
-        },
-        '__lookupGetter__': {
-            value: function (key) {
-                let d;
-                let p = this;
-                while (p && (d = getOwnPropertyDescriptor(p, key)) === undefined) {
-                    p = getPrototypeOf(this);
-                }
-                return d ? d.get : undefined;
-            }
-        },
-        '__lookupSetter__': {
-            value: function (key) {
-                let d;
-                let p = this;
-                while (p && (d = getOwnPropertyDescriptor(p, key)) === undefined) {
-                    p = getPrototypeOf(this);
-                }
-                return d ? d.set : undefined;
-            }
-        }
-    });
-}
-
 // Immutable Prototype Exotic Objects
 // https://github.com/tc39/ecma262/issues/272
-function freezeIntrinsics() {
-    seal(Object.prototype);
+function freezeIntrinsics(global) {
+    seal(global.Object.prototype);
 }
 
 // wrapping the source with `with` statements create a new lexical scope,
@@ -2494,17 +558,6 @@ function freezeIntrinsics() {
 // additionally, when specified, strict mode will be enforced to avoid leaking
 // global variables into the worker.
 function makeEvaluatorSource(src, sourceURL) {
-
-    // // removing first line CSFR protection and other comments to facilitate
-    // // the detection of returnable code
-    // src = src.replace(trimFirstMultilineCommentEx, '');
-    // src = src.replace(trimFirstLineCommentEx, '');
-    // // only add return statement if source it starts with [, {, or (
-    // var match = src.match(returnableEx);
-    // if (match) {
-    //   src = src.replace(match[1], 'return ');
-    // }
-
 
     // Create the evaluator function.
     // The shadow is a proxy that has all window properties defined as undefined.
@@ -2520,8 +573,9 @@ function makeEvaluatorSource(src, sourceURL) {
     with (arguments[0]) {
         return (function(window){
             "use strict";
-
-${src}
+            return (
+                ${ completion(src) }
+            );
 
         }).call(arguments[0], arguments[0]);
     }}
@@ -2551,8 +605,8 @@ function safeEval(src, sourceURL, globals) {
 
     if (typeof fn === 'function') {
         if (!initalized) {
-            repairAccessors();
-            freezeIntrinsics();
+            repairAccessors(window);
+            freezeIntrinsics(window);
             initalized = true;
         }
 
@@ -2838,6 +892,335 @@ var SecureIFrameElement = {
  * limitations under the License.
  */
 
+const metadata$3 = {
+    "ATTRIBUTE_NODE":                 DEFAULT,
+    "CDATA_SECTION_NODE":             DEFAULT,
+    "COMMENT_NODE":                   DEFAULT,
+    "DOCUMENT_FRAGMENT_NODE":         DEFAULT,
+    "DOCUMENT_NODE":                  DEFAULT,
+    "DOCUMENT_POSITION_CONTAINED_BY": DEFAULT,
+    "DOCUMENT_POSITION_CONTAINS":     DEFAULT,
+    "DOCUMENT_POSITION_DISCONNECTED": DEFAULT,
+    "DOCUMENT_POSITION_FOLLOWING":    DEFAULT,
+    "DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC": DEFAULT,
+    "DOCUMENT_POSITION_PRECEDING":    DEFAULT,
+    "DOCUMENT_TYPE_NODE":             DEFAULT,
+    "ELEMENT_NODE":                   DEFAULT,
+    "ENTITY_NODE":                    DEFAULT,
+    "ENTITY_REFERENCE_NODE":          DEFAULT,
+    "NOTATION_NODE":                  DEFAULT,
+    "PROCESSING_INSTRUCTION_NODE":    DEFAULT,
+    "TEXT_NODE":                      DEFAULT,
+    "appendChild":                    FUNCTION,
+    "baseURI":                        DEFAULT,
+    "childNodes":                     DEFAULT,
+    "cloneNode":                      FUNCTION,
+    "compareDocumentPosition":        FUNCTION_RAW_ARGS,
+    "contains":                       FUNCTION_RAW_ARGS,
+    "firstChild":                     SKIP_OPAQUE,
+    "hasChildNodes":                  FUNCTION,
+    "insertBefore":                   FUNCTION,
+    "isDefaultNamespace":             FUNCTION,
+    "isEqualNode":                    FUNCTION_RAW_ARGS,
+    "isSameNode":                     FUNCTION_RAW_ARGS,
+    "lastChild":                      SKIP_OPAQUE,
+    "lookupNamespaceURI":             FUNCTION,
+    "lookupPrefix":                   FUNCTION,
+    "nextSibling":                    SKIP_OPAQUE,
+    "nodeName":                       DEFAULT,
+    "nodeType":                       DEFAULT,
+    "nodeValue":                      DEFAULT,
+    "normalize":                      FUNCTION,
+    "ownerDocument":                  DEFAULT,
+    "parentElement":                  SKIP_OPAQUE,
+    "parentNode":                     SKIP_OPAQUE,
+    "previousSibling":                SKIP_OPAQUE,
+    "removeChild":                    FUNCTION,
+    "replaceChild":                   FUNCTION,
+    "textContent":                    DEFAULT
+};
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+function SecureDOMEvent(event, key) {
+
+    var o = getFromCache(event, key);
+    if (o) {
+        return o;
+    }
+
+    o = Object.create(null, {
+        toString: {
+            value: function() {
+                return "SecureDOMEvent: " + event + "{ key: " + JSON.stringify(key) + " }";
+            }
+        }
+    });
+
+    var DOMEventSecureDescriptors = {
+        // Events properties that are DOM Elements were compiled from
+        // https://developer.mozilla.org/en-US/docs/Web/Events
+        target: SecureObject.createFilteredProperty(o, event, "target"),
+        currentTarget: SecureObject.createFilteredProperty(o, event, "currentTarget"),
+
+        initEvent: SecureObject.createFilteredMethod(o, event, "initEvent"),
+        // Touch Events are special on their own:
+        // https://developer.mozilla.org/en-US/docs/Web/API/Touch
+        touches: SecureDOMEvent.filterTouchesDescriptor(o, event, "touches"),
+        targetTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, "targetTouches"),
+        changedTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, "changedTouches"),
+
+        view: {
+            get: function() {
+                var key = getKey(o);
+                var swin = getEnv$1(key);
+                var win = getRef(swin, key);
+                return win === event.view ? swin : undefined;
+            }
+        }
+    };
+
+    ["preventDefault", "stopImmediatePropagation", "stopPropagation"].forEach(function(method) {
+        SecureObject.addMethodIfSupported(o, event, method);
+    });
+
+    // non-standard properties and aliases
+    ["relatedTarget", "srcElement", "explicitOriginalTarget", "originalTarget"].forEach(function(property) {
+        SecureObject.addPropertyIfSupported(o, event, property);
+    });
+
+    // re-exposing externals
+    // TODO: we might need to include non-enumerables
+    for (var name in event) {
+        if (!(name in o)) {
+            // every DOM event has a different shape, we apply filters when possible,
+            // and bypass when no secure filter is found.
+            Object.defineProperty(o, name, DOMEventSecureDescriptors[name] || SecureObject.createFilteredProperty(o, event, name));
+        }
+    }
+
+    setRef(o, event, key);
+    addToCache(event, o, key);
+    registerProxy(o);
+
+    return o;
+}
+
+SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
+
+    var valueOverride;
+    // descriptor to produce a new collection of touches where the target of each
+    // touch is a secure element
+    return {
+        get: function() {
+            if (valueOverride) {
+                return valueOverride;
+            }
+            // perf hard-wired in case there is not a touches to wrap
+            var touches = event[propName];
+            if (!touches) {
+                return touches;
+            }
+            // touches, of type ToucheList does not implement "map"
+            return Array.prototype.map.call(touches, function(touch) {
+                // touches is normally a big big collection of touch objects,
+                // we do not want to pre-process them all, just create the getters
+                // and process the accessor on the spot. e.g.:
+                // https://developer.mozilla.org/en-US/docs/Web/Events/touchstart
+                var keys = [];
+                var touchShape = touch;
+                // Walk up the prototype chain and gather all properties
+                do {
+                    keys = keys.concat(Object.keys(touchShape));
+                } while ((touchShape = Object.getPrototypeOf(touchShape)) && touchShape !== Object.prototype);
+
+                // Create a stub object with all the properties
+                return keys.reduce(function(o, p) {
+                    return Object.defineProperty(o, p, {
+                        // all props in a touch object are readonly by spec:
+                        // https://developer.mozilla.org/en-US/docs/Web/API/Touch
+                        get: function() {
+                            return SecureObject.filterEverything(se, touch[p]);
+                        }
+                    });
+                }, {});
+            });
+        },
+        set: function(value) {
+            valueOverride = value;
+        }
+    };
+};
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+const metadata$4 = {
+    "addEventListener":               FUNCTION,
+    "dispatchEvent":                  FUNCTION,
+    "removeEventListener":            FUNCTION
+};
+
+function addEventTargetMethods(st, raw, key) {
+    Object.defineProperties(st, {
+        addEventListener: createAddEventListenerDescriptor(st, raw, key),
+        dispatchEvent: SecureObject.createFilteredMethod(st, raw, "dispatchEvent", { rawArguments: true }),
+
+        // removeEventListener() is special in that we do not want to
+        // unfilter/unwrap the listener argument or it will not match what
+        // was actually wired up originally
+        removeEventListener: {
+            writable: true,
+            value: function(type, listener, options) {
+                var sCallback = getFromCache(listener, key);
+                raw.removeEventListener(type, sCallback, options);
+            }
+        }
+    });
+}
+
+function createEventTargetMethodsStateless(config, prototype) {
+    config["addEventListener"] = createAddEventListenerDescriptorStateless(prototype);
+
+    config["dispatchEvent"] = SecureObject.createFilteredMethodStateless("dispatchEvent", prototype, { rawArguments: true });
+
+    // removeEventListener() is special in that we do not want to
+    // unfilter/unwrap the listener argument or it will not match what
+    // was actually wired up originally
+    config["removeEventListener"] = {
+        value: function(type, listener, options) {
+            var raw = SecureObject.getRaw(this);
+            var sCallback = getFromCache(listener, getKey(this));
+            raw.removeEventListener(type, sCallback, options);
+        }
+    };
+}
+
+function createAddEventListenerDescriptor(st, el, key) {
+    return {
+        writable: true,
+        value: function(event, callback, useCapture) {
+            if (!callback) {
+                return; // by spec, missing callback argument does not throw,
+                // just ignores it.
+            }
+
+            var sCallback = getFromCache(callback, key);
+            if (!sCallback) {
+                sCallback = function(e) {
+                    verifyAccess(st, callback, true);
+                    var se = SecureDOMEvent(e, key);
+                    callback.call(st, se);
+                };
+
+                // Back reference for removeEventListener() support
+                addToCache(callback, sCallback, key);
+                setKey(callback, key);
+            }
+
+            el.addEventListener(event, sCallback, useCapture);
+        }
+    };
+}
+
+function createAddEventListenerDescriptorStateless() {
+    return {
+        value: function(event, callback, useCapture) {
+            if (!callback) {
+                return; // by spec, missing callback argument does not throw,
+                // just ignores it.
+            }
+
+            var so = this;
+            var el = SecureObject.getRaw(so);
+            var key = getKey(so);
+            var sCallback = getFromCache(callback, key);
+            if (!sCallback) {
+                sCallback = function(e) {
+                    verifyAccess(so, callback, true);
+                    var se = SecureDOMEvent(e, key);
+                    callback.call(so, se);
+                };
+
+                // Back reference for removeEventListener() support
+                addToCache(callback, sCallback, key);
+                setKey(callback, key);
+            }
+
+            el.addEventListener(event, sCallback, useCapture);
+        }
+    };
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+let warn = window.console.warn;
+let error = Error;
+
+function registerReportAPI(api) {
+    if (api) {
+        warn = api.warn;
+        error = api.error;
+    }
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 function cloneFiltered(el, st) {
     var root = el.cloneNode(false);
     function cloneChildren(parent, parentClone) {
@@ -3106,7 +1489,7 @@ function SecureElement(el, key) {
             SecureIFrameElement.addMethodsAndProperties(prototype);
         }
 
-        var tagNameSpecificConfig = SecureObject.addPrototypeMethodsAndPropertiesStateless(metadata$1, prototypicalInstance, prototype);
+        var tagNameSpecificConfig = SecureObject.addPrototypeMethodsAndPropertiesStateless(metadata$2, prototypicalInstance, prototype);
 
         // Conditionally add things that not all Node types support
         if ("attributes" in el) {
@@ -3504,7 +1887,7 @@ SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype
     };
 };
 
-const metadata$1 = {
+const metadata$2 = {
     "prototypes": {
         "DocumentFragment" : {
             "childElementCount":              DEFAULT,
@@ -4675,8 +3058,8 @@ const metadata$1 = {
             "specified":                      DEFAULT,
             "value":                          DEFAULT
         },
-        "Node": metadata$4,
-        "EventTarget": metadata$5
+        "Node": metadata$3,
+        "EventTarget": metadata$4
     }
 };
 
@@ -4729,7 +3112,7 @@ function SecureCanvasRenderingContext2D(ctx, key) {
         }
     });
 
-    SecureObject.addPrototypeMethodsAndProperties(metadata$$1, o, ctx, key);
+    SecureObject.addPrototypeMethodsAndProperties(metadata$1, o, ctx, key);
 
     setRef(o, ctx, key);
     addToCache(ctx, o, key);
@@ -4738,7 +3121,7 @@ function SecureCanvasRenderingContext2D(ctx, key) {
     return o;
 }
 
-const metadata$$1 = {
+const metadata$1 = {
     "prototypes": {
         "CanvasRenderingContext2D" : {
             "addHitRegion" :            FUNCTION,
@@ -4886,6 +3269,10 @@ function isPlainObject(value) {
 var extraFilter;
 function injectExtraFilter(filter) {
     extraFilter = filter;
+}
+var extraUnfilteredType$1;
+function injectExtraUnfilteredType(unfilteredType) {
+    extraUnfilteredType$1 = unfilteredType;
 }
 
 function SecureObject(thing, key) {
@@ -6536,28 +4923,24 @@ SecureObject.isUnfilteredType = function(raw, key) {
         }
     }
 
-    var namespace = key["namespace"];
-    // Special previlege for RTC, TODO:RJ remove it once we have SecureMediaStream
-    if ((namespace === "runtime_rtc_spark" || namespace === "runtime_rtc")
-        && window["MediaStream"] && (raw instanceof window["MediaStream"])) {
-        return true;
-    }
     // Do not filter ArrayBufferView types. https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView
     if (raw && (raw.buffer instanceof ArrayBuffer) && raw.byteLength !== undefined) {
+        return true;
+    }
+
+    if (extraUnfilteredType$1 && extraUnfilteredType$1(raw, key)) {
         return true;
     }
 
     return false;
 };
 
-//FIXME(tbliss): remove this once the necessary APIs become standard and can be exposed to everyone
-SecureObject.addRTCMediaApis = function(st, raw, name, key) {
+SecureObject.addUnfilteredPropertyIfSupported = function(st, raw, name) {
     if (raw[name]) {
-      var namespace = key["namespace"];
-        var config = {
-                enumerable: true,
-                value: (namespace === "runtime_rtc_spark" || namespace === "runtime_rtc") ? raw[name] : undefined,
-                writable: true
+        const config = {
+            enumerable: true,
+            value: raw[name],
+            writable: true
         };
         Object.defineProperty(st, name, config);
     }
@@ -6565,6 +4948,1798 @@ SecureObject.addRTCMediaApis = function(st, raw, name, key) {
 
 SecureObject.FunctionPrototypeBind = Function.prototype.bind;
 SecureObject.ArrayPrototypeSlice = Array.prototype.slice;
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+function SecureDocument(doc, key) {
+
+    var o = getFromCache(doc, key);
+    if (o) {
+        return o;
+    }
+
+    // create prototype to allow instanceof checks against document
+    var prototype = function() {};
+    Object.freeze(prototype);
+
+    o = Object.create(prototype, {
+        toString: {
+            value: function() {
+                return "SecureDocument: " + doc + "{ key: " + JSON.stringify(key) + " }";
+            }
+        },
+        createAttribute: {
+            value: function(name) {
+                var att = doc.createAttribute(name);
+                setKey(att, key);
+                return SecureElement(att, key);
+            }
+        },
+        createElement: {
+            value: function(tag) {
+                var el = doc.createElement(tag);
+                setKey(el, key);
+                return SecureElement(el, key);
+            }
+        },
+        createElementNS: {
+            value: function(namespace, tag) {
+                var el = doc.createElementNS(namespace, tag);
+                setKey(el, key);
+                return SecureElement(el, key);
+            }
+        },
+        createDocumentFragment: {
+            value: function() {
+                var el = doc.createDocumentFragment();
+                setKey(el, key);
+                return SecureElement(el, key);
+            }
+        },
+        createTextNode: {
+            value: function(text) {
+                var el = doc.createTextNode(text);
+                setKey(el, key);
+                return SecureElement(el, key);
+            }
+        },
+        createComment: {
+            value: function(data) {
+                var el = doc.createComment(data);
+                setKey(el, key);
+                return SecureElement(el, key);
+            }
+        },
+        domain: {
+            get: function() {
+                return doc.domain;
+            },
+            set: function() {
+                throw new Error("SecureDocument does not allow setting domain property.");
+            }
+        },
+        querySelector: {
+            value: function(selector) {
+                return SecureElement.secureQuerySelector(doc, key, selector);
+            }
+        }
+    });
+
+    addEventTargetMethods(o, doc, key);
+
+    function getCookieKey() {
+        return "LSKey[" + key["namespace"] + "]";
+    }
+
+    Object.defineProperty(o, "cookie", {
+        get: function() {
+            var fullCookie = doc.cookie;
+            var entries = fullCookie.split(";");
+            var cookieKey = getCookieKey();
+            // filter out cookies that do not match current namespace
+            var nsFiltered = entries.filter(function(val) {
+                var left = val.split("=")[0].trim();
+                return left.indexOf(cookieKey) === 0;
+            });
+            // strip LockerService key before returning to user land
+            var keyFiltered = nsFiltered.map(function(val) {
+                return val.trim().substring(cookieKey.length);
+            });
+            return keyFiltered.join("; ");
+        },
+        set: function(cookie) {
+            var chunks = cookie.split(";");
+            var entry = chunks[0].split("=");
+            var newKey = getCookieKey() + entry[0];
+            chunks[0] = newKey + "=" + entry[1];
+            var newCookie = chunks.join(";");
+            doc.cookie = newCookie;
+        }
+    });
+
+    ["implementation"].forEach(function(name) {
+        // These are direct passthrough's and should never be wrapped in a SecureObject
+        Object.defineProperty(o, name, {
+            enumerable: true,
+            value: doc[name]
+        });
+    });
+
+    SecureObject.addPrototypeMethodsAndProperties(metadata$5, o, doc, key);
+
+    setRef(o, doc, key);
+    addToCache(doc, o, key);
+    registerProxy(o);
+
+    return o;
+}
+
+const metadata$5 = {
+    "prototypes": {
+        "HTMLDocument" : {
+            // Defined on Instance
+            "location":                         DEFAULT,
+            // Defined on Proto
+            "fgColor":                          DEFAULT,
+            "linkColor":                        DEFAULT,
+            "vlinkColor":                       DEFAULT,
+            "alinkColor":                       DEFAULT,
+            "bgColor":                          DEFAULT,
+            "clear":                            FUNCTION,
+            "captureEvents":                    FUNCTION,
+            "releaseEvents":                    FUNCTION
+        },
+        "Document" : {
+            "URL":                              DEFAULT,
+            "activeElement":                    DEFAULT,
+            "adoptNode":                        FUNCTION,
+            "anchors":                          DEFAULT,
+            "applets":                          DEFAULT,
+            "body":                             DEFAULT,
+            "caretRangeFromPoint":              FUNCTION,
+            "characterSet":                     DEFAULT,
+            "charset":                          DEFAULT,
+            "childElementCount":                DEFAULT,
+            "children":                         DEFAULT,
+            "close":                            FUNCTION,
+            "compatMode":                       DEFAULT,
+            "contentType":                      DEFAULT,
+            "cookie":                           DEFAULT,
+            "createAttribute":                  FUNCTION,
+            "createAttributeNS":                FUNCTION,
+            "createCDATASection":               FUNCTION,
+            "createComment":                    FUNCTION,
+            "createDocumentFragment":           FUNCTION,
+            "createElement":                    FUNCTION,
+            "createElementNS":                  FUNCTION,
+            "createEvent":                      FUNCTION,
+            "createExpression":                 FUNCTION,
+            "createNSResolver":                 FUNCTION,
+            "createNodeIterator":               FUNCTION,
+            "createProcessingInstruction":      FUNCTION,
+            "createRange":                      FUNCTION,
+            "createTextNode":                   FUNCTION,
+            "createTreeWalker":                 FUNCTION,
+            "defaultView":                      DEFAULT,
+            "designMode":                       DEFAULT,
+            "dir":                              DEFAULT,
+            "doctype":                          DEFAULT,
+            "documentElement":                  DEFAULT,
+            "documentURI":                      DEFAULT,
+            // SecureDocument does not allow setting domain property.
+            // "domain":                           DEFAULT,
+            "elementFromPoint":                 FUNCTION,
+            "elementsFromPoint":                FUNCTION,
+            "embeds":                           DEFAULT,
+            "evaluate":                         FUNCTION,
+            "execCommand":                      FUNCTION,
+            "exitPointerLock":                  FUNCTION,
+            "firstElementChild":                DEFAULT,
+            "fonts":                            DEFAULT,
+            "forms":                            DEFAULT,
+            "getElementById":                   FUNCTION,
+            "getElementsByClassName":           FUNCTION,
+            "getElementsByName":                FUNCTION,
+            "getElementsByTagName":             FUNCTION,
+            "getElementsByTagNameNS":           FUNCTION,
+            "getSelection":                     FUNCTION,
+            "hasFocus":                         FUNCTION,
+            "head":                             DEFAULT,
+            "hidden":                           DEFAULT,
+            "images":                           DEFAULT,
+            "implementation":                   DEFAULT,
+            "importNode":                       FUNCTION,
+            "inputEncoding":                    DEFAULT,
+            "lastElementChild":                 DEFAULT,
+            "lastModified":                     DEFAULT,
+            "links":                            DEFAULT,
+            "onabort":                          EVENT,
+            "onautocomplete":                   EVENT,
+            "onautocompleteerror":              EVENT,
+            "onbeforecopy":                     EVENT,
+            "onbeforecut":                      EVENT,
+            "onbeforepaste":                    EVENT,
+            "onblur":                           EVENT,
+            "oncancel":                         EVENT,
+            "oncanplay":                        EVENT,
+            "oncanplaythrough":                 EVENT,
+            "onchange":                         EVENT,
+            "onclick":                          EVENT,
+            "onclose":                          EVENT,
+            "oncontextmenu":                    EVENT,
+            "oncopy":                           EVENT,
+            "oncuechange":                      EVENT,
+            "oncut":                            EVENT,
+            "ondblclick":                       EVENT,
+            "ondrag":                           EVENT,
+            "ondragend":                        EVENT,
+            "ondragenter":                      EVENT,
+            "ondragleave":                      EVENT,
+            "ondragover":                       EVENT,
+            "ondragstart":                      EVENT,
+            "ondrop":                           EVENT,
+            "ondurationchange":                 EVENT,
+            "onemptied":                        EVENT,
+            "onended":                          EVENT,
+            "onerror":                          EVENT,
+            "onfocus":                          EVENT,
+            "oninput":                          EVENT,
+            "oninvalid":                        EVENT,
+            "onkeydown":                        EVENT,
+            "onkeypress":                       EVENT,
+            "onkeyup":                          EVENT,
+            "onload":                           EVENT,
+            "onloadeddata":                     EVENT,
+            "onloadedmetadata":                 EVENT,
+            "onloadstart":                      EVENT,
+            "onmousedown":                      EVENT,
+            "onmouseenter":                     EVENT,
+            "onmouseleave":                     EVENT,
+            "onmousemove":                      EVENT,
+            "onmouseout":                       EVENT,
+            "onmouseover":                      EVENT,
+            "onmouseup":                        EVENT,
+            "onmousewheel":                     EVENT,
+            "onpaste":                          EVENT,
+            "onpause":                          EVENT,
+            "onplay":                           EVENT,
+            "onplaying":                        EVENT,
+            "onpointerlockchange":              EVENT,
+            "onpointerlockerror":               EVENT,
+            "onprogress":                       EVENT,
+            "onratechange":                     EVENT,
+            "onreadystatechange":               EVENT,
+            "onreset":                          EVENT,
+            "onresize":                         EVENT,
+            "onscroll":                         EVENT,
+            "onsearch":                         EVENT,
+            "onseeked":                         EVENT,
+            "onseeking":                        EVENT,
+            "onselect":                         EVENT,
+            "onselectionchange":                EVENT,
+            "onselectstart":                    EVENT,
+            "onshow":                           EVENT,
+            "onstalled":                        EVENT,
+            "onsubmit":                         EVENT,
+            "onsuspend":                        EVENT,
+            "ontimeupdate":                     EVENT,
+            "ontoggle":                         EVENT,
+            "ontouchcancel":                    EVENT,
+            "ontouchend":                       EVENT,
+            "ontouchmove":                      EVENT,
+            "ontouchstart":                     EVENT,
+            "onvolumechange":                   EVENT,
+            "onwaiting":                        EVENT,
+            "onwebkitfullscreenchange":         EVENT,
+            "onwebkitfullscreenerror":          EVENT,
+            "onwheel":                          EVENT,
+            "open":                             FUNCTION,
+            "origin":                           DEFAULT,
+            "plugins":                          DEFAULT,
+            "pointerLockElement":               DEFAULT,
+            "preferredStylesheetSet":           DEFAULT,
+            "queryCommandEnabled":              FUNCTION,
+            "queryCommandIndeterm":             FUNCTION,
+            "queryCommandState":                FUNCTION,
+            "queryCommandSupported":            FUNCTION,
+            "queryCommandValue":                FUNCTION,
+            "querySelector":                    FUNCTION,
+            "querySelectorAll":                 FUNCTION,
+            "readyState":                       DEFAULT,
+            "referrer":                         DEFAULT,
+            "registerElement":                  FUNCTION,
+            "rootElement":                      DEFAULT,
+            "scripts":                          DEFAULT,
+            "scrollingElement":                 DEFAULT,
+            "selectedStylesheetSet":            DEFAULT,
+            "styleSheets":                      DEFAULT,
+            "title":                            DEFAULT,
+            "visibilityState":                  DEFAULT,
+            "webkitCancelFullScreen":           FUNCTION,
+            "webkitCurrentFullScreenElement":   DEFAULT,
+            "webkitExitFullscreen":             FUNCTION,
+            "webkitFullscreenElement":          DEFAULT,
+            "webkitFullscreenEnabled":          DEFAULT,
+            "webkitHidden":                     DEFAULT,
+            "webkitIsFullScreen":               DEFAULT,
+            "webkitVisibilityState":            DEFAULT,
+            // Blocked on purpose because of security risk
+            // "write":                            FUNCTION,
+            // "writeln":                          FUNCTION,
+            "xmlEncoding":                      DEFAULT,
+            "xmlStandalone":                    DEFAULT,
+            "xmlVersion":                       DEFAULT
+        },
+        "Node": metadata$3,
+        "EventTarget": metadata$4
+    }
+};
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+function SecureLocation(loc, key) {
+
+    var o = getFromCache(loc, key);
+    if (o) {
+        return o;
+    }
+
+    o = Object.create(null, {
+        toString: {
+            value: function() {
+                return loc.href;
+            }
+        }
+    });
+
+    ["href", "protocol", "host", "hostname", "port", "pathname", "search", "hash", "username", "password", "origin"].forEach(function(property) {
+        SecureObject.addPropertyIfSupported(o, loc, property);
+    });
+
+    ["reload", "replace"].forEach(function(method) {
+        SecureObject.addMethodIfSupported(o, loc, method);
+    });
+
+
+    /**
+     * When a location.assign() call is found the href provided is evaluated
+     * to ensure it is a legal scheme. 'http' and 'https' are considered
+     * legal, while other schemes will throw an error because they present a possibility for
+     * un-intended script execution.
+     */
+    SecureObject.addMethodIfSupported(o, loc, 'assign', {
+        beforeCallback: function(href) {
+            if (href && typeof href === 'string' && href.length > 1) {
+                var dummy = document.createElement('a');
+                dummy.href = href;
+
+                if (dummy.protocol === 'http:' || dummy.protocol === 'https:') {
+                    return href;
+                } else {
+                    throw new error('SecureLocation.assign only supports http://, https:// schemes.');
+                }
+            }
+        }
+    });
+
+    setRef(o, loc, key);
+    addToCache(loc, o, key);
+    registerProxy(o);
+
+    return o;
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var extraAddProperty$1;
+function injectExtraAddProperty$1(addProperty) {
+    extraAddProperty$1 = addProperty;
+}
+
+function SecureNavigator(navigator, key) {
+
+    var o = getFromCache(navigator, key);
+    if (o) {
+        return o;
+    }
+
+    o = Object.create(null, {
+        toString: {
+            value: function() {
+                return "SecureNavigator: " + navigator + "{ key: " + JSON.stringify(key) + " }";
+            }
+        }
+    });
+
+    ["appCodeName", "appName", "appVersion", "cookieEnabled", "geolocation",
+        "language", "onLine", "platform", "product", "userAgent"].forEach(function(name) {
+            SecureObject.addPropertyIfSupported(o, navigator, name);
+        });
+
+    if (extraAddProperty$1) {
+        extraAddProperty$1(o, navigator, key);
+    }
+
+    setRef(o, navigator, key);
+    addToCache(navigator, o, key);
+    registerProxy(o);
+
+    return o;
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+function SecureXMLHttpRequest(key) {
+
+    // Create a new closure constructor for new XHMLHttpRequest() syntax support that captures the key
+    return function() {
+        var xhr = new XMLHttpRequest();
+
+        var o = Object.create(null, {
+            toString: {
+                value: function() {
+                    return "SecureXMLHttpRequest: " + xhr + " { key: " + JSON.stringify(key) + " }";
+                }
+            }
+        });
+
+        // Properties
+        ["readyState", "status", "statusText", "response", "responseType", "responseText",
+            "responseURL", "timeout", "withCredentials", "upload"].forEach(function(name) {
+                SecureObject.addPropertyIfSupported(o, xhr, name);
+            });
+
+        SecureObject.addPropertyIfSupported(o, xhr, "responseXML", {
+            afterGetCallback: function(value) {
+                return value;
+            }
+        });
+
+        // Event handlers
+        ["onloadstart", "onprogress", "onabort", "onerror", "onload", "ontimeout", "onloadend", "onreadystatechange"].forEach(function(name) {
+            Object.defineProperty(o, name, {
+                set: function(callback) {
+                    xhr[name] = function(e) {
+                        callback.call(o, SecureDOMEvent(e, key));
+                    };
+                }
+            });
+        });
+
+        Object.defineProperties(o, {
+            abort: SecureObject.createFilteredMethod(o, xhr, "abort"),
+
+            addEventListener: createAddEventListenerDescriptor(o, xhr, key),
+
+            open: SecureObject.createFilteredMethod(o, xhr, "open", {
+                beforeCallback: function(method, url) {
+                    var normalizer = document.createElement("a");
+                    normalizer.href = decodeURIComponent(url + "");
+                    var urlLower = normalizer.href.toLowerCase();
+                    // TODO: inject URL prefix check
+                    if (urlLower.indexOf("/aura") >= 0) {
+                        throw new error("SecureXMLHttpRequest.open cannot be used with Aura framework internal API endpoints " + url + "!");
+                    }
+                }
+            }),
+
+            send: SecureObject.createFilteredMethod(o, xhr, "send"),
+
+            getAllResponseHeaders: SecureObject.createFilteredMethod(o, xhr, "getAllResponseHeaders"),
+            getResponseHeader: SecureObject.createFilteredMethod(o, xhr, "getResponseHeader"),
+
+            setRequestHeader: SecureObject.createFilteredMethod(o, xhr, "setRequestHeader"),
+
+            overrideMimeType: SecureObject.createFilteredMethod(o, xhr, "overrideMimeType")
+        });
+
+        setRef(o, xhr, key);
+
+        return Object.freeze(o);
+    };
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+function SecureMutationObserver(key) {
+
+    function filterRecords(st, records) {
+        var filtered = [];
+
+        records.forEach(function(record) {
+            if (hasAccess(st, record.target)) {
+                filtered.push(SecureObject.filterEverything(st, record));
+            }
+        });
+
+        return filtered;
+    }
+
+    // Create a new closure constructor for new XHMLHttpRequest() syntax support that captures the key
+    return function(callback) {
+        var o = Object.create(null);
+
+        var observer = new MutationObserver(function(records) {
+            var filtered = filterRecords(o, records);
+            if (filtered.length > 0) {
+                callback(filtered);
+            }
+        });
+
+        Object.defineProperties(o, {
+            toString: {
+                value: function() {
+                    return "SecureMutationObserver: " + observer + " { key: " + JSON.stringify(key) + " }";
+                }
+            },
+
+            "observe": SecureObject.createFilteredMethod(o, observer, "observe", { rawArguments: true }),
+            "disconnect": SecureObject.createFilteredMethod(o, observer, "disconnect"),
+
+            "takeRecords": {
+                writable: true,
+                value: function() {
+                    return filterRecords(o, observer["takeRecords"]());
+                }
+            }
+        });
+
+        setRef(o, observer, key);
+
+        return Object.freeze(o);
+    };
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+function SecureNotification(key) {
+
+    // Create a new closure constructor for new Notification() syntax support that captures the key
+    return function(title, options) {
+        var notification = new Notification(title, options);
+
+        var o = Object.create(null, {
+            toString: {
+                value: function() {
+                    return "SecureNotification: " + notification + " { key: " + JSON.stringify(key) + " }";
+                }
+            }
+        });
+
+        // Properties
+        ["actions", "badge", "body", "data", "dir", "lang", "tag", "icon", "image", "requireInteraction",
+            "silent", "timestamp", "title", "vibrate", "noscreen", "renotify", "sound", "sticky"].forEach(function (name) {
+                SecureObject.addPropertyIfSupported(o, notification, name);
+            });
+
+        // Event handlers
+        ["onclick", "onerror"].forEach(function (name) {
+            Object.defineProperty(o, name, {
+                set: function(callback) {
+                    notification[name] = function(e) {
+                        callback.call(o, SecureDOMEvent(e, key));
+                    };
+                }
+            });
+        });
+
+        Object.defineProperties(o, {
+            close: SecureObject.createFilteredMethod(o, notification, "close")
+        });
+
+        setRef(o, notification, key);
+
+        return Object.freeze(o);
+    };
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+function SecureStorage(storage, type, key) {
+
+    var o = getFromCache(storage, key);
+    if (o) {
+        return o;
+    }
+
+    // Read existing key to synthetic key index from storage
+    var stringizedKey = JSON.stringify(key);
+    var nextSyntheticKey = "LSSNextSynthtic:" + type;
+    var storedIndexKey = "LSSIndex:" + type + stringizedKey;
+    var nameToSyntheticRaw;
+    try {
+      nameToSyntheticRaw = storage.getItem(storedIndexKey);
+    } catch(e) {
+      // There is a bug in google chrome where localStorage becomes inaccessible.
+      // Don't fast fail and break all applications. Defer the exception throwing to when the app actually uses localStorage
+    }
+    var nameToSynthetic = nameToSyntheticRaw ? JSON.parse(nameToSyntheticRaw) : {};
+
+    function persistSyntheticNameIndex() {
+        // Persist the nameToSynthetic index
+        var stringizedIndex = JSON.stringify(nameToSynthetic);
+        storage.setItem(storedIndexKey, stringizedIndex);
+    }
+
+    function getSynthetic(name) {
+        var synthetic = nameToSynthetic[name];
+        if (!synthetic) {
+            var nextSynthticRaw = storage.getItem(nextSyntheticKey);
+            var nextSynthetic = nextSynthticRaw ? Number(nextSynthticRaw) : 1;
+
+            synthetic = nextSynthetic++;
+
+            // Persist the next synthetic counter
+            storage.setItem(nextSyntheticKey, nextSynthetic);
+
+            nameToSynthetic[name] = synthetic;
+
+            persistSyntheticNameIndex();
+        }
+
+        return synthetic;
+    }
+
+    function forgetSynthetic(name) {
+        var synthetic = getSynthetic(name);
+        if (synthetic) {
+            delete nameToSynthetic[name];
+            persistSyntheticNameIndex();
+        }
+    }
+
+    o = Object.create(null, {
+        toString: {
+            value: function() {
+                return "SecureStorage: " + type + " { key: " + JSON.stringify(key) + " }";
+            }
+        },
+
+        length: {
+            get: function() {
+                return Object.keys(nameToSynthetic).length;
+            }
+        },
+
+        getItem: {
+            value: function(name) {
+                var synthetic = getSynthetic(name);
+                return synthetic ? storage.getItem(synthetic) : null;
+            }
+        },
+
+        setItem: {
+            value: function(name, value) {
+                var synthetic = getSynthetic(name);
+                storage.setItem(synthetic, value);
+            }
+        },
+
+        removeItem: {
+            value: function(name) {
+                var syntheticKey = getSynthetic(name);
+                if (syntheticKey) {
+                    storage.removeItem(syntheticKey);
+                    forgetSynthetic(name);
+                }
+            }
+        },
+
+        key: {
+            value: function(index) {
+                return Object.keys(nameToSynthetic)[index];
+            }
+        },
+
+        clear: {
+            value: function() {
+                Object.keys(nameToSynthetic).forEach(function(name) {
+                    var syntheticKey = getSynthetic(name);
+                    storage.removeItem(syntheticKey);
+                });
+
+                // Forget all synthetic
+                nameToSynthetic = {};
+                storage.removeItem(storedIndexKey);
+            }
+        }
+    });
+
+    setRef(o, storage, key);
+    addToCache(storage, o, key);
+    registerProxy(o);
+
+    return o;
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// For URL, we only need to tame one static method. That method is on the
+// window.URL primordial and disappears from instances of URL. We only create
+// the secure object and we will let the deep freeze operation make it tamper
+// proof.
+
+// Taming of URL createObjectURL will not be necessary on webkit
+// "CSP rules ignored when a page navigates to a blob URL" is declassified,
+// https://bugs.webkit.org/show_bug.cgi?id=174883
+
+// and once the correct behavior on Edge is confirmed (curently in development)
+// https://developer.microsoft.com/en-us/microsoft-edge/platform/status/urlapi/
+
+// Only FireFox implements the correct behavior.
+
+function SecureURL(raw) {
+
+  var SecureURLMethods = Object.create(null,{
+    'createObjectURL': {
+      value: function(object) {
+        if (Object.prototype.toString.call(object) === '[object Blob]') {
+          if (object.type === 'text/html') {
+            // There are no relible ways to convert syncronously
+            // a blob back to a string. Disallow until
+            // <rdar://problem/33575448> is declassified
+            throw new TypeError("SecureURL does not allow creation of Object URL from blob type " + object.type);
+          }
+        }
+        // IMPORTANT: thisArg is the target of the proxy.
+        return raw.createObjectURL(object);
+      }
+    },
+    'toString': {
+      value: function() {
+        return "SecureURL: " + Object.prototype.toString.call(raw);
+      }
+    }
+  });
+
+  return new Proxy(raw, {
+    get: function (target, name) {
+      // Give priority to the overritten methods.
+      var desc = Object.getOwnPropertyDescriptor(SecureURLMethods, name);
+      if (desc === undefined) {
+        desc = Object.getOwnPropertyDescriptor(target, name);
+      }
+      if (desc === undefined || desc.value === undefined) {
+        return undefined;
+      }
+      // Properties not found the object are not static.
+      if (Object.keys(target).indexOf(name) < 0) {
+        return desc.value;
+      }
+      // Prevent static methods from executing in the context of the proxy.
+      return function() {
+        return desc.value.apply(undefined, arguments);
+      };
+    },
+    set: function () { return true; }
+  });
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var extraAddProperty;
+function injectExtraAddProperty$$1(addProperty) {
+    extraAddProperty = addProperty;
+}
+
+// This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
+// which, by definition, do not provide authority or access to globals.
+var whitelist = [
+    // Accessible Intrinsics (not reachable by own property name traversal)
+    // -> from ES5
+    "ThrowTypeError",
+    // -> from ES6.
+    "IteratorPrototype", "ArrayIteratorPrototype", "StringIteratorPrototype", "MapIteratorPrototype", "SetIteratorPrototype", "GeneratorFunction", "TypedArray",
+
+    // Intrinsics
+    // -> from ES5
+    "Function", "WeakMap", "StringMap",
+    // Proxy,
+    "escape", "unescape", "Object", "NaN", "Infinity", "undefined",
+    // eval,
+    "parseInt", "parseFloat", "isNaN", "isFinite", "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent", "Function", "Array", "String", "Boolean", "Number",
+    "Math", "Date", "RegExp", "Error", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "JSON",
+    // -> from ES6
+    "ArrayBuffer", "Int8Array", "Uint8Array", "Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array", "Uint32Array", "Float32Array", "Float64Array", "DataView",
+    "Promise",
+
+    // Misc
+    "Intl"
+];
+
+function SecureWindow(win, key) {
+
+    var o = getFromCache(win, key);
+    if (o) {
+        return o;
+    }
+
+    // Create prototype to allow basic object operations like hasOwnProperty etc
+    var emptyProto = {};
+    // Do not treat window like a plain object, $A.util.isPlainObject() returns true if we leave the constructor intact
+    emptyProto.constructor = null;
+    Object.freeze(emptyProto);
+
+    o = Object.create(emptyProto, {
+        document: {
+            enumerable: true,
+            value: SecureDocument(win.document, key)
+        },
+        window: {
+            enumerable: true,
+            get: function () {
+                return o;
+            }
+        },
+        localStorage: {
+            enumerable: true,
+            value: SecureStorage(win.localStorage, "LOCAL", key)
+        },
+        sessionStorage: {
+            enumerable: true,
+            value: SecureStorage(win.sessionStorage, "SESSION", key)
+        },
+        MutationObserver: {
+            enumerable: true,
+            value: SecureMutationObserver(key)
+        },
+        navigator: {
+            enumerable: true,
+            value: SecureNavigator(win.navigator, key)
+        },
+        XMLHttpRequest: {
+            enumerable: true,
+            value: SecureXMLHttpRequest(key)
+        },
+        setTimeout: {
+            enumerable: true,
+            value: function (callback) {
+                return setTimeout.apply(win, [SecureObject.FunctionPrototypeBind.call(callback, o)].concat(SecureObject.ArrayPrototypeSlice.call(arguments, 1)));
+            }
+        },
+        setInterval: {
+            enumerable: true,
+            value: function (callback) {
+                return setInterval.apply(win, [SecureObject.FunctionPrototypeBind.call(callback, o)].concat(SecureObject.ArrayPrototypeSlice.call(arguments, 1)));
+            }
+        },
+        location: {
+            enumerable: true,
+            get: function() {
+                return SecureLocation(location, key);
+            },
+            set: function(value) {
+                var ret = location.href = value;
+                return ret;
+            }
+        },
+        URL: {
+            enumerable: true,
+            value: SecureURL(win.URL)
+        },
+        toString: {
+            value: function() {
+                return "SecureWindow: " + win + "{ key: " + JSON.stringify(key) + " }";
+            }
+        }
+    });
+
+    SecureObject.addMethodIfSupported(o, win, "getComputedStyle", {
+        rawArguments: true
+    });
+
+    ["outerHeight", "outerWidth"].forEach(function(name) {
+        SecureObject.addPropertyIfSupported(o, win, name);
+    });
+
+    ["scroll", "scrollBy", "scrollTo"].forEach(function(name) {
+        SecureObject.addMethodIfSupported(o, win, name);
+    });
+
+    ["open"].forEach(function(name) {
+        SecureObject.addMethodIfSupported(o, win, name, {
+            beforeCallback  : function(url){
+                // If an url was provided to window.open()
+                if (url && typeof url === "string" && url.length > 1) {
+                    // Only allow http|https|relative urls.
+                    var schemeRegex = /^[\s]*(http:\/\/|https:\/\/|\/)/i;
+                    if (!schemeRegex.test(url)){
+                        throw new error("SecureWindow.open supports http://, https:// schemes and relative urls.");
+                    }
+                }
+            }
+        });
+    });
+
+    if ("FormData" in win) {
+        var formDataValueOverride;
+        Object.defineProperty(o, "FormData", {
+            get: function() {
+                return formDataValueOverride || function() {
+                    var args = SecureObject.ArrayPrototypeSlice.call(arguments);
+                    // make sure we have access to any <form> passed in to constructor
+                    var form;
+                    if (args.length > 0) {
+                        form = args[0];
+                        verifyAccess(o, form);
+                    }
+
+                    var rawArgs = form ? [getRef(form, getKey(form))]: [];
+                    var cls = win["FormData"];
+                    if (typeof cls === "function") {
+                        return new (Function.prototype.bind.apply(window["FormData"], [null].concat(rawArgs)));
+                    } else {
+                        return new cls(rawArgs);
+                    }
+                };
+            },
+            set: function(value) {
+                formDataValueOverride = value;
+            }
+        });
+    }
+
+    if ("Notification" in win) {
+        var notificationValueOverride;
+        Object.defineProperty(o, "Notification", {
+            get: function() {
+                if (notificationValueOverride) {
+                    return notificationValueOverride;
+                }
+                var notification = SecureNotification(key);
+                if ("requestPermission" in win["Notification"]) {
+                    Object.defineProperty(notification, "requestPermission", {
+                        enumerable: true,
+                        value: function(callback) {
+                            return Notification["requestPermission"](callback);
+                        }
+                    });
+                }
+                if ("permission" in win["Notification"]) {
+                    Object.defineProperty(notification, "permission", {
+                        enumerable: true,
+                        value: Notification["permission"]
+                    });
+                }
+                return notification;
+            },
+            set: function(value) {
+                notificationValueOverride = value;
+            }
+        });
+    }
+
+    ["Blob", "File"].forEach(function(name) {
+        if (name in win) {
+            var valueOverride;
+            Object.defineProperty(o, name, {
+                get: function() {
+                    return valueOverride || function() {
+                        var cls = win[name],
+                        result,
+                        args = Array.prototype.slice.call(arguments);
+                        var scriptTagsRegex = /<script[\s\S]*?>[\s\S]*?<\/script[\s]*?>/gi;
+                        if (scriptTagsRegex.test(args[0])) {
+                            throw new error(name + " creation failed: <script> tags are blocked");
+                        }
+                        if (typeof cls === "function") {
+                            //  Function.prototype.bind.apply is being used to invoke the constructor and to pass all the arguments provided by the caller
+                            // TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
+                            result = new (Function.prototype.bind.apply(cls, [null].concat(args)));
+                        } else {
+                            // For browsers that use a constructor that's not a function, invoke the constructor directly.
+                            // For example, on Mobile Safari window["Blob"] returns an object called BlobConstructor
+                            // Invoke constructor with specific arguments, handle up to 3 arguments(Blob accepts 2 param, File accepts 3 param)
+                            switch (args.length) {
+                                case 0:
+                                    result = new cls();
+                                    break;
+                                case 1:
+                                    result = new cls(args[0]);
+                                    break;
+                                case 2:
+                                    result = new cls(args[0], args[1]);
+                                    break;
+                                case 3:
+                                    result = new cls(args[0], args[1], args[2]);
+                                    break;
+                            }
+                        }
+                        return result;
+                    };
+                },
+                set: function(value) {
+                    valueOverride = value;
+                }
+            });
+        }
+    });
+
+    addEventTargetMethods(o, win, key);
+
+    // Has to happen last because it depends on the secure getters defined above that require the object to be keyed
+    whitelist.forEach(function(name) {
+        // These are direct passthrough's and should never be wrapped in a SecureObject
+        Object.defineProperty(o, name, {
+            enumerable: true,
+            writable: true,
+            value: win[name]
+        });
+    });
+
+    if (extraAddProperty) {
+        extraAddProperty(o, win, key);
+    }
+
+    SecureObject.addPrototypeMethodsAndProperties(metadata$$1, o, win, key);
+
+    setRef(o, win, key);
+    addToCache(win, o, key);
+    registerProxy(o);
+
+    return o;
+}
+
+const metadata$$1 = {
+    "prototypes": {
+        "Window" : {
+            "AnalyserNode":                         FUNCTION,
+            "AnimationEvent":                       FUNCTION,
+            "AppBannerPromptResult":                FUNCTION,
+            "ApplicationCache":                     FUNCTION,
+            "ApplicationCacheErrorEvent":           FUNCTION,
+            "Array":                                RAW,
+            "ArrayBuffer":                          RAW,
+            "Attr":                                 RAW,
+            "Audio":                                CTOR,
+            "AudioBuffer":                          FUNCTION,
+            "AudioBufferSourceNode":                FUNCTION,
+            "AudioContext":                         CTOR,
+            "AudioDestinationNode":                 FUNCTION,
+            "AudioListener":                        FUNCTION,
+            "AudioNode":                            FUNCTION,
+            "AudioParam":                           FUNCTION,
+            "AudioProcessingEvent":                 FUNCTION,
+            "AutocompleteErrorEvent":               FUNCTION,
+            "BarProp":                              FUNCTION,
+            "BatteryManager":                       FUNCTION,
+            "BeforeInstallPromptEvent":             FUNCTION,
+            "BeforeUnloadEvent":                    FUNCTION,
+            "BiquadFilterNode":                     FUNCTION,
+            "BlobEvent":                            FUNCTION,
+            "Boolean":                              FUNCTION,
+            "CDATASection":                         FUNCTION,
+            "CSS":                                  FUNCTION,
+            "CSSFontFaceRule":                      FUNCTION,
+            "CSSGroupingRule":                      FUNCTION,
+            "CSSImportRule":                        FUNCTION,
+            "CSSKeyframeRule":                      FUNCTION,
+            "CSSKeyframesRule":                     FUNCTION,
+            "CSSMediaRule":                         FUNCTION,
+            "CSSNamespaceRule":                     FUNCTION,
+            "CSSPageRule":                          FUNCTION,
+            "CSSRule":                              FUNCTION,
+            "CSSRuleList":                          FUNCTION,
+            "CSSStyleDeclaration":                  FUNCTION,
+            "CSSStyleRule":                         FUNCTION,
+            "CSSStyleSheet":                        FUNCTION,
+            "CSSSupportsRule":                      FUNCTION,
+            "CSSViewportRule":                      FUNCTION,
+            "CanvasCaptureMediaStreamTrack":        FUNCTION,
+            "CanvasGradient":                       FUNCTION,
+            "CanvasPattern":                        FUNCTION,
+            "CanvasRenderingContext2D":             RAW,
+            "ChannelMergerNode":                    FUNCTION,
+            "ChannelSplitterNode":                  FUNCTION,
+            "CharacterData":                        FUNCTION,
+            "ClientRect":                           FUNCTION,
+            "ClientRectList":                       FUNCTION,
+            "ClipboardEvent":                       FUNCTION,
+            "CloseEvent":                           FUNCTION,
+            "Comment":                              CTOR,
+            "CompositionEvent":                     FUNCTION,
+            "ConvolverNode":                        FUNCTION,
+            "Credential":                           FUNCTION,
+            "CredentialsContainer":                 FUNCTION,
+            "Crypto":                               FUNCTION,
+            "CryptoKey":                            FUNCTION,
+            "CustomEvent":                          CTOR,
+            "DOMError":                             FUNCTION,
+            "DOMException":                         FUNCTION,
+            "DOMImplementation":                    FUNCTION,
+            "DOMParser":                            RAW,
+            "DOMStringList":                        FUNCTION,
+            "DOMStringMap":                         FUNCTION,
+            "DOMTokenList":                         FUNCTION,
+            "DataTransfer":                         FUNCTION,
+            "DataTransferItem":                     FUNCTION,
+            "DataTransferItemList":                 FUNCTION,
+            "DataView":                             FUNCTION,
+            "Date":                                 RAW,
+            "DelayNode":                            FUNCTION,
+            "DeviceMotionEvent":                    FUNCTION,
+            "DeviceOrientationEvent":               FUNCTION,
+            "Document":                             FUNCTION,
+            "DocumentFragment":                     FUNCTION,
+            "DocumentType":                         FUNCTION,
+            "DragEvent":                            FUNCTION,
+            "DynamicsCompressorNode":               FUNCTION,
+            "ES6Promise":                           DEFAULT,
+            "Element":                              RAW,
+            "Error":                                FUNCTION,
+            "ErrorEvent":                           FUNCTION,
+            "EvalError":                            FUNCTION,
+            "Event":                                CTOR,
+            "EventSource":                          FUNCTION,
+            "EventTarget":                          RAW,
+            "FederatedCredential":                  FUNCTION,
+            "FileError":                            FUNCTION,
+            "FileList":                             RAW,
+            "FileReader":                           RAW,
+            "Float32Array":                         RAW,
+            "Float64Array":                         RAW,
+            "FocusEvent":                           FUNCTION,
+            "FontFace":                             FUNCTION,
+            "Function":                             FUNCTION,
+            "GainNode":                             FUNCTION,
+            "HTMLAllCollection":                    FUNCTION,
+            "HTMLAnchorElement":                    RAW,
+            "HTMLAreaElement":                      RAW,
+            "HTMLAudioElement":                     RAW,
+            "HTMLBRElement":                        RAW,
+            "HTMLBaseElement":                      RAW,
+            "HTMLBodyElement":                      RAW,
+            "HTMLButtonElement":                    RAW,
+            "HTMLCanvasElement":                    RAW,
+            "HTMLCollection":                       RAW,
+            "HTMLContentElement":                   RAW,
+            "HTMLDListElement":                     RAW,
+            "HTMLDataListElement":                  RAW,
+            "HTMLDetailsElement":                   RAW,
+            "HTMLDialogElement":                    RAW,
+            "HTMLDirectoryElement":                 RAW,
+            "HTMLDivElement":                       RAW,
+            "HTMLDocument":                         RAW,
+            "HTMLElement":                          RAW,
+            "HTMLEmbedElement":                     RAW,
+            "HTMLFieldSetElement":                  RAW,
+            "HTMLFontElement":                      RAW,
+            "HTMLFormControlsCollection":           FUNCTION,
+            "HTMLFormElement":                      RAW,
+            "HTMLFrameElement":                     RAW,
+            "HTMLFrameSetElement":                  RAW,
+            "HTMLHRElement":                        RAW,
+            "HTMLHeadElement":                      RAW,
+            "HTMLHeadingElement":                   RAW,
+            "HTMLHtmlElement":                      RAW,
+            "HTMLIFrameElement":                    RAW,
+            "HTMLImageElement":                     RAW,
+            "HTMLInputElement":                     RAW,
+            "HTMLKeygenElement":                    RAW,
+            "HTMLLIElement":                        RAW,
+            "HTMLLabelElement":                     RAW,
+            "HTMLLegendElement":                    RAW,
+            "HTMLLinkElement":                      RAW,
+            "HTMLMapElement":                       RAW,
+            "HTMLMarqueeElement":                   RAW,
+            "HTMLMediaElement":                     RAW,
+            "HTMLMenuElement":                      RAW,
+            "HTMLMetaElement":                      RAW,
+            "HTMLMeterElement":                     RAW,
+            "HTMLModElement":                       RAW,
+            "HTMLOListElement":                     RAW,
+            "HTMLObjectElement":                    RAW,
+            "HTMLOptGroupElement":                  RAW,
+            "HTMLOptionElement":                    RAW,
+            "HTMLOptionsCollection":                RAW,
+            "HTMLOutputElement":                    RAW,
+            "HTMLParagraphElement":                 RAW,
+            "HTMLParamElement":                     RAW,
+            "HTMLPictureElement":                   RAW,
+            "HTMLPreElement":                       RAW,
+            "HTMLProgressElement":                  RAW,
+            "HTMLQuoteElement":                     RAW,
+            "HTMLScriptElement":                    RAW,
+            "HTMLSelectElement":                    RAW,
+            "HTMLShadowElement":                    RAW,
+            "HTMLSourceElement":                    RAW,
+            "HTMLSpanElement":                      RAW,
+            "HTMLStyleElement":                     RAW,
+            "HTMLTableCaptionElement":              RAW,
+            "HTMLTableCellElement":                 RAW,
+            "HTMLTableColElement":                  RAW,
+            "HTMLTableElement":                     RAW,
+            "HTMLTableRowElement":                  RAW,
+            "HTMLTableSectionElement":              RAW,
+            "HTMLTemplateElement":                  RAW,
+            "HTMLTextAreaElement":                  RAW,
+            "HTMLTitleElement":                     RAW,
+            "HTMLTrackElement":                     RAW,
+            "HTMLUListElement":                     RAW,
+            "HTMLUnknownElement":                   RAW,
+            "HTMLVideoElement":                     RAW,
+            "HashChangeEvent":                      FUNCTION,
+            "IdleDeadline":                         FUNCTION,
+            "Image":                                CTOR,
+            "ImageBitmap":                          FUNCTION,
+            "ImageData":                            FUNCTION,
+            "Infinity":                             DEFAULT,
+            "InputDeviceCapabilities":              FUNCTION,
+            "Int16Array":                           FUNCTION,
+            "Int32Array":                           FUNCTION,
+            "Int8Array":                            FUNCTION,
+            "Intl":                                 DEFAULT,
+            "JSON":                                 DEFAULT,
+            "KeyboardEvent":                        FUNCTION,
+            "Location":                             FUNCTION,
+            "MIDIAccess":                           FUNCTION,
+            "MIDIConnectionEvent":                  FUNCTION,
+            "MIDIInput":                            FUNCTION,
+            "MIDIInputMap":                         FUNCTION,
+            "MIDIMessageEvent":                     FUNCTION,
+            "MIDIOutput":                           FUNCTION,
+            "MIDIOutputMap":                        FUNCTION,
+            "MIDIPort":                             FUNCTION,
+            "Map":                                  RAW,
+            "Math":                                 DEFAULT,
+            "MediaDevices":                         DEFAULT,
+            "MediaElementAudioSourceNode":          FUNCTION,
+            "MediaEncryptedEvent":                  FUNCTION,
+            "MediaError":                           FUNCTION,
+            "MediaKeyMessageEvent":                 FUNCTION,
+            "MediaKeySession":                      FUNCTION,
+            "MediaKeyStatusMap":                    FUNCTION,
+            "MediaKeySystemAccess":                 FUNCTION,
+            "MediaKeys":                            FUNCTION,
+            "MediaList":                            FUNCTION,
+            "MediaQueryList":                       FUNCTION,
+            "MediaQueryListEvent":                  FUNCTION,
+            "MediaRecorder":                        CTOR,
+            "MediaSource":                          FUNCTION,
+            "MediaStreamAudioDestinationNode":      CTOR,
+            "MediaStreamAudioSourceNode":           CTOR,
+            "MediaStreamEvent":                     CTOR,
+            "MediaStreamTrack":                     FUNCTION,
+            "MessageChannel":                       RAW,
+            "MessageEvent":                         RAW,
+            "MessagePort":                          RAW,
+            "MimeType":                             FUNCTION,
+            "MimeTypeArray":                        FUNCTION,
+            "MutationObserver":                     CTOR,
+            "MutationRecord":                       FUNCTION,
+            "MouseEvent":                           CTOR,
+            "NaN":                                  DEFAULT,
+            "NamedNodeMap":                         FUNCTION,
+            "Navigator":                            FUNCTION,
+            "Node":                                 RAW,
+            "NodeFilter":                           FUNCTION,
+            "NodeIterator":                         FUNCTION,
+            "NodeList":                             FUNCTION,
+            "Number":                               FUNCTION,
+            "Object":                               FUNCTION,
+            "OfflineAudioCompletionEvent":          FUNCTION,
+            "OfflineAudioContext":                  FUNCTION,
+            "Option":                               CTOR,
+            "OscillatorNode":                       FUNCTION,
+            "PERSISTENT":                           DEFAULT,
+            "PageTransitionEvent":                  FUNCTION,
+            "PasswordCredential":                   FUNCTION,
+            "Path2D":                               FUNCTION,
+            "Performance":                          RAW,
+            "PerformanceEntry":                     FUNCTION,
+            "PerformanceMark":                      FUNCTION,
+            "PerformanceMeasure":                   FUNCTION,
+            "PerformanceNavigation":                FUNCTION,
+            "PerformanceResourceTiming":            FUNCTION,
+            "PerformanceTiming":                    FUNCTION,
+            "PeriodicWave":                         FUNCTION,
+            "PopStateEvent":                        FUNCTION,
+            "Presentation":                         FUNCTION,
+            "PresentationAvailability":             FUNCTION,
+            "PresentationConnection":               FUNCTION,
+            "PresentationConnectionAvailableEvent": FUNCTION,
+            "PresentationConnectionCloseEvent":     FUNCTION,
+            "PresentationRequest":                  FUNCTION,
+            "ProcessingInstruction":                FUNCTION,
+            "ProgressEvent":                        FUNCTION,
+            "Promise":                              FUNCTION,
+            "PromiseRejectionEvent":                FUNCTION,
+            "RTCCertificate":                       FUNCTION,
+            "RTCIceCandidate":                      FUNCTION,
+            "RTCSessionDescription":                CTOR,
+            "RadioNodeList":                        FUNCTION,
+            "Range":                                FUNCTION,
+            "RangeError":                           FUNCTION,
+            "ReadableByteStream":                   FUNCTION,
+            "ReadableStream":                       FUNCTION,
+            "ReferenceError":                       FUNCTION,
+            "Reflect":                              DEFAULT,
+            "RegExp":                               FUNCTION,
+            "Request":                              FUNCTION,
+            "Response":                             FUNCTION,
+            "SVGAElement":                          FUNCTION,
+            "SVGAngle":                             FUNCTION,
+            "SVGAnimateElement":                    FUNCTION,
+            "SVGAnimateMotionElement":              FUNCTION,
+            "SVGAnimateTransformElement":           FUNCTION,
+            "SVGAnimatedAngle":                     FUNCTION,
+            "SVGAnimatedBoolean":                   FUNCTION,
+            "SVGAnimatedEnumeration":               FUNCTION,
+            "SVGAnimatedInteger":                   FUNCTION,
+            "SVGAnimatedLength":                    FUNCTION,
+            "SVGAnimatedLengthList":                FUNCTION,
+            "SVGAnimatedNumber":                    FUNCTION,
+            "SVGAnimatedNumberList":                FUNCTION,
+            "SVGAnimatedPreserveAspectRatio":       FUNCTION,
+            "SVGAnimatedRect":                      FUNCTION,
+            "SVGAnimatedString":                    FUNCTION,
+            "SVGAnimatedTransformList":             FUNCTION,
+            "SVGAnimationElement":                  RAW,
+            "SVGCircleElement":                     RAW,
+            "SVGClipPathElement":                   RAW,
+            "SVGComponentTransferFunctionElement":  RAW,
+            "SVGCursorElement":                     RAW,
+            "SVGDefsElement":                       RAW,
+            "SVGDescElement":                       RAW,
+            "SVGDiscardElement":                    RAW,
+            "SVGElement":                           RAW,
+            "SVGEllipseElement":                    RAW,
+            "SVGFEBlendElement":                    RAW,
+            "SVGFEColorMatrixElement":              RAW,
+            "SVGFEComponentTransferElement":        RAW,
+            "SVGFECompositeElement":                RAW,
+            "SVGFEConvolveMatrixElement":           RAW,
+            "SVGFEDiffuseLightingElement":          RAW,
+            "SVGFEDisplacementMapElement":          RAW,
+            "SVGFEDistantLightElement":             RAW,
+            "SVGFEDropShadowElement":               RAW,
+            "SVGFEFloodElement":                    RAW,
+            "SVGFEFuncAElement":                    RAW,
+            "SVGFEFuncBElement":                    RAW,
+            "SVGFEFuncGElement":                    RAW,
+            "SVGFEFuncRElement":                    RAW,
+            "SVGFEGaussianBlurElement":             RAW,
+            "SVGFEImageElement":                    RAW,
+            "SVGFEMergeElement":                    RAW,
+            "SVGFEMergeNodeElement":                RAW,
+            "SVGFEMorphologyElement":               RAW,
+            "SVGFEOffsetElement":                   RAW,
+            "SVGFEPointLightElement":               RAW,
+            "SVGFESpecularLightingElement":         RAW,
+            "SVGFESpotLightElement":                RAW,
+            "SVGFETileElement":                     RAW,
+            "SVGFETurbulenceElement":               RAW,
+            "SVGFilterElement":                     RAW,
+            "SVGForeignObjectElement":              RAW,
+            "SVGGElement":                          RAW,
+            "SVGGeometryElement":                   RAW,
+            "SVGGradientElement":                   RAW,
+            "SVGGraphicsElement":                   RAW,
+            "SVGImageElement":                      RAW,
+            "SVGLength":                            FUNCTION,
+            "SVGLengthList":                        FUNCTION,
+            "SVGLineElement":                       RAW,
+            "SVGLinearGradientElement":             RAW,
+            "SVGMPathElement":                      RAW,
+            "SVGMarkerElement":                     RAW,
+            "SVGMaskElement":                       RAW,
+            "SVGMatrix":                            RAW,
+            "SVGMetadataElement":                   RAW,
+            "SVGNumber":                            FUNCTION,
+            "SVGNumberList":                        FUNCTION,
+            "SVGPathElement":                       RAW,
+            "SVGPatternElement":                    RAW,
+            "SVGPoint":                             FUNCTION,
+            "SVGPointList":                         FUNCTION,
+            "SVGPolygonElement":                    RAW,
+            "SVGPolylineElement":                   RAW,
+            "SVGPreserveAspectRatio":               FUNCTION,
+            "SVGRadialGradientElement":             RAW,
+            "SVGRect":                              FUNCTION,
+            "SVGRectElement":                       RAW,
+            "SVGSVGElement":                        RAW,
+            "SVGScriptElement":                     RAW,
+            "SVGSetElement":                        RAW,
+            "SVGStopElement":                       RAW,
+            "SVGStringList":                        FUNCTION,
+            "SVGStyleElement":                      RAW,
+            "SVGSwitchElement":                     RAW,
+            "SVGSymbolElement":                     RAW,
+            "SVGTSpanElement":                      RAW,
+            "SVGTextContentElement":                RAW,
+            "SVGTextElement":                       RAW,
+            "SVGTextPathElement":                   RAW,
+            "SVGTextPositioningElement":            RAW,
+            "SVGTitleElement":                      RAW,
+            "SVGTransform":                         FUNCTION,
+            "SVGTransformList":                     FUNCTION,
+            "SVGUnitTypes":                         FUNCTION,
+            "SVGUseElement":                        RAW,
+            "SVGViewElement":                       RAW,
+            "SVGViewSpec":                          FUNCTION,
+            "SVGZoomEvent":                         FUNCTION,
+            "Screen":                               FUNCTION,
+            "ScreenOrientation":                    FUNCTION,
+            "SecurityPolicyViolationEvent":         FUNCTION,
+            "Selection":                            FUNCTION,
+            "Set":                                  RAW,
+            "SourceBuffer":                         FUNCTION,
+            "SourceBufferList":                     FUNCTION,
+            "SpeechSynthesisEvent":                 FUNCTION,
+            "SpeechSynthesisUtterance":             FUNCTION,
+            "String":                               RAW,
+            "StyleSheet":                           FUNCTION,
+            "StyleSheetList":                       FUNCTION,
+            "SubtleCrypto":                         FUNCTION,
+            "Symbol":                               RAW,
+            "SyntaxError":                          FUNCTION,
+            "TEMPORARY":                            DEFAULT,
+            "Text":                                 CTOR,
+            "TextDecoder":                          FUNCTION,
+            "TextEncoder":                          RAW,
+            "TextEvent":                            FUNCTION,
+            "TextMetrics":                          FUNCTION,
+            "TextTrack":                            FUNCTION,
+            "TextTrackCue":                         FUNCTION,
+            "TextTrackCueList":                     FUNCTION,
+            "TextTrackList":                        FUNCTION,
+            "TimeRanges":                           RAW,
+            "Touch":                                FUNCTION,
+            "TouchEvent":                           FUNCTION,
+            "TouchList":                            FUNCTION,
+            "TrackEvent":                           FUNCTION,
+            "TransitionEvent":                      FUNCTION,
+            "TreeWalker":                           FUNCTION,
+            "TypeError":                            FUNCTION,
+            "UIEvent":                              FUNCTION,
+            "URIError":                             FUNCTION,
+            // Replaced by SecureURL
+            // "URL":                                  RAW,
+            "URLSearchParams":                      FUNCTION,
+            "Uint16Array":                          RAW,
+            "Uint32Array":                          RAW,
+            "Uint8Array":                           RAW,
+            "Uint8ClampedArray":                    RAW,
+            "VTTCue":                               FUNCTION,
+            "ValidityState":                        FUNCTION,
+            "WaveShaperNode":                       FUNCTION,
+            "WeakMap":                              RAW,
+            "WeakSet":                              RAW,
+            "WebGLActiveInfo":                      FUNCTION,
+            "WebGLBuffer":                          FUNCTION,
+            "WebGLContextEvent":                    FUNCTION,
+            "WebGLFramebuffer":                     FUNCTION,
+            "WebGLProgram":                         FUNCTION,
+            "WebGLRenderbuffer":                    FUNCTION,
+            "WebGLRenderingContext":                FUNCTION,
+            "WebGLShader":                          FUNCTION,
+            "WebGLShaderPrecisionFormat":           FUNCTION,
+            "WebGLTexture":                         FUNCTION,
+            "WebGLUniformLocation":                 FUNCTION,
+            "WebKitAnimationEvent":                 FUNCTION,
+            "WebKitCSSMatrix":                      CTOR,
+            "WebKitTransitionEvent":                FUNCTION,
+            "WebSocket":                            RAW,
+            "WheelEvent":                           FUNCTION,
+            "Window":                               FUNCTION,
+            "XMLDocument":                          FUNCTION,
+            "XMLHttpRequest":                       CTOR,
+            "XMLHttpRequestEventTarget":            FUNCTION,
+            "XMLHttpRequestUpload":                 FUNCTION,
+            "XMLSerializer":                        CTOR,
+            "XPathEvaluator":                       FUNCTION,
+            "XPathExpression":                      FUNCTION,
+            "XPathResult":                          FUNCTION,
+            "XSLTProcessor":                        FUNCTION,
+            "alert":                                FUNCTION,
+            "atob":                                 FUNCTION,
+            "blur":                                 FUNCTION,
+            "btoa":                                 FUNCTION,
+            "cancelAnimationFrame":                 FUNCTION,
+            "cancelIdleCallback":                   FUNCTION,
+            "captureEvents":                        FUNCTION,
+            "chrome":                               DEFAULT,
+            "clearInterval":                        FUNCTION,
+            "clearTimeout":                         FUNCTION,
+            "close":                                FUNCTION,
+            "closed":                               DEFAULT,
+            "confirm":                              FUNCTION,
+            "console":                              RAW,
+            "createImageBitmap":                    FUNCTION,
+            "crypto":                               DEFAULT,
+            "decodeURI":                            FUNCTION,
+            "decodeURIComponent":                   FUNCTION,
+            "defaultStatus":                        DEFAULT,
+            "defaultstatus":                        DEFAULT,
+            "devicePixelRatio":                     DEFAULT,
+            "document":                             DEFAULT,
+            "encodeURI":                            FUNCTION,
+            "encodeURIComponent":                   FUNCTION,
+            "escape":                               FUNCTION,
+            "fetch":                                FUNCTION,
+            "find":                                 FUNCTION,
+            "focus":                                FUNCTION,
+            "frameElement":                         DEFAULT,
+            "frames":                               DEFAULT,
+            "getComputedStyle":                     FUNCTION,
+            "getMatchedCSSRules":                   FUNCTION,
+            "getSelection":                         FUNCTION,
+            "history":                              RAW,
+            "innerHeight":                          DEFAULT,
+            "innerWidth":                           DEFAULT,
+            "isFinite":                             FUNCTION,
+            "isNaN":                                FUNCTION,
+            "isSecureContext":                      DEFAULT,
+            "length":                               DEFAULT,
+            "localStorage":                         DEFAULT,
+            "locationbar":                          DEFAULT,
+            "matchMedia":                           FUNCTION,
+            "menubar":                              DEFAULT,
+            "moveBy":                               FUNCTION,
+            "moveTo":                               FUNCTION,
+            "name":                                 DEFAULT,
+            "navigator":                            DEFAULT,
+            "offscreenBuffering":                   DEFAULT,
+            "onabort":                              EVENT,
+            "onanimationend":                       EVENT,
+            "onanimationiteration":                 EVENT,
+            "onanimationstart":                     EVENT,
+            "onautocomplete":                       EVENT,
+            "onautocompleteerror":                  EVENT,
+            "onbeforeunload":                       EVENT,
+            "onblur":                               EVENT,
+            "oncancel":                             EVENT,
+            "oncanplay":                            EVENT,
+            "oncanplaythrough":                     EVENT,
+            "onchange":                             EVENT,
+            "onclick":                              EVENT,
+            "onclose":                              EVENT,
+            "oncontextmenu":                        EVENT,
+            "oncuechange":                          EVENT,
+            "ondblclick":                           EVENT,
+            "ondevicemotion":                       EVENT,
+            "ondeviceorientation":                  EVENT,
+            "ondeviceorientationabsolute":          EVENT,
+            "ondrag":                               EVENT,
+            "ondragend":                            EVENT,
+            "ondragenter":                          EVENT,
+            "ondragleave":                          EVENT,
+            "ondragover":                           EVENT,
+            "ondragstart":                          EVENT,
+            "ondrop":                               EVENT,
+            "ondurationchange":                     EVENT,
+            "onemptied":                            EVENT,
+            "onended":                              EVENT,
+            "onerror":                              EVENT,
+            "onfocus":                              EVENT,
+            "onhashchange":                         EVENT,
+            "oninput":                              EVENT,
+            "oninvalid":                            EVENT,
+            "onkeydown":                            EVENT,
+            "onkeypress":                           EVENT,
+            "onkeyup":                              EVENT,
+            "onlanguagechange":                     EVENT,
+            "onload":                               EVENT,
+            "onloadeddata":                         EVENT,
+            "onloadedmetadata":                     EVENT,
+            "onloadstart":                          EVENT,
+            "onmessage":                            EVENT,
+            "onmousedown":                          EVENT,
+            "onmouseenter":                         EVENT,
+            "onmouseleave":                         EVENT,
+            "onmousemove":                          EVENT,
+            "onmouseout":                           EVENT,
+            "onmouseover":                          EVENT,
+            "onmouseup":                            EVENT,
+            "onmousewheel":                         EVENT,
+            "onoffline":                            EVENT,
+            "ononline":                             EVENT,
+            "onpagehide":                           EVENT,
+            "onpageshow":                           EVENT,
+            "onpause":                              EVENT,
+            "onplay":                               EVENT,
+            "onplaying":                            EVENT,
+            "onpopstate":                           EVENT,
+            "onprogress":                           EVENT,
+            "onratechange":                         EVENT,
+            "onrejectionhandled":                   EVENT,
+            "onreset":                              EVENT,
+            "onresize":                             EVENT,
+            "onscroll":                             EVENT,
+            "onsearch":                             EVENT,
+            "onseeked":                             EVENT,
+            "onseeking":                            EVENT,
+            "onselect":                             EVENT,
+            "onshow":                               EVENT,
+            "onstalled":                            EVENT,
+            "onstorage":                            EVENT,
+            "onsubmit":                             EVENT,
+            "onsuspend":                            EVENT,
+            "ontimeupdate":                         EVENT,
+            "ontoggle":                             EVENT,
+            "ontransitionend":                      EVENT,
+            "ontouchcancel":                        EVENT,
+            "ontouchend":                           EVENT,
+            "ontouchmove":                          EVENT,
+            "ontouchstart":                         EVENT,
+            "onunhandledrejection":                 EVENT,
+            "onunload":                             EVENT,
+            "onvolumechange":                       EVENT,
+            "onwaiting":                            EVENT,
+            "onwheel":                              EVENT,
+            "open":                                 FUNCTION,
+            "outerHeight":                          DEFAULT,
+            "outerWidth":                           DEFAULT,
+            "pageStartTime":                        DEFAULT,
+            "pageXOffset":                          DEFAULT,
+            "pageYOffset":                          DEFAULT,
+            "parent":                               DEFAULT,
+            "parseFloat":                           FUNCTION,
+            "parseInt":                             FUNCTION,
+            "performance":                          RAW,
+            "personalbar":                          DEFAULT,
+            "postMessage":                          FUNCTION,
+            "print":                                FUNCTION,
+            "prompt":                               FUNCTION,
+            "releaseEvents":                        FUNCTION,
+            "requestAnimationFrame":                FUNCTION,
+            "requestIdleCallback":                  FUNCTION,
+            "resizeBy":                             FUNCTION,
+            "resizeTo":                             FUNCTION,
+            "screen":                               RAW,
+            "screenLeft":                           DEFAULT,
+            "screenTop":                            DEFAULT,
+            "screenX":                              DEFAULT,
+            "screenY":                              DEFAULT,
+            "scroll":                               FUNCTION,
+            "scrollBy":                             FUNCTION,
+            "scrollTo":                             FUNCTION,
+            "scrollX":                              DEFAULT,
+            "scrollY":                              DEFAULT,
+            "scrollbars":                           DEFAULT,
+            "sessionStorage":                       DEFAULT,
+            "self":                                 DEFAULT,
+            "setInterval":                          FUNCTION,
+            "setTimeout":                           FUNCTION,
+            "status":                               DEFAULT,
+            "statusbar":                            DEFAULT,
+            "stop":                                 FUNCTION,
+            "styleMedia":                           DEFAULT,
+            "toolbar":                              DEFAULT,
+            "top":                                  DEFAULT,
+            "undefined":                            DEFAULT,
+            "unescape":                             FUNCTION,
+            "window":                               DEFAULT
+        },
+        "EventTarget": metadata$4
+    }
+};
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -7357,7 +7532,7 @@ function createForDef(src, def) {
     // Key this def so we can transfer the key to component instances
     setKey(def, key);
 
-    return evaluate(src, key, sourceURL);
+    return evaluate('(function () {' + src + '}())', key, sourceURL);
 }
 
 function createForModule(src, defDescriptor) {
@@ -7367,11 +7542,12 @@ function createForModule(src, defDescriptor) {
     const key = getKeyForNamespace(namespace);
 
     // Mute several globals for modules
-    src = `
-const {$A, aura, Sfdc, sforce} = {};
-return (
-${src}
-)`;
+    src = `(function() {
+  const {$A, aura, Sfdc, sforce} = {};
+
+  return ${src}
+
+}())`;
 
     const returnValue = evaluate(src, key, sourceURL);
     // Key the sanitized definition so we can transfer the key to interop component instances
@@ -7424,8 +7600,10 @@ function initialize(types, api) {
     registerTypes(types);
     registerAuraAPI(api);
     registerReportAPI(api);
-    injectExtraFilter(filterAuraTypes);
-    injectExtraAddProperty(addAuraGlobals);
+    injectExtraFilter(extraFilteredTypes);
+    injectExtraUnfilteredType(extraUnfilteredType);
+    injectExtraAddProperty$$1(addExtraWindowProperties);
+    injectExtraAddProperty$1(addExtraNavigatorProperties);
 
     isLockerInitialized = true;
 }
@@ -7492,7 +7670,7 @@ function wrapEngine(engine, /* deprecated */ defDescriptor) {
     return secureEngine;
 }
 
-function filterAuraTypes(raw, key, belongsToLocker) {
+function extraFilteredTypes(raw, key, belongsToLocker) {
     if (raw instanceof AuraAction) {
         return belongsToLocker ? SecureAuraAction(raw, key) : SecureObject(raw, key);
     } else if (raw instanceof AuraComponent) {
@@ -7505,31 +7683,46 @@ function filterAuraTypes(raw, key, belongsToLocker) {
     return null;
 }
 
-function addAuraGlobals(sw, win, key) {
+function extraUnfilteredType(raw, key) {
+    const namespace = key['namespace'];
+    if (namespace === 'runtime_rtc_spark' || namespace === 'runtime_rtc') {
+        return window['MediaStream'] && (raw instanceof window['MediaStream']);
+    }
+    return false;
+}
 
-    defineProperty(sw, '$A', {
+function addExtraWindowProperties(st, raw, key) {
+
+    defineProperty(st, '$A', {
         enumerable: true,
-        value: SecureAura(win['$A'], key)
+        value: SecureAura(raw['$A'], key)
     });
 
     // Salesforce API entry points (first phase) - W-3046191 is tracking adding a publish() API
     // enhancement where we will move these to their respective javascript/container architectures
-    ['Sfdc', 'sforce'].forEach(name => SecureObject.addPropertyIfSupported(sw, win, name));
+    ['Sfdc', 'sforce'].forEach(name => SecureObject.addPropertyIfSupported(st, raw, name));
 
     // Add RTC related api only to specific namespaces
-    addRTCPeerConnection(sw, win, key);
-}
-
-function addRTCPeerConnection(sw, win, key) {
     const namespace = key['namespace'];
     if (namespace === 'runtime_rtc_spark' || namespace === 'runtime_rtc') {
         ['RTCPeerConnection', 'webkitRTCPeerConnection'].forEach(name => {
-            if (name in win) {
-                defineProperty(sw, name, {
+            if (name in raw) {
+                defineProperty(st, name, {
                     enumerable: true,
-                    value: SecureRTCPeerConnection(win[name], key)
+                    value: SecureRTCPeerConnection(raw[name], key)
                 });
             }
+        });
+
+        SecureObject.addUnfilteredPropertyIfSupported(st, raw, 'MediaStream');
+    }
+}
+
+function addExtraNavigatorProperties(st, raw, key) {
+    const namespace = key['namespace'];
+    if (namespace === 'runtime_rtc_spark' || namespace === 'runtime_rtc') {
+        ['mediaDevices', 'mozGetUserMedia', 'webkitGetUserMedia'].forEach(name => {
+            SecureObject.addUnfilteredPropertyIfSupported(st, raw, name);
         });
     }
 }

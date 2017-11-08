@@ -525,6 +525,9 @@ Component.prototype.implementsDirectly = function(type) {
  */
 Component.prototype.addEventHandler=function(event,handler,phase,includeFacets){
     // Guards
+    if(this.destroyed){
+        return;
+    }
     if($A.util.isExpression(handler)){
         var reference=handler;
         handler=$A.eventService.expressionHandler.bind($A.eventService,handler);
@@ -604,8 +607,10 @@ Component.prototype.addHandler = function(eventName, valueProvider, actionExpres
 //     }
 //     this.addEventHandler(eventName,actionExpression,phase,includeFacets);
     //
+    if(this.destroyed){
+        return;
+    }
     var dispatcher = this.getEventDispatcher();
-
     if(!phase) {
         phase = "bubble";
     }
@@ -654,8 +659,12 @@ Component.prototype.removeEventHandler=function(event,handler,phase) {
     }
     phase = AuraEventService.validatePhase(phase,AuraEventService.Phase.BUBBLE);
 
-    var handlers=this.getEventDispatcher()[event];
-    if(handlers){
+    var dispatcher=this.getEventDispatcher();
+    var handlers=null;
+    if (dispatcher !== null) {
+        handlers = dispatcher[event];
+    }
+    if(handlers !== null){
         var phaseHandlers=handlers[phase];
         if(phaseHandlers){
             for(var i=0;i<phaseHandlers.length;i++){
@@ -2555,9 +2564,12 @@ Component.prototype.setupComponentEvents = function(cmp, config) {
 
         var len = events.length;
         if (len > 0) {
+            // Ugh... we should not need to check here, but code is spread all over.
             dispatcher = this.getEventDispatcher();
-            for (var i = 0; i < events.length; i++) {
-                dispatcher[events[i]] = {};
+            if (dispatcher !== null) {
+                for (var i = 0; i < events.length; i++) {
+                    dispatcher[events[i]] = {};
+                }
             }
         }
 

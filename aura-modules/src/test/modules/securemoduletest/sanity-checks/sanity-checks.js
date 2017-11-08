@@ -5,8 +5,6 @@ import sanityChecksHtml from './sanity-checks.html';
 
 export default class SanityChecks extends Element {
     @api testRenderer = false;
-    @track
-    objectVar;
 
     render() {
         if (this.testRenderer) {

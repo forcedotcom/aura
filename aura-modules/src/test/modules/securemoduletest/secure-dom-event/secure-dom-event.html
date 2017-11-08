@@ -1,0 +1,23 @@
+<template>
+    <div id="title">SecureDOMEvent test</div>
+    <button id="buttonInMarkup" onclick={handleClick}>Button in markup</button>
+
+    <template for:each={accounts} for:item="account">
+        <button onclick={handleClick} id="buttonInIteration">Button inside for:each</button>
+    </template>
+
+    <p if:true={boolVar}>
+        <button onclick={handleClick} id="buttonInIf">Button inside aura:if</button>
+    </p>
+
+
+    <template for:each={accounts} for:item="account">
+        <p if:true={boolVar}>
+            <button onclick={handleClick} id="buttonInNestedIteration">Button inside aura:iteration and aura:if</button>
+        </p>
+    </template>
+
+    <securemoduletest-slot-author>
+        <button onclick={handleClick} id="buttonInFacet">Button inside slot</button>
+    </securemoduletest-slot-author>
+</template>

@@ -24,6 +24,9 @@ export function assertStartsWith(start, full, message) {
     assert(full && full.indexOf && full.indexOf(start) === 0, message);
 }
 
+export function assertContains(searchString, full, message) {
+    assert(full && full.indexOf && (full.indexOf(searchString) !== -1), message);
+}
 export function assertEquals(expected, actual, message) {
     assert(expected === actual, message);
 }

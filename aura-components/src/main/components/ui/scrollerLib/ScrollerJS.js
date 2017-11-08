@@ -1005,6 +1005,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 this.x = x;
             }
         },
+
         /**
         * Handles move gesture event.
         *
@@ -1013,6 +1014,12 @@ function lib(w) { //eslint-disable-line no-unused-vars
         * @private
         */
         _move: function (e) {
+            //if e is input type="range", should let itself handle it.
+            if (e.target.tagName === 'INPUT' && e.target.type === 'range') {
+                event.cancelScrolling = true;
+                event.preventBounce = false;
+                return;
+            }
             // If an element captures onTouchMove and sets "cancelScrolling" to true, Scroller will cancel scrolling.
             if (!this.enabled || (EVENT_TYPE[e.type] !== this._initiated) || e.cancelScrolling) {
                 e.scrollDirection = this.scrollDirection; // keep bubbling up the direction if is defined

@@ -175,7 +175,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private InstanceService instanceService;
 
     @Inject
-    private ContextService contextService;
+    protected ContextService contextService;
 
     @Inject
     private FileMonitor fileMonitor;

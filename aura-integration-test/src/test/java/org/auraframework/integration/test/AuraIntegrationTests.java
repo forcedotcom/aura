@@ -15,11 +15,7 @@
  */
 package org.auraframework.integration.test;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,7 +51,7 @@ public class AuraIntegrationTests extends TestSuite {
     public static final int TEST_ITERATIONS;
     private static final Logger logger = Logger.getLogger(AuraIntegrationTests.class.getName());
 
-    private final String nameFragment;
+    private final String[] namesFragment;
     private static final boolean RUN_PERF_TESTS = System.getProperty("runPerfTests") != null;
 
     private final List<String> skipTests;
@@ -76,9 +72,9 @@ public class AuraIntegrationTests extends TestSuite {
     private AuraIntegrationTests() {
         String frag = System.getProperty("testNameContains");
         if (frag != null && !frag.trim().equals("")) {
-            nameFragment = frag.toLowerCase();
+            namesFragment = frag.toLowerCase().split("\\s*,\\s*");
         } else {
-            nameFragment = null;
+            namesFragment = null;
         }
 
         // comma-delimited list of fully qualified test classes (case-insensitive), e.g. my.test.TestClass
@@ -91,8 +87,8 @@ public class AuraIntegrationTests extends TestSuite {
     @Override
     public void run(final TestResult masterResult) {
         logger.info("Building test inventories");
-        if (nameFragment != null) {
-            logger.info("Filtering by test names containing: " + nameFragment);
+        if (namesFragment != null) {
+            logger.info("Filtering by test names containing: " + Arrays.toString(namesFragment));
         }
         if (RUN_PERF_TESTS) {
             logger.info("Filtering only test annotated with @PerfTest");
@@ -152,8 +148,15 @@ public class AuraIntegrationTests extends TestSuite {
             }
         } else if (test instanceof TestCase) {
             String testName = test.getClass().getName().toLowerCase() + "." + ((TestCase) test).getName().toLowerCase();
-            if (nameFragment != null) {
-                if (!testName.contains(nameFragment)) {
+            if (namesFragment != null) {
+                boolean nameMatch = false;
+                for (String nameFragment: namesFragment) {
+                    if (testName.contains(nameFragment)) {
+                        nameMatch = true;
+                        continue;
+                    }
+                }
+                if (!nameMatch) {
                     return;
                 }
             } else if (!skipTests.isEmpty() && skipTests.contains(testName)) {

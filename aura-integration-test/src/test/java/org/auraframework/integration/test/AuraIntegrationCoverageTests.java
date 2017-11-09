@@ -36,14 +36,14 @@ public class AuraIntegrationCoverageTests extends TestSuite {
         return new AuraIntegrationCoverageTests();
     }
 
-    private final String nameFragment;
+    private final String[] namesFragment;
 
     public AuraIntegrationCoverageTests() {
         String frag = System.getProperty("testNameContains");
         if (frag != null && !frag.trim().equals("")) {
-            nameFragment = frag.toLowerCase();
+            namesFragment = frag.toLowerCase().split("\\s*,\\s*");
         } else {
-            nameFragment = null;
+            namesFragment = null;
         }
         Set<TestInventory> inventories = ServiceLocator.get().getAll(TestInventory.class);
         for (TestInventory inventory : inventories) {
@@ -64,10 +64,17 @@ public class AuraIntegrationCoverageTests extends TestSuite {
             }
             return;
         } else if (test instanceof TestCase) {
-            if (nameFragment != null) {
+            if (namesFragment != null) {
                 String testName = test.getClass().getName().toLowerCase() + "."
                         + ((TestCase) test).getName().toLowerCase();
-                if (!testName.contains(nameFragment)) {
+                boolean nameMatch = false;
+                for (String nameFragment : namesFragment) {
+                    if (testName.contains(nameFragment)) {
+                        nameMatch = true;
+                        continue;
+                    }
+                }
+                if (!nameMatch) {
                     return;
                 }
             }

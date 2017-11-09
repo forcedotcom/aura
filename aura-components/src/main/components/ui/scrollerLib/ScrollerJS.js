@@ -1740,11 +1740,12 @@ function lib(w) { //eslint-disable-line no-unused-vars
          */
         _scrollIntoViewIfNeeded: function(elm) {
             if (this.opts.useCSSTransition) {
+                var elemBoundingRect = elm.getBoundingClientRect();
                 var x = this.x,
                     y = this.y,
                     topOffset = this.wrapper.getBoundingClientRect().top,
-                    elmBot = elm.getBoundingClientRect().bottom - topOffset,
-                    elmTop = elm.getBoundingClientRect().top - topOffset,
+                    elmBot = elemBoundingRect.bottom - topOffset,
+                    elmTop = elemBoundingRect.top - topOffset,
                     elmHeight = elmBot - elmTop,
                     pos;
 

@@ -105,7 +105,7 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
             // ignore file path issues
         }
 
-        return new BundleSourceImpl<ModuleDef>(modDesc, sourceMap, true);
+        return new BundleSourceImpl<>(modDesc, sourceMap, true);
     }
 
     private void processBundle(File base, Map<DefDescriptor<?>, Source<?>> sourceMap,

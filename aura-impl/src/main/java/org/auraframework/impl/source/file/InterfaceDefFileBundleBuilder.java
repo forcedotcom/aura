@@ -83,6 +83,6 @@ public class InterfaceDefFileBundleBuilder implements FileBundleSourceBuilder {
                 // error
             }
         }
-        return new BundleSourceImpl<InterfaceDef>(intfDesc, sourceMap, true);
+        return new BundleSourceImpl<>(intfDesc, sourceMap, true);
     }
 }

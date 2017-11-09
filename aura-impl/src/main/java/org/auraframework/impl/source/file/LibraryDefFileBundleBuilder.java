@@ -85,6 +85,6 @@ public class LibraryDefFileBundleBuilder implements FileBundleSourceBuilder {
                 // error
             }
         }
-        return new BundleSourceImpl<LibraryDef>(libDesc, sourceMap, true);
+        return new BundleSourceImpl<>(libDesc, sourceMap, true);
     }
 }

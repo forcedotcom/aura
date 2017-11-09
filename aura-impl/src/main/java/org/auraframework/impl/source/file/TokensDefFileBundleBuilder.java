@@ -15,11 +15,15 @@
  */
 package org.auraframework.impl.source.file;
 
-import com.google.common.collect.Maps;
+import java.io.File;
+import java.util.Map;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.StyleDef;
+import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.SVGDef;
 import org.auraframework.def.TokensDef;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.BundleSource;
@@ -27,8 +31,7 @@ import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 
-import java.io.File;
-import java.util.Map;
+import com.google.common.collect.Maps;
 
 @ServiceComponent
 public class TokensDefFileBundleBuilder implements FileBundleSourceBuilder {
@@ -58,15 +61,15 @@ public class TokensDefFileBundleBuilder implements FileBundleSourceBuilder {
                     format = Format.XML;
                     break;
                 case ".auradoc":
-                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, StyleDef.class);
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, DocumentationDef.class);
                     format = Format.XML;
                     break;
                 case ".design":
-                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, StyleDef.class);
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, DesignDef.class);
                     format = Format.XML;
                     break;
                 case ".svg":
-                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, StyleDef.class);
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, SVGDef.class);
                     format = Format.SVG;
                     break;
                 default:
@@ -81,6 +84,6 @@ public class TokensDefFileBundleBuilder implements FileBundleSourceBuilder {
                 // error
             }
         }
-        return new BundleSourceImpl<TokensDef>(tokensDesc, sourceMap, true);
+        return new BundleSourceImpl<>(tokensDesc, sourceMap, true);
     }
 }

@@ -74,7 +74,7 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
 
     private void updateFileMap() {
     	Builder<String> namespacesBuilder = ImmutableSet.builder();
-        Map<String,FileEntry> tfileMap = new ConcurrentHashMap<String,FileEntry>();
+        Map<String,FileEntry> tfileMap = new ConcurrentHashMap<>();
         for (File namespace : base.listFiles()) {
             if (namespace.isDirectory()) {
             	namespacesBuilder.add(namespace.getName());

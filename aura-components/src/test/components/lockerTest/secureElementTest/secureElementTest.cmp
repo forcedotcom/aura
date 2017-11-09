@@ -87,6 +87,10 @@
     <aura:method name="testNodeApiParamUnfilter"/>
     <aura:method name="testElementObjectProperties"/>
     <aura:method name="testHasChildNodes"/>
+    <aura:method name="testSetAttributeXlinkHref"/>
+    <aura:method name="testSetAttributeNSXlinkHref"/>
+    <aura:method name="testSetAttributeNodeXlinkHref"/>
+    <aura:method name="testSetAttributeNodeNSXlinkHref"/>
 
     <lockerTest:facet/>
 

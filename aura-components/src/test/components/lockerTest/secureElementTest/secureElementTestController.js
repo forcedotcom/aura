@@ -508,7 +508,6 @@
         var testUtils = cmp.get("v.testUtils");
         // Verify that warning messages. There should be 3 of these, verifying just 1 for sanity check
         testUtils.expectAuraWarning('SecureElement: [object HTMLButtonElement]{ key: {"namespace":"lockerTest"} } does not allow getting/setting the href attribute, ignoring!');
-
         var button = document.createElement("button");
         testUtils.assertNull(button.getAttribute("href"), "Should have got null when trying to access invalid attributes");
         testUtils.assertUndefined(button.setAttribute("href", "/foo"), "Should return undefined when trying to set invalid attributes on dom element");
@@ -608,5 +607,45 @@
         // Root level element which includes a facet from a different namespace
         var elementWithInaccessibleChildNodes = document.getElementById("outsideFacet");
         testUtils.assertFalse(elementWithInaccessibleChildNodes.hasChildNodes());
+    },
+
+    testSetAttributeXlinkHref: function(cmp) {
+        var testUtils = cmp.get('v.testUtils');
+        var element = document.createElement('image');
+
+        testUtils.expectAuraWarning('SecureElement: [object HTMLUnknownElement]{ key: {"namespace":"lockerTest"} } does not allow getting/setting the xlink:href attribute, ignoring!');
+
+        element.setAttribute('xlink:href', 'http://www.google.com');
+        document.body.appendChild(element);
+    },
+
+    testSetAttributeNSXlinkHref: function(cmp) {
+        var testUtils = cmp.get('v.testUtils');
+        var element = document.createElement('image');
+
+        testUtils.expectAuraWarning('SecureElement: [object HTMLUnknownElement]{ key: {"namespace":"lockerTest"} } does not allow getting/setting the xlink:href attribute, ignoring!');
+
+        element.setAttributeNS('https://www.w3.org/2000/svg', 'xlink:href', 'http://www.google.com');
+        document.body.appendChild(element);
+    },
+
+    testSetAttributeNodeXlinkHref: function(cmp) {
+      var testUtils = cmp.get('v.testUtils');
+      var element = document.createElement('image');
+      var xlink = document.createAttribute('xlink:href');
+
+      testUtils.expectAuraWarning('SecureElement: [object HTMLUnknownElement]{ key: {"namespace":"lockerTest"} } does not allow getting/setting the xlink:href attribute, ignoring!');
+
+      element.setAttributeNode(xlink);
+    },
+
+    testSetAttributeNodeNSXlinkHref: function(cmp) {
+      var testUtils = cmp.get('v.testUtils');
+      var element = document.createElement('image');
+      var xlink = document.createAttribute('xlink:href');
+
+      testUtils.expectAuraWarning('SecureElement: [object HTMLUnknownElement]{ key: {"namespace":"lockerTest"} } does not allow getting/setting the xlink:href attribute, ignoring!');
+
+      element.setAttributeNodeNS('https://www.w3.org/2000/svg', xlink);
     }
 })

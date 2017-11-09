@@ -662,5 +662,29 @@
         test: function(cmp) {
             cmp.testHasChildNodes();
         }
+    },
+
+    testSetAttributeXlinkHref: {
+        test: function(cmp) {
+            cmp.testSetAttributeXlinkHref();
+        }
+    },
+
+    testSetAttributeNSXlinkHref: {
+        test: function(cmp) {
+            cmp.testSetAttributeNSXlinkHref();
+        }
+    },
+
+    testSetAttributeNodeXlinkHref: {
+        test: function(cmp) {
+            cmp.testSetAttributeNodeXlinkHref();
+        }
+    },
+
+    testSetAttributeNodeNSXlinkHref: {
+        test: function(cmp) {
+            cmp.testSetAttributeNodeNSXlinkHref();
+        }
     }
 })

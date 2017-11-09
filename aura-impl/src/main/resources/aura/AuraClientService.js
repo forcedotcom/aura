@@ -3805,14 +3805,9 @@ AuraClientService.prototype.addComponentHandlers = function(component, actionEve
     if (actionEventHandlers) {
         var containerValueProvider = {
             get : function(functionName) {
-                return {
-                    run : function(event) {
-                        window[functionName](event);
-                    },
-                    runDeprecated : function(event) {
-                        window[functionName](event);
-                    }
-                };
+                var action=new Action();
+                action.run=action.runDeprecated=window[functionName];
+                return action;
             }
         };
 

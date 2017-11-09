@@ -23,6 +23,7 @@
 Aura.Event.Event = function(config) {
     // source is only used to calculate the path, not determine access
     this.source = config["component"] || $A.clientService.currentAccess || $A.getRoot();
+    this.sourceEvent=null;
     this.eventDef = config["eventDef"];
     this.eventDispatcher = config["eventDispatcher"];
     this.eventName = config["name"];
@@ -49,6 +50,18 @@ Aura.Event.Event = function(config) {
 Aura.Event.Event.prototype.getSource = function() {
     return this.source;
 };
+
+/**
+ * Gets the source event that fired this event, if it was fired by an event binding, i.e. {!e.myEvent}.
+ *
+ * @returns {Object} The source event
+ * @platform
+ * @export
+ */
+Aura.Event.Event.prototype.getSourceEvent = function() {
+    return this.sourceEvent;
+};
+
 
 /**
  * Gets the Event Definition.

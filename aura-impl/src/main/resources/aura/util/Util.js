@@ -2385,6 +2385,17 @@ Aura.Utils.Util.prototype.isAction = function(obj) {
 };
 
 /**
+ * Checks if the object is an Aura Event object.
+ *
+ * @param {Object} obj The object to check for.
+ * @returns {Boolean} True if the object type is an Aura Event.
+ * @export
+ */
+Aura.Utils.Util.prototype.isEvent = function(obj) {
+    return obj instanceof Aura.Event.Event;
+};
+
+/**
  * Checks if touch events are supported. Cache the result, it shouldn't change.
  *
  * @returns {Boolean} True if touch events are supported.

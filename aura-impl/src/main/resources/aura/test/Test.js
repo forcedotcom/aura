@@ -1622,9 +1622,9 @@ TestInstance.prototype.addEventHandler = function(eventName, handler, component,
             // throw new Error("Test.addEventHandler called with 'insert'. Please update test.");
             component.addHandler(eventName, {
                 get: function () {
-                    return {
-                        run: handler, runDeprecated: handler
-                    };
+                    var action=new Action();
+                    action.run=action.runDeprecated=handler;
+                    return action;
                 }
             }, "TESTHANDLER",insert);
         }else{

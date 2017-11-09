@@ -7143,7 +7143,7 @@ function SecureAuraEvent(event, key) {
         }
     });
 
-	[ "fire", "getName", "getParam", "getParams", "getPhase", "getSource", "pause", "preventDefault", "resume", "stopPropagation", "getType", "getEventType" ]
+	[ "fire", "getName", "getParam", "getParams", "getPhase", "getSource", "getSourceEvent", "pause", "preventDefault", "resume", "stopPropagation", "getType", "getEventType" ]
 	.forEach(function(name) {
 		Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name));
 	});

@@ -2513,8 +2513,14 @@ Component.prototype.getActionCaller = function(valueProvider, actionExpression) 
             clientAction=valueProvider.getConcreteComponent().get(clientAction);
         }
 
-        if (clientAction) {
+        if ($A.util.isAction(clientAction)) {
             clientAction.runDeprecated(event);
+        } else if($A.util.isEvent(clientAction)){
+            clientAction.sourceEvent=event;
+            clientAction.fire();
+        // } else if(clientAction.runDeprecated){
+        //     throw new Error("WHY ARE YOU RUNNING A NOT AN ACTION?");
+        //     clientAction.runDeprecated(event);
         } else {
             $A.assert(false, "no client action by name " + actionExpression);
         }

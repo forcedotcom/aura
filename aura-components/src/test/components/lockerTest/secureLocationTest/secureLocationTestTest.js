@@ -13,10 +13,15 @@
         }
     },
 
-    // Disabled until pull request #1851 gets in
-    _testAssignJavascriptBypass: {
-        test: function(cmp) {
-            cmp.testAssignJavascriptBypass();
+    testJavascriptPseudoScheme: {
+        test: function(component) {
+            component.testJavascriptPseudoScheme();
+        }
+    },
+
+    testLocationAssign: {
+        test: function(component) {
+            component.testLocationAssign();
         }
     }
 })

@@ -164,5 +164,17 @@
         test: function(cmp) {
             cmp.testBlockedApis();
         }
+    },
+
+    testJavascriptPseudoScheme: {
+        test: function(component) {
+            component.testJavascriptPseudoScheme();
+        }
+    },
+
+    testLocationAssign: {
+        test: function(component) {
+            component.testLocationAssign();
+        }
     }
 })

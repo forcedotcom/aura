@@ -163,5 +163,17 @@
         test: function (cmp) {
             cmp.testMediaStreamBlocked();
         }
+    },
+
+    testJavascriptPseudoScheme: {
+        test: function(component) {
+            component.testJavascriptPseudoScheme();
+        }
+    },
+
+    testLocationAssign: {
+        test: function(component) {
+            component.testLocationAssign();
+        }
     }
 })

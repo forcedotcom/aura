@@ -20,6 +20,8 @@
 
     <aura:method name="testLocationAccessorsEquality"/>
     <aura:method name="testAssignJavascriptBypass"/>
+    <aura:method name="testJavascriptPseudoScheme"/>
+    <aura:method name="testLocationAssign"/>
 
     <div id="title">SecureLocation test</div>
 </aura:component>

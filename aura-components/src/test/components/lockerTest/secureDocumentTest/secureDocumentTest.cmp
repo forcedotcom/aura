@@ -42,7 +42,9 @@
     <aura:method name="testDocumentElementHasNonZeroPropertyValues"/>
     <aura:method name="testDocumentConstructorPassesInstanceOf"/>
     <aura:method name="testBlockedApis"/>
-
+    <aura:method name="testJavascriptPseudoScheme"/>
+    <aura:method name="testLocationAssign"/>
+    
     <div id="title">SecureDocument test</div>
 
     <div aura:id="content"/>

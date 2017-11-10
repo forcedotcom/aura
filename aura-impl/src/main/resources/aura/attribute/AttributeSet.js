@@ -263,6 +263,11 @@ AttributeSet.prototype.set = function(key, value, component) {
     	}
     }
 
+    var prv = null;
+    if (this.values[attribute] instanceof PropertyReferenceValue) {
+        prv = this.values[attribute];
+    }
+
     // Process all keys except last one
     if (path) {
         var step = path.shift();
@@ -288,6 +293,9 @@ AttributeSet.prototype.set = function(key, value, component) {
             step = nextStep;
         }
         key = step;
+        if (target[key] instanceof PropertyReferenceValue) {
+            prv = target[key];
+        }
     }
 
     // Check the type
@@ -317,16 +325,25 @@ AttributeSet.prototype.set = function(key, value, component) {
         }
     }
 
-    // We don't want to update the GVP from a component.
-    // We do that from inside the GVP using $A.set()
-    // So clear the reference and change
-    if (target[key] instanceof PropertyReferenceValue && !target[key].isGlobal ) {
-        target[key].set(value);
-    } else if (!(target[key] instanceof FunctionCallValue)) {
+    if (!(target[key] instanceof FunctionCallValue)) {
         // HALO: TODO: JBUCH: I DON'T LIKE THIS...
         // Silently do nothing when you try to set on a FunctionCallValue,
         // which we need to support legacy old behaviour due to inheritance.
-        target[key] = value;
+
+        // We don't want to update the GVP from a component.
+        // We do that from inside the GVP using $A.set()
+        // So clear the reference and change
+        if (prv && !prv.isGlobal) {
+            if (prv !== target[key]) {
+                target[key] = value;
+                value = prv.evaluate();
+            }
+
+            prv.set(value);
+        }
+        else {
+            target[key] = value;
+        }
     }
 // #if {"excludeModes" : ["PRODUCTION", "STATS"]}
     else {

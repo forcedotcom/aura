@@ -1,0 +1,24 @@
+<aura:component>
+    <aura:attribute name="parentMapAttribute" type="Map" default="{'sobjectType':'Account','Name':'Default Parent Map Value'}"/>
+    <aura:attribute name="parentStringAttribute" type="String" default="Default Parent String Value"/>
+
+    Parent component:
+    <div>Parent map value: <ui:label aura:id="parentMapOutput">{!v.parentMapAttribute.Name}</ui:label></div>
+    <div>Parent string value: <ui:label aura:id="parentStringOutput">{!v.parentStringAttribute}</ui:label></div>
+    <ui:button label="Change Map Value From Parent" press="{!c.parentChangeMap}"/>
+    <ui:button label="Change String Value From Parent" press="{!c.parentChangeString}"/>
+
+    <hr/>
+    <br/>
+
+    Child Component:
+    <expressionTest:twoWayBindingsChild aura:id="childComponent" childMapAttribute="{!v.parentMapAttribute}" childStringAttribute="{!v.parentStringAttribute}"/>
+
+    <hr/>
+    <br/>
+
+    Nested component with HtmlAttribute:
+    <li aura:id="liWithPrv" prv="{!v.parentMapAttribute.Name}">
+        {!v.parentMapAttribute.Name}
+    </li>
+</aura:component>

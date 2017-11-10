@@ -23,6 +23,7 @@
     missingWhitelist: {
             // TODO: getToken and set - framework still deciding whether to fully expose or not
             "$A": ["error", "newCmp", "newCmpAsync", "run", "getToken", "set"]
+            ,"Event": ["getSourceEvent"]
     },
 
     testPlatformApis: {

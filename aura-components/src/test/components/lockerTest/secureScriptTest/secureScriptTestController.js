@@ -99,5 +99,23 @@
                 testUtils.assertUndefined(window.testHack, "JS code was executed via a sourceURL");
             }
         );
+    },
+
+    testSetAttributeNodeSrcAttribute: function (cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var src = document.createAttribute("src");
+        src.value = "/auraFW/resources/qa/testScript.js";
+
+        var script = document.createElement("script");
+        script.setAttributeNode(src);
+        document.body.appendChild(script);
+
+        testUtils.addWaitForWithFailureMessage(
+            true,
+            function () {
+                return window.testScript;
+            },
+            "Setting the 'src' attribute on a SecureScriptElement should load and evaluate in SecureWindow"
+        );        
     }
 })

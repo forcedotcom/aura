@@ -40,5 +40,11 @@
         test: function(cmp) {
             cmp.testScriptURL();
         }
+    },
+
+    testSetAttributeNodeSrcAttribute: {
+        test: function(cmp) {      
+            cmp.testSetAttributeNodeSrcAttribute(cmp);
+        }
     }
 })

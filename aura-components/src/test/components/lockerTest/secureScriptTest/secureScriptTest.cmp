@@ -23,6 +23,7 @@
     <aura:method name="testGetSetAttributeNode"/>
     <aura:method name="testLoadScript"/>
     <aura:method name="testScriptURL"/>
+    <aura:method name="testSetAttributeNodeSrcAttribute"/>
 
     <div aura:id="title">SecureScriptElement test</div>
 </aura:component>

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-11-07
- * Version: 0.2.7
+ * Generated: 2017-11-09
+ * Version: 0.2.8
  */
 
 (function (global, factory) {
@@ -60,6 +60,7 @@ if (typeof WeakMap !== "undefined" && typeof Proxy !== "undefined") {
     substituteMapForWeakMap = map.get(proxyAsKey) !== true;
 }
 
+// TODO: RJ probably move this out to utils
 function newWeakMap() {
     return typeof WeakMap !== "undefined" ? (!substituteMapForWeakMap ? new WeakMap() : new Map()) : {
         /* WeakMap dummy polyfill */
@@ -832,40 +833,76 @@ SecureScriptElement.run = function(st) {
  * limitations under the License.
  */
 
+let warn = window.console.warn;
+let error = Error;
+
+function registerReportAPI(api) {
+    if (api) {
+        warn = api.warn;
+        error = api.error;
+    }
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var SecureIFrameElement = {
     addMethodsAndProperties: function(prototype) {
-                Object.defineProperties(prototype, {
+        Object.defineProperties(prototype, {
             // Standard HTMLElement methods
             // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
-            blur: SecureObject.createFilteredMethodStateless("blur", prototype),
-            focus: SecureObject.createFilteredMethodStateless("focus", prototype),
-            contentWindow: {
+            "blur": SecureObject.createFilteredMethodStateless("blur", prototype),
+            "focus": SecureObject.createFilteredMethodStateless("focus", prototype),
+            "contentWindow": {
                 get: function() {
                     var raw = SecureObject.getRaw(this);
                     return raw.contentWindow ? SecureIFrameElement.SecureIFrameContentWindow(raw.contentWindow, getKey(this)) : raw.contentWindow;
+                }
+            },
+            // Reason: [W-4437391] Cure53 Report SF-04-004: Window access via encoded path segments.
+            "src": {
+                get: function() {
+                    var raw = SecureObject.getRaw(this);
+                    return raw.src;
+                },
+                set: function() {
+                    warn("SecureIFrameElement does not allow setting 'src' property.");
                 }
             }
         });
 
         // Standard list of iframe's properties from:
         // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
-        // Note: ignoring 'contentDocument', 'sandbox' and 'srcdoc' from the list above.
-        ["height", "width", "name", "src"].forEach(function(name) {
+        // Note: Ignoring 'contentDocument', 'sandbox' and 'srcdoc' from the list above.
+        ["height", "width", "name"].forEach(function(name) {
             Object.defineProperty(prototype, name, SecureObject.createFilteredPropertyStateless(name, prototype));
         });
     },
 
     SecureIFrameContentWindow: function(w, key) {
         var sicw = Object.create(null, {
-            toString: {
-                value: function() {
+            "toString": {
+                "value": function() {
                     return "SecureIFrameContentWindow: " + w + "{ key: " + JSON.stringify(key) + " }";
                 }
             }
         });
 
         Object.defineProperties(sicw, {
-            postMessage: SecureObject.createFilteredMethod(sicw, w, "postMessage", { rawArguments: true })
+            "postMessage": SecureObject.createFilteredMethod(sicw, w, "postMessage", { rawArguments: true })
         });
 
         setRef(sicw, w, key);
@@ -1179,6 +1216,10 @@ function createAddEventListenerDescriptorStateless() {
     };
 }
 
+const assert = {
+    block : fn => fn()
+};
+
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
@@ -1195,15 +1236,41 @@ function createAddEventListenerDescriptorStateless() {
  * limitations under the License.
  */
 
-let warn = window.console.warn;
-let error = Error;
-
-function registerReportAPI(api) {
-    if (api) {
-        warn = api.warn;
-        error = api.error;
-    }
+const proxyMap = newWeakMap();
+function addProxy(proxy, raw) {
+    proxyMap.set(proxy, raw);
 }
+
+const lsProxyFormatter = {
+    header: (proxy) => {
+        const raw = proxyMap.get(proxy);
+        if (!raw) {
+            return null;
+        }
+        // If SecureElement proxy, show the original element
+        if (raw instanceof Element) {
+            return ['object', {object: raw}]
+        }
+        // TODO: If Array proxy or HTMLCollection/NodeList proxy, we need to filter the elements and display only the raw values of those elements
+        return null;
+    },
+    hasBody: () => {
+        // let the browser display the object in its native format
+        return false;
+    },
+    body: () => {
+        return null;
+    }
+};
+
+/** Custom Formatter for Dev Tools
+  * To enable this, open Chrome Dev Tools
+  * Go to Settings,
+  * Under console, select "Enable custom formatters"
+  * For more information, https://docs.google.com/document/d/1FTascZXT9cxfetuPRT2eXPQKXui4nWFivUnS_335T3U/preview 
+  */
+window.devtoolsFormatters = window.devtoolsFormatters || [];
+window.devtoolsFormatters.push(lsProxyFormatter);
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -1456,7 +1523,6 @@ function SecureElement(el, key) {
             "class": true,
             "contextmenu": true,
             "dropzone": true,
-            "http-equiv": true,
             "id": true,
             "role": true
         };
@@ -1666,11 +1732,19 @@ function SecureElement(el, key) {
     setRef(o, el, key);
     addToCache(el, o, key);
     registerProxy(o);
-
+    // Mark the proxy to be unwrapped by custom formatter
+    assert.block(() => {
+        addProxy(o, el);
+    });
     return o;
 }
 
 SecureElement.isValidAttributeName = function(raw, name, prototype, caseInsensitiveAttributes) {
+    // Reason: [W-4210397] Locker does not allow setting custom HTTP headers.
+    if (raw.tagName === "META" && name.toLowerCase() === "http-equiv") {
+        return false;
+    }
+
     // Always allow names with the form a-b.* (e.g. data-foo, x-foo, ng-repeat, etc)
     if (name.indexOf("-") >= 0) {
         return true;
@@ -1696,7 +1770,7 @@ SecureElement.isValidAttributeName = function(raw, name, prototype, caseInsensit
     }
 
     // Special case Meta element's custom 'property' attribute. It used by the Open Graph protocol.
-    if(raw.tagName === "META" && name.toLowerCase() === "property"){
+    if (raw.tagName === "META" && name.toLowerCase() === "property"){
         return true;
     }
 
@@ -3206,7 +3280,7 @@ const metadata$1 = {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function assert(condition) {
+function assert$1(condition) {
     if (!condition) {
         throw new Error();
     }
@@ -3413,7 +3487,7 @@ SecureObject.filterEverything = function(st, raw, options) {
             setRef(swallowed, raw, key);
             mutated = true;
         } else {
-            assert(key, "A secure object should always have a key.");
+            assert$1(key, "A secure object should always have a key.");
             if (extraFilter) {
                 swallowed = extraFilter(raw, key, belongsToLocker);
             }
@@ -5467,17 +5541,29 @@ function SecureXMLHttpRequest(key) {
 
             addEventListener: createAddEventListenerDescriptor(o, xhr, key),
 
-            open: SecureObject.createFilteredMethod(o, xhr, "open", {
-                beforeCallback: function(method, url) {
+            open: {
+                enumerable: true,
+                writable: true,
+                value: function () {
+                    arguments[1];
+
                     var normalizer = document.createElement("a");
-                    normalizer.href = decodeURIComponent(url + "");
-                    var urlLower = normalizer.href.toLowerCase();
-                    // TODO: inject URL prefix check
-                    if (urlLower.indexOf("/aura") >= 0) {
-                        throw new error("SecureXMLHttpRequest.open cannot be used with Aura framework internal API endpoints " + url + "!");
+                    normalizer.setAttribute("href", arguments[1]);
+
+                    // Order of operations are important!
+                    var pathname = normalizer.pathname;
+                    pathname = decodeURIComponent(pathname);
+                    pathname = pathname.toLowerCase();
+                    
+                    if (pathname.includes("/aura")) {
+                        throw new error("SecureXMLHttpRequest.open cannot be used with Aura framework internal API endpoints " + arguments[1] + "!");
                     }
+
+                    arguments[1] = normalizer.getAttribute("href");
+
+                    return xhr.open.apply(xhr, arguments);
                 }
-            }),
+            },
 
             send: SecureObject.createFilteredMethod(o, xhr, "send"),
 
@@ -7143,7 +7229,7 @@ function SecureAuraEvent(event, key) {
         }
     });
 
-	[ "fire", "getName", "getParam", "getParams", "getPhase", "getSource", "getSourceEvent", "pause", "preventDefault", "resume", "stopPropagation", "getType", "getEventType" ]
+	[ "fire", "getName", "getParam", "getParams", "getPhase", "getSource", "pause", "preventDefault", "resume", "stopPropagation", "getType", "getEventType" ]
 	.forEach(function(name) {
 		Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name));
 	});

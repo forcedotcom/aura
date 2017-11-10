@@ -550,6 +550,19 @@
         testUtils.assertNull(cmp.find("title").getElement().getAttribute("property"), "Should have got null when trying to access 'property' attributes on a div");
     },
 
+    testPropertyAttributeBlockedOnMeta: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var meta = document.createElement("meta");
+        meta.setAttribute("http-equiv", "refresh");
+        meta.setAttribute("content", "200");
+        document.head.appendChild(meta);
+
+        var el = document.querySelector("meta");
+        testUtils.assertEquals(null, el.getAttribute("http-equiv"));
+        testUtils.assertEquals("200", el.getAttribute("content"));
+    },
+
     // Verify that element can traverse up the dom hierarchy using parentNode property
     testRecursiveTraversal: function(cmp, event, helper){
         var testUtils = cmp.get("v.testUtils");

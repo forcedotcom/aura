@@ -77,6 +77,7 @@
     <aura:method name="testForAttributeAllowedOnLabelOnly"/>
     <aura:method name="testPropertyMeta"/>
     <aura:method name="testPropertyAttributeAllowedOnMetaOnly"/>
+    <aura:method name="testPropertyAttributeBlockedOnMeta"/>
     <aura:method name="testRecursiveTraversal"/>
     <aura:method name="testInnerHtmlFiltering"/>
     <aura:method name="testTextContentFiltering"/>

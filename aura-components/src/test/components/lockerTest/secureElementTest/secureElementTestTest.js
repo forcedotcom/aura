@@ -257,6 +257,12 @@
         }
     },
 
+    testPropertyAttributeBlockedOnMeta: {
+        test: function(cmp) {
+            cmp.testPropertyAttributeBlockedOnMeta();
+        }
+    },
+
     //FIXME - goliver - "LI" : [ "value" ],
 
     //FIXME - goliver - "LINK" : [ "crossOrigin", "href", "hreflang", "media", "rel", "sizes", "title", "type" ],

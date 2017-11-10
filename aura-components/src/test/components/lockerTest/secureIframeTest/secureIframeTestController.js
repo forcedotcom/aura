@@ -36,6 +36,18 @@
     	});
     },
 
+    testIframeAttributeSrcIsImmutable: function(cmp, event, helper) {
+        var testUtils = cmp.get("v.testUtils");
+        var newIFrame = document.createElement("iframe");
+        var oldIFrame = cmp.find("iframe").getElement();
+        
+        newIFrame.src = "/lockerTestOtherNamespace/iframeMessageChannel.cmp";
+        oldIFrame.src = "/lockerTestOtherNamespace/iframeMessageChannel.cmp";
+
+        testUtils.assertEquals(null, newIFrame.getAttribute("src"), "The attribute 'src' has been changed!");
+        testUtils.assertEquals("/lockerTestOtherNamespace/iframeCmp.cmp", oldIFrame.getAttribute("src"), "The attribute 'src' has been changed!");
+    },
+
     testIframeMethods: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
         var methodsWhitelist = event.getParam("arguments").methodsWhitelist;

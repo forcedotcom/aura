@@ -24,6 +24,7 @@
         <aura:attribute name="attributesWhitelist" type="List"/>
         <aura:attribute name="attributesBlacklist" type="List"/>
     </aura:method>
+    <aura:method name="testIframeAttributeSrcIsImmutable" action="{!c.testIframeAttributeSrcIsImmutable}"/>
     <aura:method name="testIframeMethods" action="{!c.testIframeMethods}">
         <aura:attribute name="methodsWhitelist" type="List"/>
     </aura:method>

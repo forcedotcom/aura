@@ -8,6 +8,38 @@
     // TODO(W-3674741, W-4446969): FF and LockerService disabled for iOS browser in 212
     browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-SAFARI", "-IPHONE", "-IPAD"],
 
+    mock: function(responseList) {
+        function StubXMLHttpRequest() {}
+        function noop() {}
+        Object.assign(StubXMLHttpRequest.prototype, {
+            open: function(method, url) {
+                var dummy = document.createElement("a");
+                dummy.href = url;
+                this.response = responseList[dummy.pathname];
+            },
+            setRequestHeader: noop,
+            getResponseHeader: noop,
+            send: function() {
+                this.readyState = this.response.readyState;
+                this.status = this.response.status;
+                this.responseText = this.response.responseText;
+                this.responseXML = this.response.responseXML;
+                this.onreadystatechange && this.onreadystatechange();
+            },
+            abort: noop,
+            getAllResponseHeaders: noop,
+            overrideMimeType: noop,
+            readyState: null,
+            status: null,
+            responseText: null,
+            responseXML: null
+        });
+        StubXMLHttpRequest.DONE = XMLHttpRequest.DONE;
+
+        var override = $A.test.overrideFunction(window, "XMLHttpRequest", StubXMLHttpRequest);
+        $A.test.addCleanup(function() { override.restore(); });
+    },
+
     setUp: function(cmp) {
         cmp.set("v.testUtils", $A.test);
     },
@@ -33,31 +65,32 @@
     testResponseXML: {
         test: function(cmp) {
 
-            function StubXMLHttpRequest() {}
-            function noop() {}
-            Object.assign(StubXMLHttpRequest.prototype, {
-                open: noop,
-                setRequestHeader: noop,
-                getResponseHeader: noop,
-                send: function() {
-                    this.readyState = 4;
-                    this.status = 200;
-                    this.responseText = '<?xml version="1.0"?><catalog><book id="bk101"/><book id="bk102"/></catalog>';
-                    this.responseXML = (new DOMParser()).parseFromString(this.responseText,"text/xml");
-                },
-                abort: noop,
-                getAllResponseHeaders: noop,
-                overrideMimeType: noop,
-                readyState: null,
-                status: null,
-                responseText: null,
-                responseXML: null
+            this.mock({
+                "/document.xml": {
+                    readyState: 4, status: 200,
+                    responseText: '<?xml version="1.0"?><catalog><book id="bk101"/><book id="bk102"/></catalog>',
+                    responseXML: (new DOMParser()).parseFromString(this.responseText,"text/xml")
+                }
             });
-            StubXMLHttpRequest.DONE = XMLHttpRequest.DONE;
 
-            var override = $A.test.overrideFunction(window, "XMLHttpRequest", StubXMLHttpRequest);
             cmp.testResponseXML();
-            $A.test.addCleanup(function() { override.restore(); });
+        }
+    },
+
+    testOpenMethodURLParameter: {
+        test: function(cmp) {
+            this.mock({
+                "/api/get": {
+                    readyState: 4, status: 200,
+                    responseText: 'good',
+                },
+                "/auraFW/resources/qa/testScript.js": {
+                    readyState: 4, status: 200,
+                    responseText: 'bad',
+                },
+            });
+
+            cmp.testOpenMethodURLParameter();
         }
     }
 })

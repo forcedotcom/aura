@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-11-09
+ * Generated: 2017-11-10
  * Version: 0.2.8
  */
 
@@ -530,6 +530,36 @@ function completion(src) {
     }
 }
 
+/**
+ * Sanitizes a URL string . Will prevent:
+ * - usage of UTF-8 control characters. Update BLACKLIST constant to support more
+ * - usage of \n, \t in url strings
+ *
+ *
+ * @param {String} urlString
+ * @return {String}
+ */
+
+function sanitizeURL(urlString) {
+    const BLACKLIST = /[\u2029\u2028]/ig;
+
+    // false, '', undefined, null
+    if (!urlString) {
+        return urlString;
+    }
+
+    if (typeof urlString !== 'string') {
+        throw new TypeError('URL argument is not a string');
+    }
+
+    let out = urlString;
+    out = out.replace(BLACKLIST, '');
+
+    const normalized = document.createElement('a');
+    normalized.href = out;
+    return normalized.href;
+}
+
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
@@ -583,11 +613,7 @@ function makeEvaluatorSource(src, sourceURL) {
 })`;
 
     // Sanitize the URL
-    if (sourceURL) {
-        const a = document.createElement('a');
-        a.href = sourceURL;
-        sourceURL = a.href;
-    }
+    sourceURL = sanitizeURL(sourceURL);
     if (sourceURL) {
         fnSource += '\n//# sourceURL=' + sourceURL;
     }
@@ -670,7 +696,24 @@ function SecureScriptElement() {}
 
 SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
     function getAttributeName(name) {
-        return name.toLowerCase() === "src" ? "data-locker-src" : name;
+        var lowercasedName = name.toLowerCase();
+        switch (lowercasedName) {
+            case "src": return "data-locker-src";
+            case "href": return "data-locker-href";
+            default: return name;
+        }
+    }
+
+    function isAttributeAllowed(name) {
+        // null, undefined, ''
+        // allow a passthrough of these values
+        if (!name) {
+            return true;
+        }
+
+        var BLACKLIST = ['xlink:href'];
+        var lowercasedName = name.toLowerCase();
+        return BLACKLIST.indexOf(lowercasedName) === -1;
     }
 
     elementOverrides["src"] = {
@@ -693,7 +736,9 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
     var orignalSetAttribute = prototype.setAttribute;
     elementOverrides["setAttribute"] = {
         value: function(name, value) {
-            orignalSetAttribute.apply(this, [getAttributeName(name), value]);
+            if (isAttributeAllowed(name)) {
+                orignalSetAttribute.apply(this, [getAttributeName(name), value]);
+            }
         }
     };
 
@@ -707,7 +752,9 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
     var orignalSetAttributeNS = prototype.setAttributeNS;
     elementOverrides["setAttributeNS"] = {
         value: function(ns, name, value) {
-            orignalSetAttributeNS.apply(this, [ns, getAttributeName(name), value]);
+            if (isAttributeAllowed(name)) {
+                orignalSetAttributeNS.apply(this, [ns, getAttributeName(name), value]);
+            }
         }
     };
 
@@ -741,13 +788,25 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
             some browsers may initiate fetching the script before it has been
             added to the DOM. Not using a script tag will prevent that. */
             var clone = raw.cloneNode();
-            var floatingElement = document.createElement("span");
-            floatingElement.setAttributeNode(clone);
+            var normalizer = document.createElement("span");
+            normalizer.setAttributeNode(clone);
 
-            if (floatingElement.hasAttribute("src")) {
-                raw = document.createAttribute(getAttributeName("src"));
-                raw.value = floatingElement.getAttribute("src");
+            var attrNode = normalizer.attributes[0];
+            switch (attrNode.name) {
+                case 'xlink:href': {
+                    return undefined;
+                }
+                case 'src':
+                case 'href': {
+                    raw = document.createAttribute(getAttributeName(attrNode.name));
+                    raw.value = attrNode.value;
+                    break;
+                }
+                default: {
+                    break;
+                }
             }
+
             var replacedAttr = orignalSetAttributeNode.call(this, raw);
             return SecureObject.filterEverything(this, replacedAttr);
         }
@@ -774,6 +833,11 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
                     if (attribute.name === "data-locker-src") {
                         attributeName = "src";
                     }
+
+                    if (attribute.name === "data-locker-href") {
+                        attributeName = "href";
+                    }
+
                     secureAttributes.push({
                         name: attributeName,
                         value: SecureObject.filterEverything(this, attribute.value)
@@ -787,12 +851,19 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
 
 SecureScriptElement.run = function(st) {
     var src = st.getAttribute("src");
-    if (!src) {
+    var href = st.getAttribute("href");
+    var scriptUrl = src || href;
+
+    if (!scriptUrl) {
         return;
     }
 
     var el = SecureObject.getRaw(st);
     document.head.appendChild(el);
+
+    if (href && !(el instanceof SVGScriptElement)) {
+        return;
+    }
 
     // Get source using XHR and secure it using
     var xhr = new XMLHttpRequest();
@@ -800,7 +871,7 @@ SecureScriptElement.run = function(st) {
         var key = getKey(st);
         if (xhr.readyState === 4 && xhr.status === 200) {
             var code = xhr.responseText;
-            evaluate(code, key, src);
+            evaluate(code, key, scriptUrl);
 
             el.dispatchEvent(new Event("load"));
         }
@@ -808,10 +879,10 @@ SecureScriptElement.run = function(st) {
         // DCHASMAN TODO W-2837800 Add in error handling for 404's etc
     };
 
-    xhr.open("GET", src, true);
+    xhr.open("GET", scriptUrl, true);
 
     //for relative urls enable sending credentials
-    if (src.indexOf("/") === 0) {
+    if (scriptUrl.indexOf("/") === 0) {
         xhr.withCredentials = true;
     }
     xhr.send();
@@ -1307,7 +1378,8 @@ function cloneFiltered(el, st) {
 }
 
 function runIfRunnable(st) {
-    if (st instanceof HTMLScriptElement) {
+    var shouldRun = st instanceof HTMLScriptElement || st instanceof SVGScriptElement;
+    if (shouldRun) {
         SecureScriptElement.run(st);
         return true;
     }

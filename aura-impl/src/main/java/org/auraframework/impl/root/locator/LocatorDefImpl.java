@@ -40,6 +40,7 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
     private Map<String, Object> locatorContextDefs = null;
 	private String alias = null;
 	private Boolean isPrimitive = null;
+	private DefDescriptor<? extends RootDefinition> parentDescriptor = null;
 
     private static final long serialVersionUID = -6148857447543915255L;
 
@@ -49,6 +50,7 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
         this.alias = builder.alias;
         this.locatorContextDefs = AuraUtil.immutableMap(builder.locatorContextDefs);
         this.isPrimitive = builder.isPrimitive;
+        this.parentDescriptor = builder.parentDescriptor;
     }
 
     @Override
@@ -83,7 +85,7 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
 
     @Override
     public DefDescriptor<? extends RootDefinition> getParentDescriptor() {
-        return this.getParentDescriptor();
+        return this.parentDescriptor;
     }
 
     @Override
@@ -112,6 +114,7 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
         private Map<String, Object> locatorContextDefs;
 		private String alias = null;
 		private Boolean isPrimitive = null;
+		private DefDescriptor<? extends RootDefinition> parentDescriptor = null;
 
         public Builder() {
             super(LocatorDef.class);
@@ -147,6 +150,15 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
         
         public Boolean getIsPrimitive() {
             return this.isPrimitive;
+        }
+        
+        public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {
+        	this.parentDescriptor = parentDescriptor;
+        	return this;
+        }
+        
+        public DefDescriptor<? extends RootDefinition> getParentDescriptor() {
+        	return this.parentDescriptor;
         }
 
     }

@@ -96,7 +96,8 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
         if (AuraTextUtil.isNullEmptyOrWhitespace(description)) {
             error("The attribute '%s' is required on '<%s>'.", ATTRIBUTE_DESCRIPTION, TAG);
         }
-
+        
+        builder.setParentDescriptor(getParentHandler().getDefDescriptor());
         builder.setLocation(getLocation());
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
         builder.setTarget(target);

@@ -44,7 +44,7 @@ function ComponentDef(config) {
     if (intfConfig) {
         for (var m = 0; m < intfConfig.length; m++) {
             var intf = new DefDescriptor(intfConfig[m]);
-            var intfName = intf.getNamespace() + ":" + intf.getName();
+            var intfName = intf.getFullName();
             this.interfaces[intfName] = true;
         }
     }
@@ -186,8 +186,8 @@ function ComponentDef(config) {
 }
 
 ComponentDef.prototype.hasInit = function() {
-    if(this.hasInitHandler === undefined) {
-        if(!this.valueHandlerDefs) {
+    if (this.hasInitHandler === undefined) {
+        if (!this.valueHandlerDefs) {
             this.hasInitHandler = false;
         } else {
             for(var c=0;c<this.valueHandlerDefs.length;c++) {
@@ -243,7 +243,7 @@ ComponentDef.prototype.getSuperDef = function() {
  * @export
  */
 ComponentDef.prototype.getHelper = function() {
-    var name = this.getDescriptor().getQualifiedName();
+    var name = this.descriptor.getQualifiedName();
     var componentClass = $A.componentService.getComponentClass(name);
     return componentClass ? componentClass.prototype["helper"] : undefined;
 };
@@ -596,7 +596,7 @@ ComponentDef.prototype.getValueHandlerDefs = function() {
  * @export
  */
 ComponentDef.prototype.toString = function() {
-    return this.getDescriptor().getQualifiedName();
+    return this.descriptor.getQualifiedName();
 };
 
 /**
@@ -611,7 +611,7 @@ ComponentDef.prototype.toString = function() {
  * @export
  */
 ComponentDef.prototype.isInstanceOf = function(name) {
-    var thisName = this.descriptor.getNamespace() + ":" + this.descriptor.getName();
+    var thisName = this.descriptor.getFullName();
     if (thisName === name || this.implementsDirectly(name)) {
         return true;
     }
@@ -664,13 +664,20 @@ ComponentDef.prototype.getLocatorDefs = function() {
  * @private
  */
 ComponentDef.prototype.initSuperDef = function(config) {
-    if (config) {
-        var sDef = $A.componentService.createComponentDef(config);
-        $A.assert(sDef, "Super def undefined for " + this.descriptor + " value = " + config["descriptor"]);
-        return sDef;
+    if (!config) {
+        return null;
     }
 
-    return null;
+    var superDef = $A.componentService.createComponentDef(config);
+    if (!superDef) {
+        var failingCmp = this.descriptor.getFullName();
+        var superCmp = config["descriptor"]? config["descriptor"] : config;
+        var auraError = new $A.auraError("Super component's def (" + superCmp + ") is missing for " + failingCmp);
+        auraError.setComponent(failingCmp);
+        throw auraError;
+    }
+
+    return superDef;
 };
 
 /**

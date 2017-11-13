@@ -36,14 +36,24 @@ Test.Aura.Component.ComponentDefTest = function() {
                 }
             },
             "$A": {
-                "assert": function() {},
+                "auraError": function() {
+                    return {
+                        setComponent: function(){}
+                    };
+                },
                 "componentService": {
-                    "createComponentDef": function() {}
+                    "createComponentDef": function() {
+                        return {
+                            getAllStyleDefs: function() {},
+                            getAllFlavoredStyleDefs: function() {}
+                        };
+                    }
                 }
             },
             "DefDescriptor": function() {
                 return {
-                    "getNamespace": function() {}
+                    "getNamespace": function() {},
+                    "getFullName": function() {}
                 };
             },
             "Json": {
@@ -60,20 +70,102 @@ Test.Aura.Component.ComponentDefTest = function() {
     }
 
     [Fixture]
-    function HasInit() {
+    function constructor() {
+        var mockAura = Mocks.GetMocks(Object.Global(), {
+            "Aura": {
+                "Component": {
+                    "ComponentDef": _componentDef
+                }
+            },
+            "$A": {
+                "auraError": function(msg) {
+                    return {
+                        message: msg,
+                        setComponent: function(cmp) {
+                            this.component = cmp;
+                        }
+                    };
+                },
+                "componentService": {
+                    "createComponentDef": function() {
+                        return null;
+                    }
+                }
+            },
+            "DefDescriptor": function() {
+                return {
+                    "getNamespace": function() {},
+                    "getFullName": function() {
+                        return "ns:cmp";
+                    }
+                };
+            },
+            "Json": {
+                "ApplicationKey": {
+                    "DESCRIPTOR": "descriptor",
+                    "SUPERDEF": "super"
+                }
+            },
+            "AttributeDefSet": function() {},
+            "RequiredVersionDefSet": function() {}
+        });
+
+        [Fact]
+        function throwsErrorWithFailingDescriptor() {
+            var actual;
+            var expect = "ns:cmp";
+            mockAura(function () {
+                try {
+                    new Aura.Component.ComponentDef({});
+                } catch(e) {
+                    actual = e.component;
+                }
+            });
+
+            Assert.Equal(expect, actual);
+        }
+
+        [Fact]
+        function throwsErrorWithSuperDescriptorInMessage() {
+            var actual;
+            var expect = "superDefDescriptor";
+            mockAura(function () {
+                try {
+                    new Aura.Component.ComponentDef({
+                        "super": {
+                            descriptor: expect
+                        }
+                    });
+                } catch(e) {
+                    actual = e.message;
+                }
+            });
+
+            Assert.True(actual.indexOf(expect) > -1);
+        }
+    }
+
+    [Fixture]
+    function hasInit() {
+
         [Fact]
         function ReturnsFalseWhenNoValueHandlerDefs() {
-            var actual;
+            // Arrange
+            var cmpDef;
             getAuraMock(function () {
-                var cd = new Aura.Component.ComponentDef({});
-                actual = cd.hasInit();
-                Assert.False(actual);
+                cmpDef = new Aura.Component.ComponentDef({});
             });
+
+            // Act
+            var actual = cmpDef.hasInit();
+
+            // Assert
+            Assert.False(actual);
         }
 
         [Fact]
         function ReturnsTrueWhenHasInitValueDefHandlerDef() {
-            var actual;
+            // Arrange
             var mockConfig = {
                 "handlerDefs": [
                     {
@@ -82,16 +174,21 @@ Test.Aura.Component.ComponentDefTest = function() {
                     }
                 ]
             };
+            var cmpDef;
             getAuraMock(function() {
-                var cd = new Aura.Component.ComponentDef(mockConfig);
-                actual = cd.hasInit();
-                Assert.True(actual);
+                cmpDef = new Aura.Component.ComponentDef(mockConfig);
             });
+
+            // Act
+            var actual = cmpDef.hasInit();
+
+            // Assert
+            Assert.True(actual);
         }
 
         [Fact]
         function ReturnsFalseWhenNoInitValueDefHandlerDef() {
-            var actual;
+            // Arrange
             var mockConfig = {
                 "handlerDefs": [
                     {
@@ -100,11 +197,16 @@ Test.Aura.Component.ComponentDefTest = function() {
                     }
                 ]
             };
+            var cmpDef;
             getAuraMock(function() {
-                var cd = new Aura.Component.ComponentDef(mockConfig);
-                actual = cd.hasInit();
-                Assert.False(actual);
+                cmpDef = new Aura.Component.ComponentDef(mockConfig);
             });
+
+            // Act
+            var actual = cmpDef.hasInit();
+
+            // Assert
+            Assert.False(actual);
         }
     }
 }

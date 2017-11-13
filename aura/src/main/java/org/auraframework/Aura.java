@@ -20,7 +20,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -52,7 +51,6 @@ public class Aura implements AuraDeprecated {
     private static ConverterService converterService;
     private static BuilderService builderService;
     private static LocalizationService localizationService;
-    private static ExceptionAdapter exceptionAdapter;
     private static LocalizationAdapter localizationAdapter;
     private static CSPInliningService cspInliningService;
 
@@ -62,15 +60,6 @@ public class Aura implements AuraDeprecated {
     @Inject
     public void setLocalizationAdapter(LocalizationAdapter adapter) {
         localizationAdapter = adapter;
-    }
-
-    @Inject
-    public void setExceptionAdapter(ExceptionAdapter adapter) {
-        exceptionAdapter = adapter;
-    }
-
-    @Deprecated
-    public void setCachingService(Object service) {
     }
     
     @Inject
@@ -103,10 +92,6 @@ public class Aura implements AuraDeprecated {
         styleAdapter = adapter;
     }
 
-    @Deprecated
-    public void setSourceControlAdapter(Object adapter) {
-    }
-
     @Inject
     public void setIntegrationService(IntegrationService service) {
         integrationService = service;
@@ -125,10 +110,6 @@ public class Aura implements AuraDeprecated {
     @Inject
     public void setLocalizationService(LocalizationService service) {
         localizationService = service;
-    }
-
-    @Deprecated
-    public void setServerService(Object service) {
     }
 
     /**
@@ -203,15 +184,6 @@ public class Aura implements AuraDeprecated {
     @Deprecated
     public static LocalizationService getLocalizationService() {
         return localizationService;
-    }
-
-    /**
-     * USE INJECTION INSTEAD
-     * @return
-     */
-    @Deprecated
-    public static ExceptionAdapter getExceptionAdapter() {
-        return exceptionAdapter;
     }
 
     /**

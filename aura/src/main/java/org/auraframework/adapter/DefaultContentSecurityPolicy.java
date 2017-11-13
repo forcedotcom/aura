@@ -38,7 +38,6 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
     private static String inlineHeader = null;
     private static String defaultHeader = null;
 
-    private List<String> sameOrigin = null;
     private final CSPInliningService cspInliningService;
 
     private boolean nonCspInlineEnabled;
@@ -168,11 +167,10 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
 
     /** Creates a shared, immutable list for same-origin-only */
     private List<String> getSameOrigin() {
-        if (sameOrigin == null) {
-            sameOrigin = new ArrayList<>(1);
-            sameOrigin.add(null);
-        }
-        return sameOrigin;
+    	List<String> sameOrigin = new ArrayList<String>(1);
+    	sameOrigin.add(null);
+        
+    	return sameOrigin;
     }
 
     @Override

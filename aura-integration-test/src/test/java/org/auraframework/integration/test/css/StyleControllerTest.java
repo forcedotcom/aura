@@ -60,7 +60,7 @@ public class StyleControllerTest extends StyleTestCase {
         Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format(".%s {color:green}\n", 
+        String expected = String.format(".%s {color:green}", 
         		definitionService.getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
@@ -78,7 +78,7 @@ public class StyleControllerTest extends StyleTestCase {
         Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format("@media screen {\n  .%s {color:green}\n}\n", 
+        String expected = String.format("@media screen {\n  .%s {color:green}\n}", 
         		definitionService.getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
@@ -96,7 +96,7 @@ public class StyleControllerTest extends StyleTestCase {
         Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format(".%s {color:green}\n", 
+        String expected = String.format(".%s {color:green}", 
         		definitionService.getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
@@ -114,7 +114,7 @@ public class StyleControllerTest extends StyleTestCase {
         Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format("@media screen {\n  .%s {color:red}\n}\n", 
+        String expected = String.format("@media screen {\n  .%s {color:red}\n}", 
         		definitionService.getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
@@ -132,7 +132,7 @@ public class StyleControllerTest extends StyleTestCase {
         Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format(".%s {color:green}\n", 
+        String expected = String.format(".%s {color:green}", 
         		definitionService.getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
@@ -149,7 +149,7 @@ public class StyleControllerTest extends StyleTestCase {
         Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format(".%s {color:green}\n", 
+        String expected = String.format(".%s {color:green}", 
         		definitionService.getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
@@ -166,7 +166,7 @@ public class StyleControllerTest extends StyleTestCase {
         Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format(".%s {color:green}\n", 
+        String expected = String.format(".%s {color:green}", 
         		definitionService.getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
@@ -187,7 +187,7 @@ public class StyleControllerTest extends StyleTestCase {
         Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format(".%s {color:green}\n", 
+        String expected = String.format(".%s {color:green}", 
         		definitionService.getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }

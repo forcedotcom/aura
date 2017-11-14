@@ -15,10 +15,15 @@
  */
 package org.auraframework.impl.factory;
 
-import com.google.common.collect.Iterables;
+import static org.auraframework.impl.factory.StyleParser.ALLOWED_CONDITIONS;
+
+import javax.inject.Inject;
+
 import org.auraframework.Aura;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.css.ResolveStrategy;
+import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.DefinitionAccessImpl;
@@ -31,9 +36,7 @@ import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import javax.inject.Inject;
-
-import static org.auraframework.impl.factory.StyleParser.ALLOWED_CONDITIONS;
+import com.google.common.collect.Iterables;
 
 /**
  * Flavored CSS style parser.
@@ -48,11 +51,14 @@ public final class FlavoredStyleParser implements DefinitionFactory<TextSource<F
     public FlavoredStyleDef getDefinition(DefDescriptor<FlavoredStyleDef> descriptor, TextSource<FlavoredStyleDef> source)
             throws QuickFixException {
 
+        // this will collect all token function references but will leave them unevaluated in the CSS
+        TokenValueProvider tvp = styleAdapter.getTokenValueProvider(descriptor, ResolveStrategy.PASSTHROUGH);
+        
         ParserResult result = CssPreprocessor.initial(styleAdapter)
                 .source(source.getContents())
                 .resourceName(source.getSystemId())
                 .allowedConditions(Iterables.concat(ALLOWED_CONDITIONS, Aura.getStyleAdapter().getExtraAllowedConditions()))
-                .tokens(descriptor)
+                .tokens(descriptor, tvp)
                 .flavors(descriptor)
                 .parse();
 

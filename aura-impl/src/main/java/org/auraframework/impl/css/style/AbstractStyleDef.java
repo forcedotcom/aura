@@ -21,6 +21,7 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.builder.BaseStyleDefBuilder;
 import org.auraframework.css.ResolveStrategy;
+import org.auraframework.css.StyleContext;
 import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.TokenDef;
@@ -69,11 +70,15 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
 
     @Override
     public String getCode(List<Plugin> plugins) {
+        StyleContext styleContext = Aura.getContextService().getCurrentContext().getStyleContext();
+        StyleAdapter styleAdapter = Aura.getStyleAdapter();        
+        TokenValueProvider tvp = styleAdapter.getTokenValueProvider(descriptor, ResolveStrategy.RESOLVE_NORMAL);
+        
         try {
-            return CssPreprocessor.runtime()
+            return CssPreprocessor.runtime(styleContext, styleAdapter)
                     .source(content)
                     .resourceName(descriptor.getQualifiedName())
-                    .tokens(descriptor)
+                    .tokens(descriptor, tvp)
                     .extras(plugins)
                     .parse()
                     .content();

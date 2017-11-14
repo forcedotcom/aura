@@ -67,16 +67,6 @@ public final class CssPreprocessor {
         return new ParserConfiguration(styleAdapter, false);
     }
 
-    /** For parsing contextual css, skips syntax validations and static rework, uses current {@link StyleContext} */
-    public static ParserConfiguration runtime() {
-        return runtime(Aura.getContextService().getCurrentContext().getStyleContext());
-    }
-
-    /** For parsing contextual css, skips syntax validations and static rework, uses given {@link StyleContext} */
-    public static ParserConfiguration runtime(StyleContext styleContext) {
-        return runtime(styleContext, Aura.getStyleAdapter());
-    }
-
     public static ParserConfiguration runtime(StyleContext styleContext, StyleAdapter styleAdapter) {
         return new ParserConfiguration(styleAdapter, true).styleContext(styleContext);
     }
@@ -103,12 +93,11 @@ public final class CssPreprocessor {
             this.runtime = runtime;
             this.styleAdapter = styleAdapter;
 
-            if (!runtime) {                
+            if (!runtime) {
                 plugins.addAll(styleAdapter.getCompilationPlugins());
                 plugins.add(new UrlContextPathPlugin());
             }
 
-            
             plugins.add(new UrlCacheBustingPlugin());
             plugins.add(new UnquotedIEFilterPlugin());
             plugins.add(Prefixer.defaultBrowserSupport().prune(true).rearrange(true));
@@ -137,25 +126,15 @@ public final class CssPreprocessor {
         }
 
         /** enables aura tokens */
-        public ParserConfiguration tokens(DefDescriptor<? extends BaseStyleDef> style) {
+        public ParserConfiguration tokens(DefDescriptor<? extends BaseStyleDef> style, TokenValueProvider tvp) {
             if (runtime) {
-                // this will resolve all token function references
-                TokenValueProvider tvp = styleAdapter.getTokenValueProvider(style, ResolveStrategy.RESOLVE_NORMAL);
                 plugins.add(new TokenFunctionPlugin(tvp));
-                
-                // in runtime mode refine all at-rules, so that tokens inside of them are not missed
-                // todo: this can be optimized further
                 plugins.add(AutoRefine.only(Match.AT_RULES));
             } else {
-                // this will collect all token function references but will leave them unevaluated in the CSS
-                TokenValueProvider tvp = styleAdapter.getTokenValueProvider(style, ResolveStrategy.PASSTHROUGH);
                 plugins.add(new TokenFunctionPlugin(tvp));
-
-                // validate tokens are used with allowed properties
                 if (styleAdapter.tokenPropertyValidation(style)) {
                     plugins.add(new TokenPropertyValidationPlugin());
                 }
-
                 plugins.add(new TokenSecurityPlugin());
             }
             return this;

@@ -16,6 +16,8 @@
 package org.auraframework.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.auraframework.css.ResolveStrategy.PASSTHROUGH;
+import static org.auraframework.css.ResolveStrategy.RESOLVE_NORMAL;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +32,7 @@ import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.css.StyleContext;
 import org.auraframework.css.TokenValueProvider;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -45,6 +48,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.service.StyleService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -69,7 +73,20 @@ public class StyleServiceImpl implements StyleService {
 
     @Inject
     private DefinitionService definitionService;
-    
+
+    @Override
+    public String applyTokens(DefDescriptor<TokensDef> tokens) throws QuickFixException {
+        checkNotNull(tokens, "the 'tokens' param cannot be null");
+        DefDescriptor<? extends BaseComponentDef> appDescriptor = contextService.getCurrentContext().getLoadingApplicationDescriptor();
+        if (appDescriptor == null) {
+            throw new IllegalStateException("application descriptor not set in aura context");
+        }
+
+        Set<DefDescriptor<? extends BaseStyleDef>> styleDescriptors = getStyleDependencies(appDescriptor);
+        String styles = extractStyles(ImmutableList.of(tokens), styleDescriptors, true);
+        return styles;
+    }
+
     @Override
     public String applyTokens(DefDescriptor<TokensDef> tokens, DefDescriptor<? extends BaseStyleDef> style) throws QuickFixException {
         return applyTokens(ImmutableList.of(tokens), ImmutableList.of(style));
@@ -85,7 +102,7 @@ public class StyleServiceImpl implements StyleService {
             throws QuickFixException {
         checkNotNull(tokens, "the 'tokens' arg cannot be null");
         checkNotNull(tokens, "the 'styles' arg cannot be null");
-        return extractStyles(tokens, styles);
+        return extractStyles(tokens, styles, false);
     }
 
     @Override
@@ -129,29 +146,30 @@ public class StyleServiceImpl implements StyleService {
         }
 
         // add clientLoaded styles
-        if (clientLoaded != null) {
-            Iterables.addAll(styles, clientLoaded);
-        }
+        Iterables.addAll(styles, clientLoaded);
 
         // add extra styles
         if (extraStyles != null) {
             Iterables.addAll(styles, extraStyles);
         }
 
-        return extractStyles(tokens, styles);
+        return extractStyles(tokens, styles, false);
     }
 
-    /** gets all style dependencies for the given component */
-    private Set<DefDescriptor<? extends BaseStyleDef>> getStyleDependencies(DefDescriptor<?> defDescriptor) throws QuickFixException {
+    /** gets all style dependencies for the given descriptor */
+    private Set<DefDescriptor<? extends BaseStyleDef>> getStyleDependencies(DefDescriptor<?> descriptor) throws QuickFixException {
         Set<DefDescriptor<? extends BaseStyleDef>> styles = new LinkedHashSet<>();
 
-        String descUid = definitionService.getUid(null, defDescriptor);
-        if (descUid != null) {
-            for (DefDescriptor<?> dep : definitionService.getDependencies(descUid)) {
-                if (BaseStyleDef.class.isAssignableFrom(dep.getDefType().getPrimaryInterface())) {
-                    @SuppressWarnings("unchecked") // did primary interface check above
-                    DefDescriptor<? extends BaseStyleDef> desc = (DefDescriptor<? extends BaseStyleDef>)dep;
-                    styles.add(desc);
+        String uid = definitionService.getUid(null, descriptor);
+        if (uid != null) {
+            Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
+            if (dependencies != null) {
+                for (DefDescriptor<?> dep : dependencies) {
+                    if (BaseStyleDef.class.isAssignableFrom(dep.getDefType().getPrimaryInterface())) {
+                        @SuppressWarnings("unchecked") // did primary interface check above
+                        DefDescriptor<? extends BaseStyleDef> desc = (DefDescriptor<? extends BaseStyleDef>) dep;
+                        styles.add(desc);
+                    }
                 }
             }
         }
@@ -160,24 +178,28 @@ public class StyleServiceImpl implements StyleService {
     }
 
     /** here's the good stuff */
-    private String extractStyles(Iterable<DefDescriptor<TokensDef>> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> styles)
+    private String extractStyles(Iterable<DefDescriptor<TokensDef>> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> styles, boolean strictFilter)
             throws QuickFixException {
 
-        // custom style context to include our one-off token descriptors
         AuraContext context = contextService.getCurrentContext();
         StyleContext styleContext = StyleContextImpl.build(definitionService, context, tokens);
-        context.setStyleContext(styleContext);
 
         // figure out which tokens we will be utilizing
         Set<String> tokenNames = styleContext.getTokens().getNames(tokens);
 
         // pre-filter style defs
         // 1: skip over any styles without expressions
-        // 2: skip any styles not using a relevant var (removed... todo?)
+        // 2: skip any styles not using a relevant token
         List<BaseStyleDef> filtered = new ArrayList<>();
         for (DefDescriptor<? extends BaseStyleDef> style : styles) {
             BaseStyleDef def = definitionService.getDefinition(style);
-            if (!def.getExpressions().isEmpty()) {
+
+            if (strictFilter) {
+                Set<String> defTokenNames = def.getTokenNames();
+                if (!defTokenNames.isEmpty() && defTokenNames.stream().anyMatch(tokenNames::contains)) {
+                    filtered.add(def);
+                }
+            } else if (!def.getExpressions().isEmpty()) { // preserve option for the original behavior for 212, remove this path in 214+
                 filtered.add(def);
             }
         }
@@ -187,12 +209,8 @@ public class StyleServiceImpl implements StyleService {
         ConditionalsValidator conditionalsValidator = new ConditionalsValidator();
 
         for (BaseStyleDef style : filtered) {
-            // in dev mode, output a comment indicating which style def this css came from
-            if (context.isDevMode()) {
-                out.append(String.format("/* %s */\n", style.getDescriptor()));
-            }
-
             MagicEraser magicEraser = new MagicEraser(tokenNames, style.getDescriptor());
+            TokenValueProvider tvp = styleAdapter.getTokenValueProvider(style.getDescriptor(), PASSTHROUGH, styleContext.getTokens());
 
             // first pass reduces the css to the stuff that utilizes a relevant var.
             // we run this in a separate pass so that our MagicEraser plugin gets TokenFunctions delivered
@@ -200,23 +218,34 @@ public class StyleServiceImpl implements StyleService {
             // so that we can use the token plugin in passthrough mode.
             String css = CssPreprocessor.raw()
                     .source(style.getRawCode())
-                    .tokens(style.getDescriptor())
+                    .tokens(style.getDescriptor(), tvp)
                     .extra(new UnquotedIEFilterPlugin())
                     .extra(conditionalsValidator)
                     .extra(magicEraser)
                     .parse()
                     .content();
 
+            tvp = styleAdapter.getTokenValueProvider(style.getDescriptor(), RESOLVE_NORMAL, styleContext.getTokens());
+
             // second pass evaluates as normal (applies token function values, conditionals, etc...)
             List<Plugin> contextual = styleAdapter.getContextualRuntimePlugins();
             css = CssPreprocessor.runtime(styleContext, styleAdapter)
                     .source(css)
-                    .tokens(style.getDescriptor())
+                    .tokens(style.getDescriptor(), tvp)
                     .extras(contextual)
                     .parse()
                     .content();
 
-            out.append(css).append("\n");
+            if (!AuraTextUtil.isEmptyOrWhitespace(css)) {
+                // in dev mode, output a comment indicating which style def this css came from
+                if (context.isDevMode()) {
+                    out.append(String.format("/* %s */\n", style.getDescriptor()));
+                }
+                out.append(css);
+                if (context.isDevMode()) {
+                    out.append("\n");
+                }
+            }
         }
 
         return out.toString();

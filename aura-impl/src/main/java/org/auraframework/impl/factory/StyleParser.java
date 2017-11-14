@@ -20,6 +20,8 @@ import com.google.common.collect.Iterables;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.css.ResolveStrategy;
+import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.DefinitionAccessImpl;
@@ -90,13 +92,16 @@ public abstract class StyleParser implements DefinitionFactory<TextSource<StyleD
                 && configAdapter.validateCss();
         
         String className = Styles.buildClassName(descriptor);
+        
+        // this will collect all token function references but will leave them unevaluated in the CSS
+        TokenValueProvider tvp = styleAdapter.getTokenValueProvider(descriptor, ResolveStrategy.PASSTHROUGH);
 
         ParserResult result = CssPreprocessor.initial(styleAdapter)
                 .source(source.getContents())
                 .resourceName(source.getSystemId())
                 .allowedConditions(Iterables.concat(ALLOWED_CONDITIONS, styleAdapter.getExtraAllowedConditions()))
                 .componentClass(className, shouldValidate)
-                .tokens(descriptor)
+                .tokens(descriptor, tvp)
                 .parse();
 
         StyleDefImpl.Builder builder = new StyleDefImpl.Builder();

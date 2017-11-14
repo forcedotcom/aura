@@ -38,6 +38,7 @@ import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.modules.ModulesCompilerData;
+import org.auraframework.modules.impl.metadata.ModulesMetadataServiceImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.system.AuraContext;
@@ -102,6 +103,7 @@ public class BundleModuleDefFactoryUnitTest {
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
         moduleDefFactory.setModulesCompilerService(mockCompiler);
+        moduleDefFactory.setModulesMetadataService(new ModulesMetadataServiceImpl());
 
         ModuleDef moduleDef = moduleDefFactory.getDefinition(module, mockBundleSource);
         String devCode = moduleDef.getCode(CodeType.DEV);
@@ -143,6 +145,7 @@ public class BundleModuleDefFactoryUnitTest {
         when(mockBundleSource.getBundledParts()).thenReturn(mockBundledParts);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
+        moduleDefFactory.setModulesMetadataService(new ModulesMetadataServiceImpl());
 
         try {
             moduleDefFactory.getDefinition(module, mockBundleSource);
@@ -174,6 +177,7 @@ public class BundleModuleDefFactoryUnitTest {
         when(mockBundleSource.getBundledParts()).thenReturn(mockBundledParts);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
+        moduleDefFactory.setModulesMetadataService(new ModulesMetadataServiceImpl());
 
         try {
             moduleDefFactory.getDefinition(module, mockBundleSource);
@@ -205,6 +209,7 @@ public class BundleModuleDefFactoryUnitTest {
         when(mockBundleSource.getBundledParts()).thenReturn(mockBundledParts);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
+        moduleDefFactory.setModulesMetadataService(new ModulesMetadataServiceImpl());
 
         try {
             moduleDefFactory.getDefinition(module, mockBundleSource);
@@ -245,6 +250,7 @@ public class BundleModuleDefFactoryUnitTest {
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
         moduleDefFactory.setModulesCompilerService(mockCompiler);
+        moduleDefFactory.setModulesMetadataService(new ModulesMetadataServiceImpl());
 
         try {
             moduleDefFactory.getDefinition(module, mockBundleSource);
@@ -288,6 +294,7 @@ public class BundleModuleDefFactoryUnitTest {
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
         moduleDefFactory.setModulesCompilerService(mockCompiler);
+        moduleDefFactory.setModulesMetadataService(new ModulesMetadataServiceImpl());
 
         ContextService mockContextService = mock(ContextService.class);
         AuraContext mockAuraContext = mock(AuraContext.class);

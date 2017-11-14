@@ -33,10 +33,9 @@ import org.auraframework.impl.root.component.ModuleDefImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.modules.ModulesCompilerData;
-import org.auraframework.modules.impl.source.Meta;
+import org.auraframework.modules.impl.metadata.ModulesMetadataService;
 import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.Location;
@@ -47,17 +46,15 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.base.CharMatcher;
-import com.google.gson.Gson;
 
 /**
  * Provides ModuleDef implementation
  */
 @ServiceComponent
 public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<ModuleDef>, ModuleDef> {
-
-    private static final Gson GSON = new Gson();
     
     private ModulesCompilerService modulesCompilerService;
+    private ModulesMetadataService modulesMetadataService;
 
     @Override
     public Class<?> getSourceInterface() {
@@ -102,7 +99,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
             // ensure module folders adhere to web component (custom element) naming conventions.
 
-            if (CharMatcher.JAVA_UPPER_CASE.matchesAnyOf(namespace)) {
+            if (CharMatcher.javaUpperCase().matchesAnyOf(namespace)) {
                 throw new InvalidDefinitionException("Use lowercase for module folder names. Not " + namespace, location);
             }
 
@@ -110,7 +107,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                 throw new InvalidDefinitionException("Namespace cannot have a hyphen. Not " + namespace, location);
             }
 
-            if (CharMatcher.JAVA_UPPER_CASE.matchesAnyOf(name)) {
+            if (CharMatcher.javaUpperCase().matchesAnyOf(name)) {
                 throw new InvalidDefinitionException("Use lowercase and hyphens for module file names. Not " + name, location);
             }
         }
@@ -173,19 +170,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         Source<?> jsonSource = sourceMap.get(jsonDefDescriptor);
         if (jsonSource != null) {
             if (jsonSource instanceof TextSource) {
-                Meta result = GSON.fromJson(((TextSource<?>) jsonSource).getContents(), Meta.class);
-                Double minVersion = result.getMinVersion();
-                if (minVersion != null) {
-                    builder.setMinVersion(minVersion);
-                }
-                Boolean expose = result.isExpose();
-                if (expose != null && expose) {
-                    builder.setAccess(new DefinitionAccessImpl(Access.GLOBAL));
-                }
-                Boolean requireLocker = result.getRequireLocker();
-                if (requireLocker != null && requireLocker) {
-                    builder.setRequireLocker(requireLocker);
-                }
+                this.modulesMetadataService.processModuleMetadata(((TextSource<?>) jsonSource).getContents(), builder);
             }
         }
     }
@@ -288,5 +273,10 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
     @Inject
     public void setModulesCompilerService(ModulesCompilerService modulesCompilerService) {
         this.modulesCompilerService = modulesCompilerService;
+    }
+
+    @Inject
+    public void setModulesMetadataService(ModulesMetadataService modulesMetadataService) {
+        this.modulesMetadataService = modulesMetadataService;
     }
 }

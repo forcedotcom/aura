@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 
 /**
- * Runs the /moduletest/bootstrap.app app to verify module and aura/module interoperability works.
+ * Runs the /moduleTest/bootstrap.app app to verify module and aura/module interoperability works.
  */
 public class ModulesBootstrapUITest extends WebDriverTestCase {
 
@@ -38,7 +38,7 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
     private static final By BY_M_BOUND = By.cssSelector(".m-bound");
     private static final By BY_M_UNBOUND = By.cssSelector(".m-unbound");
     private static final By BY_M_EXPR = By.cssSelector(".m-expr");
-    protected String BOOTSTRAP_APP_URL = "/moduletest/bootstrap.app";
+    protected String BOOTSTRAP_APP_URL = "/moduleTest/bootstrap.app";
 
     @Flapper
     @Test

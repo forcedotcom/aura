@@ -9,11 +9,11 @@ export default class Foo extends Element {
             {
                 label: 'item1',
                 items: [
-                    { label: 'item1.1' },
-                    { label: 'item1.2' }
+                    { label: 'item1.1', items: [] },
+                    { label: 'item1.2', items: [] }
                 ]
             },
-            { label: 'item2' }
+            { label: 'item2', items: [] }
         ];
     }
 }

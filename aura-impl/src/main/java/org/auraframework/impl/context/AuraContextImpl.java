@@ -144,6 +144,7 @@ public class AuraContextImpl implements AuraContext {
 
     private boolean modulesEnabled = false;
     private boolean useCompatSource = false;
+    private boolean forceCompat = false;
     private List<String> scriptHashes = new ArrayList<>();
     private String nonce;
     private String actionPublicCacheKey;
@@ -934,6 +935,10 @@ public class AuraContextImpl implements AuraContext {
             if (this.useCompatSource()) {
                 json.writeMapEntry("c", 1);
             }
+
+            if (this.forceCompat()) {
+                json.writeMapEntry("fc", 1);
+            }
             
             json.writeMapEnd();
         } catch (IOException ioe) {
@@ -1031,6 +1036,16 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public void setUseCompatSource(boolean useCompatSource) {
         this.useCompatSource = useCompatSource;
+    }
+
+    @Override
+    public void setForceCompat(boolean forceCompat) {
+        this.forceCompat = forceCompat;
+    }
+
+    @Override
+    public boolean forceCompat() {
+        return this.forceCompat;
     }
 
     @Override

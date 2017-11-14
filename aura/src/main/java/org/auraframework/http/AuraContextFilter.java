@@ -253,7 +253,8 @@ public class AuraContextFilter implements Filter {
         
         context.setClient(new Client(request.getHeader(HttpHeaders.USER_AGENT)));
         context.setModulesEnabled(isModulesEnabled(request, configMap, m));
-        context.setUseCompatSource(useCompatSource(request, configMap, m));
+        context.setForceCompat(forceCompat(request, configMap, m));
+        context.setUseCompatSource(context.forceCompat() || useCompatSource(request, configMap, m));
         context.setActionPublicCacheKey(getActionPublicCacheKey(configMap));
         if (configMap != null) {
             getLoaded(context, configMap.get("loaded"));
@@ -402,7 +403,7 @@ public class AuraContextFilter implements Filter {
     }
 
     /**
-     * Whether compat module should be served based on ???
+     * Whether compat module should be served based on browser
      *
      * @param request http request
      * @param mode Aura context mode
@@ -414,17 +415,33 @@ public class AuraContextFilter implements Filter {
             return configMapContains("c", "1", configMap);
         }
 
+        String uaHeader = request.getHeader(HttpHeaders.USER_AGENT);
+        return !this.browserCompatibilityService.isCompatible(uaHeader);
+    }
+
+    /**
+     * force compat mode
+     *
+     * @param request http request
+     * @param mode Aura context mode
+     * @return whether compat module should be served
+     */
+    protected boolean forceCompat(HttpServletRequest request, Map<String, Object> configMap, Mode mode) {
+        if (configMap != null) {
+            // when fc is present, it's a request to fetch module compiled code in compatibility mode
+            return configMapContains("fc", "1", configMap);
+        }
+
         if (mode == Mode.DEV || mode == Mode.SELENIUM) {
             // DO NOT allow url param override in prod
-            String compatEnabledParam = request.getParameter(AuraServlet.AURA_PREFIX + "compat");
-            if (compatEnabledParam != null) {
+            String forceCompatEnabledParam = request.getParameter(AuraServlet.AURA_PREFIX + "compat");
+            if (forceCompatEnabledParam != null) {
                 // Uses BooleanParam which is true for "1", "true", "yes". Anything else is false.
                 return compatParam.get(request);
             }
         }
 
-        String uaHeader = request.getHeader(HttpHeaders.USER_AGENT);
-        return !this.browserCompatibilityService.isCompatible(uaHeader);
+        return false;
     }
 
     private boolean configMapContains(@Nonnull String key, @Nonnull String value, @Nonnull Map<String, Object> configMap) {

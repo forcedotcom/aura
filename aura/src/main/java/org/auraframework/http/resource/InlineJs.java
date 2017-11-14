@@ -17,6 +17,7 @@ package org.auraframework.http.resource;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -24,6 +25,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -35,6 +38,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.AuraJWTError;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.resource.ResourceLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.MoreObjects;
@@ -43,9 +47,12 @@ import com.google.common.collect.ImmutableList;
 @ServiceComponent
 public class InlineJs extends AuraResourceImpl {
 
+    private static final String DOWNGRADE_JS_RESOURCE_PATH = "aura/resources/compat-helpers/downgrade.js";
+
     private RenderingService renderingService;
     private List<InlineJSAppender> inlineJsAppenders;
 
+    private String downgradeJs = null;
 
     public InlineJs() {
         super("inline.js", Format.JS);
@@ -91,11 +98,34 @@ public class InlineJs extends AuraResourceImpl {
         out.write("\n    ");
 
         Component template = serverService.writeTemplate(context, def, getComponentAttributes(request), out);
+
+        writeModuleCompatDowngradeJs(context, out);
         for(InlineJSAppender appender : MoreObjects.firstNonNull(inlineJsAppenders, ImmutableList.<InlineJSAppender>of())){
             appender.append(def, context, out);
         }
 
         renderingService.render(template, null, out);
+    }
+
+    /**
+     * Add downgrade.js content into inline.js if module compat mode is forced
+     *
+     * @param context AuraContext
+     * @param out inline.js output
+     */
+    private void writeModuleCompatDowngradeJs(AuraContext context, PrintWriter out) {
+        if (context.forceCompat()) {
+            if (downgradeJs == null) {
+                ResourceLoader resourceLoader = this.configAdapter.getResourceLoader();
+                try {
+                    URL url = resourceLoader.getResource(DOWNGRADE_JS_RESOURCE_PATH);
+                    downgradeJs = Resources.toString(url, Charsets.UTF_8);
+                } catch (IOException e) {
+                    downgradeJs = "";
+                }
+            }
+            out.append(downgradeJs).append(";");
+        }
     }
 
 

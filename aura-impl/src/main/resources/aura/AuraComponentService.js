@@ -37,6 +37,9 @@ function AuraComponentService() {
     this.componentDefStorage    = new Aura.Component.ComponentDefStorage();
     this.moduleNameToDescriptorLookup = {};
 
+    // holds a temporary list of collected styles
+    this.moduleStyleBuffer = [];
+
     // holds ComponentDef configs to be created
     this.savedComponentConfigs = {};
 
@@ -831,9 +834,29 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
         }
         Ctor = entry.definition.apply(undefined, deps);
     }
+
     Ctor = Ctor || exportns;
     entry.ns = Ctor;
+
+    this.collectModuleStyles(Ctor);
+
     return Ctor;
+};
+
+AuraComponentService.prototype.collectModuleStyles = function (Ctor) {
+    if (Ctor.style) {
+        this.moduleStyleBuffer.push(Ctor.style);
+        Ctor.style = undefined;
+    }
+};
+
+
+AuraComponentService.prototype.flushModuleStyles = function () {
+    var styles = this.moduleStyleBuffer;
+    if (styles.length) {
+        this.moduleStyleBuffer = [];
+        $A.util.style.apply(styles.join('\n'));
+    }
 };
 
 AuraComponentService.prototype.createInteropComponentDef = function (descriptor) {
@@ -850,6 +873,7 @@ AuraComponentService.prototype.createInteropComponentDef = function (descriptor)
     });
 
     this.componentDefRegistry[descriptor] = interOpCmpDef;
+    this.flushModuleStyles();
     return interOpCmpDef;
 };
 

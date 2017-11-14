@@ -1,5 +1,7 @@
 define('modules-moduletest', ['x-test', 'engine'], function (_xTest, engine) {
 
+const style = undefined;
+
 function tmpl($api, $cmp, $slotset, $ctx) {
   const {
     d: api_dynamic,
@@ -11,6 +13,14 @@ function tmpl($api, $cmp, $slotset, $ctx) {
       "$default$": [api_dynamic($cmp.test)]
     }
   })];
+}
+
+if (style) {
+   const tagName = 'modules-moduletest';
+   const token = 'modules-moduletest_moduletest';
+
+   tmpl.token = token;
+   tmpl.style = style(tagName, token);
 }
 
 class Test extends engine.Element {
@@ -39,6 +49,7 @@ Test.publicProps = {
         config: 0
     }
 };
+Test.style = tmpl.style;
 
 return Test;
 

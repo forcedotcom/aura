@@ -1,4 +1,4 @@
-/* proxy-compat-noop */
+/* proxy-compat */
 /*
  * Copyright (C) 2018 Salesforce, inc.
  */
@@ -9,54 +9,598 @@
 	(global.Proxy = factory());
 }(this, (function () { 'use strict';
 
-function getKey(replicaOrAny, key) {
-    return replicaOrAny[key];
+function __extends(d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 }
-function callKey(replicaOrAny, key) {
+
+// RFC4122 version 4 uuid
+var ProxySlot = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+});
+var ArraySlot = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+});
+var ProxyIdentifier = function ProxyCompat() { };
+var create = Object.create;
+var defineProperty$1 = Object.defineProperty;
+var isExtensible$1 = Object.isExtensible;
+var getPrototypeOf$2 = Object.getPrototypeOf;
+var setPrototypeOf$1 = Object.setPrototypeOf;
+var getOwnPropertyDescriptor$1 = Object.getOwnPropertyDescriptor;
+var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+var getOwnPropertyNames$1 = Object.getOwnPropertyNames;
+var preventExtensions$1 = Object.preventExtensions;
+var _a$1 = Array.prototype;
+var ArraySlice$1 = _a$1.slice;
+var ArrayUnshift$1 = _a$1.unshift;
+var isArray$1 = Array.isArray;
+// Proto chain check might be needed because of usage of a limited polyfill
+// https://github.com/es-shims/get-own-property-symbols
+// In this case, because this polyfill is assing all the stuff to Object.prototype to keep
+// all the other invariants of Symbols, we need to do some manual checks here for the slow patch.
+var inOperator = function inOperatorCompat(obj, key) {
+    if (typeof Symbol !== 'undefined' && typeof Symbol() === 'object') {
+        if (key && key.constructor === Symbol) {
+            while (obj) {
+                if (getOwnPropertySymbols(obj).indexOf(key) !== -1) {
+                    return true;
+                }
+                obj = getPrototypeOf$2(obj);
+            }
+            return false;
+        }
+        return key in obj;
+    }
+    return key in obj;
+};
+var defaultHandlerTraps = {
+    get: function (target, key) {
+        return target[key];
+    },
+    set: function (target, key, newValue) {
+        target[key] = newValue;
+        return true;
+    },
+    apply: function (targetFn, thisArg, argumentsList) {
+        return targetFn.apply(thisArg, argumentsList);
+    },
+    construct: function (targetFn, argumentsList, newTarget) {
+        return new (targetFn.bind.apply(targetFn, [void 0].concat(argumentsList)))();
+    },
+    defineProperty: function (target, property, descriptor) {
+        defineProperty$1(target, property, descriptor);
+        return true;
+    },
+    deleteProperty: function (target, property) {
+        return delete target[property];
+    },
+    ownKeys: function (target) {
+        // Note: we don't need to worry about symbols here since Symbol and Proxy go hand to hand
+        return getOwnPropertyNames$1(target);
+    },
+    has: function (target, propertyKey) {
+        return inOperator(target, propertyKey);
+    },
+    preventExtensions: function (target) {
+        preventExtensions$1(target);
+        return true;
+    },
+    getOwnPropertyDescriptor: getOwnPropertyDescriptor$1,
+    getPrototypeOf: getPrototypeOf$2,
+    isExtensible: isExtensible$1,
+    setPrototypeOf: setPrototypeOf$1,
+};
+var lastRevokeFn;
+var proxyTrapFalsyErrors = {
+    set: function (target, key) {
+        throw new TypeError("'set' on proxy: trap returned falsish for property '" + key + "'");
+    },
+    deleteProperty: function (target, key) {
+        throw new TypeError("'deleteProperty' on proxy: trap returned falsish for property '" + key + "'");
+    },
+    setPrototypeOf: function (target, proto) {
+        throw new TypeError("'setPrototypeOf' on proxy: trap returned falsish");
+    },
+    preventExtensions: function (target, proto) {
+        throw new TypeError("'preventExtensions' on proxy: trap returned falsish");
+    },
+    defineProperty: function (target, key, descriptor) {
+        throw new TypeError("'defineProperty' on proxy: trap returned falsish for property '" + key + "'");
+    }
+};
+function proxifyProperty(proxy, key, descriptor) {
+    var enumerable = descriptor.enumerable, configurable = descriptor.configurable;
+    defineProperty$1(proxy, key, {
+        enumerable: enumerable,
+        configurable: configurable,
+        get: function () {
+            return proxy.get(key);
+        },
+        set: function (value) {
+            proxy.set(key, value);
+        },
+    });
+}
+var XProxy = /** @class */ (function () {
+    function XProxy(target, handler) {
+        var targetIsFunction = typeof target === 'function';
+        var targetIsArray = isArray$1(target);
+        if ((typeof target !== 'object' || target === null) && !targetIsFunction) {
+            throw new Error("Cannot create proxy with a non-object as target");
+        }
+        if (typeof handler !== 'object' || handler === null) {
+            throw new Error("new XProxy() expects the second argument to an object");
+        }
+        // Construct revoke function, and set lastRevokeFn so that Proxy.revocable can steal it.
+        // The caller might get the wrong revoke function if a user replaces or wraps XProxy
+        // to call itself, but that seems unlikely especially when using the polyfill.
+        var throwRevoked = false;
+        lastRevokeFn = function () {
+            throwRevoked = true;
+        };
+        // Define proxy as Object, or Function (if either it's callable, or apply is set).
+        var proxy = this; // reusing the already created object, eventually the prototype will be resetted
+        if (targetIsFunction) {
+            proxy = function Proxy() {
+                var usingNew = (this && this.constructor === proxy);
+                var args = ArraySlice$1.call(arguments);
+                if (usingNew) {
+                    return proxy.construct(args, this);
+                }
+                else {
+                    return proxy.apply(this, args);
+                }
+            };
+        }
+        var _loop_1 = function (trapName) {
+            defineProperty$1(proxy, trapName, {
+                value: function () {
+                    if (throwRevoked) {
+                        throw new TypeError("Cannot perform '" + trapName + "' on a proxy that has been revoked");
+                    }
+                    var args = ArraySlice$1.call(arguments);
+                    ArrayUnshift$1.call(args, target);
+                    var h = handler[trapName] ? handler : defaultHandlerTraps;
+                    var value = h[trapName].apply(h, args);
+                    if (proxyTrapFalsyErrors[trapName] && value === false) {
+                        proxyTrapFalsyErrors[trapName].apply(proxyTrapFalsyErrors, args);
+                    }
+                    return value;
+                },
+                writable: false,
+                enumerable: false,
+                configurable: false,
+            });
+        };
+        for (var trapName in defaultHandlerTraps) {
+            _loop_1(trapName);
+        }
+        var proxyDefaultHasInstance;
+        var SymbolHasInstance = Symbol.hasInstance;
+        var FunctionPrototypeSymbolHasInstance = Function.prototype[SymbolHasInstance];
+        defineProperty$1(proxy, SymbolHasInstance, {
+            get: function () {
+                var hasInstance = proxy.get(SymbolHasInstance);
+                // We do not want to deal with any Symbol.hasInstance here
+                // because we need to do special things to check prototypes.
+                // Symbol polyfill adds Symbol.hasInstance to the function prototype
+                // so if we have that here, we need to return our own.
+                // If the value we get from this function is different, that means
+                // user has supplied custom function so we need to respect that.
+                if (hasInstance === FunctionPrototypeSymbolHasInstance) {
+                    return proxyDefaultHasInstance || (proxyDefaultHasInstance = function (inst) {
+                        return defaultHasInstance(inst, proxy);
+                    });
+                }
+                return hasInstance;
+            },
+            configurable: false,
+            enumerable: false
+        });
+        defineProperty$1(proxy, ProxySlot, {
+            value: ProxyIdentifier,
+            configurable: false,
+            enumerable: false,
+            writable: false,
+        });
+        defineProperty$1(proxy, 'forIn', {
+            value: function () {
+                return proxy.ownKeys().reduce(function (o, key) {
+                    o[key] = void 0;
+                    return o;
+                }, create(null));
+            },
+            configurable: false,
+            enumerable: false,
+            writable: false,
+        });
+        var SymbolIterator = Symbol.iterator;
+        defineProperty$1(proxy, SymbolIterator, {
+            enumerable: false,
+            configurable: true,
+            get: function () {
+                return this.get(SymbolIterator);
+            },
+            set: function (value) {
+                this.set(SymbolIterator, value);
+            },
+        });
+        if (targetIsArray) {
+            var trackedLength_1 = 0;
+            var adjustArrayIndex_1 = function (newLength) {
+                // removing old indexes from proxy when needed
+                while (trackedLength_1 > newLength) {
+                    delete proxy[--trackedLength_1];
+                }
+                // add new indexes to proxy when needed
+                for (var i = trackedLength_1; i < newLength; i += 1) {
+                    proxifyProperty(proxy, i, {
+                        enumerable: true,
+                        configurable: true,
+                    });
+                }
+                trackedLength_1 = newLength;
+            };
+            defineProperty$1(proxy, ArraySlot, {
+                value: ProxyIdentifier,
+                writable: true,
+                enumerable: false,
+                configurable: false,
+            });
+            defineProperty$1(proxy, 'length', {
+                enumerable: false,
+                configurable: true,
+                get: function () {
+                    var proxyLength = proxy.get('length');
+                    // check if the trackedLength matches the length of the proxy
+                    if (proxyLength !== trackedLength_1) {
+                        adjustArrayIndex_1(proxyLength);
+                    }
+                    return proxyLength;
+                },
+                set: function (value) {
+                    proxy.set('length', value);
+                },
+            });
+            // building the initial index. this is observable by the proxy
+            // because we access the length property during the construction
+            // of the proxy, but it should be fine...
+            adjustArrayIndex_1(proxy.get('length'));
+        }
+        return proxy;
+    }
+    XProxy.revocable = function (target, handler) {
+        var p = new XProxy(target, handler);
+        return {
+            proxy: p,
+            revoke: lastRevokeFn,
+        };
+    };
+    return XProxy;
+}());
+
+function defaultHasInstance(instance, Type) {
+    // We have to grab getPrototypeOf here
+    // because caching it at the module level is too early.
+    // We need our shimmed version.
+    var getPrototypeOf = Object.getPrototypeOf;
+    var instanceProto = getPrototypeOf(instance);
+    var TypeProto = getKey(Type, 'prototype');
+    while (instanceProto !== null) {
+        if (instanceProto === TypeProto) {
+            return true;
+        }
+        instanceProto = getPrototypeOf(instanceProto);
+    }
+    return false;
+}
+function isCompatProxy(replicaOrAny) {
+    return replicaOrAny && replicaOrAny[ProxySlot] === ProxyIdentifier;
+}
+var getKey = function (replicaOrAny, key) {
+    if (isCompatProxy(replicaOrAny)) {
+        return replicaOrAny.get(key);
+    }
+    return replicaOrAny[key];
+};
+var callKey = function (replicaOrAny, key) {
     var args = [];
     for (var _i = 2; _i < arguments.length; _i++) {
         args[_i - 2] = arguments[_i];
     }
-    return replicaOrAny[key].apply(replicaOrAny, args);
-}
-function setKey(replicaOrAny, key, newValue, originalReturnValue) {
-    var returnValue = replicaOrAny[key] = newValue;
-    return arguments.length === 4 ? originalReturnValue : returnValue;
-}
-function deleteKey(replicaOrAny, key) {
+    var fn = getKey(replicaOrAny, key);
+    return fn.apply(replicaOrAny, args);
+};
+var setKey = function (replicaOrAny, key, newValue, originalReturnValue) {
+    if (isCompatProxy(replicaOrAny)) {
+        replicaOrAny.set(key, newValue);
+    }
+    else {
+        replicaOrAny[key] = newValue;
+    }
+    return arguments.length === 4 ? originalReturnValue : newValue;
+};
+var deleteKey = function (replicaOrAny, key) {
+    if (isCompatProxy(replicaOrAny)) {
+        return replicaOrAny.deleteProperty(key);
+    }
     delete replicaOrAny[key];
-}
-function inKey(replicaOrAny, key) {
-    return key in replicaOrAny;
-}
-function iterableKey(replicaOrAny) {
+};
+var inKey = function (replicaOrAny, key) {
+    if (isCompatProxy(replicaOrAny)) {
+        return replicaOrAny.has(key);
+    }
+    return inOperator(replicaOrAny, key);
+};
+var iterableKey = function (replicaOrAny) {
+    if (isCompatProxy(replicaOrAny)) {
+        return replicaOrAny.forIn();
+    }
     return replicaOrAny;
-}
+};
 function instanceOfKey(instance, Type) {
-    return instance instanceof Type;
+    var instanceIsCompatProxy = isCompatProxy(instance);
+    if (!isCompatProxy(Type) && !instanceIsCompatProxy) {
+        return instance instanceof Type;
+    }
+    // TODO: Once polyfills are transpiled to compat
+    // We can probably remove the below check
+    if (instanceIsCompatProxy) {
+        return defaultHasInstance(instance, Type);
+    }
+    return Type[Symbol.hasInstance](instance);
 }
 
-var NOOP_COMPAT;
-if (typeof Proxy === 'undefined') {
-    NOOP_COMPAT = { getKey: getKey, callKey: callKey, setKey: setKey, deleteKey: deleteKey, inKey: inKey, iterableKey: iterableKey, instanceOfKey: instanceOfKey };
+var _keys = Object.keys;
+var _getOwnPropertyNames = Object.getOwnPropertyNames;
+var _hasOwnProperty = Object.hasOwnProperty;
+var _getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+var _preventExtensions = Object.preventExtensions;
+var _defineProperty = Object.defineProperty;
+var _isExtensible = Object.isExtensible;
+var _getPrototypeOf = Object.getPrototypeOf;
+var _setPrototypeOf = Object.setPrototypeOf;
+var _isArray = Array.isArray;
+var _a = Array.prototype;
+var ArrayShift = _a.shift;
+var ArraySlice = _a.slice;
+var ArrayUnshift = _a.unshift;
+// Patched Functions:
+function isArray(replicaOrAny) {
+    if (isCompatProxy(replicaOrAny)) {
+        return replicaOrAny[ArraySlot] === ProxyIdentifier;
+    }
+    return _isArray(replicaOrAny);
 }
-else {
-    // We can't use Object.assign because in IE11 does not exist (it will be polyfilled later)
-    Proxy.getKey = getKey;
-    Proxy.setKey = setKey;
-    Proxy.callKey = callKey;
-    Proxy.deleteKey = deleteKey;
-    Proxy.inKey = inKey;
-    Proxy.iterableKey = iterableKey;
-    Proxy.instanceOfKey = instanceOfKey;
-    NOOP_COMPAT = Proxy;
+// http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.4
+function compatConcat() {
+    var O = Object(this);
+    var A = [];
+    var N = 0;
+    var items = ArraySlice.call(arguments);
+    ArrayUnshift.call(items, O);
+    while (items.length) {
+        var E = ArrayShift.call(items);
+        if (isArray(E)) {
+            var k = 0;
+            var length = E.length;
+            for (k; k < length; k += 1, N += 1) {
+                var subElement = getKey(E, k);
+                A[N] = subElement;
+            }
+        }
+        else {
+            A[N] = E;
+            N += 1;
+        }
+    }
+    return A;
 }
-var NOOP_COMPAT$1 = NOOP_COMPAT;
+// http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.13
+function compatUnshift() {
+    var O = Object(this);
+    var len = O.length;
+    var argCount = arguments.length;
+    var k = len;
+    while (k > 0) {
+        var from = k - 1;
+        var to = k + argCount - 1;
+        var fromPresent = hasOwnProperty.call(O, from);
+        if (fromPresent) {
+            var fromValue = O[from];
+            setKey(O, to, fromValue);
+        }
+        else {
+            deleteKey(O, to);
+        }
+        k -= 1;
+    }
+    var j = 0;
+    var items = ArraySlice.call(arguments);
+    while (items.length) {
+        var E = ArrayShift.call(items);
+        setKey(O, j, E);
+        j += 1;
+    }
+    O.length = len + argCount;
+    return O.length;
+}
+// http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.7
+function compatPush() {
+    var O = Object(this);
+    var n = O.length;
+    var items = ArraySlice.call(arguments);
+    while (items.length) {
+        var E = ArrayShift.call(items);
+        setKey(O, n, E);
+        n += 1;
+    }
+    O.length = n;
+    return O.length;
+}
+function keys(replicaOrAny) {
+    if (isCompatProxy(replicaOrAny)) {
+        var all = replicaOrAny.forIn(); // get all enumerables and filter by own
+        var result = [];
+        for (var prop_1 in all) {
+            var desc = replicaOrAny.getOwnPropertyDescriptor(prop_1);
+            if (desc && desc.enumerable === true) {
+                result.push(prop_1);
+            }
+        }
+        return result;
+    }
+    return _keys(replicaOrAny);
+}
+function getPrototypeOf(replicaOrAny) {
+    if (isCompatProxy(replicaOrAny)) {
+        return replicaOrAny.getPrototypeOf();
+    }
+    return _getPrototypeOf(replicaOrAny);
+}
+function setPrototypeOf(replicaOrAny, proto) {
+    if (isCompatProxy(replicaOrAny)) {
+        return replicaOrAny.setPrototypeOf(proto);
+    }
+    return _setPrototypeOf(replicaOrAny, proto);
+}
+function getOwnPropertyNames(replicaOrAny) {
+    if (isCompatProxy(replicaOrAny)) {
+        return replicaOrAny.ownKeys(); // TODO: only strings
+    }
+    return _getOwnPropertyNames(replicaOrAny);
+}
+function getOwnPropertyDescriptor(replicaOrAny, key) {
+    if (isCompatProxy(replicaOrAny)) {
+        return replicaOrAny.getOwnPropertyDescriptor(key);
+    }
+    return _getOwnPropertyDescriptor(replicaOrAny, key);
+}
+function preventExtensions(replicaOrAny) {
+    if (isCompatProxy(replicaOrAny)) {
+        return replicaOrAny.preventExtensions();
+    }
+    return _preventExtensions(replicaOrAny);
+}
+function isExtensible(replicaOrAny) {
+    if (isCompatProxy(replicaOrAny)) {
+        return replicaOrAny.isExtensible();
+    }
+    return _isExtensible(replicaOrAny);
+}
+function defineProperty(replicaOrAny, key, descriptor) {
+    if (isCompatProxy(replicaOrAny)) {
+        return replicaOrAny.defineProperty(key, descriptor);
+    }
+    return _defineProperty(replicaOrAny, key, descriptor);
+}
+function hasOwnProperty(key) {
+    if (isCompatProxy(this)) {
+        return !!this.getOwnPropertyDescriptor(key);
+    }
+    return _hasOwnProperty.call(this, key);
+}
+function assign(replicaOrAny) {
+    if (replicaOrAny == null) {
+        throw new TypeError('Cannot convert undefined or null to object');
+    }
+    var to = Object(replicaOrAny);
+    for (var index = 1; index < arguments.length; index++) {
+        var nextSource = arguments[index];
+        if (nextSource != null) {
+            if (isCompatProxy(nextSource)) {
+                for (var nextKey in iterableKey(nextSource)) {
+                    if (nextSource.getOwnPropertyDescriptor(nextKey)) {
+                        setKey(to, nextKey, getKey(nextSource, nextKey));
+                    }
+                }
+            }
+            else {
+                for (var nextKey in nextSource) {
+                    // Avoid bugs when hasOwnProperty is shadowed in regular objects
+                    if (_hasOwnProperty.call(nextSource, nextKey)) {
+                        setKey(to, nextKey, nextSource[nextKey]);
+                    }
+                }
+            }
+        }
+    }
+    return to;
+}
+// patches
+// [*] Object.prototype.hasOwnProperty should be patched as a general rule
+// [ ] Object.propertyIsEnumerable should be patched
+// [*] Array.isArray
+Object.prototype.hasOwnProperty = hasOwnProperty;
+Array.isArray = isArray;
+// trap `preventExtensions` can be covered by a patched version of:
+// [*] Object.preventExtensions()
+// [ ] Reflect.preventExtensions()
+// trap `getOwnPropertyDescriptor` can be covered by a patched version of:
+// [*] Object.getOwnPropertyDescriptor()
+// [ ] Reflect.getOwnPropertyDescriptor()
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/defineProperty
+// trap `defineProperty` can be covered by a patched version of:
+// [*] Object.defineProperty()
+// [ ] Reflect.defineProperty()
+// trap `deleteProperty` can be covered by the transpilation and the patched version of:
+// [ ] Reflect.deleteProperty()
+// trap `ownKeys` can be covered by a patched version of:
+// [*] Object.getOwnPropertyNames()
+// [ ] Object.getOwnPropertySymbols()
+// [*] Object.keys()
+// [ ] Reflect.ownKeys()
+Object.defineProperty = defineProperty;
+Object.preventExtensions = preventExtensions;
+Object.getOwnPropertyDescriptor = getOwnPropertyDescriptor;
+Object.getOwnPropertyNames = getOwnPropertyNames;
+Object.keys = keys;
+Object.isExtensible = isExtensible;
+// trap `getPrototypeOf` can be covered by a patched version of:
+// [x] Object.setPrototypeOf()
+// [ ] Reflect.setPrototypeOf()
+// trap `getPrototypeOf` can be covered by a patched version of:
+// [x] Object.getPrototypeOf()
+// [ ] Reflect.getPrototypeOf()
+Object.setPrototypeOf = setPrototypeOf;
+Object.getPrototypeOf = getPrototypeOf;
+// Other necessary patches:
+// [*] Object.assign
+Object.assign = assign;
+Array.prototype.unshift = compatUnshift;
+Array.prototype.concat = compatConcat;
+Array.prototype.push = compatPush;
+function overrideProxy() {
+    return Proxy.__COMPAT__;
+}
+// At this point Proxy can be the real Proxy (function) a noop-proxy (object with noop-keys) or undefined
+var FinalProxy = typeof Proxy !== 'undefined' ? Proxy : {};
+if (typeof FinalProxy !== 'function' || overrideProxy()) {
+    FinalProxy = /** @class */ (function (_super) {
+        __extends(Proxy, _super);
+        function Proxy() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return Proxy;
+    }(XProxy));
+}
+FinalProxy.getKey = getKey;
+FinalProxy.callKey = callKey;
+FinalProxy.setKey = setKey;
+FinalProxy.deleteKey = deleteKey;
+FinalProxy.inKey = inKey;
+FinalProxy.iterableKey = iterableKey;
+FinalProxy.instanceOfKey = instanceOfKey;
+var FinalProxy$1 = FinalProxy;
 
-return NOOP_COMPAT$1;
+return FinalProxy$1;
 
 })));
-/** version: 0.15.3 */
+/** version: 0.16.3 */
 
 /* Transformed Polyfills + Babel helpers */
 var __inKey = window.Proxy.inKey;
@@ -7535,535 +8079,4 @@ __setKey(Date, "now", function now() {
   __deleteKey(this, "regeneratorRuntime");
 })(__setKey(this, "EngineHelpers", __getKey(this, "EngineHelpers") || {}));
 /* proxy-compat */
-/*
- * Copyright (C) 2018 Salesforce, inc.
- */
-
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define(factory) :
-	(global.Proxy = factory());
-}(this, (function () { 'use strict';
-
-function __extends(d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-}
-
-// RFC4122 version 4 uuid
-var ProxySlot = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-});
-var ArraySlot = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-});
-var ProxyIdentifier = function ProxyCompat() { };
-var create = Object.create;
-var defineProperty$1 = Object.defineProperty;
-var isExtensible$1 = Object.isExtensible;
-var getPrototypeOf$2 = Object.getPrototypeOf;
-var setPrototypeOf$1 = Object.setPrototypeOf;
-var getOwnPropertyDescriptor$1 = Object.getOwnPropertyDescriptor;
-var getOwnPropertySymbols = Object.getOwnPropertySymbols;
-var getOwnPropertyNames$1 = Object.getOwnPropertyNames;
-var preventExtensions$1 = Object.preventExtensions;
-var ArraySlice = Array.prototype.slice;
-var isArray$1 = Array.isArray;
-var iterator = Symbol.iterator;
-var symbolHasInstance$1 = Symbol.hasInstance;
-var FunctionPrototypeSymbolHasInstance = Function.prototype[symbolHasInstance$1];
-// Proto chain check might be needed because of usage of a limited polyfill
-// https://github.com/es-shims/get-own-property-symbols
-// In this case, because this polyfill is assing all the stuff to Object.prototype to keep
-// all the other invariants of Symbols, we need to do some manual checks here for the slow patch.
-var inOperator = typeof Symbol() === 'object' ? function inOperatorCompat(obj, key) {
-    if (key && key.constructor === Symbol) {
-        while (obj) {
-            if (getOwnPropertySymbols(obj).indexOf(key) !== -1) {
-                return true;
-            }
-            obj = getPrototypeOf$2(obj);
-        }
-        return false;
-    }
-    return key in obj;
-} : function inOperator(obj, key) {
-    return key in obj;
-};
-var defaultHandlerTraps = {
-    get: function (target, key) {
-        return target[key];
-    },
-    set: function (target, key, newValue) {
-        target[key] = newValue;
-        return true;
-    },
-    apply: function (targetFn, thisArg, argumentsList) {
-        return targetFn.apply(thisArg, argumentsList);
-    },
-    construct: function (targetFn, argumentsList, newTarget) {
-        return new (targetFn.bind.apply(targetFn, [void 0].concat(argumentsList)))();
-    },
-    defineProperty: function (target, property, descriptor) {
-        defineProperty$1(target, property, descriptor);
-        return true;
-    },
-    deleteProperty: function (target, property) {
-        return delete target[property];
-    },
-    ownKeys: function (target) {
-        // Note: we don't need to worry about symbols here since Symbol and Proxy go hand to hand
-        return getOwnPropertyNames$1(target);
-    },
-    has: function (target, propertyKey) {
-        return inOperator(target, propertyKey);
-    },
-    preventExtensions: function (target) {
-        preventExtensions$1(target);
-        return true;
-    },
-    getOwnPropertyDescriptor: getOwnPropertyDescriptor$1,
-    getPrototypeOf: getPrototypeOf$2,
-    isExtensible: isExtensible$1,
-    setPrototypeOf: setPrototypeOf$1,
-};
-var lastRevokeFn;
-var proxyTrapFalsyErrors = {
-    set: function (target, key) {
-        throw new TypeError("'set' on proxy: trap returned falsish for property '" + key + "'");
-    },
-    deleteProperty: function (target, key) {
-        throw new TypeError("'deleteProperty' on proxy: trap returned falsish for property '" + key + "'");
-    },
-    setPrototypeOf: function (target, proto) {
-        throw new TypeError("'setPrototypeOf' on proxy: trap returned falsish");
-    },
-    preventExtensions: function (target, proto) {
-        throw new TypeError("'preventExtensions' on proxy: trap returned falsish");
-    },
-    defineProperty: function (target, key, descriptor) {
-        throw new TypeError("'defineProperty' on proxy: trap returned falsish for property '" + key + "'");
-    }
-};
-function proxifyProperty(proxy, key, descriptor) {
-    var enumerable = descriptor.enumerable, configurable = descriptor.configurable;
-    defineProperty$1(proxy, key, {
-        enumerable: enumerable,
-        configurable: configurable,
-        get: function () {
-            return proxy.get(key);
-        },
-        set: function (value) {
-            proxy.set(key, value);
-        },
-    });
-}
-var XProxy = /** @class */ (function () {
-    function XProxy(target, handler) {
-        var targetIsFunction = typeof target === 'function';
-        var targetIsArray = isArray$1(target);
-        if ((typeof target !== 'object' || target === null) && !targetIsFunction) {
-            throw new Error("Cannot create proxy with a non-object as target");
-        }
-        if (typeof handler !== 'object' || handler === null) {
-            throw new Error("new XProxy() expects the second argument to an object");
-        }
-        // Construct revoke function, and set lastRevokeFn so that Proxy.revocable can steal it.
-        // The caller might get the wrong revoke function if a user replaces or wraps XProxy
-        // to call itself, but that seems unlikely especially when using the polyfill.
-        var throwRevoked = false;
-        lastRevokeFn = function () {
-            throwRevoked = true;
-        };
-        // Define proxy as Object, or Function (if either it's callable, or apply is set).
-        var proxy = this; // reusing the already created object, eventually the prototype will be resetted
-        if (targetIsFunction) {
-            proxy = function Proxy() {
-                var usingNew = (this && this.constructor === proxy);
-                var args = ArraySlice.call(arguments);
-                if (usingNew) {
-                    return proxy.construct(args, this);
-                }
-                else {
-                    return proxy.apply(this, args);
-                }
-            };
-        }
-        var _loop_1 = function (trapName) {
-            defineProperty$1(proxy, trapName, {
-                value: function () {
-                    if (throwRevoked) {
-                        throw new TypeError("Cannot perform '" + trapName + "' on a proxy that has been revoked");
-                    }
-                    var args = ArraySlice.call(arguments);
-                    args.unshift(target);
-                    var h = handler[trapName] ? handler : defaultHandlerTraps;
-                    var value = h[trapName].apply(h, args);
-                    if (proxyTrapFalsyErrors[trapName] && value === false) {
-                        proxyTrapFalsyErrors[trapName].apply(proxyTrapFalsyErrors, args);
-                    }
-                    return value;
-                },
-                writable: false,
-                enumerable: false,
-                configurable: false,
-            });
-        };
-        for (var trapName in defaultHandlerTraps) {
-            _loop_1(trapName);
-        }
-        var proxyDefaultHasInstance;
-        defineProperty$1(proxy, symbolHasInstance$1, {
-            get: function () {
-                var hasInstance = proxy.get(symbolHasInstance$1);
-                // We do not want to deal with any Symbol.hasInstance here
-                // because we need to do special things to check prototypes.
-                // Symbol polyfill adds Symbol.hasInstance to the function prototype
-                // so if we have that here, we need to return our own.
-                // If the value we get from this function is different, that means
-                // user has supplied custom function so we need to respect that.
-                if (hasInstance === FunctionPrototypeSymbolHasInstance) {
-                    return proxyDefaultHasInstance || (proxyDefaultHasInstance = function (inst) {
-                        return defaultHasInstance(inst, proxy);
-                    });
-                }
-                return hasInstance;
-            },
-            configurable: false,
-            enumerable: false
-        });
-        defineProperty$1(proxy, ProxySlot, {
-            value: ProxyIdentifier,
-            configurable: false,
-            enumerable: false,
-            writable: false,
-        });
-        defineProperty$1(proxy, 'forIn', {
-            value: function () {
-                return proxy.ownKeys().reduce(function (o, key) {
-                    o[key] = void 0;
-                    return o;
-                }, create(null));
-            },
-            configurable: false,
-            enumerable: false,
-            writable: false,
-        });
-        if (targetIsArray) {
-            var trackedLength_1 = 0;
-            var adjustArrayIndex_1 = function (newLength) {
-                // removing old indexes from proxy when needed
-                while (trackedLength_1 > newLength) {
-                    delete proxy[--trackedLength_1];
-                }
-                // add new indexes to proxy when needed
-                for (var i = trackedLength_1; i < newLength; i += 1) {
-                    proxifyProperty(proxy, i, {
-                        enumerable: true,
-                        configurable: true,
-                    });
-                }
-                trackedLength_1 = newLength;
-            };
-            defineProperty$1(proxy, ArraySlot, {
-                value: ProxyIdentifier,
-                writable: true,
-                enumerable: false,
-                configurable: false,
-            });
-            defineProperty$1(proxy, 'length', {
-                enumerable: false,
-                configurable: true,
-                get: function () {
-                    var proxyLength = proxy.get('length');
-                    // check if the trackedLength matches the length of the proxy
-                    if (proxyLength !== trackedLength_1) {
-                        adjustArrayIndex_1(proxyLength);
-                    }
-                    return proxyLength;
-                },
-                set: function (value) {
-                    proxy.set('length', value);
-                },
-            });
-            // building the initial index. this is observable by the proxy
-            // because we access the length property during the construction
-            // of the proxy, but it should be fine...
-            adjustArrayIndex_1(proxy.get('length'));
-        }
-        return proxy;
-    }
-    XProxy.revocable = function (target, handler) {
-        var p = new XProxy(target, handler);
-        return {
-            proxy: p,
-            revoke: lastRevokeFn,
-        };
-    };
-    return XProxy;
-}());
-
-defineProperty$1(XProxy.prototype, iterator, {
-    enumerable: false,
-    configurable: true,
-    get: function () {
-        return this.get(iterator);
-    },
-    set: function (value) {
-        this.set(iterator, value);
-    },
-});
-
-var symbolHasInstance = Symbol.hasInstance;
-function defaultHasInstance(instance, Type) {
-    // We have to grab getPrototypeOf here
-    // because caching it at the module level is too early.
-    // We need our shimmed version.
-    var getPrototypeOf = Object.getPrototypeOf;
-    var instanceProto = getPrototypeOf(instance);
-    var TypeProto = getKey(Type, 'prototype');
-    while (instanceProto !== null) {
-        if (instanceProto === TypeProto) {
-            return true;
-        }
-        instanceProto = getPrototypeOf(instanceProto);
-    }
-    return false;
-}
-function isCompatProxy(replicaOrAny) {
-    return replicaOrAny && replicaOrAny[ProxySlot] === ProxyIdentifier;
-}
-var getKey = function (replicaOrAny, key) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.get(key);
-    }
-    return replicaOrAny[key];
-};
-var callKey = function (replicaOrAny, key) {
-    var args = [];
-    for (var _i = 2; _i < arguments.length; _i++) {
-        args[_i - 2] = arguments[_i];
-    }
-    var fn = getKey(replicaOrAny, key);
-    return fn.apply(replicaOrAny, args);
-};
-var setKey = function (replicaOrAny, key, newValue, originalReturnValue) {
-    if (isCompatProxy(replicaOrAny)) {
-        replicaOrAny.set(key, newValue);
-    }
-    else {
-        replicaOrAny[key] = newValue;
-    }
-    return arguments.length === 4 ? originalReturnValue : newValue;
-};
-var deleteKey = function (replicaOrAny, key) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.deleteProperty(key);
-    }
-    delete replicaOrAny[key];
-};
-var inKey = function (replicaOrAny, key) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.has(key);
-    }
-    return inOperator(replicaOrAny, key);
-};
-var iterableKey = function (replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.forIn();
-    }
-    return replicaOrAny;
-};
-function instanceOfKey(instance, Type) {
-    var instanceIsCompatProxy = isCompatProxy(instance);
-    if (!isCompatProxy(Type) && !instanceIsCompatProxy) {
-        return instance instanceof Type;
-    }
-    // TODO: Once polyfills are transpiled to compat
-    // We can probably remove the below check
-    if (instanceIsCompatProxy) {
-        return defaultHasInstance(instance, Type);
-    }
-    return Type[symbolHasInstance](instance);
-}
-
-var _keys = Object.keys;
-var _getOwnPropertyNames = Object.getOwnPropertyNames;
-var _hasOwnProperty = Object.hasOwnProperty;
-var _getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-var _preventExtensions = Object.preventExtensions;
-var _defineProperty = Object.defineProperty;
-var _isExtensible = Object.isExtensible;
-var _getPrototypeOf = Object.getPrototypeOf;
-var _setPrototypeOf = Object.setPrototypeOf;
-var _isArray = Array.isArray;
-// Patched Functions:
-function isArray(replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny[ArraySlot] === ProxyIdentifier;
-    }
-    return _isArray(replicaOrAny);
-}
-function keys(replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        var all = replicaOrAny.forIn(); // get all enumerables and filter by own
-        var result = [], prop;
-        for (var prop_1 in all) {
-            if (replicaOrAny.getOwnPropertyDescriptor(prop_1)) {
-                result.push(prop_1);
-            }
-        }
-        return result;
-    }
-    return _keys(replicaOrAny);
-}
-function getPrototypeOf(replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.getPrototypeOf();
-    }
-    return _getPrototypeOf(replicaOrAny);
-}
-function setPrototypeOf(replicaOrAny, proto) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.setPrototypeOf(proto);
-    }
-    return _setPrototypeOf(replicaOrAny, proto);
-}
-function getOwnPropertyNames(replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.ownKeys(); // TODO: only strings
-    }
-    return _getOwnPropertyNames(replicaOrAny);
-}
-function getOwnPropertyDescriptor(replicaOrAny, key) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.getOwnPropertyDescriptor(key);
-    }
-    return _getOwnPropertyDescriptor(replicaOrAny, key);
-}
-function preventExtensions(replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.preventExtensions();
-    }
-    return _preventExtensions(replicaOrAny);
-}
-function isExtensible(replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.isExtensible();
-    }
-    return _isExtensible(replicaOrAny);
-}
-function defineProperty(replicaOrAny, key, descriptor) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.defineProperty(key, descriptor);
-    }
-    return _defineProperty(replicaOrAny, key, descriptor);
-}
-function hasOwnProperty(key) {
-    if (isCompatProxy(this)) {
-        return !!this.getOwnPropertyDescriptor(key);
-    }
-    return _hasOwnProperty.call(this, key);
-}
-function assign(replicaOrAny) {
-    if (replicaOrAny == null) {
-        throw new TypeError('Cannot convert undefined or null to object');
-    }
-    var to = Object(replicaOrAny);
-    for (var index = 1; index < arguments.length; index++) {
-        var nextSource = arguments[index];
-        if (nextSource != null) {
-            if (isCompatProxy(nextSource)) {
-                for (var nextKey in iterableKey(nextSource)) {
-                    if (nextSource.getOwnPropertyDescriptor(nextKey)) {
-                        setKey(to, nextKey, getKey(nextSource, nextKey));
-                    }
-                }
-            }
-            else {
-                for (var nextKey in nextSource) {
-                    // Avoid bugs when hasOwnProperty is shadowed in regular objects
-                    if (_hasOwnProperty.call(nextSource, nextKey)) {
-                        setKey(to, nextKey, nextSource[nextKey]);
-                    }
-                }
-            }
-        }
-    }
-    return to;
-}
-// patches
-// [*] Object.prototype.hasOwnProperty should be patched as a general rule
-// [ ] Object.propertyIsEnumerable should be patched
-// [*] Array.isArray
-Object.prototype.hasOwnProperty = hasOwnProperty;
-Array.isArray = isArray;
-// trap `preventExtensions` can be covered by a patched version of:
-// [*] Object.preventExtensions()
-// [ ] Reflect.preventExtensions()
-// trap `getOwnPropertyDescriptor` can be covered by a patched version of:
-// [*] Object.getOwnPropertyDescriptor()
-// [ ] Reflect.getOwnPropertyDescriptor()
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/defineProperty
-// trap `defineProperty` can be covered by a patched version of:
-// [*] Object.defineProperty()
-// [ ] Reflect.defineProperty()
-// trap `deleteProperty` can be covered by the transpilation and the patched version of:
-// [ ] Reflect.deleteProperty()
-// trap `ownKeys` can be covered by a patched version of:
-// [*] Object.getOwnPropertyNames()
-// [ ] Object.getOwnPropertySymbols()
-// [*] Object.keys()
-// [ ] Reflect.ownKeys()
-Object.defineProperty = defineProperty;
-Object.preventExtensions = preventExtensions;
-Object.getOwnPropertyDescriptor = getOwnPropertyDescriptor;
-Object.getOwnPropertyNames = getOwnPropertyNames;
-Object.keys = keys;
-Object.isExtensible = isExtensible;
-// trap `getPrototypeOf` can be covered by a patched version of:
-// [x] Object.setPrototypeOf()
-// [ ] Reflect.setPrototypeOf()
-// trap `getPrototypeOf` can be covered by a patched version of:
-// [x] Object.getPrototypeOf()
-// [ ] Reflect.getPrototypeOf()
-Object.setPrototypeOf = setPrototypeOf;
-Object.getPrototypeOf = getPrototypeOf;
-// Other necessary patches:
-// [*] Object.assign
-Object.assign = assign;
-function overrideProxy() {
-    return Proxy.__COMPAT__;
-}
-// At this point Proxy can be the real Proxy (function) a noop-proxy (object with noop-keys) or undefined
-var FinalProxy = typeof Proxy !== undefined ? Proxy : {};
-if (typeof FinalProxy !== 'function' || overrideProxy()) {
-    FinalProxy = (_a = /** @class */ (function (_super) {
-            __extends(Proxy, _super);
-            function Proxy() {
-                return _super !== null && _super.apply(this, arguments) || this;
-            }
-            return Proxy;
-        }(XProxy)),
-        _a.getKey = getKey,
-        _a.callKey = callKey,
-        _a.setKey = setKey,
-        _a.deleteKey = deleteKey,
-        _a.inKey = inKey,
-        _a.iterableKey = iterableKey,
-        _a.instanceOfKey = instanceOfKey,
-        _a);
-}
-var FinalProxy$1 = FinalProxy;
-var _a;
-
-return FinalProxy$1;
-
-})));
-/** version: 0.15.3 */
-
-/* Overrides for proxy-compat globals */
  var __getKey = window.Proxy.getKey; var __setKey = window.Proxy.setKey; var __callKey = window.Proxy.callKey; var __iterableKey = window.Proxy.iterableKey; var __inKey = window.Proxy.inKey; var __deleteKey = window.Proxy.deleteKey; var __instanceOfKey = window.Proxy.instanceOfKey;

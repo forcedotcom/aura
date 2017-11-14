@@ -733,8 +733,10 @@ public interface AuraContext {
     boolean isModulesEnabled();
 
     void setUseCompatSource(boolean useCompatSource);
+    void setForceCompat(boolean forceCompat);
 
     boolean useCompatSource();
+    boolean forceCompat();
 
     /**
      * add base 64 SHA256 hash of a script. This is used for CSP2 inline js

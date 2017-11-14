@@ -31,6 +31,7 @@
     <aura:dependency resource="markup://moduleTest:testLib" type="LIBRARY"/>
     <aura:import library="moduleTest:simpleLib" property="simpleLib"/>
     <aura:import library="moduleTest:simpleCmp" property="simpleModule"/>
+
     <section>
         <ui:button aura:id="y" class="button-toggle" label="Toggle if - first modules container" press="{!c.toggle}" />
         <br/>
@@ -40,6 +41,7 @@
 
         <div>
             <module:marker></module:marker>
+            <moduleTest:testCss></moduleTest:testCss>
             <moduleTest:schemaTest></moduleTest:schemaTest>
             <moduleTest:schemaLabel></moduleTest:schemaLabel>
         </div>
@@ -51,21 +53,6 @@
             <p>[v.test3]: <span class="a-res3">{!v.test3}</span></p>
             <p>[expression]: <span class="a-expr">{! v.test3 + '!!' }</span></p>
         </section>
-
-        <aura:if isTrue="{!v.branch}">
-            <section class="aura simple" aura:id="container">
-                <moduleTest:simpleCmp
-                        aura:id="simple"
-                        literal="Hi!"
-                        bound="{!v.test}"
-                        nested="{!v.privItems[0].label}"
-                        unbound="{#v.test2}"
-                        expression="{! v.test3 + '!!' }"
-                        callbackaction="{!c.cbAction}"
-                        onpress="{!c.cbEvent}"
-                />
-            </section>
-        </aura:if>
 
         <section class="aura">
             <moduleTest:compositeCmp
@@ -79,6 +66,23 @@
 
             />
         </section>
+
+
+        <section class="aura simple" aura:id="container">
+            <aura:if isTrue="{!v.branch}">
+            <moduleTest:simpleCmp
+                    aura:id="simple"
+                    literal="Hi!"
+                    bound="{!v.test}"
+                    nested="{!v.privItems[0].label}"
+                    unbound="{#v.test2}"
+                    expression="{! v.test3 + '!!' }"
+                    callbackaction="{!c.cbAction}"
+                    onpress="{!c.cbEvent}"
+            />
+            </aura:if>
+        </section>
+
 
         <p>Iteration:</p>
 

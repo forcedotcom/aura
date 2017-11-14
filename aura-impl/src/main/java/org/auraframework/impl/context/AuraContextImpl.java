@@ -875,17 +875,6 @@ public class AuraContextImpl implements AuraContext {
                 json.writeMapEntry("styleContext", getStyleContext());
             }
 
-            // Normal and full get the locales, but not the css stuff
-            if (style == EncodingStyle.Normal || style == EncodingStyle.Full || style == EncodingStyle.AppResource) {
-                if (getRequestedLocales() != null) {
-                    List<String> locales = new ArrayList<>();
-                    for (Locale locale : getRequestedLocales()) {
-                        locales.add(locale.toString());
-                    }
-                    json.writeMapEntry("requestedLocales", locales);
-                }
-            }
-            
             if (configAdapter.isActionPublicCachingEnabled() && 
             		(style == EncodingStyle.Normal || style == EncodingStyle.Full)) {
                 json.writeMapEntry("apce", 1);

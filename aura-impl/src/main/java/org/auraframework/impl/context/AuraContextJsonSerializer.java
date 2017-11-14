@@ -93,14 +93,6 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             json.writeMapEntry("contextPath", contextPath);
         }
 
-        if (ctx.getRequestedLocales() != null) {
-            List<String> locales = new ArrayList<>();
-            for (Locale locale : ctx.getRequestedLocales()) {
-                locales.add(locale.toString());
-            }
-            json.writeMapEntry("requestedLocales", locales);
-        }
-
         if (testContextAdapter != null) {
             TestContext testContext = testContextAdapter.getTestContext();
             if (testContext != null) {

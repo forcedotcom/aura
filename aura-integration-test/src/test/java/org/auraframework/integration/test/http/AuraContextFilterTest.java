@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpHeaders;
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.http.AuraContextFilter;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.http.BrowserCompatibilityService;
@@ -63,9 +62,6 @@ public class AuraContextFilterTest extends AuraTestCase {
     private ConfigAdapter configAdapter;
 
     @Inject
-    private LocalizationAdapter localizationAdapter;
-
-    @Inject
     private BrowserCompatibilityService browserCompatibilityService;
 
     @Mock
@@ -90,7 +86,6 @@ public class AuraContextFilterTest extends AuraTestCase {
         filter.setLoggingService(loggingService);
         filter.setDefinitionService(definitionService);
         filter.setConfigAdapter(configAdapter);
-        filter.setLocalizationAdapter(localizationAdapter);
         filter.setBrowserCompatibilityService(browserCompatibilityService);
         
         Mockito.when(request.getLocales()).thenReturn(new Vector<>(ImmutableList.of(Locale.ENGLISH)).elements());

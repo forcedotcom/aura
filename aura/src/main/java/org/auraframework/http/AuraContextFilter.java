@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpHeaders;
 import org.auraframework.AuraDeprecated;
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -90,7 +89,6 @@ public class AuraContextFilter implements Filter {
     private DefinitionService definitionService;
     protected ConfigAdapter configAdapter;
     protected SerializationService serializationService;
-    private LocalizationAdapter localizationAdapter;
     private BrowserCompatibilityService browserCompatibilityService;
 
     @Inject
@@ -135,9 +133,7 @@ public class AuraContextFilter implements Filter {
         this.testFilter = testFilter;
     }
 
-    @Inject
-    public void setLocalizationAdapter(LocalizationAdapter localizationAdapter) {
-        this.localizationAdapter = localizationAdapter;
+    public void setLocalizationAdapter(Object ignored) {
     }
 
     @Inject
@@ -225,22 +221,7 @@ public class AuraContextFilter implements Filter {
             }
         }
 
-        List<Locale> requestedLocales = Collections.list(request.getLocales());
-
-        //
-        // When a context is starting, LocalizationAdapter does not have a valid
-        // context to get the requested locales to create appropriate
-        // AuraLocale.
-        // So, we pass the locales to LocalizationAdapter
-        //
-        localizationAdapter.setRequestedLocales(requestedLocales);
-
         AuraContext context = contextService.startContext(m, f, a, appDesc);
-
-        //
-        // Reset it after the context is started (created)
-        //
-        localizationAdapter.setRequestedLocales(null);
 
         String contextPath = request.getContextPath();
         // some appservers (like tomcat) use "/" as the root path, others ""
@@ -249,7 +230,7 @@ public class AuraContextFilter implements Filter {
         }
         context.setContextPath(contextPath);
         context.setNum(num.get(request));
-        context.setRequestedLocales(requestedLocales);
+        context.setRequestedLocales(Collections.list(request.getLocales()));
         
         context.setClient(new Client(request.getHeader(HttpHeaders.USER_AGENT)));
         context.setModulesEnabled(isModulesEnabled(request, configMap, m));

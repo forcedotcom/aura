@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-11-10
+ * Generated: 2017-11-14
  * Version: 0.2.8
  */
 
@@ -3463,6 +3463,14 @@ SecureObject.isDOMElementOrNode = function(el) {
         ((typeof HTMLElement === "object" && el instanceof HTMLElement) || (typeof Node === "object" && el instanceof Node) || (typeof el.nodeType === "number" && typeof el.nodeName === "string"));
 };
 
+/**
+ * Filter the given raw object with the accessors key and provide a filtered view.
+ * Best used when the type of "raw" is not known
+ * @param st Represents the accessor who is trying to access "raw"
+ * @param raw The raw object that we are trying to filter
+ * @param options
+ * @returns {*}
+ */
 SecureObject.filterEverything = function(st, raw, options) {
 
     if (!raw) {
@@ -7637,6 +7645,57 @@ function registerTypes(types) {
 }
 
 /*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+const service = {
+    piercing: (component, data, def, context, target, key, value, callback) => {
+        if (value === EventTarget.prototype.dispatchEvent && SecureObject.isDOMElementOrNode(target)) {
+            /** See if target represents a lockerized module
+             * Else look up the key by the class.
+             * If found, get the SecureWindow for that key
+             **/
+            let lsKey = getKey(target);
+            if (!lsKey) {
+                const Ctor = component.constructor;
+                lsKey = getKey(Ctor);
+                /**
+                 * For elements not created by interop component, this is the first chance we have
+                 * had to trust the element. Propagate the key from Ctor to the element
+                 */
+                if (lsKey) {
+                    trust$1(Ctor, target);
+                }
+            }
+            if (lsKey) {
+                // Create a SecureElement for the custom element
+                const secureTarget = SecureElement(target, lsKey);
+                callback(event => {
+                    return secureTarget.dispatchEvent(event);
+                });
+            }
+        }
+    }
+};
+
+function registerEngineAPI(api) {
+    if (api && api.registerEngineServices) {
+        api.registerEngineServices(service);
+    }
+}
+
+/*
  * Copyright (C) 2017 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
@@ -7758,6 +7817,7 @@ function initialize(types, api) {
     registerTypes(types);
     registerAuraAPI(api);
     registerReportAPI(api);
+    registerEngineAPI(api);
     injectExtraFilter(extraFilteredTypes);
     injectExtraUnfilteredType(extraUnfilteredType);
     injectExtraAddProperty$$1(addExtraWindowProperties);

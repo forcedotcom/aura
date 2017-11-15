@@ -83,22 +83,21 @@
 
     testScriptURL: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-
-        var hack = "function $globalEvalIIFE$() { arguments[0].testScript = true; arguments[0].testHack = window + ''; }";
-
-        var script = document.createElement("script");
-        script.src = "/auraFW/resources/qa/testScript.js"+ "?\n" + hack;
-        document.body.appendChild(script);
-
-        testUtils.addWaitFor(
-            true,
-            function() {
-                return window.testScript;
-            },
-            function(){
-                testUtils.assertUndefined(window.testHack, "JS code was executed via a sourceURL");
-            }
-        );
+        var scriptURL = "/auraFW/resources/qa/testScript.js"
+        var hackFn = "(function(){arguments[0].testScript=true;arguments[0].testHack=window+'';})()";
+        var hackChars = ["?\n", "#\u2028", "#\u2029"];
+        
+        try {
+            hackChars.forEach(function(char) {
+                var script = document.createElement("script");
+                script.src = scriptURL + char + hackFn;
+                document.body.appendChild(script);
+                testUtils.assertUndefined(window.testHack, "Sandbox breakout via sourceURL");
+                testUtils.assertEquals(window.testScript, true, "SecureScript did not load the associated resource");    
+            });            
+        } catch(e) {
+            testUtils.fail("Sandbox breakout via sourceURL");    
+        }
     },
 
     testSetAttributeNodeSrcAttribute: function (cmp) {
@@ -116,6 +115,6 @@
                 return window.testScript;
             },
             "Setting the 'src' attribute on a SecureScriptElement should load and evaluate in SecureWindow"
-        );        
+        );
     }
 })

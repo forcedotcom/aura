@@ -12,6 +12,28 @@
         cmp.set("v.testUtils", $A.test);
     },
 
+    mock: function(response) {
+        function StubXMLHttpRequest() {}
+        Object.assign(StubXMLHttpRequest.prototype, {
+            open: function(method, url) {
+                this.response = response;
+            },
+            setRequestHeader: function() {},
+            getResponseHeader: function(name) {
+                return this.response.headers[name];
+            },
+            send: function() {
+                this.readyState = this.response.readyState;
+                this.status = this.response.status;
+                this.responseText = this.response.responseText;
+                this.onreadystatechange();
+            }
+        });
+        StubXMLHttpRequest.DONE = 4;
+        var override = $A.test.overrideFunction(window, "XMLHttpRequest", StubXMLHttpRequest);
+        $A.test.addCleanup(function() { override.restore(); });
+    },
+
     testScriptSrcExposed: {
         test: function(cmp) {
             cmp.testScriptSrcExposed();
@@ -38,6 +60,11 @@
 
     testScriptURL: {
         test: function(cmp) {
+            this.mock({
+                readyState:4, status: 200,
+                headers: {'content-type': "application/javascript"},
+                responseText: "window.testScript=true"
+            });
             cmp.testScriptURL();
         }
     },

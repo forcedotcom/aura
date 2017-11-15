@@ -165,38 +165,46 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
                     results.add(libraryDefDescriptor);
                 }
             } else if (dep.contains("-")) {
-                String colon = StringUtils.replaceOnce(dep, "-", ":");
-                String[] split = colon.split(":");
-                String namespace = split[0];
-                String name = split[1];
+                if (!isAuraDependency(dep)) {
+                    String colon = StringUtils.replaceOnce(dep, "-", ":");
+                    String[] split = colon.split(":");
+                    String namespace = split[0];
+                    String name = split[1];
 
-                boolean moduleExists = false;
-                String descriptor = ModuleDefinitionUtil.convertToAuraDescriptor(namespace, name, configAdapter);
-                DefDescriptor<ModuleDef> moduleDescriptor = definitionService.getDefDescriptor(descriptor, ModuleDef.class);
+                    String descriptor = ModuleDefinitionUtil.convertToAuraDescriptor(namespace, name, configAdapter);
+                    DefDescriptor<ModuleDef> moduleDescriptor = definitionService.getDefDescriptor(descriptor, ModuleDef.class);
 
-                String namespaceAlias = configAdapter.getModuleNamespaceAliases().get(namespace);
-                if (namespaceAlias != null) {
-                    String aliasedDescriptor = ModuleDefinitionUtil.convertToAuraDescriptor(namespaceAlias, name, configAdapter);
-                    DefDescriptor<ModuleDef> aliasedModuleDescriptor = definitionService.getDefDescriptor(aliasedDescriptor, ModuleDef.class);
-                    moduleExists = definitionService.exists(aliasedModuleDescriptor);
-                    if (moduleExists) {
-                        // aliased module exists so we reference aliased descriptor
-                        moduleDescriptor = aliasedModuleDescriptor;
+                    String namespaceAlias = configAdapter.getModuleNamespaceAliases().get(namespace);
+                    if (namespaceAlias != null) {
+                        String aliasedDescriptor = ModuleDefinitionUtil.convertToAuraDescriptor(namespaceAlias, name, configAdapter);
+                        DefDescriptor<ModuleDef> aliasedModuleDescriptor = definitionService.getDefDescriptor(aliasedDescriptor, ModuleDef.class);
+                        if (definitionService.exists(aliasedModuleDescriptor)) {
+                            // aliased module exists so we reference aliased descriptor
+                            moduleDescriptor = aliasedModuleDescriptor;
+                        }
                     }
-                }
-
-                if (!moduleExists) {
-                    // aliased doesn't exist so we check original
-                    moduleExists = definitionService.exists(moduleDescriptor);
-                }
-
-                if (moduleExists) {
-                    // if module exists, then add module dependency and continue
                     results.add(moduleDescriptor);
                 }
             }
         }
         return results;
+    }
+
+    /**
+     * Whether dependency is an internal Aura provided client dependency
+     *
+     * NOTE: checks need to be updated and aligned with Aura provided modules
+     * AuraComponentService.prototype.initCoreModules
+     * in AuraComponentService.js
+     *
+     * @param dependency module dependency
+     * @return true if Aura dependency
+     */
+    private boolean isAuraDependency(String dependency) {
+        return dependency != null &&
+                ("aura-instrumentation".equals(dependency) ||
+                        "aura-storage".equals(dependency) ||
+                dependency.startsWith("proxy-compat"));
     }
 
     @Override

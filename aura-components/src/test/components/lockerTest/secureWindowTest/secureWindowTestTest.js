@@ -47,6 +47,8 @@
 
     testLocationExposedOnWindow: {
         test: function(cmp) {
+            // v.expectedPath is a string and will not be altered by Locker filtering
+            cmp.set("v.expectedPath", window.location.pathname);
             cmp.testLocationExposedOnWindow();
         }
     },

@@ -18,6 +18,7 @@
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
     <aura:attribute name="testComplete" type="Boolean" default="false" description="Flag to set to signal async operations are complete and test can complete"/>
+    <aura:attribute name="expectedPath" type="String" default="" description="Current url path for the running test suite. Used for window.location tests"/>
 
     <aura:method name="test$AExposedOnWindow" action="{!c.test$AExposedOnWindow}"/>
     <aura:method name="testDocumentExposedOnWindow" action="{!c.testDocumentExposedOnWindow}"/>

@@ -34,7 +34,7 @@
     testLocationExposedOnWindow: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         testUtils.assertDefined(window.location);
-        testUtils.assertEquals("/lockerTest/secureWindowTest.cmp", window.location.pathname, "window.location not pointing to the right url");
+        testUtils.assertEquals(cmp.get("v.expectedPath"), window.location.pathname, "window.location not pointing to the right url");
         testUtils.assertDefined(location, "location object not defined");
         testUtils.assertEquals(location, window.location);
     },

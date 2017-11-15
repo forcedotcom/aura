@@ -18,6 +18,7 @@ package org.auraframework.integration.test.http;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.CheckAccessibility;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -103,6 +104,7 @@ public class AuraResourceServletUITest extends WebDriverTestCase {
 
     @Test
     @ThreadHostileTest
+    @UnAdaptableTest // due to memcached override in core
     public void testAltStringsCacheContainsAppCss() throws Exception {
         openCachesAppWithRefresh("cssStringsCache", "markup://performance:caches@CSS");
         //assertEquals("There should be 1 entry in the css strings cache for CSS", "1", getCount());

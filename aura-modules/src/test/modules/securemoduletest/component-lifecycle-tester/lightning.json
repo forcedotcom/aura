@@ -1,0 +1,5 @@
+{
+  "requireLocker": "true",
+  "description": "Module for testing that life cycle hooks are sanitized",
+  "expose": true
+}

@@ -1,5 +1,5 @@
 {
   "requireLocker": "true",
-  "description": "Modue for performing DOM events",
+  "description": "Module for performing DOM events",
   "expose": true
 }

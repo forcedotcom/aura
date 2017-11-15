@@ -1,0 +1,5 @@
+{
+  "requireLocker": "true",
+  "description": "Module for testing constructor life cycle hook",
+  "expose": true
+}

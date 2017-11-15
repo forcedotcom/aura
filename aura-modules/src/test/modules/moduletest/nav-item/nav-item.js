@@ -10,7 +10,7 @@ export default class NavItem extends Element {
             new CustomEvent('itemregister', {
                 bubbles: true,
                 cancelable: true,
-                composable: true,
+                composed: true
             })
         );
     }

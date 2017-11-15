@@ -15,8 +15,6 @@ export default class Simple extends Element {
         accessorValue: 'accessor-test-value'
     };
 
-    static publicMethods = ['test'];
-
     @api get myAccessor() {
         return this.state.accessorValue;
     }
@@ -31,6 +29,7 @@ export default class Simple extends Element {
         const event = new CustomEvent('press', {
             bubbles   : true,
             cancelable: true,
+            composed: true,
             detail    : { value: 'test!' }
         });
 
@@ -41,7 +40,7 @@ export default class Simple extends Element {
         throw new Error('boom!');
     }
 
-    test() {
+    @api test() {
         return 'Test method!';
     }
 
@@ -50,6 +49,7 @@ export default class Simple extends Element {
 
         this.dispatchEvent(new CustomEvent('change', {
             bubbles: true,
+            composed: true,
             detail : {
                 myAccessor: this.myAccessor
             }

@@ -10,6 +10,7 @@ export default class MappedAttrTests extends Element {
 
         this.dispatchEvent(new CustomEvent('change', {
             bubbles: true,
+            composed: true,
             detail: { format: 'format-changed-value', msg: 'msg-changed-value' }
         }));
     }

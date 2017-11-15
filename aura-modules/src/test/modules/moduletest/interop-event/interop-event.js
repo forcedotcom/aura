@@ -9,6 +9,7 @@ export default class InteropEvent extends Element {
         const customEvent = new CustomEvent('remove', {
             bubbles: true,
             cancelable: true,
+            composed: true,
             detail: { ids: [113] }
         });
 

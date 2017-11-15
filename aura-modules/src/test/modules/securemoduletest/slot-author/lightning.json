@@ -1,0 +1,5 @@
+{
+  "requireLocker": "true",
+  "description": "Module with a slot for performing DOM events tests",
+  "expose": true
+}

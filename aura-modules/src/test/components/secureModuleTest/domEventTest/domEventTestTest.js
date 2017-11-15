@@ -22,7 +22,7 @@
     },
 
     // W-4437423
-    _testInitEventOnTemplateElement: {
+    testInitEventOnTemplateElement: {
         test: function(cmp) {
             cmp.domEventTester("testInitEventOnTemplateElement");
         }
@@ -38,6 +38,12 @@
     testEventTargetOfHtmlElementHandler: {
         test: function(cmp) {
             cmp.domEventTester("testEventTargetOfHtmlElementHandler");
+        }
+    },
+
+    testInitEventOnElementOfChildModule: {
+        test: function(cmp) {
+            cmp.domEventTester("testInitEventOnElementOfChildModule");
         }
     }
 })

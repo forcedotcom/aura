@@ -410,6 +410,7 @@ InteropComponent.prototype.attachOnChangeToElement = function (element) {
 InteropComponent.prototype.render = function () {
     var element = document.createElement(this.componentDef.elementName);
     this._customElement = this.setupInteropInstance();
+    $A.lockerService.trust(this, this._customElement);
     return [element];
 };
 

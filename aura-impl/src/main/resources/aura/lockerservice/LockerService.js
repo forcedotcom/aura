@@ -93,6 +93,12 @@ function LockerService() {
         $A.warning(message);
     }
 
+    function registerEngineServices(serviceHooks) {
+        if ($A.componentService.moduleEngine && $A.componentService.moduleEngine["register"]) {
+            $A.componentService.moduleEngine["register"](serviceHooks);
+        }
+    }
+
     // App.js is built with two versions of AuraLocker, and we select at
     // runtime. In the future, we could move this to
     // initializeInjectedServices.
@@ -117,7 +123,8 @@ function LockerService() {
                 "getPublicMethodNames": getPublicMethodNames,
                 "requireLocker": requireLocker,
                 "warn": warn,
-                "error": $A.auraError
+                "error": $A.auraError,
+                "registerEngineServices": registerEngineServices
             };
 
             var lib = window["AuraLocker"];

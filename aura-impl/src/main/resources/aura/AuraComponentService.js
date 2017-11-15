@@ -837,9 +837,9 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
 
     Ctor = Ctor || exportns;
     entry.ns = Ctor;
-
     this.collectModuleStyles(Ctor);
-
+    // Propagate the key from definition to Ctor, will be used to used by locker's piercing hook to look up keys on component instances
+    $A.lockerService.trust(entry.definition, Ctor);
     return Ctor;
 };
 

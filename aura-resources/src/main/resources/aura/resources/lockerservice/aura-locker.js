@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-11-14
- * Version: 0.2.8
+ * Generated: 2017-11-15
+ * Version: 0.2.10
  */
 
 (function (global, factory) {
@@ -531,17 +531,25 @@ function completion(src) {
 }
 
 /**
- * Sanitizes a URL string . Will prevent:
- * - usage of UTF-8 control characters. Update BLACKLIST constant to support more
- * - usage of \n, \t in url strings
- *
- *
- * @param {String} urlString
- * @return {String}
+ * Sanitizes for a DOM element. Typical use would be when wanting to sanitize for
+ * an href or src attribute of an element or window.open
+ * @param {*} url
  */
+function sanitizeURLForElement(url) {
+    const normalized = document.createElement('a');
+    normalized.href = url;
+    return sanitizeURLString(normalized.href);
+}
 
-function sanitizeURL(urlString) {
-    const BLACKLIST = /[\u2029\u2028]/ig;
+/**
+* Sanitizes a URL string . Will prevent:
+* - usage of UTF-8 control characters. Update BLACKLIST constant to support more
+* - usage of \n, \t in url strings
+* @param {String} urlString
+* @returns {String}
+*/
+function sanitizeURLString(urlString) {
+    const BLACKLIST = /[\u2029\u2028\n\r\t]/ig;
 
     // false, '', undefined, null
     if (!urlString) {
@@ -552,12 +560,7 @@ function sanitizeURL(urlString) {
         throw new TypeError('URL argument is not a string');
     }
 
-    let out = urlString;
-    out = out.replace(BLACKLIST, '');
-
-    const normalized = document.createElement('a');
-    normalized.href = out;
-    return normalized.href;
+    return urlString.replace(BLACKLIST, '');
 }
 
 /*
@@ -613,7 +616,7 @@ function makeEvaluatorSource(src, sourceURL) {
 })`;
 
     // Sanitize the URL
-    sourceURL = sanitizeURL(sourceURL);
+    sourceURL = sanitizeURLForElement(sourceURL);
     if (sourceURL) {
         fnSource += '\n//# sourceURL=' + sourceURL;
     }
@@ -3396,6 +3399,18 @@ function isPlainObject(value) {
     return true;
 }
 
+/**
+ * Basic URL Scheme checking utility.
+ * Checks for http: and https: url schemes.
+ * @param {String} url
+ * @return {Boolean}
+ */
+function isValidURLScheme(url) {
+    const normalized = document.createElement('a');
+    normalized.href = url;
+    return normalized.protocol === 'https:' || normalized.protocol === 'http:';
+}
+
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
@@ -3679,6 +3694,8 @@ function convertSymbol(property) {
     return property;
 }
 
+const unfilteredConstructors = [Object, Array];
+
 var filteringProxyHandler = (function() {
     function FilteringProxyHandler() {
     }
@@ -3687,7 +3704,15 @@ var filteringProxyHandler = (function() {
         var raw = getRef(target, getKey(target));
         var value = raw[property];
 
-        return value ? SecureObject.filterEverything(target, value): value;
+        if (!value) {
+            return value;
+        }
+
+        if (property === "constructor" && unfilteredConstructors.includes(value)) {
+            return value;
+        }
+
+        return SecureObject.filterEverything(target, value);
     };
 
     FilteringProxyHandler.prototype["set"] = function(target, property, value) {
@@ -3991,6 +4016,10 @@ function getArrayProxyHandler(key) {
                 var raw = target;
                 var filtered = getFilteredArray(handler, raw, key);
                 var ret;
+
+                if (property === "constructor" && unfilteredConstructors.includes(raw[property])) {
+                    return raw[property];
+                }
 
                 property = convertSymbol(property);
                 if (isNaN(property) || parseFloat(property) < 0 || (parseFloat(property) !== 0 && parseFloat(property) !== parseInt(property, 10))) {
@@ -6132,11 +6161,14 @@ function SecureWindow(win, key) {
         SecureObject.addMethodIfSupported(o, win, name, {
             beforeCallback  : function(url){
                 // If an url was provided to window.open()
-                if (url && typeof url === "string" && url.length > 1) {
-                    // Only allow http|https|relative urls.
-                    var schemeRegex = /^[\s]*(http:\/\/|https:\/\/|\/)/i;
-                    if (!schemeRegex.test(url)){
-                        throw new error("SecureWindow.open supports http://, https:// schemes and relative urls.");
+                if (url) {
+                    // coerce argument to string and sanitize.
+                    var urlString = sanitizeURLForElement(url);
+                    // try to open only if we have a non-empty string
+                    if (urlString.length > 1) {                        
+                        if (!isValidURLScheme(urlString)) {
+                            throw new error("SecureWindow.open supports http://, https:// schemes and relative urls.");
+                        }
                     }
                 }
             }

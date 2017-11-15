@@ -1816,10 +1816,13 @@ function lib(w) { //eslint-disable-line no-unused-vars
         resize: function () {
             var self = this;
             RAF(function () {
-                // update size
-                self._setSize();
-                // position might be invalid after resizing, move it to the edge if so
-                self._resetPositionIfOutOfBound();
+                // don't resize if the scroller is hidden via a display:none declaration on an ancestor
+                if(self._isScrollerVisible()) {
+                    // update size
+                    self._setSize();
+                    // position might be invalid after resizing, move it to the edge if so
+                    self._resetPositionIfOutOfBound();
+                }
             });
         },
 

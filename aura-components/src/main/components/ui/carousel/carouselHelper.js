@@ -124,12 +124,16 @@
                     pages = wrapperDom.getElementsByClassName('carousel-page') || [],
                     width  = wrapperDom.offsetWidth;
 
-                for (var i = 0, len = pages.length; i < len; i++) {
-                    pages[i].style.width =  width + 'px';
-                }
+                // if both offsetWidth and offsetHeight are 0,
+                // assume the layout has display:none and bail
+                if(width > 0 || wrapperDom.offsetHeight > 0) {
+                    for (var i = 0, len = pages.length; i < len; i++) {
+                        pages[i].style.width =  width + 'px';
+                    }
 
-                this._setSize();
-                this._refreshIndicators();
+                    this._setSize();
+                    this._refreshIndicators();
+                }
             },
 
             /* PUBLIC */

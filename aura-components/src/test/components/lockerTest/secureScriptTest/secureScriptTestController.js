@@ -115,6 +115,91 @@
                 return window.testScript;
             },
             "Setting the 'src' attribute on a SecureScriptElement should load and evaluate in SecureWindow"
+        );        
+    },
+
+    testSVGScriptLoadHref: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var script = document.createElementNS("http://www.w3.org/2000/svg","script");
+        script.setAttribute("href", "/auraFW/resources/qa/testScript.js");
+        document.body.appendChild(script);
+
+        testUtils.addWaitForWithFailureMessage(
+            true,
+            function() {
+                return window.testScript;
+            },
+            "SVGScriptElement was not loaded"
         );
+    },
+
+    testSVGScriptLoadHrefOnlySVG: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var script = document.createElement("script");
+        script.setAttribute("href", "/auraFW/resources/qa/testScript.js");
+        var testComplete = false;
+        document.body.appendChild(script);
+
+        setTimeout(function() {
+            testComplete = true;            
+        }, 2000);
+
+        testUtils.addWaitFor(
+            true,
+            function() {
+                return testComplete;
+            },
+            function() {
+                testUtils.assertEquals(window.loadCount, undefined, "HTMLScriptElement loaded from href attribute");
+            }
+        );
+    },
+
+    testSVGScriptAttributesList: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var script = document.createElementNS("http://www.w3.org/2000/svg","script");
+        script.setAttribute("href", "/auraFW/resources/qa/testScript.js");
+
+        var attributeList = script.attributes;
+        testUtils.assertEquals(attributeList.length, 1, "Incorrect number of attributes");
+        testUtils.assertEquals(attributeList[0].name, "href", "href is not listed in the `Element.attributes`");
+        testUtils.assertEquals(attributeList[0].value, "/auraFW/resources/qa/testScript.js", "href value mismatched");
+    },
+
+    testSVGScriptSetAttributeNode: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var script = document.createElementNS("http://www.w3.org/2000/svg","script");
+        var hrefAttr = document.createAttribute('href');
+        hrefAttr.value = "/auraFW/resources/qa/testScript.js";
+        script.setAttributeNode(hrefAttr);
+        document.body.appendChild(script);
+
+        testUtils.addWaitForWithFailureMessage(
+            true,
+            function() {
+                return window.testScript;
+            },
+            "Setting the attributeNode 'href' on a SVGScriptElement should load and evaluate in SecureWindow"
+        );
+    },
+
+    testScriptDisableXlinkHref: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        
+        var script = document.createElementNS("script");
+        script.setAttribute("xlink:href", "/auraFW/resources/qa/testScript.js");
+        testUtils.assertEquals(script.attributes.length, 0, "setAttribute xlink:href should be disabled on SecureScriptElement");
+
+        script.setAttributeNS("http://www.w3.org/2000/svg", "xlink:href", "/auraFW/resources/qa/testScript.js");
+        testUtils.assertEquals(script.attributes.length, 0, "setAttributeNS xlink:href should be disabled on SecureScriptElement");
+
+        var attr = document.createAttribute("xlink:href");
+        attr.value = "/auraFW/resources/qa/testScript.js";
+
+        script.setAttributeNode(attr);
+        testUtils.assertEquals(script.attributes.length, 0, "setAttributeNode xlink:href should be disabled on SecureScriptElement");
     }
 })

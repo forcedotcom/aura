@@ -73,5 +73,35 @@
         test: function(cmp) {      
             cmp.testSetAttributeNodeSrcAttribute(cmp);
         }
+    },
+
+    testSVGScriptLoadHref: {
+        test: function(cmp) {
+            cmp.testSVGScriptLoadHref();
+        }
+    },
+
+    testSVGScriptLoadHrefOnlySVG: {
+        test: function(cmp) {
+            cmp.testSVGScriptLoadHrefOnlySVG();
+        }
+    },
+
+    testSVGScriptAttributesList: {
+        test: function(cmp) {
+            cmp.testSVGScriptAttributesList();
+        }
+    },
+
+    testSVGScriptSetAttributeNode: {
+        test: function(cmp) {
+            cmp.testSVGScriptSetAttributeNode();
+        }
+    },
+
+    testScriptDisableXlinkHref: {
+        test: function(cmp) {
+            cmp.testScriptDisableXlinkHref();
+        }
     }
 })

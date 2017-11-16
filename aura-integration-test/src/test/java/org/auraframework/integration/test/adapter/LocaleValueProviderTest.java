@@ -16,6 +16,8 @@
 package org.auraframework.integration.test.adapter;
 
 import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -32,8 +34,7 @@ import org.auraframework.service.LocalizationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 @UnAdaptableTest
 public class LocaleValueProviderTest extends AuraImplTestCase {
@@ -311,6 +312,23 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
         expectedMonthNamesJP.put("11", "11月");
         expectedMonthNamesJP.put("12", "12月");
         assertDateLocaleProperties(Locale.JAPANESE, LocaleValueProvider.MONTH_NAME, expectedMonthNamesJP);
+
+        // Russian differentiates usage of standalone month names and formatting month names
+        // NOTE: Other known similar locales: "ca", "cs", "el", "fi", "hr", "it", "it_CH", "lt", "pl", "ru", "sk", "uk"
+        HashMap<String, String> expectedMonthNamesRU = new HashMap<>();
+        expectedMonthNamesRU.put("Янв.", "Январь");
+        expectedMonthNamesRU.put("Февр.", "Февраль");
+        expectedMonthNamesRU.put("Март", "Март");
+        expectedMonthNamesRU.put("Апр.", "Апрель");
+        expectedMonthNamesRU.put("Май", "Май");
+        expectedMonthNamesRU.put("Июнь", "Июнь");
+        expectedMonthNamesRU.put("Июль", "Июль");
+        expectedMonthNamesRU.put("Авг.", "Август");
+        expectedMonthNamesRU.put("Сент.", "Сентябрь");
+        expectedMonthNamesRU.put("Окт.", "Октябрь");
+        expectedMonthNamesRU.put("Нояб.", "Ноябрь");
+        expectedMonthNamesRU.put("Дек.", "Декабрь");
+        assertDateLocaleProperties(new Locale("ru"), LocaleValueProvider.MONTH_NAME, expectedMonthNamesRU);
     }
     
     /**
@@ -356,6 +374,9 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
         LocaleValueProvider lvp = new LocaleValueProvider(localizationService, localizationAdapter, definitionService);
         
         ArrayList<LocalizedLabel> values = (ArrayList<LocalizedLabel>) lvp.getData().get(dateName);
+        if (LocaleValueProvider.MONTH_NAME.equals(dateName)) {
+        		assertEquals("Month names must be 13", 13, values.size());
+        }
         Set<String> expectedShortNames = expectedData.keySet();
         for (int i=0; i<values.size(); i++) {
             String shortName = values.get(i).getShortName();

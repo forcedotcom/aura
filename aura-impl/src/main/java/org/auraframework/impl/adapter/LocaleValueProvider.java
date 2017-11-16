@@ -40,6 +40,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class LocaleValueProvider implements GlobalValueProvider {
     public static String USER_LOCALE_LANGUAGE = "userLocaleLang";
@@ -168,12 +169,28 @@ public class LocaleValueProvider implements GlobalValueProvider {
     }
 
     private List<LocalizedLabel> getNameOfMonths(AuraLocale locale) throws QuickFixException {
-        DateFormatSymbols monthSymbols = DateFormatSymbols.getInstance(locale.getLanguageLocale());
-        String[] months = monthSymbols.getMonths();
-        String[] shortMonths = monthSymbols.getShortMonths();
-        ArrayList<LocalizedLabel> monthList = new ArrayList<>(months.length);
-        for (int i = 0; i < months.length; i++) {
-            monthList.add(new LocalizedLabel(months[i], shortMonths[i]));
+        Locale lang = locale.getLanguageLocale();
+        Calendar cal = Calendar.getInstance(lang);
+        Map<String, Integer> shortNames = cal.getDisplayNames(Calendar.MONTH, Calendar.SHORT_STANDALONE, lang);
+        Map<String, Integer> fullNames = cal.getDisplayNames(Calendar.MONTH, Calendar.LONG_STANDALONE, lang);
+        ArrayList<LocalizedLabel> monthList = new ArrayList<>(13);
+        // We always return 13 months, which is the maximum known used calendar months atm
+        for (int i = Calendar.JANUARY; i <= Calendar.UNDECIMBER; i++) {
+            String shortName = "";
+            String fullName = "";
+            for (Entry<String, Integer> nameMonth : shortNames.entrySet()) {
+                if (nameMonth.getValue() != null && nameMonth.getValue() == i) {
+                    shortName = nameMonth.getKey();
+                    break;
+                }
+            }
+            for (Entry<String, Integer> nameMonth : fullNames.entrySet()) {
+                if (nameMonth.getValue() != null && nameMonth.getValue() == i) {
+                    fullName = nameMonth.getKey();
+                    break;
+                }
+            }
+            monthList.add(new LocalizedLabel(fullName, shortName));
         }
         return monthList;
     }

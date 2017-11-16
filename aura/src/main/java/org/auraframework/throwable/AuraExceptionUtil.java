@@ -22,14 +22,11 @@ import java.util.List;
 import org.auraframework.Aura;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for Exceptiony things.
  */
 public final class AuraExceptionUtil {
-    //private static final Logger _log = LoggerFactory.getLogger(AuraExceptionUtil.class);
 
     public static String getStackTrace(Throwable th) {
         StringWriter sw = new StringWriter();

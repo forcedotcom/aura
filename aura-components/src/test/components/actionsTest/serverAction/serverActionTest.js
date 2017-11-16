@@ -427,17 +427,6 @@
         }
     },
 
-    testRunActionsCallbackJavascriptError : {
-        test : function(cmp) {
-            $A.test.expectAuraError("this is intentional");
-            var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() {
-                throw new Error("this is intentional");
-            });
-            $A.enqueueAction(a);
-            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
-        }
-    },
-
     testServerActionSendsError : {
         test : [
             function(cmp) {

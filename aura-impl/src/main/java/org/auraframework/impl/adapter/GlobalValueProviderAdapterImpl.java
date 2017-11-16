@@ -15,8 +15,12 @@
  */
 package org.auraframework.impl.adapter;
 
-import com.google.common.collect.Sets;
-import org.auraframework.adapter.ConfigAdapter;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.GlobalValueProviderAdapter;
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -27,10 +31,7 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LocalizationService;
 
-import javax.inject.Inject;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 /**
  */

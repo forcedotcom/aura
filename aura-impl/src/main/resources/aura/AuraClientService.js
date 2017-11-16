@@ -3560,41 +3560,6 @@ AuraClientService.prototype.resetToken = function(newToken) {
 
 
 /**
- * [DEPRECATED] Run the actions.
- *
- * This function effectively attempts to submit all pending actions immediately (if
- * there is room in the outgoing request queue). If there is no way to immediately queue
- * the actions, they are submitted via the normal mechanism.
- *
- * @param {Array.<Action>}
- *            actions an array of Action objects
- * @param {Object}
- *            scope The scope in which the function is executed
- * @param {function}
- *            callback The callback function to run
- * @memberOf AuraClientService
- * @deprecated
- * @export
- */
-AuraClientService.prototype.runActions = function(actions, scope, callback) {
-    $A.deprecated("AuraClientService.runActions has been deprecated, do not use it", null, "2017/09/20", "2017/10/20", "AuraClientService.runActions");
-    var i;
-    var count = actions.length;
-    var completion = function() {
-        count -= 1;
-        if (count === 0) {
-            callback.call(scope);
-        }
-    };
-
-    for (i = 0; i < actions.length; i++) {
-        this.enqueueAction(actions[i]);
-        actions[i].setCompletion(completion);
-    }
-    this.process();
-};
-
-/**
  * Inject a component and set up its event handlers. For Integration
  * Service.
  *
@@ -3883,38 +3848,6 @@ AuraClientService.prototype.isActionAbsentFromStorage = function(action) {
     }
 
     return this.actionStorage.isKeyAbsentFromCache(action.getStorageKey());
-};
-
-/**
- * [DEPRECATED] [DOES NOT WORK] [DO NOT USE] Defer the action by returning a Promise object.
- * Configure your action excluding the callback prior to deferring.
- * The Promise is a thenable, meaning it exposes a 'then' function for consumers to chain updates.
- *
- * @param {Action} action - target action
- * @return {Promise} a promise which is resolved or rejected depending on the state of the action
- * @export
- * @deprecated
- */
-AuraClientService.prototype.deferAction = function (action) {
-    $A.deprecated("$A.deferAction is broken, do not use it.","Use '$A.enqueueAction(action);'.","2017/01/06","2017/02/17","AuraClientService.deferAction");
-    var self = this;
-    var promise = new Promise(function(success, error) {
-
-        action.wrapCallback(self, function (a) {
-            if (a.getState() === 'SUCCESS') {
-                success(a.getReturnValue());
-            }
-            else {
-                // Reject the promise as it was not successful.
-                // Give the user a somewhat useful object to use on reject.
-                error({ state: a.getState(), action: a });
-            }
-        });
-
-        self.enqueueAction(action);
-    });
-
-    return promise;
 };
 
 /**

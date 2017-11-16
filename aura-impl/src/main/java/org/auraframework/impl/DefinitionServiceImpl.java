@@ -15,11 +15,20 @@
  */
 package org.auraframework.impl;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import org.apache.log4j.Logger;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.cache.Cache;
@@ -78,18 +87,10 @@ import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
 import org.auraframework.validation.ReferenceValidationContext;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * The public access to definitions inside Aura.
@@ -100,8 +101,6 @@ import java.util.stream.Collectors;
 @ServiceComponent
 public class DefinitionServiceImpl implements DefinitionService {
     private static final long serialVersionUID = -2488984746420077688L;
-
-    private static final Logger logger = Logger.getLogger(DefinitionServiceImpl.class);
 
     private ContextService contextService;
 
@@ -1681,7 +1680,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                 try {
                     if (cd.built && !cd.validated) {
                         if (iteration != 0) {
-                            //logger.warn("Nested add of " + cd.descriptor + " during validation of "
+                            // loggingService.warn("Nested add of " + cd.descriptor + " during validation of "
                             //        + currentCC.topLevel);
                             // throw new
                             // AuraRuntimeException("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
@@ -1794,17 +1793,17 @@ public class DefinitionServiceImpl implements DefinitionService {
                     }
                 }
                 incremental = System.currentTimeMillis() - incremental;
-                logger.info("warmCaches: PROCESSED CompilingDefRegistry with namespaces = "+registry.getNamespaces()
+                loggingService.info("warmCaches: PROCESSED CompilingDefRegistry with namespaces = "+registry.getNamespaces()
                         +", time = "+incremental);
             } else {
-                logger.warn("warmCaches: SKIP "+registry.getClass().getSimpleName()
+                loggingService.warn("warmCaches: SKIP "+registry.getClass().getSimpleName()
                             +" with prefixes="+registry.getPrefixes()
                             +" with namespace="+registry.getNamespaces()
                             +" with defTypes="+registry.getDefTypes());
             }
         }
         long elapsedTime = System.currentTimeMillis() - startTime;
-        logger.info("warmCaches(END): Total time ="+elapsedTime);
+        loggingService.info("warmCaches(END): Total time ="+elapsedTime);
     }
 
     private void cleanupValidation(CompileContext cc) {
@@ -1833,12 +1832,12 @@ public class DefinitionServiceImpl implements DefinitionService {
                 try {
                     if (cd.built && !cd.validated) {
                         if (iteration != 0) {
-                            logger.warn("warmCaches: Nested add of " + cd.descriptor);
+                            loggingService.warn("warmCaches: Nested add of " + cd.descriptor);
                         }
                         try {
                             cd.def.validateReferences(validationContext);
                         } catch (Throwable t) {
-                            logger.error("warmCaches: Failed to validate "+cd.descriptor, t);
+                            loggingService.warn("warmCaches: Failed to validate "+cd.descriptor, t);
                         }
                         // Always mark as validated to avoid future complaints.
                         cd.validated = true;

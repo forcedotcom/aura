@@ -16,44 +16,53 @@
 
 package org.auraframework.impl.adapter;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
+
 import java.util.UUID;
 import java.util.logging.Level;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
-import org.auraframework.impl.test.util.LoggingTestAppender;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.GenericEventException;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 public class ServerErrorUtilAdapterImplUnitTest {
 
     private static final String SERVER_ERROR_EVENT = "aura:serverActionError";
 
-    private ServerErrorUtilAdapterImpl serverErrorUtilAdapter = new ServerErrorUtilAdapterImpl();
+    private ServerErrorUtilAdapterImpl serverErrorUtilAdapter;
 
     @Before
     public void setUp() {
+        serverErrorUtilAdapter = new ServerErrorUtilAdapterImpl();
+
         ContextService mockContextSerivce = Mockito.mock(ContextService.class);
         AuraContext mockContext = Mockito.mock(AuraContext.class);
         Mockito.when(mockContext.getMode()).thenReturn(Mode.DEV);
         Mockito.when(mockContextSerivce.getCurrentContext()).thenReturn(mockContext);
+
+        LoggingService mockLoggingService = Mockito.mock(LoggingService.class);
+
         serverErrorUtilAdapter.setContextService(mockContextSerivce);
+        serverErrorUtilAdapter.setLoggingService(mockLoggingService);
     }
 
     @Test
     public void handleException() throws Exception {
         try {
             serverErrorUtilAdapter.handleException("err");
-            Assert.fail("Expected exception not thrown");
+            fail("Expected exception not thrown");
         } catch (GenericEventException gee) {
-            Assert.assertTrue(gee.getMessage().equals(SERVER_ERROR_EVENT) && gee.getCause() == null);
+            assertTrue(gee.getMessage().equals(SERVER_ERROR_EVENT) && gee.getCause() == null);
         }
     }
 
@@ -62,18 +71,26 @@ public class ServerErrorUtilAdapterImplUnitTest {
         RuntimeException re = new RuntimeException();
         try {
             serverErrorUtilAdapter.handleCustomException("err", re);
-            Assert.fail("Expected exception not thrown");
+            fail("Expected exception not thrown");
         } catch (GenericEventException gee) {
-            Assert.assertTrue(gee.getMessage().equals(SERVER_ERROR_EVENT) && gee.getCause().equals(re));
+            assertTrue(gee.getMessage().equals(SERVER_ERROR_EVENT) && gee.getCause().equals(re));
         }
     }
 
     @Test
-    public void processError() {
-        Logger logger = Logger.getLogger(ServerErrorUtilAdapterImpl.class);
-        LoggingTestAppender appender = new LoggingTestAppender();
-        List<LoggingEvent> logs = appender.getLog();
-        logger.addAppender(appender);
+    public void processErrorWithInfoLevelException() {
+        ServerErrorUtilAdapterImpl serverErrorUtilAdapter = new ServerErrorUtilAdapterImpl();
+
+        ContextService mockContextSerivce = Mockito.mock(ContextService.class);
+        AuraContext mockContext = Mockito.mock(AuraContext.class);
+        Mockito.when(mockContext.getMode()).thenReturn(Mode.DEV);
+        Mockito.when(mockContextSerivce.getCurrentContext()).thenReturn(mockContext);
+
+        LoggingService mockLoggingService = Mockito.mock(LoggingService.class);
+
+        serverErrorUtilAdapter.setContextService(mockContextSerivce);
+        serverErrorUtilAdapter.setLoggingService(mockLoggingService);
+
 
         String message = "err";
         String errorId = serverErrorUtilAdapter.processError(message, new RuntimeException(), Level.INFO, null);
@@ -81,7 +98,9 @@ public class ServerErrorUtilAdapterImplUnitTest {
         // This will throw if errorId isn't a uuid.
         UUID.fromString(errorId);
 
-        String logMessage = logs.get(0).getMessage().toString();
-        Assert.assertTrue(logMessage.equals(message));
+        ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+        verify(mockLoggingService).warn(argument.capture(), any(Throwable.class));
+        assertEquals(message, argument.getValue());
     }
+
 }

@@ -579,44 +579,6 @@
             this.addWaitForLogRace(cmp, 0, 1, "aborted: ABORTED value");
             this.addWaitForLogRace(cmp, 0, 1, "release: SUCCESS ");
         } ]
-    },
-
-    ///////////////////////////////////////////////////////////////////////
-    // runActions
-    ///////////////////////////////////////////////////////////////////////
-
-    testSimpleRunActions : {
-        test : [ function(cmp) {
-            var helper = cmp.helper;
-            $A.clientService.runActions([
-                    helper.getAction(cmp, cmp, this.buildCommands(cmp, [ [ "APPEND", "a" ], ["READ"] ]), "first")
-                ], this, function() {
-                    cmp.helper.log(cmp, cmp, "group1");
-                });
-        }, function(cmp) {
-            var helper = cmp.helper;
-            $A.clientService.runActions([
-                    helper.getAction(cmp, cmp, this.buildCommands(cmp, [ [ "APPEND", "b1" ], ["READ"] ]), "second"),
-                    helper.getAction(cmp, cmp, this.buildCommands(cmp, [ [ "APPEND", "b2" ], ["READ"] ]), "second")
-                ], this, function() {
-                    cmp.helper.log(cmp, cmp, "group2");
-                });
-        }, function(cmp) {
-            var helper = cmp.helper;
-            $A.clientService.runActions([
-                    helper.getAction(cmp, cmp, this.buildCommands(cmp, [ [ "APPEND", "c1" ], ["READ"] ]), "third"),
-                    helper.getAction(cmp, cmp, this.buildCommands(cmp, [ [ "APPEND", "c2" ], ["READ"] ]), "third")
-                ], this, function() {
-                    cmp.helper.log(cmp, cmp, "group3");
-                });
-        }, function(cmp) {
-            this.addWaitForLogRaceOrdered(cmp, 0, 7, [ "first: SUCCESS a", "group1" ] );
-
-            this.addWaitForLogRaceOrdered(cmp, 0, 7, [ "second: SUCCESS b1", "group2" ]);
-            this.addWaitForLogRaceOrdered(cmp, 0, 7, [ "second: SUCCESS b2", "group2" ]);
-
-            this.addWaitForLogRaceOrdered(cmp, 0, 7, [ "third: SUCCESS c1", "group3" ]);
-            this.addWaitForLogRaceOrdered(cmp, 0, 7, [ "third: SUCCESS c2", "group3" ]);
-        }]
     }
+
 })

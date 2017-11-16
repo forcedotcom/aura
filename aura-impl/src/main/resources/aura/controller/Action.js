@@ -62,9 +62,6 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.returnValue = undefined;
     this.returnValueUserland = undefined;
 
-    // FIXME: only for runActions - deprecated
-    this.completion = undefined;
-
     // FIXME: creation path
     this.pathStack = [];
     this.canCreate = true;
@@ -301,35 +298,6 @@ Action.prototype.setCreationPathIndex = function(idx) {
         $A.warning("Improper index increment. Expected: " + (top.idx + 1) + ", Actual: " + idx);
     } else {
         top.idx = idx;
-    }
-};
-
-/**
- * Sets the completion function.
- *
- * @private
- */
-Action.prototype.setCompletion = function(fn) {
-    $A.assert($A.util.isFunction(fn), "Action.setCompletion: argument must be a function");
-    this.completion = fn;
-};
-
-/**
- * Calls the completion function if any.
- *
- * @private
- */
-Action.prototype.complete = function() {
-    try {
-        if (this.completion) {
-            this.completion();
-        }
-    } catch (e) {
-        if ($A.clientService.inAuraLoop()) {
-            throw e;
-        } else {
-            throw new $A.auraError("Action.complete: Failed during completion callback", e);
-        }
     }
 };
 
@@ -993,7 +961,6 @@ Action.prototype.finishAction = function(context) {
                     }
                 }
 
-                this.complete();
                 if (this.components && (cb || !this.storable || !$A.clientService.getActionStorage().isStorageEnabled())) {
                     context.finishComponentConfigs(id);
                     clearComponents = false;
@@ -1066,7 +1033,6 @@ Action.prototype.abort = function() {
     } finally {
         $A.log("ABORTED: "+this.getStorageKey());
     }
-    this.complete();
 };
 
 /**

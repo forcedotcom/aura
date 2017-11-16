@@ -27,7 +27,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
@@ -35,7 +34,6 @@ import java.util.function.Predicate;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
@@ -59,6 +57,7 @@ import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.CompilerService;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.service.LoggingService;
 import org.auraframework.service.RegistryService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
@@ -90,6 +89,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
 
     private ExceptionAdapter exceptionAdapter;
 
+    private LoggingService loggingService;
+
     @Inject
     private CompilerService compilerService;
 
@@ -111,8 +112,6 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     private List<ComponentLocationAdapter> sortedAdapters;
 
     private AuraGlobalControllerDefRegistry globalControllerDefRegistry;
-
-    private static final Logger _log = Logger.getLogger(RegistryService.class);
 
     private ConcurrentHashMap<ComponentLocationAdapter, SourceLocationInfo> locationMap = new ConcurrentHashMap<>();
 
@@ -212,7 +211,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         } catch (Exception e) {
             // Do not fail here, just act as if we don't have a registries file.
             // You'd have to create a bad registries file...
-            _log.error("Unable to read registries file", e);
+            loggingService.warn("Unable to read registries file", e);
         }
         return null;
     }
@@ -261,7 +260,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         } else if (location.getComponentSourceDir() != null) {
             File components = location.getComponentSourceDir();
             if (!components.canRead() || !components.canExecute() || !components.isDirectory()) {
-                _log.error("Unable to find " + components + ", ignored.");
+                loggingService.warn("Unable to find " + components + ", ignored.");
             } else {
                 try {
                     canonical = components.getCanonicalPath();
@@ -578,13 +577,14 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         this.globalControllerDefRegistry = globalControllerDefRegistry;
     }
 
-    public ExceptionAdapter getExceptionAdapter() {
-        return exceptionAdapter;
-    }
-
     @Inject
     public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
         this.exceptionAdapter = exceptionAdapter;
+    }
+
+    @Inject
+    public void setLoggingService(LoggingService loggingService) {
+        this.loggingService = loggingService;
     }
 
     @Inject

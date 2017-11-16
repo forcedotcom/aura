@@ -247,7 +247,6 @@ function AuraInstance () {
     this.getEvt                    = this.eventService.newEvent.bind(this.eventService);
 
     // DEPRECATED
-    this.deferAction               = this.clientService.deferAction.bind(this.clientService);
     this.newCmp                    = this.componentService["newComponentDeprecated"].bind(this.componentService);
     this.newCmpDeprecated          = this.componentService["newComponentDeprecated"].bind(this.componentService);
     this.newCmpAsync               = this.componentService["newComponentAsync"].bind(this.componentService);
@@ -361,7 +360,6 @@ function AuraInstance () {
     this["getDefinitions"] = this.getDefinitions;
 
     // DEPRECATED
-    this["deferAction"] = this.deferAction;
     this["newCmp"] = this.newCmp;
     this["newCmpDeprecated"] = this.newCmpDeprecated;
     this["newCmpAsync"] = this.newCmpAsync;

@@ -15,12 +15,6 @@
  */
 package org.auraframework.impl.context;
 
-import com.ibm.icu.text.DecimalFormat;
-import com.ibm.icu.text.DecimalFormatSymbols;
-import com.ibm.icu.util.Currency;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -29,7 +23,6 @@ import java.util.TimeZone;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.util.AuraLocaleImpl;
@@ -42,7 +35,6 @@ import org.springframework.context.annotation.Lazy;
 @Lazy
 @ServiceComponent
 public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLocalizationAdapter {
-    Logger logger = Logger.getLogger(LocalizationAdapterImpl.class);
 
     @Inject
     private ContextService contextService;

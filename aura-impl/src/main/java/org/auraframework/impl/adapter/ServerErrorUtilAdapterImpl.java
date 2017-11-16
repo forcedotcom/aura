@@ -15,10 +15,17 @@
  */
 package org.auraframework.impl.adapter;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.util.UUID;
+import java.util.logging.Level;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+
 import org.auraframework.adapter.ServerErrorUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraExceptionUtil;
@@ -26,13 +33,6 @@ import org.auraframework.throwable.ClientSideError;
 import org.auraframework.throwable.GenericEventException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-
-import java.io.IOException;
-import java.util.UUID;
-import java.util.logging.Level;
 
 /**
  * Default implementation for the error util wrapper.
@@ -43,8 +43,9 @@ import java.util.logging.Level;
 public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
 
     private static final String EVENTNAME = "aura:serverActionError";
-    private static final Logger logger = Logger.getLogger(ServerErrorUtilAdapterImpl.class);
-    private ContextService contextService; 
+
+    private ContextService contextService;
+    private LoggingService loggingService;
 
     @Override
     public void handleException(String message) {
@@ -141,17 +142,17 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
      * Default implementation for processing the error (e.g. logging).
      * Context-specific implementations can override this if needed.
      *
-     * @param message   			Error message
-     * @param thrown    			Error thrown
+     * @param message               Error message
+     * @param thrown                Error thrown
      * @param customErrorDetails    Custom error context
-     * @return            			The error's id
+     * @return                      The error's id
      */
     protected String processError(String message, Throwable thrown, Level level, @Nullable String customErrorDetails) {
         // Log the error.
         if (level.equals(Level.INFO)) {
-            logger.info(message, thrown);
+            loggingService.warn(message, thrown);
         } else {
-            logger.error(message, thrown);
+            loggingService.error(message, thrown);
         }
 
         // Default implementation uses a random uuid for the error id.
@@ -164,6 +165,14 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
     @Inject
     public void setContextService(ContextService contextService) {
         this.contextService = contextService;
+    }
+
+    /**
+     * Injection override.
+     */
+    @Inject
+    public void setLoggingService(LoggingService loggingService) {
+        this.loggingService = loggingService;
     }
 
     /**

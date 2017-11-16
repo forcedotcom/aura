@@ -82,7 +82,6 @@ public final class CPUProfilerAnalyzerTest extends UnitTestCase {
     /**
      * Recursivelly converts a JSONObject/JSONArray into a java Collection
      */
-    @SuppressWarnings("unchecked")
     private static Object toCollection(Object obj) throws JSONException {
         if (obj instanceof JSONArray) {
             JSONArray array = (JSONArray) obj;

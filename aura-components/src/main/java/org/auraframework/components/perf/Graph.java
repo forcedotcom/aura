@@ -29,7 +29,7 @@ public class Graph {
     }
 
     public void addNodeIfAbsent(Node node) {
-        if (nodes.containsKey(node.getDescriptor())) {
+        if (nodes.containsKey(node.getDescriptor().getQualifiedName())) {
             return;
         }
         nodes.put(node.getDescriptor().getQualifiedName(), node);

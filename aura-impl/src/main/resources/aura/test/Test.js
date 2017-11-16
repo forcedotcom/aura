@@ -46,18 +46,18 @@ function TestInstance() {
     this.prePostDecodeConfigs = [];
     this.installOverride();
     this.name = undefined;
-    
-    //borrow Aura.time if it's there, if not, polyfill 
-    this.time = 
-    	(window['Aura'] && Aura.time && Aura.time instanceof Function)?
-    	Aura.time:(
-    		(window.performance && window.performance.now) ? window.performance.now.bind(performance) : function(){return Date.now();}
-    	);  
+
+    //borrow Aura.time if it's there, if not, polyfill
+    this.time =
+        (window['Aura'] && Aura.time && Aura.time instanceof Function)?
+        Aura.time:(
+            (window.performance && window.performance.now) ? window.performance.now.bind(performance) : function(){return Date.now();}
+        );
     //for debug use only
     if(window.sessionStorage) {
-    	sessionStorage.setItem('frameworkReadyWhenCreateTestInstance', window['Aura']?true:false);
-    	sessionStorage.setItem('frameworkJsReadyWhenCreateTestInstance', (window['Aura'] && window['Aura']['frameworkJsReady'])?true:false);
-    	sessionStorage.setItem('timeStampOfTestInstanceCreation', this.time());
+        sessionStorage.setItem('frameworkReadyWhenCreateTestInstance', window['Aura']?true:false);
+        sessionStorage.setItem('frameworkJsReadyWhenCreateTestInstance', (window['Aura'] && window['Aura']['frameworkJsReady'])?true:false);
+        sessionStorage.setItem('timeStampOfTestInstanceCreation', this.time());
     }
 }
 
@@ -282,28 +282,6 @@ TestInstance.prototype.getAction = function(component, name, params, callback) {
         }
     }
     return action;
-};
-
-/**
- * Run a set of actions as a transaction.
- *
- * This is a wrapper around runActions allowing a test to safely run a set of actions as a single transaction with a
- * callback.
- *
- * @param {Array}
- *            actions A list of actions to run.
- * @param {Object}
- *            scope The scope for the callback.
- * @param {Function}
- *            callback The callback
- * @export
- * @function Test#runActionsAsTransaction
- */
-TestInstance.prototype.runActionsAsTransaction = function(actions, scope, callback) {
-    $A.assert(!$A.services.client.inAuraLoop(), "runActionsAsTransaction called from inside Aura call stack");
-    $A.run(function() {
-        $A.services.client.runActions(actions, scope, callback);
-    });
 };
 
 /**
@@ -1656,7 +1634,7 @@ TestInstance.prototype.getAuraErrorMessage = function() {
 
 /**
  * Assert that the Access check failure message is as expected
- * 
+ *
  * @param {String}
  *      errorMessage An Aura Error Message
  * @param {String}
@@ -1665,7 +1643,7 @@ TestInstance.prototype.getAuraErrorMessage = function() {
  *      targetCmp A string containing component being accessed
  * @param {String}
  *      accessingCmp A string containing accessing component details
- * 
+ *
  * @export
  * @function Test#getPopOverErrorMessage
  */

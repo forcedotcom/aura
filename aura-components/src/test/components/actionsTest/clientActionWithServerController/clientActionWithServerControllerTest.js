@@ -32,26 +32,7 @@
             action.setCallback(this, function() {
                 component._gotResponse = true;
             });
-            $A.test.enqueueAction(action, true);
-            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([action]); },
-                function() {
-                    $A.test.assertEquals("SUCCESS", action.getState());
-                    $A.test.assertTrue(component._gotResponse, "Client Side Action was not called after enqueue.");
-                });
-        } ]
-    },
-
-    /**
-     * Test the client side foreground action is executed once enqueued
-     */
-    testRunClientActionInBackground : {
-        test : [ function(component) {
-            var action = component.get("c.clientExecuteInBackground");
-            component._gotResponse = false;
-            action.setCallback(this, function() {
-                component._gotResponse = true;
-            });
-            $A.test.enqueueAction(action, true);
+            $A.enqueueAction(action);
             $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([action]); },
                 function() {
                     $A.test.assertEquals("SUCCESS", action.getState());

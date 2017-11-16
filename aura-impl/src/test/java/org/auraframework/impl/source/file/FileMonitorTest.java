@@ -44,7 +44,7 @@ public class FileMonitorTest extends AuraImplTestCase {
         ((FileMonitorImpl)fileMonitor).listener = listenerMock;
 
         LoggingService loggingServiceMock = Mockito.mock(LoggingService.class);
-        ((FileMonitorImpl)fileMonitor).logger = loggingServiceMock;
+        ((FileMonitorImpl)fileMonitor).loggingService = loggingServiceMock;
 
         fileMonitor.addDirectory(tmpDir.toString(), 0L);
 

@@ -15,8 +15,6 @@
  */
 package org.auraframework;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.auraframework.adapter.ConfigAdapter;

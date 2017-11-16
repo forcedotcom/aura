@@ -15,7 +15,11 @@
  */
 package org.auraframework.impl.expression;
 
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.Expression;
@@ -26,14 +30,10 @@ import org.auraframework.impl.expression.functions.Function;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 /**
  * function calling expression

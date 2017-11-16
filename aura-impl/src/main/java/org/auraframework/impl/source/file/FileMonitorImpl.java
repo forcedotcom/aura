@@ -72,7 +72,7 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
     private ConfigAdapter configAdapter;
 
     @Inject
-    protected LoggingService logger;
+    protected LoggingService loggingService;
 
     private final ConcurrentLinkedQueue<WeakReference<SourceListener>> listeners = new ConcurrentLinkedQueue<>();
 
@@ -163,7 +163,7 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
 
             Path dir = monitoredKeys.get(key);
             if (dir == null) {
-                logger.info("[FileMonitorImpl] did not recognize the requested WatchKey!");
+                loggingService.info("[FileMonitorImpl] did not recognize the requested WatchKey!");
                 continue;
             }
 
@@ -175,7 +175,7 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
                 if (kind == OVERFLOW) {
                     // TODO - perhaps notify a special event to clear all caches,
                     // if file changes overflow the monitor
-                    logger.info("[FileMonitorImpl] WatchService for aura file changes has overflowed.  Changes may have been missed.");
+                    loggingService.info("[FileMonitorImpl] WatchService for aura file changes has overflowed.  Changes may have been missed.");
                     continue;
                 }
 
@@ -202,7 +202,7 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
                             listener.fileDeleted(new FileChangeEvent(child));
                         }
                     } catch (Exception ex) {
-                        logger.info("[FileMonitorImpl] Unable to signal source change due to exception: " + ex.getMessage());
+                        loggingService.info("[FileMonitorImpl] Unable to signal source change due to exception: " + ex.getMessage());
                     }
                 }
                 // recursively add any new directories created
@@ -249,9 +249,9 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
 
         try {
             registerAll(dir, registryCreationTime);
-            logger.info("[FileMonitorImpl] Monitoring directory " + dirPath);
+            loggingService.info("[FileMonitorImpl] Monitoring directory " + dirPath);
         } catch (Exception ex) {
-            logger.error("[FileMonitorImpl] Unable to monitor directory " + dirPath + " due to exception: " + ex.getMessage());
+            loggingService.error("[FileMonitorImpl] Unable to monitor directory " + dirPath + " due to exception: " + ex.getMessage());
         }
     }
 
@@ -265,15 +265,15 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
             try {
                 watchService = FileSystems.getDefault().newWatchService();
             } catch (IOException e) {
-                logger.error("[FileMonitorImpl] Could not create aura WatchService.  File changes will not be noticed");
+                loggingService.error("[FileMonitorImpl] Could not create aura WatchService.  File changes will not be noticed");
             }
             setTerminateThread(false);
             watchServiceThread = new Thread(this);
             watchServiceThread.setDaemon(true);
             watchServiceThread.start();
-            logger.info("[FileMonitorImpl] Aura file monitor started");
+            loggingService.info("[FileMonitorImpl] Aura file monitor started");
         } else {
-            logger.warn("[FileMonitorImpl] Aura file monitor disabled");
+            loggingService.warn("[FileMonitorImpl] Aura file monitor disabled");
         }
     }
 
@@ -287,7 +287,7 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
             setTerminateThread(true);
             watchService.notifyAll();
             watchServiceThread = null;
-            logger.info("[FileMonitorImpl] Aura file monitor signaled to stop");
+            loggingService.info("[FileMonitorImpl] Aura file monitor signaled to stop");
         }
     }
 

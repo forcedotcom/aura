@@ -1,19 +1,7 @@
 /*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+     * Copyright (C) 2017 salesforce.com, inc.
+     */
+    
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -71,6 +59,13 @@ var assert = {
     }
 };
 
+var topLevelContextSymbol = Symbol('Top Level Context');
+var currentContext = {};
+currentContext[topLevelContextSymbol] = true;
+function establishContext(ctx) {
+    currentContext = ctx;
+}
+
 var freeze = Object.freeze;
 var seal = Object.seal;
 var keys = Object.keys;
@@ -81,18 +76,20 @@ var getPrototypeOf = Object.getPrototypeOf;
 var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 var getOwnPropertyNames = Object.getOwnPropertyNames;
 var defineProperties = Object.defineProperties;
+var getOwnPropertySymbols = Object.getOwnPropertySymbols;
 var hasOwnProperty = Object.hasOwnProperty;
 var preventExtensions = Object.preventExtensions;
 var isExtensible = Object.isExtensible;
 var isArray = Array.isArray;
-var _a$2 = Array.prototype;
-var ArrayFilter = _a$2.filter;
-var ArraySlice = _a$2.slice;
-var ArraySplice = _a$2.splice;
-var ArrayIndexOf = _a$2.indexOf;
-var ArrayPush = _a$2.push;
-var ArrayMap = _a$2.map;
-var forEach = _a$2.forEach;
+var _a$1 = Array.prototype;
+var ArrayConcat = _a$1.concat;
+var ArrayFilter = _a$1.filter;
+var ArraySlice = _a$1.slice;
+var ArraySplice = _a$1.splice;
+var ArrayIndexOf = _a$1.indexOf;
+var ArrayPush = _a$1.push;
+var ArrayMap = _a$1.map;
+var forEach = _a$1.forEach;
 function isUndefined(obj) {
     return obj === undefined;
 }
@@ -116,6 +113,96 @@ function toString$1(obj) {
         return OtS.call(obj);
     }
     return obj + '';
+}
+
+var EmptySlots = create(null);
+function getSlotsetValue(slotset, slotName) {
+    assert.isTrue(isObject(slotset), "Invalid slotset value " + toString$1(slotset));
+    // TODO: mark slotName as reactive
+    return slotset && slotset[slotName];
+}
+var slotsetProxyHandler = {
+    get: function (slotset, key) { return getSlotsetValue(slotset, key); },
+    set: function () {
+        assert.logError("$slotset object cannot be mutated from template.");
+        return false;
+    },
+    deleteProperty: function () {
+        assert.logError("$slotset object cannot be mutated from template.");
+        return false;
+    },
+    apply: function () {
+        assert.fail("invalid call invocation from slotset");
+    },
+    construct: function () {
+        assert.fail("invalid construction invocation from slotset");
+    },
+};
+function validateSlots(vm, html) {
+    var _a = vm.cmpSlots, cmpSlots = _a === void 0 ? EmptySlots : _a;
+    var _b = html.slots, slots = _b === void 0 ? [] : _b;
+    for (var slotName in cmpSlots) {
+        if (ArrayIndexOf.call(slots, slotName) === -1) {
+            // TODO: this should never really happen because the compiler should always validate
+            console.warn("Ignoring unknown provided slot name \"" + slotName + "\" in " + vm + ". This is probably a typo on the slot attribute.");
+        }
+    }
+}
+function validateFields(vm, html) {
+    var component = vm.component;
+    // validating identifiers used by template that should be provided by the component
+    var _a = html.ids, ids = _a === void 0 ? [] : _a;
+    ids.forEach(function (propName) {
+        if (!(propName in component)) {
+            console.warn("The template rendered by " + vm + " references `this." + propName + "`, which is not declared. This is likely a typo in the template.");
+        }
+        else if (hasOwnProperty.call(component, propName)) {
+            assert.fail(component + "'s template is accessing `this." + toString$1(propName) + "` directly, which is considered a private field. Instead access it via a getter or make it reactive by moving it to `this.state." + toString$1(propName) + "`.");
+        }
+    });
+}
+function validateTemplate(vm, html) {
+    validateSlots(vm, html);
+    validateFields(vm, html);
+}
+function applyTokenToHost(vm, html) {
+    var vnode = vm.vnode, context = vm.context;
+    var oldToken = context.tplToken;
+    var newToken = html.token;
+    if (oldToken !== newToken) {
+        var host = vnode.elm;
+        // Remove the token currently applied to the host element if different than the one associated
+        // with the current template
+        if (!isUndefined(oldToken)) {
+            host.removeAttribute(oldToken);
+        }
+        // If the template has a token apply the token to the host element
+        if (!isUndefined(newToken)) {
+            host.setAttribute(newToken, '');
+        }
+    }
+}
+function evaluateTemplate(vm, html) {
+    assert.vm(vm);
+    assert.isTrue(isFunction(html), "evaluateTemplate() second argument must be a function instead of " + html);
+    // TODO: add identity to the html functions
+    var component = vm.component, context = vm.context, _a = vm.cmpSlots, cmpSlots = _a === void 0 ? EmptySlots : _a, cmpTemplate = vm.cmpTemplate;
+    // reset the cache momizer for template when needed
+    if (html !== cmpTemplate) {
+        applyTokenToHost(vm, html);
+        vm.cmpTemplate = html;
+        context.tplCache = create(null);
+        context.tplToken = html.token;
+        assert.block(function devModeCheck() {
+            validateTemplate(vm, html);
+        });
+    }
+    assert.isTrue(isObject(context.tplCache), "vm.context.tplCache must be an object associated to " + cmpTemplate + ".");
+    var _b = Proxy.revocable(cmpSlots, slotsetProxyHandler), slotset = _b.proxy, slotsetRevoke = _b.revoke;
+    var vnodes = html.call(undefined, api, component, slotset, context.tplCache);
+    assert.invariant(isArray(vnodes), "Compiler should produce html functions that always return an array.");
+    slotsetRevoke();
+    return vnodes;
 }
 
 // Few more execptions that are using the attribute name to match the property in lowercase.
@@ -265,72 +352,6 @@ var GlobalHTMLProperties = {
 // TODO: complete this list with Node properties
 // https://developer.mozilla.org/en-US/docs/Web/API/Node
 
-var topLevelContextSymbol = Symbol('Top Level Context');
-var currentContext = {};
-currentContext[topLevelContextSymbol] = true;
-function establishContext(ctx) {
-    currentContext = ctx;
-}
-
-function insert(vnode) {
-    assert.vnode(vnode);
-    var vm = vnode.vm;
-    assert.vm(vm);
-    if (vm.idx > 0) {
-        assert.isTrue(vnode.isRoot, vm + " is already inserted.");
-        destroy(vnode); // moving the element from one place to another is observable via life-cycle hooks
-    }
-    addInsertionIndex(vm);
-    if (vm.isDirty) {
-        // this code path guarantess that when patching the custom element for the first time,
-        // the body is computed only after the element is in the DOM, otherwise the hooks
-        // for any children's vnode are not going to be useful.
-        rehydrate(vm);
-    }
-}
-function update(oldVnode, vnode) {
-    assert.vnode(vnode);
-    var vm = vnode.vm;
-    assert.vm(vm);
-    // TODO: we don't really need this block anymore, but it will require changes
-    // on many tests that are just patching the element directly.
-    if (vm.idx === 0 && !vnode.isRoot) {
-        // when inserting a root element, or when reusing a DOM element for a new
-        // component instance, the insert() hook is never called because the element
-        // was already in the DOM before creating the instance, and diffing the
-        // vnode, for that, we wait until the patching process has finished, and we
-        // use the postpatch() hook to trigger the connectedCallback logic.
-        insert(vnode);
-        // Note: we don't have to worry about destroy() hook being called before this
-        // one because they never happen in the same patching mechanism, only one
-        // of them is called. In the case of the insert() hook, we use the value of `idx`
-        // to dedupe the calls since they both can happen in the same patching process.
-    }
-    if (vm.isDirty) {
-        // this code path guarantess that when patching the custom element the body is computed only after the element is in the DOM
-        rehydrate(vm);
-    }
-}
-function destroy(vnode) {
-    assert.vnode(vnode);
-    var vm = vnode.vm;
-    assert.vm(vm);
-    assert.isTrue(vm.idx, vm + " is not inserted.");
-    removeInsertionIndex(vm);
-    // just in case it comes back, with this we guarantee re-rendering it
-    vm.isDirty = true;
-    clearListeners(vm);
-    // At this point we need to force the removal of all children because
-    // we don't have a way to know that children custom element were removed
-    // from the DOM. Once we move to use realm custom elements, we can remove this.
-    patchShadowRoot(vm, []);
-}
-var lifeCycleHooks = {
-    insert: insert,
-    update: update,
-    destroy: destroy,
-};
-
 var nextTickCallbackQueue = [];
 var SPACE_CHAR = 32;
 var EmptyObject = seal(create(null));
@@ -355,7 +376,7 @@ var CAMEL_REGEX = /-([a-z])/g;
 var attrNameToPropNameMap = create(null);
 function getPropNameFromAttrName(attrName) {
     var propName = attrNameToPropNameMap[attrName];
-    if (!propName) {
+    if (!propName && isString(attrName)) {
         propName = attrName.replace(CAMEL_REGEX, function (g) { return g[1].toUpperCase(); });
         attrNameToPropNameMap[attrName] = propName;
     }
@@ -382,16 +403,6 @@ function getAttrNameFromPropName(propName) {
         propNameToAttributeNameMap[propName] = attrName;
     }
     return attrName;
-}
-function toAttributeValue(raw) {
-    // normalizing attrs from compiler into HTML global attributes
-    if (raw === true) {
-        raw = '';
-    }
-    else if (raw === false) {
-        raw = null;
-    }
-    return raw != null ? raw + '' : null; // null and undefined should always produce null
 }
 function noop() { }
 var classNameToClassMap = create(null);
@@ -422,380 +433,13 @@ function getMapFromClassName(className) {
     return map;
 }
 
-var CHAR_S = 115;
-var CHAR_V = 118;
-var CHAR_G = 103;
-var EmptyData = create(null);
-var NamespaceAttributeForSVG = 'http://www.w3.org/2000/svg';
-var SymbolIterator = Symbol.iterator;
-function addNS(data, children, sel) {
-    data.ns = NamespaceAttributeForSVG;
-    if (isUndefined(children) || sel === 'foreignObject') {
-        return;
-    }
-    var len = children.length;
-    for (var i_1 = 0; i_1 < len; ++i_1) {
-        var child = children[i_1];
-        var data_1 = child.data;
-        if (data_1 !== undefined) {
-            var grandChildren = child.children;
-            addNS(data_1, grandChildren, child.sel);
-        }
-    }
-}
-// [v]node node
-function v(sel, data, children, text, elm, Ctor) {
-    data = data || EmptyData;
-    var key = data.key;
-    // Try to identify the owner, but for root elements and other special cases, we
-    // can just fallback to 0 which means top level creation.
-    var uid = vmBeingRendered ? vmBeingRendered.uid : 0;
-    var vnode = { sel: sel, data: data, children: children, text: text, elm: elm, key: key, Ctor: Ctor, uid: uid };
-    assert.block(function devModeCheck() {
-        // adding toString to all vnodes for debuggability
-        vnode.toString = function () { return "[object:vnode " + sel + "]"; };
-    });
-    return vnode;
-}
-// [h]tml node
-function h(sel, data, children) {
-    assert.isTrue(isString(sel), "h() 1st argument sel must be a string.");
-    assert.isTrue(isObject(data), "h() 2nd argument data must be an object.");
-    assert.isTrue(isArray(children), "h() 3rd argument children must be an array.");
-    // checking reserved internal data properties
-    assert.invariant(data.class === undefined, "vnode.data.class should be undefined when calling h().");
-    var classMap = data.classMap, className = data.className, style = data.style, styleMap = data.styleMap;
-    assert.isFalse(className && classMap, "vnode.data.className and vnode.data.classMap ambiguous declaration.");
-    data.class = classMap || (className && getMapFromClassName(className));
-    assert.isFalse(styleMap && style, "vnode.data.styleMap and vnode.data.style ambiguous declaration.");
-    assert.block(function devModeCheck() {
-        if (style && !isString(style)) {
-            assert.logWarning("Invalid 'style' attribute passed to <" + sel + "> should be a string value, and will be ignored.");
-        }
-    });
-    data.style = styleMap || (style && style + '');
-    assert.block(function devModeCheck() {
-        children.forEach(function (vnode) {
-            if (vnode === null) {
-                return;
-            }
-            assert.vnode(vnode);
-        });
-    });
-    if (sel.length === 3 && sel.charCodeAt(0) === CHAR_S && sel.charCodeAt(1) === CHAR_V && sel.charCodeAt(2) === CHAR_G) {
-        addNS(data, children, sel);
-    }
-    return v(sel, data, children);
-}
-// [c]ustom element node
-function c(sel, Ctor, data) {
-    // The compiler produce AMD modules that do not support circular dependencies
-    // We need to create an indirection to circumvent those cases.
-    // We could potentially move this check to the definition
-    if (Ctor.__circular__) {
-        Ctor = Ctor();
-    }
-    assert.isTrue(isString(sel), "c() 1st argument sel must be a string.");
-    assert.isTrue(isFunction(Ctor), "c() 2nd argument Ctor must be a function.");
-    assert.isTrue(isObject(data), "c() 3nd argument data must be an object.");
-    // checking reserved internal data properties
-    assert.invariant(data.class === undefined, "vnode.data.class should be undefined when calling c().");
-    var key = data.key, slotset = data.slotset, styleMap = data.styleMap, style = data.style, attrs = data.attrs, on = data.on, className = data.className, classMap = data.classMap, _props = data.props;
-    assert.isTrue(arguments.length < 4, "Compiler Issue: Custom elements expect up to 3 arguments, received " + arguments.length + " instead.");
-    data = { hook: lifeCycleHooks, key: key, slotset: slotset, attrs: attrs, on: on, _props: _props };
-    assert.isFalse(className && classMap, "vnode.data.className and vnode.data.classMap ambiguous declaration.");
-    data.class = classMap || (className && getMapFromClassName(className));
-    assert.isFalse(styleMap && style, "vnode.data.styleMap and vnode.data.style ambiguous declaration.");
-    assert.block(function devModeCheck() {
-        if (style && !isString(style)) {
-            assert.logWarning("Invalid 'style' attribute passed to <" + sel + "> should be a string value, and will be ignored.");
-        }
-    });
-    data.style = styleMap || (style && style + '');
-    return v(sel, data, EmptyArray, undefined, undefined, Ctor);
-}
-// [i]terable node
-function i(iterable, factory) {
-    var list = [];
-    if (isUndefined(iterable) || iterable === null) {
-        assert.logWarning("Invalid template iteration for value \"" + iterable + "\" in " + vmBeingRendered + ", it should be an Array or an iterable Object.");
-        return list;
-    }
-    assert.isFalse(isUndefined(iterable[SymbolIterator]), "Invalid template iteration for value `" + iterable + "` in " + vmBeingRendered + ", it requires an array-like object, not `null` or `undefined`.");
-    var iterator = iterable[SymbolIterator]();
-    assert.isTrue(iterator && isFunction(iterator.next), "Invalid iterator function for \"" + iterable + "\" in " + vmBeingRendered + ".");
-    var next = iterator.next();
-    var i = 0;
-    var value = next.value, last = next.done;
-    var _loop_1 = function () {
-        // implementing a look-back-approach because we need to know if the element is the last
-        next = iterator.next();
-        last = next.done;
-        // template factory logic based on the previous collected value
-        var vnode = factory(value, i, i === 0, last);
-        if (isArray(vnode)) {
-            ArrayPush.apply(list, vnode);
-        }
-        else {
-            ArrayPush.call(list, vnode);
-        }
-        assert.block(function devModeCheck() {
-            var vnodes = isArray(vnode) ? vnode : [vnode];
-            vnodes.forEach(function (vnode) {
-                if (vnode && isObject(vnode) && vnode.sel && vnode.Ctor && isUndefined(vnode.key)) {
-                    // TODO - it'd be nice to log the owner component rather than the iteration children
-                    assert.logWarning("Missing \"key\" attribute in iteration with child \"" + toString$1(vnode.Ctor.name) + "\", index " + i + ". Instead set a unique \"key\" attribute value on all iteration children so internal state can be preserved during rehydration.");
-                }
-            });
-        });
-        // preparing next value
-        i += 1;
-        value = next.value;
-    };
-    while (last === false) {
-        _loop_1();
-    }
-    return list;
-}
-/**
- * [f]lattening
- */
-function f(items) {
-    assert.isTrue(isArray(items), 'flattening api can only work with arrays.');
-    var len = items.length;
-    var flattened = [];
-    for (var i_2 = 0; i_2 < len; i_2 += 1) {
-        var item = items[i_2];
-        if (isArray(item)) {
-            ArrayPush.apply(flattened, item);
-        }
-        else {
-            ArrayPush.call(flattened, item);
-        }
-    }
-    return flattened;
-}
-// [t]ext node
-function t(value) {
-    return v(undefined, undefined, undefined, value);
-}
-// [d]ynamic value to produce a text vnode
-function d(value) {
-    if (value === undefined || value === null) {
-        return null;
-    }
-    return v(undefined, undefined, undefined, value);
-}
-// [b]ind function
-function b(fn) {
-    assert.vm(vmBeingRendered);
-    function handler(event) {
-        // TODO: only if the event is `composed` it can be dispatched
-        invokeComponentCallback(handler.vm, handler.fn, handler.vm.component, [event]);
-    }
-    handler.vm = vmBeingRendered;
-    handler.fn = fn;
-    return handler;
-}
-
-
-
-var api = Object.freeze({
-	v: v,
-	h: h,
-	c: c,
-	i: i,
-	f: f,
-	t: t,
-	d: d,
-	b: b
-});
-
-var EmptySlots = create(null);
-function getSlotsetValue(slotset, slotName) {
-    assert.isTrue(isObject(slotset), "Invalid slotset value " + toString$1(slotset));
-    // TODO: mark slotName as reactive
-    return slotset && slotset[slotName];
-}
-var slotsetProxyHandler = {
-    get: function (slotset, key) { return getSlotsetValue(slotset, key); },
-    set: function () {
-        assert.logError("$slotset object cannot be mutated from template.");
-        return false;
-    },
-    deleteProperty: function () {
-        assert.logError("$slotset object cannot be mutated from template.");
-        return false;
-    },
-    apply: function () {
-        assert.fail("invalid call invocation from slotset");
-    },
-    construct: function () {
-        assert.fail("invalid construction invocation from slotset");
-    },
-};
-function validateSlots(vm, html) {
-    var _a = vm.cmpSlots, cmpSlots = _a === void 0 ? EmptySlots : _a;
-    var _b = html.slots, slots = _b === void 0 ? [] : _b;
-    for (var slotName in cmpSlots) {
-        if (ArrayIndexOf.call(slots, slotName) === -1) {
-            // TODO: this should never really happen because the compiler should always validate
-            console.warn("Ignoring unknown provided slot name \"" + slotName + "\" in " + vm + ". This is probably a typo on the slot attribute.");
-        }
-    }
-}
-function validateFields(vm, html) {
-    var component = vm.component;
-    // validating identifiers used by template that should be provided by the component
-    var _a = html.ids, ids = _a === void 0 ? [] : _a;
-    ids.forEach(function (propName) {
-        if (!(propName in component)) {
-            console.warn("The template rendered by " + vm + " references `this." + propName + "`, which is not declared. This is likely a typo in the template.");
-        }
-        else if (hasOwnProperty.call(component, propName)) {
-            assert.fail(component + "'s template is accessing `this." + toString$1(propName) + "` directly, which is considered a private field. Instead access it via a getter or make it reactive by moving it to `this.state." + toString$1(propName) + "`.");
-        }
-    });
-}
-function validateTemplate(vm, html) {
-    validateSlots(vm, html);
-    validateFields(vm, html);
-}
-function evaluateTemplate(vm, html) {
-    assert.vm(vm);
-    assert.isTrue(isFunction(html), "evaluateTemplate() second argument must be a function instead of " + html);
-    // TODO: add identity to the html functions
-    var component = vm.component, context = vm.context, _a = vm.cmpSlots, cmpSlots = _a === void 0 ? EmptySlots : _a, cmpTemplate = vm.cmpTemplate;
-    // reset the cache momizer for template when needed
-    if (html !== cmpTemplate) {
-        context.tplCache = create(null);
-        vm.cmpTemplate = html;
-        assert.block(function devModeCheck() {
-            validateTemplate(vm, html);
-        });
-    }
-    assert.isTrue(isObject(context.tplCache), "vm.context.tplCache must be an object associated to " + cmpTemplate + ".");
-    var _b = Proxy.revocable(cmpSlots, slotsetProxyHandler), slotset = _b.proxy, slotsetRevoke = _b.revoke;
-    var vnodes = html.call(undefined, api, component, slotset, context.tplCache);
-    assert.invariant(isArray(vnodes), "Compiler should produce html functions that always return an array.");
-    slotsetRevoke();
-    return vnodes;
-}
-
-var isRendering = false;
-var vmBeingRendered = null;
-function invokeComponentCallback(vm, fn, fnCtx, args) {
-    var context = vm.context;
-    var ctx = currentContext;
-    establishContext(context);
-    var result, error;
-    try {
-        // TODO: membrane proxy for all args that are objects
-        result = fn.apply(fnCtx, args);
-    }
-    catch (e) {
-        error = e;
-    }
-    establishContext(ctx);
-    if (error) {
-        error.wcStack = getComponentStack(vm);
-        throw error; // rethrowing the original error after restoring the context
-    }
-    return result;
-}
-function invokeComponentMethod(vm, methodName, args) {
-    var component = vm.component;
-    return invokeComponentCallback(vm, component[methodName], component, args);
-}
-function invokeComponentConstructor(vm, Ctor) {
-    var context = vm.context;
-    var ctx = currentContext;
-    establishContext(context);
-    var component, error;
-    try {
-        component = new Ctor();
-    }
-    catch (e) {
-        error = e;
-    }
-    establishContext(ctx);
-    if (error) {
-        error.wcStack = getComponentStack(vm);
-        throw error; // rethrowing the original error after restoring the context
-    }
-    return component;
-}
-function invokeComponentRenderMethod(vm) {
-    var component = vm.component, context = vm.context;
-    var ctx = currentContext;
-    establishContext(context);
-    var isRenderingInception = isRendering;
-    var vmBeingRenderedInception = vmBeingRendered;
-    isRendering = true;
-    vmBeingRendered = vm;
-    var result, error;
-    try {
-        var html = component.render();
-        if (isFunction(html)) {
-            result = evaluateTemplate(vm, html);
-        }
-        else if (!isUndefined(html)) {
-            assert.fail("The template rendered by " + vm + " must return an imported template tag (e.g.: `import html from \"./mytemplate.html\"`) or undefined, instead, it has returned " + html + ".");
-        }
-    }
-    catch (e) {
-        error = e;
-    }
-    isRendering = isRenderingInception;
-    vmBeingRendered = vmBeingRenderedInception;
-    establishContext(ctx);
-    if (error) {
-        error.wcStack = getComponentStack(vm);
-        throw error; // rethrowing the original error after restoring the context
-    }
-    return result || [];
-}
-function invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue) {
-    var component = vm.component, context = vm.context;
-    var attributeChangedCallback = component.attributeChangedCallback;
-    if (isUndefined(attributeChangedCallback)) {
-        return;
-    }
-    var ctx = currentContext;
-    establishContext(context);
-    var error;
-    try {
-        component.attributeChangedCallback(attrName, toAttributeValue(oldValue), toAttributeValue(newValue));
-    }
-    catch (e) {
-        error = e;
-    }
-    establishContext(ctx);
-    if (error) {
-        error.wcStack = getComponentStack(vm);
-        throw error; // rethrowing the original error after restoring the context
-    }
-}
-function getComponentStack(vm) {
-    var wcStack = [];
-    var elm = vm.vnode.elm;
-    do {
-        var vm_1 = elm[ViewModelReflection];
-        if (!isUndefined(vm_1)) {
-            wcStack.push(vm_1.component.toString());
-        }
-        elm = elm.parentElement;
-    } while (elm);
-    return wcStack.reverse().join('\n\t');
-}
-
-var hooks = ['wiring', 'rehydrated', 'connected', 'disconnected', 'piercing'];
+var hooks$1 = ['wiring', 'rendered', 'connected', 'disconnected', 'piercing'];
 /* eslint-enable */
 var Services = create(null);
 function register(service) {
     assert.isTrue(isObject(service), "Invalid service declaration, " + service + ": service must be an object");
-    for (var i = 0; i < hooks.length; ++i) {
-        var hookName = hooks[i];
+    for (var i = 0; i < hooks$1.length; ++i) {
+        var hookName = hooks$1[i];
         if (hookName in service) {
             var l = Services[hookName];
             if (isUndefined(l)) {
@@ -811,6 +455,207 @@ function invokeServiceHook(vm, cbs) {
     var component = vm.component, data = vm.vnode.data, def = vm.def, context = vm.context;
     for (var i = 0, len = cbs.length; i < len; ++i) {
         cbs[i].call(undefined, component, data, def, context);
+    }
+}
+
+var idx = 0;
+var uid = 0;
+var OwnerKey = Symbol('key');
+function addInsertionIndex(vm) {
+    assert.vm(vm);
+    assert.invariant(vm.idx === 0, vm + " is already locked to a previously generated idx.");
+    vm.idx = ++idx;
+    var connected = Services.connected;
+    if (connected) {
+        invokeServiceHook(vm, connected);
+    }
+    var connectedCallback = vm.component.connectedCallback;
+    if (connectedCallback && connectedCallback !== noop) {
+        invokeComponentMethod(vm, 'connectedCallback');
+    }
+}
+function removeInsertionIndex(vm) {
+    assert.vm(vm);
+    assert.invariant(vm.idx > 0, vm + " is not locked to a previously generated idx.");
+    vm.idx = 0;
+    var disconnected = Services.disconnected;
+    if (disconnected) {
+        invokeServiceHook(vm, disconnected);
+    }
+    var disconnectedCallback = vm.component.disconnectedCallback;
+    if (disconnectedCallback && disconnectedCallback !== noop) {
+        invokeComponentMethod(vm, 'disconnectedCallback');
+    }
+}
+function createVM(vnode) {
+    assert.vnode(vnode);
+    var elm = vnode.elm, Ctor = vnode.Ctor;
+    assert.invariant(elm instanceof HTMLElement, "VM creation requires a DOM element to be associated to vnode " + vnode + ".");
+    var def = getComponentDef(Ctor);
+    console.log("[object:vm " + def.name + "] is being initialized.");
+    uid += 1;
+    var vm = {
+        uid: uid,
+        idx: 0,
+        isScheduled: false,
+        isDirty: true,
+        def: def,
+        context: {},
+        cmpProps: {},
+        cmpTrack: {},
+        cmpState: undefined,
+        cmpSlots: undefined,
+        cmpEvents: undefined,
+        cmpListener: undefined,
+        cmpClasses: undefined,
+        cmpTemplate: undefined,
+        cmpRoot: undefined,
+        classListObj: undefined,
+        component: undefined,
+        vnode: vnode,
+        shadowVNode: createShadowRootVNode(elm, []),
+        // used to track down all object-key pairs that makes this vm reactive
+        deps: [],
+    };
+    assert.block(function devModeCheck() {
+        vm.toString = function () {
+            return "[object:vm " + def.name + " (" + vm.idx + ")]";
+        };
+    });
+    vnode.vm = vm;
+    // linking elm with VM before creating the instance
+    elm[ViewModelReflection] = vm;
+    defineProperties(elm, def.descriptors);
+    createComponent(vm, Ctor);
+    linkComponent(vm);
+    assert.block(function devModeCheck() {
+        var attributeChangedCallback = vm.component.attributeChangedCallback, observedAttrs = vm.def.observedAttrs;
+        if (observedAttrs.length && isUndefined(attributeChangedCallback)) {
+            console.warn(vm + " has static observedAttributes set to [\"" + keys(observedAttrs).join('", "') + "\"] but it is missing the attributeChangedCallback() method to watch for changes on those attributes. Double check for typos on the name of the callback.");
+        }
+    });
+    return vm;
+}
+function relinkVM(vm, vnode) {
+    assert.vm(vm);
+    assert.vnode(vnode);
+    assert.isTrue(vnode.elm instanceof HTMLElement, "Only DOM elements can be linked to their corresponding component.");
+    assert.invariant(vm.component, "vm.component is required to be defined before " + vm + " gets linked to " + vnode + ".");
+    vnode.vm = vm;
+    vm.vnode = vnode;
+}
+function rehydrate(vm) {
+    assert.vm(vm);
+    if (vm.idx && vm.isDirty) {
+        var vnode = vm.vnode;
+        assert.isTrue(vnode.elm instanceof HTMLElement, "rehydration can only happen after " + vm + " was patched the first time.");
+        var children = renderComponent(vm);
+        vm.isScheduled = false;
+        patchShadowRoot(vm, children);
+        var rendered = Services.rendered;
+        if (rendered) {
+            invokeServiceHook(vm, rendered);
+        }
+        var renderedCallback = vm.component.renderedCallback;
+        if (renderedCallback && renderedCallback !== noop) {
+            invokeComponentMethod(vm, 'renderedCallback');
+        }
+    }
+}
+var rehydrateQueue = [];
+function flushRehydrationQueue() {
+    assert.invariant(rehydrateQueue.length, "If rehydrateQueue was scheduled, it is because there must be at least one VM on this pending queue instead of " + rehydrateQueue + ".");
+    var vms = rehydrateQueue.sort(function (a, b) { return a.idx > b.idx; });
+    rehydrateQueue = []; // reset to a new queue
+    for (var i = 0, len = vms.length; i < len; i += 1) {
+        rehydrate(vms[i]);
+    }
+}
+function scheduleRehydration(vm) {
+    assert.vm(vm);
+    if (!vm.isScheduled) {
+        vm.isScheduled = true;
+        if (rehydrateQueue.length === 0) {
+            addCallbackToNextTick(flushRehydrationQueue);
+        }
+        ArrayPush.call(rehydrateQueue, vm);
+    }
+}
+function isNodeOwnedByVM(vm, node) {
+    assert.vm(vm);
+    assert.invariant(node instanceof Node, "isNodeOwnedByVM() should be called with a node as the second argument instead of " + node);
+    assert.childNode(vm.vnode.elm, node, "isNodeOwnedByVM() should never be called with a node that is not a child node of " + vm);
+    // @ts-ignore
+    return node[OwnerKey] === vm.uid;
+}
+function wasNodePassedIntoVM(vm, node) {
+    assert.vm(vm);
+    assert.invariant(node instanceof Node, "isNodePassedToVM() should be called with a node as the second argument instead of " + node);
+    assert.childNode(vm.vnode.elm, node, "isNodePassedToVM() should never be called with a node that is not a child node of " + vm);
+    var ownerUid = vm.vnode.uid;
+    // TODO: we need to walk the parent path here as well, in case they passed it via slots multiple times
+    // @ts-ignore
+    return node[OwnerKey] === ownerUid;
+}
+function createShadowRootVNode(elm, children) {
+    var sel = elm.tagName.toLocaleLowerCase();
+    var vnode = {
+        sel: sel,
+        data: EmptyObject,
+        children: children,
+        elm: elm,
+        key: undefined,
+        text: undefined,
+    };
+    return vnode;
+}
+function patchShadowRoot(vm, children) {
+    assert.vm(vm);
+    var oldShadowVNode = vm.shadowVNode;
+    var shadowVNode = createShadowRootVNode(vm.vnode.elm, children);
+    vm.shadowVNode = patch(oldShadowVNode, shadowVNode);
+}
+
+var TargetToReactiveRecordMap = new WeakMap();
+function notifyListeners(target, key) {
+    var reactiveRecord = TargetToReactiveRecordMap.get(target);
+    if (reactiveRecord) {
+        var value = reactiveRecord[key];
+        if (value) {
+            var len = value.length;
+            for (var i = 0; i < len; i += 1) {
+                var vm = value[i];
+                assert.vm(vm);
+                console.log("Marking " + vm + " as dirty: property \"" + toString$1(key) + "\" of " + toString$1(target) + " was set to a new value.");
+                if (!vm.isDirty) {
+                    markComponentAsDirty(vm);
+                    console.log("Scheduling " + vm + " for rehydration due to mutation.");
+                    scheduleRehydration(vm);
+                }
+            }
+        }
+    }
+}
+function subscribeToSetHook(vm, target, key) {
+    assert.vm(vm);
+    var reactiveRecord = TargetToReactiveRecordMap.get(target);
+    if (isUndefined(reactiveRecord)) {
+        var newRecord = create(null);
+        reactiveRecord = newRecord;
+        TargetToReactiveRecordMap.set(target, newRecord);
+    }
+    var value = reactiveRecord[key];
+    if (isUndefined(value)) {
+        value = [];
+        reactiveRecord[key] = value;
+    }
+    else if (value[0] === vm) {
+        return; // perf optimization considering that most subscriptions will come from the same vm
+    }
+    if (ArrayIndexOf.call(value, vm) === -1) {
+        ArrayPush.call(value, vm);
+        // we keep track of the sets that vm is listening from to be able to do some clean up later on
+        ArrayPush.call(vm.deps, value);
     }
 }
 
@@ -886,283 +731,75 @@ var unwrap = getKey ?
     function (replicaOrAny) { return (replicaOrAny && getKey(replicaOrAny, TargetSlot)) || replicaOrAny; }
     : function (replicaOrAny) { return (replicaOrAny && replicaOrAny[TargetSlot]) || replicaOrAny; };
 
+var create$1 = Object.create;
+var getPrototypeOf$1 = Object.getPrototypeOf;
+var getOwnPropertyNames$1 = Object.getOwnPropertyNames;
+var getOwnPropertySymbols$1 = Object.getOwnPropertySymbols;
+var isArray$1 = Array.isArray;
 /* eslint-enable */
-function piercingHook(membrane, target, key, value) {
-    var vm = membrane.handler.vm;
-    assert.vm(vm);
-    var piercing = Services.piercing;
-    if (piercing) {
-        var component = vm.component, data = vm.vnode.data, def = vm.def, context = vm.context;
-        var result_1 = value;
-        var next_1 = true;
-        var callback = function (newValue) {
-            next_1 = false;
-            result_1 = newValue;
-        };
-        for (var i = 0, len = piercing.length; next_1 && i < len; ++i) {
-            piercing[i].call(undefined, component, data, def, context, target, key, value, callback);
-        }
-        return result_1 === value ? getReplica(membrane, result_1) : result_1;
-    }
+function getTarget(item) {
+    return item && item[TargetSlot];
 }
-var PiercingMembraneHandler = /** @class */ (function () {
-    function PiercingMembraneHandler(vm) {
-        assert.vm(vm);
-        this.vm = vm;
-    }
-    PiercingMembraneHandler.prototype.get = function (membrane, target, key) {
-        if (key === OwnerKey) {
-            return undefined;
-        }
-        var value = target[key];
-        return piercingHook(membrane, target, key, value);
-    };
-    PiercingMembraneHandler.prototype.set = function (membrane, target, key, newValue) {
-        target[key] = newValue;
-        return true;
-    };
-    PiercingMembraneHandler.prototype.deleteProperty = function (membrane, target, key) {
-        delete target[key];
-        return true;
-    };
-    PiercingMembraneHandler.prototype.apply = function (membrane, targetFn, thisArg, argumentsList) {
-        return getReplica(membrane, targetFn.apply(thisArg, argumentsList));
-    };
-    PiercingMembraneHandler.prototype.construct = function (membrane, targetFn, argumentsList, newTarget) {
-        assert.isTrue(newTarget, "construct handler expects a 3rd argument with a newly created object that will be ignored in favor of the wrapped constructor.");
-        return getReplica(membrane, new (targetFn.bind.apply(targetFn, [void 0].concat(argumentsList)))());
-    };
-    return PiercingMembraneHandler;
-}());
-function pierce(vm, value) {
-    assert.vm(vm);
-    var membrane = vm.membrane;
-    if (!membrane) {
-        var handler = new PiercingMembraneHandler(vm);
-        membrane = new Membrane(handler);
-        vm.membrane = membrane;
-    }
-    return getReplica(membrane, value);
-}
-
-/*eslint-enable*/
-var vmBeingConstructed = null;
-function isBeingConstructed(vm) {
-    assert.vm(vm);
-    return vmBeingConstructed === vm;
-}
-function createComponent(vm, Ctor) {
-    assert.vm(vm);
-    // create the component instance
-    var vmBeingConstructedInception = vmBeingConstructed;
-    vmBeingConstructed = vm;
-    var component = invokeComponentConstructor(vm, Ctor);
-    vmBeingConstructed = vmBeingConstructedInception;
-    assert.isTrue(vm.component === component, "Invalid construction for " + vm + ", maybe you are missing the call to super() on classes extending Element.");
-}
-function linkComponent(vm) {
-    assert.vm(vm);
-    // wiring service
-    var wire = vm.def.wire;
-    if (wire) {
-        var wiring = Services.wiring;
-        if (wiring) {
-            invokeServiceHook(vm, wiring);
-        }
-    }
-}
-function clearListeners(vm) {
-    assert.vm(vm);
-    var deps = vm.deps;
-    var len = deps.length;
-    if (len) {
-        for (var i = 0; i < len; i += 1) {
-            var set = deps[i];
-            var pos = ArrayIndexOf.call(deps[i], vm);
-            assert.invariant(pos > -1, "when clearing up deps, the vm must be part of the collection.");
-            ArraySplice.call(set, pos, 1);
-        }
-        deps.length = 0;
-    }
-}
-function createComponentListener() {
-    return function handler(event) {
-        dispatchComponentEvent(handler.vm, event);
-    };
-}
-function addComponentEventListener(vm, eventName, newHandler) {
-    assert.vm(vm);
-    assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of " + vm + " by adding a new event listener for \"" + eventName + "\".");
-    var cmpEvents = vm.cmpEvents, cmpListener = vm.cmpListener, vmIdx = vm.idx;
-    if (isUndefined(cmpEvents)) {
-        // this piece of code must be in sync with modules/component-events
-        vm.cmpEvents = cmpEvents = create(null);
-        vm.cmpListener = cmpListener = createComponentListener();
-        cmpListener.vm = vm;
-    }
-    if (isUndefined(cmpEvents[eventName])) {
-        cmpEvents[eventName] = [];
-        // this is not only an optimization, it is also needed to avoid adding the same
-        // listener twice when the initial diffing algo kicks in without an old vm to track
-        // what was already added to the DOM.
-        if (!vm.isDirty || vmIdx > 0) {
-            // if the element is already in the DOM and rendered, we intentionally make a sync mutation
-            // here and also keep track of the mutation for a possible rehydration later on without having
-            // to rehydrate just now.
-            var elm = vm.vnode.elm;
-            elm.addEventListener(eventName, cmpListener, false);
-        }
-    }
-    assert.block(function devModeCheck() {
-        if (cmpEvents[eventName] && ArrayIndexOf.call(cmpEvents[eventName], newHandler) !== -1) {
-            assert.logWarning(vm + " has duplicate listeners for event \"" + eventName + "\". Instead add the event listener in the connectedCallback() hook.");
-        }
-    });
-    ArrayPush.call(cmpEvents[eventName], newHandler);
-}
-function removeComponentEventListener(vm, eventName, oldHandler) {
-    assert.vm(vm);
-    assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of " + vm + " by removing an event listener for \"" + eventName + "\".");
-    var cmpEvents = vm.cmpEvents;
-    if (cmpEvents) {
-        var handlers = cmpEvents[eventName];
-        var pos = handlers && ArrayIndexOf.call(handlers, oldHandler);
-        if (handlers && pos > -1) {
-            ArraySplice.call(cmpEvents[eventName], pos, 1);
-            return;
-        }
-    }
-    assert.block(function devModeCheck() {
-        assert.logWarning("Did not find event listener " + oldHandler + " for event \"" + eventName + "\" on " + vm + ". Instead only remove an event listener once.");
-    });
-}
-function dispatchComponentEvent(vm, event) {
-    assert.vm(vm);
-    assert.invariant(event instanceof Event, "dispatchComponentEvent() must receive an event instead of " + event);
-    var cmpEvents = vm.cmpEvents, component = vm.component;
-    var type = event.type;
-    assert.invariant(cmpEvents && cmpEvents[type] && cmpEvents[type].length, "dispatchComponentEvent() should only be invoked if there is at least one listener in queue for " + type + " on " + vm + ".");
-    var handlers = cmpEvents[type];
-    var uninterrupted = true;
-    var stopImmediatePropagation = event.stopImmediatePropagation;
-    event.stopImmediatePropagation = function () {
-        uninterrupted = false;
-        stopImmediatePropagation.call(this);
-    };
-    var e = pierce(vm, event);
-    for (var i = 0, len = handlers.length; uninterrupted && i < len; i += 1) {
-        // TODO: only if the event is `composed` it can be dispatched
-        invokeComponentCallback(vm, handlers[i], component, [e]);
-    }
-    // restoring original methods
-    event.stopImmediatePropagation = stopImmediatePropagation;
-}
-function addComponentSlot(vm, slotName, newValue) {
-    assert.vm(vm);
-    assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of slot " + slotName + " in " + vm);
-    assert.isTrue(isArray(newValue) && newValue.length > 0, "Slots can only be set to a non-empty array, instead received " + toString$1(newValue) + " for slot " + slotName + " in " + vm + ".");
-    var cmpSlots = vm.cmpSlots;
-    var oldValue = cmpSlots && cmpSlots[slotName];
-    // TODO: hot-slots names are those slots used during the last rendering cycle, and only if
-    // one of those is changed, the vm should be marked as dirty.
-    // TODO: Issue #133
-    if (!isArray(newValue)) {
-        newValue = undefined;
-    }
-    if (oldValue !== newValue) {
-        if (isUndefined(cmpSlots)) {
-            vm.cmpSlots = cmpSlots = create(null);
-        }
-        cmpSlots[slotName] = newValue;
-        console.log("Marking " + vm + " as dirty: a new value for slot \"" + slotName + "\" was added.");
-        if (!vm.isDirty) {
-            markComponentAsDirty(vm);
-        }
-    }
-}
-function removeComponentSlot(vm, slotName) {
-    assert.vm(vm);
-    assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of slot " + slotName + " in " + vm);
-    // TODO: hot-slots names are those slots used during the last rendering cycle, and only if
-    // one of those is changed, the vm should be marked as dirty.
-    var cmpSlots = vm.cmpSlots;
-    if (cmpSlots && cmpSlots[slotName]) {
-        cmpSlots[slotName] = undefined; // delete will de-opt the cmpSlots, better to set it to undefined
-        console.log("Marking " + vm + " as dirty: the value of slot \"" + slotName + "\" was removed.");
-        if (!vm.isDirty) {
-            markComponentAsDirty(vm);
-        }
-    }
-}
-function renderComponent(vm) {
-    assert.vm(vm);
-    assert.invariant(vm.isDirty, vm + " is not dirty.");
-    console.log(vm + " is being updated.");
-    clearListeners(vm);
-    var vnodes = invokeComponentRenderMethod(vm);
-    vm.isDirty = false;
-    assert.invariant(isArray(vnodes), vm + ".render() should always return an array of vnodes instead of " + vnodes);
-    var rehydrated = Services.rehydrated;
-    if (rehydrated) {
-        addCallbackToNextTick(function () { return invokeServiceHook(vm, rehydrated); });
-    }
-    return vnodes;
-}
-function markComponentAsDirty(vm) {
-    assert.vm(vm);
-    assert.isFalse(vm.isDirty, "markComponentAsDirty() for " + vm + " should not be called when the componet is already dirty.");
-    assert.isFalse(isRendering, "markComponentAsDirty() for " + vm + " cannot be called during rendering of " + vmBeingRendered + ".");
-    vm.isDirty = true;
-}
-
-var TargetToReactiveRecordMap = new WeakMap();
-function notifyListeners(target, key) {
-    var reactiveRecord = TargetToReactiveRecordMap.get(target);
-    if (reactiveRecord) {
-        var value = reactiveRecord[key];
-        if (value) {
-            var len = value.length;
-            for (var i = 0; i < len; i += 1) {
-                var vm = value[i];
-                assert.vm(vm);
-                console.log("Marking " + vm + " as dirty: property \"" + toString$1(key) + "\" of " + toString$1(target) + " was set to a new value.");
-                if (!vm.isDirty) {
-                    markComponentAsDirty(vm);
-                    console.log("Scheduling " + vm + " for rehydration due to mutation.");
-                    scheduleRehydration(vm);
-                }
+function extract(objectOrArray) {
+    if (isArray$1(objectOrArray)) {
+        return objectOrArray.map(function (item) {
+            var original = getTarget(item);
+            if (original) {
+                return extract(original);
             }
+            return item;
+        });
+    }
+    var obj = create$1(getPrototypeOf$1(objectOrArray));
+    return getOwnPropertyNames$1(objectOrArray).concat(getOwnPropertySymbols$1(objectOrArray))
+        .reduce(function (seed, key) {
+        var item = objectOrArray[key];
+        var original = getTarget(item);
+        if (original) {
+            seed[key] = extract(original);
         }
-    }
+        else {
+            seed[key] = item;
+        }
+        return seed;
+    }, obj);
 }
-function subscribeToSetHook(vm, target, key) {
-    assert.vm(vm);
-    var reactiveRecord = TargetToReactiveRecordMap.get(target);
-    if (isUndefined(reactiveRecord)) {
-        var newRecord = create(null);
-        reactiveRecord = newRecord;
-        TargetToReactiveRecordMap.set(target, newRecord);
+var formatter = {
+    header: function (plainOrProxy) {
+        var originalTarget = plainOrProxy[TargetSlot];
+        if (!originalTarget) {
+            return null;
+        }
+        var obj = extract(plainOrProxy);
+        return ['object', { object: obj }];
+    },
+    hasBody: function () {
+        return false;
+    },
+    body: function () {
+        return null;
     }
-    var value = reactiveRecord[key];
-    if (isUndefined(value)) {
-        value = [];
-        reactiveRecord[key] = value;
-    }
-    else if (value[0] === vm) {
-        return; // perf optimization considering that most subscriptions will come from the same vm
-    }
-    if (ArrayIndexOf.call(value, vm) === -1) {
-        ArrayPush.call(value, vm);
-        // we keep track of the sets that vm is listening from to be able to do some clean up later on
-        ArrayPush.call(vm.deps, value);
-    }
+};
+function init$1() {
+    // Custom Formatter for Dev Tools
+    // To enable this, open Chrome Dev Tools
+    // Go to Settings,
+    // Under console, select "Enable custom formatters"
+    // For more information, https://docs.google.com/document/d/1FTascZXT9cxfetuPRT2eXPQKXui4nWFivUnS_335T3U/preview
+    var devWindow = window; // eslint-disable-line no-undef
+    var devtoolsFormatters = devWindow.devtoolsFormatters || [];
+    devtoolsFormatters.push(formatter);
+    devWindow.devtoolsFormatters = devtoolsFormatters; // eslint-disable-line no-undef
 }
 
+assert.block(function () {
+    init$1();
+});
 /*eslint-enable*/
 var ReactiveMap = new WeakMap();
 var ObjectDotPrototype = Object.prototype;
 function lockShadowTarget(shadowTarget, originalTarget) {
-    var targetKeys = getOwnPropertyNames(originalTarget);
+    var targetKeys = ArrayConcat.call(getOwnPropertyNames(originalTarget), getOwnPropertySymbols(originalTarget));
     targetKeys.forEach(function (key) {
         var descriptor = getOwnPropertyDescriptor(originalTarget, key);
         // We do not need to wrap the descriptor if not configurable
@@ -1214,7 +851,7 @@ var ReactiveProxyHandler = /** @class */ (function () {
             return originalTarget;
         }
         var value = originalTarget[key];
-        if (isRendering && vmBeingRendered) {
+        if (isRendering) {
             subscribeToSetHook(vmBeingRendered, originalTarget, key); // eslint-disable-line no-undef
         }
         var observable = isObservable(value);
@@ -1264,11 +901,15 @@ var ReactiveProxyHandler = /** @class */ (function () {
     };
     ReactiveProxyHandler.prototype.has = function (shadowTarget, key) {
         var originalTarget = this.originalTarget;
+        // make reactive
+        if (isRendering) {
+            subscribeToSetHook(vmBeingRendered, originalTarget, key); // eslint-disable-line no-undef
+        }
         return key in originalTarget;
     };
     ReactiveProxyHandler.prototype.ownKeys = function (shadowTarget) {
         var originalTarget = this.originalTarget;
-        return getOwnPropertyNames(originalTarget);
+        return ArrayConcat.call(getOwnPropertyNames(originalTarget), getOwnPropertySymbols(originalTarget));
     };
     ReactiveProxyHandler.prototype.isExtensible = function (shadowTarget) {
         var shadowIsExtensible = isExtensible(shadowTarget);
@@ -1291,11 +932,16 @@ var ReactiveProxyHandler = /** @class */ (function () {
     };
     ReactiveProxyHandler.prototype.getOwnPropertyDescriptor = function (shadowTarget, key) {
         var originalTarget = this.originalTarget;
+        // keys looked up via hasOwnProperty need to be reactive
+        if (isRendering) {
+            subscribeToSetHook(vmBeingRendered, originalTarget, key); // eslint-disable-line no-undef
+        }
         var desc = getOwnPropertyDescriptor(originalTarget, key);
         if (!desc) {
             return desc;
         }
-        if (!desc.configurable && !hasOwnProperty.call(shadowTarget, key)) {
+        var shadowDescriptor = getOwnPropertyDescriptor(shadowTarget, key);
+        if (!desc.configurable && !shadowDescriptor) {
             // If descriptor from original target is not configurable,
             // We must copy the wrapped descriptor over to the shadow target.
             // Otherwise, proxy will throw an invariant error.
@@ -1304,7 +950,7 @@ var ReactiveProxyHandler = /** @class */ (function () {
             desc = wrapDescriptor(desc);
             defineProperty(shadowTarget, key, desc);
         }
-        return desc;
+        return shadowDescriptor || desc;
     };
     ReactiveProxyHandler.prototype.preventExtensions = function (shadowTarget) {
         var originalTarget = this.originalTarget;
@@ -1315,11 +961,22 @@ var ReactiveProxyHandler = /** @class */ (function () {
     ReactiveProxyHandler.prototype.defineProperty = function (shadowTarget, key, descriptor) {
         var originalTarget = this.originalTarget;
         var configurable = descriptor.configurable;
-        var unwrappedDescriptor = unwrapDescriptor(descriptor);
-        if (configurable === false) {
-            defineProperty(shadowTarget, key, unwrappedDescriptor);
+        // We have to check for value in descriptor
+        // because Object.freeze(proxy) calls this method
+        // with only { configurable: false, writeable: false }
+        // Additionally, method will only be called with writeable:false
+        // if the descriptor has a value, as opposed to getter/setter
+        // So we can just check if writable is present and then see if
+        // value is present. This eliminates getter and setter descriptors
+        if ('writable' in descriptor && !('value' in descriptor)) {
+            var originalDescriptor = getOwnPropertyDescriptor(originalTarget, key);
+            descriptor.value = originalDescriptor.value;
         }
-        defineProperty(originalTarget, key, unwrappedDescriptor);
+        defineProperty(originalTarget, key, unwrapDescriptor(descriptor));
+        if (configurable === false) {
+            defineProperty(shadowTarget, key, wrapDescriptor(descriptor));
+        }
+        notifyListeners(originalTarget, key);
         return true;
     };
     return ReactiveProxyHandler;
@@ -1338,6 +995,10 @@ function getReactiveProxy(value) {
     return proxy;
 }
 
+// stub function to prevent misuse of the @track decorator
+function track() {
+    assert.fail("@track may only be used as a decorator.");
+}
 // TODO: how to allow symbols as property keys?
 function createTrackedPropertyDescriptor(proto, key, descriptor) {
     defineProperty(proto, key, {
@@ -1375,11 +1036,19 @@ function createTrackedPropertyDescriptor(proto, key, descriptor) {
     });
 }
 
+// stub function to prevent misuse of the @wire decorator
+function wire() {
+    assert.fail("@wire may only be used as a decorator.");
+}
 // TODO: how to allow symbols as property keys?
 function createWiredPropertyDescriptor(proto, key, descriptor) {
     createTrackedPropertyDescriptor(proto, key, descriptor);
 }
 
+// stub function to prevent misuse of the @api decorator
+function api$1() {
+    assert.fail("@api may only be used as a decorator.");
+}
 var vmBeingUpdated = null;
 function prepareForPropUpdate(vm) {
     assert.vm(vm);
@@ -1564,6 +1233,65 @@ ClassList.prototype = {
     }
 };
 
+/* eslint-enable */
+function piercingHook(membrane, target, key, value) {
+    var vm = membrane.handler.vm;
+    assert.vm(vm);
+    var piercing = Services.piercing;
+    if (piercing) {
+        var component = vm.component, data = vm.vnode.data, def = vm.def, context = vm.context;
+        var result_1 = value;
+        var next_1 = true;
+        var callback = function (newValue) {
+            next_1 = false;
+            result_1 = newValue;
+        };
+        for (var i = 0, len = piercing.length; next_1 && i < len; ++i) {
+            piercing[i].call(undefined, component, data, def, context, target, key, value, callback);
+        }
+        return result_1 === value ? getReplica(membrane, result_1) : result_1;
+    }
+}
+var PiercingMembraneHandler = /** @class */ (function () {
+    function PiercingMembraneHandler(vm) {
+        assert.vm(vm);
+        this.vm = vm;
+    }
+    PiercingMembraneHandler.prototype.get = function (membrane, target, key) {
+        if (key === OwnerKey) {
+            return undefined;
+        }
+        var value = target[key];
+        return piercingHook(membrane, target, key, value);
+    };
+    PiercingMembraneHandler.prototype.set = function (membrane, target, key, newValue) {
+        target[key] = newValue;
+        return true;
+    };
+    PiercingMembraneHandler.prototype.deleteProperty = function (membrane, target, key) {
+        delete target[key];
+        return true;
+    };
+    PiercingMembraneHandler.prototype.apply = function (membrane, targetFn, thisArg, argumentsList) {
+        return getReplica(membrane, targetFn.apply(thisArg, argumentsList));
+    };
+    PiercingMembraneHandler.prototype.construct = function (membrane, targetFn, argumentsList, newTarget) {
+        assert.isTrue(newTarget, "construct handler expects a 3rd argument with a newly created object that will be ignored in favor of the wrapped constructor.");
+        return getReplica(membrane, new (targetFn.bind.apply(targetFn, [void 0].concat(argumentsList)))());
+    };
+    return PiercingMembraneHandler;
+}());
+function pierce(vm, value) {
+    assert.vm(vm);
+    var membrane = vm.membrane;
+    if (!membrane) {
+        var handler = new PiercingMembraneHandler(vm);
+        membrane = new Membrane(handler);
+        vm.membrane = membrane;
+    }
+    return getReplica(membrane, value);
+}
+
 var _a$3 = Element.prototype;
 var querySelector = _a$3.querySelector;
 var querySelectorAll = _a$3.querySelectorAll;
@@ -1697,6 +1425,7 @@ function ComponentElement() {
     vmBeingConstructed.component = this;
     this[ViewModelReflection] = vmBeingConstructed;
 }
+/*eslint-disable*/
 ComponentElement.prototype = {
     // Raptor.Element APIs
     renderedCallback: noop,
@@ -1708,10 +1437,13 @@ ComponentElement.prototype = {
     dispatchEvent: function (event) {
         var _this = this;
         var elm = getLinkedElement(this);
+        var vm = this[ViewModelReflection];
         assert.block(function () {
-            var evtName = event.type;
-            var vm = _this[ViewModelReflection];
+            var evtName = event.type, composed = event.composed, bubbles = event.bubbles;
             assert.isFalse(isBeingConstructed(vm), "this.dispatchEvent() should not be called during the construction of the custom element for " + _this + " because no one is listening for the event \"" + evtName + "\" just yet.");
+            if (bubbles && !composed) {
+                assert.logWarning("Invalid event \"" + evtName + "\" dispatched in element " + _this + ". Events with 'bubbles: true' must also be 'composed: true'. Without 'composed: true', the dispatched event will not be observable outside of your component.");
+            }
             if (vm.idx === 0) {
                 assert.logWarning("Unreachable event \"" + evtName + "\" dispatched from disconnected element " + _this + ". Events can only reach the parent element after the element is connected (via connectedCallback) and before the element is disconnected(via disconnectedCallback).");
             }
@@ -1719,8 +1451,10 @@ ComponentElement.prototype = {
                 assert.logWarning("Invalid event type: '" + evtName + "' dispatched in element " + _this + ". Event name should only contain lowercase alphanumeric characters.");
             }
         });
-        // custom elements will rely on the DOM dispatchEvent mechanism
-        return elm.dispatchEvent(event);
+        // Pierce dispatchEvent so locker service has a chance to overwrite
+        pierce(vm, elm);
+        var dispatchEvent = piercingHook(vm.membrane, elm, 'dispatchEvent', elm.dispatchEvent);
+        return dispatchEvent.call(elm, event);
     },
     addEventListener: function (type, listener) {
         var vm = this[ViewModelReflection];
@@ -1746,13 +1480,6 @@ ComponentElement.prototype = {
     getAttribute: function (attrName) {
         var vm = this[ViewModelReflection];
         assert.vm(vm);
-        var attrs = vm.vnode.data.attrs;
-        if (!attrName) {
-            if (arguments.length === 0) {
-                throw new TypeError("Failed to execute `getAttribute` on " + vm + ": 1 argument is required, got 0.");
-            }
-            return null;
-        }
         // logging errors for experimentals and special attributes
         assert.block(function devModeCheck() {
             var propName = getPropNameFromAttrName(attrName);
@@ -1770,9 +1497,8 @@ ComponentElement.prototype = {
                 }
             }
         });
-        // normalizing attrs from compiler into HTML global attributes
-        var raw = attrs && attrName in attrs ? attrs[attrName] : null;
-        return toAttributeValue(raw);
+        var elm = getLinkedElement(this);
+        return elm.getAttribute.apply(elm, ArraySlice.call(arguments));
     },
     getBoundingClientRect: function () {
         var elm = getLinkedElement(this);
@@ -1852,24 +1578,6 @@ ComponentElement.prototype = {
             vm.cmpRoot = cmpRoot;
         }
         return cmpRoot;
-    },
-    get state() {
-        var vm = this[ViewModelReflection];
-        assert.vm(vm);
-        var cmpState = vm.cmpState;
-        if (isUndefined(cmpState)) {
-            cmpState = vm.cmpState = getReactiveProxy(create(null)); // lazy creation of the cmpState
-        }
-        return cmpState;
-    },
-    set state(newState) {
-        var vm = this[ViewModelReflection];
-        assert.vm(vm);
-        if (isArray(newState) || !isObservable(newState)) {
-            assert.fail(vm + " failed to set new state to " + newState + ". `this.state` can only be set to an observable object.");
-            return;
-        }
-        vm.cmpState = getReactiveProxy(newState); // lazy creation of the cmpState
     },
     toString: function () {
         var vm = this[ViewModelReflection];
@@ -1963,8 +1671,8 @@ function createComponentDef(Ctor) {
     var props = getPublicPropertiesHash(Ctor);
     var methods = getPublicMethodsHash(Ctor);
     var observedAttrs = getObservedAttributesHash(Ctor);
-    var wire = getWireHash(Ctor);
-    var track = getTrackHash(Ctor);
+    var wire$$1 = getWireHash(Ctor);
+    var track$$1 = getTrackHash(Ctor);
     var proto = Ctor.prototype;
     var _loop_1 = function (propName) {
         var propDef = props[propName];
@@ -1993,9 +1701,9 @@ function createComponentDef(Ctor) {
     for (var propName in props) {
         _loop_1(propName);
     }
-    if (wire) {
+    if (wire$$1) {
         var _loop_2 = function (propName) {
-            if (wire[propName].method) {
+            if (wire$$1[propName].method) {
                 return "continue";
             }
             var descriptor = getOwnPropertyDescriptor(proto, propName);
@@ -2009,11 +1717,11 @@ function createComponentDef(Ctor) {
             // initializing getters and setters for each public prop on the target prototype
             createWiredPropertyDescriptor(proto, propName, descriptor);
         };
-        for (var propName in wire) {
+        for (var propName in wire$$1) {
             _loop_2(propName);
         }
     }
-    if (track) {
+    if (track$$1) {
         var _loop_3 = function (propName) {
             var descriptor = getOwnPropertyDescriptor(proto, propName);
             // TODO: maybe these conditions should be always applied.
@@ -2026,7 +1734,7 @@ function createComponentDef(Ctor) {
             // initializing getters and setters for each public prop on the target prototype
             createTrackedPropertyDescriptor(proto, propName, descriptor);
         };
-        for (var propName in track) {
+        for (var propName in track$$1) {
             _loop_3(propName);
         }
     }
@@ -2035,13 +1743,13 @@ function createComponentDef(Ctor) {
         var superDef = getComponentDef(superProto);
         props = assign(create(null), superDef.props, props);
         methods = assign(create(null), superDef.methods, methods);
-        wire = (superDef.wire || wire) ? assign(create(null), superDef.wire, wire) : undefined;
+        wire$$1 = (superDef.wire || wire$$1) ? assign(create(null), superDef.wire, wire$$1) : undefined;
     }
     var descriptors = createDescriptorMap(props, methods);
     var def = {
         name: name,
-        wire: wire,
-        track: track,
+        wire: wire$$1,
+        track: track$$1,
         props: props,
         methods: methods,
         observedAttrs: observedAttrs,
@@ -2049,7 +1757,7 @@ function createComponentDef(Ctor) {
     };
     assert.block(function devModeCheck() {
         freeze(Ctor.prototype);
-        freeze(wire);
+        freeze(wire$$1);
         freeze(props);
         freeze(methods);
         freeze(observedAttrs);
@@ -2094,28 +1802,28 @@ function createMethodCaller(key) {
         return vm.component[key].apply(vm.component, ArraySlice.call(arguments));
     };
 }
-var _a$1 = Element.prototype;
-var getAttribute = _a$1.getAttribute;
-var setAttribute = _a$1.setAttribute;
-var removeAttribute = _a$1.removeAttribute;
+var _a$2 = Element.prototype;
+var getAttribute = _a$2.getAttribute;
+var setAttribute = _a$2.setAttribute;
+var removeAttribute = _a$2.removeAttribute;
 function getAttributePatched(attrName) {
     var vm = this[ViewModelReflection];
     assert.vm(vm);
     assert.block(function devModeCheck() {
         var propsConfig = vm.def.props;
-        attrName = attrName.toLocaleLowerCase();
+        attrName = isString(attrName) ? attrName.toLocaleLowerCase() : null;
         var propName = getPropNameFromAttrName(attrName);
         if (propsConfig[propName]) {
             assert.logError("Invalid attribute \"" + attrName + "\" for " + vm + ". Instead access the public property with `element." + propName + ";`.");
         }
     });
-    return getAttribute.call(this, attrName);
+    return getAttribute.apply(this, ArraySlice.call(arguments));
 }
 function setAttributePatched(attrName, newValue) {
     var vm = this[ViewModelReflection];
     assert.vm(vm);
     var _a = vm.def, propsConfig = _a.props, observedAttrs = _a.observedAttrs;
-    attrName = attrName.toLocaleLowerCase();
+    attrName = isString(attrName) ? attrName.toLocaleLowerCase() : null;
     assert.block(function devModeCheck() {
         if (!vm.vnode.isRoot) {
             assert.logError("Invalid operation on Element " + vm + ". Elements created via a template should not be mutated using DOM APIs. Instead of attempting to update this element directly to change the value of attribute \"" + attrName + "\", you can update the state of the component, and let the engine to rehydrate the element accordingly.");
@@ -2128,7 +1836,7 @@ function setAttributePatched(attrName, newValue) {
     var oldValue = getAttribute.call(this, attrName);
     setAttribute.call(this, attrName, newValue);
     newValue = getAttribute.call(this, attrName);
-    if (attrName in observedAttrs && oldValue !== newValue) {
+    if (!isNull(attrName) && attrName in observedAttrs && oldValue !== newValue) {
         invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
     }
 }
@@ -2136,7 +1844,7 @@ function removeAttributePatched(attrName) {
     var vm = this[ViewModelReflection];
     assert.vm(vm);
     var _a = vm.def, propsConfig = _a.props, observedAttrs = _a.observedAttrs;
-    attrName = attrName.toLocaleLowerCase();
+    attrName = isString(attrName) ? attrName.toLocaleLowerCase() : null;
     assert.block(function devModeCheck() {
         if (!vm.vnode.isRoot) {
             assert.logError("Invalid operation on Element " + vm + ". Elements created via a template should not be mutated using DOM APIs. Instead of attempting to remove attribute \"" + attrName + "\" from this element, you can update the state of the component, and let the engine to rehydrate the element accordingly.");
@@ -2149,7 +1857,7 @@ function removeAttributePatched(attrName) {
     var oldValue = getAttribute.call(this, attrName);
     removeAttribute.call(this, attrName);
     var newValue = getAttribute.call(this, attrName);
-    if (attrName in observedAttrs && oldValue !== newValue) {
+    if (!isNull(attrName) && attrName in observedAttrs && oldValue !== newValue) {
         invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
     }
 }
@@ -2186,24 +1894,24 @@ function createDescriptorMap(publicProps, publicMethodsConfig) {
     return descriptors;
 }
 function getTrackHash(target) {
-    var track = target.track;
-    if (!track || !getOwnPropertyNames(track).length) {
+    var track$$1 = target.track;
+    if (!track$$1 || !getOwnPropertyNames(track$$1).length) {
         return;
     }
     assert.block(function devModeCheck() {
         // TODO: check that anything in `track` is correctly defined in the prototype
     });
-    return assign(create(null), track);
+    return assign(create(null), track$$1);
 }
 function getWireHash(target) {
-    var wire = target.wire;
-    if (!wire || !getOwnPropertyNames(wire).length) {
+    var wire$$1 = target.wire;
+    if (!wire$$1 || !getOwnPropertyNames(wire$$1).length) {
         return;
     }
     assert.block(function devModeCheck() {
         // TODO: check that anything in `wire` is correctly defined in the prototype
     });
-    return assign(create(null), wire);
+    return assign(create(null), wire$$1);
 }
 function getPublicPropertiesHash(target) {
     var props = target.publicProps;
@@ -2291,428 +1999,543 @@ function getComponentDef(Ctor) {
     return def;
 }
 
-var idx = 0;
-var uid = 0;
-var OwnerKey = Symbol('key');
-function addInsertionIndex(vm) {
-    assert.vm(vm);
-    assert.invariant(vm.idx === 0, vm + " is already locked to a previously generated idx.");
-    vm.idx = ++idx;
-    var connectedCallback = vm.component.connectedCallback;
-    if (connectedCallback && connectedCallback !== noop) {
-        invokeComponentMethod(vm, 'connectedCallback');
+var isRendering = false;
+var vmBeingRendered = null;
+function invokeComponentCallback(vm, fn, fnCtx, args) {
+    var context = vm.context;
+    var ctx = currentContext;
+    establishContext(context);
+    var result, error;
+    try {
+        // TODO: membrane proxy for all args that are objects
+        result = fn.apply(fnCtx, args);
     }
-    var connected = Services.connected;
-    if (connected) {
-        addCallbackToNextTick(function () { return invokeServiceHook(vm, connected); });
+    catch (e) {
+        error = e;
+    }
+    establishContext(ctx);
+    if (error) {
+        error.wcStack = getComponentStack(vm);
+        throw error; // rethrowing the original error after restoring the context
+    }
+    return result;
+}
+function invokeComponentMethod(vm, methodName, args) {
+    var component = vm.component;
+    return invokeComponentCallback(vm, component[methodName], component, args);
+}
+function invokeComponentConstructor(vm, Ctor) {
+    var context = vm.context;
+    var ctx = currentContext;
+    establishContext(context);
+    var component, error;
+    try {
+        component = new Ctor();
+    }
+    catch (e) {
+        error = e;
+    }
+    establishContext(ctx);
+    if (error) {
+        error.wcStack = getComponentStack(vm);
+        throw error; // rethrowing the original error after restoring the context
+    }
+    return component;
+}
+function invokeComponentRenderMethod(vm) {
+    var component = vm.component, context = vm.context;
+    var ctx = currentContext;
+    establishContext(context);
+    var isRenderingInception = isRendering;
+    var vmBeingRenderedInception = vmBeingRendered;
+    isRendering = true;
+    vmBeingRendered = vm;
+    var result, error;
+    try {
+        var html = component.render();
+        if (isFunction(html)) {
+            result = evaluateTemplate(vm, html);
+        }
+        else if (!isUndefined(html)) {
+            assert.fail("The template rendered by " + vm + " must return an imported template tag (e.g.: `import html from \"./mytemplate.html\"`) or undefined, instead, it has returned " + html + ".");
+        }
+    }
+    catch (e) {
+        error = e;
+    }
+    isRendering = isRenderingInception;
+    vmBeingRendered = vmBeingRenderedInception;
+    establishContext(ctx);
+    if (error) {
+        error.wcStack = getComponentStack(vm);
+        throw error; // rethrowing the original error after restoring the context
+    }
+    return result || [];
+}
+function invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue) {
+    var component = vm.component, context = vm.context;
+    var attributeChangedCallback = component.attributeChangedCallback;
+    if (isUndefined(attributeChangedCallback)) {
+        return;
+    }
+    var ctx = currentContext;
+    establishContext(context);
+    var error;
+    try {
+        component.attributeChangedCallback(attrName, oldValue, newValue);
+    }
+    catch (e) {
+        error = e;
+    }
+    establishContext(ctx);
+    if (error) {
+        error.wcStack = getComponentStack(vm);
+        throw error; // rethrowing the original error after restoring the context
     }
 }
-function removeInsertionIndex(vm) {
-    assert.vm(vm);
-    assert.invariant(vm.idx > 0, vm + " is not locked to a previously generated idx.");
-    vm.idx = 0;
-    var disconnectedCallback = vm.component.disconnectedCallback;
-    if (disconnectedCallback && disconnectedCallback !== noop) {
-        invokeComponentMethod(vm, 'disconnectedCallback');
-    }
-    var disconnected = Services.disconnected;
-    if (disconnected) {
-        addCallbackToNextTick(function () { return invokeServiceHook(vm, disconnected); });
-    }
+function getComponentStack(vm) {
+    var wcStack = [];
+    var elm = vm.vnode.elm;
+    do {
+        var vm_1 = elm[ViewModelReflection];
+        if (!isUndefined(vm_1)) {
+            wcStack.push(vm_1.component.toString());
+        }
+        elm = elm.parentElement;
+    } while (elm);
+    return wcStack.reverse().join('\n\t');
 }
-function createVM(vnode) {
-    assert.vnode(vnode);
-    var elm = vnode.elm, Ctor = vnode.Ctor;
-    assert.invariant(elm instanceof HTMLElement, "VM creation requires a DOM element to be associated to vnode " + vnode + ".");
-    var def = getComponentDef(Ctor);
-    console.log("[object:vm " + def.name + "] is being initialized.");
-    uid += 1;
-    var vm = {
-        uid: uid,
-        idx: 0,
-        isScheduled: false,
-        isDirty: true,
-        def: def,
-        context: {},
-        cmpProps: {},
-        cmpTrack: {},
-        cmpState: undefined,
-        cmpSlots: undefined,
-        cmpEvents: undefined,
-        cmpListener: undefined,
-        cmpClasses: undefined,
-        cmpTemplate: undefined,
-        cmpRoot: undefined,
-        classListObj: undefined,
-        component: undefined,
-        vnode: vnode,
-        shadowVNode: createShadowRootVNode(elm, []),
-        // used to track down all object-key pairs that makes this vm reactive
-        deps: [],
-    };
-    assert.block(function devModeCheck() {
-        vm.toString = function () {
-            return "[object:vm " + def.name + " (" + vm.idx + ")]";
-        };
-    });
-    vnode.vm = vm;
-    // linking elm with VM before creating the instance
-    elm[ViewModelReflection] = vm;
-    defineProperties(elm, def.descriptors);
-    createComponent(vm, Ctor);
-    linkComponent(vm);
-    assert.block(function devModeCheck() {
-        var attributeChangedCallback = vm.component.attributeChangedCallback, observedAttrs = vm.def.observedAttrs;
-        if (observedAttrs.length && isUndefined(attributeChangedCallback)) {
-            console.warn(vm + " has static observedAttributes set to [\"" + keys(observedAttrs).join('", "') + "\"] but it is missing the attributeChangedCallback() method to watch for changes on those attributes. Double check for typos on the name of the callback.");
+
+/*eslint-enable*/
+var vmBeingConstructed = null;
+function isBeingConstructed(vm) {
+    assert.vm(vm);
+    return vmBeingConstructed === vm;
+}
+function createComponent(vm, Ctor) {
+    assert.vm(vm);
+    // create the component instance
+    var vmBeingConstructedInception = vmBeingConstructed;
+    vmBeingConstructed = vm;
+    var component = invokeComponentConstructor(vm, Ctor);
+    vmBeingConstructed = vmBeingConstructedInception;
+    assert.isTrue(vm.component === component, "Invalid construction for " + vm + ", maybe you are missing the call to super() on classes extending Element.");
+    assert.block(function () {
+        var track = getComponentDef(Ctor).track;
+        if ('state' in component && (!track || !track.state)) {
+            assert.logWarning("Non-trackable component state detected in " + component + ". Updates to state property will not be reactive. To make state reactive, add @track decorator.");
         }
     });
-    return vm;
 }
-function relinkVM(vm, vnode) {
+function linkComponent(vm) {
     assert.vm(vm);
-    assert.vnode(vnode);
-    assert.isTrue(vnode.elm instanceof HTMLElement, "Only DOM elements can be linked to their corresponding component.");
-    assert.invariant(vm.component, "vm.component is required to be defined before " + vm + " gets linked to " + vnode + ".");
-    vnode.vm = vm;
-    vm.vnode = vnode;
-}
-function rehydrate(vm) {
-    assert.vm(vm);
-    if (vm.idx && vm.isDirty) {
-        var vnode = vm.vnode;
-        assert.isTrue(vnode.elm instanceof HTMLElement, "rehydration can only happen after " + vm + " was patched the first time.");
-        var children = renderComponent(vm);
-        vm.isScheduled = false;
-        patchShadowRoot(vm, children);
-        var renderedCallback = vm.component.renderedCallback;
-        if (renderedCallback && renderedCallback !== noop) {
-            invokeComponentMethod(vm, 'renderedCallback');
+    // wiring service
+    var wire = vm.def.wire;
+    if (wire) {
+        var wiring = Services.wiring;
+        if (wiring) {
+            invokeServiceHook(vm, wiring);
         }
     }
 }
-var rehydrateQueue = [];
-function flushRehydrationQueue() {
-    assert.invariant(rehydrateQueue.length, "If rehydrateQueue was scheduled, it is because there must be at least one VM on this pending queue instead of " + rehydrateQueue + ".");
-    var vms = rehydrateQueue.sort(function (a, b) { return a.idx > b.idx; });
-    rehydrateQueue = []; // reset to a new queue
-    for (var i = 0, len = vms.length; i < len; i += 1) {
-        rehydrate(vms[i]);
-    }
-}
-function scheduleRehydration(vm) {
+function clearListeners(vm) {
     assert.vm(vm);
-    if (!vm.isScheduled) {
-        vm.isScheduled = true;
-        if (rehydrateQueue.length === 0) {
-            addCallbackToNextTick(flushRehydrationQueue);
+    var deps = vm.deps;
+    var len = deps.length;
+    if (len) {
+        for (var i = 0; i < len; i += 1) {
+            var set = deps[i];
+            var pos = ArrayIndexOf.call(deps[i], vm);
+            assert.invariant(pos > -1, "when clearing up deps, the vm must be part of the collection.");
+            ArraySplice.call(set, pos, 1);
         }
-        ArrayPush.call(rehydrateQueue, vm);
+        deps.length = 0;
     }
 }
-function isNodeOwnedByVM(vm, node) {
-    assert.vm(vm);
-    assert.invariant(node instanceof Node, "isNodeOwnedByVM() should be called with a node as the second argument instead of " + node);
-    assert.childNode(vm.vnode.elm, node, "isNodeOwnedByVM() should never be called with a node that is not a child node of " + vm);
-    // @ts-ignore
-    return node[OwnerKey] === vm.uid;
-}
-function wasNodePassedIntoVM(vm, node) {
-    assert.vm(vm);
-    assert.invariant(node instanceof Node, "isNodePassedToVM() should be called with a node as the second argument instead of " + node);
-    assert.childNode(vm.vnode.elm, node, "isNodePassedToVM() should never be called with a node that is not a child node of " + vm);
-    var ownerUid = vm.vnode.uid;
-    // TODO: we need to walk the parent path here as well, in case they passed it via slots multiple times
-    // @ts-ignore
-    return node[OwnerKey] === ownerUid;
-}
-function createShadowRootVNode(elm, children) {
-    var sel = elm.tagName.toLocaleLowerCase();
-    var vnode = {
-        sel: sel,
-        data: EmptyObject,
-        children: children,
-        elm: elm,
-        key: undefined,
-        text: undefined,
+function createComponentListener() {
+    return function handler(event) {
+        dispatchComponentEvent(handler.vm, event);
     };
+}
+function addComponentEventListener(vm, eventName, newHandler) {
+    assert.vm(vm);
+    assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of " + vm + " by adding a new event listener for \"" + eventName + "\".");
+    var cmpEvents = vm.cmpEvents, cmpListener = vm.cmpListener, vmIdx = vm.idx;
+    if (isUndefined(cmpEvents)) {
+        // this piece of code must be in sync with modules/component-events
+        vm.cmpEvents = cmpEvents = create(null);
+        vm.cmpListener = cmpListener = createComponentListener();
+        cmpListener.vm = vm;
+    }
+    if (isUndefined(cmpEvents[eventName])) {
+        cmpEvents[eventName] = [];
+        // this is not only an optimization, it is also needed to avoid adding the same
+        // listener twice when the initial diffing algo kicks in without an old vm to track
+        // what was already added to the DOM.
+        if (!vm.isDirty || vmIdx > 0) {
+            // if the element is already in the DOM and rendered, we intentionally make a sync mutation
+            // here and also keep track of the mutation for a possible rehydration later on without having
+            // to rehydrate just now.
+            var elm = vm.vnode.elm;
+            elm.addEventListener(eventName, cmpListener, false);
+        }
+    }
+    assert.block(function devModeCheck() {
+        if (cmpEvents[eventName] && ArrayIndexOf.call(cmpEvents[eventName], newHandler) !== -1) {
+            assert.logWarning(vm + " has duplicate listeners for event \"" + eventName + "\". Instead add the event listener in the connectedCallback() hook.");
+        }
+    });
+    ArrayPush.call(cmpEvents[eventName], newHandler);
+}
+function removeComponentEventListener(vm, eventName, oldHandler) {
+    assert.vm(vm);
+    assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of " + vm + " by removing an event listener for \"" + eventName + "\".");
+    var cmpEvents = vm.cmpEvents;
+    if (cmpEvents) {
+        var handlers = cmpEvents[eventName];
+        var pos = handlers && ArrayIndexOf.call(handlers, oldHandler);
+        if (handlers && pos > -1) {
+            ArraySplice.call(cmpEvents[eventName], pos, 1);
+            return;
+        }
+    }
+    assert.block(function devModeCheck() {
+        assert.logWarning("Did not find event listener " + oldHandler + " for event \"" + eventName + "\" on " + vm + ". Instead only remove an event listener once.");
+    });
+}
+function dispatchComponentEvent(vm, event) {
+    assert.vm(vm);
+    assert.invariant(event instanceof Event, "dispatchComponentEvent() must receive an event instead of " + event);
+    var cmpEvents = vm.cmpEvents, component = vm.component;
+    var type = event.type;
+    assert.invariant(cmpEvents && cmpEvents[type] && cmpEvents[type].length, "dispatchComponentEvent() should only be invoked if there is at least one listener in queue for " + type + " on " + vm + ".");
+    var handlers = cmpEvents[type];
+    var uninterrupted = true;
+    var stopImmediatePropagation = event.stopImmediatePropagation;
+    event.stopImmediatePropagation = function () {
+        uninterrupted = false;
+        stopImmediatePropagation.call(this);
+    };
+    var e = pierce(vm, event);
+    for (var i = 0, len = handlers.length; uninterrupted && i < len; i += 1) {
+        // TODO: only if the event is `composed` it can be dispatched
+        invokeComponentCallback(vm, handlers[i], component, [e]);
+    }
+    // restoring original methods
+    event.stopImmediatePropagation = stopImmediatePropagation;
+}
+function addComponentSlot(vm, slotName, newValue) {
+    assert.vm(vm);
+    assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of slot " + slotName + " in " + vm);
+    assert.isTrue(isArray(newValue) && newValue.length > 0, "Slots can only be set to a non-empty array, instead received " + toString$1(newValue) + " for slot " + slotName + " in " + vm + ".");
+    var cmpSlots = vm.cmpSlots;
+    var oldValue = cmpSlots && cmpSlots[slotName];
+    // TODO: hot-slots names are those slots used during the last rendering cycle, and only if
+    // one of those is changed, the vm should be marked as dirty.
+    // TODO: Issue #133
+    if (!isArray(newValue)) {
+        newValue = undefined;
+    }
+    if (oldValue !== newValue) {
+        if (isUndefined(cmpSlots)) {
+            vm.cmpSlots = cmpSlots = create(null);
+        }
+        cmpSlots[slotName] = newValue;
+        console.log("Marking " + vm + " as dirty: a new value for slot \"" + slotName + "\" was added.");
+        if (!vm.isDirty) {
+            markComponentAsDirty(vm);
+        }
+    }
+}
+function removeComponentSlot(vm, slotName) {
+    assert.vm(vm);
+    assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of slot " + slotName + " in " + vm);
+    // TODO: hot-slots names are those slots used during the last rendering cycle, and only if
+    // one of those is changed, the vm should be marked as dirty.
+    var cmpSlots = vm.cmpSlots;
+    if (cmpSlots && cmpSlots[slotName]) {
+        cmpSlots[slotName] = undefined; // delete will de-opt the cmpSlots, better to set it to undefined
+        console.log("Marking " + vm + " as dirty: the value of slot \"" + slotName + "\" was removed.");
+        if (!vm.isDirty) {
+            markComponentAsDirty(vm);
+        }
+    }
+}
+function renderComponent(vm) {
+    assert.vm(vm);
+    assert.invariant(vm.isDirty, vm + " is not dirty.");
+    console.log(vm + " is being updated.");
+    clearListeners(vm);
+    var vnodes = invokeComponentRenderMethod(vm);
+    vm.isDirty = false;
+    assert.invariant(isArray(vnodes), vm + ".render() should always return an array of vnodes instead of " + vnodes);
+    return vnodes;
+}
+function markComponentAsDirty(vm) {
+    assert.vm(vm);
+    assert.isFalse(vm.isDirty, "markComponentAsDirty() for " + vm + " should not be called when the componet is already dirty.");
+    assert.isFalse(isRendering, "markComponentAsDirty() for " + vm + " cannot be called during rendering of " + vmBeingRendered + ".");
+    vm.isDirty = true;
+}
+
+function insert(vnode) {
+    assert.vnode(vnode);
+    var vm = vnode.vm;
+    assert.vm(vm);
+    if (vm.idx > 0) {
+        assert.isTrue(vnode.isRoot, vm + " is already inserted.");
+        destroy(vnode); // moving the element from one place to another is observable via life-cycle hooks
+    }
+    addInsertionIndex(vm);
+    if (vm.isDirty) {
+        // this code path guarantess that when patching the custom element for the first time,
+        // the body is computed only after the element is in the DOM, otherwise the hooks
+        // for any children's vnode are not going to be useful.
+        rehydrate(vm);
+    }
+}
+function update(oldVnode, vnode) {
+    assert.vnode(vnode);
+    var vm = vnode.vm;
+    assert.vm(vm);
+    // TODO: we don't really need this block anymore, but it will require changes
+    // on many tests that are just patching the element directly.
+    if (vm.idx === 0 && !vnode.isRoot) {
+        // when inserting a root element, or when reusing a DOM element for a new
+        // component instance, the insert() hook is never called because the element
+        // was already in the DOM before creating the instance, and diffing the
+        // vnode, for that, we wait until the patching process has finished, and we
+        // use the postpatch() hook to trigger the connectedCallback logic.
+        insert(vnode);
+        // Note: we don't have to worry about destroy() hook being called before this
+        // one because they never happen in the same patching mechanism, only one
+        // of them is called. In the case of the insert() hook, we use the value of `idx`
+        // to dedupe the calls since they both can happen in the same patching process.
+    }
+    if (vm.isDirty) {
+        // this code path guarantess that when patching the custom element the body is computed only after the element is in the DOM
+        rehydrate(vm);
+    }
+}
+function destroy(vnode) {
+    assert.vnode(vnode);
+    var vm = vnode.vm;
+    assert.vm(vm);
+    assert.isTrue(vm.idx, vm + " is not inserted.");
+    removeInsertionIndex(vm);
+    // just in case it comes back, with this we guarantee re-rendering it
+    vm.isDirty = true;
+    clearListeners(vm);
+    // At this point we need to force the removal of all children because
+    // we don't have a way to know that children custom element were removed
+    // from the DOM. Once we move to use realm custom elements, we can remove this.
+    patchShadowRoot(vm, []);
+}
+var lifeCycleHooks = {
+    insert: insert,
+    update: update,
+    destroy: destroy,
+};
+
+var CHAR_S = 115;
+var CHAR_V = 118;
+var CHAR_G = 103;
+var EmptyData = create(null);
+var NamespaceAttributeForSVG = 'http://www.w3.org/2000/svg';
+var SymbolIterator = Symbol.iterator;
+function addNS(data, children, sel) {
+    data.ns = NamespaceAttributeForSVG;
+    if (isUndefined(children) || sel === 'foreignObject') {
+        return;
+    }
+    var len = children.length;
+    for (var i_1 = 0; i_1 < len; ++i_1) {
+        var child = children[i_1];
+        var data_1 = child.data;
+        if (data_1 !== undefined) {
+            var grandChildren = child.children;
+            addNS(data_1, grandChildren, child.sel);
+        }
+    }
+}
+// [v]node node
+function v(sel, data, children, text, elm, Ctor) {
+    data = data || EmptyData;
+    var key = data.key;
+    var uid = 0;
+    // For root elements and other special cases the vm is not set.
+    if (!isNull(vmBeingRendered)) {
+        uid = vmBeingRendered.uid;
+        data.token = vmBeingRendered.context.tplToken;
+    }
+    var vnode = { sel: sel, data: data, children: children, text: text, elm: elm, key: key, Ctor: Ctor, uid: uid };
+    assert.block(function devModeCheck() {
+        // adding toString to all vnodes for debuggability
+        vnode.toString = function () { return "[object:vnode " + sel + "]"; };
+    });
     return vnode;
 }
-function patchShadowRoot(vm, children) {
-    assert.vm(vm);
-    var oldShadowVNode = vm.shadowVNode;
-    var shadowVNode = createShadowRootVNode(vm.vnode.elm, children);
-    vm.shadowVNode = patch(oldShadowVNode, shadowVNode);
-}
-
-// this hook will set up the component instance associated to the new vnode,
-// and link the new vnode with the corresponding component
-function initializeComponent(oldVnode, vnode) {
-    var Ctor = vnode.Ctor;
-    if (isUndefined(Ctor)) {
-        return;
-    }
-    /**
-     * The reason why we do the initialization here instead of prepatch or any other hook
-     * is because the creation of the component does require the element to be available.
-     */
-    assert.invariant(vnode.elm, vnode + ".elm should be ready.");
-    if (oldVnode.vm && oldVnode.Ctor === Ctor) {
-        assert.invariant(vnode.elm === oldVnode.elm, vnode + ".elm should always match the oldVnode's   element.");
-        relinkVM(oldVnode.vm, vnode);
-    }
-    else {
-        createVM(vnode);
-    }
-    assert.invariant(vnode.vm.component, "vm " + vnode.vm + " should have a component and element associated to it.");
-}
-var componentInit = {
-    create: initializeComponent,
-    update: initializeComponent,
-};
-
-function syncProps(oldVnode, vnode) {
-    var vm = vnode.vm;
-    if (isUndefined(vm)) {
-        return;
-    }
-    var component = vm.component, publicProps = vm.def.props;
-    var oldProps = oldVnode.data._props;
-    var newProps = vnode.data._props;
-    // infuse key-value pairs from _props into the component
-    if (oldProps !== newProps && (oldProps || newProps)) {
-        var key = void 0, cur = void 0;
-        oldProps = oldProps || EmptyObject;
-        newProps = newProps || EmptyObject;
-        // removed props should be reset in component's props
-        for (key in oldProps) {
-            if (!(key in newProps)) {
-                prepareForPropUpdate(vm);
-                component[key] = undefined;
-            }
+// [h]tml node
+function h(sel, data, children) {
+    assert.isTrue(isString(sel), "h() 1st argument sel must be a string.");
+    assert.isTrue(isObject(data), "h() 2nd argument data must be an object.");
+    assert.isTrue(isArray(children), "h() 3rd argument children must be an array.");
+    // checking reserved internal data properties
+    assert.invariant(data.class === undefined, "vnode.data.class should be undefined when calling h().");
+    var classMap = data.classMap, className = data.className, style = data.style, styleMap = data.styleMap;
+    assert.isFalse(className && classMap, "vnode.data.className and vnode.data.classMap ambiguous declaration.");
+    data.class = classMap || (className && getMapFromClassName(className));
+    assert.isFalse(styleMap && style, "vnode.data.styleMap and vnode.data.style ambiguous declaration.");
+    assert.block(function devModeCheck() {
+        if (style && !isString(style)) {
+            assert.logWarning("Invalid 'style' attribute passed to <" + sel + "> should be a string value, and will be ignored.");
         }
-        // new or different props should be set in component's props
-        for (key in newProps) {
-            cur = newProps[key];
-            if (!(key in oldProps) || oldProps[key] != cur) {
-                if (isUndefined(publicProps[key])) {
-                    // TODO: this should never really happen because the compiler should always validate
-                    assert.fail("Ignoring unknown public property \"" + key + "\" of " + vm + ". This is likely a typo on the corresponding attribute \"" + getAttrNameFromPropName(key) + "\".");
-                    return;
+    });
+    data.style = styleMap || (style && style + '');
+    assert.block(function devModeCheck() {
+        children.forEach(function (vnode) {
+            if (vnode === null) {
+                return;
+            }
+            assert.vnode(vnode);
+        });
+    });
+    if (sel.length === 3 && sel.charCodeAt(0) === CHAR_S && sel.charCodeAt(1) === CHAR_V && sel.charCodeAt(2) === CHAR_G) {
+        addNS(data, children, sel);
+    }
+    return v(sel, data, children);
+}
+// [c]ustom element node
+function c(sel, Ctor, data) {
+    // The compiler produce AMD modules that do not support circular dependencies
+    // We need to create an indirection to circumvent those cases.
+    // We could potentially move this check to the definition
+    if (Ctor.__circular__) {
+        Ctor = Ctor();
+    }
+    assert.isTrue(isString(sel), "c() 1st argument sel must be a string.");
+    assert.isTrue(isFunction(Ctor), "c() 2nd argument Ctor must be a function.");
+    assert.isTrue(isObject(data), "c() 3nd argument data must be an object.");
+    // checking reserved internal data properties
+    assert.invariant(data.class === undefined, "vnode.data.class should be undefined when calling c().");
+    var key = data.key, slotset = data.slotset, styleMap = data.styleMap, style = data.style, on = data.on, className = data.className, classMap = data.classMap, _props = data.props;
+    var attrs = data.attrs;
+    assert.isTrue(arguments.length < 4, "Compiler Issue: Custom elements expect up to 3 arguments, received " + arguments.length + " instead.");
+    // hack to allow component authors to force the usage of the "is" attribute in their components
+    var forceTagName = Ctor.forceTagName;
+    if (!isUndefined(forceTagName) && (isUndefined(attrs) || isUndefined(attrs.is))) {
+        attrs = attrs || {};
+        attrs.is = sel;
+        sel = forceTagName;
+    }
+    data = { hook: lifeCycleHooks, key: key, slotset: slotset, attrs: attrs, on: on, _props: _props };
+    assert.isFalse(className && classMap, "vnode.data.className and vnode.data.classMap ambiguous declaration.");
+    data.class = classMap || (className && getMapFromClassName(className));
+    assert.isFalse(styleMap && style, "vnode.data.styleMap and vnode.data.style ambiguous declaration.");
+    assert.block(function devModeCheck() {
+        if (style && !isString(style)) {
+            assert.logWarning("Invalid 'style' attribute passed to <" + sel + "> should be a string value, and will be ignored.");
+        }
+    });
+    data.style = styleMap || (style && style + '');
+    return v(sel, data, EmptyArray, undefined, undefined, Ctor);
+}
+// [i]terable node
+function i(iterable, factory) {
+    var list = [];
+    if (isUndefined(iterable) || iterable === null) {
+        assert.logWarning("Invalid template iteration for value \"" + iterable + "\" in " + vmBeingRendered + ", it should be an Array or an iterable Object.");
+        return list;
+    }
+    assert.isFalse(isUndefined(iterable[SymbolIterator]), "Invalid template iteration for value `" + iterable + "` in " + vmBeingRendered + ", it requires an array-like object, not `null` or `undefined`.");
+    var iterator = iterable[SymbolIterator]();
+    assert.isTrue(iterator && isFunction(iterator.next), "Invalid iterator function for \"" + iterable + "\" in " + vmBeingRendered + ".");
+    var next = iterator.next();
+    var i = 0;
+    var value = next.value, last = next.done;
+    var _loop_1 = function () {
+        // implementing a look-back-approach because we need to know if the element is the last
+        next = iterator.next();
+        last = next.done;
+        // template factory logic based on the previous collected value
+        var vnode = factory(value, i, i === 0, last);
+        if (isArray(vnode)) {
+            ArrayPush.apply(list, vnode);
+        }
+        else {
+            ArrayPush.call(list, vnode);
+        }
+        assert.block(function devModeCheck() {
+            var vnodes = isArray(vnode) ? vnode : [vnode];
+            vnodes.forEach(function (vnode) {
+                if (vnode && isObject(vnode) && vnode.sel && vnode.Ctor && isUndefined(vnode.key)) {
+                    // TODO - it'd be nice to log the owner component rather than the iteration children
+                    assert.logWarning("Missing \"key\" attribute in iteration with child \"" + toString$1(vnode.Ctor.name) + "\", index " + i + ". Instead set a unique \"key\" attribute value on all iteration children so internal state can be preserved during rehydration.");
                 }
-                prepareForPropUpdate(vm);
-                component[key] = cur;
-            }
+            });
+        });
+        // preparing next value
+        i += 1;
+        value = next.value;
+    };
+    while (last === false) {
+        _loop_1();
+    }
+    return list;
+}
+/**
+ * [f]lattening
+ */
+function f(items) {
+    assert.isTrue(isArray(items), 'flattening api can only work with arrays.');
+    var len = items.length;
+    var flattened = [];
+    for (var i_2 = 0; i_2 < len; i_2 += 1) {
+        var item = items[i_2];
+        if (isArray(item)) {
+            ArrayPush.apply(flattened, item);
+        }
+        else {
+            ArrayPush.call(flattened, item);
         }
     }
-    // Note: _props, which comes from api.c()'s data.props, is only used to populate
-    //       public props, and any other alien key added to it by the compiler will be
-    //       ignored, and a warning is shown.
+    return flattened;
 }
-var componentProps = {
-    create: syncProps,
-    update: syncProps,
-};
+// [t]ext node
+function t(value) {
+    return v(undefined, undefined, undefined, value);
+}
+// [d]ynamic value to produce a text vnode
+function d(value) {
+    if (value === undefined || value === null) {
+        return null;
+    }
+    return v(undefined, undefined, undefined, value);
+}
+// [b]ind function
+function b(fn) {
+    assert.vm(vmBeingRendered);
+    function handler(event) {
+        // TODO: only if the event is `composed` it can be dispatched
+        invokeComponentCallback(handler.vm, handler.fn, handler.vm.component, [event]);
+    }
+    handler.vm = vmBeingRendered;
+    handler.fn = fn;
+    return handler;
+}
 
-function observeAttributes(oldVnode, vnode) {
-    var vm = vnode.vm;
-    if (isUndefined(vm)) {
-        return;
-    }
-    var observedAttrs = vm.def.observedAttrs;
-    if (observedAttrs.length === 0) {
-        return; // nothing to observe
-    }
-    var oldAttrs = oldVnode.data.attrs;
-    var newAttrs = vnode.data.attrs;
-    if (oldAttrs === newAttrs || (isUndefined(oldAttrs) && isUndefined(newAttrs))) {
-        return;
-    }
-    // infuse key-value pairs from _props into the component
-    var key, cur;
-    oldAttrs = oldAttrs || EmptyObject;
-    newAttrs = newAttrs || EmptyObject;
-    // removed props should be reset in component's props
-    for (key in oldAttrs) {
-        if (key in observedAttrs && !(key in newAttrs)) {
-            invokeComponentAttributeChangedCallback(vm, key, oldAttrs[key], null);
-        }
-    }
-    // new or different props should be set in component's props
-    for (key in newAttrs) {
-        if (key in observedAttrs) {
-            cur = newAttrs[key];
-            if (!(key in oldAttrs) || oldAttrs[key] != cur) {
-                invokeComponentAttributeChangedCallback(vm, key, oldAttrs[key], cur);
-            }
-        }
-    }
-}
-var componentAttrs = {
-    create: observeAttributes,
-    update: observeAttributes,
-};
 
-function removeAllCmpEventListeners(vnode) {
-    var vm = vnode.vm;
-    if (isUndefined(vm)) {
-        return;
-    }
-    var on = vm.cmpEvents, listener = vm.listener;
-    if (on && listener) {
-        var elm = vnode.elm;
-        var name = void 0;
-        for (name in on) {
-            elm.removeEventListener(name, listener, false);
-        }
-        vm.listener = undefined;
-    }
-}
-function updateCmpEventListeners(oldVnode, vnode) {
-    var vm = vnode.vm;
-    if (isUndefined(vm)) {
-        return;
-    }
-    var oldVm = oldVnode.vm;
-    if (oldVm === vm) {
-        return;
-    }
-    var oldOn = (oldVm && oldVm.cmpEvents) || EmptyObject;
-    var _a = vm.cmpEvents, on = _a === void 0 ? EmptyObject : _a;
-    if (oldOn === on) {
-        return;
-    }
-    var elm = vnode.elm;
-    var oldElm = oldVnode.elm;
-    var listener = vm.cmpListener = (oldVm && oldVm.cmpListener) || createComponentListener();
-    listener.vm = vm;
-    var name;
-    for (name in on) {
-        if (isUndefined(oldOn[name])) {
-            elm.addEventListener(name, listener, false);
-        }
-    }
-    for (name in oldOn) {
-        if (isUndefined(on[name])) {
-            oldElm.removeEventListener(name, listener, false);
-        }
-    }
-}
-var eventListenersModule = {
-    create: updateCmpEventListeners,
-    update: updateCmpEventListeners,
-    destroy: removeAllCmpEventListeners
-};
 
-function syncClassNames(oldVnode, vnode) {
-    var vm = vnode.vm;
-    if (isUndefined(vm)) {
-        return;
-    }
-    var oldVm = oldVnode.vm;
-    if (oldVm === vm) {
-        return;
-    }
-    var oldClass = (oldVm && oldVm.cmpClasses) || EmptyObject;
-    var _a = vm.cmpClasses, klass = _a === void 0 ? EmptyObject : _a;
-    if (oldClass === klass) {
-        return;
-    }
-    var elm = vnode.elm, _b = vnode.data.class, ownerClass = _b === void 0 ? EmptyObject : _b;
-    var name;
-    for (name in oldClass) {
-        // remove only if it was removed from within the instance and it is not set from owner
-        if (oldClass[name] && !klass[name] && !ownerClass[name]) {
-            elm.classList.remove(name);
-        }
-    }
-    for (name in klass) {
-        if (klass[name] && !oldClass[name]) {
-            elm.classList.add(name);
-        }
-    }
-}
-var componentClasses = {
-    create: syncClassNames,
-    update: syncClassNames,
-};
-
-function update$1(oldVnode, vnode) {
-    var vm = vnode.vm;
-    if (isUndefined(vm)) {
-        return;
-    }
-    var oldSlots = oldVnode.data.slotset;
-    var newSlots = vnode.data.slotset;
-    // infuse key-value pairs from slotset into the component
-    if (oldSlots !== newSlots && (oldSlots || newSlots)) {
-        var key = void 0, cur = void 0;
-        oldSlots = oldSlots || EmptyObject;
-        newSlots = newSlots || EmptyObject;
-        // removed slots should be removed from component's slotset
-        for (key in oldSlots) {
-            if (!(key in newSlots)) {
-                removeComponentSlot(vm, key);
-            }
-        }
-        // new or different slots should be set in component's slotset
-        for (key in newSlots) {
-            cur = newSlots[key];
-            if (!(key in oldSlots) || oldSlots[key] != cur) {
-                if (cur && cur.length) {
-                    addComponentSlot(vm, key, cur);
-                }
-                else {
-                    removeComponentSlot(vm, key);
-                }
-            }
-        }
-    }
-}
-var componentSlotset = {
-    create: update$1,
-    update: update$1,
-};
-
-// TODO: eventually use the one shipped by snabbdom directly
-function update$2(oldVnode, vnode) {
-    var oldProps = oldVnode.data.props;
-    var props = vnode.data.props;
-    if (isUndefined(oldProps) && isUndefined(props)) {
-        return;
-    }
-    if (oldProps === props) {
-        return;
-    }
-    oldProps = oldProps || EmptyObject;
-    props = props || EmptyObject;
-    var key, cur, old;
-    var elm = vnode.elm;
-    for (key in oldProps) {
-        if (!(key in props)) {
-            delete elm[key];
-        }
-    }
-    for (key in props) {
-        cur = props[key];
-        old = oldProps[key];
-        if (old !== cur) {
-            if (old !== cur && (key !== 'value' || elm[key] !== cur)) {
-                // only touching the dom if the prop really changes.
-                assert.block(function devModeCheck() {
-                    if (elm[key] === cur && old !== undefined) {
-                        console.warn("Unneccessary update of property \"" + key + "\" in " + elm + ", it has the same value in " + (vnode.vm || vnode) + ".");
-                    }
-                });
-                elm[key] = cur;
-            }
-        }
-    }
-}
-var props = {
-    create: update$2,
-    update: update$2,
-};
+var api = Object.freeze({
+	v: v,
+	h: h,
+	c: c,
+	i: i,
+	f: f,
+	t: t,
+	d: d,
+	b: b
+});
 
 var array = Array.isArray;
 function primitive(s) {
@@ -2805,18 +2628,18 @@ function createKeyToOldIdx(children, beginIdx, endIdx) {
     }
     return map;
 }
-var hooks$1 = ['create', 'update', 'remove', 'destroy', 'pre', 'post'];
+var hooks = ['create', 'update', 'remove', 'destroy', 'pre', 'post'];
 // export { h } from './h';
 // export { thunk } from './thunk';
 function init(modules, domApi) {
     var i$$1, j, cbs = {};
     var api = domApi !== undefined ? domApi : htmlDomApi;
-    for (i$$1 = 0; i$$1 < hooks$1.length; ++i$$1) {
-        cbs[hooks$1[i$$1]] = [];
+    for (i$$1 = 0; i$$1 < hooks.length; ++i$$1) {
+        cbs[hooks[i$$1]] = [];
         for (j = 0; j < modules.length; ++j) {
-            var hook = modules[j][hooks$1[i$$1]];
+            var hook = modules[j][hooks[i$$1]];
             if (hook !== undefined) {
-                cbs[hooks$1[i$$1]].push(hook);
+                cbs[hooks[i$$1]].push(hook);
             }
         }
     }
@@ -3083,14 +2906,240 @@ function init(modules, domApi) {
     };
 }
 
+// this hook will set up the component instance associated to the new vnode,
+// and link the new vnode with the corresponding component
+function initializeComponent(oldVnode, vnode) {
+    var Ctor = vnode.Ctor;
+    if (isUndefined(Ctor)) {
+        return;
+    }
+    /**
+     * The reason why we do the initialization here instead of prepatch or any other hook
+     * is because the creation of the component does require the element to be available.
+     */
+    assert.invariant(vnode.elm, vnode + ".elm should be ready.");
+    if (oldVnode.vm && oldVnode.Ctor === Ctor) {
+        assert.invariant(vnode.elm === oldVnode.elm, vnode + ".elm should always match the oldVnode's   element.");
+        relinkVM(oldVnode.vm, vnode);
+    }
+    else {
+        createVM(vnode);
+    }
+    assert.invariant(vnode.vm.component, "vm " + vnode.vm + " should have a component and element associated to it.");
+}
+var componentInit = {
+    create: initializeComponent,
+    update: initializeComponent,
+};
+
+function syncProps(oldVnode, vnode) {
+    var vm = vnode.vm;
+    if (isUndefined(vm)) {
+        return;
+    }
+    var component = vm.component, publicProps = vm.def.props;
+    var oldProps = oldVnode.data._props;
+    var newProps = vnode.data._props;
+    // infuse key-value pairs from _props into the component
+    if (oldProps !== newProps && (oldProps || newProps)) {
+        var key = void 0, cur = void 0;
+        oldProps = oldProps || EmptyObject;
+        newProps = newProps || EmptyObject;
+        // removed props should be reset in component's props
+        for (key in oldProps) {
+            if (!(key in newProps)) {
+                prepareForPropUpdate(vm);
+                component[key] = undefined;
+            }
+        }
+        // new or different props should be set in component's props
+        for (key in newProps) {
+            cur = newProps[key];
+            if (!(key in oldProps) || oldProps[key] != cur) {
+                if (isUndefined(publicProps[key])) {
+                    // TODO: this should never really happen because the compiler should always validate
+                    assert.fail("Ignoring unknown public property \"" + key + "\" of " + vm + ". This is likely a typo on the corresponding attribute \"" + getAttrNameFromPropName(key) + "\".");
+                    return;
+                }
+                prepareForPropUpdate(vm);
+                component[key] = cur;
+            }
+        }
+    }
+    // Note: _props, which comes from api.c()'s data.props, is only used to populate
+    //       public props, and any other alien key added to it by the compiler will be
+    //       ignored, and a warning is shown.
+}
+var componentProps = {
+    create: syncProps,
+    update: syncProps,
+};
+
+function removeAllCmpEventListeners(vnode) {
+    var vm = vnode.vm;
+    if (isUndefined(vm)) {
+        return;
+    }
+    var on = vm.cmpEvents, listener = vm.listener;
+    if (on && listener) {
+        var elm = vnode.elm;
+        var name = void 0;
+        for (name in on) {
+            elm.removeEventListener(name, listener, false);
+        }
+        vm.listener = undefined;
+    }
+}
+function updateCmpEventListeners(oldVnode, vnode) {
+    var vm = vnode.vm;
+    if (isUndefined(vm)) {
+        return;
+    }
+    var oldVm = oldVnode.vm;
+    if (oldVm === vm) {
+        return;
+    }
+    var oldOn = (oldVm && oldVm.cmpEvents) || EmptyObject;
+    var _a = vm.cmpEvents, on = _a === void 0 ? EmptyObject : _a;
+    if (oldOn === on) {
+        return;
+    }
+    var elm = vnode.elm;
+    var oldElm = oldVnode.elm;
+    var listener = vm.cmpListener = (oldVm && oldVm.cmpListener) || createComponentListener();
+    listener.vm = vm;
+    var name;
+    for (name in on) {
+        if (isUndefined(oldOn[name])) {
+            elm.addEventListener(name, listener, false);
+        }
+    }
+    for (name in oldOn) {
+        if (isUndefined(on[name])) {
+            oldElm.removeEventListener(name, listener, false);
+        }
+    }
+}
+var eventListenersModule = {
+    create: updateCmpEventListeners,
+    update: updateCmpEventListeners,
+    destroy: removeAllCmpEventListeners
+};
+
+function syncClassNames(oldVnode, vnode) {
+    var vm = vnode.vm;
+    if (isUndefined(vm)) {
+        return;
+    }
+    var oldVm = oldVnode.vm;
+    if (oldVm === vm) {
+        return;
+    }
+    var oldClass = (oldVm && oldVm.cmpClasses) || EmptyObject;
+    var _a = vm.cmpClasses, klass = _a === void 0 ? EmptyObject : _a;
+    if (oldClass === klass) {
+        return;
+    }
+    var elm = vnode.elm, _b = vnode.data.class, ownerClass = _b === void 0 ? EmptyObject : _b;
+    var name;
+    for (name in oldClass) {
+        // remove only if it was removed from within the instance and it is not set from owner
+        if (oldClass[name] && !klass[name] && !ownerClass[name]) {
+            elm.classList.remove(name);
+        }
+    }
+    for (name in klass) {
+        if (klass[name] && !oldClass[name]) {
+            elm.classList.add(name);
+        }
+    }
+}
+var componentClasses = {
+    create: syncClassNames,
+    update: syncClassNames,
+};
+
+function update$1(oldVnode, vnode) {
+    var vm = vnode.vm;
+    if (isUndefined(vm)) {
+        return;
+    }
+    var oldSlots = oldVnode.data.slotset;
+    var newSlots = vnode.data.slotset;
+    // infuse key-value pairs from slotset into the component
+    if (oldSlots !== newSlots && (oldSlots || newSlots)) {
+        var key = void 0, cur = void 0;
+        oldSlots = oldSlots || EmptyObject;
+        newSlots = newSlots || EmptyObject;
+        // removed slots should be removed from component's slotset
+        for (key in oldSlots) {
+            if (!(key in newSlots)) {
+                removeComponentSlot(vm, key);
+            }
+        }
+        // new or different slots should be set in component's slotset
+        for (key in newSlots) {
+            cur = newSlots[key];
+            if (!(key in oldSlots) || oldSlots[key] != cur) {
+                if (cur && cur.length) {
+                    addComponentSlot(vm, key, cur);
+                }
+                else {
+                    removeComponentSlot(vm, key);
+                }
+            }
+        }
+    }
+}
+var componentSlotset = {
+    create: update$1,
+    update: update$1,
+};
+
+// TODO: eventually use the one shipped by snabbdom directly
+function update$2(oldVnode, vnode) {
+    var oldProps = oldVnode.data.props;
+    var props = vnode.data.props;
+    if (isUndefined(oldProps) && isUndefined(props)) {
+        return;
+    }
+    if (oldProps === props) {
+        return;
+    }
+    oldProps = oldProps || EmptyObject;
+    props = props || EmptyObject;
+    var key, cur, old;
+    var elm = vnode.elm;
+    for (key in oldProps) {
+        if (!(key in props)) {
+            delete elm[key];
+        }
+    }
+    for (key in props) {
+        cur = props[key];
+        old = oldProps[key];
+        if (old !== cur) {
+            if (old !== cur && (key !== 'value' || elm[key] !== cur)) {
+                // only touching the dom if the prop really changes.
+                assert.block(function devModeCheck() {
+                    if (elm[key] === cur && old !== undefined) {
+                        console.warn("Unneccessary update of property \"" + key + "\" in " + elm + ", it has the same value in " + (vnode.vm || vnode) + ".");
+                    }
+                });
+                elm[key] = cur;
+            }
+        }
+    }
+}
+var props = {
+    create: update$2,
+    update: update$2,
+};
+
 var xlinkNS = 'http://www.w3.org/1999/xlink';
 var xmlNS = 'http://www.w3.org/XML/1998/namespace';
 var ColonCharCode = 58;
 var XCharCode = 120;
-var _a$5 = Element.prototype;
-var setAttribute$1 = _a$5.setAttribute;
-var removeAttribute$1 = _a$5.removeAttribute;
-var setAttributeNS = _a$5.setAttributeNS;
 function updateAttrs(oldVnode, vnode) {
     var oldAttrs = oldVnode.data.attrs;
     var attrs = vnode.data.attrs;
@@ -3101,6 +3150,7 @@ function updateAttrs(oldVnode, vnode) {
         return;
     }
     var elm = vnode.elm;
+    var setAttribute = elm.setAttribute, removeAttribute = elm.removeAttribute, setAttributeNS = elm.setAttributeNS;
     var key;
     oldAttrs = oldAttrs || {};
     attrs = attrs || {};
@@ -3110,14 +3160,14 @@ function updateAttrs(oldVnode, vnode) {
         var old = oldAttrs[key];
         if (old !== cur) {
             if (cur === true) {
-                setAttribute$1.call(elm, key, "");
+                setAttribute.call(elm, key, "");
             }
             else if (cur === false) {
-                removeAttribute$1.call(elm, key);
+                removeAttribute.call(elm, key);
             }
             else {
                 if (key.charCodeAt(0) !== XCharCode) {
-                    setAttribute$1.call(elm, key, cur);
+                    setAttribute.call(elm, key, cur);
                 }
                 else if (key.charCodeAt(3) === ColonCharCode) {
                     // Assume xml namespace
@@ -3128,7 +3178,7 @@ function updateAttrs(oldVnode, vnode) {
                     setAttributeNS.call(elm, xlinkNS, key, cur);
                 }
                 else {
-                    setAttribute$1.call(elm, key, cur);
+                    setAttribute.call(elm, key, cur);
                 }
             }
         }
@@ -3136,7 +3186,7 @@ function updateAttrs(oldVnode, vnode) {
     // remove removed attributes
     for (key in oldAttrs) {
         if (!(key in attrs)) {
-            removeAttribute$1.call(elm, key);
+            removeAttribute.call(elm, key);
         }
     }
 }
@@ -3270,6 +3320,24 @@ var eventListenersModule$1 = {
     destroy: removeAllEventListeners
 };
 
+function updateToken(oldVnode, vnode) {
+    var oldToken = oldVnode.data.token;
+    var newToken = vnode.data.token, elm = vnode.elm;
+    if (oldToken === newToken) {
+        return;
+    }
+    if (!isUndefined(oldToken)) {
+        elm.removeAttribute(oldToken);
+    }
+    if (!isUndefined(newToken)) {
+        elm.setAttribute(newToken, '');
+    }
+}
+var tokenModule = {
+    create: updateToken,
+    update: updateToken,
+};
+
 function updateUID(oldVnode, vnode) {
     var oldUid = oldVnode.uid;
     var elm = vnode.elm, uid = vnode.uid;
@@ -3288,15 +3356,19 @@ var patch = init([
     componentInit,
     componentSlotset,
     componentProps,
-    componentAttrs,
     // from this point on, we do a series of DOM mutations
     eventListenersModule,
     componentClasses,
-    props,
+    // Attrs need to be applied to element before props
+    // IE11 will wipe out value on radio inputs if value
+    // is set before type=radio.
+    // See https://git.soma.salesforce.com/raptor/raptor/issues/791 for more
     attributesModule,
+    props,
     classes,
     styleModule,
     eventListenersModule$1,
+    tokenModule,
     uidModule,
 ]);
 
@@ -3336,26 +3408,6 @@ assign(Node.prototype, {
         return replacedNode;
     }
 });
-/**
- * This algo mimics 2.5 of web component specification somehow:
- * https://www.w3.org/TR/custom-elements/#upgrades
- */
-function upgradeElement(element, Ctor) {
-    if (isUndefined(Ctor)) {
-        throw new TypeError("Invalid Component Definition: " + Ctor + ".");
-    }
-    var tagName = element.tagName.toLowerCase();
-    var vnode = c(tagName, Ctor, { className: element.className || undefined });
-    vnode.isRoot = true;
-    patch(element, vnode);
-    // providing the hook to detect insertion and removal
-    element[ConnectingSlot] = function () {
-        insert(vnode);
-    };
-    element[DisconnectingSlot] = function () {
-        forceDisconnection(vnode);
-    };
-}
 // this could happen for two reasons:
 // * it is a root, and was removed manually
 // * the element was appended to another container which requires disconnection to happen first
@@ -3385,9 +3437,28 @@ function forceDisconnection(vnode) {
 function createElement(tagName, options) {
     if (options === void 0) { options = {}; }
     var Ctor = isFunction(options.is) ? options.is : null;
-    var element = document.createElement(tagName, Ctor ? null : options);
-    if (Ctor && element instanceof HTMLElement) {
-        upgradeElement(element, Ctor);
+    var vnode = undefined;
+    // If we have a Ctor, create our VNode
+    if (Ctor) {
+        vnode = c(tagName, Ctor, {});
+        vnode.isRoot = true;
+        // If Ctor defines forceTagName
+        // vnode.sel will be the tagname we should use
+        tagName = vnode.sel;
+    }
+    // Create element with correct tagName
+    var element = document.createElement(tagName);
+    // If we created a vnode
+    if (vnode) {
+        // patch that guy
+        patch(element, vnode); // eslint-disable-line no-undef
+        // Handle insertion and removal from the DOM
+        element[ConnectingSlot] = function () {
+            insert(vnode); // eslint-disable-line no-undef
+        };
+        element[DisconnectingSlot] = function () {
+            forceDisconnection(vnode); // eslint-disable-line no-undef
+        };
     }
     return element;
 }
@@ -3397,8 +3468,11 @@ exports.getComponentDef = getComponentDef;
 exports.Element = ComponentElement;
 exports.register = register;
 exports.unwrap = unwrap;
+exports.api = api$1;
+exports.track = track;
+exports.wire = wire;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.14.11 */
+/** version: 0.16.3 */

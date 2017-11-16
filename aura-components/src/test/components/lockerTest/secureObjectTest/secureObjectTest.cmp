@@ -31,6 +31,9 @@
     <aura:method name="testUnfilteringOfArrayBuffer" />
     <aura:method name="verifyInputBindingToNewPropOnBackingObject" />
 
+    <aura:method name="testObjectConstructor"/>
+    <aura:method name="testArrayConstructor"/>
+
     <div id="title">SecureObject test</div>
     <lockerTest:wrapUnwrapFacet aura:id="wrapUnwrapFacet" obj="{!v.wrapUnwrapTestObj}" value1="{!v.wrapUnwrapTestObj.value1}" value2="{!v.wrapUnwrapTestObj.sub.value2}" />
     <div id="wrapUnwrapTestObj">{!v.wrapUnwrapTestObj.value1},{!v.wrapUnwrapTestObj.sub.value2},{!v.wrapUnwrapTestObj.value3}</div>

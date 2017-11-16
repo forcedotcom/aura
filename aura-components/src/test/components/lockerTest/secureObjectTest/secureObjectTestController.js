@@ -92,5 +92,33 @@
         crypto.getRandomValues(uint8Array);
         var valuesChanged = uint8Array[0] !== 0 || uint8Array[1] !== 0 || uint8Array[2] !== 0;
         testUtils.assertTrue(valuesChanged, "Uint8Array not populated with values after calling Crypto.getRandomValues");
+    },
+
+    testObjectConstructor: function(component) {
+        var testUtils = component.get("v.testUtils");
+
+        // Create a proxied object.
+        var obj = {
+            obj: {a:1, b:2, c:3}
+        };
+        component.set("v.wrapUnwrapTestObj", obj);
+        var testObject = component.get("v.wrapUnwrapTestObj").obj;
+
+        // We need to use === to avoid filtering arguments throught the secure functions of the test harness.
+        testUtils.assertTrue(Object === testObject.constructor, "Invalid SecureObject constructor");
+    },
+
+    testArrayConstructor: function(component) {
+        var testUtils = component.get("v.testUtils");
+
+        // Create a proxied array.
+        var obj = {
+            arr: [1, 2, 3]
+        };
+        component.set("v.wrapUnwrapTestObj", obj);
+        var testObject = component.get("v.wrapUnwrapTestObj").arr;
+
+        // We need to use === to avoid filtering arguments throught the secure functions of the test harness.
+        testUtils.assertTrue(Array === testObject.constructor, "Invalid SecureObject constructor");
     }
 })

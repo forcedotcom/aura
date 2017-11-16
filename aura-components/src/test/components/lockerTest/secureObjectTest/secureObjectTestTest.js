@@ -114,5 +114,17 @@
         test: function(cmp) {
             cmp.testUnfilteringOfArrayBuffer();
         }
+    },
+
+    testObjectConstructor: {
+        test: function(cmp) {
+            cmp.testObjectConstructor();
+        }
+    },
+
+    testArrayConstructor: {
+        test: function(cmp) {
+            cmp.testArrayConstructor();
+        }
     }
 })

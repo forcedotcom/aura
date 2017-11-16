@@ -153,6 +153,17 @@
         });
     },
 
+    testOpen_UrlRestrictionByPass: function(cmp){
+        var testUtils = cmp.get("v.testUtils");
+        var url = ["data:,The URL restriction is bypassed!"];
+        try {
+            window.open(url, "_self");
+            testUtils.fail("Expect to validate non-string arguments in window.open :" +  url);
+        } catch (e) {
+            testUtils.assertEquals("SecureWindow.open supports http://, https:// schemes and relative urls.", e.message);
+        }
+    },
+
     // Automation for W-3547492
     testCreateImageElement: function(cmp) {
         var testUtils = cmp.get("v.testUtils");

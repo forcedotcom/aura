@@ -129,6 +129,14 @@
         }
     },
 
+    testOpen_UrlRestrictionByPass: {
+        // "window.open" will not open a new window for mobile autobuild runs.
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
+        test: function(cmp) {
+            cmp.testOpen_UrlRestrictionByPass();
+        }
+    },
+
     testCreateImageElement: {
         test: function(cmp) {
             cmp.testCreateImageElement();

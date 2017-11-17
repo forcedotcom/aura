@@ -102,5 +102,11 @@
         test: function(cmp) {
             cmp.testEventParamsFilteringDifferentLocker();
         }
-    }
+    },
+
+    testGetSourceEvent: {
+        test: function(cmp) {        
+            cmp.testGetSourceEvent();
+        }        
+    },
 })

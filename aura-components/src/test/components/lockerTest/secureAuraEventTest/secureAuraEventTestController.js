@@ -169,5 +169,16 @@
                             "Expected SecureComponentRef when event handler from another namespace passes own component ref back in callback function");
                 }
         );
-    }
+    },
+
+    testGetSourceEvent: function(cmp, evt) {
+        var evt;
+        var testUtils = cmp.get("v.testUtils");
+        cmp.addEventHandler("componentEvent",function(event){
+            evt = event;
+        });
+        cmp.find("btn2").getElement().click();
+        var actual = evt.getSourceEvent();
+        testUtils.assertStartsWith("SecureAuraEvent", actual.toString(), "Expecting SecureAuraEvent from getSourceEvent");        
+    },
 })

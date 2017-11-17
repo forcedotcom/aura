@@ -120,5 +120,28 @@
 
         // We need to use === to avoid filtering arguments throught the secure functions of the test harness.
         testUtils.assertTrue(Array === testObject.constructor, "Invalid SecureObject constructor");
+    },
+
+    testSanitizeJSHref: function(component) {
+        var testUtils = component.get('v.testUtils');
+        var element = document.createElement('a');
+        var errorMessage = '';
+        document.body.appendChild(element);
+
+        try {
+          element.setAttribute('href', 'javascript:console.log("stuff")');
+        } catch (error) {
+          errorMessage = error.message;
+        }
+
+        testUtils.assertEquals('An unsupported URL scheme was detected. Only http:// and https:// are supported.', errorMessage, 'Javascript pseudo-scheme was not correctly sanitized by LockerService.');
+    },
+
+    testSanitizeJSSrc: function(component) {
+        var testUtils = component.get('v.testUtils');
+        var element = document.createElement('image');
+        document.body.appendChild(element);
+        testUtils.expectAuraWarning('SecureElement: [object HTMLUnknownElement]{ key: {"namespace":"lockerTest"} } does not allow getting/setting the src attribute, ignoring!');
+        element.setAttribute('src', 'javascript:console.log("stuff")');
     }
 })

@@ -30,6 +30,8 @@
     <aura:method name="testRawObjectsConstructorAndProperties" action="{!c.testRawObjectsConstructorAndProperties}"/>
     <aura:method name="testUnfilteringOfArrayBuffer" />
     <aura:method name="verifyInputBindingToNewPropOnBackingObject" />
+    <aura:method name="testSanitizeJSHref" />
+    <aura:method name="testSanitizeJSSrc" />
 
     <aura:method name="testObjectConstructor"/>
     <aura:method name="testArrayConstructor"/>

@@ -124,7 +124,20 @@
 
     testArrayConstructor: {
         test: function(cmp) {
-            cmp.testArrayConstructor();
+            cmp.testSanitizeJSSrc();
+        }
+    },
+
+    testSanitizeJSHref: {
+        test: function(cmp) {
+            cmp.testSanitizeJSHref();
+        }
+    },
+
+    testSanitizeJSSrc: {
+        test: function(cmp) {
+            cmp.testSanitizeJSSrc();
+
         }
     }
 })

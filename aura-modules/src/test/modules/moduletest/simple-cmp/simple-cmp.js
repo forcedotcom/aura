@@ -55,4 +55,26 @@ export default class Simple extends Element {
             }
         }));
     }
+
+    @track _nullValueTest;
+
+    @api
+    get nullValueTest() {
+        return this._nullValueTest;
+    }
+
+    @api
+    set nullValueTest(value) {
+        this._nullValueTest = value;
+    }
+
+    get hasValue() {
+        return !!(
+            this._nullValueTest
+        );
+    }
+
+    get valueText() {
+        return this._nullValueTest;
+    }
 }

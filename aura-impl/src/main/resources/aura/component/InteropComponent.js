@@ -336,21 +336,23 @@ InteropComponent.prototype.get = function (key) {
     var path = key.split('.');
     path.shift(); // remove provider
     $A.assert(path.length === 1, 'This component does not allow to get nested properties');
-    var prop = $A.expressionService.resolve(path.join('.'), this.attributes);
+    var propValue = $A.expressionService.resolve(path.join('.'), this.attributes);
 
-    if (prop !== undefined && prop !== null) {
-        return $A.util.isExpression(prop.value) ? prop.value.evaluate() : prop;
-    } else {
+    if (propValue !== undefined && propValue !== null) {
+        if ($A.util.isExpression(propValue.value)) {
+            propValue = propValue.value.evaluate();
+        }
+    } else if (!$A.util.isExpression(this.attributes[path[0]])) {
         // when an attribute is unbound, it would not be in this.attributes
         // however, we should call interop module getter instead
         var propName = this.attrNameToPropMap[path[0]];
         var element = this.getElement();
         if (propName && element) {
-            return element[propName];
+            propValue = element[propName];
         }
-
-        return prop;
     }
+
+    return propValue;
 };
 
 /**

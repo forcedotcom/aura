@@ -219,5 +219,50 @@
                 });
             }
         ]
+    },
+
+    getNullValueText: function (cmp) {
+        return cmp
+            .find('nullTest')
+            .getElement()
+            .querySelector('.null-test')
+            .innerText;
+    },
+    testNullValue: {
+        attributes: {
+            'nullValueTest': 'John',
+        },
+        test: [
+            function(cmp) {
+                var actual = this.getNullValueText(cmp);
+
+                $A.test.assertEquals('John', actual, 'The bound value should be John');
+                cmp.set("v.nullValueTest", null);
+            },
+            function (cmp) {
+                var actual = this.getNullValueText(cmp);
+
+                $A.test.assertEquals('', actual, 'After setting the nullTest attribute to null the rendered text should be empty');
+            }
+        ]
+    },
+
+    testUndefinedValue: {
+        attributes: {
+            'nullValueTest': 'John',
+        },
+        test: [
+            function(cmp) {
+                var actual = this.getNullValueText(cmp);
+
+                $A.test.assertEquals('John', actual, 'The bound value should be John');
+                cmp.set("v.nullValueTest", undefined);
+            },
+            function (cmp) {
+                var actual = this.getNullValueText(cmp);
+
+                $A.test.assertEquals('', actual, 'After setting the nullTest attribute to undefined the rendered text should be empty');
+            }
+        ]
     }
 })

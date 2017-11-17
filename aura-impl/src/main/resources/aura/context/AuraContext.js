@@ -635,3 +635,11 @@ Aura.Context.AuraContext.prototype.isActionPublicCachingEnabled = function() {
 Aura.Context.AuraContext.prototype.getActionPublicCacheKey = function() {
     return this.actionPublicCacheKey;
 };
+
+/**
+ * Whether compat source is needed.
+ * @returns {Boolean} whether compat is enabled
+ */
+Aura.Context.AuraContext.prototype.isCompat = function() {
+    return this.useCompatSource;
+};

@@ -215,8 +215,7 @@ CryptoAdapter["setKey"] = function(rawKey) {
         CryptoAdapter.ALGO,     // algorithm of key
         false,                  // don't allow key export
         ["encrypt", "decrypt"]  // allowed operations
-    )
-        .then(
+    )["then"](
             function(key) {
                 // it's possible for key import to fail, which we treat as a fatal
                 // error. all pending and future operations will fail.

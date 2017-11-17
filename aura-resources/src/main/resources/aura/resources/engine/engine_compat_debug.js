@@ -1220,10 +1220,9 @@ function getAttributePatched(attrName) {
 }
 function setAttributePatched(attrName, newValue) {
     var vm = this[ViewModelReflection];
-    var _a = vm.def, propsConfig = _a.props, observedAttrs = _a.observedAttrs;
-    attrName = isString(attrName) ? attrName.toLocaleLowerCase() : null;
+    var observedAttrs = vm.def.observedAttrs;
     var oldValue = getAttribute.call(this, attrName);
-    setAttribute.call(this, attrName, newValue);
+    setAttribute.apply(this, ArraySlice.call(arguments));
     newValue = getAttribute.call(this, attrName);
     if (!isNull(attrName) && attrName in observedAttrs && oldValue !== newValue) {
         invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
@@ -1231,10 +1230,9 @@ function setAttributePatched(attrName, newValue) {
 }
 function removeAttributePatched(attrName) {
     var vm = this[ViewModelReflection];
-    var _a = vm.def, propsConfig = _a.props, observedAttrs = _a.observedAttrs;
-    attrName = isString(attrName) ? attrName.toLocaleLowerCase() : null;
+    var observedAttrs = vm.def.observedAttrs;
     var oldValue = getAttribute.call(this, attrName);
-    removeAttribute.call(this, attrName);
+    removeAttribute.apply(this, ArraySlice.call(arguments));
     var newValue = getAttribute.call(this, attrName);
     if (!isNull(attrName) && attrName in observedAttrs && oldValue !== newValue) {
         invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
@@ -2691,4 +2689,4 @@ exports.wire = wire;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.16.3 */
+/** version: 0.16.5 */

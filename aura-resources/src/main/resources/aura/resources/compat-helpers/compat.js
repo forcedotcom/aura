@@ -15,6 +15,41 @@ function __extends(d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 }
 
+var ArrayConcat$1 = Array.prototype.concat;
+var getOwnPropertyNames = Object.getOwnPropertyNames;
+function patchedGetOwnPropertyNames(replicaOrAny) {
+    if (isCompatProxy(replicaOrAny)) {
+        return replicaOrAny.ownKeys().filter(function (key) { return key.constructor !== Symbol; }); // TODO: only strings
+    }
+    return getOwnPropertyNames(replicaOrAny);
+}
+// https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys
+// https://tc39.github.io/ecma262/#sec-ordinaryownpropertykeys
+function OwnPropertyKeys(O) {
+    return ArrayConcat$1.call(patchedGetOwnPropertyNames(O), Object.getOwnPropertySymbols(O));
+}
+function patchedAssign(replicaOrAny) {
+    if (replicaOrAny == null) {
+        throw new TypeError('Cannot convert undefined or null to object');
+    }
+    var to = Object(replicaOrAny);
+    for (var index = 1; index < arguments.length; index++) {
+        var nextSource = arguments[index];
+        if (nextSource != null) {
+            var keys = OwnPropertyKeys(nextSource);
+            for (var i = 0; i < keys.length; i += 1) {
+                var nextKey = keys[i];
+                var descriptor = Object.getOwnPropertyDescriptor(nextSource, nextKey);
+                if (descriptor !== undefined && descriptor.enumerable === true) {
+                    setKey(to, nextKey, getKey(nextSource, nextKey));
+                }
+            }
+            
+        }
+    }
+    return to;
+}
+
 // RFC4122 version 4 uuid
 var ProxySlot = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -31,8 +66,6 @@ var isExtensible$1 = Object.isExtensible;
 var getPrototypeOf$2 = Object.getPrototypeOf;
 var setPrototypeOf$1 = Object.setPrototypeOf;
 var getOwnPropertyDescriptor$1 = Object.getOwnPropertyDescriptor;
-var getOwnPropertySymbols = Object.getOwnPropertySymbols;
-var getOwnPropertyNames$1 = Object.getOwnPropertyNames;
 var preventExtensions$1 = Object.preventExtensions;
 var _a$1 = Array.prototype;
 var ArraySlice$1 = _a$1.slice;
@@ -44,6 +77,7 @@ var isArray$1 = Array.isArray;
 // all the other invariants of Symbols, we need to do some manual checks here for the slow patch.
 var inOperator = function inOperatorCompat(obj, key) {
     if (typeof Symbol !== 'undefined' && typeof Symbol() === 'object') {
+        var getOwnPropertySymbols = Object.getOwnPropertySymbols;
         if (key && key.constructor === Symbol) {
             while (obj) {
                 if (getOwnPropertySymbols(obj).indexOf(key) !== -1) {
@@ -79,8 +113,7 @@ var defaultHandlerTraps = {
         return delete target[property];
     },
     ownKeys: function (target) {
-        // Note: we don't need to worry about symbols here since Symbol and Proxy go hand to hand
-        return getOwnPropertyNames$1(target);
+        return OwnPropertyKeys(target);
     },
     has: function (target, propertyKey) {
         return inOperator(target, propertyKey);
@@ -356,7 +389,6 @@ function instanceOfKey(instance, Type) {
 }
 
 var _keys = Object.keys;
-var _getOwnPropertyNames = Object.getOwnPropertyNames;
 var _hasOwnProperty = Object.hasOwnProperty;
 var _getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 var _preventExtensions = Object.preventExtensions;
@@ -468,12 +500,6 @@ function setPrototypeOf(replicaOrAny, proto) {
     }
     return _setPrototypeOf(replicaOrAny, proto);
 }
-function getOwnPropertyNames(replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.ownKeys(); // TODO: only strings
-    }
-    return _getOwnPropertyNames(replicaOrAny);
-}
 function getOwnPropertyDescriptor(replicaOrAny, key) {
     if (isCompatProxy(replicaOrAny)) {
         return replicaOrAny.getOwnPropertyDescriptor(key);
@@ -504,33 +530,6 @@ function hasOwnProperty(key) {
     }
     return _hasOwnProperty.call(this, key);
 }
-function assign(replicaOrAny) {
-    if (replicaOrAny == null) {
-        throw new TypeError('Cannot convert undefined or null to object');
-    }
-    var to = Object(replicaOrAny);
-    for (var index = 1; index < arguments.length; index++) {
-        var nextSource = arguments[index];
-        if (nextSource != null) {
-            if (isCompatProxy(nextSource)) {
-                for (var nextKey in iterableKey(nextSource)) {
-                    if (nextSource.getOwnPropertyDescriptor(nextKey)) {
-                        setKey(to, nextKey, getKey(nextSource, nextKey));
-                    }
-                }
-            }
-            else {
-                for (var nextKey in nextSource) {
-                    // Avoid bugs when hasOwnProperty is shadowed in regular objects
-                    if (_hasOwnProperty.call(nextSource, nextKey)) {
-                        setKey(to, nextKey, nextSource[nextKey]);
-                    }
-                }
-            }
-        }
-    }
-    return to;
-}
 // patches
 // [*] Object.prototype.hasOwnProperty should be patched as a general rule
 // [ ] Object.propertyIsEnumerable should be patched
@@ -557,7 +556,7 @@ Array.isArray = isArray;
 Object.defineProperty = defineProperty;
 Object.preventExtensions = preventExtensions;
 Object.getOwnPropertyDescriptor = getOwnPropertyDescriptor;
-Object.getOwnPropertyNames = getOwnPropertyNames;
+Object.getOwnPropertyNames = patchedGetOwnPropertyNames;
 Object.keys = keys;
 Object.isExtensible = isExtensible;
 // trap `getPrototypeOf` can be covered by a patched version of:
@@ -570,7 +569,7 @@ Object.setPrototypeOf = setPrototypeOf;
 Object.getPrototypeOf = getPrototypeOf;
 // Other necessary patches:
 // [*] Object.assign
-Object.assign = assign;
+Object.assign = patchedAssign;
 Array.prototype.unshift = compatUnshift;
 Array.prototype.concat = compatConcat;
 Array.prototype.push = compatPush;
@@ -600,211 +599,239 @@ var FinalProxy$1 = FinalProxy;
 return FinalProxy$1;
 
 })));
-/** version: 0.16.3 */
+/** version: 0.16.5 */
 
 /* Transformed Polyfills + Babel helpers */
 var __inKey = window.Proxy.inKey;
-var __getKey = window.Proxy.getKey;
 var __callKey = window.Proxy.callKey;
+var __getKey = window.Proxy.getKey;
 var __setKey = window.Proxy.setKey;
 var __deleteKey = window.Proxy.deleteKey;
 var __iterableKey = window.Proxy.iterableKey;
 var __instanceOfKey = window.Proxy.instanceOfKey;
+// THIS POLYFILL HAS BEEN MODIFIED FROM THE SOURCE
+// https://github.com/eligrey/classList.js
 
-(function (view) {
+if (__inKey(self, "document")) {
 
-  "use strict";
+  // Full polyfill for browsers with no classList support
+  // Including IE < Edge missing SVGElement.classList
+  if (!__inKey(__callKey(document, "createElement", "_"), "classList") || __getKey(document, "createElementNS") && !__inKey(__callKey(document, "createElementNS", "http://www.w3.org/2000/svg", "g"), "classList")) {
 
-  if (!__inKey(view, 'Element')) return;
+    (function (view) {
 
-  var classListProp = "classList",
-      protoProp = "prototype",
-      elemCtrProto = __getKey(__getKey(view, "Element"), protoProp),
-      objCtr = Object,
-      strTrim = __getKey(__getKey(String, protoProp), "trim") || function () {
-    return __callKey(this, "replace", /^\s+|\s+$/g, "");
-  },
-      arrIndexOf = __getKey(__getKey(Array, protoProp), "indexOf") || function (item) {
-    var i = 0,
-        len = __getKey(this, "length");
-    for (; i < len; i++) {
-      if (__inKey(this, i) && __getKey(this, i) === item) {
-        return i;
+      "use strict";
+
+      if (!__inKey(view, 'Element')) return;
+
+      var classListProp = "classList",
+          protoProp = "prototype",
+          elemCtrProto = __getKey(__getKey(view, "Element"), protoProp),
+          objCtr = Object,
+          strTrim = __getKey(__getKey(String, protoProp), "trim") || function () {
+        return __callKey(this, "replace", /^\s+|\s+$/g, "");
+      },
+          arrIndexOf = __getKey(__getKey(Array, protoProp), "indexOf") || function (item) {
+        var i = 0,
+            len = __getKey(this, "length");
+        for (; i < len; i++) {
+          if (__inKey(this, i) && __getKey(this, i) === item) {
+            return i;
+          }
+        }
+        return -1;
       }
-    }
-    return -1;
-  }
-  // Vendors: please allow content code to instantiate DOMExceptions
-  ,
-      DOMEx = function (type, message) {
-    __setKey(this, "name", type);
-    __setKey(this, "code", __getKey(DOMException, type));
-    __setKey(this, "message", message);
-  },
-      checkTokenAndGetIndex = function (classList, token) {
-    if (token === "") {
-      throw new DOMEx("SYNTAX_ERR", "An invalid or illegal string was specified");
-    }
-    if (__callKey(/\s/, "test", token)) {
-      throw new DOMEx("INVALID_CHARACTER_ERR", "String contains an invalid character");
-    }
-    return __callKey(arrIndexOf, "call", classList, token);
-  },
-      ClassList = function (elem) {
-    var trimmedClasses = __callKey(strTrim, "call", __callKey(elem, "getAttribute", "class") || ""),
-        classes = trimmedClasses ? __callKey(trimmedClasses, "split", /\s+/) : [],
-        i = 0,
-        len = __getKey(classes, "length");
-    for (; i < len; i++) {
-      __callKey(this, "push", __getKey(classes, i));
-    }
-    __setKey(this, "_updateClassName", function () {
-      __callKey(elem, "setAttribute", "class", __callKey(this, "toString"));
-    });
-  },
-      classListProto = __setKey(ClassList, protoProp, []),
-      classListGetter = function () {
-    return new ClassList(this);
-  };
-  // Most DOMException implementations don't allow calling DOMException's toString()
-  // on non-DOMExceptions. Error's toString() is sufficient here.
-  __setKey(DOMEx, protoProp, __getKey(Error, protoProp));
-  __setKey(classListProto, "item", function (i) {
-    return __getKey(this, i) || null;
-  });
-  __setKey(classListProto, "contains", function (token) {
-    token += "";
-    return checkTokenAndGetIndex(this, token) !== -1;
-  });
-  __setKey(classListProto, "add", function () {
-    var tokens = arguments,
-        i = 0,
-        l = __getKey(tokens, "length"),
-        token,
-        updated = false;
-    do {
-      token = __getKey(tokens, i) + "";
-      if (checkTokenAndGetIndex(this, token) === -1) {
-        __callKey(this, "push", token);
-        updated = true;
-      }
-    } while (++i < l);
+      // Vendors: please allow content code to instantiate DOMExceptions
+      ,
+          DOMEx = function (type, message) {
+        __setKey(this, "name", type);
+        __setKey(this, "code", __getKey(DOMException, type));
+        __setKey(this, "message", message);
+      },
+          checkTokenAndGetIndex = function (classList, token) {
+        if (token === "") {
+          throw new DOMEx("SYNTAX_ERR", "The token must not be empty.");
+        }
+        if (__callKey(/\s/, "test", token)) {
+          throw new DOMEx("INVALID_CHARACTER_ERR", "The token must not contain space characters.");
+        }
+        return __callKey(arrIndexOf, "call", classList, token);
+      },
+          ClassList = function (elem) {
+        var trimmedClasses = __callKey(strTrim, "call", __callKey(elem, "getAttribute", "class") || ""),
+            classes = trimmedClasses ? __callKey(trimmedClasses, "split", /\s+/) : [],
+            i = 0,
+            len = __getKey(classes, "length");
+        for (; i < len; i++) {
+          __callKey(this, "push", __getKey(classes, i));
+        }
+        __setKey(this, "_updateClassName", function () {
+          __callKey(elem, "setAttribute", "class", __callKey(this, "toString"));
+        });
+      },
+          classListProto = __setKey(ClassList, protoProp, []),
+          classListGetter = function () {
+        return new ClassList(this);
+      };
+      // Most DOMException implementations don't allow calling DOMException's toString()
+      // on non-DOMExceptions. Error's toString() is sufficient here.
+      __setKey(DOMEx, protoProp, __getKey(Error, protoProp));
+      __setKey(classListProto, "item", function (i) {
+        return __getKey(this, i) || null;
+      });
+      __setKey(classListProto, "contains", function (token) {
+        return checkTokenAndGetIndex(this, token + "") !== -1;
+      });
+      __setKey(classListProto, "add", function () {
+        var tokens = arguments,
+            i = 0,
+            l = __getKey(tokens, "length"),
+            token,
+            updated = false;
+        do {
+          token = __getKey(tokens, i) + "";
+          if (checkTokenAndGetIndex(this, token) === -1) {
+            __callKey(this, "push", token);
+            updated = true;
+          }
+        } while (++i < l);
 
-    if (updated) {
-      __callKey(this, "_updateClassName");
-    }
-  });
-  __setKey(classListProto, "remove", function () {
-    var tokens = arguments,
-        i = 0,
-        l = __getKey(tokens, "length"),
-        token,
-        updated = false,
-        index;
-    do {
-      token = __getKey(tokens, i) + "";
-      index = checkTokenAndGetIndex(this, token);
-      while (index !== -1) {
-        __callKey(this, "splice", index, 1);
-        updated = true;
-        index = checkTokenAndGetIndex(this, token);
-      }
-    } while (++i < l);
-
-    if (updated) {
-      __callKey(this, "_updateClassName");
-    }
-  });
-  __setKey(classListProto, "toggle", function (token, force) {
-    token += "";
-
-    var result = __callKey(this, "contains", token),
-        method = result ? force !== true && "remove" : force !== false && "add";
-
-    if (method) {
-      __callKey(this, method, token);
-    }
-
-    if (force === true || force === false) {
-      return force;
-    } else {
-      return !result;
-    }
-  });
-  __setKey(classListProto, "toString", function () {
-    return __callKey(this, "join", " ");
-  });
-
-  if (__getKey(objCtr, "defineProperty")) {
-    var classListPropDesc = {
-      get: classListGetter,
-      enumerable: true,
-      configurable: true
-    };
-    try {
-      __callKey(objCtr, "defineProperty", elemCtrProto, classListProp, classListPropDesc);
-    } catch (ex) {
-      // IE 8 doesn't support enumerable:true
-      // adding undefined to fight this issue https://github.com/eligrey/classList.js/issues/36
-      // modernie IE8-MSW7 machine has IE8 8.0.6001.18702 and is affected
-      if (__getKey(ex, "number") === undefined || __getKey(ex, "number") === -0x7FF5EC54) {
-        __setKey(classListPropDesc, "enumerable", false);
-        __callKey(objCtr, "defineProperty", elemCtrProto, classListProp, classListPropDesc);
-      }
-    }
-  } else if (__getKey(__getKey(objCtr, protoProp), "__defineGetter__")) {
-    __callKey(elemCtrProto, "__defineGetter__", classListProp, classListGetter);
-  }
-})(__getKey(window, "self"));
-
-// There is full or partial native classList support, so just check if we need
-// to normalize the add/remove and toggle APIs.
-
-(function () {
-  "use strict";
-
-  var testElement = __callKey(document, "createElement", "_");
-
-  __callKey(__getKey(testElement, "classList"), "add", "c1", "c2");
-
-  // Polyfill for IE 10/11 and Firefox <26, where classList.add and
-  // classList.remove exist but support only one argument at a time.
-  if (!__callKey(__getKey(testElement, "classList"), "contains", "c2")) {
-    var createMethod = function (method) {
-      var original = __getKey(__getKey(DOMTokenList, "prototype"), method);
-
-      __setKey(__getKey(DOMTokenList, "prototype"), method, function (token) {
-        var i,
-            len = __getKey(arguments, "length");
-
-        for (i = 0; i < len; i++) {
-          token = __getKey(arguments, i);
-          __callKey(original, "call", this, token);
+        if (updated) {
+          __callKey(this, "_updateClassName");
         }
       });
-    };
-    createMethod('add');
-    createMethod('remove');
-  }
+      __setKey(classListProto, "remove", function () {
+        var tokens = arguments,
+            i = 0,
+            l = __getKey(tokens, "length"),
+            token,
+            updated = false,
+            index;
+        do {
+          token = __getKey(tokens, i) + "";
+          index = checkTokenAndGetIndex(this, token);
+          while (index !== -1) {
+            __callKey(this, "splice", index, 1);
+            updated = true;
+            index = checkTokenAndGetIndex(this, token);
+          }
+        } while (++i < l);
 
-  __callKey(__getKey(testElement, "classList"), "toggle", "c3", false);
+        if (updated) {
+          __callKey(this, "_updateClassName");
+        }
+      });
+      __setKey(classListProto, "toggle", function (token, force) {
+        var result = __callKey(this, "contains", token),
+            method = result ? force !== true && "remove" : force !== false && "add";
 
-  // Polyfill for IE 10 and Firefox <24, where classList.toggle does not
-  // support the second argument.
-  if (__callKey(__getKey(testElement, "classList"), "contains", "c3")) {
-    var _toggle = __getKey(__getKey(DOMTokenList, "prototype"), "toggle");
+        if (method) {
+          __callKey(this, method, token);
+        }
 
-    __setKey(__getKey(DOMTokenList, "prototype"), "toggle", function (token, force) {
-      if (__inKey(arguments, 1) && !__callKey(this, "contains", token) === !force) {
-        return force;
-      } else {
-        return __callKey(_toggle, "call", this, token);
+        if (force === true || force === false) {
+          return force;
+        } else {
+          return !result;
+        }
+      });
+      __setKey(classListProto, "replace", function (token, replacement_token) {
+        var index = checkTokenAndGetIndex(token + "");
+        if (index !== -1) {
+          __callKey(this, "splice", index, 1, replacement_token);
+          __callKey(this, "_updateClassName");
+        }
+      });
+      __setKey(classListProto, "toString", function () {
+        return __callKey(this, "join", " ");
+      });
+
+      if (__getKey(objCtr, "defineProperty")) {
+        var classListPropDesc = {
+          get: classListGetter,
+          enumerable: true,
+          configurable: true
+        };
+        try {
+          __callKey(objCtr, "defineProperty", elemCtrProto, classListProp, classListPropDesc);
+        } catch (ex) {
+          // IE 8 doesn't support enumerable:true
+          // adding undefined to fight this issue https://github.com/eligrey/classList.js/issues/36
+          // modernie IE8-MSW7 machine has IE8 8.0.6001.18702 and is affected
+          if (__getKey(ex, "number") === undefined || __getKey(ex, "number") === -0x7FF5EC54) {
+            __setKey(classListPropDesc, "enumerable", false);
+            __callKey(objCtr, "defineProperty", elemCtrProto, classListProp, classListPropDesc);
+          }
+        }
+      } else if (__getKey(__getKey(objCtr, protoProp), "__defineGetter__")) {
+        __callKey(elemCtrProto, "__defineGetter__", classListProp, classListGetter);
       }
-    });
+    })(self);
   }
 
-  testElement = null;
-})();
+  // There is full or partial native classList support, so just check if we need
+  // to normalize the add/remove and toggle APIs.
+
+  (function () {
+    "use strict";
+
+    var testElement = __callKey(document, "createElement", "_");
+
+    __callKey(__getKey(testElement, "classList"), "add", "c1", "c2");
+
+    // Polyfill for IE 10/11 and Firefox <26, where classList.add and
+    // classList.remove exist but support only one argument at a time.
+    if (!__callKey(__getKey(testElement, "classList"), "contains", "c2")) {
+      var createMethod = function (method) {
+        var original = __getKey(__getKey(DOMTokenList, "prototype"), method);
+
+        __setKey(__getKey(DOMTokenList, "prototype"), method, function (token) {
+          var i,
+              len = __getKey(arguments, "length");
+
+          for (i = 0; i < len; i++) {
+            token = __getKey(arguments, i);
+            __callKey(original, "call", this, token);
+          }
+        });
+      };
+      createMethod('add');
+      createMethod('remove');
+    }
+
+    __callKey(__getKey(testElement, "classList"), "toggle", "c3", false);
+
+    // Polyfill for IE 10 and Firefox <24, where classList.toggle does not
+    // support the second argument.
+    if (__callKey(__getKey(testElement, "classList"), "contains", "c3")) {
+      var _toggle = __getKey(__getKey(DOMTokenList, "prototype"), "toggle");
+
+      __setKey(__getKey(DOMTokenList, "prototype"), "toggle", function (token, force) {
+        if (__inKey(arguments, 1) && !__callKey(this, "contains", token) === !force) {
+          return force;
+        } else {
+          return __callKey(_toggle, "call", this, token);
+        }
+      });
+    }
+
+    // replace() polyfill
+    if (!__inKey(__getKey(__callKey(document, "createElement", "_"), "classList"), "replace")) {
+      __setKey(__getKey(DOMTokenList, "prototype"), "replace", function (token, replacement_token) {
+        var tokens = __callKey(__callKey(this, "toString"), "split", " "),
+            index = __callKey(tokens, "indexOf", token + "");
+        if (index !== -1) {
+          tokens = __callKey(tokens, "slice", index);
+          __callKey(__getKey(this, "remove"), "apply", this, tokens);
+          __callKey(this, "add", replacement_token);
+          __callKey(__getKey(this, "add"), "apply", this, __callKey(tokens, "slice", 1));
+        }
+      });
+    }
+
+    testElement = null;
+  })();
+}
 __setKey(window, "CustomEvent", function CustomEvent(type, eventInitDict) {
   if (!type) {
     throw Error('TypeError: Failed to construct "CustomEvent": An event name must be provided.');

@@ -1089,7 +1089,7 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
                 var observable_1 = isObservable(newValue);
                 newValue = observable_1 ? getReactiveProxy(newValue) : newValue;
                 assert.block(function devModeCheck() {
-                    if (!observable_1 && isObject(newValue)) {
+                    if (!observable_1 && newValue !== null && isObject(newValue)) {
                         assert.logWarning("Assigning a non-reactive value " + newValue + " to member property " + key + " of " + vm + " is not common because mutations on that value cannot be observed.");
                     }
                 });
@@ -1810,31 +1810,20 @@ function getAttributePatched(attrName) {
     var vm = this[ViewModelReflection];
     assert.vm(vm);
     assert.block(function devModeCheck() {
-        var propsConfig = vm.def.props;
-        attrName = isString(attrName) ? attrName.toLocaleLowerCase() : null;
-        var propName = getPropNameFromAttrName(attrName);
-        if (propsConfig[propName]) {
-            assert.logError("Invalid attribute \"" + attrName + "\" for " + vm + ". Instead access the public property with `element." + propName + ";`.");
-        }
+        assertPublicAttributeColission(vm, attrName);
     });
     return getAttribute.apply(this, ArraySlice.call(arguments));
 }
 function setAttributePatched(attrName, newValue) {
     var vm = this[ViewModelReflection];
     assert.vm(vm);
-    var _a = vm.def, propsConfig = _a.props, observedAttrs = _a.observedAttrs;
-    attrName = isString(attrName) ? attrName.toLocaleLowerCase() : null;
+    var observedAttrs = vm.def.observedAttrs;
     assert.block(function devModeCheck() {
-        if (!vm.vnode.isRoot) {
-            assert.logError("Invalid operation on Element " + vm + ". Elements created via a template should not be mutated using DOM APIs. Instead of attempting to update this element directly to change the value of attribute \"" + attrName + "\", you can update the state of the component, and let the engine to rehydrate the element accordingly.");
-        }
-        var propName = getPropNameFromAttrName(attrName);
-        if (propsConfig[propName]) {
-            assert.logError("Invalid attribute \"" + attrName + "\" for " + vm + ". Instead update the public property with `element." + propName + " = value;`.");
-        }
+        assertTemplateMutationViolation(vm, attrName);
+        assertPublicAttributeColission(vm, attrName);
     });
     var oldValue = getAttribute.call(this, attrName);
-    setAttribute.call(this, attrName, newValue);
+    setAttribute.apply(this, ArraySlice.call(arguments));
     newValue = getAttribute.call(this, attrName);
     if (!isNull(attrName) && attrName in observedAttrs && oldValue !== newValue) {
         invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
@@ -1843,22 +1832,30 @@ function setAttributePatched(attrName, newValue) {
 function removeAttributePatched(attrName) {
     var vm = this[ViewModelReflection];
     assert.vm(vm);
-    var _a = vm.def, propsConfig = _a.props, observedAttrs = _a.observedAttrs;
-    attrName = isString(attrName) ? attrName.toLocaleLowerCase() : null;
+    var observedAttrs = vm.def.observedAttrs;
     assert.block(function devModeCheck() {
-        if (!vm.vnode.isRoot) {
-            assert.logError("Invalid operation on Element " + vm + ". Elements created via a template should not be mutated using DOM APIs. Instead of attempting to remove attribute \"" + attrName + "\" from this element, you can update the state of the component, and let the engine to rehydrate the element accordingly.");
-        }
-        var propName = getPropNameFromAttrName(attrName);
-        if (propsConfig[propName]) {
-            assert.logError("Invalid attribute \"" + attrName + "\" for " + vm + ". Instead update the public property with `element." + propName + " = undefined;`.");
-        }
+        assertTemplateMutationViolation(vm, attrName);
+        assertPublicAttributeColission(vm, attrName);
     });
     var oldValue = getAttribute.call(this, attrName);
-    removeAttribute.call(this, attrName);
+    removeAttribute.apply(this, ArraySlice.call(arguments));
     var newValue = getAttribute.call(this, attrName);
     if (!isNull(attrName) && attrName in observedAttrs && oldValue !== newValue) {
         invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
+    }
+}
+function assertPublicAttributeColission(vm, attrName) {
+    var lowercasedAttrName = isString(attrName) ? attrName.toLocaleLowerCase() : null;
+    var propName = getPropNameFromAttrName(lowercasedAttrName);
+    var propsConfig = vm.def.props;
+    if (propsConfig && propsConfig[propName]) {
+        assert.logError("Invalid attribute \"" + lowercasedAttrName + "\" for " + vm + ". Instead access the public property with `element." + propName + ";`.");
+    }
+}
+function assertTemplateMutationViolation(vm, attrName) {
+    var isRoot = vm.vnode.isRoot;
+    if (!isRoot) {
+        assert.logError("Invalid operation on Element " + vm + ". Elements created via a template should not be mutated using DOM APIs. Instead of attempting to update this element directly to change the value of attribute \"" + attrName + "\", you can update the state of the component, and let the engine to rehydrate the element accordingly.");
     }
 }
 function createDescriptorMap(publicProps, publicMethodsConfig) {
@@ -3475,4 +3472,4 @@ exports.wire = wire;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.16.3 */
+/** version: 0.16.5 */

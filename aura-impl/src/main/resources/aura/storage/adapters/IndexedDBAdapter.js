@@ -72,7 +72,8 @@ var IndexedDBAdapter = function IndexedDBAdapter(config) {
     // objectStore name is the descriptor of current app or cmp
     var context = $A.getContext();
     var tableName = config["partitionName"] || (context && (context.app || context.cmp));
-    tableName = tableName || window.location.pathname;
+    // fallback if context has not been created
+    tableName = tableName || window["Aura"]["app"];
     this.tableName = tableName || "store";
 
     this.sweepingSuspended = false;

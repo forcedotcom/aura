@@ -90,7 +90,11 @@ Test.Aura.Storage.Adapters.IndexedDBAdapterTest = function(){
     function initialize(){
         var mocks = Mocks.GetMocks(Object.Global(), {
             $A: {
-                getContext: function() {},
+                getContext: function() {
+                    return {
+                        "app": "app"
+                    }
+                },
                 log: function() {},
                 warning: function() {},
             },
@@ -209,7 +213,13 @@ Test.Aura.Storage.Adapters.IndexedDBAdapterTest = function(){
     function cleanseKeys() {
 
         var mockAura = Mocks.GetMocks(Object.Global(), {
-            $A: { getContext: function() {} },
+            $A: {
+                getContext: function() {
+                    return {
+                        "app": "app"
+                    }
+                }
+            },
             window: { location: {} }
         });
 

@@ -106,6 +106,23 @@ export default class SecureDOMEventClazz extends Element {
         child.testInitEventOnElementOfChildModule();
     }
 
+    @api
+    testCustomEvent() {
+        let listenerCalled = false;
+        this.addEventListener("customEvent", event => {
+            const eventData = event.detail.welcome;
+            testUtil.assertEquals("Hello", eventData[0], "Expected data to be equal to 'Hello'");
+            testUtil.assertEquals("World!", eventData[1], "Expected data to be equal to 'World!'");
+            listenerCalled = true;
+        });
+
+        const testData = {detail: {welcome: ["Hello", "World!"]}};
+        const customEvt = new CustomEvent("customEvent", testData);
+        this.dispatchEvent(customEvt);
+
+        testUtil.assertEquals(true, listenerCalled, "Expected custom event to be dispatched.");
+    }
+
     assertClickHandlerCalled() {
         // W-4462187 will fix this and these lines can be uncommented then
         // testUtil.assertStartsWith("SecureElement", this._event.target.toString());

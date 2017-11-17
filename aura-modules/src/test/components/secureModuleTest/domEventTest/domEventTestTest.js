@@ -45,5 +45,11 @@
         test: function(cmp) {
             cmp.domEventTester("testInitEventOnElementOfChildModule");
         }
+    },
+
+    testCustomEvent: {
+        test: function(cmp) {
+            cmp.domEventTester("testCustomEvent");
+        }
     }
 })

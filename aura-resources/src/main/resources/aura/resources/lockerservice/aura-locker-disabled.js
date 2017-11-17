@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-11-15
- * Version: 0.2.10
+ * Generated: 2017-11-16
+ * Version: 0.2.11
  */
 
 (function (global, factory) {

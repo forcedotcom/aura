@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-11-15
- * Version: 0.2.10
+ * Generated: 2017-11-16
+ * Version: 0.2.11
  */
 
 (function (global, factory) {
@@ -1361,6 +1361,77 @@ window.devtoolsFormatters.push(lsProxyFormatter);
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+function assert$1(condition) {
+    if (!condition) {
+        throw new Error();
+    }
+}
+
+// TODO: remove these functions. Our filtering mechanism should not
+// rely on the more expensive operation.
+
+function isObjectObject(value) {
+    return (typeof value === 'object' && value !== null) &&
+      objectToString.call(value) === '[object Object]';
+}
+
+// https://github.com/jonschlinkert/is-plain-object
+// Copyright © 2017, Jon Schlinkert. Released under the MIT License.
+function isPlainObject(value) {
+
+    if (isObjectObject(value) === false) {
+        return false;
+    }
+
+    // If has modified constructor
+    const ctor = value.constructor;
+    if (typeof ctor !== 'function') {
+        return false;
+    }
+
+    try {
+        // If has modified prototype
+        const proto = ctor.prototype;
+        if (isObjectObject(proto) === false) {
+            return false;
+        }
+        // If constructor does not have an Object-specific method
+        if (proto.hasOwnProperty('isPrototypeOf') === false) {
+            return false;
+        }
+    } catch (e) { /* Assume is  object when throws */ }
+
+    // Most likely a plain Object
+    return true;
+}
+
+/**
+ * Basic URL Scheme checking utility.
+ * Checks for http: and https: url schemes.
+ * @param {String} url
+ * @return {Boolean}
+ */
+function isValidURLScheme(url) {
+    const normalized = document.createElement('a');
+    normalized.href = url;
+    return normalized.protocol === 'https:' || normalized.protocol === 'http:';
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 function cloneFiltered(el, st) {
     var root = el.cloneNode(false);
@@ -2013,6 +2084,16 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
     });
 };
 
+SecureElement.validateURLScheme = function(value) {
+    let url = sanitizeURLForElement(value);
+
+    if (!isValidURLScheme(url)) {
+      throw new error('An unsupported URL scheme was detected. Only http:// and https:// are supported.');
+    }
+
+    return url;
+};
+
 SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype, caseInsensitiveAttributes, invalidAttributeReturnValue, namespaced, nameProp, key) {
     return {
         writable: true,
@@ -2027,6 +2108,11 @@ SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype
             if (!SecureElement.isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes)) {
                 warn(this + " does not allow getting/setting the " + name.toLowerCase() + " attribute, ignoring!");
                 return invalidAttributeReturnValue;
+            }
+
+            // args[0] is the attribute name. args[1] is the attribute value
+            if (args[0] === 'href' || args[0] === 'src') {
+              args[1] = SecureElement.validateURLScheme(args[1]);
             }
 
             args = SecureObject.filterArguments(this, args, { rawArguments: true });
@@ -3339,77 +3425,6 @@ const metadata$1 = {
         }
     }
 };
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-function assert$1(condition) {
-    if (!condition) {
-        throw new Error();
-    }
-}
-
-// TODO: remove these functions. Our filtering mechanism should not
-// rely on the more expensive operation.
-
-function isObjectObject(value) {
-    return (typeof value === 'object' && value !== null) &&
-      objectToString.call(value) === '[object Object]';
-}
-
-// https://github.com/jonschlinkert/is-plain-object
-// Copyright © 2017, Jon Schlinkert. Released under the MIT License.
-function isPlainObject(value) {
-
-    if (isObjectObject(value) === false) {
-        return false;
-    }
-
-    // If has modified constructor
-    const ctor = value.constructor;
-    if (typeof ctor !== 'function') {
-        return false;
-    }
-
-    try {
-        // If has modified prototype
-        const proto = ctor.prototype;
-        if (isObjectObject(proto) === false) {
-            return false;
-        }
-        // If constructor does not have an Object-specific method
-        if (proto.hasOwnProperty('isPrototypeOf') === false) {
-            return false;
-        }
-    } catch (e) { /* Assume is  object when throws */ }
-
-    // Most likely a plain Object
-    return true;
-}
-
-/**
- * Basic URL Scheme checking utility.
- * Checks for http: and https: url schemes.
- * @param {String} url
- * @return {Boolean}
- */
-function isValidURLScheme(url) {
-    const normalized = document.createElement('a');
-    normalized.href = url;
-    return normalized.protocol === 'https:' || normalized.protocol === 'http:';
-}
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -7341,8 +7356,21 @@ function SecureAuraEvent(event, key) {
         }
     });
 
-	[ "fire", "getName", "getParam", "getParams", "getPhase", "getSource", "pause", "preventDefault", "resume", "stopPropagation", "getType", "getEventType" ]
-	.forEach(function(name) {
+	[
+        "fire",
+        "getName",
+        "getParam",
+        "getParams",
+        "getPhase",
+        "getSource",
+        "getSourceEvent",
+        "pause",
+        "preventDefault",
+        "resume",
+        "stopPropagation",
+        "getType",
+        "getEventType"
+    ].forEach(function(name) {
 		Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name));
 	});
 

@@ -280,27 +280,27 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         }  catch (MalformedURLException e) {}
 
         if (engineSource != null) {
-            this.engine = "try {\n" + engineSource + "\n} catch (e) {}";
+            this.engine = engineSource;
         }
 
         if (engineMinSource != null) {
-            this.engineMin = "try { " + engineMinSource + " } catch (e) {}";
+            this.engineMin = engineMinSource;
         }
 
         if (compatHelpersSource != null && engineCompatSource != null) {
-            this.engineCompat = "try {\n" + compatHelpersSource + "\n" + engineCompatSource + "\n} catch (e) {}";
+            this.engineCompat = compatHelpersSource + "\n" + engineCompatSource;
         }
 
         if (compatHelpersMinSource != null && engineCompatMinSource != null) {
-            this.engineCompatMin = "try { " + compatHelpersMinSource + "\n" + engineCompatMinSource + " } catch (e) {}";
+            this.engineCompatMin = compatHelpersMinSource + "\n" + engineCompatMinSource;
         }
 
         if (engineProdDebugSource != null) {
-            this.engineProdDebug = "try { " + engineProdDebugSource + " } catch (e) {}";
+            this.engineProdDebug = engineProdDebugSource;
         }
 
         if (compatHelpersSource != null && engineCompatProdDebugSource != null) {
-            this.engineCompatProdDebug = "try {\n" + compatHelpersSource + "\n" + engineCompatProdDebugSource + "\n} catch (e) {}";
+            this.engineCompatProdDebug = compatHelpersSource + "\n" + engineCompatProdDebugSource;
         }
     }
 

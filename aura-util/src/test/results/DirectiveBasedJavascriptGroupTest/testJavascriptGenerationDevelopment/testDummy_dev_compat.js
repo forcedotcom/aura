@@ -1,7 +1,5 @@
-try {
 
 var mock='engine compat';console.log(mock);
-} catch (e) {}
 
 new function() {
 var rrrrr = "ARRRRRRRR";

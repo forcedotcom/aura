@@ -203,9 +203,17 @@ public class ServerServiceImpl implements ServerService {
             Action oldAction = context.setCurrentAction(action);
             boolean earlyCleanup = false;
             try {
+                DefDescriptor<ComponentDef> callingDesscriptor = action.getCallingDescriptor();
+                if (callingDesscriptor != null && !context.getPreloadedDefinitions().contains(callingDesscriptor)) {
+                    // we can assume that if the client is calling an action from a particular component, it has the component and we won't need to serialize it back
+                    // components referenced in the action will be added to the context and thus serialized back to the client
+                    Set<DefDescriptor<?>> preloadedDefinitions = Sets.newHashSet(context.getPreloadedDefinitions());
+                    preloadedDefinitions.addAll(definitionService.getDependencies(definitionService.getUid(null, callingDesscriptor)));
+                    context.setPreloadedDefinitions(preloadedDefinitions);
+                }
                 action.setup();
                 action.run();
-            } catch (AuraExecutionException x) {
+            } catch (AuraExecutionException | QuickFixException x) {
                 earlyCleanup = true;
                 exceptionAdapter.handleException(x, action);
             } finally {

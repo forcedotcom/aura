@@ -1557,6 +1557,9 @@ Component.prototype.getAttributeValueProvider = function() {
  * @export
  */
 Component.prototype.setAttributeValueProvider = function (avp) {
+    var currentAttributeValueProvider = this.getAttributeValueProvider();
+    currentAttributeValueProvider.deIndex(this.localId, this.globalId);
+    
     this.attributeValueProvider = avp;
     if(avp) {
         // JBA: without this, programmatically created components exhibit indeterministic owners

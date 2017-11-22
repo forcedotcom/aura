@@ -745,7 +745,7 @@ public class JsonEncoder implements Json {
         if (serializer == null) {
             throw new JsonSerializerNotFoundException(key);
         }
-        serializer.serialize(this, key);
+        this.writeString(key);
         writeMapSeparator();
     }
 

@@ -7175,7 +7175,6 @@ return {
             
             wrapperComponent = $A.createComponentFromConfig({
                 descriptor: 'markup://aura:html',
-                skipCreationPath: true,
                 attributes: {
                     body: innerBody,
                     tag: wrapperTag,
@@ -7203,7 +7202,6 @@ return {
             descriptor: 'markup://ui:label',
             localId: 'inputLabel',
             valueProvider: component,
-            skipCreationPath: true,
             attributes: {
                 label: labelAttribute,
                 "class": labelClass,
@@ -7237,7 +7235,6 @@ return {
             descriptor: 'markup://ui:legend',
             localId: 'inputLabel',
             valueProvider: component,
-            skipCreationPath: true,
             attributes: {
                 legend: labelAttribute,
                 "class" : labelClass,
@@ -7270,7 +7267,6 @@ return {
             descriptor: 'markup://ui:picklistLabel',
             localId: 'inputLabel',
             valueProvider: component,
-            skipCreationPath: true,
             attributes: {
                 label: labelAttribute,
                 "class" : labelClass,

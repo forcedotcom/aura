@@ -39,7 +39,6 @@
             // creating HTML div (simple input) or fieldset (compound input)
             wrapperComponent = $A.createComponentFromConfig({
                 descriptor: 'markup://aura:html',
-                skipCreationPath: true,
                 attributes: {
                     body: innerBody,
                     tag: wrapperTag,
@@ -68,7 +67,6 @@
             descriptor: 'markup://ui:label',
             localId: 'inputLabel',
             valueProvider: component,
-            skipCreationPath: true,
             attributes: {
                 label: labelAttribute,
                 "class": labelClass,
@@ -103,7 +101,6 @@
             descriptor: 'markup://ui:legend',
             localId: 'inputLabel',
             valueProvider: component,
-            skipCreationPath: true,
             attributes: {
                 legend: labelAttribute,
                 "class" : labelClass,
@@ -137,7 +134,6 @@
             descriptor: 'markup://ui:picklistLabel',
             localId: 'inputLabel',
             valueProvider: component,
-            skipCreationPath: true,
             attributes: {
                 label: labelAttribute,
                 "class" : labelClass,

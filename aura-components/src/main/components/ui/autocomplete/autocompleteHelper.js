@@ -74,7 +74,6 @@
                 descriptor: "markup://ui:autocompleteList",
                 localId: "list",
                 valueProvider: component,
-                skipCreationPath: true,
                 attributes: {
                     'class' : component.getReference("v.autocompleteListClass"),
                     'dataProvider' : component.getReference("v.dataProvider"),
@@ -105,8 +104,7 @@
                 autocompletePanelCmp = $A.createComponentFromConfig({
                     descriptor: "markup://ui:autocompletePanel",
                     localId: "panel",
-                    valueProvider: component,
-                    skipCreationPath: true
+                    valueProvider: component
                 });
                 
                 // insert autocompletePanel into returnCmp

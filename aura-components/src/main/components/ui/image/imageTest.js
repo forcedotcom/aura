@@ -131,6 +131,49 @@
             $A.test.assertEquals(imgEl, document.getElementsByTagName("img")[0]);
         }
     },
+    testItShouldSanitizeImgSrcWhenUrlProvidedHasJavascriptCase1: {
+        attributes: {
+            src: 'javascript:alert("OK")', // eslint-disable-line no-script-url
+            href: 'http://www.salesforce.com',
+            imageType: 'decorative'
+        },
+        test: [
+            function (cmp) {
+                var imgEl = cmp.getDef().getHelper().getImageElement(cmp);
+                $A.test.assertTrue(imgEl.getAttribute('src') === '');
+
+            }
+        ]
+    },
+
+    testItShouldSanitizeImgSrcWhenUrlProvidedHasJavascriptCase2: {
+        attributes: {
+            src: '  javascript:alert("OK")', // eslint-disable-line no-script-url
+            href: 'http://www.salesforce.com',
+            imageType: 'decorative'
+        },
+        test: [
+            function (cmp) {
+                var imgEl = cmp.getDef().getHelper().getImageElement(cmp);
+                $A.test.assertTrue(imgEl.getAttribute('src') === '');
+
+            }
+        ]
+    },
+
+    testItShouldSanitizeAnchorSrcWhenUrlProvidedHasJavascript: {
+        attributes: {
+            src: '/auraFW/resources/aura/auralogo.png',
+            href: 'javascript:alert("OK")', // eslint-disable-line no-script-url
+            imageType: 'decorative'
+        },
+        test: [
+            function (cmp) {
+                var firstElement = cmp.find('body').getElement().firstChild;
+                $A.test.assertTrue($A.test.isInstanceOfImageElement(firstElement));
+            }
+        ]
+    },
 
     //W-1014086
     _testAccessibility: {

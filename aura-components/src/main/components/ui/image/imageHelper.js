@@ -40,7 +40,7 @@
 
             var image = this.buildImageElement(cmp);
 
-            var href = cmp.get("v.href");
+            var href = this.sanitizeUrl(cmp.get("v.href"));
 
             if (!$A.util.isEmpty(href)) {
                 var link = $A.util.createHtmlElement("a", {
@@ -61,7 +61,7 @@
     buildImageElement: function (cmp) {
         var image = $A.util.createHtmlElement("img", {
             "data-aura-rendered-by": cmp.getGlobalId(),
-            "src": cmp.get("v.src"),
+            "src": this.sanitizeUrl(cmp.get("v.src")),
             "class": cmp.get("v.class"),
             "alt": cmp.get("v.alt"),
             "title": cmp.get("v.title")
@@ -80,6 +80,14 @@
         });
 
         return image;
+    },
+
+    sanitizeUrl: function (url) {
+        var regex = /^\s*javascript:/;
+        if (regex.test(url)) {
+            return '';
+        }
+        return url;
     }
 
 });

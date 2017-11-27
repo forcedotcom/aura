@@ -38,9 +38,9 @@ public class AuraTextUtil {
     private static final TrieMatcher JS_SEARCH_REPLACE = TrieMatcher.compile(JS_IN, JS_OUT);
 
     private static final String[] JSON_IN = new String[] { "\\", "\n", "\r", "\t", "\"", "!--", "<", ">", "\u2028",
-            "\u2029", "\u0000", "*/" };
+            "\u2029", "\u0000", "\u001F", "*/" };
     private static final String[] JSON_OUT = new String[] { "\\\\", "\\n", "\\r", "\\t", "\\\"", "\\u0021--",
-            "\\u003C", "\\u003E", "\\n", "\\u2029", "", "\\u002A/" };
+            "\\u003C", "\\u003E", "\\n", "\\u2029", "", "\\u001F", "\\u002A/" };
     private static final TrieMatcher JSON_SEARCH_REPLACE = TrieMatcher.compile(JSON_IN, JSON_OUT);
 
     private static final String[] RESERVED_METHODS = new String[]{

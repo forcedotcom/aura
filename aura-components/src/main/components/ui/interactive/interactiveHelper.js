@@ -44,6 +44,10 @@
      */
     addDomHandler : function(component, event) {
         var element = component.getElement();
+        if (element === null) {
+            $A.warning("Can't add handler to component because didn't have valid html element. Component was " + JSON.stringify(component));
+            return ;
+        }
         var elementId = this.getUid(element) || this.newUid(element);
 
         var handler = $A.getCallback(this.domEventHandler);

@@ -5215,8 +5215,13 @@ return {
     "setMenuItemFocus":function(component, index) {
         var menuItem = this.getMenuItem(component, index);
         if (menuItem && menuItem.isValid() && menuItem.getElement()) {
-            menuItem.setFocus();
-            this.fireMenuFocusChangeEvent(component, null, menuItem);
+            
+            
+            
+            setTimeout($A.getCallback(function () {
+                menuItem.setFocus();
+                this.fireMenuFocusChangeEvent(component, null, menuItem);
+            }).bind(this),5);
         }
     },
     "setKeyboardEventHandlers":function(component) {

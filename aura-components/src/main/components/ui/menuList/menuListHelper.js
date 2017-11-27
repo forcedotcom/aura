@@ -74,11 +74,16 @@
     setMenuItemFocus: function(component, index) {
         var menuItem = this.getMenuItem(component, index);
         if (menuItem && menuItem.isValid() && menuItem.getElement()) {
-            menuItem.setFocus();
-            this.fireMenuFocusChangeEvent(component, null, menuItem);
+            // We have to set a timeout here, so that
+            // the menu items get positioned before we set focus.
+            // for more info see : W-4319141
+            setTimeout($A.getCallback(function () {
+                menuItem.setFocus();
+                this.fireMenuFocusChangeEvent(component, null, menuItem);
+            }).bind(this),5);
         }
     },
-
+    
     setKeyboardEventHandlers: function(component) {
     	var el = component.find("datalist").getElement();
     	$A.util.on(el, "keydown", this.getKeyboardInteractionHandler(component));

@@ -1,0 +1,12 @@
+<aura:component render="client">
+    <div aura:id="div"></div>
+    <div aura:id="div"></div>
+
+    <div aura:id="output"></div>
+
+
+    <aura:iteration items="[1]" var="item">
+        <div aura:id="div2">{!item}</div>
+        <div aura:id="output2">{!item}</div>
+    </aura:iteration>
+</aura:component>

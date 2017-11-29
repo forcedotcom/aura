@@ -391,8 +391,12 @@ Component.prototype.find = function(name) {
             if (globalId) {
                 if ($A.util.isArray(globalId)) {
                     var ret = [];
+                    var found;
                     for (var i = 0; i < globalId.length; i++) {
-                        ret.push($A.componentService.get(globalId[i]));
+                        found = $A.componentService.get(globalId[i]);
+                        if(found !== null && found !== undefined) {
+                            ret.push(found);
+                        }
                     }
                     return ret;
                 }
@@ -1557,12 +1561,21 @@ Component.prototype.getAttributeValueProvider = function() {
  * @export
  */
 Component.prototype.setAttributeValueProvider = function (avp) {
+    // Kris: This causes problems, and until people move their finds to the new AVP
+    // We can't fix this.
+    // var currentAttributeValueProvider = this.getAttributeValueProvider();
+    // currentAttributeValueProvider.doDeIndex();
+    
     this.attributeValueProvider = avp;
     if(avp) {
         // JBA: without this, programmatically created components exhibit indeterministic owners
         // with no way for the creator to fix
         this.owner = avp.globalId;
+
+        // Allow finding on the new valueProvider
+        avp.index(this.localId, this.globalId);
     }
+
 };
 
 /**

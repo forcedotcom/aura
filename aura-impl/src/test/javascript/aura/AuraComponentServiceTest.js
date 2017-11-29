@@ -38,6 +38,10 @@ Test.Aura.AuraComponentServiceTest = function(){
             ComponentDefStorage: function () {},
             ComponentClassRegistry: function () {}
         },
+        Controller: {
+            ActionStorage: function () {
+            }
+        },
         Library: {
             LibraryRegistry: function () {},
             LibraryIncludeRegistry: function () {}
@@ -582,6 +586,89 @@ Test.Aura.AuraComponentServiceTest = function(){
             });
 
             Assert.True(actual);
+        }
+    }
+
+    [Fixture]
+    function saveComponentDefs() {
+        var $Amock=Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                util: {
+                    estimateSize: function(objs){
+                        return objs.length * 1024;
+                    }
+                }
+            }
+        });
+
+        [Fact]
+        function enoughRoomInStorageSavesComponents(){
+            var saveCalled = false;
+
+            $Amock(function() {
+                targetService.componentDefStorage = {
+                    getStorage: function(){
+                        return {
+                            getSize: function () {
+                                return {then: function (f) {
+                                    return {then: function(fn){
+                                        return {then: function(){fn(f(0))}};
+                                    }};
+                                }};
+                            },
+                            getMaxSize: function () {
+                                return 10;
+                            }
+                        }
+                    },
+                    storeDefs: function() {
+                        saveCalled = true;
+                    },
+                    EVICTION_HEADROOM: 0
+                };
+                targetService.saveDefsToStorage({componentDefs:[{}]});
+            });
+
+            Assert.True(saveCalled, "with enough room in storage, storeDefs should have been called on componentDefStorage");
+        }
+
+        [Fact]
+        function notEnoughRoomInStorageClearsStorages() {
+            var saveCalled = false;
+            var clearCalled = false;
+
+            $Amock(function() {
+                targetService.componentDefStorage = {
+                    getStorage: function(){
+                        return {
+                            getSize: function () {
+                                return {then: function (f) {
+                                    return {then: function(fn){
+                                        return {then: function(){fn(f(1))}};
+                                    }};
+                                }};
+                            },
+                            getMaxSize: function () {
+                                return 1;
+                            }
+                        }
+                    },
+                    storeDefs: function() {
+                        saveCalled = true;
+                    },
+                    clear: function() {
+                        clearCalled = true;
+                        return {then:function(){return {then:function(fn){return fn()}}}};
+                    },
+                    EVICTION_HEADROOM: 0
+                };
+                targetService.saveDefsToStorage({componentDefs:[{}]});
+            });
+
+            Assert.True(!saveCalled && clearCalled, "there was not enough room in storage" +
+                (saveCalled?", storeDefs should not have been called on componentDefStorage":"") +
+                (!clearCalled?", clear of the storage should have been called":"")
+            );
         }
     }
 }

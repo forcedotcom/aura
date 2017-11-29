@@ -35,6 +35,7 @@ function AuraComponentService() {
     this.libraryIncludeRegistry = new Aura.Library.LibraryIncludeRegistry();
     this.componentClassRegistry = new Aura.Component.ComponentClassRegistry();
     this.componentDefStorage    = new Aura.Component.ComponentDefStorage();
+    this.actionStorage          = new Aura.Controller.ActionStorage();
     this.moduleNameToDescriptorLookup = {};
 
     // holds a temporary list of collected styles
@@ -1773,7 +1774,9 @@ AuraComponentService.prototype.restoreDefsFromStorage = function (context) {
  * @return {Promise} Promise when storage is cleared
  */
 AuraComponentService.prototype.clearDefsFromStorage = function (metricsPayload) {
-    return this.componentDefStorage.clear(metricsPayload);
+    return this.componentDefStorage.clear(metricsPayload).then(function(){
+        return this.actionStorage.clear();
+    }.bind(this));
 };
 
 /**
@@ -1815,8 +1818,14 @@ AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
     // def AuraStorage mutual exclusion is not required to
     return self.pruneDefsFromStorage(defSizeKb + libSizeKb + evtSizeKb + moduleSizeKb)
         .then(
-            function() {
-                return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs, evtConfigs, moduleConfigs, context);
+            function(cleared) {
+                if (!cleared) {
+                    // nothing was cleared from storage, we should be safe to store
+                    return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs, evtConfigs, moduleConfigs, context);
+                // } else {
+                    // storage was cleared. We can't be certain if the defs that were being requested to save contain all their required dependencies
+                    // so... we just won't store them to avoid an inconsistent storage.
+                }
             }
         )
         .then(
@@ -2266,7 +2275,7 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
                 var maxSize = defStorage.getMaxSize();
                 newSize = currentSize + requiredSpaceKb + maxSize * self.componentDefStorage.EVICTION_HEADROOM;
                 if (newSize < maxSize) {
-                    return undefined;
+                    return false;
                 }
 
                 // If we arrive here, some eviction is required...
@@ -2289,7 +2298,7 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
                     "storageRequiredSize" : newSize
                 };
 
-                return self.clearDefsFromStorage(metricsPayload);
+                return self.clearDefsFromStorage(metricsPayload).then(function(){return true;});
 
 
                 /*

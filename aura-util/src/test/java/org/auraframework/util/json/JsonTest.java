@@ -424,13 +424,6 @@ public class JsonTest extends UnitTestCase {
         json.writeMapEntry("key2", "value2");
         json.writeMapEnd();
         assertEquals("{\n  \"key1\":\"value1\",\n  \"key2\":\"value2\"\n}", json.getAppendable().toString());
-
-        json = new JsonEncoder(new StringBuilder(), false);
-        json.writeMapBegin();
-        json.writeMapEntry(1, "value1");
-        json.writeMapEntry(2, "value2");
-        json.writeMapEnd();
-        assertEquals("{\"1\":\"value1\",\"2\":\"value2\"}", json.getAppendable().toString());
     }
 
     @Test

@@ -271,7 +271,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
                 "        cmp.set('v.status', 'Pending');" +
                 "        $A.storageService.getStorage('actions').set('testkey','testvalue')" +
                 "            .then(function(){" +
-                "                return $A.storageService.getStorage('ComponentDefStorage').set('testkey','{2:1}');" +
+                "                return $A.storageService.getStorage('ComponentDefStorage').set('testkey','{\"2\":\"1\"}');" +
                 "            }).then(function() {" +
                 "                cmp.set('v.storageOutput','Storage Done');" +
                 "                cmp.set('v.status','Done');" +

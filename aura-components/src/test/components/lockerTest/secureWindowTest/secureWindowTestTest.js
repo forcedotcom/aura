@@ -91,7 +91,6 @@
 
     testArbitrarySchemes: {
         // "window.open" will not open a new window for mobile autobuild runs.
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testArbitrarySchemes();
         }
@@ -99,7 +98,6 @@
 
     testOpen_HttpsUrl: {
         // "window.open" will not open a new window for mobile autobuild runs.
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_HttpsUrl();
         }
@@ -107,7 +105,6 @@
 
     testOpen_HttpUrl: {
         // "window.open" will not open a new window for mobile autobuild runs.
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_HttpUrl();
         }
@@ -115,7 +112,6 @@
 
     testOpen_RelativeUrl:{
         // "window.open" will not open a new window for mobile autobuild runs.
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_RelativeUrl();
         }
@@ -123,7 +119,6 @@
 
     testOpen_JavascriptIsBlocked: {
         // "window.open" will not open a new window for mobile autobuild runs.
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_JavascriptIsBlocked();
         }
@@ -131,7 +126,6 @@
 
     testOpen_UrlRestrictionByPass: {
         // "window.open" will not open a new window for mobile autobuild runs.
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_UrlRestrictionByPass();
         }

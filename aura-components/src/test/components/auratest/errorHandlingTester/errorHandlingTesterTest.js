@@ -178,6 +178,8 @@
      * Verify Aura default error handler can handle systemError event when there is a component which misses required attribute.
      */
     testErrorFromRequiredAttributeMissingComponent: {
+        // marking as flapper due to intermittent failure; refer to work item W-4517775
+        labels : ["flapper"],
         test: function(cmp) {
             var iframeSrc = "/auratest/errorHandlingApp.app?addAttributeMissingComponent=true";
             this.loadIframe(iframeSrc, cmp, "iframeContainer");

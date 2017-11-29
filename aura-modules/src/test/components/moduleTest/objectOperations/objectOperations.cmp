@@ -1,0 +1,3 @@
+<aura:component>
+    <moduleTest:objectOperationsCmp />
+</aura:component>

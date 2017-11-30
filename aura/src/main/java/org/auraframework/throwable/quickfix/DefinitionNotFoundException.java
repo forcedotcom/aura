@@ -16,13 +16,16 @@
 package org.auraframework.throwable.quickfix;
 
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.Location;
+import org.auraframework.throwable.AuraExceptionDefDescriptorInfo;
 
 /**
  * thrown when unable to locate a def for a descriptor
  */
-public class DefinitionNotFoundException extends AuraValidationException {
+public class DefinitionNotFoundException extends AuraValidationException
+        implements AuraExceptionDefDescriptorInfo {
 
     private static final long serialVersionUID = 1918131174943191514L;
 
@@ -44,10 +47,6 @@ public class DefinitionNotFoundException extends AuraValidationException {
         this(descriptor, null);
     }
 
-    public DefDescriptor<?> getDescriptor() {
-        return descriptor;
-    }
-
     public static String getMessage(DefType defType, String defName, String usedAt) {
         if (usedAt == null || usedAt.length() == 0) {
             return String.format(messageFormat, defType, defName);
@@ -59,4 +58,10 @@ public class DefinitionNotFoundException extends AuraValidationException {
     public static String getMessage(DefType defType, String defName) {
         return String.format(messageFormat, defType, defName);
     }
+
+    @Override
+    public DefDescriptor<? extends Definition> getDescriptor() {
+        return descriptor;
+    }
+
 }

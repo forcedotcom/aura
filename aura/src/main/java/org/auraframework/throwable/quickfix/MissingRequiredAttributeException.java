@@ -16,26 +16,33 @@
 package org.auraframework.throwable.quickfix;
 
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.system.Location;
+import org.auraframework.throwable.AuraExceptionDefDescriptorInfo;
 
-/**
- */
-public class MissingRequiredAttributeException extends AuraValidationException {
+public class MissingRequiredAttributeException extends AuraValidationException
+        implements AuraExceptionDefDescriptorInfo {
 
-    /**
-     */
     private static final long serialVersionUID = -819293607407443413L;
     private static final String MESSAGE = "%s %s is missing required attribute '%s'";
+    private final DefDescriptor<?> descriptor;
 
-    public MissingRequiredAttributeException(DefDescriptor<?> desc, String attributeName) {
-        this(desc, attributeName, null);
+    public MissingRequiredAttributeException(DefDescriptor<?> descriptor, String attributeName) {
+        this(descriptor, attributeName, null);
     }
 
-    public MissingRequiredAttributeException(DefDescriptor<?> desc, String attributeName, Location l) {
-        super(getMessage(desc, attributeName), l);
+    public MissingRequiredAttributeException(DefDescriptor<?> descriptor, String attributeName, Location l) {
+        super(getMessage(descriptor, attributeName), l);
+        this.descriptor = descriptor;
     }
 
     public static String getMessage(DefDescriptor<?> desc, String attributeName) {
         return String.format(MESSAGE, desc.getDefType(), desc.getQualifiedName(), attributeName);
     }
+
+    @Override
+    public DefDescriptor<? extends Definition> getDescriptor() {
+        return descriptor;
+    }
+
 }

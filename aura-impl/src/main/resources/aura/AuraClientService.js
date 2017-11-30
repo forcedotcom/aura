@@ -2849,8 +2849,6 @@ AuraClientService.prototype.finishProcessing = function() {
     this.setInCollection();
     try {
         $A.renderingService.rerenderDirty();
-    } catch (e) {
-        throw e;
     } finally {
         this.clearInCollection();
         if (this.actionsQueued.length > 0) {

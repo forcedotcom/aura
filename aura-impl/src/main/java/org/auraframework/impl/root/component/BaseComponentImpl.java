@@ -92,7 +92,7 @@ BaseComponent<D, I> {
     protected final ConverterService converterService;
 
     private final InstanceService instanceService;
-	private Instance<?> lexicalParent;
+    private Instance<?> lexicalParent;
 
     /**
      * Top level component instance with attributes passed in. Builds out the tree recursively, but only after the
@@ -354,9 +354,9 @@ BaseComponent<D, I> {
             // sensitive for descriptors (ugh!).
             //
             json.writeMapKey("componentDef");
-        	json.writeMapBegin();
-        	json.writeMapEntry("descriptor", def.getDescriptor());
-        	json.writeMapEnd();
+            json.writeMapBegin();
+            json.writeMapEntry("descriptor", def.getDescriptor());
+            json.writeMapEnd();
 
             if (!descriptor.equals(originalDescriptor)) {
                 json.writeMapEntry("original", originalDescriptor);
@@ -370,7 +370,7 @@ BaseComponent<D, I> {
             if (def.getAPIVersion() != null  &&
                 Aura.getConfigAdapter().isInternalNamespace(def.getDescriptor().getNamespace()) &&
                 context.getCurrentCallingDescriptor() == null) {
-            	json.writeMapEntry("version", def.getAPIVersion());
+                json.writeMapEntry("version", def.getAPIVersion());
             }
 
             if (def.getRendererDescriptor() != null) {

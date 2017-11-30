@@ -34,6 +34,7 @@ import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.cache.Cache;
 import org.auraframework.css.StyleContext;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.ComponentDef;
@@ -203,17 +204,27 @@ public class ServerServiceImpl implements ServerService {
             Action oldAction = context.setCurrentAction(action);
             boolean earlyCleanup = false;
             try {
-                DefDescriptor<ComponentDef> callingDesscriptor = action.getCallingDescriptor();
-                if (callingDesscriptor != null && !context.getPreloadedDefinitions().contains(callingDesscriptor)) {
+                DefDescriptor<ComponentDef> callingDescriptor = action.getCallingDescriptor();
+                if (callingDescriptor != null && !context.getPreloadedDefinitions().contains(callingDescriptor)) {
                     // we can assume that if the client is calling an action from a particular component, it has the component and we won't need to serialize it back
                     // components referenced in the action will be added to the context and thus serialized back to the client
                     Set<DefDescriptor<?>> preloadedDefinitions = Sets.newHashSet(context.getPreloadedDefinitions());
-                    preloadedDefinitions.addAll(definitionService.getDependencies(definitionService.getUid(null, callingDesscriptor)));
+                    try {
+                        preloadedDefinitions.addAll(definitionService.getDependencies(definitionService.getUid(null, callingDescriptor)));
+                    } catch (QuickFixException e) {
+                        // we assumed thed calling descriptor was a component, but it could be an application
+                        DefDescriptor<ApplicationDef> callingAppDescriptor = definitionService.getDefDescriptor(callingDescriptor.getQualifiedName(), ApplicationDef.class);
+                        try {
+                            preloadedDefinitions.addAll(definitionService.getDependencies(definitionService.getUid(null, callingAppDescriptor)));
+                        } catch (QuickFixException qfe) {
+                            // well, it's not a component, it's not an app... give up trying to exclude it from the set being serialized
+                        }
+                    }
                     context.setPreloadedDefinitions(preloadedDefinitions);
                 }
                 action.setup();
                 action.run();
-            } catch (AuraExecutionException | QuickFixException x) {
+            } catch (AuraExecutionException x) {
                 earlyCleanup = true;
                 exceptionAdapter.handleException(x, action);
             } finally {

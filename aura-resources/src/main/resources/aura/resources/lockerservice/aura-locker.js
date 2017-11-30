@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-11-16
- * Version: 0.2.11
+ * Generated: 2017-11-30
+ * Version: 0.3.1
  */
 
 (function (global, factory) {
@@ -1682,6 +1682,27 @@ function SecureElement(el, key) {
             sep.constructor = function() {throw new TypeError("Illegal constructor");};
             return sep;
         })();
+
+        // Allow React to register spies on input nodes
+        // See inputValueTracking.js
+        // https://github.com/facebook/react/blob/master/packages/react-dom/src/client/inputValueTracking.js
+        ['checked', 'value'].forEach(prop => {
+            if (prop in el) {
+                const descriptor = Object.getOwnPropertyDescriptor(el.constructor.prototype, prop);
+
+                Object.defineProperty(prototype.constructor.prototype, prop, {
+                    configurable: descriptor.configurable,
+                    enumerable: true,
+                    get: function () {
+                        return SecureObject.filterEverything(o, el[prop]);
+                    },
+                    set: function (value) {
+                        el[prop] = SecureObject.filterEverything(o, value);
+                    }
+                });
+            }
+        });
+
 
         SecureElement.addStandardMethodAndPropertyOverrides(prototype, caseInsensitiveAttributes, key);
 
@@ -3442,13 +3463,13 @@ const metadata$1 = {
  * limitations under the License.
  */
 
-var extraFilter;
-function injectExtraFilter(filter) {
-    extraFilter = filter;
+var filterTypeHook$1;
+function registerFilterTypeHook(hook) {
+    filterTypeHook$1 = hook;
 }
-var extraUnfilteredType$1;
-function injectExtraUnfilteredType(unfilteredType) {
-    extraUnfilteredType$1 = unfilteredType;
+var isUnfilteredTypeHook$1;
+function registerIsUnfilteredTypeHook(hook) {
+    isUnfilteredTypeHook$1 = hook;
 }
 
 function SecureObject(thing, key) {
@@ -3598,8 +3619,8 @@ SecureObject.filterEverything = function(st, raw, options) {
             mutated = true;
         } else {
             assert$1(key, "A secure object should always have a key.");
-            if (extraFilter) {
-                swallowed = extraFilter(raw, key, belongsToLocker);
+            if (filterTypeHook$1) {
+                swallowed = filterTypeHook$1(raw, key, belongsToLocker);
             }
             if (swallowed) {
                 mutated = raw !== swallowed;
@@ -5126,7 +5147,7 @@ SecureObject.isUnfilteredType = function(raw, key) {
         return true;
     }
 
-    if (extraUnfilteredType$1 && extraUnfilteredType$1(raw, key)) {
+    if (isUnfilteredTypeHook$1 && isUnfilteredTypeHook$1(raw, key)) {
         return true;
     }
 
@@ -5163,6 +5184,10 @@ SecureObject.ArrayPrototypeSlice = Array.prototype.slice;
  * limitations under the License.
  */
 
+function isForbiddenTag(el) {
+    return el.constructor === HTMLStyleElement || el.constructor === SVGStyleElement;
+}
+
 function SecureDocument(doc, key) {
 
     var o = getFromCache(doc, key);
@@ -5190,6 +5215,9 @@ function SecureDocument(doc, key) {
         createElement: {
             value: function(tag) {
                 var el = doc.createElement(tag);
+                if (isForbiddenTag(el)) {
+                    throw new Error(`Creation of ${tag} tags is not allowed`);
+                }
                 setKey(el, key);
                 return SecureElement(el, key);
             }
@@ -5197,6 +5225,9 @@ function SecureDocument(doc, key) {
         createElementNS: {
             value: function(namespace, tag) {
                 var el = doc.createElementNS(namespace, tag);
+                if (isForbiddenTag(el)) {
+                    throw new Error(`Creation of ${tag} tags is not allowed`);
+                }
                 setKey(el, key);
                 return SecureElement(el, key);
             }
@@ -5571,9 +5602,9 @@ function SecureLocation(loc, key) {
  * limitations under the License.
  */
 
-var extraAddProperty$1;
-function injectExtraAddProperty$1(addProperty) {
-    extraAddProperty$1 = addProperty;
+var addPropertiesHook$1;
+function registerAddPropertiesHook$1(hook) {
+    addPropertiesHook$1 = hook;
 }
 
 function SecureNavigator(navigator, key) {
@@ -5596,8 +5627,8 @@ function SecureNavigator(navigator, key) {
             SecureObject.addPropertyIfSupported(o, navigator, name);
         });
 
-    if (extraAddProperty$1) {
-        extraAddProperty$1(o, navigator, key);
+    if (addPropertiesHook$1) {
+        addPropertiesHook$1(o, navigator, key);
     }
 
     setRef(o, navigator, key);
@@ -6053,9 +6084,9 @@ function SecureURL(raw) {
  * limitations under the License.
  */
 
-var extraAddProperty;
-function injectExtraAddProperty$$1(addProperty) {
-    extraAddProperty = addProperty;
+var addPropertiesHook;
+function registerAddPropertiesHook$$1(hook) {
+    addPropertiesHook = hook;
 }
 
 // This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
@@ -6306,8 +6337,8 @@ function SecureWindow(win, key) {
         });
     });
 
-    if (extraAddProperty) {
-        extraAddProperty(o, win, key);
+    if (addPropertiesHook) {
+        addPropertiesHook(o, win, key);
     }
 
     SecureObject.addPrototypeMethodsAndProperties(metadata$$1, o, win, key);
@@ -7695,7 +7726,7 @@ let AuraComponent;
 let AuraEvent;
 let AuraPropertyReferenceValue;
 
-function registerTypes(types) {
+function registerAuraTypes(types) {
     if (types) {
         AuraAction = types.Action;
         AuraComponent = types.Component;
@@ -7874,14 +7905,14 @@ function initialize(types, api) {
         return;
     }
 
-    registerTypes(types);
+    registerAuraTypes(types);
     registerAuraAPI(api);
     registerReportAPI(api);
     registerEngineAPI(api);
-    injectExtraFilter(extraFilteredTypes);
-    injectExtraUnfilteredType(extraUnfilteredType);
-    injectExtraAddProperty$$1(addExtraWindowProperties);
-    injectExtraAddProperty$1(addExtraNavigatorProperties);
+    registerFilterTypeHook(filterTypeHook);
+    registerIsUnfilteredTypeHook(isUnfilteredTypeHook);
+    registerAddPropertiesHook$$1(windowAddPropertiesHook);
+    registerAddPropertiesHook$1(navigatorAddPropertiesHook);
 
     isLockerInitialized = true;
 }
@@ -7948,7 +7979,7 @@ function wrapEngine(engine, /* deprecated */ defDescriptor) {
     return secureEngine;
 }
 
-function extraFilteredTypes(raw, key, belongsToLocker) {
+function filterTypeHook(raw, key, belongsToLocker) {
     if (raw instanceof AuraAction) {
         return belongsToLocker ? SecureAuraAction(raw, key) : SecureObject(raw, key);
     } else if (raw instanceof AuraComponent) {
@@ -7961,7 +7992,7 @@ function extraFilteredTypes(raw, key, belongsToLocker) {
     return null;
 }
 
-function extraUnfilteredType(raw, key) {
+function isUnfilteredTypeHook(raw, key) {
     const namespace = key['namespace'];
     if (namespace === 'runtime_rtc_spark' || namespace === 'runtime_rtc') {
         return window['MediaStream'] && (raw instanceof window['MediaStream']);
@@ -7969,7 +8000,7 @@ function extraUnfilteredType(raw, key) {
     return false;
 }
 
-function addExtraWindowProperties(st, raw, key) {
+function windowAddPropertiesHook(st, raw, key) {
 
     defineProperty(st, '$A', {
         enumerable: true,
@@ -7996,7 +8027,7 @@ function addExtraWindowProperties(st, raw, key) {
     }
 }
 
-function addExtraNavigatorProperties(st, raw, key) {
+function navigatorAddPropertiesHook(st, raw, key) {
     const namespace = key['namespace'];
     if (namespace === 'runtime_rtc_spark' || namespace === 'runtime_rtc') {
         ['mediaDevices', 'mozGetUserMedia', 'webkitGetUserMedia'].forEach(name => {

@@ -124,5 +124,40 @@
         testUtils.assertEquals(3, selectOptions.length);
         testUtils.assertEquals('<option value="1">1</option>', selectOptions[0].outerHTML);
         testUtils.assertEquals('<option value="2">2</option>', selectOptions.item(1).outerHTML);
+    },
+
+    testDefineCheckedProperty: function(cmp, event, helper) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var node = document.createElement("input");
+        node.type = 'checkbox';
+
+        var getValue = helper.trackValueOnNode(node, 'checked');
+
+        node.checked = true;
+        testUtils.assertEquals("true", getValue(), "Custom node 'checked' attribute setter not called");
+        testUtils.assertEquals(true, node.checked, "Custom node 'checked' attribute getter returned wrong value");
+        node.checked = false;
+        testUtils.assertEquals("false", getValue(), "Custom node 'checked' attribute setter not called");
+        testUtils.assertEquals(false, node.checked, "Custom node 'checked' attribute getter returned wrong value");
+
+        return node;
+    },
+
+    testDefineValueProperty: function(cmp, event, helper) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var node = document.createElement("input");
+
+        var getValue = helper.trackValueOnNode(node, 'value');
+
+        node.value = "black";
+        testUtils.assertEquals("black", getValue(), "Custom node 'value' attribute setter not called");
+        testUtils.assertEquals("black", node.value, "Custom node 'value' attribute getter returned wrong value");
+        node.value = "white";
+        testUtils.assertEquals("white", getValue(), "Custom node 'value' attribute setter not called");
+        testUtils.assertEquals("white", node.value, "Custom node 'value' attribute getter returned wrong value");
+
+        return node;
     }
 })

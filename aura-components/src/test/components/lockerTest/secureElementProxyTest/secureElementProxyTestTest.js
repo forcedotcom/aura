@@ -70,5 +70,19 @@
         test: function(cmp) {
             cmp.testAddOptionsToSelect();
         }
+    },
+
+    testDefineCheckedProperty: {
+        test: function(cmp) {
+            var node = cmp.testDefineCheckedProperty();
+            $A.test.assertEquals(false, node.checked, "Custom setter for node attribute 'checked' should change the raw node");
+        }
+    },
+
+    testDefineValueProperty: {
+        test: function(cmp) {
+            var node = cmp.testDefineValueProperty();
+            $A.test.assertEquals("white", node.value, "Custom setter for node attribute 'value' should change the raw node");
+        }
     }
 })

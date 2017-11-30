@@ -584,7 +584,11 @@ public class JsonEncoder implements Json {
      */
     @Override
     public void writeLiteral(Object value) throws IOException {
-        out.append(value.toString());
+        if (value == null) {
+            out.append("null");
+        } else {
+            out.append(value.toString());
+        }
     }
 
     /**
@@ -595,6 +599,10 @@ public class JsonEncoder implements Json {
      */
     @Override
     public void writeString(Object value) throws IOException {
+        if (value == null) {
+            out.append("null");
+            return;
+        }
         out.append('"');
         out.append(AuraTextUtil.escapeForJSONString(value.toString()));
         out.append('"');

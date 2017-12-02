@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-11-30
- * Version: 0.3.1
+ * Generated: 2017-12-01
+ * Version: 0.3.2
  */
 
 (function (global, factory) {
@@ -24,6 +24,7 @@
 	(factory((global.AuraLockerDisabled = global.AuraLockerDisabled || {})));
 }(this, (function (exports) { 'use strict';
 
+/* eslint-disable no-unused-vars, prefer-template */
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
@@ -47,76 +48,81 @@
 
 // DO NOT USE ES6 METHODS IN THIS FILE.
 
-
 function evaluate(src) {
-    return (0,eval)('(function(){\n' + src + '\n})()');
+  return (0, eval)('(function(){\n' + src + '\n})()');
 }
 
 function create(src, key, sourceURL) {
-    return {
-        globals: window,
-        returnValue: evaluate(src)
-    };
+  return {
+    globals: window,
+    returnValue: evaluate(src)
+  };
 }
 
 function createForClass(src, defDescriptor) {
-    return evaluate('return (\n' + src + '\n)');
+  return evaluate('return (\n' + src + '\n)');
 }
 
 // @deprecated
 function createForDef(src, def) {
-    return evaluate(src);
+  return evaluate(src);
 }
 
 function createForModule(src, defDescriptor) {
-    return evaluate('return (\n' + src + '\n)');
+  return evaluate('return (\n' + src + '\n)');
 }
 
 function getEnv(key) {
-    return window;
+  return window;
 }
 
 function getEnvForSecureObject(st) {
-    return window;
+  return window;
 }
 
-function getKeyForNamespace(namespace) { /* Do Nothing */ }
+function getKeyForNamespace(namespace) {
+  /* Do Nothing */
+}
 
 function getRaw(value) {
-    return value;
+  return value;
 }
 
-function initialize(types) { /* Do Nothing */ }
+function initialize(types) {
+  /* Do Nothing */
+}
 
 function isEnabled() {
-    return false;
+  return false;
 }
 
 // @deprecated
 function instanceOf(value, type) {
-    return value instanceof type;
+  return value instanceof type;
 }
 
 function runScript(src, namespace) {
-    return evaluate(src);
+  return evaluate(src);
 }
 
-function trust(from, thing) { /* Do Nothing */ }
+function trust(from, thing) {
+  /* Do Nothing */
+}
 
 function unwrap(from, st) {
-    return st;
+  return st;
 }
 
 function wrapComponent(component) {
-    return component;
+  return component;
 }
 
 function wrapComponentEvent(component, event) {
-    return event;
+  return event;
 }
 
 function wrapEngine(engine) {
-    return engine;
+  return engine;
 }
 
 exports.create = create;

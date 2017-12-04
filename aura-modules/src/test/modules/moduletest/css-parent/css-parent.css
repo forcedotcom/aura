@@ -1,0 +1,20 @@
+h1 {
+    color: red;
+}
+
+.content {
+    margin-left: 10px;
+}
+
+[title="legend"] {
+    font-size: 9px;
+}
+
+ul li {
+    display: block;
+}
+
+.foo, .bar {
+    width: 100px;
+    height: 100px;
+}

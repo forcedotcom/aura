@@ -29,7 +29,7 @@
              
     <aura:handler name="pageSelected" action="{!c.onPageSelected}" />
     
-    <ul class="{! 'carousel-nav-items' + (v.navigationTabs ? ' tabs' : '')}" role="presentation">
+    <ul class="{! 'carousel-nav-items' + (v.navigationTabs ? ' tabs' : '')}" role="tablist">
     	<aura:renderIf isTrue="{!v.pageComponents.length > 1}">		
 		    <aura:iteration items="{!v.pageComponents}" var="page" indexVar="index">	    	
 	    		<!-- pageIndex starts with 1 -->	    		

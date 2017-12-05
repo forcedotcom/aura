@@ -29,6 +29,10 @@
 			if (pageModel.devNameOrId) {
 				cmp.set("v.priv_id", "tab_" + pageModel.devNameOrId);
 			}
+			
+			if (pageModel.pageId) {
+                cmp.set("v.priv_ariaControlId", pageModel.pageId);
+			}
 		} else if (pageCmp) {
 			title = pageCmp.get('v.title') || title;
 		}
@@ -69,7 +73,6 @@
     			itemEl.focus();
     		}
     	} else {
-    		cmp.set("v.priv_ariaControlId", '');
     		cmp.set("v.priv_ariaSelected", false);
     		cmp.set("v.priv_tabIndex", -1);
     		cmp.set("v.priv_selectedClass", "");

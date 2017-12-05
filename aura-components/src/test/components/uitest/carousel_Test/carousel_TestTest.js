@@ -524,10 +524,11 @@
 					+ expected + " to be selectged but indicator #" + actual
 					+ " was selected. " + msg;
 		}
+		
 
 		for ( var i = 0; i < indicators.length; i++) {
 			var indicatorElem = indicators[i].getElement().childNodes[0];
-
+			
 			if ((selectedIndicator - 1) === i) {
 				$A.test.assertTrue($A.util.hasClass(indicatorElem,
 						"carousel-nav-item-selected"), errorMsg(
@@ -540,8 +541,6 @@
 				$A.test.assertFalse($A.util.hasClass(indicatorElem,
 						"carousel-nav-item-selected"), errorMsg(
 						selectedIndicator, (i + 1)));
-				this.assertAriaControlDefined(indicatorElem, false, errorMsg(
-						selectedIndicator, (i + 1), "Checking aria-control"));
 				this.assertAriaSelected(indicatorElem, false, errorMsg(
 						selectedIndicator, (i + 1), "Checking aria-selected"))
 			}

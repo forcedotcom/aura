@@ -176,5 +176,11 @@
         test: function(component) {
             component.testLocationAssign();
         }
+    },
+
+    testBlockStyleTag: {
+        test: function(cmp) {
+            cmp.testBlockStyleTag();
+        }
     }
 })

@@ -44,6 +44,7 @@
     <aura:method name="testBlockedApis"/>
     <aura:method name="testJavascriptPseudoScheme"/>
     <aura:method name="testLocationAssign"/>
+    <aura:method name="testBlockStyleTag"/>
     
     <div id="title">SecureDocument test</div>
 

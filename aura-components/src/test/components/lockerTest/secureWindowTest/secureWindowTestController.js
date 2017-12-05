@@ -1,5 +1,5 @@
 ({
-    test$AExposedOnWindow: function(cmp) {
+    testDollarAExposedOnWindow: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         testUtils.assertStartsWith("SecureAura", window.$A.toString(), "Expected $A to return SecureAura");
     },

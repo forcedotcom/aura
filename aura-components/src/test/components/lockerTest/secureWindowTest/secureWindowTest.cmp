@@ -20,7 +20,7 @@
     <aura:attribute name="testComplete" type="Boolean" default="false" description="Flag to set to signal async operations are complete and test can complete"/>
     <aura:attribute name="expectedPath" type="String" default="" description="Current url path for the running test suite. Used for window.location tests"/>
 
-    <aura:method name="test$AExposedOnWindow" action="{!c.test$AExposedOnWindow}"/>
+    <aura:method name="testDollarAExposedOnWindow"/>
     <aura:method name="testDocumentExposedOnWindow" action="{!c.testDocumentExposedOnWindow}"/>
     <aura:method name="testCircularReferenceIsSecureWindow" action="{!c.testCircularReferenceIsSecureWindow}"/>
     <aura:method name="testNoAccessToWindowViaSetTimeout" action="{!c.testNoAccessToWindowViaSetTimeout}"/>

@@ -12,9 +12,12 @@
         cmp.set("v.testUtils", $A.test);
     },
 
-    test$AExposedOnWindow: {
+    /**
+     * Test that $A is available on window
+     */
+    testDollarAExposedOnWindow: {
         test: function(cmp) {
-            cmp.test$AExposedOnWindow();
+            cmp.testDollarAExposedOnWindow();
         }
     },
 

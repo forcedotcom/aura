@@ -225,9 +225,13 @@ public class AttributeSetImpl implements AttributeSet {
         if (attributeMap != null) {
             Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = getRootDefinition().getAttributeDefs();
             for (Map.Entry<String, Object> entry : attributeMap.entrySet()) {
-                DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor(entry.getKey(), AttributeDef.class);
-                if (attrs.containsKey(desc)) {
-                    setExpression(desc, entry.getValue());
+                try {
+                    DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor(entry.getKey(), AttributeDef.class);
+                    if (attrs.containsKey(desc)) {
+                        setExpression(desc, entry.getValue());
+                    }
+                } catch (AuraRuntimeException arex) {
+                    new InvalidDefinitionException("Error setting attribute: " + entry.getKey(), new Location(this.parent.getDescriptor().toString(), 0), arex);
                 }
             }
         }

@@ -78,8 +78,6 @@ public class AuraContextFilter implements Filter {
     protected static final BooleanParam modulesParam = new BooleanParam(AuraServlet.AURA_PREFIX + "modules", false);
     protected static final BooleanParam compatParam = new BooleanParam(AuraServlet.AURA_PREFIX + "compat", false);
 
-    private String componentDir = null;
-
     private AuraTestFilter testFilter;
 
     private AuraDeprecated auraDeprecated; // force initialization of Aura
@@ -206,9 +204,6 @@ public class AuraContextFilter implements Filter {
 
         DefDescriptor<? extends BaseComponentDef> appDesc = getAppParam(request, configMap);
 
-        if (componentDir != null) {
-            System.setProperty("aura.componentDir", componentDir);
-        }
         //
         // FIXME: our usage of format should be revisited. Most URLs have
         // a fixed format, so we should have a way of getting that.
@@ -480,10 +475,6 @@ public class AuraContextFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         processInjection(filterConfig);
-        String dirConfig = filterConfig.getInitParameter("componentDir");
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(dirConfig)) {
-            componentDir = filterConfig.getServletContext().getRealPath("/") + dirConfig;
-        }
         if (testFilter != null) {
             testFilter.init(filterConfig);
         }

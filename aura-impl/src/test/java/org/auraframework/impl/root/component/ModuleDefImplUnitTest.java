@@ -81,6 +81,7 @@ public class ModuleDefImplUnitTest {
         dependencies.add("aura-storage");
         dependencies.add("proxy-compat/getKey");
         dependencies.add("proxy-compat/setKey");
+        dependencies.add("@resource-url/my_image");
         dependencies.add("namespace-component-name");
         moduleDefBuilder.setModuleDependencies(dependencies);
 

@@ -191,7 +191,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     }
 
     /**
-     * Whether dependency is an internal Aura provided client dependency
+     * Whether dependency is an internal Aura provided client dependency or an @ schema
      *
      * NOTE: checks need to be updated and aligned with Aura provided modules
      * AuraComponentService.prototype.initCoreModules
@@ -204,7 +204,8 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         return dependency != null &&
                 ("aura-instrumentation".equals(dependency) ||
                         "aura-storage".equals(dependency) ||
-                dependency.startsWith("proxy-compat"));
+                dependency.startsWith("proxy-compat") || 
+                dependency.startsWith("@"));
     }
 
     @Override

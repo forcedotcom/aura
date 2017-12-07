@@ -39,6 +39,7 @@ Aura.Services.AuraClientService$AuraXHR.prototype.reset = function() {
 /**
  * add an action.
  */
+
 Aura.Services.AuraClientService$AuraXHR.prototype.addAction = function(action) {
     if (action) {
         if (this.actions[""+action.getId()]) {
@@ -237,8 +238,12 @@ function AuraClientService () {
     this.reloadFunction = undefined;
     this.reloadPointPassed = false;
 
+    // Shares token data across tabs to prevent unneeded page reloads.
+    this.tokenSharing = true;
+
     this.handleAppCache();
     this.setupBootstrapErrorReloadButton();
+    this.setupTokenListener();
 }
 
 /**
@@ -1938,6 +1943,10 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
             $A.log("AuraClientService.runAfterBootstrapReady(): Received updated token from bootstrap");
             this.setToken(boot["token"], true);
         }
+        if (this.tokenSharing && this._token) {
+            $A.log("AuraClientService.runAfterBootstrapReady(): Broadcasting token received during bootstrap");
+            this.broadcastToken(this._token);
+        }
         this.checkBootstrapUIDs(Aura["appBootstrapCache"]);
         this.saveBootstrapToStorage(boot);
     }
@@ -3535,13 +3544,54 @@ AuraClientService.prototype.parseAndFireEvent = function(evtObj) {
  *
  * @param {String} token The new token.
  * @param {Boolean} saveToStorage True to save the token to storage, false to not save.
+ * @param {Boolean} broadcast True to broadcast token to existing windows/tabs
  * @memberOf AuraClientService
  * @private
  */
-AuraClientService.prototype.setToken = function(newToken, saveToStorage) {
+AuraClientService.prototype.setToken = function(newToken, saveToStorage, broadcast) {
+    var oldToken = this._token;
     this._token = newToken;
+
     if (saveToStorage) {
        this.saveTokenToStorage();
+    }
+
+    if (broadcast && this.tokenSharing && (!oldToken || (newToken !== oldToken))) {
+        this.broadcastToken(newToken);
+    }
+};
+
+/**
+ * Broadcasts token to other open tabs to prevent stale token usage after a re-issue from the server.
+ *
+ * @param {String} newToken The new token to broadcast.
+ * @private
+ */
+AuraClientService.prototype.broadcastToken = function(newToken) {
+    if (this.tokenSharing && window.localStorage) {
+        $A.log("[AuraClientService.broadcastToken]: Broadcasting new token.");
+        window.localStorage.setItem(AuraClientService.TOKEN_KEY, newToken);
+    }
+};
+
+/**
+ * Establish event listener for receiving broadcasted tokens
+ * @private
+ */
+AuraClientService.prototype.setupTokenListener = function() {
+    if (this.tokenSharing && window.localStorage) {
+        var self = this;
+        if (window.addEventListener) {
+            window.addEventListener("storage", function(event) {
+                if (event.key === AuraClientService.TOKEN_KEY && event.newValue && event.oldValue !== event.newValue) {
+                    $A.log("[AuraClientService.tokenListener]: Received new token.");
+                    self._token = event.newValue;
+
+                    // local storage is synchronous, other tabs will still receive the updated value before this delete
+                    window.localStorage.removeItem(AuraClientService.TOKEN_KEY);
+                }
+            });
+        }
     }
 };
 
@@ -4103,12 +4153,19 @@ AuraClientService.prototype.invalidSession = function(newToken) {
     // if new token provided then persist to storage and reload. if persisting
     // fails then we must go to the server for bootstrap.js to get a new token.
     if ($A.util.isString(newToken) && !$A.util.isEmpty(newToken)) {
-        this._token = newToken;
-        this.saveTokenToStorage()
-            .then(refresh.bind(null, false), refresh.bind(null, true))
-            .then(undefined, function(err) {
-                $A.warning("AuraClientService.invalidSession(): Failed to refresh, " + err);
-            });
+        if (this.tokenSharing) {
+            $A.log("[AuraClientService.invalidSession]: Token sharing enabled, attempting token update.");
+            this.setToken(newToken, false, true);
+            this.saveTokenToStorage().then(undefined, refresh.bind(null, true));
+        }
+        else {
+            this._token = newToken;
+            this.saveTokenToStorage()
+                .then(refresh.bind(null, false), refresh.bind(null, true))
+                .then(undefined, function (err) {
+                    $A.warning("AuraClientService.invalidSession(): Failed to refresh, " + err);
+                });
+        }
     } else {
         // refresh (to get a new session id) and force bootstrap.js to the server
         // (to get a new csrf token).

@@ -95,7 +95,8 @@
 
     initWidth: function (cmp) {
         var el = cmp.getElement();
-        if (el) {
+        
+        if (el instanceof Element) {
             var style = window.getComputedStyle(el, '');
             var width = parseFloat(style.marginLeft) + parseFloat(style.marginRight) + el.offsetWidth;
             $A.util.setDataAttribute(el, "original-width", width);

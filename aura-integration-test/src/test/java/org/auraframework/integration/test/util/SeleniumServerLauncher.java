@@ -15,10 +15,10 @@
  */
 package org.auraframework.integration.test.util;
 
-import java.net.Socket;
-
 import org.apache.log4j.Logger;
-import org.openqa.grid.selenium.GridLauncher;
+import org.openqa.grid.selenium.GridLauncherV3;
+
+import java.net.Socket;
 
 /**
  * Get WebDriver instances for Aura tests.
@@ -46,8 +46,7 @@ public class SeleniumServerLauncher {
         Logger logger = Logger.getLogger(SeleniumServerLauncher.class.getName());
 
         logger.info("Launching Selenium server on port " + serverPort);
-        GridLauncher.main(String.format("-port %s -browserTimeout %s %s", serverPort, browserTimeout,
-                String.format(browsers, TestExecutor.NUM_THREADS + 2))
+        GridLauncherV3.main(String.format("-port %s -browserTimeout %s", serverPort, browserTimeout)
                 .split(" "));
         logger.info("Waiting for server to open port");
         waitForServer(host, serverPort);

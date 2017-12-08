@@ -1050,15 +1050,12 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     private void openAndWait(String url, boolean waitForInit) throws Exception {
         getAuraUITestingUtil().getRawEval("document._waitingForReload = true;");
         openRaw(url);
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                Object ret = getAuraUITestingUtil().getRawEval("return !document._waitingForReload");
-                if (ret != null && ((Boolean) ret).booleanValue()) {
-                    return true;
-                }
-                return false;
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) d -> {
+            Object ret = getAuraUITestingUtil().getRawEval("return !document._waitingForReload");
+            if (ret != null && ((Boolean) ret).booleanValue()) {
+                return true;
             }
+            return false;
         }, getAuraUITestingUtil().getTimeout(), "fail on loading url:" + url);
 
         if (waitForInit) {
@@ -1076,12 +1073,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @throws AssertionFailedError if the provided javascript does not return a boolean.
      */
     public void waitForCondition(final String javascript, int timeoutInSecs) {
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return getAuraUITestingUtil().getBooleanEval(javascript);
-            }
-        }, timeoutInSecs, "fail on waiting for condition:" + javascript);
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) d -> getAuraUITestingUtil().getBooleanEval(javascript), timeoutInSecs, "fail on waiting for condition:" + javascript);
     }
 
     /**
@@ -1097,12 +1089,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     public void waitFor(long timeoutInSeconds) {
         WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSeconds);
         try {
-            wait.until(new ExpectedCondition<Boolean>() {
-                @Override
-                public Boolean apply(WebDriver d) {
-                    return false;
-                }
-            });
+            wait.until((ExpectedCondition<Boolean>) d -> false);
         } catch (TimeoutException expected) {
             return;
         }

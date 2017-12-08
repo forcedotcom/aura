@@ -18,6 +18,7 @@ package org.auraframework.integration.test;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
@@ -49,8 +50,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-
-import com.google.common.base.Function;
 
 /**
  * Tests to verify that the client gets updated when we want it to get updated.
@@ -115,15 +114,12 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         if (isIE()) {
             waitFor(3);
         }
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                Object ret = getAuraUITestingUtil().getRawEval("return !document._waitingForReload");
-                if (ret != null && ((Boolean) ret).booleanValue()) {
-                    return true;
-                }
-                return false;
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) d -> {
+            Object ret = getAuraUITestingUtil().getRawEval("return !document._waitingForReload");
+            if (ret != null && ((Boolean) ret).booleanValue()) {
+                return true;
             }
+            return false;
         }, "Page failed to refresh after server action triggered.");
         getAuraUITestingUtil().waitForDocumentReady();
         getAuraUITestingUtil().waitForAuraFrameworkReady(getAuraErrorsExpectedDuringInit());
@@ -194,22 +190,12 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         open(cmpDesc);
         assertNull(getAuraUITestingUtil().getEval("return window.tempVar;"));
         getAuraUITestingUtil().findDomElement(By.cssSelector("#click")).click();
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return "inconsequential".equals(getAuraUITestingUtil().getEval("return window.tempVar;"));
-            }
-        });
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) d -> "inconsequential".equals(getAuraUITestingUtil().getEval("return window.tempVar;")));
         updateStringSource(controllerDesc, "{clicked:function(){window.tempVar='meaningful'}}");
         open(cmpDesc);
         assertNull(getAuraUITestingUtil().getEval("return window.tempVar;"));
         getAuraUITestingUtil().findDomElement(By.cssSelector("#click")).click();
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return "meaningful".equals(getAuraUITestingUtil().getEval("return window.tempVar;"));
-            }
-        });
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) d -> "meaningful".equals(getAuraUITestingUtil().getEval("return window.tempVar;")));
     }
 
     @Test
@@ -328,12 +314,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 getAuraUITestingUtil().findDomElement(By.cssSelector("." + className)).getCssValue("font-style"));
         updateStringSource(styleDesc, String.format(".%s {font-style:normal;}", className));
         triggerServerAction();
-        getAuraUITestingUtil().waitForElementFunction(By.cssSelector("." + className), new Function<WebElement, Boolean>() {
-            @Override
-            public Boolean apply(WebElement element) {
-                return "normal".equals(element.getCssValue("font-style"));
-            }
-        });
+        getAuraUITestingUtil().waitForElementFunction(By.cssSelector("." + className), element -> "normal".equals(element.getCssValue("font-style")));
     }
 
     /**
@@ -359,21 +340,11 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
             updateStringSource(styleDesc, String.format(".%s {font-style:normal;}", className));
             triggerServerAction();
             getAuraUITestingUtil().waitForElementFunction(By.cssSelector("." + className),
-                    new Function<WebElement, Boolean>() {
-                        @Override
-                        public Boolean apply(WebElement element) {
-                            return "normal".equals(element.getCssValue("font-style"));
-                        }
-                    });
+                    element -> "normal".equals(element.getCssValue("font-style")));
             updateStringSource(styleDesc, String.format(".%s {font-style:italic;}", className));
             triggerServerAction();
             getAuraUITestingUtil().waitForElementFunction(By.cssSelector("." + className),
-                    new Function<WebElement, Boolean>() {
-                        @Override
-                        public Boolean apply(WebElement element) {
-                            return "italic".equals(element.getCssValue("font-style"));
-                        }
-                    });
+                    element -> "italic".equals(element.getCssValue("font-style")));
         }
     }
 
@@ -396,12 +367,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         updateStringSource(tokensDesc,
                 "<aura:tokens><aura:token name='fsize' value='66px'/></aura:tokens>");
         triggerServerAction();
-        getAuraUITestingUtil().waitForElementFunction(By.cssSelector("." + className), new Function<WebElement, Boolean>() {
-            @Override
-            public Boolean apply(WebElement element) {
-                return "66px".equals(element.getCssValue("font-size"));
-            }
-        });
+        getAuraUITestingUtil().waitForElementFunction(By.cssSelector("." + className), element -> "66px".equals(element.getCssValue("font-size")));
     }
 
     @Test
@@ -421,31 +387,16 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         open(cmpDesc);
         assertNull(getAuraUITestingUtil().getEval("return window.tempVar;"));
         getAuraUITestingUtil().findDomElement(By.cssSelector("#click")).click();
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return "inconsequential".equals(getAuraUITestingUtil().getEval("return window.tempVar;"));
-            }
-        });
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) d -> "inconsequential".equals(getAuraUITestingUtil().getEval("return window.tempVar;")));
         updateStringSource(
                 controllerDesc,
                 "{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);},clicked:function(){window.tempVar='meaningful'}}");
         triggerServerAction();
         // wait for page to reload by checking that our tempVar is undefined again
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver input) {
-                return (Boolean) getAuraUITestingUtil()
-                        .getEval("return !window.tempVar;");
-            }
-        });
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) input -> (Boolean) getAuraUITestingUtil()
+                .getEval("return !window.tempVar;"));
         getAuraUITestingUtil().findDomElement(By.cssSelector("#click")).click();
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver input) {
-                return "meaningful".equals(getAuraUITestingUtil().getEval("return window.tempVar;"));
-            }
-        });
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) input -> "meaningful".equals(getAuraUITestingUtil().getEval("return window.tempVar;")));
     }
 
     @Test
@@ -495,14 +446,11 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         assertEquals("simply", getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().getHelp();"));
         updateStringSource(helperDesc, "({getHelp:function(){return 'complicated';}})");
         triggerServerAction();
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver input) {
-                getAuraUITestingUtil().waitForDocumentReady();
-                getAuraUITestingUtil().waitForAuraFrameworkReady(null);
-                return "complicated".equals(getAuraUITestingUtil()
-                        .getEval("return window.$A && $A.getRoot() && $A.getRoot().getDef().getHelper().getHelp();"));
-            }
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) input -> {
+            getAuraUITestingUtil().waitForDocumentReady();
+            getAuraUITestingUtil().waitForAuraFrameworkReady(null);
+            return "complicated".equals(getAuraUITestingUtil()
+                    .getEval("return window.$A && $A.getRoot() && $A.getRoot().getDef().getHelper().getHelp();"));
         });
     }
 
@@ -540,17 +488,14 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         updateStringSource(eventDesc,
                 "<aura:event type='APPLICATION'><aura:attribute name='explode' type='String' default='kaboom'/></aura:event>");
         triggerServerAction();
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver input) {
-                getAuraUITestingUtil().waitForDocumentReady();
-                getAuraUITestingUtil().waitForAuraFrameworkReady(null);
-                String eval = String
-                        .format("return ((window.$A && $A.getEvt('%s')) && (window.$A && $A.getEvt('%s')).getDef().getAttributeDefs().getDef('explode').getDefault());",
-                                eventDesc.getDescriptorName(), eventDesc.getDescriptorName());
-                final String defaultValue = getAuraUITestingUtil().getEval(eval).toString(); 
-                return "kaboom".equals(defaultValue);
-            }
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) input -> {
+            getAuraUITestingUtil().waitForDocumentReady();
+            getAuraUITestingUtil().waitForAuraFrameworkReady(null);
+            String eval = String
+                    .format("return ((window.$A && $A.getEvt('%s')) && (window.$A && $A.getEvt('%s')).getDef().getAttributeDefs().getDef('explode').getDefault());",
+                            eventDesc.getDescriptorName(), eventDesc.getDescriptorName());
+            final String defaultValue = getAuraUITestingUtil().getEval(eval).toString();
+            return "kaboom".equals(defaultValue);
         });
     }
 
@@ -584,15 +529,12 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         updateStringSource(depDesc,
                 String.format(baseComponentTag, "", "<aura:attribute name='val' type='String' default='final'/>"));
         triggerServerAction();
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver input) {
-                getAuraUITestingUtil().waitForDocumentReady();
-                getAuraUITestingUtil().waitForAuraFrameworkReady(null);
-                return "final".equals(getAuraUITestingUtil().getEval(String
-                        .format("return window.$A && $A.componentService.getDef('%s').getAttributeDefs().getDef('val').getDefault();",
-                                depDesc.getDescriptorName())));
-            }
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) input -> {
+            getAuraUITestingUtil().waitForDocumentReady();
+            getAuraUITestingUtil().waitForAuraFrameworkReady(null);
+            return "final".equals(getAuraUITestingUtil().getEval(String
+                    .format("return window.$A && $A.componentService.getDef('%s').getAttributeDefs().getDef('val').getDefault();",
+                            depDesc.getDescriptorName())));
         });
     }
 
@@ -674,14 +616,11 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         updateStringSource(includeDesc, "function b(){return 'updated'}");
 
         triggerServerAction();
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver input) {
-                getAuraUITestingUtil().waitForDocumentReady();
-                getAuraUITestingUtil().waitForAuraFrameworkReady(null);
-                return "updated".equals(getAuraUITestingUtil().getEval(String.format(
-                        "return $A.getRoot().getDef().getHelper().mylib.%s;", includeDesc.getName())));
-            }
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) input -> {
+            getAuraUITestingUtil().waitForDocumentReady();
+            getAuraUITestingUtil().waitForAuraFrameworkReady(null);
+            return "updated".equals(getAuraUITestingUtil().getEval(String.format(
+                    "return $A.getRoot().getDef().getHelper().mylib.%s;", includeDesc.getName())));
         });
     }
 
@@ -709,14 +648,11 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 String.format("<aura:library><aura:include name='%s'/></aura:library>", includeOtherDesc.getName()));
 
         triggerServerAction();
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver input) {
-                getAuraUITestingUtil().waitForDocumentReady();
-                getAuraUITestingUtil().waitForAuraFrameworkReady(null);
-                return "secondpick".equals(getAuraUITestingUtil().getEval(String.format(
-                        "return $A.getRoot().getDef().getHelper().mylib.%s;", includeOtherDesc.getName())));
-            }
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) input -> {
+            getAuraUITestingUtil().waitForDocumentReady();
+            getAuraUITestingUtil().waitForAuraFrameworkReady(null);
+            return "secondpick".equals(getAuraUITestingUtil().getEval(String.format(
+                    "return $A.getRoot().getDef().getHelper().mylib.%s;", includeOtherDesc.getName())));
         });
     }
 
@@ -768,12 +704,9 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
         // Retrieve cmp from server and wait for callback output
         getAuraUITestingUtil().findDomElement(By.cssSelector("button")).click();
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                String text = getText(By.cssSelector("#container"));
-                return text.startsWith("cmp");
-            }
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) d -> {
+            String text = getText(By.cssSelector("#container"));
+            return text.startsWith("cmp");
         }, "Text of app never updated after retrieving component from server");
 
         // Update the source of the component we retrieve from storage
@@ -787,13 +720,10 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 "var storage = $A.storageService.getStorage('ComponentDefStorage');" +
                 "if (!storage) { callback('No storage'); return; };" +
                 "storage.get('markup://" + cmpDefString + "').then(function(item) { callback(item ? 'SUCCESS' : 'empty') });";
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-            	d.manage().timeouts().setScriptTimeout(1, TimeUnit.SECONDS);
-                Object result = ((JavascriptExecutor) getDriver()).executeAsyncScript(getPersistedDef);
-                return "SUCCESS".equals(result);
-            }
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) d -> {
+            d.manage().timeouts().setScriptTimeout(1, TimeUnit.SECONDS);
+            Object result = ((JavascriptExecutor) getDriver()).executeAsyncScript(getPersistedDef);
+            return "SUCCESS".equals(result);
         }, "Definition never persisted on client after server call");
 
         getDriver().navigate().refresh();
@@ -802,30 +732,27 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         // as the response, dump the storages and reload. Instead of trying to wait for the double reload, wait for
         // Aura Fwk + the app to finish loading (window.initialize) then create def storage (which won't exist
         // because no dynamic defs have been received) and verify it is empty.
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                String script = "var callback = arguments[arguments.length - 1];" +
-                        "if (!window.initialized || !$A) { callback(null); return; }" +
-                        "if (!$A.storageService.getStorage('ComponentDefStorage')) {" +
-                        "  $A.storageService.initStorage({name: 'ComponentDefStorage', persistent: true, secure: false, maxSize: 442368, expiration: 3600, debugLogging: true, clearOnInit: false});" +
-                        "}" +
-                        "var storage = $A.storageService.getStorage('ComponentDefStorage');" +
-                        "storage.getAll().then(" +
-                        "  function(items){ callback(Object.keys(items)) }," +
-                        "  function() { callback(null); }" +
-                        ")";
-                Object result = null;
-                try {
-                    result = ((JavascriptExecutor) getDriver()).executeAsyncScript(script);
-                } catch (WebDriverException e) {
-                    // If the page reloads during our script WebDriver will throw an error.
-                    if (!e.getMessage().contains("document unloaded while waiting for result")) {
-                        throw e;
-                    }
+        getAuraUITestingUtil().waitUntil((ExpectedCondition<Boolean>) d -> {
+            String script = "var callback = arguments[arguments.length - 1];" +
+                    "if (!window.initialized || !$A) { callback(null); return; }" +
+                    "if (!$A.storageService.getStorage('ComponentDefStorage')) {" +
+                    "  $A.storageService.initStorage({name: 'ComponentDefStorage', persistent: true, secure: false, maxSize: 442368, expiration: 3600, debugLogging: true, clearOnInit: false});" +
+                    "}" +
+                    "var storage = $A.storageService.getStorage('ComponentDefStorage');" +
+                    "storage.getAll().then(" +
+                    "  function(items){ callback(Object.keys(items)) }," +
+                    "  function() { callback(null); }" +
+                    ")";
+            Object result = null;
+            try {
+                result = ((JavascriptExecutor) getDriver()).executeAsyncScript(script);
+            } catch (WebDriverException e) {
+                // If the page reloads during our script WebDriver will throw an error.
+                if (!e.getMessage().contains("document unloaded while waiting for result")) {
+                    throw e;
                 }
-                return result != null && ((ArrayList<?>) result).size() == 0;
             }
+            return result != null && ((ArrayList<?>) result).size() == 0;
         }, "Storages never cleared after reload");
 
         // The page will reload after the storage is cleared so wait for it to be fully initialized then retrieve

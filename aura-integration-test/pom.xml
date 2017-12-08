@@ -105,6 +105,10 @@
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-io</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-http</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -127,7 +131,7 @@
     </dependencies>
     <properties>
         <chromedriver.download.root.url>http://chromedriver.storage.googleapis.com</chromedriver.download.root.url>
-        <chromedriver.version>2.25</chromedriver.version>
+        <chromedriver.version>2.33</chromedriver.version>
         <jetty.spawn>true</jetty.spawn>
         <jetty.resources>${basedir}/../aura/src/main/webapp</jetty.resources>
         <aura.build.id />

@@ -32,10 +32,7 @@ import org.auraframework.system.TextSource;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-
-import com.google.common.base.Function;
 
 public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
     private static String rootComponent = 
@@ -217,30 +214,22 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
             getAuraTestingUtil().updateSource(lib, newSource);
             //refresh the testApp, until it pick up the source change in test_Library.lib
             getAuraUITestingUtil().waitUntilWithCallback(
-                    new Function<WebDriver, Integer>() {
-                        @Override
-                        public Integer apply(WebDriver driver) {
-                            driver.navigate().refresh();
-                            //click the button
-                            getAuraUITestingUtil().waitForElement(By.className(testLibButtonClass));
-                            findDomElement(By.className(testLibButtonClass)).click();
-                            //get the text from output div
-                            getAuraUITestingUtil().waitForElement(By.className(testLibButtonClass));
-                            String text = findDomElement(By.className(outputDivClass)).getText();
-                            if(text.contains("BASICFirst")) {
-                                return 1;
-                            } else {
-                                return null;
-                            }
+                    driver -> {
+                        driver.navigate().refresh();
+                        //click the button
+                        getAuraUITestingUtil().waitForElement(By.className(testLibButtonClass));
+                        findDomElement(By.className(testLibButtonClass)).click();
+                        //get the text from output div
+                        getAuraUITestingUtil().waitForElement(By.className(testLibButtonClass));
+                        String text = findDomElement(By.className(outputDivClass)).getText();
+                        if(text.contains("BASICFirst")) {
+                            return 1;
+                        } else {
+                            return null;
                         }
                     },
-                    new ExpectedCondition<String>() {
-                        @Override
-                        public String apply(WebDriver d) {
-                            return "outputDiv doesn't contain 'BASICFirst'"
-                                    +findDomElement(By.className(outputDivClass)).getText();
-                        }
-                    },
+                    (ExpectedCondition<String>) d -> "outputDiv doesn't contain 'BASICFirst'"
+                            +findDomElement(By.className(outputDivClass)).getText(),
                     30,
                     "fail waiting on test app pick up new source in test_Library.lib");
         } else {

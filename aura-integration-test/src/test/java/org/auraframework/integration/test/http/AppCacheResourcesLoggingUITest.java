@@ -15,17 +15,11 @@
  */
 package org.auraframework.integration.test.http;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import org.apache.log4j.spi.LoggingEvent;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
-import org.auraframework.def.StyleDef;
+import org.auraframework.def.*;
 import org.auraframework.integration.test.logging.AbstractLoggingUITest;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.FreshBrowserInstance;
@@ -35,15 +29,13 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.html5.AppCacheStatus;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Tests for AppCache functionality by watching the requests received at the server and verifying that the updated
@@ -336,22 +328,19 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     }
 
     private void waitForStorage(WebElement clickableElement, final String waitForText, String failMessage) {
-        getAuraUITestingUtil().waitUntil(new Function<WebDriver, String>() {
-            @Override
-            public String apply(WebDriver input) {
-                clickableElement.click();
-                getAuraUITestingUtil().waitForElementText(By.cssSelector("div.status"), "Done", true);
+        getAuraUITestingUtil().waitUntil(input -> {
+            clickableElement.click();
+            getAuraUITestingUtil().waitForElementText(By.cssSelector("div.status"), "Done", true);
 
-                try {
-                    String text = findDomElement(By.cssSelector("div.storageOutput")).getText();
-                    if (text.equals(waitForText)) {
-                        return text;
-                    }
-                } catch (StaleElementReferenceException e) {
-                    // could happen before the click or if output is rerendering
+            try {
+                String text = findDomElement(By.cssSelector("div.storageOutput")).getText();
+                if (text.equals(waitForText)) {
+                    return text;
                 }
-                return null;
+            } catch (StaleElementReferenceException e) {
+                // could happen before the click or if output is rerendering
             }
+            return null;
         }, failMessage);
     }
 
@@ -363,13 +352,10 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
 
     private void assertAppCacheStatus(final AppCacheStatus status) {
         getAuraUITestingUtil().waitUntil(
-                new Function<WebDriver, Boolean>() {
-                    @Override
-                    public Boolean apply(WebDriver input) {
-                        String script = "return window.applicationCache.status;";
-                        int appCacheStatus = Integer.parseInt(getAuraUITestingUtil().getEval(script).toString());
-                        return status == AppCacheStatus.getEnum(appCacheStatus);
-                    }
+                input -> {
+                    String script = "return window.applicationCache.status;";
+                    int appCacheStatus = Integer.parseInt(getAuraUITestingUtil().getEval(script).toString());
+                    return status == AppCacheStatus.getEnum(appCacheStatus);
                 },
                 "applicationCache.status was not " + status.name());
     }
@@ -467,63 +453,51 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
             getDriver().get(url);
         }
 
-        getAuraUITestingUtil().waitUntilWithCallback(new Function<WebDriver, Integer>() {
-                @Override
-                public Integer apply(WebDriver input) {
-                    String script = "return window.applicationCache.status;";
-                    int appCacheStatus = Integer.parseInt(getAuraUITestingUtil().getEval(script).toString());
-                    if (appCacheStatus != AppCacheStatus.DOWNLOADING.value() && appCacheStatus != AppCacheStatus.CHECKING.value()) {
-                        return appCacheStatus;
-                    } else {
-                        return null;
-                    }
-                }
-            },
-            new ExpectedCondition<String>() {
-                @Override
-                public String apply(WebDriver d) {
+        getAuraUITestingUtil().waitUntilWithCallback(input -> {
+            String script = "return window.applicationCache.status;";
+            int appCacheStatus = Integer.parseInt(getAuraUITestingUtil().getEval(script).toString());
+            if (appCacheStatus != AppCacheStatus.DOWNLOADING.value() && appCacheStatus != AppCacheStatus.CHECKING.value()) {
+                return appCacheStatus;
+            } else {
+                return null;
+            }
+        },
+                (ExpectedCondition<String>) d -> {
                     String script = "return window.applicationCache.status;";
                     int appCacheStatus = Integer.parseInt(getAuraUITestingUtil().getEval(script).toString());
 
                     return "Current AppCache status is: " + AppCacheStatus.getEnum(appCacheStatus).toString();
-                }
-            },
+                },
             10,
             "Application cache status is stuck on Downloading or Checking.");
 
-        getAuraUITestingUtil().waitUntil(new Function<WebDriver, WebElement>() {
-                @Override
-                public WebElement apply(WebDriver input) {
-                    try {
-                        WebElement find = findDomElement(By.cssSelector(".clickableme"));
-                        if (markupToken.equals(find.getText())) {
-                            return find;
-                        }
-                    } catch (StaleElementReferenceException e) {
-                        // slight chance of happening between the findDomElement and getText
-                    }
-                    return null;
+        getAuraUITestingUtil().waitUntil(input -> {
+            try {
+                WebElement find = findDomElement(By.cssSelector(".clickableme"));
+                if (markupToken.equals(find.getText())) {
+                    return find;
                 }
-            },
+            } catch (StaleElementReferenceException e) {
+                // slight chance of happening between the findDomElement and getText
+            }
+            return null;
+        },
             "fail to load clickableme");
         Thread.sleep(200);
         List<Request> logs = parseLogs(appender.getLog());
 
-        String output = getAuraUITestingUtil().waitUntil(new Function<WebDriver, String>() {
-                @Override
-                public String apply(WebDriver input) {
-                    try {
-                        WebElement find = findDomElement(By.cssSelector(".clickableme"));
-                        find.click();
-                        WebElement outputEl = findDomElement(By.cssSelector("div.attroutput"));
-                        return outputEl.getText();
-                    } catch (StaleElementReferenceException e) {
-                        // could happen before the click or if output is
-                        // rerendering
-                    }
-                    return null;
-                }
-            }, "fail to click on clickableme or couldn't locate output value");
+        String output = getAuraUITestingUtil().waitUntil(input -> {
+            try {
+                WebElement find = findDomElement(By.cssSelector(".clickableme"));
+                find.click();
+                WebElement outputEl = findDomElement(By.cssSelector("div.attroutput"));
+                return outputEl.getText();
+            } catch (StaleElementReferenceException e) {
+                // could happen before the click or if output is
+                // rerendering
+            }
+            return null;
+        }, "fail to click on clickableme or couldn't locate output value");
 
         String expected = String.format("%s%s%s", jsToken, cssToken, fwToken);
         assertEquals("Unexpected alert text", expected, output);

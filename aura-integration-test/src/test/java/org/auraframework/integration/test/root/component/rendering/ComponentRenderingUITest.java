@@ -15,14 +15,11 @@
  */
 package org.auraframework.integration.test.root.component.rendering;
 
-import com.google.common.base.Function;
-
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
 
 /**
  * This class has tests for rendering components on a page.
@@ -157,12 +154,7 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
 
     private boolean isAuraClientEnginePresentOnPage() {
         try {
-            return getAuraUITestingUtil().waitUntil(new Function<WebDriver, Boolean>() {
-                @Override
-                public Boolean apply(WebDriver input) {
-                    return getAuraUITestingUtil().isAuraFrameworkReady();
-                }
-            }, 10); // give it only 10sec for these tests or they'll take too
+            return getAuraUITestingUtil().waitUntil(input -> getAuraUITestingUtil().isAuraFrameworkReady(), 10); // give it only 10sec for these tests or they'll take too
                     // long for the neg cases
         } catch (TimeoutException e) {
             return false;

@@ -57,7 +57,7 @@ script:
 # container, the commands in the script: section will be executed. No Zen-specific content
 # can be added.
 build:
-  image: ops0-artifactrepo1-0-prd.data.sfdc.net/aura/aura-build-base:cb4cd61@sha256:3a18286179f891c59f3031199d057cfe71ffb25f14740d3c3649a9b8455c5e15
+  image: ops0-artifactrepo1-0-prd.data.sfdc.net/aura/aura-build-base:fcf931d370b3@sha256:f6186c721cb9a004c6f3fe4eb3da38a076ddce876907fc48b88aec09137b19f3
   auth_config:
     username: $$DOCKER_USERNAME
     password: $$DOCKER_PASSWORD
@@ -71,7 +71,7 @@ build:
     - ./.zenbuild.sh
 compose:
   external-deps:
-    image: ops0-artifactrepo1-0-prd.data.sfdc.net/aura/aura-build-external-deps:bd6ddb0@sha256:d024d12df6b15324e647cff3c3939082307289bd36f6297085f683c9cdd66871
+    image: ops0-artifactrepo1-0-prd.data.sfdc.net/aura/aura-build-external-deps:e4d75e4@sha256:c4d21dab24941c2f4ab1de4aa6e21be7f3329df59c3d2ba2af5b60cc9563b93f
     auth_config:
       username: $$DOCKER_USERNAME
       password: $$DOCKER_PASSWORD

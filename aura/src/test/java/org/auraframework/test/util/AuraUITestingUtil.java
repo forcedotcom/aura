@@ -15,32 +15,21 @@
  */
 package org.auraframework.test.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.logging.Logger;
-
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Assert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import java.util.*;
+import java.util.function.Function;
+import java.util.logging.Logger;
 
 /**
  * A place to put common UI testing specific helper methods
@@ -250,12 +239,7 @@ public class AuraUITestingUtil {
     public boolean waitForElementNotPresent(String msg, final By locator) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
         return wait.withMessage(msg)
-            .ignoring(StaleElementReferenceException.class).until(new ExpectedCondition<Boolean>() {
-                @Override
-                public Boolean apply(WebDriver d) {
-                    return d.findElements(locator).isEmpty();
-                }
-            });
+            .ignoring(StaleElementReferenceException.class).until((ExpectedCondition<Boolean>) d -> d.findElements(locator).isEmpty());
     }
 
     public WebElement findElementAndTypeEventNameInIt(String event) {
@@ -550,16 +534,13 @@ public class AuraUITestingUtil {
      * @return
      */
     public <V> Function<? super WebDriver, V> addErrorCheck(final Function<? super WebDriver, V> function) {
-        return new Function<WebDriver, V>() {
-            @Override
-            public V apply(WebDriver driver) {
-                V value = function.apply(driver);
-                if ((value == null) || (Boolean.class.equals(value.getClass()) && !Boolean.TRUE.equals(value))) {
-                    String errors = (String) getRawEval("return (window.$A && window.$A.test) ? window.$A.test.getErrors() : '';");
-                    assertJsTestErrors(errors);
-                }
-                return value;
+        return (Function<WebDriver, V>) driver -> {
+            V value = function.apply(driver);
+            if ((value == null) || (Boolean.class.equals(value.getClass()) && !Boolean.TRUE.equals(value))) {
+                String errors = (String) getRawEval("return (window.$A && window.$A.test) ? window.$A.test.getErrors() : '';");
+                assertJsTestErrors(errors);
             }
+            return value;
         };
     }
 
@@ -605,17 +586,13 @@ public class AuraUITestingUtil {
     public List<WebElement> findDomElements(final By locator) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
         return wait.withMessage("fail to find element in dom:" + locator.toString())
-                .ignoring(StaleElementReferenceException.class).until(new ExpectedCondition<List<WebElement>>() {
-
-                    @Override
-                    public List<WebElement> apply(WebDriver d) {
-                        List<WebElement> elements = driver.findElements(locator);
-                        if (elements.size() > 0 &&
-                                getBooleanEval("return arguments[0].ownerDocument === document", elements.get(0))) {
-                            return elements;
-                        }
-                        return null;
+                .ignoring(StaleElementReferenceException.class).until((ExpectedCondition<List<WebElement>>) d -> {
+                    List<WebElement> elements = driver.findElements(locator);
+                    if (elements.size() > 0 &&
+                            getBooleanEval("return arguments[0].ownerDocument === document", elements.get(0))) {
+                        return elements;
                     }
+                    return null;
                 });
     }
 
@@ -742,10 +719,7 @@ public class AuraUITestingUtil {
                 new ExpectedCondition<Boolean>() {
                     @Override
                     public Boolean apply(WebDriver d) {
-                        boolean res = getBooleanEval("return (window.$A && window.$A.test && window.$A.test.isComplete()) || false;");
-                        if (res) {
-                        }
-                        return res;
+                        return getBooleanEval("return (window.$A && window.$A.test && window.$A.test.isComplete()) || false;");
                     }
                 },
                 new ExpectedCondition<String>() {
@@ -801,8 +775,7 @@ public class AuraUITestingUtil {
                 new ExpectedCondition<Boolean>() {
                     @Override
                     public Boolean apply(WebDriver d) {
-                        boolean res = getBooleanEval("return document.readyState === 'complete'");
-                        return res;
+                        return getBooleanEval("return document.readyState === 'complete'");
                     }
                 },
                 new ExpectedCondition<String>() {
@@ -830,8 +803,7 @@ public class AuraUITestingUtil {
                         new Function<WebDriver, Boolean>() {
                             @Override
                             public Boolean apply(WebDriver input) {
-                                Boolean res = (Boolean) getRawEval("return !!window.$A");
-                                return res;
+                                return (Boolean) getRawEval("return !!window.$A");
                             }
                         });
 
@@ -843,8 +815,7 @@ public class AuraUITestingUtil {
                             @Override
                             public Boolean apply(WebDriver input) {
                                 assertNoAuraErrorMessage(expectedErrors);
-                                boolean res = isAuraFrameworkReady();
-                                return res;
+                                return isAuraFrameworkReady();
                             }
                         });
     }
@@ -922,14 +893,11 @@ public class AuraUITestingUtil {
      */
     public void waitForElementText(final By locator, final String text, final boolean toBePresent, String message,
             final Boolean matchFullText) {
-        waitForElementFunction(locator, new Function<WebElement, Boolean>() {
-            @Override
-            public Boolean apply(WebElement element) {
-                if (matchFullText == true) {
-                    return toBePresent == element.getText().equals(text);
-                } else {
-                    return toBePresent == element.getText().contains(text);
-                }
+        waitForElementFunction(locator, element -> {
+            if (matchFullText == true) {
+                return toBePresent == element.getText().equals(text);
+            } else {
+                return toBePresent == element.getText().contains(text);
             }
         }, message);
     }

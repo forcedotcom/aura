@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.auraframework.def.ComponentDef;
@@ -39,6 +38,7 @@ import org.openqa.selenium.WebElement;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * UI test for usage of Integration Service.
@@ -135,12 +135,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         WebElement buttonShowStyle = findDomElement(By.cssSelector(".btnShowStyle"));
         buttonShowStyle.click();
         getAuraUITestingUtil().waitForElementFunction(By.cssSelector("div.dataFromAttributeStyle"),
-                new Function<WebElement, Boolean>() {
-                    @Override
-                    public Boolean apply(WebElement element) {
-                        return element.getText().startsWith("rgb(255, 255, 255)")||element.getText().startsWith("#fff");
-                    }
-            }
+                element -> element.getText().startsWith("rgb(255, 255, 255)")||element.getText().startsWith("#fff")
         );
     }
 

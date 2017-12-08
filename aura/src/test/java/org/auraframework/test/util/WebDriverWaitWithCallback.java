@@ -19,7 +19,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 /**
  * A specialization of {@link WebDriverWait} that run passed in callback function when wait time out.

@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -50,6 +49,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
+import java.util.function.Function;
 
 public class CachingServiceImplTest extends AuraImplTestCase {
 
@@ -193,12 +193,7 @@ public class CachingServiceImplTest extends AuraImplTestCase {
                 cache, valGenerator, keys, null, keys);
     }
 
-    private Function<DefDescriptor<?>, Optional<? extends Definition>> mockDefinitionFunction = new Function<DefDescriptor<?>, Optional<? extends Definition>>() {
-        @Override
-        public Optional<? extends Definition> apply(DefDescriptor<?> key) {
-            return Optional.of(Mockito.mock(Definition.class));
-        }
-    };
+    private Function<DefDescriptor<?>, Optional<? extends Definition>> mockDefinitionFunction = key -> Optional.of(Mockito.mock(Definition.class));
 
     @Test
     public void testNotifyDependentSourceChange_InvalidatesAllCachedDependencies() {
@@ -212,12 +207,7 @@ public class CachingServiceImplTest extends AuraImplTestCase {
         cachingService.initializeCaches();
         testNotifyDependentSourceChange_InvalidatesAllCachedValues(cachingService,
                 cachingService.getDepsCache(),
-                new Function<String, DependencyEntry>() {
-                    @Override
-                    public DependencyEntry apply(String key) {
-                        return new DependencyEntry(null);
-                    }
-                }, keys);
+                key -> new DependencyEntry(null), keys);
     }
 
     @Test
@@ -232,12 +222,7 @@ public class CachingServiceImplTest extends AuraImplTestCase {
         cachingService.initializeCaches();
         testNotifyDependentSourceChange_InvalidatesAllCachedValues(cachingService,
                 cachingService.getDescriptorFilterCache(),
-                new Function<String, Set<DefDescriptor<?>>>() {
-                    @Override
-                    public Set<DefDescriptor<?>> apply(String key) {
-                        return Collections.emptySet();
-                    }
-                }, keys);
+                key -> Collections.emptySet(), keys);
     }
 
     @Test
@@ -251,12 +236,7 @@ public class CachingServiceImplTest extends AuraImplTestCase {
         cachingService.setLoggingAdapter(loggingAdapter);
         cachingService.initializeCaches();
         testNotifyDependentSourceChange_InvalidatesAllCachedValues(cachingService,
-                cachingService.getStringsCache(), new Function<String, String>() {
-                    @Override
-                    public String apply(String key) {
-                        return "";
-                    }
-                }, keys);
+                cachingService.getStringsCache(), key -> "", keys);
     }
 
     @Test
@@ -354,12 +334,7 @@ public class CachingServiceImplTest extends AuraImplTestCase {
         cachingService.initializeCaches();
         Cache<DefDescriptor<?>, Boolean> cache = cachingService.getExistsCache();
         testNotifyDependentSourceChange_InvalidatesSome(cachingService, cache,
-                new Function<DefDescriptor<?>, Boolean>() {
-                    @Override
-                    public Boolean apply(DefDescriptor<?> input) {
-                        return true;
-                    }
-                }, baseDds, source, invalidatedDds);
+                input -> true, baseDds, source, invalidatedDds);
     }
 
     @Test
@@ -380,11 +355,6 @@ public class CachingServiceImplTest extends AuraImplTestCase {
         cachingService.initializeCaches();
         testNotifyDependentSourceChange_InvalidatesAllCachedValues(cachingService,
                 cachingService.getExistsCache(),
-                new Function<DefDescriptor<?>, Boolean>() {
-                    @Override
-                    public Boolean apply(DefDescriptor<?> key) {
-                        return true;
-                    }
-                }, keys);
+                key -> true, keys);
     }
 }

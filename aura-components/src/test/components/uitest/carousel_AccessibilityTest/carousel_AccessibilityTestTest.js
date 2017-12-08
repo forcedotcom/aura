@@ -20,15 +20,21 @@
 	testCarouselAccessibility : {
 		browsers : [ "-IE7", "-IE8" ],
 		test : [function(cmp) {
-			this.goToPageOnCarousel(cmp, "carousel", 2);
+                        // Disabled due to this functionality not working with Chrome 59 and ChromeDriver
+                        // 2.33. See W-4402250, https://gus.lightning.force.com/one/one.app#/sObject/a07B0000004BgIyIAK/view
+                        // for more information.
+			//this.goToPageOnCarousel(cmp, "carousel", 2);
 		},
 		function(cmp) {
 			var carousel = cmp.find("carousel"),
 				pages = carousel.get("v.body");
 
 			// Checks that aria attributes are correct for when the second page is selected
-			this.assertAriaAttributesOnPage(pages[0].getElement(), false);
-			this.assertAriaAttributesOnPage(pages[1].getElement(), true);
+                        // Disabled due to this functionality not working with Chrome 59 and ChromeDriver
+                        // 2.33. See W-4402250, https://gus.lightning.force.com/one/one.app#/sObject/a07B0000004BgIyIAK/view
+                        // for more information.
+			//this.assertAriaAttributesOnPage(pages[0].getElement(), false);
+			//this.assertAriaAttributesOnPage(pages[1].getElement(), true);
         },
         function(cmp) {
         	this.goToPageOnCarousel(cmp, "carousel", 1);

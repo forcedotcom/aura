@@ -126,18 +126,19 @@
         <webdriver.chrome.driver>${aura.home}/aura-integration-test/bin/chromedriverlauncher</webdriver.chrome.driver>
         <webdriver.reusebrowser>true</webdriver.reusebrowser>
         <webdriver.browser.type>GOOGLECHROME</webdriver.browser.type> <!-- refer to org.auraframework.test.WebDriverUtil.BrowserType enums for valid values -->
-		<webdriver.timeout>60</webdriver.timeout>
+        <webdriver.timeout>60</webdriver.timeout>
         <sauce.record.video>false</sauce.record.video>
         <sauce.record.screenshots>false</sauce.record.screenshots>
         <screenshots.directory>${project.build.directory}/screenshots</screenshots.directory>
         <screenshots.baseurl>file://${screenshots.directory}</screenshots.baseurl>
-		<additionalClasspaths>${aura.home}/aura-util/target/test-classes/;${aura.home}/aura/target/test-classes/;${aura.home}/aura-impl-expression/target/test-classes/;${aura.home}/aura-integration-test/target/test-classes/;${aura.home}/aura-impl/target/test-classes/;${aura.home}/aura-components/target/test-classes/;${aura.home}/aura/src/test/components/;${aura.home}/aura-impl/src/test/components/</additionalClasspaths>
+        <additionalClasspaths>${aura.home}/aura-util/target/test-classes/;${aura.home}/aura/target/test-classes/;${aura.home}/aura-impl-expression/target/test-classes/;${aura.home}/aura-integration-test/target/test-classes/;${aura.home}/aura-impl/target/test-classes/;${aura.home}/aura-components/target/test-classes/;${aura.home}/aura/src/test/components/;${aura.home}/aura-impl/src/test/components/</additionalClasspaths>
     </properties>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jetty.version}</version>
                 <configuration>
                     <connectors>
                         <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
@@ -219,33 +220,34 @@
             </plugin>
         </plugins>
     </build>
-	<profiles>
-		<profile>
-			<id>jarsOnly</id>
-			<activation>
-				<property>
-					<name>jarsOnly</name>
-				</property>
-			</activation>
-			<properties>
-				<additionalClasspaths />
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.eclipse.jetty</groupId>
-						<artifactId>jetty-maven-plugin</artifactId>
-						<configuration>
-							<systemProperties>
-								<systemProperty>
-									<name>aura.home</name>
-									<value />
-								</systemProperty>
-							</systemProperties>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+    <profiles>
+        <profile>
+            <id>jarsOnly</id>
+            <activation>
+                <property>
+                    <name>jarsOnly</name>
+                </property>
+            </activation>
+            <properties>
+                <additionalClasspaths />
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-maven-plugin</artifactId>
+                        <version>${jetty.version}</version>
+                        <configuration>
+                            <systemProperties>
+                                <systemProperty>
+                                    <name>aura.home</name>
+                                    <value />
+                                </systemProperty>
+                            </systemProperties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

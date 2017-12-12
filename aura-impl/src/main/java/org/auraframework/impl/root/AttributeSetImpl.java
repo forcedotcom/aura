@@ -231,7 +231,7 @@ public class AttributeSetImpl implements AttributeSet {
                         setExpression(desc, entry.getValue());
                     }
                 } catch (AuraRuntimeException arex) {
-                    new InvalidDefinitionException("Error setting attribute: " + entry.getKey(), new Location(this.parent.getDescriptor().toString(), 0), arex);
+                    throw new InvalidDefinitionException("Error setting attribute: " + entry.getKey(), new Location(this.parent.getDescriptor().toString(), 0), arex);
                 }
             }
         }

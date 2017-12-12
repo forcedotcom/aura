@@ -15,6 +15,8 @@
  */
 package org.auraframework.integration.test.http;
 
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.CheckAccessibility;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
@@ -109,5 +111,16 @@ public class AuraResourceServletUITest extends WebDriverTestCase {
         openCachesAppWithRefresh("cssStringsCache", "markup://performance:caches@CSS");
         //assertEquals("There should be 1 entry in the css strings cache for CSS", "1", getCount());
         checkCount("There should be 1 entry in the css strings cache for CSS", "1");
+    }
+
+    @Test
+    public void testWhitespaceAttributeNamesIgnored() throws Exception {
+        String markup = "<aura:application><aura:attribute name=\"message\" type=\"String\"/>{#v.message}</aura:application>";
+        DefDescriptor<ApplicationDef> descriptor = addSourceAutoCleanup(ApplicationDef.class, markup);
+        
+        String url = "/" + descriptor.getNamespace() + "/" + descriptor.getName()
+                + ".app?=empty&%20%20=spaces&%09=tab&%0D%0A=newline&message=hello";
+        openNoAura(url);
+        getAuraUITestingUtil().waitForElementText(By.tagName("body"), "hello", true);
     }
 }

@@ -182,6 +182,12 @@ public abstract class AuraResourceImpl implements AuraResource {
                 }
                 @SuppressWarnings("unchecked")
                 Map<String,Object> result = (Map<String, Object>) new JsonReader().read(attributesString);
+                // Strip any whitespace-keyed params
+                for (Object key : result.keySet().toArray()) {
+                    if (key.toString().trim().isEmpty()) {
+                        result.remove(key);
+                    }
+                }
                 return result;
             } catch (Exception e) {
                 return null;
@@ -191,8 +197,8 @@ public abstract class AuraResourceImpl implements AuraResource {
             Map<String, Object> attributes = Maps.newHashMap();
 
             while (attributeNames.hasMoreElements()) {
-                String name = attributeNames.nextElement();
-                if (!name.startsWith("aura.")) {
+                String name = attributeNames.nextElement().trim();
+                if (!name.startsWith("aura.") && !name.isEmpty()) {
                     Object value = new StringParam(name, 0, false).get(request);
 
                     attributes.put(name, value);

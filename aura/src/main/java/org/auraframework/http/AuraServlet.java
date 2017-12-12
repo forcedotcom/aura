@@ -428,8 +428,8 @@ public class AuraServlet extends AuraBaseServlet {
         Map<String, Object> attributes = new HashMap<>();
 
         while (attributeNames.hasMoreElements()) {
-            String name = attributeNames.nextElement();
-            if (!name.startsWith(AURA_PREFIX)) {
+            String name = attributeNames.nextElement().trim();
+            if (!name.startsWith(AURA_PREFIX) && !name.isEmpty()) {
                 Object value = new StringParam(name, 0, false).get(request);
 
                 attributes.put(name, value);

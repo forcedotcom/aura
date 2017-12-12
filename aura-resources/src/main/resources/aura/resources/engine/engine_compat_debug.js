@@ -52,57 +52,6 @@ function isString(obj) {
     return typeof obj === 'string';
 }
 
-var EmptySlots = create(null);
-function getSlotsetValue(slotset, slotName) {
-    // TODO: mark slotName as reactive
-    return slotset && slotset[slotName];
-}
-var slotsetProxyHandler = {
-    get: function (slotset, key) { return getSlotsetValue(slotset, key); },
-    set: function () {
-        return false;
-    },
-    deleteProperty: function () {
-        return false;
-    },
-    apply: function () {
-    },
-    construct: function () {
-    },
-};
-function applyTokenToHost(vm, html) {
-    var vnode = vm.vnode, context = vm.context;
-    var oldToken = context.tplToken;
-    var newToken = html.token;
-    if (oldToken !== newToken) {
-        var host = vnode.elm;
-        // Remove the token currently applied to the host element if different than the one associated
-        // with the current template
-        if (!isUndefined(oldToken)) {
-            host.removeAttribute(oldToken);
-        }
-        // If the template has a token apply the token to the host element
-        if (!isUndefined(newToken)) {
-            host.setAttribute(newToken, '');
-        }
-    }
-}
-function evaluateTemplate(vm, html) {
-    // TODO: add identity to the html functions
-    var component = vm.component, context = vm.context, _a = vm.cmpSlots, cmpSlots = _a === void 0 ? EmptySlots : _a, cmpTemplate = vm.cmpTemplate;
-    // reset the cache momizer for template when needed
-    if (html !== cmpTemplate) {
-        applyTokenToHost(vm, html);
-        vm.cmpTemplate = html;
-        context.tplCache = create(null);
-        context.tplToken = html.token;
-    }
-    var _b = Proxy.revocable(cmpSlots, slotsetProxyHandler), slotset = _b.proxy, slotsetRevoke = _b.revoke;
-    var vnodes = html.call(undefined, api, component, slotset, context.tplCache);
-    slotsetRevoke();
-    return vnodes;
-}
-
 // Few more execptions that are using the attribute name to match the property in lowercase.
 // this list was compiled from https://msdn.microsoft.com/en-us/library/ms533062(v=vs.85).aspx
 // and https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes
@@ -307,7 +256,6 @@ function scheduleRehydration(vm) {
     }
 }
 function isNodeOwnedByVM(vm, node) {
-    // @ts-ignore
     return node[OwnerKey] === vm.uid;
 }
 function wasNodePassedIntoVM(vm, node) {
@@ -532,8 +480,10 @@ var ReactiveProxyHandler = /** @class */ (function () {
         return true;
     };
     ReactiveProxyHandler.prototype.apply = function (target /*, thisArg: any, argArray?: any*/) {
+        
     };
     ReactiveProxyHandler.prototype.construct = function (target, argArray, newTarget) {
+        
     };
     ReactiveProxyHandler.prototype.has = function (shadowTarget, key) {
         var originalTarget = this.originalTarget;
@@ -560,6 +510,7 @@ var ReactiveProxyHandler = /** @class */ (function () {
         return targetIsExtensible;
     };
     ReactiveProxyHandler.prototype.setPrototypeOf = function (shadowTarget, prototype) {
+        
     };
     ReactiveProxyHandler.prototype.getPrototypeOf = function (shadowTarget) {
         var originalTarget = this.originalTarget;
@@ -631,6 +582,7 @@ function getReactiveProxy(value) {
 
 // stub function to prevent misuse of the @track decorator
 function track() {
+    
 }
 // TODO: how to allow symbols as property keys?
 function createTrackedPropertyDescriptor(proto, key, descriptor) {
@@ -663,6 +615,7 @@ function createTrackedPropertyDescriptor(proto, key, descriptor) {
 
 // stub function to prevent misuse of the @wire decorator
 function wire() {
+    
 }
 // TODO: how to allow symbols as property keys?
 function createWiredPropertyDescriptor(proto, key, descriptor) {
@@ -671,6 +624,7 @@ function createWiredPropertyDescriptor(proto, key, descriptor) {
 
 // stub function to prevent misuse of the @api decorator
 function api$1() {
+    
 }
 var vmBeingUpdated = null;
 function prepareForPropUpdate(vm) {
@@ -704,11 +658,12 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
                 }
             }
             else if (isBeingConstructed(vm)) {
-                var observable_1 = isObservable(newValue);
-                newValue = observable_1 ? getReactiveProxy(newValue) : newValue;
+                var observable = isObservable(newValue);
+                newValue = observable ? getReactiveProxy(newValue) : newValue;
                 vm.cmpProps[key] = newValue;
             }
             else {
+                
             }
         },
         enumerable: descriptor ? descriptor.enumerable : true,
@@ -732,6 +687,7 @@ function createPublicAccessorDescriptor(proto, key, descriptor) {
                 set.call(this, newValue);
             }
             else {
+                
             }
         },
         enumerable: enumerable,
@@ -1018,7 +974,6 @@ ComponentElement.prototype = {
     dispatchEvent: function (event) {
         var elm = getLinkedElement(this);
         var vm = this[ViewModelReflection];
-        // Pierce dispatchEvent so locker service has a chance to overwrite
         pierce(vm, elm);
         var dispatchEvent = piercingHook(vm.membrane, elm, 'dispatchEvent', elm.dispatchEvent);
         return dispatchEvent.call(elm, event);
@@ -1126,7 +1081,7 @@ function createComponentDef(Ctor) {
     var wire$$1 = getWireHash(Ctor);
     var track$$1 = getTrackHash(Ctor);
     var proto = Ctor.prototype;
-    var _loop_1 = function (propName) {
+    for (var propName in props) {
         var propDef = props[propName];
         // initializing getters and setters for each public prop on the target prototype
         var descriptor = getOwnPropertyDescriptor(proto, propName);
@@ -1137,33 +1092,23 @@ function createComponentDef(Ctor) {
         else {
             createPublicPropertyDescriptor(proto, propName, descriptor);
         }
-    };
-    for (var propName in props) {
-        _loop_1(propName);
     }
     if (wire$$1) {
-        var _loop_2 = function (propName) {
+        for (var propName in wire$$1) {
             if (wire$$1[propName].method) {
-                return "continue";
+                // for decorated methods we need to do nothing
+                continue;
             }
             var descriptor = getOwnPropertyDescriptor(proto, propName);
             // TODO: maybe these conditions should be always applied.
-            // initializing getters and setters for each public prop on the target prototype
             createWiredPropertyDescriptor(proto, propName, descriptor);
-        };
-        for (var propName in wire$$1) {
-            _loop_2(propName);
         }
     }
     if (track$$1) {
-        var _loop_3 = function (propName) {
+        for (var propName in track$$1) {
             var descriptor = getOwnPropertyDescriptor(proto, propName);
             // TODO: maybe these conditions should be always applied.
-            // initializing getters and setters for each public prop on the target prototype
             createTrackedPropertyDescriptor(proto, propName, descriptor);
-        };
-        for (var propName in track$$1) {
-            _loop_3(propName);
         }
     }
     var superProto = getPrototypeOf(Ctor);
@@ -1238,6 +1183,7 @@ function removeAttributePatched(attrName) {
         invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
     }
 }
+
 function createDescriptorMap(publicProps, publicMethodsConfig) {
     // replacing mutators and accessors on the element itself to catch any mutation
     var descriptors = {
@@ -1275,6 +1221,7 @@ function getTrackHash(target) {
     if (!track$$1 || !getOwnPropertyNames(track$$1).length) {
         return;
     }
+    // TODO: check that anything in `track` is correctly defined in the prototype
     return assign(create(null), track$$1);
 }
 function getWireHash(target) {
@@ -1282,6 +1229,7 @@ function getWireHash(target) {
     if (!wire$$1 || !getOwnPropertyNames(wire$$1).length) {
         return;
     }
+    // TODO: check that anything in `wire` is correctly defined in the prototype
     return assign(create(null), wire$$1);
 }
 function getPublicPropertiesHash(target) {
@@ -1322,6 +1270,58 @@ function getComponentDef(Ctor) {
     def = createComponentDef(Ctor);
     CtorToDefMap.set(Ctor, def);
     return def;
+}
+
+var EmptySlots = create(null);
+function getSlotsetValue(slotset, slotName) {
+    return slotset && slotset[slotName];
+}
+var slotsetProxyHandler = {
+    get: function (slotset, key) { return getSlotsetValue(slotset, key); },
+    set: function () {
+        return false;
+    },
+    deleteProperty: function () {
+        return false;
+    },
+    apply: function () {
+        
+    },
+    construct: function () {
+        
+    },
+};
+function applyTokenToHost(vm, html) {
+    var vnode = vm.vnode, context = vm.context;
+    var oldToken = context.tplToken;
+    var newToken = html.token;
+    if (oldToken !== newToken) {
+        var host = vnode.elm;
+        // Remove the token currently applied to the host element if different than the one associated
+        // with the current template
+        if (!isUndefined(oldToken)) {
+            host.removeAttribute(oldToken);
+        }
+        // If the template has a token apply the token to the host element
+        if (!isUndefined(newToken)) {
+            host.setAttribute(newToken, '');
+        }
+    }
+}
+function evaluateTemplate(vm, html) {
+    var component = vm.component, context = vm.context, _a = vm.cmpSlots, cmpSlots = _a === void 0 ? EmptySlots : _a, cmpTemplate = vm.cmpTemplate;
+    // reset the cache momizer for template when needed
+    if (html !== cmpTemplate) {
+        applyTokenToHost(vm, html);
+        vm.cmpTemplate = html;
+        context.tplCache = create(null);
+        context.tplToken = html.token;
+        
+    }
+    var _b = Proxy.revocable(cmpSlots, slotsetProxyHandler), slotset = _b.proxy, slotsetRevoke = _b.revoke;
+    var vnodes = html.call(undefined, api, component, slotset, context.tplCache);
+    slotsetRevoke();
+    return vnodes;
 }
 
 var isRendering = false;
@@ -1382,6 +1382,7 @@ function invokeComponentRenderMethod(vm) {
             result = evaluateTemplate(vm, html);
         }
         else if (!isUndefined(html)) {
+            
         }
     }
     catch (e) {
@@ -1436,14 +1437,13 @@ function isBeingConstructed(vm) {
     return vmBeingConstructed === vm;
 }
 function createComponent(vm, Ctor) {
-    // create the component instance
     var vmBeingConstructedInception = vmBeingConstructed;
     vmBeingConstructed = vm;
     var component = invokeComponentConstructor(vm, Ctor);
     vmBeingConstructed = vmBeingConstructedInception;
+    
 }
 function linkComponent(vm) {
-    // wiring service
     var wire = vm.def.wire;
     if (wire) {
         var wiring = Services.wiring;
@@ -1502,6 +1502,7 @@ function removeComponentEventListener(vm, eventName, oldHandler) {
             return;
         }
     }
+    
 }
 function dispatchComponentEvent(vm, event) {
     var cmpEvents = vm.cmpEvents, component = vm.component;
@@ -1541,8 +1542,6 @@ function addComponentSlot(vm, slotName, newValue) {
     }
 }
 function removeComponentSlot(vm, slotName) {
-    // TODO: hot-slots names are those slots used during the last rendering cycle, and only if
-    // one of those is changed, the vm should be marked as dirty.
     var cmpSlots = vm.cmpSlots;
     if (cmpSlots && cmpSlots[slotName]) {
         cmpSlots[slotName] = undefined; // delete will de-opt the cmpSlots, better to set it to undefined
@@ -1648,7 +1647,6 @@ function v(sel, data, children, text, elm, Ctor) {
 }
 // [h]tml node
 function h(sel, data, children) {
-    // checking reserved internal data properties
     var classMap = data.classMap, className = data.className, style = data.style, styleMap = data.styleMap;
     data.class = classMap || (className && getMapFromClassName(className));
     data.style = styleMap || (style && style + '');
@@ -1665,7 +1663,6 @@ function c(sel, Ctor, data) {
     if (Ctor.__circular__) {
         Ctor = Ctor();
     }
-    // checking reserved internal data properties
     var key = data.key, slotset = data.slotset, styleMap = data.styleMap, style = data.style, on = data.on, className = data.className, classMap = data.classMap, _props = data.props;
     var attrs = data.attrs;
     // hack to allow component authors to force the usage of the "is" attribute in their components
@@ -1690,7 +1687,7 @@ function i(iterable, factory) {
     var next = iterator.next();
     var i = 0;
     var value = next.value, last = next.done;
-    var _loop_1 = function () {
+    while (last === false) {
         // implementing a look-back-approach because we need to know if the element is the last
         next = iterator.next();
         last = next.done;
@@ -1702,12 +1699,8 @@ function i(iterable, factory) {
         else {
             ArrayPush.call(list, vnode);
         }
-        // preparing next value
         i += 1;
         value = next.value;
-    };
-    while (last === false) {
-        _loop_1();
     }
     return list;
 }
@@ -2149,6 +2142,7 @@ function initializeComponent(oldVnode, vnode) {
     else {
         createVM(vnode);
     }
+    
 }
 var componentInit = {
     create: initializeComponent,
@@ -2376,6 +2370,7 @@ function updateAttrs(oldVnode, vnode) {
         var cur = attrs[key];
         var old = oldAttrs[key];
         if (old !== cur) {
+            // TODO: once we fix issue #861, we can move the prepareForAttributeMutationFromTemplate up here.
             if (cur === true) {
                 setAttribute.call(elm, key, "");
             }
@@ -2689,4 +2684,4 @@ exports.wire = wire;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.16.5 */
+/** version: 0.16.8 */

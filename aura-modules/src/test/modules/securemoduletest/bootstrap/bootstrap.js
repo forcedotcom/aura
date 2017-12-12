@@ -14,7 +14,7 @@ export default class Bootstrap extends Element {
 
     @api
     testDollarAuraNotAccessibleInModules() {
-        testUtil.assertEquals("undefined", typeof $A, "Expected $A to be not accessible in interop component"); // eslint-disable-line raptor/no-aura
+        testUtil.assertEquals("undefined", typeof $A, "Expected $A to be not accessible in interop component"); // eslint-disable-line lwc/no-aura
         // modules can access $A through window and we are hoping to catch that while linting modules.
         // It was a conscious decision to not block $A on window for the sake of performance
         // testUtils.assertUndefined(window.$A);
@@ -60,5 +60,5 @@ function engineIsSecureInLocalFunc() {
 }
 
 function dollarAuraNotAccessibleInLocalFunc() {
-    testUtil.assertEquals("undefined", typeof $A, "Expected $A to be not accessible in local functions"); // eslint-disable-line raptor/no-aura
+    testUtil.assertEquals("undefined", typeof $A, "Expected $A to be not accessible in local functions"); // eslint-disable-line lwc/no-aura
 }

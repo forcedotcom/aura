@@ -58,8 +58,8 @@
             },
             function (cmp) {
                 var interopCmp = cmp.find('simple')
-                $A.test.assertEquals('format-changed-value', interopCmp.get('v.style'), 'it should change the style value from inside raptor component');
-                $A.test.assertEquals('msg-changed-value', interopCmp.get('v.message'), 'it should change the message value from inside raptor component');
+                $A.test.assertEquals('format-changed-value', interopCmp.get('v.style'), 'it should change the style value from inside LWC component');
+                $A.test.assertEquals('msg-changed-value', interopCmp.get('v.message'), 'it should change the message value from inside LWC component');
             }
         ]
     },

@@ -1024,7 +1024,7 @@
                 <plugin>
                     <groupId>org.auraframework</groupId>
                     <artifactId>tools-maven-plugin</artifactId>
-                    <version>0.1.7</version>
+                    <version>0.2.0</version>
                     <configuration>
                         <arguments>
                             <argument>${eslint.extra.arg}</argument>
@@ -1034,7 +1034,7 @@
                             <argument>${project.basedir}/src/test/modules</argument>
                         </arguments>
                         <modulesEslintrc>${basedir}/modules.eslintrc.json</modulesEslintrc>
-                        <errorHintMessage>(NOTE: to check modules with eslint use: mvn tools:eslint-raptor)</errorHintMessage>
+                        <errorHintMessage>(NOTE: to check modules with eslint use: mvn tools:eslint-lwc)</errorHintMessage>
                     </configuration>
                 </plugin>
             </plugins>
@@ -1130,11 +1130,11 @@
                         <artifactId>tools-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <!-- run eslint on raptor modules -->
-                                <id>eslint-raptor</id>
+                                <!-- run eslint on LWC modules -->
+                                <id>eslint-lwc</id>
                                 <phase>process-classes</phase>
                                 <goals>
-                                    <goal>eslint-raptor</goal>
+                                    <goal>eslint-lwc</goal>
                                 </goals>
                             </execution>
                         </executions>

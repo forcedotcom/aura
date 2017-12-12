@@ -1,6 +1,7 @@
 import * as engine from 'engine';
-// eslint-disable-next-line raptor/no-compat
+// eslint-disable-next-line lwc/no-compat
 import aura from 'aura';
+// eslint-disable-next-line lwc/no-compat-module-storage
 import storage from 'aura-storage';
 
 export default class ImportCmp extends engine.Element {

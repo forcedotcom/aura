@@ -473,12 +473,12 @@ InteropComponent.prototype.swapInteropElement = function (currentElement, newEle
     // only for components, not libraries
     if (typeof this.interopClass === 'function') {
         var cmp = this;
-        var raptorCmp = this.getElement();
+        var lwcCmp = this.getElement();
 
         // Set public accessors in attribute bag so aura land can get it.
         Object.keys(this.interopDef['props']).forEach(function (propName) {
             if (cmp.isReadOnlyProperty(propName)) {
-                cmp.set('v.' + cmp.propNameToAttrMap[propName], raptorCmp[propName]);
+                cmp.set('v.' + cmp.propNameToAttrMap[propName], lwcCmp[propName]);
             }
         });
     }

@@ -2,7 +2,7 @@ import { Element } from 'engine';
 
 function resolveAfter1Sec(x) {
     return new Promise(resolve => {
-        setTimeout(() => { // eslint-disable-line raptor/no-set-timeout
+        setTimeout(() => { // eslint-disable-line lwc/no-set-timeout
             resolve(x);
         }, 1000);
     });

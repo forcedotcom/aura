@@ -456,7 +456,7 @@
                                         <artifactId>tools-maven-plugin</artifactId>
                                         <versionRange>[0.0.19,)</versionRange>
                                         <goals>
-                                            <goal>eslint-raptor</goal>
+                                            <goal>eslint-lwc</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>

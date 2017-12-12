@@ -1,4 +1,4 @@
-// eslint-disable-next-line raptor/no-compat-execute
+// eslint-disable-next-line lwc/no-compat-execute
 import {executeGlobalController} from "aura";
 
 export function executedGlobalControllerWithCustomException() {

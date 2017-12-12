@@ -1,5 +1,5 @@
 import { Element } from "engine";
-// eslint-disable-next-line no-unused-vars, raptor/no-aura-libs
+// eslint-disable-next-line no-unused-vars, lwc/no-aura-libs
 import { const1 } from "moduleTest:testLib";
 import { log } from "./util.js"; // eslint-disable-line no-unused-vars
 

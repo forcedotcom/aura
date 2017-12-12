@@ -11,7 +11,7 @@ export default class SanityChecks extends Element {
             // Verify that render method has access to secure wrappers when invoked through interop
             testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
                 + " return SecureWindow in render method");
-            testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line raptor/no-aura
+            testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line lwc/no-aura
                 "Expected $A to be not accessible in render method");
             testUtil.assertStartsWith("SecureDocument", document.toString(), "Expected document to"
                 + " return SecureDocument in render method");
@@ -117,7 +117,7 @@ export default class SanityChecks extends Element {
     @api
     testSetTimeoutNonFunctionParamExploit() {
         try {
-            setTimeout({ bind: () => { // eslint-disable-line raptor/no-set-timeout
+            setTimeout({ bind: () => { // eslint-disable-line lwc/no-set-timeout
                 return () => {
                     alert(this); // eslint-disable-line no-alert
                 };
@@ -182,7 +182,7 @@ export default class SanityChecks extends Element {
         // Test Element
         testUtil.assertTrue(element instanceof HTMLDivElement, "DIV element should be an instance of HTMLDivElement");
         testUtil.assertTrue(element instanceof HTMLElement, "DIV element should be an instance of HTMLElement");
-        // Because Raptor is redefining the Element class
+        // Because LWC is redefining the Element class
         testUtil.assertTrue(element instanceof window.Element, "DIV element should be an instance of Element");
         testUtil.assertTrue(element instanceof Node, "DIV element should be an instance of Node");
         testUtil.assertTrue(element instanceof EventTarget, "DIV element should be an instance of EventTarget");

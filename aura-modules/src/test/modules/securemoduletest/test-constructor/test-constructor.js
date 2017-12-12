@@ -7,7 +7,7 @@ export default class TestConstructor extends Element {
         // Verify that render method has access to secure wrappers when invoked through interop
         testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
             + " return SecureWindow in constructor");
-        testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line raptor/no-aura
+        testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line lwc/no-aura
             "Expected $A to be not accessible in constructor");
         testUtil.assertStartsWith("SecureDocument", document.toString(), "Expected document to"
             + " return SecureDocument in constructor");

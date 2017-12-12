@@ -45,7 +45,7 @@ function InteropComponentDef(config) {
 /**
  * This method cant be initialized @construnction time because we dont have this.interopDef["props"] (window["Engine"]['getComponentDef'](interopClass)) for libraries
  *
- * @param interopMap in 'props' contains a mapping in the form 'prop' => 'attr' ( (raptor name) => (aura name) )
+ * @param interopMap in 'props' contains a mapping in the form 'prop' => 'attr' ( (lwc name) => (aura name) )
  * @param props
  */
 InteropComponentDef.prototype.setupPropAttrMap = function (interopMap, props) {

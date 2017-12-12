@@ -118,11 +118,11 @@
             function (cmp) {
                 var interopCmp = cmp.find('simple');
                 var removePrevented = interopCmp.getElement().querySelector(this.selector.removePrevented).innerText;
-                $A.test.assertEquals('true', removePrevented, 'it should prevent default of custom event fired on raptor and prevented in aura land.');
+                $A.test.assertEquals('true', removePrevented, 'it should prevent default of custom event fired on LWC and prevented in aura land.');
             },
             function (cmp) {
                 var removePropagated = cmp.find('evt-propagated').getElement().innerText;
-                $A.test.assertEquals('false', removePropagated, 'it should stop propagation of custom event fired on raptor and prevented in aura land.');
+                $A.test.assertEquals('false', removePropagated, 'it should stop propagation of custom event fired on LWC and prevented in aura land.');
             },
         ]
     },

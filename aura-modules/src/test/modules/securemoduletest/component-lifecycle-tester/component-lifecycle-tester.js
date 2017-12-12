@@ -14,7 +14,7 @@ export default class ComponentLifecycleTester extends Element {
             // Verify that render method has access to secure wrappers when invoked through interop
             testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
                 + " return SecureWindow in connectedCallback");
-            testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line raptor/no-aura
+            testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line lwc/no-aura
                 "Expected $A to be not accessible in connectedCallback");
             testUtil.assertStartsWith("SecureDocument", document.toString(), "Expected document to"
                 + " return SecureDocument in connectedCallback");
@@ -29,7 +29,7 @@ export default class ComponentLifecycleTester extends Element {
             // Verify that render method has access to secure wrappers when invoked through interop
             testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
                 + " return SecureWindow in disconnectedCallback");
-            testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line raptor/no-aura
+            testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line lwc/no-aura
                 "Expected $A to be not accessible in disconnectedCallback");
             testUtil.assertStartsWith("SecureDocument", document.toString(), "Expected document to"
                 + " return SecureDocument in disconnectedCallback");
@@ -49,7 +49,7 @@ export default class ComponentLifecycleTester extends Element {
             // Verify that render method has access to secure wrappers when invoked through interop
             testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
                 + " return SecureWindow in attributeChangedCallback");
-            testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line raptor/no-aura
+            testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line lwc/no-aura
                 "Expected $A to be not accessible in attributeChangedCallback");
             testUtil.assertStartsWith("SecureDocument", document.toString(), "Expected document to"
                 + " return SecureDocument in attributeChangedCallback");
@@ -64,7 +64,7 @@ export default class ComponentLifecycleTester extends Element {
             // Verify that render method has access to secure wrappers when invoked through interop
             testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
                 + " return SecureWindow in renderedCallback");
-            testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line raptor/no-aura
+            testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line lwc/no-aura
                 "Expected $A to be not accessible in renderedCallback");
             testUtil.assertStartsWith("SecureDocument", document.toString(), "Expected document to"
                 + " return SecureDocument in renderedCallback");

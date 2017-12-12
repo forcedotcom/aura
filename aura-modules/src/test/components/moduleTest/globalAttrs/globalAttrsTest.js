@@ -55,8 +55,8 @@
         },
         test: [
             function (cmp) {
-                var raptorCmp = cmp.find('raptor');
-                raptorCmp.set('v.class', 'new-custom-class')
+                var lwcCmp = cmp.find('lwc');
+                lwcCmp.set('v.class', 'new-custom-class')
             },
             function (cmp) {
                 var customEl = this.getCustomElement(cmp);

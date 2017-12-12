@@ -1,22 +1,23 @@
 {
-    "extends" : [ "plugin:raptor/recommended" ],
-    "plugins" : [ "raptor" ],
+    "extends" : [ "plugin:lwc/recommended" ],
+    "plugins" : [ "lwc" ],
     "rules" : {
-        "raptor/no-inline-disable" : [
+        "lwc/no-inline-disable" : [
                 1,
                 {
                     "whitelist" : {
-                        "raptor/no-set-timeout" : [ "**/aura-modules/src/test/modules/moduletest/async/async.js",
+                        "lwc/no-set-timeout" : [ "**/aura-modules/src/test/modules/moduletest/async/async.js",
                             "**/aura-modules/src/test/modules/securemoduletest/sanity-checks/sanity-checks.js"],
                         "dot-notation" : [ "**/aura-modules/src/test/modules/moduletest/exports/exports.js" ],
                         "no-console" : [ "**/src/test/modules/**/*.js" ],
                         "no-unused-vars" : [ "**/src/main/modules/module/marker/marker.js",
                             "**/src/test/modules/**/*.js",
                             "**/src/test/schemas/**/*.js" ],
-                        "raptor/no-compat" : [ "**/aura-modules/src/test/modules/moduletest/import-cmp/import-cmp.js" ],
-                        "raptor/no-compat-execute" : [ "**/aura-modules/src/test/modules/moduletest/exports/exports.js" ],
-                        "raptor/no-aura-libs" : [ "**/aura-modules/src/test/modules/moduletest/simple-cmp/simple-cmp.js" ],
-                        "raptor/no-aura" : [ "**/aura-modules/src/test/modules/securemoduletest/bootstrap/bootstrap.js",
+                        "lwc/no-compat" : [ "**/aura-modules/src/test/modules/moduletest/import-cmp/import-cmp.js" ],
+                        "lwc/no-compat-execute" : [ "**/aura-modules/src/test/modules/moduletest/exports/exports.js" ],
+                        "lwc/no-compat-module-storage" : [ "**/aura-modules/src/test/modules/moduletest/import-cmp/import-cmp.js" ],
+                        "lwc/no-aura-libs" : [ "**/aura-modules/src/test/modules/moduletest/simple-cmp/simple-cmp.js" ],
+                        "lwc/no-aura" : [ "**/aura-modules/src/test/modules/securemoduletest/bootstrap/bootstrap.js",
                             "**/aura-modules/src/test/modules/securemoduletest/sanity-checks/sanity-checks.js",
                             "**/aura-modules/src/test/modules/securemoduletest/simple-cmp/simple-cmp.js",
                             "**/aura-modules/src/test/modules/securemoduletest/simple-lib/simple-lib.js",
@@ -28,7 +29,7 @@
                             "**/aura-modules/src/test/modules/securemoduletest/simple-cmp/simple-cmp.js",
                             "**/aura-modules/src/test/modules/securemoduletest/simple-lib/simple-lib.js"],
                         "no-script-url" : [ "**/aura-modules/src/test/modules/moduletest/nav-item/nav-item.js"],
-                        "raptor/no-inner-html" : ["**/aura-modules/src/test/modules/securemoduletest/sanity-checks/helper.js"],
+                        "lwc/no-inner-html" : ["**/aura-modules/src/test/modules/securemoduletest/sanity-checks/helper.js"],
                         "no-alert" : ["**/aura-modules/src/test/modules/securemoduletest/sanity-checks/sanity-checks.js"],
                         "no-array-constructor": ["**/aura-modules/src/test/modules/securemoduletest/sanity-checks/sanity-checks.js"],
                         "no-new-object": ["**/aura-modules/src/test/modules/securemoduletest/sanity-checks/sanity-checks.js"]

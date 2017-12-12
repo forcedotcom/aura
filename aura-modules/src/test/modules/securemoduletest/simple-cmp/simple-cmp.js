@@ -12,10 +12,10 @@ export default class Simple extends Element {
 
     render() {
         if (this.testRenderer) {
-            // Verify that render method has access to secure wrappers when module included in another raptor module
+            // Verify that render method has access to secure wrappers when module included in another LWC module
             testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
                 + " return SecureWindow in render method");
-            testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line raptor/no-aura
+            testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line lwc/no-aura
                 "Expected $A to be not accessible in render method");
             testUtil.assertStartsWith("SecureDocument", document.toString(), "Expected document to"
                 + " return SecureDocument in render method");
@@ -32,7 +32,7 @@ export default class Simple extends Element {
 
     @api
     testDollarAuraNotAccessibleInModules() {
-        testUtil.assertEquals("undefined", typeof $A, "Expected $A to be not accessible in module"); // eslint-disable-line raptor/no-aura
+        testUtil.assertEquals("undefined", typeof $A, "Expected $A to be not accessible in module"); // eslint-disable-line lwc/no-aura
         return true;
     }
 

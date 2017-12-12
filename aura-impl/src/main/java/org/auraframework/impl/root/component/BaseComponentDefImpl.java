@@ -699,6 +699,21 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         for (DependencyDef dep : this.dependencies) {
             dep.appendDependencies(dependencies, this);
         }
+        if (externalModelDescriptor != null) {
+            dependencies.add(externalModelDescriptor);
+        }
+        if (externalRendererDescriptor != null) {
+            dependencies.add(externalRendererDescriptor);
+        }
+        if (externalControllerDescriptor != null) {
+            dependencies.add(externalControllerDescriptor);
+        }
+        if (externalHelperDescriptor != null) {
+            dependencies.add(externalHelperDescriptor);
+        }
+        if (externalProviderDescriptor != null) {
+            dependencies.add(externalProviderDescriptor);
+        }
     }
 
     @Override
@@ -1702,7 +1717,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         @SuppressWarnings("unchecked")
-		@Override
+        @Override
         public void finish() {
             if (render == null) {
                 this.renderType = RenderType.AUTO;

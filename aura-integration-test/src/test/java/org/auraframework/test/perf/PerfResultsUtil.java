@@ -171,7 +171,7 @@ public final class PerfResultsUtil {
     private static File writeFile(File file, String contents, String what) {
         OutputStreamWriter writer = null;
         try {
-            IOUtil.mkdirs(file.getParentFile());
+            file.getParentFile().mkdirs();
             writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
             writer.write(contents);
             LOG.info("wrote " + what + ": " + file.getAbsolutePath());

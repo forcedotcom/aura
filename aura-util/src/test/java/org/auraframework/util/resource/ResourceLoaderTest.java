@@ -15,19 +15,27 @@
  */
 package org.auraframework.util.resource;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.jar.JarOutputStream;
+import java.util.zip.ZipEntry;
+
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Scanner;
+import com.google.common.base.Preconditions;
 
 /**
  * Tests for aura.util.resource.ResourceLoader
@@ -126,7 +134,7 @@ public class ResourceLoaderTest extends UnitTestCase {
     }
 
     private void createJarResourceLoader(boolean deleteCacheOnStart) throws IOException, URISyntaxException {
-        IOUtil.createJarFromFolder(origFolder, jar);
+        createJarFromFolder(origFolder, jar);
         URLClassLoader jarURLLoader = new URLClassLoader(new URL[] { jar.toURI().toURL() });
         jarLoader = new ResourceLoader(jarTempFolder.getPath(), jarURLLoader, deleteCacheOnStart);
     }
@@ -492,4 +500,69 @@ public class ResourceLoaderTest extends UnitTestCase {
             assertEquals("Hi, my name is bar.", barValue);
         }
     }
+
+    /**
+     * A method used by listfiles to list the files recursively in the subfolders
+     *
+     * @param at
+     * @param files
+     */
+    private List<File> listFiles(File at, List<File> files) {
+        if (at.isDirectory()) {
+            File[] ff = at.listFiles();
+            if (ff != null) {
+                for (File f : ff) {
+                    files.add(f);
+                    listFiles(f, files);
+                }
+            }
+        }
+        return files;
+    }
+
+    /**
+     * Create a JAR file containing the directory structure given by the folder.
+     *
+     * @param folder the folder to recursively scan to fill the jar
+     * @param jarFile the file that should contain the newly created jar.
+     */
+    private void createJarFromFolder(File folder, File jarFile) throws IOException, URISyntaxException {
+        Preconditions.checkArgument(folder.isDirectory() && folder.exists());
+        if (!jarFile.createNewFile()) {
+            throw new IOException("Unable to create jarfile at " + jarFile.getPath());
+        }
+        JarOutputStream out = new JarOutputStream(new FileOutputStream(jarFile));
+        List<File> files = listFiles(folder, new ArrayList<>());
+        URI folderURI = new URI(folder.getPath());
+
+        for (File f : files) {
+            URI path = new URI(f.getPath());
+            String pathString = folderURI.relativize(path).getPath();
+            if (f.isDirectory()) {
+                // Directory entries in a JAR must end with a /
+                if (!pathString.endsWith("/")) {
+                    pathString = pathString + '/';
+                }
+            }
+
+            ZipEntry ze = new ZipEntry(pathString);
+            out.putNextEntry(ze);
+
+            if (f.isFile()) {
+                FileInputStream in = new FileInputStream(f);
+                try {
+                    byte[] buffer = new byte[1024];
+                    int count;
+                    while ((count = in.read(buffer)) > 0) {
+                        out.write(buffer, 0, count);
+                    }
+                } finally {
+                    in.close();
+                }
+            }
+            out.closeEntry();
+        }
+        out.close();
+    }
+
 }

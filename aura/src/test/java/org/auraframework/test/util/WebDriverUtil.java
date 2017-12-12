@@ -233,7 +233,7 @@ public final class WebDriverUtil {
         return SELENIUM_VERSION;
     }
 
-    public static synchronized ChromeOptions addChromeOptions(DesiredCapabilities capabilities, Dimension windowSize) {
+    public static synchronized ChromeOptions addChromeOptions(DesiredCapabilities capabilities, Dimension windowSize, boolean runHeadless) {
         ChromeOptions options = new ChromeOptions();
         List<String> arguments = Lists.newArrayList();
         arguments.add("--ignore-gpu-blacklist");
@@ -243,6 +243,9 @@ public final class WebDriverUtil {
         }
         if (windowSize != null) {
             arguments.add("window-size=" + windowSize.width + ',' + windowSize.height);
+        }
+        if (runHeadless) {
+            arguments.add("--headless");
         }
         options.addArguments(arguments);
         // To remove message "You are using an unsupported command-line flag: --ignore-certificate-errors.

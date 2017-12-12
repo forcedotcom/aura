@@ -25,6 +25,7 @@ import org.auraframework.integration.test.util.TestExecutor.TestRun;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.test.perf.util.PerfExecutorTestCase;
+import org.auraframework.test.util.WebDriverProvider;
 
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -43,8 +44,9 @@ public class TestSetRunnerController implements Controller {
      * @throws Exception
      */
     @AuraEnabled
-    public void runTestSet(@Key("testSet") List<String> tests, @Key("scope") String scope) throws Exception {
+    public void runTestSet(@Key("testSet") List<String> tests, @Key("scope") String scope, @Key("headless") boolean headless) throws Exception {
         changeStatus(tests, "ENQUEUED", scope);
+        System.setProperty(WebDriverProvider.BROWSER_RUN_HEADLESS_PROPERTY, headless ? "true" : "false");
         for (String name : tests) {
             StatefulTestRun testRunner = new StatefulTestRun(name, scope);
             TestExecutor.getInstance().submit(testRunner);

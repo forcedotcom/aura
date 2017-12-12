@@ -863,10 +863,11 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
              * WebDriverUtil.addChromeOptions(capabilities, windowSize); }
              */
 
-	    logger.info(String.format("Requesting: %s", capabilities));
+            logger.info(String.format("Requesting: %s", capabilities));
             if(currentBrowserType == BrowserType.GOOGLECHROME) {
-		WebDriverUtil.addChromeOptions(capabilities, null);
-	    }
+                boolean runHeadless = Boolean.parseBoolean(System.getProperty(WebDriverProvider.BROWSER_RUN_HEADLESS_PROPERTY));
+                WebDriverUtil.addChromeOptions(capabilities, null, runHeadless);
+            }
 
             currentDriver = provider.get(capabilities);
 

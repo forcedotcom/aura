@@ -25,11 +25,6 @@ import java.net.Socket;
  */
 public class SeleniumServerLauncher {
     /**
-     * Browser settings for each node. See https://code.google.com/p/selenium/wiki/Grid2 for more information.
-     */
-    private static String browsers = "-browser browserName=chrome,maxInstances=%1$s -browser browserName=firefox,maxInstances=%1$s";
-
-    /**
      * How long, in seconds, the browser is allowed to hang before timing out. The Selenium default is 3 hours, which is
      * excessive and may timeout autobuilds with an absolute timeout. The issue has been logged to Selenium and tracked
      * here: https://code.google.com/p/selenium/issues/detail?id=5414

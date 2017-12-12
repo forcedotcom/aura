@@ -31,6 +31,7 @@ public interface WebDriverProvider extends AuraServiceProvider {
     String WEBDRIVER_SERVER_PROPERTY = "webdriver.remote.server";
     String REUSE_BROWSER_PROPERTY = "webdriver.reusebrowser";
     String BROWSER_TYPE_PROPERTY = "webdriver.browser.type";
+    String BROWSER_RUN_HEADLESS_PROPERTY = "webdriver.browser.runheadless";
     String GETDRIVER_TIMEOUT_PROPERTY = "webdriver.timeout.getdriver";
     String DEVICE_NAME_PROPERTY = "webdriver.device.name";
     String PLATFORM_VERSION_PROPERTY = "webdriver.platform.version";

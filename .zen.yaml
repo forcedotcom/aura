@@ -71,7 +71,7 @@ build:
     - ./.zenbuild.sh
 compose:
   external-deps:
-    image: ops0-artifactrepo1-0-prd.data.sfdc.net/aura/aura-build-external-deps:e4d75e4@sha256:c4d21dab24941c2f4ab1de4aa6e21be7f3329df59c3d2ba2af5b60cc9563b93f
+    image: ops0-artifactrepo1-0-prd.data.sfdc.net/aura/aura-build-external-deps:ef89294@sha256:612db4f8a3f344b106fe08836b6fbffb49c793a75054e648d43ab53f4936ed20
     auth_config:
       username: $$DOCKER_USERNAME
       password: $$DOCKER_PASSWORD

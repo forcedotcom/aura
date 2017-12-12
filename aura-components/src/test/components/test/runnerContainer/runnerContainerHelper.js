@@ -501,8 +501,9 @@
             testRunner = cmp.get("c.runTestSet"),
             pollTime   = this.POLL_TIME,
             tests      = [],
+            headless   = dom.querySelectorAll('input[type="checkbox"]#headless:checked').length > 0,
             row,li, i, id;
-        
+
         if (cmp._runningTests) {
                var r = confirm("Tests are still pending execution. Are you sure you want to submit a new request?");
                if (r == true) {
@@ -524,7 +525,7 @@
         }
 
         if (tests.length) {
-            testRunner.setParams({testSet: tests, scope: cmp.get('v.scope')});
+            testRunner.setParams({testSet: tests, scope: cmp.get('v.scope'), headless: headless});
             testRunner.setCallback(this, function(action) {
                    if (action.getState() === "SUCCESS") {
                        setTimeout(function () {

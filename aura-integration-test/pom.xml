@@ -131,7 +131,7 @@
     </dependencies>
     <properties>
         <chromedriver.download.root.url>http://chromedriver.storage.googleapis.com</chromedriver.download.root.url>
-        <chromedriver.version>2.33</chromedriver.version>
+        <chromedriver.version>2.34</chromedriver.version>
         <jetty.spawn>true</jetty.spawn>
         <jetty.resources>${basedir}/../aura/src/main/webapp</jetty.resources>
         <aura.build.id />
@@ -148,6 +148,7 @@
         <webdriver.remote.server /> <!-- http://localhost:4444/wd/hub/ -->
         <webdriver.reusebrowser>true</webdriver.reusebrowser>
         <webdriver.browser.type>GOOGLECHROME</webdriver.browser.type> <!-- refer to org.auraframework.test.WebDriverUtil.BrowserType enums for valid values -->
+        <webdriver.browser.runheadless>true</webdriver.browser.runheadless>
 		<webdriver.timeout>60</webdriver.timeout>
         <sauce.record.video>false</sauce.record.video>
         <sauce.record.screenshots>false</sauce.record.screenshots>
@@ -256,6 +257,7 @@
                                     <webdriver.remote.server>${webdriver.remote.server}</webdriver.remote.server>
                                     <webdriver.reusebrowser>${webdriver.reusebrowser}</webdriver.reusebrowser>
                                     <webdriver.browser.type>${webdriver.browser.type}</webdriver.browser.type>
+                                    <webdriver.browser.runheadless>${webdriver.browser.runheadless}</webdriver.browser.runheadless>
                                     <webdriver.timeout>${webdriver.timeout}</webdriver.timeout>
                                     <skipIntTests>${skipIntTests}</skipIntTests>
                                 </systemPropertyVariables>

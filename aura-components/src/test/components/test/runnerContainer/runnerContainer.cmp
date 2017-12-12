@@ -48,6 +48,10 @@
 					<input type="checkbox" id="show_fail_only"/>
 					<label for="show_fail_only">Only Failures</label>
 				</button>
+				<button class="toggle-headless" title="Run Web Driver Tests in Headless Mode">
+					<input type="checkbox" id="headless" checked="checked"/>
+					<label title="Run Web Driver Tests in Headless Mode" for="headless">Headless</label>
+				</button>
 
 				<button class="move_sel_top" title="Moved Selected Items To Top and Scroll To Top of Container">
 					Move Selected Item To Top

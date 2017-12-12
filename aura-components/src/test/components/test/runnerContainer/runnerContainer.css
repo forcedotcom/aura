@@ -273,6 +273,11 @@
     
 }
 
+.THIS button.toggle-headless {
+    background: #337c99;
+    margin-right: 10px;
+}
+
 .THIS .hl-row{
     background-color:#ace;
 }

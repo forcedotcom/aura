@@ -67,7 +67,7 @@
     </aura:attribute>
 
 {!v.doctype}
-<html manifest="{!v.manifest}" lang="{!$Locale.language}">
+<html manifest="{!v.manifest}" lang="{!$Locale.language}" dir="{!$Locale.dir}">
 <head>
     <title>{!v.title}</title>
     {!v.extraMetaTags}

@@ -73,6 +73,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
     public static String ZERO_DIGIT = "zero";
 
     public static String IS_EASTERN_NAME_STYLE = "isEasternNameStyle";
+    public static String DIR = "dir";
 
     private final Map<String, Object> data;
     private final DefinitionService definitionService;
@@ -126,6 +127,15 @@ public class LocaleValueProvider implements GlobalValueProvider {
         builder.put(CURRENCY_FORMAT, localizationService.getCurrencyFormatPattern());
         builder.put(CURRENCY_CODE, localizationService.getCurrencyCode());
         builder.put(CURRENCY, localizationService.getCurrencySymbol());
+        
+        String dir = "ltr";
+        switch (lang.getLanguage()) {
+        case "he":  case "ji":  case "ar":  case "iw":  case "yi":  case "fa":  case "ur":
+            dir = "rtl";
+        default:
+        }
+        builder.put(DIR, dir);
+
 
         data = builder.build();
     }

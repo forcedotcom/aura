@@ -17,18 +17,37 @@ package org.auraframework.util;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
 public class DirectoryCleanerTest {
+    private Path createTempDirectory(String prefix) {
+        try {
+            Path path = Files.createTempDirectory(prefix);
+            return path;
+        } catch (Exception e) {
+            Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
+            if (!Files.exists(tmpDir)) {
+                Path parent = tmpDir.getParent();
+                while (parent != null && !Files.exists(parent)) {
+                    parent = parent.getParent();
+                }
+                throw new RuntimeException("Temp directory "+tmpDir.toString()
+                        +" does not exist first existing parent = "+parent, e);
+            }
+            throw new RuntimeException("Temp directory "+tmpDir.toString()+" Exists!!!!", e);
+        }
+    }
 
     @Test
     public void testDirectoryCleanerOnEmptyDirectory() throws Exception {
-        Path path = Files.createTempDirectory("test");
+        Path path = createTempDirectory("test");
         DirectoryCleaner target = new DirectoryCleaner(path);
         Assert.assertTrue("Our directory must exist prior to run", Files.isDirectory(path));
         target.run();
@@ -37,7 +56,7 @@ public class DirectoryCleanerTest {
 
     @Test
     public void testDirectoryCleanerOnNonExistentDirectory() throws Exception {
-        Path path = Files.createTempDirectory("test");
+        Path path = createTempDirectory("test");
         DirectoryCleaner target = new DirectoryCleaner(path);
         Files.delete(path);
         Assert.assertFalse("Path must not exist", Files.exists(path));
@@ -47,7 +66,7 @@ public class DirectoryCleanerTest {
 
     @Test
     public void testDirectoryCleanerWithProtectedDirectory() throws Exception {
-        Path path = Files.createTempDirectory("test");
+        Path path = createTempDirectory("test");
         Path innerDir = path.resolve("protected");
         Path innerFile = innerDir.resolve("foo");
         Files.createDirectory(innerDir);

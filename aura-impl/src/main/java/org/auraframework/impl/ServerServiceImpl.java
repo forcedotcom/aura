@@ -219,6 +219,8 @@ public class ServerServiceImpl implements ServerService {
                         } catch (QuickFixException qfe) {
                             // well, it's not a component, it's not an app... give up trying to exclude it from the set being serialized
                         }
+                    } catch (Exception e) {
+                        // ignore other exceptions that may surface from trying to get the definition, like from layouts
                     }
                     context.setPreloadedDefinitions(preloadedDefinitions);
                 }

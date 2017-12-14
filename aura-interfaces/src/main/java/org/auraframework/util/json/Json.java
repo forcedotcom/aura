@@ -184,10 +184,6 @@ public interface Json {
     void writeBinaryStreamEnd() throws IOException;
     void writeBreak() throws IOException;
     void writeComma() throws IOException;
-    void writeComment(String body) throws IOException;
-    void writeCommentBegin() throws IOException;
-    void writeCommentBody(String body) throws IOException;
-    void writeCommentEnd() throws IOException;
     void writeDate(Date value) throws IOException;
     void writeIndent() throws IOException;
     void writeLiteral(Object value) throws IOException;

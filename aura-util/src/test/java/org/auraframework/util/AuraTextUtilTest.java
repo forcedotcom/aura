@@ -15,11 +15,12 @@
  */
 package org.auraframework.util;
 
-import java.util.Arrays;
-import java.util.List;
-
+import org.auraframework.util.AuraTextUtil.JSONEscapedFunctionStringBuilder;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class AuraTextUtilTest extends UnitTestCase {
     /**
@@ -192,17 +193,24 @@ public class AuraTextUtilTest extends UnitTestCase {
     /**
      * JSON replacement strings.
      */
-    private static StringPair[] JSON_STRING_PAIRS = new StringPair[] { new StringPair("\r", "\\r"),
-            new StringPair("\n", "\\n"), new StringPair("\u2028", "\\n"), new StringPair("'abc'", "'abc'"),
-            new StringPair("<!--", "\\u003C\\u0021--"), new StringPair("-->", "--\\u003E"),
-            new StringPair("\"", "\\\""), new StringPair("\\", "\\\\"), new StringPair("\u0000", ""),
-            new StringPair("0123456789/!@#$%^&*()-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), };
+    private static StringPair[] JSON_STRING_PAIRS = new StringPair[] {
+            new StringPair("\u2028", "\n"),
+            new StringPair("\u0000", ""),
+            new StringPair("0123456789/!@#$%^&*()-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    };
 
     @Test
     public void testEscapeForJSONString() {
         for (StringPair p : JSON_STRING_PAIRS) {
             assertEquals(p.expected, AuraTextUtil.escapeForJSONString(p.input));
         }
+    }
+
+    @Test
+    public void testJSONEscapedFunctionStringBuilder() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        new JSONEscapedFunctionStringBuilder(sb).append("/* */");
+        assertEquals("/* \\u002A/", sb.toString());
     }
 
     private static class SplitMatch {

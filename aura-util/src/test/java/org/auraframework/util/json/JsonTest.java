@@ -15,6 +15,13 @@
  */
 package org.auraframework.util.json;
 
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import org.auraframework.util.AuraTextUtil.JSONEscapedFunctionStringBuilder;
+import org.auraframework.util.Utf8InputStreamReader;
+import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -28,13 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
-
-import org.auraframework.util.Utf8InputStreamReader;
-import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Test;
-
-import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
 
 /**
  * Test utilities in {@link JsonEncoder}.
@@ -295,51 +295,6 @@ public class JsonTest extends UnitTestCase {
             fail("Should throw exception");
         } catch (JsonEncoder.JsonException e) {
         }
-
-        try {
-            JsonEncoder json = new JsonEncoder(new StringBuilder(), true);
-            json.writeCommentBegin();
-            json.writeArrayEnd();
-            fail("Should throw exception");
-        } catch (JsonEncoder.JsonException e) {
-        }
-    }
-
-    @Test
-    public void testCommentBody() throws Exception {
-        JsonEncoder json = new JsonEncoder(new StringBuilder(), false);
-
-        try {
-            json.writeCommentBody("hi");
-            fail("Should throw exception");
-        } catch (JsonEncoder.JsonException expected) {
-            assertEquals("Json.writeCommentBody must be preceded by Json.writeCommentBegin", expected.getMessage());
-        }
-
-        json.writeCommentBegin();
-        json.writeCommentBody("hi");
-        json.writeCommentEnd();
-        assertEquals("", json.getAppendable().toString());
-
-        try {
-            json.writeArrayBegin();
-            json.writeCommentBody("hi");
-            fail("Should throw exception");
-        } catch (JsonEncoder.JsonException expected) {
-            assertEquals("Json.writeCommentBody must be preceded by Json.writeCommentBegin", expected.getMessage());
-        }
-
-        json = new JsonEncoder(new StringBuilder(), true);
-        json.writeCommentBegin();
-        json.writeCommentBody("hi");
-        json.writeCommentEnd();
-        assertEquals("\n/*\n * hi\n */", json.getAppendable().toString());
-
-        json = new JsonEncoder(new StringBuilder(), true);
-        json.writeCommentBegin();
-        json.writeCommentBody("*/hi*/");
-        json.writeCommentEnd();
-        assertEquals("\n/*\n * hi\n */", json.getAppendable().toString());
     }
 
     @Test
@@ -374,10 +329,15 @@ public class JsonTest extends UnitTestCase {
         json.writeString("test");
         assertEquals("\"test\"", json.getAppendable().toString());
 
+        json = new JsonEncoder(new JSONEscapedFunctionStringBuilder(new StringBuilder()), false);
+        json.writeString("<!--\f div */>\u0000\u2028");
+        assertEquals("HTML markup should be escaped for JSON format.", "\"<!--\\f div \\u002A/>\\n\"",
+                json.getAppendable().toString());
+
         json = new JsonEncoder(new StringBuilder(), false);
-        json.writeString("<!-- div />");
-        assertEquals("HTML markup should be escaped for JSON format.", "\"\\u003C\\u0021-- div /\\u003E\"", json
-                .getAppendable().toString());
+        json.writeString("<!--\f div */>\u0000\u2028");
+        assertEquals("HTML markup should be escaped for JSON format.", "\"<!--\\f div */>\\n\"",
+                json.getAppendable().toString());
     }
 
     @Test

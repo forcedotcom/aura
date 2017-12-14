@@ -15,6 +15,15 @@
  */
 package org.auraframework.util.json;
 
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.io.CountingOutputStream;
+import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.UncloseableOutputStream;
+import org.json.JSONObject;
+
+import javax.annotation.Nonnull;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,16 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
-
-import javax.annotation.Nonnull;
-
-import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.UncloseableOutputStream;
-
-import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.io.CountingOutputStream;
 
 /**
  * java -> javascript encoder.
@@ -440,74 +439,6 @@ public class JsonEncoder implements Json {
     }
 
     /**
-     * Start a comment.
-     *
-     * This is probably not needed, but if we do want to write a multiline
-     * comment in parts, you would call this function followed by multiple calls
-     * to {@link #writeCommentBody(String)} followed by a call to
-     * {@link #writeCommentEnd()}
-     */
-    @Override
-    public void writeCommentBegin() throws IOException {
-        if (isFormatting()) {
-            writeBreak();
-            writeIndent();
-            out.append("/*");
-        }
-        pushIndent(IndentType.COMMENT);
-    }
-
-    /**
-     * Write out a comment end.
-     */
-    @Override
-    public void writeCommentEnd() throws IOException {
-        popIndent(IndentType.COMMENT, "Json.writeCommentEnd must be preceded by Json.writeCommentBegin");
-        if (isFormatting()) {
-            writeBreak();
-            writeIndent();
-            out.append(" */");
-        }
-    }
-
-    /**
-     * Write out a part of a comment body.
-     *
-     * This call must be preceded by {@link #writeCommentBegin()}.
-     *
-     * @param body the comment to write.
-     */
-    @Override
-    public void writeCommentBody(String body) throws IOException {
-        checkIndent(IndentType.COMMENT, "Json.writeCommentBody must be preceded by Json.writeCommentBegin");
-        if (isFormatting()) {
-            writeBreak();
-            writeIndent();
-            out.append(body.replace("*/", ""));
-        }
-    }
-
-    /**
-     * Write out a comment.
-     *
-     * Note that these are not legal structures in JSON, perhaps we should have
-     * a flag to turn off the writing of these for 'valid' JSON. Unfortunately,
-     * we'd also have to rework our error handling.
-     *
-     * This could take the body and re-work newlines with the indent, but that
-     * seems a good bit of work for little gain (i.e. the result would be
-     * prettier, but who cares).
-     *
-     * @param body the body of the comment.
-     */
-    @Override
-    public void writeComment(String body) throws IOException {
-        writeCommentBegin();
-        writeCommentBody(body);
-        writeCommentEnd();
-    }
-
-    /**
      * Write the beginning of an array. Make sure to call writeArrayEnd later
      * on.
      *
@@ -603,9 +534,7 @@ public class JsonEncoder implements Json {
             out.append("null");
             return;
         }
-        out.append('"');
-        out.append(AuraTextUtil.escapeForJSONString(value.toString()));
-        out.append('"');
+        out.append(JSONObject.quote(AuraTextUtil.escapeForJSONString(value.toString())));
     }
 
     /**

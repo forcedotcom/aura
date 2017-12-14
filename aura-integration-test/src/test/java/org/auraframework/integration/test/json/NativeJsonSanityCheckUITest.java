@@ -80,4 +80,22 @@ public class NativeJsonSanityCheckUITest extends WebDriverTestCase {
                     }
                 }));
     }
+
+    @Test
+    public void testNativeJsonUsageInControllerDefWithNonUnicode() throws Exception {
+        open("/test/test_CompoundCntrlrApp.app", Mode.PRODDEBUG);
+        final WebElement button = getDriver().findElement(By.cssSelector("div[class~='test_locator2']"));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector("div[class~='test_locator2']"),
+                "Button element never appeared with JS helper");
+        assertEquals("Something wrong with test initialization.", "Button", button.getText());
+        button.click();
+        WebDriverWait wait = new WebDriverWait(getDriver(), 5);
+        assertTrue("JS controller or Java controller failed to workin PROD mode.",
+                wait.until(new ExpectedCondition<Boolean>() {
+                    @Override
+                    public Boolean apply(WebDriver d) {
+                        return ("TestController".equals(button.getText()));
+                    }
+                }));
+    }
 }

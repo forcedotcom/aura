@@ -59,7 +59,7 @@ public class JsComment implements JsonSerializable {
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeComment(this.body);
+        // no-op. comments are not supported by browsers via JSON.parse
     }
 
     @Override

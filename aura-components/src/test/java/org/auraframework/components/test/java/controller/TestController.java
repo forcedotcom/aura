@@ -15,12 +15,8 @@
  */
 package org.auraframework.components.test.java.controller;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.auraframework.adapter.ServerErrorUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
@@ -35,8 +31,10 @@ import org.auraframework.system.Annotations.Key;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @ServiceComponent
 public class TestController implements GlobalController {
@@ -64,6 +62,11 @@ public class TestController implements GlobalController {
     @AuraEnabled
     public String getString() {
         return "TestController";
+    }
+
+    @AuraEnabled
+    public String getStringWithNonUnicode() {
+        return "TestController\f";
     }
 
     @AuraEnabled

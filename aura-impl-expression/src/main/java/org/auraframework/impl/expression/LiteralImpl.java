@@ -15,9 +15,6 @@
  */
 package org.auraframework.impl.expression;
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.ExpressionType;
@@ -29,6 +26,10 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializers.NoneSerializer;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * a literal number, string, boolean, or null
@@ -63,11 +64,11 @@ public class LiteralImpl implements Literal {
         if (value == null) {
             out.append("null");
         } else if (value instanceof String) {
-        	out.append('"').append(AuraTextUtil.escapeForJSONString(value.toString())).append('"');
+            out.append(JSONObject.quote(AuraTextUtil.escapeForJSONString(value.toString())));
         } else if (value instanceof Number) {
-        	out.append(value.toString());
+            out.append(value.toString());
         } else if (value instanceof Boolean) {
-        	out.append(value.toString());
+            out.append(value.toString());
         } else {
             throw new AuraRuntimeException("Unexpected literal type in function expression.");
         }

@@ -21,5 +21,14 @@
             cmp.set("v.label", actionReturnValue);
         });
         $A.enqueueAction(action);
+    },
+
+    handleClickForNonUnicodeControllerResponse: function(cmp, event) {
+        var action = cmp.get("c.getStringWithNonUnicode");
+        action.setCallback(cmp, function(action) {
+            var actionReturnValue = action.getReturnValue();
+            cmp.set("v.label", actionReturnValue);
+        });
+        $A.enqueueAction(action);
     }
 })

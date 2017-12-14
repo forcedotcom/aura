@@ -3999,7 +3999,7 @@ return {
                           "descriptor":"isTrue",
                           "value":{
                             "exprType":"FUNCTION",
-                            "code":"function(cmp, fn) { return (cmp.get(\"v.trigger.length\")\u003E0); }",
+                            "code":"function(cmp, fn) { return (cmp.get(\"v.trigger.length\")>0); }",
                             "args":[
                               {
                                 "exprType":"PROPERTY",
@@ -13317,7 +13317,7 @@ return {
   "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
-    ["nodes","java://List\u003Caura.components.ui.TreeNode\u003E","I",false,null],
+    ["nodes","java://List<aura.components.ui.TreeNode>","I",false,null],
     ["class","aura://String","I",false,""],
     ["activeNode","aura://Aura.Component","I",false,null]
   ],
@@ -15315,7 +15315,7 @@ $A.componentService.initControllerDefs([
           },
           {
             "name":"attributes",
-            "type":"java://java.util.Map\u003Cjava.lang.String,java.lang.Object\u003E"
+            "type":"java://java.util.Map<java.lang.String,java.lang.Object>"
           },
           {
             "name":"chainLoadLabels",
@@ -15351,7 +15351,7 @@ $A.componentService.initControllerDefs([
           },
           {
             "name":"attributes",
-            "type":"java://java.util.Map\u003Cjava.lang.String,java.lang.Object\u003E"
+            "type":"java://java.util.Map<java.lang.String,java.lang.Object>"
           },
           {
             "name":"chainLoadLabels",
@@ -15383,7 +15383,7 @@ $A.componentService.initControllerDefs([
         "pa":[
           {
             "name":"components",
-            "type":"java://java.util.List\u003Cjava.util.Map\u003Cjava.lang.String,java.lang.Object\u003E\u003E"
+            "type":"java://java.util.List<java.util.Map<java.lang.String,java.lang.Object>>"
           }
         ]
       },
@@ -15397,7 +15397,7 @@ $A.componentService.initControllerDefs([
         "pa":[
           {
             "name":"names",
-            "type":"java://java.util.List\u003Cjava.lang.String\u003E"
+            "type":"java://java.util.List<java.lang.String>"
           }
         ]
       },
@@ -15436,7 +15436,7 @@ $A.componentService.initControllerDefs([
         "pa":[
           {
             "name":"usages",
-            "type":"java://java.util.Map\u003Cjava.lang.String,java.util.List\u003Cjava.lang.String\u003E\u003E"
+            "type":"java://java.util.Map<java.lang.String,java.util.List<java.lang.String>>"
           }
         ]
       },
@@ -15516,11 +15516,11 @@ $A.componentService.initControllerDefs([
         "pa":[
           {
             "name":"descriptors",
-            "type":"java://java.util.List\u003Cjava.lang.String\u003E"
+            "type":"java://java.util.List<java.lang.String>"
           },
           {
             "name":"extraStyles",
-            "type":"java://java.util.List\u003Cjava.lang.String\u003E"
+            "type":"java://java.util.List<java.lang.String>"
           }
         ]
       }
@@ -15609,13 +15609,24 @@ $A.componentService.initControllerDefs([
           },
           {
             "name":"attributes",
-            "type":"java://java.util.Map\u003Cjava.lang.String,java.lang.Object\u003E"
+            "type":"java://java.util.Map<java.lang.String,java.lang.Object>"
           }
         ]
       },
       {
         "n":"getString",
         "descriptor":"aura://TestController/ACTION$getString",
+        "at":"SERVER",
+        "rt":"java://java.lang.String",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"getStringWithNonUnicode",
+        "descriptor":"aura://TestController/ACTION$getStringWithNonUnicode",
         "at":"SERVER",
         "rt":"java://java.lang.String",
         "b":false,

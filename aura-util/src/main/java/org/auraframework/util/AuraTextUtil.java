@@ -15,6 +15,9 @@
  */
 package org.auraframework.util;
 
+import com.google.common.collect.ObjectArrays;
+
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -23,8 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.common.collect.ObjectArrays;
 
 /**
  * Collection of utility methods for manipulating or testing strings.
@@ -37,11 +38,13 @@ public class AuraTextUtil {
             "\\u003E", "\\n", "\\u2029", "" };
     private static final TrieMatcher JS_SEARCH_REPLACE = TrieMatcher.compile(JS_IN, JS_OUT);
 
-    private static final String[] JSON_IN = new String[] { "\\", "\n", "\r", "\t", "\"", "!--", "<", ">", "\u2028",
-            "\u2029", "\u0000", "\u001F", "*/" };
-    private static final String[] JSON_OUT = new String[] { "\\\\", "\\n", "\\r", "\\t", "\\\"", "\\u0021--",
-            "\\u003C", "\\u003E", "\\n", "\\u2029", "", "\\u001F", "\\u002A/" };
+    private static final String[] JSON_IN = new String[] { "\u2028", "\u0000" };
+    private static final String[] JSON_OUT = new String[] { "\n", "" };
     private static final TrieMatcher JSON_SEARCH_REPLACE = TrieMatcher.compile(JSON_IN, JSON_OUT);
+
+    private static final String[] JSON_FUNCTION_IN = new String[] { "\u2028", "\u0000", "*/" };
+    private static final String[] JSON_FUNCTION_OUT = new String[] { "\n", "", "\\u002A/" };
+    private static final TrieMatcher JSON_FUNCTION_HYDRATION_SEARCH_REPLACE = TrieMatcher.compile(JSON_FUNCTION_IN, JSON_FUNCTION_OUT);
 
     private static final String[] RESERVED_METHODS = new String[]{
             "auraType","getDef","getRendering",
@@ -718,5 +721,46 @@ public class AuraTextUtil {
             return NCNAME_IDENTIFIER_PATTERN.matcher(input).matches();
         }
         return false;
+    }
+
+    public static class JSONEscapedFunctionStringBuilder implements Appendable {
+
+        private StringBuilder sb;
+
+        public JSONEscapedFunctionStringBuilder() {
+            sb = new StringBuilder();
+        }
+
+        public JSONEscapedFunctionStringBuilder(StringBuilder stringBuilder) {
+            sb = stringBuilder;
+        }
+
+        public StringBuilder getStringBuilder() {
+            return sb;
+        }
+
+        private String replace(String s) {
+            return TrieMatcher.replaceMultiple(s, JSON_FUNCTION_HYDRATION_SEARCH_REPLACE);
+        }
+
+        @Override
+        public Appendable append(CharSequence csq) throws IOException {
+            return sb.append(replace(csq.toString()));
+        }
+
+        @Override
+        public Appendable append(CharSequence csq, int start, int end) throws IOException {
+            return sb.append(replace(csq.toString()), start, end);
+        }
+
+        @Override
+        public Appendable append(char c) throws IOException {
+            return sb.append(replace(String.valueOf(c)));
+        }
+
+        @Override
+        public String toString() {
+            return sb.toString();
+        }
     }
 }

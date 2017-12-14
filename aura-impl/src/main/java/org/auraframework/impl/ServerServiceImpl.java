@@ -15,18 +15,12 @@
  */
 package org.auraframework.impl;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
+import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
@@ -69,16 +63,22 @@ import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.AuraTextUtil.JSONEscapedFunctionStringBuilder;
 import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 @ServiceComponent
 public class ServerServiceImpl implements ServerService {
@@ -422,6 +422,7 @@ public class ServerServiceImpl implements ServerService {
         serializationContext.pushFormatRootItems();
 
         StringBuilder sb = new StringBuilder();
+        JSONEscapedFunctionStringBuilder escapedHydrationFunctionStringBuilder = new JSONEscapedFunctionStringBuilder(sb);
 
         // Process Libraries with a lower granularity level, to prevent duplication of external includes.
         Collection<LibraryDef> libraryDefs = filterAndLoad(LibraryDef.class, dependencies, null);
@@ -430,7 +431,7 @@ public class ServerServiceImpl implements ServerService {
             for (IncludeDefRef defRef : includeDefs) {
                 sb.append("$A.componentService.addLibraryExporter(\"" + defRef.getClientDescriptor() + "\", (function (){/*");
 
-                sb.append(defRef.getCode(minify));
+                escapedHydrationFunctionStringBuilder.append(defRef.getCode(minify));
 
                 sb.append("*/}));");
 
@@ -452,11 +453,11 @@ public class ServerServiceImpl implements ServerService {
             context.setClientClassLoaded(def.getDescriptor(), true);
 
             // Component Class
-            sb.append(def.getCode(minify));
+            escapedHydrationFunctionStringBuilder.append(def.getCode(minify));
 
             // Component definition
             sb.append("return ");
-            JsonEncoder.serialize(def, sb, context.getJsonSerializationContext());
+            JsonEncoder.serialize(def, escapedHydrationFunctionStringBuilder, context.getJsonSerializationContext());
             sb.append(";");
 
             sb.append("*/}));\n");

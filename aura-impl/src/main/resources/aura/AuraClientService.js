@@ -1174,7 +1174,7 @@ AuraClientService.prototype.showErrorDialogWithReload = function(e, additionalLo
             }
 
             var params = {
-                    "message=": $A.util.json.encode(payload),
+                    "message": $A.util.json.encode(payload),
                     "aura.context": context
             };
             var queryString = this.buildParams(params);

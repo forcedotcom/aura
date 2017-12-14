@@ -128,7 +128,8 @@
         }
     },
 
-    testSanitizeJSHref: {
+    // Temporarily disabled validation due to W-4532392
+    _testSanitizeJSHref: {
         test: function(cmp) {
             cmp.testSanitizeJSHref();
         }

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-12-01
- * Version: 0.3.2
+ * Generated: 2017-12-13
+ * Version: 0.3.3
  */
 
 (function (global, factory) {
@@ -50,12 +50,12 @@ const READ_ONLY_PROPERTY = { writable: false };
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var substituteMapForWeakMap = false;
+let substituteMapForWeakMap = false;
 
 if (typeof WeakMap !== 'undefined' && typeof Proxy !== 'undefined') {
   // Test for the Edge weakmap with proxies bug https://github.com/Microsoft/ChakraCore/issues/1662
-  var map = new WeakMap();
-  var proxyAsKey = new Proxy({}, {});
+  const map = new WeakMap();
+  const proxyAsKey = new Proxy({}, {});
   map.set(proxyAsKey, true);
   substituteMapForWeakMap = map.get(proxyAsKey) !== true;
 }
@@ -75,14 +75,14 @@ function newWeakMap() {
 
 // Keyed objects can only have one owner. We prevent "null" and "undefined"
 // keys by guarding all set operations.
-var keychain = newWeakMap();
-var rawToSecureByKey = new Map();
-var secureToRaw = newWeakMap();
-var opaqueSecure = newWeakMap();
-var objectToKeyedData = newWeakMap();
-var secureProxy = newWeakMap();
-var filteringProxy = newWeakMap();
-var secureFunction = newWeakMap();
+const keychain = newWeakMap();
+const rawToSecureByKey = new Map();
+const secureToRaw = newWeakMap();
+const opaqueSecure = newWeakMap();
+const objectToKeyedData = newWeakMap();
+const secureProxy = newWeakMap();
+const filteringProxy = newWeakMap();
+const secureFunction = newWeakMap();
 
 function getKey(thing) {
   return keychain.get(thing);
@@ -99,7 +99,7 @@ function setKey(thing, key) {
   if (!key) {
     throw new Error('Setting an empty key is prohibited.');
   }
-  var hasKey = keychain.get(thing);
+  const hasKey = keychain.get(thing);
   if (hasKey === undefined) {
     keychain.set(thing, key);
   } else if (hasKey === key) {
@@ -112,7 +112,7 @@ function setKey(thing, key) {
 
 function trust$1(from, thing) {
   if (from) {
-    var key = keychain.get(from);
+    const key = keychain.get(from);
     if (key) {
       setKey(thing, key);
     }
@@ -124,8 +124,8 @@ function hasAccess(from, to) {
 }
 
 function verifyAccess(from, to, skipOpaque) {
-  var fromKey = keychain.get(from);
-  var toKey = keychain.get(to);
+  const fromKey = keychain.get(from);
+  const toKey = keychain.get(to);
   if (fromKey !== toKey || (skipOpaque && isOpaque(to))) {
     throw new Error(
       `Access denied: ${JSON.stringify({
@@ -137,7 +137,7 @@ function verifyAccess(from, to, skipOpaque) {
 }
 
 function getRef(st, key, skipOpaque) {
-  var toKey = keychain.get(st);
+  const toKey = keychain.get(st);
   if (toKey !== key || (skipOpaque && opaqueSecure.get(st))) {
     throw new Error(
       `Access denied: ${JSON.stringify({
@@ -165,12 +165,12 @@ function setRef(st, raw, key, isOpaque) {
 }
 
 function getData(object, key) {
-  var keyedData = objectToKeyedData.get(object);
+  const keyedData = objectToKeyedData.get(object);
   return keyedData ? keyedData.get(key) : undefined;
 }
 
 function setData(object, key, data) {
-  var keyedData = objectToKeyedData.get(object);
+  let keyedData = objectToKeyedData.get(object);
   if (!keyedData) {
     keyedData = newWeakMap();
     objectToKeyedData.set(object, keyedData);
@@ -208,8 +208,8 @@ function unwrap$1(from, st) {
     return st;
   }
 
-  var key = keychain.get(from);
-  var ref;
+  const key = keychain.get(from);
+  let ref;
 
   if (Array.isArray(st)) {
     // Only getRef on "secure" arrays
@@ -217,9 +217,9 @@ function unwrap$1(from, st) {
       // Secure array - reconcile modifications to the filtered clone with the actual array
       ref = getRef(st, key);
 
-      var originalLength = ref.length;
-      var insertIndex = 0;
-      for (var n = 0; n < st.length; n++) {
+      const originalLength = ref.length;
+      let insertIndex = 0;
+      for (let n = 0; n < st.length; n++) {
         // Find the next available location that corresponds to the filtered projection of the array
         while (insertIndex < originalLength && getKey(ref[insertIndex]) !== key) {
           insertIndex++;
@@ -246,7 +246,7 @@ function addToCache(raw, st, key) {
     throw new Error('Caching with an empty key is prohibited.');
   }
 
-  var rawToSecure = rawToSecureByKey.get(key);
+  let rawToSecure = rawToSecureByKey.get(key);
   if (!rawToSecure) {
     rawToSecure = new WeakMap();
     rawToSecureByKey.set(key, rawToSecure);
@@ -256,7 +256,7 @@ function addToCache(raw, st, key) {
 }
 
 function getFromCache(raw, key) {
-  var rawToSecure = rawToSecureByKey.get(key);
+  const rawToSecure = rawToSecureByKey.get(key);
   return rawToSecure && rawToSecure.get(raw);
 }
 
@@ -347,7 +347,7 @@ const metadata$1 = {
 };
 
 function SecureCanvasRenderingContext2D(ctx, key) {
-  var o = getFromCache(ctx, key);
+  let o = getFromCache(ctx, key);
   if (o) {
     return o;
   }
@@ -797,7 +797,7 @@ function evaluate(src, key, sourceURL) {
  */
 
 function SecureDOMEvent(event, key) {
-  var o = getFromCache(event, key);
+  let o = getFromCache(event, key);
   if (o) {
     return o;
   }
@@ -810,7 +810,7 @@ function SecureDOMEvent(event, key) {
     }
   });
 
-  var DOMEventSecureDescriptors = {
+  const DOMEventSecureDescriptors = {
     // Events properties that are DOM Elements were compiled from
     // https://developer.mozilla.org/en-US/docs/Web/Events
     target: SecureObject.createFilteredProperty(o, event, 'target'),
@@ -825,28 +825,26 @@ function SecureDOMEvent(event, key) {
 
     view: {
       get: function() {
-        var key = getKey(o);
-        var swin = getEnv$1(key);
-        var win = getRef(swin, key);
+        const key = getKey(o);
+        const swin = getEnv$1(key);
+        const win = getRef(swin, key);
         return win === event.view ? swin : undefined;
       }
     }
   };
 
-  ['preventDefault', 'stopImmediatePropagation', 'stopPropagation'].forEach(function(method) {
-    SecureObject.addMethodIfSupported(o, event, method);
-  });
+  ['preventDefault', 'stopImmediatePropagation', 'stopPropagation'].forEach(method =>
+    SecureObject.addMethodIfSupported(o, event, method)
+  );
 
   // non-standard properties and aliases
-  ['relatedTarget', 'srcElement', 'explicitOriginalTarget', 'originalTarget'].forEach(function(
-    property
-  ) {
-    SecureObject.addPropertyIfSupported(o, event, property);
-  });
+  ['relatedTarget', 'srcElement', 'explicitOriginalTarget', 'originalTarget'].forEach(property =>
+    SecureObject.addPropertyIfSupported(o, event, property)
+  );
 
   // re-exposing externals
   // TODO: we might need to include non-enumerables
-  for (var name in event) {
+  for (const name in event) {
     if (!(name in o)) {
       // every DOM event has a different shape, we apply filters when possible,
       // and bypass when no secure filter is found.
@@ -866,7 +864,7 @@ function SecureDOMEvent(event, key) {
 }
 
 SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
-  var valueOverride;
+  let valueOverride;
   // descriptor to produce a new collection of touches where the target of each
   // touch is a secure element
   return {
@@ -875,25 +873,28 @@ SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
         return valueOverride;
       }
       // perf hard-wired in case there is not a touches to wrap
-      var touches = event[propName];
+      const touches = event[propName];
       if (!touches) {
         return touches;
       }
       // touches, of type ToucheList does not implement "map"
-      return Array.prototype.map.call(touches, function(touch) {
+      return Array.prototype.map.call(touches, touch => {
         // touches is normally a big big collection of touch objects,
         // we do not want to pre-process them all, just create the getters
         // and process the accessor on the spot. e.g.:
         // https://developer.mozilla.org/en-US/docs/Web/Events/touchstart
-        var keys = [];
-        var touchShape = touch;
+        let keys = [];
+        let touchShape = touch;
         // Walk up the prototype chain and gather all properties
         do {
           keys = keys.concat(Object.keys(touchShape));
-        } while ((touchShape = Object.getPrototypeOf(touchShape)) && touchShape !== Object.prototype);
+        } while (
+          (touchShape = Object.getPrototypeOf(touchShape)) &&
+          touchShape !== Object.prototype
+        );
 
         // Create a stub object with all the properties
-        return keys.reduce(function(o, p) {
+        return keys.reduce((o, p) => {
           return Object.defineProperty(o, p, {
             // all props in a touch object are readonly by spec:
             // https://developer.mozilla.org/en-US/docs/Web/API/Touch
@@ -930,7 +931,7 @@ function SecureScriptElement() {}
 
 SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
   function getAttributeName(name) {
-    var lowercasedName = name.toLowerCase();
+    const lowercasedName = name.toLowerCase();
     switch (lowercasedName) {
       case 'src':
         return 'data-locker-src';
@@ -948,8 +949,8 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
       return true;
     }
 
-    var BLACKLIST = ['xlink:href'];
-    var lowercasedName = name.toLowerCase();
+    const BLACKLIST = ['xlink:href'];
+    const lowercasedName = name.toLowerCase();
     return BLACKLIST.indexOf(lowercasedName) === -1;
   }
 
@@ -963,14 +964,14 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
     }
   };
 
-  var orignalGetAttribute = prototype.getAttribute;
+  const orignalGetAttribute = prototype.getAttribute;
   elementOverrides['getAttribute'] = {
     value: function(name) {
       return orignalGetAttribute.apply(this, [getAttributeName(name)]);
     }
   };
 
-  var orignalSetAttribute = prototype.setAttribute;
+  const orignalSetAttribute = prototype.setAttribute;
   elementOverrides['setAttribute'] = {
     value: function(name, value) {
       if (isAttributeAllowed(name)) {
@@ -979,14 +980,14 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
     }
   };
 
-  var orignalGetAttributeNS = prototype.getAttributeNS;
+  const orignalGetAttributeNS = prototype.getAttributeNS;
   elementOverrides['getAttributeNS'] = {
     value: function(ns, name) {
       return orignalGetAttributeNS.apply(this, [ns, getAttributeName(name)]);
     }
   };
 
-  var orignalSetAttributeNS = prototype.setAttributeNS;
+  const orignalSetAttributeNS = prototype.setAttributeNS;
   elementOverrides['setAttributeNS'] = {
     value: function(ns, name, value) {
       if (isAttributeAllowed(name)) {
@@ -995,24 +996,24 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
     }
   };
 
-  var orignalGetAttributeNode = prototype.getAttributeNode;
+  const orignalGetAttributeNode = prototype.getAttributeNode;
   elementOverrides['getAttributeNode'] = {
     value: function(name) {
       return orignalGetAttributeNode.apply(this, [getAttributeName(name)]);
     }
   };
 
-  var orignalGetAttributeNodeNS = prototype.getAttributeNodeNS;
+  const orignalGetAttributeNodeNS = prototype.getAttributeNodeNS;
   elementOverrides['getAttributeNodeNS'] = {
     value: function(ns, name) {
       return orignalGetAttributeNodeNS.apply(this, [ns, getAttributeName(name)]);
     }
   };
 
-  var orignalSetAttributeNode = prototype.setAttributeNode;
+  const orignalSetAttributeNode = prototype.setAttributeNode;
   elementOverrides['setAttributeNode'] = {
     value: function(attr) {
-      var raw = unwrap$1(this, attr);
+      let raw = unwrap$1(this, attr);
       if (!raw) {
         // this will allow the browser to throw TypeError using native error messages
         orignalGetAttributeNode.call(this, raw);
@@ -1024,11 +1025,11 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
             According to https://dev.w3.org/html5/spec-preview/the-script-element.html section 14
             some browsers may initiate fetching the script before it has been
             added to the DOM. Not using a script tag will prevent that. */
-      var clone = raw.cloneNode();
-      var normalizer = document.createElement('span');
+      const clone = raw.cloneNode();
+      const normalizer = document.createElement('span');
       normalizer.setAttributeNode(clone);
 
-      var attrNode = normalizer.attributes[0];
+      const attrNode = normalizer.attributes[0];
       switch (attrNode.name) {
         case 'xlink:href': {
           return undefined;
@@ -1044,7 +1045,7 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
         }
       }
 
-      var replacedAttr = orignalSetAttributeNode.call(this, raw);
+      const replacedAttr = orignalSetAttributeNode.call(this, raw);
       return SecureObject.filterEverything(this, replacedAttr);
     }
   };
@@ -1059,14 +1060,14 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
           return attributes;
         }
         // Secure attributes
-        var secureAttributes = [];
-        var raw = SecureObject.getRaw(this);
-        for (var i = 0; i < attributes.length; i++) {
-          var attribute = attributes[i];
+        const secureAttributes = [];
+        const raw = SecureObject.getRaw(this);
+        for (let i = 0; i < attributes.length; i++) {
+          const attribute = attributes[i];
 
           // Only add supported attributes
           if (SecureElement.isValidAttributeName(raw, attribute.name, prototype)) {
-            var attributeName = attribute.name;
+            let attributeName = attribute.name;
             if (attribute.name === 'src') {
               continue;
             }
@@ -1091,15 +1092,15 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
 };
 
 SecureScriptElement.run = function(st) {
-  var src = st.getAttribute('src');
-  var href = st.getAttribute('href');
-  var scriptUrl = src || href;
+  const src = st.getAttribute('src');
+  const href = st.getAttribute('href');
+  const scriptUrl = src || href;
 
   if (!scriptUrl) {
     return;
   }
 
-  var el = SecureObject.getRaw(st);
+  const el = SecureObject.getRaw(st);
   document.head.appendChild(el);
 
   if (href && !(el instanceof SVGScriptElement)) {
@@ -1107,11 +1108,11 @@ SecureScriptElement.run = function(st) {
   }
 
   // Get source using XHR and secure it using
-  var xhr = new XMLHttpRequest();
+  const xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function() {
-    var key = getKey(st);
+    const key = getKey(st);
     if (xhr.readyState === 4 && xhr.status === 200) {
-      var code = xhr.responseText;
+      const code = xhr.responseText;
       evaluate(code, key, scriptUrl);
 
       el.dispatchEvent(new Event('load'));
@@ -1122,7 +1123,7 @@ SecureScriptElement.run = function(st) {
 
   xhr.open('GET', scriptUrl, true);
 
-  //for relative urls enable sending credentials
+  // for relative urls enable sending credentials
   if (scriptUrl.indexOf('/') === 0) {
     xhr.withCredentials = true;
   }
@@ -1171,7 +1172,7 @@ function registerReportAPI(api) {
  * limitations under the License.
  */
 
-var SecureIFrameElement = {
+const SecureIFrameElement = {
   addMethodsAndProperties: function(prototype) {
     Object.defineProperties(prototype, {
       // Standard HTMLElement methods
@@ -1180,7 +1181,7 @@ var SecureIFrameElement = {
       focus: SecureObject.createFilteredMethodStateless('focus', prototype),
       contentWindow: {
         get: function() {
-          var raw = SecureObject.getRaw(this);
+          const raw = SecureObject.getRaw(this);
           return raw.contentWindow
             ? SecureIFrameElement.SecureIFrameContentWindow(raw.contentWindow, getKey(this))
             : raw.contentWindow;
@@ -1189,7 +1190,7 @@ var SecureIFrameElement = {
       // Reason: [W-4437391] Cure53 Report SF-04-004: Window access via encoded path segments.
       src: {
         get: function() {
-          var raw = SecureObject.getRaw(this);
+          const raw = SecureObject.getRaw(this);
           return raw.src;
         },
         set: function() {
@@ -1201,17 +1202,17 @@ var SecureIFrameElement = {
     // Standard list of iframe's properties from:
     // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
     // Note: Ignoring 'contentDocument', 'sandbox' and 'srcdoc' from the list above.
-    ['height', 'width', 'name'].forEach(function(name) {
+    ['height', 'width', 'name'].forEach(name =>
       Object.defineProperty(
         prototype,
         name,
         SecureObject.createFilteredPropertyStateless(name, prototype)
-      );
-    });
+      )
+    );
   },
 
   SecureIFrameContentWindow: function(w, key) {
-    var sicw = Object.create(null, {
+    const sicw = Object.create(null, {
       toString: {
         value: function() {
           return `SecureIFrameContentWindow: ${w}{ key: ${JSON.stringify(key)} }`;
@@ -1326,11 +1327,11 @@ function createAddEventListenerDescriptor(st, el, key) {
         // just ignores it.
       }
 
-      var sCallback = getFromCache(callback, key);
+      let sCallback = getFromCache(callback, key);
       if (!sCallback) {
         sCallback = function(e) {
           verifyAccess(st, callback, true);
-          var se = SecureDOMEvent(e, key);
+          const se = SecureDOMEvent(e, key);
           callback.call(st, se);
         };
 
@@ -1357,7 +1358,7 @@ function addEventTargetMethods(st, raw, key) {
     removeEventListener: {
       writable: true,
       value: function(type, listener, options) {
-        var sCallback = getFromCache(listener, key);
+        const sCallback = getFromCache(listener, key);
         raw.removeEventListener(type, sCallback, options);
       }
     }
@@ -1372,14 +1373,14 @@ function createAddEventListenerDescriptorStateless() {
         // just ignores it.
       }
 
-      var so = this;
-      var el = SecureObject.getRaw(so);
-      var key = getKey(so);
-      var sCallback = getFromCache(callback, key);
+      const so = this;
+      const el = SecureObject.getRaw(so);
+      const key = getKey(so);
+      let sCallback = getFromCache(callback, key);
       if (!sCallback) {
         sCallback = function(e) {
           verifyAccess(so, callback, true);
-          var se = SecureDOMEvent(e, key);
+          const se = SecureDOMEvent(e, key);
           callback.call(so, se);
         };
 
@@ -1405,8 +1406,8 @@ function createEventTargetMethodsStateless(config, prototype) {
   // was actually wired up originally
   config['removeEventListener'] = {
     value: function(type, listener, options) {
-      var raw = SecureObject.getRaw(this);
-      var sCallback = getFromCache(listener, getKey(this));
+      const raw = SecureObject.getRaw(this);
+      const sCallback = getFromCache(listener, getKey(this));
       raw.removeEventListener(type, sCallback, options);
     }
   };
@@ -1483,80 +1484,10 @@ window.devtoolsFormatters.push(lsProxyFormatter);
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function assert$1(condition) {
-  if (!condition) {
-    throw new Error();
-  }
-}
 
-// TODO: remove these functions. Our filtering mechanism should not
-// rely on the more expensive operation.
-
-function isObjectObject(value) {
-  return (
-    typeof value === 'object' && value !== null && objectToString.call(value) === '[object Object]'
-  );
-}
-
-// https://github.com/jonschlinkert/is-plain-object
-// Copyright © 2017, Jon Schlinkert. Released under the MIT License.
-function isPlainObject(value) {
-  if (isObjectObject(value) === false) {
-    return false;
-  }
-
-  // If has modified constructor
-  const ctor = value.constructor;
-  if (typeof ctor !== 'function') {
-    return false;
-  }
-
-  try {
-    // If has modified prototype
-    const proto = ctor.prototype;
-    if (isObjectObject(proto) === false) {
-      return false;
-    }
-    // If constructor does not have an Object-specific method
-    if (proto.hasOwnProperty('isPrototypeOf') === false) {
-      return false;
-    }
-  } catch (e) {
-    /* Assume is  object when throws */
-  }
-
-  // Most likely a plain Object
-  return true;
-}
-
-/**
- * Basic URL Scheme checking utility.
- * Checks for http: and https: url schemes.
- * @param {String} url
- * @return {Boolean}
+/* import { isValidURLScheme } from '../utils/checks';
+import { sanitizeURLForElement } from '../utils/sanitize';
  */
-function isValidURLScheme(url) {
-  const normalized = document.createElement('a');
-  normalized.href = url;
-  return normalized.protocol === 'https:' || normalized.protocol === 'http:';
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 const metadata$2 = {
   prototypes: {
     DocumentFragment: {
@@ -2732,13 +2663,13 @@ const metadata$2 = {
 };
 
 function cloneFiltered(el, st) {
-  var root = el.cloneNode(false);
+  const root = el.cloneNode(false);
   function cloneChildren(parent, parentClone) {
-    var childNodes = parent.childNodes;
-    for (var i = 0; i < childNodes.length; i++) {
-      var child = childNodes[i];
+    const childNodes = parent.childNodes;
+    for (let i = 0; i < childNodes.length; i++) {
+      const child = childNodes[i];
       if (hasAccess(st, child) || child.nodeType === Node.TEXT_NODE) {
-        var childClone = child.cloneNode(false);
+        const childClone = child.cloneNode(false);
         parentClone.appendChild(childClone);
         trust$1(st, childClone);
         cloneChildren(child, childClone);
@@ -2750,7 +2681,7 @@ function cloneFiltered(el, st) {
 }
 
 function runIfRunnable(st) {
-  var shouldRun = st instanceof HTMLScriptElement || st instanceof SVGScriptElement;
+  const shouldRun = st instanceof HTMLScriptElement || st instanceof SVGScriptElement;
   if (shouldRun) {
     SecureScriptElement.run(st);
     return true;
@@ -2758,25 +2689,25 @@ function runIfRunnable(st) {
   return false;
 }
 
-function _trustChildNodes(node, key) {
-  var children = node.childNodes;
-  for (var i = 0; i < children.length; i++) {
-    var child = children[i];
+function trustChildNodesRecursive(node, key) {
+  const children = node.childNodes;
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
     setKey(child, key);
-    _trustChildNodes(child, key);
+    trustChildNodesRecursive(child, key);
   }
 }
 
 function trustChildNodes(from, node) {
-  var key = getKey(from);
+  const key = getKey(from);
   if (key) {
-    _trustChildNodes(node, key);
+    trustChildNodesRecursive(node, key);
   }
 }
 
-var KEY_TO_PROTOTYPES = typeof Map !== 'undefined' ? new Map() : undefined;
+const KEY_TO_PROTOTYPES = typeof Map !== 'undefined' ? new Map() : undefined;
 
-var domPurifyConfig = {
+const domPurifyConfig = {
   // Allow SVG <use> element
   ADD_TAGS: ['use'],
   ADD_ATTR: [
@@ -2829,14 +2760,14 @@ function propertyIsSupported(target, property) {
 }
 
 function SecureElement(el, key) {
-  var o = getFromCache(el, key);
+  let o = getFromCache(el, key);
   if (o) {
     return o;
   }
 
   // A secure element can have multiple forms, this block allows us to apply
   // some polymorphic behavior to SecureElement depending on the tagName
-  var tagName = el.tagName && el.tagName.toUpperCase();
+  let tagName = el.tagName && el.tagName.toUpperCase();
   switch (tagName) {
     case 'FRAME':
       throw new error('The deprecated FRAME element is not supported in LockerService!');
@@ -2864,25 +2795,25 @@ function SecureElement(el, key) {
   }
 
   // Segregate prototypes by their locker
-  var prototypes = KEY_TO_PROTOTYPES.get(key);
+  let prototypes = KEY_TO_PROTOTYPES.get(key);
   if (!prototypes) {
     prototypes = new Map();
     KEY_TO_PROTOTYPES.set(key, prototypes);
   }
 
-  var prototypeInfo = prototypes.get(tagName);
+  let prototypeInfo = prototypes.get(tagName);
   if (!prototypeInfo) {
-    var basePrototype = Object.getPrototypeOf(el);
+    const basePrototype = Object.getPrototypeOf(el);
 
-    var expandoCapturingHandler = {
+    const expandoCapturingHandler = {
       get: function(target, property) {
         if (property in basePrototype) {
           return property in target ? target[property] : undefined;
         }
 
         // Expando - retrieve it from a private locker scoped object
-        var raw = getRef(target, key);
-        var data = getData(raw, key);
+        const raw = getRef(target, key);
+        const data = getData(raw, key);
         return data ? data[property] : undefined;
       },
 
@@ -2897,16 +2828,16 @@ function SecureElement(el, key) {
         }
 
         // Expando - store it from a private locker scoped object
-        var raw = getRef(target, key);
+        const raw = getRef(target, key);
 
         // SELECT elements allow options to be specified in array assignment style
-        if (raw instanceof HTMLSelectElement && !isNaN(property)) {
-          var rawOption = getRef(value, key);
+        if (raw instanceof HTMLSelectElement && !Number.isNaN(Number(property))) {
+          const rawOption = getRef(value, key);
           raw[property] = rawOption;
           return value;
         }
 
-        var data = getData(raw, key);
+        let data = getData(raw, key);
         if (!data) {
           data = {};
           setData(raw, key, data);
@@ -2920,14 +2851,14 @@ function SecureElement(el, key) {
         if (property in basePrototype) {
           return true;
         }
-        var raw = getRef(target, key);
-        var data = getData(raw, key);
+        const raw = getRef(target, key);
+        const data = getData(raw, key);
         return !!data && property in data;
       },
 
       deleteProperty: function(target, property) {
-        var raw = getRef(target, key);
-        var data = getData(raw, key);
+        const raw = getRef(target, key);
+        const data = getData(raw, key);
         if (data && property in data) {
           return delete data[property];
         }
@@ -2935,9 +2866,9 @@ function SecureElement(el, key) {
       },
 
       ownKeys: function(target) {
-        var raw = getRef(target, key);
-        var data = getData(raw, key);
-        var keys = Object.keys(raw);
+        const raw = getRef(target, key);
+        const data = getData(raw, key);
+        let keys = Object.keys(raw);
         if (data) {
           keys = keys.concat(Object.keys(data));
         }
@@ -2945,10 +2876,10 @@ function SecureElement(el, key) {
       },
 
       getOwnPropertyDescriptor: function(target, property) {
-        var desc = Object.getOwnPropertyDescriptor(target, property);
+        let desc = Object.getOwnPropertyDescriptor(target, property);
         if (!desc) {
-          var raw = getRef(target, key);
-          var data = getData(raw, key);
+          const raw = getRef(target, key);
+          const data = getData(raw, key);
           desc = data ? Object.getOwnPropertyDescriptor(data, property) : undefined;
         }
         return desc;
@@ -2964,7 +2895,7 @@ function SecureElement(el, key) {
     };
 
     // "class", "id", etc global attributes are special because they do not directly correspond to any property
-    var caseInsensitiveAttributes = {
+    const caseInsensitiveAttributes = {
       class: true,
       contextmenu: true,
       dropzone: true,
@@ -2972,11 +2903,11 @@ function SecureElement(el, key) {
       role: true
     };
 
-    var prototype = (function() {
+    const prototype = (function() {
       function SecureElementPrototype() {}
       SecureElementPrototype.prototype['tagName'] = tagName;
 
-      var sep = new SecureElementPrototype();
+      const sep = new SecureElementPrototype();
       sep.constructor = function() {
         throw new TypeError('Illegal constructor');
       };
@@ -3008,20 +2939,20 @@ function SecureElement(el, key) {
     Object.defineProperties(prototype, {
       toString: {
         value: function() {
-          var e = SecureObject.getRaw(this);
+          const e = SecureObject.getRaw(this);
           return `SecureElement: ${e}{ key: ${JSON.stringify(getKey(this))} }`;
         }
       }
     });
 
-    var prototypicalInstance = Object.create(prototype);
+    const prototypicalInstance = Object.create(prototype);
     setRef(prototypicalInstance, el, key);
 
     if (tagName === 'IFRAME') {
       SecureIFrameElement.addMethodsAndProperties(prototype);
     }
 
-    var tagNameSpecificConfig = SecureObject.addPrototypeMethodsAndPropertiesStateless(
+    const tagNameSpecificConfig = SecureObject.addPrototypeMethodsAndPropertiesStateless(
       metadata$2,
       prototypicalInstance,
       prototype
@@ -3061,13 +2992,13 @@ function SecureElement(el, key) {
                      *
                      * https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#Differences_from_innerText
                      */
-          var rawEl = SecureObject.getRaw(this);
-          var filtered = cloneFiltered(rawEl, o);
-          var ret = filtered.innerText;
+          const rawEl = SecureObject.getRaw(this);
+          const filtered = cloneFiltered(rawEl, o);
+          const ret = filtered.innerText;
           return ret;
         },
         set: function(value) {
-          var raw = SecureObject.getRaw(this);
+          const raw = SecureObject.getRaw(this);
           if (SecureElement.isSharedElement(raw)) {
             throw new error(
               `SecureElement.innerText cannot be used with ${raw.tagName} elements!`
@@ -3087,7 +3018,7 @@ function SecureElement(el, key) {
           return cloneFiltered(SecureObject.getRaw(this), o).innerHTML;
         },
         set: function(value) {
-          var raw = SecureObject.getRaw(this);
+          const raw = SecureObject.getRaw(this);
           // Do not allow innerHTML on shared elements (body/head)
           if (SecureElement.isSharedElement(raw)) {
             throw new error(
@@ -3105,7 +3036,7 @@ function SecureElement(el, key) {
     if (tagName === 'LINK' && 'rel' in el) {
       tagNameSpecificConfig['rel'] = {
         get: function() {
-          var raw = SecureObject.getRaw(this);
+          const raw = SecureObject.getRaw(this);
           return raw.rel;
         },
         set: function(value) {
@@ -3115,7 +3046,7 @@ function SecureElement(el, key) {
               "SecureLinkElement does not allow setting 'rel' property to 'import' value."
             );
           } else {
-            var raw = SecureObject.getRaw(this);
+            const raw = SecureObject.getRaw(this);
             raw.rel = value;
           }
         }
@@ -3126,10 +3057,10 @@ function SecureElement(el, key) {
     if (tagName === '#text' && 'splitText' in el) {
       tagNameSpecificConfig['splitText'] = {
         value: function(index) {
-          var raw = SecureObject.getRaw(this);
-          var newNode = raw.splitText(index);
+          const raw = SecureObject.getRaw(this);
+          const newNode = raw.splitText(index);
 
-          var fromKey = getKey(raw);
+          const fromKey = getKey(raw);
           if (fromKey) {
             setKey(newNode, fromKey);
           }
@@ -3144,7 +3075,7 @@ function SecureElement(el, key) {
           return cloneFiltered(SecureObject.getRaw(this), o).outerHTML;
         },
         set: function(value) {
-          var raw = SecureObject.getRaw(this);
+          const raw = SecureObject.getRaw(this);
           // Do not allow on shared elements (body/head)
           if (SecureElement.isSharedElement(raw)) {
             throw new error(
@@ -3152,7 +3083,7 @@ function SecureElement(el, key) {
             );
           }
 
-          var parent = raw.parentElement;
+          const parent = raw.parentElement;
 
           // As per specifications, throw when there is no parent
           if (!parent) {
@@ -3167,12 +3098,12 @@ function SecureElement(el, key) {
           // It returns no handle to trust the new elements. Here we create the
           // elements in a fragment then insert them in their proper location.
 
-          var frag = document
+          const frag = document
             .createRange()
             .createContextualFragment(DOMPurify['sanitize'](value, domPurifyConfig));
           trustChildNodes(this, frag);
           while (frag.childNodes.length > 0) {
-            var node = frag.childNodes[0];
+            const node = frag.childNodes[0];
             parent.insertBefore(node, raw);
           }
           parent.removeChild(raw);
@@ -3184,10 +3115,10 @@ function SecureElement(el, key) {
     if (tagName === '#text' && 'splitText' in el) {
       tagNameSpecificConfig['splitText'] = {
         value: function(index) {
-          var raw = SecureObject.getRaw(this);
-          var newNode = raw.splitText(index);
+          const raw = SecureObject.getRaw(this);
+          const newNode = raw.splitText(index);
 
-          var fromKey = getKey(raw);
+          const fromKey = getKey(raw);
           if (fromKey) {
             setKey(newNode, fromKey);
           }
@@ -3203,8 +3134,8 @@ function SecureElement(el, key) {
       tagNameSpecificConfig['insertRow'] = {
         value: function(index) {
           function getFirstTBody(table) {
-            for (var i = 0; i < table.childNodes.length; i++) {
-              var node = table.childNodes[i];
+            for (let i = 0; i < table.childNodes.length; i++) {
+              const node = table.childNodes[i];
               if (node instanceof HTMLTableSectionElement) {
                 return node;
               }
@@ -3212,14 +3143,14 @@ function SecureElement(el, key) {
             return undefined;
           }
 
-          var raw = SecureObject.getRaw(this);
-          var tbodyExists = !!getFirstTBody(raw);
-          var newRow = raw.insertRow(index);
+          const raw = SecureObject.getRaw(this);
+          const tbodyExists = !!getFirstTBody(raw);
+          const newRow = raw.insertRow(index);
           trust$1(this, newRow);
           if (!tbodyExists) {
             // a new tbody element has also been inserted, key that too.
-            var tbody = getFirstTBody(raw);
-            tbody && trust$1(this, tbody);
+            const tbody = getFirstTBody(raw);
+            trust$1(this, tbody);
           }
           return SecureElement(newRow, getKey(this));
         }
@@ -3235,8 +3166,8 @@ function SecureElement(el, key) {
     Object.defineProperties(prototype, tagNameSpecificConfig);
 
     // Build case insensitive index for attribute validation
-    Object.keys(prototype).forEach(function(k) {
-      var lower = k.toLowerCase();
+    Object.keys(prototype).forEach(k => {
+      const lower = k.toLowerCase();
       if (lower !== k) {
         caseInsensitiveAttributes[lower] = true;
       }
@@ -3315,7 +3246,7 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(
       writable: true,
       value: function(child) {
         if (!runIfRunnable(child)) {
-          var e = SecureObject.getRaw(this);
+          const e = SecureObject.getRaw(this);
           e.appendChild(getRef(child, getKey(this), true));
         }
 
@@ -3327,8 +3258,8 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(
       writable: true,
       value: function(newChild, oldChild) {
         if (!runIfRunnable(newChild)) {
-          var e = SecureObject.getRaw(this);
-          var k = getKey(this);
+          const e = SecureObject.getRaw(this);
+          const k = getKey(this);
           e.replaceChild(getRef(newChild, k, true), getRef(oldChild, k, true));
         }
 
@@ -3340,8 +3271,8 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(
       writable: true,
       value: function(newNode, referenceNode) {
         if (!runIfRunnable(newNode)) {
-          var e = SecureObject.getRaw(this);
-          var k = getKey(this);
+          const e = SecureObject.getRaw(this);
+          const k = getKey(this);
           e.insertBefore(
             getRef(newNode, k, true),
             referenceNode ? getRef(referenceNode, k, true) : null
@@ -3355,7 +3286,7 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(
     querySelector: {
       writable: true,
       value: function(selector) {
-        var raw = SecureObject.getRaw(this);
+        const raw = SecureObject.getRaw(this);
         return SecureElement.secureQuerySelector(raw, getKey(this), selector);
       }
     },
@@ -3363,7 +3294,7 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(
     insertAdjacentHTML: {
       writable: true,
       value: function(position, text) {
-        var raw = SecureObject.getRaw(this);
+        const raw = SecureObject.getRaw(this);
 
         // Do not allow insertAdjacentHTML on shared elements (body/head)
         if (SecureElement.isSharedElement(raw)) {
@@ -3372,7 +3303,7 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(
           );
         }
 
-        var parent;
+        let parent;
         if (position === 'afterbegin' || position === 'beforeend') {
           // We have access to el, nothing else to check.
         } else if (position === 'beforebegin' || position === 'afterend') {
@@ -3404,23 +3335,23 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(
       value: function(deep) {
         function copyKeys(from, to) {
           // Copy keys from the original to the cloned tree
-          var fromKey = getKey(from);
+          const fromKey = getKey(from);
           if (fromKey) {
             setKey(to, fromKey);
           }
 
-          var toChildren = to.childNodes;
-          var length = toChildren.length;
+          const toChildren = to.childNodes;
+          const length = toChildren.length;
           if (length > 0) {
-            var fromChildren = from.childNodes;
-            for (var i = 0; i < length; i++) {
+            const fromChildren = from.childNodes;
+            for (let i = 0; i < length; i++) {
               copyKeys(fromChildren[i], toChildren[i]);
             }
           }
         }
 
-        var e = SecureObject.getRaw(this);
-        var root = e.cloneNode(deep);
+        const e = SecureObject.getRaw(this);
+        const root = e.cloneNode(deep);
 
         // Maintain the same ownership in the cloned subtree
         copyKeys(e, root);
@@ -3434,7 +3365,7 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(
         return cloneFiltered(SecureObject.getRaw(this), this).textContent;
       },
       set: function(value) {
-        var raw = SecureObject.getRaw(this);
+        const raw = SecureObject.getRaw(this);
         if (SecureElement.isSharedElement(raw)) {
           throw new error(
             `SecureElement.textContent cannot be used with ${raw.tagName} elements!`
@@ -3449,13 +3380,13 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(
 
     hasChildNodes: {
       value: function() {
-        var raw = SecureObject.getRaw(this);
+        const raw = SecureObject.getRaw(this);
         // If this is a shared element, delegate the call to the shared element, no need to check for access
         if (SecureElement.isSharedElement(raw)) {
           return raw.hasChildNodes();
         }
-        var childNodes = raw.childNodes;
-        for (var i = 0; i < childNodes.length; i++) {
+        const childNodes = raw.childNodes;
+        for (let i = 0; i < childNodes.length; i++) {
           if (hasAccess(this, childNodes[i])) {
             return true;
           }
@@ -3559,17 +3490,17 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(
   });
 };
 
-SecureElement.validateURLScheme = function(value) {
-  let url = sanitizeURLForElement(value);
+/* SecureElement.validateURLScheme = function(value) {
+  const url = sanitizeURLForElement(value);
 
   if (!isValidURLScheme(url)) {
-    throw new error(
+    throw new report.error(
       'An unsupported URL scheme was detected. Only http:// and https:// are supported.'
     );
   }
 
   return url;
-};
+}; */
 
 SecureElement.createAttributeAccessMethodConfig = function(
   methodName,
@@ -3583,10 +3514,10 @@ SecureElement.createAttributeAccessMethodConfig = function(
   return {
     writable: true,
     value: function() {
-      var raw = SecureObject.getRaw(this);
-      var args = SecureObject.ArrayPrototypeSlice.call(arguments);
+      const raw = SecureObject.getRaw(this);
+      let args = SecureObject.ArrayPrototypeSlice.call(arguments);
 
-      var name = args[namespaced ? 1 : 0];
+      let name = args[namespaced ? 1 : 0];
       if (nameProp) {
         name = name[nameProp];
       }
@@ -3598,12 +3529,12 @@ SecureElement.createAttributeAccessMethodConfig = function(
       }
 
       // args[0] is the attribute name. args[1] is the attribute value
-      if (args[0] === 'href' || args[0] === 'src') {
+      /* if (args[0] === 'href' || args[0] === 'src') {
         args[1] = SecureElement.validateURLScheme(args[1]);
-      }
+      } */
 
       args = SecureObject.filterArguments(this, args, { rawArguments: true });
-      var ret = raw[methodName].apply(raw, args);
+      const ret = raw[methodName].apply(raw, args);
       return ret instanceof Node ? SecureElement(ret, key) : ret;
     }
   };
@@ -3614,10 +3545,10 @@ SecureElement.isSharedElement = function(el) {
 };
 
 SecureElement.secureQuerySelector = function(el, key, selector) {
-  var rawAll = el.querySelectorAll(selector);
-  for (var n = 0; n < rawAll.length; n++) {
-    var raw = rawAll[n];
-    var rawKey = getKey(raw);
+  const rawAll = el.querySelectorAll(selector);
+  for (let n = 0; n < rawAll.length; n++) {
+    const raw = rawAll[n];
+    const rawKey = getKey(raw);
     if (rawKey === key || SecureElement.isSharedElement(raw)) {
       return SecureElement(raw, key);
     }
@@ -3641,18 +3572,91 @@ SecureElement.secureQuerySelector = function(el, key, selector) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+function assert$1(condition) {
+  if (!condition) {
+    throw new Error();
+  }
+}
 
-var filterTypeHook$1;
+// TODO: remove these functions. Our filtering mechanism should not
+// rely on the more expensive operation.
+
+function isObjectObject(value) {
+  return (
+    typeof value === 'object' && value !== null && objectToString.call(value) === '[object Object]'
+  );
+}
+
+// https://github.com/jonschlinkert/is-plain-object
+// Copyright © 2017, Jon Schlinkert. Released under the MIT License.
+function isPlainObject(value) {
+  if (isObjectObject(value) === false) {
+    return false;
+  }
+
+  // If has modified constructor
+  const ctor = value.constructor;
+  if (typeof ctor !== 'function') {
+    return false;
+  }
+
+  try {
+    // If has modified prototype
+    const proto = ctor.prototype;
+    if (isObjectObject(proto) === false) {
+      return false;
+    }
+    // If constructor does not have an Object-specific method
+    if (proto.hasOwnProperty('isPrototypeOf') === false) {
+      return false;
+    }
+  } catch (e) {
+    /* Assume is  object when throws */
+  }
+
+  // Most likely a plain Object
+  return true;
+}
+
+/**
+ * Basic URL Scheme checking utility.
+ * Checks for http: and https: url schemes.
+ * @param {String} url
+ * @return {Boolean}
+ */
+function isValidURLScheme(url) {
+  const normalized = document.createElement('a');
+  normalized.href = url;
+  return normalized.protocol === 'https:' || normalized.protocol === 'http:';
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+let filterTypeHook$1;
 function registerFilterTypeHook(hook) {
   filterTypeHook$1 = hook;
 }
-var isUnfilteredTypeHook$1;
+let isUnfilteredTypeHook$1;
 function registerIsUnfilteredTypeHook(hook) {
   isUnfilteredTypeHook$1 = hook;
 }
 
 function SecureObject(thing, key) {
-  var o = getFromCache(thing, key);
+  let o = getFromCache(thing, key);
   if (o) {
     return o;
   }
@@ -3672,12 +3676,12 @@ function SecureObject(thing, key) {
   return Object.seal(o);
 }
 
-var defaultSecureObjectKey = {
+const defaultSecureObjectKey = {
   defaultSecureObjectKey: true
 };
 
 SecureObject.getRaw = function(so) {
-  var raw = getRef(so, getKey(so));
+  const raw = getRef(so, getKey(so));
 
   if (!raw) {
     throw new Error('Blocked attempt to invoke secure method with altered this!');
@@ -3709,18 +3713,18 @@ SecureObject.filterEverything = function(st, raw, options) {
     return raw;
   }
 
-  var t = typeof raw;
+  const t = typeof raw;
 
-  var key = getKey(st);
-  var cached = getFromCache(raw, key);
+  const key = getKey(st);
+  const cached = getFromCache(raw, key);
   if (cached) {
     return cached;
   }
 
   // Handle already proxied things
-  var rawKey = getKey(raw);
-  var belongsToLocker = rawKey === key;
-  var defaultKey = options && options.defaultKey ? options.defaultKey : defaultSecureObjectKey;
+  const rawKey = getKey(raw);
+  const belongsToLocker = rawKey === key;
+  const defaultKey = options && options.defaultKey ? options.defaultKey : defaultSecureObjectKey;
 
   if (isProxy(raw)) {
     // - If !belongsToLocker then this is a jump from one locker to another - we just need to unwrap and then reproxy based on the target locker's perspective
@@ -3732,20 +3736,20 @@ SecureObject.filterEverything = function(st, raw, options) {
       : SecureObject.filterEverything(st, getRef(raw, rawKey), options);
   }
 
-  var swallowed;
-  var mutated = false;
+  let swallowed;
+  let mutated = false;
   if (t === 'function') {
     // wrapping functions to guarantee that they run in system mode but their
     // returned value complies with user-mode.
     swallowed = function SecureFunction() {
       // special unfiltering logic to unwrap Proxies passed back to origin.
       // this could potentially be folded into filterArguments with an option set if needed.
-      var filteredArgs = [];
-      for (var i = 0; i < arguments.length; i++) {
-        var arg = arguments[i];
+      const filteredArgs = [];
+      for (let i = 0; i < arguments.length; i++) {
+        let arg = arguments[i];
         if (isFilteringProxy(arg)) {
-          var unfilteredProxy = getRef(arg, getKey(arg));
-          var unfilteredKey = getKey(unfilteredProxy);
+          const unfilteredProxy = getRef(arg, getKey(arg));
+          const unfilteredKey = getKey(unfilteredProxy);
           arg =
             unfilteredKey === getKey(raw)
               ? unfilteredProxy
@@ -3756,12 +3760,12 @@ SecureObject.filterEverything = function(st, raw, options) {
         filteredArgs[i] = arg;
       }
 
-      var self = SecureObject.filterEverything(st, this);
+      let self = SecureObject.filterEverything(st, this);
       if (isFilteringProxy(self) && getKey(self) === getKey(st)) {
         self = getRef(self, key);
       }
 
-      var fnReturnedValue = raw.apply(self, filteredArgs);
+      const fnReturnedValue = raw.apply(self, filteredArgs);
 
       return SecureObject.filterEverything(st, fnReturnedValue, options);
     };
@@ -3780,11 +3784,11 @@ SecureObject.filterEverything = function(st, raw, options) {
       return getEnv$1(key);
     } else if (raw === document) {
       return getEnv$1(key).document;
-    } else if (raw === location) {
+    } else if (raw === window.location) {
       return getEnv$1(key).location;
     }
 
-    var isNodeList = raw && (raw instanceof NodeList || raw instanceof HTMLCollection);
+    const isNodeList = raw && (raw instanceof NodeList || raw instanceof HTMLCollection);
     if (Array.isArray(raw)) {
       if (!belongsToLocker) {
         if (!rawKey) {
@@ -3860,8 +3864,8 @@ SecureObject.filterEverything = function(st, raw, options) {
 SecureObject.filterArguments = function(st, args, options) {
   function getRaw(v) {
     if (isProxy(v)) {
-      var key = getKey(v);
-      var ref = getRef(v, key);
+      const key = getKey(v);
+      const ref = getRef(v, key);
       v = ref;
     }
 
@@ -3869,8 +3873,8 @@ SecureObject.filterArguments = function(st, args, options) {
   }
 
   function getRawArray(v) {
-    var result = [];
-    for (var i = 0; i < v.length; i++) {
+    const result = [];
+    for (let i = 0; i < v.length; i++) {
       result.push(getRaw(v[i]));
     }
     return result;
@@ -3885,9 +3889,9 @@ SecureObject.filterArguments = function(st, args, options) {
     return options.unfilterEverything.call(st, args);
   }
 
-  var rawArguments = options && options.rawArguments;
-  for (var n = 0; n < args.length; n++) {
-    var value = args[n];
+  const rawArguments = options && options.rawArguments;
+  for (let n = 0; n < args.length; n++) {
+    const value = args[n];
     if (value) {
       if (rawArguments && typeof value === 'object') {
         args[n] = Array.isArray(value) ? getRawArray(value) : getRaw(value);
@@ -3915,12 +3919,12 @@ function convertSymbol(property) {
 
 const unfilteredConstructors = [Object, Array];
 
-var filteringProxyHandler = (function() {
+const filteringProxyHandler = (function() {
   function FilteringProxyHandler() {}
 
   FilteringProxyHandler.prototype['get'] = function(target, property) {
-    var raw = getRef(target, getKey(target));
-    var value = raw[property];
+    const raw = getRef(target, getKey(target));
+    const value = raw[property];
 
     if (!value) {
       return value;
@@ -3934,9 +3938,9 @@ var filteringProxyHandler = (function() {
   };
 
   FilteringProxyHandler.prototype['set'] = function(target, property, value) {
-    var raw = getRef(target, getKey(target));
+    const raw = getRef(target, getKey(target));
 
-    var filteredValue = value ? SecureObject.filterEverything(target, value) : value;
+    const filteredValue = value ? SecureObject.filterEverything(target, value) : value;
 
     raw[property] = filteredValue;
 
@@ -3946,41 +3950,41 @@ var filteringProxyHandler = (function() {
   // These are all direct pass through methods to preserve the shape etc of the delegate
 
   FilteringProxyHandler.prototype['getPrototypeOf'] = function(target) {
-    var raw = getRef(target, getKey(target));
+    const raw = getRef(target, getKey(target));
     return Object.getPrototypeOf(raw);
   };
 
   FilteringProxyHandler.prototype['setPrototypeOf'] = function(target, prototype) {
-    var raw = getRef(target, getKey(target));
+    const raw = getRef(target, getKey(target));
     return Object.setPrototypeOf(raw, prototype);
   };
 
   FilteringProxyHandler.prototype['has'] = function(target, property) {
-    var raw = getRef(target, getKey(target));
+    const raw = getRef(target, getKey(target));
     return property in raw;
   };
 
   FilteringProxyHandler.prototype['defineProperty'] = function(target, property, descriptor) {
-    var raw = getRef(target, getKey(target));
+    const raw = getRef(target, getKey(target));
     Object.defineProperty(raw, property, descriptor);
     return true;
   };
 
   FilteringProxyHandler.prototype['deleteProperty'] = function(target, property) {
-    var raw = getRef(target, getKey(target));
+    const raw = getRef(target, getKey(target));
     delete target[property];
     delete raw[property];
     return true;
   };
 
   FilteringProxyHandler.prototype['ownKeys'] = function(target) {
-    var raw = getRef(target, getKey(target));
+    const raw = getRef(target, getKey(target));
     return Object.keys(raw);
   };
 
   FilteringProxyHandler.prototype['getOwnPropertyDescriptor'] = function(target, property) {
-    var raw = getRef(target, getKey(target));
-    var descriptor = Object.getOwnPropertyDescriptor(raw, property);
+    const raw = getRef(target, getKey(target));
+    const descriptor = Object.getOwnPropertyDescriptor(raw, property);
 
     // If the descriptor is for a non-configurable property we need to shadow it directly on the surrogate
     // to avoid proxy invariant violations
@@ -3996,19 +4000,19 @@ var filteringProxyHandler = (function() {
   };
 
   FilteringProxyHandler.prototype['isExtensible'] = function(target) {
-    var raw = getRef(target, getKey(target));
+    const raw = getRef(target, getKey(target));
     return Object.isExtensible(raw);
   };
 
   FilteringProxyHandler.prototype['preventExtensions'] = function(target) {
-    var raw = getRef(target, getKey(target));
+    const raw = getRef(target, getKey(target));
     return Object.preventExtensions(raw);
   };
 
   return Object.freeze(new FilteringProxyHandler());
 })();
 
-//Prototype to make debugging and identification of direct exposure of the surrogate (should not happen) easier
+// Prototype to make debugging and identification of direct exposure of the surrogate (should not happen) easier
 function FilteringProxySurrogate(actual) {
   // For debugging usability only
   Object.defineProperty(this, '$actual$', {
@@ -4019,16 +4023,16 @@ function FilteringProxySurrogate(actual) {
 
 SecureObject.createFilteringProxy = function(raw, key) {
   // Use a direct proxy on raw to a proxy on {} to avoid the Proxy invariants for non-writable, non-configurable properties
-  var surrogate = new FilteringProxySurrogate(raw);
+  const surrogate = new FilteringProxySurrogate(raw);
   setRef(surrogate, raw, key);
 
-  var rawKey = getKey(raw);
+  const rawKey = getKey(raw);
   if (!rawKey) {
     // This is a newly created plain old js object - stamp it with the key
     setKey(raw, key);
   }
 
-  var swallowed = new Proxy(surrogate, filteringProxyHandler);
+  const swallowed = new Proxy(surrogate, filteringProxyHandler);
   registerProxy(swallowed);
 
   // DCHASMAN TODO We should be able to remove this (replaced with ls.setKey()) in the next phase of proxy work where we remove unfilterEverything() as something that is done all the time
@@ -4041,14 +4045,14 @@ SecureObject.createFilteringProxy = function(raw, key) {
   return swallowed;
 };
 
-//We cache 1 array like thing proxy per key
-var KEY_TO_ARRAY_LIKE_THING_HANDLER = typeof Map !== 'undefined' ? new Map() : undefined;
+// We cache 1 array like thing proxy per key
+const KEY_TO_ARRAY_LIKE_THING_HANDLER = typeof Map !== 'undefined' ? new Map() : undefined;
 
 function getFilteredArrayLikeThings(raw, key) {
-  var filtered = [];
+  const filtered = [];
 
-  for (var n = 0; n < raw.length; n++) {
-    var value = raw[n];
+  for (let n = 0; n < raw.length; n++) {
+    const value = raw[n];
     if (getKey(value) === key || SecureElement.isSharedElement(value)) {
       filtered.push(value);
     }
@@ -4059,21 +4063,21 @@ function getFilteredArrayLikeThings(raw, key) {
 function getArrayLikeThingProxyHandler(key) {
   function getFromFiltered(so, filtered, index) {
     // Numeric indexing into array
-    var value = filtered[index];
+    const value = filtered[index];
     return value ? SecureObject.filterEverything(so, value) : value;
   }
 
-  var handler = KEY_TO_ARRAY_LIKE_THING_HANDLER.get(key);
+  let handler = KEY_TO_ARRAY_LIKE_THING_HANDLER.get(key);
   if (!handler) {
     handler = {
       get: function(target, property) {
-        var raw = getRef(target, key);
+        const raw = getRef(target, key);
 
-        var filtered = getFilteredArrayLikeThings(raw, key);
-        var ret;
+        const filtered = getFilteredArrayLikeThings(raw, key);
+        let ret;
 
         property = convertSymbol(property);
-        if (isNaN(property)) {
+        if (Number.isNaN(Number(property))) {
           switch (property) {
             case 'length':
               ret = filtered.length;
@@ -4087,7 +4091,7 @@ function getArrayLikeThingProxyHandler(key) {
 
             case 'namedItem':
               ret = function(name) {
-                var value = raw.namedItem(name);
+                const value = raw.namedItem(name);
                 return value ? SecureObject.filterEverything(handler, value) : value;
               };
               break;
@@ -4105,11 +4109,11 @@ function getArrayLikeThingProxyHandler(key) {
               break;
             case 'Symbol(Symbol.iterator)':
               ret = function() {
-                var nextIndex = 0;
+                let nextIndex = 0;
                 return {
                   next: function() {
                     if (nextIndex < filtered.length) {
-                      var value = filtered[nextIndex];
+                      const value = filtered[nextIndex];
                       nextIndex++;
                       return {
                         value: value ? SecureObject.filterEverything(handler, value) : value,
@@ -4132,8 +4136,8 @@ function getArrayLikeThingProxyHandler(key) {
         return ret;
       },
       has: function(target, property) {
-        var raw = getRef(target, key);
-        var filtered = getFilteredArrayLikeThings(raw, key);
+        const raw = getRef(target, key);
+        const filtered = getFilteredArrayLikeThings(raw, key);
         return property in filtered;
       }
     };
@@ -4149,32 +4153,32 @@ function getArrayLikeThingProxyHandler(key) {
 }
 
 SecureObject.createProxyForArrayLikeObjects = function(raw, key) {
-  var surrogate = Object.create(Object.getPrototypeOf(raw));
+  const surrogate = Object.create(Object.getPrototypeOf(raw));
   setRef(surrogate, raw, key);
 
-  var proxy = new Proxy(surrogate, getArrayLikeThingProxyHandler(key));
+  const proxy = new Proxy(surrogate, getArrayLikeThingProxyHandler(key));
   setKey(proxy, key);
   registerProxy(proxy);
 
   return proxy;
 };
 
-//We cache 1 array proxy per key
-var KEY_TO_ARRAY_HANLDER = typeof Map !== 'undefined' ? new Map() : undefined;
+// We cache 1 array proxy per key
+const KEY_TO_ARRAY_HANLDER = typeof Map !== 'undefined' ? new Map() : undefined;
 
 function getFilteredArray(st, raw, key) {
-  var filtered = [];
+  const filtered = [];
   // TODO: RJ, we are missing named(non-integer) properties, changing this for loop to for..in should fix it
-  for (var n = 0; n < raw.length; n++) {
-    var value = raw[n];
-    var validEntry = false;
+  for (let n = 0; n < raw.length; n++) {
+    const value = raw[n];
+    let validEntry = false;
     if (
       !value || // Array can contain undefined/null/false/0 such falsy values
       getKey(value) === key // Value has been keyed and belongs to this locker
     ) {
       validEntry = true;
     } else {
-      var filteredValue = SecureObject.filterEverything(st, value, { defaultKey: key });
+      const filteredValue = SecureObject.filterEverything(st, value, { defaultKey: key });
       if (filteredValue && !isOpaque(filteredValue)) {
         validEntry = true;
       }
@@ -4191,19 +4195,19 @@ function getFilteredArray(st, raw, key) {
 function getArrayProxyHandler(key) {
   function getFromFiltered(so, filtered, index) {
     // Numeric indexing into array
-    var value = filtered[index] ? filtered[index]['rawValue'] : filtered[index];
+    const value = filtered[index] ? filtered[index]['rawValue'] : filtered[index];
     return value ? SecureObject.filterEverything(so, value) : value;
   }
   function getFilteredValues(so, filtered) {
     // Gather values from the filtered array
-    var ret = [];
-    filtered.forEach(function(item) {
-      var value = item['rawValue'];
+    const ret = [];
+    filtered.forEach(item => {
+      const value = item['rawValue'];
       ret.push(value ? SecureObject.filterEverything(so, value) : value);
     });
     return ret;
   }
-  var handler = KEY_TO_ARRAY_HANLDER.get(key);
+  let handler = KEY_TO_ARRAY_HANLDER.get(key);
   if (!handler) {
     handler = {
       getPrototypeOf: function(target) {
@@ -4220,8 +4224,8 @@ function getArrayProxyHandler(key) {
         return getFromCache(target, key);
       },
       getOwnPropertyDescriptor: function(target, property) {
-        var raw = target;
-        var filtered = getFilteredArray(handler, raw, key);
+        const raw = target;
+        const filtered = getFilteredArray(handler, raw, key);
         if (property === 'length') {
           return Object.getOwnPropertyDescriptor(filtered, property);
         }
@@ -4231,25 +4235,29 @@ function getArrayProxyHandler(key) {
         return undefined;
       },
       defineProperty: function(target, property, descriptor) {
-        var raw = target;
+        const raw = target;
         Object.defineProperty(raw, property, descriptor);
         return true;
       },
       get: function(target, property) {
-        var raw = target;
-        var filtered = getFilteredArray(handler, raw, key);
-        var ret;
+        const raw = target;
+        const filtered = getFilteredArray(handler, raw, key);
+        let ret;
 
         if (property === 'constructor' && unfilteredConstructors.includes(raw[property])) {
           return raw[property];
         }
 
         property = convertSymbol(property);
+        const coercedProperty = Number(property);
+        // If the property is 0 or a positive integer
         if (
-          isNaN(property) ||
-          parseFloat(property) < 0 ||
-          (parseFloat(property) !== 0 && parseFloat(property) !== parseInt(property, 10))
+          !Number.isNaN(coercedProperty) &&
+          Number.isInteger(coercedProperty) &&
+          coercedProperty >= 0
         ) {
+          ret = getFromFiltered(handler, filtered, property);
+        } else {
           switch (property) {
             case 'length':
               ret = filtered.length;
@@ -4258,9 +4266,9 @@ function getArrayProxyHandler(key) {
               ret = function() {
                 if (filtered.length > 0) {
                   // Get the filtered value by index to return
-                  var itemValue = getFromFiltered(handler, filtered, filtered.length - 1);
+                  const itemValue = getFromFiltered(handler, filtered, filtered.length - 1);
                   // Get raw index and update the raw array
-                  var itemToRemove = filtered.pop();
+                  const itemToRemove = filtered.pop();
                   raw.splice(itemToRemove['rawIndex'], 1);
                   return itemValue;
                 }
@@ -4272,7 +4280,7 @@ function getArrayProxyHandler(key) {
                 if (arguments.length === 0) {
                   return filtered.length;
                 }
-                for (var i = 0; i < arguments.length; i++) {
+                for (let i = 0; i < arguments.length; i++) {
                   raw.push(SecureObject.filterEverything(handler, arguments[i]));
                 }
                 return filtered.length + arguments.length;
@@ -4288,9 +4296,9 @@ function getArrayProxyHandler(key) {
               ret = function() {
                 if (filtered.length > 0) {
                   // Get the filtered value by index to return
-                  var itemValue = getFromFiltered(handler, filtered, 0);
+                  const itemValue = getFromFiltered(handler, filtered, 0);
                   // Get raw index and update the raw array
-                  var itemToRemove = filtered.shift();
+                  const itemToRemove = filtered.shift();
                   raw.splice(itemToRemove['rawIndex'], 1);
                   return itemValue;
                 }
@@ -4309,15 +4317,15 @@ function getArrayProxyHandler(key) {
               break;
             case 'splice':
               ret = function(start, deleteCount) {
-                var positionToInsert = raw.length; // By default insert at the end of raw
-                var itemsToRemove = filtered.splice(start, deleteCount);
+                let positionToInsert = raw.length; // By default insert at the end of raw
+                const itemsToRemove = filtered.splice(start, deleteCount);
                 // If there are items to remove
                 if (itemsToRemove.length > 0) {
                   // Get position to insert the new items if there are any
                   positionToInsert = itemsToRemove[0]['rawIndex'];
                   // Remove from raw
-                  for (var i = 0; i < itemsToRemove.length; i++) {
-                    var itemToRemove = itemsToRemove[i];
+                  for (let i = 0; i < itemsToRemove.length; i++) {
+                    const itemToRemove = itemsToRemove[i];
                     // Remove from raw
                     raw.splice(itemToRemove['rawIndex'] - i, 1); // Since we are removing elements from raw, account for index adjustment
                   }
@@ -4340,9 +4348,9 @@ function getArrayProxyHandler(key) {
                   }
                 }
                 // If there are items to be inserted
-                var newItems = [];
+                const newItems = [];
                 if (arguments.length > 2) {
-                  for (var j = 2; j < arguments.length; j++) {
+                  for (let j = 2; j < arguments.length; j++) {
                     newItems.push(SecureObject.filterEverything(handler, arguments[j]));
                   }
                 }
@@ -4357,8 +4365,8 @@ function getArrayProxyHandler(key) {
                 if (arguments.length === 0) {
                   return filtered.length;
                 }
-                var newItems = [];
-                for (var i = 0; i < arguments.length; i++) {
+                const newItems = [];
+                for (let i = 0; i < arguments.length; i++) {
                   newItems.push(SecureObject.filterEverything(handler, arguments[i]));
                 }
                 raw.splice.apply(raw, [0, 0].concat(newItems));
@@ -4371,7 +4379,7 @@ function getArrayProxyHandler(key) {
             case 'lastIndexOf':
             case 'slice':
               ret = function() {
-                var filteredValues = getFilteredValues(handler, filtered);
+                const filteredValues = getFilteredValues(handler, filtered);
                 return filteredValues[property].apply(filteredValues, arguments);
               };
               break;
@@ -4385,26 +4393,26 @@ function getArrayProxyHandler(key) {
             case 'some':
               ret = function() {
                 if (arguments.length > 0) {
-                  var secureCallback = SecureObject.filterEverything(handler, arguments[0]);
+                  const secureCallback = SecureObject.filterEverything(handler, arguments[0]);
                   arguments[0] = secureCallback;
                 }
-                var filteredValues = getFilteredValues(handler, filtered);
+                const filteredValues = getFilteredValues(handler, filtered);
                 return filteredValues[property].apply(filteredValues, arguments);
               };
               break;
             case 'toString':
               ret = function() {
-                var filteredValues = getFilteredValues(handler, filtered);
+                const filteredValues = getFilteredValues(handler, filtered);
                 return filteredValues.toString();
               };
               break;
             case 'Symbol(Symbol.iterator)':
               ret = function() {
-                var nextIndex = 0;
+                let nextIndex = 0;
                 return {
                   next: function() {
                     if (nextIndex < filtered.length) {
-                      var value = filtered[nextIndex]['rawValue'];
+                      const value = filtered[nextIndex]['rawValue'];
                       nextIndex++;
                       return {
                         value: value ? SecureObject.filterEverything(handler, value) : value,
@@ -4428,38 +4436,38 @@ function getArrayProxyHandler(key) {
                 return undefined;
               }
           }
-        } else {
-          ret = getFromFiltered(handler, filtered, property);
         }
-
         return ret;
       },
       set: function(target, property, value) {
-        var raw = target;
+        const raw = target;
         // Setting numerical indexes, number has to be positive integer, else its treated as an associative array key
+        const coercedProperty = Number(property);
         if (
-          !isNaN(property) &&
-          parseFloat(property) >= 0 &&
-          parseFloat(property) === parseInt(property, 10)
+          !Number.isNaN(coercedProperty) &&
+          Number.isInteger(coercedProperty) &&
+          coercedProperty >= 0
         ) {
           // Refilter raw to recreate the index mapping between raw and filtered value
-          var filtered = getFilteredArray(handler, raw, key);
+          const filtered = getFilteredArray(handler, raw, key);
           // If we are replacing existing index
           if (filtered[property]) {
             raw[filtered[property]['rawIndex']] = SecureObject.filterEverything(handler, value);
             return true;
           }
           // Adding values at a random numerical index greater than length
-          var filteredLength = filtered.length;
-          var newItems = [];
-          for (var i = 0; i < property - filtered.length; i++) {
+          const filteredLength = filtered.length;
+          const newItems = [];
+          for (let i = 0; i < property - filtered.length; i++) {
             newItems.push(undefined);
           }
           newItems.push(value);
           // Find the position in raw where we have to insert the new items
           // If filtered is empty, insert at beginning of raw
           // else, find the rawIndex of last filtered element and insert one after
-          var positionToInsert = filteredLength ? filtered[filteredLength - 1]['rawIndex'] + 1 : 0;
+          const positionToInsert = filteredLength
+            ? filtered[filteredLength - 1]['rawIndex'] + 1
+            : 0;
           raw.splice.apply(raw, [positionToInsert, 0].concat(newItems));
           return true;
         }
@@ -4468,36 +4476,37 @@ function getArrayProxyHandler(key) {
         return true;
       },
       has: function(target, property) {
-        var raw = target;
-        var filtered = getFilteredArray(handler, raw, key);
+        const raw = target;
+        const filtered = getFilteredArray(handler, raw, key);
         return property in filtered;
       },
       ownKeys: function(target) {
-        var raw = target;
-        var filtered = getFilteredArray(handler, raw, key);
+        const raw = target;
+        const filtered = getFilteredArray(handler, raw, key);
         return Object.getOwnPropertyNames(filtered);
       },
       deleteProperty: function(target, property) {
-        var raw = target;
-        // If property is a non-numerical index
+        const raw = target;
+        const coercedProperty = Number(property);
+        // If property is a numerical index(0 or positive integer)
         if (
-          isNaN(property) ||
-          parseFloat(property) < 0 ||
-          (parseFloat(property) !== 0 && parseFloat(property) !== parseInt(property, 10))
+          !Number.isNaN(coercedProperty) &&
+          Number.isInteger(coercedProperty) &&
+          coercedProperty >= 0
         ) {
-          var value = raw[property];
+          const filtered = getFilteredArray(handler, raw, key);
+          if (filtered[property]) {
+            delete raw[filtered[property]['rawIndex']];
+          }
+        } else {
+          const value = raw[property];
           // If value was set by using the array like an associative array
           if (value) {
             // Check if we have access
-            var rawValue = getRef(value, key);
+            const rawValue = getRef(value, key);
             if (rawValue) {
               delete raw[property];
             }
-          }
-        } else {
-          var filtered = getFilteredArray(handler, raw, key);
-          if (filtered[property]) {
-            delete raw[filtered[property]['rawIndex']];
           }
         }
         return true;
@@ -4522,20 +4531,20 @@ SecureObject.createProxyForArrayObjects = function(raw, key) {
   }
   // Not using a surrogate for array Proxy because we want to support for..in style of looping on arrays
   // Having a fake surrogate does not allow for correct looping. Mitigating this risk by handling all traps for Proxy.
-  var proxy = new Proxy(raw, getArrayProxyHandler(key));
+  const proxy = new Proxy(raw, getArrayProxyHandler(key));
   setKey(proxy, key);
   registerProxy(proxy);
 
   return proxy;
 };
 
-var KEY_TO_NAMED_NODE_MAP_HANLDER = typeof Map !== 'undefined' ? new Map() : undefined;
+const KEY_TO_NAMED_NODE_MAP_HANLDER = typeof Map !== 'undefined' ? new Map() : undefined;
 
 function getFilteredNamedNodeMap(raw, key, prototype, caseInsensitiveAttributes) {
-  var filtered = {};
+  const filtered = {};
 
-  for (var n = 0; n < raw.length; n++) {
-    var value = raw[n];
+  for (let n = 0; n < raw.length; n++) {
+    const value = raw[n];
     if (SecureElement.isValidAttributeName(raw, value.name, prototype, caseInsensitiveAttributes)) {
       filtered[n] = value;
     }
@@ -4546,21 +4555,21 @@ function getFilteredNamedNodeMap(raw, key, prototype, caseInsensitiveAttributes)
 
 function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) {
   function getFromFiltered(so, filtered, index) {
-    var value = filtered[index];
+    const value = filtered[index];
     return value ? SecureObject.filterEverything(so, value, { defaultKey: key }) : value;
   }
 
-  var handler = KEY_TO_NAMED_NODE_MAP_HANLDER.get(key);
+  let handler = KEY_TO_NAMED_NODE_MAP_HANLDER.get(key);
   if (!handler) {
     handler = {
       get: function(target, property) {
-        var raw = getRef(target, key);
+        const raw = getRef(target, key);
 
-        var filtered = getFilteredNamedNodeMap(raw, key, prototype, caseInsensitiveAttributes);
-        var ret;
+        const filtered = getFilteredNamedNodeMap(raw, key, prototype, caseInsensitiveAttributes);
+        let ret;
 
         property = convertSymbol(property);
-        if (isNaN(property)) {
+        if (Number.isNaN(Number(property))) {
           switch (property) {
             case 'length':
               ret = Object.keys(filtered).length;
@@ -4572,7 +4581,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
               break;
             case 'getNamedItem':
               ret = function(name) {
-                for (var val in filtered) {
+                for (const val in filtered) {
                   if (name === filtered[val].name) {
                     return SecureObject.filterEverything(handler, filtered[val], {
                       defaultKey: key
@@ -4630,7 +4639,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
               break;
             case 'getNamedItemNS':
               ret = function(namespace, localName) {
-                for (var val in filtered) {
+                for (const val in filtered) {
                   if (
                     namespace === filtered[val].namespaceURI &&
                     localName === filtered[val].localName
@@ -4672,13 +4681,13 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
                 if (
                   !SecureElement.isValidAttributeName(
                     raw,
-                    name,
+                    localName,
                     prototype,
                     caseInsensitiveAttributes
                   )
                 ) {
                   warn(
-                    `${this} does not allow removing the ${name.toLowerCase()} attribute, ignoring!`
+                    `${this} does not allow removing the ${localName.toLowerCase()} attribute, ignoring!`
                   );
                   return undefined;
                 }
@@ -4702,11 +4711,11 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
               break;
             case 'Symbol(Symbol.iterator)':
               ret = function() {
-                var nextIndex = 0;
+                let nextIndex = 0;
                 return {
                   next: function() {
                     if (nextIndex < filtered.length) {
-                      var value = filtered[nextIndex];
+                      const value = filtered[nextIndex];
                       nextIndex++;
                       return {
                         value: value ? SecureObject.filterEverything(handler, value) : value,
@@ -4729,8 +4738,8 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
         return ret;
       },
       has: function(target, property) {
-        var raw = getRef(target, key);
-        var filtered = getFilteredNamedNodeMap(
+        const raw = getRef(target, key);
+        const filtered = getFilteredNamedNodeMap(
           handler,
           raw,
           key,
@@ -4752,10 +4761,10 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
 }
 
 SecureObject.createProxyForNamedNodeMap = function(raw, key, prototype, caseInsensitiveAttributes) {
-  var surrogate = Object.create(Object.getPrototypeOf(raw));
+  const surrogate = Object.create(Object.getPrototypeOf(raw));
   setRef(surrogate, raw, key);
 
-  var proxy = new Proxy(
+  const proxy = new Proxy(
     surrogate,
     getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes)
   );
@@ -4778,8 +4787,8 @@ SecureObject.createFilteredMethod = function(st, raw, methodName, options) {
     enumerable: true,
     writable: true,
     value: function() {
-      var filteredArgs = SecureObject.filterArguments(st, arguments, options);
-      var fnReturnedValue = raw[methodName].apply(raw, filteredArgs);
+      const filteredArgs = SecureObject.filterArguments(st, arguments, options);
+      let fnReturnedValue = raw[methodName].apply(raw, filteredArgs);
 
       if (options && options.afterCallback) {
         fnReturnedValue = options.afterCallback(fnReturnedValue);
@@ -4799,11 +4808,11 @@ SecureObject.createFilteredMethodStateless = function(methodName, prototype, opt
     enumerable: true,
     writable: true,
     value: function() {
-      var st = this;
-      var raw = SecureObject.getRaw(st);
+      const st = this;
+      const raw = SecureObject.getRaw(st);
 
-      var filteredArgs = SecureObject.filterArguments(st, arguments, options);
-      var fnReturnedValue = raw[methodName].apply(raw, filteredArgs);
+      const filteredArgs = SecureObject.filterArguments(st, arguments, options);
+      let fnReturnedValue = raw[methodName].apply(raw, filteredArgs);
 
       if (options) {
         if (options.afterCallback) {
@@ -4831,17 +4840,17 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
     );
   }
 
-  var descriptor = {
+  const descriptor = {
     enumerable: true
   };
 
   descriptor.get = function() {
-    var value = raw[propertyName];
+    let value = raw[propertyName];
 
     // Continue from the current object until we find an acessible object.
     if (options && options.skipOpaque === true) {
       while (value) {
-        var hasAccess$$1 = hasAccess(st, value);
+        const hasAccess$$1 = hasAccess(st, value);
         if (hasAccess$$1 || SecureElement.isSharedElement(value)) {
           break;
         }
@@ -4878,20 +4887,20 @@ SecureObject.createFilteredPropertyStateless = function(propertyName, prototype,
     throw new Error('SecureObject.createFilteredPropertyStateless() called without prototype');
   }
 
-  var descriptor = {
+  const descriptor = {
     enumerable: true
   };
 
   descriptor.get = function() {
-    var st = this;
-    var raw = SecureObject.getRaw(st);
+    const st = this;
+    const raw = SecureObject.getRaw(st);
 
-    var value = raw[propertyName];
+    let value = raw[propertyName];
 
     // Continue from the current object until we find an acessible object.
     if (options && options.skipOpaque === true) {
       while (value) {
-        var hasAccess$$1 = hasAccess(st, value);
+        const hasAccess$$1 = hasAccess(st, value);
         if (
           hasAccess$$1 ||
           value === document.body ||
@@ -4914,9 +4923,9 @@ SecureObject.createFilteredPropertyStateless = function(propertyName, prototype,
 
   if (!options || options.writable !== false) {
     descriptor.set = function(value) {
-      var st = this;
-      var key = getKey(st);
-      var raw = getRef(st, key);
+      const st = this;
+      const key = getKey(st);
+      const raw = getRef(st, key);
 
       if (options && options.beforeSetCallback) {
         value = options.beforeSetCallback.call(st, value);
@@ -4937,7 +4946,7 @@ SecureObject.addIfSupported = function(behavior, st, element, name, options) {
   options = options || {};
   options.ignoreNonexisting = true;
 
-  var prop = behavior(st, element, name, options);
+  const prop = behavior(st, element, name, options);
   if (prop) {
     Object.defineProperty(st, name, prop);
   }
@@ -4951,9 +4960,9 @@ SecureObject.addMethodIfSupported = function(st, raw, name, options) {
   SecureObject.addIfSupported(SecureObject.createFilteredMethod, st, raw, name, options);
 };
 
-//Return the set of interfaces supported by the object in order of most specific to least specific
+// Return the set of interfaces supported by the object in order of most specific to least specific
 function getSupportedInterfaces(o) {
-  var interfaces = [];
+  const interfaces = [];
   if (o instanceof Window) {
     interfaces.push('Window', 'EventTarget');
   } else if (o instanceof Document) {
@@ -5179,13 +5188,13 @@ function getSupportedInterfaces(o) {
 }
 
 SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, key) {
-  var prototype;
+  let prototype;
 
   function worker(name) {
-    var item = prototype[name];
-    var valueOverride;
+    const item = prototype[name];
+    let valueOverride;
     if (!(name in so) && name in raw) {
-      var options = {
+      const options = {
         skipOpaque: item.skipOpaque || false,
         defaultValue: item.defaultValue || null,
         trustReturnValue: item.trustReturnValue || false,
@@ -5210,14 +5219,14 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, k
             return (
               valueOverride ||
               function() {
-                var cls = raw[name];
+                const cls = raw[name];
+                const args = Array.prototype.slice.call(arguments);
+                let result;
 
-                var result,
-                  args = Array.prototype.slice.call(arguments);
                 if (typeof cls === 'function') {
                   //  Function.prototype.bind.apply is being used to invoke the constructor and to pass all the arguments provided by the caller
                   // TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
-                  var ctor = Function.prototype.bind.apply(cls, [null].concat(args));
+                  const ctor = Function.prototype.bind.apply(cls, [null].concat(args));
                   result = new ctor();
                 } else {
                   // For browsers that use a constructor that's not a function, invoke the constructor directly.
@@ -5251,7 +5260,7 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, k
         });
       } else {
         // Properties
-        var descriptor = SecureObject.createFilteredProperty(so, raw, name, options);
+        const descriptor = SecureObject.createFilteredProperty(so, raw, name, options);
         if (descriptor) {
           Object.defineProperty(so, name, descriptor);
         }
@@ -5259,16 +5268,16 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, k
     }
   }
 
-  var supportedInterfaces = getSupportedInterfaces(raw);
+  const supportedInterfaces = getSupportedInterfaces(raw);
 
-  var prototypes = metadata$$1['prototypes'];
-  supportedInterfaces.forEach(function(name) {
+  const prototypes = metadata$$1['prototypes'];
+  supportedInterfaces.forEach(name => {
     prototype = prototypes[name];
     Object.keys(prototype).forEach(worker);
   });
 };
 
-//Closure factory
+// Closure factory
 function addPrototypeMethodsAndPropertiesStatelessHelper(
   name,
   prototype,
@@ -5277,12 +5286,12 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
   rawPrototypicalInstance,
   config
 ) {
-  var descriptor;
-  var item = prototype[name];
-  var valueOverride;
+  let descriptor;
+  const item = prototype[name];
+  let valueOverride;
 
   if (!prototypeForValidation.hasOwnProperty(name) && name in rawPrototypicalInstance) {
-    var options = {
+    const options = {
       skipOpaque: item.skipOpaque || false,
       defaultValue: item.defaultValue || null,
       trustReturnValue: item.trustReturnValue || false,
@@ -5302,7 +5311,7 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
           if (valueOverride) {
             return valueOverride;
           }
-          var raw = SecureObject.getRaw(this);
+          const raw = SecureObject.getRaw(this);
           return raw[name];
         },
         set: function(value) {
@@ -5315,16 +5324,16 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
           valueOverride ||
           function() {
             return function() {
-              var so = this;
-              var raw = SecureObject.getRaw(so);
-              var cls = raw[name];
+              const so = this;
+              const raw = SecureObject.getRaw(so);
+              const cls = raw[name];
 
               // TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
-              var ctor = Function.prototype.bind.apply(
+              const ctor = Function.prototype.bind.apply(
                 cls,
                 [null].concat(Array.prototype.slice.call(arguments))
               );
-              var result = new ctor();
+              const result = new ctor();
               trust$1(so, result);
 
               return SecureObject.filterEverything(so, result);
@@ -5341,17 +5350,17 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
         },
 
         set: function(callback) {
-          var raw = SecureObject.getRaw(this);
+          const raw = SecureObject.getRaw(this);
 
           // Insure that we pick up the current proxy for the raw object
-          var key = getKey(raw);
+          let key = getKey(raw);
           // Shared elements like <body> and <head> are not tied to specific namespaces.
           // Every namespace has a secure wrapper for these elements
           if (!key && SecureElement.isSharedElement(raw)) {
             // Obtain the key of the secure wrapper
             key = getKey(this);
           }
-          var o = getFromCache(raw, key);
+          const o = getFromCache(raw, key);
 
           raw[name] = function(e) {
             if (callback) {
@@ -5380,16 +5389,16 @@ SecureObject.addPrototypeMethodsAndPropertiesStateless = function(
   prototypicalInstance,
   prototypeForValidation
 ) {
-  var rawPrototypicalInstance = SecureObject.getRaw(prototypicalInstance);
-  var prototype;
-  var config = {};
+  const rawPrototypicalInstance = SecureObject.getRaw(prototypicalInstance);
+  let prototype;
+  const config = {};
 
-  var supportedInterfaces = getSupportedInterfaces(rawPrototypicalInstance);
+  const supportedInterfaces = getSupportedInterfaces(rawPrototypicalInstance);
 
-  var prototypes = metadata$$1['prototypes'];
-  supportedInterfaces.forEach(function(name) {
+  const prototypes = metadata$$1['prototypes'];
+  supportedInterfaces.forEach(name => {
     prototype = prototypes[name];
-    for (var property in prototype) {
+    for (const property in prototype) {
       addPrototypeMethodsAndPropertiesStatelessHelper(
         property,
         prototype,
@@ -5405,8 +5414,8 @@ SecureObject.addPrototypeMethodsAndPropertiesStateless = function(
 };
 
 function getUnfilteredTypes() {
-  var ret = [];
-  var unfilteredTypesMeta = [
+  const ret = [];
+  const unfilteredTypesMeta = [
     'File',
     'FileList',
     'CSSStyleDeclaration',
@@ -5422,17 +5431,17 @@ function getUnfilteredTypes() {
     'DOMTokenList',
     'ArrayBuffer'
   ];
-  unfilteredTypesMeta.forEach(function(unfilteredType) {
+  unfilteredTypesMeta.forEach(unfilteredType => {
     if (typeof window[unfilteredType] !== 'undefined') {
       ret.push(window[unfilteredType]);
     }
   });
   return ret;
 }
-var unfilteredTypes = getUnfilteredTypes();
+const unfilteredTypes = getUnfilteredTypes();
 
 SecureObject.isUnfilteredType = function(raw, key) {
-  for (var n = 0; n < unfilteredTypes.length; n++) {
+  for (let n = 0; n < unfilteredTypes.length; n++) {
     if (raw instanceof unfilteredTypes[n]) {
       return true;
     }
@@ -5686,13 +5695,13 @@ function isForbiddenTag(el) {
 }
 
 function SecureDocument(doc, key) {
-  var o = getFromCache(doc, key);
+  let o = getFromCache(doc, key);
   if (o) {
     return o;
   }
 
   // create prototype to allow instanceof checks against document
-  var prototype = function() {};
+  const prototype = function() {};
   Object.freeze(prototype);
 
   o = Object.create(prototype, {
@@ -5703,14 +5712,14 @@ function SecureDocument(doc, key) {
     },
     createAttribute: {
       value: function(name) {
-        var att = doc.createAttribute(name);
+        const att = doc.createAttribute(name);
         setKey(att, key);
         return SecureElement(att, key);
       }
     },
     createElement: {
       value: function(tag) {
-        var el = doc.createElement(tag);
+        const el = doc.createElement(tag);
         if (isForbiddenTag(el)) {
           throw new Error(`Creation of ${tag} tags is not allowed`);
         }
@@ -5720,7 +5729,7 @@ function SecureDocument(doc, key) {
     },
     createElementNS: {
       value: function(namespace, tag) {
-        var el = doc.createElementNS(namespace, tag);
+        const el = doc.createElementNS(namespace, tag);
         if (isForbiddenTag(el)) {
           throw new Error(`Creation of ${tag} tags is not allowed`);
         }
@@ -5730,21 +5739,21 @@ function SecureDocument(doc, key) {
     },
     createDocumentFragment: {
       value: function() {
-        var el = doc.createDocumentFragment();
+        const el = doc.createDocumentFragment();
         setKey(el, key);
         return SecureElement(el, key);
       }
     },
     createTextNode: {
       value: function(text) {
-        var el = doc.createTextNode(text);
+        const el = doc.createTextNode(text);
         setKey(el, key);
         return SecureElement(el, key);
       }
     },
     createComment: {
       value: function(data) {
-        var el = doc.createComment(data);
+        const el = doc.createComment(data);
         setKey(el, key);
         return SecureElement(el, key);
       }
@@ -5772,37 +5781,38 @@ function SecureDocument(doc, key) {
 
   Object.defineProperty(o, 'cookie', {
     get: function() {
-      var fullCookie = doc.cookie;
-      var entries = fullCookie.split(';');
-      var cookieKey = getCookieKey();
+      const fullCookie = doc.cookie;
+      const entries = fullCookie.split(';');
+      const cookieKey = getCookieKey();
       // filter out cookies that do not match current namespace
-      var nsFiltered = entries.filter(function(val) {
-        var left = val.split('=')[0].trim();
+      const nsFiltered = entries.filter(val => {
+        const left = val.split('=')[0].trim();
         return left.indexOf(cookieKey) === 0;
       });
       // strip LockerService key before returning to user land
-      var keyFiltered = nsFiltered.map(function(val) {
+      const keyFiltered = nsFiltered.map(val => {
         return val.trim().substring(cookieKey.length);
       });
       return keyFiltered.join('; ');
     },
     set: function(cookie) {
-      var chunks = cookie.split(';');
-      var entry = chunks[0].split('=');
-      var newKey = getCookieKey() + entry[0];
+      const chunks = cookie.split(';');
+      const entry = chunks[0].split('=');
+      const newKey = getCookieKey() + entry[0];
       chunks[0] = `${newKey}=${entry[1]}`;
-      var newCookie = chunks.join(';');
+      const newCookie = chunks.join(';');
       doc.cookie = newCookie;
     }
   });
 
-  ['implementation'].forEach(function(name) {
+  ['implementation'].forEach(
     // These are direct passthrough's and should never be wrapped in a SecureObject
-    Object.defineProperty(o, name, {
-      enumerable: true,
-      value: doc[name]
-    });
-  });
+    name =>
+      Object.defineProperty(o, name, {
+        enumerable: true,
+        value: doc[name]
+      })
+  );
 
   SecureObject.addPrototypeMethodsAndProperties(metadata$5, o, doc, key);
 
@@ -5830,7 +5840,7 @@ function SecureDocument(doc, key) {
  */
 
 function SecureLocation(loc, key) {
-  var o = getFromCache(loc, key);
+  let o = getFromCache(loc, key);
   if (o) {
     return o;
   }
@@ -5855,13 +5865,9 @@ function SecureLocation(loc, key) {
     'username',
     'password',
     'origin'
-  ].forEach(function(property) {
-    SecureObject.addPropertyIfSupported(o, loc, property);
-  });
+  ].forEach(property => SecureObject.addPropertyIfSupported(o, loc, property));
 
-  ['reload', 'replace'].forEach(function(method) {
-    SecureObject.addMethodIfSupported(o, loc, method);
-  });
+  ['reload', 'replace'].forEach(method => SecureObject.addMethodIfSupported(o, loc, method));
 
   /**
    * When a location.assign() call is found the href provided is evaluated
@@ -5872,7 +5878,7 @@ function SecureLocation(loc, key) {
   SecureObject.addMethodIfSupported(o, loc, 'assign', {
     beforeCallback: function(href) {
       if (href && typeof href === 'string' && href.length > 1) {
-        var dummy = document.createElement('a');
+        const dummy = document.createElement('a');
         dummy.href = href;
 
         if (dummy.protocol === 'http:' || dummy.protocol === 'https:') {
@@ -5907,13 +5913,13 @@ function SecureLocation(loc, key) {
  * limitations under the License.
  */
 
-var addPropertiesHook$1;
+let addPropertiesHook$1;
 function registerAddPropertiesHook$1(hook) {
   addPropertiesHook$1 = hook;
 }
 
 function SecureNavigator(navigator, key) {
-  var o = getFromCache(navigator, key);
+  let o = getFromCache(navigator, key);
   if (o) {
     return o;
   }
@@ -5937,9 +5943,7 @@ function SecureNavigator(navigator, key) {
     'platform',
     'product',
     'userAgent'
-  ].forEach(function(name) {
-    SecureObject.addPropertyIfSupported(o, navigator, name);
-  });
+  ].forEach(name => SecureObject.addPropertyIfSupported(o, navigator, name));
 
   if (addPropertiesHook$1) {
     addPropertiesHook$1(o, navigator, key);
@@ -5971,9 +5975,9 @@ function SecureNavigator(navigator, key) {
 function SecureXMLHttpRequest(key) {
   // Create a new closure constructor for new XHMLHttpRequest() syntax support that captures the key
   return function() {
-    var xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
 
-    var o = Object.create(null, {
+    const o = Object.create(null, {
       toString: {
         value: function() {
           return `SecureXMLHttpRequest: ${xhr} { key: ${JSON.stringify(key)} }`;
@@ -5993,9 +5997,7 @@ function SecureXMLHttpRequest(key) {
       'timeout',
       'withCredentials',
       'upload'
-    ].forEach(function(name) {
-      SecureObject.addPropertyIfSupported(o, xhr, name);
-    });
+    ].forEach(name => SecureObject.addPropertyIfSupported(o, xhr, name));
 
     SecureObject.addPropertyIfSupported(o, xhr, 'responseXML', {
       afterGetCallback: function(value) {
@@ -6013,15 +6015,15 @@ function SecureXMLHttpRequest(key) {
       'ontimeout',
       'onloadend',
       'onreadystatechange'
-    ].forEach(function(name) {
+    ].forEach(name =>
       Object.defineProperty(o, name, {
         set: function(callback) {
           xhr[name] = function(e) {
             callback.call(o, SecureDOMEvent(e, key));
           };
         }
-      });
-    });
+      })
+    );
 
     Object.defineProperties(o, {
       abort: SecureObject.createFilteredMethod(o, xhr, 'abort'),
@@ -6032,13 +6034,11 @@ function SecureXMLHttpRequest(key) {
         enumerable: true,
         writable: true,
         value: function() {
-          arguments[1];
-
-          var normalizer = document.createElement('a');
+          const normalizer = document.createElement('a');
           normalizer.setAttribute('href', arguments[1]);
 
           // Order of operations are important!
-          var pathname = normalizer.pathname;
+          let pathname = normalizer.pathname;
           pathname = decodeURIComponent(pathname);
           pathname = pathname.toLowerCase();
 
@@ -6090,9 +6090,9 @@ function SecureXMLHttpRequest(key) {
 
 function SecureMutationObserver(key) {
   function filterRecords(st, records) {
-    var filtered = [];
+    const filtered = [];
 
-    records.forEach(function(record) {
+    records.forEach(record => {
       if (hasAccess(st, record.target)) {
         filtered.push(SecureObject.filterEverything(st, record));
       }
@@ -6103,10 +6103,10 @@ function SecureMutationObserver(key) {
 
   // Create a new closure constructor for new XHMLHttpRequest() syntax support that captures the key
   return function(callback) {
-    var o = Object.create(null);
+    const o = Object.create(null);
 
-    var observer = new MutationObserver(function(records) {
-      var filtered = filterRecords(o, records);
+    const observer = new MutationObserver(records => {
+      const filtered = filterRecords(o, records);
       if (filtered.length > 0) {
         callback(filtered);
       }
@@ -6155,9 +6155,9 @@ function SecureMutationObserver(key) {
 function SecureNotification(key) {
   // Create a new closure constructor for new Notification() syntax support that captures the key
   return function(title, options) {
-    var notification = new Notification(title, options);
+    const notification = new Notification(title, options);
 
-    var o = Object.create(null, {
+    const o = Object.create(null, {
       toString: {
         value: function() {
           return `SecureNotification: ${notification} { key: ${JSON.stringify(key)} }`;
@@ -6185,20 +6185,18 @@ function SecureNotification(key) {
       'renotify',
       'sound',
       'sticky'
-    ].forEach(function(name) {
-      SecureObject.addPropertyIfSupported(o, notification, name);
-    });
+    ].forEach(name => SecureObject.addPropertyIfSupported(o, notification, name));
 
     // Event handlers
-    ['onclick', 'onerror'].forEach(function(name) {
+    ['onclick', 'onerror'].forEach(name =>
       Object.defineProperty(o, name, {
         set: function(callback) {
           notification[name] = function(e) {
             callback.call(o, SecureDOMEvent(e, key));
           };
         }
-      });
-    });
+      })
+    );
 
     Object.defineProperties(o, {
       close: SecureObject.createFilteredMethod(o, notification, 'close')
@@ -6227,35 +6225,35 @@ function SecureNotification(key) {
  */
 
 function SecureStorage(storage, type, key) {
-  var o = getFromCache(storage, key);
+  let o = getFromCache(storage, key);
   if (o) {
     return o;
   }
 
   // Read existing key to synthetic key index from storage
-  var stringizedKey = JSON.stringify(key);
-  var nextSyntheticKey = `LSSNextSynthtic:${type}`;
-  var storedIndexKey = `LSSIndex:${type}${stringizedKey}`;
-  var nameToSyntheticRaw;
+  const stringizedKey = JSON.stringify(key);
+  const nextSyntheticKey = `LSSNextSynthtic:${type}`;
+  const storedIndexKey = `LSSIndex:${type}${stringizedKey}`;
+  let nameToSyntheticRaw;
   try {
     nameToSyntheticRaw = storage.getItem(storedIndexKey);
   } catch (e) {
     // There is a bug in google chrome where localStorage becomes inaccessible.
     // Don't fast fail and break all applications. Defer the exception throwing to when the app actually uses localStorage
   }
-  var nameToSynthetic = nameToSyntheticRaw ? JSON.parse(nameToSyntheticRaw) : {};
+  let nameToSynthetic = nameToSyntheticRaw ? JSON.parse(nameToSyntheticRaw) : {};
 
   function persistSyntheticNameIndex() {
     // Persist the nameToSynthetic index
-    var stringizedIndex = JSON.stringify(nameToSynthetic);
+    const stringizedIndex = JSON.stringify(nameToSynthetic);
     storage.setItem(storedIndexKey, stringizedIndex);
   }
 
   function getSynthetic(name) {
-    var synthetic = nameToSynthetic[name];
+    let synthetic = nameToSynthetic[name];
     if (!synthetic) {
-      var nextSynthticRaw = storage.getItem(nextSyntheticKey);
-      var nextSynthetic = nextSynthticRaw ? Number(nextSynthticRaw) : 1;
+      const nextSynthticRaw = storage.getItem(nextSyntheticKey);
+      let nextSynthetic = nextSynthticRaw ? Number(nextSynthticRaw) : 1;
 
       synthetic = nextSynthetic++;
 
@@ -6271,7 +6269,7 @@ function SecureStorage(storage, type, key) {
   }
 
   function forgetSynthetic(name) {
-    var synthetic = getSynthetic(name);
+    const synthetic = getSynthetic(name);
     if (synthetic) {
       delete nameToSynthetic[name];
       persistSyntheticNameIndex();
@@ -6293,21 +6291,21 @@ function SecureStorage(storage, type, key) {
 
     getItem: {
       value: function(name) {
-        var synthetic = getSynthetic(name);
+        const synthetic = getSynthetic(name);
         return synthetic ? storage.getItem(synthetic) : null;
       }
     },
 
     setItem: {
       value: function(name, value) {
-        var synthetic = getSynthetic(name);
+        const synthetic = getSynthetic(name);
         storage.setItem(synthetic, value);
       }
     },
 
     removeItem: {
       value: function(name) {
-        var syntheticKey = getSynthetic(name);
+        const syntheticKey = getSynthetic(name);
         if (syntheticKey) {
           storage.removeItem(syntheticKey);
           forgetSynthetic(name);
@@ -6323,8 +6321,8 @@ function SecureStorage(storage, type, key) {
 
     clear: {
       value: function() {
-        Object.keys(nameToSynthetic).forEach(function(name) {
-          var syntheticKey = getSynthetic(name);
+        Object.keys(nameToSynthetic).forEach(name => {
+          const syntheticKey = getSynthetic(name);
           storage.removeItem(syntheticKey);
         });
 
@@ -6373,7 +6371,7 @@ function SecureStorage(storage, type, key) {
 // Only FireFox implements the correct behavior.
 
 function SecureURL(raw) {
-  var SecureURLMethods = Object.create(null, {
+  const SecureURLMethods = Object.create(null, {
     createObjectURL: {
       value: function(object) {
         if (Object.prototype.toString.call(object) === '[object Blob]') {
@@ -6400,7 +6398,7 @@ function SecureURL(raw) {
   return new Proxy(raw, {
     get: function(target, name) {
       // Give priority to the overritten methods.
-      var desc = Object.getOwnPropertyDescriptor(SecureURLMethods, name);
+      let desc = Object.getOwnPropertyDescriptor(SecureURLMethods, name);
       if (desc === undefined) {
         desc = Object.getOwnPropertyDescriptor(target, name);
       }
@@ -6438,14 +6436,14 @@ function SecureURL(raw) {
  * limitations under the License.
  */
 
-var addPropertiesHook;
+let addPropertiesHook;
 function registerAddPropertiesHook$$1(hook) {
   addPropertiesHook = hook;
 }
 
 // This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
 // which, by definition, do not provide authority or access to globals.
-var whitelist = [
+const whitelist = [
   // Accessible Intrinsics (not reachable by own property name traversal)
   // -> from ES5
   'ThrowTypeError',
@@ -7149,13 +7147,13 @@ const metadata$$1 = {
 };
 
 function SecureWindow(win, key) {
-  var o = getFromCache(win, key);
+  let o = getFromCache(win, key);
   if (o) {
     return o;
   }
 
   // Create prototype to allow basic object operations like hasOwnProperty etc
-  var emptyProto = {};
+  const emptyProto = {};
   // Do not treat window like a plain object, $A.util.isPlainObject() returns true if we leave the constructor intact
   emptyProto.constructor = null;
   Object.freeze(emptyProto);
@@ -7216,10 +7214,10 @@ function SecureWindow(win, key) {
     location: {
       enumerable: true,
       get: function() {
-        return SecureLocation(location, key);
+        return SecureLocation(win.location, key);
       },
       set: function(value) {
-        var ret = (location.href = value);
+        const ret = (win.location.href = value);
         return ret;
       }
     },
@@ -7238,21 +7236,19 @@ function SecureWindow(win, key) {
     rawArguments: true
   });
 
-  ['outerHeight', 'outerWidth'].forEach(function(name) {
-    SecureObject.addPropertyIfSupported(o, win, name);
-  });
+  ['outerHeight', 'outerWidth'].forEach(name => SecureObject.addPropertyIfSupported(o, win, name));
 
-  ['scroll', 'scrollBy', 'scrollTo'].forEach(function(name) {
-    SecureObject.addMethodIfSupported(o, win, name);
-  });
+  ['scroll', 'scrollBy', 'scrollTo'].forEach(name =>
+    SecureObject.addMethodIfSupported(o, win, name)
+  );
 
-  ['open'].forEach(function(name) {
+  ['open'].forEach(name =>
     SecureObject.addMethodIfSupported(o, win, name, {
       beforeCallback: function(url) {
         // If an url was provided to window.open()
         if (url) {
           // coerce argument to string and sanitize.
-          var urlString = sanitizeURLForElement(url);
+          const urlString = sanitizeURLForElement(url);
           // try to open only if we have a non-empty string
           if (urlString.length > 1) {
             if (!isValidURLScheme(urlString)) {
@@ -7263,26 +7259,26 @@ function SecureWindow(win, key) {
           }
         }
       }
-    });
-  });
+    })
+  );
 
   if ('FormData' in win) {
-    var formDataValueOverride;
+    let formDataValueOverride;
     Object.defineProperty(o, 'FormData', {
       get: function() {
         return (
           formDataValueOverride ||
           function() {
-            var args = SecureObject.ArrayPrototypeSlice.call(arguments);
+            const args = SecureObject.ArrayPrototypeSlice.call(arguments);
             // make sure we have access to any <form> passed in to constructor
-            var form;
+            let form;
             if (args.length > 0) {
               form = args[0];
               verifyAccess(o, form);
             }
 
-            var rawArgs = form ? [getRef(form, getKey(form))] : [];
-            var cls = win['FormData'];
+            const rawArgs = form ? [getRef(form, getKey(form))] : [];
+            const cls = win['FormData'];
             if (typeof cls === 'function') {
               return new (Function.prototype.bind.apply(
                 window['FormData'],
@@ -7300,13 +7296,13 @@ function SecureWindow(win, key) {
   }
 
   if ('Notification' in win) {
-    var notificationValueOverride;
+    let notificationValueOverride;
     Object.defineProperty(o, 'Notification', {
       get: function() {
         if (notificationValueOverride) {
           return notificationValueOverride;
         }
-        var notification = SecureNotification(key);
+        const notification = SecureNotification(key);
         if ('requestPermission' in win['Notification']) {
           Object.defineProperty(notification, 'requestPermission', {
             enumerable: true,
@@ -7329,18 +7325,19 @@ function SecureWindow(win, key) {
     });
   }
 
-  ['Blob', 'File'].forEach(function(name) {
+  ['Blob', 'File'].forEach(name => {
     if (name in win) {
-      var valueOverride;
+      let valueOverride;
       Object.defineProperty(o, name, {
         get: function() {
           return (
             valueOverride ||
             function() {
-              var cls = win[name],
-                result,
-                args = Array.prototype.slice.call(arguments);
-              var scriptTagsRegex = /<script[\s\S]*?>[\s\S]*?<\/script[\s]*?>/gi;
+              const cls = win[name];
+              const args = Array.prototype.slice.call(arguments);
+              let result;
+
+              const scriptTagsRegex = /<script[\s\S]*?>[\s\S]*?<\/script[\s]*?>/gi;
               if (scriptTagsRegex.test(args[0])) {
                 throw new error(`${name} creation failed: <script> tags are blocked`);
               }
@@ -7381,14 +7378,15 @@ function SecureWindow(win, key) {
   addEventTargetMethods(o, win, key);
 
   // Has to happen last because it depends on the secure getters defined above that require the object to be keyed
-  whitelist.forEach(function(name) {
+  whitelist.forEach(
     // These are direct passthrough's and should never be wrapped in a SecureObject
-    Object.defineProperty(o, name, {
-      enumerable: true,
-      writable: true,
-      value: win[name]
-    });
-  });
+    name =>
+      Object.defineProperty(o, name, {
+        enumerable: true,
+        writable: true,
+        value: win[name]
+      })
+  );
 
   if (addPropertiesHook) {
     addPropertiesHook(o, win, key);
@@ -7420,9 +7418,9 @@ function SecureWindow(win, key) {
  */
 
 function SecureRTCPeerConnection(raw, key) {
-  var SecureConstructor = function(configuration) {
-    var rtc = new raw(configuration);
-    var o = Object.create(null, {
+  const SecureConstructor = function(configuration) {
+    const rtc = new raw(configuration);
+    const o = Object.create(null, {
       toString: {
         value: function() {
           return `SecureRTCPeerConnection: ${rtc}{ key: ${JSON.stringify(key)} }`;
@@ -7431,10 +7429,10 @@ function SecureRTCPeerConnection(raw, key) {
     });
     setRef(o, rtc, key);
     // Reference to the original event target functions
-    var originalAddEventListener = rtc['addEventListener'];
-    var originalDispatchEvent = rtc['dispatchEvent'];
-    var originalRemoveEventListener = rtc['removeEventListener'];
-    var options = { rawArguments: true };
+    const originalAddEventListener = rtc['addEventListener'];
+    const originalDispatchEvent = rtc['dispatchEvent'];
+    const originalRemoveEventListener = rtc['removeEventListener'];
+    const options = { rawArguments: true };
     // Override the event target functions to handled wrapped arguments
     Object.defineProperties(rtc, {
       addEventListener: {
@@ -7443,11 +7441,11 @@ function SecureRTCPeerConnection(raw, key) {
           if (!callback) {
             return;
           }
-          var sCallback = getFromCache(callback, key);
+          let sCallback = getFromCache(callback, key);
           if (!sCallback) {
             sCallback = function(e) {
               verifyAccess(o, callback, true);
-              var se = SecureDOMEvent(e, key);
+              const se = SecureDOMEvent(e, key);
               callback.call(o, se);
             };
             addToCache(callback, sCallback, key);
@@ -7460,8 +7458,8 @@ function SecureRTCPeerConnection(raw, key) {
         enumerable: true,
         writable: true,
         value: function() {
-          var filteredArgs = SecureObject.filterArguments(o, arguments, options);
-          var fnReturnedValue = originalDispatchEvent.apply(rtc, filteredArgs);
+          const filteredArgs = SecureObject.filterArguments(o, arguments, options);
+          let fnReturnedValue = originalDispatchEvent.apply(rtc, filteredArgs);
           if (options && options.afterCallback) {
             fnReturnedValue = options.afterCallback(fnReturnedValue);
           }
@@ -7471,7 +7469,7 @@ function SecureRTCPeerConnection(raw, key) {
       removeEventListener: {
         writable: true,
         value: function(type, listener, removeOption) {
-          var sCallback = getFromCache(listener, key);
+          const sCallback = getFromCache(listener, key);
           originalRemoveEventListener.call(rtc, type, sCallback, removeOption);
         }
       }
@@ -7533,7 +7531,7 @@ function SecureEngine(engine) {
  */
 
 function SecureAura(AuraInstance, key) {
-  var o = getFromCache(AuraInstance, key);
+  let o = getFromCache(AuraInstance, key);
   if (o) {
     return o;
   }
@@ -7544,12 +7542,12 @@ function SecureAura(AuraInstance, key) {
      * new security holes.
      */
   function deepUnfilterArgs(baseObject, members) {
-    var value;
-    for (var property in members) {
+    let value;
+    for (const property in members) {
       value = members[property];
       if (value !== undefined && value !== null) {
         if (Array.isArray(value) || isPlainObject(value)) {
-          var branchValue = baseObject[property];
+          const branchValue = baseObject[property];
           baseObject[property] = deepUnfilterArgs(branchValue, value);
           continue;
         }
@@ -7562,8 +7560,8 @@ function SecureAura(AuraInstance, key) {
     return baseObject;
   }
 
-  var su = Object.create(null);
-  var sls = Object.create(null);
+  const su = Object.create(null);
+  const sls = Object.create(null);
   o = Object.create(null, {
     util: {
       writable: true,
@@ -7593,12 +7591,12 @@ function SecureAura(AuraInstance, key) {
       writable: true,
       value: function(type, attributes, callback) {
         // copy attributes before modifying so caller does not see unfiltered results
-        var attributesCopy = AuraInstance.util.apply({}, attributes, true, true);
-        var filteredArgs =
+        const attributesCopy = AuraInstance.util.apply({}, attributes, true, true);
+        const filteredArgs =
           attributes && AuraInstance.util.isObject(attributes)
             ? deepUnfilterArgs(attributesCopy, attributes)
             : attributes;
-        var fnReturnedValue = AuraInstance.createComponent(
+        const fnReturnedValue = AuraInstance.createComponent(
           type,
           filteredArgs,
           SecureObject.filterEverything(o, callback)
@@ -7611,20 +7609,20 @@ function SecureAura(AuraInstance, key) {
       enumerable: true,
       writable: true,
       value: function(components, callback) {
-        var filteredComponents = [];
+        let filteredComponents = [];
         if (Array.isArray(components)) {
-          for (var i = 0; i < components.length; i++) {
-            var filteredComponent = [];
+          for (let i = 0; i < components.length; i++) {
+            const filteredComponent = [];
             filteredComponent[0] = components[i][0];
             // copy attributes before modifying so caller does not see unfiltered results
-            var attributesCopy = AuraInstance.util.apply({}, components[i][1], true, true);
+            const attributesCopy = AuraInstance.util.apply({}, components[i][1], true, true);
             filteredComponent[1] = deepUnfilterArgs(attributesCopy, components[i][1]);
             filteredComponents.push(filteredComponent);
           }
         } else {
           filteredComponents = components;
         }
-        var fnReturnedValue = AuraInstance.createComponents(
+        const fnReturnedValue = AuraInstance.createComponents(
           filteredComponents,
           SecureObject.filterEverything(o, callback)
         );
@@ -7634,18 +7632,16 @@ function SecureAura(AuraInstance, key) {
   });
 
   // SecureAura methods and properties
-  ['enqueueAction'].forEach(function(name) {
+  ['enqueueAction'].forEach(name =>
     Object.defineProperty(
       o,
       name,
       SecureObject.createFilteredMethod(o, AuraInstance, name, { rawArguments: true })
-    );
-  });
+    )
+  );
 
   ['get', 'getComponent', 'getReference', 'getRoot', 'log', 'reportError', 'warning'].forEach(
-    function(name) {
-      Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name));
-    }
+    name => Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name))
   );
 
   setRef(o, AuraInstance, key);
@@ -7653,22 +7649,21 @@ function SecureAura(AuraInstance, key) {
 
   // SecureUtil: creating a proxy for $A.util
   ['getBooleanValue', 'isArray', 'isEmpty', 'isObject', 'isUndefined', 'isUndefinedOrNull'].forEach(
-    function(name) {
+    name =>
       Object.defineProperty(
         su,
         name,
         SecureObject.createFilteredMethod(su, AuraInstance['util'], name)
-      );
-    }
+      )
   );
   // These methods in Util deal with raw objects like components, so mark them as such
-  ['addClass', 'hasClass', 'removeClass', 'toggleClass'].forEach(function(name) {
+  ['addClass', 'hasClass', 'removeClass', 'toggleClass'].forEach(name =>
     Object.defineProperty(
       su,
       name,
       SecureObject.createFilteredMethod(su, AuraInstance['util'], name, { rawArguments: true })
-    );
-  });
+    )
+  );
 
   setRef(su, AuraInstance['util'], key);
   Object.seal(su);
@@ -7723,13 +7718,13 @@ function SecureAura(AuraInstance, key) {
     'translateToOtherCalendar',
     'UTCToWallTime',
     'WallTimeToUTC'
-  ].forEach(function(name) {
+  ].forEach(name =>
     Object.defineProperty(
       sls,
       name,
       SecureObject.createFilteredMethod(sls, AuraInstance['localizationService'], name)
-    );
-  });
+    )
+  );
 
   setRef(sls, AuraInstance['localizationService'], key);
   Object.seal(sls);
@@ -7757,7 +7752,7 @@ function SecureAura(AuraInstance, key) {
  */
 
 function SecureAuraAction(action, key) {
-  var o = getFromCache(action, key);
+  let o = getFromCache(action, key);
   if (o) {
     return o;
   }
@@ -7813,7 +7808,7 @@ function SecureAuraAction(action, key) {
  */
 
 function SecureAuraEvent(event, key) {
-  var o = getFromCache(event, key);
+  let o = getFromCache(event, key);
   if (o) {
     return o;
   }
@@ -7824,8 +7819,8 @@ function SecureAuraEvent(event, key) {
    * wrappers, but any callbacks back into the original Locker have their arguments properly filtered.
    */
   function deepUnfilterMethodArguments(baseObject, members) {
-    var value;
-    for (var property in members) {
+    let value;
+    for (const property in members) {
       value = members[property];
       if (Array.isArray(value)) {
         value = deepUnfilterMethodArguments([], value);
@@ -7833,12 +7828,12 @@ function SecureAuraEvent(event, key) {
         value = deepUnfilterMethodArguments({}, value);
       } else if (typeof value !== 'function') {
         if (value) {
-          var key = getKey(value);
+          const key = getKey(value);
           if (key) {
             value = getRef(value, key) || value;
           }
         }
-        //If value is a plain object, we need to deep unfilter
+        // If value is a plain object, we need to deep unfilter
         if (isPlainObject(value)) {
           value = deepUnfilterMethodArguments({}, value);
         }
@@ -7860,7 +7855,7 @@ function SecureAuraEvent(event, key) {
       writable: true,
       enumerable: true,
       value: function(config) {
-        var unfiltered = deepUnfilterMethodArguments({}, config);
+        const unfiltered = deepUnfilterMethodArguments({}, config);
         event['setParams'](unfiltered);
         return o;
       }
@@ -7869,7 +7864,7 @@ function SecureAuraEvent(event, key) {
       writable: true,
       enumerable: true,
       value: function(property, value) {
-        var unfiltered = deepUnfilterMethodArguments({}, { value: value }).value;
+        const unfiltered = deepUnfilterMethodArguments({}, { value: value }).value;
         event['setParam'](property, unfiltered);
       }
     }
@@ -7889,9 +7884,9 @@ function SecureAuraEvent(event, key) {
     'stopPropagation',
     'getType',
     'getEventType'
-  ].forEach(function(name) {
-    Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name));
-  });
+  ].forEach(name =>
+    Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name))
+  );
 
   setRef(o, event, key);
   addToCache(event, o, key);
@@ -7943,7 +7938,7 @@ function registerAuraAPI(api) {
  */
 
 function SecureAuraComponent(component, key) {
-  var o = getFromCache(component, key);
+  let o = getFromCache(component, key);
   if (o) {
     return o;
   }
@@ -7954,13 +7949,13 @@ function SecureAuraComponent(component, key) {
       writable: true,
       enumerable: true,
       value: function(name) {
-        var path = name.split('.');
+        const path = name.split('.');
         // protection against `cmp.get('c')`
         if (typeof path[1] !== 'string' || path[1] === '') {
           throw new SyntaxError(`Invalid key ${name}`);
         }
 
-        var value = component['get'](name);
+        const value = component['get'](name);
         if (!value) {
           return value;
         }
@@ -7975,7 +7970,7 @@ function SecureAuraComponent(component, key) {
       writable: true,
       enumerable: true,
       value: function(name) {
-        var event = component['getEvent'](name);
+        const event = component['getEvent'](name);
         if (!event) {
           return event;
         }
@@ -8029,11 +8024,11 @@ function SecureAuraComponent(component, key) {
   });
 
   // The shape of the component depends on the methods exposed in the definitions:
-  var methodsNames = getPublicMethodNames(component);
+  const methodsNames = getPublicMethodNames(component);
   if (methodsNames && methodsNames.length) {
-    methodsNames.forEach(function(methodName) {
-      SecureObject.addMethodIfSupported(o, component, methodName, { defaultKey: key });
-    });
+    methodsNames.forEach(methodName =>
+      SecureObject.addMethodIfSupported(o, component, methodName, { defaultKey: key })
+    );
   }
 
   setRef(o, component, key);
@@ -8060,7 +8055,7 @@ function SecureAuraComponent(component, key) {
  */
 
 function SecureAuraComponentRef(component, key) {
-  var o = getFromCache(component, key);
+  let o = getFromCache(component, key);
   if (o) {
     return o;
   }
@@ -8110,8 +8105,8 @@ function SecureAuraComponentRef(component, key) {
    * wrappers, but any callbacks back into the original Locker have their arguments properly filtered.
    */
   function deepUnfilterMethodArguments(baseObject, members) {
-    var value;
-    for (var property in members) {
+    let value;
+    for (const property in members) {
       value = members[property];
       if (Array.isArray(value)) {
         value = deepUnfilterMethodArguments([], value);
@@ -8119,12 +8114,12 @@ function SecureAuraComponentRef(component, key) {
         value = deepUnfilterMethodArguments({}, value);
       } else if (typeof value !== 'function') {
         if (value) {
-          var key = getKey(value);
+          const key = getKey(value);
           if (key) {
             value = getRef(value, key) || value;
           }
         }
-        //If value is a plain object, we need to deep unfilter
+        // If value is a plain object, we need to deep unfilter
         if (isPlainObject(value)) {
           value = deepUnfilterMethodArguments({}, value);
         }
@@ -8136,11 +8131,11 @@ function SecureAuraComponentRef(component, key) {
     return baseObject;
   }
 
-  var methodsNames = getPublicMethodNames(component);
+  const methodsNames = getPublicMethodNames(component);
   if (methodsNames && methodsNames.length) {
     // If SecureAuraComponentRef is an unlockerized component, then let it
     // have access to raw arguments
-    var methodOptions = {
+    const methodOptions = {
       defaultKey: key,
       unfilterEverything: !requireLocker(component)
         ? function(args) {
@@ -8149,9 +8144,9 @@ function SecureAuraComponentRef(component, key) {
         : undefined
     };
 
-    methodsNames.forEach(function(methodName) {
-      SecureObject.addMethodIfSupported(o, component, methodName, methodOptions);
-    });
+    methodsNames.forEach(methodName =>
+      SecureObject.addMethodIfSupported(o, component, methodName, methodOptions)
+    );
   }
 
   // DCHASMAN TODO Workaround for ui:button redefining addHandler using aura:method!!!
@@ -8183,7 +8178,7 @@ function SecureAuraComponentRef(component, key) {
  */
 
 function SecureAuraPropertyReferenceValue(prv, key) {
-  var o = getFromCache(prv, key);
+  let o = getFromCache(prv, key);
   if (o) {
     return o;
   }
@@ -8251,10 +8246,11 @@ function registerAuraTypes(types) {
 const service = {
   piercing: (component, data, def, context, target, key, value, callback) => {
     if (value === EventTarget.prototype.dispatchEvent && SecureObject.isDOMElementOrNode(target)) {
-      /** See if target represents a lockerized module
+      /**
+       * See if target represents a lockerized module
        * Else look up the key by the class.
        * If found, get the SecureWindow for that key
-       **/
+       */
       let lsKey = getKey(target);
       if (!lsKey) {
         const Ctor = component.constructor;

@@ -336,6 +336,9 @@
         testUtils.assertEquals(JSON.stringify(Object.keys(o)), JSON.stringify(Object.keys(po)));
 
         delete po.expando;
+        po.writableProperty = "123";
+        delete po.configurableProperty;
+        delete po.configurableWritableProperty;
 
         testUtils.assertEquals(JSON.stringify(Object.keys(o)), JSON.stringify(Object.keys(po)));
     }

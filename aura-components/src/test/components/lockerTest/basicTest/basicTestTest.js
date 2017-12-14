@@ -226,21 +226,43 @@
             var o = Object.create(TestPrototype.prototype, {
             	someProperty: {
             		configurable: true,
+                // writable: false (default)
             		enumerable: true,
             		value: "somePropertyValue",
             	},
 
             	nonEnumerableProperty: {
             		configurable: true,
+                // writable: false (default)
             		value: "nonEnumerablePropertyValue",
             	},
 
             	foo: {
+                // configurable: false (default)
+                // writable: false (default)
             		enumerable: true,
             		value: function() {
             			return "fooValue";
             		}
-            	}
+            	},
+
+              configurableProperty: {
+                configurable: true,
+                // writable: false (default)
+                value: "configurableProperty",
+              },
+
+              writableProperty: {
+                // configurable: false (default)
+                writable: true,
+                value: "writablePropertyValue",
+              },
+
+              configurableWritableProperty: {
+                configurable: true,
+                writable: true,
+                value: "configurableWritablePropertyValue",
+              },
             });
 
             var otherNamespace = cmp.find("otherNamespace");

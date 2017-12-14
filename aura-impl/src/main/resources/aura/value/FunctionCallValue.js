@@ -22,7 +22,7 @@
 function FunctionCallValue(config, valueProvider){
     this.valueProvider = valueProvider;
     this.byValue = config["byValue"];
-    this.code = $A.util.globalEval(config["code"]);
+    this.code = (0, eval)('('+config["code"]+')');
     this.context = $A.clientService.currentAccess;
 
     this.args = [];
@@ -65,7 +65,7 @@ FunctionCallValue.prototype.evaluate = function(valueProvider){
         var result = this.code.call(null, valueProvider || this.valueProvider, this.expressionFunctions);
         if(!this.hasOwnProperty("result")){
             this["result"]=result;
-        }    
+        }
         return result;
     } finally {
         $A.clientService.releaseCurrentAccess();

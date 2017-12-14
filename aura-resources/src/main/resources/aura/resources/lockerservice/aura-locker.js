@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-12-13
- * Version: 0.3.3
+ * Generated: 2017-12-14
+ * Version: 0.3.4
  */
 
 (function (global, factory) {
@@ -3983,20 +3983,37 @@ const filteringProxyHandler = (function() {
   };
 
   FilteringProxyHandler.prototype['getOwnPropertyDescriptor'] = function(target, property) {
-    const raw = getRef(target, getKey(target));
-    const descriptor = Object.getOwnPropertyDescriptor(raw, property);
-
-    // If the descriptor is for a non-configurable property we need to shadow it directly on the surrogate
-    // to avoid proxy invariant violations
-    if (
-      descriptor &&
-      !descriptor.configurable &&
-      !Object.getOwnPropertyDescriptor(target, property)
-    ) {
-      Object.defineProperty(target, property, descriptor);
+    // If the property is non-writable and non-configurable, there is nothing to do.
+    const targetDescriptor = Object.getOwnPropertyDescriptor(target, property);
+    if (targetDescriptor && !targetDescriptor.configurable && !targetDescriptor.writable) {
+      return targetDescriptor;
     }
 
-    return descriptor;
+    // Always get the descriptor of the raw object.
+    const raw = getRef(target, getKey(target));
+    const rawDescriptor = Object.getOwnPropertyDescriptor(raw, property);
+    if (rawDescriptor) {
+      // Always filter the descriptor value.
+      if (rawDescriptor.hasOwnProperty('value')) {
+        rawDescriptor.value = SecureObject.filterEverything(target, rawDescriptor.value);
+      }
+
+      // Always remove from the surrogate (and redefine if necessary).
+      if (targetDescriptor) {
+        Reflect.deleteProperty(target, property);
+      }
+
+      // Use the surrogate to preserve invariants.
+      // Only non-configurable properties are verified against the target.
+      if (!rawDescriptor.configurable) {
+        Object.defineProperty(target, property, rawDescriptor);
+      }
+    } else if (targetDescriptor) {
+      // Update the surrogate when the property is no longer on raw.
+      Reflect.deleteProperty(target, property);
+    }
+
+    return rawDescriptor;
   };
 
   FilteringProxyHandler.prototype['isExtensible'] = function(target) {
@@ -4012,18 +4029,9 @@ const filteringProxyHandler = (function() {
   return Object.freeze(new FilteringProxyHandler());
 })();
 
-// Prototype to make debugging and identification of direct exposure of the surrogate (should not happen) easier
-function FilteringProxySurrogate(actual) {
-  // For debugging usability only
-  Object.defineProperty(this, '$actual$', {
-    value: actual,
-    configurable: true
-  });
-}
-
 SecureObject.createFilteringProxy = function(raw, key) {
   // Use a direct proxy on raw to a proxy on {} to avoid the Proxy invariants for non-writable, non-configurable properties
-  const surrogate = new FilteringProxySurrogate(raw);
+  const surrogate = Object.create(Object.getPrototypeOf(raw));
   setRef(surrogate, raw, key);
 
   const rawKey = getKey(raw);

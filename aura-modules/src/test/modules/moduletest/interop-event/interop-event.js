@@ -2,7 +2,7 @@ import { Element } from "engine";
 
 export default class InteropEvent extends Element {
     @api removeCallback;
-    @api onClickHandler;
+    @api clickHandler;
     @track removePrevented = '';
 
     handleClick() {
@@ -25,6 +25,6 @@ export default class InteropEvent extends Element {
     }
 
     handleClickWithCallback(evt) {
-        this.onClickHandler({ domEvent: evt });
+        this.clickHandler({ domEvent: evt });
     }
 }

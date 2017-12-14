@@ -24,6 +24,6 @@
     <moduleTest:interopEvent aura:id="paramTests"
                              onremove="{!c.handleRemoveCustomEvent}"
                              removeCallback="{!c.handleRemoveCallback}"
-                             onClickHandler="{!c.handleRemoveCallback}"
+                             clickHandler="{!c.handleRemoveCallback}"
     />
 </aura:component>

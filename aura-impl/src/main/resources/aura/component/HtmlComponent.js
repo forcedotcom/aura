@@ -152,6 +152,11 @@ function HtmlComponent(config, localCreation) {
     if (forcedPath && act && this.creationPath) {
         act.releaseCreationPath(this.creationPath);
     }
+
+    var tag = this.attributeSet.getValue("tag");
+    if (!$A.util.isUndefinedOrNull(tag)) {
+        this.componentDef.getHelper().validateTagName(tag);
+    }
 }
 
 HtmlComponent.prototype = Object.create(Component.prototype);
@@ -230,10 +235,7 @@ HtmlComponent.prototype["renderer"] = {
         if ($A.util.isUndefinedOrNull(tag)) {
             throw new Error("Undefined tag attribute for " + component.getGlobalId());
         }
-
-        if(!helper.ALLOWED_TAGS.hasOwnProperty(tag) && !helper.ALLOWED_TAGS.hasOwnProperty(tag.toLowerCase())){
-            throw new Error("The HTML tag '"+tag+"' is not allowed.");
-        }
+        helper.validateTagName(tag);
 
         var HTMLAttributes = component.attributeSet.getValue("HTMLAttributes");
 
@@ -520,6 +522,12 @@ HtmlComponent.prototype["helper"] = {
         "hashHandler": "fcHashHandler"
     },
 
+    validateTagName: function(tagName) {
+        if (!this.ALLOWED_TAGS.hasOwnProperty(tagName) && !this.ALLOWED_TAGS.hasOwnProperty(tagName.toLowerCase())){
+            throw new Error("The HTML tag '" + tagName + "' is not allowed.");
+        }
+    },
+    
     caseAttribute: function (attribute) {
         return this.SPECIAL_CASINGS[attribute] || attribute;
     },

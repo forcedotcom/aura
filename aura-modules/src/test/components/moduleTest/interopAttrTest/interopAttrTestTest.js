@@ -264,5 +264,20 @@
                 $A.test.assertEquals('', actual, 'After setting the nullTest attribute to undefined the rendered text should be empty');
             }
         ]
+    },
+
+    testReadOnlyAttrUpdatesWhenItsDependentChanged: {
+        test: [
+            function(cmp) {
+                var target = cmp.find('input');
+                var myValidity = cmp.get('v.myValidity');
+                $A.test.assertEquals('', myValidity);
+
+                target.set('v.value', 'foo');
+
+                myValidity = cmp.get('v.myValidity');
+                $A.test.assertEquals('foo', myValidity);
+            }
+        ]
     }
 })

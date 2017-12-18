@@ -52,6 +52,7 @@ function InteropComponent(config) {
     }
 
     this.attributes = this.setupAttributes(config['attributes']);
+    this.updateReadOnlyBoundProps = [];
     this.setupMethods();
 }
 
@@ -226,8 +227,18 @@ InteropComponent.prototype.attributeChange = function (key, value) {
             this.setGlobalAttribute(element, key, value);
         } else if (!this.isReadOnlyProperty(propName)) { // we ignore changes on read only properties
             element[propName] =  value;
+            this.rehydrateBoundReadOnlyProps();
         }
     }
+};
+
+/**
+ * re-hydrate each read-only prop that is bound to an attribute (expression)
+ */
+InteropComponent.prototype.rehydrateBoundReadOnlyProps = function() {
+    this.updateReadOnlyBoundProps.forEach(function (func) {
+        func();
+    });
 };
 
 
@@ -431,9 +442,19 @@ InteropComponent.prototype.setupInteropInstance = function () {
             element.addEventListener(attrName.substring(2), value, false);
         } else if (!propName && this.isHtmlGlobalAttr(attrName)) { // first check we are not overriding this attrName
             this.setGlobalAttribute(element, attrName, value);
-        } else if (!cmp.isReadOnlyProperty(propName)) { // Don't throw when they set value on the template to some read only prop
-            if (value !== undefined) {
-                element[propName] = value;
+        } else {
+            if (!cmp.isReadOnlyProperty(propName)) { // Don't throw when they set value on the template to some read only prop
+                if (value !== undefined) {
+                    element[propName] = value;
+                }
+            } else {
+                // bookkeeping readonly bound properties so that we can rehydrate them when attribute changed
+                var attribute = this.propNameToAttrMap[propName];
+                if ($A.util.isExpression(this.attributes[attribute])) {
+                    this.updateReadOnlyBoundProps.push(function () {
+                        cmp.set("v." + attribute, element[propName]);
+                    });
+                }
             }
         }
     }.bind(this));

@@ -238,10 +238,8 @@
                                 <failIfNoTests>false</failIfNoTests>
                                 <runOrder>random</runOrder>
                                 <trimStackTrace>false</trimStackTrace>
-                                <argLine>-Djava.io.tmpdir=${java.io.tmpdir}</argLine>
                                 <systemPropertyVariables>
                                     <config>${config}</config>
-                                    <java.io.tmpdir>${java.io.tmpdir}</java.io.tmpdir>
                                     <jetty.port>${jetty.port}</jetty.port>
                                     <jetty.resources>${jetty.resources}</jetty.resources>
                                     <jetty.spawn>${jetty.spawn}</jetty.spawn>
@@ -644,10 +642,8 @@
                             <classpathDependencyExcludes>
                                 <classpathDependencyScopeExclude>compile</classpathDependencyScopeExclude>
                             </classpathDependencyExcludes>
-                            <argLine>-Djava.io.tmpdir=${java.io.tmpdir}</argLine>
                             <systemPropertyVariables>
                                 <config>${config}</config>
-                                <java.io.tmpdir>${java.io.tmpdir}</java.io.tmpdir>
                                 <jetty.port>${jetty.port}</jetty.port>
                                 <jetty.resources>${jetty.resources}</jetty.resources>
                                 <jetty.spawn>${jetty.spawn}</jetty.spawn>

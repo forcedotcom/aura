@@ -35,7 +35,6 @@
     <properties>
         <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
         <aura.home>${basedir}</aura.home>
-        <java.io.tmpdir>${project.build.directory}${file.separator}tmp</java.io.tmpdir>
         <debug>true</debug>
         <skipUnitTests>false</skipUnitTests>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -752,12 +751,11 @@
                             <exclude>**/*IntegrationTest.java</exclude>
                         </excludes>
                         <runOrder>random</runOrder>
-                        <argLine>-Xmx512m -Djava.io.tmpdir=${java.io.tmpdir}</argLine>
+                        <argLine>-Xmx512m</argLine>
                         <systemPropertyVariables>
                             <config>${config}</config>
                             <aura.home>${aura.home}</aura.home>
                             <user.timezone>GMT</user.timezone>
-                            <java.io.tmpdir>${java.io.tmpdir}</java.io.tmpdir>
                         </systemPropertyVariables>
                     </configuration>
                     <dependencies>

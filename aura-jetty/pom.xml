@@ -196,10 +196,6 @@
                             <value>${webdriver.timeout}</value>
                         </systemProperty>
                         <systemProperty>
-                            <name>java.io.tmpdir</name>
-                            <value>${java.io.tmpdir}</value>
-                        </systemProperty>
-                        <systemProperty>
                             <name>screenshots.directory</name>
                             <value>${screenshots.directory}</value>
                         </systemProperty>
@@ -235,7 +231,6 @@
                 <plugins>
                     <plugin>
                         <groupId>org.eclipse.jetty</groupId>
-                        <artifactId>jetty-maven-plugin</artifactId>
                         <version>${jetty.version}</version>
                         <configuration>
                             <systemProperties>

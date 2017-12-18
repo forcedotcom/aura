@@ -13,112 +13,181 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({	
-	/**
-	 * Set tag attribute to a valid tag with valid attributes for that tag. 
-	 */
-	testValidTag: {
-		test: function(component){
-			var tag = component.find('atag').getElement();
-			$A.test.assertNotNull(tag, "Valid tag not found");
-			$A.test.assertEquals("a", tag.tagName.toLowerCase(), "Tag name of valid tag is incorrect");
-			
-			var hrefValue = tag.getAttribute("href");
-			$A.test.assertNotNull(hrefValue, "Did not find href on valid tag");
+({    
+    /**
+     * Set tag attribute to a valid tag with valid attributes for that tag. 
+     */
+    testValidTag: {
+        test: function(component){
+            var tag = component.find('atag').getElement();
+            $A.test.assertNotNull(tag, "Valid tag not found");
+            $A.test.assertEquals("a", tag.tagName.toLowerCase(), "Tag name of valid tag is incorrect");
+            
+            var hrefValue = tag.getAttribute("href");
+            $A.test.assertNotNull(hrefValue, "Did not find href on valid tag");
             $A.test.assertTrue(aura.test.contains(hrefValue, "www.salesforce.com"), "Href value incorrect on valid tag");
-		}
-	},
-	
-	/**
-	 * For a valid tag set an invalid attribute for that tag. 
-	 */
-	testInvalidAttributes: {
-		test: function(component){
-			var tag = component.find("atagInvalidAttr").getElement();
-			$A.test.assertNotNull(tag, "Valid tag with invalid attributes not found");
-			
-			var abcValue = tag["abc"];
-			$A.test.assertNotNull(abcValue, "Did not find invalid attribute on a valid tag");
-			$A.test.assertEquals("www.salesforce.com", abcValue, "Invalid attribute value on a valid tag is incorrect");
-		}
-	},
-	
-	/**
-	 * Do not set any attributes for a valid html tag that has attirbutes. 
-	 */
-	testTagWithNoAttributes: {
-		test: function(component){
-			var tag = component.find("noAttr").getElement();		
-			$A.test.assertNotNull(tag, "Tag with no attributes not found");
-		}
-	},
-	
-	/*
-	 * TODO : @auraframework - uncommment after bug W-1538537 
-	 */
-	/**
-	 * Set tag attribute to a html tag that is not supported by aura.
-	 */
-	_testUnsupportedTag: {
-		test: function(component){
-			var tag = component.find("objecttag").getElement();		
-			$A.test.assertNull(tag, "Unsupported tag should NOT have rendered");
-		}
-	},
+        }
+    },
+    
+    /**
+     * For a valid tag set an invalid attribute for that tag. 
+     */
+    testInvalidAttributes: {
+        test: function(component){
+            var tag = component.find("atagInvalidAttr").getElement();
+            $A.test.assertNotNull(tag, "Valid tag with invalid attributes not found");
+            
+            var abcValue = tag["abc"];
+            $A.test.assertNotNull(abcValue, "Did not find invalid attribute on a valid tag");
+            $A.test.assertEquals("www.salesforce.com", abcValue, "Invalid attribute value on a valid tag is incorrect");
+        }
+    },
+    
+    /**
+     * Do not set any attributes for a valid html tag that has attirbutes. 
+     */
+    testTagWithNoAttributes: {
+        test: function(component){
+            var tag = component.find("noAttr").getElement();        
+            $A.test.assertNotNull(tag, "Tag with no attributes not found");
+        }
+    },
+    
 
-	/*
-	 * TODO : @auraframework - uncommment after bug W-1538537
-	 */
-	/**
-	 * Set tag attribute to a non-existing html tag.
-	 */
-	_testInvalidTag: {
-		test: function(component){
-			var tag = component.find("invalidtag").getElement();	
-			$A.test.assertNull(tag, "Invlaid tag should NOT have rendered");
-		}
-	},
+    testCreateIframeWithSrcdocNotAllowed : {
+        browsers: ["-IE7", "-IE8", "-IE9", "-IE10", "-IE11"],
+        test : [
+            function(component) {
+                $A.createComponent(
+                    "aura:html",
+                    {
+                        "aura:id" : "iframewithscript",
+                        "tag" : "iframe",
+                        "HTMLAttributes" : {
+                            "srcdoc" : "<script src='https://www.salesforce.com/someExternalScript'></script>"
+                        }
+                    }, function(newButton) {
+                        var target = component.find("target");
+                        var body = target.get("v.body");
+                        body.push(newButton);
+                        target.set("v.body", body);
+                    }
+                );
+            },
+            function(component) {
+                var created = component.find("iframewithscript")
+                        .getElement();
+                $A.test.assertEquals(false, created.hasAttribute("srcdoc"),
+                        "iframe 'srcdoc' attribute should not be set");
+            }
+        ]
+    },
 
-	/**
-	 * Use mismatched case for tag name
-	 */
-	testMixedCaseTag: {
-		test: function(component){
-			var tag = component.find("mixedCaseHtmlElement").getElement();
-			$A.test.assertNotNull(tag, "mismatched case tag should have rendered");
-			$A.createComponent("aura:html", {"tag":"DiV"}, function(cmp) {
-				$A.test.assertNotNull(cmp, "mismatched case tag should have been created");
-			})
-		}
-	},
-	
-	/**
-	 * Do not set tag attributes on html component.
-	 * W-1538544
-	 */
-	// auraErrorsExpectedDuringInit is not supported.
-	_testTagNotSet: {
-	    auraErrorsExpectedDuringInit:["Undefined tag attribute for", "Undefined tag attribute for", "Undefined tag attribute for"],
-	    attributes:{testNoTagAttr:true},
-	    	test: function(component){
+    testCreateIframeWithSrcdocAllowed : {
+        browsers: ["-IE7", "-IE8", "-IE9", "-IE10", "-IE11"],
+        test : [
+            function(component) {
+                var action = component.get("c.setSrcdocContextValue");
+                action.setParams({ value: true });
+                action.setCallback(this, function(){
+                    $A.createComponent(
+                        "aura:html",
+                        {
+                            "aura:id" : "iframewithscript",
+                            "tag" : "iframe",
+                            "HTMLAttributes" : {
+                                "srcdoc" : "<script src='https://www.salesforce.com/someExternalScript'></script>"
+                            }
+                        }, function(newButton) {
+                            var target = component.find("target");
+                            var body = target.get("v.body");
+                            body.push(newButton);
+                            target.set("v.body", body);
+                        }
+                    );
+                });
+                $A.enqueueAction(action);
+                $A.test.addWaitFor(true, function(){
+                    var created = component.find("iframewithscript");
+                    return created && !!created.getElement();
+                });
+            },
+            function(component) {
+                var created = component.find("iframewithscript").getElement();
+                $A.test.assertEquals(true, created.hasAttribute("srcdoc"),
+                    "iframe 'srcdoc' attribute should be set");
+                $A.test.assertEquals("https://www.salesforce.com/someExternalScript", created.contentDocument.scripts[0].src,
+                    "unexpected iframe script 'src'");
+            }
+        ]
+    },
+    
+    /*
+     * TODO : @auraframework - uncommment after bug W-1538537
+     */
+    /**
+     * Set tag attribute to a html tag that is not supported by aura.
+     */
+    _testUnsupportedTag: {
+        test: function(component){
+            var tag = component.find("objecttag").getElement();        
+            $A.test.assertNull(tag, "Unsupported tag should NOT have rendered");
+        }
+    },
+
+    /*
+     * TODO : @auraframework - uncommment after bug W-1538537
+     */
+    /**
+     * Set tag attribute to a non-existing html tag.
+     */
+    _testInvalidTag: {
+        test: function(component){
+            var tag = component.find("invalidtag").getElement();    
+            $A.test.assertNull(tag, "Invlaid tag should NOT have rendered");
+        }
+    },
+
+    /**
+     * Use mismatched case for tag name
+     */
+    testMixedCaseTag: {
+        test: function(component){
+            var tag = component.find("mixedCaseHtmlElement").getElement();
+            $A.test.assertNotNull(tag, "mismatched case tag should have rendered");
+            $A.createComponent("aura:html", {"tag":"DiV"}, function(cmp) {
+                $A.test.assertNotNull(cmp, "mismatched case tag should have been created");
+            })
+        }
+    },
+    
+    /**
+     * Do not set tag attributes on html component.
+     * W-1538544
+     */
+    // auraErrorsExpectedDuringInit is not supported.
+    _testTagNotSet: {
+        auraErrorsExpectedDuringInit:["Undefined tag attribute for", "Undefined tag attribute for", "Undefined tag attribute for"],
+        attributes:{testNoTagAttr:true},
+            test: function(component){
                     $A.test.assertTrue($A.hasErrors, "HTMl component without a tag attribute should not be allowed");
                     $A.test.assertStartsWith("Undefined tag attribute for "+component.find("notag").getGlobalId(), 
                                              $A.test.getText($A.util.getElement("auraErrorMessage")));
-		}
-	}, 
-	
-	/**
-	 * Set tag attribute on html component to an undefined value.
-	 * W-1538544 
-	 */
-	// auraErrorsExpectedDuringInit is not supported.
-	_testUndefinedTagAttr: {
-	    auraErrorsExpectedDuringInit : ["Undefined tag attribute for", "Undefined tag attribute for", "Undefined tag attribute for"],
-	    attributes:{testUndefinedTagAttr:true},
-		test: function(component){
+        }
+    }, 
+    
+    /**
+     * Set tag attribute on html component to an undefined value.
+     * W-1538544 
+     */
+    // auraErrorsExpectedDuringInit is not supported.
+    _testUndefinedTagAttr: {
+        auraErrorsExpectedDuringInit : ["Undefined tag attribute for", "Undefined tag attribute for", "Undefined tag attribute for"],
+        attributes:{testUndefinedTagAttr:true},
+        test: function(component){
                     $A.test.assertTrue($A.hasErrors, "HTML component with a undefined tag attribute should not be allowed");
                     $A.test.assertStartsWith("Undefined tag attribute for "+component.find("undefinedTag").getGlobalId(),
                                              $A.test.getText($A.util.getElement("auraErrorMessage")));
             }
-	}
+    }
 })

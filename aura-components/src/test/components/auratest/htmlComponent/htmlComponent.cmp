@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component >
+<aura:component controller="java://org.auraframework.impl.java.controller.TestControllerSetsSrcdocContextValue">
 	<aura:html tag="a" href="www.salesforce.com" aura:id="atag">valid link</aura:html><br/>
 	<aura:html tag="a" abc="www.salesforce.com" aura:id="atagInvalidAttr">invalid attributes</aura:html><br/>
 	<aura:html tag="a" aura:id="noAttr">link no attributes</aura:html><br/>
@@ -32,4 +32,6 @@
     <aura:if isTrue="{!v.testNoTagAttr}">
         <aura:html aura:id="notag" href="www.salesforce.com">No Tag attribute</aura:html>
     </aura:if>
+
+	<div aura:id="target"/>
 </aura:component>

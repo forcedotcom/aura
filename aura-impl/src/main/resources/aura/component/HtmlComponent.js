@@ -704,6 +704,18 @@ HtmlComponent.prototype["helper"] = {
                     } else if (lowerName === "type" || lowerName === "href" || lowerName === "style" || lowerName.indexOf("data-") === 0) {
                         // special case we have to use "setAttribute"
                         element.setAttribute(casedAttribute, value);
+                    } else if (lowerName === "srcdoc" && element.tagName === "IFRAME" && !$A.util.isUndefinedOrNull(value)) {
+                        var message;
+                        // Check if srcdoc is allowed.  This may change as new defs are sent down.
+                        if (!$A.get("$Global")["srcdoc"]) {
+                            message = "The '" + name + "' attribute is not supported, and will not be set for " + element + " in " + component;
+                            $A.warning(message);
+                        } else {
+                            message = "The '" + name + "' attribute has been set for " + element + " in " + component;
+                            element[casedAttribute] = value;
+                        }
+                        // Track any usages for eventual deprecation
+                        $A.logger.reportError(new $A.auraError(message), null, "WARNING");
                     } else {
                         if ($A.util.isUndefinedOrNull(value)) {
                             value = '';

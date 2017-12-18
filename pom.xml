@@ -1029,7 +1029,7 @@
                 <plugin>
                     <groupId>org.auraframework</groupId>
                     <artifactId>tools-maven-plugin</artifactId>
-                    <version>0.2.0</version>
+                    <version>0.3.0</version>
                     <configuration>
                         <arguments>
                             <argument>${eslint.extra.arg}</argument>
@@ -1038,8 +1038,6 @@
                             <argument>${project.basedir}/src/main/modules</argument>
                             <argument>${project.basedir}/src/test/modules</argument>
                         </arguments>
-                        <modulesEslintrc>${basedir}/modules.eslintrc.json</modulesEslintrc>
-                        <errorHintMessage>(NOTE: to check modules with eslint use: mvn tools:eslint-lwc)</errorHintMessage>
                     </configuration>
                 </plugin>
             </plugins>

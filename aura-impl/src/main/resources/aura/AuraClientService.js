@@ -146,7 +146,7 @@ Aura.Services.AuraClientService$AuraActionCollector = function AuraActionCollect
  * @constructor
  * @export
  */
-function AuraClientService () {
+function AuraClientService (util) {
     this._host = "";
     this._token = null;
     this._isDisconnected = false;
@@ -239,7 +239,7 @@ function AuraClientService () {
     this.reloadPointPassed = false;
 
     // Shares token data across tabs to prevent unneeded page reloads.
-    this.tokenSharing = true;
+    this.tokenSharing = util && util.isLocalStorageEnabled();
 
     this.handleAppCache();
     this.setupBootstrapErrorReloadButton();
@@ -3568,7 +3568,7 @@ AuraClientService.prototype.setToken = function(newToken, saveToStorage, broadca
  * @private
  */
 AuraClientService.prototype.broadcastToken = function(newToken) {
-    if (this.tokenSharing && window.localStorage) {
+    if (this.tokenSharing) {
         $A.log("[AuraClientService.broadcastToken]: Broadcasting new token.");
         window.localStorage.setItem(AuraClientService.TOKEN_KEY, newToken);
     }
@@ -3579,7 +3579,7 @@ AuraClientService.prototype.broadcastToken = function(newToken) {
  * @private
  */
 AuraClientService.prototype.setupTokenListener = function() {
-    if (this.tokenSharing && window.localStorage) {
+    if (this.tokenSharing) {
         var self = this;
         if (window.addEventListener) {
             window.addEventListener("storage", function(event) {

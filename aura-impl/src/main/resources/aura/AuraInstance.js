@@ -77,7 +77,7 @@ function AuraInstance () {
      * @platform
      */
     this.localizationService  = new Aura.Services.AuraLocalizationService();
-    this.clientService        = new Aura.Services.AuraClientService();
+    this.clientService        = new Aura.Services.AuraClientService(this.util);
     this.componentService     = new Aura.Services.AuraComponentService();
     this.renderingService     = new Aura.Services.AuraRenderingService();
     this.expressionService    = new Aura.Services.AuraExpressionService();

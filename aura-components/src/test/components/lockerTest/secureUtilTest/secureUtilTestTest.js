@@ -103,5 +103,17 @@
             cmp.testAddClassToSecureComponentRef();
             $A.test.assertTrue($A.util.hasClass(otherNamespaceCmp, 'changeMe'), "Failed to add class on cross-namespace cmp in secure mode");
         }
+    },
+
+    testIsEmpty_negativeCases: {
+        test: function(cmp) {
+            cmp.testIsEmpty_negativeCases();
+        }
+    },
+
+    testIsEmpty_positiveCases: {
+        test: function(cmp) {
+            cmp.testIsEmpty_positiveCases();
+        }
     }
 })

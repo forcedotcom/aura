@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-12-14
- * Version: 0.3.4
+ * Generated: 2017-12-19
+ * Version: 0.3.5
  */
 
 (function (global, factory) {
@@ -894,15 +894,17 @@ SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
         );
 
         // Create a stub object with all the properties
-        return keys.reduce((o, p) => {
-          return Object.defineProperty(o, p, {
-            // all props in a touch object are readonly by spec:
-            // https://developer.mozilla.org/en-US/docs/Web/API/Touch
-            get: function() {
-              return SecureObject.filterEverything(se, touch[p]);
-            }
-          });
-        }, {});
+        return keys.reduce(
+          (o, p) =>
+            Object.defineProperty(o, p, {
+              // all props in a touch object are readonly by spec:
+              // https://developer.mozilla.org/en-US/docs/Web/API/Touch
+              get: function() {
+                return SecureObject.filterEverything(se, touch[p]);
+              }
+            }),
+          {}
+        );
       });
     },
     set: function(value) {
@@ -1171,6 +1173,79 @@ function registerReportAPI(api) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+function assert(condition) {
+  if (!condition) {
+    throw new Error();
+  }
+}
+
+// TODO: remove these functions. Our filtering mechanism should not
+// rely on the more expensive operation.
+
+function isObjectObject(value) {
+  return (
+    typeof value === 'object' && value !== null && objectToString.call(value) === '[object Object]'
+  );
+}
+
+// https://github.com/jonschlinkert/is-plain-object
+// Copyright © 2017, Jon Schlinkert. Released under the MIT License.
+function isPlainObject(value) {
+  if (isObjectObject(value) === false) {
+    return false;
+  }
+
+  // If has modified constructor
+  const ctor = value.constructor;
+  if (typeof ctor !== 'function') {
+    return false;
+  }
+
+  try {
+    // If has modified prototype
+    const proto = ctor.prototype;
+    if (isObjectObject(proto) === false) {
+      return false;
+    }
+    // If constructor does not have an Object-specific method
+    if (proto.hasOwnProperty('isPrototypeOf') === false) {
+      return false;
+    }
+  } catch (e) {
+    /* Assume is  object when throws */
+  }
+
+  // Most likely a plain Object
+  return true;
+}
+
+/**
+ * Basic URL Scheme checking utility.
+ * Checks for http: and https: url schemes.
+ * @param {String} url
+ * @return {Boolean}
+ */
+function isValidURLScheme(url) {
+  const normalized = document.createElement('a');
+  normalized.href = url;
+  return normalized.protocol === 'https:' || normalized.protocol === 'http:';
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 const SecureIFrameElement = {
   addMethodsAndProperties: function(prototype) {
@@ -1193,8 +1268,18 @@ const SecureIFrameElement = {
           const raw = SecureObject.getRaw(this);
           return raw.src;
         },
-        set: function() {
-          warn("SecureIFrameElement does not allow setting 'src' property.");
+        set: function(url) {
+          const urlString = sanitizeURLForElement(url);
+          if (urlString.length > 0) {
+            if (!isValidURLScheme(urlString)) {
+              warn(
+                'SecureIframeElement.src supports http://, https:// schemes and relative urls.'
+              );
+            } else {
+              const raw = SecureObject.getRaw(this);
+              raw.src = urlString;
+            }
+          }
         }
       }
     });
@@ -1413,7 +1498,7 @@ function createEventTargetMethodsStateless(config, prototype) {
   };
 }
 
-const assert = {
+const assert$1 = {
   block: fn => fn()
 };
 
@@ -1451,13 +1536,9 @@ const lsProxyFormatter = {
     // TODO: If Array proxy or HTMLCollection/NodeList proxy, we need to filter the elements and display only the raw values of those elements
     return null;
   },
-  hasBody: () => {
-    // let the browser display the object in its native format
-    return false;
-  },
-  body: () => {
-    return null;
-  }
+  // let the browser display the object in its native format
+  hasBody: () => false,
+  body: () => null
 };
 
 /** Custom Formatter for Dev Tools
@@ -2771,6 +2852,8 @@ function SecureElement(el, key) {
   switch (tagName) {
     case 'FRAME':
       throw new error('The deprecated FRAME element is not supported in LockerService!');
+    default:
+      break;
   }
 
   // SecureElement is it then!
@@ -2791,6 +2874,9 @@ function SecureElement(el, key) {
 
     case Node.COMMENT_NODE:
       tagName = '#comment';
+      break;
+
+    default:
       break;
   }
 
@@ -3192,7 +3278,7 @@ function SecureElement(el, key) {
   addToCache(el, o, key);
   registerProxy(o);
   // Mark the proxy to be unwrapped by custom formatter
-  assert.block(() => {
+  assert$1.block(() => {
     addProxy(o, el);
   });
   return o;
@@ -3572,79 +3658,6 @@ SecureElement.secureQuerySelector = function(el, key, selector) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function assert$1(condition) {
-  if (!condition) {
-    throw new Error();
-  }
-}
-
-// TODO: remove these functions. Our filtering mechanism should not
-// rely on the more expensive operation.
-
-function isObjectObject(value) {
-  return (
-    typeof value === 'object' && value !== null && objectToString.call(value) === '[object Object]'
-  );
-}
-
-// https://github.com/jonschlinkert/is-plain-object
-// Copyright © 2017, Jon Schlinkert. Released under the MIT License.
-function isPlainObject(value) {
-  if (isObjectObject(value) === false) {
-    return false;
-  }
-
-  // If has modified constructor
-  const ctor = value.constructor;
-  if (typeof ctor !== 'function') {
-    return false;
-  }
-
-  try {
-    // If has modified prototype
-    const proto = ctor.prototype;
-    if (isObjectObject(proto) === false) {
-      return false;
-    }
-    // If constructor does not have an Object-specific method
-    if (proto.hasOwnProperty('isPrototypeOf') === false) {
-      return false;
-    }
-  } catch (e) {
-    /* Assume is  object when throws */
-  }
-
-  // Most likely a plain Object
-  return true;
-}
-
-/**
- * Basic URL Scheme checking utility.
- * Checks for http: and https: url schemes.
- * @param {String} url
- * @return {Boolean}
- */
-function isValidURLScheme(url) {
-  const normalized = document.createElement('a');
-  normalized.href = url;
-  return normalized.protocol === 'https:' || normalized.protocol === 'http:';
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 let filterTypeHook$1;
 function registerFilterTypeHook(hook) {
@@ -3806,7 +3819,7 @@ SecureObject.filterEverything = function(st, raw, options) {
       setRef(swallowed, raw, key);
       mutated = true;
     } else {
-      assert$1(key, 'A secure object should always have a key.');
+      assert(key, 'A secure object should always have a key.');
       if (filterTypeHook$1) {
         swallowed = filterTypeHook$1(raw, key, belongsToLocker);
       }
@@ -5798,9 +5811,7 @@ function SecureDocument(doc, key) {
         return left.indexOf(cookieKey) === 0;
       });
       // strip LockerService key before returning to user land
-      const keyFiltered = nsFiltered.map(val => {
-        return val.trim().substring(cookieKey.length);
-      });
+      const keyFiltered = nsFiltered.map(val => val.trim().substring(cookieKey.length));
       return keyFiltered.join('; ');
     },
     set: function(cookie) {
@@ -5895,6 +5906,7 @@ function SecureLocation(loc, key) {
 
         throw new error('SecureLocation.assign only supports http://, https:// schemes.');
       }
+      return undefined;
     }
   });
 
@@ -6209,6 +6221,8 @@ function SecureNotification(key) {
     Object.defineProperties(o, {
       close: SecureObject.createFilteredMethod(o, notification, 'close')
     });
+
+    addEventTargetMethods(o, notification, key);
 
     setRef(o, notification, key);
 
@@ -7370,6 +7384,8 @@ function SecureWindow(win, key) {
                   case 3:
                     result = new cls(args[0], args[1], args[2]);
                     break;
+                  default:
+                    break;
                 }
               }
               return result;
@@ -7656,16 +7672,15 @@ function SecureAura(AuraInstance, key) {
   Object.seal(o);
 
   // SecureUtil: creating a proxy for $A.util
-  ['getBooleanValue', 'isArray', 'isEmpty', 'isObject', 'isUndefined', 'isUndefinedOrNull'].forEach(
-    name =>
-      Object.defineProperty(
-        su,
-        name,
-        SecureObject.createFilteredMethod(su, AuraInstance['util'], name)
-      )
+  ['getBooleanValue', 'isArray', 'isObject', 'isUndefined', 'isUndefinedOrNull'].forEach(name =>
+    Object.defineProperty(
+      su,
+      name,
+      SecureObject.createFilteredMethod(su, AuraInstance['util'], name)
+    )
   );
   // These methods in Util deal with raw objects like components, so mark them as such
-  ['addClass', 'hasClass', 'removeClass', 'toggleClass'].forEach(name =>
+  ['addClass', 'hasClass', 'removeClass', 'toggleClass', 'isEmpty'].forEach(name =>
     Object.defineProperty(
       su,
       name,
@@ -8274,9 +8289,7 @@ const service = {
       if (lsKey) {
         // Create a SecureElement for the custom element
         const secureTarget = SecureElement(target, lsKey);
-        callback(event => {
-          return secureTarget.dispatchEvent(event);
-        });
+        callback(event => secureTarget.dispatchEvent(event));
       }
     }
   }

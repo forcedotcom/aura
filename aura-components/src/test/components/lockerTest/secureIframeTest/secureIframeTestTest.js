@@ -27,12 +27,6 @@
         }
     },
 
-    testIframeAttributeSrcIsImmutable: {
-        test: function (cmp) {
-            cmp.testIframeAttributeSrcIsImmutable();
-        }
-    },
-
     testIframeMethods: {
         test: function(cmp) {
             cmp.testIframeMethods(this.MethodsWhitelist);

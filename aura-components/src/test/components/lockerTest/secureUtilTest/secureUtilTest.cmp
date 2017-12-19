@@ -29,6 +29,16 @@
     <aura:method name="hasClass_Element"/>
     <aura:method name="toggleClass_Element"/>
 
+    <aura:attribute name="objAttr" type="Object"/>
+    <aura:attribute name="arrAttr" type="List"/>
+    <aura:attribute name="strAttr" type="String"/>
+    <div class="outerDiv" aura:id="outerDiv">
+        <div class="innerDiv" aura:id="innerDiv">
+        </div>
+    </div>
+    <aura:method name="testIsEmpty_negativeCases"/>
+    <aura:method name="testIsEmpty_positiveCases"/>
+
     <aura:method name="testAddClassToSecureComponentRef"/>
     <!--Container can change css class of cross locker component using $A.util.addClass()-->
     <ui:button label="Add Style in secure mode" aura:id="uiButton" />

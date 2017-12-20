@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:event access="GLOBAL" support="GA" type="COMPONENT" description="Indicates that any validation error should be cleared.">
+<aura:event access="GLOBAL" support="GA" type="COMPONENT" description="Indicates that validation errors are cleared.">
 </aura:event>

@@ -16,5 +16,5 @@
 
 -->
 <aura:event access="GLOBAL" support="GA" type="COMPONENT" description="Indicates that the component has validation error(s).">
-    <aura:attribute name="errors" type="Object[]"/>
+    <aura:attribute name="errors" type="Object[]" description="A list of errors for the input field."/>
 </aura:event>

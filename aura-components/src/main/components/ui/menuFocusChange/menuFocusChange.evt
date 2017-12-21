@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:event access="GLOBAL" support="GA" type="COMPONENT" description="Indicates that the user changes menu item focus inside a menu component.">
-	<aura:attribute access="GLOBAL" name="previousItem" type="Aura.Component[]" description="The menu item which is previously focused."/>
-	<aura:attribute access="GLOBAL" name="currentItem" type="Aura.Component[]" description="The menu item which is currently focused."/>
+<aura:event access="GLOBAL" support="GA" type="COMPONENT" description="Indicates that menu item focus is changed inside a menu component.">
+	<aura:attribute access="GLOBAL" name="previousItem" type="Aura.Component[]" description="The menu item that's previously focused."/>
+	<aura:attribute access="GLOBAL" name="currentItem" type="Aura.Component[]" description="The menu item that's currently focused."/>
 </aura:event>

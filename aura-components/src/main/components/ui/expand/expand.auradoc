@@ -21,8 +21,8 @@
   <aura:meta name="formFactors" value="all" />
 
   <aura:description>
-    <p>This event is fired when you collapse the <code>ui:menuList</code> component.
-    To set a handler for the <code>ui:collapse</code> event, use the <code>menuCollapse</code> attribute on <code>ui:menuList</code>.</p>
+    <p>This event is fired when you expand the <code>ui:menuList</code> component.
+    To set a handler for the <code>ui:expand</code> event, use the <code>menuExpand</code> attribute on <code>ui:menuList</code>.</p>
 
     <p>The following example adds or remove a CSS class to the <code>ui:menuList</code> component when it's collapsed or expanded.</p>
     <pre>&lt;aura:component>
@@ -49,7 +49,7 @@
     }
 })</pre>
     <p>If you're using this event with a component other than <code>ui:menuList</code>, register the event first.</p>
-    <pre>&lt;aura:registerEvent name="menuCollapse"  type="ui:collapse"
-                    description="The event fired when the menu list collapses." /></pre>
+    <pre>&lt;aura:registerEvent name="menuExpand"  type="ui:expand"
+                    description="The event fired when the menu list displays." /></pre>
   </aura:description>
 </aura:documentation>

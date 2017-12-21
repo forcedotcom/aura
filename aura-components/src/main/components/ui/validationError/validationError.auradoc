@@ -21,17 +21,17 @@
   <aura:meta name="formFactors" value="all" />
 
   <aura:description>
-    <p>This event is fired when validation errors on an input field are cleared. To set a handler for the <code>ui:clearErrors</code> event, use the <code>onClearErrors</code> attribute on a component that extends <code>ui:input</code>, 
+    <p>This event is fired when a validation error occurs on an input field. To set a handler for the <code>ui:validationError</code> event, use the <code>onError</code> attribute on a component that extends <code>ui:input</code>, 
     such as <code>ui:inputText</code> and <code>ui:inputNumber</code>.</p>
 
     <p>The following <code>ui:inputNumber</code> component displays an error message when the number entered is less than 10. It displays an alert when the error message is cleared.</p>
     <pre>&lt;aura:component>
     &lt;aura:attribute name="myNumber" type="integer" default="10"/>
-    &lt;ui:inputNumber aura:id="number" label="Enter a number: " value="{!v.myNumber}" onClearErrors="{!c.handleClearErrors}"/>
+    &lt;ui:inputNumber aura:id="number" label="Enter a number: " value="{!v.myNumber}" onError="{!c.handleError}"/>
     &lt;ui:button label="Validate" press="{!c.handleValidate}"/>
 &lt;/aura:component></pre>
 
-    <p>Here's the client-side controller that handles the input validation and clearing of the error message.</p>
+    <p>Here's the client-side controller that handles the input validation and handling of the validation error.</p>
     <pre>({
     handleValidate : function (cmp, evt, helper){
         var num = cmp.find("number");
@@ -43,13 +43,13 @@
         }
     },
     
-    handleClearErrors : function (cmp, evt, helper){
-        alert("Error has been cleared");
+    handleError : function (cmp, evt, helper){
+        alert("An error was found in your input.");
     }
 })</pre>
     <p>If you're using this event with a component other than those that extend <code>ui:input</code>, register the event first.</p>
-    <pre>&lt;aura:registerEvent name="onClearErrors"  type="ui:clearErrors"
-                    description="The event fired when validation errors are cleared." /></pre>
+    <pre>&lt;aura:registerEvent name="onError"  type="ui:validationError"
+                    description="The event fired when validation errors occur." /></pre>
     <p>For more information, see the <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_validate_fields.htm" target="_blank">Lightning Components Developer Guide</a>.</p>
   </aura:description>
 </aura:documentation>

@@ -1,0 +1,43 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+
+  <aura:meta name="owner" value="IO Components" />
+  <aura:meta name="formFactors" value="all" />
+
+  <aura:description>
+    <p>This event is fired when you scroll up and down the <code>ui:menuList</code> component, which triggers a focus change in menu items.
+    To set a handler for the <code>ui:menuFocusChange</code> event, use the <code>menuFocusChange</code> attribute on <code>ui:menuList</code>.</p>
+
+    <p>The following example shows a menu with two list items. The <code>handleChange</code> client-side controller handles the <code>ui:menuFocusChange</code> event.</p>
+    <pre>&lt;aura:component>
+    &lt;ui:menu>
+        &lt;ui:menuTriggerLink aura:id="trigger" label="Contacts"/>
+        &lt;ui:menuList class="actionMenu" aura:id="actionMenu"
+                     menuFocusChange="{!c.handleChange}">
+            &lt;ui:actionMenuItem aura:id="item1" label="All Contacts" />
+            &lt;ui:actionMenuItem aura:id="item2" label="All Primary" />
+        &lt;/ui:menuList>
+    &lt;/ui:menu>
+&lt;/aura:component></pre>
+
+    <p>If you're using this event with a component other than <code>ui:menuList</code>, register the event first.</p>
+    <pre>&lt;aura:registerEvent name="menuFocusChange"  type="ui:menuFocusChange"
+                    description="The event fired when the menu list focus changes from one menu item to another." /></pre>
+  </aura:description>
+</aura:documentation>

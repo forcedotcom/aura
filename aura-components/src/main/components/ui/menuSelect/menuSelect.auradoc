@@ -21,35 +21,37 @@
   <aura:meta name="formFactors" value="all" />
 
   <aura:description>
-    <p>This event is fired when you collapse the <code>ui:menuList</code> component.
-    To set a handler for the <code>ui:collapse</code> event, use the <code>menuCollapse</code> attribute on <code>ui:menuList</code>.</p>
+    <p>This event is fired when you select a menu item on the <code>ui:menuList</code> component.
+    To set a handler for the <code>ui:menuSelect</code> event, use the <code>menuSelect</code> attribute on <code>ui:menuList</code>.</p>
 
-    <p>The following example adds or remove a CSS class to the <code>ui:menuList</code> component when it's collapsed or expanded.</p>
+    <p>The following example shows a menu with two list items. The <code>handleSelect</code> client-side controller action handles the <code>ui:menuSelect</code> event.</p>
     <pre>&lt;aura:component>
     &lt;ui:menu>
         &lt;ui:menuTriggerLink aura:id="trigger" label="Contacts"/>
-        &lt;ui:menuList class="actionMenu" aura:id="actionMenu" 
-                     menuCollapse="{!c.addMyClass}" menuExpand="{!c.removeMyClass}">
+        &lt;ui:menuList class="actionMenu" aura:id="actionMenu" menuSelect="{!c.handleSelect}">
             &lt;ui:actionMenuItem aura:id="item1" label="All Contacts" 
                                click="{!c.doSomething}"/>
-            &lt;ui:actionMenuItem aura:id="item2" label="All Primary" click="{!c.doSomething}"/>
+            &lt;ui:actionMenuItem aura:id="item2" label="All Primary" 
+                               click="{!c.doSomething}"/>
         &lt;/ui:menuList>
     &lt;/ui:menu>
 &lt;/aura:component></pre>
 
-    <p>Here's the client-side controller that handles the adding and removing of the CSS classes.</p>
+    <p>When a menu item is clicked, the click event is handled before the <code>ui:menuSelect</code> event.</p>
     <pre>({
-    addMyClass : function(component, event, helper) {
-        var trigger = component.find("trigger");
-        $A.util.addClass(trigger, "myClass");
+    handleSelect : function(component, event, helper) {
+        var selected = event.getParam("selectedItem");
+        
+        // returns label of selected item
+        var selectedLabel = selected.get("v.label"); 
     },
-    removeMyClass : function(component, event, helper) {
-        var trigger = component.find("trigger");
-        $A.util.removeClass(trigger, "myClass");
+    
+    doSomething : function(component, event, helper) {
+        console.log("do something");
     }
 })</pre>
     <p>If you're using this event with a component other than <code>ui:menuList</code>, register the event first.</p>
-    <pre>&lt;aura:registerEvent name="menuCollapse"  type="ui:collapse"
-                    description="The event fired when the menu list collapses." /></pre>
+    <pre>&lt;aura:registerEvent name="menuSelect"  type="ui:menuSelect"
+                    description="The event fired when a menu item is selected." /></pre>
   </aura:description>
 </aura:documentation>

@@ -20,9 +20,18 @@
         var options = cmp.get("v.options");
         options = $A.util.isUndefinedOrNull(options) ? [] : options;
 
-        if (!cmp.get("v.useMenu") && (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body")))) {
-            var optionElements = helper.renderOptions(cmp, options);
-            cmp.find("select").getElement().appendChild(optionElements);
+        if (!cmp.get("v.useMenu")) {
+            var selectElement = cmp.find("select").getElement();
+
+            // Setting the 'multiple' attribute on the component does not work on the edge browser.
+            if (cmp.get("v.multiple")) {
+                selectElement.setAttribute("multiple", true);
+            }
+
+            if (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body"))) {
+                var optionElements = helper.renderOptions(cmp, options);
+                selectElement.appendChild(optionElements);
+            }
         }
     },
 
@@ -31,17 +40,26 @@
 
         var options = cmp.get("v.options");
 
-        if (!cmp.get("v.useMenu") && (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body")))) {
-
+        if (!cmp.get("v.useMenu")) {
             var selectCmp = cmp.find("select");
             // select could have been unrendered/destroyed by users or the framework in some cases
-            if (selectCmp.isValid() && selectCmp.isRendered()) {
-                var select = selectCmp.getElement();
-                var optionElements = select.children;
+            if (!selectCmp.isValid() || !selectCmp.isRendered()) {
+                return;
+            }
+
+            var selectElement = cmp.find("select").getElement();
+
+            // Setting the 'multiple' attribute on the component does not work on the edge browser.
+            if (cmp.get("v.multiple")) {
+                selectElement.setAttribute("multiple", true);
+            }
+
+            if (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body"))) {
+                var optionElements = selectElement.children;
 
                 // Remove extra option elements
                 while (optionElements.length > options.length) {
-                    select.removeChild(optionElements[options.length]);
+                    selectElement.removeChild(optionElements[options.length]);
                 }
 
                 // Update existing option elements with info from options array
@@ -55,7 +73,7 @@
                 if (index < options.length) {
                     var newElements = helper.renderOptions(cmp, options.slice(index));
 
-                    select.appendChild(newElements);
+                    selectElement.appendChild(newElements);
                 }
             }
         }

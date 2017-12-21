@@ -163,11 +163,17 @@
                         targetAlign: horizontalCornerAlignment + " " + (verticalCornerAlignment === "top" ? "bottom" : "top"),
                         padTop: 2
                     });
-
-                    this.lib.panelPositioning.reposition(function () {
-                        element.classList.add("positioned");
-                        element.style.opacity = 1;
-                    });
+                    
+                    // Adding a small timeout so that the positioning calculation
+                    // happens after the pop up have been attached to the DOM
+                    // browsers like IE11 were getting the wrong position due to a race rendering condition
+                    setTimeout($A.getCallback(function () {
+                        this.lib.panelPositioning.reposition(function () {
+                            element.classList.add("positioned");
+                            element.style.opacity = 1;
+                        });
+                    }).bind(this),5);
+                    
                 }.bind(this)));
             }
         }

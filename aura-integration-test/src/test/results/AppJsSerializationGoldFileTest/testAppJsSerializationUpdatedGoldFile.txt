@@ -3168,11 +3168,17 @@ return {
                         targetAlign: horizontalCornerAlignment + " " + (verticalCornerAlignment === "top" ? "bottom" : "top"),
                         padTop: 2
                     });
-
-                    this.lib.panelPositioning.reposition(function () {
-                        element.classList.add("positioned");
-                        element.style.opacity = 1;
-                    });
+                    
+                    
+                    
+                    
+                    setTimeout($A.getCallback(function () {
+                        this.lib.panelPositioning.reposition(function () {
+                            element.classList.add("positioned");
+                            element.style.opacity = 1;
+                        });
+                    }).bind(this),5);
+                    
                 }.bind(this)));
             }
         }

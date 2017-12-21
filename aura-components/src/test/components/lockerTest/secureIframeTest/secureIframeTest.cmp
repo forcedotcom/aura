@@ -31,7 +31,9 @@
     <aura:method name="testParentWindowIsSecureIFrameContentWindowForIframedWindow" action="{!c.testParentWindowIsSecureIFrameContentWindowForIframedWindow}"/>
     <aura:method name="testParentWindowIsWindowForTopLevelWindow" action="{!c.testParentWindowIsWindowForTopLevelWindow}"/>
     <aura:method name="testMessageChannel" action="{!c.testMessageChannel}"/>
-
+    <aura:method name="testIframeSrcFailure"/>
+    <aura:method name="testIframeSrcSuccess"/>
+    
     <div aura:id="title">SecureIFrameElement test</div>
 
     <iframe aura:id="iframe" id="iframe" src="/lockerTestOtherNamespace/iframeCmp.cmp" width="100%"/>

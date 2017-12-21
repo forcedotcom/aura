@@ -59,7 +59,7 @@
                     true,
                     function() {
                         // wait for iframe to set flag at end of init handler to signal it's fully loaded
-                        return iframe.contentWindow && iframe.contentWindow.$A && iframe.contentWindow.$A.getRoot() 
+                        return iframe.contentWindow && iframe.contentWindow.$A && iframe.contentWindow.$A.getRoot()
                                 && iframe.contentWindow.$A.getRoot().get("v.loaded");
                     },
                     "iframe never loaded"
@@ -67,5 +67,17 @@
         }, function(cmp) {
             cmp.testMessageChannel();
         }]
+    },
+
+    testIframeSrcSuccess: {
+        test: function(component) {
+            component.testIframeSrcSuccess();
+        }
+    },
+
+    testIframeSrcFailure: {
+        test: function(component) {
+            component.testIframeSrcFailure();
+        }
     }
 })

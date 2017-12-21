@@ -8,7 +8,7 @@
         attributesWhitelist.forEach(function(name) {
             testUtils.assertTrue(name in iframe);
         });
-        
+
         attributesBlacklist.forEach(function(name) {
             testUtils.assertUndefined(iframe[name], "Expected property '" + name + "' to be undefined on SecureIFrameElement");
         });
@@ -155,5 +155,26 @@
                     return cmp.get("v.messageReceived");
                 },
                 "Never received message back from iframe");
+    },
+
+    testIframeSrcFailure: function(component) {
+      var testUtils = component.get('v.testUtils');
+      var errorMessage = '';
+      var iframe = component.find('iframe').getElement();
+      iframe.src = 'http://www.google.com/';
+
+      testUtils.expectAuraWarning('SecureIframeElement.src supports http://, https:// schemes and relative urls.', 'An iframe src attribute was set using an unsupported URI scheme');
+      iframe.src = 'javascript:alert(window.__proto__.toString)';
+      testUtils.assertEquals('http://www.google.com/', iframe.src, "iframe src attribute was not expected to change")
+    },
+
+    testIframeSrcSuccess: function(component) {
+      var testUtils = component.get('v.testUtils');
+      var errorMessage = '';
+
+      var iframe = component.find('iframe').getElement();
+      iframe.src = 'https://www.google.com/';
+
+      testUtils.assertEquals('https://www.google.com/', iframe.src, 'An iframe src was not set correctly to a valid URI');
     }
 })

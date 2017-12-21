@@ -74,6 +74,8 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
 
     this.callingCmp = $A.clientService.currentAccess;
 
+    this.retryCount = 0;
+
     // propagating locker key when possible
     $A.lockerService.trust(cmp, this);
 }
@@ -1221,6 +1223,21 @@ Action.prototype.setChained = function() {
  */
 Action.prototype.isChained = function() {
     return this.chained || false;
+};
+
+/**
+ * Returns the number of times this action has been retried
+ * @returns {number}
+ */
+Action.prototype.getRetryCount = function() {
+    return this.retryCount;
+};
+
+/**
+ * Increment the retry counter on this action
+ */
+Action.prototype.incrementRetryCount = function() {
+    this.retryCount++;
 };
 
 /**

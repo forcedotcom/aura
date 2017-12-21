@@ -327,23 +327,30 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
             this.csrfValidationFunction = null;
             return;
         }
-        TestContext expectedTestContext = this.testContextAdapter.getTestContext();
-        if (expectedTestContext != null) {
-            this.setValidateCSRFToken((token) -> {
-                TestContext testContext = this.testContextAdapter.getTestContext();
-                if (testContext != null && testContext.equals(expectedTestContext)) {
-                    // Throw only once, since the app should reload and we don't
-                    // want to throw again on the next calls.
-                    this.csrfValidationFunction = null;
-                    throw exception;
-                }
-            });
-        }
+        this.setValidateCSRFToken(token -> {
+            // Throw only once, since the app should reload and we don't
+            // want to throw again on the next calls.
+            this.csrfValidationFunction = null;
+            throw exception;
+        });
     }
 
     @Override
     public void setValidateCSRFToken(Consumer<String> validationFunction) {
-        this.csrfValidationFunction = validationFunction;
+        Consumer<String> value = validationFunction;
+        if (validationFunction != null) {
+            TestContext expectedTestContext = this.testContextAdapter.getTestContext();
+            if (expectedTestContext != null) {
+                value = token -> {
+                    TestContext testContext = this.testContextAdapter.getTestContext();
+                    if (testContext != null && testContext.equals(expectedTestContext)) {
+                        validationFunction.accept(token);
+                    }
+                };
+            }
+        }
+
+        this.csrfValidationFunction = value;
     }
 
     @Override

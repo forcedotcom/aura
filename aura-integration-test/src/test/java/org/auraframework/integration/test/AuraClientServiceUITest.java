@@ -36,6 +36,8 @@ import javax.inject.Inject;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+
 import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSUPPORTED;
 
 // CSRF is only stored in persistent storage. indexedDB is not supported on Safari,
@@ -112,16 +114,20 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
         String expectedToken = "errorToken";
         Throwable cause = new RuntimeException("intentional");
         RuntimeException expectedException = new InvalidSessionException(cause, expectedToken);
-        getMockConfigAdapter().setValidateCSRFTokenException(expectedException );
 
-        WebElement trigger = getDriver().findElement(By.className("trigger"));
-        trigger.click();
+        // store result of token on second request (retry w/ new token)
+        String actual = waitForTokenReceivedAtServer(2, () -> {
+            WebElement trigger = getDriver().findElement(By.className("trigger"));
+            trigger.click();
+        }, token -> {
+            if (token.equals("aura")) {
+                throw expectedException;
+            }
+        });
+        assertEquals("Stored token not as received at server", expectedToken, actual);
 
         String storedToken = getStoredToken();
         assertEquals("Stored token not as expected", expectedToken, storedToken);
-
-        String actual = getTokenReceivedAtServer();
-        assertEquals("Stored token not as received at server", expectedToken, actual);
     }
 
     @FreshBrowserInstance
@@ -229,28 +235,42 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
         );
     }
 
-    private String getTokenReceivedAtServer() throws InterruptedException {
+    private String waitForTokenReceivedAtServer(int count, Runnable operation, Consumer<String> validation) throws InterruptedException {
         // Look only at requests coming from this client
-        CountDownLatch latch = new CountDownLatch(1);
+        CountDownLatch latch = new CountDownLatch(count);
         AtomicReference<String> receivedToken = new AtomicReference<>();
-        getMockConfigAdapter().setValidateCSRFToken((token)->{
+        getMockConfigAdapter().setValidateCSRFToken(token -> {
             //we should stop capturing after latch has released
             synchronized(this) {
                 if (latch.getCount() == 1) {
                     receivedToken.set(token);
-                    latch.countDown();
+                }
+
+                latch.countDown();
+
+                if (validation != null) {
+                    validation.accept(token);
                 }
             }
         });
 
-        WebElement trigger = getDriver().findElement(By.className("trigger"));
-        trigger.click();
-        
+        if (operation != null) {
+            operation.run();
+        }
+
         long timeout = getAuraUITestingUtil().getTimeout();
         if (!latch.await(timeout, TimeUnit.SECONDS)) {
             fail("Timed out waiting for token at server");
         }
+        getMockConfigAdapter().setValidateCSRFToken(null);
         return receivedToken.get();
+    }
+
+    private String getTokenReceivedAtServer() throws InterruptedException {
+        return waitForTokenReceivedAtServer(1, () -> {
+            WebElement trigger = getDriver().findElement(By.className("trigger"));
+            trigger.click();
+         }, null);
     }
 
     private String getStoredToken() {

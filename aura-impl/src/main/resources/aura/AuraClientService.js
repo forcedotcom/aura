@@ -240,6 +240,7 @@ function AuraClientService (util) {
 
     // Shares token data across tabs to prevent unneeded page reloads.
     this.tokenSharing = util && util.isLocalStorageEnabled();
+    this.maxActionRetries = 4;
 
     this.handleAppCache();
     this.setupBootstrapErrorReloadButton();
@@ -286,6 +287,11 @@ AuraClientService.CACHE_BUST_QUERY_PARAM = "nocache";
  * The status to return to action postprocess when receiving a response with system exception event
  */
 AuraClientService.SYSTEM_EXCEPTION_EVENT_RETURN_STATUS = "SYSTEMERROR";
+
+/**
+ * The status to reutnr to action postprocess when receiving a response with invalid session
+ */
+AuraClientService.INVALID_SESSION_RETURN_STATUS = "INVALIDSESSION";
 
 /**
  * Framework + app reload counter to detect and prevent infinite reloads.
@@ -501,7 +507,6 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
             }
             return ret;
         } else if (resp["exceptionEvent"] === true) {
-            this.throwExceptionEvent(resp);
             var evtObj = resp["event"];
             var eventName;
             var eventNamespace;
@@ -509,15 +514,23 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
                 var descriptor = new DefDescriptor(evtObj["descriptor"]);
                 eventName = descriptor.getName();
                 eventNamespace = descriptor.getNamespace();
+            }
 
-                // Note that this is for response not 200, so returning COOS in AuraEnabled controller would not go here
-                // ideally, we want to break the flow for all exception event, however, that causes regressions.
-                // for now, we stop the flow for COOS and invalidSession.
-                if (eventNamespace === "aura" && (eventName === "clientOutOfSync" || eventName === "invalidSession")) {
-                    // do not return a valid state (SUCCESS, INCOMPLETE, ERROR), we do not want action callback to handle this.
-                    ret["status"] = AuraClientService.SYSTEM_EXCEPTION_EVENT_RETURN_STATUS;
-                    return ret;
-                }
+            if (eventNamespace === "aura" && eventName === "invalidSession") {
+                ret["status"] = AuraClientService.INVALID_SESSION_RETURN_STATUS;
+                ret["event"] = evtObj;
+                return ret;
+            }
+
+            this.throwExceptionEvent(resp);
+
+            // Note that this is for response not 200, so returning COOS in AuraEnabled controller would not go here
+            // ideally, we want to break the flow for all exception event, however, that causes regressions.
+            // for now, we stop the flow for COOS and invalidSession.
+            if (eventNamespace === "aura" && eventName === "clientOutOfSync") {
+                // do not return a valid state (SUCCESS, INCOMPLETE, ERROR), we do not want action callback to handle this.
+                ret["status"] = AuraClientService.SYSTEM_EXCEPTION_EVENT_RETURN_STATUS;
+                return ret;
             }
 
             ret["status"] = "ERROR";
@@ -3286,6 +3299,8 @@ AuraClientService.prototype.receive = function(auraXHR, timedOut) {
             this.processIncompletes(auraXHR);
         } else if (responseMessage["status"] === "ERROR") {
             this.processErrors(auraXHR, responseMessage["message"]);
+        } else if (responseMessage["status"] === AuraClientService.INVALID_SESSION_RETURN_STATUS) {
+            this.retryActions(auraXHR, responseMessage["event"]);
         } else if (responseMessage["status"] === AuraClientService.SYSTEM_EXCEPTION_EVENT_RETURN_STATUS) {
             this.processSystemError(auraXHR);
         }
@@ -3313,6 +3328,38 @@ AuraClientService.prototype.receive = function(auraXHR, timedOut) {
     }
 
     return responseMessage;
+};
+
+/**
+ * Retries in-flight actions on the given XHR due to a failed server response (invalidSession)
+ * @param auraXHR originating auraXHR
+ * @param event parsed server event in the originating response
+ */
+AuraClientService.prototype.retryActions = function(auraXHR, event) {
+    var newToken = event["attributes"] &&
+                   event["attributes"]["values"] &&
+                   event["attributes"]["values"]["newToken"];
+    if ($A.util.isString(newToken) && !$A.util.isEmpty(newToken)) {
+        this.invalidSession(newToken);
+
+        $A.log("[AuraClientService].retryActions]: New token received, attempting to retry failed actions");
+        for (var name in auraXHR.actions) {
+            if (auraXHR.actions[name].getRetryCount() <= this.maxActionRetries) {
+                auraXHR.actions[name].incrementRetryCount();
+                this.enqueueAction(auraXHR.actions[name]);
+            } else {
+                $A.log("[AuraClientService].retryActions]: Exceeded action retry limit");
+                this.throwExceptionEvent({event: event});
+                this.processSystemError(auraXHR);
+                break;
+            }
+        }
+    }
+    else {
+        $A.log("[AuraClientService].retryActions]: Could not retry actions, no token received.");
+        this.throwExceptionEvent({event: event});
+        this.processSystemError(auraXHR);
+    }
 };
 
 /**
@@ -4152,7 +4199,7 @@ AuraClientService.prototype.invalidSession = function(newToken) {
 
     // if new token provided then persist to storage and reload. if persisting
     // fails then we must go to the server for bootstrap.js to get a new token.
-    if ($A.util.isString(newToken) && !$A.util.isEmpty(newToken)) {
+    if ($A.util.isString(newToken) && !$A.util.isEmpty(newToken) && newToken !== this._token) {
         if (this.tokenSharing) {
             $A.log("[AuraClientService.invalidSession]: Token sharing enabled, attempting token update.");
             this.setToken(newToken, false, true);

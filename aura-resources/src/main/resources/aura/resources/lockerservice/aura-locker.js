@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-12-19
- * Version: 0.3.5
+ * Generated: 2017-12-20
+ * Version: 0.3.6
  */
 
 (function (global, factory) {
@@ -3011,10 +3011,12 @@ function SecureElement(el, key) {
           configurable: descriptor.configurable,
           enumerable: true,
           get: function() {
-            return SecureObject.filterEverything(o, el[prop]);
+            const rawEl = SecureObject.getRaw(this);
+            return SecureObject.filterEverything(this, rawEl[prop]);
           },
           set: function(value) {
-            el[prop] = SecureObject.filterEverything(o, value);
+            const rawEl = SecureObject.getRaw(this);
+            rawEl[prop] = SecureObject.filterEverything(this, value);
           }
         });
       }

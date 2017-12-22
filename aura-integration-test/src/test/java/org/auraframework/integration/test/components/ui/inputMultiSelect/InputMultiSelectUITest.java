@@ -20,11 +20,13 @@ import java.util.List;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.PerfTest;
+import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+@ExcludeBrowsers({ BrowserType.IPAD} )
 public class InputMultiSelectUITest extends WebDriverTestCase {
     private final String[] URL = new String[] { "/uitest/inputMultiSelect_Test.cmp",
             "/uitest/inputMultiSelect_NestedOptionsTest.cmp" };

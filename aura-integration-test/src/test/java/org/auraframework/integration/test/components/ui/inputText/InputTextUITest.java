@@ -18,6 +18,7 @@ package org.auraframework.integration.test.components.ui.inputText;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.PerfTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
@@ -32,6 +33,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 /**
  * UI tests for inputText Component
  */
+@ExcludeBrowsers({ BrowserType.IPAD} )
 public class InputTextUITest extends WebDriverTestCase {
 
     public static final String TEST_CMP = "/uitest/inputtext_updateontest.cmp";

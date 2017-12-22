@@ -18,6 +18,8 @@ package org.auraframework.integration.test.components.aura.iteration;
 import java.util.List;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -25,6 +27,8 @@ import org.openqa.selenium.WebElement;
 /**
  * aura:interation UI tests.
  */
+
+@ExcludeBrowsers({ BrowserType.IPAD} )
 public class IterationUITest extends WebDriverTestCase {
     @Test
     public void testSimpleIteration() throws Exception {

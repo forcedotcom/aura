@@ -188,11 +188,12 @@ public class Hash {
         /**
          * Add data to a hash calculation.
          */
-        public void addString(String string) {
+        public StringBuilder addString(String string) {
             if (string != null) {
                 ByteBuffer bytes = utf8.encode(string);
                 digest.update(bytes);
             }
+            return this;
         }
 
         public Hash build() {

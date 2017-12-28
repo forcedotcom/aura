@@ -32,7 +32,8 @@ import org.auraframework.util.IOUtil;
 public class CopiedTextSourceImpl<D extends Definition> extends AbstractTextSourceImpl<D> {
     private final String contents;
     private final String defaultNamespace;
-    private long lastModified;
+    private final long lastModified;
+    private final String hashValue;
 
     public CopiedTextSourceImpl(TextSource<D> original) {
         this(original.getDescriptor(), original, original.getMimeType());
@@ -43,11 +44,7 @@ public class CopiedTextSourceImpl<D extends Definition> extends AbstractTextSour
         this.contents = original.getContents();
         this.defaultNamespace = original.getDefaultNamespace();
         this.lastModified = original.getLastModified();
-        try {
-            IOUtil.readText(this.getHashingReader());
-        } catch (IOException ioe) {
-            // ignore - can't get this on a string reader.
-        }
+        this.hashValue = original.getHash();
     }
 
     @Override
@@ -64,6 +61,11 @@ public class CopiedTextSourceImpl<D extends Definition> extends AbstractTextSour
     @Override
     public String getDefaultNamespace() {
         return this.defaultNamespace;
+    }
+
+    @Override
+    public String getHash() {
+        return hashValue;
     }
 
     @Override

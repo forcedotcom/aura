@@ -86,4 +86,55 @@ public class FileSourceTest extends AuraImplTestCase {
         FileSource<?> source = new FileSource<>(null, libFile);
         assertEquals("application/xml", source.getMimeType());
     }
+
+    @Test
+    public void testMimeTypeGarbage() {
+        assertEquals("X-application/unknown", FileSource.getMimeTypeFromExtension("IDontKnow"));
+    }
+
+    @Test
+    public void testMimeTypeUnknownExtension() {
+        assertEquals("X-application/unknown", FileSource.getMimeTypeFromExtension("this.blahdedah"));
+    }
+
+    @Test
+    public void testMimeTypeEmptyExtension() {
+        assertEquals("X-application/unknown", FileSource.getMimeTypeFromExtension("this."));
+    }
+
+    @Test
+    public void testMimeTypeComponent() {
+        assertEquals("application/xml", FileSource.getMimeTypeFromExtension("this.cmp"));
+    }
+
+    @Test
+    public void testMimeTypeComponentWithExtraDot() {
+        assertEquals("application/xml", FileSource.getMimeTypeFromExtension("this.that.cmp"));
+    }
+
+    @Test
+    public void testMimeTypeLibrary() {
+        assertEquals("application/xml", FileSource.getMimeTypeFromExtension("this.lib"));
+    }
+
+    @Test
+    public void testMimeTypeInterface() {
+        assertEquals("application/xml", FileSource.getMimeTypeFromExtension("this.intf"));
+    }
+
+    @Test
+    public void testMimeTypeEvent() {
+        assertEquals("application/xml", FileSource.getMimeTypeFromExtension("this.evt"));
+    }
+
+    @Test
+    public void testMimeTypeApplication() {
+        assertEquals("application/xml", FileSource.getMimeTypeFromExtension("this.app"));
+    }
+
+    @Test
+    public void testMimeTypeJavascript() {
+        assertEquals("application/javascript", FileSource.getMimeTypeFromExtension("this.js"));
+    }
+
 }

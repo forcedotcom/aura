@@ -34,9 +34,4 @@ public interface TextSource<D extends Definition> extends Source<D> {
      * Get a reader for the contents.
      */
     Reader getReader();
-
-    /**
-     * Get a hashing reader.
-     */
-    Reader getHashingReader();
 }

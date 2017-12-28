@@ -41,7 +41,7 @@ public class TokensImportDefHandlerTest extends StyleTestCase {
     private TokensImportDef source(String src) throws Exception {
         DefDescriptor<TokensImportDef> desc = definitionService.getDefDescriptor("test", TokensImportDef.class);
         StringSource<TokensImportDef> ss = new StringSource<>(desc, src, "myID", Format.XML);
-        XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(ss.getHashingReader());
+        XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(ss.getReader());
         xmlReader.next();
         TokensImportDefHandler<TokensDef> handler = new TokensImportDefHandler<>(null, xmlReader, ss, true,
                 definitionService, configAdapter, definitionParserAdapter);

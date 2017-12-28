@@ -48,7 +48,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
                 desc, "<div class='MyClass'>Child Text<br/></div>", "myID", Format.XML);
-        xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
+        xmlReader = XMLParser.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService, contextService,
                 configAdapter, definitionParserAdapter);
@@ -87,7 +87,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
                 desc, "<div><aura:set attribute='header' value='false'/></div>", "myID", Format.XML);
-        xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
+        xmlReader = XMLParser.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService, contextService,
                 configAdapter, definitionParserAdapter);
@@ -136,7 +136,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
     public void testReadFlavorable() throws Exception {
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("fake:component", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(desc, "<div aura:flavorable='true'></div>", "myID", Format.XML);
-        xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
+        xmlReader = XMLParser.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService, contextService,
                 configAdapter, definitionParserAdapter);

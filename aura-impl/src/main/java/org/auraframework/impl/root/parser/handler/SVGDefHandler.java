@@ -45,7 +45,7 @@ public class SVGDefHandler<D extends Definition> {
         builder.setOwnHash(source.getHash());
         builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
 
-        Reader stream = source.getHashingReader();
+        Reader stream = source.getReader();
         try {
             long length = IOUtil.countNumberOfCharacters(stream);
             if (length > MAX_SVG_LENGTH) {

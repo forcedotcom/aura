@@ -71,14 +71,14 @@ public class FlavorDefaultDefHandlerTest extends StyleTestCase {
         DefDescriptor<FlavorsDef> parentDesc = definitionService.getDefDescriptor("test:tmp",
                 FlavorsDef.class);
         StringSource<FlavorsDef> parentSource = new StringSource<>(parentDesc, "<aura:flavors/>", "myID", Format.XML);
-        XMLStreamReader parentReader = XMLParser.createXMLStreamReader(parentSource.getHashingReader());
+        XMLStreamReader parentReader = XMLParser.createXMLStreamReader(parentSource.getReader());
         parentReader.next();
         FlavorsDefHandler parent = new FlavorsDefHandler(parentDesc, parentSource, parentReader, true, definitionService,
                 configAdapter, definitionParserAdapter);
 
         DefDescriptor<FlavorIncludeDef> desc = definitionService.getDefDescriptor("test", FlavorIncludeDef.class);
         StringSource<FlavorIncludeDef> ss = new StringSource<>(desc, src, "myID", Format.XML);
-        XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(ss.getHashingReader());
+        XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(ss.getReader());
         xmlReader.next();
         FlavorDefaultDefHandler<FlavorsDef> handler = new FlavorDefaultDefHandler<>(parent, xmlReader, ss, true,
                 definitionService, configAdapter, definitionParserAdapter);

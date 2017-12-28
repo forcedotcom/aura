@@ -434,7 +434,7 @@ public class TokensDefImplTest extends StyleTestCase {
         DefDescriptor<TokensDef> extendsSelf = addSourceAutoCleanup(TokensDef.class, "");
         StringSource<?> source = (StringSource<?>) getAuraTestingUtil().getSource(extendsSelf);
         String contents = "<aura:tokens extends='%s'> </aura:tokens>";
-        source.addOrUpdate(String.format(contents, extendsSelf.getDescriptorName()));
+        getAuraTestingUtil().updateSource(source.getDescriptor(), String.format(contents, extendsSelf.getDescriptorName()));
         try {
             definitionService.getDefinition(extendsSelf);
             fail("A tokens def should not be able to extend itself.");
@@ -451,11 +451,11 @@ public class TokensDefImplTest extends StyleTestCase {
 
         StringSource<?> source = (StringSource<?>) getAuraTestingUtil().getSource(circular1);
         String contents = "<aura:tokens extends='%s'><aura:token name='attr' value='1'/></aura:tokens>";
-        source.addOrUpdate(String.format(contents, circular2.getDescriptorName()));
+        getAuraTestingUtil().updateSource(source.getDescriptor(), String.format(contents, circular2.getDescriptorName()));
 
         source = (StringSource<?>) getAuraTestingUtil().getSource(circular2);
         contents = "<aura:tokens extends='%s'> </aura:tokens>";
-        source.addOrUpdate(String.format(contents, circular1.getDescriptorName()));
+        getAuraTestingUtil().updateSource(source.getDescriptor(), String.format(contents, circular1.getDescriptorName()));
 
         try {
             TokensDef def = definitionService.getDefinition(circular2);

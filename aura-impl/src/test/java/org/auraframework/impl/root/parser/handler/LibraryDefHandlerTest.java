@@ -140,7 +140,7 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         XMLStreamReader xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(),
-                source.getHashingReader());
+                source.getReader());
         xmlReader.next();
         return xmlReader;
     }

@@ -368,7 +368,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
             boolean overwrite, NamespaceAccess access) {
         DefType defType = descriptor.getDefType();
         Format format = DescriptorInfo.get(defType.getPrimaryInterface()).getFormat();
-        StringSource<D> source = new StringSource<>(fileMonitor, descriptor, contents, descriptor.getQualifiedName(), format);
+        StringSource<D> source = new StringSource<>(descriptor, contents, descriptor.getQualifiedName(), format);
         return putSource(descriptor, source, overwrite, access);
     }
 
@@ -466,10 +466,6 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
         if (namespaceInfo != null) {
             @SuppressWarnings("unchecked")
             Source<D> ret = (Source<D>)namespaceInfo.get(descriptor);
-            if (ret != null && ret instanceof StringSource) {
-                // return a copy of the StringSource to emulate other Sources (hash is reset)
-                return new StringSource<>(fileMonitor, (StringSource<D>)ret);
-            }
             return ret;
         }
         return null;

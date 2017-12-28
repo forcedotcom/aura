@@ -51,8 +51,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
     private XMLStreamReader getReader(TextSource<?> source) throws XMLStreamException {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        XMLStreamReader xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(),
-                source.getHashingReader());
+        XMLStreamReader xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
         xmlReader.next();
         return xmlReader;
     }

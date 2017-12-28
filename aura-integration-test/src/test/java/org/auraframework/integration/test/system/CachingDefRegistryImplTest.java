@@ -94,8 +94,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         contextService.endContext();
         contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
 
-        StringSource<?> source = (StringSource<?>) getSource(dd);
-        source.addOrUpdate(String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"));
+        getAuraTestingUtil().updateSource(dd, String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"));
         // Verify that the initial def object hasn't been updated
         assertEquals(initialTimeStamp, initialDef.getLocation().getLastModified());
 
@@ -105,43 +104,6 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         // Verify that stale check has been performed
         long updatedTimeStamp = updatedDef.getLocation().getLastModified();
         assertTrue("Time stamp on def should have been updated", updatedTimeStamp > initialTimeStamp);
-        assertTrue(updatedDef instanceof BaseComponentDefImpl);
-        BaseComponentDefImpl<?> def = (BaseComponentDefImpl<?>) updatedDef;
-        assertNotNull("Failed to obtain the updated component Def", def.getAttributeDef("attr"));
-    }
-
-    /**
-     * verify staleness check is done when CachingDefRegistry is filled up.
-     */
-    // Flaps in SFDC build W-1265411
-    @UnAdaptableTest
-    @Test
-    public void testForStaleCheckWhenRegistryFull() throws Exception {
-        long startTimeStamp = System.currentTimeMillis() - 60000;
-        String markup = "<aura:component> %s </aura:component>";
-        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class, String.format(markup, ""));
-        ((StringSource<?>) getSource(dd)).setLastModified(startTimeStamp);
-        ComponentDef initialDef = definitionService.getDefinition(dd);
-        long initialTimeStamp = initialDef.getLocation().getLastModified();
-        assertEquals(startTimeStamp, initialTimeStamp);
-        fillCachingDefRegistryForComponents();
-
-        // Have to stop and start context because a given def is cached in MasterDefRegistry per request (context of the
-        // request)
-        contextService.endContext();
-        contextService.startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED, laxSecurityApp);
-        StringSource<?> source = (StringSource<?>) getSource(dd);
-        source.addOrUpdate(String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"));
-        source.setLastModified(startTimeStamp + 5);
-        // Verify that the initial def object hasn't been updated
-        assertEquals(initialTimeStamp, initialDef.getLocation().getLastModified());
-
-        // Fetch the def
-        assertTrue(definitionService.exists(dd));
-        ComponentDef updatedDef = definitionService.getDefinition(dd);
-        // Verify that stale check has been performed
-        long updatedTimeStamp = updatedDef.getLocation().getLastModified();
-        assertEquals("Time stamp on def should have been updated", startTimeStamp + 5, updatedTimeStamp);
         assertTrue(updatedDef instanceof BaseComponentDefImpl);
         BaseComponentDefImpl<?> def = (BaseComponentDefImpl<?>) updatedDef;
         assertNotNull("Failed to obtain the updated component Def", def.getAttributeDef("attr"));

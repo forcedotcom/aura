@@ -43,7 +43,7 @@ public class ModuleDefRefHandlerTest extends AuraImplTestCase {
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
                 desc,"<test:test />", "myID", Format.XML);
-        XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
+        XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService, contextService,
                 configAdapter, definitionParserAdapter);

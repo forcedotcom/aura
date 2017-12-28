@@ -50,7 +50,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(
                 desc,
                 "<fake:component attr='attr value'>Child Text<aura:foo/><aura:set attribute='header'>Header Value</aura:set></fake:component>", "myID", Format.XML);
-        xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
+        xmlReader = XMLParser.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService, contextService,
                 configAdapter, definitionParserAdapter);
@@ -162,7 +162,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("fake:component",
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(desc, markup, "myID", Format.XML);
-        xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
+        xmlReader = XMLParser.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService, contextService,
                 configAdapter, definitionParserAdapter);

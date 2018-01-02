@@ -26,7 +26,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-@ExcludeBrowsers({ BrowserType.IPAD} )
+@ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE } )
 public class InputSelectUITest extends WebDriverTestCase {
 
     private final String DYNAMIC_SELECT_URL = "/uitest/inputSelect_DynamicOptions.cmp";

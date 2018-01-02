@@ -33,7 +33,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 /**
  * UI tests for inputText Component
  */
-@ExcludeBrowsers({ BrowserType.IPAD} )
+@ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE} )
 public class InputTextUITest extends WebDriverTestCase {
 
     public static final String TEST_CMP = "/uitest/inputtext_updateontest.cmp";

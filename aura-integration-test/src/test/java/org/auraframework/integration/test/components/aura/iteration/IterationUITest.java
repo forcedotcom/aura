@@ -28,7 +28,7 @@ import org.openqa.selenium.WebElement;
  * aura:interation UI tests.
  */
 
-@ExcludeBrowsers({ BrowserType.IPAD} )
+@ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE } )
 public class IterationUITest extends WebDriverTestCase {
     @Test
     public void testSimpleIteration() throws Exception {

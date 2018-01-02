@@ -26,7 +26,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-@ExcludeBrowsers({ BrowserType.IPAD} )
+@ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE} )
 public class InputMultiSelectUITest extends WebDriverTestCase {
     private final String[] URL = new String[] { "/uitest/inputMultiSelect_Test.cmp",
             "/uitest/inputMultiSelect_NestedOptionsTest.cmp" };

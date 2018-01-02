@@ -58,7 +58,7 @@
      * Test negative value
      */
     testNegativeCurrency: {
-        attributes: {value: -123},
+        attributes: {value: -123, format: '¤#,##0.00'},
         test: function (component) {
             this.assertCmpElemValues(component, -123, "-$123.00");
         }
@@ -68,7 +68,7 @@
      * Test currency formatted correctly.
      */
     testDefaultFormat: {
-        attributes: {value: 1234},
+        attributes: {value: 1234, format: '¤#,##0.00'},
         test: function (component) {
             this.assertCmpElemValues(component, 1234, "$1,234.00");
             $A.test.assertEquals("¤#,##0.00", component.get('v.format'),
@@ -292,6 +292,7 @@
      * Test input with a negative sign
      */
     testNegativeSign: {
+        attributes: {format: '¤#,##0.00'},
         test: [function(component) {
             this.inputValue(component, "-123");
         }, function(component) {
@@ -318,6 +319,7 @@
      * Leading decimal mark should be treated as "0."
      */
     testLeadingDecimalMark: {
+        attributes: {format: '¤#,##0.00'},
         test: [function(component) {
             this.inputValue(component, ".12");
         }, function(component) {

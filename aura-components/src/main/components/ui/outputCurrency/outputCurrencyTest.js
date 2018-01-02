@@ -18,7 +18,7 @@
      * Positive test case: Assign Negative value for attribute 'value'.
      */
     testNegativeValue:{
-    	attributes: {value : -123},
+    	attributes: {value : -123, format: "¤#,##0.00"},
         test: function(component){
         	var val = $A.test.getText(component.find('span').getElement());
         	$A.test.assertEquals("-$123.00", val, "Negative values not displayed correctly: '(value)' or '-value'. Actual is '" + val + "'");

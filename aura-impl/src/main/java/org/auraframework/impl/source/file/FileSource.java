@@ -21,8 +21,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import org.auraframework.def.DefDescriptor;
@@ -31,7 +31,6 @@ import org.auraframework.impl.source.AbstractSourceImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
-import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.text.Hash;
@@ -43,6 +42,7 @@ public class FileSource<D extends Definition> extends AbstractSourceImpl<D> impl
     private final File file;
     private final long lastModified;
     private final Hash hash;
+    private volatile String contents;
 
     /**
      * The 'normal' constructor for a file source.
@@ -61,12 +61,18 @@ public class FileSource<D extends Definition> extends AbstractSourceImpl<D> impl
         this.hash = Hash.createPromise();
     }
 
+    /**
+     * A 'format' based constructor.
+     *
+     * This constructor gets both the file path and the mime type from the file given.
+     * The file must exist prior to constructing the source. Behaviour is undefined
+     * if the file does not exist, please do not test this case.
+     *
+     * @param descriptor the descriptor for the source.
+     * @param file the file that contains the source.
+     */
     public FileSource(DefDescriptor<D> descriptor, File file, Format format) {
-        this(descriptor, getFilePath(file), file, format);
-    }
-
-    protected FileSource(DefDescriptor<D> descriptor, String systemId, File file, Format format) {
-        super(descriptor, systemId, format);
+        super(descriptor, getFilePath(file), format);
         this.file = file;
         this.lastModified = file.lastModified();
         this.hash = Hash.createPromise();
@@ -74,17 +80,7 @@ public class FileSource<D extends Definition> extends AbstractSourceImpl<D> impl
 
     @Override
     public Reader getReader() {
-        try {
-            Reader reader = new InputStreamReader(new FileInputStream(file), "UTF8");
-            if (!hash.isSet()) {
-                reader = new HashingReader(reader, hash);
-            }
-            return reader;
-        } catch (FileNotFoundException e) {
-            throw new AuraRuntimeException(e);
-        } catch (UnsupportedEncodingException uee) {
-            throw new AuraError(uee);
-        }
+        return new StringReader(getContents());
     }
 
     @Override
@@ -116,13 +112,26 @@ public class FileSource<D extends Definition> extends AbstractSourceImpl<D> impl
      */
     @Override
     public String getContents() {
-        try {
-            StringWriter sw = new StringWriter();
-            IOUtil.copyStream(getReader(), sw);
-            return sw.toString();
-        } catch (IOException e) {
-            throw new AuraRuntimeException(e);
+        if (contents != null) {
+            return contents;
         }
+        synchronized (this) {
+            if (contents != null) {
+                return contents;
+            }
+            try {
+                Reader reader = new InputStreamReader(new FileInputStream(file), "UTF8");
+                reader = new HashingReader(reader, hash);
+                StringWriter sw = new StringWriter();
+                IOUtil.copyStream(reader, sw);
+                contents = sw.toString();
+            } catch (FileNotFoundException e) {
+                throw new AuraRuntimeException(e);
+            } catch (IOException e) {
+                throw new AuraRuntimeException(e);
+            }
+        }
+        return contents;
     }
 
     private final static Map<String,String> mimeMap;

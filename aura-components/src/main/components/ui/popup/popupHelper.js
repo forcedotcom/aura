@@ -40,7 +40,10 @@
     },
 
     handleTriggerPress: function (component) {
-        this.setTargetVisibility(component, !this.getTargetComponent(component).get("v.visible"));
+        var target = this.getTargetComponent(component);
+        if (target && target.isValid()) {
+            this.setTargetVisibility(component, !target.get("v.visible"));
+        }
     },
 
     handleTargetShow: function (component, event) {

@@ -240,7 +240,7 @@
         var testUtils = cmp.get("v.testUtils");
         window.location.href = '#view';
         testUtils.assertEquals(location, window.location);
-        testUtils.assertEquals("/lockerTest/secureWindowTest.cmp", window.location.pathname);
+        testUtils.assertEquals(cmp.get("v.expectedPath"), window.location.pathname);
         testUtils.assertEquals("#view", window.location.hash);
     },
 

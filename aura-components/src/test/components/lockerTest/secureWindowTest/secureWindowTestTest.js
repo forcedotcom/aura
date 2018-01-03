@@ -58,6 +58,7 @@
 
     testModifyWindowLocation: {
         test: function(cmp) {
+            cmp.set("v.expectedPath", window.location.pathname);
             cmp.testModifyWindowLocation();
         }
     },

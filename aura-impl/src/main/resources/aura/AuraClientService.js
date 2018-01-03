@@ -3339,12 +3339,12 @@ AuraClientService.prototype.retryActions = function(auraXHR, event) {
     var newToken = event["attributes"] &&
                    event["attributes"]["values"] &&
                    event["attributes"]["values"]["newToken"];
-    if ($A.util.isString(newToken) && !$A.util.isEmpty(newToken)) {
+    if ($A.util.isString(newToken) && !$A.util.isEmpty(newToken) && newToken !== this._token) {
         this.invalidSession(newToken);
 
         $A.log("[AuraClientService].retryActions]: New token received, attempting to retry failed actions");
         for (var name in auraXHR.actions) {
-            if (auraXHR.actions[name].getRetryCount() <= this.maxActionRetries) {
+            if (auraXHR.actions[name].getRetryCount() < this.maxActionRetries) {
                 auraXHR.actions[name].incrementRetryCount();
                 this.enqueueAction(auraXHR.actions[name]);
             } else {

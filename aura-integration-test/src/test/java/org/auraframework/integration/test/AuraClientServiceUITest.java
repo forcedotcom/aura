@@ -120,7 +120,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
             WebElement trigger = getDriver().findElement(By.className("trigger"));
             trigger.click();
         }, token -> {
-            if (token.equals("aura")) {
+            if (!token.equals(expectedToken)) {
                 throw expectedException;
             }
         });

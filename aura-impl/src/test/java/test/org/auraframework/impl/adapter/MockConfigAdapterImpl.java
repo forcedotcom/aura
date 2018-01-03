@@ -316,9 +316,10 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     @Override
     public void validateCSRFToken(String token) {
         if (this.csrfValidationFunction != null) {
-        	this.csrfValidationFunction.accept(token);
+            this.csrfValidationFunction.accept(token);
+        } else {
+            super.validateCSRFToken(token);
         }
-        super.validateCSRFToken(token);
     }
 
     @Override

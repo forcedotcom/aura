@@ -100,8 +100,10 @@
 
 	
 	handleOnOpen : function(cmp, force) {
-		var items = cmp.get('v.items');	
-		if ((cmp.get('v.visible') || !cmp.isRendered()) && !force) {
+		var items = cmp.get('v.items');
+		//changed to OR !force to make sure component is rendered before doing
+		//dom calculations, in this component force is always true
+		if (cmp.get('v.visible') || !cmp.isRendered() || !force) {
 			return;
 		}
 		this.attachEventHandler(cmp);		

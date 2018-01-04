@@ -66,7 +66,7 @@
 
     getTriggerComponent: function (element) {
         var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
-        var component = htmlCmp.getComponentValueProvider().getConcreteComponent();
+        var component = htmlCmp ? htmlCmp.getComponentValueProvider().getConcreteComponent() : null;
         while (component && !component.isInstanceOf("ui:popupTrigger")) {
             component = component.getComponentValueProvider().getConcreteComponent();
         }

@@ -372,19 +372,6 @@ public class AuraContextImplTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testGetLocalDefFromNonSystemEvenIfSetInSystem() {
-        FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
-        Definition definition = Mockito.mock(Definition.class);
-        Definition definition2 = Mockito.mock(Definition.class);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
-        impl.addLocalDef(desc, definition);
-        impl.setSystemMode(true);
-        impl.addLocalDef(desc, definition2);
-        assertNotNull(impl.getLocalDef(desc));
-        assertEquals(impl.getLocalDef(desc).orNull(), definition);
-    }
-
-    @Test
     public void testIsLocalDefNotCacheableStaysInSystemMode() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
         AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);

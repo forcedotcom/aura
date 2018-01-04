@@ -35,7 +35,7 @@ import org.auraframework.impl.util.mock.MockDefDescriptor;
 import org.auraframework.impl.util.mock.MockDefinition;
 import org.auraframework.impl.util.mock.MockRegistrySet;
 import org.auraframework.service.LoggingService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraLocalStore;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Location;
 import org.auraframework.system.RegistrySet;
@@ -46,6 +46,7 @@ import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -61,17 +62,9 @@ public class AuraLinkerTest {
     @Mock
     private LoggingService loggingService;
 
-    @Mock
-    private AuraContext context;
-
     @Before
     public void initMocks() {
         MockitoAnnotations.initMocks(this);
-    }
-
-    @Before
-    public void initContext() {
-        Mockito.when(context.getRegistries()).thenReturn(registries);
     }
 
     @Test
@@ -79,7 +72,7 @@ public class AuraLinkerTest {
         MockDefDescriptor desc1 = new MockDefDescriptor("markup", "b", "b");
         MockDefDescriptor desc2 = new MockDefDescriptor("markup", "b", "B");
 
-        AuraLinker linker = new AuraLinker(desc1, context, null, null, null, null, null);
+        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, null, registries);
         LinkingDefinition<Definition> ld1 = linker.getLinkingDef(desc1);
         LinkingDefinition<Definition> ld2 = linker.getLinkingDef(desc2);
         Assert.assertSame("Definitions should be the same", ld1, ld2);
@@ -93,7 +86,7 @@ public class AuraLinkerTest {
         MockDefDescriptor desc2 = new MockDefDescriptor("markup", "a", "b");
         MockDefinition def2 = new MockDefinition(desc1);
 
-        AuraLinker linker = new AuraLinker(desc1, context, null, null, null, null, null);
+        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, null, registries);
 
         LinkingDefinition<Definition> ld = linker.getLinkingDef(desc1);
         ld.def = def1;
@@ -119,7 +112,7 @@ public class AuraLinkerTest {
         MockDefDescriptor desc2 = new MockDefDescriptor("markup", "a", "b");
         MockDefinition def2 = new MockDefinition(desc1);
 
-        AuraLinker linker = new AuraLinker(desc1, context, null, null, null, null, null);
+        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, null, registries);
 
         LinkingDefinition<Definition> ld = linker.getLinkingDef(desc1);
         ld.def = def1;
@@ -384,13 +377,12 @@ public class AuraLinkerTest {
         RegistrySet registries = Mockito.mock(RegistrySet.class);
         DefRegistry registry = new StaticDefRegistryImpl(Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(),
                 definitions);
-        Mockito.doReturn(registry).when(registries).getRegistryFor(Mockito.any());
-        AuraContext context = Mockito.mock(AuraContext.class);
-        Mockito.doReturn(registries).when(context).getRegistries();
+        Mockito.doReturn(registry).when(registries).getRegistryFor(Matchers.any());
+        AuraLocalStore localStore = Mockito.mock(AuraLocalStore.class);
         @SuppressWarnings("unchecked")
         Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache = Mockito.mock(Cache.class);
-        return new AuraLinker(root.getDescriptor(), context, defsCache, null,
-                loggingService, configAdapter, accessChecker);
+        return new AuraLinker(root.getDescriptor(), defsCache, null,
+                loggingService, configAdapter, accessChecker, localStore, null, registries);
     }
 
     // This is here to allow tests to be run easily, it does a random set of dependencies and

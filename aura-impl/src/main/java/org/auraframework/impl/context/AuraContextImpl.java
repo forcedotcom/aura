@@ -51,6 +51,7 @@ import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraLocalStore;
 import org.auraframework.system.Client;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
@@ -149,44 +150,7 @@ public class AuraContextImpl implements AuraContext {
     private String nonce;
     private String actionPublicCacheKey;
 
-    /**
-     * The set of defs that are thread local.
-     *
-     * We have two copies of this class, one for 'user' mode, and one for 'system' mode. The only difference
-     * is that system mode defs are not sent to the client.
-     */
-    private static class LocalDefs {
-        LocalDefs() {
-            this.defs = new HashMap<>();
-            this.dynamicDescs = new HashSet<>();
-            this.localDependencies = new HashMap<>();
-            this.defNotCacheable = new HashSet<>();
-        }
-
-        final Map<DefDescriptor<? extends Definition>, Optional<Definition>> defs;
-        final Set<DefDescriptor<? extends Definition>> dynamicDescs;
-        final Set<DefDescriptor<? extends Definition>> defNotCacheable;
-
-        /**
-         * A local dependencies cache.
-         *
-         * We store both by descriptor and by uid. The descriptor keys must include the type, as the qualified name
-         * is not sufficient to distinguish it. In the case of the UID, we presume that we are safe.
-         *
-         * The two keys stored in the local cache are:
-         * <ul>
-         * <li>The UID, which should be sufficiently unique for a single request.</li>
-         * <li>The type+qualified name of the descriptor. We store this to avoid construction in the case where we don't
-         * have a UID. This is presumed safe because we assume that a single session will have a consistent set of
-         * permissions</li>
-         * </ul>
-         */
-        private final Map<String, DependencyEntry> localDependencies;
-    }
-
-    private final LocalDefs userDefs;
-    private final LocalDefs systemDefs;
-    private LocalDefs currentDefs;
+    private AuraLocalStore localStore;
 
     private final Map<String, Boolean> clientClassesLoaded;
 
@@ -213,9 +177,7 @@ public class AuraContextImpl implements AuraContext {
         this.definitionService = definitionService;
         this.testContextAdapter = testContextAdapter;
         this.globalValues = new HashMap<>();
-        this.userDefs = new LocalDefs();
-        this.systemDefs = new LocalDefs();
-        this.currentDefs = userDefs;
+        this.localStore = new AuraLocalStoreImpl();
         this.clientClassesLoaded = new HashMap<>();
         // Why is this a cache and not just a map?
         this.accessCheckCache = new CacheImpl.Builder<String, String>()
@@ -229,11 +191,7 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public void setSystemMode(boolean systemMode) {
         isSystem = systemMode;
-        if (isSystem) {
-            this.currentDefs = systemDefs;
-        } else {
-            this.currentDefs = userDefs;
-        }
+        localStore.setSystemMode(systemMode);
     }
 
     @Override
@@ -243,34 +201,22 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public void setLocalDefNotCacheable(DefDescriptor<?> descriptor) {
-        currentDefs.defNotCacheable.add(descriptor);
+        localStore.setDefNotCacheable(descriptor);
     }
 
     @Override
     public boolean isLocalDefNotCacheable(DefDescriptor<?> descriptor) {
-        return userDefs.defNotCacheable.contains(descriptor)
-            || (isSystem && systemDefs.defNotCacheable.contains(descriptor));
+        return localStore.isDefNotCacheable(descriptor);
     }
 
     @Override
     public void addLocalDef(DefDescriptor<?> descriptor, Definition def) {
-        Optional<Definition> opt;
-        if (def == null) {
-            opt = Optional.absent();
-        } else {
-            opt = Optional.of(def);
-        }
-        currentDefs.defs.putIfAbsent(descriptor, opt);
+        localStore.addDefinition(descriptor, def);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> Optional<D> getLocalDef(DefDescriptor<D> descriptor) {
-        Optional<D> opt = (Optional<D>)userDefs.defs.get(descriptor);
-        if (opt == null && isSystem) {
-            opt = (Optional<D>)systemDefs.defs.get(descriptor);
-        }
-        return opt;
+        return localStore.getDefinition(descriptor);
     }
 
     /**
@@ -281,14 +227,16 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public Map<DefDescriptor<? extends Definition>, Definition> filterLocalDefs(Set<DefDescriptor<?>> preloads) {
         Map<DefDescriptor<? extends Definition>, Definition> filtered;
+        Map<DefDescriptor<? extends Definition>, Definition> unfiltered;
 
-        filtered = Maps.newHashMapWithExpectedSize(userDefs.defs.size());
+        unfiltered = localStore.getDefinitions();
         if (preloads == null) {
-            preloads = Sets.newHashSet();
+            return unfiltered;
         }
-        for (Map.Entry<DefDescriptor<? extends Definition>, Optional<Definition>> entry : userDefs.defs.entrySet()) {
-            if (entry.getValue().isPresent() && !preloads.contains(entry.getKey())) {
-                filtered.put(entry.getKey(), entry.getValue().get());
+        filtered = Maps.newHashMapWithExpectedSize(unfiltered.size());
+        for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : unfiltered.entrySet()) {
+            if (!preloads.contains(entry.getKey())) {
+                filtered.put(entry.getKey(), entry.getValue());
             }
         }
         return filtered;
@@ -296,32 +244,13 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public <D extends Definition> void addDynamicDef(D def) {
-        DefDescriptor<? extends Definition> desc = def.getDescriptor();
-
-        if (desc == null) {
-            throw new AuraRuntimeException("Invalid def has no descriptor");
-        }
-        currentDefs.defs.put(desc, Optional.of(def));
-        currentDefs.defNotCacheable.add(desc);
-        currentDefs.dynamicDescs.add(desc);
+        localStore.addDynamicDefinition(def);
     }
 
     @Override
     public void addDynamicMatches(Set<DefDescriptor<?>> matched, DescriptorFilter matcher) {
-        for (DefDescriptor<? extends Definition> desc : userDefs.dynamicDescs) {
-            if (matcher.matchDescriptor(desc)) {
-                matched.add(desc);
-            }
-        }
-        if (isSystem) {
-            for (DefDescriptor<? extends Definition> desc : systemDefs.dynamicDescs) {
-                if (matcher.matchDescriptor(desc)) {
-                    matched.add(desc);
-                }
-            }
-        }
+        localStore.addDynamicMatches(matched, matcher);
     }
-
 
     @Override
     public boolean isPreloaded(DefDescriptor<?> descriptor) {
@@ -949,38 +878,17 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public void addLocalDependencyEntry(String key, DependencyEntry de) {
-        if (de.uid != null) {
-            currentDefs.localDependencies.put(de.uid, de);
-        }
-        currentDefs.localDependencies.put(key, de);
+        localStore.addDependencyEntry(key, de);
     }
 
     @Override
     public DependencyEntry getLocalDependencyEntry(String key) {
-        DependencyEntry entry;
-
-        entry = userDefs.localDependencies.get(key);
-        if (entry == null && isSystem) {
-            entry = systemDefs.localDependencies.get(key);
-        }
-        return entry;
+        return localStore.getDependencyEntry(key);
     }
 
     @Override
     public DependencyEntry findLocalDependencyEntry(DefDescriptor<?> descriptor) {
-        for (DependencyEntry det : userDefs.localDependencies.values()) {
-            if (det.dependencyMap != null && det.dependencyMap.containsKey(descriptor)) {
-                return det;
-            }
-        }
-        if (isSystem) {
-            for (DependencyEntry det : systemDefs.localDependencies.values()) {
-                if (det.dependencyMap != null && det.dependencyMap.containsKey(descriptor)) {
-                    return det;
-                }
-            }
-        }
-        return null;
+        return localStore.findDependencyEntry(descriptor);
     }
 
     /**
@@ -1055,5 +963,17 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public void setActionPublicCacheKey(String actionPublicCacheKey) {
         this.actionPublicCacheKey = actionPublicCacheKey;
+    }
+
+    @Override
+    public AuraLocalStore setAuraLocalStore(AuraLocalStore newStore) {
+        AuraLocalStore oldStore = localStore;
+        localStore = newStore;
+        return oldStore;
+    }
+
+    @Override
+    public AuraLocalStore getAuraLocalStore() {
+        return localStore;
     }
 }

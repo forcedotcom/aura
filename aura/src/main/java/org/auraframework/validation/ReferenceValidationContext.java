@@ -15,6 +15,9 @@
  */
 package org.auraframework.validation;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 
@@ -29,5 +32,24 @@ public interface ReferenceValidationContext extends ErrorAccumulator {
      * @param descriptor the descriptor for the definition that we want.
      * @return the definition, or null if there is none.
      */
-    <T extends Definition> T getAccessibleDefinition(DefDescriptor<T> descriptor);
+    @CheckForNull
+    <T extends Definition> T getAccessibleDefinition(@Nonnull DefDescriptor<T> descriptor);
+
+    /**
+     * Set the current 'referencing' descriptor.
+     *
+     * This sets up the current 'top level' validation descriptor, and allows
+     * for access checks on attribues based on the owner of the attribute.
+     *
+     * @param descriptor the current descriptor to validate
+     */
+    void setReferencingDescriptor(@CheckForNull DefDescriptor<?> descriptor);
+
+    /**
+     * Get the current 'referencing' descriptor.
+     *
+     * @return the current referencing descriptor.
+     */
+    @CheckForNull
+    DefDescriptor<?> getReferencingDescriptor();
 }

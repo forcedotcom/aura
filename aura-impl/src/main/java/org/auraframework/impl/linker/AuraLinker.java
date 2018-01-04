@@ -36,7 +36,7 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.service.LoggingService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraLocalStore;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Location;
 import org.auraframework.system.RegistrySet;
@@ -58,14 +58,15 @@ import com.google.common.collect.Sets;
  * AuraLinkerTest.testLinkOrderConsistencyRandom and run it to ensure sort stability.
  */
 public class AuraLinker {
-    private final AuraContext context;
     private final List<ClientLibraryDef> clientLibs;
     private final DefDescriptor<? extends Definition> topLevel;
     private final RegistrySet registries;
     private final LoggingService loggingService;
+    private final AuraLocalStore localStore;
     private final ConfigAdapter configAdapter;
     private final Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
     private final Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> descriptorCache;
+    private final Cache<String, String> accessCheckCache;
 
     private final Map<DefDescriptor<? extends Definition>, LinkingDefinition<?>> linked = Maps.newHashMap();
     private final Map<DefDescriptor<? extends Definition>, Definition> subDefinitions = Maps.newHashMap();
@@ -82,14 +83,17 @@ public class AuraLinker {
      */
     private boolean shouldCacheDependencies;
 
-    public AuraLinker(DefDescriptor<? extends Definition> topLevel, AuraContext context,
+    public AuraLinker(DefDescriptor<? extends Definition> topLevel,
             Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache,
             Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> descriptorCache,
             LoggingService loggingService, ConfigAdapter configAdapter,
-            AccessChecker accessChecker) {
+            AccessChecker accessChecker, AuraLocalStore localStore,
+            Cache<String, String> accessCheckCache,
+            RegistrySet registrySet) {
+
         this.defsCache = defsCache;
-        this.context = context;
-        this.registries = context.getRegistries();
+        this.registries = registrySet;
+        this.accessCheckCache = accessCheckCache;
         this.clientLibs = Lists.newArrayList();
         this.topLevel = topLevel;
         this.level = 0;
@@ -98,6 +102,7 @@ public class AuraLinker {
         this.loggingService = loggingService;
         this.configAdapter = configAdapter;
         this.accessChecker = accessChecker;
+        this.localStore = localStore;
     }
 
     public DefDescriptor<?> getTopLevel() {
@@ -256,22 +261,18 @@ public class AuraLinker {
                     }
                     continue;
                 }
-                context.pushCallingDescriptor(cd.descriptor);
-                try {
-                    if (cd.built && !cd.validated) {
-                        if (iteration != 0) {
-                            loggingService.warn("warmCaches: Nested add of " + cd.descriptor);
-                        }
-                        try {
-                            cd.def.validateReferences(validationContext);
-                        } catch (Throwable t) {
-                            loggingService.warn("warmCaches: Failed to validate "+cd.descriptor, t);
-                        }
-                        // Always mark as validated to avoid future complaints.
-                        cd.validated = true;
+                validationContext.setReferencingDescriptor(cd.descriptor);
+                if (cd.built && !cd.validated) {
+                    if (iteration != 0) {
+                        loggingService.warn("warmCaches: Nested add of " + cd.descriptor);
                     }
-                } finally {
-                    context.popCallingDescriptor();
+                    try {
+                        cd.def.validateReferences(validationContext);
+                    } catch (Throwable t) {
+                        loggingService.warn("warmCaches: Failed to validate "+cd.descriptor, t);
+                    }
+                    // Always mark as validated to avoid future complaints.
+                    cd.validated = true;
                 }
             }
             iteration += 1;
@@ -344,7 +345,7 @@ public class AuraLinker {
             }
         } finally {
             if (parent != null && linkingDef.def != null) {
-                accessChecker.assertAccess(parent.getDescriptor(), linkingDef.def, context.getAccessCheckCache());
+                accessChecker.assertAccess(parent.getDescriptor(), linkingDef.def, accessCheckCache);
             }
         }
     }
@@ -376,20 +377,16 @@ public class AuraLinker {
             ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(accessible);
 
             for (LinkingDefinition<?> linkingDef : compiling) {
-                context.pushCallingDescriptor(linkingDef.descriptor);
-                try {
-                    if (linkingDef.built && !linkingDef.validated) {
-                        if (iteration != 0) {
-                            // loggingService.warn("Nested add of " + linkingDef.descriptor + " during validation of "
-                            //        + topLevel);
-                            // throw new
-                            // AuraRuntimeException("Nested add of "+linkingDef.descriptor+" during validation of "+topLevel);
-                        }
-                        linkingDef.def.validateReferences(validationContext);
-                        linkingDef.validated = true;
+                validationContext.setReferencingDescriptor(linkingDef.descriptor);
+                if (linkingDef.built && !linkingDef.validated) {
+                    if (iteration != 0) {
+                        // loggingService.warn("Nested add of " + linkingDef.descriptor + " during validation of "
+                        //        + topLevel);
+                        // throw new
+                        // AuraRuntimeException("Nested add of "+linkingDef.descriptor+" during validation of "+topLevel);
                     }
-                } finally {
-                    context.popCallingDescriptor();
+                    linkingDef.def.validateReferences(validationContext);
+                    linkingDef.validated = true;
                 }
             }
             iteration += 1;
@@ -400,7 +397,7 @@ public class AuraLinker {
         //
         for (LinkingDefinition<?> linkingDef : compiling) {
             if (linkingDef.def != null) {
-                context.addLocalDef(linkingDef.descriptor, linkingDef.def);
+                localStore.addDefinition(linkingDef.descriptor, linkingDef.def);
                 if (linkingDef.built) {
                     if (linkingDef.cacheable) { // false for non-internal namespaces, or non-cacheable registries
                         defsCache.put(linkingDef.descriptor, Optional.of(linkingDef.def));
@@ -432,7 +429,7 @@ public class AuraLinker {
         //
         // Already linked defs are retrieved from cache even during recompilation for modules
         //
-        Optional<D> optLocalDef = context.getLocalDef(compiling.descriptor);
+        Optional<D> optLocalDef = localStore.getDefinition(compiling.descriptor);
         if (optLocalDef != null) {
             D localDef = optLocalDef.orNull();
             if (localDef != null) {
@@ -443,7 +440,7 @@ public class AuraLinker {
                     localDef.validateDefinition();
                 }
                 // do not perform expensive isLocalDefNotCacheable() unless needed
-                if (shouldCacheDependencies && context.isLocalDefNotCacheable(compiling.descriptor)) {
+                if (shouldCacheDependencies && localStore.isDefNotCacheable(compiling.descriptor)) {
                     shouldCacheDependencies = false;
                 }
                 return true;
@@ -491,7 +488,7 @@ public class AuraLinker {
         //
         DefRegistry registry = registries.getRegistryFor(compiling.descriptor);
         if (registry == null) {
-            context.addLocalDef(compiling.descriptor, null);
+            localStore.addDefinition(compiling.descriptor, null);
             StringBuffer message = new StringBuffer(
                     "Registry not found for " + compiling.descriptor + " in registry set: "
                     +registries.toString());
@@ -508,7 +505,7 @@ public class AuraLinker {
             compiling.cacheable = true;
         } else {
             shouldCacheDependencies = false;
-            context.setLocalDefNotCacheable(compiling.descriptor);
+            localStore.setDefNotCacheable(compiling.descriptor);
         }
 
         //
@@ -518,7 +515,7 @@ public class AuraLinker {
         //
         compiling.def = registry.getDef(compiling.descriptor);
         if (compiling.def == null) {
-            context.addLocalDef(compiling.descriptor, null);
+            localStore.addDefinition(compiling.descriptor, null);
             StringBuffer message = new StringBuffer(compiling.descriptor + " not found in registry " + registry);
             registry.find(new DescriptorFilter("*")).stream().forEach((currentDescriptor)->{
                 message.append(currentDescriptor);

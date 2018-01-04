@@ -954,9 +954,10 @@ public class DefinitionServiceImpl implements DefinitionService {
         String key = makeLocalKey(descriptor, modulesEnabled);
         Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache = cachingService.getDefsCache();
 
-        linker = new AuraLinker(descriptor, context, defsCache,
+        linker = new AuraLinker(descriptor, defsCache,
                 cachingService.getDefDescriptorByNameCache(),
-                loggingService, configAdapter, accessChecker);
+                loggingService, configAdapter, accessChecker, context.getAuraLocalStore(),
+                context.getAccessCheckCache(), context.getRegistries());
 
         threadLinker.set(linker);
         try {
@@ -1118,9 +1119,10 @@ public class DefinitionServiceImpl implements DefinitionService {
     public void warmCaches() {
         AuraContext context = contextService.getCurrentContext();
         Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache = cachingService.getDefsCache();
-        AuraLinker linker = new AuraLinker(null, context, defsCache,
+        AuraLinker linker = new AuraLinker(null, defsCache,
                 cachingService.getDefDescriptorByNameCache(),
-                loggingService, configAdapter, accessChecker);
+                loggingService, configAdapter, accessChecker, context.getAuraLocalStore(),
+                context.getAccessCheckCache(), context.getRegistries());
         linker.addMap(globalControllerDefRegistry.getAll());
         long startTime = System.currentTimeMillis();
         long incremental;

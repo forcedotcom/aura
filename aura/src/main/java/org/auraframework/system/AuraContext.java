@@ -773,4 +773,19 @@ public interface AuraContext {
      * @param actionPublicCacheKey The action public cache key
      */
     void setActionPublicCacheKey(String actionPublicCacheKey);
+
+    /**
+     * Set the aura local store to a new value, returning the old one.
+     *
+     * This should not be needed if we do not access the local store outside of the linker during linking
+     *
+     * @param newStore the new store to set
+     * @return the old store.
+     */
+    AuraLocalStore setAuraLocalStore(AuraLocalStore newStore);
+
+    /**
+     * Get the current local store.
+     */
+    AuraLocalStore getAuraLocalStore();
 }

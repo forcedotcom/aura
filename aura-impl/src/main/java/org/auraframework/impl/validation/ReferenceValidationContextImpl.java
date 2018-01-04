@@ -24,6 +24,7 @@ import org.auraframework.validation.ReferenceValidationContext;
 public class ReferenceValidationContextImpl extends ErrorAccumulatorImpl implements ReferenceValidationContext {
 
     private final Map<DefDescriptor<? extends Definition>, Definition> definitionMap;
+    private DefDescriptor<?> currentReferencingDescriptor;
 
     public ReferenceValidationContextImpl(Map<DefDescriptor<? extends Definition>, Definition> definitionMap) {
         this.definitionMap = definitionMap;
@@ -33,5 +34,16 @@ public class ReferenceValidationContextImpl extends ErrorAccumulatorImpl impleme
     @SuppressWarnings("unchecked")
     public <T extends Definition> T getAccessibleDefinition(DefDescriptor<T> descriptor) {
         return (T)definitionMap.get(descriptor);
+    }
+
+    @Override
+    public void setReferencingDescriptor(DefDescriptor<?> descriptor) {
+        currentReferencingDescriptor = descriptor;
+
+    }
+
+    @Override
+    public DefDescriptor<?> getReferencingDescriptor() {
+        return currentReferencingDescriptor;
     }
 }

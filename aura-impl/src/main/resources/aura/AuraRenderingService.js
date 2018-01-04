@@ -32,6 +32,7 @@ function AuraRenderingService() {
     this.dirtyComponentIds = [];
     this.needsCleaning = false;
     this.markerToReferencesMap = {};
+    this.rerenderFacetTopVisit = true;
 
     // For elements that do not have a data-aura-rendered-by attribute, we'll add a unique identifier.
     this.DATA_UID_KEY = "data-rendering-service-uid";
@@ -61,7 +62,7 @@ AuraRenderingService.prototype.render = function(components, parent) {
         var cmp = components[i];
 
         if (!$A.util.isComponent(cmp)) {
-            if($A.componentService.isComponentDefRef(cmp)) {
+            if ($A.componentService.isComponentDefRef(cmp)) {
                 // If someone passed a config in, construct it.
                 cmp = $A.componentService.createComponentPriv(cmp);
                 // And put the constructed component back into the array.
@@ -76,7 +77,7 @@ AuraRenderingService.prototype.render = function(components, parent) {
             $A.clientService.setCurrentAccess(cmp);
             try {
                 var renderedElements = cmp["render"]();
-                renderedElements=this.finishRender(cmp, renderedElements);
+                renderedElements = this.finishRender(cmp, renderedElements);
                 elements = elements.concat(renderedElements);
             } catch (e) {
                 if (e instanceof $A.auraError && e["component"]) {
@@ -92,7 +93,7 @@ AuraRenderingService.prototype.render = function(components, parent) {
         }
     }
 
-    if(parent) {
+    if (parent) {
         $A.util.appendChild(elements, parent);
     }
 
@@ -125,11 +126,10 @@ AuraRenderingService.prototype.rerender = function(components) {
 
     var topVisit = false;
     var visited = this.visited;
-    if(!visited) {
+    if (!visited) {
         visited = this.visited = {};
         topVisit = true;
     }
-
 
     var elements = [];
 
@@ -137,17 +137,17 @@ AuraRenderingService.prototype.rerender = function(components) {
     for (var i = 0; i < components.length; i++) {
         var cmp = components[i];
         var id = cmp.getGlobalId();
-        if (cmp.isValid()){
-            var renderedElements=[];
-            var addExistingElements=visited[id];
-            if(!visited[id]) {
-                if(!cmp.isRendered()) {
+        if (cmp.isValid()) {
+            var renderedElements = [];
+            var addExistingElements = visited[id];
+            if (!visited[id]) {
+                if (!cmp.isRendered()) {
                     throw new $A.auraError("Aura.RenderingService.rerender: attempt to rerender component that has not been rendered.", null, $A.severity.QUIET);
                 }
                 var rerenderedElements = undefined;
                 $A.clientService.setCurrentAccess(cmp);
                 try {
-                    rerenderedElements=cmp["rerender"]();
+                    rerenderedElements = cmp["rerender"]();
                 } catch (e) {
                     if (e instanceof $A.auraError && e["component"]) {
                         throw e;
@@ -343,18 +343,18 @@ AuraRenderingService.prototype.unrender = function(components) {
  * @param {Component|Array} facet the component or array of components to store.
  */
 AuraRenderingService.prototype.storeFacetInfo = function(component, facet) {
-    if(!$A.util.isComponent(component)) {
+    if (!$A.util.isComponent(component)) {
         throw new $A.auraError("AuraRenderingService.storeFacetInfo: 'component' must be a valid Component. Found '" + component + "'.",
                 null, $A.severity.QUIET);
     }
-    if($A.util.isComponent(facet)){
+    if ($A.util.isComponent(facet)) {
         facet=[facet];
     }
     if (!$A.util.isArray(facet)) {
         $A.warning("AuraRenderingService.storeFacetInfo: 'facet' must be a Component or an Array. Found '" + facet + "' in '" + component.getType() + "'.");
         facet = [];
     }
-    component._facetInfo=facet.slice(0);
+    component._facetInfo = facet.slice(0);
 };
 
 /**
@@ -427,7 +427,7 @@ AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) 
 /**
  * @public
  * @param {Component} component the component for which we are rendering the facet.
- * @param {Component} facet the facet to render.
+ * @param {Component|Array} facet the facet to render.
  * @param {Component} parent (optional) the parent for the facet.
  * @export
  */
@@ -435,13 +435,25 @@ AuraRenderingService.prototype.renderFacet = function(component, facet, parent) 
     var ret = this.render(facet, parent);
     this.storeFacetInfo(component, facet);
 
-    if(!ret.length) {
+    var containerId = component.globalId;
+    var componentOnFacet;
+    // facet can be a component or an array
+    for (var i = 0; i < component._facetInfo.length; i++) {
+        // dynamically created component uses its creator as its container when it gets created
+        // the container needs to be updated when the component gets rendered
+        componentOnFacet = component._facetInfo[i];
+        if ($A.util.isComponent(componentOnFacet) && componentOnFacet.containerComponentId !== containerId) {
+            componentOnFacet.setContainerComponentId(component.globalId);
+        }
+    }
+
+    if (!ret.length) {
         if(parent) {
             this.setMarker(component, parent);
         } else {
             this.setMarker(component, ret[0]=this.createMarker(null,"render facet: " + component.getGlobalId()));
         }
-    }else if(parent) {
+    } else if(parent) {
         this.setMarker(component, parent);
     } else {
         this.setMarker(component, ret[0]);
@@ -457,85 +469,133 @@ AuraRenderingService.prototype.renderFacet = function(component, facet, parent) 
  * @export
  */
 AuraRenderingService.prototype.rerenderFacet = function(component, facet, referenceNode) {
+
     var updatedFacet=this.getUpdatedFacetInfo(component,facet);
     var ret=[];
     var marker = this.getMarker(component);
-    var components=updatedFacet.components;
-    var target=referenceNode||marker.parentNode;
-    var calculatedPosition=0;
-    var positionMarker=marker;
-    var nextSibling=null;
-    // If the parent is NOT my marker then look inside to find it's position.
-    if(positionMarker !== target) {
-        while(positionMarker.previousSibling){
-            calculatedPosition++;
-            positionMarker=positionMarker.previousSibling;
-        }
+    var target = referenceNode||marker.parentNode;
+    var calculatedPosition = 0;
+    var nextSibling = null;
+
+    var topVisit = this.rerenderFacetTopVisit;
+    var beforeRerenderElements = null;
+    var oldElementContainerPositions = null;
+
+    // for the top visit, it needs to figure out the updated elements for the dirty component
+    // to update the component's container chain
+    if (topVisit) {
+        this.rerenderFacetTopVisit = false;
+        beforeRerenderElements = this.getAllElementsCopy(component);
+        // the positions are needed when updating elements on the containers, because if a component is unrendered
+        // during rerender, the marker element will be updated when moving marker's references.
+        oldElementContainerPositions = this.findElementsPositionFromContainers(component);
     }
-    for(var i=0;i<components.length;i++){
+
+    // If the parent is NOT my marker then look inside to find it's position.
+    if (marker !== target) {
+        // Counting the dom elements
+        // so that if an unknown element gets in the collection we won't blow up.
+        // But this means we need to count everything for the off chance this condition happens.
+        var elements = this.getAllElements(component);
+        var length = elements.length;
+        // Current is the last element in our component, or the marker.
+        var current = marker;
+        var totalElements = 0;
+
+        // Count from the marker to the firstChild so we know what index we are at in the childNodes collection.
+        while(current != null && current.previousSibling) {
+            calculatedPosition++;
+
+            // Move to the previous element and try again.
+            current = current.previousSibling;
+        }
+
+        // Count all the elements in the DOM vs what we know.
+        current = elements[length-1];
+        while (current != null) {
+            // How many nodes between the last element this component owns
+            // and the firstNode of the childNodes collection.
+            totalElements++;
+
+            // If we hit the marker, track the index of that component from the bottom.
+            // The marker is part of the component, so count it as an element.
+            if(current === marker) {
+                break;
+            }
+
+            // Move to the previous element and try again.
+            current = current.previousSibling;
+        }
+
+        // The position offset by the amount of untraced nodes.
+        calculatedPosition = calculatedPosition + (totalElements - length);
+    }
+
+    var components = updatedFacet.components;
+    for (var i = 0; i < components.length; i++) {
         var info=components[i];
         var renderedElements=null;
         if (!info.component.isValid() && info.action !== 'unrender') {
             continue;
         }
-        switch(info.action){
+
+        switch (info.action) {
             case "render":
-                renderedElements=this.render(info.component);
-                if(updatedFacet.useFragment){
-                    ret=ret.concat(renderedElements);
-                }else if(renderedElements.length){
-                    ret=ret.concat(renderedElements);
-                    marker = this.getMarker(component);
-                    // if the first element is the marker then no need to do extra work
-                    if(ret[0] !== marker) {
-                        // setMarker updates the references
-                        this.setMarker(component, ret[0]);
-                        // now clean up
-                        if(this.isCommentMarker(marker)){
-                            this.removeElement(marker);
-                        }
-                    }
-                    nextSibling=target.childNodes[calculatedPosition];
-                    this.insertElements(renderedElements,nextSibling||target,nextSibling,nextSibling);
+                var containerId = component.globalId;
+                if (info.component.containerComponentId !== containerId) {
+                    info.component.setContainerComponentId(containerId);
                 }
-                calculatedPosition+=renderedElements.length;
+
+                renderedElements = this.render(info.component);
+                if (updatedFacet.useFragment) {
+                    ret = ret.concat(renderedElements);
+                } else if (renderedElements.length) {
+                    ret = ret.concat(renderedElements);
+                    nextSibling = target.childNodes[calculatedPosition];
+                    this.insertElements(renderedElements, nextSibling||target, nextSibling, nextSibling);
+                }
+                calculatedPosition += renderedElements.length;
                 this.afterRenderStack.push(info.component);
                 break;
             case "rerender":
-                // rerender on every aura:expression is a hack.
-                // rerender is needed here when aura:expression has newly rendered elements in its facet
-                // to make the containing component be able to associate with the new elements.
-                if (this.hasDirtyValue(info.component) || info.component.getType() === "aura:expression") {
-                    renderedElements=this.rerender(info.component);
+                if (this.hasDirtyValue(info.component)) {
+                    renderedElements = this.rerender(info.component);
                 } else {
                     // This must use component.getElements() not this.getElements()
                     // Since we need a copy of the array.
-                    renderedElements=this.getAllElementsCopy(info.component);
+                    renderedElements = this.getAllElementsCopy(info.component);
                 }
                 info.component.disassociateElements();
                 this.associateElements(info.component, renderedElements);
                 ret = ret.concat(renderedElements);
-                calculatedPosition+=renderedElements.length;
+                calculatedPosition += renderedElements.length;
                 break;
             case "unrender":
                 marker = this.getMarker(component);
-                if (!this.isCommentMarker(marker)) {
+
+                // for html component, it should always has its own element as marker
+                if (!this.isCommentMarker(marker) && component.getType() !== "aura:html") {
+
+                    var allElements = this.getAllElements(info.component);
                     if (updatedFacet.fullUnrender || !marker.nextSibling) {
-                        this.setMarker(component, this.createMarker(marker,"unrender facet: " + component.getGlobalId()));
+                        var newMarker = this.createMarker(marker, "unrender facet: " + component.getGlobalId());
+                        this.setMarker(component, newMarker);
+                        // for the new comment marker
+                        calculatedPosition += 1;
                     } else {
-                        var allElements = this.getAllElements(info.component);
                         if (info.component.isValid() && allElements[0] === marker) {
                             // We can't just assume the nextSibling, it could belong to what we're unrendering.
                             // Find the next element that this unrendering component does not own.
                             var count = allElements.length - 1;
                             nextSibling = marker.nextSibling;
-                            while(count && nextSibling.nextSibling) {
+                            while (count && nextSibling.nextSibling) {
                                 nextSibling = nextSibling.nextSibling;
                                 count--;
                             }
                             this.setMarker(component, nextSibling);
                         }
                     }
+
                 }
 
                 //JBUCH: HALO: TODO: FIND OUT WHY THIS CAN BE UNRENDERING A COMPONENTDEFREF AND FIX IT
@@ -549,22 +609,142 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
                         this.cleanComponent(info.component.getGlobalId());
                     }
                 }
+
                 break;
         }
     }
     this.storeFacetInfo(component, updatedFacet.facetInfo);
-    if(updatedFacet.useFragment) {
+    if (updatedFacet.useFragment) {
         nextSibling = target.childNodes[calculatedPosition];
         this.insertElements(ret,nextSibling || target, nextSibling, nextSibling);
     }
 
     // JBUCH: HALO: FIXME: THIS IS SUB-OPTIMAL, BUT WE NEVER WANT TO REASSOCIATE HTML COMPONENTS
     var type = component.getType();
-    if (type!=="aura:html"){
+    if (type !== "aura:html") {
+        marker = this.getMarker(component);
+        if (ret.length > 0 && marker !== ret[0]) {
+            this.setMarker(component, ret[0]);
+            // now clean up if necessary
+            if (this.isCommentMarker(marker)) {
+                this.moveReferencesToMarker(marker, ret[0]);
+                this.removeElement(marker);
+            }
+        } else if (ret.length === 0 && marker) {
+            // the marker should only be comment marker
+            ret.push(marker);
+        }
+
         component.disassociateElements();
         this.associateElements(component, ret);
+
+        if (topVisit) {
+            var updatedElements = this.getAllElements(component);
+            // check if there's any elements update during rerender
+            var updateContainer = updatedElements.length !== beforeRerenderElements.length;
+            if (!updateContainer) {
+                for (var n = 0, len = beforeRerenderElements.length; n < len; n++) {
+                    if (beforeRerenderElements[n] !== updatedElements[n]) {
+                        updateContainer = true;
+                        break;
+                    }
+                }
+            }
+
+            if (updateContainer) {
+                var container = component.getConcreteComponent().getContainer();
+                this.updateContainerElements(container, oldElementContainerPositions, beforeRerenderElements, updatedElements);
+            }
+        }
     }
+
+    if (topVisit) {
+        this.rerenderFacetTopVisit = true;
+    }
+
     return ret;
+};
+
+/**
+ * @param {Component} component - the component to be found from containers
+ * @returns {Array} an arry of indexes that indicate where the component's elements are on the containers, from the bottom (direct) container to the top one
+ */
+AuraRenderingService.prototype.findElementsPositionFromContainers = function(component) {
+    var indexSet = [];
+
+    var allElements = this.getAllElements(component);
+    var container = component.getConcreteComponent().getContainer();
+
+    this.collectElementPositionsFromContainers(container, allElements[0], indexSet);
+
+    return indexSet;
+};
+
+/**
+ * Recursively traverse a component's container chain to collect the positions of the elements on containers
+ *
+ * @param {Component} container - the direct container of the element's render component
+ * @param {HTMLElement} element - the element to find in container component
+ * @param {Array} indexSet - an arry to store the indexes that indicate where the element is on the containers, from the bottom (direct) container to the top one
+ */
+AuraRenderingService.prototype.collectElementPositionsFromContainers = function(container, element, indexSet) {
+    if (!container) {
+        return;
+    }
+
+    var concrete = container.getConcreteComponent();
+    if ((concrete.getType() === "aura:html" && concrete["helper"].canHaveBody(concrete)) ||
+            concrete.isRendered() === false) {
+        return;
+    }
+
+    var allElements = this.getAllElements(concrete);
+    var index = allElements.indexOf(element);
+    if (index < 0) {
+        $A.log("AuraRenderingService.collectElementPositionsFromContainers(): Something is wrong. Container is missing children's elements");
+        return;
+    }
+
+    indexSet.push(index);
+    this.collectElementPositionsFromContainers(concrete.getContainer(), element, indexSet);
+};
+
+/**
+ * Update elements through container chain.
+ * When a dirty component gets rerendered, all containers of the component need to update their elements set accordingly.
+ *
+ * @param {Component} container - the direct container of the elements render component
+ * @param {Array} insertPositions - the old elements positions in the container's elements set, from the bottom (direct) container to the top one
+ * @param {Array} oldElements - the elements before rerendering
+ * @param {Array} updatedElements - the updated elements after rerendering
+ */
+AuraRenderingService.prototype.updateContainerElements = function(container, insertPositions, oldElements, updatedElements) {
+    if (!container || insertPositions.length === 0) {
+        return;
+    }
+
+    var concrete = container.getConcreteComponent();
+    // stop updating elements for container chain if it is a HtmlComponent which can have body.
+    // this needs to match the render logic.
+    if ((concrete.getType() === "aura:html" && concrete["helper"].canHaveBody(concrete)) ||
+            concrete.isRendered() === false) {
+        return;
+    }
+
+    var containerUpdatedElements = this.getAllElementsCopy(concrete);
+
+    var index = insertPositions.shift();
+    Array.prototype.splice.apply(containerUpdatedElements, [index, oldElements.length].concat(updatedElements));
+
+    concrete.disassociateElements();
+    this.associateElements(concrete, containerUpdatedElements);
+
+    // if the first element gets updated, marker needs to be reset
+    if (containerUpdatedElements[0] && containerUpdatedElements[0] !== this.getMarker(concrete)) {
+        this.setMarker(concrete, containerUpdatedElements[0]);
+    }
+
+    this.updateContainerElements(concrete.getContainer(), insertPositions, oldElements, updatedElements);
 };
 
 /**
@@ -573,7 +753,7 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
  * @param {Component} facet the facet to unrender.
  * @export
  */
-AuraRenderingService.prototype.unrenderFacet = function(cmp,facet){
+AuraRenderingService.prototype.unrenderFacet = function(cmp,facet) {
     if (cmp._facetInfo) {
         var facetInfo = [];
         // If in the process of destroying
@@ -626,12 +806,15 @@ AuraRenderingService.prototype.getMarker = function(cmp){
 };
 
 AuraRenderingService.prototype.setMarker = function(cmp, newMarker) {
-    if(!cmp) { return; }
+    if (!cmp) {
+        return;
+    }
+
     var concrete = cmp.getConcreteComponent();
     var oldMarker = this.getMarker(concrete);
 
     // Shouldn't hit this. I can't hit it anymore.
-    if(oldMarker === newMarker) {
+    if (oldMarker === newMarker) {
         return;
     }
 
@@ -639,15 +822,15 @@ AuraRenderingService.prototype.setMarker = function(cmp, newMarker) {
     // They always have a 1 to 1 mapping from component to element|textnode, and will never
     // use a comment marker. So no need to add overhead of tracking markers just for these component types.
     var type = cmp.getType();
-    if(type!=="aura:html") {
+    if (type!=="aura:html") {
         $A.renderingService.addMarkerReference(newMarker, concrete.getGlobalId());
     }
-    if(oldMarker) {
+    if (oldMarker) {
         $A.renderingService.removeMarkerReference(oldMarker, concrete.getGlobalId());
     }
 
     // Clear it out!
-    if(!newMarker) {
+    if (!newMarker) {
         concrete._marker = null;
     } else {
         concrete._marker = newMarker;
@@ -981,9 +1164,10 @@ AuraRenderingService.prototype.associateElements = function(cmp, elements) {
     for (var i = 0; i < len; i++) {
         element = elements[i];
 
-        if(!this.isCommentMarker(element)){
-            this.addAuraClass(cmp,element);
+        if (!this.isCommentMarker(element)) {
+            this.addAuraClass(cmp, element);
         }
+
         cmp.associateElement(element);
     }
 };
@@ -992,12 +1176,15 @@ AuraRenderingService.prototype.associateElements = function(cmp, elements) {
  * Create a new Comment marker optinally before the specified target and for the specified reason.
  * Often the reason is something relating to what was unrendered or rendered such as a globalId.
  *
+ * @param {HTMLElement} target - the target element where the created marker is placed before
+ * @param {string} reason - the text content of the marker, to help understand when or why this marker get created
+ *
  * @private
  */
-AuraRenderingService.prototype.createMarker = function(target,reason){
+AuraRenderingService.prototype.createMarker = function(target, reason) {
     var node = document.createComment(reason);
-    node.aura_marker=true;
-    if(target){
+    node.aura_marker = true;
+    if (target) {
         $A.util.insertBefore(node, target);
     }
     return node;
@@ -1110,7 +1297,7 @@ AuraRenderingService.prototype.resolveUid = function(element) {
  * @private
  */
 AuraRenderingService.prototype.addMarkerReference = function(marker, globalId) {
-    if(!marker||!globalId) {
+    if (!marker || !globalId) {
         return;
     }
     var uid = this.resolveUid(marker);
@@ -1206,12 +1393,35 @@ AuraRenderingService.prototype.moveReferencesToMarker = function(marker, newMark
     var isSwap = !!newMarker;
     newMarker = newMarker || this.createMarker(null, "unrender marker: " + marker.nodeValue);
 
-    if(references) {
+    if (references) {
         var collection = references.get();
         for(var c=collection.length-1;c>=0;c--) {
             var cmp = $A.getComponent(collection[c]);
-            if(cmp && !cmp.destroyed) {
+            if (cmp && !cmp.destroyed) {
                 this.setMarker(cmp, newMarker);
+                var concrete = cmp.getConcreteComponent();
+                var elements = concrete.allElements;
+                var position;
+                if (!elements) {
+                    concrete.elements = concrete.allElements = [newMarker];
+                } else {
+                    position = elements.indexOf(marker);
+                    if (position === -1) {
+                        // This seems like a problem, lets try to see if it happens
+                        $A.warning("AuraRenderingService.moveReferencesToMarker(): Missing marker on component " + cmp);
+                        // insert the new marker to behind if something is wrong
+                        position = elements.length;
+                    }
+                    var filteredElements = [];
+
+                    elements[position] = newMarker;
+                    for (var i=0;i<elements.length;i++) {
+                        if (!elements[i].aura_marker) {
+                            filteredElements.push(elements[i]);
+                        }
+                    }
+                    concrete.elements = filteredElements;
+                }
             }
         }
     }

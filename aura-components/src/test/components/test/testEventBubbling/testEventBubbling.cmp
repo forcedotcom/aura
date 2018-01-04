@@ -16,45 +16,45 @@
 -->
 
 <aura:component extends="test:testEventBubblingSuper">
-	<aura:dependency resource="markup://test:testEventBubbling*" type="COMPONENT"/>
+    <aura:dependency resource="markup://test:testEventBubbling*" type="COMPONENT"/>
 
-	<aura:attribute name="iterationIds" type="List" default=""/>
-	<aura:set attribute="logId" value="Root"/>
+    <aura:attribute name="iterationIds" type="List" default=""/>
+    <aura:set attribute="logId" value="Root"/>
 
     <aura:handler name="bubblingEvent" event="test:testEventBubblingEvent" action="{!c.handle}"/>
     <aura:handler name="bubblingEvent" event="test:testEventBubblingEvent" action="{!c.handle}" phase="capture"/>
     <aura:handler name="init" action="{!c.handleInit}" value="{!this}"/>
 
     <div style="position: fixed; left: 60%; padding: 5px; border: 1px solid #333; max-width:40%;">
-		<auraTest:logPanel aura:id="logPanel"/>
-	</div>
-	
+        <auraTest:logPanel aura:id="logPanel"/>
+    </div>
+
     <div aura:id="clientTarget" style="margin: 5px; padding: 5px; border: 1px solid #333;">
-    	ClientCreated
+        ClientCreated
     </div>
 
     <aura:iteration items="{!v.iterationIds}" var="i">
-		<test:testEventBubblingHandlerContainer aura:id="container" logId="{!'Container' + i}">
-			<test:testEventBubblingHandlerGrandchild aura:id="inner" logId="{!'Inner' + i}">
-			    <div style="margin: 5px; padding: 5px; border: 1px solid #333;">
-			    	{!'Facet' + i}
-			    	<test:testEventBubblingEmitter aura:id="emitter" logId="Event"/>
-			    	<test:testEventBubblingEmitterExtended aura:id="emitterExtended" logId="Extended"/>
-			    	<test:testEventBubblingEmitterOther aura:id="emitterOther" logId="Other"/>
-			    </div>
-			</test:testEventBubblingHandlerGrandchild>
-		</test:testEventBubblingHandlerContainer>
-	</aura:iteration>
+        <test:testEventBubblingHandlerContainer aura:id="container" logId="{!'Container' + i}">
+            <test:testEventBubblingHandlerGrandchild aura:id="inner" logId="{!'Inner' + i}">
+                <div style="margin: 5px; padding: 5px; border: 1px solid #333;">
+                    Facet{!i+1}
+                    <test:testEventBubblingEmitter aura:id="emitter" logId="Event"/>
+                    <test:testEventBubblingEmitterExtended aura:id="emitterExtended" logId="Extended"/>
+                    <test:testEventBubblingEmitterOther aura:id="emitterOther" logId="Other"/>
+                </div>
+            </test:testEventBubblingHandlerGrandchild>
+        </test:testEventBubblingHandlerContainer>
+    </aura:iteration>
 
-	<aura:iteration items="{!v.iterationIds}" var="i1">
-		<aura:iteration items="{!v.iterationIds}" var="i2">
-		    <div style="margin: 5px; padding: 5px; border: 1px solid #666;">
-		    	<test:testEventBubblingEmitter aura:id="emitterInIteration" logId="Passthrough"/>
-		    </div>
-		</aura:iteration>
-	</aura:iteration>
+    <aura:iteration items="{!v.iterationIds}" var="i1">
+        <aura:iteration items="{!v.iterationIds}" var="i2">
+            <div style="margin: 5px; padding: 5px; border: 1px solid #666;">
+                <test:testEventBubblingEmitter aura:id="emitterInIteration" logId="Passthrough"/>
+            </div>
+        </aura:iteration>
+    </aura:iteration>
 
-	<test:testEventBubblingHandler aura:id="provided" logId="Provided" provideByHandler="test:testEventBubblingHandlerChild"/>
-	
-	<test:testEventBubblingHandler aura:id="noSuperHandlers" logId="NoSuperHandlers" provideByHandler="test:testEventBubblingHandlerGrandchildWithoutHandlers"/>
+    <test:testEventBubblingHandler aura:id="provided" logId="Provided" provideByHandler="test:testEventBubblingHandlerChild"/>
+
+    <test:testEventBubblingHandler aura:id="noSuperHandlers" logId="NoSuperHandlers" provideByHandler="test:testEventBubblingHandlerGrandchildWithoutHandlers"/>
 </aura:component>

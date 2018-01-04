@@ -18,11 +18,11 @@
 <aura:component extensible="true" implements="test:testEventBubblingHasLogId">
     <aura:handler name="bubblingEvent" event="test:testEventBubblingEvent" action="{!c.handleSuper}"/>
 
-	<div style="max-width:60%;">
-	    {!v.body}
-	    <div style="margin: 5px; padding: 5px; border: 1px solid #333;">
-	    	Super
-	    	<test:testEventBubblingEmitter aura:id="emitter" logId="Super"/>
-	    </div>
-	</div>
+    <div style="max-width:60%;">
+        {!v.body}
+        <div style="margin: 5px; padding: 5px; border: 1px solid #333;">
+            Super
+            <test:testEventBubblingEmitter aura:id="emitter" logId="Super"/>
+        </div>
+    </div>
 </aura:component>

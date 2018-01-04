@@ -1028,6 +1028,7 @@ Aura.Utils.Util.prototype.removeElement = function(element) {
                 $A.assert(this.isUndefined(element["aura_deleted"]), "Element was reused after delete");
                 element["aura_deleted"] = true;
             }
+
             this.trashcan.appendChild(element);
         } else{
             this.trash.push(element);

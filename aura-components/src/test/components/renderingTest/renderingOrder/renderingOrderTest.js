@@ -21,7 +21,6 @@
         test: function(cmp) {
             var expected = "12345";
             var div = cmp.find("output").getElement();
-
             cmp.add();
             cmp.add();
             cmp.add();
@@ -66,7 +65,7 @@
             });
         }
     },
-    
+
     /**
      * Add then remove then add some more elements and verify the output
      * 1. Add 3 elements

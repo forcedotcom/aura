@@ -316,8 +316,9 @@ Aura.Event.Event.prototype.executeHandlerIterator = function(handlerIterator) {
     var res = {};
     var value;
 
-    var isSystemError = this.eventDef.getDescriptor().toString() === "markup://aura:systemError";
-    var isCustomerError = this.eventDef.getDescriptor().toString() === "markup://aura:customerError";
+    var type = this.getType();
+    var isSystemError = type === "aura:systemError";
+    var isCustomerError = type === "aura:customerError";
     var isComponentEventType = this.getEventExecutionType() === "COMPONENT";
 
     while(!this.paused && !res.done) {

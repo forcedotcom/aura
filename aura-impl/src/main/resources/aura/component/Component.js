@@ -87,50 +87,50 @@ function Component(config, localCreation) {
         var partialConfig;
         if (this.creationPath && this.creationPath !== "client created") {
             partialConfig = context.getComponentConfig(this.creationPath);
-    
+
             // Done with it in the context, it's now safe to remove so we don't process it again later.
             context.removeComponentConfig(this.creationPath);
         }
-    
+
         if (partialConfig) {
             this.validatePartialConfig(config,partialConfig);
             this.partialConfig = partialConfig;
         }
-    
+
         // get server rendering if there was one
         if (config["rendering"]) {
             this.rendering = config["rendering"];
         } else if (partialConfig && partialConfig["rendering"]) {
             this.rendering = this.partialConfig["rendering"];
         }
-    
+
         // add this component to the global index
         $A.componentService.indexComponent(this);
-    
+
         // sets this components definition, preferring partialconfig if it exists
         this.setupComponentDef(this.partialConfig || config);
-    
+
         // Saves a flag to indicate whether the component implements the root marker interface.
         this.isRootComponent = $A.util.isUndefinedOrNull(this["meta"] && this["meta"]["extends"]) && this.isInstanceOf("aura:rootComponent");
-    
+
         // join attributes from partial config and config, preferring partial when overlapping
         var configAttributes = { "values": {} };
-    
+
         if (config["attributes"]) {
             $A.util.apply(configAttributes["values"], config["attributes"]["values"], true);
             configAttributes["valueProvider"] = config["attributes"]["valueProvider"] || config["valueProvider"];
         }
-    
+
         if (partialConfig && partialConfig["attributes"]) {
             $A.util.apply(configAttributes["values"], partialConfig["attributes"]["values"], true);
             // NOTE: IT USED TO BE SOME LOGIC HERE TO OVERRIDE THE VALUE PROVIDER BECAUSE OF PARTIAL CONFIGS
             // IF WE RUN INTO ISSUES AT SOME POINT AFTER HALO, LOOK HERE FIRST!
         }
-    
+
         if (!configAttributes["facetValueProvider"]) {
             configAttributes["facetValueProvider"] = this;
         }
-    
+
         //JBUCH: HALO: FIXME: THIS IS A DIRTY FILTHY HACK AND I HAVE BROUGHT SHAME ON MY FAMILY
         this.attributeValueProvider = configAttributes["valueProvider"];
         this.facetValueProvider = configAttributes["facetValueProvider"];
@@ -501,15 +501,15 @@ Component.prototype.implementsDirectly = function(type) {
 
 /**
  * Dynamically adds an event handler for a component or application event.
- * 
+ *
  * @example
  * // For component event, first param matches name attribute in <aura:registerEvent> tag
  * cmp.addEventHandler("compEvent", cmp.getReference("c.handleEvent"));
- * 
+ *
  * // For application event, first param is event descriptor, "c:appEvent"
  * cmp.addEventHandler("c:appEvent", cmp.getReference("c.handleAppEvent"));
- * 
- * // Anonymous function handler for component event 
+ *
+ * // Anonymous function handler for component event
  * cmp.addEventHandler("compEvent", function(auraEvent) {
  *     // add handler logic here
  *     console.log("Handled the component event in anonymous function");
@@ -842,7 +842,7 @@ Component.prototype.destroy = function() {
         }
         this.docLevelHandlers=undefined;
     }
-    
+
     // call unrender before setting _destroying
     // so that _destroying could be used for isValid check.
     $A.renderingService.unrender(this);
@@ -943,7 +943,7 @@ Component.prototype.destroy = function() {
             }
         }
     }
-    
+
     // Destroyed. Mark invalid
     this.destroyed=1;
 };
@@ -1114,8 +1114,8 @@ Component.prototype.getSuper = function() {
  * lookup. Also adds the rendering component's global Id as an attribute to the
  * rendered element. Primarily called by RenderingService.
  *
- * @param {Object}
- *            config
+ * @param {HTMLElement} element - the element to associate with the component
+ *
  * @protected
  * @export
  */
@@ -1133,8 +1133,8 @@ Component.prototype.associateElement = function(element) {
         }
 
         this.allElements.push(element);
-        // Is it NOT a marker, put it in the customer accessed elements collection. 
-        if(!element.aura_marker) {
+        // Is it NOT a marker, put it in the customer accessed elements collection.
+        if (!element.aura_marker) {
             this.elements.push(element);
             this.associateRenderedBy(this, element);
         }
@@ -1145,8 +1145,6 @@ Component.prototype.associateElement = function(element) {
  * Disassociates a rendered element with the component that rendered it for later
  * lookup.
  *
- * @param {Object}
- *            config
  * @protected
  * @export
  */
@@ -1155,11 +1153,11 @@ Component.prototype.disassociateElements = function() {
         var concrete = this.getConcreteComponent();
         concrete.disassociateElements();
     } else {
-        if(this.elements){
-            this.elements.length=0;
+        if (this.elements) {
+            this.elements.length = 0;
         }
-        if(this.allElements) {
-            this.allElements.length=0;
+        if (this.allElements) {
+            this.allElements.length = 0;
         }
     }
 };
@@ -1192,8 +1190,8 @@ Component.prototype.getElement = function() {
     var elements = this.getElements();
     if (elements) {
         for (var i = 0; i<elements.length; i++) {
-            if (elements[i]){
-            	return elements[i];
+            if (elements[i]) {
+                return elements[i];
             }
         }
     }
@@ -1565,7 +1563,7 @@ Component.prototype.setAttributeValueProvider = function (avp) {
     // We can't fix this.
     // var currentAttributeValueProvider = this.getAttributeValueProvider();
     // currentAttributeValueProvider.doDeIndex();
-    
+
     this.attributeValueProvider = avp;
     if(avp) {
         // JBA: without this, programmatically created components exhibit indeterministic owners
@@ -2493,7 +2491,7 @@ Component.prototype.getMethodHandler = function(methodDef,methodEventDef){
             }
             methodEvent.setParams(params);
             methodEvent.fired=true;
-        
+
             action.runDeprecated(methodEvent);
             return action.returnValue;
         }

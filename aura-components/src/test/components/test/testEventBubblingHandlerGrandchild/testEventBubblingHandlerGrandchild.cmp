@@ -17,12 +17,12 @@
 -->
 <aura:component extensible="true" extends="test:testEventBubblingHandlerChild">
     <aura:handler name="bubblingEvent" event="test:testEventBubblingEvent" action="{!c.handleGrandchild}"/>
-    
+
     <div style="margin: 5px; padding: 10px; border: 1px solid #333;">
-    	{!v.logId}Grandchild
-    	<test:testEventBubblingEmitter aura:id="emitter" logId="Event"/>
-    	<test:testEventBubblingEmitterExtended aura:id="emitterExtended" logId="Extended"/>
-    	<test:testEventBubblingEmitterOther aura:id="emitterOther" logId="Other"/>
-		{!v.body}
+        {!v.logId}Grandchild
+        <test:testEventBubblingEmitter aura:id="emitter" logId="Event"/>
+        <test:testEventBubblingEmitterExtended aura:id="emitterExtended" logId="Extended"/>
+        <test:testEventBubblingEmitterOther aura:id="emitterOther" logId="Other"/>
+        {!v.body}
     </div>
 </aura:component>

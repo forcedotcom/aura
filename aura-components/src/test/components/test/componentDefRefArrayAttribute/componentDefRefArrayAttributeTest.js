@@ -97,7 +97,7 @@
                         var cmps = cmp.get("v.cmpDefRefsOnFacet");
                         cmps.push(newCmp);
                         // add new element to trigger rerender
-                        cmp.set("v.cmpDefRefs", cmps);
+                        cmp.set("v.cmpDefRefsOnFacet", cmps);
                         completed = true;
                     });
 

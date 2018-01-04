@@ -1,0 +1,10 @@
+
+.THIS div {
+    background-color:yellow;
+    width: 200px;
+}
+
+div.THIS {
+    background-color:pink;
+    width: 200px;
+}

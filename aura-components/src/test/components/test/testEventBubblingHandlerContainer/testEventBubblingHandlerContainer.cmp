@@ -17,11 +17,11 @@
 -->
 <aura:component implements="test:testEventBubblingHasLogId">
     <aura:handler name="bubblingEvent" event="test:testEventBubblingEvent" action="{!c.handleContainer}"/>
-    
+
     <div style="margin: 5px; padding: 10px; border: 1px solid #333;">
-    	{!v.logId}
-    	<test:testEventBubblingHandlerGrandchild aura:id="content" logId="{! v.logId + 'Content'}">
-			{!v.body}
-		</test:testEventBubblingHandlerGrandchild>
+        {!v.logId}
+        <test:testEventBubblingHandlerGrandchild aura:id="content" logId="{! v.logId + 'Content'}">
+            {!v.body}
+        </test:testEventBubblingHandlerGrandchild>
     </div>
 </aura:component>

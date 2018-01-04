@@ -134,7 +134,7 @@ function ExpressionComponent(config, localCreation) {
 
     // create all value providers for this component m/v/c etc.
     this.setupValueProviders(config["valueProviders"]);
-    
+
     // initialize attributes
     this.setupAttributes(configAttributes, localCreation);
 
@@ -208,7 +208,7 @@ ExpressionComponent.prototype.setupValueProviders = function(customValueProvider
     }
 };
 
-/** 
+/**
  * Component.js has logic that is specific to HtmlComponent. Great! So we can move that into here and out of Component.js
  * That logic is the LockerService part to assign trust to the owner.
  */
@@ -221,7 +221,7 @@ ExpressionComponent.prototype.setupComponentDef = function() {
 };
 
 /**
- * Simple type checking. All simple components implement aura:rootComponent and cannot be extended, 
+ * Simple type checking. All simple components implement aura:rootComponent and cannot be extended,
  * so the simple condition here is sufficient unless any of the individual components change.
  */
 ExpressionComponent.prototype.isInstanceOf = function(type) {
@@ -232,21 +232,21 @@ ExpressionComponent.prototype.isInstanceOf = function(type) {
 ExpressionComponent.prototype["renderer"] = {
     "render" : function(component) {
         var value = component.attributeSet.getValue("value");
-        if($A.util.isUndefinedOrNull(value)){
+        if ($A.util.isUndefinedOrNull(value)) {
             value = "";
         }
 
-        if(!($A.util.isComponent(value) || $A.util.isArray(value))){
+        if (!$A.util.isComponent(value) && !$A.util.isArray(value)) {
             // JBUCH: HALO: TODO: MIGHT BE ABLE TO RETURN THIS TO SIMPLE TEXTNODE MANAGEMENT
             var owner = component.getOwner();
             $A.clientService.setCurrentAccess(owner);
             try {
                 value = component._lastRenderedTextNode = $A.createComponentFromConfig({ "descriptor": "markup://aura:text", "attributes":{ value: value } });
-                value.setContainerComponentId(component.globalId);                
+                value.setContainerComponentId(component.globalId);
             } finally {
                 $A.clientService.releaseCurrentAccess();
             }
-            
+
             $A.lockerService.trust(owner, value);
         }
 

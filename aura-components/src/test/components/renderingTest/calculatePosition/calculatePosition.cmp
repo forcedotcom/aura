@@ -15,9 +15,16 @@
     limitations under the License.
 
 -->
-<aura:component implements="test:testEventBubblingHasLogId">
-    <aura:registerEvent name="bubblingEvent" type="test:testEventBubblingEvent" />
-    <aura:method name="fireEvent" action="{!c.fireEvent}"/>
+<aura:component>
+    <aura:attribute name="empty" type="Aura.Component[]"/>
+    <aura:attribute name="items" type="List" default="[1, 2, 3, 4]"/>
+    
+    <ui:button label="Rerender" press="{!c.rerender}"/>
 
-    <ui:button aura:id="button" press="{!c.fireEvent}" label="{!v.logId}"/>
+    <div aura:id="output">
+        {!v.empty}
+        <aura:iteration aura:id="iteration" items="{!v.items}" var="item">
+            <div>{!item}</div>
+        </aura:iteration>
+    </div>
 </aura:component>

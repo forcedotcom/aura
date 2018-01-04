@@ -1,0 +1,89 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name="one" type="Boolean" default="false"/>
+    <aura:attribute name="two" type="Boolean" default="false"/>
+    <aura:attribute name="three" type="Boolean" default="false"/>
+    <aura:attribute name="four" type="Boolean" default="false"/>
+
+    <aura:attribute name="facet1" type="Aura.Component[]"/>
+    <aura:attribute name="facet2" type="Aura.Component[]"/>
+
+    <ui:button aura:id="toggleOne" label="Toggle One" press="{!c.one}"/>
+    <ui:button aura:id="toggleTwo" label="Toggle Two" press="{!c.two}"/>
+    <ui:button aura:id="toggleThree" label="Toggle Three" press="{!c.three}"/>
+    <ui:button aura:id="toggleFour" label="Toggle Four" press="{!c.four}"/>
+    <ui:button aura:id="rerenderAuraExpression" label="Rerender AuraExpression" press="{!c.rerenderAuraExpression}"/>
+
+    <ul>
+        <li>One: {!v.one}</li>
+        <li>Two: {!v.two}</li>
+        <li>Three: {!v.three}</li>
+        <li>Four: {!v.four}</li>
+    </ul>
+
+    <section aura:id="output">
+        <aura:if isTrue="{!v.one}">
+            <auratest:empty/>
+            <div>One:true</div>
+            <aura:set attribute="else">
+                <aura:if isTrue="{!v.two}">
+                    <div>Two:true</div>
+                    <aura:set attribute="else">
+                        <aura:if isTrue="{!v.three}">
+                            <div>Three:true</div>
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{!v.four}">
+                                    {!v.facet1}
+                                    <div>Four:true</div>
+                                    <aura:set attribute="else">
+                                        <auratest:empty/>
+                                        <div>Four:false</div>
+                                    </aura:set>
+                                </aura:if>
+                            </aura:set>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+            </aura:set>
+        </aura:if>
+    </section>
+
+    <aura:if isTrue="{!v.one}">
+        <div>One:true</div>
+        <aura:set attribute="else">
+            <aura:if isTrue="{!v.two}">
+                <div>Two:true</div>
+                <aura:set attribute="else">
+                    <aura:if isTrue="{!v.three}">
+                        <div>Three:true</div>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.four}">
+                                <div>Four:true</div>
+                                {!v.facet2}
+                                <aura:set attribute="else">
+                                    <div>Four:false</div>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </aura:set>
+            </aura:if>
+        </aura:set>
+    </aura:if>
+</aura:component>

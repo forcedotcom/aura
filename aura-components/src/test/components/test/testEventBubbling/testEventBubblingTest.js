@@ -24,25 +24,28 @@
 
     testFacetEventHandledByRoot : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "handle Event in Root", //
-            "handleSuper Event in Root" ];
+            var expected = [
+                "fire Event",
+                "handle CAPTURE Event in Root",
+                "handle Event in Root",
+                "handleSuper Event in Root"
+            ];
 
             cmp.find("logPanel").clear();
             cmp.find("emitter").fireEvent();
+
             this.assertLogs(cmp, expected);
         }
     },
 
     testFacetExtendedEventHandledByRoot : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Extended", //
-            "handle CAPTURE Extended in Root", //
-            "handle Extended in Root", //
-            "handleSuper Extended in Root" ];
+            var expected = [
+                "fire Extended",
+                "handle CAPTURE Extended in Root",
+                "handle Extended in Root",
+                "handleSuper Extended in Root"
+            ];
 
             cmp.find("logPanel").clear();
             cmp.find("emitterExtended").fireEvent();
@@ -72,13 +75,13 @@
 
     testInnerEventNotHandledByContainer : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "handleGrandchild Event in Inner", //
-            "handleChild Event in Inner", //
-            "handle Event in Inner", //
-            "handle Event in Root", //
+            var expected = [
+            "fire Event",
+            "handle CAPTURE Event in Root",
+            "handleGrandchild Event in Inner",
+            "handleChild Event in Inner",
+            "handle Event in Inner",
+            "handle Event in Root",
             "handleSuper Event in Root" ];
 
             cmp.find("logPanel").clear();
@@ -89,12 +92,12 @@
 
     testInnerEventFromSuperNotHandledByContainerOrSubdefs : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "handleChild Event in Inner", //
-            "handle Event in Inner", //
-            "handle Event in Root", //
+            var expected = [
+            "fire Event",
+            "handle CAPTURE Event in Root",
+            "handleChild Event in Inner",
+            "handle Event in Inner",
+            "handle Event in Root",
             "handleSuper Event in Root" ];
 
             cmp.find("logPanel").clear();
@@ -105,11 +108,11 @@
 
     testInnerExtendedEventFromSuperSuperNotHandledByContainerOrSubdefs : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Extended", //
-            "handle CAPTURE Extended in Root", //
-            "handle Extended in Inner", //
-            "handle Extended in Root", //
+            var expected = [
+            "fire Extended",
+            "handle CAPTURE Extended in Root",
+            "handle Extended in Inner",
+            "handle Extended in Root",
             "handleSuper Extended in Root" ];
 
             cmp.find("logPanel").clear();
@@ -120,14 +123,14 @@
 
     testContainerContentGrandchildEventBubblesAllTheWay : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "handleGrandchild Event in ContainerContent", //
-            "handleChild Event in ContainerContent", //
-            "handle Event in ContainerContent", //
-            "handleContainer Event in Container", //
-            "handle Event in Root", //
+            var expected = [
+            "fire Event",
+            "handle CAPTURE Event in Root",
+            "handleGrandchild Event in ContainerContent",
+            "handleChild Event in ContainerContent",
+            "handle Event in ContainerContent",
+            "handleContainer Event in Container",
+            "handle Event in Root",
             "handleSuper Event in Root" ];
 
             cmp.find("logPanel").clear();
@@ -138,13 +141,13 @@
 
     testContainerContentExtendedEventFromSuperNotHandledBySubdefs : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Extended", //
-            "handle CAPTURE Extended in Root", //
-            "handleChild Extended in ContainerContent", //
-            "handle Extended in ContainerContent", //
-            "handleContainer Extended in Container", //
-            "handle Extended in Root", //
+            var expected = [
+            "fire Extended",
+            "handle CAPTURE Extended in Root",
+            "handleChild Extended in ContainerContent",
+            "handle Extended in ContainerContent",
+            "handleContainer Extended in Container",
+            "handle Extended in Root",
             "handleSuper Extended in Root" ];
 
             cmp.find("logPanel").clear();
@@ -155,12 +158,12 @@
 
     testProvidedByHandlerBubbling : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "handleChild Event in Provided", //
-            "handle Event in Provided", //
-            "handle Event in Root", //
+            var expected = [
+            "fire Event",
+            "handle CAPTURE Event in Root",
+            "handleChild Event in Provided",
+            "handle Event in Provided",
+            "handle Event in Root",
             "handleSuper Event in Root" ];
 
             cmp.find("logPanel").clear();
@@ -170,36 +173,37 @@
     },
 
     testClientCreatedBubblingIncludesRoot : {
-        test : [ function(cmp) {
-            var that = this;
-            cmp._target = undefined;
-            $A.componentService.createComponent("test:testEventBubblingHandlerGrandchild", {
-                logId : "Client"
-            }, function(newCmp) {
-                var output = cmp.find("clientTarget");
-                newCmp.setAttributeValueProvider(output);
-                var body = output.get("v.body");
-                body.push(newCmp);
-                output.set("v.body", body);
-                cmp._target = newCmp;
-            });
-            $A.test.addWaitFor(true, function() {
-                return cmp._target !== undefined;
-            });
-        }, function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "handleGrandchild Event in Client", //
-            "handleChild Event in Client", //
-            "handle Event in Client",
-            "handle Event in Root",
-            "handleSuper Event in Root" ];
+        test : [
+            function(cmp) {
+                var that = this;
+                cmp._target = undefined;
+                $A.componentService.createComponent("test:testEventBubblingHandlerGrandchild", {
+                        logId : "Client"
+                    }, function(newCmp) {
+                        var output = cmp.find("clientTarget");
+                        newCmp.setAttributeValueProvider(output);
+                        var body = output.get("v.body");
+                        body.push(newCmp);
+                        output.set("v.body", body);
+                        cmp._target = newCmp;
+                    });
+                $A.test.addWaitFor(true, function() { return cmp._target !== undefined; });
+            }, function(cmp) {
+                var expected = [
+                "fire Event",
+                "handle CAPTURE Event in Root",
+                "handleGrandchild Event in Client",
+                "handleChild Event in Client",
+                "handle Event in Client",
+                "handle Event in Root",
+                "handleSuper Event in Root" ];
 
-            cmp.find("logPanel").clear();
-            cmp._target.find("emitter").fireEvent();
-            this.assertLogs(cmp, expected);
-        } ]
+                cmp.find("logPanel").clear();
+
+                cmp._target.find("emitter").fireEvent();
+                this.assertLogs(cmp, expected);
+            }
+        ]
     },
 
     testClientCreatedThenProvidedByHandlerBubbling : {
@@ -221,10 +225,10 @@
                 return cmp._target !== undefined;
             });
         }, function(cmp) {
-            var expected = [ //
-            "fire Extended", //
-            "handle CAPTURE Extended in Root", //
-            "handleChild Extended in ProvidedClient", //
+            var expected = [
+            "fire Extended",
+            "handle CAPTURE Extended in Root",
+            "handleChild Extended in ProvidedClient",
             "handle Extended in ProvidedClient",
             "handle Extended in Root",
             "handleSuper Extended in Root" ];
@@ -237,14 +241,14 @@
 
     testStopInRoot : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "handleGrandchild Event in ContainerContent", //
-            "handleChild Event in ContainerContent", //
-            "handle Event in ContainerContent", //
-            "handleContainer Event in Container", //
-            "handle Event in Root", //
+            var expected = [
+            "fire Event",
+            "handle CAPTURE Event in Root",
+            "handleGrandchild Event in ContainerContent",
+            "handleChild Event in ContainerContent",
+            "handle Event in ContainerContent",
+            "handleContainer Event in Container",
+            "handle Event in Root",
             "stopRoot Event" ];
 
             $A.test.addEventHandler("bubblingEvent", function(e) {
@@ -260,13 +264,13 @@
 
     testStopInContainer : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "handleGrandchild Event in ContainerContent", //
-            "handleChild Event in ContainerContent", //
-            "handle Event in ContainerContent", //
-            "handleContainer Event in Container", //
+            var expected = [
+            "fire Event",
+            "handle CAPTURE Event in Root",
+            "handleGrandchild Event in ContainerContent",
+            "handleChild Event in ContainerContent",
+            "handle Event in ContainerContent",
+            "handleContainer Event in Container",
             "stopContainer Event" ];
 
             $A.test.addEventHandler("bubblingEvent", function(e) {
@@ -282,11 +286,11 @@
 
     testStopInChild : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "handleGrandchild Event in ContainerContent", //
-            "handleChild Event in ContainerContent", //
+            var expected = [
+            "fire Event",
+            "handle CAPTURE Event in Root",
+            "handleGrandchild Event in ContainerContent",
+            "handleChild Event in ContainerContent",
             "stopChild Event" ];
 
             $A.test.addEventHandler("bubblingEvent", function(e) {
@@ -302,10 +306,10 @@
 
     testStopInGrandchild : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "handleGrandchild Event in ContainerContent", //
+            var expected = [
+            "fire Event",
+            "handle CAPTURE Event in Root",
+            "handleGrandchild Event in ContainerContent",
             "stopGrandchild Event" ];
 
             $A.test.addEventHandler("bubblingEvent", function(e) {
@@ -321,9 +325,9 @@
 
     testSelfDestroyedDuringBubbling : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
+            var expected = [
+            "fire Event",
+            "handle CAPTURE Event in Root",
             "destroy Inner" ];
 
             var toDestroy = cmp.find("inner");
@@ -340,10 +344,11 @@
 
     testSuperDestroyedDuringBubbling : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "destroy InnerSuper" ];
+            var expected = [
+                "fire Event",
+                "handle CAPTURE Event in Root",
+                "destroy InnerSuper"
+            ];
 
             var toDestroy = cmp.find("inner").getSuper();
             $A.test.addEventHandler("bubblingEvent", function() {
@@ -359,11 +364,12 @@
 
     testSuperSuperDestroyedDuringBubbling : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "handleGrandchild Event in Inner", //
-            "destroy InnerSuperSuper" ];
+            var expected = [
+                "fire Event",
+                "handle CAPTURE Event in Root",
+                "handleGrandchild Event in Inner",
+                "destroy InnerSuperSuper"
+            ];
 
             var toDestroy = cmp.find("inner").getSuper().getSuper();
             $A.test.addEventHandler("bubblingEvent", function() {
@@ -379,13 +385,14 @@
 
     testComponentValueProviderDestroyedDuringBubbling : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "handleGrandchild Event in ContainerContent", //
-            "handleChild Event in ContainerContent", //
-            "handle Event in ContainerContent", //
-            "destroy Container" ];
+            var expected = [
+                "fire Event",
+                "handle CAPTURE Event in Root",
+                "handleGrandchild Event in ContainerContent",
+                "handleChild Event in ContainerContent",
+                "handle Event in ContainerContent",
+                "destroy Container"
+            ];
 
             var toDestroy = cmp.find("container");
             $A.test.addEventHandler("bubblingEvent", function() {
@@ -401,11 +408,11 @@
 
     testSuperWithoutHandlersContinuesBubbling : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "handle Event in NoSuperHandlers", //
-            "handle Event in Root", //
+            var expected = [
+            "fire Event",
+            "handle CAPTURE Event in Root",
+            "handle Event in NoSuperHandlers",
+            "handle Event in Root",
             "handleSuper Event in Root" ];
 
             cmp.find("logPanel").clear();
@@ -416,16 +423,16 @@
 
     testEventHandlerAddedDuringBubblingAreNotIncluded : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Event", //
-            "handle CAPTURE Event in Root", //
-            "handleAdded1 Event", //
-            "handleAdded2 Event", //
-            "handleAdded3 Event", //
-            "add handlers", //
-            "handleChild Event in Provided", //
-            "handle Event in Provided", //
-            "handle Event in Root", //
+            var expected = [
+            "fire Event",
+            "handle CAPTURE Event in Root",
+            "handleAdded1 Event",
+            "handleAdded2 Event",
+            "handleAdded3 Event",
+            "add handlers",
+            "handleChild Event in Provided",
+            "handle Event in Provided",
+            "handle Event in Root",
             "handleSuper Event in Root" ];
 
             var added = false;
@@ -464,12 +471,13 @@
             this.assertLogs(cmp, expected);
         }
     },
-    
+
     testSelfHandledWithoutFacetValueProvider : {
         test : function(cmp) {
-            var expected = [ //
-            "fire Super", //
-            "handleSuper Super in Root" ];
+            var expected = [
+                "fire Super",
+                "handleSuper Super in Root"
+            ];
 
             cmp.find("logPanel").clear();
             cmp.getSuper().find("emitter").fireEvent();
@@ -480,9 +488,9 @@
     testBubbleThroughPassthroughValue: {
         test: function(cmp) {
             var expected = [
-                "fire Passthrough", 
-                "handle CAPTURE Passthrough in Root", //
-                "handle Passthrough in Root", 
+                "fire Passthrough",
+                "handle CAPTURE Passthrough in Root",
+                "handle Passthrough in Root",
                 "handleSuper Passthrough in Root"
             ];
             var emitter = cmp.find("emitterInIteration");
@@ -495,4 +503,5 @@
             $A.test.assertEquals(expected.toString(), actual.toString());
         }
     }
+
 })

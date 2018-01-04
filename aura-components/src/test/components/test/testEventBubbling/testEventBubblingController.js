@@ -8,10 +8,9 @@
 
     handle : function(cmp, event, helper) {
         var name = event.getParam("name");
-        if(event.getPhase() == "capture") {
+        if (event.getPhase() == "capture") {
             $A.logger.info("handle CAPTURE " + name + " in " + cmp.get("v.logId"));
-        }
-        else {
+        } else {
             $A.logger.info("handle " + name + " in " + cmp.get("v.logId"));
         }
     }

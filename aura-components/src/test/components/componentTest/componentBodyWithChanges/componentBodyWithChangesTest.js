@@ -77,7 +77,7 @@
     },
 
     // W-2407542
-    _testABWithEmptyList : {
+    testABWithEmptyList : {
         attributes : {
             colors : ""
         },
@@ -137,7 +137,7 @@
     },
 
     // W-2407542
-    _testAAWithEmptyList : {
+    testAAWithEmptyList : {
         attributes : {
             colors : ""
         },

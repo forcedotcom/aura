@@ -27,46 +27,50 @@
     browsers: ["-IE7", "-IE8"],
     testActionMenu: {
         owner: "ctatlah,ronak.shah",
-        test: [function (cmp) {
-            actionMenu = cmp.find("actionMenu");
-            menuLabel = cmp.find("trigger");
+        test: [
+            function (cmp) {
+                var actionMenu = cmp.find("actionMenu");
+                var menuLabel = cmp.find("trigger");
 
-            //check menu is default to hidden by using AURA API
-            $A.test.assertFalse(actionMenu.get('v.visible'), "Action Menu should not be visible");
+                //check menu is default to hidden by using AURA API
+                $A.test.assertFalse(actionMenu.get('v.visible'), "Action Menu should not be visible");
 
-            //check menu is default to hidden by using DOM API
-            $A.test.assertTrue($A.util.hasClass(actionMenu.getElement(), "uiMenuList"), "Class name should be just uiMenuList");
-            $A.test.assertFalse($A.util.hasClass(actionMenu.getElement(), "visible"), "Class name should not contain visible");
-            this.clickAnchor(menuLabel);
+                //check menu is default to hidden by using DOM API
+                $A.test.assertTrue($A.util.hasClass(actionMenu.getElement(), "uiMenuList"), "Class name should be just uiMenuList");
+                $A.test.assertFalse($A.util.hasClass(actionMenu.getElement(), "visible"), "Class name should not contain visible");
+                this.clickAnchor(menuLabel);
 
-            //Check if secondItem in the menu is disabled
-            $A.test.addWaitForWithFailureMessage(true, function () {
-                return cmp.find("actionItem2").get("v.disabled");
-            }, "Check if Item2 in the menu is disabled");
-        }, function (cmp) {
-            //make sure menuItem is not attached to body directly and its attached to uiMenu instead
-            //Test case for W-2181713
-            var actionMenuParentClassName = actionMenu.getElement().parentNode.className;
-            $A.test.assertTrue($A.test.contains(actionMenuParentClassName, "uiMenu"), "Menu Item List not attached to correct uiMenu");
+                //Check if secondItem in the menu is disabled
+                $A.test.addWaitForWithFailureMessage(true, function () {
+                    return cmp.find("actionItem2").get("v.disabled");
+                }, "Check if Item2 in the menu is disabled");
+            }, function (cmp) {
+                var actionMenu = cmp.find("actionMenu");
+                var menuLabel = cmp.find("trigger");
 
-            var disableAttrValue = cmp.find("actionItem1").get("v.disabled");
-            $A.test.assertFalse(disableAttrValue, "Menu item 1 should be clickable");
+                //make sure menuItem is not attached to body directly and its attached to uiMenu instead
+                //Test case for W-2181713
+                var actionMenuParentClassName = actionMenu.getElement().parentNode.className;
+                $A.test.assertTrue($A.test.contains(actionMenuParentClassName, "uiMenu"), "Menu Item List not attached to correct uiMenu");
 
-            //check menu is visible by using AURA API
-            $A.test.assertTrue(actionMenu.get('v.visible'), "Menu should be visible");
-            $A.test.assertTrue($A.util.hasClass(actionMenu.getElement(), "visible"), "Class name should be uiMenuList visible");
+                var disableAttrValue = cmp.find("actionItem1").get("v.disabled");
+                $A.test.assertFalse(disableAttrValue, "Menu item 1 should be clickable");
 
-            //disable ActionItem1
-            cmp.find("actionItem1").set("v.disabled", true);
-            var disableAttrValue = cmp.find("actionItem1").get("v.disabled");
-            $A.test.assertTrue(disableAttrValue, "Menu item 1 should not be clickable");
+                //check menu is visible by using AURA API
+                $A.test.assertTrue(actionMenu.get('v.visible'), "Menu should be visible");
+                $A.test.assertTrue($A.util.hasClass(actionMenu.getElement(), "visible"), "Class name should be uiMenuList visible");
 
-            //click actionItem3 and check if label is updated
-            this.clickAnchor(cmp.find("actionItem3"));
-            $A.test.addWaitForWithFailureMessage(cmp.find("actionItem3").get('v.label'), function () {
-                return menuLabel.get('v.label')
-            }, "Label should be updated to " + cmp.find("actionItem3").get('v.label'));
-        }
+                //disable ActionItem1
+                cmp.find("actionItem1").set("v.disabled", true);
+                var disableAttrValue = cmp.find("actionItem1").get("v.disabled");
+                $A.test.assertTrue(disableAttrValue, "Menu item 1 should not be clickable");
+
+                //click actionItem3 and check if label is updated
+                this.clickAnchor(cmp.find("actionItem3"));
+                $A.test.addWaitForWithFailureMessage(cmp.find("actionItem3").get('v.label'), function () {
+                    return menuLabel.get('v.label')
+                }, "Label should be updated to " + cmp.find("actionItem3").get('v.label'));
+            }
         ]
     },
 
@@ -413,9 +417,12 @@
             } else {
                mouseOverEvent = new MouseEvent("mouseover")
             }
-            menuItem3.getElement().dispatchEvent(mouseOverEvent);
-            $A.test.addWaitForWithFailureMessage(menuItem3.get('v.label'), function () {
-                return $A.test.getActiveElementText()
+            var element = menuItem3.getElement();
+            element.dispatchEvent(mouseOverEvent);
+
+            var expected = menuItem3.get('v.label');
+            $A.test.addWaitForWithFailureMessage(expected, function () {
+                return $A.test.getActiveElementText();
             }, "Focus should be on item 3");
         }]
     },

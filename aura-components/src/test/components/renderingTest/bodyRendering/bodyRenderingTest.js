@@ -78,7 +78,6 @@
     },
 
     assertComponents: function(component, values, message) {
-        $A.rerender(component);
         $A.test.addWaitFor(true,
             this.iframesLoaded,
             function() {
@@ -188,6 +187,7 @@
         test: [
             function(component) {
                 this.createComponents(component, 4, function(body, newCmps) {
+                    // replace the middle 2 components with the 4 new components
                     body.splice.apply(body,[1,2].concat(newCmps));
                     return body;
                 });

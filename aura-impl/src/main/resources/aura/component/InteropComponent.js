@@ -476,29 +476,18 @@ InteropComponent.prototype.setupInteropInstance = function () {
  * so the insertion hooks get called once the element is on the DOM.
 */
 InteropComponent.prototype.swapInteropElement = function (currentElement, newElement) {
-    // AuraRenderingService.associateElements is called in finishRender
-    // and that would add the temporary element (currentElement) to owner.elements
-    // so when swap, we need to replace the instance in parent.elements
-    var owner = $A.getCmp(this.owner);
-    var parentGetElements = owner.getElements();
-    if (parentGetElements && parentGetElements.indexOf(currentElement) >= 0) {
-        owner.disassociateElements();
-        parentGetElements.forEach(function(parentGetElement) {
-            if (parentGetElement === currentElement) {
-                owner.associateElement(newElement);
-                $A.renderingService.addAuraClass(owner, newElement);
-            } else {
-                owner.associateElement(parentGetElement);
-            }
-        });
+    if (currentElement === newElement) {
+        return;
     }
 
     this.disassociateElements();
     // moveReferencesToMarker calls $A.util.insertBefore however we want to control dom connected here
     // so we check for swap existence in moveReferencesToMarker and skip insertBefore call
     $A.renderingService.moveReferencesToMarker(currentElement, newElement);
-    currentElement.parentElement.replaceChild(newElement, currentElement);
     this.associateElement(newElement);
+    currentElement.parentElement.replaceChild(newElement, currentElement);
+
+    this.updateContainerElement(this.getContainer(), currentElement, newElement);
 
     // only for components, not libraries
     if (typeof this.interopClass === 'function') {
@@ -512,6 +501,41 @@ InteropComponent.prototype.swapInteropElement = function (currentElement, newEle
             }
         });
     }
+};
+
+InteropComponent.prototype.updateContainerElement = function (container, currentElement, newElement) {
+    if (!container) {
+        return;
+    }
+
+    // AuraRenderingService.associateElements is called in finishRender
+    // and that would add the temporary element (currentElement) to owner.elements
+    // so when swap, we need to replace the instance in parent.elements
+    var concrete = container.getConcreteComponent();
+    if (concrete.getType() === "aura:html") {
+        return;
+    }
+
+    var parentGetElements = concrete.getElements();
+    if (parentGetElements) {
+        if (parentGetElements.indexOf(currentElement) >= 0) {
+            concrete.disassociateElements();
+
+            for (var i = 0, len = parentGetElements.length; i < len; i++) {
+                var element = parentGetElements[i];
+                if (element === currentElement) {
+                    concrete.associateElement(newElement);
+                    $A.renderingService.addAuraClass(concrete, newElement);
+                } else {
+                    concrete.associateElement(element);
+                }
+            }
+        } else if (parentGetElements.indexOf(newElement) >= 0) {
+            $A.renderingService.addAuraClass(concrete, newElement);
+        }
+    }
+
+    this.updateContainerElement(concrete.getContainer(), currentElement, newElement);
 };
 
 /**

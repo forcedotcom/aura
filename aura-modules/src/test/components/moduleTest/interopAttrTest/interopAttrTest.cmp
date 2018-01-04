@@ -5,6 +5,8 @@
     <aura:attribute name="nullValueTest" type="String" />
     <aura:attribute name="programmatic" type="Aura.Component"/>
     <aura:attribute name="myValidity" type="String" />
+    <aura:attribute name="onChange" type="Aura.Action" default="{! c.handleChange}"/>
+    <aura:attribute name="result" type="String" />
 
     <moduleTest:simpleCmp aura:id="main" literal="{!v.bool}" expression="{! $Label.Section1.renderer }" myAccessor="{!v.accessorValue}" />
     <moduleTest:simpleCmp aura:id="accessor-primitive-value" myAccessor="some-value-to-be-ignored" />
@@ -17,5 +19,9 @@
 
     <div class="programmatic">{! v.programmatic }</div>
 
-    <moduleTest:simpleInput aura:id="input" validity="{! v.myValidity}"></moduleTest:simpleInput>
+    <moduleTest:simpleInput aura:id="input" validity="{! v.myValidity}" />
+
+    <moduleTest:simpleInput aura:id="input1" onchange="{! v.onChange}" />
+
+    {!v.body}
 </aura:component>

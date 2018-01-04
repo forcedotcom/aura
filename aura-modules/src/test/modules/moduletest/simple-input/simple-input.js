@@ -16,3 +16,9 @@ export default class SimpleInput extends Element {
         return this.value;
     }
 }
+
+SimpleInput.interopMap = {
+    exposeNativeEvent: {
+        change: true,
+    },
+};

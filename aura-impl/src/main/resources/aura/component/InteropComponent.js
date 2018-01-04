@@ -60,11 +60,11 @@ function InteropComponent(config) {
 InteropComponent.prototype = Object.create(Component.prototype);
 InteropComponent.prototype.constructor = InteropComponent;
 
-InteropComponent.prototype.bridgeAction = function (prv, isEvent, hasNativeAPIExposed) {
+InteropComponent.prototype.bridgeAction = function (prv, isEvent, hasNativeAPIExposed, action) {
     var component = this;
 
     return $A.getCallback(function callbackBridge(params) {
-        var action = prv.evaluate();
+        var targetAction = (prv && prv.evaluate()) || action;
         var event = new Aura.Event.InteropEvent(component, {
             'isEvent': isEvent,
             'params': params,
@@ -72,7 +72,7 @@ InteropComponent.prototype.bridgeAction = function (prv, isEvent, hasNativeAPIEx
         });
 
         $A.run(function () {
-            action.runDeprecated(event);
+            targetAction.runDeprecated(event);
         });
     });
 
@@ -131,15 +131,21 @@ InteropComponent.prototype.setupAttributes = function(config) {
                 var isPTV = valueProvider instanceof PassthroughValue;
                 $A.assert(isPTV || provider === 'c' || provider === 'v', 'Provider type not supported');
 
-                // For "v" add change handler, for "c" add bridging
+                var valueDescriptor = value['descriptor'];
+                var startsWithOn = valueDescriptor && valueDescriptor.indexOf('on') === 0;
+                var hasNativeAPIExposed = startsWithOn && this.hasNativeAPIExposed(valueDescriptor.substr(2));
+                // For "v" add change handler, for "v.[Aura.Action attribute]" and "c" add bridging
                 if (provider === 'v') {
-                    valueConfig.addChangeHandler(this, attribute, changeHandlerPRVFactory(this));
+                    if (hasNativeAPIExposed) {
+                        isEvent = true;
+                        valueConfig = this.bridgeAction(valueConfig, isEvent, hasNativeAPIExposed);
+                    } else {
+                        valueConfig.addChangeHandler(this, attribute, changeHandlerPRVFactory(this));
+                    }
                 } else if (provider === 'c') {
-                    var definedAttribute = !!this.interopDef['props'][value['descriptor']];
-                    var startsWithOn = value['descriptor'].indexOf('on') === 0;
+                    var definedAttribute = !!this.interopDef['props'][valueDescriptor];
                     $A.assert(definedAttribute || startsWithOn, 'Attribute not defined in the component');
                     isEvent = !definedAttribute;
-                    var hasNativeAPIExposed = startsWithOn && this.hasNativeAPIExposed(value['descriptor'].substr(2));
                     valueConfig = this.bridgeAction(valueConfig, isEvent, hasNativeAPIExposed);
                 } else {
                     valueConfig.addChangeHandler(this, attribute, changeHandlerPRVFactory(this, attribute));
@@ -148,6 +154,9 @@ InteropComponent.prototype.setupAttributes = function(config) {
             } else {
                 valueConfig.addChangeHandler(this, attribute, changeHandlerFCV.bind(self, attribute, valueConfig));
             }
+        } else if ($A.util.isAction(valueConfig)) {
+            isEvent = true;
+            valueConfig = this.bridgeAction(undefined, isEvent, attribute.indexOf('on') === 0 && this.hasNativeAPIExposed(attribute.substr(2)), valueConfig);
         }
 
         // The mapping will have all public properties

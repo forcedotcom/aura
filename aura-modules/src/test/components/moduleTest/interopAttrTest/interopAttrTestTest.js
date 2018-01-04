@@ -279,5 +279,63 @@
                 $A.test.assertEquals('foo', myValidity);
             }
         ]
+    },
+
+    testAuraActionAttributeIsCalledWhenEventIsFired: {
+        attributes: {
+            'result': '',
+        },
+        test: [
+            function(cmp) {
+                var target = cmp.find('input1');
+                target.set('v.value', 'foo');
+                var detail = {
+                    value: 'foo'
+                };
+                target.getElement().querySelector('input').dispatchEvent(
+                    new CustomEvent('change', {
+                        composed: true,
+                        bubbles: true,
+                        detail,
+                    })
+                );
+                $A.test.assertEquals(cmp.get('v.result'), 'foo');
+            }
+        ]
+    },
+
+    testCreateComponentWithAuraActionAttribute: {
+        test: [
+            function(cmp) {
+                $A.createComponent(
+                    "moduleTest:simpleInput",
+                    {
+                        "onchange": cmp.get('v.onChange'),
+                        "aura:id": "input2"
+                    },
+                    function(newCmp) {
+                        var body = cmp.get("v.body");
+                        body.push(newCmp);
+                        cmp.set("v.body", body);
+                    }
+                );
+            },
+            function(cmp) {
+                var target = cmp.find('input2');
+                target.set('v.value', 'bar');
+                var detail = {
+                    value: 'bar'
+                };
+                target.getElement().querySelector('input').dispatchEvent(
+                    new CustomEvent('change', {
+                        composed: true,
+                        bubbles: true,
+                        detail,
+                    })
+                );
+
+                $A.test.assertEquals(cmp.get('v.result'), 'bar');
+            }
+        ]
     }
 })

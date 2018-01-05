@@ -57,7 +57,7 @@
             }
 
             if (!$A.reportError(message, err) && !existing) {
-                var console_error = (window.console && window.console.error);
+                var console_error = (window.console && window.console.error.bind(window.console));
                 // if we ignored the error && there is no existing onerror handler, we log to the console.
                 if (console_error) {
                     console_error(message, err);
@@ -90,7 +90,7 @@
         }
 
         if (!validError || !$A.reportError(null, error)) {
-            var console_error = (window.console && window.console.error);
+            var console_error = (window.console && window.console.error.bind(window.console));
             if (console_error) {
                 console_error(null, event.reason);
             }

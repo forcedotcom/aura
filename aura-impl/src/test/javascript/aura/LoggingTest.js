@@ -168,7 +168,8 @@ Test.Aura.LoggingTest = function() {
                 },
                 "window": {
                     "console": {
-                        "foo":function(){}
+                        "foo":function(){},
+                        "error": {"bind":function(){}}
                     }
                 }
             })(function() {

@@ -21,7 +21,7 @@
         var currencyCode = cmp.get("v.currencyCode");
         var currencySymbol = cmp.get("v.currencySymbol") || currencyCode;
         var formatted;
-        if (($A.util.isNumber(num) || $A.util.isString(num)) && !$A.util.isEmpty(num)) {
+        if (($A.util.isNumber(num) || $A.util.isString(num)) && !$A.util.isEmpty(num) && !isNaN(num)) {
             var hasFormat = !$A.util.isEmpty(f);
             if (hasFormat || currencySymbol) {
                 var nf;
@@ -62,7 +62,7 @@
             var val = cmp.get("v.value");
             var currencyCode = cmp.get("v.currencyCode");
             var currencySymbol = cmp.get("v.currencySymbol") || currencyCode;
-            if (($A.util.isNumber(val) || $A.util.isString(val)) && !$A.util.isEmpty(val)) {
+            if (($A.util.isNumber(val) || $A.util.isString(val)) && !$A.util.isEmpty(val) && !isNaN(val)) {
                 var hasFormat = !$A.util.isEmpty(f);
                 if (hasFormat || currencySymbol) {
                     var nf;

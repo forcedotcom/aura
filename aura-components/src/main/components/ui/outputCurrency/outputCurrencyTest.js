@@ -273,6 +273,26 @@
             $A.rerender(component);
             $A.test.assertEquals('GBP1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
         }
+    },
+
+    testNaNValue: {
+        attributes: {
+            value: NaN
+        },
+        test: function (component) {
+            $A.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Value should be empty");
+        }
+    },
+
+    testNaNWithParams: {
+        attributes: {
+            value: NaN,
+            format: '¤#,##0.0000',
+            currencyCode: '$'
+        },
+        test: function (component) {
+            $A.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Value should be empty");
+        }
     }
 /*eslint-disable semi*/
 })

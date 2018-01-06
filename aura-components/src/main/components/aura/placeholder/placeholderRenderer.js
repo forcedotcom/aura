@@ -96,7 +96,6 @@
             "attributes" : atts
         });
 
-        action.setExclusive($A.util.getBooleanValue(cmp.get("v.exclusive")));
         $A.enqueueAction(action);
 
         this.superAfterRender();

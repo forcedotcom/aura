@@ -4,7 +4,6 @@
         a.setParams({
             testName : _testName
         });
-        a.setExclusive();
         $A.test.enqueueAction(a);
     },
 

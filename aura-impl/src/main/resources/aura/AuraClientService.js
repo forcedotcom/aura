@@ -3901,7 +3901,7 @@ AuraClientService.prototype.enqueueAction = function(action, background) {
     $A.assert($A.util.isAction(action), "Cannot call EnqueueAction() with a non Action parameter.");
 
     if (background) {
-        $A.deprecated("Do not use the deprecated background parameter",null,"2017/03/08","2018/03/08", "AuraClientService.enqueueAction(action, background)");
+        $A.warning("$A.enqueueAction(): Do not use the deprecated background parameter. The parameter is not used anymore.");
     }
 
     if (this.allowFlowthrough) {

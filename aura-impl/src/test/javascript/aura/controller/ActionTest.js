@@ -981,44 +981,6 @@ Test.Aura.Controller.ActionTest = function() {
         }
     }
 
-    [Fixture]
-    function RunAfter() {
-        [Fact]
-        function AddsActionParamToQueue() {
-            // Arrange
-            var expectedReturn = "expectedReturn";
-            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
-                getContext: function() {
-                    return Stubs.Aura.GetContext();
-                },
-                assert : function(param) {
-                },
-                clientService : {
-                    enqueueAction : function(param) {
-                        actual = param;
-                    }
-                },
-                deprecated: function(){}
-            });
-            var target = newAction();
-            var action = {
-                def : {
-                    isServerAction : function() {
-                    }
-                }
-            };
-            var actual = null;
-
-            // Act
-            mockAssert(function() {
-                target.runAfter(action);
-            })
-
-            // Assert
-            Assert.Equal(action, actual);
-        }
-    }
-
     [ Fixture ]
     function GetStored() {
         [Fact]
@@ -2193,58 +2155,6 @@ Test.Aura.Controller.ActionTest = function() {
             });
 
             Assert.Equal(actual, true);
-        }
-    }
-
-    [Fixture]
-    function getAbortableId() {
-        [Fact]
-        function ReturnsUndefined() {
-            var target;
-            var expected = undefined;
-            var actual;
-
-            mockActionDependencies(function(){
-                target = new Action();
-                actual = target.getAbortableId();
-            });
-
-            Assert.Equal(expected, actual);
-        }
-    }
-
-    [Fixture]
-    function setExclusive() {
-        [Fact]
-        function ReturnsFalse() {
-            var target;
-            var expected = false;
-            var actual;
-
-            mockActionDependencies(function(){
-                target = new Action();
-                actual = target.setExclusive();
-            });
-
-            Assert.Equal(expected, actual);
-        }
-    }
-
-    [Fixture]
-    function isExclusive() {
-        [Fact]
-        function ReturnsFalse() {
-            var target;
-            var expected = false;
-            var actual;
-
-            mockActionDependencies(function(){
-                target = new Action();
-                target.setExclusive();
-                actual = target.isExclusive();
-            });
-
-            Assert.Equal(expected, actual);
         }
     }
 

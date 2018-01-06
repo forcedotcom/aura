@@ -743,25 +743,6 @@ Action.prototype.setBackground = function() {
 };
 
 /**
- * Deprecated. Note: This method is deprecated and should not be used.
- * Use <code>$A.enqueueAction</code> instead.
- *
- * The deprecated <code>runAfter</code> method adds a specified server-side action to the action queue. It is for
- * server-side actions only. For example, <code>this.runAfter(serverAction);</code> sends the action to the server and
- * runs the callback when the server action completes (if the action was not aborted).
- *
- * @deprecated
- * @public
- * @param {Action}
- *            action The action to run.
- * @export
- */
-Action.prototype.runAfter = function(action) {
-    $A.deprecated("Action.runAfter is no longer supported.","Use '$A.enqueueAction'.","2017/09/20","2017/10/20", "Action.runAfter");
-    $A.clientService.enqueueAction(action);
-};
-
-/**
  * Updates the fields from a response.
  *
  * @param {Object} response The response from the server.
@@ -1055,19 +1036,6 @@ Action.prototype.setAbortable = function() {
 };
 
 /**
- * [Deprecated] [Returns undefined]
- *
- * @public
- * @returns {string} undefined
- * @export
- * @deprecated
- */
-Action.prototype.getAbortableId = function() {
-    $A.deprecated("Action.getAbortableId is no longer supported.", null, "2017/09/20","2017/10/20", "Action.getAbortableId");
-    return undefined;
-};
-
-/**
  * Checks if this action is a refresh.
  * @export
  */
@@ -1084,32 +1052,6 @@ Action.prototype.isRefreshAction = function() {
  */
 Action.prototype.isAbortable = function() {
     return this.abortable;
-};
-
-/**
- * [Deprecated] Does nothing.
- *
- * @public
- * @returns {Boolean} false
- * @export
- * @deprecated
- */
-Action.prototype.setExclusive = function() {
-    $A.deprecated("Action.setExclusive is no longer supported.", null, "2017/09/20","2017/10/20", "Action.setExclusive");
-    return false;
-};
-
-/**
- * [Deprecated] Returns false.
- *
- * @public
- * @returns {Boolean} false
- * @export
- * @deprecated
- */
-Action.prototype.isExclusive = function() {
-    $A.deprecated("Action.isExclusive is no longer supported.", null, "2017/09/20","2017/10/20", "Action.isExclusive");
-    return false;
 };
 
 /**

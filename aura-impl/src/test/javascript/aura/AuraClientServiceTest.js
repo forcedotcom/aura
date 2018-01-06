@@ -404,9 +404,6 @@ Test.Aura.AuraClientServiceTest = function() {
         this.isPublicCachingEnabled = Stubs.GetMethod(false);
         this.runDeprecated = Stubs.GetMethod();
         this.addCallbackGroup = Stubs.GetMethod();
-        this.abortableId = undefined;
-        this.getAbortableId = function () { return undefined; };
-        this.setAbortableId = function (nid) { };
         this.abort = Stubs.GetMethod();
         this.def = {
             isClientAction : Stubs.GetMethod(true),

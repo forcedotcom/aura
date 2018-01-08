@@ -1127,7 +1127,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         long startTime = System.currentTimeMillis();
         long incremental;
 
-        DefType [] types = new DefType [] { DefType.LIBRARY, DefType.COMPONENT, DefType.APPLICATION };
+        DefType [] types = new DefType [] { DefType.LIBRARY, DefType.COMPONENT, DefType.MODULE, DefType.APPLICATION };
 
         for (DefRegistry registry : context.getRegistries().getAllRegistries()) {
             if (registry instanceof CompilingDefRegistry

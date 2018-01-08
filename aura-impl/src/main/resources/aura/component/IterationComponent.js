@@ -454,6 +454,26 @@ IterationComponent.prototype["provider"] = {
     }
 };
 
-IterationComponent.prototype["renderer"] = Aura.Component.BaseComponent.prototype["renderer"];
+IterationComponent.prototype["renderer"] = {
+    "render": function(component){
+        var rendering = component.getRendering();
+        return rendering||$A.renderingService.renderFacet(component,component.get("v.body"));
+    },
+
+    "afterRender": function(component){
+        var body = component.get("v.body");
+        $A.afterRender(body);
+    },
+
+    "rerender": function(component){
+        var body = component.get("v.body");
+        return $A.renderingService.rerenderFacet(component,body);
+    },
+
+    "unrender" : function(component){
+        var body = component.get("v.body");
+        $A.renderingService.unrenderFacet(component,body);
+    }
+};
 
 Aura.Component.IterationComponent = IterationComponent;

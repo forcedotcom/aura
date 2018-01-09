@@ -671,11 +671,14 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
  */
 AuraRenderingService.prototype.findElementsPositionFromContainers = function(component) {
     var indexSet = [];
+    var visited = {};
 
     var allElements = this.getAllElements(component);
-    var container = component.getConcreteComponent().getContainer();
+    var concrete = component.getConcreteComponent();
 
-    this.collectElementPositionsFromContainers(container, allElements[0], indexSet);
+    // it is possible to set a container component to child's component's attribute
+    visited[concrete.getGlobalId()] = true;
+    this.collectElementPositionsFromContainers(concrete, allElements[0], indexSet, visited);
 
     return indexSet;
 };
@@ -683,18 +686,22 @@ AuraRenderingService.prototype.findElementsPositionFromContainers = function(com
 /**
  * Recursively traverse a component's container chain to collect the positions of the elements on containers
  *
- * @param {Component} container - the direct container of the element's render component
+ * @param {Component} concreteComponent - the component which contains the element
  * @param {HTMLElement} element - the element to find in container component
  * @param {Array} indexSet - an arry to store the indexes that indicate where the element is on the containers, from the bottom (direct) container to the top one
+ * @param {Object} visited - an map to track the components have been visited
  */
-AuraRenderingService.prototype.collectElementPositionsFromContainers = function(container, element, indexSet) {
+AuraRenderingService.prototype.collectElementPositionsFromContainers = function(concreteComponent, element, indexSet, visited) {
+
+    var container = concreteComponent.getContainer();
     if (!container) {
         return;
     }
 
     var concrete = container.getConcreteComponent();
+    var globalId = concrete.getGlobalId();
     if ((concrete.getType() === "aura:html" && concrete["helper"].canHaveBody(concrete)) ||
-            concrete.isRendered() === false) {
+            concrete.isRendered() === false || visited[globalId] === true) {
         return;
     }
 
@@ -706,7 +713,8 @@ AuraRenderingService.prototype.collectElementPositionsFromContainers = function(
     }
 
     indexSet.push(index);
-    this.collectElementPositionsFromContainers(concrete.getContainer(), element, indexSet);
+    visited[globalId] = true;
+    this.collectElementPositionsFromContainers(concrete, element, indexSet, visited);
 };
 
 /**

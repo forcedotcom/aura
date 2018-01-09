@@ -337,5 +337,18 @@
                 $A.test.assertEquals(cmp.get('v.result'), 'bar');
             }
         ]
+    },
+
+    testBooleanAttributeUpdatesWhenChangeHappenedInElement: {
+        test: [
+            function(cmp) {
+                var target = cmp.find('inputRadio');
+
+                target.set('v.checked', false);
+                target.getElement().querySelector('input').click();
+
+                $A.test.assertTrue(cmp.get('v.radioChecked'));
+            }
+        ]
     }
 })

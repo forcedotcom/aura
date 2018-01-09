@@ -411,7 +411,7 @@ InteropComponent.prototype.attachOnChangeToElement = function (element) {
         if (detail && event.target === element) {
             Object.keys(detail).forEach(function (propName) {
                 var attrName = self.propNameToAttrMap[propName];
-                if (self.attributes[attrName]) {
+                if (attrName in self.attributes) {
                     self.set('v.' + attrName, detail[propName]);
                 }
             });

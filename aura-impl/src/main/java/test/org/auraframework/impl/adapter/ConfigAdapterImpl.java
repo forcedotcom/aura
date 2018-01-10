@@ -90,49 +90,6 @@ import com.google.common.collect.Sets;
 public class ConfigAdapterImpl implements ConfigAdapter {
     Logger logger = Logger.getLogger(ConfigAdapterImpl.class);
 
-    private static final ImmutableSortedSet<String> cacheDependencyExceptions = ImmutableSortedSet.of(
-            //
-            // FIXME: these following 16 lines (applauncher) should be removed ASAP. They are here because
-            // we do not detect file backed apex, and we probably don't really want to.
-            //
-            "apex://applauncher.accountsettingscontroller",
-            "apex://applauncher.applauncherapexcontroller",
-            "apex://applauncher.applauncherdesktopcontroller",
-            "apex://applauncher.applauncherheadercontroller",
-            "apex://applauncher.applaunchersetupdesktopcontroller",
-            "apex://applauncher.applaunchersetupreorderercontroller",
-            "apex://applauncher.applaunchersetuptilecontroller",
-            "apex://applauncher.appmenu",
-            "apex://applauncher.changepasswordcontroller",
-            "apex://applauncher.communitylogocontroller",
-            "apex://applauncher.employeeloginlinkcontroller",
-            "apex://applauncher.forgotpasswordcontroller",
-            "apex://applauncher.identityheadercontroller",
-            "apex://applauncher.loginformcontroller",
-            "apex://applauncher.selfregistercontroller",
-            "apex://applauncher.sociallogincontroller",
-
-            "apex://array",
-            "apex://aura.component",
-            "apex://blob",
-            "apex://boolean",
-            "apex://date",
-            "apex://datetime",
-            "apex://decimal",
-            "apex://double",
-            "apex://event",
-            "apex://id",
-            "apex://integer",
-            "apex://list",
-            "apex://long",
-            "apex://map",
-            "apex://object",
-            "apex://set",
-            "apex://string",
-            "apex://sobject",
-            "apex://time"
-            );
-
     private static final String TIMESTAMP_FORMAT_PROPERTY = "aura.build.timestamp.format";
     private static final String TIMESTAMP_PROPERTY = "aura.build.timestamp";
     private static final String VERSION_PROPERTY = "aura.build.version";
@@ -166,9 +123,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private Boolean validateCss;
 
     @Inject
-    private LocalizationAdapter localizationAdapter;
-
-    @Inject
     private DefinitionService definitionService;
 
     @Inject
@@ -195,11 +149,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      */
     public ConfigAdapterImpl(final String resourceCacheDir) {
         this.resourceCacheDir = resourceCacheDir;
+        setupTempDirDelete();
     }
 
-    public ConfigAdapterImpl(String resourceCacheDir, LocalizationAdapter localizationAdapter, InstanceService instanceService, ContextService contextService, FileMonitor fileMonitor) {
+    public ConfigAdapterImpl(String resourceCacheDir, InstanceService instanceService, ContextService contextService, FileMonitor fileMonitor) {
         this.resourceCacheDir = resourceCacheDir;
-        this.localizationAdapter = localizationAdapter;
         this.instanceService = instanceService;
         this.contextService = contextService;
 
@@ -422,12 +376,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             }
         }
         return "";
-    }
-
-    @Override
-    public String getCurrentTimezone() {
-        AuraLocale al = localizationAdapter.getAuraLocale();
-        return al.getTimeZone().getID();
     }
 
     @Override
@@ -748,10 +696,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         return new DefaultContentSecurityPolicy(allowInline, cspInliningService);
     }
 
-    public void setLocalizationAdapter(LocalizationAdapter adapter) {
-        this.localizationAdapter = adapter;
-    }
-
     public void setContextService(ContextService service) {
         this.contextService = service;
     }
@@ -793,16 +737,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public boolean isCacheable(DefRegistry registry, DefDescriptor<?> descriptor) {
         if (descriptor == null) {
             return false;
-        }
-        // test cacheDependencyExceptions (like static types in Apex)
-        String descriptorName = descriptor.getQualifiedName().toLowerCase();
-
-        // truncate array markers
-        if (descriptorName.endsWith("[]")) {
-            descriptorName = descriptorName.substring(0, descriptorName.length() - 2);
-        }
-        if (cacheDependencyExceptions.contains(descriptorName)) {
-            return true;
         }
         if (registry != null && !registry.isCacheable()) {
             return false;
@@ -895,7 +829,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public boolean isActionPublicCachingEnabled() {
         return false;
-	}
+    }
 
     @Override
     public String getActionPublicCacheKey() {
@@ -906,4 +840,16 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public NodeLambdaFactory nodeServiceFactory() {
         return NodeLambdaFactorySidecar.INSTANCE;
     }
+
+    /**
+     * Force the delete of our temp dir.
+     *
+     * We allow override here to avoid conditions where we may end up not wanting to queue
+     * up a thread to run on system exit. In that case we don't properly clean up, but whoever
+     * overrides needs to ensure that their deployment does the right thing.
+     */
+    protected void setupTempDirDelete() {
+        IOUtil.markTempDirForDelete();
+    }
+
 }

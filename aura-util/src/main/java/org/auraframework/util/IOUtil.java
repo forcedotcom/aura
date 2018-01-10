@@ -27,10 +27,11 @@ import java.io.Writer;
 import java.security.SecureRandom;
 
 public class IOUtil {
+    private static volatile File topLevel = null;
     private static String defaultTempDir = null;
+    private static boolean markedForDelete = false;
 
-    public static String newTempDir(String prefix) {
-        File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+    private static File makeTempDir(File base, String prefix) {
         int count = 0;
         long time = System.currentTimeMillis();
         StringBuilder sb = new StringBuilder();
@@ -47,10 +48,9 @@ public class IOUtil {
         while (count < 1000) {
             sb.setLength(len);
             sb.append(Long.toString(random.nextLong(), 36));
-            File attempt = new File(tmpDir, sb.toString());
+            File attempt = new File(base, sb.toString());
             if (attempt.mkdirs()) {
-                Runtime.getRuntime().addShutdownHook(new Thread(new DirectoryCleaner(attempt.toPath())));
-                return attempt.getAbsolutePath();
+                return attempt;
             }
             System.out.println(attempt);
             count += 1;
@@ -58,11 +58,42 @@ public class IOUtil {
         throw new RuntimeException("Unable to create a temporary directory");
     }
 
+    private static File getTopLevel() {
+        if (topLevel != null) {
+            return topLevel;
+        }
+        synchronized (IOUtil.class) {
+            if (topLevel != null) {
+                return topLevel;
+            }
+            try {
+                File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+                tmpDir = tmpDir.getCanonicalFile();
+                tmpDir = makeTempDir(tmpDir, "aura");
+                topLevel = tmpDir;
+            } catch (IOException ioe) {
+                throw new RuntimeException("Temporary directory does not exist");
+            }
+        }
+        return topLevel;
+    }
+
+    public static String newTempDir(String prefix) {
+        return makeTempDir(getTopLevel(), prefix).getPath();
+    }
+
     public static synchronized String getDefaultTempDir() {
         if (defaultTempDir == null) {
             defaultTempDir = newTempDir("aura_default");
         }
         return defaultTempDir;
+    }
+
+    public static synchronized void markTempDirForDelete() {
+        if (!markedForDelete) {
+            markedForDelete = true;
+            Runtime.getRuntime().addShutdownHook(new Thread(new DirectoryCleaner(getTopLevel().toPath())));
+        }
     }
 
     public static void copyStream(InputStream in, OutputStream out) throws IOException {

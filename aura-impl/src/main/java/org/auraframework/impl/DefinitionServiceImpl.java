@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.auraframework.adapter.ConfigAdapter;
@@ -78,6 +79,7 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.IOUtil;
 import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
 

@@ -15,6 +15,11 @@ export default class SimpleInput extends Element {
     get validity() {
         return this.value;
     }
+
+    @api
+    get inputValidity() {
+        return this.root.querySelector('input').validity;
+    }
 }
 
 SimpleInput.interopMap = {

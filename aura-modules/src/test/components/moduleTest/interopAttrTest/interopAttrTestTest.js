@@ -1,5 +1,5 @@
 ({
-    browsers: ['GOOGLECHROME'],
+    browsers: ['GOOGLECHROME', "IE11"],
 
     selector: {
         literal: '.m-literal span',
@@ -296,7 +296,7 @@
                     new CustomEvent('change', {
                         composed: true,
                         bubbles: true,
-                        detail,
+                        detail: detail,
                     })
                 );
                 $A.test.assertEquals(cmp.get('v.result'), 'foo');
@@ -330,7 +330,7 @@
                     new CustomEvent('change', {
                         composed: true,
                         bubbles: true,
-                        detail,
+                        detail: detail,
                     })
                 );
 
@@ -348,6 +348,17 @@
                 target.getElement().querySelector('input').click();
 
                 $A.test.assertTrue(cmp.get('v.radioChecked'));
+            }
+        ]
+    },
+
+    testCompatGetAttribute: {
+        test: [
+            function(cmp) {
+                var target = cmp.find('input');
+                target.set('v.value', 'foo');
+                var validity = target.get('v.inputValidity');
+                $A.test.assertTrue(validity.valid);
             }
         ]
     }

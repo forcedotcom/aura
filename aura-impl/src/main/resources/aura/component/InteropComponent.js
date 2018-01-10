@@ -372,7 +372,7 @@ InteropComponent.prototype.get = function (key) {
         }
     }
 
-    return propValue;
+    return $A.componentService.moduleEngine['unwrap'](propValue);
 };
 
 /**

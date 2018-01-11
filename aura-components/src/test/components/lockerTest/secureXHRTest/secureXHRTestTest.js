@@ -12,6 +12,9 @@
         function StubXMLHttpRequest() {}
         function noop() {}
         Object.assign(StubXMLHttpRequest.prototype, {
+            addEventListener: function(type, listener) {
+                this.__listners[type] = listener;
+            },
             open: function(method, url) {
                 var dummy = document.createElement("a");
                 dummy.href = url;
@@ -24,10 +27,16 @@
                 this.status = this.response.status;
                 this.responseText = this.response.responseText;
                 this.responseXML = this.response.responseXML;
-                this.onreadystatechange && this.onreadystatechange();
+                this.onreadystatechange && this.onreadystatechange(document.createEvent("Event"));
+
+                var onload = this.__listners["load"];
+                if (onload) {
+                    onload(document.createEvent("Event"));
+                }
             },
             abort: noop,
             getAllResponseHeaders: noop,
+            __listners: {},
             overrideMimeType: noop,
             readyState: null,
             status: null,
@@ -52,12 +61,26 @@
 
     testAddEventListener: {
         test: function(cmp) {
+            this.mock({
+                "/resources/qa/testDocument.xml": {
+                    readyState: 4, status: 200,
+                    responseText: '<!DOCTYPE html><html lang="en"><head><title>Aura</title></head></html>'
+                }
+            });
+
             cmp.testAddEventListener();
         }
     },
 
     testOnReadyStateChange: {
         test: function(cmp) {
+            this.mock({
+                "/resources/qa/testDocument.xml": {
+                    readyState: 4, status: 200,
+                    responseText: '<!DOCTYPE html><html lang="en"><head><title>Aura</title></head></html>'
+                }
+            });
+
             cmp.testOnReadyStateChange();
         }
     },

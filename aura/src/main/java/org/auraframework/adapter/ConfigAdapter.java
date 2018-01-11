@@ -191,11 +191,6 @@ public interface ConfigAdapter extends AuraAdapter {
      */
     boolean getXHRExclusivity();
 
-    /**
-     * @return whether modules is enabled through configuration
-     */
-    boolean isModulesEnabled();
-
     boolean cdnEnabled();
 
     /**

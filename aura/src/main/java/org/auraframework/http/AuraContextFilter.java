@@ -227,9 +227,10 @@ public class AuraContextFilter implements Filter {
         context.setRequestedLocales(Collections.list(request.getLocales()));
         
         context.setClient(new Client(request.getHeader(HttpHeaders.USER_AGENT)));
-        context.setModulesEnabled(isModulesEnabled(request, configMap, m));
+
         context.setForceCompat(forceCompat(request, configMap, m));
         context.setUseCompatSource(context.forceCompat() || useCompatSource(request, configMap, m));
+
         context.setActionPublicCacheKey(getActionPublicCacheKey(configMap));
         if (configMap != null) {
             getLoaded(context, configMap.get("loaded"));
@@ -348,33 +349,6 @@ public class AuraContextFilter implements Filter {
         }
 
         return m;
-    }
-
-    /**
-     * Whether modules should be enabled based on ConfigAdapter, URL param, or context config from URL
-     *
-     * @param request http request
-     * @param configMap context config from encoded url
-     * @param mode Aura context mode
-     * @return whether modules should be enabled
-     */
-    protected boolean isModulesEnabled(HttpServletRequest request, Map<String, Object> configMap, Mode mode) {
-        if (configMap != null) {
-            // when m is present, it's a request to fetch module enabled content
-            // hence, this AuraContext should also be module enabled
-            return configMapContains("m", "1", configMap);
-        }
-
-        if (mode != Mode.PROD) {
-            // DO NOT allow url param override in prod
-            String modulesEnabledParam = request.getParameter(AuraServlet.AURA_PREFIX + "modules");
-            if (modulesEnabledParam != null) {
-                // Uses BooleanParam which is true for "1", "true", "yes". Anything else is false.
-                return modulesParam.get(request);
-            }
-        }
-
-        return configAdapter.isModulesEnabled();
     }
 
     /**

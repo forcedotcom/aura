@@ -871,19 +871,16 @@ public class DefinitionServiceImpl implements DefinitionService {
     /**
      * Creates a key for the localDependencies, using DefType, FQN, and modules
      * */
-    private String makeLocalKey(@Nonnull DefDescriptor<?> descriptor, boolean modulesEnabled) {
+    private String makeLocalKey(@Nonnull DefDescriptor<?> descriptor) {
         String key = descriptor.getDefType().toString() + ":" + descriptor.getQualifiedName().toLowerCase();
-        if (modulesEnabled) {
-            key += ":m";
-        }
         return key;
     }
 
     /**
      * Creates a key for the global {@link CachingServiceImpl#defsCache}, using UID, type, FQN, and modules
      */
-    private String makeGlobalKey(String uid, @Nonnull DefDescriptor<?> descriptor, boolean modulesEnabled) {
-        return uid + "/" + makeLocalKey(descriptor, modulesEnabled);
+    private String makeGlobalKey(String uid, @Nonnull DefDescriptor<?> descriptor) {
+        return uid + "/" + makeLocalKey(descriptor);
     }
 
     /**
@@ -891,8 +888,8 @@ public class DefinitionServiceImpl implements DefinitionService {
      *
      * @param descriptor - the descriptor use for the key
      */
-    private String makeNonUidGlobalKey(@Nonnull DefDescriptor<?> descriptor, boolean modulesEnabled) {
-        return makeLocalKey(descriptor, modulesEnabled);
+    private String makeNonUidGlobalKey(@Nonnull DefDescriptor<?> descriptor) {
+        return makeLocalKey(descriptor);
     }
 
     /**
@@ -922,8 +919,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         // See localDependencies comment
         AuraLinker linker = threadLinker.get();
         AuraContext context = contextService.getCurrentContext();
-        boolean modulesEnabled = context.isModulesEnabled();
-        String key = makeLocalKey(descriptor, modulesEnabled);
+        String key = makeLocalKey(descriptor);
         Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache = cachingService.getDefsCache();
 
         linker = new AuraLinker(descriptor, defsCache,
@@ -1007,11 +1003,11 @@ public class DefinitionServiceImpl implements DefinitionService {
             // that have already been put in cache, and have the UID on the client.
             // This behaviour is the same as historical behaviour, and we will not change it at the
             // moment. Note that it also helps perf markedly.
-            depsCache.put(makeGlobalKey(de.uid, descriptor, modulesEnabled), de);
+            depsCache.put(makeGlobalKey(de.uid, descriptor), de);
 
             if (linker.getShouldCacheDependencies()) {
                 // put unqualified descriptor key for dependency
-                depsCache.put(makeNonUidGlobalKey(descriptor, modulesEnabled), de);
+                depsCache.put(makeNonUidGlobalKey(descriptor), de);
             }
 
             // See localDependencies comment
@@ -1048,9 +1044,8 @@ public class DefinitionServiceImpl implements DefinitionService {
     private DependencyEntry getDE(@CheckForNull String uid, @Nonnull DefDescriptor<?> descriptor) {
         // See localDependencies comment
         AuraContext context = contextService.getCurrentContext();
-        boolean modulesEnabled = context.isModulesEnabled();
         Cache<String, DependencyEntry> depsCache = cachingService.getDepsCache();
-        String key = makeLocalKey(descriptor, modulesEnabled);
+        String key = makeLocalKey(descriptor);
         DependencyEntry de;
 
         if (uid != null) {
@@ -1059,14 +1054,14 @@ public class DefinitionServiceImpl implements DefinitionService {
                 return de;
             }
             // retrieves correct DE via module addition to cache key
-            de = depsCache.getIfPresent(makeGlobalKey(uid, descriptor, modulesEnabled));
+            de = depsCache.getIfPresent(makeGlobalKey(uid, descriptor));
         } else {
             // See localDependencies comment
             de = context.getLocalDependencyEntry(key);
             if (de != null) {
                 return de;
             }
-            de = depsCache.getIfPresent(makeNonUidGlobalKey(descriptor, modulesEnabled));
+            de = depsCache.getIfPresent(makeNonUidGlobalKey(descriptor));
         }
         if (de != null) {
             // See localDependencies comment

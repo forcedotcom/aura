@@ -52,7 +52,6 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.allowedGlobals = config["allowedGlobals"];
     this.globals = config["globals"];
     this.tokens={};
-    this.isModulesEnabled = !!config["m"];
     this.useCompatSource = !!config["c"];
     this.moduleNamespaceAliases = config["mna"] || {};
     this.actionPublicCachingEnabled = !!config["apce"];
@@ -218,9 +217,6 @@ Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic, in
     }
     if (includeCacheKeyForCacheableXHR) {
         contextToSend["apck"] = this.actionPublicCacheKey;
-    }
-    if(this.isModulesEnabled) {
-        contextToSend["m"] = 1;
     }
     if(this.useCompatSource) {
         contextToSend["c"] = 1;

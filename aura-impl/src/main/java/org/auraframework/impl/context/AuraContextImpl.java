@@ -138,7 +138,6 @@ public class AuraContextImpl implements AuraContext {
 
     private boolean isSystem = false;
 
-    private boolean modulesEnabled = false;
     private boolean useCompatSource = false;
     private boolean forceCompat = false;
     private List<String> scriptHashes = new ArrayList<>();
@@ -862,15 +861,11 @@ public class AuraContextImpl implements AuraContext {
                 json.writeMapEntry("scriptNonce", nonce);
             }
 
-            if (this.isModulesEnabled()) {
-                json.writeMapEntry("m", 1);
-                
-                if (style == EncodingStyle.Full) {
-                    Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
-                    if (!moduleNamespaceAliases.isEmpty()) {
-                        json.writeMapEntry("mna", moduleNamespaceAliases);
-                    }	
-                }
+            if (style == EncodingStyle.Full) {
+                Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
+                if (!moduleNamespaceAliases.isEmpty()) {
+                    json.writeMapEntry("mna", moduleNamespaceAliases);
+                }	
             }
 
             if (this.useCompatSource()) {
@@ -941,16 +936,6 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public RegistrySet getRegistries() {
         return this.registries;
-    }
-
-    @Override
-    public void setModulesEnabled(boolean isModulesEnabled) {
-        this.modulesEnabled = isModulesEnabled;
-    }
-
-    @Override
-    public boolean isModulesEnabled() {
-        return this.modulesEnabled;
     }
 
     @Override

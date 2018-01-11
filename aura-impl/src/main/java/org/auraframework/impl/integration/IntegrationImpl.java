@@ -320,8 +320,7 @@ public class IntegrationImpl implements Integration {
         context.setContextPath(contextPath);
         context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 
-        // modulesEnabled and useCompatSource are REQUIRED
-        context.setModulesEnabled(configAdapter.isModulesEnabled());
+        // useCompatSource is REQUIRED
         context.setUseCompatSource(!this.browserCompatibilityService.isCompatible(this.userAgent));
 
         if (num != null) {

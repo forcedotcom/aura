@@ -413,8 +413,8 @@ public class RegistrySerializer {
                 master = registryService.getRegistry(componentDirectory);
                 registries = registryService.getRegistrySet(master);
             }
-            AuraContext context = contextService.startBasicContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, registries);
-            context.setModulesEnabled(modulesEnabled);
+
+            contextService.startBasicContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, registries);
 
             try {
                 write(out, master);

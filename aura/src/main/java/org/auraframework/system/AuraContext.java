@@ -750,10 +750,6 @@ public interface AuraContext {
      */
     boolean isSystemMode();
 
-    void setModulesEnabled(boolean isModulesEnabled);
-
-    boolean isModulesEnabled();
-
     void setUseCompatSource(boolean useCompatSource);
     void setForceCompat(boolean forceCompat);
 

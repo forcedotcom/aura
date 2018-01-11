@@ -88,17 +88,11 @@ public class DefRefDelegateUnitTest {
     @Test
     public void testSwitchableReferences() throws Exception {
         when(mockDefinitionService.exists(moduleDefDescriptor)).thenReturn(true);
-        when(mockDefinitionService.exists(componentDefDescriptor)).thenReturn(true);
 
         DefRefDelegate defRefDelegate = new DefRefDelegate(mockComponentDefRef);
 
-        when(mockContext.isModulesEnabled()).thenReturn(true);
         assertTrue("Should be ModuleDefRef with modules enabled",
                 defRefDelegate.get() instanceof ModuleDefRef);
-
-        when(mockContext.isModulesEnabled()).thenReturn(false);
-        assertEquals("Should be ComponentDefRef with modules disabled",
-                mockComponentDefRef, defRefDelegate.get());
     }
 
     @Test
@@ -108,11 +102,6 @@ public class DefRefDelegateUnitTest {
 
         DefRefDelegate defRefDelegate = new DefRefDelegate(mockComponentDefRef);
 
-        when(mockContext.isModulesEnabled()).thenReturn(true);
-        assertEquals("Should be ComponentDefRef with non existent module and modules enabled",
-                mockComponentDefRef, defRefDelegate.get());
-
-        when(mockContext.isModulesEnabled()).thenReturn(false);
         assertEquals("Should be ComponentDefRef with non existent module and modules disabled",
                 mockComponentDefRef, defRefDelegate.get());
     }
@@ -124,12 +113,7 @@ public class DefRefDelegateUnitTest {
 
         DefRefDelegate defRefDelegate = new DefRefDelegate(mockComponentDefRef);
 
-        when(mockContext.isModulesEnabled()).thenReturn(true);
         assertTrue("Should be ModuleDefRef with non existent component and modules enabled",
-                defRefDelegate.get() instanceof ModuleDefRef);
-
-        when(mockContext.isModulesEnabled()).thenReturn(false);
-        assertTrue("Should be ModuleDefRef with non existent component and modules disabled",
                 defRefDelegate.get() instanceof ModuleDefRef);
     }
 

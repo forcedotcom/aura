@@ -34,9 +34,7 @@ public class JSTestCaseModel implements ModelInstance {
 
         TestCaseDef caseDef = (TestCaseDef) component.getAttributes().getValue("case");
 
-        // disable modules within test case iframes if parent request has modules disabled
-        String modulesParam = context.isModulesEnabled() ? "" : "&aura.modules=0";
-        url = component.getAttributes().getValue("url").toString() + "&aura.jstestrun=" + caseDef.getName() + modulesParam;
+        url = component.getAttributes().getValue("url").toString() + "&aura.jstestrun=" + caseDef.getName();
     }
 
     @AuraEnabled

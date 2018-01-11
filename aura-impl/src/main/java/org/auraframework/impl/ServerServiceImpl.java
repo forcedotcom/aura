@@ -382,10 +382,8 @@ public class ServerServiceImpl implements ServerService {
         final String mKey = minify ? "MIN:" : "DEV:";
         final String uid = context.getUid(appDesc);
         final String lockerService = configAdapter.isLockerServiceEnabled() ? ":ls" : "";
-        // modules definitions will be present with modules enabled so needs to be cached separately
-        final String modules = context.isModulesEnabled() ? ":m" : "";
         final String compat = context.useCompatSource() ? ":c" : "";
-        final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + ":" + lockerService + modules + compat;
+        final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + ":" + lockerService + compat;
 
         final Callable<String> buildFunction = () -> {
             String res = getDefinitionsString(dependencies, key);

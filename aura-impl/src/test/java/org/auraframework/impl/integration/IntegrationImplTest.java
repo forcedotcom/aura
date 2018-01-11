@@ -93,7 +93,6 @@ public class IntegrationImplTest {
         when(definitionService.getDefDescriptor(tag, ComponentDef.class)).thenReturn(componentDefDescriptor);
         when(definitionService.getDefinition(componentDefDescriptor)).thenReturn(componentDef);
         when(renderContext.getCurrent()).thenReturn(currentRenderAppendable);
-        when(configAdapter.isModulesEnabled()).thenReturn(true);
         when(browserCompatibilityService.isCompatible(anyString())).thenReturn(false);
 
         //ACT
@@ -105,7 +104,6 @@ public class IntegrationImplTest {
 
         //ASSERT
         verify(servletUtilAdapter).getInlineJs(context, applicationDef);
-        verify(configAdapter, atLeastOnce()).isModulesEnabled();
         verify(browserCompatibilityService, atLeastOnce()).isCompatible(anyString());
     }
 

@@ -218,12 +218,9 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             json.writeMapEntry("ls", 1);
         }
 
-        if (ctx.isModulesEnabled()) {
-            json.writeMapEntry("m", 1);
-            Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
-            if (!moduleNamespaceAliases.isEmpty()) {
-                json.writeMapEntry("mna", moduleNamespaceAliases);
-            }
+        Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
+        if (!moduleNamespaceAliases.isEmpty()) {
+            json.writeMapEntry("mna", moduleNamespaceAliases);
         }
 
         if (ctx.useCompatSource()) {

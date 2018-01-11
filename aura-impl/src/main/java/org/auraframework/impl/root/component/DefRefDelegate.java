@@ -256,7 +256,7 @@ public class DefRefDelegate implements DefinitionReference {
             }
         }
 
-        if (this.switchable && Aura.getContextService().getCurrentContext().isModulesEnabled()) {
+        if (this.switchable) {
             return this.moduleDefRef;
         }
         return this.componentDefRef;

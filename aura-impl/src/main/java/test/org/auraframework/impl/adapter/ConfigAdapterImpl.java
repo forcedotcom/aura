@@ -800,11 +800,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
-    public boolean isModulesEnabled() {
-        return true;
-    }
-
-    @Override
     public boolean cdnEnabled() {
         return false;
     }

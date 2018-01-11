@@ -16,7 +16,6 @@
 package org.auraframework.impl.linker;
 
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.cache.Cache;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -28,6 +27,8 @@ import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import java.util.Map;
+
 public class AccessChecker {
     private final ConfigAdapter configAdapter;
 
@@ -38,13 +39,13 @@ public class AccessChecker {
     /**
      * assert that the referencingDescriptor has access to the definition.
      *
-     * @param referencingDesriptor the descriptor that has a reference to the definition
+     * @param referencingDescriptor the descriptor that has a reference to the definition
      * @param def the definition that is being referenced.
      * @param accessCheckCache the cache for messages.
      * @throws NoAccessException if access is denied.
      */
     public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def,
-            Cache<String,String> accessCheckCache) throws QuickFixException {
+            Map<String,String> accessCheckCache) throws QuickFixException {
         String status = getAccessMessage(referencingDescriptor, def, accessCheckCache);
         if (status != null) {
             throw new NoAccessException(status);
@@ -54,26 +55,26 @@ public class AccessChecker {
     /**
      * Check that a referencing descriptor has access to a definition.
      *
-     * @param referencingDesriptor the descriptor that has a reference to the definition
+     * @param referencingDescriptor the descriptor that has a reference to the definition
      * @param def the definition that is being referenced.
      * @param accessCheckCache the cache for messages.
      * @return true if access is granted.
      */
     public <D extends Definition> boolean checkAccess(DefDescriptor<?> referencingDescriptor, D def,
-            Cache<String,String> accessCheckCache) {
+            Map<String,String> accessCheckCache) {
         return computeAccess(referencingDescriptor, def, accessCheckCache) == null;
     }
 
     /**
      * Check that a referencing descriptor has access to a definition and return the message if any.
      *
-     * @param referencingDesriptor the descriptor that has a reference to the definition
+     * @param referencingDescriptor the descriptor that has a reference to the definition
      * @param def the definition that is being referenced.
      * @param accessCheckCache the cache for messages.
      * @return the message that should be given back to the user, or null if access is granted.
      */
     public <D extends Definition> String getAccessMessage(DefDescriptor<?> referencingDescriptor, D def,
-            Cache<String,String> accessCheckCache) {
+            Map<String,String> accessCheckCache) {
         String status = computeAccess(referencingDescriptor, def, accessCheckCache);
         if (status == null || !configAdapter.isProduction()) {
             return status;
@@ -85,8 +86,7 @@ public class AccessChecker {
     /**
      * Internal routine to compute access messages.
      */
-    private <D extends Definition> String computeAccess(DefDescriptor<?> referencingDescriptor, D def,
-            Cache<String,String> accessCheckCache) {
+    private <D extends Definition> String computeAccess(DefDescriptor<?> referencingDescriptor, D def, Map<String,String> accessCheckCache) {
         if (def == null) {
             return null;
         }
@@ -153,8 +153,9 @@ public class AccessChecker {
 
         String status = null;
         if (accessCheckCache != null) {
-            status = accessCheckCache.getIfPresent(key);
+            status = accessCheckCache.get(key);
         }
+
         if (status == null) {
             // System.out.printf("** MDR.miss.assertAccess() cache miss for: %s\n", key);
             // We may re-enter this code, but only in race conditions. We should generate the
@@ -185,15 +186,18 @@ public class AccessChecker {
             if (accessCheckCache != null) {
                 accessCheckCache.put(key, status);
             }
+
         }
+
         if (status.isEmpty()) {
             return null;
         }
+
         if (!configAdapter.isProduction()) {
             return status;
         }
-        return DefinitionNotFoundException.getMessage(def.getDescriptor().getDefType(),
-                def.getDescriptor().getName());
+
+        return DefinitionNotFoundException.getMessage(def.getDescriptor().getDefType(), def.getDescriptor().getName());
     }
 
     /**

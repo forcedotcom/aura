@@ -196,4 +196,6 @@ public interface Json {
     void writeMapSeparator() throws IOException;
     void writeString(Object value) throws IOException;
     void writeValue(Object value) throws IOException;
+    void startCapturing();
+    String stopCapturing();
 }

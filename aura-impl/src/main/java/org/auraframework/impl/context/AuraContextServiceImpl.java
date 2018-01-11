@@ -15,12 +15,7 @@
  */
 package org.auraframework.impl.context;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
+import com.google.common.collect.ImmutableMap;
 import org.auraframework.adapter.ContextAdapter;
 import org.auraframework.adapter.GlobalValueProviderAdapter;
 import org.auraframework.adapter.PrefixDefaultsAdapter;
@@ -43,11 +38,15 @@ import org.auraframework.util.json.BasicJsonSerializationContext;
 import org.auraframework.util.json.JsonSerializerFactory;
 import org.springframework.context.annotation.Lazy;
 
-import com.google.common.collect.ImmutableMap;
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Lazy
 @ServiceComponent
 public class AuraContextServiceImpl implements ContextService {
+
     @Inject
     private GlobalValueProviderAdapter primaryGlobalValueProviderAdapter;
 
@@ -68,7 +67,7 @@ public class AuraContextServiceImpl implements ContextService {
 
     @Inject
     private RegistryService registryService;
-
+    
     private static final long serialVersionUID = 2204785781318401371L;
 
     @Override
@@ -102,7 +101,6 @@ public class AuraContextServiceImpl implements ContextService {
      * costly to initialize.
      *
      * @param mode AuraContext.Mode
-     * @param loaders SourceLoaders
      * @param format Format of output
      * @param access Access
      * @param globalValueProviders GlobalValueProviders
@@ -158,6 +156,7 @@ public class AuraContextServiceImpl implements ContextService {
     }
 
     private Map<String, GlobalValueProvider> getGlobalProviders() {
+
         // load any @Primary GlobalValueProviderAdapter first, to give it's
         // implementations precedence
         Map<String, GlobalValueProvider> instances = new HashMap<>();
@@ -165,7 +164,7 @@ public class AuraContextServiceImpl implements ContextService {
             instances.put(g.getValueProviderKey().getPrefix(), g);
         }
         for (GlobalValueProviderAdapter factory : globalValueProviderAdapters) {
-            if (!factory.equals(globalValueProviderAdapters)) {
+            if (!factory.equals(primaryGlobalValueProviderAdapter)) {
                 for (GlobalValueProvider g : factory.createValueProviders()) {
                     if (!instances.containsKey(g.getValueProviderKey().getPrefix())) {
                         instances.put(g.getValueProviderKey().getPrefix(), g);
@@ -173,6 +172,7 @@ public class AuraContextServiceImpl implements ContextService {
                 }
             }
         }
+
         return instances;
     }
 

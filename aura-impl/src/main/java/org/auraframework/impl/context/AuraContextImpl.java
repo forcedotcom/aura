@@ -15,8 +15,43 @@
  */
 package org.auraframework.impl.context;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.apache.log4j.Logger;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.css.StyleContext;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.EventType;
+import org.auraframework.impl.ServerServiceImpl;
+import org.auraframework.impl.css.token.StyleContextImpl;
+import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.instance.Action;
+import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.Event;
+import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.InstanceStack;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.system.*;
+import org.auraframework.system.LoggingContext.KeyValueLogger;
+import org.auraframework.test.TestContext;
+import org.auraframework.test.TestContextAdapter;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.SystemErrorException;
+import org.auraframework.throwable.quickfix.InvalidEventTypeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.util.json.JsonSerializationContext;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,50 +64,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.cache.Cache;
-import org.auraframework.css.StyleContext;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.EventType;
-import org.auraframework.impl.ServerServiceImpl;
-import org.auraframework.impl.cache.CacheImpl;
-import org.auraframework.impl.css.token.StyleContextImpl;
-import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.instance.Action;
-import org.auraframework.instance.BaseComponent;
-import org.auraframework.instance.Event;
-import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.instance.InstanceStack;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraLocalStore;
-import org.auraframework.system.Client;
-import org.auraframework.system.DependencyEntry;
-import org.auraframework.system.LoggingContext.KeyValueLogger;
-import org.auraframework.system.RegistrySet;
-import org.auraframework.test.TestContext;
-import org.auraframework.test.TestContextAdapter;
-import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.SystemErrorException;
-import org.auraframework.throwable.quickfix.InvalidEventTypeException;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonEncoder;
-import org.auraframework.util.json.JsonSerializationContext;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 public class AuraContextImpl implements AuraContext {
     // JBUCH: TEMPORARY FLAG FOR 202 CRUC. REMOVE IN 204.
@@ -99,6 +92,8 @@ public class AuraContextImpl implements AuraContext {
     private final Set<String> dynamicNamespaces = Sets.newLinkedHashSet();
 
     private Set<DefDescriptor<?>> preloadedDefinitions = null;
+    private Set<DefDescriptor<?>> unmodifiablePreloadedDefinitions = null;
+    private int preloadedDefinitionsUnionCount = 0;
 
     private final Format format;
 
@@ -154,12 +149,9 @@ public class AuraContextImpl implements AuraContext {
 
     private final Map<String, Boolean> clientClassesLoaded;
 
-    private final Cache<String, String> accessCheckCache;
+    private final Map<String, String> accessCheckCache;
 
     private final RegistrySet registries;
-
-    private final static int ACCESS_CHECK_CACHE_SIZE = 4096;
-
 
     public AuraContextImpl(Mode mode, RegistrySet registries, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
@@ -179,13 +171,7 @@ public class AuraContextImpl implements AuraContext {
         this.globalValues = new HashMap<>();
         this.localStore = new AuraLocalStoreImpl();
         this.clientClassesLoaded = new HashMap<>();
-        // Why is this a cache and not just a map?
-        this.accessCheckCache = new CacheImpl.Builder<String, String>()
-                .setInitialSize(ACCESS_CHECK_CACHE_SIZE)
-                .setMaximumSize(ACCESS_CHECK_CACHE_SIZE)
-                .setRecordStats(true)
-                .setSoftValues(true)
-                .build();
+        this.accessCheckCache = new HashMap<>();
     }
 
     @Override
@@ -329,12 +315,39 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public Set<DefDescriptor<?>> getPreloadedDefinitions() {
-        return preloadedDefinitions;
+        return unmodifiablePreloadedDefinitions;
+    }
+
+    @Override
+    public void addPreloadedDefinitions(Set<DefDescriptor<?>> preloadedDefinitions) {
+        // the naive thing to do here would be to call addAll on the set, but that was a huge huge source of allocation in profiling (10% of all allocations!)
+        // so be a little more clever and use Sets.union unless we're making a ridiculous number of unions
+
+        if (this.preloadedDefinitions == null) {
+            setPreloadedDefinitions(preloadedDefinitions);   // do this even if it's empty to preserve old setPreloadedDefinitions behavior
+        } else if (preloadedDefinitions.isEmpty()) {
+            // nothing to do
+        } else if (this.preloadedDefinitions.isEmpty()) {
+            setPreloadedDefinitions(preloadedDefinitions);
+        } else if (++preloadedDefinitionsUnionCount < 4) {
+            this.preloadedDefinitions = Sets.union(preloadedDefinitions, this.preloadedDefinitions);
+            this.unmodifiablePreloadedDefinitions = Collections.unmodifiableSet(this.preloadedDefinitions);
+        } else if (preloadedDefinitionsUnionCount == 4) {
+            Set<DefDescriptor<?>> newPreloaded = Sets.newHashSetWithExpectedSize(this.preloadedDefinitions.size() + 2 * preloadedDefinitions.size());
+            newPreloaded.addAll(this.preloadedDefinitions);
+            newPreloaded.addAll(preloadedDefinitions);
+            this.preloadedDefinitions = newPreloaded;
+            this.unmodifiablePreloadedDefinitions = Collections.unmodifiableSet(this.preloadedDefinitions);
+        } else {
+            this.preloadedDefinitions.addAll(preloadedDefinitions);
+        }
     }
 
     @Override
     public void setPreloadedDefinitions(Set<DefDescriptor<?>> preloadedDefinitions) {
-        this.preloadedDefinitions = Collections.unmodifiableSet(preloadedDefinitions);
+        this.preloadedDefinitions = preloadedDefinitions;
+        this.unmodifiablePreloadedDefinitions = Collections.unmodifiableSet(preloadedDefinitions);
+        this.preloadedDefinitionsUnionCount = 0;
     }
 
     @Override
@@ -611,9 +624,19 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public void serializeAsPart(Json json) throws IOException {
+        // if this changes, getComponentsToSerialize() may also need to change
         if (fakeInstanceStack != null) {
             fakeInstanceStack.serializeAsPart(json);
         }
+    }
+
+    /**
+     * Used by {@link AuraContextJsonSerializer} to see which components are to be
+     * serialized and thus should be part of the cache key.
+     */
+    public Map<String, BaseComponent<?, ?>> getComponentsToSerialize() {
+        if (fakeInstanceStack == null) return Collections.emptyMap();
+        return fakeInstanceStack.getComponents();
     }
 
     @Override
@@ -911,7 +934,7 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public Cache<String, String> getAccessCheckCache() {
+    public Map<String, String> getAccessCheckCache() {
         return accessCheckCache;
     }
 

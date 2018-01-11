@@ -15,14 +15,14 @@
  */
 package org.auraframework.util.text;
 
-import java.io.StringReader;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-
+import org.apache.commons.codec.binary.Base64;
 import org.auraframework.util.text.Hash.StringBuilder;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.StringReader;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class HashTest {
 
@@ -126,17 +126,18 @@ public class HashTest {
     @Test
     public void testCannotReset() throws Exception {
         byte[] bytes = { 12, 34, 56, 78, 90 };
+        byte[] otherBytes = { 12};
         Hash hash = new ExposedHash();
         hash.setHash(bytes);
         IllegalStateException expected = null;
 
         Assert.assertTrue(hash.isSet());
         try {
-            hash.setHash(bytes);
+            hash.setHash(otherBytes);
         } catch (IllegalStateException e) {
             expected = e;
         }
-        Assert.assertNotNull("Hash shouldn't accept a second setHash() call", expected);
+        Assert.assertNotNull("Hash shouldn't accept a second setHash() call with a different value", expected);
 
         expected = null;
         try {
@@ -162,7 +163,7 @@ public class HashTest {
     }
 
     private int getHashCode(String string) throws NoSuchAlgorithmException {
-        return Arrays.hashCode(MessageDigest.getInstance("MD5").digest(string.getBytes()));
+        return Base64.encodeBase64URLSafeString(MessageDigest.getInstance("MD5").digest(string.getBytes())).hashCode();
     }
 
     private void assertHash(Hash hash, boolean isSet, int hashCode) throws Exception {
@@ -202,14 +203,18 @@ public class HashTest {
 
     @Test
     public void testStringBuilderNoStrings() throws Exception {
-        int expected = Arrays.hashCode(MessageDigest.getInstance("MD5").digest());
+        int expected = nullHashCode();
         StringBuilder builder = new StringBuilder();
         assertHash(builder.build(), true, expected);
     }
 
+    private int nullHashCode() throws NoSuchAlgorithmException {
+        return Base64.encodeBase64URLSafeString(MessageDigest.getInstance("MD5").digest()).hashCode();
+    }
+
     @Test
     public void testStringBuilderNull() throws Exception {
-        int expected = Arrays.hashCode(MessageDigest.getInstance("MD5").digest());
+        int expected = nullHashCode();
         StringBuilder builder = new StringBuilder();
         builder.addString(null);
         assertHash(builder.build(), true, expected);

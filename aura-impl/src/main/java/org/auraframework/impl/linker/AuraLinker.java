@@ -66,7 +66,7 @@ public class AuraLinker {
     private final ConfigAdapter configAdapter;
     private final Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
     private final Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> descriptorCache;
-    private final Cache<String, String> accessCheckCache;
+    private final Map<String, String> accessCheckCache;
 
     private final Map<DefDescriptor<? extends Definition>, LinkingDefinition<?>> linked = Maps.newHashMap();
     private final Map<DefDescriptor<? extends Definition>, Definition> subDefinitions = Maps.newHashMap();
@@ -88,7 +88,7 @@ public class AuraLinker {
             Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> descriptorCache,
             LoggingService loggingService, ConfigAdapter configAdapter,
             AccessChecker accessChecker, AuraLocalStore localStore,
-            Cache<String, String> accessCheckCache,
+            Map<String, String> accessCheckCache,
             RegistrySet registrySet) {
 
         this.defsCache = defsCache;

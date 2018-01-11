@@ -16,13 +16,15 @@
 package org.auraframework.system;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
-import org.auraframework.cache.Cache;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -37,12 +39,11 @@ import org.auraframework.instance.InstanceStack;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
+
+import com.google.common.base.Optional;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 import org.auraframework.util.json.JsonSerializationContext;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 /**
  * AuraContext public interface
@@ -436,7 +437,28 @@ public interface AuraContext {
     void setLoadingApplicationDescriptor(DefDescriptor<? extends BaseComponentDef> loadingAppDesc);
 
     /**
+     * Add the definitions that the client should already have.
+     *
+     * @param preloaded the additional set.
+     */
+    default void addPreloadedDefinitions(Set<DefDescriptor<?>> preloaded) {
+        // this implementation is inefficient. please override in your subclass!
+        Set<DefDescriptor<?>> current = getPreloadedDefinitions();
+        if (current == null) {
+            setPreloadedDefinitions(preloaded);
+        } else {
+            HashSet<DefDescriptor<?>> s = Sets.newHashSetWithExpectedSize(preloaded.size() + current.size());
+            s.addAll(preloaded);
+            s.addAll(current);
+            setPreloadedDefinitions(s);
+        }
+    }
+
+    /**
      * Set the definitions that the client should already have.
+     * 
+     * IMPORTANT: there was an old pattern where you would call getPreloadedDefinitions and copy that into a new set and then
+     * add to that set and then call setPreloadedDefinitions. That's super inefficient so don't do it! Call addPreloadedDefinitions instead. 
      *
      * @param preloaded the actual set.
      */
@@ -707,7 +729,7 @@ public interface AuraContext {
     /**
      * Get the access check cache.
      */
-    Cache<String, String> getAccessCheckCache();
+    Map<String, String> getAccessCheckCache();
 
     /**
      * Get the set of registries associated with this context.

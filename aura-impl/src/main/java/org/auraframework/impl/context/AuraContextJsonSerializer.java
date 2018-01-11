@@ -15,15 +15,7 @@
  */
 package org.auraframework.impl.context;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -43,7 +35,12 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -86,7 +83,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
                 json.writeMapEntry("cmp", String.format("%s:%s", appDesc.getNamespace(), appDesc.getName()));
             }
         }
-                    
+
         String contextPath = ctx.getContextPath();
         if (!contextPath.isEmpty()) {
             // serialize servlet context path for html component to prepend for client created components
@@ -105,7 +102,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         } else {
             json.writeMapEntry("fwuid", configAdapter.getAuraFrameworkNonce());
         }
-        
+
         //
         // Now comes the tricky part, we have to serialize all of the definitions that are
         // required on the client side, and, of all types. This way, we won't have to handle
@@ -151,7 +148,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             writeDefs(json, "eventDefs", eventDefs);
             writeDefs(json, "libraryDefs", libraryDefs);
             writeDefs(json, "componentDefs", componentDefs);
-            writeDefs(json, "moduleDefs", moduleDefs);           
+            writeDefs(json, "moduleDefs", moduleDefs);
         }
 
         try {
@@ -162,7 +159,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
 
         // Create the new loaded array.
         // loaded = server + (client - server) @ DELETED.
-        
+
         // Step 1: Start with client defintion set
         Set<DefDescriptor<?>> currentLoaded = new HashSet<>();
         currentLoaded.addAll(ctx.getClientLoaded().keySet());
@@ -220,7 +217,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         if (configAdapter.isLockerServiceEnabled()) {
             json.writeMapEntry("ls", 1);
         }
-        
+
         if (ctx.isModulesEnabled()) {
             json.writeMapEntry("m", 1);
             Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
@@ -228,7 +225,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
                 json.writeMapEntry("mna", moduleNamespaceAliases);
             }
         }
-        
+
         if (ctx.useCompatSource()) {
             json.writeMapEntry("c", 1);
         }

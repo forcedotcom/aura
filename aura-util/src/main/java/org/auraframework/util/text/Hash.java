@@ -15,6 +15,8 @@
  */
 package org.auraframework.util.text;
 
+import org.apache.commons.codec.binary.Base64;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -23,9 +25,6 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * A wrapper around an MD5 hash. This functions as a future, being created
@@ -33,11 +32,9 @@ import org.apache.commons.codec.binary.Base64;
  */
 public class Hash {
     /**
-     * Radix for hash bytes to string, using 0-9a-f. We might someday want to be
-     * base64 to have a shorter string, but that makes the encoding marginally
-     * more complex since we have to handle byte-wrap boundaries ourselves.
+     * base64 urlsafe encoded md5 hash
      */
-    private byte[] value;
+    private String value;
 
     /**
      * Creates a new, empty {@code Hash} to be filled in later with either
@@ -80,7 +77,7 @@ public class Hash {
                 digest.update(buffer, 0, read);
                 read = bytecode.read(buffer);
             }
-            value = digest.digest();
+            value = Base64.encodeBase64URLSafeString(digest.digest());
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("MD-5 is a required hash algorithm, but isn't defined", e);
         }
@@ -111,13 +108,13 @@ public class Hash {
         if (value == null) {
             return "no-hash-value";
         }
-        return Base64.encodeBase64URLSafeString(value);
+        return value;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o instanceof Hash) {
-            return Arrays.equals(value, ((Hash) o).value);
+            return value == null ? ((Hash) o).value == null : value.equals(((Hash) o).value);
         }
         return false;
     }
@@ -128,7 +125,7 @@ public class Hash {
             return 3; // arbitrary value, but I dislike 0 as a hash precisely
                       // because it's so normal
         }
-        return Arrays.hashCode(value);
+        return value.hashCode();
     }
 
     public boolean isSet() {
@@ -142,10 +139,11 @@ public class Hash {
      * @throws IllegalStateException if already set.
      */
     public void setHash(byte[] hash) throws IllegalStateException {
-        if (value != null && !value.equals(hash)) {
+        String newValue = Base64.encodeBase64URLSafeString(hash);
+        if (value != null && !value.equals(newValue)) {
             throw new IllegalStateException("Cannot set hash twice");
         }
-        value = Arrays.copyOf(hash, hash.length);
+        value = newValue;
     }
 
     /**

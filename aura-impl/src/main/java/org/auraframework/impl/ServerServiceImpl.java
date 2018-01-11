@@ -63,7 +63,6 @@ import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.AuraTextUtil.JSONEscapedFunctionStringBuilder;
 import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.JsonEncoder;
@@ -208,21 +207,19 @@ public class ServerServiceImpl implements ServerService {
                 if (callingDescriptor != null && !context.getPreloadedDefinitions().contains(callingDescriptor)) {
                     // we can assume that if the client is calling an action from a particular component, it has the component and we won't need to serialize it back
                     // components referenced in the action will be added to the context and thus serialized back to the client
-                    Set<DefDescriptor<?>> preloadedDefinitions = Sets.newHashSet(context.getPreloadedDefinitions());
                     try {
-                        preloadedDefinitions.addAll(definitionService.getDependencies(definitionService.getUid(null, callingDescriptor)));
+                        context.addPreloadedDefinitions(definitionService.getDependencies(definitionService.getUid(null, callingDescriptor)));
                     } catch (QuickFixException e) {
                         // we assumed thed calling descriptor was a component, but it could be an application
                         DefDescriptor<ApplicationDef> callingAppDescriptor = definitionService.getDefDescriptor(callingDescriptor.getQualifiedName(), ApplicationDef.class);
                         try {
-                            preloadedDefinitions.addAll(definitionService.getDependencies(definitionService.getUid(null, callingAppDescriptor)));
+                            context.addPreloadedDefinitions(definitionService.getDependencies(definitionService.getUid(null, callingAppDescriptor)));
                         } catch (QuickFixException qfe) {
                             // well, it's not a component, it's not an app... give up trying to exclude it from the set being serialized
                         }
                     } catch (Exception e) {
                         // ignore other exceptions that may surface from trying to get the definition, like from layouts
                     }
-                    context.setPreloadedDefinitions(preloadedDefinitions);
                 }
                 action.setup();
                 action.run();

@@ -18,7 +18,6 @@ package org.auraframework.http;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -273,7 +272,7 @@ public class AuraContextFilter implements Filter {
         }
         @SuppressWarnings("unchecked")
         Map<String, String> loaded = (Map<String, String>) loadedEntry;
-        Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
+        Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMapWithExpectedSize(loaded.size() * 3/2);
 
         for (Map.Entry<String, String> entry : loaded.entrySet()) {
             String uid = entry.getValue();

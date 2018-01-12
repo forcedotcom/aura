@@ -35,7 +35,7 @@ var valueFactory = {
                 }
                 return new PropertyReferenceValue(valueConfig["path"], component);
             } else if (valueConfig["exprType"] === "FUNCTION") {
-                return new FunctionCallValue(valueConfig, component, valueConfig["target"]);
+                return new FunctionCallValue(valueConfig, component);
             }else{
                 // Recurse over child objects to create Actions, PropertyReferences, and FunctionCalls
                 var childConfig={};

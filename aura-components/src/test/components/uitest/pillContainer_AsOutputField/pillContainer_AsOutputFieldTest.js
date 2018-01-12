@@ -33,24 +33,17 @@
 
     testInsert: {
         test: function (cmp) {
-        	this._insertPill(cmp, this.PILLS[0], false)
+        	this._insertPill(cmp, this.PILLS[0]);
         }
     },
     
-    testInsertWithLongPillText: {
-        test: function (cmp) {
-        	this._insertPill(cmp, this.PILLS_WITHLONGLENGTH[0], true)
-        }
-    },
-    
-    _insertPill: function(cmp, pill, isTitlePresent) {
+    _insertPill: function(cmp, pill) {
     	var pillContainer = cmp.find("pillContainer");
         pillContainer.insertItems( [pill] );
         var pillItem = $A.test.select(".pill");
         var actualNumberOfPills = pillItem.length;
         $A.test.assertEquals(1, actualNumberOfPills, "Incorrect number of pills displayed.");
         this._validateIconURLIsPresent(cmp, actualNumberOfPills);
-        this._validateTitlePresentInPill(pillItem[0], isTitlePresent, pill.label);
     },
 
     testPillIconInformational: {
@@ -320,19 +313,7 @@
     _isDisplayNone: function (element) {
         var display = element.currentStyle ? element.currentStyle.display : getComputedStyle(element, null).display;
         return display === "none";
-    },
-
-    _validateTitlePresentInPill: function(pill, isTitlePresent, label){
-    	var pillTitle = $A.test.getElementAttributeValue(pill,"title")
-    	if(!isTitlePresent){
-    		$A.test.assertFalsy(pillTitle,"Title attribute should not be present on the pill")
-    	}
-    	else{
-    		$A.test.assertTruthy(pillTitle,"Title attribute should be present on the pill")
-        	$A.test.assertEquals(label, pillTitle, "Title attribute set is incorrect");
-            var pillTextElement = $A.test.select(".pillText")[0];
-            $A.test.assertTrue(pillTextElement.offsetWidth < pillTextElement.scrollWidth, "Pill text should be truncated");
-    	}
     }
+
 
 })

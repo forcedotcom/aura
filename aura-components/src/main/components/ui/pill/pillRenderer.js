@@ -17,17 +17,6 @@
     afterRender: function (component, helper) {
         helper.lib.interactive.addDomEvents(component);
 
-        //add title when there's ellipsis
-        var label = component.get("v.label");
-        if (label) {
-            var innerLabel = component.find("label");
-            if (innerLabel) {
-                var innerLabelElement = innerLabel.getElement();
-                if (innerLabelElement && innerLabelElement.offsetWidth < innerLabelElement.scrollWidth) {
-                    component.getElement().title = label;
-                }
-            }
-        }
         return this.superAfterRender();
     },
 

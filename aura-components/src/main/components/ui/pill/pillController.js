@@ -30,6 +30,22 @@
         helper.removeFocus(component);
     },
 
+    onMouseEnter: function(component) {
+        //add title when there's ellipsis, remove otherwise
+        var label = component.get("v.label");
+        if (label) {
+            var innerLabel = component.find("label");
+            if (innerLabel) {
+                var innerLabelElement = innerLabel.getElement();
+                if (innerLabelElement && innerLabelElement.offsetWidth < innerLabelElement.scrollWidth) {
+                    component.getElement().title = label;
+                } else {
+                    component.getElement().title = undefined;
+                }
+            }
+        }
+    },
+
     onFocus: function() {
     },
 

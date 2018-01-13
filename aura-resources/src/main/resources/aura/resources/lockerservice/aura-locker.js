@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2017-12-20
- * Version: 0.3.6
+ * Generated: 2018-01-12
+ * Version: 0.3.8
  */
 
 (function (global, factory) {
@@ -76,7 +76,10 @@ function newWeakMap() {
 // Keyed objects can only have one owner. We prevent "null" and "undefined"
 // keys by guarding all set operations.
 const keychain = newWeakMap();
-const rawToSecureByKey = new Map();
+// Map to store <key> to <Weakmap of <raw> to <Secure> pairs>, this is the primary cache
+const rawToSecurePrimaryCacheByKey = new Map();
+// Map to store <key> to <Map of <raw> to <Secure> pairs>, will be used for raw objects that cannot be stored in a WeakMap, this is the secondary cache
+const rawToSecureSecondaryCacheByKey = new Map();
 const secureToRaw = newWeakMap();
 const opaqueSecure = newWeakMap();
 const objectToKeyedData = newWeakMap();
@@ -246,18 +249,41 @@ function addToCache(raw, st, key) {
     throw new Error('Caching with an empty key is prohibited.');
   }
 
-  let rawToSecure = rawToSecureByKey.get(key);
-  if (!rawToSecure) {
-    rawToSecure = new WeakMap();
-    rawToSecureByKey.set(key, rawToSecure);
+  let rawToSecurePrimary = rawToSecurePrimaryCacheByKey.get(key);
+  let rawToSecureSecondary;
+  if (!rawToSecurePrimary) {
+    rawToSecurePrimary = new WeakMap();
+    rawToSecurePrimaryCacheByKey.set(key, rawToSecurePrimary);
   }
-
-  rawToSecure.set(raw, st);
+  try {
+    rawToSecurePrimary.set(raw, st);
+  } catch (e) {
+    /**
+     * If caching raw object fails in a weakmap,
+     * then create a secondary cache implemented using a Map(which is more fault tolerant).
+     */
+    rawToSecureSecondary = rawToSecureSecondaryCacheByKey.get(key);
+    if (!rawToSecureSecondary) {
+      // Created on demand
+      rawToSecureSecondary = new Map();
+      rawToSecureSecondaryCacheByKey.set(key, rawToSecureSecondary);
+    }
+    rawToSecureSecondary.set(raw, st);
+  }
 }
 
 function getFromCache(raw, key) {
-  const rawToSecure = rawToSecureByKey.get(key);
-  return rawToSecure && rawToSecure.get(raw);
+  const rawToSecurePrimaryCache = rawToSecurePrimaryCacheByKey.get(key);
+  if (rawToSecurePrimaryCache) {
+    let secureThing = rawToSecurePrimaryCache.get(raw);
+    // If raw object was cached in primary WeakMap and we have used the secondary cache, look there
+    if (!secureThing && rawToSecureSecondaryCacheByKey.size > 0) {
+      const rawToSecureSecondary = rawToSecureSecondaryCacheByKey.get(key);
+      secureThing = rawToSecureSecondary && rawToSecureSecondary.get(raw);
+    }
+    return secureThing;
+  }
+  return undefined;
 }
 
 /*
@@ -7207,6 +7233,7 @@ function SecureWindow(win, key) {
     },
     navigator: {
       enumerable: true,
+      writable: true,
       value: SecureNavigator(win.navigator, key)
     },
     XMLHttpRequest: {
@@ -8268,6 +8295,31 @@ function registerAuraTypes(types) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+let strictCSPStatus = true;
+
+
+
+function registerLockerAPI(api) {
+  if (api) {
+    strictCSPStatus = api.isStrictCSP;
+  }
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 const service = {
   piercing: (component, data, def, context, target, key, value, callback) => {
     if (value === EventTarget.prototype.dispatchEvent && SecureObject.isDOMElementOrNode(target)) {
@@ -8369,7 +8421,6 @@ function windowAddPropertiesHook(st, raw, key) {
         });
       }
     });
-
     SecureObject.addUnfilteredPropertyIfSupported(st, raw, 'MediaStream');
   }
 }
@@ -8480,6 +8531,7 @@ function initialize(types, api) {
 
   registerAuraTypes(types);
   registerAuraAPI(api);
+  registerLockerAPI(api);
   registerReportAPI(api);
   registerEngineAPI(api);
   registerFilterTypeHook(filterTypeHook);

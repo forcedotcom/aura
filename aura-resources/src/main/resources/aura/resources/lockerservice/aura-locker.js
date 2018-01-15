@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-01-12
- * Version: 0.3.8
+ * Generated: 2018-01-15
+ * Version: 0.3.9
  */
 
 (function (global, factory) {
@@ -806,6 +806,211 @@ function evaluate(src, key, sourceURL) {
   return safeEval(src, sourceURL, getEnv$1(key));
 }
 
+const assert = {
+  block: fn => fn(),
+  isTrue: (condition, message) => {
+    if (!condition) {
+      throw new Error(`Assertion failed: ${message}`);
+    }
+  },
+  isFalse: (condition, message) => {
+    if (condition) {
+      throw new Error(`Assertion failed: ${message}`);
+    }
+  },
+  invariant: (condition, message) => {
+    if (!condition) {
+      throw new Error(`Invariant violation: ${message}`);
+    }
+  }
+};
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+let warn = window.console.warn;
+let error = Error;
+
+function registerReportAPI(api) {
+  if (api) {
+    warn = api.warn;
+    error = api.error;
+  }
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+function assert$2(condition) {
+  if (!condition) {
+    throw new Error();
+  }
+}
+
+// TODO: remove these functions. Our filtering mechanism should not
+// rely on the more expensive operation.
+
+function isObjectObject(value) {
+  return (
+    typeof value === 'object' && value !== null && objectToString.call(value) === '[object Object]'
+  );
+}
+
+// https://github.com/jonschlinkert/is-plain-object
+// Copyright © 2017, Jon Schlinkert. Released under the MIT License.
+function isPlainObject(value) {
+  if (isObjectObject(value) === false) {
+    return false;
+  }
+
+  // If has modified constructor
+  const ctor = value.constructor;
+  if (typeof ctor !== 'function') {
+    return false;
+  }
+
+  try {
+    // If has modified prototype
+    const proto = ctor.prototype;
+    if (isObjectObject(proto) === false) {
+      return false;
+    }
+    // If constructor does not have an Object-specific method
+    if (proto.hasOwnProperty('isPrototypeOf') === false) {
+      return false;
+    }
+  } catch (e) {
+    /* Assume is  object when throws */
+  }
+
+  // Most likely a plain Object
+  return true;
+}
+
+/**
+ * Basic URL Scheme checking utility.
+ * Checks for http: and https: url schemes.
+ * @param {String} url
+ * @return {Boolean}
+ */
+function isValidURLScheme(url) {
+  const normalized = document.createElement('a');
+  normalized.href = url;
+  return normalized.protocol === 'https:' || normalized.protocol === 'http:';
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+const SecureIFrameElement = {
+  addMethodsAndProperties: function(prototype) {
+    Object.defineProperties(prototype, {
+      // Standard HTMLElement methods
+      // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
+      blur: SecureObject.createFilteredMethodStateless('blur', prototype),
+      focus: SecureObject.createFilteredMethodStateless('focus', prototype),
+      contentWindow: {
+        get: function() {
+          const raw = SecureObject.getRaw(this);
+          return raw.contentWindow
+            ? SecureIFrameElement.SecureIFrameContentWindow(raw.contentWindow, getKey(this))
+            : raw.contentWindow;
+        }
+      },
+      // Reason: [W-4437391] Cure53 Report SF-04-004: Window access via encoded path segments.
+      src: {
+        get: function() {
+          const raw = SecureObject.getRaw(this);
+          return raw.src;
+        },
+        set: function(url) {
+          const urlString = sanitizeURLForElement(url);
+          if (urlString.length > 0) {
+            if (!isValidURLScheme(urlString)) {
+              warn(
+                'SecureIframeElement.src supports http://, https:// schemes and relative urls.'
+              );
+            } else {
+              const raw = SecureObject.getRaw(this);
+              raw.src = urlString;
+            }
+          }
+        }
+      }
+    });
+
+    // Standard list of iframe's properties from:
+    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
+    // Note: Ignoring 'contentDocument', 'sandbox' and 'srcdoc' from the list above.
+    ['height', 'width', 'name'].forEach(name =>
+      Object.defineProperty(
+        prototype,
+        name,
+        SecureObject.createFilteredPropertyStateless(name, prototype)
+      )
+    );
+  },
+
+  // TODO: Move this function into a separate file
+  SecureIFrameContentWindow: function(w, key) {
+    const sicw = Object.create(null, {
+      toString: {
+        value: function() {
+          return `SecureIFrameContentWindow: ${w}{ key: ${JSON.stringify(key)} }`;
+        }
+      }
+    });
+
+    Object.defineProperties(sicw, {
+      postMessage: SecureObject.createFilteredMethod(sicw, w, 'postMessage', { rawArguments: true })
+    });
+
+    setRef(sicw, w, key);
+    addToCache(w, sicw, key);
+    registerProxy(sicw);
+
+    return sicw;
+  }
+};
+
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
@@ -823,6 +1028,7 @@ function evaluate(src, key, sourceURL) {
  */
 
 function SecureDOMEvent(event, key) {
+  assert.invariant(event, 'Wrapping an undefined event is prohibited.');
   let o = getFromCache(event, key);
   if (o) {
     return o;
@@ -867,6 +1073,26 @@ function SecureDOMEvent(event, key) {
   ['relatedTarget', 'srcElement', 'explicitOriginalTarget', 'originalTarget'].forEach(property =>
     SecureObject.addPropertyIfSupported(o, event, property)
   );
+
+  // For MessageEvent, special handling if the message is from a cross origin iframe
+  if (event instanceof MessageEvent) {
+    let xorigin = false;
+    const eventSource = event.source;
+    try {
+      xorigin = !!(eventSource && eventSource.nodeType);
+    } catch (e) {
+      xorigin = true;
+    }
+    // If the MessageEvent object is from a different domain,
+    // and accessing the nodeType property triggers an exception, then the source is a content window,
+    // wrap the source in a SecureIFrameContentWindow
+    if (xorigin) {
+      Object.defineProperty(o, 'source', {
+        enumerable: true,
+        value: SecureIFrameElement.SecureIFrameContentWindow(eventSource, key)
+      });
+    }
+  }
 
   // re-exposing externals
   // TODO: we might need to include non-enumerables
@@ -1174,191 +1400,6 @@ SecureScriptElement.run = function(st) {
  * limitations under the License.
  */
 
-let warn = window.console.warn;
-let error = Error;
-
-function registerReportAPI(api) {
-  if (api) {
-    warn = api.warn;
-    error = api.error;
-  }
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-function assert(condition) {
-  if (!condition) {
-    throw new Error();
-  }
-}
-
-// TODO: remove these functions. Our filtering mechanism should not
-// rely on the more expensive operation.
-
-function isObjectObject(value) {
-  return (
-    typeof value === 'object' && value !== null && objectToString.call(value) === '[object Object]'
-  );
-}
-
-// https://github.com/jonschlinkert/is-plain-object
-// Copyright © 2017, Jon Schlinkert. Released under the MIT License.
-function isPlainObject(value) {
-  if (isObjectObject(value) === false) {
-    return false;
-  }
-
-  // If has modified constructor
-  const ctor = value.constructor;
-  if (typeof ctor !== 'function') {
-    return false;
-  }
-
-  try {
-    // If has modified prototype
-    const proto = ctor.prototype;
-    if (isObjectObject(proto) === false) {
-      return false;
-    }
-    // If constructor does not have an Object-specific method
-    if (proto.hasOwnProperty('isPrototypeOf') === false) {
-      return false;
-    }
-  } catch (e) {
-    /* Assume is  object when throws */
-  }
-
-  // Most likely a plain Object
-  return true;
-}
-
-/**
- * Basic URL Scheme checking utility.
- * Checks for http: and https: url schemes.
- * @param {String} url
- * @return {Boolean}
- */
-function isValidURLScheme(url) {
-  const normalized = document.createElement('a');
-  normalized.href = url;
-  return normalized.protocol === 'https:' || normalized.protocol === 'http:';
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-const SecureIFrameElement = {
-  addMethodsAndProperties: function(prototype) {
-    Object.defineProperties(prototype, {
-      // Standard HTMLElement methods
-      // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
-      blur: SecureObject.createFilteredMethodStateless('blur', prototype),
-      focus: SecureObject.createFilteredMethodStateless('focus', prototype),
-      contentWindow: {
-        get: function() {
-          const raw = SecureObject.getRaw(this);
-          return raw.contentWindow
-            ? SecureIFrameElement.SecureIFrameContentWindow(raw.contentWindow, getKey(this))
-            : raw.contentWindow;
-        }
-      },
-      // Reason: [W-4437391] Cure53 Report SF-04-004: Window access via encoded path segments.
-      src: {
-        get: function() {
-          const raw = SecureObject.getRaw(this);
-          return raw.src;
-        },
-        set: function(url) {
-          const urlString = sanitizeURLForElement(url);
-          if (urlString.length > 0) {
-            if (!isValidURLScheme(urlString)) {
-              warn(
-                'SecureIframeElement.src supports http://, https:// schemes and relative urls.'
-              );
-            } else {
-              const raw = SecureObject.getRaw(this);
-              raw.src = urlString;
-            }
-          }
-        }
-      }
-    });
-
-    // Standard list of iframe's properties from:
-    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
-    // Note: Ignoring 'contentDocument', 'sandbox' and 'srcdoc' from the list above.
-    ['height', 'width', 'name'].forEach(name =>
-      Object.defineProperty(
-        prototype,
-        name,
-        SecureObject.createFilteredPropertyStateless(name, prototype)
-      )
-    );
-  },
-
-  SecureIFrameContentWindow: function(w, key) {
-    const sicw = Object.create(null, {
-      toString: {
-        value: function() {
-          return `SecureIFrameContentWindow: ${w}{ key: ${JSON.stringify(key)} }`;
-        }
-      }
-    });
-
-    Object.defineProperties(sicw, {
-      postMessage: SecureObject.createFilteredMethod(sicw, w, 'postMessage', { rawArguments: true })
-    });
-
-    setRef(sicw, w, key);
-    addToCache(w, sicw, key);
-    registerProxy(sicw);
-
-    return sicw;
-  }
-};
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 const metadata$3 = {
   ATTRIBUTE_NODE: DEFAULT,
   CDATA_SECTION_NODE: DEFAULT,
@@ -1442,7 +1483,7 @@ function createAddEventListenerDescriptor(st, el, key) {
       if (!sCallback) {
         sCallback = function(e) {
           verifyAccess(st, callback, true);
-          const se = SecureDOMEvent(e, key);
+          const se = e && SecureDOMEvent(e, key);
           callback.call(st, se);
         };
 
@@ -1491,7 +1532,7 @@ function createAddEventListenerDescriptorStateless() {
       if (!sCallback) {
         sCallback = function(e) {
           verifyAccess(so, callback, true);
-          const se = SecureDOMEvent(e, key);
+          const se = e && SecureDOMEvent(e, key);
           callback.call(so, se);
         };
 
@@ -1523,10 +1564,6 @@ function createEventTargetMethodsStateless(config, prototype) {
     }
   };
 }
-
-const assert$1 = {
-  block: fn => fn()
-};
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -3306,7 +3343,7 @@ function SecureElement(el, key) {
   addToCache(el, o, key);
   registerProxy(o);
   // Mark the proxy to be unwrapped by custom formatter
-  assert$1.block(() => {
+  assert.block(() => {
     addProxy(o, el);
   });
   return o;
@@ -3847,7 +3884,7 @@ SecureObject.filterEverything = function(st, raw, options) {
       setRef(swallowed, raw, key);
       mutated = true;
     } else {
-      assert(key, 'A secure object should always have a key.');
+      assert$2(key, 'A secure object should always have a key.');
       if (filterTypeHook$1) {
         swallowed = filterTypeHook$1(raw, key, belongsToLocker);
       }
@@ -3872,6 +3909,8 @@ SecureObject.filterEverything = function(st, raw, options) {
       } else if (typeof raw['Window'] === 'function' && raw instanceof raw['Window']) {
         // Cross realm window instances (window.open() and iframe.contentWindow)
         swallowed = SecureIFrameElement.SecureIFrameContentWindow(raw, key);
+        // TODO: Move these properties into SecureIFrameContentWindow class
+        // so every instance gets the properties
         SecureObject.addMethodIfSupported(swallowed, raw, 'close');
         SecureObject.addMethodIfSupported(swallowed, raw, 'focus');
         SecureObject.addPropertyIfSupported(swallowed, raw, 'opener');
@@ -5302,7 +5341,7 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, k
           set: function(callback) {
             raw[name] = function(e) {
               if (callback) {
-                callback.call(so, SecureDOMEvent(e, key));
+                callback.call(so, e && SecureDOMEvent(e, key));
               }
             };
           }
@@ -5413,7 +5452,7 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
 
           raw[name] = function(e) {
             if (callback) {
-              callback.call(o, SecureDOMEvent(e, key));
+              callback.call(o, e && SecureDOMEvent(e, key));
             }
           };
         }
@@ -6067,7 +6106,7 @@ function SecureXMLHttpRequest(key) {
       Object.defineProperty(o, name, {
         set: function(callback) {
           xhr[name] = function(e) {
-            callback.call(o, SecureDOMEvent(e, key));
+            callback.call(o, e && SecureDOMEvent(e, key));
           };
         }
       })
@@ -6240,7 +6279,7 @@ function SecureNotification(key) {
       Object.defineProperty(o, name, {
         set: function(callback) {
           notification[name] = function(e) {
-            callback.call(o, SecureDOMEvent(e, key));
+            callback.call(o, e && SecureDOMEvent(e, key));
           };
         }
       })
@@ -7498,7 +7537,7 @@ function SecureRTCPeerConnection(raw, key) {
           if (!sCallback) {
             sCallback = function(e) {
               verifyAccess(o, callback, true);
-              const se = SecureDOMEvent(e, key);
+              const se = e && SecureDOMEvent(e, key);
               callback.call(o, se);
             };
             addToCache(callback, sCallback, key);

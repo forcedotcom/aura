@@ -856,6 +856,10 @@ public class AuraContextImpl implements AuraContext {
             if (configAdapter.isLockerServiceEnabled()) {
                 json.writeMapEntry("ls", 1);
             }
+            
+            if (configAdapter.isStrictCSPEnforced()) {
+                json.writeMapEntry("csp", 1);
+            }
 
             if (nonce != null && style == EncodingStyle.Full){
                 json.writeMapEntry("scriptNonce", nonce);

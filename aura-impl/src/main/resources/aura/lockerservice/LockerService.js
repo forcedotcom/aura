@@ -24,7 +24,6 @@ function LockerService() {
     var service = {};
 
     function selectLib(lib) {
-
         // API For Aura Framework (will be obfuscated by Closure Compiler).
 
         service.create                = lib["create"];
@@ -102,11 +101,12 @@ function LockerService() {
     // App.js is built with two versions of AuraLocker, and we select at
     // runtime. In the future, we could move this to
     // initializeInjectedServices.
-    function initialize(isEnabled) {
-
-        if (isInitialized) {
-            return;
-        }
+    function initialize(context) {
+        if (isInitialized) { return; }
+        
+        context = context || {};
+        var isEnabled = !!context["ls"];
+        var isStrictCSP = !!context["csp"];
 
         if (isEnabled && !!window["AuraLocker"]) {
             var types = {
@@ -122,6 +122,7 @@ function LockerService() {
             var api = {
                 "getPublicMethodNames": getPublicMethodNames,
                 "requireLocker": requireLocker,
+                "isStrictCSP": isStrictCSP,
                 "warn": warn,
                 "error": $A.auraError,
                 "registerEngineServices": registerEngineServices

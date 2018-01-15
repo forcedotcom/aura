@@ -312,7 +312,7 @@ Aura["frameworkJsReady"] = true;
 // This should be similar to initFramework
 if (Aura["initConfig"]) {
     // LockerService must be initialized before scripts can be executed.
-    $A.lockerService.initialize(Aura["initConfig"]["context"]["ls"]);
+    $A.lockerService.initialize(Aura["initConfig"]["context"]);
 
     var scripts = Aura["inlineJsLocker"];
     if (scripts) {

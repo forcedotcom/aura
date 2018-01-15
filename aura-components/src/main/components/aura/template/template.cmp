@@ -139,7 +139,7 @@
         } else {
 
             // LockerService must be initialized before scripts can be executed.
-            $A.lockerService.initialize(auraConfig.context.ls);
+            $A.lockerService.initialize(auraConfig.context);
 
             // scripts inside custom templates with Locker active are stored
             // until now since we need LockerService before running

@@ -217,7 +217,11 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         if (configAdapter.isLockerServiceEnabled()) {
             json.writeMapEntry("ls", 1);
         }
-
+        
+        if (configAdapter.isStrictCSPEnforced()) {
+            json.writeMapEntry("csp", 1);
+        }
+        
         Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
         if (!moduleNamespaceAliases.isEmpty()) {
             json.writeMapEntry("mna", moduleNamespaceAliases);

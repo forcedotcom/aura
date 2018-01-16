@@ -172,7 +172,7 @@
                             element.classList.add("positioned");
                             element.style.opacity = 1;
                         });
-                    }).bind(this),5);
+                    }).bind(this),50);
                     
                 }.bind(this)));
             }

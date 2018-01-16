@@ -50,6 +50,7 @@
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <?m2e execute onConfiguration?>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>add-source</goal>
@@ -68,6 +69,7 @@
                 <artifactId>antlr3-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <?m2e execute?>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>antlr</goal>
@@ -90,35 +92,5 @@
                 </executions>
             </plugin>
         </plugins>
-		<pluginManagement>
-            <plugins>
-                <plugin>
-                    <!--This plugin's configuration is used to store Eclipse m2e settings
-                        only. It has no influence on the Maven build itself. -->
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.codehaus.mojo</groupId>
-                						<artifactId>build-helper-maven-plugin</artifactId>
-                                        <versionRange>[1.0.0,)</versionRange>
-                                        <goals>
-                                            <goal>add-source</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <execute />
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 </project>

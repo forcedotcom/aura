@@ -553,13 +553,23 @@ InteropComponent.prototype.afterRender = function () {
     if (document.body.contains(element)) {
         this.swapInteropElement(element, this._customElement);
     } else {
-        $A.getCmp(this.owner).addEventHandler('markup://aura:valueRender', this.afterParentRender.bind(this), 'default');
+        var owner = $A.getCmp(this.owner);
+        if (owner) {
+            this.boundAfterParentRender = this.afterParentRender.bind(this);
+            owner.addEventHandler('markup://aura:valueRender', this.boundAfterParentRender, 'default');
+        }
     }
 };
 
 InteropComponent.prototype.afterParentRender = function () {
-    this.swapInteropElement(this.elements[0], this._customElement);
-    $A.getCmp(this.owner).removeEventHandler('markup://aura:valueRender', this.afterParentRender.bind(this), 'default');
+    var element = this.elements[0];
+    if (document.body.contains(element)) {
+        this.swapInteropElement(element, this._customElement);
+        var owner = $A.getCmp(this.owner);
+        if (owner) {
+            owner.removeEventHandler('markup://aura:valueRender', this.boundAfterParentRender, 'default');
+        }
+    }
 };
 
 /**

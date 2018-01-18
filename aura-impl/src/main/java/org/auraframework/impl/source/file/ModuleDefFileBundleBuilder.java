@@ -153,6 +153,13 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
                 format = Format.JS;
             }
 
+            // Handle xml metadata source.
+            if (descriptor == null && fileName.endsWith("meta.xml")) {
+                String xmlName = moduleDescriptor.getName() + "-" + ModuleDef.META_XML_NAME;
+                descriptor = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, namespace, xmlName, ModuleDef.class, moduleDescriptor);
+                format = Format.XML;
+            }
+
             if (descriptor != null) {
                 sourceMap.put(descriptor, new FileSource<>(descriptor, file, format));
             }

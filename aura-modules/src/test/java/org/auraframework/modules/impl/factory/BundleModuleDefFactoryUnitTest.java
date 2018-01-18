@@ -25,7 +25,9 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
@@ -39,6 +41,11 @@ import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.modules.impl.metadata.ModulesMetadataServiceImpl;
+import org.auraframework.modules.impl.metadata.xml.ExposeElementHandler;
+import org.auraframework.modules.impl.metadata.xml.MinApiVersionElementHandler;
+import org.auraframework.modules.impl.metadata.xml.ModuleMetadataXMLHandler;
+import org.auraframework.modules.impl.metadata.xml.RequireLockerElementHandler;
+import org.auraframework.modules.impl.metadata.xml.TagsElementHandler;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.system.AuraContext;
@@ -79,14 +86,32 @@ public class BundleModuleDefFactoryUnitTest {
         when(jsonFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/lightning.json");
         when(jsonFileSource.getContents()).thenReturn("{ description: 'hello there', expose: 'true', minVersion: '12.3' }");
 
+        String xml =
+                "<LightningComponentBundle>\n" +
+                    "<expose>true</expose>\n" +
+                    "<minApiVersion>12.3</minApiVersion>\n" +
+                    "<requireLocker>true</requireLocker>\n" +
+                    "<tags>\n" +
+                    "   <tag>random__tag</tag>\n" +
+                    "   <tag>bob__tag</tag>\n" +
+                    "   <tag>home__tag</tag>\n" +
+                    "</tags>\n" +
+                "</LightningComponentBundle>";
+        FileSource<ModuleDef> xmlMetadataFileSource = mock(FileSource.class);
+        when(xmlMetadataFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp-meta.xml");
+        when(xmlMetadataFileSource.getContents()).thenReturn(xml);
+
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
         DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
-        DefDescriptor<ModuleDef> json = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, "nameSpace", "moduleCmp-lightning", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> json = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, "nameSpace", "moduleCmp-" + ModuleDef.META_FILE_BASENAME, ModuleDef.class, module);
+        DefDescriptor<ModuleDef> xmlMetadata = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, "nameSpace", "moduleCmp-" + ModuleDef.META_XML_NAME, ModuleDef.class, module);
 
         Map<DefDescriptor<?>, Source<?>> mockBundledParts = Maps.newHashMap();
         mockBundledParts.put(module, jsFileSource);
         mockBundledParts.put(template, htmlFileSource);
+        // TODO: remove json metadata
         mockBundledParts.put(json, jsonFileSource);
+        mockBundledParts.put(xmlMetadata, xmlMetadataFileSource);
 
         when(mockBundleSource.getBundledParts()).thenReturn(mockBundledParts);
 
@@ -103,7 +128,15 @@ public class BundleModuleDefFactoryUnitTest {
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
         moduleDefFactory.setModulesCompilerService(mockCompiler);
-        moduleDefFactory.setModulesMetadataService(new ModulesMetadataServiceImpl());
+
+        List<ModuleMetadataXMLHandler> xmlHandlers = new ArrayList<>();
+        xmlHandlers.add(new TagsElementHandler());
+        xmlHandlers.add(new ExposeElementHandler());
+        xmlHandlers.add(new MinApiVersionElementHandler());
+        xmlHandlers.add(new RequireLockerElementHandler());
+        ModulesMetadataServiceImpl modulesMetadataService = new ModulesMetadataServiceImpl();
+        modulesMetadataService.setModuleXMLHandlers(xmlHandlers);
+        moduleDefFactory.setModulesMetadataService(modulesMetadataService);
 
         ModuleDef moduleDef = moduleDefFactory.getDefinition(module, mockBundleSource);
         String devCode = moduleDef.getCode(CodeType.DEV);

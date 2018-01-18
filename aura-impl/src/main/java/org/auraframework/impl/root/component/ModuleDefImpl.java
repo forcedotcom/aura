@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,23 +27,18 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.LibraryDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RequiredVersionDef;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.def.module.ModuleDef;
+import org.auraframework.def.module.ModuleDesignDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
-import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.impl.root.BundleDefImpl;
+import org.auraframework.impl.root.PlatformDefImpl;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -56,7 +50,7 @@ import com.google.common.collect.Sets;
 /**
  * ModuleDef holds compiled code and serializes for client
  */
-public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDef {
+public class ModuleDefImpl extends BundleDefImpl<ModuleDef> implements ModuleDef {
 
     private static final long serialVersionUID = 5154640929496754931L;
     private String path;
@@ -68,6 +62,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     private Double minVersion;
     private String externalReferences;
     private Boolean requireLocker;
+    private ModuleDesignDef moduleDesignDef;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
@@ -79,6 +74,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         this.minVersion = builder.minVersion;
         this.externalReferences = builder.externalReferences;
         this.requireLocker = builder.requireLocker;
+        this.moduleDesignDef = builder.moduleDesignDef;
     }
 
     @Override
@@ -90,11 +86,6 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     public String getPath() {
         return this.path;
     }
-
-    @Override
-    public Double getMinVersion() {
-        return this.minVersion;
-    }
     
     @Override
     public String getExternalReferences() {
@@ -103,6 +94,11 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
 
     @Override
     public Boolean getRequireLocker() { return requireLocker; }
+
+    @Override
+    public ModuleDesignDef getModuleDesignDef() {
+        return this.moduleDesignDef;
+    }
 
     @Override
     public void serialize(Json json) throws IOException {
@@ -209,15 +205,6 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     }
 
     @Override
-    public void validateDefinition() throws QuickFixException {
-        super.validateDefinition();
-
-        if (this.minVersion != null && !this.access.isGlobal()) {
-            throw new InvalidDefinitionException("Module must be exposed to have a minVersion", this.location);
-        }
-    }
-
-    @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         super.validateReferences(validationContext);
         validateLabels();
@@ -248,17 +235,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     }
 
     @Override
-    public Map<DefDescriptor<AttributeDef>, AttributeDef> getDeclaredAttributeDefs() {
-        return Collections.emptyMap();
-    }
-
-    @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
         return Collections.emptyMap();
     }
 
@@ -267,71 +244,16 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         return null;
     }
 
-    @Override
-    public RequiredVersionDef getRequiredVersion(String namespace) {
-        return null;
-    }
-
-    @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
-        return false;
-    }
-
-    @Override
-    public DefDescriptor<? extends ProviderDef> getProviderDescriptor() throws QuickFixException {
-        return null;
-    }
-
-    @Override
-    public ProviderDef getProviderDef() throws QuickFixException {
-        return null;
-    }
-
-    @Override
-    public List<DefDescriptor<?>> getBundle() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public ProviderDef getLocalProviderDef() throws QuickFixException {
-        return null;
-    }
-
-    @Override
-    public SupportLevel getSupport() {
-        return SupportLevel.PROTO;
-    }
-
-    @Override
-    public DocumentationDef getDocumentationDef() throws QuickFixException {
-        return null;
-    }
-
-    @Override
-    public Map<DefDescriptor<?>, Definition> getBundledDefs() {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    public <X extends Definition> X getBundledDefinition(DefDescriptor<X> descriptor) {
-        return null;
-    }
-
-    public static final class Builder extends DefinitionImpl.BuilderImpl<ModuleDef> {
+    public static final class Builder extends BundleDefImpl.Builder<ModuleDef> {
 
         private String path;
         private Map<CodeType, String> codes;
         private Set<String> moduleDependencies;
         private String customElementName;
         private Set<PropertyReference> labelReferences = new HashSet<>();
-        private Double minVersion = null;
         private String externalReferences;
         private Boolean requireLocker = false;
+        private ModuleDesignDef moduleDesignDef = null;
 
         public Builder() {
             super(ModuleDef.class);
@@ -361,10 +283,6 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
                 }
                 this.labelReferences.add(new PropertyReferenceImpl(label, location));
             }
-        }
-
-        public void setMinVersion(double minVersion) {
-            this.minVersion = minVersion;
         }
         
         public void setExternalReferences(String externalReferences) {

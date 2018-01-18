@@ -101,7 +101,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final boolean isAbstract;
     private final boolean isExtensible;
     private final boolean isTemplate;
-    private final Double minVersion;
 
     private final DefDescriptor<T> extendsDescriptor;
     private final DefDescriptor<ComponentDef> templateDefDescriptor;
@@ -208,7 +207,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
         this.classCode = builder.classCode;
         this.minifiedClassCode = builder.minifiedClassCode;
-        this.minVersion = builder.minVersion;
 
         if (getDescriptor() != null) {
             this.compoundControllerDescriptor = DefDescriptorImpl.getAssociateDescriptor(getDescriptor(),
@@ -1128,8 +1126,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     }
                 }
 
-                if(minVersion != null) {
-                    json.writeMapEntry(ApplicationKey.MINVERSION, minVersion);
+                if(this.minVersion != null) {
+                    json.writeMapEntry(ApplicationKey.MINVERSION, this.minVersion);
                 }
 
                 serializeFields(json);
@@ -1371,7 +1369,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         public boolean isAbstract;
         public boolean isExtensible;
         public boolean isTemplate;
-        public Double minVersion;
 
         public DefDescriptor<ModelDef> modelDefDescriptor;
         public DefDescriptor<T> extendsDescriptor;
@@ -1995,10 +1992,4 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         return svgDef != null ? svgDef.getDescriptor() : null;
     }
 
-    /**
-     * Define the minimum API version that a component should be at to use the current component.
-     * @return Double value if set, null otherwise
-     */
-    @Override
-    public Double getMinVersion() { return minVersion; };
 }

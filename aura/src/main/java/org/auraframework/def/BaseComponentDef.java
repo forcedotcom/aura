@@ -216,5 +216,4 @@ public interface BaseComponentDef extends RootDefinition {
     SVGDef getSVGDef();
     // FIXME: this should be deprecated.
     DefDescriptor<SVGDef> getSVGDefDescriptor();
-    Double getMinVersion();
 }

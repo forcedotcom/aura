@@ -137,9 +137,6 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setPath(baseFilePath);
         builder.setCustomElementName(getCustomElementName(componentPath));
 
-        // meta (lightning.json)
-        processJson(descriptor, builder, sourceMap);
-
         ModulesCompilerData compilerData;
         try {
             compilerData = modulesCompilerService.compile(componentPath, sources);
@@ -152,25 +149,53 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setLabels(compilerData.labels);
         builder.setOwnHash(calculateOwnHash(descriptor, codes));
         builder.setExternalReferences(compilerData.externalReferences);
+
+        // json metadata (lightning.json)
+        // TODO: remove once meta.xml is in place
+        processJson(descriptor, builder, sourceMap);
+
+        // xml metadata (-meta.xml)
+        processMetadata(descriptor, builder, sourceMap);
+
         return builder.build();
     }
 
     /**
+     * Process xml metadata
+     *
+     * @param descriptor current descriptor
+     * @param builder module def builder
+     * @param sourceMap source map
+     */
+    private void processMetadata(DefDescriptor<ModuleDef> descriptor, Builder builder, Map<DefDescriptor<?>,
+            Source<?>> sourceMap) throws QuickFixException {
+        DefDescriptor<ModuleDef> xmlDescriptor = new DefDescriptorImpl<>(ModuleDef.META_PREFIX,
+                descriptor.getNamespace(), descriptor.getName() + "-" + ModuleDef.META_XML_NAME, ModuleDef.class, descriptor);
+        Source<?> xmlSource = sourceMap.get(xmlDescriptor);
+        if (xmlSource != null) {
+            if (xmlSource instanceof TextSource) {
+                this.modulesMetadataService.processMetadata(((TextSource<?>) xmlSource), builder);
+            }
+        }
+    }
+
+    /**
      * Processes json metadata file.
+     * expose - access
      * minVersion - minimum support version
      *
      * @param descriptor current descriptor
-     * @param builder def builder
+     * @param builder module def builder
      * @param sourceMap source map
      */
     private void processJson(DefDescriptor<ModuleDef> descriptor, Builder builder,
-                             Map<DefDescriptor<?>, Source<?>> sourceMap) {
-        DefDescriptor<ModuleDef> jsonDefDescriptor = new DefDescriptorImpl<>(ModuleDef.META_PREFIX,
+                             Map<DefDescriptor<?>, Source<?>> sourceMap) throws QuickFixException {
+        DefDescriptor<ModuleDef> jsonDescriptor = new DefDescriptorImpl<>(ModuleDef.META_PREFIX,
                 descriptor.getNamespace(), descriptor.getName() + "-" + ModuleDef.META_FILE_BASENAME, ModuleDef.class, descriptor);
-        Source<?> jsonSource = sourceMap.get(jsonDefDescriptor);
+        Source<?> jsonSource = sourceMap.get(jsonDescriptor);
         if (jsonSource != null) {
             if (jsonSource instanceof TextSource) {
-                this.modulesMetadataService.processModuleMetadata(((TextSource<?>) jsonSource).getContents(), builder);
+                this.modulesMetadataService.processModuleMetadata(((TextSource<?>) jsonSource), builder);
             }
         }
     }

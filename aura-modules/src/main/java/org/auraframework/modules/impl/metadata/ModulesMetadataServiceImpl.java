@@ -16,10 +16,27 @@
 package org.auraframework.modules.impl.metadata;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.impl.factory.XMLParser;
 import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
+import org.auraframework.modules.impl.metadata.xml.ModuleMetadataXMLHandler;
 import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.Location;
+import org.auraframework.system.TextSource;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+import javax.inject.Inject;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Handles module metadata in lightning.json
@@ -27,22 +44,29 @@ import org.auraframework.system.AuraContext.Access;
 @ServiceComponent
 public class ModulesMetadataServiceImpl implements ModulesMetadataService {
 
+    private Map<String, ModuleMetadataXMLHandler> elementHandlers = new HashMap();
+
     protected static final Gson GSON = new Gson();
 
     /**
      * Process lightning.json metadata
      * 
-     * @param contents metadata
+     * @param source metadata
      * @param moduleBuilder builder for ModuleDef
      */
     @Override
-    public void processModuleMetadata(String contents, Builder moduleBuilder) {
-        Meta meta = GSON.fromJson(contents, Meta.class);
-        processDefaultMetadata(meta, moduleBuilder);
+    public void processModuleMetadata(TextSource source, Builder moduleBuilder) throws QuickFixException {
+        try {
+            Meta meta = GSON.fromJson(source.getContents(), Meta.class);
+            processDefaultMetadata(meta, moduleBuilder);
+        } catch (JsonSyntaxException e) {
+            throw new InvalidDefinitionException("JSON parse error: " + e.getMessage(),
+                    new Location(source));
+        }
     }
 
     /**
-     * Process default properties of module metadata (lightning.json)
+     * Process default properties of module metadata in JSON (lightning.json)
      *
      * @param meta POJO of metadata json
      * @param moduleBuilder builder for ModuleDef
@@ -61,4 +85,49 @@ public class ModulesMetadataServiceImpl implements ModulesMetadataService {
             moduleBuilder.setRequireLocker(requireLocker);
         }
     }
+
+    /**
+     * Process XML metadata for modules
+     *
+     * @param source XML metadata source
+     * @param moduleBuilder builder for ModuleDef
+     */
+    @Override
+    public void processMetadata(TextSource source, Builder moduleBuilder) throws QuickFixException {
+        XMLStreamReader reader = null;
+        String rootElement = "LightningComponentBundle";
+        try (StringReader sr = new StringReader(source.getContents())) {
+            XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+            reader = inputFactory.createXMLStreamReader(sr);
+            while (reader.hasNext()) {
+                int eventType = reader.next();
+                switch (eventType) {
+                    case XMLStreamConstants.START_ELEMENT:
+                        String elementName = reader.getLocalName();
+                        ModuleMetadataXMLHandler handler = this.elementHandlers.get(elementName);
+                        if (handler != null) {
+                            handler.process(reader, moduleBuilder, source);
+                        } else {
+                            if (!elementName.equals(rootElement)) {
+                                throw new XMLStreamException("Unhandled XML element: " + elementName);
+                            }
+                        }
+                        break;
+                    case XMLStreamConstants.END_ELEMENT:
+                        break;
+                }
+            }
+        } catch (XMLStreamException e) {
+            throw new InvalidDefinitionException("XML parse error: " + e.getMessage(),
+                    XMLParser.getLocation(reader, source));
+        }
+    }
+
+    @Inject
+    public void setModuleXMLHandlers(List<ModuleMetadataXMLHandler> handlers) {
+        for (ModuleMetadataXMLHandler handler : handlers) {
+            this.elementHandlers.put(handler.handledElement(), handler);
+        }
+    }
+
 }

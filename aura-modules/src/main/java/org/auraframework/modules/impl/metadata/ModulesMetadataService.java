@@ -16,16 +16,27 @@
 package org.auraframework.modules.impl.metadata;
 
 import org.auraframework.impl.root.component.ModuleDefImpl;
+import org.auraframework.system.TextSource;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Handle metadata for modules
  */
 public interface ModulesMetadataService {
     /**
-     * Process metadata for modules and apply values to ModuleDef via its builder
+     * Process JSON metadata for modules and apply values to ModuleDef via its builder
+     * TODO: remove once meta.xml is in place
      *
-     * @param contents metadata
+     * @param source JSON metadata
      * @param moduleBuilder builder for ModuleDef
      */
-    void processModuleMetadata(String contents, ModuleDefImpl.Builder moduleBuilder);
+    void processModuleMetadata(TextSource source, ModuleDefImpl.Builder moduleBuilder) throws QuickFixException;
+
+    /**
+     * Process XML metadata for modules and apply values to ModuleDef via its builder
+     *
+     * @param source XML metadata
+     * @param moduleBuilder builder for ModuleDef
+     */
+    void processMetadata(TextSource source, ModuleDefImpl.Builder moduleBuilder) throws QuickFixException;
 }

@@ -64,8 +64,8 @@ public class ModuleDefFileBundleBuilderUnitTest {
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
 
         File mockCssFile = mock(File.class);
-        setupMockFile(mockCssFile, mockBaseFile, "module.css");
-        DefDescriptor<ModuleDef> css = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, "nameSpace", "moduleCmp-module", ModuleDef.class, module);
+        setupMockFile(mockCssFile, mockBaseFile, "module-cmp.css");
+        DefDescriptor<ModuleDef> css = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
 
         File mockTemplateFile = mock(File.class);
         setupMockFile(mockTemplateFile, mockBaseFile, "module-cmp.html");
@@ -81,9 +81,13 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         File mockJsonFile = mock(File.class);
         setupMockFile(mockJsonFile, mockBaseFile, "lightning.json");
-        DefDescriptor<ModuleDef> json = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, "nameSpace", "moduleCmp-lightning", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> json = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, "nameSpace", "moduleCmp-" + ModuleDef.META_FILE_BASENAME, ModuleDef.class, module);
 
-        File[] baseListFiles = new File[] { mockJsFile, mockCssFile, mockTemplateFile, mockJsonFile, mockUtilJsFile, mockDataJsFile };
+        File mockMetaXMLFile = mock(File.class);
+        setupMockFile(mockMetaXMLFile, mockBaseFile, "module-cmp-meta.xml");
+        DefDescriptor<ModuleDef> meta = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, "nameSpace", "moduleCmp-" + ModuleDef.META_XML_NAME, ModuleDef.class, module);
+
+        File[] baseListFiles = new File[] { mockJsFile, mockCssFile, mockTemplateFile, mockJsonFile, mockMetaXMLFile, mockUtilJsFile, mockDataJsFile };
 
         when(mockBaseFile.listFiles()).thenReturn(baseListFiles);
 
@@ -115,11 +119,12 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         assertEquals("number of entries for module bundle source differs", baseListFiles.length, sourceMap.size());
         assertEquals("incorrect base js entry", "/namespace/module-cmp/module-cmp.js", sourceMap.get(module).getSystemId());
-        assertEquals("incorrect base css entry", "/namespace/module-cmp/module.css", sourceMap.get(css).getSystemId());
+        assertEquals("incorrect base css entry", "/namespace/module-cmp/module-cmp.css", sourceMap.get(css).getSystemId());
         assertEquals("incorrect base template entry", "/namespace/module-cmp/module-cmp.html", sourceMap.get(template).getSystemId());
         assertEquals("incorrect base utils js entry", "/namespace/module-cmp/utils.js",  sourceMap.get(utilJs).getSystemId());
         assertEquals("incorrect base data js entry", "/namespace/module-cmp/data.js", sourceMap.get(dataJs).getSystemId());
-        assertEquals("incorrect base data js entry", "/namespace/module-cmp/lightning.json", sourceMap.get(json).getSystemId());
+        assertEquals("incorrect base json entry", "/namespace/module-cmp/lightning.json", sourceMap.get(json).getSystemId());
+        assertEquals("incorrect base xml entry", "/namespace/module-cmp/module-cmp-meta.xml", sourceMap.get(meta).getSystemId());
     }
 
     /**

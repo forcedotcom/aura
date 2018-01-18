@@ -15,8 +15,8 @@
  */
 package org.auraframework.def.module;
 
+import org.auraframework.def.BundleDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.RootDefinition;
 
 /**
  * Module Definition
@@ -24,7 +24,7 @@ import org.auraframework.def.RootDefinition;
  * Extending RootDefinition in order to be used in BundleAwareDefRegistry.
  * However, RootDefinition API needs to be refactored to remove unnecessary APIs.
  */
-public interface ModuleDef extends RootDefinition {
+public interface ModuleDef extends BundleDef {
 
     enum CodeType {
         DEV, PROD, COMPAT, PROD_COMPAT
@@ -36,6 +36,8 @@ public interface ModuleDef extends RootDefinition {
     String META_PREFIX = "meta";
     // base name of metadata file
     String META_FILE_BASENAME = "lightning";
+    // name of xml metadata file
+    String META_XML_NAME = META_FILE_BASENAME + "-xml";
 
     @Override
     DefDescriptor<ModuleDef> getDescriptor();
@@ -43,8 +45,6 @@ public interface ModuleDef extends RootDefinition {
     String getCode(CodeType codeType);
 
     String getPath();
-
-    Double getMinVersion();
     
     /**
      * @return serialized JSONObject with references to custom metadata
@@ -56,4 +56,10 @@ public interface ModuleDef extends RootDefinition {
      * @return
      */
     Boolean getRequireLocker();
+
+    /**
+     * Module design definition
+     * @return
+     */
+    ModuleDesignDef getModuleDesignDef();
 }

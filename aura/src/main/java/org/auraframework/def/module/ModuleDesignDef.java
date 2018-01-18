@@ -13,16 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.builder;
-
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.RootDefinition;
-import org.auraframework.def.RootDefinition.SupportLevel;
+package org.auraframework.def.module;
 
 /**
- * @since 0.0.196
+ * Module design definition
  */
-public interface RootDefinitionBuilder<T extends RootDefinition> extends BundleDefBuilder<T> {
-    RootDefinitionBuilder<T> setSupport(SupportLevel support);
-    RootDefinitionBuilder<T> setDocumentationDef(DocumentationDef def);
+public interface ModuleDesignDef {
 }

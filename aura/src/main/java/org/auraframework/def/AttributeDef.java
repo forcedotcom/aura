@@ -23,7 +23,7 @@ public interface AttributeDef extends Definition, ParentedDef {
     @Override
     DefDescriptor<AttributeDef> getDescriptor();
 
-    public static enum SerializeToType {
+    enum SerializeToType {
         SERVER, BOTH, NONE, INVALID
     };
 

@@ -19,11 +19,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.def.BundleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.service.CompilerService;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.BundleSourceLoader;
@@ -59,13 +59,13 @@ public class BundleAwareDefRegistry implements DefRegistry {
     private final long creationTime;
 
     private static class DefHolder {
-        public DefHolder(DefDescriptor<RootDefinition> descriptor) {
+        public DefHolder(DefDescriptor<BundleDef> descriptor) {
             this.descriptor = descriptor;
         }
-        public final DefDescriptor<RootDefinition> descriptor;
-        public RootDefinition def;
+        public final DefDescriptor<BundleDef> descriptor;
+        public BundleDef def;
         public QuickFixException qfe;
-        public BundleSource<RootDefinition> source;
+        public BundleSource<BundleDef> source;
         public boolean initialized;
     }
 
@@ -121,7 +121,7 @@ public class BundleAwareDefRegistry implements DefRegistry {
             //
             for (DefDescriptor<?> descriptor : descriptors) {
                 @SuppressWarnings("unchecked")
-                DefDescriptor<RootDefinition> rootDescriptor = (DefDescriptor<RootDefinition>)descriptor;
+                DefDescriptor<BundleDef> rootDescriptor = (DefDescriptor<BundleDef>)descriptor;
                 String key = descriptor.getDescriptorName().toLowerCase();
                 registry.put(key, new DefHolder(rootDescriptor));
             }
@@ -133,7 +133,7 @@ public class BundleAwareDefRegistry implements DefRegistry {
             return registry.get(BundleSourceLoader.getBundleName(descriptor));
         } else {
             @SuppressWarnings("unchecked")
-            BundleSource<RootDefinition> source = (BundleSource<RootDefinition>)sourceLoader.getBundle(descriptor);
+            BundleSource<BundleDef> source = (BundleSource<BundleDef>)sourceLoader.getBundle(descriptor);
             if (source == null) {
             	return null;
             }
@@ -143,14 +143,14 @@ public class BundleAwareDefRegistry implements DefRegistry {
         }
     }
 
-    private BundleSource<RootDefinition> getSource(DefHolder holder) {
+    private BundleSource<BundleDef> getSource(DefHolder holder) {
         if (holder == null) {
             return null;
         }
         if (holder.source != null) {
             return holder.source;
         } else {
-            return (BundleSource<RootDefinition>)sourceLoader.getSource(holder.descriptor);
+            return (BundleSource<BundleDef>)sourceLoader.getSource(holder.descriptor);
         }
     }
 
@@ -164,8 +164,8 @@ public class BundleAwareDefRegistry implements DefRegistry {
         synchronized (holder) { 
             if (!holder.initialized) {
                 try {
-                    DefDescriptor<RootDefinition> canonical = holder.descriptor;
-                    BundleSource<RootDefinition> source = getSource(holder);
+                    DefDescriptor<BundleDef> canonical = holder.descriptor;
+                    BundleSource<BundleDef> source = getSource(holder);
                     holder.def = compilerService.compile(canonical, source);
                 } catch (QuickFixException qfe) {
                     holder.qfe = qfe;

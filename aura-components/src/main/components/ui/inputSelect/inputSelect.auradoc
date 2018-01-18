@@ -81,8 +81,10 @@ HTML <code>value</code> attribute.</p>
 &lt;ui:inputSelect aura:id="Select1" label="Select1" options="{!v.options1}" />
 &lt;ui:inputSelect aura:id="Select2" label="Select2" options="{!v.options2}" />
 </pre>		
-		
-		
+		<h4>Usage Considerations</h4>
+        <p>Using <code>ui:inputSelect</code> with Lightning Runtime for Flows is supported, but empty option labels are not supported. 
+        To create a picklist field on an object and set an empty default value, use a formula inside the flow to substitute empty values to a value like <code>--EMPTY--</code>.
+		Using the substitute value ensures that the empty picklist value does not get replaced by the label of the picklist variable created in the flow.</p>
 	</aura:description>	
 		<aura:example name="inputselect" ref="auradocs:demoSelect" label="Using ui:inputSelect">
     	<p>This example displays a drop-down list with single and multiple selection enabled, and another with dynamically generated list options. It retrieves the selected value of a <code>ui:inputSelect</code> component.

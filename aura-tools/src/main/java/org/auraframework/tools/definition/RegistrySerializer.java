@@ -33,16 +33,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.def.BundleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.RegistryService;
-import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -312,8 +311,8 @@ public class RegistrySerializer {
                 types.add(desc.getDefType());
                 prefixes.add(desc.getPrefix());
                 filtered.put(desc, def);
-                if (def instanceof RootDefinition) {
-                    RootDefinition rd = (RootDefinition) def;
+                if (def instanceof BundleDef) {
+                    BundleDef rd = (BundleDef) def;
                     Map<DefDescriptor<?>, Definition> bundled = rd.getBundledDefs();
                     if (bundled != null) {
                         for (Map.Entry<DefDescriptor<?>, Definition> entry : bundled.entrySet()) {

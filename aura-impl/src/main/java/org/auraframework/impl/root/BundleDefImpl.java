@@ -108,11 +108,10 @@ public abstract class BundleDefImpl<T extends BundleDef> extends PlatformDefImpl
     }
 
     public abstract static class Builder<T extends BundleDef> extends PlatformDefImpl.Builder<T> implements BundleDefBuilder<T> {
-        private Map<DefDescriptor<?>,Definition> bundledDefs;
+        private Map<DefDescriptor<?>,Definition> bundledDefs = Maps.newHashMap();
 
         public Builder(Class<T> defClass) {
             super(defClass);
-            this.bundledDefs = Maps.newHashMap();
         }
 
         @Override

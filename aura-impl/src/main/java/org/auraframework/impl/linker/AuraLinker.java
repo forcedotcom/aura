@@ -28,12 +28,12 @@ import javax.annotation.Nonnull;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.BundleDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DescriptorKey;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraLocalStore;
@@ -551,9 +551,9 @@ public class AuraLinker {
      * only a bundle source loader for text components.
      */
     private void populateSubDefs(Definition def) {
-        if (def instanceof RootDefinition) {
-            RootDefinition rootDef = (RootDefinition)def;
-            for (Definition subdef : rootDef.getBundledDefs().values()) {
+        if (def instanceof BundleDef) {
+            BundleDef bundleDef = (BundleDef)def;
+            for (Definition subdef : bundleDef.getBundledDefs().values()) {
                 subDefinitions.put(subdef.getDescriptor(), subdef);
             }
         }

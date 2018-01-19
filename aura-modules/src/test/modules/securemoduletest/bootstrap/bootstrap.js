@@ -1,4 +1,4 @@
-import { Element, createElement, toString } from 'engine';
+import { Element, createElement, toString, api } from 'engine';
 import * as testUtil from 'securemoduletest-test-util';
 import * as simpleLib from 'securemoduletest-simple-lib';
 

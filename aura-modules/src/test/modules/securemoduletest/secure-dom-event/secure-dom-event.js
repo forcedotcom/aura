@@ -1,4 +1,4 @@
-import { Element } from 'engine';
+import { Element, track, api } from 'engine';
 import * as testUtil from 'securemoduletest-test-util';
 
 export default class SecureDOMEventClazz extends Element {

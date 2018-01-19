@@ -1,4 +1,4 @@
-import { Element } from 'engine';
+import { Element, api } from 'engine';
 
 const DEFAULT_HREF = 'javascript:void(0);'; // eslint-disable-line no-script-url
 

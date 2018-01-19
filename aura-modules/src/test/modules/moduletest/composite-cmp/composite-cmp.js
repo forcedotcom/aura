@@ -1,4 +1,4 @@
-import { Element } from 'engine';
+import { Element, api } from 'engine';
 export default class Composite extends Element {
     @api literal = "Default literal";
     @api bound = "Default bound";

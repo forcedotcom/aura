@@ -1,4 +1,4 @@
-import { Element, createElement, toString } from "engine";
+import { Element, createElement, toString, track, api } from "engine";
 import * as testUtil from 'securemoduletest-test-util';
 
 export default class Simple extends Element {

@@ -225,9 +225,7 @@
 
         for (var i = 0; i < len; i++) {
             var config = tabValues.get ? tabValues.get(i) : tabValues[i];
-            var newComponent = $A.createComponentFromConfig(config);
-            fn(newComponent);
-
+            $A.createComponent("ui:tabItem", config.attributes, fn);
         }
         
     },

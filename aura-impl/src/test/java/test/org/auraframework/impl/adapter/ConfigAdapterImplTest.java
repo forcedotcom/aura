@@ -16,7 +16,6 @@
 package test.org.auraframework.impl.adapter;
 
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.context.AuraContextServiceImpl;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
@@ -34,10 +33,7 @@ import org.auraframework.util.text.Hash;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import test.org.auraframework.impl.adapter.ConfigAdapterImpl;
-
 import javax.inject.Inject;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -106,7 +102,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         String version = configAdapter.getAuraVersion();
         if (!version.equals("development")) {
             assertTrue("Unexpected version format: " + version,
-                    version.matches("^\\d+(\\.\\d+(\\.\\d+(\\.\\d+)?)?)?(-.*)?$"));
+                    version.matches("^\\d+(\\.\\d+)+(-SNAPSHOT)?$"));
         }
         assertTrue(configAdapter.getBuildTimestamp() > 0);
     }

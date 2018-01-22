@@ -15,8 +15,28 @@
  */
 package org.auraframework.def.module;
 
+import java.util.Map;
+
 /**
- * Module design definition
+ * ModuleDesignDef is java representation of the  
+ * design configuration specified in <tagConfigs> </tagConfigs> tags 
+ * in -meta.xml file of raptor component bundle.
  */
 public interface ModuleDesignDef {
+
+    /**
+     * Returns all the design configurations in the -meta.xml
+     * @return Map of configuration with tagName/elementName as the key and ModuleDesignConfig {@link ModuleDesignConfig} as the value.
+     * The map can be empty when no configurations are available. 
+     * @link 
+     */
+    public Map<String, ModuleDesignConfig> getConfigs();
+
+    /**
+     * Gets design configuration for given tag specified in <tagConfig> </tagConfig>
+     * @param tagName String - represents a tag , ex - lightning__recordHome
+     * @return config for the given tag if present , null otherwise.
+     */
+    public ModuleDesignConfig getConfig(String tagName);
+
 }

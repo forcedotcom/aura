@@ -18,6 +18,7 @@ package org.auraframework.impl.javascript.testsuite;
 import java.io.IOException;
 import java.util.List;
 
+import org.auraframework.Aura;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -38,6 +39,9 @@ public class JavascriptTestSuiteDef extends DefinitionImpl<TestSuiteDef> impleme
 
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        if (Aura.getConfigAdapter().isProduction()) {
+            return;
+        }
         for (TestCaseDef def : caseDefs) {
             def.validateReferences(validationContext);
         }

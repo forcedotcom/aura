@@ -203,7 +203,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     }
 
     @Override
-    public void setIsProduction(boolean isProduction) {
+    public void setIsProduction(Boolean isProduction) {
         this.isProduction = isProduction;
     }
 

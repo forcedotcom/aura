@@ -27,7 +27,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -243,6 +242,7 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
     @Override
     public synchronized void addDirectory(String dirPath, Long registryCreationTime) {
         Path dir = Paths.get(dirPath);
+        start();
         if (watchService == null || monitoredDirs.contains(dir.toString())) {
             return;
         }
@@ -259,7 +259,6 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
      * Start monitor when aura services are ready
      */
     @Override
-    @PostConstruct
     public synchronized void start() {
         if (configAdapter.isFileMonitorEnabled() && !isStarted()) {
             try {

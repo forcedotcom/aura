@@ -19,9 +19,12 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.service.LoggingService;
 import org.auraframework.util.FileListener;
 import org.auraframework.util.IOUtil;
+import org.junit.After;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+
+import test.org.auraframework.impl.adapter.MockConfigAdapterImpl;
 
 import java.io.File;
 import java.util.Arrays;
@@ -33,6 +36,11 @@ import java.util.Arrays;
  * As unit-test like that this class looks, it is not, it's really an integration test. It goes to the file system!
  */
 public class FileMonitorTest extends AuraImplTestCase {
+
+    @After
+    public void resetGlobalMocks() {
+        ((MockConfigAdapterImpl)configAdapter).setIsProduction(null);
+    }
 
     @Test
     public void testFileMonitorNotifiesWithRegistryCreationTimeInPast() throws Exception {
@@ -46,11 +54,14 @@ public class FileMonitorTest extends AuraImplTestCase {
         LoggingService loggingServiceMock = Mockito.mock(LoggingService.class);
         ((FileMonitorImpl)fileMonitor).loggingService = loggingServiceMock;
 
-        fileMonitor.addDirectory(tmpDir.toString(), 0L);
-
         ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(loggingServiceMock, Mockito.atLeast(0)).error(argumentCaptor.capture());
         Mockito.verify(loggingServiceMock, Mockito.atLeast(0)).warn(argumentCaptor.capture());
+
+        ((MockConfigAdapterImpl)configAdapter).setIsProduction(false);
+
+        fileMonitor.addDirectory(tmpDir.toString(), 0L);
+
         assertEquals("Should not have any errors or warnings", Arrays.asList(), argumentCaptor.getAllValues());
 
         Mockito.verify(listenerMock, Mockito.atLeastOnce()).fileChanged(Mockito.anyObject());

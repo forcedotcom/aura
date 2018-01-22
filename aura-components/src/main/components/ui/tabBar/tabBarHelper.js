@@ -207,10 +207,6 @@
 
         var fn = function (newCmp) {
             counter--;
-            newCmp.addHandler("onActivate", cmp, "c.onTabActivated");
-            newCmp.addHandler("onClose", cmp, "c.onTabClosed");
-            newCmp.addHandler("onTabHover", cmp, "c.onTabHover");
-            newCmp.addHandler("onTabUnhover", cmp, "c.onTabUnhover");
             items.push(newCmp);
             
             if(newCmp.get("v.active")) {
@@ -225,7 +221,17 @@
 
         for (var i = 0; i < len; i++) {
             var config = tabValues.get ? tabValues.get(i) : tabValues[i];
-            $A.createComponent("ui:tabItem", config.attributes, fn);
+
+            var attributes = config.attributes.values || config.attributes;
+            attributes["onActivate"] = cmp.getReference("c.onTabActivated");
+            attributes["onClose"] = cmp.getReference("c.onTabClosed");
+            attributes["onTabHover"] = cmp.getReference("c.onTabHover");
+            attributes["onTabUnhover"] = cmp.getReference("c.onTabUnhover");
+
+            attributes["aura:id"] = config.localId;
+
+            var descriptor = config.descriptor || config.componentDef.descriptor;
+            $A.createComponent(descriptor, attributes, fn);
         }
         
     },

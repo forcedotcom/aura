@@ -22,7 +22,6 @@
         var innerBody;
         var body = [];
         var wrapperTag;
-        var wrapperComponent;
 
         if (!$A.util.isEmpty(labelAttribute) || isCompound) {
             if (isCompound) {
@@ -37,18 +36,16 @@
             }
 
             // creating HTML div (simple input) or fieldset (compound input)
-            wrapperComponent = $A.createComponentFromConfig({
-                descriptor: 'markup://aura:html',
-                attributes: {
+            $A.createComponent('aura:html', {
                     body: innerBody,
                     tag: wrapperTag,
                     "class": "form-element"
+                },
+                function (wrapperComponent) {
+                    body.push(wrapperComponent);
+                    component.set("v.body", body);
                 }
-            });
-
-            // Setting new body
-            body.push(wrapperComponent);
-            component.set("v.body", body);
+            );
         }
     },
 
@@ -63,26 +60,22 @@
         var requiredIndicator = labelDisplay && component.get("v.required") ? component.get("v.requiredIndicator") : null;
 
         // creating label component
-        var labelComponent = $A.createComponentFromConfig({
-            descriptor: 'markup://ui:label',
-            localId: 'inputLabel',
-            valueProvider: component,
-            attributes: {
-                label: labelAttribute,
-                "class": labelClass,
-                "for": domId,
-                labelDisplay: labelDisplay,
-                title: component.get("v.labelTitle"),
-                requiredIndicator: requiredIndicator
+        $A.createComponent("markup://ui:label", {
+            "aura:id": 'inputLabel',
+            label: labelAttribute,
+            "class": labelClass,
+            "for": domId,
+            labelDisplay: labelDisplay,
+            title: component.get("v.labelTitle"),
+            requiredIndicator: requiredIndicator
+        }, function(labelComponent) {
+            // Inserting label inside of innerBody
+            if (labelPositionAttribute === 'left' || labelPositionAttribute === 'top') {
+                innerBody.unshift(labelComponent);
+            } else {
+                innerBody.push(labelComponent);
             }
         });
-
-        // Inserting label inside of innerBody
-        if (labelPositionAttribute === 'left' || labelPositionAttribute === 'top') {
-            innerBody.unshift(labelComponent);
-        } else {
-            innerBody.push(labelComponent);
-        }
 
         return innerBody;
     },
@@ -97,25 +90,21 @@
         var requiredIndicator = labelDisplay && component.get("v.required") ? component.get("v.requiredIndicator") : null;
 
         // creating legend component
-        var legendComponent = $A.createComponentFromConfig({
-            descriptor: 'markup://ui:legend',
-            localId: 'inputLabel',
-            valueProvider: component,
-            attributes: {
-                legend: labelAttribute,
-                "class" : labelClass,
-                labelDisplay: labelDisplay,
-                title: component.get("v.labelTitle"),
-                requiredIndicator: requiredIndicator
+        $A.createComponent("markup://ui:legend", {
+            "aura:id": "inputLabel",
+            legend: labelAttribute,
+            "class": labelClass,
+            labelDisplay: labelDisplay,
+            title: component.get("v.labelTitle"),
+            requiredIndicator: requiredIndicator
+        }, function(legendComponent) {
+            // Inserting legend inside of innerBody
+            if (labelPositionAttribute === "bottom") {
+                innerBody.push(legendComponent);
+            } else {
+                innerBody.unshift(legendComponent);
             }
         });
-
-        // Inserting legend inside of innerBody
-        if (labelPositionAttribute === 'bottom') {
-            innerBody.push(legendComponent);
-        } else {
-            innerBody.unshift(legendComponent);
-        }
 
         return innerBody;
     },
@@ -130,25 +119,21 @@
         var requiredIndicator = labelDisplay && component.get("v.required") ? component.get("v.requiredIndicator") : null;
 
         // creating picklistLabel component
-        var legendComponent = $A.createComponentFromConfig({
-            descriptor: 'markup://ui:picklistLabel',
-            localId: 'inputLabel',
-            valueProvider: component,
-            attributes: {
-                label: labelAttribute,
-                "class" : labelClass,
-                labelDisplay: labelDisplay,
-                title: component.get("v.labelTitle"),
-                requiredIndicator: requiredIndicator
+        $A.createComponent("markup://ui:picklistLabel", {
+            "aura:id": "inputLabel",
+            label: labelAttribute,
+            "class": labelClass,
+            labelDisplay: labelDisplay,
+            title: component.get("v.labelTitle"),
+            requiredIndicator: requiredIndicator
+        }, function (picklistLabelComponent) {
+            // Inserting legend inside of innerBody
+            if (labelPositionAttribute === "bottom") {
+                innerBody.push(picklistLabelComponent);
+            } else {
+                innerBody.unshift(picklistLabelComponent);
             }
         });
-
-        // Inserting legend inside of innerBody
-        if (labelPositionAttribute === 'bottom') {
-            innerBody.push(legendComponent);
-        } else {
-            innerBody.unshift(legendComponent);
-        }
 
         return innerBody;
     },
@@ -160,9 +145,9 @@
      * didn't seem like the best way to do it. Also it would have dependencies on
      * components like force:icon which is not in the ui namespace.
      **/
-    renderFieldHelpComponent: function(component){
-    	var fieldHelpComponent = component.get('v.fieldHelpComponent');
-    	if ($A.util.isArray(fieldHelpComponent) && !$A.util.isEmpty(fieldHelpComponent)) {
+    renderFieldHelpComponent: function (component) {
+        var fieldHelpComponent = component.get('v.fieldHelpComponent');
+        if ($A.util.isArray(fieldHelpComponent) && !$A.util.isEmpty(fieldHelpComponent)) {
             for (var i = 0; i < this.SUPPORTED_FIELDHELP_COMPONENTS.length; i++) {
                 if (fieldHelpComponent[0].isInstanceOf(this.SUPPORTED_FIELDHELP_COMPONENTS[i])) {
                     var labelComponent = component.find('inputLabel');
@@ -172,7 +157,7 @@
                     break;
                 }
             }
-    	}
+        }
     },
     getGlobalId: function (component) {
         return component.get("v.domId") || component.getGlobalId();
@@ -358,35 +343,35 @@
         }
 
         if (this._thereIsErrorComponent(cmp)) {
-            this._updateErrorComponent(cmp,errors);
+            this._updateErrorComponent(cmp, errors);
 
         } else {
             // Do nothing if no error component AND no error.
             if ($A.util.isEmpty(errors)) {
                 return;
             }
-            this._createDefaultErrorComponent(cmp,errors);
+            this._createDefaultErrorComponent(cmp, errors);
         }
     },
-    _thereIsErrorComponent : function (cmp) {
+    _thereIsErrorComponent: function (cmp) {
         return cmp.get('v.errorComponent').length > 0;
     },
-    _updateErrorComponent : function (cmp, errors) {
+    _updateErrorComponent: function (cmp, errors) {
         var errorCmp = cmp.get('v.errorComponent')[0];
 
         errorCmp.set("v.errors", errors);
         var concreteHelper = cmp.getConcreteComponent().getDef().getHelper();
         concreteHelper.updateAriaDescribedBy(cmp, errorCmp.getGlobalId());
     },
-    _createDefaultErrorComponent : function (cmp, errors) {
+    _createDefaultErrorComponent: function (cmp, errors) {
         $A.createComponent(
             "ui:inputDefaultError",
             {
-                "errors" : errors
+                "errors": errors
             },
             function (errorCmp, status) {
-            	if (status === "SUCCESS") {
-            	    cmp.set("v.errorComponent", errorCmp);
+                if (status === "SUCCESS") {
+                    cmp.set("v.errorComponent", errorCmp);
                     var concreteCmpHelper = cmp.getConcreteComponent().getDef().getHelper();
                     concreteCmpHelper.updateAriaDescribedBy(cmp, errorCmp.getGlobalId());
                 }
@@ -529,7 +514,7 @@
         }
     },
 
-    shouldShowError : function (component) {
+    shouldShowError: function (component) {
         // For compound fields, individual field components will display their own errors. See W-2855697
         // inputDateTime is a special case where the compound field is responsible for displaying the error.
         return !$A.util.getBooleanValue(component.get("v.isCompound"));

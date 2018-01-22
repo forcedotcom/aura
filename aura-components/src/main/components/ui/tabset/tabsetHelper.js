@@ -346,7 +346,7 @@
             tab.set("v.ariaControlId",tab.getGlobalId());
         }
 
-        config.localId = 'tabItem';
+        config.localId = "tabItem";
         config.attributes = values;
         config.descriptor = tabItemDef;
         config.valueProvider = cmp;

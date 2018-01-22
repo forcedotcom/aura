@@ -118,6 +118,9 @@ public class ModuleDefImpl extends BundleDefImpl<ModuleDef> implements ModuleDef
         if (this.minVersion != null) {
             json.writeMapEntry(ApplicationKey.MINVERSION, this.minVersion);
         }
+        if (this.apiVersion != null) {
+            json.writeMapEntry(ApplicationKey.APIVERSION, this.apiVersion);
+        }
         if (this.requireLocker) {
             json.writeMapEntry(ApplicationKey.REQUIRELOCKER, this.requireLocker);
         }

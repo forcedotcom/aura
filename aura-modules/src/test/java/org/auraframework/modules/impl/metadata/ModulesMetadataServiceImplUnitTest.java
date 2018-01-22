@@ -18,6 +18,7 @@ package org.auraframework.modules.impl.metadata;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.root.component.ModuleDefImpl;
 import org.auraframework.impl.source.file.FileSource;
+import org.auraframework.modules.impl.metadata.xml.ApiVersionElementHandler;
 import org.auraframework.modules.impl.metadata.xml.ExposeElementHandler;
 import org.auraframework.modules.impl.metadata.xml.MinApiVersionElementHandler;
 import org.auraframework.modules.impl.metadata.xml.ModuleMetadataXMLHandler;
@@ -42,7 +43,8 @@ public class ModulesMetadataServiceImplUnitTest {
         String xml =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                     "  <LightningComponentBundle>\n" +
-                    "  <expose>   true</expose>" +
+                    "  <isExposed>   true</isExposed>" +
+                    "  <apiVersion>  42.0</apiVersion>" +
                     "  <minApiVersion>  41.0</minApiVersion>" +
                     " <requireLocker>true</requireLocker>  \n" +
                     "<tags>" +
@@ -59,11 +61,7 @@ public class ModulesMetadataServiceImplUnitTest {
 
         ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
 
-        List<ModuleMetadataXMLHandler> xmlHandlers = new ArrayList<>();
-        xmlHandlers.add(new TagsElementHandler());
-        xmlHandlers.add(new ExposeElementHandler());
-        xmlHandlers.add(new MinApiVersionElementHandler());
-        xmlHandlers.add(new RequireLockerElementHandler());
+        List<ModuleMetadataXMLHandler> xmlHandlers = getXmlHandlers();
 
         ModulesMetadataServiceImpl modulesMetadataService = new ModulesMetadataServiceImpl();
         modulesMetadataService.setModuleXMLHandlers(xmlHandlers);
@@ -73,6 +71,7 @@ public class ModulesMetadataServiceImplUnitTest {
         ModuleDef moduleDef = builder.build();
 
         assertTrue("should have global access", moduleDef.getAccess().isGlobal());
+        assertEquals("apiVersion should be 42.0", "42.0", moduleDef.getAPIVersion());
         assertEquals("minVersion should be 41.0", new Double(41.0), moduleDef.getMinVersion());
         assertTrue("should require locker", moduleDef.getRequireLocker());
         assertEquals("should have 3 tags", 3, moduleDef.getTags().size());
@@ -83,7 +82,7 @@ public class ModulesMetadataServiceImplUnitTest {
     public void processBadXML() throws Exception {
         String xml =
                 "<LightningComponentBundle>\n" +
-                    "<expose>true</expose>\n" +
+                    "<isExposed>   true</isExposed>" +
                     "<minApiVersion>41.0</minApiVersion>\n" +
                     "<requireLocker>true</requireLocker>\n" +
                     "<tags>\n" +
@@ -99,11 +98,7 @@ public class ModulesMetadataServiceImplUnitTest {
         when(xmlSource.getSystemId()).thenReturn("/fake/xml/file.xml");
 
         ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
-        List<ModuleMetadataXMLHandler> xmlHandlers = new ArrayList<>();
-        xmlHandlers.add(new TagsElementHandler());
-        xmlHandlers.add(new ExposeElementHandler());
-        xmlHandlers.add(new MinApiVersionElementHandler());
-        xmlHandlers.add(new RequireLockerElementHandler());
+        List<ModuleMetadataXMLHandler> xmlHandlers = getXmlHandlers();
 
         ModulesMetadataServiceImpl modulesMetadataService = new ModulesMetadataServiceImpl();
         modulesMetadataService.setModuleXMLHandlers(xmlHandlers);
@@ -121,7 +116,7 @@ public class ModulesMetadataServiceImplUnitTest {
     public void processMoreBadXML() throws Exception {
         String xml =
                 "<LightningComponentBundle> " +
-                        "  <expose> <abc>true</abc> <tags> <tag> availableForRecordHome</tag> </tags> </expose>\n" +
+                        "  <isExposed> <abc>true</abc> <tags> <tag> availableForRecordHome</tag> </tags> </isExposed>\n" +
                         "  <minApiVersion>41.0  </minApiVersion>\n" +
                         "    <requireLocker>true  </requireLocker>\n" +
                         "<tags>\n" +
@@ -137,11 +132,7 @@ public class ModulesMetadataServiceImplUnitTest {
         when(xmlSource.getSystemId()).thenReturn("/fake/xml/file.xml");
 
         ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
-        List<ModuleMetadataXMLHandler> xmlHandlers = new ArrayList<>();
-        xmlHandlers.add(new TagsElementHandler());
-        xmlHandlers.add(new ExposeElementHandler());
-        xmlHandlers.add(new MinApiVersionElementHandler());
-        xmlHandlers.add(new RequireLockerElementHandler());
+        List<ModuleMetadataXMLHandler> xmlHandlers = getXmlHandlers();
 
         ModulesMetadataServiceImpl modulesMetadataService = new ModulesMetadataServiceImpl();
         modulesMetadataService.setModuleXMLHandlers(xmlHandlers);
@@ -154,5 +145,15 @@ public class ModulesMetadataServiceImplUnitTest {
             assertTrue("should be XML parse error", qfe.getMessage().contains("Unexpected element abc"));
         }
     }
+
+	private List<ModuleMetadataXMLHandler> getXmlHandlers() {
+		List<ModuleMetadataXMLHandler> xmlHandlers = new ArrayList<>();
+        xmlHandlers.add(new TagsElementHandler());
+        xmlHandlers.add(new ExposeElementHandler());
+        xmlHandlers.add(new ApiVersionElementHandler());
+        xmlHandlers.add(new MinApiVersionElementHandler());
+        xmlHandlers.add(new RequireLockerElementHandler());
+		return xmlHandlers;
+	}
 
 }

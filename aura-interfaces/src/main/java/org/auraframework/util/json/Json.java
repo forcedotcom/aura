@@ -79,6 +79,7 @@ public interface Json {
         ACTIONS("action","xx"),
         ACTIONDEFS("actionDefs","ac"),
         ACTIONTYPE("actionType","at"),
+        APIVERSION("apiVersion","av"),
         ATTRIBUTES("attributes","a"),
         ATTRIBUTEDEFS("attributeDefs","ad"),
         BACKGROUND("background","b"),

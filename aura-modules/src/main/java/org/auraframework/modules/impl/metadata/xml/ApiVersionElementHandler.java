@@ -16,25 +16,21 @@
 package org.auraframework.modules.impl.metadata.xml;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
-import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.TextSource;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 @ServiceComponent
-public class ExposeElementHandler implements ModuleMetadataXMLHandler {
+public class ApiVersionElementHandler implements ModuleMetadataXMLHandler {
     @Override
     public String handledElement() {
-        return "isExposed";
+        return "apiVersion";
     }
 
     @Override
     public void process(XMLStreamReader reader, Builder moduleBuilder, TextSource source) throws XMLStreamException {
-        if (ModuleMetadataXMLParserUtil.readBoolean(reader)) {
-            moduleBuilder.setAccess(new DefinitionAccessImpl(Access.GLOBAL));
-        }
+        moduleBuilder.setAPIVersion(String.format ("%.1f", ModuleMetadataXMLParserUtil.readDouble(reader)));
     }
 }

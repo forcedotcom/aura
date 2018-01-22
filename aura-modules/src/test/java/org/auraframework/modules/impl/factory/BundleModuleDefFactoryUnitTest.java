@@ -88,7 +88,7 @@ public class BundleModuleDefFactoryUnitTest {
 
         String xml =
                 "<LightningComponentBundle>\n" +
-                    "<expose>true</expose>\n" +
+                    "<isExposed>true</isExposed>\n" +
                     "<minApiVersion>12.3</minApiVersion>\n" +
                     "<requireLocker>true</requireLocker>\n" +
                     "<tags>\n" +

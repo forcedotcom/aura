@@ -41,7 +41,7 @@ public class DescriptionDefHandler<P> extends ParentedTagHandler<DescriptionDefI
     private final StringBuilder body = new StringBuilder();
     private final DescriptionDefImpl.Builder builder = new DescriptionDefImpl.Builder();
 
-    public DescriptionDefHandler(RootTagHandler<DocumentationDef> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
+    public DescriptionDefHandler(DocumentationDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                  boolean isInInternalNamespace, DefinitionService definitionService,
                                  ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
@@ -57,7 +57,7 @@ public class DescriptionDefHandler<P> extends ParentedTagHandler<DescriptionDefI
     protected void readAttributes() {
     	String name = getAttributeValue(ATTRIBUTE_NAME);
     	if (name == null) {
-    		name = ((DocumentationDefHandler) getParentHandler()).getNextId();
+            name = ((DocumentationDefHandler)getParentHandler()).getNextId();
     	}
         builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, getParentHandler().defDescriptor, DescriptionDef.class));
         builder.setName(name);

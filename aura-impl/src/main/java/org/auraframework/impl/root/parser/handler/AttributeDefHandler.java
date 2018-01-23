@@ -26,6 +26,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
+import org.auraframework.impl.root.component.DefRefDelegate;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
@@ -170,7 +171,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         ContainerTagHandler<?> parentHandler = getParentHandler();
         if(parentHandler!=null) {
-            DefinitionReference dr = createDefRefDelegate(getParentHandler());
+            DefinitionReference dr = new DefRefDelegate(getDefRefHandler((RootTagHandler<P>)getParentHandler()).getElement());
             body.add(dr);
         }
     }

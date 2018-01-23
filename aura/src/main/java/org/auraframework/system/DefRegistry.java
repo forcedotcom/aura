@@ -16,6 +16,7 @@
 package org.auraframework.system;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
@@ -63,6 +64,18 @@ public interface DefRegistry extends Serializable {
      */
     @Nonnull
     Set<DefDescriptor<?>> find(@Nonnull DescriptorFilter matcher);
+
+    /**
+     * Find the set of components that have a tag.
+     *
+     * For a component to be returned here, it must implement the PlatformDef interface
+     * and have one of the tags passed in.
+     *
+     * @param tags the set of requested tags (any tag suffices)
+     * @return the set of descriptors for defs that match.
+     */
+    @Nonnull
+    default Set<DefDescriptor<?>> findByTags(@Nonnull Set<String> tags) { return Collections.emptySet(); };
 
     /**
      * Returns true if the source related to the descriptor exists. Does not

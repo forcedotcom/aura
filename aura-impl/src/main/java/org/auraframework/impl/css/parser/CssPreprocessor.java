@@ -15,22 +15,15 @@
  */
 package org.auraframework.impl.css.parser;
 
-import com.salesforce.omakase.Omakase;
-import com.salesforce.omakase.PluginRegistry;
-import com.salesforce.omakase.plugin.Plugin;
-import com.salesforce.omakase.plugin.conditionals.Conditionals;
-import com.salesforce.omakase.plugin.conditionals.ConditionalsValidator;
-import com.salesforce.omakase.plugin.core.AutoRefine;
-import com.salesforce.omakase.plugin.core.AutoRefine.Match;
-import com.salesforce.omakase.plugin.core.StandardValidation;
-import com.salesforce.omakase.plugin.prefixer.PrefixCleaner;
-import com.salesforce.omakase.plugin.prefixer.Prefixer;
-import com.salesforce.omakase.plugin.syntax.UnquotedIEFilterPlugin;
-import com.salesforce.omakase.writer.StyleWriter;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import org.auraframework.Aura;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.css.FlavorAnnotation;
-import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.StyleContext;
 import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.BaseStyleDef;
@@ -46,11 +39,18 @@ import org.auraframework.impl.css.parser.plugin.UrlCacheBustingPlugin;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.StyleParserException;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import com.salesforce.omakase.Omakase;
+import com.salesforce.omakase.PluginRegistry;
+import com.salesforce.omakase.plugin.Plugin;
+import com.salesforce.omakase.plugin.conditionals.Conditionals;
+import com.salesforce.omakase.plugin.conditionals.ConditionalsValidator;
+import com.salesforce.omakase.plugin.core.AutoRefine;
+import com.salesforce.omakase.plugin.core.AutoRefine.Match;
+import com.salesforce.omakase.plugin.core.StandardValidation;
+import com.salesforce.omakase.plugin.prefixer.PrefixCleaner;
+import com.salesforce.omakase.plugin.prefixer.Prefixer;
+import com.salesforce.omakase.plugin.syntax.UnquotedIEFilterPlugin;
+import com.salesforce.omakase.writer.StyleWriter;
 
 /**
  * Parses CSS source code.

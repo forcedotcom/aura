@@ -25,7 +25,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * RootDefinitions are the Definitions that can be defined at the top-level of markup. This includes things like
  * component, interface, and event. The common trait of all of these types is that they can include AttributeDefs.
  */
-public interface RootDefinition extends BundleDef, Versionable {
+public interface RootDefinition extends PlatformDef, Versionable {
     enum SupportLevel {
         PROTO, DEPRECATED, BETA, GA
     }
@@ -37,13 +37,13 @@ public interface RootDefinition extends BundleDef, Versionable {
      * @return just the attributes declared on this definition
      */
     Map<DefDescriptor<AttributeDef>, AttributeDef> getDeclaredAttributeDefs();
-    
+
     /**
      * @return all the required versions for this component
      * @throws QuickFixException
      */
     Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs();
-    
+
     /**
      * @param namespace
      * @return The RequiredVersionDef for the given namespace
@@ -72,4 +72,5 @@ public interface RootDefinition extends BundleDef, Versionable {
     SupportLevel getSupport();
 
     DocumentationDef getDocumentationDef() throws QuickFixException;
+
 }

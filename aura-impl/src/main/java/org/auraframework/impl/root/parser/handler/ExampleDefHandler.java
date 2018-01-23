@@ -19,8 +19,8 @@ import com.google.common.collect.ImmutableSet;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ExampleDef;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.documentation.ExampleDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
@@ -31,7 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.util.Set;
 
-public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHandler<ExampleDefImpl, P> {
+public class ExampleDefHandler extends ParentedTagHandler<ExampleDefImpl, DocumentationDef> {
 
     public static final String TAG = "aura:example";
 
@@ -46,7 +46,7 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
 
     private final ExampleDefImpl.Builder builder = new ExampleDefImpl.Builder();
 
-    public ExampleDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
+    public ExampleDefHandler(DocumentationDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                              boolean isInInternalNamespace, DefinitionService definitionService,
                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
@@ -83,7 +83,7 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
         }
         builder.setLabel(label);
 
-        DefDescriptor<P> parentDesc = getParentHandler().getDefDescriptor();
+        DefDescriptor<DocumentationDef> parentDesc = getParentHandler().getDefDescriptor();
         String exampleName = String.format("%s_%s", parentDesc.getDescriptorName(), name);
         builder.setDescriptor(definitionService.getDefDescriptor(exampleName, ExampleDef.class));
     }

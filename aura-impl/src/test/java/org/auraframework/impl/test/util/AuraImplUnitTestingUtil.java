@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.auraframework.def.ApplicationDef;
@@ -54,7 +53,6 @@ import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.clientlibrary.ClientLibraryDefImpl;
-import org.auraframework.impl.css.token.TokensDefImpl;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -937,18 +935,6 @@ public class AuraImplUnitTestingUtil {
         }
         builder.setAccess(access);
         builder.setLocation((location == null) ? getLocation() : location);
-        return builder.build();
-    }
-
-    public TokensDef makeTokensDef(Map<String, String> variables) {
-        TokensDefImpl.Builder builder = new TokensDefImpl.Builder();
-        for (Entry<String, String> entry : variables.entrySet()) {
-            AttributeDefRefImpl value = makeAttributeDefRef(entry.getKey(), entry.getValue(), null);
-            AttributeDefImpl attr = makeAttributeDef(entry.getKey(),
-                    definitionService.getDefDescriptor("String", TypeDef.class), value, false, null, null);
-            builder.addAttributeDef(attr.getDescriptor(), attr);
-        }
-
         return builder.build();
     }
 

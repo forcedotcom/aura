@@ -20,7 +20,7 @@ import java.util.Map;
 
 /**
  */
-public interface DocumentationDef extends RootDefinition {
+public interface DocumentationDef extends Definition {
     @Override
     DefDescriptor<DocumentationDef> getDescriptor();
     

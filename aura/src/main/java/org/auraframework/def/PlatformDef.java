@@ -15,12 +15,13 @@
  */
 package org.auraframework.def;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import java.util.List;
-import java.util.Map;
-
-public interface PlatformDef extends Definition {
+public interface PlatformDef extends BundleDef {
 
     @Override
     DefDescriptor<? extends PlatformDef> getDescriptor();
@@ -39,10 +40,9 @@ public interface PlatformDef extends Definition {
     AttributeDef getAttributeDef(String name) throws QuickFixException;
 
     /**
-     * Associated Tags
-     * @return list of tags
+     * Get the set of tags for this def.
      */
-    List<String> getTags();
+    default Set<String> getTags() { return Collections.emptySet(); };
 
     /**
      * Supported minimum version

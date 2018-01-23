@@ -31,7 +31,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.DefinitionReference.Load;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.DefinitionReferenceImpl.Builder;
 import org.auraframework.impl.util.TextTokenizer;
@@ -44,13 +43,13 @@ import org.auraframework.util.AuraTextUtil;
 /**
  * Abstract definition reference handler
  */
-public abstract class BaseDefRefHandler<T extends DefinitionReference, P extends RootDefinition, C extends Definition,
+public abstract class BaseDefRefHandler<T extends DefinitionReference, P extends Definition, C extends Definition,
         B extends Builder<T, C>> extends ParentedTagHandler<T, P> {
 
     protected List<DefinitionReference> body;
     protected B builder;
 
-    public BaseDefRefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
+    public BaseDefRefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                   boolean isInInternalNamespace, DefinitionService definitionService,
                                   ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

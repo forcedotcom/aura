@@ -15,11 +15,17 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
+import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
+
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TokenDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.token.TokenDefImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.DefinitionService;
@@ -28,13 +34,9 @@ import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
-import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
-
-public final class TokenDefHandler<P extends RootDefinition> extends ParentedTagHandler<TokenDef, P> {
+public final class TokenDefHandler extends ParentedTagHandler<TokenDef, TokensDef> {
     protected static final String TAG = "aura:token";
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_VALUE = "value";
@@ -56,7 +58,7 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
         super();
     }
 
-    public TokenDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
+    public TokenDefHandler(TokensDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                            boolean isInInternalNamespace, DefinitionService definitionService,
                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

@@ -19,9 +19,10 @@ import com.google.common.collect.ImmutableSet;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
+import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionReference;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
+import org.auraframework.impl.root.component.DefRefDelegate;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
@@ -30,6 +31,7 @@ import org.auraframework.util.AuraTextUtil;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -37,7 +39,7 @@ import java.util.Set;
 /**
  * <aura:set> tags
  */
-public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTagHandler<AttributeDefRefImpl, P> {
+public class AttributeDefRefHandler<P extends Definition> extends ParentedTagHandler<AttributeDefRefImpl, P> {
 
     public static final String TAG = "aura:set";
 
@@ -54,7 +56,7 @@ public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTa
         super();
     }
 
-    public AttributeDefRefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
+    public AttributeDefRefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                   boolean isInInternalNamespace, DefinitionService definitionService,
                                   ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
@@ -99,7 +101,7 @@ public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTa
 
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
-        DefinitionReference dr = createDefRefDelegate(getParentHandler());
+        DefinitionReference dr = new DefRefDelegate(getDefRefHandler(getParentHandler()).getElement());
         children.add(dr);
     }
 
@@ -107,5 +109,4 @@ public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTa
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         children.addAll(tokenizeChildText());
     }
-
 }

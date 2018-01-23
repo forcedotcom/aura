@@ -19,7 +19,7 @@ import com.google.common.collect.ImmutableSet;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.FlavorIncludeDef;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.flavor.FlavorIncludeDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
@@ -33,7 +33,7 @@ import java.util.Set;
 
 import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
 
-public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedTagHandler<FlavorIncludeDef, P> {
+public class FlavorIncludeDefHandler extends ParentedTagHandler<FlavorIncludeDef, FlavorsDef> {
     protected static final String TAG = "aura:include";
     private static final String ATTRIBUTE_SOURCE = "source";
 
@@ -41,7 +41,7 @@ public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedT
 
     private final FlavorIncludeDefImpl.Builder builder = new FlavorIncludeDefImpl.Builder();
 
-    public FlavorIncludeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
+    public FlavorIncludeDefHandler(FlavorsDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                    boolean isInInternalNamespace, DefinitionService definitionService,
                                    ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

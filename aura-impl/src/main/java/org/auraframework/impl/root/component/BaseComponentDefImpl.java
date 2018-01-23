@@ -946,6 +946,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         return interfaces;
     }
 
+    @Override
+    public Set<String> getTags() {
+        return tags;
+    }
+
     private Set<DefDescriptor<InterfaceDef>> getAllInterfaces() throws QuickFixException {
         Set<DefDescriptor<InterfaceDef>> interfaceDefs = Sets.newLinkedHashSet();
         for (DefDescriptor<InterfaceDef> interfaceDef : interfaces) {
@@ -1462,6 +1467,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 this.interfaces = Sets.newHashSet();
             }
             this.interfaces.add(interfaceDesc);
+            addTag(interfaceDesc.getDescriptorName());
             return this;
         }
 

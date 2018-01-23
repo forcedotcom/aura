@@ -23,8 +23,8 @@ import com.salesforce.omakase.data.Property;
 import com.salesforce.omakase.util.Properties;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TokenDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.ExpressionType;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -69,7 +69,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
     private final Object value;
     private final Set<String> allowedProperties;
     private final String allowedPropertiesString;
-    private final DefDescriptor<? extends RootDefinition> parentDescriptor;
+    private final DefDescriptor<TokensDef> parentDescriptor;
     private transient final ConfigAdapter configAdapter;
 
     private final int hashCode;
@@ -79,14 +79,14 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
         this.value = builder.value;
         this.allowedProperties = AuraUtil.immutableSet(builder.allowedProperties);
         this.allowedPropertiesString = builder.allowedPropertiesString;
-        this.parentDescriptor = builder.parentDescriptor;
+        this.parentDescriptor = (DefDescriptor<TokensDef>)builder.parentDescriptor;
         this.configAdapter = builder.configAdapter;
 
         this.hashCode = AuraUtil.hashCode(descriptor, location, value);
     }
 
     @Override
-    public DefDescriptor<? extends RootDefinition> getParentDescriptor() {
+    public DefDescriptor<TokensDef> getParentDescriptor() {
         return parentDescriptor;
     }
 
@@ -216,7 +216,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
         private Object value;
         private Set<String> allowedProperties;
         private String allowedPropertiesString;
-        private DefDescriptor<? extends RootDefinition> parentDescriptor;
+        private DefDescriptor<TokensDef> parentDescriptor;
         private ConfigAdapter configAdapter;
 
         public Builder setValue(Object value) {
@@ -242,7 +242,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
             return this;
         }
 
-        public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {
+        public Builder setParentDescriptor(DefDescriptor<TokensDef> parentDescriptor) {
             this.parentDescriptor = parentDescriptor;
             return this;
         }

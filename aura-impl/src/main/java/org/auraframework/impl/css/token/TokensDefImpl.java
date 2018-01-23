@@ -18,6 +18,7 @@ package org.auraframework.impl.css.token;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +28,6 @@ import org.auraframework.Aura;
 import org.auraframework.builder.TokensDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RequiredVersionDef;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokenDescriptorProviderDef;
 import org.auraframework.def.TokenMapProviderDef;
@@ -38,7 +35,7 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.util.Tokens;
 import org.auraframework.impl.java.provider.TokenDescriptorProviderInstance;
-import org.auraframework.impl.root.RootDefinitionImpl;
+import org.auraframework.impl.root.PlatformDefImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -59,7 +56,7 @@ import com.google.common.collect.Sets;
 /**
  * Implementation for {@link TokensDef}.
  */
-public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implements TokensDef {
+public final class TokensDefImpl extends PlatformDefImpl<TokensDef> implements TokensDef {
     private static final long serialVersionUID = -7900230831915100535L;
 
     private final Map<String, TokenDef> tokens;
@@ -352,32 +349,12 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
     }
 
     @Override
-    public void serialize(Json json) throws IOException {}
-
-    @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
-        return null; // events not supported here
-    }
-
-    @Override
-    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
-        return other.getDefType().equals(DefType.TOKENS) && descriptor.equals(other);
-    }
-
-    @Override
-    public List<DefDescriptor<?>> getBundle() {
-        return Lists.newArrayList();
-    }
-
-    @Override
-    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
-        throw new UnsupportedOperationException("TokensDef cannot contain RequiredVersionDefs.");
-    }
-
-    @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
-        throw new UnsupportedOperationException("TokensDef cannot contain AttributeDefs.");
+        return Collections.emptyMap();
     }
+
+    @Override
+    public void serialize(Json json) throws IOException {}
 
     @Override
     public int hashCode() {
@@ -400,7 +377,7 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
         return false;
     }
 
-    public static final class Builder extends RootDefinitionImpl.Builder<TokensDef> implements TokensDefBuilder {
+    public static final class Builder extends PlatformDefImpl.Builder<TokensDef> implements TokensDefBuilder {
         private DefDescriptor<TokensDef> extendsDescriptor;
         private DefDescriptor<TokenDescriptorProviderDef> descriptorProvider;
         private DefDescriptor<TokenMapProviderDef> mapProvider;

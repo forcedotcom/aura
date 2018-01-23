@@ -79,7 +79,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
         this.value = builder.value;
         this.allowedProperties = AuraUtil.immutableSet(builder.allowedProperties);
         this.allowedPropertiesString = builder.allowedPropertiesString;
-        this.parentDescriptor = (DefDescriptor<TokensDef>)builder.parentDescriptor;
+        this.parentDescriptor = builder.parentDescriptor;
         this.configAdapter = builder.configAdapter;
 
         this.hashCode = AuraUtil.hashCode(descriptor, location, value);

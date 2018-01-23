@@ -86,9 +86,8 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
 
     @Override
     public void addExpressionReferences(Set<PropertyReference> propRefs) {
-        // TODO: this should be a typed exception
-        throw new AuraRuntimeException("Expressions are not allowed inside a " + defDescriptor.getDefType()
-                + " definition", propRefs.iterator().next().getLocation());
+        // We do a null operation here, and allow for overrides. This is probably
+        // actually incorrect, as expressions in methods do not get handled.
     }
 
     public final void process() throws XMLStreamException, QuickFixException {

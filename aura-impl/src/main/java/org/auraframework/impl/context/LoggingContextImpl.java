@@ -59,10 +59,8 @@ public class LoggingContextImpl implements LoggingContext {
     }
 
     protected void startActionTimer(String actionName, Action action) {
-        String actionId = action.getId();
-        if (actionId == null) {
-            actionId = "none";
-        }
+        String actionId = (action == null || action.getId() == null)? "none" : action.getId();
+
         startTimer(LoggingService.TIMER_ACTION + actionName, ImmutableMap.of("id", actionId));
     }
 

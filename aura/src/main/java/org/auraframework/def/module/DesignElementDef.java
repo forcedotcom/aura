@@ -44,11 +44,6 @@ public interface DesignElementDef {
     public String getAttributeValue(String name);
 
     /**
-     * @param attributes to be added to the design element
-     */
-    public void addAttributes(Map<String, String> attributes);
-
-    /**
      * @return All the child elements.
      * Example <tag1> <tag2></tag2> <tag3></tag3> </tag1> would return java representation of tag2 and tag3 when this method is called on tag1.
      */

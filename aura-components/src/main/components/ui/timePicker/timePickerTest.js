@@ -18,7 +18,7 @@
 	 * Test to make sure timepicker is now accessible with inputDefaultError
 	 */
 	testAccessible : {
-    	browsers: ["-IE7","-IE8"],
+    	browsers: ["-IE8"],
         test : [function(cmp){
         	cmp.find("hours").set("v.value", "100");
         	cmp.get("c.updateHours").runDeprecated({});

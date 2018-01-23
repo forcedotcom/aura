@@ -18,7 +18,7 @@
 	 * Verify multiple carousels can exist on same page.
 	 */
 	testMultipleCarousels : {
-		browsers : [ "-IE7", "-IE8" ],
+		browsers : [ "-IE8" ],
 		test : function(cmp) {
 			var carousel1 = cmp.find("carousel1");
 			$A.test.assertFalse($A.util.isUndefinedOrNull(carousel1), "Did not find carousel 1");
@@ -32,7 +32,7 @@
      * to the target page and navigation indicators are updated.
      */
  	testSwitchPageUsingPageIndicator : {
- 		browsers: ["-IE7","-IE8"],
+ 		browsers: ["-IE8"],
  		test : [function(cmp) {
  			// go to 1st page
  			this.goToPageOnCarousel(cmp, "carousel1", 1, "c1-p1");
@@ -92,7 +92,7 @@
      * Page content of a carousel page can be dynamically updated.
      */
     testUpdatePageContent : {
-    	browsers: ["-IE7","-IE8"],
+    	browsers: ["-IE8"],
  		test : [function(cmp){
  			var carousel = cmp.find("carousel1");
             this.goToPageOnCarousel(cmp, "carousel1", 7, "c1-updateOutput");
@@ -126,7 +126,7 @@
      */
     // TODO: Flapping on Jenkins autobuilds
  	_testCarouselWithOneTab : {
- 		browsers: ["-IE7","-IE8"],
+ 		browsers: ["-IE8"],
  		test : function(cmp){
  		    var carousel = cmp.find("carousel2");
  		    var pages = this.getPagesOnCarousel(carousel);
@@ -146,7 +146,7 @@
      *  Can use navigation indicators at the bottom of page to switch pages
      */
     testNavigationBarAtBottomSwitchPage : {
- 		browsers: ["-IE7","-IE8"],
+ 		browsers: ["-IE8"],
  		test : function(cmp){
             var carousel = cmp.find("carouselNavBottom");
             this.goToPageOnCarousel(cmp, "carouselNavBottom", 2, "cnb-p2");
@@ -157,7 +157,7 @@
 	 * Setting isDefault on a carouselPage shows that page on load.
 	 */
 	testDefaultPage : {
-		browsers : [ "-IE7", "-IE8" ],
+		browsers : [ "-IE8" ],
 		test : function(cmp) {
 			var expectedDefaultPage = 2;
 			var carousel = cmp.find("carousel1");
@@ -183,7 +183,7 @@
 	 * page is set.
 	 */
 	testDefaultPageNavigationIndicators : {
-		browsers : [ "-IE7", "-IE8" ],
+		browsers : [ "-IE8" ],
 		test : function(cmp) {
 			var expectedDefaultPage = 2;
 			var carousel = cmp.find("carousel1");
@@ -197,7 +197,7 @@
 	 * Verify the correct default page is loaded.
 	 */
 	testCarouselDefaultPageOverridesPageSetting : {
-		browsers : [ "-IE7", "-IE8" ],
+		browsers : [ "-IE8" ],
 		test : function(cmp) {
 			var expectedDefaultPage = 3;
 			var carousel = cmp.find("carouselDefaultOverride");
@@ -230,7 +230,7 @@
 	 */
     // TODO: W-2406307: remaining Halo test failure
 	_testRerenderCarousel : {
-		browsers : [ "-IE7", "-IE8" ],
+		browsers : [ "-IE8" ],
 		test : [
 				function(cmp) {
 					var btn = cmp.find("btnCreatePages");
@@ -266,7 +266,7 @@
 	 * Carousel with 100 pages renderes correctly.
 	 */
 	testMaxPages : {
-		browsers : [ "-IE7", "-IE8" ],
+		browsers : [ "-IE8" ],
 		test : function(cmp) {
 			var carousel = cmp.find("carouselMaxPages");
 			var pages = this.getPagesOnCarousel(carousel);
@@ -283,7 +283,7 @@
 	 * Continous flow carousel has correct aria values set.
 	 */
 	testContinousFlowAriaValues : {
-		browsers : [ "-IE7", "-IE8" ],
+		browsers : [ "-IE8" ],
 		test : function(cmp) {
 			var carousel = cmp.find("carouselContinousFlow");
 			var pages = this.getPagesOnCarousel(carousel);
@@ -297,7 +297,7 @@
 	 * Able to render a component that has a carousel within a carousel.
 	 */
 	testCarouselWithinCarousel : {
-		browsers : [ "-IE7", "-IE8" ],
+		browsers : [ "-IE8" ],
 		test : function(cmp) {
 			var parent = cmp.find("carouselInCarousel");
 			$A.test.assertFalse($A.util.isUndefinedOrNull(parent),
@@ -320,7 +320,7 @@
 	 * carousel are set properly.
 	 */
 	testCarouselWithinCarouselSwitchChildPage : {
-		browsers : [ "-IE7", "-IE8" ],
+		browsers : [ "-IE8" ],
 		test : [
 				function(cmp) {
 					var parent = cmp.find("carouselInCarousel");
@@ -358,7 +358,7 @@
 	 * child carousel are set properly.
 	 */
 	testCarouselWithinCarouselSwitchParentPage : {
-		browsers : [ "-IE7", "-IE8" ],
+		browsers : [ "-IE8" ],
 		test : [
 				function(cmp) {
 					var parent = cmp.find("carouselInCarousel");
@@ -391,7 +391,7 @@
 	 * changed
 	 */
 	testCustomPageChangeAction : {
-		browsers : [ "-IE7", "-IE8" ],
+		browsers : [ "-IE8" ],
 		test : [
 				function(cmp) {
 					cmp.set("v.isPageChangeActionCalled", false);

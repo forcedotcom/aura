@@ -89,7 +89,7 @@
      * and $A.test.getText() won't trim the space
      */
     testLineFeed:{
-        browsers: ["-IE7", "-IE8"],
+        browsers: ["-IE8"],
         attributes: {value: '\n'},
         test: function(component){
         	$A.test.assertEquals('', component.find("span").getElement().textContent, "Failed to convert \r\n\ and \n into <br>");
@@ -101,7 +101,7 @@
      * and $A.test.\u200bgetText() won't trim the space
      */
     testCarriageReturn:{
-        browsers: ["-IE7", "-IE8"],
+        browsers: ["-IE8"],
         labels : ["UnAdaptableTest"],
         attributes: {value: '\r\n'},
         test: function(component){
@@ -116,7 +116,7 @@
      * and $A.test.getText() won't trim the space
      */
     testLineFeeds:{
-        browsers: ["-IE7", "-IE8"],
+        browsers: ["-IE8"],
         attributes: {value: '\n1\n2\n'},
         test: function(component){
         	$A.test.assertEquals('12', component.find("span").getElement().textContent, "Failed to convert \r\n\ and \n into <br>");
@@ -128,7 +128,7 @@
      * and $A.test.getText() won't trim the space
      */
     testCarriageReturnLineFeeds:{
-        browsers: ["-IE7", "-IE8"],
+        browsers: ["-IE8"],
         labels : ["UnAdaptableTest"],
         attributes: {value: '\r\na\r\nb\r\n'},
         test: function(component){ 

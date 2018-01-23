@@ -203,7 +203,7 @@
      * Change type of input element (non-IE)
      */
     testChangeTypeOfInputElement:{
-    	browsers: ["-IE7","-IE8","-IE9"],
+    	browsers: ["-IE8","-IE9"],
         test:function(component){
             var input = component.find("specialAttributes_input").getElement();
             $A.test.assertEquals("text" , input.getAttribute("type"), "Failed to render type attribute");

@@ -94,10 +94,8 @@
     },
     /**
      * Verify setting resizable attribute to true, then switching to false.
-     * Do not run in IE7 because hasAttribute() support is IE8+
      */
     testResizable: {
-    	browsers : ["-IE7"],
         attributes : {resizable: true},
         doNotWrapInAuraRun : true,
         test: function(component){

@@ -86,7 +86,7 @@
      * Ignored in IE7 because ie7 handles bounding rectangle differently and the datepicker ends up be askewed
      */
     testCheckDatePickerPosition: {
-        browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD", "-IE7", "-SAFARI"],
+        browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD", "-SAFARI"],
         test: [
             function(cmp) {
                 this.openDatePicker(cmp, this.inputDateTriggerID);

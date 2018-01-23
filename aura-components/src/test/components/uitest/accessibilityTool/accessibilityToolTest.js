@@ -15,7 +15,7 @@
  */
 ({
     //Excluding IE7/8 because this test will only work with modern browsers
-    browsers: ["-IE7", "-IE8"],
+    browsers: ["-IE8"],
 
         runTest: function (expected, errorMessage, element, testsToSkip) {
             var output = $A.devToolService.checkAccessibility(element, testsToSkip);

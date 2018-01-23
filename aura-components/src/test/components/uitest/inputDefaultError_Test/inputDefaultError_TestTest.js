@@ -121,7 +121,6 @@
      * Show inputDefault error then take it away, then put it back
      */
     testInputDefaultToggles : {
-        browsers: ["-IE7"],
         attributes: {"caseToRender" : "default"},
         test : [function(cmp){
             // Validate the components

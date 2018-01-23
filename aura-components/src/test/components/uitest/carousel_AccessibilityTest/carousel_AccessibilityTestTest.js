@@ -18,7 +18,7 @@
 	 * Verify aria attributes are correct on carousel pages
 	 */
 	testCarouselAccessibility : {
-		browsers : [ "-IE7", "-IE8" ],
+		browsers : [ "-IE8" ],
 		test : [function(cmp) {
                         // Disabled due to this functionality not working with Chrome 59 and ChromeDriver
                         // 2.33. See W-4402250, https://gus.lightning.force.com/one/one.app#/sObject/a07B0000004BgIyIAK/view

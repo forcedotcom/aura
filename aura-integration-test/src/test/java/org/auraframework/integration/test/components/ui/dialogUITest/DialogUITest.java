@@ -186,7 +186,7 @@ public class DialogUITest extends WebDriverTestCase {
     /***********************************************************************************************
      *************************** NON-MODAL DIALOG BOX CHECK******************************************
      ***********************************************************************************************/
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.SAFARI,
+    @ExcludeBrowsers({ BrowserType.IE8, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     @Test
     public void testDialogNonModalCheckBoxes() throws Exception {
@@ -212,7 +212,7 @@ public class DialogUITest extends WebDriverTestCase {
     }
 
     // Checking if Dialog box will will close after having all elements tabbed through
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     @Test
     public void testDialogNonModalTab() throws Exception {
@@ -248,7 +248,7 @@ public class DialogUITest extends WebDriverTestCase {
                 LAUNCH_DIALOG, element.getAttribute("className"));
     }
 
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     @Test
     public void testDialogNonModalFocusOnExit() throws Exception {
@@ -274,7 +274,7 @@ public class DialogUITest extends WebDriverTestCase {
 
     // Checking that the Escape button should not submit with submiting
     // here
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     @Test
     public void testDialogNonModalDefaultSubmit() throws Exception {
@@ -331,7 +331,7 @@ public class DialogUITest extends WebDriverTestCase {
     }
 
     // Check that shift tab does not break nonModal Dialog boxes
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     @Test
     public void testDialogNonModalShiftTab() throws Exception {

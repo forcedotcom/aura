@@ -55,7 +55,7 @@
     },
 
     testHtmlEntitiesInIE: {
-        browsers: ["IE7", "IE8", "IE9", "IE10", "IE11"],
+        browsers: ["IE8", "IE9", "IE10", "IE11"],
         test: function(component){
             var children = component.find("nbsp");
             $A.test.assertEquals(160, $A.test.getText(children[0].getElement()).charCodeAt(1), "Entity nbsp not rendered as expected at index 0");
@@ -66,7 +66,7 @@
     },
 
     testHtmlEntitiesOutsideOfIE: {
-        browsers: ["-IE7","-IE8","-IE9", "-IE10", "-IE11"],
+        browsers: ["-IE8","-IE9", "-IE10", "-IE11"],
         test: function(component){
             this.assertText(component, "nbsp", "\u00A0", 1);
         }

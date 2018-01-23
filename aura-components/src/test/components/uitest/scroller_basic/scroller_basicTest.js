@@ -20,7 +20,7 @@
 	 * Bug: W-2397722
 	 */
 	testReEnableScrollerDynamically: {
-        browsers: ["-IE7","-IE8"],
+        browsers: ["-IE8"],
         test: [
                function(cmp) {
             	   	//this.setDefaultAuraRenderedBy(cmp);

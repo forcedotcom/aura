@@ -279,7 +279,7 @@ public class TabsetUITest extends WebDriverTestCase {
      * IE7/8 don't handle arrows well.
      */
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD,
-            BrowserType.IE8, BrowserType.IE7 })
+            BrowserType.IE8 })
     @Test
     public void testLeftRightUpDownArrows() throws Exception {
         open(createURL("basic", "false"));

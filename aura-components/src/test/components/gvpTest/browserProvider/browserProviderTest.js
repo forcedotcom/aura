@@ -1,6 +1,6 @@
 ({
     testDesktopBrowser:{
-	browsers: [ 'GOOGLECHROME', 'IE11', 'IE10', 'IE9', 'IE8', 'IE7', 'FIREFOX', 'SAFARI'],
+	browsers: [ 'GOOGLECHROME', 'IE11', 'IE10', 'IE9', 'IE8', 'FIREFOX', 'SAFARI'],
     	test:function(cmp){
 		    $A.test.assertEquals("DESKTOP", $A.get("$Browser.formFactor"));
 		}

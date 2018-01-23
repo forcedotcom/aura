@@ -22,7 +22,7 @@
      * Flapping in Safari
      */
     testActionMenuWithAttachToBodySet: {
-        browsers: ["-IE7", "-IE8", "-SAFARI"],
+        browsers: ["-IE8", "-SAFARI"],
         test: [function(cmp) {
                 actionMenu = cmp.find("actionMenuAttachToBody");
                 menuLabel = cmp.find("triggerAttachToBody");

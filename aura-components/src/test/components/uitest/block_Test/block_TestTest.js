@@ -46,7 +46,7 @@
 	 * In IE7/8 cant use object.sytle.float need to use object.sytle.styleFloat
 	 */
 	testLeftBlockFacet:{
-		browsers : ["-IE7","-IE8"],
+		browsers : ["-IE8"],
 		test: function(cmp){
 			var leftDiv = $A.test.getElementByClass("bLeft")[0];
 			$A.test.assertEquals("left", $A.test.getStyle(leftDiv,'float'), "Css 'float' property for leftblock should be left");
@@ -57,7 +57,7 @@
 	 * In IE7/8 cant use object.sytle.float need to use object.sytle.styleFloat
 	 */
 	testLeftBlockFacetInIE:{
-		browsers : ["IE7","IE8"],
+		browsers : ["IE8"],
 		test: function(cmp){
 			var leftDiv = $A.test.getElementByClass("bLeft")[0];
 			$A.test.assertEquals("left", $A.test.getStyle(leftDiv,'styleFloat'), "Css 'float' property for leftblock should be left");
@@ -68,7 +68,7 @@
 	 * In IE7/8 cant use object.sytle.float need to use object.sytle.styleFloat
 	 */	
 	testRightBlockFacet:{
-		browsers : ["-IE7","-IE8"],
+		browsers : ["-IE8"],
 		test: function(cmp){
 			var rightDiv = $A.test.getElementByClass("bRight")[0];
 			$A.test.assertEquals("right", $A.test.getStyle(rightDiv,'float'), "Css 'float' property for rightblock should be right");
@@ -79,7 +79,7 @@
 	 * In IE7/8 cant use object.sytle.float need to use object.sytle.styleFloat
 	 */
 	testRightBlockFacetInIE:{
-		browsers : ["IE7","IE8"],
+		browsers : ["IE8"],
 		test: function(cmp){
 			var leftDiv = $A.test.getElementByClass("bRight")[0];
 			$A.test.assertEquals("right", $A.test.getStyle(leftDiv,'styleFloat'), "Css 'float' property for leftblock should be left");

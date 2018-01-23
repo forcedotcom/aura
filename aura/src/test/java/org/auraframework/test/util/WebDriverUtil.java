@@ -15,7 +15,11 @@
  */
 package org.auraframework.test.util;
 
-import com.google.common.collect.Lists;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Platform;
@@ -23,10 +27,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.internal.BuildInfo;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import com.google.common.collect.Lists;
 
 /**
  * Utility methods related to WebDriver
@@ -42,7 +43,7 @@ public final class WebDriverUtil {
                     	BrowserType.IPAD,
                     	BrowserType.ANDROID_PHONE,
                     	BrowserType.ANDROID_TABLET);
-    public static Set<BrowserType> DESKTOP = 
+    public static Set<BrowserType> DESKTOP =
     		EnumSet.of(BrowserType.IE9,
                     	BrowserType.IE10,
     					BrowserType.IE11,
@@ -82,7 +83,6 @@ public final class WebDriverUtil {
         IE10(DesiredCapabilities.internetExplorer(), "10", "Windows 2012"),
         IE9(DesiredCapabilities.internetExplorer(), "9", "Windows 7"),
         IE8(DesiredCapabilities.internetExplorer(), "8", Platform.WINDOWS),
-        IE7(DesiredCapabilities.internetExplorer(), "7", Platform.WINDOWS),
         GOOGLECHROME(DesiredCapabilities.chrome(), "34", Platform.ANY, ExtraCapability.DISABLE_POPUP_BLOCKING),
         SAFARI(DesiredCapabilities.safari(), "7", "OS X 10.9"),
         ANDROID_PHONE(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.PHONE, ExtraCapability.PORTRAIT),

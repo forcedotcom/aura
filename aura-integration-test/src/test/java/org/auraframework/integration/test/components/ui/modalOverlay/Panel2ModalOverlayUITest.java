@@ -15,6 +15,8 @@
  */
 package org.auraframework.integration.test.components.ui.modalOverlay;
 
+import java.util.List;
+
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
@@ -26,10 +28,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
-import java.util.List;
-
 @ExcludeBrowsers({BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD,
-        BrowserType.IE7, BrowserType.IE8})
+        BrowserType.IE8})
 @Ignore("W-2929107")
 public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     private final String APP = "/uitest/panel2_Test.app";

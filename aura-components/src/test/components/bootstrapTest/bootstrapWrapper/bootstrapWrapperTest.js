@@ -1,6 +1,6 @@
 ({
     // IndexedDB has problems in Safari and is not supported in older IE
-    browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
+    browsers:["-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
 
     // Test modifies/deletes the persistent database
     labels: ["threadHostile"],

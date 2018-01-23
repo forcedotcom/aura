@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	browsers: ["-IE7","-IE8"],
+	browsers: ["-IE8"],
 	DOM    : 0,
     ITEMS  : 1,
     doNotWrapInAuraRun : true,

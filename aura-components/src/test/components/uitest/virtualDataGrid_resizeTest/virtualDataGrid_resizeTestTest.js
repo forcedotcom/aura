@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	browsers: ["-IE7","-IE8"],
+	browsers: ["-IE8"],
 	
 	WIDTHS : {
 		initialWidths  : [200, 400, 100, 50],

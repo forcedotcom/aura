@@ -25,7 +25,7 @@
      * TODO: Disabling test in IE7&8, bug W-2320774
      */
     testActionMenuWithAttachToBodySet: {
-        browsers: ["-IE7", "-IE8"],
+        browsers: ["-IE8"],
         test: [function (cmp) {
             actionMenu = cmp.find("actionMenuAttachToBody");
             menuLabel = cmp.find("triggerAttachToBody");

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    browsers: ["-IE7", "-IE8"],
+    browsers: ["-IE8"],
 
     /** load a component that has a flavor, that isn't in dependencies (and thus not in app.css) */
     testAsyncLoaded: {

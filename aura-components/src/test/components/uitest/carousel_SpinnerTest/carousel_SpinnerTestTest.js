@@ -18,7 +18,7 @@
  	 * Verify spinner element is present.
  	 */
  	testCarouselSpinnerComponent : {
- 		browsers: ["-IE7","-IE8"],
+ 		browsers: ["-IE8"],
  		test : function(cmp){
 			var spinnerCmp = cmp.find("testSpinner");
 			$A.test.assertFalse($A.util.isUndefinedOrNull(spinnerCmp), "Spinner component was not set properly");

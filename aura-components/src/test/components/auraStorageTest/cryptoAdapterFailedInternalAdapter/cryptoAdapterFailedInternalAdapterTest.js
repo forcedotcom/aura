@@ -9,7 +9,7 @@
      */
 
     // IndexedDB has problems in Safari and is not supported in older IE
-    browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
+    browsers:["-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
 
     // threadHostile - test modifies/deletes the persistent database.
     // UnAdaptableTest - must be run on https or localhost otherwise CryptoAdapter will not register

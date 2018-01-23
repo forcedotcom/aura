@@ -55,7 +55,7 @@
     
 
     testCreateIframeWithSrcdocNotAllowed : {
-        browsers: ["-IE7", "-IE8", "-IE9", "-IE10", "-IE11"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
         test : [
             function(component) {
                 $A.createComponent(
@@ -84,7 +84,7 @@
     },
 
     testCreateIframeWithSrcdocAllowed : {
-        browsers: ["-IE7", "-IE8", "-IE9", "-IE10", "-IE11"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
         test : [
             function(component) {
                 var action = component.get("c.setSrcdocContextValue");

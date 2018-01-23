@@ -50,7 +50,7 @@ public class InputSearchUITest extends WebDriverTestCase {
     // W-1551076: Webdriver not firing search event in Safari
     // W-1410946: "x" not displayed on IE7/IE8
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
-            BrowserType.SAFARI, BrowserType.IE7, BrowserType.IE8 })
+            BrowserType.SAFARI, BrowserType.IE8 })
     @Test
     public void testClearSelection() throws Exception {
         String valueExpression = getAuraUITestingUtil().getValueFromRootExpr("v.searched");

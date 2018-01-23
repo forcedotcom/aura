@@ -15,9 +15,31 @@
  */
 package org.auraframework.integration.test.util;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import junit.framework.AssertionFailedError;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpGet;
@@ -76,30 +98,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.uiautomation.ios.client.uiamodels.impl.RemoteIOSDriver;
 import org.uiautomation.ios.client.uiamodels.impl.augmenter.IOSDriverAugmenter;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.concurrent.Semaphore;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import junit.framework.AssertionFailedError;
 
 /**
  * Base class for Aura WebDriver tests.
@@ -1038,9 +1039,9 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         try {
             openAndWait(url, waitForInit);
         } catch (TimeoutException e) {
-            // Hack to avoid timeout issue for IE7 and IE8. Appears that tests fail for the first time when we run the
+            // Hack to avoid timeout issue for IE8. Appears that tests fail for the first time when we run the
             // test in new vm session on Sauce.
-            if (currentBrowserType == BrowserType.IE7 || currentBrowserType == BrowserType.IE8) {
+            if (currentBrowserType == BrowserType.IE8) {
                 openAndWait(url, waitForInit);
             } else {
                 throw e;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	browsers : ["-IE7","-IE8"],
+	browsers : ["-IE8"],
 
 	EXPECTED_TAB_HEADER_LABELS: ["tabTitle 1", "tabTitle 2", "tabTitle 3", "tabTitle 4 Long title here because i'm odd",
 	                             "tabTitle 5", "tabTitle 6", "tabTitle 7", "tabTitle 8 Long title here because i'm odd",

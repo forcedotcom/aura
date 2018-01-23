@@ -311,7 +311,7 @@
      */
     // TODO(W-3259241): Flapping on Jenkins autobuilds
     testRichTextInvalidDimensions:{
-        browsers: ["-IE7", "-IE8"],
+        browsers: ["-IE8"],
         attributes : {width: -100, height:-10},
         test : function() {
             // just verify ckeditor loaded
@@ -430,11 +430,9 @@
     
     /**
      * Verify setting resizable attribute to true, then switching to false.
-     * Do not run in IE7 because hasAttribute() support is IE8+
      */
     // TODO(W-3259241): Flapping on Jenkins autobuilds
     testResizable: {
-    	browsers : ["-IE7"],
         attributes : {isRichText: false, resizable: true},
         doNotWrapInAuraRun : true,
         test: function(component){

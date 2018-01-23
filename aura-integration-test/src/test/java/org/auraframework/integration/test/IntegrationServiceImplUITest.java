@@ -714,7 +714,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * skipped. So changing url # should not fire aura:locationChange event
      */
     // History Service is not supported in IE7 or IE8
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8 })
+    @ExcludeBrowsers({ BrowserType.IE8 })
     @Test
     public void testHistoryServiceAPIs() throws Exception {
         String expectedTxt = "";

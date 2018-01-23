@@ -15,6 +15,11 @@
  */
 package org.auraframework.integration.test.components.ui.inputDate;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
@@ -23,11 +28,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 public class InputDateWithLabelUITest extends WebDriverTestCase {
 
@@ -151,7 +151,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
      *********************************** Date Picker Tests*******************************************
      ***********************************************************************************************/
     // Home and End Button Test using January (31 days) , February (28 or 29 days), September (30 days)
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
+    @ExcludeBrowsers({ BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
     @Test
     public void testHomeEnd() throws Exception {
@@ -187,7 +187,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Testing the functionality of page_down, page_up, shift+page_down, shift+page_up
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE9, BrowserType.IE10, BrowserType.IE11, BrowserType.ANDROID_PHONE,
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.IE11, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     @Test
     public void testPageUpDownYear() throws Exception {

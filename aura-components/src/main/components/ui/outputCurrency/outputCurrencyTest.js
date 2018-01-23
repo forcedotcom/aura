@@ -105,7 +105,7 @@
      */
     testCurrencySymbolGBP: {
         // TODO(W-1787430): Special char added to formatted currency values in IE
-        browsers: ["-IE7","-IE8","-IE9","-IE10"],
+        browsers: ["-IE8","-IE9","-IE10"],
         attributes : {value : 123, currencySymbol : '£'},
         test: function(component){
             $A.test.assertEquals('£123.00', $A.test.getText(component.find('span').getElement()), "Text not correct when currencySymbol is specified");
@@ -138,7 +138,7 @@
      */
     testFractionDigitsPad: {
         // TODO(W-1787430): Special char added to formatted currency values in IE
-        browsers: ["-IE7","-IE8","-IE9","-IE10"],
+        browsers: ["-IE8","-IE9","-IE10"],
         attributes : {value : 1234567890, format : '¤#,##0.0000'},
         test: function(component){
             $A.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and pads with zeros.");
@@ -149,7 +149,7 @@
      */
     testFractionDigitsTruncate_RoundDown: {
         // TODO(W-1787430): Special char added to formatted currency values in IE
-        browsers: ["-IE7","-IE8","-IE9","-IE10"],
+        browsers: ["-IE8","-IE9","-IE10"],
         attributes : {value : 1234567890.7654321, format : '¤#,##0.0000'},
         test: function(component){
             $A.test.assertEquals('$1,234,567,890.7654', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and truncates.");
@@ -160,7 +160,7 @@
      */
     testFractionDigitsTruncate_RoundUp: {
         // TODO(W-1787430): Special char added to formatted currency values in IE
-        browsers: ["-IE7","-IE8","-IE9","-IE10"],
+        browsers: ["-IE8","-IE9","-IE10"],
         attributes : {value : 1234567890.7654521, format : '¤#,##0.0000'},
         test: function(component){
             $A.test.assertEquals('$1,234,567,890.7655', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and truncates.");
@@ -172,7 +172,7 @@
      */
     testFractionDigitsZeroValue: {
         // TODO(W-1787430): Special char added to formatted currency values in IE
-        browsers: ["-IE7","-IE8","-IE9","-IE10"],
+        browsers: ["-IE8","-IE9","-IE10"],
         attributes : {value : 123.45, format : '¤#'},
         test: function(component){
             $A.test.assertEquals('$123', $A.test.getText(component.find('span').getElement()), "fractionDigits should be allowed to take value of 0.");
@@ -194,7 +194,7 @@
      */
     testUpdateValue: {
         // TODO(W-1787430): Special char added to formatted currency values in IE
-        browsers: ["-IE7","-IE8","-IE9","-IE10"],
+        browsers: ["-IE8","-IE9","-IE10"],
         attributes : {value : 1234567890, format : '¤#,##0.0000'},
         test: function(component){
             $A.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
@@ -209,7 +209,7 @@
      */
     testUpdateValueWithSame: {
         // TODO(W-1787430): Special char added to formatted currency values in IE
-        browsers: ["-IE7","-IE8","-IE9","-IE10"],
+        browsers: ["-IE8","-IE9","-IE10"],
         attributes : {value : 1234567890, format : '¤#,##0.0000'},
         test: function(component){
         	$A.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
@@ -224,7 +224,7 @@
      */
     testUpdateFormat: {
         // TODO(W-1787430): Special char added to formatted currency values in IE
-        browsers: ["-IE7","-IE8","-IE9","-IE10"],
+        browsers: ["-IE8","-IE9","-IE10"],
         attributes : {value : 1234567890, format : '¤#,##0.0000'},
         test: function(component){
             $A.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
@@ -239,7 +239,7 @@
      */
     testUpdateFormatWithSame: {
         // TODO(W-1787430): Special char added to formatted currency values in IE
-        browsers: ["-IE7","-IE8","-IE9","-IE10"],
+        browsers: ["-IE8","-IE9","-IE10"],
         attributes : {value : 1234567890, format : '¤#,##0.0000'},
         test: function(component){
         	$A.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");

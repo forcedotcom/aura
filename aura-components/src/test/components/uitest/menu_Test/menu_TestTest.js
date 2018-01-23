@@ -24,7 +24,7 @@
      * Disabling test from IE7 and IE8 as sauce labs env issue.
      */
     owner: "ronak.shah",
-    browsers: ["-IE7", "-IE8"],
+    browsers: ["-IE8"],
     testActionMenu: {
         owner: "ctatlah,ronak.shah",
         test: [

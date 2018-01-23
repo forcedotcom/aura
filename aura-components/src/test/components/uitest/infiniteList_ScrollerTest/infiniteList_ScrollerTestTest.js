@@ -21,7 +21,7 @@
     */ 
    testNoPullToRefreshNoDivSpace: {
        // Excluding ie8 and 7 browsers due to lack of support for addEventListener function
-       browsers: ["-IE7","-IE8"],
+       browsers: ["-IE8"],
         test: function(cmp) {
             var wrapper     = cmp.find("scroller3").getElement(),
                 content     = wrapper.children[0],

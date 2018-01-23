@@ -49,7 +49,7 @@
     
     //test for [script-src 'self' chrome-extension: 'unsafe-inline';]
     testScriptSource : {
-        browsers : [ "-IE8", "-IE7" ],
+        browsers : [ "-IE8" ],
         attributes: { testScriptSource: true },
         test:[ 
             function(cmp) {
@@ -106,7 +106,7 @@
     //IE9 is giving me error: "getApplication not implemented", not sure why, not CSP related though
     //IE8 and below doesn't support HTML5 video
     testMediaSource : {
-        browsers : [ "-FIREFOX", "-IE9", "-IE8", "-IE7"],
+        browsers : [ "-FIREFOX", "-IE9", "-IE8"],
     	attributes: { testMediaSource: true },
     	test: [function(cmp) {
     		var ele = document.getElementById('videoSameDomain');

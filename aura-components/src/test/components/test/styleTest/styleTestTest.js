@@ -19,7 +19,7 @@
      * known issue with IE11 and layout : W-2375142
      */
     testStyleCssInjectedIntoDom : {
-        browsers : ["-IE7", "-IE8", "-IE11", "-IE10"],
+        browsers : ["-IE8", "-IE11", "-IE10"],
         test : function(cmp) {
             var found = false;
             var cssText = "";
@@ -53,7 +53,7 @@
      * styleSheets object so try to find the template CSS a slightly different way.
      */
     testStyleCssInjectedIntoDomIE : {
-        browsers : ["IE7", "IE8"],
+        browsers : ["IE8"],
         test : function(cmp) {
             var found = false;
             var styleSheets = document.styleSheets;

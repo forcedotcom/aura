@@ -84,7 +84,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
     private boolean isIE() {
         switch (getBrowserType()) {
-        case IE7:
         case IE8:
         case IE9:
         case IE10:

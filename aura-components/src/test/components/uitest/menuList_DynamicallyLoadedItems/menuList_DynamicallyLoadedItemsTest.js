@@ -15,7 +15,7 @@
  */
 ({
     owner: "rrigot",
-    browsers: ["-IE7", "-IE8"],
+    browsers: ["-IE8"],
 
     /**
      * Test that opens the menu twice, and checks that the content that the ui:menuList has indexed is correctly

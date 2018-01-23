@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-  browsers: ["-IE7","-IE8"],
+  browsers: ["-IE8"],
 
   ASSISTIVE_SORT_TEXT : "Sort ",
 

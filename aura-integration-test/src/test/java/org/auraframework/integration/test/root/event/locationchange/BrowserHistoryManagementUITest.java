@@ -29,7 +29,7 @@ import org.openqa.selenium.WebElement;
  * change event is fired as soon as the page is loaded. Implementation is in AuraHistoryService_Private.js
  */
 // History Service is not supported in IE7 or IE8
-@ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8 })
+@ExcludeBrowsers({ BrowserType.IE8 })
 public class BrowserHistoryManagementUITest extends WebDriverTestCase {
     /**
      * A basic component which has specified a event to be fired for location change but has no handler.

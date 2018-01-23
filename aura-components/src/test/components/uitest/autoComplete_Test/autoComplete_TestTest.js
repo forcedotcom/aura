@@ -8,7 +8,7 @@
      * Test case created for W-2089843. Where anchor tags were not clickable on mobile. Running on all platforms that AutoComplete works on
      */
     testTouchListElm: {
-	browsers : ["-IE7", "-IE8"],
+	browsers : ["-IE8"],
 	test : [function(cmp){
 			this._changeInput(cmp, "h");
 	    }, function(cmp){
@@ -30,7 +30,7 @@
     },
     
     testTouchListElmWhenUseAutocompletePanelSet: {
-    	browsers : ["-IE7", "-IE8"],
+    	browsers : ["-IE8"],
     	attributes: {usePanel: true},
         test : [function(cmp){
 				this._changeInput(cmp, "h");
@@ -207,7 +207,7 @@
      * Test if autocomplete matches special characters like '$', '#' etc
      */
     testMatchSpecialCharacters: {
-        browsers : ["-IE7", "-IE8"],
+        browsers : ["-IE8"],
         test : [function(cmp){
                 this._changeInputSplChar(cmp, "$");
             }, function(cmp){
@@ -233,7 +233,7 @@
          * 4. Check that this next option is highlighted
          */
         testHoverAndKeyboardHighlight : {
-            browsers : ["-IE7", "-IE8"],
+            browsers : ["-IE8"],
             RANDOM_OPTION : 3,
             test : [function(cmp){
                 this._changeInput(cmp, "h");
@@ -263,7 +263,7 @@
         },
         
         testListClosedWhenInputCleared: {
-	        browsers : ["-IE7", "-IE8"],
+	        browsers : ["-IE8"],
 	        test : [function(cmp){
 	                this._changeInput(cmp, "h");
 	            }, function(cmp){

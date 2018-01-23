@@ -349,7 +349,7 @@ public class InputTextUITest extends WebDriverTestCase {
         WebElement outputValue = findDomElement(By.cssSelector(".outputValue"));
 
         // IE < 9 uses values 1, 2, 4 for left, right, middle click (respectively)
-        String expectedVal = (BrowserType.IE7.equals(getBrowserType()) || BrowserType.IE8.equals(getBrowserType())) ? "1"
+        String expectedVal = BrowserType.IE8.equals(getBrowserType()) ? "1"
                 : "0";
         input.click();
         assertEquals("Left click not performed ", expectedVal, outputValue.getText());

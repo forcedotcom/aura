@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    browsers: ["-IE7","-IE8", "-IPHONE", "-IPAD", "-ANDROID_PHONE", "-ANDROID_TABLET"],
+    browsers: ["-IE8", "-IPHONE", "-IPAD", "-ANDROID_PHONE", "-ANDROID_TABLET"],
     
     /**
      * Test panel notify

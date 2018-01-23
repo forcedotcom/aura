@@ -15,7 +15,7 @@
  */
 ({
 	testClearAndReplaceWholeArrayInAttribute: {
-		browsers: ["-IE7", "-IE8"], //skip IE8 because W-2516537
+		browsers: ["-IE8"], //skip IE8 because W-2516537
 		test: [function(cmp) {
 			cmp.set("v.mapdata",{"items":[]});
 		}, function(cmp) {

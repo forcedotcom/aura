@@ -15,7 +15,7 @@
  */
 ({
 	testToggleCanShowMore: {
-        browsers: ["-IE7","-IE8"],
+        browsers: ["-IE8"],
         test: [
             function(component) {
                 // Make sure the "pull to show more" div exists
@@ -59,7 +59,7 @@
      * able to scroll vertically. 
      */
     testVerticalScrollInHorizontalScroller: {
-    	browsers: ["-IE7", "-IE8"],
+    	browsers: ["-IE8"],
     	test: function(component) {
     		// record inital height of scroller
     		var scroller = component.find("horizontalScrollBottom").getElement()
@@ -84,7 +84,7 @@
      * to scroll vertically. 
      */
     testVerticalScrollInVerticalScroller: {
-    	browsers: ["-IE7", "-IE8"],
+    	browsers: ["-IE8"],
     	test: function(component) {
     		// record inital height of scroller
     		var scroller = component.find("verticalScrollBottom").getElement()

@@ -15,6 +15,9 @@
  */
 package org.auraframework.integration.test.components.ui.listSorter;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
@@ -27,9 +30,6 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-
 /**
  * UI automation for ui:ListSorter.
  */
@@ -37,7 +37,7 @@ import java.net.URISyntaxException;
  * UnAdaptable because issue with sfdc environments with sendkeys in iframes see W-1985839 and W-2009411
  */
 @UnAdaptableTest
-@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.IE7, BrowserType.SAFARI })
+@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.SAFARI })
 public class ListSorterUITest extends WebDriverTestCase {
 
     public static final String APP = "/uitest/listSorter_Test.cmp";

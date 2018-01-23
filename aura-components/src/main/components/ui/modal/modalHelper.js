@@ -117,13 +117,12 @@
     },
 
     close: function (cmp, callback, shouldReturnFocus) {
-        // shouldReturnFocus defaults to true if it is not explicitly passed in.
-        if ($A.util.isUndefinedOrNull(shouldReturnFocus) || shouldReturnFocus) {
-            this.focusLib.stackUtil.unstackFocus(cmp);
-        }
-
         cmp.hide(function () {
             if (cmp.isValid()) {
+                // MODAL should not handle return focus.
+                // ui:destroyPanel event handling in panelManager2 will return the focus
+                // after activateNextPanel which could cause focus move to next panel.
+                // so to return focus correctly, must return it after activateNextPanel.
                 cmp.getEvent('notify').setParams({
                     action: 'destroyPanel',
                     typeOf: 'ui:destroyPanel',

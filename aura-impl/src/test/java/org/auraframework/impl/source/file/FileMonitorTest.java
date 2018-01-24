@@ -20,6 +20,7 @@ import org.auraframework.service.LoggingService;
 import org.auraframework.util.FileListener;
 import org.auraframework.util.IOUtil;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -42,6 +43,12 @@ public class FileMonitorTest extends AuraImplTestCase {
         ((MockConfigAdapterImpl)configAdapter).setIsProduction(null);
     }
 
+    @Before
+    public void setGlobalMocks() {
+        // this is needed to be set (and reset) because other tests don't restore state properly
+        ((MockConfigAdapterImpl)configAdapter).setIsProduction(false);
+    }
+
     @Test
     public void testFileMonitorNotifiesWithRegistryCreationTimeInPast() throws Exception {
         File tmpDir = new File(IOUtil.newTempDir("testFileMonitorNotifiesWithRegistryCreationTimeInPast"));
@@ -57,8 +64,6 @@ public class FileMonitorTest extends AuraImplTestCase {
         ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(loggingServiceMock, Mockito.atLeast(0)).error(argumentCaptor.capture());
         Mockito.verify(loggingServiceMock, Mockito.atLeast(0)).warn(argumentCaptor.capture());
-
-        ((MockConfigAdapterImpl)configAdapter).setIsProduction(false);
 
         fileMonitor.addDirectory(tmpDir.toString(), 0L);
 

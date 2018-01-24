@@ -31,7 +31,8 @@
      * Switching pages using the navigation page indicators correctly switchs page
      * to the target page and navigation indicators are updated.
      */
- 	testSwitchPageUsingPageIndicator : {
+     // test disabled as it is chronically flapping in CI
+    _testSwitchPageUsingPageIndicator : {
  		browsers: ["-IE8"],
  		test : [function(cmp) {
  			// go to 1st page

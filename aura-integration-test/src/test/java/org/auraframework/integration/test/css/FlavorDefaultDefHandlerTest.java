@@ -80,7 +80,7 @@ public class FlavorDefaultDefHandlerTest extends StyleTestCase {
         StringSource<FlavorIncludeDef> ss = new StringSource<>(desc, src, "myID", Format.XML);
         XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(ss.getReader());
         xmlReader.next();
-        FlavorDefaultDefHandler handler = new FlavorDefaultDefHandler(parent, xmlReader, ss, true,
+        FlavorDefaultDefHandler<FlavorsDef> handler = new FlavorDefaultDefHandler<>(parent, xmlReader, ss, true,
                 definitionService, configAdapter, definitionParserAdapter);
         return handler.getElement();
     }

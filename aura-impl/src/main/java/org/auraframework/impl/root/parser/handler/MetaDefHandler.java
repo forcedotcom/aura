@@ -22,7 +22,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
-import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.MetaDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
@@ -34,7 +34,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Parses <aura:meta> tags into MetaDefImpl
  */
-public class MetaDefHandler extends ParentedTagHandler<MetaDefImpl, DocumentationDef> {
+public class MetaDefHandler<P extends RootDefinition> extends ParentedTagHandler<MetaDefImpl, P> {
 
     public static final String TAG = "aura:meta";
 
@@ -45,7 +45,7 @@ public class MetaDefHandler extends ParentedTagHandler<MetaDefImpl, Documentatio
 
     private final MetaDefImpl.Builder builder = new MetaDefImpl.Builder();
 
-    public MetaDefHandler(DocumentationDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
+    public MetaDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                           boolean isInInternalNamespace, DefinitionService definitionService,
                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter,

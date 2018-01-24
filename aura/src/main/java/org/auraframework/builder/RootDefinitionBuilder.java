@@ -20,7 +20,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.def.RootDefinition.SupportLevel;
 
 /**
- * The builder for a root level (bundle) definition.
+ * @since 0.0.196
  */
 public interface RootDefinitionBuilder<T extends RootDefinition> extends BundleDefBuilder<T> {
     RootDefinitionBuilder<T> setSupport(SupportLevel support);

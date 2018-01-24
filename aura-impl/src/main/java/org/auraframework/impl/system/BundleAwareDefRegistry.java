@@ -16,19 +16,14 @@
 package org.auraframework.impl.system;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
 
 import org.auraframework.def.BundleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.PlatformDef;
 import org.auraframework.service.CompilerService;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.BundleSourceLoader;
@@ -242,17 +237,6 @@ public class BundleAwareDefRegistry implements DefRegistry {
         }
         return matches;
     }
-
-    @Override
-    public Set<DefDescriptor<?>> findByTags(@Nonnull Set<String> tags) {
-        registry.values().stream().forEach(h -> { try { getDef(h.descriptor); } catch (QuickFixException qfe) {}});
-        return registry.values().stream().filter(h ->
-                h.def != null
-                && h.def instanceof PlatformDef
-                && !Collections.disjoint(((PlatformDef)h.def).getTags(), tags))
-            .map(h -> h.descriptor).collect(Collectors.toSet());
-    }
-
 
     @Override
     public <T extends Definition> boolean exists(DefDescriptor<T> descriptor) {

@@ -16,21 +16,31 @@
 package org.auraframework.impl.svg;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.builder.SVGDefBuilder;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.def.SVGDef;
-import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.impl.root.RootDefinitionImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import com.google.common.collect.Lists;
 
 /**
  * Defines an SVG for use within the component bundles. It will be parsed out in bulk as markup with minimal validation.
  * It's primary purpose is to serve an icon that represents the top level component visually for use in various editors.
  * Generally, the SVG source size should be less than 4096 bytes.
  */
-public class SVGDefImpl extends DefinitionImpl<SVGDef> implements SVGDef {
+public class SVGDefImpl extends RootDefinitionImpl<SVGDef> implements SVGDef {
     private static final long serialVersionUID = 94337546417596992L;
 
     private final String contents;
@@ -49,6 +59,27 @@ public class SVGDefImpl extends DefinitionImpl<SVGDef> implements SVGDef {
     }
 
     @Override
+    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
+        throw new UnsupportedOperationException("SVGDef cannot contain RegisterEventDefs.");
+    }
+
+    @Override
+    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
+        throw new UnsupportedOperationException("SVGDef cannot contain AttributeDefs.");
+    }
+
+    @Override
+    public List<DefDescriptor<?>> getBundle() {
+        List<DefDescriptor<?>> ret = Lists.newArrayList();
+        return ret;
+    }
+
+    @Override
+    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
+        return DefDescriptorImpl.compare(descriptor, other) == 0;
+    }
+
+    @Override
     public void serialize(Json json) throws IOException {
     }
 
@@ -57,7 +88,12 @@ public class SVGDefImpl extends DefinitionImpl<SVGDef> implements SVGDef {
         return this.contents;
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<SVGDef> implements SVGDefBuilder {
+    @Override
+    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
+    	throw new UnsupportedOperationException("SVGDefImpl cannot contain RequiredVersionDefs.");
+    }
+
+    public static class Builder extends RootDefinitionImpl.Builder<SVGDef> implements SVGDefBuilder {
         private String contents;
 
         public Builder() {

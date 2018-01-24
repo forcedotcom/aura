@@ -1,1 +1,1 @@
-/l/{"mode":"UTEST","app":"#REPLACED#","styleContext":{"c":"other","tokens":["markup://test:fakeTokens"],"tuid":"2gMNlo5Ho_fm4bLrgFUtzg"},"pathPrefix":"","test":"org.auraframework.integration.test.css.StyleContextSerializationTest.testCssUrlWithProvidedTokens","ls":1,"csp":1}/app.css
+/l/{"mode":"UTEST","app":"#REPLACED#","styleContext":{"c":"other","tokens":["markup://test:fakeTokens"],"tuid":"7iCvN6Go0i9h1Ps4yUD42Q"},"pathPrefix":"","test":"org.auraframework.integration.test.css.StyleContextSerializationTest.testCssUrlWithProvidedTokens","ls":1,"csp":1}/app.css

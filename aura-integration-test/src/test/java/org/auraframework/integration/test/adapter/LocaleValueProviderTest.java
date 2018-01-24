@@ -15,13 +15,9 @@
  */
 package org.auraframework.integration.test.adapter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -38,8 +34,7 @@ import org.auraframework.service.LocalizationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 @UnAdaptableTest
 public class LocaleValueProviderTest extends AuraImplTestCase {

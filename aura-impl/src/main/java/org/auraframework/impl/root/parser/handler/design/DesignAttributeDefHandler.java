@@ -15,11 +15,7 @@
  */
 package org.auraframework.impl.root.parser.handler.design;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.InterfaceDef;
@@ -28,12 +24,15 @@ import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.design.DesignAttributeDefImpl;
 import org.auraframework.impl.root.parser.handler.ParentedTagHandler;
+import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
 public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttributeDef, DesignDef> {
     public static final String TAG = "design:attribute";
@@ -72,7 +71,7 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
     }
 
     // TODO implement tool specific properties
-    public DesignAttributeDefHandler(DesignDefHandler parentHandler, XMLStreamReader xmlReader,
+    public DesignAttributeDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
                                      TextSource<?> source, boolean isInInternalNamespace, DefinitionService definitionService,
                                      ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
@@ -137,7 +136,7 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (isInInternalNamespace() && DesignAttributeDefaultDefHandler.TAG.equalsIgnoreCase(tag)) {
-            DesignAttributeDefaultDef def = new DesignAttributeDefaultDefHandler((DesignDefHandler)getParentHandler(), xmlReader, source,
+            DesignAttributeDefaultDef def = new DesignAttributeDefaultDefHandler(getParentHandler(), xmlReader, source,
                     isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter).getElement();
             builder.setDefault(def);
         } else {

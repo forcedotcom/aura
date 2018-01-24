@@ -17,8 +17,11 @@ package org.auraframework.def;
 
 /**
  * Handles <bundle name>.svg files within the bundle.
+ *
+ * FIXME: this is a hack, as there should be more here than just some string contents. It really should
+ * have a better definition in the public docs to be part of OSS aura.
  */
-public interface SVGDef extends Definition {
+public interface SVGDef extends RootDefinition {
     @Override
     DefDescriptor<SVGDef> getDescriptor();
 

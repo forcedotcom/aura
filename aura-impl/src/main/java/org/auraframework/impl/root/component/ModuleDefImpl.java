@@ -50,7 +50,7 @@ import com.google.common.collect.Sets;
 /**
  * ModuleDef holds compiled code and serializes for client
  */
-public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleDef {
+public class ModuleDefImpl extends BundleDefImpl<ModuleDef> implements ModuleDef {
 
     private static final long serialVersionUID = 5154640929496754931L;
     private String path;
@@ -247,7 +247,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         return null;
     }
 
-    public static final class Builder extends PlatformDefImpl.Builder<ModuleDef> {
+    public static final class Builder extends BundleDefImpl.Builder<ModuleDef> {
 
         private String path;
         private Map<CodeType, String> codes;

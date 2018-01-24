@@ -16,11 +16,7 @@
 package org.auraframework.impl;
 
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -32,52 +28,23 @@ import javax.inject.Inject;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.ActionDef;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DefDescriptor.DescriptorKey;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
-import org.auraframework.impl.linker.AccessChecker;
-import org.auraframework.impl.linker.AuraLinker;
-import org.auraframework.impl.linker.LinkingDefinition;
-import org.auraframework.impl.system.BundleAwareDefRegistry;
-import org.auraframework.impl.system.CompilingDefRegistry;
-import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.impl.system.SubDefDescriptorImpl;
+import org.auraframework.impl.linker.*;
+import org.auraframework.impl.system.*;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
-import org.auraframework.impl.visitor.GlobalReferenceVisitor;
-import org.auraframework.impl.visitor.UsageMap;
-import org.auraframework.impl.visitor.UsageMapCombiner;
-import org.auraframework.impl.visitor.UsageMapSupplier;
+import org.auraframework.impl.visitor.*;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.service.CachingService;
-import org.auraframework.service.ContextService;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.service.LoggingService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.service.*;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.BundleSource;
-import org.auraframework.system.DefRegistry;
-import org.auraframework.system.DependencyEntry;
-import org.auraframework.system.Location;
-import org.auraframework.system.Source;
-import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
-import org.auraframework.throwable.quickfix.CompositeValidationException;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.InvalidExpressionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.quickfix.*;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
@@ -524,49 +491,6 @@ public class DefinitionServiceImpl implements DefinitionService {
             }
         }
 
-        return matched;
-    }
-
-    @Override
-    public Set<DefDescriptor<?>> findByTags(Set<String> tags) {
-        final String filterKey = tags.toString();
-        Set<DefDescriptor<?>> matched = Sets.newHashSet();
-        AuraContext context = contextService.getCurrentContext();
-        Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache = cachingService.getDescriptorFilterCache();
-        Lock rLock = cachingService.getReadLock();
-
-        //
-        // If we have somthing that is non-constant, we'll have to muck with caches and do some funky
-        // running around.
-        //
-        rLock.lock();
-        try {
-            //
-            // We _never_ cache non-constant namespaces. We'd like to make them illegal, but for the moment
-            // we will make them undesirable.
-            //
-            Collection<DefRegistry> registries = context.getRegistries().getAllRegistries();
-            for (DefRegistry reg : registries) {
-                if (reg.hasFind()) {
-                    Set<DefDescriptor<?>> registryResults = null;
-
-                    if (reg.isCacheable()) {
-                        // cache results per registry
-                        String cacheKey = filterKey + "|" + reg.toString();
-                        registryResults = descriptorFilterCache.getIfPresent(cacheKey);
-                        if (registryResults == null) {
-                            registryResults = reg.findByTags(tags);
-                            descriptorFilterCache.put(cacheKey, registryResults);
-                        }
-                    } else {
-                        registryResults = reg.findByTags(tags);
-                    }
-                    matched.addAll(registryResults);
-                }
-            }
-        } finally {
-            rLock.unlock();
-        }
         return matched;
     }
 

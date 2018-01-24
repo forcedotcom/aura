@@ -22,5 +22,5 @@ public interface ParentedDef {
     /**
      * Gets the parent descriptor.
      */
-    DefDescriptor<?> getParentDescriptor();
+    DefDescriptor<? extends RootDefinition> getParentDescriptor();
 }

@@ -25,9 +25,6 @@
     <aura:method name="hasAttr">
         <aura:attribute name="stringAttr" type="String" default="default string"/>
     </aura:method>
-    <aura:method name="hasExpressionAttr" action="c.funcHasAttr">
-        <aura:attribute name="stringAttr" type="String" default="{!v.outputStringAttr}"/>
-    </aura:method>
     <aura:method name="noAttr">
     </aura:method>
        

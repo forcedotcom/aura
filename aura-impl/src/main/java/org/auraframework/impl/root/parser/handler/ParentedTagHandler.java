@@ -21,6 +21,7 @@ import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.HtmlTag;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
@@ -36,7 +37,7 @@ import java.util.List;
 /**
  * Tag handler has a parent
  */
-public abstract class ParentedTagHandler<T extends Definition, P extends Definition> extends ContainerTagHandler<T> {
+public abstract class ParentedTagHandler<T extends Definition, P extends RootDefinition> extends ContainerTagHandler<T> {
 
     private ContainerTagHandler<P> parentHandler;
 
@@ -57,8 +58,11 @@ public abstract class ParentedTagHandler<T extends Definition, P extends Definit
         this.parentHandler = parentHandler;
     }
 
-    protected ContainerTagHandler<P> getParentHandler() {
-        return parentHandler;
+    protected RootTagHandler<P> getParentHandler() {
+        if(parentHandler instanceof RootTagHandler) {
+            return (RootTagHandler<P>) parentHandler;
+        }
+        return null;
     }
 
     protected DefDescriptor<P> getParentDefDescriptor(){

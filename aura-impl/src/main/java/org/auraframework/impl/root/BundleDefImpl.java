@@ -15,6 +15,17 @@
  */
 package org.auraframework.impl.root;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.auraframework.builder.BundleDefBuilder;
+import org.auraframework.def.BundleDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.expression.PropertyReference;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.text.Hash;
+import org.auraframework.validation.ReferenceValidationContext;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,21 +34,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.auraframework.builder.BundleDefBuilder;
-import org.auraframework.def.BundleDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
-import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.system.DefinitionImpl;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.text.Hash;
-import org.auraframework.validation.ReferenceValidationContext;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-public abstract class BundleDefImpl<T extends BundleDef> extends DefinitionImpl<T> implements BundleDef {
-    private static final long serialVersionUID = -95244696973620803L;
+public abstract class BundleDefImpl<T extends BundleDef> extends PlatformDefImpl<T> implements BundleDef {
 
     private final Map<DefDescriptor<?>, Definition> bundledDefs;
 
@@ -110,7 +107,7 @@ public abstract class BundleDefImpl<T extends BundleDef> extends DefinitionImpl<
         }
     }
 
-    public abstract static class Builder<T extends BundleDef> extends DefinitionImpl.BuilderImpl<T> implements BundleDefBuilder<T> {
+    public abstract static class Builder<T extends BundleDef> extends PlatformDefImpl.Builder<T> implements BundleDefBuilder<T> {
         private Map<DefDescriptor<?>,Definition> bundledDefs = Maps.newHashMap();
 
         public Builder(Class<T> defClass) {
@@ -126,7 +123,7 @@ public abstract class BundleDefImpl<T extends BundleDef> extends DefinitionImpl<
         @Override
         public String getOwnHash() {
             String working = super.getOwnHash();
-            if (bundledDefs != null && bundledDefs.size() > 0) {
+            if (bundledDefs != null) {
                 StringBuffer hashAcc = new StringBuffer();
                 hashAcc.append(working);
 

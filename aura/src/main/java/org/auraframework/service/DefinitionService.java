@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
@@ -155,18 +153,6 @@ public interface DefinitionService extends AuraService {
      * @param referenceDescriptor if matcher contains a wildcard, will be used to filter matches based on access
      */
     Set<DefDescriptor<?>> find(DescriptorFilter matcher, BaseComponentDef referenceDescriptor);
-
-    /**
-     * Find the set of components that have a tag.
-     *
-     * For a component to be returned here, it must implement the PlatformDef interface
-     * and have one of the tags passed in.
-     *
-     * @param tags the set of requested tags (any tag suffices)
-     * @return the set of descriptors for defs that match.
-     */
-    @Nonnull
-    Set<DefDescriptor<?>> findByTags(@Nonnull Set<String> tags);
 
     /**
      * Given a string that contains search patterns or wildcards, return a set

@@ -31,7 +31,6 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.HelperDef;
-import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.TypeDef;
@@ -39,7 +38,8 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.DefinitionServiceImpl;
 import org.auraframework.impl.context.AbstractRegistryAdapterImpl;
-import org.auraframework.impl.system.*;
+import org.auraframework.impl.system.DefFactoryImpl;
+import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.CachingService;
 import org.auraframework.system.AuraContext;
@@ -998,39 +998,6 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             }
         }
         assertTrue("markup://ui:button should have been added to depsCache again", foundit);
-    }
-
-    @Test
-    public void testFindByTagsIntegrationTestStringSource() throws Exception {
-        DefDescriptor<?> ifc = addSourceAutoCleanup(InterfaceDef.class, "<aura:interface />");
-        DefDescriptor<?> cmp = addSourceAutoCleanup(ComponentDef.class,
-                String.format("<aura:component implements=\"%s\" />", ifc.getDescriptorName()));
-        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
-        Set<DefDescriptor<?>> values = definitionService.findByTags(Sets.newHashSet(ifc.getDescriptorName()));
-        assertEquals("Should get one component back", 1, values.size());
-        assertTrue("Should find by tag", values.contains(cmp));
-    }
-
-    /**
-     * Find things that implement aura:rootComponent, and ensure that there are several.
-     *
-     * The set when this test was written is:
-            aura-components/src/main/components/aura/expression/expression.cmp
-            aura-components/src/main/components/aura/text/text.cmp
-            aura-components/src/main/components/aura/application/application.app
-            aura-components/src/main/components/aura/iteration/iteration.cmp
-            aura-components/src/main/components/aura/unescapedHtml/unescapedHtml.cmp
-            aura-components/src/main/components/aura/component/component.cmp
-            aura-components/src/main/components/aura/if/if.cmp
-            aura-components/src/main/components/aura/html/html.cmp
-    */
-    @Test
-    public void testFindByTagsIntegrationTestFileBased() throws Exception {
-        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
-        Set<DefDescriptor<?>> values = definitionService.findByTags(Sets.newHashSet("aura:rootComponent"));
-        assertTrue("Should several components back", values.size() >= 2);
-        assertTrue("Should find component by tag", values.contains(new DefDescriptorImpl<>("markup", "aura", "component", ComponentDef.class)));
-        assertTrue("Should find application by tag", values.contains(new DefDescriptorImpl<>("markup", "aura", "application", ApplicationDef.class)));
     }
 
     @Test

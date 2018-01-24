@@ -15,31 +15,30 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionReference;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl.Builder;
-import org.auraframework.impl.root.component.DefRefDelegate;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.validation.ReferenceValidationContext;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 /**
  * Handles all references to other components. Note that while the reference to the other component is created here, it
  * is not validated until the {@link ComponentDefRefImpl#validateReferences(ReferenceValidationContext)} method is called by loading registry.
  */
-public class ComponentDefRefHandler<P extends Definition> extends BaseDefRefHandler<ComponentDefRef, P, ComponentDef, ComponentDefRefImpl.Builder> {
+public class ComponentDefRefHandler<P extends RootDefinition> extends BaseDefRefHandler<ComponentDefRef, P, ComponentDef, ComponentDefRefImpl.Builder> {
 
-    public ComponentDefRefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
+    public ComponentDefRefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                   boolean isInInternalNamespace, DefinitionService definitionService,
                                   ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
@@ -69,7 +68,7 @@ public class ComponentDefRefHandler<P extends Definition> extends BaseDefRefHand
             if (componentDefRef.isFlavorable() || componentDefRef.hasFlavorableChild()) {
                 builder.setHasFlavorableChild(true);
             }
-            DefinitionReference defRef = new DefRefDelegate(componentDefRef);
+            DefinitionReference defRef = createDefRefDelegate(componentDefRef);
             body.add(defRef);
         }
     }

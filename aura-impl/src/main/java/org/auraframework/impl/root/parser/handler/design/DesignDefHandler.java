@@ -25,13 +25,11 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.design.DesignAttributeDef;
-import org.auraframework.def.design.DesignDef;
-import org.auraframework.def.design.DesignTemplateDef;
+import org.auraframework.def.design.*;
 import org.auraframework.def.genericxml.GenericXmlElement;
 import org.auraframework.impl.design.DesignDefImpl;
 import org.auraframework.impl.root.GenericXmlElementImpl;
-import org.auraframework.impl.root.parser.handler.FileTagHandler;
+import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.impl.root.parser.handler.genericxml.GenericXmlElementHandlerProvider;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
@@ -40,7 +38,7 @@ import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
-public class DesignDefHandler extends FileTagHandler<DesignDef> {
+public class DesignDefHandler extends RootTagHandler<DesignDef> {
     public static final String TAG = "design:component";
     private static final String ATTRIBUTE_LABEL = "label";
 

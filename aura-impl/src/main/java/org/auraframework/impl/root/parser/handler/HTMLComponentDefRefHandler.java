@@ -15,32 +15,30 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
-import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.HtmlTag;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.HTMLDefRefBuilderImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamReader;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Handles free HTML in component markup.
  */
-public class HTMLComponentDefRefHandler<P extends Definition> extends ComponentDefRefHandler<P> {
+public class HTMLComponentDefRefHandler<P extends RootDefinition> extends ComponentDefRefHandler<P> {
 
     protected HTMLDefRefBuilderImpl htmlBuilder = new HTMLDefRefBuilderImpl();
 
-    protected HTMLComponentDefRefHandler(ContainerTagHandler<P> parentHandler, String tag, XMLStreamReader xmlReader,
+    protected HTMLComponentDefRefHandler(RootTagHandler<P> parentHandler, String tag, XMLStreamReader xmlReader,
                                          TextSource<?> source, boolean isInInternalNamespace, DefinitionService definitionService,
                                          ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

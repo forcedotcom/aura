@@ -24,6 +24,7 @@ import org.auraframework.def.design.DesignTemplateDef;
 import org.auraframework.def.design.DesignTemplateRegionDef;
 import org.auraframework.impl.design.DesignTemplateDefImpl;
 import org.auraframework.impl.root.parser.handler.ParentedTagHandler;
+import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -45,7 +46,7 @@ public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateD
         super();
     }
 
-    public DesignTemplateDefHandler(DesignDefHandler parentHandler, XMLStreamReader xmlReader,
+    public DesignTemplateDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
                                     TextSource<?> source, boolean isInInternalNamespace, DefinitionService definitionService,
                                     ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
@@ -67,7 +68,7 @@ public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateD
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (DesignTemplateRegionDefHandler.TAG.equalsIgnoreCase(tag)) {
-            DesignTemplateRegionDef templateRegion = new DesignTemplateRegionDefHandler((DesignDefHandler)getParentHandler(), xmlReader,
+            DesignTemplateRegionDef templateRegion = new DesignTemplateRegionDefHandler(getParentHandler(), xmlReader,
                     source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter).getElement();
             builder.addDesignTemplateRegion(
                     definitionService.getDefDescriptor(templateRegion.getName(), DesignTemplateRegionDef.class),

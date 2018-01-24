@@ -28,7 +28,7 @@ import com.google.common.base.Optional;
  * {@link TokensDef}s are top-level defs that contain aura:token tags. They provide the information necessary to perform
  * token variable substitution in stylesheets.
  */
-public interface TokensDef extends PlatformDef {
+public interface TokensDef extends RootDefinition {
     @Override
     DefDescriptor<TokensDef> getDescriptor();
 

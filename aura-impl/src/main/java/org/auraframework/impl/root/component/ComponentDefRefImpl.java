@@ -35,6 +35,7 @@ import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.impl.root.DefinitionReferenceImpl;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;

@@ -5,8 +5,8 @@
             function (cmp) {
                 var c = cmp.find("import-cmp");
                 return new Promise(function(resolve, reject) {
-                    c.getEngine(function(engine) {
-                        $A.test.assertDefined(engine, "import of 'engine' should return a defined object");
+                    c.getElement(function(element) {
+                        $A.test.assertDefined(element, "import of 'engine' element should return a defined object");
                         resolve();
                     });
                 });

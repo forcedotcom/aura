@@ -1,15 +1,15 @@
-import * as engine from 'engine';
+import { api, Element } from 'engine';
 // eslint-disable-next-line lwc/no-compat
 import aura from 'aura';
 // eslint-disable-next-line lwc/no-compat-module-storage
 import storage from 'aura-storage';
 
-export default class ImportCmp extends engine.Element {
+export default class ImportCmp extends Element {
     // @api functions are called from aura component moduleTest:importTest
 
     @api
-    getEngine(f) {
-        f(engine);
+    getElement(f) {
+        f(Element);
     }
 
     @api

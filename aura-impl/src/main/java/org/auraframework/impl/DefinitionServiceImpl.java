@@ -97,7 +97,7 @@ import com.google.common.collect.Sets;
 public class DefinitionServiceImpl implements DefinitionService {
     private static final long serialVersionUID = -2488984746420077688L;
 
-    private ContextService contextService;
+    protected ContextService contextService;
 
     private CachingService cachingService;
 

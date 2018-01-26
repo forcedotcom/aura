@@ -23,6 +23,7 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.service.ContextService;
+import org.auraframework.system.ApiVersioned;
 import org.auraframework.system.BundleSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -41,6 +42,9 @@ public abstract class BaseComponentDefFactory<T extends BaseComponentDef> extend
         }
         BaseComponentDefBuilder<T> builder = (BaseComponentDefBuilder<T>)handler.getBuilder();
         builder.setMinifyEnabled(source.isMinifyEnabled());
+        if (source instanceof ApiVersioned){
+            builder.setAPIVersion(((ApiVersioned)source).getAPIVersion());
+        }
         return builder.build();
     }
 }

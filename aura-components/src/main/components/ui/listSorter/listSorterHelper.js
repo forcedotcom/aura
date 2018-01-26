@@ -327,25 +327,27 @@
      * Update dialog size
      */
     updateSize : function(cmp) {
-    	var containerEl = cmp.find('sorterContainer').getElement(); 
-		var formfactor = $A.get("$Browser.formFactor");
-        var header = cmp.find('headerBar').getElement();
-        var menuListHeight;
-		if (formfactor !== 'DESKTOP') {
-			var viewPort = $A.util.getWindowSize();
-            menuListHeight = viewPort.height - header.offsetHeight;
-			
-			//fill up the whole screen
-			$A.util.addClass(cmp.find('sorterContainer').getElement(), formfactor);
-			containerEl.setAttribute("style", "width: " + viewPort.width + "px; height: " + viewPort.height + "px");
-			//update sorter menu size to fill up the rest of the screen with the menu list
-			cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';
-		} else {
-			//update sorter menu size to fill up the rest of the screen with the menu list
-			menuListHeight = containerEl.offsetHeight - header.offsetHeight;
+        if(cmp.isValid() && cmp.isRendered()) {
+            var containerEl = cmp.find('sorterContainer').getElement();
+            var formfactor = $A.get("$Browser.formFactor");
+            var header = cmp.find('headerBar').getElement();
+            var menuListHeight;
+            if (formfactor !== 'DESKTOP') {
+                var viewPort = $A.util.getWindowSize();
+                menuListHeight = viewPort.height - header.offsetHeight;
 
-			cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';
-		}
+                //fill up the whole screen
+                $A.util.addClass(cmp.find('sorterContainer').getElement(), formfactor);
+                containerEl.setAttribute("style", "width: " + viewPort.width + "px; height: " + viewPort.height + "px");
+                //update sorter menu size to fill up the rest of the screen with the menu list
+                cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';
+            } else {
+                //update sorter menu size to fill up the rest of the screen with the menu list
+                menuListHeight = containerEl.offsetHeight - header.offsetHeight;
+
+                cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';
+            }
+        }
     },
     
 	/**

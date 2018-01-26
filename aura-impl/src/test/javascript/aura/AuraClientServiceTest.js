@@ -1391,26 +1391,6 @@ Test.Aura.AuraClientServiceTest = function() {
     function invalidSession() {
 
         [Fact]
-        function DisablesParallelBootstrapWhenFailedToStoreToken() {
-
-            mockGlobal(function() {
-                var target = new Aura.Services.AuraClientService();
-                // Since we use document.cookie to switch parallel bootstrap,
-                // we just verify the method gets called.
-                target.disableParallelBootstrapLoadOnNextLoad = Stubs.GetMethod();
-                target.saveTokenToStorage = function() {
-                    return RejectPromise();
-                };
-
-                // Act
-                target.invalidSession("myToken");
-
-                // Assert
-                Assert.Equal(1, target.disableParallelBootstrapLoadOnNextLoad.Calls.length)
-            });
-        }
-
-        [Fact]
         function DisablesParallelBootstrapWhenGivenInvalidToken() {
 
             mockGlobal(function() {

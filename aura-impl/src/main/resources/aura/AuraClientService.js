@@ -4187,36 +4187,17 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
  * @export
  */
 AuraClientService.prototype.invalidSession = function(newToken) {
-    var self = this;
-
-    function refresh(disableParallelBootstrapLoad) {
-        if (disableParallelBootstrapLoad) {
-            self.disableParallelBootstrapLoadOnNextLoad();
-        }
-        $A.log("[AuraClientService.invalidSession]: Reloading the page.");
-        self.hardRefresh();
-    }
-
     // if new token provided then persist to storage and reload. if persisting
     // fails then we must go to the server for bootstrap.js to get a new token.
-    if ($A.util.isString(newToken) && !$A.util.isEmpty(newToken) && newToken !== this._token) {
-        if (this.tokenSharing) {
-            $A.log("[AuraClientService.invalidSession]: Token sharing enabled, attempting token update.");
-            this.setToken(newToken, false, true);
-            this.saveTokenToStorage().then(undefined, refresh.bind(null, true));
-        }
-        else {
-            this._token = newToken;
-            this.saveTokenToStorage()
-                .then(refresh.bind(null, false), refresh.bind(null, true))
-                .then(undefined, function (err) {
-                    $A.warning("AuraClientService.invalidSession(): Failed to refresh, " + err);
-                });
-        }
+    if ($A.util.isString(newToken) && !$A.util.isEmpty(newToken) && newToken !== "invalid_csrf" && newToken !== this._token) {
+        $A.log("[AuraClientService.invalidSession]: New Token provided, replacing existing token.");
+        this.setToken(newToken, true, true);
     } else {
         // refresh (to get a new session id) and force bootstrap.js to the server
         // (to get a new csrf token).
-        refresh(true);
+        this.disableParallelBootstrapLoadOnNextLoad();
+        $A.log("[AuraClientService.invalidSession]: Reloading the page.");
+        this.hardRefresh();
     }
 };
 

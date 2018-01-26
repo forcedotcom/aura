@@ -22,6 +22,7 @@
                           defaultExpiration="3600"
                           secure="false"
                           persistent="true"
+                          defaultAutoRefreshInterval="10"
                           clearStorageOnInit="false"/>
 
         <script>

@@ -2417,6 +2417,33 @@ AuraClientService.prototype.collectStorableAction = function(action, index) {
 };
 
 /**
+ * TODO: lukeis HACK! to be refactored with uri addressable defs
+ * @param response
+ * @returns {boolean}
+ */
+AuraClientService.prototype.allDefsExistOnClient = function(response, actionName) {
+    var deps = response["defDependencies"];
+    if (deps && deps.length > 0) {
+        for (var i=0, length=deps.length; i<length;i++) {
+            var descriptor = deps[i];
+
+            if ( $A.componentService.getComponentDef(descriptor) ||
+                 $A.eventService.getEventDef(descriptor) ||
+                 $A.componentService.hasLibrary(descriptor) ||
+                 $A.componentService.hasModuleDefinition(descriptor)) {
+                // we have the definition on the client! Hadanza!
+                continue;
+            }  // else
+            $A.metricsService.transaction("aura", "performance:stored-action-missing-defs", { "context": {
+                "attributes" : {"action": actionName, "missingDef": descriptor, "requiredDefs": deps}
+            }});
+            return false;
+        }
+    }
+    return true;
+};
+
+/**
  * Bulk process the storable actions collected by AuraClientService#collectStorableAction.
  * - Action storage is bulk queried for cached action results.
  * - If a cached result is found for an action then the action is processed immediately. Otherwise
@@ -2482,7 +2509,8 @@ AuraClientService.prototype.processStorableActions = function() {
 
                     for (i = 0; i < arr.length; i++) {
                         try {
-                            if (value) {
+                            // TODO FIXME HACK lukeis - remove check for allDefsExistOnClient
+                            if (value && that.allDefsExistOnClient(value, arr[i].action.def.descriptor)) {
                                 that.executeStoredAction(arr[i].action, value, that.collector.collected, arr[i].index);
                                 that.collector.actionsToCollect -= 1;
                             } else {
@@ -3413,6 +3441,44 @@ AuraClientService.prototype.processSystemError = function(auraXHR) {
     }
 };
 
+// TODO lukeis refactor for uri-defs, include uids
+AuraClientService.prototype.extractAllDefs = function(config) {
+    var configs = [];
+    if (config["componentDefs"]) {
+        configs = config["componentDefs"];
+    }
+    if (config["libraryDefs"]) {
+        configs = configs.concat(config["libraryDefs"]);
+    }
+    if (config["eventDefs"]) {
+        configs = configs.concat(config["eventDefs"]);
+    }
+    if (config["moduleDefs"]) {
+        configs = configs.concat(config["moduleDefs"]);
+    }
+
+    var retConfigs = [];
+    for (var i=0,length=configs.length; i<length; i++) {
+        if (configs[i]["descriptor"]) {
+            retConfigs.push(configs[i]["descriptor"]);
+        }
+    }
+
+    // include loaded as actions to the server "safely" assume these already exist on the client
+    var loaded = Object.keys($A.getContext().loaded);
+    for (i=0, length=loaded.length; i<length; i++) {
+        var def = loaded[i];
+        if ($A.util.isString(def)) {
+            if (def.indexOf("@") >= 0) {
+                def = def.split("@")[1];
+            }
+            retConfigs.push(def);
+        }
+    }
+
+    return retConfigs;
+};
+
 AuraClientService.prototype.processResponses = function(auraXHR, responseMessage) {
     /// ******* The order of parameters to this method matter. They are used in overrides *******
     var action, actionResponses, response, dupes;
@@ -3422,6 +3488,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
     }
     var context=$A.getContext();
     var priorAccess=this.currentAccess;
+    var allDefsInContextResponse = [];
 
     if(!priorAccess){
         this.setCurrentAccess($A.getRoot());
@@ -3431,6 +3498,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             var responseContext = responseMessage["context"];
             context['merge'](responseContext);
             $A.componentService.saveDefsToStorage(responseContext, context);
+            allDefsInContextResponse = this.extractAllDefs(responseContext);
         }
     } catch (e) {
         $A.logger.reportError(e);
@@ -3482,6 +3550,10 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             if (!action) {
                 throw new $A.auraError("Unable to find an action for "+response["id"]+": "+response);
             } else {
+                if (allDefsInContextResponse.length > 0) {
+                    action.defDependencies = allDefsInContextResponse;
+                }
+
                 actionsToPersist.push(action);
                 var key = this.actionStoreMap[action.getId()];
                 dupes = this.getAndClearDupes(key);

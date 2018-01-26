@@ -36,7 +36,7 @@
 
     <div style="background: #ccc; padding: 10px; cursor: pointer">
         <ui:inputText value="{!v.load}" /> |
-        <ui:button press="{!c.fetchCmp}" label="Fetch cmp" /> |
+        <ui:button press="{!c.fetchCmp}" label="Fetch cmp" class="fetchCmp" /> |
         <ui:button press="{!c.createComponentFromConfig}" label="$A.createComponentFromConfig" /> |
         <ui:button press="{!c.createComponent}" label="$A.createComponent" /> |
         <ui:button press="{!c.clearActionAndDefStorage}" label="Clear Caches (not loaded)" /> |

@@ -761,6 +761,9 @@ Action.prototype.updateFromResponse = function(response) {
     this.error = response["error"];
     this.storage = response["storage"];
     this.components = response["components"];
+    if (response["defDependencies"]) {
+        this.defDependencies = response["defDependencies"];
+    }
     if (this.state === "ERROR") {
         //
         // Careful now. If we get back an event from the server as part of the error,
@@ -862,6 +865,7 @@ Action.prototype.getStored = function() {
         return {
             "returnValue" : this.returnValue,
             "components" : this.components,
+            "defDependencies" : this.defDependencies,
             "state" : "SUCCESS",
             "storage" : {
                 "created" : new Date().getTime()

@@ -15,27 +15,27 @@
  */
 package org.auraframework.impl.root;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.PlatformDef;
-import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
-public abstract class PlatformDefImpl<T extends PlatformDef> extends DefinitionImpl<T> implements PlatformDef {
+public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefImpl<T> implements PlatformDef {
 
     private static final long serialVersionUID = -1067302360183554890L;
     protected final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
     protected final Double minVersion;
-    protected List<String> tags;
+    protected Set<String> tags;
 
     protected PlatformDefImpl(Builder<T> builder) {
         super(builder);
@@ -45,7 +45,7 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends DefinitionI
             this.attributeDefs = Collections.unmodifiableMap(new LinkedHashMap<>(builder.attributeDefs));
         }
         this.minVersion = builder.minVersion;
-        this.tags = builder.tags;
+        this.tags = Collections.unmodifiableSet(builder.tags);
     }
 
     @Override
@@ -61,18 +61,20 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends DefinitionI
      * @return Double value if set, null otherwise
      */
     @Override
-    public Double getMinVersion() { return this.minVersion; }
+    public Double getMinVersion() {
+        return this.minVersion;
+    }
 
     @Override
-    public List<String> getTags() {
+    public Set<String> getTags() {
         return this.tags;
     }
 
-    public abstract static class Builder<T extends PlatformDef> extends DefinitionImpl.BuilderImpl<T> {
+    public abstract static class Builder<T extends PlatformDef> extends BundleDefImpl.Builder<T> {
 
         public Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
         public Double minVersion;
-        public List<String> tags = new ArrayList();
+        public Set<String> tags = Collections.emptySet();
 
         public Builder(Class<T> defClass) {
             super(defClass);
@@ -95,8 +97,15 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends DefinitionI
             this.attributeDefs.put(defDescriptor, attributeDef);
         }
 
-        public void setTags(List<String> tags) {
+        public void setTags(Set<String> tags) {
             this.tags = tags;
+        }
+
+        public void addTag(String tag) {
+            if (tags.isEmpty()) {
+                tags = Sets.newHashSet();
+            }
+            this.tags.add(tag);
         }
 
         public void setMinVersion(Double minVersion) {

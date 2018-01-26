@@ -23,7 +23,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.EventType;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -31,10 +38,10 @@ import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-
-import com.google.common.collect.Lists;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.validation.ReferenceValidationContext;
+
+import com.google.common.collect.Lists;
 
 /**
  * The definition of an event, basically just defines shape, i.e. attributes

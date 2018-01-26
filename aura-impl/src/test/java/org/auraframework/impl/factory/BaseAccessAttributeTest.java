@@ -18,7 +18,7 @@ package org.auraframework.impl.factory;
 import javax.inject.Inject;
 
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.def.Definition;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.util.AuraTestingUtil;
 import org.auraframework.impl.util.AuraTestingUtil.BundleEntryInfo;
@@ -31,7 +31,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 @UnAdaptableTest("when run in core, we throw error with different type.")
-public abstract class BaseAccessAttributeTest<D extends RootDefinition> extends AuraImplTestCase {
+public abstract class BaseAccessAttributeTest<D extends Definition> extends AuraImplTestCase {
 
     @Inject
     protected CompilerService compilerService;

@@ -52,6 +52,7 @@ import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl.Builder;
+import org.auraframework.impl.root.component.DefRefDelegate;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
@@ -254,7 +255,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             if (componentDefRef.isFlavorable() || componentDefRef.hasFlavorableChild()) {
                 builder.setHasFlavorableChild(true);
             }
-            DefinitionReference defRef = createDefRefDelegate(componentDefRef);
+            DefinitionReference defRef = new DefRefDelegate(componentDefRef);
             body.add(defRef);
         }
     }

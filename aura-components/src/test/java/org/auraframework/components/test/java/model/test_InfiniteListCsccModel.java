@@ -15,12 +15,13 @@
  */
 package org.auraframework.components.test.java.model;
 
-import org.auraframework.system.Annotations.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
 
 @Model
 public class test_InfiniteListCsccModel {

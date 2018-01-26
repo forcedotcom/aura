@@ -15,16 +15,20 @@
  */
 package org.auraframework.http.cspinlining;
 
-import com.google.common.collect.Lists;
+import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSUPPORTED;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.auraframework.service.CSPInliningService.InlineScriptMode;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.junit.Test;
 
-import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSUPPORTED;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import com.google.common.collect.Lists;
 
 public class AuraCSPInliningServiceTest {
 

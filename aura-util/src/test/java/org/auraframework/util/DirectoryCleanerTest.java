@@ -21,7 +21,6 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;

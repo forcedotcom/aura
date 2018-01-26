@@ -15,8 +15,11 @@
  */
 package org.auraframework.integration.test;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -35,10 +38,8 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * UI test for usage of Integration Service.

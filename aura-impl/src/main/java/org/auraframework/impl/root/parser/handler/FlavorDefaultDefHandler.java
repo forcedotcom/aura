@@ -19,7 +19,7 @@ import com.google.common.collect.ImmutableSet;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.FlavorDefaultDef;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.flavor.FlavorDefaultDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
@@ -29,11 +29,12 @@ import org.auraframework.util.AuraTextUtil;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import java.util.Set;
 
 import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
 
-public class FlavorDefaultDefHandler<P extends RootDefinition> extends ParentedTagHandler<FlavorDefaultDef, P> {
+public class FlavorDefaultDefHandler extends ParentedTagHandler<FlavorDefaultDef, FlavorsDef> {
     protected static final String TAG = "aura:flavor";
     private static final String ATTRIBUTE_COMPONENT = "component";
     private static final String ATTRIBUTE_DEFAULT = "default";
@@ -44,7 +45,7 @@ public class FlavorDefaultDefHandler<P extends RootDefinition> extends ParentedT
 
     private final FlavorDefaultDefImpl.Builder builder = new FlavorDefaultDefImpl.Builder();
 
-    public FlavorDefaultDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
+    public FlavorDefaultDefHandler(FlavorsDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                    boolean isInInternalNamespace, DefinitionService definitionService,
                                    ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

@@ -39,7 +39,8 @@
 
 package org.auraframework.util.phobos.script.util;
 
-import javax.script.*;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
 
 /*
  * Abstract super class for factory implementations.

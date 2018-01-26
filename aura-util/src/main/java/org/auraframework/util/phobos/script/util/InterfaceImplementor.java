@@ -39,8 +39,12 @@
 
 package org.auraframework.util.phobos.script.util;
 
-import javax.script.*;
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+import javax.script.Invocable;
+import javax.script.ScriptException;
 
 /*
  * java.lang.reflect.Proxy based interface implementor. This is meant

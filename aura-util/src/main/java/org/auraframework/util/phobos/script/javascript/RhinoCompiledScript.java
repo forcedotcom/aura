@@ -38,9 +38,17 @@
  */
 
 package org.auraframework.util.phobos.script.javascript;
-import javax.script.*;
-import org.mozilla.javascript.*;
-import org.auraframework.util.phobos.script.util.*;
+import javax.script.CompiledScript;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+
+import org.auraframework.util.phobos.script.util.ExtendedScriptException;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.JavaScriptException;
+import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.Script;
+import org.mozilla.javascript.Scriptable;
 
 /**
  * Represents compiled JavaScript code.

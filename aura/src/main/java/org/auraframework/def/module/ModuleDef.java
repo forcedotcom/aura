@@ -15,8 +15,8 @@
  */
 package org.auraframework.def.module;
 
-import org.auraframework.def.BundleDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.PlatformDef;
 
 /**
  * Module Definition
@@ -24,7 +24,7 @@ import org.auraframework.def.DefDescriptor;
  * Extending RootDefinition in order to be used in BundleAwareDefRegistry.
  * However, RootDefinition API needs to be refactored to remove unnecessary APIs.
  */
-public interface ModuleDef extends BundleDef {
+public interface ModuleDef extends PlatformDef {
 
     enum CodeType {
         DEV, PROD, COMPAT, PROD_COMPAT
@@ -45,7 +45,7 @@ public interface ModuleDef extends BundleDef {
     String getCode(CodeType codeType);
 
     String getPath();
-    
+
     /**
      * @return serialized JSONObject with references to custom metadata
      */

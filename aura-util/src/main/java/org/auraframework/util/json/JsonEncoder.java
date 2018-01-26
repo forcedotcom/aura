@@ -15,25 +15,34 @@
  */
 package org.auraframework.util.json;
 
-import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.io.CountingOutputStream;
-import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.UncloseableOutputStream;
-import org.json.JSONObject;
-
-import javax.annotation.Nonnull;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.TimeZone;
+
+import javax.annotation.Nonnull;
+
+import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.UncloseableOutputStream;
+import org.json.JSONObject;
+
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.io.CountingOutputStream;
 
 /**
  * java -> javascript encoder.

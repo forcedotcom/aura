@@ -22,23 +22,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.builder.DocumentationDefBuilder;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DescriptionDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ExampleDef;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RequiredVersionDef;
-import org.auraframework.def.RootDefinition;
-import org.auraframework.impl.root.RootDefinitionImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
 
-public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> implements DocumentationDef {
+public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> implements DocumentationDef {
 
     private static final long serialVersionUID = 7808842576422413967L;
 
@@ -50,21 +44,6 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
 
         this.descriptionDefs = builder.descriptionMap;
         this.exampleDefs = builder.exampleMap;
-    }
-
-    @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
-        throw new UnsupportedOperationException("DocumentationDef cannot contain RegisterEventDefs.");
-    }
-
-    @Override
-    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
-        throw new UnsupportedOperationException("DocumentationDef cannot contain AttributeDefs.");
-    }
-
-    @Override
-    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
-        throw new UnsupportedOperationException("DocumentationDef cannot contain RequiredVersionDefs.");
     }
 
     @Override
@@ -99,16 +78,6 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
     }
 
     @Override
-    public List<DefDescriptor<?>> getBundle() {
-        return null;
-    }
-
-    @Override
-    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
-        return DefDescriptorImpl.compare(descriptor, other) == 0;
-    }
-
-    @Override
     public void serialize(Json json) throws IOException {
         // TODO Auto-generated method stub
     }
@@ -122,7 +91,7 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
         }
     }
 
-    public static class Builder extends RootDefinitionImpl.Builder<DocumentationDef> implements DocumentationDefBuilder {
+    public static class Builder extends DefinitionImpl.BuilderImpl<DocumentationDef> implements DocumentationDefBuilder {
         public Builder() {
             super(DocumentationDef.class);
         }

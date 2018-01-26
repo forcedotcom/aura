@@ -15,21 +15,32 @@
  */
 package org.auraframework.test.util;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.logging.Logger;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Assert;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.logging.Logger;
+import com.google.common.collect.Lists;
 
 /**
  * A place to put common UI testing specific helper methods

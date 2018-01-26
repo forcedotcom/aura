@@ -16,7 +16,13 @@
 package org.auraframework.components.test.java.model;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.def.ComponentDef;
@@ -29,11 +35,11 @@ import org.auraframework.system.Annotations.Type;
 @ServiceComponentModelInstance
 public class TestModelWithAuraTypeAnnotation implements ModelInstance{
 
-	private final InstanceService instanceService;
-	
-	public TestModelWithAuraTypeAnnotation(InstanceService instanceService) {
-		this.instanceService = instanceService;
-	}
+    private final InstanceService instanceService;
+    
+    public TestModelWithAuraTypeAnnotation(InstanceService instanceService) {
+        this.instanceService = instanceService;
+    }
 	
     /**
      * Basic data type.

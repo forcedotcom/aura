@@ -18,7 +18,6 @@ package org.auraframework.impl.root.parser.handler;
 import com.google.common.collect.ImmutableSet;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TokensDef;
 import org.auraframework.def.TokensImportDef;
 import org.auraframework.impl.css.token.TokensImportDefImpl;
@@ -33,7 +32,7 @@ import java.util.Set;
 
 import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
 
-public class TokensImportDefHandler<P extends RootDefinition> extends ParentedTagHandler<TokensImportDef, P> {
+public class TokensImportDefHandler extends ParentedTagHandler<TokensImportDef, TokensDef> {
     protected static final String TAG = "aura:import";
     private static final String ATTRIBUTE_NAME = "name";
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_DESCRIPTION);
@@ -43,7 +42,7 @@ public class TokensImportDefHandler<P extends RootDefinition> extends ParentedTa
         super();
     }
 
-    public TokensImportDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
+    public TokensImportDefHandler(TokensDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                   boolean isInInternalNamespace, DefinitionService definitionService,
                                   ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

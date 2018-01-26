@@ -15,7 +15,16 @@
  */
 package org.auraframework.impl.integration;
 
-import com.google.common.collect.ImmutableMap;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.clientlibrary.ClientLibraryService;
@@ -23,18 +32,17 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.BrowserCompatibilityService;
-import org.auraframework.service.*;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.RenderContext;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.util.json.JsonSerializer;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import com.google.common.collect.ImmutableMap;
 
 
 public class IntegrationImplTest {

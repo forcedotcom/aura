@@ -23,7 +23,7 @@ import java.io.Reader;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
-import org.auraframework.util.phobos.script.javascript.*;
+import org.auraframework.util.phobos.script.javascript.RhinoScriptEngineFactory;
 
 /**
  * Base class for validators using Rhino

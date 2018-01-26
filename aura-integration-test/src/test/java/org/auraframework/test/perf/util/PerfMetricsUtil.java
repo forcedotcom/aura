@@ -15,14 +15,21 @@
  */
 package org.auraframework.test.perf.util;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.auraframework.util.test.perf.metrics.PerfMetric;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
-import org.auraframework.util.test.perf.rdp.*;
+import org.auraframework.util.test.perf.rdp.RDPAnalyzer;
+import org.auraframework.util.test.perf.rdp.RDPNotification;
+import org.auraframework.util.test.perf.rdp.TraceEventStats;
+import org.auraframework.util.test.perf.rdp.TraceEventUtil;
 import org.json.JSONException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;

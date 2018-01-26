@@ -21,8 +21,6 @@ import org.auraframework.system.TextSource;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 
 @ServiceComponent
 public class TagsElementHandler implements ModuleMetadataXMLHandler {
@@ -33,18 +31,17 @@ public class TagsElementHandler implements ModuleMetadataXMLHandler {
     }
 
     @Override
-    public void process(XMLStreamReader reader, Builder moduleBuilder, TextSource source) throws XMLStreamException {
-        List<String> tags = new ArrayList<>();
+    public void process(XMLStreamReader reader, Builder moduleBuilder, TextSource<?> source) throws XMLStreamException {
         while (reader.hasNext()) {
             int eventType = reader.next();
             switch (eventType) {
                 case XMLStreamReader.START_ELEMENT:
                     String elementName = reader.getLocalName();
-                    if (elementName.equals("tag"))
-                        tags.add(ModuleMetadataXMLParserUtil.readCharacters(reader));
+                    if (elementName.equals("tag")) {
+                        moduleBuilder.addTag(ModuleMetadataXMLParserUtil.readCharacters(reader));
+                    }
                     break;
                 case XMLStreamReader.END_ELEMENT:
-                    moduleBuilder.setTags(tags);
                     return;
             }
         }

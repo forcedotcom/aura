@@ -26,7 +26,10 @@ public interface TokenDef extends Definition, ParentedDef {
     @Override
     DefDescriptor<TokenDef> getDescriptor();
 
-    /**
+    @Override
+    DefDescriptor<TokensDef> getParentDescriptor();
+    
+     /**
      * Gets the value of the token. This may be a String, Integer, etc... but it might also be an expression.
      */
     Object getValue();

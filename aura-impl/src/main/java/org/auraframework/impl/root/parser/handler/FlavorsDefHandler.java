@@ -34,14 +34,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.util.Set;
 
-public class FlavorsDefHandler extends RootTagHandler<FlavorsDef> {
+public class FlavorsDefHandler extends FileTagHandler<FlavorsDef> {
     protected static final String TAG = "aura:flavors";
 
     private final FlavorsDefImpl.Builder builder = new FlavorsDefImpl.Builder();
-
-    public FlavorsDefHandler() {
-        super();
-    }
 
     public FlavorsDefHandler(DefDescriptor<FlavorsDef> defDescriptor, TextSource<FlavorsDef> source,
                              XMLStreamReader xmlReader, boolean isInInternalNamespace,
@@ -82,12 +78,12 @@ public class FlavorsDefHandler extends RootTagHandler<FlavorsDef> {
         String tag = getTagName();
 
         if (FlavorIncludeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            FlavorIncludeDef def = new FlavorIncludeDefHandler<>(this, xmlReader, source, isInInternalNamespace,
+            FlavorIncludeDef def = new FlavorIncludeDefHandler(this, xmlReader, source, isInInternalNamespace,
                     definitionService, configAdapter, definitionParserAdapter).getElement();
             builder.addFlavorIncludeDef(def);
         }
         else if (FlavorDefaultDefHandler.TAG.equalsIgnoreCase(tag)) {
-            FlavorDefaultDef def = new FlavorDefaultDefHandler<>(this, xmlReader, source, isInInternalNamespace,
+            FlavorDefaultDef def = new FlavorDefaultDefHandler(this, xmlReader, source, isInInternalNamespace,
                     definitionService, configAdapter, definitionParserAdapter).getElement();
             builder.addFlavorDefaultDef(def);
         } else {

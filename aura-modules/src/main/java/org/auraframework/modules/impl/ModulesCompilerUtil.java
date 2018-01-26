@@ -15,9 +15,16 @@
  */
 package org.auraframework.modules.impl;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.auraframework.def.module.ModuleDef.CodeType;
@@ -28,7 +35,9 @@ import org.auraframework.tools.node.impl.NodeBundleBuilder;
 import org.auraframework.tools.node.impl.NodeTool;
 import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
 import org.auraframework.util.IOUtil;
-import org.json.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public final class ModulesCompilerUtil {
 

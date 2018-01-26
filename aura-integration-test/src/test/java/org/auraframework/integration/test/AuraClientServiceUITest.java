@@ -15,6 +15,16 @@
  */
 package org.auraframework.integration.test;
 
+import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSUPPORTED;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+
+import javax.inject.Inject;
+
 import org.auraframework.http.cspinlining.CSPInliningMockRule;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
@@ -30,15 +40,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import javax.inject.Inject;
-
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
-
-import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSUPPORTED;
 
 // CSRF is only stored in persistent storage. indexedDB is not supported on Safari,
 // so persistent storage is not able to be created on Safari.

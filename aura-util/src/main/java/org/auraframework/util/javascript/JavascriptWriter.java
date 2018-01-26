@@ -15,17 +15,40 @@
  */
 package org.auraframework.util.javascript;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.util.IOUtil;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.javascript.jscomp.*;
-import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
-
+import com.google.javascript.jscomp.AbstractCompiler;
+import com.google.javascript.jscomp.BasicErrorManager;
+import com.google.javascript.jscomp.CheckLevel;
+import com.google.javascript.jscomp.CommandLineRunner;
+import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
+import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
+import com.google.javascript.jscomp.CompilerPass;
+import com.google.javascript.jscomp.CustomPassExecutionTime;
+import com.google.javascript.jscomp.ErrorFormat;
+import com.google.javascript.jscomp.JSError;
+import com.google.javascript.jscomp.MessageFormatter;
+import com.google.javascript.jscomp.PropertyRenamingPolicy;
+import com.google.javascript.jscomp.Result;
+import com.google.javascript.jscomp.SourceFile;
+import com.google.javascript.jscomp.SourceMap;
+import com.google.javascript.jscomp.VariableRenamingPolicy;
+import com.google.javascript.jscomp.WarningsGuard;
 
 /**
  * Util for compressing and writing javascript.

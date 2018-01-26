@@ -24,5 +24,5 @@ import javax.xml.stream.XMLStreamReader;
 
 public interface ModuleMetadataXMLHandler {
     String handledElement();
-    void process(XMLStreamReader reader, Builder moduleBuilder, TextSource source) throws XMLStreamException, QuickFixException;
+    void process(XMLStreamReader reader, Builder moduleBuilder, TextSource<?> source) throws XMLStreamException, QuickFixException;
 }

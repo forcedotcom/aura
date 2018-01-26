@@ -15,16 +15,16 @@
  */
 package org.auraframework.integration.test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
 
 import org.auraframework.integration.test.util.TestExecutor;
 import org.auraframework.integration.test.util.TestExecutor.TestRun;
@@ -37,6 +37,11 @@ import org.auraframework.util.test.util.TestInventory.Type;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
 
 /**
  * Run all integration tests.

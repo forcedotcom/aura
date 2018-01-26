@@ -31,9 +31,10 @@ import javax.xml.stream.XMLStreamReader;
 public class FlavorsXMLParser extends XMLParser<FlavorsDef> {
     @Override
     protected FlavorsDefHandler getHandler(DefDescriptor<FlavorsDef> descriptor,
-                                           TextSource<FlavorsDef> source, XMLStreamReader xmlReader,
-                                           boolean isInInternalNamespace, DefinitionService definitionService,
-                                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) throws QuickFixException {
+            TextSource<FlavorsDef> source, XMLStreamReader xmlReader,
+            boolean isInInternalNamespace, DefinitionService definitionService,
+            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter)
+            throws QuickFixException {
         return new FlavorsDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
                 configAdapter, definitionParserAdapter);
     }

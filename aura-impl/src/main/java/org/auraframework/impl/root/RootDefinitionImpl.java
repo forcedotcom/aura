@@ -39,7 +39,7 @@ import java.util.Set;
 /**
  * Shared definition code between component and event definition.
  */
-public abstract class RootDefinitionImpl<T extends RootDefinition> extends BundleDefImpl<T> implements RootDefinition {
+public abstract class RootDefinitionImpl<T extends RootDefinition> extends PlatformDefImpl<T> implements RootDefinition {
 
     private static final long serialVersionUID = 2885495270950386878L;
     protected final Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs;
@@ -97,7 +97,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Bundl
         return hashCode;
     }
 
-    public abstract static class Builder<T extends RootDefinition> extends BundleDefImpl.Builder<T> implements
+    public abstract static class Builder<T extends RootDefinition> extends PlatformDefImpl.Builder<T> implements
     RootDefinitionBuilder<T> {
 
         public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs;

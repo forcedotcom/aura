@@ -21,7 +21,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.ParentedDef;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -138,7 +137,7 @@ public class AccessChecker {
 
         if (def instanceof ParentedDef) {
             ParentedDef parentedDef = (ParentedDef) def;
-            DefDescriptor<? extends RootDefinition> parentDescriptor = parentedDef.getParentDescriptor();
+            DefDescriptor<?> parentDescriptor = parentedDef.getParentDescriptor();
             namespace = parentDescriptor.getNamespace();
             target = String.format("%s:%s.%s", namespace, parentDescriptor.getName(), desc.getName());
         } else {

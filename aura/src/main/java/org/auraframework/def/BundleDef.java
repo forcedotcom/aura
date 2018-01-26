@@ -17,7 +17,7 @@ package org.auraframework.def;
 
 import java.util.Map;
 
-public interface BundleDef extends PlatformDef {
+public interface BundleDef extends Definition {
 
     @Override
     DefDescriptor<? extends BundleDef> getDescriptor();

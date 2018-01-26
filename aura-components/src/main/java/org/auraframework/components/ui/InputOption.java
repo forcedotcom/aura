@@ -17,7 +17,11 @@ package org.auraframework.components.ui;
 
 import java.io.IOException;
 
-import org.auraframework.data.*;
+import org.auraframework.data.HasDisabled;
+import org.auraframework.data.HasLabel;
+import org.auraframework.data.HasName;
+import org.auraframework.data.HasSelected;
+import org.auraframework.data.HasValue;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 

@@ -15,6 +15,14 @@
  */
 package org.auraframework.http.cspinlining;
 
+import static org.auraframework.service.CSPInliningService.InlineScriptMode.NONCE;
+import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSAFEINLINE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -22,12 +30,6 @@ import org.auraframework.service.CSPInliningService.InlineScriptMode;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.junit.Test;
-
-import static org.auraframework.service.CSPInliningService.InlineScriptMode.NONCE;
-import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSAFEINLINE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.mockito.Mockito.*;
 
 public class CSPInliningAISRuleTest {
     @Test

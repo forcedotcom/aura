@@ -18,6 +18,7 @@ package org.auraframework.impl.css.token;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,6 @@ import org.auraframework.Aura;
 import org.auraframework.builder.TokensDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
@@ -352,32 +352,12 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
     }
 
     @Override
-    public void serialize(Json json) throws IOException {}
-
-    @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
-        return null; // events not supported here
-    }
-
-    @Override
-    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
-        return other.getDefType().equals(DefType.TOKENS) && descriptor.equals(other);
-    }
-
-    @Override
-    public List<DefDescriptor<?>> getBundle() {
-        return Lists.newArrayList();
-    }
-
-    @Override
-    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
-        throw new UnsupportedOperationException("TokensDef cannot contain RequiredVersionDefs.");
-    }
-
-    @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
-        throw new UnsupportedOperationException("TokensDef cannot contain AttributeDefs.");
+        return Collections.emptyMap();
     }
+
+    @Override
+    public void serialize(Json json) throws IOException {}
 
     @Override
     public int hashCode() {
@@ -466,5 +446,25 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
         public TokensDefImpl build() {
             return new TokensDefImpl(this);
         }
+    }
+
+    @Override
+    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
+        return false;
+    }
+
+    @Override
+    public List<DefDescriptor<?>> getBundle() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
+        return Collections.emptyMap();
     }
 }

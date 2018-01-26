@@ -15,16 +15,108 @@
  */
 package org.auraframework.impl.util;
 
-// import constants
-
-import org.auraframework.impl.util.UserAgent.UA;
+import static org.auraframework.impl.util.BrowserConsts.BROWSER_UNKNOWN;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_ANDROID;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_ANDROID_VERSION_BASE;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_DARWIN_CFNETWORK;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_IPAD;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_IPHONE;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_LINUX;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC_68K;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC_OSX;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC_PPC;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_PALM;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_RIM;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_SUN;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_SUN_4;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_SUN_5;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_SUN_I86;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_SYMBIAN;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_UNKNOWN;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_7;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_7_5;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_8;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_8_1;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_2K;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_2K3;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_3_1;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_7;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_8;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_8_1;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_95;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_98;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_CE;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_ME;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_NT;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_RT;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_RT_8_1;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_VISTA;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_XP;
+import static org.auraframework.impl.util.UserAgent.VERSIONED_CUTOFF;
+import static org.auraframework.impl.util.UserAgent.UA.ANDROID;
+import static org.auraframework.impl.util.UserAgent.UA.ANDROID_MOBILE;
+import static org.auraframework.impl.util.UserAgent.UA.ARM;
+import static org.auraframework.impl.util.UserAgent.UA.BLACKBERRY;
+import static org.auraframework.impl.util.UserAgent.UA.BLACKBERRY10_AND_ABOVE;
+import static org.auraframework.impl.util.UserAgent.UA.BLAZER;
+import static org.auraframework.impl.util.UserAgent.UA.DARWIN;
+import static org.auraframework.impl.util.UserAgent.UA.EPOC;
+import static org.auraframework.impl.util.UserAgent.UA.I86;
+import static org.auraframework.impl.util.UserAgent.UA.INUX;
+import static org.auraframework.impl.util.UserAgent.UA.IPAD;
+import static org.auraframework.impl.util.UserAgent.UA.IPHONE;
+import static org.auraframework.impl.util.UserAgent.UA.IPOD;
+import static org.auraframework.impl.util.UserAgent.UA.MAC;
+import static org.auraframework.impl.util.UserAgent.UA.MAC68000;
+import static org.auraframework.impl.util.UserAgent.UA.MAC68K;
+import static org.auraframework.impl.util.UserAgent.UA.NOKIA;
+import static org.auraframework.impl.util.UserAgent.UA.OSX;
+import static org.auraframework.impl.util.UserAgent.UA.OS_X;
+import static org.auraframework.impl.util.UserAgent.UA.PALM;
+import static org.auraframework.impl.util.UserAgent.UA.PHONE;
+import static org.auraframework.impl.util.UserAgent.UA.POWERPC;
+import static org.auraframework.impl.util.UserAgent.UA.PPC;
+import static org.auraframework.impl.util.UserAgent.UA.SUNOS;
+import static org.auraframework.impl.util.UserAgent.UA.SUNOS_4;
+import static org.auraframework.impl.util.UserAgent.UA.SUNOS_5;
+import static org.auraframework.impl.util.UserAgent.UA.SYMBIAN;
+import static org.auraframework.impl.util.UserAgent.UA.SYMBOS;
+import static org.auraframework.impl.util.UserAgent.UA.TRIDENT;
+import static org.auraframework.impl.util.UserAgent.UA.TRIDENT_3_1;
+import static org.auraframework.impl.util.UserAgent.UA.TRIDENT_4;
+import static org.auraframework.impl.util.UserAgent.UA.WIN;
+import static org.auraframework.impl.util.UserAgent.UA.WINCE;
+import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_16_BIT;
+import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_3_1;
+import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_95;
+import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_98;
+import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_CE;
+import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_NT;
+import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_PHONE_8;
+import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_PHONE_8_1;
+import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_PHONE_OS_7;
+import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_PHONE_OS_7_5;
+import static org.auraframework.impl.util.UserAgent.UA.WIN_16_BIT;
+import static org.auraframework.impl.util.UserAgent.UA.WIN_2K;
+import static org.auraframework.impl.util.UserAgent.UA.WIN_2K3;
+import static org.auraframework.impl.util.UserAgent.UA.WIN_7;
+import static org.auraframework.impl.util.UserAgent.UA.WIN_8;
+import static org.auraframework.impl.util.UserAgent.UA.WIN_8_1;
+import static org.auraframework.impl.util.UserAgent.UA.WIN_95;
+import static org.auraframework.impl.util.UserAgent.UA.WIN_98;
+import static org.auraframework.impl.util.UserAgent.UA.WIN_ME;
+import static org.auraframework.impl.util.UserAgent.UA.WIN_NT;
+import static org.auraframework.impl.util.UserAgent.UA.WIN_VISTA;
+import static org.auraframework.impl.util.UserAgent.UA.WIN_XP;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.auraframework.impl.util.BrowserConsts.*;
-import static org.auraframework.impl.util.UserAgent.UA.*;
-import static org.auraframework.impl.util.UserAgent.VERSIONED_CUTOFF;
+// import constants
+
+import org.auraframework.impl.util.UserAgent.UA;
 
 /**
  * Utility to parse and handle browser user-agent Strings.

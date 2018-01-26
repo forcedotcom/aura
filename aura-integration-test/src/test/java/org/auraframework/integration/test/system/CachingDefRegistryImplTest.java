@@ -21,13 +21,11 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
-import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.CachingDefRegistryImpl;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;

@@ -15,7 +15,9 @@
  */
 package org.auraframework.test.perf.util;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 // Immutable Java bean to serialize/deserialize json config
 // This must exactly match the config param names

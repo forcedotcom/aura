@@ -39,7 +39,9 @@
 
 package org.auraframework.util.phobos.script.util;
 
-import java.util.*;
+import java.util.AbstractSet;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Entry set implementation for Bindings implementations

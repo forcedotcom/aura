@@ -16,7 +16,14 @@
 ({
     afterRender : function(cmp){
         //set id attribute for aria-controls
-    	cmp.find("tabBody").getElement().setAttribute("id", cmp.getGlobalId());
+        var tabBodyCmp = cmp.find("tabBody");
+        if (tabBodyCmp && tabBodyCmp.isValid()) {  
+            var element = tabBodyCmp.getElement();
+            if (element) {
+                element.setAttribute("id", cmp.getGlobalId());
+            }
+        }
+
         this.superAfterRender();
     }
 })// eslint-disable-line semi

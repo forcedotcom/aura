@@ -1027,7 +1027,7 @@
                 <plugin>
                     <groupId>org.auraframework</groupId>
                     <artifactId>tools-maven-plugin</artifactId>
-                    <version>0.3.0</version>
+                    <version>0.5.0</version>
                     <configuration>
                         <arguments>
                             <argument>${eslint.extra.arg}</argument>

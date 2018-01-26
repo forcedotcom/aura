@@ -117,7 +117,7 @@ export default class SanityChecks extends Element {
     @api
     testSetTimeoutNonFunctionParamExploit() {
         try {
-            setTimeout({ bind: () => { // eslint-disable-line lwc/no-set-timeout
+            setTimeout({ bind: () => {
                 return () => {
                     alert(this); // eslint-disable-line no-alert
                 };

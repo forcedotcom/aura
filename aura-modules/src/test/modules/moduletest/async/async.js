@@ -2,7 +2,7 @@ import { Element } from 'engine';
 
 function resolveAfter1Sec(x) {
     return new Promise(resolve => {
-        setTimeout(() => { // eslint-disable-line lwc/no-set-timeout
+        setTimeout(() => {
             resolve(x);
         }, 1000);
     });

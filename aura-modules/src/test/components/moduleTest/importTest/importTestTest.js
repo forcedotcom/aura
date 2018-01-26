@@ -42,5 +42,20 @@
                 });
             }
         ]
+    },
+
+    testImportedLibIsCallableFromConstructor: {
+        browsers : [ 'GOOGLECHROME' ],
+        test: [
+            function (cmp) {
+                var c = cmp.find("import-cmp");
+                return new Promise(function(resolve, reject) {
+                    c.getLibImport(function(libImport) {
+                        $A.test.assertEquals("expected", libImport, "Unexpected value returned from function call of imported library call");
+                        resolve();
+                    });
+                });
+            }
+        ]
     }
 })

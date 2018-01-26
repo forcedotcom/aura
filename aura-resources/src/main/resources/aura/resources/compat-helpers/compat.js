@@ -1,8 +1,7 @@
 /* proxy-compat */
-/*
- * Copyright (C) 2018 Salesforce, inc.
+/**
+ * Copyright (C) 2017 salesforce.com, inc.
  */
-
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -17,6 +16,7 @@ function __extends(d, b) {
 
 var ArrayConcat$2 = Array.prototype.concat;
 var getOwnPropertyNames = Object.getOwnPropertyNames;
+var _hasOwnProperty = Object.hasOwnProperty;
 function patchedGetOwnPropertyNames(replicaOrAny) {
     if (isCompatProxy(replicaOrAny)) {
         return replicaOrAny.ownKeys().filter(function (key) { return key.constructor !== Symbol; }); // TODO: only strings
@@ -49,6 +49,12 @@ function patchedAssign(replicaOrAny) {
     }
     return to;
 }
+function compatHasOwnProperty(key) {
+    if (isCompatProxy(this)) {
+        return !!this.getOwnPropertyDescriptor(key);
+    }
+    return _hasOwnProperty.call(this, key);
+}
 
 // RFC4122 version 4 uuid
 var ProxySlot = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -67,9 +73,9 @@ var getPrototypeOf$2 = Object.getPrototypeOf;
 var setPrototypeOf$1 = Object.setPrototypeOf;
 var getOwnPropertyDescriptor$1 = Object.getOwnPropertyDescriptor;
 var preventExtensions$1 = Object.preventExtensions;
-var _a$1 = Array.prototype;
-var ArraySlice$1 = _a$1.slice;
-var ArrayUnshift$1 = _a$1.unshift;
+var _a$2 = Array.prototype;
+var ArraySlice$2 = _a$2.slice;
+var ArrayUnshift$2 = _a$2.unshift;
 var isArray$1 = Array.isArray;
 // Proto chain check might be needed because of usage of a limited polyfill
 // https://github.com/es-shims/get-own-property-symbols
@@ -187,7 +193,7 @@ var XProxy = /** @class */ (function () {
         if (targetIsFunction) {
             proxy = function Proxy() {
                 var usingNew = (this && this.constructor === proxy);
-                var args = ArraySlice$1.call(arguments);
+                var args = ArraySlice$2.call(arguments);
                 if (usingNew) {
                     return proxy.construct(args, this);
                 }
@@ -202,8 +208,8 @@ var XProxy = /** @class */ (function () {
                     if (throwRevoked) {
                         throw new TypeError("Cannot perform '" + trapName + "' on a proxy that has been revoked");
                     }
-                    var args = ArraySlice$1.call(arguments);
-                    ArrayUnshift$1.call(args, target);
+                    var args = ArraySlice$2.call(arguments);
+                    ArrayUnshift$2.call(args, target);
                     var h = handler[trapName] ? handler : defaultHandlerTraps;
                     var value = h[trapName].apply(h, args);
                     if (proxyTrapFalsyErrors[trapName] && value === false) {
@@ -320,6 +326,27 @@ var XProxy = /** @class */ (function () {
             revoke: lastRevokeFn,
         };
     };
+    XProxy.prototype.push = function () {
+        var push = this.get('push');
+        if (push === Array.prototype.push) {
+            push = compatPush;
+        }
+        return push.apply(this, arguments);
+    };
+    XProxy.prototype.concat = function () {
+        var concat = this.get('concat');
+        if (concat === Array.prototype.concat) {
+            concat = compatConcat;
+        }
+        return concat.apply(this, arguments);
+    };
+    XProxy.prototype.unshift = function () {
+        var unshift = this.get('unshift');
+        if (unshift === Array.prototype.unshift) {
+            unshift = compatUnshift;
+        }
+        return unshift.apply(this, arguments);
+    };
     return XProxy;
 }());
 
@@ -339,7 +366,14 @@ function defaultHasInstance(instance, Type) {
     return false;
 }
 function isCompatProxy(replicaOrAny) {
-    return replicaOrAny && replicaOrAny[ProxySlot] === ProxyIdentifier;
+    try {
+        return replicaOrAny && replicaOrAny[ProxySlot] === ProxyIdentifier;
+    }
+    catch (e) {
+        // some objects (iframe.contentWindow for example) throw an error trying
+        // to access random properties
+        return false;
+    }
 }
 var getKey = function (replicaOrAny, key) {
     return isCompatProxy(replicaOrAny) ?
@@ -402,29 +436,11 @@ function instanceOfKey(instance, Type) {
     return Type[Symbol.hasInstance](instance);
 }
 
-function setPrototypeOf$2(obj, proto) {
-    obj.__proto__ = proto;
-    return obj;
-}
-
-if (!Object.setPrototypeOf || !({ __proto__: [] } instanceof Array)) {
-    Object.setPrototypeOf = setPrototypeOf$2;
-}
-var _keys = Object.keys;
-var _hasOwnProperty = Object.hasOwnProperty;
-var _getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-var _preventExtensions = Object.preventExtensions;
-var _defineProperty = Object.defineProperty;
-var _isExtensible = Object.isExtensible;
-var _getPrototypeOf = Object.getPrototypeOf;
-var _setPrototypeOf = Object.setPrototypeOf;
 var _isArray = Array.isArray;
-var _a = Array.prototype;
-var ArrayShift = _a.shift;
-var ArraySlice = _a.slice;
-var ArrayUnshift = _a.unshift;
-var ArrayPush = _a.push;
-var ArrayConcat = _a.concat;
+var _a$1 = Array.prototype;
+var ArraySlice$1 = _a$1.slice;
+var ArrayShift$1 = _a$1.shift;
+var ArrayUnshift$1 = _a$1.unshift;
 // Patched Functions:
 function isArray(replicaOrAny) {
     if (isCompatProxy(replicaOrAny)) {
@@ -432,15 +448,28 @@ function isArray(replicaOrAny) {
     }
     return _isArray(replicaOrAny);
 }
+// http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.7
+function compatPush() {
+    var O = Object(this);
+    var n = O.length;
+    var items = ArraySlice$1.call(arguments);
+    while (items.length) {
+        var E = ArrayShift$1.call(items);
+        setKey(O, n, E);
+        n += 1;
+    }
+    O.length = n;
+    return O.length;
+}
 // http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.4
 function compatConcat() {
     var O = Object(this);
     var A = [];
     var N = 0;
-    var items = ArraySlice.call(arguments);
-    ArrayUnshift.call(items, O);
+    var items = ArraySlice$1.call(arguments);
+    ArrayUnshift$1.call(items, O);
     while (items.length) {
-        var E = ArrayShift.call(items);
+        var E = ArrayShift$1.call(items);
         if (isArray(E)) {
             var k = 0;
             var length = E.length;
@@ -465,7 +494,7 @@ function compatUnshift() {
     while (k > 0) {
         var from = k - 1;
         var to = k + argCount - 1;
-        var fromPresent = hasOwnProperty.call(O, from);
+        var fromPresent = compatHasOwnProperty.call(O, from);
         if (fromPresent) {
             var fromValue = O[from];
             setKey(O, to, fromValue);
@@ -476,28 +505,31 @@ function compatUnshift() {
         k -= 1;
     }
     var j = 0;
-    var items = ArraySlice.call(arguments);
+    var items = ArraySlice$1.call(arguments);
     while (items.length) {
-        var E = ArrayShift.call(items);
+        var E = ArrayShift$1.call(items);
         setKey(O, j, E);
         j += 1;
     }
     O.length = len + argCount;
     return O.length;
 }
-// http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.7
-function compatPush() {
-    var O = Object(this);
-    var n = O.length;
-    var items = ArraySlice.call(arguments);
-    while (items.length) {
-        var E = ArrayShift.call(items);
-        setKey(O, n, E);
-        n += 1;
-    }
-    O.length = n;
-    return O.length;
+
+function setPrototypeOf$2(obj, proto) {
+    obj.__proto__ = proto;
+    return obj;
 }
+
+if (!Object.setPrototypeOf || !({ __proto__: [] } instanceof Array)) {
+    Object.setPrototypeOf = setPrototypeOf$2;
+}
+var _keys = Object.keys;
+var _getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+var _preventExtensions = Object.preventExtensions;
+var _defineProperty = Object.defineProperty;
+var _isExtensible = Object.isExtensible;
+var _getPrototypeOf = Object.getPrototypeOf;
+var _setPrototypeOf = Object.setPrototypeOf;
 function keys(replicaOrAny) {
     if (isCompatProxy(replicaOrAny)) {
         var all = replicaOrAny.forIn(); // get all enumerables and filter by own
@@ -548,17 +580,11 @@ function defineProperty(replicaOrAny, key, descriptor) {
     }
     return _defineProperty(replicaOrAny, key, descriptor);
 }
-function hasOwnProperty(key) {
-    if (isCompatProxy(this)) {
-        return !!this.getOwnPropertyDescriptor(key);
-    }
-    return _hasOwnProperty.call(this, key);
-}
 // patches
 // [*] Object.prototype.hasOwnProperty should be patched as a general rule
 // [ ] Object.propertyIsEnumerable should be patched
 // [*] Array.isArray
-Object.prototype.hasOwnProperty = hasOwnProperty;
+Object.prototype.hasOwnProperty = compatHasOwnProperty;
 Array.isArray = isArray;
 // trap `preventExtensions` can be covered by a patched version of:
 // [*] Object.preventExtensions()
@@ -622,33 +648,12 @@ FinalProxy.deleteKey = deleteKey;
 FinalProxy.inKey = inKey;
 FinalProxy.iterableKey = iterableKey;
 FinalProxy.instanceOfKey = instanceOfKey;
-FinalProxy.compatPush = function (replicaOrAny) {
-    var originalPush = getKey(replicaOrAny, 'push');
-    var args = ArraySlice.call(arguments, 1);
-    return originalPush === ArrayPush ?
-        compatPush.apply(replicaOrAny, args) :
-        originalPush.apply(replicaOrAny, args);
-};
-FinalProxy.compatUnshift = function (replicaOrAny) {
-    var originalUnshift = getKey(replicaOrAny, 'unshift');
-    var args = ArraySlice.call(arguments, 1);
-    return originalUnshift === ArrayUnshift ?
-        compatUnshift.apply(replicaOrAny, args) :
-        originalUnshift.apply(replicaOrAny, args);
-};
-FinalProxy.compatConcat = function (replicaOrAny) {
-    var originalConcat = getKey(replicaOrAny, 'concat');
-    var args = ArraySlice.call(arguments, 1);
-    return originalConcat === ArrayConcat ?
-        compatConcat.apply(replicaOrAny, args) :
-        originalConcat.apply(replicaOrAny, args);
-};
 var FinalProxy$1 = FinalProxy;
 
 return FinalProxy$1;
 
 })));
-/** version: 0.16.8 */
+/** version: 0.17.11 */
 
 /* Transformed Polyfills + Babel helpers */
 // THIS POLYFILL HAS BEEN MODIFIED FROM THE SOURCE
@@ -4692,13 +4697,12 @@ __setKey(module, "exports", function (bitmap, value) {
 "use strict";
 /* WEBPACK VAR INJECTION */(function(module) {
 
-var __compatConcat = window.Proxy.compatConcat;
 var __setKey = window.Proxy.setKey;
 var __callKey = window.Proxy.callKey;
 var id = 0;
 var px = Math.random();
 __setKey(module, 'exports', function (key) {
-  return __compatConcat('Symbol(', key === undefined ? '' : key, ')_', __callKey(++id + px, 'toString', 36));
+  return 'Symbol('.concat(key === undefined ? '' : key, ')_', __callKey(++id + px, 'toString', 36));
 });
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
 
@@ -5053,11 +5057,10 @@ __setKey(module, 'exports', Object.create || function create(O, Properties) {
 "use strict";
 
 
-var __compatConcat = window.Proxy.compatConcat;
 var __setKey = window.Proxy.setKey;
 // 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
 var $keys = __webpack_require__(48);
-var hiddenKeys = __compatConcat(__webpack_require__(34), 'length', 'prototype');
+var hiddenKeys = __webpack_require__(34).concat('length', 'prototype');
 
 __setKey(exports, 'f', Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
   return $keys(O, hiddenKeys);
@@ -5263,7 +5266,6 @@ __setKey(exports, 'f', __webpack_require__(3));
 "use strict";
 /* WEBPACK VAR INJECTION */(function(module) {
 
-var __compatPush = window.Proxy.compatPush;
 var __setKey = window.Proxy.setKey;
 var __iterableKey = window.Proxy.iterableKey;
 var __getKey = window.Proxy.getKey;
@@ -5278,11 +5280,11 @@ __setKey(module, 'exports', function (object, names) {
   var result = [];
   var key;
   for (key in __iterableKey(O)) {
-    if (key != IE_PROTO) has(O, key) && __compatPush(result, key);
+    if (key != IE_PROTO) has(O, key) && result.push(key);
   } // Don't enum bug & hidden keys
   while (__getKey(names, 'length') > i) {
     if (has(O, key = __getKey(names, i++))) {
-      ~arrayIndexOf(result, key) || __compatPush(result, key);
+      ~arrayIndexOf(result, key) || result.push(key);
     }
   }return result;
 });
@@ -5594,7 +5596,7 @@ __setKey(module, 'exports', {
       // 23.1.3.5 Map.prototype.forEach(callbackfn, thisArg = undefined)
       forEach: function forEach(callbackfn /* , that = undefined */) {
         validate(this, NAME);
-        var f = ctx(callbackfn, __getKey(arguments, 'length') > 1 ? __getKey(arguments, 1) : undefined, 3);
+        var f = ctx(callbackfn, arguments.length > 1 ? arguments[1] : undefined, 3);
         var entry;
         while (entry = entry ? __getKey(entry, 'n') : __getKey(this, '_f')) {
           f(__getKey(entry, 'v'), __getKey(entry, 'k'), this);
@@ -5680,7 +5682,6 @@ __setKey(module, 'exports', {
 "use strict";
 /* WEBPACK VAR INJECTION */(function(module) {
 
-var __compatPush = window.Proxy.compatPush;
 var __setKey = window.Proxy.setKey;
 var __getKey = window.Proxy.getKey;
 var __inKey = window.Proxy.inKey;
@@ -5726,7 +5727,7 @@ __setKey(module, 'exports', function (TYPE, $create) {
               case 6:
                 return index; // findIndex
               case 2:
-                __compatPush(result, val); // filter
+                result.push(val); // filter
             } else if (IS_EVERY) return false; // every
         }
       }
@@ -5742,7 +5743,6 @@ __setKey(module, 'exports', function (TYPE, $create) {
 "use strict";
 /* WEBPACK VAR INJECTION */(function(module) {
 
-var __compatPush = window.Proxy.compatPush;
 var __getKey = window.Proxy.getKey;
 var __setKey = window.Proxy.setKey;
 var __callKey = window.Proxy.callKey;
@@ -5782,7 +5782,7 @@ __setKey(UncaughtFrozenStore, 'prototype', {
   },
   set: function set(key, value) {
     var entry = findUncaughtFrozen(this, key);
-    if (entry) __setKey(entry, 1, value);else __compatPush(__getKey(this, 'a'), [key, value]);
+    if (entry) __setKey(entry, 1, value);else __getKey(this, 'a').push([key, value]);
   },
   'delete': function _delete(key) {
     var index = arrayFindIndex(__getKey(this, 'a'), function (it) {
@@ -5838,7 +5838,6 @@ __setKey(module, 'exports', {
 "use strict";
 /* WEBPACK VAR INJECTION */(function(module) {
 
-var __compatPush = window.Proxy.compatPush;
 var __getKey = window.Proxy.getKey;
 var __setKey = window.Proxy.setKey;
 var __callKey = window.Proxy.callKey;
@@ -5855,7 +5854,7 @@ __setKey(module, 'exports', function (isEntries) {
     var key;
     while (length > i) {
       if (__callKey(isEnum, 'call', O, key = __getKey(keys, i++))) {
-        __compatPush(result, isEntries ? [key, __getKey(O, key)] : __getKey(O, key));
+        result.push(isEntries ? [key, __getKey(O, key)] : __getKey(O, key));
       }
     }return result;
   };
@@ -5900,7 +5899,6 @@ module.exports = __webpack_require__(105);
 
 // ECMAScript 6 symbols shim
 
-var __compatPush = window.Proxy.compatPush;
 var __getKey = window.Proxy.getKey;
 var __deleteKey = window.Proxy.deleteKey;
 var __setKey = window.Proxy.setKey;
@@ -6026,7 +6024,7 @@ var $getOwnPropertyNames = function getOwnPropertyNames(it) {
   var i = 0;
   var key;
   while (__getKey(names, 'length') > i) {
-    if (!has(AllSymbols, key = __getKey(names, i++)) && key != HIDDEN && key != META) __compatPush(result, key);
+    if (!has(AllSymbols, key = __getKey(names, i++)) && key != HIDDEN && key != META) result.push(key);
   }return result;
 };
 var $getOwnPropertySymbols = function getOwnPropertySymbols(it) {
@@ -6036,7 +6034,7 @@ var $getOwnPropertySymbols = function getOwnPropertySymbols(it) {
   var i = 0;
   var key;
   while (__getKey(names, 'length') > i) {
-    if (has(AllSymbols, key = __getKey(names, i++)) && (IS_OP ? has(ObjectProto, key) : true)) __compatPush(result, __getKey(AllSymbols, key));
+    if (has(AllSymbols, key = __getKey(names, i++)) && (IS_OP ? has(ObjectProto, key) : true)) result.push(__getKey(AllSymbols, key));
   }return result;
 };
 
@@ -6044,7 +6042,7 @@ var $getOwnPropertySymbols = function getOwnPropertySymbols(it) {
 if (!USE_NATIVE) {
   $Symbol = function _Symbol() {
     if (__instanceOfKey(this, $Symbol)) throw TypeError('Symbol is not a constructor!');
-    var tag = uid(__getKey(arguments, 'length') > 0 ? __getKey(arguments, 0) : undefined);
+    var tag = uid(arguments.length > 0 ? arguments[0] : undefined);
     var $set = function $set(value) {
       if (this === ObjectProto) __callKey($set, 'call', OPSymbols, value);
       if (has(this, HIDDEN) && has(__getKey(this, HIDDEN), tag)) __setKey(__getKey(this, HIDDEN), tag, false);
@@ -6128,8 +6126,8 @@ $JSON && $export(__getKey($export, 'S') + __getKey($export, 'F') * (!USE_NATIVE 
     var args = [it];
     var i = 1;
     var replacer, $replacer;
-    while (__getKey(arguments, 'length') > i) {
-      __compatPush(args, __getKey(arguments, i++));
+    while (arguments.length > i) {
+      args.push(arguments[i++]);
     }replacer = __getKey(args, 1);
     if (typeof replacer == 'function') $replacer = replacer;
     if ($replacer || !isArray(replacer)) replacer = function replacer(key, value) {
@@ -6193,7 +6191,6 @@ __setKey(module, 'exports', function (name) {
 "use strict";
 /* WEBPACK VAR INJECTION */(function(module) {
 
-var __compatPush = window.Proxy.compatPush;
 var __setKey = window.Proxy.setKey;
 var __getKey = window.Proxy.getKey;
 var __callKey = window.Proxy.callKey;
@@ -6210,7 +6207,7 @@ __setKey(module, 'exports', function (it) {
     var i = 0;
     var key;
     while (__getKey(symbols, 'length') > i) {
-      if (__callKey(isEnum, 'call', it, key = __getKey(symbols, i++))) __compatPush(result, key);
+      if (__callKey(isEnum, 'call', it, key = __getKey(symbols, i++))) result.push(key);
     }
   }return result;
 });
@@ -6470,13 +6467,13 @@ $export(__getKey($export, 'S') + __getKey($export, 'F') * !__webpack_require__(5
   from: function from(arrayLike /* , mapfn = undefined, thisArg = undefined */) {
     var O = toObject(arrayLike);
     var C = typeof this == 'function' ? this : Array;
-    var aLen = __getKey(arguments, 'length');
-    var mapfn = aLen > 1 ? __getKey(arguments, 1) : undefined;
+    var aLen = arguments.length;
+    var mapfn = aLen > 1 ? arguments[1] : undefined;
     var mapping = mapfn !== undefined;
     var index = 0;
     var iterFn = getIterFn(O);
     var length, result, step, iterator;
-    if (mapping) mapfn = ctx(mapfn, aLen > 2 ? __getKey(arguments, 2) : undefined, 2);
+    if (mapping) mapfn = ctx(mapfn, aLen > 2 ? arguments[2] : undefined, 2);
     // if object isn't iterable or it's array with default iterator - use simple case
     if (iterFn != undefined && !(C == Array && isArrayIter(iterFn))) {
       for (iterator = __callKey(iterFn, 'call', O), result = new C(); !__getKey(step = __callKey(iterator, 'next'), 'done'); index++) {
@@ -6551,10 +6548,10 @@ $export(__getKey($export, 'S') + __getKey($export, 'F') * __webpack_require__(6)
   // 22.1.2.3 Array.of( ...items)
   of: function of() /* ...args */{
     var index = 0;
-    var aLen = __getKey(arguments, 'length');
+    var aLen = arguments.length;
     var result = new (typeof this == 'function' ? this : Array)(aLen);
     while (aLen > index) {
-      createProperty(result, index, __getKey(arguments, index++));
+      createProperty(result, index, arguments[index++]);
     }__setKey(result, 'length', aLen);
     return result;
   }
@@ -6596,7 +6593,7 @@ __setKey(module, 'exports', __getKey([], 'copyWithin') || function copyWithin(ta
   var len = toLength(__getKey(O, 'length'));
   var to = toAbsoluteIndex(target, len);
   var from = toAbsoluteIndex(start, len);
-  var end = __getKey(arguments, 'length') > 2 ? __getKey(arguments, 2) : undefined;
+  var end = arguments.length > 2 ? arguments[2] : undefined;
   var count = Math.min((end === undefined ? len : toAbsoluteIndex(end, len)) - from, len - to);
   var inc = 1;
   if (from < to && to < from + count) {
@@ -6643,9 +6640,9 @@ var toLength = __webpack_require__(18);
 __setKey(module, 'exports', function fill(value /* , start = 0, end = @length */) {
   var O = toObject(this);
   var length = toLength(__getKey(O, 'length'));
-  var aLen = __getKey(arguments, 'length');
-  var index = toAbsoluteIndex(aLen > 1 ? __getKey(arguments, 1) : undefined, length);
-  var end = aLen > 2 ? __getKey(arguments, 2) : undefined;
+  var aLen = arguments.length;
+  var index = toAbsoluteIndex(aLen > 1 ? arguments[1] : undefined, length);
+  var end = aLen > 2 ? arguments[2] : undefined;
   var endPos = end === undefined ? length : toAbsoluteIndex(end, length);
   while (endPos > index) {
     __setKey(O, index++, value);
@@ -6661,8 +6658,8 @@ __setKey(module, 'exports', function fill(value /* , start = 0, end = @length */
 /* WEBPACK VAR INJECTION */(function(module) {
 
 var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
 var __callKey = window.Proxy.callKey;
+var __getKey = window.Proxy.getKey;
 var strong = __webpack_require__(58);
 var validate = __webpack_require__(19);
 var MAP = 'Map';
@@ -6670,7 +6667,7 @@ var MAP = 'Map';
 // 23.1 Map Objects
 __setKey(module, 'exports', __webpack_require__(26)(MAP, function (get) {
   return function Map() {
-    return get(this, __getKey(arguments, 'length') > 0 ? __getKey(arguments, 0) : undefined);
+    return get(this, arguments.length > 0 ? arguments[0] : undefined);
   };
 }, {
   // 23.1.3.6 Map.prototype.get(key)
@@ -6911,7 +6908,6 @@ __setKey(module, 'exports', {
 /* WEBPACK VAR INJECTION */(function(module) {
 
 var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
 var __callKey = window.Proxy.callKey;
 var strong = __webpack_require__(58);
 var validate = __webpack_require__(19);
@@ -6920,7 +6916,7 @@ var SET = 'Set';
 // 23.2 Set Objects
 __setKey(module, 'exports', __webpack_require__(26)(SET, function (get) {
   return function Set() {
-    return get(this, __getKey(arguments, 'length') > 0 ? __getKey(arguments, 0) : undefined);
+    return get(this, arguments.length > 0 ? arguments[0] : undefined);
   };
 }, {
   // 23.2.3.1 Set.prototype.add(value)
@@ -6957,7 +6953,7 @@ var InternalMap;
 
 var wrapper = function wrapper(get) {
   return function WeakMap() {
-    return get(this, __getKey(arguments, 'length') > 0 ? __getKey(arguments, 0) : undefined);
+    return get(this, arguments.length > 0 ? arguments[0] : undefined);
   };
 };
 
@@ -7053,7 +7049,6 @@ __setKey(module, 'exports', function (original) {
 /* WEBPACK VAR INJECTION */(function(module) {
 // 19.1.2.1 Object.assign(target, source, ...)
 
-var __compatConcat = window.Proxy.compatConcat;
 var __setKey = window.Proxy.setKey;
 var __callKey = window.Proxy.callKey;
 var __getKey = window.Proxy.getKey;
@@ -7079,13 +7074,13 @@ __setKey(module, 'exports', !$assign || __webpack_require__(6)(function () {
 }) ? function assign(target, source) {
   // eslint-disable-line no-unused-vars
   var T = toObject(target);
-  var aLen = __getKey(arguments, 'length');
+  var aLen = arguments.length;
   var index = 1;
   var getSymbols = __getKey(gOPS, 'f');
   var isEnum = __getKey(pIE, 'f');
   while (aLen > index) {
-    var S = IObject(__getKey(arguments, index++));
-    var keys = getSymbols ? __compatConcat(getKeys(S), getSymbols(S)) : getKeys(S);
+    var S = IObject(arguments[index++]);
+    var keys = getSymbols ? getKeys(S).concat(getSymbols(S)) : getKeys(S);
     var length = __getKey(keys, 'length');
     var j = 0;
     var key;
@@ -7103,7 +7098,6 @@ __setKey(module, 'exports', !$assign || __webpack_require__(6)(function () {
 "use strict";
 
 
-var __getKey = window.Proxy.getKey;
 var __callKey = window.Proxy.callKey;
 var weak = __webpack_require__(60);
 var validate = __webpack_require__(19);
@@ -7112,7 +7106,7 @@ var WEAK_SET = 'WeakSet';
 // 23.4 WeakSet Objects
 __webpack_require__(26)(WEAK_SET, function (get) {
   return function WeakSet() {
-    return get(this, __getKey(arguments, 'length') > 0 ? __getKey(arguments, 0) : undefined);
+    return get(this, arguments.length > 0 ? arguments[0] : undefined);
   };
 }, {
   // 23.4.3.1 WeakSet.prototype.add(value)
@@ -7135,7 +7129,7 @@ var $includes = __webpack_require__(50)(true);
 
 $export(__getKey($export, 'P'), 'Array', {
   includes: function includes(el /* , fromIndex = 0 */) {
-    return $includes(this, el, __getKey(arguments, 'length') > 1 ? __getKey(arguments, 1) : undefined);
+    return $includes(this, el, arguments.length > 1 ? arguments[1] : undefined);
   }
 });
 
@@ -7179,7 +7173,6 @@ $export(__getKey($export, 'S'), 'Object', {
 "use strict";
 /* WEBPACK VAR INJECTION */(function(module) {
 
-var __compatConcat = window.Proxy.compatConcat;
 var __getKey = window.Proxy.getKey;
 var __setKey = window.Proxy.setKey;
 var __callKey = window.Proxy.callKey;
@@ -7191,7 +7184,7 @@ var Reflect = __getKey(__webpack_require__(4), 'Reflect');
 __setKey(module, 'exports', Reflect && __getKey(Reflect, 'ownKeys') || function ownKeys(it) {
   var keys = __callKey(gOPN, 'f', anObject(it));
   var getSymbols = __getKey(gOPS, 'f');
-  return getSymbols ? __compatConcat(keys, getSymbols(it)) : keys;
+  return getSymbols ? keys.concat(getSymbols(it)) : keys;
 });
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
 
@@ -7232,8 +7225,7 @@ $export(__getKey($export, 'S'), 'Object', {
 });
 
 /***/ })
-/******/ ]);var __compatPush = window.Proxy.compatPush;
-var __setKey = window.Proxy.setKey;
+/******/ ]);var __setKey = window.Proxy.setKey;
 var __getKey = window.Proxy.getKey;
 var __callKey = window.Proxy.callKey;
 var __instanceOfKey = window.Proxy.instanceOfKey;
@@ -7523,8 +7515,8 @@ var __deleteKey = window.Proxy.deleteKey;
   });
 
   __setKey(babelHelpers, "extends", Object.assign || function (target) {
-    for (var i = 1; i < __getKey(arguments, "length"); i++) {
-      var source = __getKey(arguments, i);
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
 
       for (var key in __iterableKey(source)) {
         if (__callKey(__getKey(Object.prototype, "hasOwnProperty"), "call", source, key)) {
@@ -7646,7 +7638,7 @@ var __deleteKey = window.Proxy.deleteKey;
 
       try {
         for (var _i = __callKey(arr, Symbol.iterator), _s; !(_n = __getKey(_s = __callKey(_i, "next"), "done")); _n = true) {
-          __compatPush(_arr, __getKey(_s, "value"));
+          _arr.push(__getKey(_s, "value"));
 
           if (i && __getKey(_arr, "length") === i) break;
         }
@@ -8022,7 +8014,7 @@ var __deleteKey = window.Proxy.deleteKey;
         __setKey(entry, "afterLoc", __getKey(locs, 3));
       }
 
-      __compatPush(__getKey(this, "tryEntries"), entry);
+      __getKey(this, "tryEntries").push(entry);
     }
 
     function resetTryEntry(entry) {
@@ -8044,7 +8036,7 @@ var __deleteKey = window.Proxy.deleteKey;
       var keys = [];
 
       for (var key in __iterableKey(object)) {
-        __compatPush(keys, key);
+        keys.push(key);
       }
 
       __callKey(keys, "reverse");

@@ -1,7 +1,6 @@
-/*
-     * Copyright (C) 2017 salesforce.com, inc.
-     */
-    
+/**
+ * Copyright (C) 2017 salesforce.com, inc.
+ */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -17,7 +16,7 @@ function establishContext(ctx) {
 
 const { freeze, seal, keys, create, assign, defineProperty, getPrototypeOf, setPrototypeOf, getOwnPropertyDescriptor, getOwnPropertyNames, defineProperties, getOwnPropertySymbols, hasOwnProperty, preventExtensions, isExtensible, } = Object;
 const { isArray } = Array;
-const { concat: ArrayConcat, filter: ArrayFilter, slice: ArraySlice, splice: ArraySplice, indexOf: ArrayIndexOf, push: ArrayPush, map: ArrayMap, forEach, } = Array.prototype;
+const { concat: ArrayConcat, filter: ArrayFilter, slice: ArraySlice, splice: ArraySplice, unshift: ArrayUnshift, indexOf: ArrayIndexOf, push: ArrayPush, map: ArrayMap, forEach, } = Array.prototype;
 function isUndefined(obj) {
     return obj === undefined;
 }
@@ -37,20 +36,7 @@ function isString(obj) {
 // this list was compiled from https://msdn.microsoft.com/en-us/library/ms533062(v=vs.85).aspx
 // and https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes
 // Note: this list most be in sync with the compiler as well.
-const HTMLPropertyNamesWithLowercasedReflectiveAttributes = [
-    'accessKey',
-    'readOnly',
-    'tabIndex',
-    'bgColor',
-    'colSpan',
-    'rowSpan',
-    'contentEditable',
-    'dateTime',
-    'formAction',
-    'isMap',
-    'maxLength',
-    'useMap',
-];
+
 // Global HTML Attributes & Properties
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes
 // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement
@@ -81,19 +67,11 @@ function addCallbackToNextTick(callback) {
 const attrNameToPropNameMap = create(null);
 
 /**
- * This dictionary contains the mapping between property names
- * and the corresponding attribute name. This helps to trigger observable attributes.
+ * This method maps between property names
+ * and the corresponding attribute name.
  */
-const propNameToAttributeNameMap = {
-    // these are exceptions to the rule that cannot be inferred via `CAPS_REGEX`
-    className: 'class',
-    htmlFor: 'for',
-};
-// Few more exceptions where the attribute name matches the property in lowercase.
-HTMLPropertyNamesWithLowercasedReflectiveAttributes.forEach((propName) => {
-    propNameToAttributeNameMap[propName] = propName.toLowerCase();
-});
 
+const usesNativeSymbols = typeof Symbol() === 'symbol';
 function noop() { }
 const classNameToClassMap = create(null);
 function getMapFromClassName(className) {
@@ -143,7 +121,7 @@ function invokeServiceHook(vm, cbs) {
 
 let idx = 0;
 let uid = 0;
-const OwnerKey = Symbol('key');
+const OwnerKey = usesNativeSymbols ? Symbol('key') : '$$OwnerKey$$';
 function addInsertionIndex(vm) {
     vm.idx = ++idx;
     const { connected } = Services;
@@ -183,10 +161,8 @@ function createVM(vnode) {
         cmpSlots: undefined,
         cmpEvents: undefined,
         cmpListener: undefined,
-        cmpClasses: undefined,
         cmpTemplate: undefined,
         cmpRoot: undefined,
-        classListObj: undefined,
         component: undefined,
         vnode,
         shadowVNode: createShadowRootVNode(elm, []),
@@ -206,18 +182,69 @@ function relinkVM(vm, vnode) {
     vm.vnode = vnode;
 }
 function rehydrate(vm) {
-    if (vm.idx && vm.isDirty) {
-        const children = renderComponent(vm);
+    if (vm.idx > 0 && vm.isDirty) {
+        const children = renderComponent(vm).filter((child) => { return child; });
         vm.isScheduled = false;
         patchShadowRoot(vm, children);
-        const { rendered } = Services;
-        if (rendered) {
-            invokeServiceHook(vm, rendered);
+        processPostPatchCallbacks(vm);
+    }
+}
+function patchErrorBoundaryVm(errorBoundaryVm) {
+    const children = renderComponent(errorBoundaryVm).filter((child) => { return child; });
+    const { vnode: { elm }, shadowVNode: oldShadowVNode } = errorBoundaryVm;
+    errorBoundaryVm.isScheduled = false;
+    // patch function mutates and returns newShadowVNode object,
+    // however, if patching fails we don't get a return value which
+    // contains partial changes to the vnode. These changes are mandatory
+    // for successful patching, therefore we preserve newShadowVNode reference
+    // prior calling patch
+    const newShadowVNode = createShadowRootVNode(elm, children);
+    errorBoundaryVm.shadowVNode = newShadowVNode;
+    // patch failures are caught in flushRehydrationQueue
+    patch(oldShadowVNode, newShadowVNode);
+    processPostPatchCallbacks(errorBoundaryVm);
+}
+function patchShadowRoot(vm, children) {
+    let error;
+    const { shadowVNode: oldShadowVNode } = vm;
+    // patch function mutates and returns newShadowVNode object,
+    // however, if patching fails we don't get a return value which
+    // contains partial changes to the vnode. These changes are mandatory
+    // for successful patching, therefore we preserve newShadowVNode reference
+    // prior calling patch
+    const newShadowVNode = createShadowRootVNode(vm.vnode.elm, children);
+    vm.shadowVNode = newShadowVNode;
+    try {
+        patch(oldShadowVNode, newShadowVNode);
+    }
+    catch (e) {
+        error = Object(e);
+    }
+    finally {
+        if (!isUndefined(error)) {
+            const errorBoundaryVm = getErrorBoundaryVMFromOwnElement(vm);
+            if (errorBoundaryVm) {
+                recoverFromLifecyleError(vm, errorBoundaryVm, error);
+                // syncronously render error boundary's alternative view
+                // to recover in the same tick
+                if (errorBoundaryVm.isDirty) {
+                    patchErrorBoundaryVm(errorBoundaryVm);
+                }
+            }
+            else {
+                throw error; // eslint-disable-line no-unsafe-finally
+            }
         }
-        const { component: { renderedCallback } } = vm;
-        if (renderedCallback && renderedCallback !== noop) {
-            invokeComponentMethod(vm, 'renderedCallback');
-        }
+    }
+}
+function processPostPatchCallbacks(vm) {
+    const { rendered } = Services;
+    if (rendered) {
+        invokeServiceHook(vm, rendered);
+    }
+    const { component: { renderedCallback } } = vm;
+    if (renderedCallback && renderedCallback !== noop) {
+        invokeComponentMethod(vm, 'renderedCallback');
     }
 }
 let rehydrateQueue = [];
@@ -225,7 +252,56 @@ function flushRehydrationQueue() {
     const vms = rehydrateQueue.sort((a, b) => a.idx > b.idx);
     rehydrateQueue = []; // reset to a new queue
     for (let i = 0, len = vms.length; i < len; i += 1) {
-        rehydrate(vms[i]);
+        const vm = vms[i];
+        try {
+            rehydrate(vm);
+        }
+        catch (error) {
+            const errorBoundaryVm = getErrorBoundaryVMFromParentElement(vm);
+            // we only recover if error boundary is present in the hierarchy
+            if (errorBoundaryVm) {
+                recoverFromLifecyleError(vm, errorBoundaryVm, error);
+                if (errorBoundaryVm.isDirty) {
+                    patchErrorBoundaryVm(errorBoundaryVm);
+                }
+            }
+            else {
+                if (i + 1 < len) {
+                    // pieces of the queue are still pending to be rehydrated, those should have priority
+                    if (rehydrateQueue.length === 0) {
+                        addCallbackToNextTick(flushRehydrationQueue);
+                    }
+                    ArrayUnshift.apply(rehydrateQueue, ArraySlice.call(vms, i + 1));
+                }
+                // rethrowing the original error will break the current tick, but since the next tick is
+                // already scheduled, it should continue patching the rest.
+                throw error; // eslint-disable-line no-unsafe-finally
+            }
+        }
+    }
+}
+function recoverFromLifecyleError(failedVm, errorBoundaryVm, error) {
+    if (isUndefined(error.wcStack)) {
+        error.wcStack = getComponentStack(failedVm);
+    }
+    resetShadowRoot(failedVm); // remove offenders
+    invokeComponentMethod(errorBoundaryVm, 'errorCallback', [error, error.wcStack]);
+}
+function resetShadowRoot(vm) {
+    const { vnode, vnode: { elm }, shadowVNode: oldShadowVNode } = vm;
+    // patch function mutates and returns newShadowVNode object,
+    // however, if patching fails we don't get a return value which
+    // contains partial changes to the vnode. These changes are mandatory
+    // for successful patching, therefore we preserve newShadowVNode reference
+    // prior calling patch
+    const newShadowVNode = createShadowRootVNode(elm, []);
+    vm.shadowVNode = newShadowVNode;
+    try {
+        patch(oldShadowVNode, newShadowVNode);
+    }
+    catch (e) {
+        vnode.children = [];
+        vnode.elm.innerHTML = "";
     }
 }
 function scheduleRehydration(vm) {
@@ -258,10 +334,41 @@ function createShadowRootVNode(elm, children) {
     };
     return vnode;
 }
-function patchShadowRoot(vm, children) {
-    const { shadowVNode: oldShadowVNode } = vm;
-    const shadowVNode = createShadowRootVNode(vm.vnode.elm, children);
-    vm.shadowVNode = patch(oldShadowVNode, shadowVNode);
+function getErrorBoundaryVMFromParentElement(vm) {
+    const { vnode: { elm } } = vm;
+    const parentElm = elm && elm.parentElement;
+    return getErrorBoundaryVM(parentElm);
+}
+function getErrorBoundaryVMFromOwnElement(vm) {
+    const { vnode: { elm } } = vm;
+    return getErrorBoundaryVM(elm);
+}
+function getErrorBoundaryVM(startingElement) {
+    let elm = startingElement;
+    let vm = null;
+    while (!isNull(elm)) {
+        // @ts-ignore
+        vm = elm[ViewModelReflection];
+        if (!isUndefined(vm) && !isUndefined(vm.component.errorCallback)) {
+            return vm;
+        }
+        // TODO: if shadowDOM start preventing this walking process, we will
+        // need to find a different way to find the right boundary
+        elm = elm.parentElement;
+    }
+    return null;
+}
+function getComponentStack(vm) {
+    const wcStack = [];
+    let elm = vm.vnode.elm;
+    do {
+        const vm = elm[ViewModelReflection];
+        if (!isUndefined(vm)) {
+            wcStack.push(vm.component.toString());
+        }
+        elm = elm.parentElement;
+    } while (elm);
+    return wcStack.reverse().join('\n\t');
 }
 
 const TargetToReactiveRecordMap = new WeakMap();
@@ -308,7 +415,7 @@ const TargetSlot = Symbol();
 const MembraneSlot = Symbol();
 function isReplicable(value) {
     const type = typeof value;
-    return value && (type === 'object' || type === 'function');
+    return value && (type === 'object' || type === 'function') && !(value instanceof HTMLIFrameElement);
 }
 function getReplica(membrane, value) {
     if (isNull(value)) {
@@ -369,9 +476,25 @@ class Membrane {
 // TODO: we are using a funky and leaky abstraction here to try to identify if
 // the proxy is a compat proxy, and define the unwrap method accordingly.
 const { getKey } = Proxy;
-const unwrap = getKey ?
-    (replicaOrAny) => (replicaOrAny && getKey(replicaOrAny, TargetSlot)) || replicaOrAny
-    : (replicaOrAny) => (replicaOrAny && replicaOrAny[TargetSlot]) || replicaOrAny;
+function safeUnwrapCompat(replicaOrAny) {
+    try {
+        return (replicaOrAny && getKey(replicaOrAny, TargetSlot)) || replicaOrAny;
+    }
+    catch (e) {
+        // Issue #867 - guard against errors during property access
+        return replicaOrAny;
+    }
+}
+function safeUnwrap(replicaOrAny) {
+    try {
+        return (replicaOrAny && replicaOrAny[TargetSlot]) || replicaOrAny;
+    }
+    catch (e) {
+        // Issue #867 - guard against errors during property access
+        return replicaOrAny;
+    }
+}
+const unwrap = getKey ? safeUnwrapCompat : safeUnwrap;
 
 /*eslint-enable*/
 const ReactiveMap = new WeakMap();
@@ -627,6 +750,12 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
         },
         set(newValue) {
             const vm = this[ViewModelReflection];
+            if (vm.vnode.isRoot || isBeingConstructed(vm)) {
+                vmBeingUpdated = vm;
+                const observable = isObservable(newValue);
+                newValue = observable ? getReactiveProxy(newValue) : newValue;
+                
+            }
             if (vmBeingUpdated === vm) {
                 // not need to wrap or check the value since that is happening somewhere else
                 vmBeingUpdated = null; // releasing the lock
@@ -637,14 +766,7 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
                     notifyListeners(this, key);
                 }
             }
-            else if (isBeingConstructed(vm)) {
-                const observable = isObservable(newValue);
-                newValue = observable ? getReactiveProxy(newValue) : newValue;
-                vm.cmpProps[key] = newValue;
-            }
-            else {
-                
-            }
+            else {}
         },
         enumerable: descriptor ? descriptor.enumerable : true,
     });
@@ -659,121 +781,25 @@ function createPublicAccessorDescriptor(proto, key, descriptor) {
         },
         set(newValue) {
             const vm = this[ViewModelReflection];
-            if (!isBeingConstructed(vm) && vmBeingUpdated !== vm) {
-                return;
-            }
-            vmBeingUpdated = null; // releasing the lock
-            if (set) {
-                set.call(this, newValue);
-            }
-            else {
+            if (vm.vnode.isRoot || isBeingConstructed(vm)) {
+                vmBeingUpdated = vm;
+                const observable = isObservable(newValue);
+                newValue = observable ? getReactiveProxy(newValue) : newValue;
                 
             }
+            if (vmBeingUpdated === vm) {
+                // not need to wrap or check the value since that is happening somewhere else
+                vmBeingUpdated = null; // releasing the lock
+                if (set) {
+                    set.call(this, newValue);
+                }
+                else {}
+            }
+            else {}
         },
         enumerable,
     });
 }
-
-function getLinkedElement$1(classList) {
-    return classList[ViewModelReflection].vnode.elm;
-}
-// This needs some more work. ClassList is a weird DOM api because it
-// is a TokenList, but not an Array. For now, we are just implementing
-// the simplest one.
-// https://www.w3.org/TR/dom/#domtokenlist
-function ClassList(vm) {
-    defineProperty(this, ViewModelReflection, {
-        value: vm,
-        writable: false,
-        enumerable: false,
-        configurable: false,
-    });
-}
-ClassList.prototype = {
-    add() {
-        const vm = this[ViewModelReflection];
-        const { cmpClasses } = vm;
-        const elm = getLinkedElement$1(this);
-        // Add specified class values. If these classes already exist in attribute of the element, then they are ignored.
-        forEach.call(arguments, (className) => {
-            className = className + '';
-            if (!cmpClasses[className]) {
-                cmpClasses[className] = true;
-                // this is not only an optimization, it is also needed to avoid adding the same
-                // class twice when the initial diffing algo kicks in without an old vm to track
-                // what was already added to the DOM.
-                if (vm.idx || vm.vnode.isRoot) {
-                    // we intentionally make a sync mutation here and also keep track of the mutation
-                    // for a possible rehydration later on without having to rehydrate just now.
-                    elm.classList.add(className);
-                }
-            }
-        });
-    },
-    remove() {
-        const vm = this[ViewModelReflection];
-        const { cmpClasses, vnode } = vm;
-        const elm = getLinkedElement$1(this);
-        // Remove specified class values.
-        forEach.call(arguments, (className) => {
-            className = className + '';
-            if (cmpClasses[className]) {
-                cmpClasses[className] = false;
-                // this is not only an optimization, it is also needed to avoid removing the same
-                // class twice when the initial diffing algo kicks in without an old vm to track
-                // what was already added to the DOM.
-                if (vm.idx || vnode.isRoot) {
-                    // we intentionally make a sync mutation here when needed and also keep track of the mutation
-                    // for a possible rehydration later on without having to rehydrate just now.
-                    const ownerClass = vnode.data.class;
-                    // This is only needed if the owner is not forcing that class to be present in case of conflicts.
-                    if (isUndefined(ownerClass) || !ownerClass[className]) {
-                        elm.classList.remove(className);
-                    }
-                }
-            }
-        });
-    },
-    item(index) {
-        const vm = this[ViewModelReflection];
-        const { cmpClasses } = vm;
-        // Return class value by index in collection.
-        return getOwnPropertyNames(cmpClasses)
-            .filter((className) => cmpClasses[className + ''])[index] || null;
-    },
-    toggle(className, force) {
-        const vm = this[ViewModelReflection];
-        const { cmpClasses } = vm;
-        // When only one argument is present: Toggle class value; i.e., if class exists then remove it and return false, if not, then add it and return true.
-        // When a second argument is present: If the second argument evaluates to true, add specified class value, and if it evaluates to false, remove it.
-        if (arguments.length > 1) {
-            if (force) {
-                this.add(className);
-            }
-            else if (!force) {
-                this.remove(className);
-            }
-            return !!force;
-        }
-        if (cmpClasses[className]) {
-            this.remove(className);
-            return false;
-        }
-        this.add(className);
-        return true;
-    },
-    contains(className) {
-        const vm = this[ViewModelReflection];
-        const { cmpClasses } = vm;
-        // Checks if specified class value exists in class attribute of the element.
-        return !!cmpClasses[className];
-    },
-    toString() {
-        const vm = this[ViewModelReflection];
-        const { cmpClasses } = vm;
-        return getOwnPropertyNames(cmpClasses).filter((className) => cmpClasses[className + '']).join(' ');
-    }
-};
 
 /* eslint-enable */
 function piercingHook(membrane, target, key, value) {
@@ -830,19 +856,19 @@ function pierce(vm, value) {
 }
 
 const { querySelector, querySelectorAll } = Element.prototype;
-function getLinkedElement$2(root) {
+function getLinkedElement$1(root) {
     return root[ViewModelReflection].vnode.elm;
 }
 function shadowRootQuerySelector(shadowRoot, selector) {
     const vm = shadowRoot[ViewModelReflection];
-    const elm = getLinkedElement$2(shadowRoot);
+    const elm = getLinkedElement$1(shadowRoot);
     pierce(vm, elm);
     const querySelector = piercingHook(vm.membrane, elm, 'querySelector', elm.querySelector);
     return querySelector.call(elm, selector);
 }
 function shadowRootQuerySelectorAll(shadowRoot, selector) {
     const vm = shadowRoot[ViewModelReflection];
-    const elm = getLinkedElement$2(shadowRoot);
+    const elm = getLinkedElement$1(shadowRoot);
     pierce(vm, elm);
     const querySelectorAll = piercingHook(vm.membrane, elm, 'querySelectorAll', elm.querySelectorAll);
     return querySelectorAll.call(elm, selector);
@@ -1006,15 +1032,7 @@ ComponentElement.prototype = {
         elm.tabIndex = value;
     },
     get classList() {
-        const vm = this[ViewModelReflection];
-        let { classListObj } = vm;
-        // lazy creation of the ClassList Object the first time it is accessed.
-        if (isUndefined(classListObj)) {
-            vm.cmpClasses = {};
-            classListObj = new ClassList(vm);
-            vm.classListObj = classListObj;
-        }
-        return classListObj;
+        return getLinkedElement(this).classList;
     },
     get root() {
         const vm = this[ViewModelReflection];
@@ -1109,22 +1127,12 @@ function createComponentDef(Ctor) {
 }
 function createGetter(key) {
     return function () {
-        const vm = this[ViewModelReflection];
-        return vm.component[key];
+        return this[ViewModelReflection].component[key];
     };
 }
 function createSetter(key) {
     return function (newValue) {
-        const vm = this[ViewModelReflection];
-        // logic for setting new properties of the element directly from the DOM
-        // will only be allowed for root elements created via createElement()
-        if (!vm.vnode.isRoot) {
-            return;
-        }
-        const observable = isObservable(newValue);
-        newValue = observable ? getReactiveProxy(newValue) : newValue;
-        prepareForPropUpdate(vm);
-        vm.component[key] = newValue;
+        this[ViewModelReflection].component[key] = newValue;
     };
 }
 function createMethodCaller(key) {
@@ -1133,29 +1141,54 @@ function createMethodCaller(key) {
         return vm.component[key].apply(vm.component, ArraySlice.call(arguments));
     };
 }
-const { getAttribute, setAttribute, removeAttribute } = Element.prototype;
+const { getAttribute, getAttributeNS, setAttribute, setAttributeNS, removeAttribute, removeAttributeNS } = Element.prototype;
 function getAttributePatched(attrName) {
     return getAttribute.apply(this, ArraySlice.call(arguments));
 }
 function setAttributePatched(attrName, newValue) {
     const vm = this[ViewModelReflection];
-    const { def: { observedAttrs } } = vm;
-    const oldValue = getAttribute.call(this, attrName);
+    const isObserved = isAttrObserved(vm, attrName);
+    const oldValue = isObserved ? getAttribute.call(this, attrName) : null;
     setAttribute.apply(this, ArraySlice.call(arguments));
-    newValue = getAttribute.call(this, attrName);
-    if (!isNull(attrName) && attrName in observedAttrs && oldValue !== newValue) {
-        invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
+    if (isObserved) {
+        newValue = getAttribute.call(this, attrName);
+        if (oldValue !== newValue) {
+            invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
+        }
+    }
+}
+function setAttributeNSPatched(attrNameSpace, attrName, newValue) {
+    const vm = this[ViewModelReflection];
+    const isObserved = isAttrObserved(vm, attrName);
+    const oldValue = isObserved ? getAttributeNS.call(this, attrNameSpace, attrName) : null;
+    setAttributeNS.apply(this, ArraySlice.call(arguments));
+    if (isObserved) {
+        newValue = getAttributeNS.call(this, attrNameSpace, attrName);
+        if (oldValue !== newValue) {
+            invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
+        }
     }
 }
 function removeAttributePatched(attrName) {
     const vm = this[ViewModelReflection];
-    const { def: { observedAttrs } } = vm;
-    const oldValue = getAttribute.call(this, attrName);
+    const isObserved = isAttrObserved(vm, attrName);
+    const oldValue = isObserved ? getAttribute.call(this, attrName) : null;
     removeAttribute.apply(this, ArraySlice.call(arguments));
-    const newValue = getAttribute.call(this, attrName);
-    if (!isNull(attrName) && attrName in observedAttrs && oldValue !== newValue) {
-        invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
+    if (isObserved && oldValue !== null) {
+        invokeComponentAttributeChangedCallback(vm, attrName, oldValue, null);
     }
+}
+function removeAttributeNSPatched(attrNameSpace, attrName) {
+    const vm = this[ViewModelReflection];
+    const isObserved = isAttrObserved(vm, attrName);
+    const oldValue = isObserved ? getAttributeNS.call(this, attrNameSpace, attrName) : null;
+    removeAttributeNS.apply(this, ArraySlice.call(arguments));
+    if (isObserved && oldValue !== null) {
+        invokeComponentAttributeChangedCallback(vm, attrName, oldValue, null);
+    }
+}
+function isAttrObserved(vm, attrName) {
+    return attrName in vm.def.observedAttrs;
 }
 
 function createDescriptorMap(publicProps, publicMethodsConfig) {
@@ -1169,8 +1202,16 @@ function createDescriptorMap(publicProps, publicMethodsConfig) {
             value: setAttributePatched,
             configurable: true,
         },
+        setAttributeNS: {
+            value: setAttributeNSPatched,
+            configurable: true,
+        },
         removeAttribute: {
             value: removeAttributePatched,
+            configurable: true,
+        },
+        removeAttributeNS: {
+            value: removeAttributeNSPatched,
             configurable: true,
         },
     };
@@ -1310,12 +1351,15 @@ function invokeComponentCallback(vm, fn, fnCtx, args) {
         result = fn.apply(fnCtx, args);
     }
     catch (e) {
-        error = e;
+        error = Object(e);
     }
-    establishContext(ctx);
-    if (error) {
-        error.wcStack = getComponentStack(vm);
-        throw error; // rethrowing the original error after restoring the context
+    finally {
+        establishContext(ctx);
+        if (error) {
+            error.wcStack = getComponentStack(vm);
+            // rethrowing the original error annotated after restoring the context
+            throw error; // eslint-disable-line no-unsafe-finally
+        }
     }
     return result;
 }
@@ -1332,12 +1376,15 @@ function invokeComponentConstructor(vm, Ctor) {
         component = new Ctor();
     }
     catch (e) {
-        error = e;
+        error = Object(e);
     }
-    establishContext(ctx);
-    if (error) {
-        error.wcStack = getComponentStack(vm);
-        throw error; // rethrowing the original error after restoring the context
+    finally {
+        establishContext(ctx);
+        if (error) {
+            error.wcStack = getComponentStack(vm);
+            // rethrowing the original error annotated after restoring the context
+            throw error; // eslint-disable-line no-unsafe-finally
+        }
     }
     return component;
 }
@@ -1360,49 +1407,22 @@ function invokeComponentRenderMethod(vm) {
         }
     }
     catch (e) {
-        error = e;
+        error = Object(e);
     }
-    isRendering = isRenderingInception;
-    vmBeingRendered = vmBeingRenderedInception;
-    establishContext(ctx);
-    if (error) {
-        error.wcStack = getComponentStack(vm);
-        throw error; // rethrowing the original error after restoring the context
+    finally {
+        establishContext(ctx);
+        isRendering = isRenderingInception;
+        vmBeingRendered = vmBeingRenderedInception;
+        if (error) {
+            error.wcStack = getComponentStack(vm);
+            // rethrowing the original error annotated after restoring the context
+            throw error; // eslint-disable-line no-unsafe-finally
+        }
     }
     return result || [];
 }
 function invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue) {
-    const { component, context } = vm;
-    const { attributeChangedCallback } = component;
-    if (isUndefined(attributeChangedCallback)) {
-        return;
-    }
-    const ctx = currentContext;
-    establishContext(context);
-    let error;
-    try {
-        component.attributeChangedCallback(attrName, oldValue, newValue);
-    }
-    catch (e) {
-        error = e;
-    }
-    establishContext(ctx);
-    if (error) {
-        error.wcStack = getComponentStack(vm);
-        throw error; // rethrowing the original error after restoring the context
-    }
-}
-function getComponentStack(vm) {
-    const wcStack = [];
-    let elm = vm.vnode.elm;
-    do {
-        const vm = elm[ViewModelReflection];
-        if (!isUndefined(vm)) {
-            wcStack.push(vm.component.toString());
-        }
-        elm = elm.parentElement;
-    } while (elm);
-    return wcStack.reverse().join('\n\t');
+    invokeComponentCallback(vm, vm.component.attributeChangedCallback, vm.component, [attrName, oldValue, newValue]);
 }
 
 /*eslint-enable*/
@@ -1637,7 +1657,7 @@ function c(sel, Ctor, data) {
     if (Ctor.__circular__) {
         Ctor = Ctor();
     }
-    const { key, slotset, styleMap, style, on, className, classMap, props: _props } = data;
+    const { key, slotset, styleMap, style, on, className, classMap, props } = data;
     let { attrs } = data;
     // hack to allow component authors to force the usage of the "is" attribute in their components
     const { forceTagName } = Ctor;
@@ -1646,7 +1666,7 @@ function c(sel, Ctor, data) {
         attrs.is = sel;
         sel = forceTagName;
     }
-    data = { hook: lifeCycleHooks, key, slotset, attrs, on, _props };
+    data = { hook: lifeCycleHooks, key, slotset, attrs, on, props };
     data.class = classMap || (className && getMapFromClassName(className));
     data.style = styleMap || (style && style + '');
     return v(sel, data, EmptyArray, undefined, undefined, Ctor);
@@ -2117,48 +2137,6 @@ var componentInit = {
     update: initializeComponent,
 };
 
-function syncProps(oldVnode, vnode) {
-    const { vm } = vnode;
-    if (isUndefined(vm)) {
-        return;
-    }
-    const { component, def: { props: publicProps } } = vm;
-    let { data: { _props: oldProps } } = oldVnode;
-    let { data: { _props: newProps } } = vnode;
-    // infuse key-value pairs from _props into the component
-    if (oldProps !== newProps && (oldProps || newProps)) {
-        let key, cur;
-        oldProps = oldProps || EmptyObject;
-        newProps = newProps || EmptyObject;
-        // removed props should be reset in component's props
-        for (key in oldProps) {
-            if (!(key in newProps)) {
-                prepareForPropUpdate(vm);
-                component[key] = undefined;
-            }
-        }
-        // new or different props should be set in component's props
-        for (key in newProps) {
-            cur = newProps[key];
-            if (!(key in oldProps) || oldProps[key] != cur) {
-                if (isUndefined(publicProps[key])) {
-                    // TODO: this should never really happen because the compiler should always validate
-                    return;
-                }
-                prepareForPropUpdate(vm);
-                component[key] = cur;
-            }
-        }
-    }
-    // Note: _props, which comes from api.c()'s data.props, is only used to populate
-    //       public props, and any other alien key added to it by the compiler will be
-    //       ignored, and a warning is shown.
-}
-var componentProps = {
-    create: syncProps,
-    update: syncProps,
-};
-
 function removeAllCmpEventListeners(vnode) {
     const { vm } = vnode;
     if (isUndefined(vm)) {
@@ -2210,39 +2188,6 @@ const eventListenersModule = {
     destroy: removeAllCmpEventListeners
 };
 
-function syncClassNames(oldVnode, vnode) {
-    const { vm } = vnode;
-    if (isUndefined(vm)) {
-        return;
-    }
-    const { vm: oldVm } = oldVnode;
-    if (oldVm === vm) {
-        return;
-    }
-    const oldClass = (oldVm && oldVm.cmpClasses) || EmptyObject;
-    const { cmpClasses: klass = EmptyObject } = vm;
-    if (oldClass === klass) {
-        return;
-    }
-    const { elm, data: { class: ownerClass = EmptyObject } } = vnode;
-    let name;
-    for (name in oldClass) {
-        // remove only if it was removed from within the instance and it is not set from owner
-        if (oldClass[name] && !klass[name] && !ownerClass[name]) {
-            elm.classList.remove(name);
-        }
-    }
-    for (name in klass) {
-        if (klass[name] && !oldClass[name]) {
-            elm.classList.add(name);
-        }
-    }
-}
-var componentClasses = {
-    create: syncClassNames,
-    update: syncClassNames,
-};
-
 function update$1(oldVnode, vnode) {
     const { vm } = vnode;
     if (isUndefined(vm)) {
@@ -2280,7 +2225,6 @@ var componentSlotset = {
     update: update$1,
 };
 
-// TODO: eventually use the one shipped by snabbdom directly
 function update$2(oldVnode, vnode) {
     let oldProps = oldVnode.data.props;
     let props = vnode.data.props;
@@ -2293,24 +2237,25 @@ function update$2(oldVnode, vnode) {
     oldProps = oldProps || EmptyObject;
     props = props || EmptyObject;
     let key, cur, old;
-    const { elm } = vnode;
+    const { elm, vm } = vnode;
     for (key in oldProps) {
-        if (!(key in props)) {
-            delete elm[key];
+        if (!(key in props) && (key in elm)) {
+            elm[key] = undefined;
         }
     }
     for (key in props) {
         cur = props[key];
         old = oldProps[key];
-        if (old !== cur) {
-            if (old !== cur && (key !== 'value' || elm[key] !== cur)) {
-                // only touching the dom if the prop really changes.
-                elm[key] = cur;
+        if (old !== cur && (key in elm) && (key !== 'value' || elm[key] !== cur)) {
+            if (!isUndefined(vm)) {
+                prepareForPropUpdate(vm); // this is just in case the vnode is actually a custom element
             }
+            // touching the dom if the prop really changes.
+            elm[key] = cur;
         }
     }
 }
-var props = {
+const propsModule = {
     create: update$2,
     update: update$2,
 };
@@ -2318,7 +2263,6 @@ var props = {
 const xlinkNS = 'http://www.w3.org/1999/xlink';
 const xmlNS = 'http://www.w3.org/XML/1998/namespace';
 const ColonCharCode = 58;
-const XCharCode = 120;
 function updateAttrs(oldVnode, vnode) {
     let { data: { attrs: oldAttrs } } = oldVnode;
     let { data: { attrs } } = vnode;
@@ -2329,7 +2273,7 @@ function updateAttrs(oldVnode, vnode) {
         return;
     }
     const { elm } = vnode;
-    const { setAttribute, removeAttribute, setAttributeNS } = elm;
+    const { setAttribute, removeAttribute } = elm;
     let key;
     oldAttrs = oldAttrs || {};
     attrs = attrs || {};
@@ -2338,7 +2282,6 @@ function updateAttrs(oldVnode, vnode) {
         const cur = attrs[key];
         const old = oldAttrs[key];
         if (old !== cur) {
-            // TODO: once we fix issue #861, we can move the prepareForAttributeMutationFromTemplate up here.
             if (cur === true) {
                 setAttribute.call(elm, key, "");
             }
@@ -2346,16 +2289,13 @@ function updateAttrs(oldVnode, vnode) {
                 removeAttribute.call(elm, key);
             }
             else {
-                if (key.charCodeAt(0) !== XCharCode) {
-                    setAttribute.call(elm, key, cur);
-                }
-                else if (key.charCodeAt(3) === ColonCharCode) {
+                if (key.charCodeAt(3) === ColonCharCode) {
                     // Assume xml namespace
-                    setAttributeNS.call(elm, xmlNS, key, cur);
+                    elm.setAttributeNS.call(elm, xmlNS, key, cur);
                 }
                 else if (key.charCodeAt(5) === ColonCharCode) {
                     // Assume xlink namespace
-                    setAttributeNS.call(elm, xlinkNS, key, cur);
+                    elm.setAttributeNS.call(elm, xlinkNS, key, cur);
                 }
                 else {
                     setAttribute.call(elm, key, cur);
@@ -2366,7 +2306,17 @@ function updateAttrs(oldVnode, vnode) {
     // remove removed attributes
     for (key in oldAttrs) {
         if (!(key in attrs)) {
-            removeAttribute.call(elm, key);
+            if (key.charCodeAt(3) === ColonCharCode) {
+                // Assume xml namespace
+                elm.removeAttributeNS.call(elm, xmlNS, key, cur);
+            }
+            else if (key.charCodeAt(5) === ColonCharCode) {
+                // Assume xlink namespace
+                elm.removeAttributeNS.call(elm, xlinkNS, key, cur);
+            }
+            else {
+                removeAttribute.call(elm, key);
+            }
         }
     }
 }
@@ -2428,17 +2378,17 @@ function updateClass(oldVnode, vnode) {
     if (oldClass === klass) {
         return;
     }
-    const innerClass = (vnode.vm && vnode.vm.cmpClasses) || EmptyObject;
+    const { classList } = elm;
     let name;
     for (name in oldClass) {
         // remove only if it is not in the new class collection and it is not set from within the instance
-        if (!klass[name] && !innerClass[name]) {
-            elm.classList.remove(name);
+        if (!klass[name]) {
+            classList.remove(name);
         }
     }
     for (name in klass) {
         if (!oldClass[name]) {
-            elm.classList.add(name);
+            classList.add(name);
         }
     }
 }
@@ -2535,16 +2485,14 @@ const uidModule = {
 const patch = init([
     componentInit,
     componentSlotset,
-    componentProps,
     // from this point on, we do a series of DOM mutations
     eventListenersModule,
-    componentClasses,
     // Attrs need to be applied to element before props
     // IE11 will wipe out value on radio inputs if value
     // is set before type=radio.
     // See https://git.soma.salesforce.com/raptor/raptor/issues/791 for more
     attributesModule,
-    props,
+    propsModule,
     classes,
     styleModule,
     eventListenersModule$1,
@@ -2647,4 +2595,4 @@ exports.wire = wire;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.16.8 */
+/** version: 0.17.11 */

@@ -231,10 +231,6 @@ Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic, in
 Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     var i, defs;
 
-    if (otherContext["mode"] !== this.getMode()) {
-        throw new $A.auraError("[Mode mismatch] Expected '" + this.getMode() + "' instead tried to merge mode '" + otherContext["mode"] + "'", null, $A.severity.QUIET);
-    }
-
     if ($A.util.isUndefinedOrNull(this.fwuid)) {
         this.fwuid = otherContext["fwuid"];
     }

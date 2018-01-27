@@ -34,9 +34,11 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.StringReader;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Handles module metadata in lightning.json
@@ -121,6 +123,15 @@ public class ModulesMetadataServiceImpl implements ModulesMetadataService {
             throw new InvalidDefinitionException("XML parse error: " + e.getMessage(),
                     XMLParser.getLocation(reader, source));
         }
+    }
+
+    /**
+     * Currently no valid tags.
+     * @return empty set
+     */
+    @Override
+    public Set<String> getValidTags() {
+        return Collections.emptySet();
     }
 
     @Inject

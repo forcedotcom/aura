@@ -16,9 +16,11 @@
 package org.auraframework.modules.impl.factory;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -55,6 +57,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
     
     private ModulesCompilerService modulesCompilerService;
     private ModulesMetadataService modulesMetadataService;
+    private Set<String> validTags = Collections.emptySet();
 
     @Override
     public Class<?> getSourceInterface() {
@@ -149,6 +152,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setLabels(compilerData.labels);
         builder.setOwnHash(calculateOwnHash(descriptor, codes));
         builder.setExternalReferences(compilerData.externalReferences);
+        builder.setValidTags(this.validTags);
 
         // json metadata (lightning.json)
         // TODO: remove once meta.xml is in place
@@ -303,5 +307,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
     @Inject
     public void setModulesMetadataService(ModulesMetadataService modulesMetadataService) {
         this.modulesMetadataService = modulesMetadataService;
+        // set valid tags once.
+        this.validTags = Collections.unmodifiableSet(this.modulesMetadataService.getValidTags());
     }
 }

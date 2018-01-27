@@ -32,13 +32,13 @@ import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDesignDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
-import org.auraframework.impl.root.BundleDefImpl;
 import org.auraframework.impl.root.PlatformDefImpl;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -63,6 +63,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     private String externalReferences;
     private Boolean requireLocker;
     private ModuleDesignDef moduleDesignDef;
+    private Set<String> validTags;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
@@ -75,6 +76,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         this.externalReferences = builder.externalReferences;
         this.requireLocker = builder.requireLocker;
         this.moduleDesignDef = builder.moduleDesignDef;
+        this.validTags = builder.validTags;
     }
 
     @Override
@@ -211,6 +213,24 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         super.validateReferences(validationContext);
         validateLabels();
+        validateTags();
+    }
+
+    /**
+     * Validates whether tags are valid
+     * @throws QuickFixException invalid definition
+     */
+    private void validateTags() throws QuickFixException {
+        Set<String> tags = this.getTags();
+        if (!tags.isEmpty()) {
+            if (!this.validTags.isEmpty()) {
+                for (String tag : tags) {
+                    if (!this.validTags.contains(tag)) {
+                        throw new InvalidDefinitionException(tag + " is not a valid tag", getLocation());
+                    }
+                }
+            }
+        }
     }
 
     private void validateLabels() throws QuickFixException {
@@ -257,6 +277,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private String externalReferences;
         private Boolean requireLocker = false;
         private ModuleDesignDef moduleDesignDef = null;
+        private Set<String> validTags = Collections.emptySet();
 
         public Builder() {
             super(ModuleDef.class);
@@ -294,6 +315,10 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
 
         public void setRequireLocker(Boolean requireLocker) {
             this.requireLocker = requireLocker;
+        }
+
+        public void setValidTags(Set<String> validTags) {
+            this.validTags = validTags;
         }
 
         @Override

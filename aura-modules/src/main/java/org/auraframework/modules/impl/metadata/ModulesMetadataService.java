@@ -19,6 +19,8 @@ import org.auraframework.impl.root.component.ModuleDefImpl;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import java.util.Set;
+
 /**
  * Handle metadata for modules
  */
@@ -39,4 +41,10 @@ public interface ModulesMetadataService {
      * @param moduleBuilder builder for ModuleDef
      */
     void processMetadata(TextSource source, ModuleDefImpl.Builder moduleBuilder) throws QuickFixException;
+
+    /**
+     * Valid tags
+     * @return set of valid tags
+     */
+    Set<String> getValidTags();
 }

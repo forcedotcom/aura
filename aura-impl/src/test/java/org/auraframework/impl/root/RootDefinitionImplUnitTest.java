@@ -17,9 +17,9 @@ package org.auraframework.impl.root;
 
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.PlatformDef.SupportLevel;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.def.RootDefinition.SupportLevel;
 import org.auraframework.impl.root.RootDefinitionImpl.Builder;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
 import org.junit.Test;

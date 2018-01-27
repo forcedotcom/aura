@@ -15,12 +15,9 @@
  */
 package org.auraframework.builder;
 
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.def.PlatformDef;
+import org.auraframework.def.PlatformDef.SupportLevel;
 
-/**
- * The builder for a root level (bundle) definition.
- */
-public interface RootDefinitionBuilder<T extends RootDefinition> extends PlatformDefBuilder<T> {
-    RootDefinitionBuilder<T> setDocumentationDef(DocumentationDef def);
+public interface PlatformDefBuilder<T extends PlatformDef> extends BundleDefBuilder<T> {
+    PlatformDefBuilder<T> setSupport(SupportLevel support);
 }

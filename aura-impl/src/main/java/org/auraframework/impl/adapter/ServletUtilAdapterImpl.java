@@ -643,7 +643,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     @Override
     public final void setCSPHeaders(DefDescriptor<?> top, HttpServletRequest req, HttpServletResponse rsp) {
-        if (canSkipCSPHeader(top, req)) {
+        if (canSkipCSPHeader(req)) {
             return;
         }
 
@@ -685,8 +685,8 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      * @param req
      * @return true if CSP header setting can be skipped
      */
-    private boolean canSkipCSPHeader(final DefDescriptor<?> defDesc, final HttpServletRequest req) {
-        if(defDesc == null | req == null) {
+    private boolean canSkipCSPHeader(final HttpServletRequest req) {
+        if(req == null) {
             return false;
         }
 
@@ -695,19 +695,8 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             return false;
         }
 
-        final String descriptorName = defDesc.getDescriptorName();
-        if(!descriptorName.equals("one:one") && !descriptorName.equals("clients:msMail")) { // only skip while loading one.app or msMail.app
-            return false;
-        }
-
         final String auraFormat = req.getParameter("aura.format");
-        if(auraFormat != null && auraFormat.equals("HTML")) {
-            return false;
-        }
-
-        // Skip one.app requests for non HTML content with already established aura context
-        final String auraContext = req.getParameter("aura.context");
-        if(auraContext != null) {
+        if(auraFormat != null && !auraFormat.equals("HTML")) {
             return true;
         }
 

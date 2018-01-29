@@ -118,7 +118,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     /**
      * Test to verify blur and focus events works when set in the ui:autocomplete component. Test case: W-2391008
      */
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD })
     @Test
     public void testAutoCompleteWithBlurAndFocusEvent() throws Exception {
         open(URL);

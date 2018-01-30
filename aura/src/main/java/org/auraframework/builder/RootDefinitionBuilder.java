@@ -17,10 +17,12 @@ package org.auraframework.builder;
 
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.def.RootDefinition.SupportLevel;
 
 /**
  * The builder for a root level (bundle) definition.
  */
-public interface RootDefinitionBuilder<T extends RootDefinition> extends PlatformDefBuilder<T> {
+public interface RootDefinitionBuilder<T extends RootDefinition> extends BundleDefBuilder<T> {
+    RootDefinitionBuilder<T> setSupport(SupportLevel support);
     RootDefinitionBuilder<T> setDocumentationDef(DocumentationDef def);
 }

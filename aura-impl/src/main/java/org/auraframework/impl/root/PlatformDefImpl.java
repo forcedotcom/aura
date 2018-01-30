@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.builder.PlatformDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.PlatformDef;
@@ -37,7 +36,6 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
     protected final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
     protected final Double minVersion;
     protected Set<String> tags;
-    private final SupportLevel support;
 
     protected PlatformDefImpl(Builder<T> builder) {
         super(builder);
@@ -48,12 +46,6 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
         }
         this.minVersion = builder.minVersion;
         this.tags = Collections.unmodifiableSet(builder.tags);
-
-        if (builder.support == null) {
-            this.support = SupportLevel.PROTO;
-        } else {
-            this.support = builder.support;
-        }
     }
 
     @Override
@@ -78,18 +70,11 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
         return this.tags;
     }
 
-    @Override
-    public SupportLevel getSupport() {
-        return support;
-    }
-
-    public abstract static class Builder<T extends PlatformDef> extends BundleDefImpl.Builder<T> implements PlatformDefBuilder<T> {
+    public abstract static class Builder<T extends PlatformDef> extends BundleDefImpl.Builder<T> {
 
         public Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
         public Double minVersion;
         public Set<String> tags = Collections.emptySet();
-
-        private SupportLevel support;
 
         public Builder(Class<T> defClass) {
             super(defClass);
@@ -125,12 +110,6 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
 
         public void setMinVersion(Double minVersion) {
             this.minVersion = minVersion;
-        }
-
-        @Override
-        public PlatformDefImpl.Builder<T> setSupport(SupportLevel support) {
-            this.support = support;
-            return this;
         }
     }
 }

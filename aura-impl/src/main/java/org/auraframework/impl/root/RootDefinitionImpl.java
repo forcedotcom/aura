@@ -46,6 +46,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Platf
     protected final List<DefDescriptor<ProviderDef>> providerDescriptors;
     protected final DocumentationDef documentationDef;
     private final int hashCode;
+    private final SupportLevel support;
 
     protected RootDefinitionImpl(Builder<T> builder) {
         super(builder);
@@ -56,6 +57,12 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Platf
             this.requiredVersionDefs = Collections.unmodifiableMap(new LinkedHashMap<>(builder.requiredVersionDefs));
         }
         this.providerDescriptors = AuraUtil.immutableList(builder.providerDescriptors);
+
+        if (builder.support == null) {
+            support = SupportLevel.PROTO;
+        } else {
+            support = builder.support;
+        }
 
         this.documentationDef = builder.documentationDef;
         this.hashCode = AuraUtil.hashCode(descriptor, location, attributeDefs, requiredVersionDefs);
@@ -95,6 +102,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Platf
 
         public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs;
         public List<DefDescriptor<ProviderDef>> providerDescriptors;
+        private SupportLevel support;
         private DocumentationDef documentationDef;
 
         public Builder(Class<T> defClass) {
@@ -133,6 +141,17 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Platf
         public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
             return this.requiredVersionDefs;
         }
+
+        @Override
+        public Builder<T> setSupport(SupportLevel support) {
+            this.support = support;
+            return this;
+        }
+    }
+
+    @Override
+    public SupportLevel getSupport() {
+        return support;
     }
 
     @Override

@@ -41,18 +41,6 @@
     },
 
     /**
-     * Verify behavior when 'format' attribute is assigned an empty string.
-     */
-    testEmptyFormat:{
-        attributes: {value : '2004-09-23T16:30:00.000Z', format: '', langLocale: 'en', timezone: 'GMT'},
-        test:function(component){
-        	$A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		$A.test.assertEquals("Sep 23, 2004 4:30:00 PM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time format.");
-        	});
-        }
-    },
-
-    /**
      * Verify behavior when 'format' is given a valid time format.
      */
     testFormat: {
@@ -112,7 +100,7 @@
      * Verify behavior when 'langLocale' is not provided.
      */
     testDefaultLangLocale:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', timezone: 'GMT'},
+	attributes : {value:'2004-09-23T16:30:00.000Z', format: 'MMM dd, yyyy h:mm:ss A', timezone: 'GMT'},
 	test: function(component){
 	        $A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
@@ -126,7 +114,7 @@
      * Verify behavior when 'langLocale' is assigned a empty string.
      */
     testEmptyStringLangLocale:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', timezone: 'GMT', langLocale: ''},
+	attributes : {value:'2004-09-23T16:30:00.000Z', timezone: 'GMT', format: 'MMM dd, yyyy h:mm:ss A', langLocale: ''},
 	test: function(component){
 	        $A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
@@ -140,7 +128,7 @@
      * Verify behavior when 'langLocale' is assigned garbage.
      */
     testInvalidLangLocale:{
- 	attributes : {value:'2004-09-23T16:30:00.000Z', timezone: 'GMT', langLocale: 'zz'},
+ 	attributes : {value:'2004-09-23T16:30:00.000Z', timezone: 'GMT', format: 'MMM dd, yyyy h:mm:ss A', langLocale: 'zz'},
 	test: function(component){
 	        $A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());

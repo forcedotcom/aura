@@ -786,6 +786,8 @@
             oldNode = currentNode;
         }
 
+        oldNode = null;
+
         /* Return sanitized string or DOM */
         if (RETURN_DOM) {
 

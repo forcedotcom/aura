@@ -944,6 +944,16 @@ Component.prototype.destroy = function() {
         }
     }
 
+    // Destroy handlers
+    // PropertyReferenceValue was leaking becasue it was tied to handlers
+    var handlers = this.handlers;
+    if(handlers) {
+        for(var h in handlers) {
+            handlers[h] = null;
+        }
+        handlers = null;
+    }
+
     // Destroyed. Mark invalid
     this.destroyed=1;
 };

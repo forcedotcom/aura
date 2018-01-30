@@ -17,8 +17,7 @@
 -->
 <aura:component extensible="false" implements="ui:panelType" description="An inline panel.">
     <aura:import library="ui:panelLib" property="lib"/>
-
-    <aura:attribute name="startOfDialogLabel" type="String" default="Start of Dialog" description="Accessibility label that indicates the start of the dialog" />
+    
     <aura:attribute name="title" type="String" description="The title of the dialog window" />
     <aura:attribute name="class" type="String" description="CSS class" />
     <aura:attribute name="closeOnClickOut" type="Boolean" default="false" description="If true, adds a listener to close the dialog when a user clicks outside the dialog. The default is false." />
@@ -39,7 +38,6 @@
          aura:flavorable="true">
 
         <div aura:id="content" class="{! join(' ',$Browser.isIOS ? 'IOS' : '','container') }">
-            <span class="assistiveText">{!v.startOfDialogLabel}</span>
 
             <aura:if isTrue="{! v.header.length || !empty(v.title) }">
                 <div class="panel-header">

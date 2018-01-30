@@ -155,7 +155,7 @@ public class AuraContextServiceImpl implements ContextService {
         contextAdapter.popSystemContext();
     }
 
-    private Map<String, GlobalValueProvider> getGlobalProviders() {
+    protected Map<String, GlobalValueProvider> getGlobalProviders() {
 
         // load any @Primary GlobalValueProviderAdapter first, to give it's
         // implementations precedence

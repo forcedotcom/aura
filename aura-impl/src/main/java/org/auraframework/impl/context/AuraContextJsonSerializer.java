@@ -47,10 +47,16 @@ import java.util.Set;
  * AuraContext JSON Serializer
  */
 public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
+    
+    public static interface AuraContextJsonSerializerProvider {
+        AuraContextJsonSerializer createAuraContextJsonSerializer(ConfigAdapter configAdapter,
+                TestContextAdapter testContextAdapter, DefinitionService definitionService);
+    }
+    
     public static final String DELETED = "deleted";
 
-    private final TestContextAdapter testContextAdapter;
-    private final ConfigAdapter configAdapter;
+    protected final TestContextAdapter testContextAdapter;
+    protected final ConfigAdapter configAdapter;
     private final DefinitionService definitionService;
 
     public AuraContextJsonSerializer(ConfigAdapter configAdapter, TestContextAdapter testContextAdapter,
@@ -66,10 +72,21 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void serialize(Json json, AuraContext ctx) throws IOException {
-
+    public void serialize(Json json, AuraContext ctx) throws IOException {        
+        // pre-compute some things needed to determine the cache key
+        String fwuid = ctx.getFrameworkUID() != null ? ctx.getFrameworkUID() : configAdapter.getAuraFrameworkNonce();
+        Map<DefDescriptor<? extends Definition>, Definition> defMap = ctx.filterLocalDefs(ctx.getPreloadedDefinitions());
+        
+        serialize(json, ctx, fwuid, defMap);
+    }
+    
+    /**
+     * IMPORTANT: if this logic changes, cache key construction in ZeroAuraContextJsonSerializer may also need to change.
+     */
+    @SuppressWarnings("unchecked")
+    protected void serialize(Json json, AuraContext ctx, String fwuid, Map<DefDescriptor<? extends Definition>, Definition> defMap) throws IOException {
+        
         json.writeMapBegin();
         json.writeMapEntry("mode", ctx.getMode());
         boolean isApplication = false;
@@ -97,11 +114,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             }
         }
 
-        if (ctx.getFrameworkUID() != null) {
-            json.writeMapEntry("fwuid", ctx.getFrameworkUID());
-        } else {
-            json.writeMapEntry("fwuid", configAdapter.getAuraFrameworkNonce());
-        }
+        json.writeMapEntry("fwuid", fwuid);
 
         //
         // Now comes the tricky part, we have to serialize all of the definitions that are
@@ -110,10 +123,6 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         // all dependencies actually get sent to the client. Note that the 'loaded' set needs
         // to be updated as well, but that needs to happen prior to this.
         //
-        Map<DefDescriptor<? extends Definition>, Definition> defMap;
-
-        defMap = ctx.filterLocalDefs(ctx.getPreloadedDefinitions());
-
         if (defMap.size() > 0) {
             List<Definition> componentDefs = Lists.newArrayList();
             List<Definition> eventDefs = Lists.newArrayList();

@@ -29,7 +29,6 @@
     <aura:attribute name="headerClass" type="String" default="" description="additional CSS class for the header" />
     <aura:attribute name="bodyClass" type="String" description="additional CSS class for the body" />    
     <aura:attribute name="footerClass" type="String" default="" description="additional CSS class for the footer" />
-    <aura:attribute name="startOfDialogLabel" type="String" default="Start of Dialog" description="Accessibility label that indicates the start of the dialog" />
     <aura:attribute name="showCloseButton" type="Boolean" default="true" description="Adds a close button in top right corner of the dialog"/>
     <aura:attribute name="closeButton" type="Aura.Component[]" />
     <aura:attribute name="closeAction" type="Object" description="Overrides default close action (which is destroy) when close button is clicked." />
@@ -61,11 +60,10 @@
              tabindex="-1"
              class="{!join(' ', 'panel', token('uiModal.modal'), v.modalClass)}"
              role="dialog"
+             aria-modal="true"
              aria-labelledby="{!'title_' + globalId}">
 
             <div aura:id="content" class="{!join(' ', 'modal-container', token('uiModal.container'))}">
-                <span class="assistiveText">{!v.startOfDialogLabel}</span>
-
                 <div class="{!join(' ', 'modal-header', token('uiModal.header'), v.headerClass, and(empty(v.header), empty(v.title)) ? 'empty ' + token('uiModal.headerEmpty') : '')}">
                     {!v.icon}
                     <aura:if isTrue="{!!empty(v.title)}">

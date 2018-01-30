@@ -95,7 +95,6 @@
                 var output = cmp.find("output");
 
                 cmp.set("v.value", expected);
-                $A.rerender(cmp);
 
                 $A.test.addWaitForWithFailureMessage(true, function() {
                     var bold = output.getElement().firstChild;
@@ -109,9 +108,7 @@
                 var output = cmp.find("output");
 
                 cmp.set("v.value", "<b>Initial</b>");
-                $A.rerender(cmp);
                 cmp.set("v.value", expected);
-                $A.rerender(cmp);
 
                 $A.test.addWaitForWithFailureMessage(true, function() {
                     var italic = output.getElement().firstChild;

@@ -23,6 +23,7 @@
 
     <aura:attribute name="facet1" type="Aura.Component[]"/>
     <aura:attribute name="facet2" type="Aura.Component[]"/>
+    <aura:attribute name="component" type="Aura.Component"/>
 
     <ui:button aura:id="toggleOne" label="Toggle One" press="{!c.one}"/>
     <ui:button aura:id="toggleTwo" label="Toggle Two" press="{!c.two}"/>
@@ -75,6 +76,7 @@
                         <aura:set attribute="else">
                             <aura:if isTrue="{!v.four}">
                                 <div>Four:true</div>
+                                {!v.component}
                                 {!v.facet2}
                                 <aura:set attribute="else">
                                     <div>Four:false</div>

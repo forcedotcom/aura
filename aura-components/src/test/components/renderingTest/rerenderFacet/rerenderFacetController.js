@@ -33,6 +33,7 @@
         if (!value) {
             cmp.set("v.facet1", []);
             cmp.set("v.facet2", []);
+            cmp.set("v.component", null);
         }
     },
 
@@ -43,12 +44,14 @@
 
         var components = [
             ["renderingTest:html", null],
+            ["renderingTest:html", null],
             ["renderingTest:html", null]
         ];
 
         $A.createComponents(components, function(newCmps) {
             cmp.set("v.facet1", [newCmps[0]]);
             cmp.set("v.facet2", [newCmps[1]]);
+            cmp.set("v.component", newCmps[2]);
         });
     }
 

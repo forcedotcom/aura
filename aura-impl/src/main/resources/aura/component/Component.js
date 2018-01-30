@@ -808,7 +808,7 @@ Component.prototype.removeDocumentLevelHandler = function(dlh) {
  */
 Component.prototype.destroy = function() {
     if(arguments.length){
-        $A.deprecated("Component.destroy() no longer supports asynchronous destruction.","Please remove any arguments passed to destroy().","2017/02/07","2018/02/07");
+        $A.warning("Deprecation warning: Component.destroy() no longer supports asynchronous destruction. Please remove any arguments passed to destroy().");
     }
 
     // NoOp if we've already been through here, or if we're returning via circular reference; 1, -1

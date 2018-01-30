@@ -265,9 +265,10 @@ AuraRenderingService.prototype.unrender = function(components) {
     //#if {"modes" : ["STATS"]}
     var startTime = (new Date()).getTime();
     //#end
-    var visited = this.visited;
 
+    var visited = this.visited;
     components = this.getArray(components);
+
     var cmp;
     var container;
     var beforeUnrenderElements;
@@ -284,7 +285,7 @@ AuraRenderingService.prototype.unrender = function(components) {
             // If the parent is NOT unrendering, then remove these and unrender it's children.
             // In the unrenderFacets function, those elements won't be removed from the DOM since their parents here
             // are getting removed.
-            if(container && !container.getConcreteComponent().isUnrendering()) {
+            if (container && !container.getConcreteComponent().isUnrendering()) {
                 // This is the top of the unrendering tree.
                 // Save the elements we want to remove, so they can be deleted after the unrender is called.
                 beforeUnrenderElements = cmp.getElements();
@@ -305,12 +306,26 @@ AuraRenderingService.prototype.unrender = function(components) {
             } finally {
                 $A.clientService.releaseCurrentAccess(cmp);
 
+                var oldContainerMarker = this.getMarker(container);
                 this.removeElement(this.getMarker(cmp), container);
+
+                var currentContainerMarker = this.getMarker(container);
+                // When we remove the marker from container, we only update the references which use the marker element
+                // as marker. So, in the container chain, the old marker element may still exist in the component's element
+                // collection, if the element is not the marker of the component. Keeping the container chain up to date is
+                // required now, because we use the first element to determine the postion when updating container chain during
+                // re-rendering facet.
+                if (oldContainerMarker !== currentContainerMarker) {
+                    this.replaceContainerElement(container, oldContainerMarker, currentContainerMarker);
+                }
 
                 // If we have beforeUnrenderElements, then we're in a component that should have its
                 // elements removed, and those elements are the ones in beforeUnrenderElements.
-                if(beforeUnrenderElements && beforeUnrenderElements.length) {
-                    for(var c=0,len=beforeUnrenderElements.length;c<len;c++) {
+                if (beforeUnrenderElements && beforeUnrenderElements.length) {
+                    // TODO: at the top level of unrendering tree, it's probably needed to remove beforeUnrenderElements
+                    // from container chain. Otherwise, the containers may have redundant elements until they get rerendered.
+
+                    for (var c = 0, len = beforeUnrenderElements.length; c < len; c++) {
                         $A.util.removeElement(beforeUnrenderElements[c]);
                     }
                 }
@@ -333,6 +348,37 @@ AuraRenderingService.prototype.unrender = function(components) {
         'endTime' : (new Date()).getTime()
     });
     //#end
+};
+
+/**
+ * Used in AuraRenderingService.unrender to update the new marker element in the container chain.
+ *
+ * Do not use this method in render or re-render. It doesn't apply aura-class to the new element.
+ */
+AuraRenderingService.prototype.replaceContainerElement = function(container, oldElement, newElement) {
+    if (!container) {
+        return;
+    }
+
+    var concrete = container.getConcreteComponent();
+    // stop updating elements for container chain if it is a HtmlComponent which can have body.
+    // this needs to match the render logic.
+    if ((concrete.getType() === "aura:html" && concrete["helper"].canHaveBody(concrete)) ||
+            concrete.isRendered() === false) {
+        return;
+    }
+
+    var allElements = this.getAllElements(concrete);
+    var index = allElements.indexOf(oldElement);
+    if (index > -1) {
+        allElements[index] = newElement;
+
+        var elements = this.getElements(concrete);
+        index = elements.indexOf(oldElement);
+        elements[index] = newElement;
+    }
+
+    this.replaceContainerElement(concrete.getContainer(), oldElement, newElement);
 };
 
 /**
@@ -1373,14 +1419,14 @@ AuraRenderingService.prototype.removeElement = function(marker, container) {
     //var container = component.getConcreteComponent().getContainer();
     //if(!container || !container.getConcreteComponent().isUnrendering()) {
     var concrete = container && container.getConcreteComponent();
-    if(!concrete || !concrete.isUnrendering()) {
-        if(this.isSharedMarker(marker)) {
+    if (!concrete || !concrete.isUnrendering()) {
+        if (this.isSharedMarker(marker)) {
             // No point in moving everything to another comment marker.
-            if(this.isCommentMarker(marker)) { return; }
+            if (this.isCommentMarker(marker)) { return; }
 
             // Move all the past references to a comment!
             this.moveReferencesToMarker(marker);
-        } else if(concrete && concrete.destroyed===-1 && !this.isCommentMarker(marker)) {
+        } else if (concrete && concrete.destroyed === -1 && !this.isCommentMarker(marker)) {
             // this element is going away anyway since the container is being destroyed.
             return;
         }
@@ -1449,10 +1495,8 @@ AuraRenderingService.prototype.moveReferencesToMarker = function(marker, newMark
  */
 AuraRenderingService.prototype.isSharedMarker = function(marker) {
     var references = this.getMarkerReferences(marker);
-    if(references) {
-        return references.size() > 0;
-    }
-    return false;
+
+    return references? references.size() > 0 : false;
 };
 
 /**

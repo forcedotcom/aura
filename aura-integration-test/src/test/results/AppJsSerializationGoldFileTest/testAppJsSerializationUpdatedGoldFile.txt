@@ -8064,7 +8064,7 @@ return {
 
             
             
-            if (resizer._pendingUpdates && Object.keys(resizer._pendingUpdates).length > 0) {
+            if (Object.keys(resizer._pendingUpdates || {}).length > 0) {
                 return;
             }
 

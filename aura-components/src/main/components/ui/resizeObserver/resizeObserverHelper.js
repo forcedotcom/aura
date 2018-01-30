@@ -106,7 +106,7 @@
 
             // Check to see if all components have called in and we're ready to
             // actually perform the resizer() call
-            if (resizer._pendingUpdates && Object.keys(resizer._pendingUpdates).length > 0) {
+            if (Object.keys(resizer._pendingUpdates || {}).length > 0) {
                 return;
             }
 

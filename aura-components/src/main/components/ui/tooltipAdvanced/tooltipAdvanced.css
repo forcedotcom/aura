@@ -33,6 +33,7 @@
 .THIS.advanced-wrapper {
 	position: inherit;
 	opacity: 0;
+	width: 100%;
 }
 
 .THIS .tooltip-advanced {

@@ -270,6 +270,21 @@
         test: [
             function(cmp) {
                 var target = cmp.find('input');
+                var validity = target.get('v.validity');
+                $A.test.assertEquals('', validity);
+
+                target.set('v.value', 'foo');
+
+                validity = target.get('v.validity');
+                $A.test.assertEquals('foo', validity);
+            }
+        ]
+    },
+
+    testReadOnlyBoundAttrUpdatesWhenItsDependentChanged: {
+        test: [
+            function(cmp) {
+                var target = cmp.find('input');
                 var myValidity = cmp.get('v.myValidity');
                 $A.test.assertEquals('', myValidity);
 

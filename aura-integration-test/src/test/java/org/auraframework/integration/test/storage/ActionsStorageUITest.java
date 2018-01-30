@@ -40,6 +40,7 @@ public class ActionsStorageUITest extends WebDriverTestCase {
 
     private ExpectedCondition<Boolean> valueToContain(final WebElement element, final String text) {
         return new ExpectedCondition<Boolean>() {
+            @Override
             public Boolean apply(WebDriver driver) {
                 String value = null;
 
@@ -51,13 +52,12 @@ public class ActionsStorageUITest extends WebDriverTestCase {
                 return value != null && value.contains(text);
             }
 
+            @Override
             public String toString() {
                 return String.format("value in %s to be contain %s", element.toString(), text);
             }
         };
     }
-
-
 
     @Test
     public void testClearedComponentDefStorageCausesStoredActionToCallServer() throws Exception {

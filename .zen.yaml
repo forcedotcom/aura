@@ -20,14 +20,6 @@ minimum_code_coverage_percentage: 0
 
 # Content between here and the end of the file, while it must be valid YAML,
 # is currently read textually by Zen. The order of the sections cannot change.
-itest:
-  codeline: main
-  modules:
-    aura:
-      optional_history_file: null
-      properties_name: aura.version
-  ftest_labels: [~ignore,aura.precheckin,auracontainer.selenium]
-  ab_enabled: false
 
 script:
   localedef -v -c -i en_US -f UTF-8 en_US.UTF-8

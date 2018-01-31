@@ -16,11 +16,11 @@
 
 function lib() { // eslint-disable-line no-unused-vars
 
-    var abbreviations = {
-        thousand : 'k',
-        million  : 'm',
-        billion  : 'b',
-        trillion : 't'
+    var exponentByPrefix = {
+        'k': 3,
+        'm': 6,
+        'b': 9,
+        't': 12
     };
 
     function isNoZeroLeadingNumber(string) {
@@ -57,43 +57,53 @@ function lib() { // eslint-disable-line no-unused-vars
             return $A.localizationService.getDefaultNumberFormat();
         },
         unFormatNumber: function (string ) {
-            var decimalSeparator = $A.get("$Locale.decimal");
-            var currencySymbol   = $A.get("$Locale.currency");
-
-            var stringOriginal = string,
-                thousandRegExp,
-                millionRegExp,
-                billionRegExp,
-                trillionRegExp;
-
             if (this.isNumber(string)) {
                 return string;
             }
 
+            var decimalSeparator = $A.get("$Locale.decimal");
+            var currencySymbol   = $A.get("$Locale.currency");
+            var stringOriginal = string;
+                     
             if (isNoZeroLeadingNumber(string)) {
                 string = injectZeroBeforeDecimalSeparator(string);
             }
-
+                      
             if (decimalSeparator !== '.') {
                 string = string.replace(/\./g, '').replace(decimalSeparator, '.');
             }
 
-            // see if abbreviations are there so that we can multiply to the correct number
-            thousandRegExp = new RegExp('[^a-zA-Z]' + abbreviations.thousand + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
-            millionRegExp  = new RegExp('[^a-zA-Z]' + abbreviations.million  + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
-            billionRegExp  = new RegExp('[^a-zA-Z]' + abbreviations.billion  + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
-            trillionRegExp = new RegExp('[^a-zA-Z]' + abbreviations.trillion + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
-            // do some math to create our number
-            return ((stringOriginal.match(thousandRegExp)) ? Math.pow(10, 3) : 1) *
-                   ((stringOriginal.match(millionRegExp))  ? Math.pow(10, 6) : 1) *
-                   ((stringOriginal.match(billionRegExp))  ? Math.pow(10, 9) : 1) *
-                   ((stringOriginal.match(trillionRegExp)) ? Math.pow(10, 12) : 1) *
-                   (((string.split('-').length + Math.min(string.split('(').length - 1, string.split(')').length - 1)) % 2) ? 1 : -1) *
-                   Number(string.replace(/[^0-9\.]+/g, ''));
+            var numberOnlyPart = string.replace(/[^0-9\.]+/g, '');
+            var value = 
+                    (((string.split('-').length + Math.min(string.split('(').length - 1, string.split(')').length - 1)) % 2) ? 1 : -1) *
+                    Number(numberOnlyPart);
+
+            // find if contains kmtb.
+            var exponentKey = Object.keys(exponentByPrefix).find(function(abbreviation) {
+                var regExp = new RegExp('[^a-zA-Z]' + abbreviation + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
+                return stringOriginal.match(regExp);
+            }); 
+
+            if (exponentKey) {   
+                var exponent = exponentByPrefix[exponentKey];            
+                // W-4606483
+                // to avoid 4.1 * 1000000 = 4099999.9999999995
+                var decimalSeparatorIndex = numberOnlyPart.indexOf('.');
+                var fractionalDigitsNeeded = decimalSeparatorIndex >= 0 ? (numberOnlyPart.length - (decimalSeparatorIndex + exponent + 1)) : 0;
+                if (fractionalDigitsNeeded < 0) { 
+                    fractionalDigitsNeeded = 0; 
+                }
+            
+                return parseFloat(((value * Math.pow(10, exponent)).toFixed(fractionalDigitsNeeded)));    
+            } else {            
+                return value;
+            }
         },
+
         isNumber: function (number) {
             return $A.util.isNumber(number);
         },
+
         isFormattedNumber: function (string) {
             var decimalSeparator  = $A.get("$Locale.decimal");
             var groupingSeparator = $A.get("$Locale.grouping");
@@ -112,7 +122,6 @@ function lib() { // eslint-disable-line no-unused-vars
                             '(\\d*(\\' + groupingSeparator + '\\d*)*)*' +
                             '(\\' + decimalSeparator + '\\d*)?' +
                             '(K|B|M|T)?$';
-
 
             var reg = new RegExp(regString, 'i');
             return reg.test(string);

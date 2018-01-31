@@ -81,7 +81,31 @@ Test.inputNumberLibrary = function () {
         function unFormatNumber_GoodFormattedString() {
             mockAura(function () {
                 var unFormatted = library.unFormatNumber('1,234,567.89');
-                Assert.Equal(1234567.89,unFormatted);
+                Assert.Equal(1234567.89, unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_GoodFormattedStringM() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('1,234,567.89m');
+                Assert.Equal(1234567890000, unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_GoodFormattedStringB() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('1,234,567.89b');
+                Assert.Equal(1234567890000000, unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_GoodFormattedStringT() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('1,234,567.89t');
+                Assert.Equal(1234567890000000000, unFormatted);
             })
         }
 
@@ -94,10 +118,107 @@ Test.inputNumberLibrary = function () {
         }
 
         [Fact]
+        function unFormatNumber_Shortcut_dot1K() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('.1k');
+                Assert.Equal(100,unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Shortcut_dot0001K() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('0.00001m');
+                Assert.Equal(10, unFormatted);
+            })
+        }
+        
+        [Fact]
+        function unFormatNumber_Shortcut_dot00001K() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('0.00000000001m');
+                Assert.Equal(0.00001, unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Shortcut_41K() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('4.1k');
+                Assert.Equal(4100,unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Shortcut_4K() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('4k');
+                Assert.Equal(4000,unFormatted);
+            })
+        }
+        
+        [Fact]
+        function unFormatNumber_Shortcut_4111111K() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('4.111111k');
+                Assert.Equal(4111.111,unFormatted);
+
+            })
+        }
+        
+        [Fact]
+        function unFormatNumber_Shortcut_4111111111111111K() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('4.111111111111111111k');
+                Assert.Equal(4111.11111111111, unFormatted);
+            })
+        }
+        [Fact]
+        function unFormatNumber_Shortcut_N4111111111111111K() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('-4.111111111111111111k');
+                Assert.Equal(-4111.11111111111, unFormatted);
+            })
+        }
+
+        [Fact]
         function unFormatNumber_Shortcut_M() {
             mockAura(function () {
                 var unFormatted = library.unFormatNumber('12.8m');
-                Assert.Equal(12800000,unFormatted);
+                Assert.Equal(12800000, unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Shortcut_PLUSM() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('+12.8m');
+                Assert.Equal(12800000, unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Shortcut_NM() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('-12.8m');
+                Assert.Equal(-12800000, unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Shortcut_1M() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('1m');
+                Assert.Equal(1000000, unFormatted);
+            })
+        }
+        
+
+        [Fact]
+        function unFormatNumber_Shortcut_41M() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('4.1m');
+                Assert.Equal(4100000, unFormatted);
             })
         }
 
@@ -110,10 +231,50 @@ Test.inputNumberLibrary = function () {
         }
 
         [Fact]
+        function unFormatNumber_Shortcut_41B() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('4.1b');
+                Assert.Equal(4100000000,unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Shortcut_1B() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('1b');
+                Assert.Equal(1000000000,unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Shortcut_41987989898989989899898B() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('4.1987989898989989899898b');
+                Assert.Equal(4198798989.8989989899898,unFormatted);
+            })
+        }
+
+        [Fact]
         function unFormatNumber_Shortcut_T() {
             mockAura(function () {
                 var unFormatted = library.unFormatNumber('12.8t');
-                Assert.Equal(12800000000000,unFormatted);
+                Assert.Equal(12800000000000, unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Shortcut_1T() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('1t');
+                Assert.Equal(1000000000000, unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Shortcut_41T() {
+            mockAura(function () {
+                var unFormatted = library.unFormatNumber('4.1t');
+                Assert.Equal(4100000000000, unFormatted);
             })
         }
 
@@ -121,10 +282,17 @@ Test.inputNumberLibrary = function () {
         function unFormatNumber_LocaleEuro() {
             mockLocaleEurope(function () {
                 var unFormatted = library.unFormatNumber('€12,8b');
-                Assert.Equal(12800000000,unFormatted);
+                Assert.Equal(12800000000, unFormatted);
             })
         }
 
+        [Fact]
+        function unFormatNumber_LocaleEuro41() {
+            mockLocaleEurope(function () {
+                var unFormatted = library.unFormatNumber('€4,1b');
+                Assert.Equal(4100000000, unFormatted);
+            })
+        }
     }
 
     [Fixture]

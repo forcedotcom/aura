@@ -320,6 +320,10 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         public void setValidTags(Set<String> validTags) {
             this.validTags = validTags;
         }
+        
+        public void setModuleDesignDef(ModuleDesignDef moduleDesignDef){
+        	this.moduleDesignDef = moduleDesignDef;
+        }
 
         @Override
         public ModuleDef build() throws QuickFixException {

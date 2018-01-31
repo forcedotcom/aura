@@ -26,9 +26,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * component, interface, and event. The common trait of all of these types is that they can include AttributeDefs.
  */
 public interface RootDefinition extends PlatformDef, Versionable {
-    enum SupportLevel {
-        PROTO, DEPRECATED, BETA, GA
-    }
 
     @Override
     DefDescriptor<? extends RootDefinition> getDescriptor();
@@ -68,8 +65,6 @@ public interface RootDefinition extends PlatformDef, Versionable {
     List<DefDescriptor<?>> getBundle();
 
     ProviderDef getLocalProviderDef() throws QuickFixException;
-
-    SupportLevel getSupport();
 
     DocumentationDef getDocumentationDef() throws QuickFixException;
 

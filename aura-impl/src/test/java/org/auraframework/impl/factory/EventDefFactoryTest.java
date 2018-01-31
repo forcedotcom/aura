@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
-import org.auraframework.def.RootDefinition.SupportLevel;
+import org.auraframework.def.PlatformDef.SupportLevel;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.util.AuraTestingUtil;
 import org.auraframework.impl.util.AuraTestingUtil.BundleEntryInfo;

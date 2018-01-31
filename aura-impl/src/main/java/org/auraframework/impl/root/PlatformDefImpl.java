@@ -16,11 +16,11 @@
 package org.auraframework.impl.root;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.builder.PlatformDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.PlatformDef;
@@ -36,13 +36,15 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
     protected final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
     protected final Double minVersion;
     protected Set<String> tags;
+    private final SupportLevel support;
 
     protected PlatformDefImpl(Builder<T> builder) {
         super(builder);
+        this.support = builder.support;
         if (builder.attributeDefs == null || builder.attributeDefs.size() == 0) {
             this.attributeDefs = ImmutableMap.of();
         } else {
-            this.attributeDefs = Collections.unmodifiableMap(new LinkedHashMap<>(builder.attributeDefs));
+            this.attributeDefs = Collections.unmodifiableMap(builder.attributeDefs);
         }
         this.minVersion = builder.minVersion;
         this.tags = Collections.unmodifiableSet(builder.tags);
@@ -70,15 +72,20 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
         return this.tags;
     }
 
-    public abstract static class Builder<T extends PlatformDef> extends BundleDefImpl.Builder<T> {
+    @Override
+    public SupportLevel getSupport() {
+        return this.support;
+    }
 
-        public Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
+    public abstract static class Builder<T extends PlatformDef> extends BundleDefImpl.Builder<T> implements PlatformDefBuilder<T> {
+
+        public Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = Maps.newLinkedHashMap();
         public Double minVersion;
         public Set<String> tags = Collections.emptySet();
+        private SupportLevel support = SupportLevel.PROTO;
 
         public Builder(Class<T> defClass) {
             super(defClass);
-            this.attributeDefs = Maps.newLinkedHashMap();
         }
 
         /**
@@ -110,6 +117,14 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
 
         public void setMinVersion(Double minVersion) {
             this.minVersion = minVersion;
+        }
+
+        @Override
+        public Builder<T> setSupport(SupportLevel support) {
+            if (support != null) {
+                this.support = support;
+            }
+            return this;
         }
     }
 }

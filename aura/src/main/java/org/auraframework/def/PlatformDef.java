@@ -23,6 +23,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 public interface PlatformDef extends BundleDef {
 
+    enum SupportLevel {
+        PROTO, DEPRECATED, BETA, GA
+    }
+
     @Override
     DefDescriptor<? extends PlatformDef> getDescriptor();
 
@@ -50,4 +54,6 @@ public interface PlatformDef extends BundleDef {
      * @return supported minimum version
      */
     Double getMinVersion();
+
+    SupportLevel getSupport();
 }

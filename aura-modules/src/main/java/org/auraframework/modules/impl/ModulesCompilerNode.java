@@ -25,20 +25,23 @@ import org.json.JSONObject;
 /**
  * ModulesCompiler implementation that spawns a process to invoke node
  */
-final class ModulesCompilerNode implements ModulesCompiler {
+public class ModulesCompilerNode implements ModulesCompiler {
 
-    private final Lambda compileLambda;
+    protected Lambda compileLambda;
     private final LoggingService loggingService;
+    protected final NodeLambdaFactory factory;
 
-    ModulesCompilerNode(NodeLambdaFactory factory, LoggingService loggingService) throws Exception {
-        compileLambda = factory.get(ModulesCompilerUtil.getCompilerBundle(factory), ModulesCompilerUtil.COMPILER_HANDLER);
+    protected ModulesCompilerNode(NodeLambdaFactory factory, LoggingService loggingService) throws Exception {
+        this.factory = factory;
         this.loggingService = loggingService;
     }
 
     @Override
     public ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
-        JSONObject input = ModulesCompilerUtil.generateCompilerInput(entry, sources);
+        JSONObject input = generateCompilerInput(entry, sources);
         JSONObject output;
+
+        compileLambda = getCompileLambda();
 
         try {
             output = compileLambda.invoke(input);
@@ -59,6 +62,22 @@ final class ModulesCompilerNode implements ModulesCompiler {
             loggingService.warn("ModulesCompilerNode: compiler error " + entry + ": " + error);
             throw new RuntimeException(error);
         }
+        return parseCompilerOutput(output);
+    }
+
+    protected JSONObject generateCompilerInput(String entry, Map<String, String> sources) {
+        return ModulesCompilerUtil.generateCompilerInput(entry, sources);
+    }
+
+    protected Lambda getCompileLambda() throws Exception {
+        if (compileLambda == null) {
+            compileLambda = this.factory.get(ModulesCompilerUtil.getCompilerBundle(factory), ModulesCompilerUtil.COMPILER_HANDLER);
+        }
+
+        return compileLambda;
+    }
+
+    protected ModulesCompilerData parseCompilerOutput(JSONObject output) {
         return ModulesCompilerUtil.parseCompilerOutput(output);
     }
 }

@@ -32,8 +32,8 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
     private ModulesCompiler compiler;
     private NodeLambdaFactory nodeServiceFactory;
 
-    private LoggingService loggingService;
-    private ConfigAdapter configAdapter;
+    protected LoggingService loggingService;
+    protected ConfigAdapter configAdapter;
 
     @Inject
     public void setLoggingService(LoggingService loggingService) {
@@ -57,7 +57,7 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
         return data;
     }
 
-    private synchronized ModulesCompiler getCompiler() throws Exception {
+    protected synchronized ModulesCompiler getCompiler() throws Exception {
         if (compiler == null) {
             nodeServiceFactory = configAdapter.nodeServiceFactory();
             compiler = new ModulesCompilerNode(nodeServiceFactory, loggingService);

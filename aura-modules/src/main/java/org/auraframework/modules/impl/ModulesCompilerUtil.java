@@ -107,7 +107,7 @@ public final class ModulesCompilerUtil {
         return file;
     }
 
-    static JSONObject generateCompilerInput(String entry, Map<String, String> sources) throws JSONException {
+    public static JSONObject generateCompilerInput(String entry, Map<String, String> sources) throws JSONException {
         JSONObject options = new JSONObject();
         options.put("format", "amd");
         options.put("mode", "all");
@@ -129,7 +129,7 @@ public final class ModulesCompilerUtil {
         return input;
     }
 
-    static ModulesCompilerData parseCompilerOutput(JSONObject result) {
+    public static ModulesCompilerData parseCompilerOutput(JSONObject result) {
         JSONObject dev = result.getJSONObject("dev");
         JSONObject prod = result.getJSONObject("prod");
         JSONObject compat = result.getJSONObject("compat");

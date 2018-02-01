@@ -22,7 +22,7 @@ import org.auraframework.modules.ModulesCompilerData;
 /**
  * Interface to compile modules
  */
-interface ModulesCompiler {
+public interface ModulesCompiler {
     
     ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception;
 }

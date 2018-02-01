@@ -210,6 +210,7 @@ AuraHistoryService.prototype.reset = function () {
  * Whether to use pushState.
  * Native Android browser has issues with pushState
  * IOS7 UIWebView has issues with pushState and history
+ * IE11 popstate event does not fire on URL change
  * @returns {boolean} true if pushState should be used
  * @private
  */
@@ -221,6 +222,8 @@ AuraHistoryService.prototype.usePushState = function() {
             !!window.history.pushState &&
             // NOT native Android browser
             !(ua.indexOf("Android ") > -1 && ua.indexOf("Mozilla/5.0") > -1 && ua.indexOf("AppleWebKit") > -1 && ua.indexOf("Chrome") === -1) &&
+            // NOT IE11
+            !(ua.indexOf('Trident/') > -1) &&
             // NOT IOS7 UIWebView (native app webview)
             !$A.util.isIOSWebView();
     }

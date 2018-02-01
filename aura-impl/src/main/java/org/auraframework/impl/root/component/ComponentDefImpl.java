@@ -33,7 +33,8 @@ import org.auraframework.validation.ReferenceValidationContext;
  * Once they are created, they can only be replaced, never changed.
  */
 public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> implements ComponentDef {
-    private static final long serialVersionUID = 6449560899515044182L;
+
+    private static final long serialVersionUID = -8833271874946123511L;
 
     protected ComponentDefImpl(Builder builder) {
         super(builder);

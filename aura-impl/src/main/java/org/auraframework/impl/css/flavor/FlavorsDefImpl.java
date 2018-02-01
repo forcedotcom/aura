@@ -46,7 +46,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class FlavorsDefImpl extends RootDefinitionImpl<FlavorsDef> implements FlavorsDef {
-    private static final long serialVersionUID = -4162113731545878044L;
+
+    private static final long serialVersionUID = 8656338421965511637L;
 
     private final List<FlavorIncludeDef> flavorIncludeDefs;
     private final List<FlavorDefaultDef> flavorDefaultDefs;

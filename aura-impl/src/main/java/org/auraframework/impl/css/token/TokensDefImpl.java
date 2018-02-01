@@ -60,7 +60,8 @@ import com.google.common.collect.Sets;
  * Implementation for {@link TokensDef}.
  */
 public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implements TokensDef {
-    private static final long serialVersionUID = -7900230831915100535L;
+
+    private static final long serialVersionUID = -6632330906775767056L;
 
     private final Map<String, TokenDef> tokens;
     private final List<DefDescriptor<TokensDef>> imports;

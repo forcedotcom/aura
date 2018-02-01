@@ -47,7 +47,9 @@ import com.google.common.collect.Lists;
  * The definition of an event, basically just defines shape, i.e. attributes
  */
 public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventDef {
-    private static final long serialVersionUID = 610875326950592992L;
+
+    private static final long serialVersionUID = -5328742464932470661L;
+
     private final EventType eventType;
     private final DefDescriptor<EventDef> extendsDescriptor;
     private final int hashCode;

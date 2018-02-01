@@ -40,7 +40,8 @@ import org.auraframework.util.json.Json;
  */
 public final class MethodDefImpl extends RootDefinitionImpl<MethodDef> implements MethodDef {
 
-    private static final long serialVersionUID = 2241357666688011567L;
+    private static final long serialVersionUID = -2477214600636335736L;
+
     private final DefDescriptor<? extends RootDefinition> parentDescriptor;
     private final String action;
     private final SerializeToType serializeTo;

@@ -55,7 +55,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 
 public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements DesignDef {
-    private static final long serialVersionUID = -8621907027705407577L;
+
+    private static final long serialVersionUID = -8856144193410487528L;
+
     private final Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> attributeDesignDefs;
     private final DesignTemplateDef template;
     private final Multimap<String, DesignOptionDef> options;

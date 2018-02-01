@@ -37,7 +37,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public abstract class BundleDefImpl<T extends BundleDef> extends DefinitionImpl<T> implements BundleDef {
-    private static final long serialVersionUID = -95244696973620803L;
+
+    private static final long serialVersionUID = 5663901917141134057L;
 
     private final Map<DefDescriptor<?>, Definition> bundledDefs;
 

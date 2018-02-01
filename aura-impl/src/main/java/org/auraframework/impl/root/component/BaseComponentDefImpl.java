@@ -94,10 +94,11 @@ import com.google.common.collect.Sets;
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
+    private static final long serialVersionUID = -5640566031972178622L;
+
     public static final DefDescriptor<InterfaceDef> ROOT_MARKER = new DefDescriptorImpl<>(
             "markup", "aura", "rootComponent", InterfaceDef.class);
 
-    private static final long serialVersionUID = -2485193714215681494L;
     private final boolean isAbstract;
     private final boolean isExtensible;
     private final boolean isTemplate;

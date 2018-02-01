@@ -41,7 +41,7 @@ import java.util.Set;
  */
 public abstract class RootDefinitionImpl<T extends RootDefinition> extends PlatformDefImpl<T> implements RootDefinition {
 
-    private static final long serialVersionUID = 2885495270950386878L;
+    private static final long serialVersionUID = 8654409165914592261L;
     protected final Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs;
     protected final List<DefDescriptor<ProviderDef>> providerDescriptors;
     protected final DocumentationDef documentationDef;

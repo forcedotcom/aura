@@ -30,7 +30,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 public class FlavorBundleDefImpl extends RootDefinitionImpl<FlavorBundleDef> implements FlavorBundleDef {
-    private static final long serialVersionUID = 2461622780260969197L;
+
+    private static final long serialVersionUID = 7895713566349526564L;
 
     protected FlavorBundleDefImpl(Builder builder) {
         super(builder);

@@ -32,7 +32,7 @@ import com.google.common.collect.Sets;
 
 public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefImpl<T> implements PlatformDef {
 
-    private static final long serialVersionUID = -1067302360183554890L;
+    private static final long serialVersionUID = -5903259567383044872L;
     protected final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
     protected final Double minVersion;
     protected Set<String> tags;

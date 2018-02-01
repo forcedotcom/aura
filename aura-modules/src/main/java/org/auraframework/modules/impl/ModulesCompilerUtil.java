@@ -133,7 +133,6 @@ public final class ModulesCompilerUtil {
         JSONObject dev = result.getJSONObject("dev");
         JSONObject prod = result.getJSONObject("prod");
         JSONObject compat = result.getJSONObject("compat");
-        // TODO COMPAT : update to "prod_compat" when compiler is updated
         JSONObject prodCompat = result.getJSONObject("prod_compat");
 
         String devCode = dev.getString("code");
@@ -149,12 +148,9 @@ public final class ModulesCompilerUtil {
 
         JSONObject metadata = prodCompat.getJSONObject("metadata");
         JSONArray bundleDependenciesArray = metadata.getJSONArray("bundleDependencies");
-        JSONArray bundleLabelsArray = metadata.getJSONArray("bundleLabels");
         Set<String> bundleDependencies = new HashSet<>();
         Set<String> bundleLabels = new HashSet<>();
 
-        // NOTE @dval: Simplify this logic once constructor defined labels is deprecated in lwc (212)
-        // Labels should be defined and collected only from the label:// schema static imports.
         for (int i = 0; i < bundleDependenciesArray.length(); i++) {
             String dep = bundleDependenciesArray.getString(i);
             if (dep.startsWith(LABEL_SCHEMA)) {
@@ -163,9 +159,6 @@ public final class ModulesCompilerUtil {
             bundleDependencies.add(dep);
         }
 
-        for (int i = 0; i < bundleLabelsArray.length(); i++) {
-            bundleLabels.add(bundleLabelsArray.getString(i));
-        }
         return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels, "TODO: external-references");
     }
 }

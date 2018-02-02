@@ -81,7 +81,7 @@ function lib() { //eslint-disable-line no-unused-vars
                     formattedTime = $A.localizationService.formatTimeUTC(convertedDate, config.timeFormat, config.langLocale);
                 }
 
-                var isoFormattedDateTime = $A.localizationService.toISOString(convertedDate);
+                var isoFormattedDateTime = convertedDate.toISOString();
 
                 callback({
                     date: formattedDate,
@@ -114,7 +114,7 @@ function lib() { //eslint-disable-line no-unused-vars
 
             var isoValue = function (convertedDate) {
                 var translatedDate = $A.localizationService.translateFromOtherCalendar(convertedDate);
-                var isoString = $A.localizationService.toISOString(translatedDate);
+                var isoString = translatedDate.toISOString();
 
                 callback(isoString);
             };

@@ -285,9 +285,6 @@
         var date = new Date();
         testUtils.assertTrue(date instanceof Date, "Array created via 'new Date()' should be an instance of Date");
 
-        var iso = $A.localizationService.toISOString(date);
-        testUtils.assertEquals(date.toISOString(), iso);
-
         // Test Element
         var element = document.createElement("div");
         testUtils.assertTrue(element instanceof HTMLDivElement, "DIV element should be an instance of HTMLDivElement");

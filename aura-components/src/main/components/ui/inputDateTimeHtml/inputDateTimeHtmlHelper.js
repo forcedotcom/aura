@@ -32,7 +32,7 @@
     },
 
     setInputValue: function (elem, date) {
-        var isoString = $A.localizationService.toISOString(date);
+        var isoString = date.toISOString();
 
         // datetime-local input doesn't support any time zone offset information,
         // so we need to remove the 'Z' off of the end.
@@ -67,7 +67,7 @@
     },
 
     setValue: function (component, value) {
-        component.set("v.value", $A.localizationService.toISOString(value));
+        component.set("v.value", value.toISOString());
         component._ignoreChange = true;
     }
 });

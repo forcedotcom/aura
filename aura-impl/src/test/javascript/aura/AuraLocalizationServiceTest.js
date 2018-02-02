@@ -49,6 +49,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
 
     var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
         assert: function () {},
+        deprecated: function() {},
         auraError: function() {},
         get:function(value){
             if(value === "$Locale.dateFormat") return targetDateFormat;
@@ -1657,9 +1658,12 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             // Arrange
             var expected = "";
             var targetService = new Aura.Services.AuraLocalizationService();
+            var actual;
 
             // Act
-            var actual = targetService.toISOString(expected);
+            mockUtil(function() {
+                actual = targetService.toISOString(expected);
+            });
 
             // Assert
             Assert.Equal(expected, actual);

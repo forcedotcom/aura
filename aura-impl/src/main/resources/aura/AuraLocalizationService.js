@@ -315,7 +315,10 @@ AuraLocalizationService.prototype.displayDurationInYears = function(d) {
  * @platform
  */
 AuraLocalizationService.prototype.duration = function(num, unit) {
-    return unit ? this.moment["duration"](num, unit) : this.moment["duration"](num);
+    var duration = this.moment["duration"](num, unit);
+
+    // TODO: figure out if users are calling the APIs on it
+    return duration;
 };
 
 /**
@@ -662,11 +665,15 @@ AuraLocalizationService.prototype.getHoursInDuration = function(d) {
  * Get the date time related labels (month name, weekday name, am/pm etc.).
  * @return {Object} the localized label set.
  * @memberOf AuraLocalizationService
+ * @deprecated
  * @public
  * @export
  * @platform
  */
 AuraLocalizationService.prototype.getLocalizedDateTimeLabels = function() {
+    $A.deprecated("$A.localizationService.getLocalizedDateTimeLabels(): The labels from this method are no longer supported. This method will be removed in an upcoming release.",
+            null, null, null, "AuraLocalizationService.getLocalizedDateTimeLabels");
+
     var langLocale = $A.get("$Locale.langLocale");
     var l = this.getAvailableMomentLocale(langLocale);
     return this.moment["localeData"](l);
@@ -1066,11 +1073,14 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
  * var d = new Date();
  * // Returns "2015-10-09T20:47:17.590Z"
  * $A.localizationService.toISOString(d);
+ * @deprecated
  * @public
  * @export
  * @platform
  */
 AuraLocalizationService.prototype.toISOString = function(date) {
+    $A.deprecated("$A.localizationService.toISOString(): The method is no longer supported by framework, and will be removed in an upcoming release.",
+            "Use native method Date.toISOString() instead", null, null, "AuraLocalizationService.toISOString");
     if (date && $A.lockerService.instanceOf(date, Date)) {
         if (date.toISOString) {
             return date.toISOString();

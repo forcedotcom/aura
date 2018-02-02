@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 ({
-
     convertFrom24To12: function(component, hours) {
         var amPmCmp = component.find("ampm");
         if (amPmCmp) {
@@ -35,18 +34,74 @@
         var is24HourFormat = $A.util.getBooleanValue(component.get("v.is24HourFormat"));
         if (is24HourFormat === false) {
             // Localize am/pm label
-            var localizedData = $A.localizationService.getLocalizedDateTimeLabels();
-            var ampm = localizedData._ampm;
-            if (ampm) {
-                var amOptCmp = component.find("amOpt");
-                if (amOptCmp) {
-                    amOptCmp.set("v.label", ampm.am);
-                }
-                var pmOptCmp = component.find("pmOpt");
-                if (pmOptCmp) {
-                    pmOptCmp.set("v.label", ampm.pm);
+            var dayPeriodLabels = this.getLocalizedDayPeriodLabels();
+
+            var amOptCmp = component.find("amOpt");
+            if (amOptCmp && dayPeriodLabels["am"]) {
+                amOptCmp.set("v.label", dayPeriodLabels["am"]);
+            }
+
+            var pmOptCmp = component.find("pmOpt");
+            if (pmOptCmp && dayPeriodLabels["pm"]) {
+                pmOptCmp.set("v.label", dayPeriodLabels["pm"]);
+            }
+        }
+    },
+
+    getLocalizedDayPeriodLabels: function() {
+        if (this.localizedDayPeriodLabels) {
+            return this.localizedDayPeriodLabels;
+        }
+
+        this.localizedDayPeriodLabels = {};
+        var locale = $A.get("$Locale.langLocale").replace("_", "-");
+
+        // Using UTC to avoid broswer's timezone offset
+        var amDate = new Date(Date.UTC(2012, 11, 20, 11, 11, 0));
+        var amLabel = this.getLocalizedDayPeriodLabelByDate(amDate, locale);
+        if (amLabel) {
+            this.localizedDayPeriodLabels["am"] = amLabel;
+        }
+
+        var pmDate = new Date(Date.UTC(2012, 11, 20, 23, 11, 0));
+        var pmLabel = this.getLocalizedDayPeriodLabelByDate(pmDate, locale);
+        if (pmLabel) {
+            this.localizedDayPeriodLabels["pm"] = pmLabel;
+        }
+
+        return this.localizedDayPeriodLabels;
+    },
+
+    getLocalizedDayPeriodLabelByDate: function(date, locale) {
+        // The browsers which don't support DateTimeFormat.formatToParts rely on the config to parse out the labels
+        var dateTimeFormatConfig = {
+            'timeZone': "UTC",
+            "hour12": true,
+            "hour": "2-digit",
+            "minute": "2-digit"
+        };
+
+        var dayPeriodLabelFormat;
+        try {
+            dayPeriodLabelFormat = Intl.DateTimeFormat(locale, dateTimeFormatConfig);
+        } catch (e) {
+            $A.warning("Failed to get day period labels for unsupported locale '" + locale + "'. " + e.message);
+            return null;
+        }
+
+        if (dayPeriodLabelFormat.formatToParts) {
+            var parts = dayPeriodLabelFormat.formatToParts(date);
+            for (var i = 0; i < parts.length; i++) {
+                var part = parts[i];
+                if (part["type"].toLowerCase() === "dayperiod") {
+                    return part["value"];
                 }
             }
+        } else {
+            // Fallback for browsers don't support DateTimeFormat.formatToParts, like IE11 and Edge
+            var timeString = dayPeriodLabelFormat.format(date);
+            // IE11 adds LTR / RTL mark in the formatted date time string
+            return timeString.replace(/[\u200E\u200F]/g,'').replace(/ ?.{2}:.{2} ?/, "");
         }
     },
 

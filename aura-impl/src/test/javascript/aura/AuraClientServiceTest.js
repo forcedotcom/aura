@@ -4012,4 +4012,147 @@ Test.Aura.AuraClientServiceTest = function() {
             });
         }
     }
+
+    [Fixture]
+    function buildActionNameList() {
+        [Fact]
+        function IncludesFrameworkNamespace() {
+            var input = [ { descriptor: "aura://ComponentController/ACTION$getComponent" } ];
+            var expected = "aura.Component.getComponent=1";
+            
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                var actual = target.buildActionNameList(input);
+                Assert.Equal(expected, actual);
+            });
+        }
+
+        [Fact]
+        function IncludesManagedNamespace() {
+            var input = [ { descriptor: "prefix://managed.Custom/ACTION$doIt" } ];
+            var expected = "managed.Custom.doIt=1";
+            
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                var actual = target.buildActionNameList(input);
+                Assert.Equal(expected, actual);
+            });
+        }
+
+        [Fact]
+        function IncludesDefaultNamespace() {
+            var input = [ { descriptor: "prefix://Custom/ACTION$doIt" } ];
+            var expected = "other.Custom.doIt=1";
+            
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                var actual = target.buildActionNameList(input);
+                Assert.Equal(expected, actual);
+            });
+        }
+
+        [Fact]
+        function IncludesJavaPackage() {
+            var input = [ { descriptor: "java://org.auraframework.ServerController/ACTION$doIt" } ];
+            var expected = "org.auraframework.Server.doIt=1";
+            
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                var actual = target.buildActionNameList(input);
+                Assert.Equal(expected, actual);
+            });
+        }
+
+        [Fact]
+        function IdentifiesUnpackagedJavaPackage() {
+            var input = [ { descriptor: "java://ServerController/ACTION$doIt" } ];
+            var expected = "other.Server.doIt=1";
+            
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                var actual = target.buildActionNameList(input);
+                Assert.Equal(expected, actual);
+            });
+        }
+
+        [Fact]
+        function SortsAlphabetically() {
+            var input = [
+                { descriptor: "java://org.first/ACTION$doIt" },
+                { descriptor: "prefix://second/ACTION$doIt" },
+                { descriptor: "aura://third/ACTION$doIt" }
+            ];
+            var expected = "aura.third.doIt=1&org.first.doIt=1&other.second.doIt=1";
+            
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                var actual = target.buildActionNameList(input);
+                Assert.Equal(expected, actual);
+            });
+        }
+
+        [Fact]
+        function CountsMultipleOccurrences() {
+            var input = [
+                { descriptor: "prefix://first/ACTION$doIt" },
+                { descriptor: "java://org.first/ACTION$doIt" },
+                { descriptor: "prefix://first/ACTION$doIt" },
+                { descriptor: "prefix://first/ACTION$doIt" }
+            ];
+            var expected = "org.first.doIt=1&other.first.doIt=3";
+            
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                var actual = target.buildActionNameList(input);
+                Assert.Equal(expected, actual);
+            });
+        }
+
+        [Fact]
+        function TrimsLastControllerFragment() {
+            var input = [ { descriptor: "prefix://some.Controller.CustomController/ACTION$doIt" } ];
+            var expected = "some.Controller.Custom.doIt=1";
+            
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                var actual = target.buildActionNameList(input);
+                Assert.Equal(expected, actual);
+            });
+        }
+
+        [Fact]
+        function TrimsAtMaxLength() {
+            // Each query param will be 98 chars long.
+            var input = [
+                { descriptor: "java://org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflictA/ACTION$doIt" },
+                { descriptor: "java://org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflictB/ACTION$doIt" },
+                { descriptor: "java://org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict0/ACTION$doIt" },
+                { descriptor: "java://org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict1/ACTION$doIt" },
+                { descriptor: "java://org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict2/ACTION$doIt" },
+                { descriptor: "java://org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict3/ACTION$doIt" },
+                { descriptor: "java://org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict4/ACTION$doIt" },
+                { descriptor: "java://org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict5/ACTION$doIt" },
+                { descriptor: "java://org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict6/ACTION$doIt" },
+                { descriptor: "java://org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict7/ACTION$doIt" },
+                { descriptor: "java://org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict8/ACTION$doIt" },
+                { descriptor: "java://org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict9/ACTION$doIt" }
+            ];
+            var expected = "org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict0.doIt=1"
+                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict1.doIt=1"
+                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict2.doIt=1"
+                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict3.doIt=1"
+                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict4.doIt=1"
+                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict5.doIt=1"
+                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict6.doIt=1"
+                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict7.doIt=1"
+                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict8.doIt=1"
+                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict9.doIt=1";
+            
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                var actual = target.buildActionNameList(input);
+                Assert.Equal(expected, actual);
+            });
+        }
+    }
 }

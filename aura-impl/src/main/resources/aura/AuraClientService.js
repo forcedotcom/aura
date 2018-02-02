@@ -307,6 +307,11 @@ AuraClientService.CONSECUTIVE_RELOAD_COUNTER_KEY = "__RELOAD_COUNT";
 AuraClientService.UNKNOWN_FRAMEWORK_UID = "UNKNOWN";
 
 /**
+ * Maximum length for action request query strings.
+ */
+AuraClientService.MAX_ACTION_QUERY_LENGTH = 1000;
+
+/**
  * set the XHR queue size.
  *
  * This is a one time set for the queue size. Any further attempts will be ignored.
@@ -3248,26 +3253,51 @@ AuraClientService.prototype.buildParams = function(map) {
 };
 
 /**
- * Create an encoded query string with action names and their occurrence count
+ * Create an encoded query string with action names and their occurrence count.
  *
  * @param {Action[]} actions  The list of actions.
  * @returns {String}          The encoded query string.
  * @private
  */
 AuraClientService.prototype.buildActionNameList = function(actions) {
-    var map = {};
+    var i, map = {};
 
-    for (var i = 0; i < actions.length; i++) {
+    for (i = 0; i < actions.length; i++) {
         var actionDescriptor = actions[i]["descriptor"];
         var parts = actionDescriptor.split('/');
         var controllerMethod = parts.pop().split('$').pop();
-        var controller = parts.pop().split('.').pop().split('Controller').shift();
-        var actionName = controller + "." + controllerMethod;
+        var controller = parts.pop();
+        var index = controller.indexOf("Controller", controller.length - "Controller".length);
+        if ( index > 0 ) {
+            controller = controller.substring(0, index);
+        }
+        var prefix = "";
+        if ( controller.indexOf('.') < 0 ){
+            if ( parts[0] === "aura:" ) {
+                prefix = "aura.";
+            } else {
+                prefix = "other.";
+            }
+        }
+        var actionName = prefix + controller + "." + controllerMethod;
 
         map[actionName] = map[actionName] ? map[actionName] + 1 : 1;
     }
 
-    return this.buildParams(map);
+    var arr = [];
+    var keys = Object.keys(map).sort();
+    for (i = 0; i < keys.length; i++) {
+        if ( i > 0 ) {
+            arr.push("&");
+        }
+        var key = keys[i];
+        arr.push(key, "=", encodeURIComponent(map[key]));
+    }
+    var list = arr.join("");
+    if (list.length > AuraClientService.MAX_ACTION_QUERY_LENGTH) {
+        list = list.substring(0, list.lastIndexOf("&", AuraClientService.MAX_ACTION_QUERY_LENGTH));
+    }
+    return list;
 };
 
 

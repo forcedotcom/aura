@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-01-15
- * Version: 0.3.9
+ * Generated: 2018-01-31
+ * Version: 0.3.10
  */
 
 (function (global, factory) {
@@ -517,34 +517,24 @@ function repairAccessors(global) {
  * limitations under the License.
  */
 
-// Adapted from SES/Caja
-// Copyright (C) 2011 Google Inc.
-// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
-// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
+// Mitigate proxy-related security issues
+// https://github.com/tc39/ecma262/issues/272
 
-// The code verifyStrictFunctionBody has been simplified since
-// https://bugs.webkit.org/show_bug.cgi?id=173303 is now declassified
-
-/**
- * The unsafe* variables hold precious values that must not escape
- * to untrusted code.
+/*
+ * Copyright (C) 2017 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    '    ' http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-// see startSES.js
-const unsafeFunction = Function;
-
-/**
- * <p>We use Crock's trick of simply passing {@code funcBodySrc} to
- * the original {@code Function} constructor, which will throw a
- * SyntaxError if it does not parse as a FunctionBody.
- */
-// See repairES5.js
-function verifyStrictFunctionBody(funcBodySrc) {
-  funcBodySrc = String(funcBodySrc);
-  unsafeFunction(`
-"use strict";
-${funcBodySrc}`);
-  return funcBodySrc;
-}
 
 /*
  * Copyright (C) 2017 salesforce.com, inc.
@@ -562,103 +552,116 @@ ${funcBodySrc}`);
  * limitations under the License.
  */
 
-// Adapted from SES/Caja
-// Copyright (C) 2011 Google Inc.
-// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
-// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
+let initalized = false;
 
 /**
- * Fails if {@code exprSource} does not parse as a strict
- * Expression production.
- *
- * <p>To verify that exprSrc parses as a strict Expression, we
- * verify that, when surrounded by parens and followed by ";", it
- * parses as a strict FunctionBody, and that when surrounded with
- * double parens it still parses as a strict FunctionBody. We
- * place a newline before the terminal token so that a "//"
- * comment cannot suppress the close paren or parens.
- *
- * <p>We never check without parens because not all
- * expressions, for example "function(){}", form valid expression
- * statements. We check both single and double parens so there's
- * no exprSrc text which can close the left paren(s), do
- * something, and then provide open paren(s) to balance the final
- * close paren(s). No one such attack will survive both tests.
- *
- * <p>Note that all verify*(allegedString) functions now always
- * start by coercing the alleged string to a guaranteed primitive
- * string, do their verification checks on that, and if it passes,
- * returns that. Otherwise they throw. If you don't know whether
- * something is a string before verifying, use only the output of
- * the verifier, not the input. Or coerce it early yourself.
+ * Stores (key => value) where "key" is the current secureWindow context and
+ * "value" is the secureEvaluator which is scoped to that secureWindow context.
  */
-// see startSES.js
-function verifyStrictExpression(exprSrc) {
-  exprSrc = String(exprSrc);
-  verifyStrictFunctionBody(`( ${exprSrc}\n);`);
-  verifyStrictFunctionBody(`(( ${exprSrc}\n));`);
-  return exprSrc;
+const keyToEvaluator = new Map();
+
+/**
+ * Defines a list of intrinsics (properties on window) which
+ * we want to be accessible via rapid lookup of pointer rather than
+ * having to search for them whenever they are accessed.
+ */
+const constants = ['Object', 'Array'];
+
+/**
+ * Used to generate the secureEvalFactory
+ * which build secureEval functions scoped to secureWindows.
+ */
+const evaluatorFactorySource = `
+  (function() {
+    with (arguments[0]) {
+      const {${constants.join(',')}} = arguments[0];
+      return function(){
+        "use strict";
+        return eval(arguments[0]);
+      };
+    }
+  })
+`;
+
+const evaluatorFactory = (0, eval)(evaluatorFactorySource);
+
+// Immutable Prototype Exotic Objects
+// https://github.com/tc39/ecma262/issues/272
+function freezeIntrinsics(global) {
+  seal(global.Object.prototype);
 }
 
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-// Adapted from SES/Caja
-// Copyright (C) 2011 Google Inc.
-// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
-// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
-
 /**
- * A safe form of the indirect {@code eval} function, which
- * evaluates {@code src} as strict code that can only refer freely
- * to the {@code sharedImports}.
+ * Generates a makeEvaluator object which can be be used to generate
+ * secureEval() functions which are bound in scope to a secureWindow.
  *
- * <p>Given our parserless methods of verifying untrusted sources,
- * we unfortunately have no practical way to obtain the completion
- * value of a safely evaluated Program. Instead, we adopt a
- * compromise based on the following observation. All Expressions
- * are valid Programs, and all Programs are valid
- * FunctionBodys. If {@code src} parses as a strict expression,
- * then we evaluate it as an expression and correctly return its
- * completion value, since that is simply the value of the
- * expression.
+ * secureEval functions are unique in that they have the following traits:
  *
- * <p>Otherwise, we evaluate {@code src} as a FunctionBody and
- * return what that would return from its implicit enclosing
- * function. If {@code src} is simply a Program, then it would not
- * have an explicit {@code return} statement, and so we fail to
- * return its completion value.
+ * 1. Operate as a standard eval() call but with a limited scope - this prevents hackers from accessing
+ * global data that we do not provide in the first with() or the list of constants.
  *
- * <p>When SES {@code eval} is provided primitively, it should
- * accept a Program and evaluate it to the Program's completion
- * value. Unfortunately, this is not possible on ES5 without
- * parsing.
+ * 2. Improved performance over safeEval() by exposing a list of consts to the inner width we reduce
+ * DOM tree traversal when searching for window properties.
+ *
+ * 3. Improved debugability. Rather than seeing the entire secureEval in the debugger,
+ * the innermost function is exposed during debugging instead of the entire function.
  */
-// See fakeEval in startSES.js
-function completion(src) {
-  src = String(src);
-  try {
-    return verifyStrictExpression(src);
-  } catch (err) {
-    return `
-(function(){
-  "use strict";
-  ${verifyStrictFunctionBody(src)}
-}).call(this)`;
+function makeEvaluator(win) {
+  let isInternalEval = false;
+
+  const proxy = new Proxy(win, {
+    has: (target, prop) => {
+      if (prop === 'eval') {
+        if (isInternalEval) {
+          isInternalEval = false;
+          return false;
+        }
+      }
+      return prop !== 'arguments' && (prop in target || prop in window);
+    }
+  });
+
+  const scopedEvaluator = evaluatorFactory(proxy);
+
+  function evaluator(src) {
+    isInternalEval = true;
+    const result = scopedEvaluator.call(win, src);
+    isInternalEval = false;
+    return result;
   }
+
+  evaluator.toString = () => 'function eval() { [Locker Service code] }';
+
+  win.eval = evaluator;
+
+  return evaluator;
+}
+
+/**
+ * Generates a secureEval function and builds the required
+ * resources for generating a secureEval function if they do not currently exist.
+ *
+ * Returns secureEval() to the caller.
+ *
+ * @return function secureEval
+ * @param key a key used by getEnv to produce a reference to the current secureWindow context
+ */
+function getSecureEval(key) {
+  let evaluator = keyToEvaluator.get(key);
+  
+  if (!initalized) {        
+      repairAccessors(window);        
+      freezeIntrinsics(window);        
+      initalized = true;        
+  }
+
+  if (!evaluator) {
+    const win = getEnv$1(key);
+    evaluator = makeEvaluator(win);
+    keyToEvaluator.set(key, evaluator);
+  }
+
+  return evaluator;
 }
 
 /**
@@ -697,87 +700,6 @@ function sanitizeURLForElement(url) {
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
- * Licensed under the Apache License, Version 2.0(the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-let initalized = false;
-
-// Immutable Prototype Exotic Objects
-// https://github.com/tc39/ecma262/issues/272
-function freezeIntrinsics(global) {
-  seal(global.Object.prototype);
-}
-
-// wrapping the source with `with` statements create a new lexical scope,
-// that can prevent access to the globals in the worker by shodowing them
-// with the members of new scopes passed as arguments into the `hookFn` call.
-// additionally, when specified, strict mode will be enforced to avoid leaking
-// global variables into the worker.
-function makeEvaluatorSource(src, sourceURL) {
-  // Create the evaluator function.
-  // The shadow is a proxy that has all window properties defined as undefined.
-  // We mute globals for convenience. However, they remain available on window.
-  // force strict mode
-  // Objects: this = globals, window = globals
-
-  let fnSource = `
-(function () {
-    with (new Proxy({}, {
-        has: (target, prop) => prop in window
-    })) {
-    with (arguments[0]) {
-        return (function(window){
-            "use strict";
-            return (
-                ${completion(src)}
-            );
-
-        }).call(arguments[0], arguments[0]);
-    }}
-})`;
-
-  // Sanitize the URL
-  sourceURL = sanitizeURLForElement(sourceURL);
-  if (sourceURL) {
-    fnSource += `\n//# sourceURL=${sourceURL}`;
-  }
-
-  return fnSource;
-}
-
-function safeEval(src, sourceURL, globals) {
-  if (!src) {
-    return undefined;
-  }
-
-  const fnSource = makeEvaluatorSource(src, sourceURL);
-  const fn = (0, eval)(fnSource); // eslint-disable-line no-eval
-
-  if (typeof fn === 'function') {
-    if (!initalized) {
-      repairAccessors(window);
-      freezeIntrinsics(window);
-      initalized = true;
-    }
-
-    return fn(globals);
-  }
-
-  throw new SyntaxError(`Unable to evaluate code at: ${sourceURL}`);
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -794,6 +716,7 @@ const keyToEnvironment = new Map();
 
 function getEnv$1(key) {
   let env = keyToEnvironment.get(key);
+
   if (!env) {
     env = SecureWindow(window, key);
     keyToEnvironment.set(key, env);
@@ -802,8 +725,21 @@ function getEnv$1(key) {
   return env;
 }
 
+/**
+ * Evaluates a string using secureEval rather than eval.
+ * Sanitizes the input string and attaches a sourceURL so the
+ * result can be easily found in browser debugging tools.
+ */
 function evaluate(src, key, sourceURL) {
-  return safeEval(src, sourceURL, getEnv$1(key));
+  const secureEval = getSecureEval(key);
+
+  // Sanitize the URL
+  if (sourceURL) {
+    sourceURL = sanitizeURLForElement(sourceURL);
+    src += `\n//# sourceURL=${sourceURL}`;
+  }
+
+  return secureEval(src);
 }
 
 const assert = {
@@ -991,7 +927,11 @@ const SecureIFrameElement = {
 
   // TODO: Move this function into a separate file
   SecureIFrameContentWindow: function(w, key) {
-    const sicw = Object.create(null, {
+    let sicw = getFromCache(w, key);
+    if (sicw) {
+      return sicw;
+    }
+    sicw = Object.create(null, {
       toString: {
         value: function() {
           return `SecureIFrameContentWindow: ${w}{ key: ${JSON.stringify(key)} }`;

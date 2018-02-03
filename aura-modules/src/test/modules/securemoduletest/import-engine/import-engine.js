@@ -1,4 +1,5 @@
 import * as testUtil from 'securemoduletest-test-util';
+// LWC does not currently support * imports from engine.
 import * as engineAlias from 'engine';
 
 export function testDefiningNewPropertiesOnEngine() {

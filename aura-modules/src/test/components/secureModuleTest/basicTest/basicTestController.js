@@ -36,13 +36,14 @@
         var returnStatus = testModule.testEngineIsSecure();
         testUtils.assertTrue(returnStatus);
     },
-
-    testEngineIsImmutable: function (cmp) {
-        var testUtils = cmp.get("v.testUtils");
-        var testModule = cmp.find("importEngine");
-        testUtils.assertTrue(testModule.testDefiningNewPropertiesOnEngine());
-        testUtils.assertTrue(testModule.testModifyExistingPropertiesOnEngine());
-    },
+    
+    // Disabled until LWC supports * style imports again
+    // testEngineIsImmutable: function (cmp) {
+    //     var testUtils = cmp.get("v.testUtils");
+    //     var testModule = cmp.find("importEngine");
+    //     testUtils.assertTrue(testModule.testDefiningNewPropertiesOnEngine());
+    //     testUtils.assertTrue(testModule.testModifyExistingPropertiesOnEngine());
+    // },
 
     testElementIsImmutable: function (cmp) {
         var testUtils = cmp.get("v.testUtils");

@@ -25,14 +25,14 @@
     <aura:method name="testEngineIsSecure"/>
     <aura:method name="testOptOutOfLockerUsingMetaData"/>
     <aura:method name="testMiscGlobalsNotAccessibleInModules"/>
-    <aura:method name="testEngineIsImmutable"/>
+    <!-- <aura:method name="testEngineIsImmutable"/> -->
     <aura:method name="testElementIsImmutable"/>
     <aura:method name="testSecureModulesInUnsupportedBrowsers"/>
 
     <!-- secureModuleTest:bootstrap is a test module with some basic setup and checks -->
     <secureModuleTest:bootstrap aura:id="bootstrap"/>
     <secureModuleTest:nonLockerizedCmp aura:id="nonLockerized"/>
-    <secureModuleTest:importEngine aura:id="importEngine"/>
+    <!-- <secureModuleTest:importEngine aura:id="importEngine"/> -->
     <secureModuleTest:importElement aura:id="importElement"/>
 
     <!--secureModuleTest:sanityChecks is a test module with extensive tests for lockerService functionality-->

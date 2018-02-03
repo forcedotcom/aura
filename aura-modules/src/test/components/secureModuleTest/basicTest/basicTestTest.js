@@ -46,7 +46,8 @@
         }
     },
 
-    testEngineIsImmutable: {
+    // Disabled until LWC supports * imports again
+    _testEngineIsImmutable: {
         test: function (cmp) {
             cmp.testEngineIsImmutable();
         }

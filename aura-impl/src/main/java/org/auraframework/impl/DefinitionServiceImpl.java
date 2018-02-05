@@ -528,17 +528,13 @@ public class DefinitionServiceImpl implements DefinitionService {
     }
 
     @Override
-    public Set<DefDescriptor<?>> findByTags(Set<String> tags) {
+    public Set<DefDescriptor<?>> findByTags(final Set<String> namespaces, Set<String> tags) {
         final String filterKey = tags.toString();
         Set<DefDescriptor<?>> matched = Sets.newHashSet();
         AuraContext context = contextService.getCurrentContext();
         Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache = cachingService.getDescriptorFilterCache();
         Lock rLock = cachingService.getReadLock();
 
-        //
-        // If we have somthing that is non-constant, we'll have to muck with caches and do some funky
-        // running around.
-        //
         rLock.lock();
         try {
             //
@@ -549,7 +545,24 @@ public class DefinitionServiceImpl implements DefinitionService {
             for (DefRegistry reg : registries) {
                 if (reg.hasFind()) {
                     Set<DefDescriptor<?>> registryResults = null;
+                    boolean partial_overlap = false;
 
+                    if (namespaces != null) {
+                        //
+                        // If we have a namespace filter, we may need to filter the results from the
+                        // registry, and we may be able to ignore some registries, so do that calculation
+                        // here.
+                        //
+                        int ns_overlap = Sets.intersection(reg.getNamespaces(), namespaces).size();
+                        if (ns_overlap == 0) {
+                            // No namespaces from the registry are included... bolt.
+                            continue;
+                        }
+                        if (ns_overlap != reg.getNamespaces().size()) {
+                            // not all namespaces from the registry are included.
+                            partial_overlap = true;
+                        }
+                    }
                     if (reg.isCacheable()) {
                         // cache results per registry
                         String cacheKey = filterKey + "|" + reg.toString();
@@ -560,6 +573,11 @@ public class DefinitionServiceImpl implements DefinitionService {
                         }
                     } else {
                         registryResults = reg.findByTags(tags);
+                    }
+                    if (partial_overlap) {
+                        registryResults = registryResults.stream()
+                            .filter(x -> namespaces.contains(x.getNamespace()))
+                            .collect(Collectors.toSet());
                     }
                     matched.addAll(registryResults);
                 }

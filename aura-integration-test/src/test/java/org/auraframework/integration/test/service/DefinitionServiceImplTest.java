@@ -1008,7 +1008,30 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<?> cmp = addSourceAutoCleanup(ComponentDef.class,
                 String.format("<aura:component implements=\"%s\" />", ifc.getDescriptorName()));
         contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
-        Set<DefDescriptor<?>> values = definitionService.findByTags(Sets.newHashSet(ifc.getDescriptorName()));
+        Set<DefDescriptor<?>> values = definitionService.findByTags(null, Sets.newHashSet(ifc.getDescriptorName()));
+        assertEquals("Should get one component back", 1, values.size());
+        assertTrue("Should find by tag", values.contains(cmp));
+    }
+
+    @Test
+    public void testFindByTagsIntegrationTestStringSourceLimitedNamespaceNotFound() throws Exception {
+        DefDescriptor<?> ifc = addSourceAutoCleanup(InterfaceDef.class, "<aura:interface />");
+        addSourceAutoCleanup(ComponentDef.class,
+                String.format("<aura:component implements=\"%s\" />", ifc.getDescriptorName()));
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
+        Set<DefDescriptor<?>> values = definitionService.findByTags(Sets.newHashSet("aura"),
+                Sets.newHashSet(ifc.getDescriptorName()));
+        assertEquals("Should get no components back", 0, values.size());
+    }
+
+    @Test
+    public void testFindByTagsIntegrationTestStringSourceLimitedNamespaceFound() throws Exception {
+        DefDescriptor<?> ifc = addSourceAutoCleanup(InterfaceDef.class, "<aura:interface />");
+        DefDescriptor<?> cmp = addSourceAutoCleanup(ComponentDef.class,
+                String.format("<aura:component implements=\"%s\" />", ifc.getDescriptorName()));
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
+        Set<DefDescriptor<?>> values = definitionService.findByTags(Sets.newHashSet(cmp.getNamespace()),
+                Sets.newHashSet(ifc.getDescriptorName()));
         assertEquals("Should get one component back", 1, values.size());
         assertTrue("Should find by tag", values.contains(cmp));
     }
@@ -1029,7 +1052,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     @Test
     public void testFindByTagsIntegrationTestFileBased() throws Exception {
         contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
-        Set<DefDescriptor<?>> values = definitionService.findByTags(Sets.newHashSet("aura:rootComponent"));
+        Set<DefDescriptor<?>> values = definitionService.findByTags(null, Sets.newHashSet("aura:rootComponent"));
         assertTrue("Should several components back", values.size() >= 2);
         assertTrue("Should find component by tag", values.contains(new DefDescriptorImpl<>("markup", "aura", "component", ComponentDef.class)));
         assertTrue("Should find application by tag", values.contains(new DefDescriptorImpl<>("markup", "aura", "application", ApplicationDef.class)));

@@ -164,9 +164,23 @@ public interface DefinitionService extends AuraService {
      *
      * @param tags the set of requested tags (any tag suffices)
      * @return the set of descriptors for defs that match.
+     * @deprecated use #findByTags(null, tags)
      */
     @Nonnull
-    Set<DefDescriptor<?>> findByTags(@Nonnull Set<String> tags);
+    default Set<DefDescriptor<?>> findByTags(@Nonnull Set<String> tags) { return findByTags(null, tags);};
+
+    /**
+     * Find the set of components that have a tag.
+     *
+     * For a component to be returned here, it must implement the PlatformDef interface
+     * and have one of the tags passed in.
+     *
+     * @param namespace a set of namespaces by which to filter the search, null means do not filter.
+     * @param tags the set of requested tags (any tag suffices)
+     * @return the set of descriptors for defs that match.
+     */
+    @Nonnull
+    Set<DefDescriptor<?>> findByTags(Set<String> namespaces, @Nonnull Set<String> tags);
 
     /**
      * Given a string that contains search patterns or wildcards, return a set

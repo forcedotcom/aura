@@ -177,6 +177,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     @Test
+    // exclude due to appium/saucelabs issue where connection is reset when the COOSE occurs
+    @ExcludeBrowsers({BrowserType.IPHONE, BrowserType.IPAD})
     public void testGetClientRenderingAfterJsControllerChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<div id='click' onclick='{!c.clicked}'>click</div>"));

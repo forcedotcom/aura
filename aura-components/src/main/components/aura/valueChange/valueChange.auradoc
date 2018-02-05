@@ -1,0 +1,57 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+
+  <aura:meta name="owner" value="IO Components" />
+  <aura:meta name="formFactors" value="all" />
+  <aura:meta name="isSubComponent" value="false" />
+  <aura:meta name="sldsLink" value="" />
+  <aura:meta name="category" value="Events" />
+  <aura:meta name="classification" value="Value" />
+
+  <aura:description>
+    <p>This event is fired when an attribute value changes. Handle this event using the <code>aura:handler</code> tag.
+    A component can have multiple <code>aura:handler</code> tags to detect changes to different attribute values.</p>
+    <pre>&lt;aura:handler name="change" value="{!v.items}" action="{!c.itemsChange}"/></pre>
+    
+    <p>This example updates an attribute value, which fires the <code>aura:valueChange</code> event.</p>
+    <pre>&lt;aura:component>
+    &lt;aura:attribute name="myBool" type="Boolean" default="true"/>
+
+    &lt;!-- Handle the aura:valueChange event -->
+    &lt;aura:handler name="change" value="{!v.myBool}" action="{!c.handleValueChange}"/>
+    &lt;lightning:button label="change value" onclick="{!c.changeValue}"/>
+&lt;/aura:component></pre>
+
+    <p>The client-side controller actions trigger the value change and handle it.</p>
+    <pre>({
+    changeValue : function (component, event, helper) {
+      component.set("v.myBool", false);
+    },
+
+    handleValueChange : function (component, event, helper) {
+        alert("old value: " + event.getParam("oldValue"));
+        alert("current value: " + event.getParam("value"));
+    }
+})</pre>
+
+    <p>The <code>valueChange</code> event gives you access to the previous value (<code>oldValue</code>) and the current value (<code>value</code>) in the handler action. 
+    In this example, <code>oldValue</code> returns true and <code>value</code> returns false.</p>
+    
+   </aura:description>
+</aura:documentation>

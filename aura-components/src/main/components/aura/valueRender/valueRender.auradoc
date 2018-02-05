@@ -1,0 +1,36 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+
+  <aura:meta name="owner" value="IO Components" />
+  <aura:meta name="formFactors" value="all" />
+  <aura:meta name="isSubComponent" value="false" />
+  <aura:meta name="sldsLink" value="" />
+  <aura:meta name="category" value="Events" />
+  <aura:meta name="classification" value="Value" />
+
+  <aura:description>
+    <p>This event is fired when when an app or component is rendered or rerendered. Handle this event using the <code>aura:handler</code> tag.</p>
+    <pre>&lt;aura:handler name="render" value="{!this}" action="{!c.onRender}"/></pre>
+    
+    <p>In this example, the onRender action in your client-side controller handles initial rendering and rerendering of the component. You can choose any name for the <code>action</code> attribute.</p>
+    <p class="note">Setting <code>value="{!this}"</code> marks this as a value event. You should always use this setting for an <code>init</code> event.</p>
+    <p>The <code>render</code> event is fired after the <code>init</code> event, which is fired after component construction but before rendering.</p>
+    <p>For more information, see the <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/components_lifecycle.htm" target="_blank">Lightning Components Developer Guide</a>.</p>
+   </aura:description>
+</aura:documentation>

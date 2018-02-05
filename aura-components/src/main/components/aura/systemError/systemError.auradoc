@@ -1,0 +1,53 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+
+  <aura:meta name="owner" value="IO Components" />
+  <aura:meta name="formFactors" value="all" />
+  <aura:meta name="isSubComponent" value="false" />
+  <aura:meta name="sldsLink" value="" />
+  <aura:meta name="category" value="Events" />
+  <aura:meta name="classification" value="Error" />
+
+  <aura:description>
+    <p>This event is fired when an error is encountered during the execution of a server-side action. Handle this event using the <code>aura:handler</code> tag.</p>
+    <pre>&lt;aura:handler event="aura:systemError" action="{!c.handleError}"/></pre>
+    <p>This example shows a button that triggers an error and a handler for the aura:systemError event.</p>
+    <pre>&lt;aura:component controller="myController">
+    &lt;aura:handler event="aura:systemError" action="{!c.showSystemError}"/>
+    &lt;aura:attribute name="response" type="Aura.Action"/>
+    &lt;!-- Other component markup here -->
+    &lt;lightning:button aura:id="trigger" label="Trigger error" onclick="{!c.trigger}"/>
+&lt;/aura:component></pre>
+
+    <p>This client-side controller triggers the firing of an error and handles that error.</p>
+    <pre>({
+    trigger: function(cmp, event) {
+        // Call an Apex controller that throws an error
+        var action = cmp.get("c.throwError");
+        action.setCallback(cmp, function(response){
+            cmp.set("v.response", response);
+        });
+        $A.enqueueAction(action);
+    },
+    showSystemError: function(cmp, event) {
+        // Handle system error
+    }
+})</pre>
+   </aura:description>
+</aura:documentation>

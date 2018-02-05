@@ -16,7 +16,7 @@
 
 -->
 <aura:event type="APPLICATION" support="GA" access="GLOBAL" description="Indicates that an error has occurred.">
-    <aura:attribute name="message" type="String" access="GLOBAL" />
-    <aura:attribute name="error" type="String" access="GLOBAL" />
-    <aura:attribute name="auraError" type="Object" />
+    <aura:attribute name="message" type="String" access="GLOBAL" description="The message to be displayed during an error."/>
+    <aura:attribute name="error" type="String" access="GLOBAL" description="The system error that's returned."/>
+    <aura:attribute name="auraError" type="Object" description=""/>
 </aura:event>

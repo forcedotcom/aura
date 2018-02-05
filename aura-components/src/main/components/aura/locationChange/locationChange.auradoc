@@ -1,0 +1,44 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+
+  <aura:meta name="owner" value="IO Components" />
+  <aura:meta name="formFactors" value="all" />
+  <aura:meta name="isSubComponent" value="false" />
+  <aura:meta name="sldsLink" value="" />
+  <aura:meta name="category" value="Events" />
+  <aura:meta name="classification" value="Navigation" />
+
+  <aura:description>
+    <p>This event is fired when the hash part of the URL has changed. Handle this event using the <code>aura:handler</code> tag.</p>
+    <pre>&lt;aura:handler event="aura:locationChange" action="{!c.update}"/&gt;</pre>
+    <p>This client-side controller handles the <code>aura:locationChange</code> event.</p>
+    <pre>({
+    update : function (component, event, helper) {
+        // Get the new hash from the event
+        var loc = event.getParam("token");
+        // Do something else
+    }
+})</pre>
+    <p>In Spring ’18 and later, the URL format used by Lightning Experience standard apps and the Salesforce mobile app is changing.
+    For example, the new format replaces the <code>/one/one.app/#/sObject/Account/home</code> token to <code>/lightning/o/Account/home</code>.
+    This critical update is enabled by default in new orgs beginning in Spring ’18, for Lightning Experience standard apps and the Salesforce mobile app. It doesn’t apply to console apps and communities.</p>
+    <p>In Summer ’18 and later, this critical update will be automatically enabled for all orgs, which applies to Lightning Experience standard apps, console apps, and the Salesforce mobile app. Communities won’t be affected.</p>
+    <p>Although <code>aura:locationChange</code> tracks changes to the hash fragment in a URL, it’s not useful for tracking navigation with the new URL format.</p>
+  </aura:description>
+</aura:documentation>

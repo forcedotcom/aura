@@ -373,9 +373,15 @@ AuraRenderingService.prototype.replaceContainerElement = function(container, old
     if (index > -1) {
         allElements[index] = newElement;
 
-        var elements = this.getElements(concrete);
-        index = elements.indexOf(oldElement);
-        elements[index] = newElement;
+        // because this replacement only happens when container component gets a new marker during child's unrender,
+        // the new element is supposed to be always comment marker
+        if (!this.isCommentMarker(oldElement)) {
+            var elements = this.getElements(concrete);
+            index = elements.indexOf(oldElement);
+            if (index > -1) {
+                elements.splice(index, 1);
+            }
+        }
     }
 
     this.replaceContainerElement(concrete.getContainer(), oldElement, newElement);
@@ -423,7 +429,8 @@ AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) 
         components:[],
         facetInfo:[],
         useFragment:false,
-        fullUnrender:false
+        fullUnrender:false,
+        hasNewMarker:false
     };
     var renderCount=0;
     if(component._facetInfo) {
@@ -453,6 +460,10 @@ AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) 
                 }
                 if (!found) {
                     updatedFacet.components.push({action:"render",component: child, oldIndex: -1, newIndex: i});
+                    // the component will have a new marker from the new rendered component
+                    if (i === 0) {
+                        updatedFacet.hasNewMarker = true;
+                    }
                     renderCount++;
                 }
                 updatedFacet.facetInfo.push(child);
@@ -623,7 +634,9 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
                 if (!this.isCommentMarker(marker) && component.getType() !== "aura:html") {
 
                     var allElements = this.getAllElements(info.component);
-                    if (updatedFacet.fullUnrender || !marker.nextSibling) {
+                    // if there will be a new marker from new rendered component, we should not move the marker to next sibling
+                    // when unrendering the first component on facet
+                    if (updatedFacet.fullUnrender || !marker.nextSibling || (info.oldIndex === 0 && updatedFacet.hasNewMarker)) {
                         var newMarker = this.createMarker(marker, "unrender facet: " + component.getGlobalId());
                         this.setMarker(component, newMarker);
                         // for the new comment marker

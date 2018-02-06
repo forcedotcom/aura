@@ -26,7 +26,7 @@
     /**
      * Verify that timezone can be 'overriden' using timezone attribute.
      */
-    testCalendarISOValueWithTimeZoneOverride: {
+    _testCalendarISOValueWithTimeZoneOverride: {
         test: function(cmp) {
             var testCmp = cmp.find('ISOStringFromJavaWithTZOverride');
             this.waitForTextPresent(testCmp, "2004-10-23 09:30:00");
@@ -34,7 +34,7 @@
     },
 
     /**
-     * Verify that outputDateTime can accept Calendar object from java model and display it.  
+     * Verify that outputDateTime can accept Calendar object from java model and display it.
      */
     testCalendarValueFromJavaModel: {
         test: function(cmp) {

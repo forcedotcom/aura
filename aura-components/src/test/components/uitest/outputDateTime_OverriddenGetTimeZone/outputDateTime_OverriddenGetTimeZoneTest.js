@@ -15,7 +15,7 @@
  */
 ({
     testFormatDateTime:{
-	attributes: {value : '2004-09-23T16:30:00.000Z'},
+	attributes: {value : '2004-09-23T16:30:00.000Z', format: 'MMM dd, yyyy h:mm:ss A'},
         test:function(cmp){
             aura.test.addWaitFor(true, function(){return $A.test.getText(cmp.getSuper().find('span').getElement()).length > 0;},function(){
                 aura.test.assertEquals("Sep 23, 2004 12:30:00 PM", $A.test.getText(cmp.getSuper().find('span').getElement()), "Timezone should be the one specified in the overridden method");

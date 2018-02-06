@@ -155,10 +155,12 @@
 
         if (index >= 0 && index < component._dataProviders.length) {
             var e = component._dataProviders[index].get("e.provide");
-            if (refresh) {
-                e.setParams({parameters:{refresh:true}});
+            if (e) {
+                if (refresh) {
+                    e.setParams({parameters:{refresh:true}});
+                }
+                e.fire();
             }
-            e.fire();
         } else {
             this.showLoading(component, false);
             component.getConcreteComponent()._refreshing = false;

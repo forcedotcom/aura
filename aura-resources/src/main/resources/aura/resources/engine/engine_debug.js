@@ -415,7 +415,7 @@ const TargetSlot = Symbol();
 const MembraneSlot = Symbol();
 function isReplicable(value) {
     const type = typeof value;
-    return value && (type === 'object' || type === 'function') && !(value instanceof HTMLIFrameElement);
+    return value && (type === 'object' || type === 'function');
 }
 function getReplica(membrane, value) {
     if (isNull(value)) {
@@ -476,25 +476,9 @@ class Membrane {
 // TODO: we are using a funky and leaky abstraction here to try to identify if
 // the proxy is a compat proxy, and define the unwrap method accordingly.
 const { getKey } = Proxy;
-function safeUnwrapCompat(replicaOrAny) {
-    try {
-        return (replicaOrAny && getKey(replicaOrAny, TargetSlot)) || replicaOrAny;
-    }
-    catch (e) {
-        // Issue #867 - guard against errors during property access
-        return replicaOrAny;
-    }
-}
-function safeUnwrap(replicaOrAny) {
-    try {
-        return (replicaOrAny && replicaOrAny[TargetSlot]) || replicaOrAny;
-    }
-    catch (e) {
-        // Issue #867 - guard against errors during property access
-        return replicaOrAny;
-    }
-}
-const unwrap = getKey ? safeUnwrapCompat : safeUnwrap;
+const unwrap = getKey ?
+    (replicaOrAny) => (replicaOrAny && getKey(replicaOrAny, TargetSlot)) || replicaOrAny
+    : (replicaOrAny) => (replicaOrAny && replicaOrAny[TargetSlot]) || replicaOrAny;
 
 /*eslint-enable*/
 const ReactiveMap = new WeakMap();
@@ -919,12 +903,65 @@ function getAllMatches(vm, elm, selector) {
 function isParentNodeKeyword(key) {
     return (key === 'parentNode' || key === 'parentElement');
 }
+function isIframeContentWindow(key, value) {
+    return (key === 'contentWindow') && value.window === value;
+}
+function wrapIframeWindow(win) {
+    return {
+        [TargetSlot]: win,
+        postMessage() {
+            return win.postMessage.apply(win, arguments);
+        },
+        blur() {
+            return win.blur.apply(win, arguments);
+        },
+        close() {
+            return win.close.apply(win, arguments);
+        },
+        focus() {
+            return win.focus.apply(win, arguments);
+        },
+        get closed() {
+            return win.closed;
+        },
+        get frames() {
+            return win.frames;
+        },
+        get length() {
+            return win.length;
+        },
+        get location() {
+            return win.location;
+        },
+        set location(value) {
+            win.location = value;
+        },
+        get opener() {
+            return win.opener;
+        },
+        get parent() {
+            return win.parent;
+        },
+        get self() {
+            return win.self;
+        },
+        get top() {
+            return win.top;
+        },
+        get window() {
+            return win.window;
+        },
+    };
+}
 // Registering a service to enforce the shadowDOM semantics via the Raptor membrane implementation
 register({
     piercing(component, data, def, context, target, key, value, callback) {
         const vm = component[ViewModelReflection];
         const { elm } = vm.vnode; // eslint-disable-line no-undef
         if (value) {
+            if (isIframeContentWindow(key, value)) {
+                callback(wrapIframeWindow(value));
+            }
             if (value === querySelector) {
                 // TODO: it is possible that they invoke the querySelector() function via call or apply to set a new context, what should
                 // we do in that case? Right now this is essentially a bound function, but the original is not.
@@ -2490,7 +2527,6 @@ const patch = init([
     // Attrs need to be applied to element before props
     // IE11 will wipe out value on radio inputs if value
     // is set before type=radio.
-    // See https://git.soma.salesforce.com/raptor/raptor/issues/791 for more
     attributesModule,
     propsModule,
     classes,
@@ -2595,4 +2631,4 @@ exports.wire = wire;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.17.11 */
+/** version: 0.17.15 */

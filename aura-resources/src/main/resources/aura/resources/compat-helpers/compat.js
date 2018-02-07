@@ -653,7 +653,7 @@ var FinalProxy$1 = FinalProxy;
 return FinalProxy$1;
 
 })));
-/** version: 0.17.11 */
+/** version: 0.17.15 */
 
 /* Transformed Polyfills + Babel helpers */
 // THIS POLYFILL HAS BEEN MODIFIED FROM THE SOURCE

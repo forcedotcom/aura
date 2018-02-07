@@ -433,7 +433,7 @@ var TargetSlot = Symbol();
 var MembraneSlot = Symbol();
 function isReplicable(value) {
     var type = typeof value;
-    return value && (type === 'object' || type === 'function') && !(value instanceof HTMLIFrameElement);
+    return value && (type === 'object' || type === 'function');
 }
 function getReplica(membrane, value) {
     if (isNull(value)) {
@@ -495,25 +495,9 @@ var Membrane = /** @class */ (function () {
 // TODO: we are using a funky and leaky abstraction here to try to identify if
 // the proxy is a compat proxy, and define the unwrap method accordingly.
 var getKey = Proxy.getKey;
-function safeUnwrapCompat(replicaOrAny) {
-    try {
-        return (replicaOrAny && getKey(replicaOrAny, TargetSlot)) || replicaOrAny;
-    }
-    catch (e) {
-        // Issue #867 - guard against errors during property access
-        return replicaOrAny;
-    }
-}
-function safeUnwrap(replicaOrAny) {
-    try {
-        return (replicaOrAny && replicaOrAny[TargetSlot]) || replicaOrAny;
-    }
-    catch (e) {
-        // Issue #867 - guard against errors during property access
-        return replicaOrAny;
-    }
-}
-var unwrap = getKey ? safeUnwrapCompat : safeUnwrap;
+var unwrap = getKey ?
+    function (replicaOrAny) { return (replicaOrAny && getKey(replicaOrAny, TargetSlot)) || replicaOrAny; }
+    : function (replicaOrAny) { return (replicaOrAny && replicaOrAny[TargetSlot]) || replicaOrAny; };
 
 /*eslint-enable*/
 var ReactiveMap = new WeakMap();
@@ -942,12 +926,102 @@ function getAllMatches(vm, elm, selector) {
 function isParentNodeKeyword(key) {
     return (key === 'parentNode' || key === 'parentElement');
 }
+function isIframeContentWindow(key, value) {
+    return (key === 'contentWindow') && value.window === value;
+}
+function wrapIframeWindow(win) {
+    return _a = {},
+        _a[TargetSlot] = win,
+        _a.postMessage = function () {
+            return win.postMessage.apply(win, arguments);
+        },
+        _a.blur = function () {
+            return win.blur.apply(win, arguments);
+        },
+        _a.close = function () {
+            return win.close.apply(win, arguments);
+        },
+        _a.focus = function () {
+            return win.focus.apply(win, arguments);
+        },
+        Object.defineProperty(_a, "closed", {
+            get: function () {
+                return win.closed;
+            },
+            enumerable: true,
+            configurable: true
+        }),
+        Object.defineProperty(_a, "frames", {
+            get: function () {
+                return win.frames;
+            },
+            enumerable: true,
+            configurable: true
+        }),
+        Object.defineProperty(_a, "length", {
+            get: function () {
+                return win.length;
+            },
+            enumerable: true,
+            configurable: true
+        }),
+        Object.defineProperty(_a, "location", {
+            get: function () {
+                return win.location;
+            },
+            set: function (value) {
+                win.location = value;
+            },
+            enumerable: true,
+            configurable: true
+        }),
+        Object.defineProperty(_a, "opener", {
+            get: function () {
+                return win.opener;
+            },
+            enumerable: true,
+            configurable: true
+        }),
+        Object.defineProperty(_a, "parent", {
+            get: function () {
+                return win.parent;
+            },
+            enumerable: true,
+            configurable: true
+        }),
+        Object.defineProperty(_a, "self", {
+            get: function () {
+                return win.self;
+            },
+            enumerable: true,
+            configurable: true
+        }),
+        Object.defineProperty(_a, "top", {
+            get: function () {
+                return win.top;
+            },
+            enumerable: true,
+            configurable: true
+        }),
+        Object.defineProperty(_a, "window", {
+            get: function () {
+                return win.window;
+            },
+            enumerable: true,
+            configurable: true
+        }),
+        _a;
+    var _a;
+}
 // Registering a service to enforce the shadowDOM semantics via the Raptor membrane implementation
 register({
     piercing: function (component, data, def, context, target, key, value, callback) {
         var vm = component[ViewModelReflection];
         var elm = vm.vnode.elm; // eslint-disable-line no-undef
         if (value) {
+            if (isIframeContentWindow(key, value)) {
+                callback(wrapIframeWindow(value));
+            }
             if (value === querySelector) {
                 // TODO: it is possible that they invoke the querySelector() function via call or apply to set a new context, what should
                 // we do in that case? Right now this is essentially a bound function, but the original is not.
@@ -2525,7 +2599,6 @@ var patch = init([
     // Attrs need to be applied to element before props
     // IE11 will wipe out value on radio inputs if value
     // is set before type=radio.
-    // See https://git.soma.salesforce.com/raptor/raptor/issues/791 for more
     attributesModule,
     propsModule,
     classes,
@@ -2635,4 +2708,4 @@ exports.wire = wire;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.17.11 */
+/** version: 0.17.15 */

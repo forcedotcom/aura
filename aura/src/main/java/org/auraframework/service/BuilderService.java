@@ -21,6 +21,7 @@ import org.auraframework.builder.CacheBuilder;
 import org.auraframework.builder.ComponentDefBuilder;
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.builder.FlavoredStyleDefBuilder;
+import org.auraframework.builder.ModuleDefRefBuilder;
 import org.auraframework.builder.StyleDefBuilder;
 import org.auraframework.builder.TokensDefBuilder;
 import org.auraframework.def.ApplicationDef;
@@ -68,12 +69,17 @@ public interface BuilderService extends AuraService {
     ComponentDefRefBuilder getComponentDefRefBuilder();
 
     /**
+     * Retrieves a Builder for {@link org.auraframework.def.module.ModuleDefRef}
+     */
+    ModuleDefRefBuilder getModuleDefRefBuilder();
+
+    /**
      * Retrieves a Builder suitable for defining a {@link TokensDef}.
      */
     TokensDefBuilder getTokensDefBuilder();
 
     /**
-     * Retrieves a Builder suitable for defining a {@link Cache}
+     * Retrieves a Builder suitable for defining a {@link org.auraframework.cache.Cache}
      *
      * @param <K>
      *

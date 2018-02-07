@@ -21,6 +21,7 @@ import org.auraframework.builder.CacheBuilder;
 import org.auraframework.builder.ComponentDefBuilder;
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.builder.FlavoredStyleDefBuilder;
+import org.auraframework.builder.ModuleDefRefBuilder;
 import org.auraframework.builder.StyleDefBuilder;
 import org.auraframework.builder.TokensDefBuilder;
 import org.auraframework.impl.cache.CacheImpl;
@@ -30,6 +31,7 @@ import org.auraframework.impl.css.token.TokensDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
+import org.auraframework.impl.root.component.ModuleDefRefImpl;
 import org.auraframework.service.BuilderService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -50,6 +52,11 @@ public class BuilderServiceImpl implements BuilderService {
     @Override
     public ComponentDefRefBuilder getComponentDefRefBuilder() {
         return new ComponentDefRefImpl.Builder();
+    }
+
+    @Override
+    public ModuleDefRefBuilder getModuleDefRefBuilder() {
+        return new ModuleDefRefImpl.Builder();
     }
 
     @Override

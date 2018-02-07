@@ -137,7 +137,8 @@ Test.Aura.Component.ComponentTest=function(){
                 },
                 renderingService:{
                     unrender:function(){},
-                    getMarker:function(){}
+                    getMarker:function(){},
+                    cleanComponent: function(){}
                 },
                 util:{
                     apply:function(){
@@ -443,13 +444,15 @@ Test.Aura.Component.ComponentTest=function(){
 
     [Fixture]
     function render() {
+
         var mockSuperComponent = {
             render: function() {
                 return "SuperRender";
             }
         };
+
         [Fact]
-        function CallsOwnRenderWhenHasOwnRender() {
+        function CallsOwnRender() {
             // Arrange
             var expected = "Render";
             var mockRenderer = {
@@ -471,12 +474,13 @@ Test.Aura.Component.ComponentTest=function(){
         }
 
         [Fact]
-        function CallsSuperComponentRenderWhenNoOwnRender() {
+        function CallsSuperComponentRenderIfNoOwnRender() {
             // Arrange
             var expected = "SuperRender";
             var actual = null;
             mockFramework(function() {
                 var target = new Aura.Component.Component({},true);
+                target["renderer"] = {};
                 target.setSuperComponent(mockSuperComponent);
 
                 // Act
@@ -489,22 +493,48 @@ Test.Aura.Component.ComponentTest=function(){
     }
 
     [Fixture]
-    function unrender() {
+    function rerender() {
+
+        var mockSuperComponent = {
+            rerender: function() {
+                return "SuperRerender";
+            }
+        };
+
         [Fact]
-        function RemoveUnrenderedComponentFromDirtyComponents() {
+        function CallsOwnRerender() {
             // Arrange
-            var expected = "testGlobalId";
+            var expected = "Rerender";
+            var mockRenderer = {
+                    rerender: function() {return expected}
+                };
             var actual = null;
             mockFramework(function() {
-                // Assuming that cleanComponent() cleans the given component from dirtyComponents.
-                $A.renderingService.cleanComponent = function(globalId) {
-                    actual = globalId;
-                }
                 var target = new Aura.Component.Component({},true);
-                target.setupGlobalId(expected);
+                target["renderer"] = mockRenderer;
+                // shouldn't call rerender in super component
+                target.setSuperComponent(mockSuperComponent);
 
                 // Act
-                target.unrender();
+                actual = target.rerender();
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function CallsSuperComponentRerenderIfNoOwnRerender() {
+            // Arrange
+            var expected = "SuperRerender";
+            var actual = null;
+            mockFramework(function() {
+                var target = new Aura.Component.Component({},true);
+                target["renderer"] = {};
+                target.setSuperComponent(mockSuperComponent);
+
+                // Act
+                actual = target.rerender();
             });
 
             // Assert
@@ -513,7 +543,118 @@ Test.Aura.Component.ComponentTest=function(){
     }
 
     [Fixture]
-    function GetDef() {
+    function afterRender() {
+
+        [Fact]
+        function CallsOwnAfterRender() {
+            // Arrange
+            var mockAfterRender = Stubs.GetMethod();
+
+            mockFramework(function() {
+                var target = new Aura.Component.Component({},true);
+                target["renderer"] = {
+                    afterRender: mockAfterRender
+                };
+
+                // Act
+                target.afterRender();
+            });
+
+            // Assert
+            Assert.Equal(1, mockAfterRender.Calls.length);
+        }
+
+        [Fact]
+        function CallsSuperComponentAfterRenderIfNoOwnAfterRender() {
+            // Arrange
+            var mockSuperAfterRender = Stubs.GetMethod();
+
+            mockFramework(function() {
+                var target = new Aura.Component.Component({},true);
+                target["renderer"] = {};
+                target.setSuperComponent({
+                    afterRender: mockSuperAfterRender
+                });
+
+                // Act
+                target.afterRender();
+            });
+
+            // Assert
+            Assert.Equal(1, mockSuperAfterRender.Calls.length);
+        }
+    }
+
+    [Fixture]
+    function unrender() {
+
+        [Fact]
+        function CallsOwnUnrender() {
+            // Arrange
+            var mockUnrender = Stubs.GetMethod();
+
+            mockFramework(function() {
+                var target = new Aura.Component.Component({},true);
+                target["renderer"] = {
+                    unrender: mockUnrender
+                };
+
+                // Act
+                target.unrender();
+            });
+
+            // Assert
+            Assert.Equal(1, mockUnrender.Calls.length);
+        }
+
+        [Fact]
+        function CallsSuperComponentUnrenderIfNoOwnUnrender() {
+            // Arrange
+            var mockSuperUnrender = Stubs.GetMethod();
+
+            mockFramework(function() {
+                var target = new Aura.Component.Component({},true);
+                target["renderer"] = {};
+                target.setSuperComponent({
+                    unrender: mockSuperUnrender
+                });
+
+                // Act
+                target.unrender();
+            });
+
+            // Assert
+            Assert.Equal(1, mockSuperUnrender.Calls.length);
+        }
+
+        [Fact]
+        function RemoveUnrenderedComponentFromDirtyComponents() {
+            // Arrange
+            var expected = "testGlobalId";
+            var actual = null;
+            mockFramework(function() {
+                // Assuming that cleanComponent() cleans the given component from dirtyComponents.
+                var mockCleanComponent = $A.renderingService.cleanComponent;
+                $A.renderingService.cleanComponent = function(globalId) {
+                    actual = globalId;
+                }
+                var target = new Aura.Component.Component({},true);
+                target.setupGlobalId(expected);
+
+                // Act
+                target.unrender();
+
+                // set global mock back
+                $A.renderingService.cleanComponent = mockCleanComponent;
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function getDef() {
         [Fact]
         function ReturnsComponentDef() {
             // Arrange

@@ -675,7 +675,7 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
     this.storeFacetInfo(component, updatedFacet.facetInfo);
     if (updatedFacet.useFragment) {
         nextSibling = target.childNodes[calculatedPosition];
-        this.insertElements(ret,nextSibling || target, nextSibling, nextSibling);
+        this.insertElements(ret, nextSibling || target, nextSibling, nextSibling);
     }
 
     // JBUCH: HALO: FIXME: THIS IS SUB-OPTIMAL, BUT WE NEVER WANT TO REASSOCIATE HTML COMPONENTS

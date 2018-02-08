@@ -133,14 +133,16 @@ public class BundleAwareDefRegistry implements DefRegistry {
         }
     }
 
-    private synchronized DefHolder getHolder(DefDescriptor<?> descriptor) {
+    private DefHolder getHolder(DefDescriptor<?> descriptor) {
         if (cacheable) {
-            return registry.get(BundleSourceLoader.getBundleName(descriptor));
+            synchronized (this) {
+                return registry.get(BundleSourceLoader.getBundleName(descriptor));
+            }
         } else {
             @SuppressWarnings("unchecked")
             BundleSource<BundleDef> source = (BundleSource<BundleDef>)sourceLoader.getBundle(descriptor);
             if (source == null) {
-            	return null;
+                return null;
             }
             DefHolder holder = new DefHolder(source.getDescriptor());
             holder.source = source;

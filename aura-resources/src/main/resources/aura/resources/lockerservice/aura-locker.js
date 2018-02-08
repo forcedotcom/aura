@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-01-31
- * Version: 0.3.10
+ * Generated: 2018-02-07
+ * Version: 0.3.11
  */
 
 (function (global, factory) {
@@ -517,41 +517,6 @@ function repairAccessors(global) {
  * limitations under the License.
  */
 
-// Mitigate proxy-related security issues
-// https://github.com/tc39/ecma262/issues/272
-
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    '    ' http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 let initalized = false;
 
 /**
@@ -630,10 +595,12 @@ function makeEvaluator(win) {
     return result;
   }
 
-  evaluator.toString = () => 'function eval() { [Locker Service code] }';
+  // Define eval.toString() as a non configurable, non writable property to prevent tampering.
+  Object.defineProperty(evaluator, 'toString', {
+    value: () => 'function eval() { [native code] }'
+  });
 
   win.eval = evaluator;
-
   return evaluator;
 }
 
@@ -648,11 +615,11 @@ function makeEvaluator(win) {
  */
 function getSecureEval(key) {
   let evaluator = keyToEvaluator.get(key);
-  
-  if (!initalized) {        
-      repairAccessors(window);        
-      freezeIntrinsics(window);        
-      initalized = true;        
+
+  if (!initalized) {
+    repairAccessors(window);
+    freezeIntrinsics(window);
+    initalized = true;
   }
 
   if (!evaluator) {
@@ -8416,7 +8383,7 @@ function navigatorAddPropertiesHook(st, raw, key) {
 function create$$1(src, key, sourceURL) {
   return {
     globals: getEnv$1(key),
-    returnValue: evaluate(src, key, sourceURL)
+    returnValue: evaluate(`(function () {${src}}())`, key, sourceURL)
   };
 }
 

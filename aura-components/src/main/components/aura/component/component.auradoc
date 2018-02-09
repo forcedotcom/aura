@@ -39,6 +39,55 @@
 
 </pre>
 		</p>
+        <p>The <code>aura:component</code> tag has the following optional attributes.</p>
+        <table>
+      <tr>
+        <th>Attribute</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+         <td>access</td>
+         <td>String</td>
+         <td>Indicates whether the component can be used outside of its own namespace. Possible values are <code>public</code> (default), and <code>global</code>.</td>
+       </tr>
+       <tr>
+         <td>controller</td>
+         <td>String</td>
+         <td>The server-side controller class for the component in the format <code>namespace.myController</code> or <code>myController</code> if using the default namespace.</td>
+       </tr>
+       <tr>
+        <td>description</td>
+        <td>String</td>
+        <td>A description of the component.</td>
+      </tr>
+       <tr>
+        <td>extends</td>
+        <td>Component</td>
+        <td>The component to be extended.</td>
+      </tr>
+      <tr>
+        <td>extensible</td>
+        <td>Boolean</td>
+        <td>Set to <code>true</code> if the component can be extended. The default is <code>false</code>.</td>
+      </tr>
+      <tr>
+        <td>implements</td>
+        <td>String</td>
+        <td>A comma-separated list of interfaces that the component implements.</td>
+      </tr>
+      <tr>
+        <td>isTemplate</td>
+        <td>Boolean</td>
+        <td>Set to true if the component is a template. The default is <code>false</code>. A template must have <code>isTemplate="true"</code> set in its <code>aura:component</code> tag.</td>
+      </tr>
+      <tr>
+        <td>template</td>
+        <td>Component</td>
+        <td>The template for this component. A template bootstraps loading of the framework and app. The default template is <code>aura:template</code>. You can customize the template by creating your own component that extends the default template.
+        For more information, see the <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/apps_template_overview.htm" target="_blank">Lightning Components Developer Guide</a>.</td>
+      </tr>
+    </table>
 	</aura:description>	
 		
 	

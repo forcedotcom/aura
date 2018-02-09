@@ -1,0 +1,52 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+
+  <aura:meta name="owner" value="IO Components" />
+  <aura:meta name="formFactors" value="all" />
+  <aura:meta name="isSubComponent" value="false" />
+  <aura:meta name="sldsLink" value="" />
+  <aura:meta name="category" value="Events" />
+  <aura:meta name="classification" value="Rendering" />
+
+  <aura:description>
+    <p class="note">We don't recommend using the legacy <code>aura:waiting</code> event except as a last resort. 
+    The <code>aura:doneWaiting</code> application event is fired for every server request, even for requestse from other components in your app. 
+    Unless your component is running in complete isolation in a standalone app and not included in Lightning Experience or the Salesforce app, you probably don’t want to handle this application event. 
+    The container app may fire server-side actions and trigger your event handler multiple times.</p>
+    <p>This event is automatically fired when a server-side action is added using <code>$A.enqueueAction()</code> and subsequently run, or when it’s expecting a response from an Apex controller.   
+    The <code>aura:waiting</code> event is handled by a client-side controller. A component can have only one <code>&lt;aura:handler&gt;</code> tag to handle this event.</p>
+    <pre>&lt;aura:handler event="aura:waiting" action="{!c.showSpinner}"/></pre>
+    <p>This example shows a spinner when <code>aura:waiting</code> is fired.</p>
+    <pre>&lt;aura:component>
+     &lt;aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    &lt;!-- Other component markup here -->
+    &lt;center>&lt;ui:spinner aura:id="spinner"/>&lt;/center>
+&lt;/aura:component></pre>
+    <p>This client-side controller fires an event that displays the spinner.
+</p>  
+    <pre>({
+    showSpinner : function (component, event, helper) {
+        var spinner = component.find('spinner');
+        var evt = spinner.get("e.toggle");
+        evt.setParams({ isVisible : true });
+        evt.fire();    
+    }
+})</pre>
+   </aura:description>
+</aura:documentation>

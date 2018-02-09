@@ -1,0 +1,52 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+
+  <aura:meta name="owner" value="IO Components" />
+  <aura:meta name="formFactors" value="all" />
+  <aura:meta name="isSubComponent" value="false" />
+  <aura:meta name="sldsLink" value="" />
+  <aura:meta name="category" value="Events" />
+  <aura:meta name="classification" value="Rendering" />
+
+  <aura:description>
+    <p class="note">We don't recommend using the legacy <code>aura:doneRendering</code> event except as a last resort. 
+    Unless your component is running in complete isolation in a standalone app and not included in complex apps, such as Lightning Experience or the Salesforce app, 
+    you probably don’t want to handle this application event. The container app may trigger your event handler multiple times.</p>
+    <p>This event is automatically fired if no more components need to be rendered or rerendered due to any attribute value changes. 
+    The <code>aura:doneRendering</code> event is handled by a client-side controller. A component can have only one <code>&lt;aura:handler&gt;</code> tag to handle this event.</p>
+    <pre>&lt;aura:handler event="aura:doneRendering" action="{!c.doneRendering}"/></pre>
+    <p>For example, you want to customize the behavior of your app after it’s finished rendering the first time but not after subsequent rerenderings. 
+    Create an attribute to determine if it’s the first rendering.</p>
+    <pre>&lt;aura:component>
+    &lt;aura:handler event="aura:doneRendering" action="{!c.doneRendering}"/>
+    &lt;aura:attribute name="isDoneRendering" type="Boolean" default="false"/>
+    &lt;!-- Other component markup here -->
+    &lt;p>My component&lt;/p>
+&lt;/aura:component></pre>
+    <p>This client-side controller checks that the <code>aura:doneRendering</code> event has been fired only once.</p>  
+    <pre>({
+  doneRendering: function(cmp, event, helper) {
+    if(!cmp.get("v.isDoneRendering")){
+      cmp.set("v.isDoneRendering", true);
+      //do something after component is first rendered
+    }
+  }
+})</pre>
+   </aura:description>
+</aura:documentation>

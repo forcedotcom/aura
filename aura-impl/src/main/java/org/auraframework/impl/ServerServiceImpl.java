@@ -123,7 +123,7 @@ public class ServerServiceImpl implements ServerService {
     private Cache<String, String> stringsCache;
 
     private Cache<String, String> altStringsCache;
-    
+
     private Cache<String, String> cssStringsCache;
 
     @PostConstruct
@@ -283,7 +283,7 @@ public class ServerServiceImpl implements ServerService {
         if (tokensUid.isPresent()) {
             keyBuilder.append(":").append(tokensUid.get());
         }
-        
+
         keyBuilder.append("$");
 
         // minified or not
@@ -305,7 +305,6 @@ public class ServerServiceImpl implements ServerService {
                         return getAppCssString(dependencies);
                     }
                 });
-        
 
         if (out != null) {
             out.append(cached);
@@ -624,7 +623,7 @@ public class ServerServiceImpl implements ServerService {
         templateUtil.writePreloadLinkTags(servletUtilAdapter.getCssPreloadUrls(context), sb);
         templateUtil.writePreloadScriptTags(servletUtilAdapter.getJsPreloadUrls(context), sb);
         templateUtil.writePrefetchScriptTags(servletUtilAdapter.getJsPrefetchUrls(context), sb);
-        
+
         attributes.put("prefetchTags", sb.toString());
         sb.setLength(0);
 
@@ -640,7 +639,7 @@ public class ServerServiceImpl implements ServerService {
         templateUtil.writeHtmlDataHrefStyles(servletUtilAdapter.getStyles(context), "auraCss", sb);
         attributes.put("auraStyleTags", sb.toString());
         sb.setLength(0);
-        
+
         if (mode.allowLocalRendering() && value.isLocallyRenderable()) {
 
             BaseComponent<?, ?> cmp = (BaseComponent<?, ?>) instanceService.getInstance(value, componentAttributes);

@@ -15,6 +15,7 @@
  */
 package org.auraframework.system;
 
+import java.util.List;
 import java.util.Map;
 
 import org.auraframework.instance.Action;
@@ -26,13 +27,13 @@ import com.google.common.cache.CacheStats;
  * LoggingContext public interface
  */
 public interface LoggingContext {
-    
+
     void startAction(String actionName, Action action);
-    
+
     void stopAction(String actionName);
 
     void startTimer(String name);
-    
+
     void startTimer(String name, Map<String, String> context);
 
     void stopTimer(String name);
@@ -54,7 +55,7 @@ public interface LoggingContext {
     void setValue(String name, Object value);
 
     void logRequestValues();
-    
+
     KeyValueLogger getKeyValueLogger(StringBuffer log);
 
     /**
@@ -65,7 +66,9 @@ public interface LoggingContext {
     }
 
     void logCSPReport(Map<String, Object> report);
- 
+
+    void logDeprecationUsages(Map<String, List<String>> usages);
+
     /**
      * Log cache statistics.
      * @param name the name of the cache for which statistics are being reported.
@@ -74,7 +77,7 @@ public interface LoggingContext {
      * @param stats cache statistics to report
      */
     void logCacheInfo(String name, String message, long size, CacheStats stats);
-    
+
     /**
      * Logs an informational message, independent of context such as action or
      * timers, for which context-sensitive methods can be provided via other

@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.context;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -397,6 +398,21 @@ public class LoggingContextImpl implements LoggingContext {
     @Override
     public void logCSPReport(Map<String, Object> report) {
         log(report);
+    }
+
+    @Override
+    public void logDeprecationUsages(Map<String, List<String>> usages) {
+        if (usages == null) {
+            return;
+        }
+
+        for (Map.Entry<String, List<String>> entry : usages.entrySet()) {
+            String api = entry.getKey();
+            for (String caller : entry.getValue()) {
+                String message = String.format("Aura API Deprecation Usages: api=%s, caller=%s", api, caller);
+                logger.warn(message);
+            }
+        }
     }
 
     @Override

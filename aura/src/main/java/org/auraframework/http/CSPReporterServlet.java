@@ -43,9 +43,9 @@ public class CSPReporterServlet extends HttpServlet {
     // KEEP THIS URL IN SYNC WITH THE SERVLET'S URL-MAPPING ENTRY IN WEB.XML!
     // (or find a way to do it programmatically.)
     public static final String URL = "/_/csp";
-   
+
     public static final String JSON_NAME = "csp-report";
-        
+
     public static final String BLOCKED_URI = "blocked-uri";
     public static final String COLUMN_NUMBER = "column-number";
     public static final String DOCUMENT_URI = "document-uri";
@@ -65,7 +65,7 @@ public class CSPReporterServlet extends HttpServlet {
         super.init(config);
         processInjection(config);
     }
-    
+
     public void processInjection(ServletConfig config) {
         SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
@@ -73,9 +73,8 @@ public class CSPReporterServlet extends HttpServlet {
     @SuppressWarnings("unchecked")
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        
         Map<String, Object> report = null;
-        
+
         try {
             BufferedReader reader = req.getReader();
             report = (Map<String, Object>)new JsonReader().read(reader);

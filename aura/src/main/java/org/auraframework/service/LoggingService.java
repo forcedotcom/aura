@@ -15,6 +15,7 @@
  */
 package org.auraframework.service;
 
+import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
@@ -65,12 +66,12 @@ public interface LoggingService extends AuraService {
      * Close and clean up logging context
      */
     void release();
-    
+
     /**
      * Start timers for an action.
      */
     void startAction(String actionName, Action action);
-    
+
     /**
      * Stop all timers for an action
      */
@@ -155,17 +156,26 @@ public interface LoggingService extends AuraService {
      * flush the logged values.
      */
     void flush();
-    
+
     /**
      * get a key value pair logger that appends to the buffer
      */
     KeyValueLogger getKeyValueLogger(StringBuffer log);
-    
+
     /**
      * write a Content Security Policy report to the logs
      * @param report a deserialized JSON map
      */
     void logCSPReport(Map<String, Object> report);
+
+    /**
+     * Log deprecated Aura client API usages.
+     *
+     * Do not use this method outside of framework.
+     *
+     * @param usages - a map of deprecated API name and a list of its callers
+     */
+    void logDeprecationUsages(Map<String, List<String>> usages);
 
     /**
      * Logs an informational message, independent of context such as action or

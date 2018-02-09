@@ -1347,7 +1347,8 @@ AuraInstance.prototype.deprecated = function(message, workaround, sinceDate, due
             reporting = true;
         }
 
-        callers.push(callingCmp? callingCmp : "UNKNOWN");
+        // caller component will be missing if the caller is not in Aura loop
+        callers.push(callingCmp || caller.trim() || "UNKNOWN");
 
         // reporting when a deprecated API gets called 5 times
         if (reporting || callers.length === 5) {

@@ -24,6 +24,8 @@ import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.util.json.Json;
 
 import javax.inject.Inject;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -66,7 +68,7 @@ public class LoggingServiceImpl implements LoggingService {
             lc.startAction(actionName, action);
         }
     }
-    
+
     @Override
     public void stopAction(String actionName) {
         LoggingContext lc = getLoggingContext();
@@ -74,7 +76,7 @@ public class LoggingServiceImpl implements LoggingService {
             lc.stopAction(actionName);
         }
     }
-    
+
     @Override
     public void stopTimer(String name) {
         LoggingContext lc = getLoggingContext();
@@ -188,6 +190,14 @@ public class LoggingServiceImpl implements LoggingService {
         LoggingContext lc = getLoggingContext();
         if (lc != null) {
             lc.logCSPReport(report);
+        }
+    }
+
+    @Override
+    public void logDeprecationUsages(Map<String, List<String>> usages) {
+        LoggingContext loggingContext = getLoggingContext();
+        if (loggingContext != null) {
+            loggingContext.logDeprecationUsages(usages);
         }
     }
 

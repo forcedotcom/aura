@@ -232,16 +232,8 @@ public class ComponentController implements GlobalController {
     @CabooseAction
     @AuraEnabled
     public void reportDeprecationUsages(@Key("usages") Map<String, List<String>> usages) {
-        if (usages == null) {
-            return;
-        }
-
-        for (Map.Entry<String, List<String>> entry : usages.entrySet()) {
-            String api = entry.getKey();
-            for (String caller : entry.getValue()) {
-                String message = String.format("Aura API Deprecation Usages: api=%s, caller=%s", api, caller);
-                this.loggingService.warn(message);
-            }
+        if (usages != null) {
+            this.loggingService.logDeprecationUsages(usages);
         }
     }
 

@@ -415,9 +415,11 @@
 	goToPageOnCarousel : function(cmp, carouselName, pageNumber, pageId) {
 		pageNumber--;
 		var carousel = cmp.find(carouselName);
-		var navIndicators = this.getNavigationIndicators(carousel);
-		var targetIndicator = navIndicators[pageNumber];
-		targetIndicator.get("e.click").setComponentEvent().fire();
+		var carouselEl = carousel.getElement();
+		var indicators = carouselEl.querySelectorAll('.uiCarouselPageIndicatorItem');
+		
+		indicators[pageNumber].click();
+		
 		var waitForPageChange = this.waitForPageChange;
 		var that = this;
 		$A.test.addWaitFor(true,

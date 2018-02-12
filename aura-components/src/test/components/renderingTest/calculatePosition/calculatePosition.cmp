@@ -18,8 +18,14 @@
 <aura:component>
     <aura:attribute name="empty" type="Aura.Component[]"/>
     <aura:attribute name="items" type="List" default="[1, 2, 3, 4]"/>
-    
-    <ui:button label="Rerender" press="{!c.rerender}"/>
+    <aura:attribute name="showButton" type="Boolean" default="true"/>
+
+    <aura:if aura:id="showButton" isTrue="{!v.showButton}">
+        <ui:button aura:id="button" label="Rerender" press="{!c.rerender}"/>
+        <aura:set attribute="else">
+            a button was here!
+        </aura:set>
+    </aura:if>
 
     <div aura:id="output">
         {!v.empty}

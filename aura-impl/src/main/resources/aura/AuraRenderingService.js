@@ -560,15 +560,23 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
         var totalElements = 0;
 
         // Count from the marker to the firstChild so we know what index we are at in the childNodes collection.
-        while(current != null && current.previousSibling) {
+        while (current != null && current.previousSibling) {
             calculatedPosition++;
 
             // Move to the previous element and try again.
             current = current.previousSibling;
         }
 
+        if (!target) {
+            // Some existing components intendedly remove elements from DOM.
+            // This could cause rendering issue if the element if a shared marker.
+            current = elements[length-1];
+        } else {
+            // The elements order may be different between component elements collection and DOM,
+            // so we need to find the real last child in the DOM.
+            current = this.getLastSharedElementInCollection(elements, target.childNodes);
+        }
         // Count all the elements in the DOM vs what we know.
-        current = elements[length-1];
         while (current != null) {
             // How many nodes between the last element this component owns
             // and the firstNode of the childNodes collection.
@@ -606,12 +614,19 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
                 renderedElements = this.render(info.component);
                 if (updatedFacet.useFragment) {
                     ret = ret.concat(renderedElements);
+                    calculatedPosition += renderedElements.length;
                 } else if (renderedElements.length) {
                     ret = ret.concat(renderedElements);
-                    nextSibling = target.childNodes[calculatedPosition];
-                    this.insertElements(renderedElements, nextSibling||target, nextSibling, nextSibling);
+                    if (!target) {
+                        $A.warning("Rendering Error: The element for the following component was removed from the DOM outside of the Aura lifecycle. " +
+                                "We cannot render any further updates to it or its children.\nComponent: " + $A.clientService.getAccessStackHierarchy() +
+                                " {" + component.getGlobalId() + "}");
+                    } else {
+                        nextSibling = target.childNodes[calculatedPosition];
+                        this.insertElements(renderedElements, nextSibling||target, nextSibling, nextSibling);
+                        calculatedPosition += renderedElements.length;
+                    }
                 }
-                calculatedPosition += renderedElements.length;
                 this.afterRenderStack.push(info.component);
                 break;
             case "rerender":
@@ -722,6 +737,29 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
     }
 
     return ret;
+};
+
+/**
+ * Find the element which is the last element in the DOM from component elements collection.
+ * @private
+ */
+AuraRenderingService.prototype.getLastSharedElementInCollection = function(cmpElements, domElements) {
+    if (!cmpElements || !domElements) {
+        return null;
+    }
+
+    var lastElement = null;
+    var largestIndex = -1;
+    for (var i = 0, len = cmpElements.length; i < len; i++) {
+        var element = cmpElements[i];
+        var index = Array.prototype.indexOf.call(domElements, element);
+        if (index > largestIndex) {
+            largestIndex = index;
+            lastElement = element;
+        }
+    }
+
+    return lastElement;
 };
 
 /**

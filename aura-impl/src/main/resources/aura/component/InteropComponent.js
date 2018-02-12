@@ -540,8 +540,6 @@ InteropComponent.prototype.updateContainerElement = function (container, current
 
 /**
  * Invoke the afterRender method
- * Most of the time the element will be in the DOM in the afterRender so we will swap the real one there
- * For weird corner cases, we will wait til the parent its rendered.
  * @export
  */
 InteropComponent.prototype.afterRender = function () {
@@ -550,25 +548,24 @@ InteropComponent.prototype.afterRender = function () {
     }
 
     var element = this.elements[0];
-    if (document.body.contains(element)) {
-        this.swapInteropElement(element, this._customElement);
-    } else {
-        var owner = $A.getCmp(this.owner);
-        if (owner) {
-            this.boundAfterParentRender = this.afterParentRender.bind(this);
-            owner.addEventHandler('markup://aura:valueRender', this.boundAfterParentRender, 'default');
-        }
-    }
-};
 
-InteropComponent.prototype.afterParentRender = function () {
-    var element = this.elements[0];
-    if (document.body.contains(element)) {
+    // This used to be a document.body.contains(element) check but that breaks
+    // when the element renders in a non-attached document fragment. This
+    // check assumes that we can safely swap when we have a parent element.
+    // It's not clear that this check is necessary as there were no comments
+    // talking about any specific scenarios. Leaving it in to be safe.
+    if (element.parentElement) {
         this.swapInteropElement(element, this._customElement);
-        var owner = $A.getCmp(this.owner);
-        if (owner) {
-            owner.removeEventHandler('markup://aura:valueRender', this.boundAfterParentRender, 'default');
-        }
+        return;
+    }
+
+    var owner = $A.getCmp(this.owner);
+    if (owner) {
+        var handleValueRenderOnce = function () {
+            owner.removeEventHandler('markup://aura:valueRender', handleValueRenderOnce);
+            this.swapInteropElement(element, this._customElement);
+        }.bind(this);
+        owner.addEventHandler('markup://aura:valueRender', handleValueRenderOnce, 'default');
     }
 };
 

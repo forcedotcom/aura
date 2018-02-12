@@ -26,79 +26,59 @@
     <aura:attribute name="timezone1" type="String" description="ACCESS CHECK FIX. PLEASE INVESTIGATE."/>
     <aura:attribute name="timezone2" type="String" description="ACCESS CHECK FIX. PLEASE INVESTIGATE."/>
 
-	<aura:attribute name="renderItem" type="String" default="" description="used to selectively pick the right block to run the tests" />
+    <aura:attribute name="renderItem" type="String" default="" description="used to selectively pick the right block to run the tests" />
 
-	<aura:if isTrue="{! v.renderItem == 'testShowTodayDatepickerFlag'}">	
-	<div class="block">
-	    <div>
-	        <h1>Datepicker Show Today Button Tests - showToday=true</h1>
-	    </div>
-	    <div class="subtitle">
-			<div style="color:red"><b>Initial Attr</b></div>
-			<div><b>showToday:</b> true</div>
-	    	<div style="color:red"><b>Run-Time Attr</b></div>
-	    	<div><b>selectedDate:</b> value={!v.selectedDate.value}    hours={!v.selectedDate.hours}    minutes={!v.selectedDate.minutes}</div>
-		</div>
-	    <div>
-	        <ui:datePicker aura:id="datePicker" showToday="true" selectDate="{!c.handleSelectedDate}" visible="true"/>
-	    </div>
-	</div>
-	</aura:if>
-
-
-	<aura:if isTrue="{! v.renderItem == 'testHideTodayDatepickerFlag'}">	
-	<div class="block">
-	    <div>
-	        <h1>Datepicker Show Today Button Tests - showToday=false</h1>
-	    </div>
-	    <div class="subtitle">
-			<div style="color:red"><b>Initial Attr</b></div>
-			<div><b>showToday:</b> false</div>
-	    	<div style="color:red"><b>Run-Time Attr</b></div>
-	    	<div><b>selectedDate:</b> value={!v.selectedDate.value}    hours={!v.selectedDate.hours}    minutes={!v.selectedDate.minutes}</div>
-		</div>
-	    <div>
-	        <ui:datePicker aura:id="datePicker" showToday="false" selectDate="{!c.handleSelectedDate}" visible="true"/>
-	    </div>
-	</div>
-	</aura:if>
+    <aura:if isTrue="{! v.renderItem == 'testShowTodayDatepickerFlag'}">
+        <div class="block">
+            <div>
+                <h1>Datepicker Show Today Button Tests - showToday=true</h1>
+            </div>
+            <div class="subtitle">
+                <div style="color:red"><b>Initial Attr</b></div>
+                <div><b>showToday:</b> true</div>
+                <div style="color:red"><b>Run-Time Attr</b></div>
+                <div><b>selectedDate:</b> value={!v.selectedDate.value}    hours={!v.selectedDate.hours}    minutes={!v.selectedDate.minutes}</div>
+            </div>
+            <div>
+                <ui:datePicker aura:id="datePicker" showToday="true" selectDate="{!c.handleSelectedDate}" visible="true"/>
+            </div>
+        </div>
+    </aura:if>
 
 
-	<aura:if isTrue="{! v.renderItem == 'testDefaultValueOfDatePicker'}">	
-	<div class="block">
-	    <div>
-	        <h1>Datepicker Show Today Button Tests - <br />
-	        with predefined date - 2015-7-15</h1>
-	    </div>
-	    <div class="subtitle">
-			<div style="color:red"><b>Initial Attr</b></div>
-			<div><b>showToday:</b> false</div>
-	    	<div style="color:red"><b>Run-Time Attr</b></div>
-	    	<div><b>selectedDate:</b> value={!v.selectedDate.value}    hours={!v.selectedDate.hours}    minutes={!v.selectedDate.minutes}</div>
-		</div>
-	    <div>
-	        <ui:datePicker aura:id="datePicker" showToday="true" selectDate="{!c.handleSelectedDate}" visible="true" value="2015-7-15"/>
-	    </div>
-	</div>
-	</aura:if>
+    <aura:if isTrue="{! v.renderItem == 'testHideTodayDatepickerFlag'}">
+        <div class="block">
+            <div>
+                <h1>Datepicker Show Today Button Tests - showToday=false</h1>
+            </div>
+            <div class="subtitle">
+                <div style="color:red"><b>Initial Attr</b></div>
+                <div><b>showToday:</b> false</div>
+                <div style="color:red"><b>Run-Time Attr</b></div>
+                <div><b>selectedDate:</b> value={!v.selectedDate.value}    hours={!v.selectedDate.hours}    minutes={!v.selectedDate.minutes}</div>
+            </div>
+            <div>
+                <ui:datePicker aura:id="datePicker" showToday="false" selectDate="{!c.handleSelectedDate}" visible="true"/>
+            </div>
+        </div>
+    </aura:if>
 
-	<aura:if isTrue="{! v.renderItem == 'testLocalizedTodayWithTimezoneAPI'}">	
-	<div class="block">
-	    <div>
-	        <h1>
-	        	Datepicker Show Today Button Tests<br/>
-	        	{!v.expectedDiffCase}
-        	</h1>
-	    </div>
-	    <div class="subtitle">
-			<div style="color:red"><b>Runtime Attr:</b></div>
-			<div><b>Time Diff Case:</b> {!v.timeDiffCase}</div>
-			<div><b>Today Time Full:</b> {!v.todayDate_str}</div>
-			<div style="color:red"><b>Time Zone 1:</b> {!v.timezone1}</div>
-	    	<div><b>todayDate1:</b> {!v.todayDate1}</div>
-	    	<div style="color:red"><b>Time Zone 2:</b> {!v.timezone2}</div>
-	    	<div><b>todayDate2:</b> {!v.todayDate2}</div>
-		</div>
-	</div>
-	</aura:if>
+    <aura:if isTrue="{! v.renderItem == 'testDefaultValueOfDatePicker'}">
+        <div class="block">
+            <div>
+                <h1>Datepicker Show Today Button Tests - <br />
+                with predefined date - 2015-7-15</h1>
+            </div>
+            <div class="subtitle">
+                <div style="color:red"><b>Initial Attr</b></div>
+                <div><b>showToday:</b> false</div>
+                <div style="color:red"><b>Run-Time Attr</b></div>
+                <div><b>selectedDate:</b> value={!v.selectedDate.value}    hours={!v.selectedDate.hours}    minutes={!v.selectedDate.minutes}</div>
+            </div>
+            <div>
+                <ui:datePicker aura:id="datePicker" showToday="true" selectDate="{!c.handleSelectedDate}" visible="true" value="2015-7-15"/>
+            </div>
+        </div>
+    </aura:if>
+
 </aura:component>

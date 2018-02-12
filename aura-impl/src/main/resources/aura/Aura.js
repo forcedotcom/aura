@@ -213,9 +213,6 @@ function noop() {}
 // #include aura.requiredVersion.RequiredVersionDef
 // #include aura.requiredVersion.RequiredVersionDefSet
 
-// -- L10n ---------------------------------------------------------------
-// #include aura.l10n.AuraLocalizationContext
-
 // -- Storage -------------------------------------------------------------
 // #include aura.storage.AuraStorageService
 // #include aura.storage.AuraStorage

@@ -17,7 +17,6 @@ aura-impl/src/main/resources/aura/controller/    @kgray
 aura-impl/src/main/resources/aura/error/         @kgray @yungcheng-chen
 aura-impl/src/main/resources/aura/event/         @kgray
 aura-impl/src/main/resources/aura/flavors/       @kgray
-aura-impl/src/main/resources/aura/l10n/          @kgray
 aura-impl/src/main/resources/aura/library/       @kgray
 aura-impl/src/main/resources/aura/method/        @kgray
 aura-impl/src/main/resources/aura/metrics/       @kgray @mrafique

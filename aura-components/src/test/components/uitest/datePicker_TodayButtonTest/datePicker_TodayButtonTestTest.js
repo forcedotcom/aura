@@ -16,11 +16,10 @@
 ({
     owner:"ctatlah",
 
-    CSS_SELECTOR:{
+    CSS_SELECTOR: {
         todayButton : 'span.today',
         uiDatePicker : '.uiDatePicker'
     },
-
 
     //test to check if the Today Button is visible (showToday=true)
     //clicking on the today button should populate the datepicker to today date
@@ -113,212 +112,6 @@
         ]
     },
 
-    //test localized service
-    //SAME YEAR, MONTH, DAY
-    testLocalizedTodayWithTimezoneAPISameDayMonthYear: {
-        attributes : {"renderItem" : "testLocalizedTodayWithTimezoneAPI"},
-        test: [function(cmp){
-            this.setupTimezones(cmp);
-        }, function(cmp) {
-            //based on the locale
-            var self = this;
-            cmp.set('v.todayDate', new Date('Jul 06 2015 01:26:37 GMT-0700 (PDT)'));
-            cmp.set('v.todayDate_str', cmp.get('v.todayDate').toString());
-            cmp.set('v.expectedDiffCase', 'SAME YEAR, MONTH, DAY');
-        }, function(cmp){
-            //based on the locale
-            var self = this;
-
-            $A.localizationService.getDateStringBasedOnTimezone(
-                cmp.get('v.timezone1'),
-                cmp.get('v.todayDate'),
-                function(dateString) {
-                    cmp.set('v.todayDate1', dateString);
-                    self.verifyValidDateString( dateString);
-                }
-            );
-
-            $A.localizationService.getDateStringBasedOnTimezone(
-                cmp.get('v.timezone2'),
-                cmp.get('v.todayDate'),
-                function(dateString) {
-                    cmp.set('v.todayDate2', dateString);
-                    self.verifyValidDateString( dateString);
-                }
-            );
-        }, function(cmp){
-            var self = this;
-
-            $A.test.addWaitForWithFailureMessage(
-                true,
-                function(){//testFunction
-                    return cmp.get('v.todayDate1') && cmp.get('v.todayDate2') &&
-                        cmp.get('v.todayDate1').length > 0 && cmp.get('v.todayDate2').length > 0;
-                },
-                'today Dates should have been initialized',//failureMessage
-                function(){//callback
-                    self.verifyDateOffset( cmp.get('v.todayDate1'), cmp.get('v.todayDate2'), cmp);
-                }
-            );
-        }]
-    },
-
-
-
-    //test localized service
-    //NEXT DAY SAME MONTH
-    testLocalizedTodayWithTimezoneAPINextDaySameMonth: {
-        attributes : {"renderItem" : "testLocalizedTodayWithTimezoneAPI"},
-        test: [function(cmp){
-            this.setupTimezones(cmp);
-        }, function(cmp) {
-            //based on the locale
-            var self = this;
-            cmp.set('v.todayDate', new Date('Jul 06 2015 21:26:37 GMT-0700 (PDT)'));
-            cmp.set('v.todayDate_str', cmp.get('v.todayDate').toString());
-            cmp.set('v.expectedDiffCase', 'NEXT DAY SAME MONTH');
-        }, function(cmp){
-            //based on the locale
-            var self = this;
-
-            $A.localizationService.getDateStringBasedOnTimezone(
-                cmp.get('v.timezone1'),
-                cmp.get('v.todayDate'),
-                function(dateString) {
-                    cmp.set('v.todayDate1', dateString);
-                    self.verifyValidDateString( dateString);
-                }
-            );
-
-            $A.localizationService.getDateStringBasedOnTimezone(
-                cmp.get('v.timezone2'),
-                cmp.get('v.todayDate'),
-                function(dateString) {
-                    cmp.set('v.todayDate2', dateString);
-                    self.verifyValidDateString( dateString);
-                }
-            );
-        }, function(cmp){
-            var self = this;
-
-            $A.test.addWaitForWithFailureMessage(
-                true,
-                function(){//testFunction
-                    return cmp.get('v.todayDate1') && cmp.get('v.todayDate2') &&
-                        cmp.get('v.todayDate1').length > 0 && cmp.get('v.todayDate2').length > 0;
-                },
-                'today Dates should have been initialized',//failureMessage
-                function(){//callback
-                    self.verifyDateOffset( cmp.get('v.todayDate1'), cmp.get('v.todayDate2'), cmp);
-                }
-            );
-        }]
-    },
-
-
-
-    //test localized service
-    //FIRST DAY NEXT MONTH
-    testLocalizedTodayWithTimezoneAPIFirstDayNextMonth: {
-        attributes : {"renderItem" : "testLocalizedTodayWithTimezoneAPI"},
-        test: [function(cmp){
-            this.setupTimezones(cmp);
-        }, function(cmp) {
-            //based on the locale
-            var self = this;
-            cmp.set('v.todayDate', new Date('Jul 31 2015 21:26:37 GMT-0700 (PDT)'));
-            cmp.set('v.todayDate_str', cmp.get('v.todayDate').toString());
-            cmp.set('v.expectedDiffCase', 'FIRST DAY NEXT MONTH');
-        }, function(cmp){
-            //based on the locale
-            var self = this;
-
-            $A.localizationService.getDateStringBasedOnTimezone(
-                cmp.get('v.timezone1'),
-                cmp.get('v.todayDate'),
-                function(dateString) {
-                    cmp.set('v.todayDate1', dateString);
-                    self.verifyValidDateString( dateString);
-                }
-            );
-
-            $A.localizationService.getDateStringBasedOnTimezone(
-                cmp.get('v.timezone2'),
-                cmp.get('v.todayDate'),
-                function(dateString) {
-                    cmp.set('v.todayDate2', dateString);
-                    self.verifyValidDateString( dateString);
-                }
-            );
-        }, function(cmp){
-            var self = this;
-
-            $A.test.addWaitForWithFailureMessage(
-                true,
-                function(){//testFunction
-                    return cmp.get('v.todayDate1') && cmp.get('v.todayDate2') &&
-                        cmp.get('v.todayDate1').length > 0 && cmp.get('v.todayDate2').length > 0;
-                },
-                'today Dates should have been initialized',//failureMessage
-                function(){//callback
-                    self.verifyDateOffset( cmp.get('v.todayDate1'), cmp.get('v.todayDate2'), cmp);
-                }
-            );
-        }]
-    },
-
-
-    //test localized service
-    //FIRST DAY NEXT YEAR
-    testLocalizedTodayWithTimezoneAPIFirstDayNextYear: {
-        attributes : {"renderItem" : "testLocalizedTodayWithTimezoneAPI"},
-        test: [function(cmp){
-            this.setupTimezones(cmp);
-        }, function(cmp) {
-            //based on the locale
-            var self = this;
-            cmp.set('v.todayDate', new Date('Dec 31 2015 21:26:37 GMT-0700 (PDT)'));
-            cmp.set('v.todayDate_str', cmp.get('v.todayDate').toString());
-            cmp.set('v.expectedDiffCase', 'FIRST DAY NEXT YEAR');
-        }, function(cmp){
-            //based on the locale
-            var self = this;
-
-            $A.localizationService.getDateStringBasedOnTimezone(
-                cmp.get('v.timezone1'),
-                cmp.get('v.todayDate'),
-                function(dateString) {
-                    cmp.set('v.todayDate1', dateString);
-                    self.verifyValidDateString( dateString);
-                }
-            );
-
-            $A.localizationService.getDateStringBasedOnTimezone(
-                cmp.get('v.timezone2'),
-                cmp.get('v.todayDate'),
-                function(dateString) {
-                    cmp.set('v.todayDate2', dateString);
-                    self.verifyValidDateString( dateString);
-                }
-            );
-        }, function(cmp){
-            var self = this;
-
-            $A.test.addWaitForWithFailureMessage(
-                true,
-                function(){//testFunction
-                    return cmp.get('v.todayDate1') && cmp.get('v.todayDate2') &&
-                        cmp.get('v.todayDate1').length > 0 && cmp.get('v.todayDate2').length > 0;
-                },
-                'today Dates should have been initialized',//failureMessage
-                function(){//callback
-                    self.verifyDateOffset( cmp.get('v.todayDate1'), cmp.get('v.todayDate2'), cmp);
-                }
-            );
-        }]
-    },
-
-
     //helper
     //verify if an element el contains css class name
     verifyContainClass: function(el, cssClassName){
@@ -407,62 +200,6 @@
         };
     },
 
-
-    //verify date offset
-    verifyDateOffset: function(todayDateString1, todayDateString2, cmp){
-        var self = this;
-
-        var todayDateObj1 = self.verifyValidDateString( todayDateString1 );
-        var todayDateObj2 = self.verifyValidDateString( todayDateString2 );
-
-        if (todayDateObj1.day !== todayDateObj2.day){
-            //timezone provides different dates, needs further date
-
-            if (todayDateObj1.day < todayDateObj2.day){
-                //next day same month
-                cmp.set('v.timeDiffCase', 'NEXT DAY SAME MONTH: todayDate2.day = todayDate1.day + 1');
-                $A.test.assertTrue(
-                    todayDateObj2.day - 1 === todayDateObj1.day,
-                    'NEXT DAY SAME MONTH: todayDate2.day = todayDate1.day + 1'
-                );
-            }
-            else if (todayDateObj1.month < todayDateObj2.month){
-                //first day next month
-                cmp.set('v.timeDiffCase', 'FIRST DAY NEXT MONTH: todayDate2.month = todayDate1.month + 1');
-                $A.test.assertTrue(
-                    todayDateObj2.month - 1 === todayDateObj1.month,
-                    'FIRST DAY NEXT MONTH: todayDate2.month = todayDate1.month + 1'
-                );
-            }
-            else{
-                //next year first day first month
-                cmp.set('v.timeDiffCase', 'FIRST DAY NEXT YEAR: todayDate2.year = todayDate1.year + 1');
-                $A.test.assertTrue(
-                    todayDateObj2.year - 1 === todayDateObj1.year,
-                    'FIRST DAY NEXT YEAR: todayDate2.year = todayDate1.year + 1'
-                );
-            }
-        }
-        else{
-            cmp.set('v.timeDiffCase', 'SAME DAY, MONTH, YEAR, offset is minor');
-            $A.test.assertEquals(
-                todayDateObj1.day,
-                todayDateObj2.day,
-                'SAME DAY, MONTH, YEAR : day should match'
-            );
-            $A.test.assertEquals(
-                todayDateObj1.month,
-                todayDateObj2.month,
-                'SAME DAY, MONTH, YEAR : month should match'
-            );
-            $A.test.assertEquals(
-                todayDateObj1.year,
-                todayDateObj2.year,
-                'SAME DAY, MONTH, YEAR : year should match'
-            );
-        }
-    },
-
     verifyDatepickerTodayAttr: function(cmp, expectedDay, expectedMonth_StartFromZero, expectedYear){
         var datepickerCmp = cmp.find('datePicker');
         var todayStr = datepickerCmp.find("grid").get('v._today');//yyyy-MM-dd
@@ -483,12 +220,5 @@
             datepickerCmp.find('grid').get("v.year"),
             'YEAR Val must match. Found : ' + todayStr
         );
-    },
-
-
-    //set up timezones
-    setupTimezones: function(cmp){
-        cmp.set('v.timezone1', 'America/Los_Angeles');
-        cmp.set('v.timezone2', 'Asia/Bankok');
     }
 })

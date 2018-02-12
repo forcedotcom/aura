@@ -142,15 +142,6 @@ function AuraInstance () {
         history : this.historyService,
 
         /**
-         * Localization Service
-         *
-         * @public
-         * @type AuraLocalizationService
-         * @memberOf AuraInstance.prototype
-         */
-        localization : this.localizationService,
-
-        /**
          * Storage Service
          *
          * @public
@@ -178,16 +169,6 @@ function AuraInstance () {
          * @see Aura#services.event
          */
         e : this.eventService,
-
-        /**
-         * Alias of Localization Service
-         *
-         * @public
-         * @type AuraLocalizationService
-         * @memberOf AuraInstance.prototype
-         * @see Aura#service.localization
-         */
-        l10n : this.localizationService,
 
         /**
          * Style Service
@@ -378,7 +359,6 @@ function AuraInstance () {
     services["component"] = services.component;
     services["client"] = services.client;
     services["history"] = services.history;
-    services["l10n"] = services.localization;
     services["storage"] = services.storage;
     services["metrics"] = services.metrics;
     services["cmp"] = services.cmp;

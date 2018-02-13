@@ -55,6 +55,7 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
     private static final String ATTRIBUTE_MIN_API = "minAPI";
     private static final String ATTRIBUTE_MAX_API = "maxAPI";
     private static final String ATTRIBUTE_TRANSLATABLE = "translatable";
+    private static final String ATTRIBUTE_ACCESSCHECK = "accessCheck";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL,
             ATTRIBUTE_TYPE, ATTRIBUTE_REQUIRED, ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE,
@@ -63,7 +64,8 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
     private final static Set<String> INTERNAL_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL,
             ATTRIBUTE_TYPE, ATTRIBUTE_REQUIRED, ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE,
             ATTRIBUTE_MIN, ATTRIBUTE_MAX, ATTRIBUTE_PLACEHOLDER, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_DEFAULT,
-            ATTRIBUTE_MAX_API, ATTRIBUTE_MIN_API, ATTRIBUTE_TRANSLATABLE, ATTRIBUTE_ALLOWED_INTERFACES);
+            ATTRIBUTE_MAX_API, ATTRIBUTE_MIN_API, ATTRIBUTE_TRANSLATABLE, ATTRIBUTE_ALLOWED_INTERFACES,
+            ATTRIBUTE_ACCESSCHECK);
 
     private final DesignAttributeDefImpl.Builder builder = new DesignAttributeDefImpl.Builder();
 
@@ -98,6 +100,7 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
         String minApi = getAttributeValue(ATTRIBUTE_MIN_API);
         String maxApi = getAttributeValue(ATTRIBUTE_MAX_API);
         Boolean translatable = getBooleanAttributeValue(ATTRIBUTE_TRANSLATABLE);
+        String accessCheck = getAttributeValue(ATTRIBUTE_ACCESSCHECK);
 
         String allowedInterfaceNames = getAttributeValue(ATTRIBUTE_ALLOWED_INTERFACES);
         if (allowedInterfaceNames != null && allowedInterfaceNames.length() > 0) {
@@ -131,6 +134,7 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
         builder.setParentDescriptor(getParentDefDescriptor());
         builder.setIsInternalNamespace(isInInternalNamespace());
         builder.setAccess(readAccessAttribute());
+        builder.setAccessCheck(accessCheck);
     }
 
     @Override

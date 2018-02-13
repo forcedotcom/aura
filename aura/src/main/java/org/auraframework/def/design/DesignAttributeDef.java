@@ -128,4 +128,10 @@ public interface DesignAttributeDef extends Definition, ParentedDef{
      * @return
      */
     Set<DefDescriptor<InterfaceDef>> getAllowedInterfaces();
+    
+    /**
+    * Gets the sfdc access check this attribute should honor in during design time.
+    * @return
+    */
+    String getAccessCheck();
 }

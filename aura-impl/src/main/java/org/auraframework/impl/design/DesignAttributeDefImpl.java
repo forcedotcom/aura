@@ -66,6 +66,7 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
     private final String maxApi;
     private final boolean translatable;
     private final DesignAttributeDefaultDef defaultFacet;
+    private final String accessCheck;
 
     protected DesignAttributeDefImpl(Builder builder) {
         super(builder);
@@ -88,6 +89,7 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
         this.defaultFacet = builder.defaultFacet;
         this.isInInternalNamespace = builder.isInInternalNamespace;
         this.parentDescriptor = builder.parentDescriptor;
+        this.accessCheck = builder.accessCheck;
     }
 
     @Override
@@ -179,6 +181,11 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
     public DefDescriptor<? extends RootDefinition> getParentDescriptor() {
         return parentDescriptor;
     }
+    
+    @Override
+    public String getAccessCheck() {
+    	return accessCheck;
+    }
 
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
@@ -250,6 +257,7 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
         private boolean isInInternalNamespace;
         private DefDescriptor<? extends RootDefinition> parentDescriptor;
         private Set<DefDescriptor<InterfaceDef>> allowedInterfaces;
+        private String accessCheck;
 
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
@@ -372,6 +380,12 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
             }
             this.allowedInterfaces.add(allowedInterface);
             return this;
+        }
+        
+        @Override
+        public DesignAttributeDefBuilder setAccessCheck(String accessCheck) {
+        	this.accessCheck = accessCheck;
+        	return this;
         }
     }
 }

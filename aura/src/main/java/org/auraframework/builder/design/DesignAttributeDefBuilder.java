@@ -58,4 +58,6 @@ public interface DesignAttributeDefBuilder extends DefBuilder<DesignAttributeDef
     DesignAttributeDefBuilder setIsInternalNamespace(boolean internalNamespace);
 
     DesignAttributeDefBuilder addAllowedInterface(DefDescriptor<InterfaceDef> allowedInterface);
+    
+    DesignAttributeDefBuilder setAccessCheck(String accessCheck);
 }

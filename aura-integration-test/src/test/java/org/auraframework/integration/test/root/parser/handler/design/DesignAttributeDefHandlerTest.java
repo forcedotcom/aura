@@ -41,7 +41,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
                 name,
                 "<design:attribute name=\""
                         + name
-                        + "\" required=\"true\" readonly=\"true\" type=\"String\" dependsOn=\"myparent\" datasource=\"one,two,three\" min=\"-100\" max=\"100\" label=\"some label\" placeholder=\"some placeholder\" />");
+                        + "\" required=\"true\" readonly=\"true\" type=\"String\" dependsOn=\"myparent\" datasource=\"one,two,three\" min=\"-100\" max=\"100\" label=\"some label\" placeholder=\"some placeholder\" accessCheck=\"testCheck\"/>");
 
         assertTrue(element.isRequired());
         assertTrue(element.isReadOnly());
@@ -52,6 +52,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         assertEquals("100", element.getMax());
         assertEquals("some label", element.getLabel());
         assertEquals("some placeholder", element.getPlaceholderText());
+        assertEquals("testCheck", element.getAccessCheck());
         assertNull(element.getAttributeDefault());
     }
 

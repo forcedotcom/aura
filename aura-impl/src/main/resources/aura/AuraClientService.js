@@ -289,9 +289,15 @@ AuraClientService.CACHE_BUST_QUERY_PARAM = "nocache";
 AuraClientService.SYSTEM_EXCEPTION_EVENT_RETURN_STATUS = "SYSTEMERROR";
 
 /**
- * The status to reutnr to action postprocess when receiving a response with invalid session
+ * The status to return to action postprocess when receiving a response with invalid session
  */
 AuraClientService.INVALID_SESSION_RETURN_STATUS = "INVALIDSESSION";
+
+/**
+ * Reserved token that the server responds with in the case that a new TOKEN
+ * cannot be issued.
+ */
+AuraClientService.INVALID_CSRF = "invalid_csrf";
 
 /**
  * Framework + app reload counter to detect and prevent infinite reloads.
@@ -3397,16 +3403,16 @@ AuraClientService.prototype.retryActions = function(auraXHR, event) {
     var newToken = event["attributes"] &&
                    event["attributes"]["values"] &&
                    event["attributes"]["values"]["newToken"];
-    if ($A.util.isString(newToken) && !$A.util.isEmpty(newToken) && newToken !== this._token) {
-        this.invalidSession(newToken);
+    if (this.isValidToken(newToken) && newToken !== this._token) {
+        this.setToken(newToken, true, true);
 
-        $A.log("[AuraClientService].retryActions]: New token received, attempting to retry failed actions");
+        $A.log("[AuraClientService.retryActions]: New token received, attempting to retry failed actions");
         for (var name in auraXHR.actions) {
             if (auraXHR.actions[name].getRetryCount() < this.maxActionRetries) {
                 auraXHR.actions[name].incrementRetryCount();
                 this.enqueueAction(auraXHR.actions[name]);
             } else {
-                $A.log("[AuraClientService].retryActions]: Exceeded action retry limit");
+                $A.log("[AuraClientService.retryActions]: Exceeded action retry limit");
                 this.throwExceptionEvent({event: event});
                 this.processSystemError(auraXHR);
                 break;
@@ -3414,10 +3420,17 @@ AuraClientService.prototype.retryActions = function(auraXHR, event) {
         }
     }
     else {
-        $A.log("[AuraClientService].retryActions]: Could not retry actions, no token received.");
+        $A.log("[AuraClientService.retryActions]: Could not retry actions, no token received.");
         this.throwExceptionEvent({event: event});
         this.processSystemError(auraXHR);
     }
+};
+
+/**
+ * Returns true if the token is of valid format
+ */
+AuraClientService.prototype.isValidToken = function(token) {
+    return ($A.util.isString(token) && !$A.util.isEmpty(token) && token !== AuraClientService.INVALID_CSRF);
 };
 
 /**
@@ -4291,7 +4304,7 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
 AuraClientService.prototype.invalidSession = function(newToken) {
     // if new token provided then persist to storage and reload. if persisting
     // fails then we must go to the server for bootstrap.js to get a new token.
-    if ($A.util.isString(newToken) && !$A.util.isEmpty(newToken) && newToken !== "invalid_csrf" && newToken !== this._token) {
+    if (this.isValidToken(newToken) && newToken !== this._token) {
         $A.log("[AuraClientService.invalidSession]: New Token provided, replacing existing token.");
         this.setToken(newToken, true, true);
     } else {

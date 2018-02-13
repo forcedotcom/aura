@@ -260,12 +260,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
 
     @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    public AttributeDef getAttributeDef(String name) throws QuickFixException {
-        return null;
+        return this.attributeDefs;
     }
 
     public static final class Builder extends PlatformDefImpl.Builder<ModuleDef> {
@@ -308,10 +303,6 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
                 }
                 this.labelReferences.add(new PropertyReferenceImpl(label, location));
             }
-        }
-        
-        public void setExternalReferences(String externalReferences) {
-            this.externalReferences = externalReferences;
         }
 
         public void setRequireLocker(Boolean requireLocker) {

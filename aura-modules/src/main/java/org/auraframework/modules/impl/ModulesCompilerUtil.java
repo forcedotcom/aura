@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -29,6 +31,8 @@ import java.util.function.Supplier;
 
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompilerData;
+import org.auraframework.modules.ModulesCompilerData.WireAdapter;
+import org.auraframework.modules.ModulesCompilerData.WireDecoration;
 import org.auraframework.tools.node.api.NodeBundle;
 import org.auraframework.tools.node.api.NodeLambdaFactory;
 import org.auraframework.tools.node.impl.NodeBundleBuilder;
@@ -129,6 +133,97 @@ public final class ModulesCompilerUtil {
         return input;
     }
 
+    static String[] convertJsonArrayToStringArray(JSONArray input) {
+        if (input == null) {
+            return null;
+        }
+
+        String[] ret = new String[input.length()];
+        for (int i = 0; i < input.length(); i++) {
+            try {
+                ret[i] = input.getString(i);
+            } catch(JSONException e) {
+                return null;
+            }
+        }
+
+        return ret;
+    }
+
+    static Set<String> parsePublicProperties(JSONArray input) {
+        if (input == null) {
+            return null;
+        }
+
+        Set<String> ret = new HashSet<>();
+        for (int i = 0; i < input.length(); i++) {
+            JSONObject publicDecoration = input.getJSONObject(i);
+            if (publicDecoration != null) {
+                try {
+                    if (publicDecoration.getString("type").equals("property")) {
+                        ret.add(publicDecoration.getString("name"));
+                    }
+                } catch (JSONException e){
+                    // ignore
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    static Set<WireDecoration> parseWireDecorations(JSONArray input) {
+        if (input == null) {
+            return null;
+        }
+
+        Set<WireDecoration> wireDecorations = new HashSet<>();
+        for (int i = 0; i < input.length(); i++) {
+            try {
+                JSONObject wo = input.getJSONObject(i);
+                JSONObject adapter = wo.getJSONObject("adapter");
+                JSONObject paramsObject = wo.getJSONObject("params");
+                Map<String, String> paramsMap = new HashMap<>();
+                if (paramsObject != null) {
+                    Iterator<?> keys = paramsObject.keys();
+                    while (keys.hasNext()) {
+                        String key = (String)keys.next();
+                        String paramValue = paramsObject.getString(key);
+                        if (paramValue != null) {
+                            paramsMap.put(key, paramValue);
+                        }
+                    }
+                }
+
+                JSONObject staticFields = wo.getJSONObject("static");
+                Map<String, String[]> staticFieldsMap = new HashMap<>();
+                if (staticFields != null) {
+                    Iterator<?> keys = staticFields.keys();
+                    while (keys.hasNext()) {
+                        String key = (String)keys.next();
+                        String[] staticFieldsValues = convertJsonArrayToStringArray(staticFields.getJSONArray(key));
+                        if (staticFieldsValues != null) {
+                            staticFieldsMap.put(key, staticFieldsValues);
+                        }
+                    }
+                }
+
+                wireDecorations.add(
+                    new WireDecoration(
+                            wo.getString("type"),
+                            wo.getString("name"),
+                            new WireAdapter(adapter.getString("name"), adapter.getString("reference")),
+                            paramsMap,
+                            staticFieldsMap)
+                    );
+            } catch (JSONException e) {
+                // ignore
+            }
+        }
+
+        return wireDecorations;
+    }
+    
     public static ModulesCompilerData parseCompilerOutput(JSONObject result) {
         JSONObject dev = result.getJSONObject("dev");
         JSONObject prod = result.getJSONObject("prod");
@@ -147,18 +242,35 @@ public final class ModulesCompilerUtil {
         codeMap.put(CodeType.PROD_COMPAT, prodCompatCode);
 
         JSONObject metadata = prodCompat.getJSONObject("metadata");
-        JSONArray bundleDependenciesArray = metadata.getJSONArray("bundleDependencies");
+        JSONArray bundleReferences = metadata.getJSONArray("references");
+
         Set<String> bundleDependencies = new HashSet<>();
         Set<String> bundleLabels = new HashSet<>();
 
-        for (int i = 0; i < bundleDependenciesArray.length(); i++) {
-            String dep = bundleDependenciesArray.getString(i);
-            if (dep.startsWith(LABEL_SCHEMA)) {
+        for (int i = 0; i < bundleReferences.length(); i++) {
+            JSONObject reference = bundleReferences.getJSONObject(i);
+            String dep = reference.getString("name");
+            String type = reference.getString("type");
+            if (type.equals("module") && dep.startsWith(LABEL_SCHEMA)) {
                 bundleLabels.add(dep.substring(LABEL_SCHEMA.length()));
             }
             bundleDependencies.add(dep);
         }
 
-        return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels, "TODO: external-references");
+        JSONArray bundleDecorators = metadata.getJSONArray("decorators");
+        Set<String> publicProperties = null;
+        Set<WireDecoration> wireDecorations = null;
+        for (int i = 0; i < bundleDecorators.length(); i++) {
+            JSONObject decorator = bundleDecorators.getJSONObject(i);
+            String type = decorator.getString("type");
+            JSONArray decorations = decorator.getJSONArray("targets");
+            if (type.equals("api")) {
+                publicProperties = parsePublicProperties(decorations);
+            } else if (type.equals("wire")) {
+                wireDecorations = parseWireDecorations(decorations);
+            }
+        }
+
+        return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels, publicProperties, wireDecorations);
     }
 }

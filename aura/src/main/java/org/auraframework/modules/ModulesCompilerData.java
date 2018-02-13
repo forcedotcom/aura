@@ -28,13 +28,50 @@ public final class ModulesCompilerData {
     public final Map<CodeType, String> codes;
     public final Set<String> bundleDependencies;
     public final Set<String> labels;
-    public final String externalReferences;
-    
-    public ModulesCompilerData(Map<CodeType, String> codes, Set<String> bundleDependencies,
-                               Set<String> labels, String externalReferences) {
+    public final Set<String> publicProperties;
+    public final Set<WireDecoration> wireDecorations;
+
+    public ModulesCompilerData(
+            Map<CodeType, String> codes,
+            Set<String> bundleDependencies,
+            Set<String> labels,
+            Set<String> publicProperties,
+            Set<WireDecoration> wireDecorations) {
         this.codes = codes;
         this.bundleDependencies = bundleDependencies;
         this.labels = labels;
-        this.externalReferences = externalReferences;
+        this.publicProperties = publicProperties;
+        this.wireDecorations = wireDecorations;
+    }
+
+    public static final class WireDecoration {
+        public final String type;
+        public final String name;
+        public final WireAdapter adapter;
+        public final Map<String, String> params;
+        public final Map<String, String[]> staticFields;
+
+        public WireDecoration(
+                String type,
+                String name,
+                WireAdapter adapter,
+                Map<String, String> params,
+                Map<String, String[]> staticFields) {
+            this.type = type;
+            this.name = name;
+            this.adapter = adapter;
+            this.params = params;
+            this.staticFields = staticFields;
+        }
+    }
+
+    public static final class WireAdapter {
+        public final String name;
+        public final String reference;
+
+        public WireAdapter(String name, String reference) {
+            this.name = name;
+            this.reference = reference;
+        }
     }
 }

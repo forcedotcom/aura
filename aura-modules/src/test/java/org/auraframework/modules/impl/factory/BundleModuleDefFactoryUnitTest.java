@@ -123,7 +123,7 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.PROD_COMPAT, mockCompiled);
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
-        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), null);
+        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet());
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
@@ -278,7 +278,7 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.DEV, mockCompiled);
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
-        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), null);
+        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet());
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
@@ -322,7 +322,7 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.PROD_COMPAT, mockCompiled);
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
-        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), null);
+        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet());
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();

@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,10 +28,12 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -151,8 +154,17 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setModuleDependencies(compilerData.bundleDependencies);
         builder.setLabels(compilerData.labels);
         builder.setOwnHash(calculateOwnHash(descriptor, codes));
-        builder.setExternalReferences(compilerData.externalReferences);
         builder.setValidTags(this.validTags);
+
+        Set<String> publicProperties = compilerData.publicProperties;
+        if (publicProperties != null) {
+            Iterator<String> iter = publicProperties.iterator();
+            while (iter.hasNext()) {
+                DefDescriptor<AttributeDef> attributeDefDesc = new DefDescriptorImpl<>(null, null, iter.next(), AttributeDef.class);
+                AttributeDef attributeDef = new AttributeDefImpl(attributeDefDesc, null, null, null, false, null, null, null);
+                builder.addAttributeDef(attributeDefDesc, attributeDef);
+            }
+        }
 
         // json metadata (lightning.json)
         // TODO: remove once meta.xml is in place

@@ -15,12 +15,17 @@
  */
 package org.auraframework.modules.impl;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
+import org.auraframework.modules.ModulesCompilerData.WireDecoration;
 import org.auraframework.tools.node.api.NodeBundle;
 import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.json.JSONArray;
 import org.junit.Test;
 
 import com.google.common.base.Charsets;
@@ -50,5 +55,94 @@ public class ModulesCompilerUtilTest extends UnitTestCase {
                 .toString();
         String expected = "{\"mode\":\"all\",\"sources\":{\"modules/moduletest/moduletest.js\":\"import { Element, api } from \\\"engine\\\";\\n\\nexport default class Test extends Element {\\n    @api stringQuote = 'str\\\"ing';\\n    @api stringDoubleQuote = \\\"str'ing\\\";\\n    @api stringBacktick = `key=${value}`;\\n    \\n    @api VALID_NAME_RE = /^([a-zA-Z]\\\\w*):([a-zA-Z]\\\\w*)$/;\\n}\",\"modules/moduletest/moduletest.html\":\"<template>\\n    <x-test>{test}<\\/x-test>\\n<\\/template>\"},\"mapNamespaceFromPath\":true,\"format\":\"amd\"}";
         assertEquals(expected, compilerInput);
+    }
+
+    @Test
+    public void testConvertJsonArrayToStringArrayWithNullReturnsNull() {
+        assertNull(ModulesCompilerUtil.convertJsonArrayToStringArray(null));
+    }
+
+    @Test
+    public void testConvertJsonArrayToStringArrayWithEmptyArrayReturnsEmptyArray() {
+        String[] actual = ModulesCompilerUtil.convertJsonArrayToStringArray(new JSONArray());
+        assertNotNull(actual);
+        assertEquals(0, actual.length);
+    }
+
+    @Test
+    public void testConvertJsonArrayToStringArrayWithValidInput() {
+        JSONArray target = new JSONArray("['a', 'b', 'c']");
+        String[] actual = ModulesCompilerUtil.convertJsonArrayToStringArray(target);
+        String[] expected = {"a", "b", "c"};
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i], actual[i]);
+        }
+    }
+
+    @Test
+    public void testConvertJsonArrayToStringArrayWithInvalidInput() {
+        JSONArray target = new JSONArray("[{a:1, b:2, c:3}]");
+        assertNull(ModulesCompilerUtil.convertJsonArrayToStringArray(target));
+    }
+
+    @Test
+    public void testParsePublicPropertiesWithNullReturnsNull() {
+        assertNull(ModulesCompilerUtil.parsePublicProperties(null));
+    }
+
+    @Test
+    public void testParsePublicPropertiesWithEmptyArrayReturnsEmptySet() {
+        Set<String> actual = ModulesCompilerUtil.parsePublicProperties(new JSONArray());
+        assertNotNull(actual);
+        assertEquals(0, actual.size());
+    }
+
+    @Test
+    public void testParsePublicPropertiesWithValidInput() {
+        JSONArray target = new JSONArray("[{type: 'property', name: 'foo'}]");
+        Set<String> actual = ModulesCompilerUtil.parsePublicProperties(target);
+        assertTrue(actual.contains("foo"));
+    }
+
+    @Test
+    public void testParsePublicPropertiesWithInvalidInput() {
+        JSONArray target = new JSONArray("[{foo: 'bar'}]");
+        Set<String> actual = ModulesCompilerUtil.parsePublicProperties(target);
+        assertEquals(0, actual.size());
+    }
+
+    @Test
+    public void testParseWireDecorationsWithNullReturnsNull() {
+        assertNull(ModulesCompilerUtil.parseWireDecorations(null));
+    }
+
+    @Test
+    public void testParseWireDecorationsWithEmptyArrayReturnsEmptySet() {
+        Set<WireDecoration> actual = ModulesCompilerUtil.parseWireDecorations(new JSONArray());
+        assertNotNull(actual);
+        assertEquals(0, actual.size());
+    }
+
+    @Test
+    public void testParseWireDecorationsWithValidInput() {
+        JSONArray target = new JSONArray("[{type: 'property', name: 'wiredTodo', adapter: {name: 'getTodo', reference: 'todo'}, params: {todoId: 'todoId'}, static: { fields: ['subject', 'due'] } }]");
+        Set<WireDecoration> actual = ModulesCompilerUtil.parseWireDecorations(target);
+        Iterator<WireDecoration> iter = actual.iterator();
+        while(iter.hasNext()) {
+            WireDecoration actualDecoration = iter.next();
+            assertEquals("property", actualDecoration.type);
+            assertEquals("wiredTodo", actualDecoration.name);
+            assertEquals("getTodo", actualDecoration.adapter.name);
+            assertEquals("todo", actualDecoration.adapter.reference);
+            assertEquals("todoId", actualDecoration.params.get("todoId"));
+            assertEquals("[subject, due]", Arrays.toString(actualDecoration.staticFields.get("fields")));
+        }
+    }
+
+    @Test
+    public void testParseWireDecorationsWithInvalidInput() {
+        JSONArray target = new JSONArray("[{foo: 'bar'}]");
+        Set<WireDecoration> actual = ModulesCompilerUtil.parseWireDecorations(target);
+        assertEquals(0, actual.size());
     }
 }

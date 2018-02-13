@@ -15,6 +15,7 @@
  */
 package org.auraframework.def.module;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ import java.util.Map;
  * @author a.bhargava
  * @since 214
  */
-public interface DesignElementDef {
+public interface DesignElementDef extends Serializable {
 
     /**
      * @return The XML tag name. Example: <property> tag would return "property"
@@ -55,4 +56,10 @@ public interface DesignElementDef {
      * @return Child Elements which are instances of designElementClass.
      */
     <T> List<T> getChildren(Class<? extends DesignElementDef> designElementClass);
+
+    /**
+     * 
+     * @return the text contained within the xml tag
+     */
+    public String getText();
 }

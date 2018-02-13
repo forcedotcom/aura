@@ -23,7 +23,7 @@ import java.util.Map;
  * root level design elements which make the design file.
  *
  */
-public interface ModuleDesignConfig {
+public interface ModuleDesignConfig extends DesignElementDef {
     /**
      * Returns map with elementName/tagName as the key with list of all elements of that type. 
      * @return Map 

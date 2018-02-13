@@ -22,7 +22,7 @@ import java.util.Map;
  * design configuration specified in <tagConfigs> </tagConfigs> tags 
  * in -meta.xml file of raptor component bundle.
  */
-public interface ModuleDesignDef {
+public interface ModuleDesignDef extends DesignElementDef {
 
     /**
      * Returns all the design configurations in the -meta.xml

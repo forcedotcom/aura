@@ -74,8 +74,12 @@ public class JSTestModel implements ModelInstance {
         } else {
             testMode = Mode.AUTOJSTEST;
         }
-        url = String.format("/%s/%s.%s?aura.nonce=%s&aura.mode=%s&aura.testReset=true", descriptor.getNamespace(), descriptor.getName(),
-                defType == DefType.COMPONENT ? "cmp" : "app", nonce, testMode.name());
+
+        String fmt = "%s/%s/%s.%s?aura.nonce=%s&aura.mode=%s&aura.testReset=true";
+        String contextPath = context.getContextPath();
+        String ext = defType == DefType.COMPONENT ? "cmp" : "app";
+        url = String.format(fmt, contextPath, descriptor.getNamespace(), descriptor.getName(),
+            ext, nonce, testMode.name());
 
         String test = (String) component.getAttributes().getValue("test");
         tcds = filterTestCases(test);
@@ -96,12 +100,12 @@ public class JSTestModel implements ModelInstance {
     }
 
     @AuraEnabled
-    public TestSuiteDef getTestSuite() throws QuickFixException {
+    public TestSuiteDef getTestSuite() {
         return def;
     }
 
     @AuraEnabled
-    public List<TestCaseDef> getTestCases() throws QuickFixException {
+    public List<TestCaseDef> getTestCases() {
         return tcds;
     }
 

@@ -296,7 +296,7 @@ public class AuraTestFilter {
 
                     String newUri = createURI(testRunnerAppNamespace, testRunnerAppName, DefType.APPLICATION, mode,
                             Format.HTML, Authentication.AUTHENTICATED.name(), NO_RUN, qs);
-                    RequestDispatcher dispatcher = request.getServletContext().getContext(newUri).getRequestDispatcher(newUri);
+                    RequestDispatcher dispatcher = request.getRequestDispatcher(newUri);
                     if (dispatcher != null) {
                         testContextAdapter.release();
                         dispatcher.forward(request, response);
@@ -519,7 +519,7 @@ public class AuraTestFilter {
                 super.sendRedirect(location);
             }
         };
-        RequestDispatcher dispatcher = req.getServletContext().getContext(uri).getRequestDispatcher(uri);
+        RequestDispatcher dispatcher = req.getRequestDispatcher(uri);
         if (dispatcher == null) {
             return null;
         }
@@ -546,6 +546,14 @@ public class AuraTestFilter {
         String qs = String.format("aura.testTimeout=%s&aura.nonce=%s", timeout, System.nanoTime());
         String suiteSrcUrl = createURI(targetDescriptor.getNamespace(), targetDescriptor.getName(),
                 targetDescriptor.getDefType(), null, Format.JS, Authentication.AUTHENTICATED.name(), testName, qs);
+
+        if (contextService.isEstablished()) {
+            String contextPath = contextService.getCurrentContext().getContextPath();
+            if (!AuraTextUtil.isNullEmptyOrWhitespace(contextPath)) {
+                suiteSrcUrl = contextPath + suiteSrcUrl;
+            }
+        }
+
         tag = tag + String.format("<script src='%s'%s></script>\n", suiteSrcUrl, "");
         return tag;
     }

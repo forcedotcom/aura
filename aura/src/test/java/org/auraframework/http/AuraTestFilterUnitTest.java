@@ -151,14 +151,17 @@ public class AuraTestFilterUnitTest {
         Mockito.doReturn(testServletContext).when(requestServletContext).getContext(Mockito.anyString());
         
         Mockito.doReturn(dispatcher).when(testServletContext).getRequestDispatcher(Mockito.startsWith("/aura?"));
+        Mockito.doReturn(dispatcher).when(request).getRequestDispatcher(Mockito.startsWith("/aura?"));
         
         String renderedTargetComponent = "RENDEREDTARGETCOMPONENT";
-        Mockito.doReturn(new SimpleTestRequestDispatcher() {
+        SimpleTestRequestDispatcher simpleReqDispatcher = new SimpleTestRequestDispatcher() {
             @Override
-            public void forward(ServletRequest req, ServletResponse res) throws ServletException, IOException {
+            public void forward(ServletRequest req, ServletResponse res) throws IOException {
                 res.getWriter().write(renderedTargetComponent);
             }
-        }).when(testServletContext).getRequestDispatcher(Mockito.startsWith("/aura?"));
+        };
+        Mockito.doReturn(simpleReqDispatcher).when(testServletContext).getRequestDispatcher(Mockito.startsWith("/aura?"));
+        Mockito.doReturn(simpleReqDispatcher).when(request).getRequestDispatcher(Mockito.startsWith("/aura?"));
 
         FilterChain chain = (req, res) -> {};
         filter.doFilter(request, response, chain);
@@ -244,13 +247,16 @@ public class AuraTestFilterUnitTest {
         
         Mockito.doReturn(requestServletContext).when(request).getServletContext();
         Mockito.doReturn(testServletContext).when(requestServletContext).getContext(Mockito.anyString());
-        
-        Mockito.doReturn(new SimpleTestRequestDispatcher() {
+
+        SimpleTestRequestDispatcher simpleReqDispatcher = new SimpleTestRequestDispatcher() {
             @Override
-            public void forward(ServletRequest req, ServletResponse res) throws ServletException, IOException {
+            public void forward(ServletRequest req, ServletResponse res) throws IOException {
                 ((HttpServletResponse)res).sendRedirect(redirectionUrl);
             }
-        }).when(testServletContext).getRequestDispatcher(Mockito.startsWith("/aura?"));
+        };
+        Mockito.doReturn(simpleReqDispatcher).when(testServletContext).getRequestDispatcher(Mockito.startsWith("/aura?"));
+        Mockito.doReturn(simpleReqDispatcher).when(request).getRequestDispatcher(Mockito.startsWith("/aura?"));
+
 
         FilterChain chain = (req, res) -> {};
         filter.doFilter(request, response, chain);

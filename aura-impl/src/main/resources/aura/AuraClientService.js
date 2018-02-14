@@ -2231,7 +2231,8 @@ AuraClientService.prototype.initializeInjectedServices = function(services) {
     if (services) {
         var serviceRegistry = this.moduleServices;
         services.forEach(function (serviceDefinition) {
-            var serviceConstructor = $A.componentService.evaluateModuleDef(serviceDefinition);
+            var serviceModule = $A.componentService.evaluateModuleDef(serviceDefinition);
+            var serviceConstructor = serviceModule["default"] || serviceModule;
             var service = serviceConstructor(Aura.ServiceApi, $A.componentService.moduleEngine);
             $A.assert(service.name, 'Unknown service name');
             serviceRegistry[service.name] = service;
@@ -2583,7 +2584,7 @@ AuraClientService.prototype.persistStorableActions = function(actions) {
     }
 
     if (doStore && this.actionStorage.isStorageEnabled()) {
-        this.actionStorage.setAll(values)
+        return this.actionStorage.setAll(values)
             .then(
                 undefined,
                 function(error){
@@ -2593,7 +2594,7 @@ AuraClientService.prototype.persistStorableActions = function(actions) {
                 }
             );
     }
-
+    return Promise["resolve"]();
 };
 
 /**
@@ -3143,6 +3144,19 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
 };
 
 /**
+* Prepares the request
+*/
+AuraClientService.prototype.prepareRequest = function (actions) {
+    var params = {
+        "message"      : $A.util.json.encode({ "actions" : actions }),
+        "aura.context" : $A.getContext().encodeForServer(true),
+        "aura.token"   : this._token
+    };
+
+    return this.buildParams(params);
+};
+
+/**
  * Send beacon
  *
  * @returns true if payload was successfully sent to the server.
@@ -3153,12 +3167,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
 AuraClientService.prototype.sendBeacon = function(action) {
     if (window.navigator && window.navigator["sendBeacon"] && window.Blob) {
         try {
-            var params = {
-                "message"      : $A.util.json.encode({ "actions" : [action] }),
-                "aura.context" : $A.getContext().encodeForServer(true),
-                "aura.token"   : this._token
-            };
-            var blobObj = new Blob([this.buildParams(params)], {
+            var blobObj = new Blob([this.prepareRequest([action])], {
                 "type" : "application/x-www-form-urlencoded; charset=ISO-8859-13"
             });
             return window.navigator["sendBeacon"](this._host + "/auraAnalytics", blobObj);
@@ -3306,7 +3315,6 @@ AuraClientService.prototype.buildActionNameList = function(actions) {
     return list;
 };
 
-
 /**
  * This function is only meant to be used for the corner case of preloading actions before Aura is available
  * It gets the actions that were preloaded ahead of time, a map with actionIds, and the prelaod XHR response object
@@ -3339,6 +3347,41 @@ AuraClientService.prototype.hydrateActions = function(actions, preloadMapId, res
     }
 
     this.receive(xhr);
+};
+
+/**
+ * This function is only meant to be used for the corner case of preloading actions before Aura is available
+ * It gets the actions that were preloaded ahead of time, a map with actionIds, and the prelaod XHR response object
+ * Basically is like a regular server action but re-wiring the server results manually
+ *
+ * @return {Promise<ReifyResult>} a promise that resolves to the actions contained in the rawResponse
+ */
+AuraClientService.prototype.reifyActions = function(rawResponses) {
+    var context = $A.getContext();
+    var actionsToPersist = [], nonStorableActions = [];
+    rawResponses.forEach(function (rawResponse) {
+        var response = this.decode({ "status": 200, "responseText" : rawResponse });
+        var reponsePayload = response["message"];
+        var responseContext = reponsePayload["context"];
+        var responseActions = reponsePayload["actions"];
+
+        // Merge Context
+        context['merge'](responseContext, true /* ignoreMissmatch */);
+        $A.componentService.saveDefsToStorage(responseContext, context);
+
+        responseActions.forEach(function (responseAction) {
+            var action = this.buildStorableServerAction(responseAction);
+            if (action) {
+                actionsToPersist.push(action);
+            } else {
+                nonStorableActions.push(responseAction);
+            }
+        }, this);
+    }, this);
+
+    return this.persistStorableActions(actionsToPersist).then(function () {
+        return { "storableActions": actionsToPersist, "nonStorableActions": nonStorableActions };
+    });
 };
 
 /**

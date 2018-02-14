@@ -104,27 +104,3 @@ Aura.ExportsModule = {
         }});
     }
 };
-
-Aura.ServiceApi = {
-    "replaceModule": function (targetCtor, replacementCtor) {
-        var targetDef;
-        var replacementDef;
-
-        Object.keys($A.componentService.moduleDefRegistry).some(function (key) {
-            var def = $A.componentService.moduleDefRegistry[key];
-            if (def.ns === targetCtor) {
-                targetDef = def;
-            } else if (def.ns === replacementCtor) {
-                replacementDef = def;
-            }
-            return targetDef && replacementDef;
-        });
-
-        $A.assert(targetDef && replacementDef, 'Definitions could not be found');
-        $A.assert(targetDef.access === replacementDef.access, 'Access checks do not match');
-        $A.componentService.moduleDefRegistry[targetDef.moduleName] = replacementDef;
-    },
-    "registerSchema": function(schema, resolver) {
-        $A.clientService.addModuleSchemaResolver(schema, resolver);
-    }
-};

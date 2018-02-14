@@ -228,18 +228,21 @@ Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic, in
  * @param {Object} otherContext the context from the server to join in to this one.
  * @export
  */
-Aura.Context.AuraContext.prototype.merge = function(otherContext) {
+Aura.Context.AuraContext.prototype.merge = function(otherContext, allowMissmatch) {
     var i, defs;
 
-    if ($A.util.isUndefinedOrNull(this.fwuid)) {
-        this.fwuid = otherContext["fwuid"];
-    }
-    if (otherContext["fwuid"] !== this.fwuid) {
-        throw new $A.auraError("framework mismatch", null, $A.severity.QUIET);
-    }
+    if (!allowMissmatch) {
 
-    $A.clientService.enableAccessChecks=otherContext["enableAccessChecks"];
-    this.moduleServices = otherContext["services"];
+        if ($A.util.isUndefinedOrNull(this.fwuid)) {
+            this.fwuid = otherContext["fwuid"];
+        }
+        if (otherContext["fwuid"] !== this.fwuid) {
+            throw new $A.auraError("framework mismatch", null, $A.severity.QUIET);
+        }
+
+        $A.clientService.enableAccessChecks = otherContext["enableAccessChecks"];
+        this.moduleServices = otherContext["services"];
+    }
 
     try {
         this.globalValueProviders.merge(otherContext["globalValueProviders"]);
@@ -273,7 +276,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
         }
 
         this.joinComponentConfigs(otherContext["components"], ""+this.getNum());
-        this.joinLoaded(otherContext["loaded"]);
+        this.joinLoaded(otherContext["loaded"], allowMissmatch);
     }
 };
 
@@ -499,13 +502,13 @@ Aura.Context.AuraContext.prototype.clearComponentConfigs = function(actionId) {
 /**
  * @private
  */
-Aura.Context.AuraContext.prototype.joinLoaded = function(loaded) {
+Aura.Context.AuraContext.prototype.joinLoaded = function(loaded, dontOverride) {
     if (this.loaded === undefined) {
         this.loaded = {};
     }
     if (loaded) {
         for ( var i in loaded) {
-            if (loaded.hasOwnProperty(i) && !($A.util.isFunction(i))) {
+            if (loaded.hasOwnProperty(i) && !dontOverride && !($A.util.isFunction(i))) {
                 var newL = loaded[i];
                 if (newL === 'deleted') {
                     delete this.loaded[i];

@@ -230,6 +230,7 @@ function noop() {}
 // #include aura.metrics.AuraMetricsService
 
 //-- Module Exports ----------------------------------------------------------
+// #include aura.modules.AuraExportsServiceApi
 // #include aura.modules.AuraExportsCompat
 // #include aura.modules.AuraExportsStorage
 // #include aura.modules.AuraExportsLogger

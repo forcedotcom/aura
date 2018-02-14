@@ -271,6 +271,11 @@ public class AuraServlet extends AuraBaseServlet {
                 if (v != null) {
                     instance.setCallerVersion(v);
                 }
+
+                if (map.get("storable") != null) {
+                    instance.setStorable();
+                }
+
                 actionList.add(instance);
             }
         }
@@ -592,7 +597,7 @@ public class AuraServlet extends AuraBaseServlet {
             boolean publiclyCacheable = isGet && context.getActionPublicCacheKey() != null
                     && context.getActionPublicCacheKey().equals(configAdapter.getActionPublicCacheKey());
             if (publiclyCacheable) {
-                // We will set cache headers to allow caching for publicly cacheable action if 
+                // We will set cache headers to allow caching for publicly cacheable action if
                 // the action public cache key sent in the context is the same as the current value
                 // AND there are no errors. So we need to use a string buffer for the action output first
                 // so that we can then check the action status and set any cache headers before writing

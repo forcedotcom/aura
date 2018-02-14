@@ -1772,7 +1772,7 @@ Test.Aura.Controller.ActionTest = function() {
                 "descriptor" : expectedDescriptor,
                 "params" : expectedParams,
                 "callingDescriptor": "UNKNOWN",
-                "version": null
+                "version": undefined
             };
             var target = newAction();
             target.getId = function() {

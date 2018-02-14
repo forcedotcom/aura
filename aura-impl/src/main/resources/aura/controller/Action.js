@@ -1204,9 +1204,12 @@ Action.prototype.toJSON = function() {
         "id" : this.getId(),
         "descriptor" : (this.def?this.def.getDescriptor():"UNKNOWN"),
         "callingDescriptor" : isVersioned ? (callingComponentDef ? callingComponentDef.getDescriptor().getQualifiedName() : "UNKNOWN") : "UNKNOWN",
-        "params" : this.params,
-        "version" : isVersioned ? version : null
+        "params" : this.params
     };
+
+    if (isVersioned) {
+        json["version"] = version;
+    }
 
     return json;
 };

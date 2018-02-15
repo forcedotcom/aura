@@ -314,7 +314,15 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         }
         
         public void setModuleDesignDef(ModuleDesignDef moduleDesignDef){
-        	this.moduleDesignDef = moduleDesignDef;
+            this.moduleDesignDef = moduleDesignDef;
+        }
+
+        public ModuleDesignDef getModuleDesignDef(){
+            return this.moduleDesignDef;
+        }
+
+        public Set<String> getValidTags(){
+            return this.validTags;
         }
 
         @Override

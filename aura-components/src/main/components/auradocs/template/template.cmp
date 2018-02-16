@@ -37,5 +37,11 @@
     <aura:set attribute="auraPreInitBlock">
         <auraStorage:init name="actions" maxSize="4096" defaultExpiration="3600" secure="true" persistent="false"
             defaultAutoRefreshInterval="3600" debugLoggingEnabled="true" clearStorageOnInit="false"/>
+
+        if($A.util.isIE) {
+            //Custom override for IE11.  IE11's implentation of popState/pushState
+            //is different to other browsers.
+            window.history.pushState = undefined;
+        }
     </aura:set>
 </aura:component>

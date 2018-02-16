@@ -23,4 +23,5 @@
     <aura:attribute name="typeStringList" type="String[]"/>
     <aura:attribute name="typeMapList" type="Map[]"/>
     <aura:attribute name="typeSet" type="Set"/>
+    <aura:attribute name="pairAttr" type="java://org.auraframework.util.type.CustomPairType" default="HouseNo$300"/>
 </aura:component>

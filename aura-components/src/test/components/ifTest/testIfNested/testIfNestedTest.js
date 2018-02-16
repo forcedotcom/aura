@@ -15,14 +15,14 @@
  */
 ({
 	testOuterTrue: {
-        attributes : {outer : "true", inner: "false"},
+        attributes : {outer : true, inner: false},
         test: function(component){
             this.whatItIs(component, "Outer is True, inner false:", true, false);
         }
     },
 
     testOuterFalse: {
-        attributes : {outer : "false", inner : "true"},
+        attributes : {outer : false, inner : true},
         test: function(component){
             this.whatItIs(component, "Outer is false, inner true:", false, true);
         }
@@ -30,7 +30,7 @@
 
     // TODO(W-1419175): onchange events don't fire across function expressions
     _testRerender: {
-        attributes : {outer : "true", inner : "false"},
+        attributes : {outer : true, inner : false},
         test: function(component){
             this.whatItIs(component, "Testing rerender, outer is true, inner false:", true, false);
             component.set("v.outer", false);

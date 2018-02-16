@@ -65,5 +65,20 @@
     throwErrorFromUnrender: function(cmp) {
         cmp.set("v.throwErrorFromUnrender", true);
         cmp.destroy();
+    },
+
+    throwError: function(cmp) {
+        $A.createComponent("div", {
+        	onclick : cmp.getReference("c.click")
+        }, function(newc){
+        	var target = cmp.find("target");
+        	var body = target.get("v.body");
+        	body.push(newc);
+        	target.set("v.body", body);
+        });
+    },
+    
+    click :function(cmp){
+    	alert("clicked");
     }
 })

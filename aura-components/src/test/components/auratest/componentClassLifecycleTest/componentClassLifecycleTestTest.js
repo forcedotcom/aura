@@ -148,7 +148,7 @@
     //put Parent in iteration and check if it behaves just like loading it alone
     testIteratedParent_Init : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             "testParentInIteration": true
         },
         test : [function(testCmp) {
@@ -160,7 +160,7 @@
     //put Parent in iteration and check if it behaves just like loading it alone
     testIteratedParent_Rerender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             "testParentInIteration": true
         },
         test : [function(testCmp) {
@@ -172,7 +172,7 @@
     //put Parent in iteration and check if it behaves just like loading it alone
     testIteratedParent_Unrender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             "testParentInIteration": true
         },
         test : [function(testCmp) {
@@ -358,7 +358,7 @@
     //put componentClassOuter in iteration and check if it behaves just like loading it alone
     testIteratedOuter_Init : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             "testOuterInIteration": true
         },
         test : [function(testCmp) {
@@ -370,7 +370,7 @@
     //put Parent in iteration and check if it behaves just like loading it alone
     testIteratedOuter_Rerender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             "testOuterInIteration": true
         },
         test : [function(testCmp) {
@@ -384,7 +384,7 @@
     //put Parent in iteration and check if it behaves just like loading it alone
     testIteratedOuter_Unrender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             "testOuterInIteration": true
         },
         test : [function(testCmp) {
@@ -530,7 +530,7 @@
     //put static child into an iteration, see if it behaves same as loading alone
     testIteratedChild_Init : {
         attributes : {
-            iterationItems : "ONE,TWO",  
+            iterationItems : [ "ONE", "TWO" ],  
             testChildInIteration : true
         },
         test : [ function(testCmp) {
@@ -542,7 +542,7 @@
     //put static child into an iteration, see if it behaves same as loading alone
     testIteratedChild_Rerender : {
         attributes : {
-            iterationItems : "ONE,TWO",  
+            iterationItems : [ "ONE", "TWO" ],  
             testChildInIteration : true
         },
         test : [ function(testCmp) {
@@ -554,7 +554,7 @@
     //put static child into an iteration, see if it behaves same as loading alone
     testIteratedChild_Unrender : {
         attributes : {
-            iterationItems : "ONE,TWO",  
+            iterationItems : [ "ONE", "TWO" ],  
             testChildInIteration : true
         },
         test : [ function(testCmp) {
@@ -705,7 +705,7 @@
     //Check grandChild component provided by server in iteration
     testIteratedGrandChildServerProvider_Init : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testGrandChildServerInIteration : true
         },
@@ -718,7 +718,7 @@
     //Check grandChild component provided by server in iteration
     testIteratedGrandChildServerProvider_Rerender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testGrandChildServerInIteration : true
         },
@@ -731,7 +731,7 @@
     //Check grandChild component provided by server in iteration
     testIteratedGrandChildServerProvider_Unrender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testGrandChildServerInIteration : true
         },
@@ -775,7 +775,7 @@
      */
     _testIteratedServerProvidedGrandChildServerProvider_Init : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testServerProviderGrandChildServerProviderInIteration : true
         },
@@ -787,7 +787,7 @@
     
     _testIteratedServerProvidedGrandChildServerProvider_Rerender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testServerProviderGrandChildServerProviderInIteration : true
         },
@@ -799,7 +799,7 @@
     
     _testIteratedServerProvidedGrandChildServerProvider_Unrender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testServerProviderGrandChildServerProviderInIteration : true
         },
@@ -846,7 +846,7 @@
      */
     testIteratedClientProvidedGrandChildServerProvider_Init : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testClientProviderGrandChildServerProviderInIteration : true
         },
@@ -868,7 +868,7 @@
     
     testIteratedClientProvidedGrandChildServerProvider_Rerender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testClientProviderGrandChildServerProviderInIteration : true
         },
@@ -880,7 +880,7 @@
     
     testIteratedClientProvidedGrandChildServerProvider_Unrender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testClientProviderGrandChildServerProviderInIteration : true
         },
@@ -1052,7 +1052,7 @@
      */
     _testIteratedServerProvidedClientProvidingGrandChildServerProvider_Init : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testServerProviderClientProviderGrandChildServerProviderInIteration : true
         },
@@ -1075,7 +1075,7 @@
     
     _testIteratedServerProvidedClientProvidingGrandChildServerProvider_Rerender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testServerProviderClientProviderGrandChildServerProviderInIteration : true
         },
@@ -1088,7 +1088,7 @@
     
     _testIteratedServerProvidedClientProvidingGrandChildServerProvider_Unrender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testServerProviderClientProviderGrandChildServerProviderInIteration : true
         },
@@ -1209,7 +1209,7 @@
     //put GrandChildClientProvider in interation, verify it behaves the same of loading seperately
     testIteratedGrandChildClientProvider_Init : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             testGrandChildClientInIteration : true
         },
         test : [function(testCmp) {
@@ -1221,7 +1221,7 @@
     //put GrandChildClientProvider in interation, verify it behaves the same of loading seperately
     testIteratedGrandChildClientProvider_Rerender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             testGrandChildClientInIteration : true
         },
         test : [function(testCmp) {
@@ -1233,7 +1233,7 @@
     //put GrandChildClientProvider in interation, verify it behaves the same of loading seperately
     testIteratedGrandChildClientProvider_Unrender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             testGrandChildClientInIteration : true
         },
         test : [function(testCmp) {
@@ -1272,7 +1272,7 @@
      */
     _testIteratedServerProvidedGrandChildClientProvider_Init : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testServerProviderGrandChildClientProviderInIteration : true
         },
@@ -1285,7 +1285,7 @@
     
     _testIteratedServerProvidedGrandChildClientProvider_Rerender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testServerProviderGrandChildClientProviderInIteration : true
         },
@@ -1298,7 +1298,7 @@
     
     _testIteratedServerProvidedGrandChildClientProvider_Unrender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testServerProviderGrandChildClientProviderInIteration : true
         },
@@ -1345,7 +1345,7 @@
      */
     testIteratedClientProvidedGrandChildClientProvider_Init : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             testClientProviderGrandChildClientProviderInIteration : true
         },
         test : [function(testCmp) {
@@ -1370,7 +1370,7 @@
      */
     testIteratedClientProvidedGrandChildClientProvider_Rerender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             testClientProviderGrandChildClientProviderInIteration : true
         },
         test : [function(testCmp) {
@@ -1385,7 +1385,7 @@
      */
     testIteratedClientProvidedGrandChildClientProvider_Unrender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             testClientProviderGrandChildClientProviderInIteration : true
         },
         test : [function(testCmp) {
@@ -1557,7 +1557,7 @@
      */
     _testIteratedServerProvidedClientProvidingGrandChildClientProvider_Init : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testServerProviderClientProviderGrandChildClientProviderInIteration : true
         },
@@ -1580,7 +1580,7 @@
     
     _testIteratedServerProvidedClientProvidingGrandChildClientProvider_Rerender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testServerProviderClientProviderGrandChildClientProviderInIteration : true
         },
@@ -1593,7 +1593,7 @@
     
     _testIteratedServerProvidedClientProvidingGrandChildClientProvider_Unrender : {
         attributes : {
-            iterationItems : "ONE,TWO",
+            iterationItems : [ "ONE", "TWO" ],
             iterationForceServer : true,
             testServerProviderClientProviderGrandChildClientProviderInIteration : true
         },

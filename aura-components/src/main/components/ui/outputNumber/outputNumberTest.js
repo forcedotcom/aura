@@ -55,7 +55,8 @@
     /**
      * Negative test case:Verify providing non numeric value for Value attribute.
      */
-    testNonNumericValue: {
+    // W-4348694 handle non-numeric better
+    _testNonNumericValue: {
         attributes : {value : 'NotANumber'},
         test: function(component){
             $A.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Should gracefully display nothing");

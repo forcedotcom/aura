@@ -15,13 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component render="client">
-	<!-- Strings -->
-	<aura:attribute name="stringAttribute" type="String"></aura:attribute>
-	<aura:attribute name="stringArrayAttribute" type="String[]"></aura:attribute>
-	
-	<!-- Lists -->
-	<aura:attribute name="listAttribute" type="List"></aura:attribute>
-	
-	
-</aura:component>
+<aura:application>
+    <aura:attribute name="timeFormat" type="String" description="The java.text.SimpleDateFormat style format for the time."/>
+    <aura:attribute name="interval" type="Integer" default="30" description="The interval in minutes."/>
+    <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if this time picker list is displayed. Defaults to false."/>
+
+    <ui:inputTimePicker aura:id="target" visible="{!v.visible}" interval="{!v.interval}" timeFormat="{!v.timeFormat}" />
+</aura:application>
+

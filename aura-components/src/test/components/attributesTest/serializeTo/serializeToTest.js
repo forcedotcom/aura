@@ -15,7 +15,7 @@
  */
 ({
     testSerializeTo : {
-        attributes : { both : "hi", server : "bye", none : "shy", serverDefault : "why", noneDefault : "cry" },
+        attributes : { both : "hi" },
         test : function(cmp) {
             $A.test.assertEquals("hi", cmp.get("v.both"), "BOTH not serialized from server");
             $A.test.assertEquals(undefined, cmp.get("v.server"), "SERVER should not have been serialized from server");

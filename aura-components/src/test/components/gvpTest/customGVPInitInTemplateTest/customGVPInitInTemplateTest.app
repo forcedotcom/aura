@@ -15,6 +15,8 @@
     limitations under the License.
 -->
 
-<aura:component template="gvpTest:customGVPTemplate" render="client">
-    <aura:attribute default="Default" type="String" name="stringValue"></aura:attribute>
-</aura:component>
+<aura:application template="gvpTest:customGVPTemplate">
+    <aura:attribute name="valueChanged" type="Boolean" default="false" />
+    <aura:attribute name="gvpValue" type="String" default="{!$CustomInitInTemplate.task_mode_today}"/>
+    <aura:handler name="change" value="{!v.gvpValue}" action="{!c.valueChanged}" />
+</aura:application>

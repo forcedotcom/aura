@@ -13,8 +13,8 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
 -->
-<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestJavaModel">
-    <aura:dependency resource="provider:*" />
-</aura:component>
+
+<aura:application template="gvpTest:customGVPTemplate" render="client">
+    <aura:attribute default="Default" type="String" name="stringValue"></aura:attribute>
+</aura:application>

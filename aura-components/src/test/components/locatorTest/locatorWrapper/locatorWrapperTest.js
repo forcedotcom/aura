@@ -143,11 +143,17 @@
     },
     testParentWithAuraIdLocatorChildRadio: {
         test: function (cmp) {
-            var trx = this.clickDivAndGetTransaction($A.util.format(".{0} .{1}", "locatorWrapperIdWithDef", "innerRadio"));
-            this.validateLocatorResult(trx.context.locator, "innerRadio__radio" /*target*/, "locatorWrapperIdWithDef" /*scope*/, 
-                    {
-                        "parentKey": cmp.get("v.wrapperText")
-                    });
+            this.clickDivAndGetTransaction($A.util.format(".{0} .{1}", "locatorWrapperIdWithDef", "innerRadio"));
+            var that = this;
+            $A.test.addWaitFor(true, function(){
+                return !!that.lastTransaction;
+            }, function () {
+                var trx = this.lastTransaction;
+                this.validateLocatorResult(trx.context.locator, "innerRadio__radio" /*target*/, "locatorWrapperIdWithDef" /*scope*/, 
+                        {
+                            "parentKey": cmp.get("v.wrapperText")
+                        });
+            });
         }
     }
     

@@ -54,7 +54,7 @@
             // Verify that "*" is chosen as default
             $A.test.assertEquals($A.getRoot(), rows[0], "Expected to see all fields by default in the result set.");
             $A.test.assertEquals($A.getRoot().getSuper(), rows[1], "Expected to see aura:component in the result set.");
-            $A.test.assertEquals("markup://aura:component", rows[1].getDef().getDescriptor().getQualifiedName(),
+            $A.test.assertEquals("markup://aura:application", rows[1].getDef().getDescriptor().getQualifiedName(),
                     "Expected to see aura:component in the result set.");
         }
     },
@@ -66,7 +66,7 @@
              var result = $A.getQueryStatement().query();
              this.verifyQueryResultCount(result, 2);
              
-             var lock = {};
+             var expected = {};
              $A.createComponent(
                  "markup://aura:text",
                  {"aura:id":"txt_Id"},
@@ -74,14 +74,14 @@
                      var body = cmp.get("v.body");
                      body.push(newCmp);
                      cmp.set("v.body", body);
-                     lock.set = true;
+                     expected.cmp = newCmp;
                  }
               );
 
-              $A.test.addWaitFor(true, function(){ return lock.set; }, function(){
+              $A.test.addWaitFor(true, function(){ return !!expected.cmp; }, function(){
                    result = $A.getQueryStatement().query();
                    this.verifyQueryResultCount(result, 3);
-                   $A.test.assertEquals(cmp.find("txt_Id"), result.rows[2], "Components created on client side are not retrieved by query.");
+                   $A.test.assertEquals(expected.cmp, result.rows[2], "Components created on client side are not retrieved by query.");
               });
         }
     },

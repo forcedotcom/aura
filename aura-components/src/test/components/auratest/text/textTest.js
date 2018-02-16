@@ -29,7 +29,7 @@
     },
 
     /**
-     * Truncating with ellipsis to 0 length will not truncate the value.
+     * Truncating with ellipsis to 0 length will give unmodified string.
      */
     testTruncateZeroAttributeValue: {
         attributes : {value: 'truncate me', truncate: '0'},
@@ -40,7 +40,7 @@
     },
 
     /**
-     * Truncating without ellipsis to 0 length will not truncate the value.
+     * Truncating without ellipsis to 0 length will give unmodified string.
      */
     testTruncateZeroAttributeValueWithoutEllipsis: {
         attributes : {value: 'truncate me', truncate: '0', ellipsis: 'false'},

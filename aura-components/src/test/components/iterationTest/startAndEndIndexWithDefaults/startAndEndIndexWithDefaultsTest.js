@@ -1,6 +1,6 @@
 ({
     testStartEndIndexDefaultValues: {
-        attributes: {items: "a,b,c,d,e", setIndexesInInit: "false"},
+        attributes: { items: [ "a", "b", "c", "d", "e" ], setIndexesInInit: false },
         test: function(cmp) {
             var expected = "0:a,";
 
@@ -16,7 +16,7 @@
      * markup.
      */
     testChangeStartEndIndexesInInit: {
-        attributes: {items: "a,b,c,d,e", setIndexesInInit: "true"},
+        attributes: { items: [ "a", "b", "c", "d", "e" ], setIndexesInInit: true },
         test: function(cmp) {
             var expected = "1:b,2:c,";
 

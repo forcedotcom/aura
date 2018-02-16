@@ -15,16 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.components.aurajstest.JSTestCaseModel" extends="ui:tab">
-    <aura:attribute name="case" type="java://org.auraframework.def.TestCaseDef"/>
-    <aura:attribute name="suite" type="java://org.auraframework.def.TestSuiteDef"/>
-    <aura:attribute name="shortName" type="String"/>
-    <aura:attribute name="runTime" type="String"/>
+<aura:component extends="ui:tab">
+    <aura:attribute name="name" type="String"/>
     <aura:attribute name="url" type="String"/>
+    <aura:attribute name="runTime" type="String"/>
 
 	<!-- PRIVATE ATTRIBUTE(S) -->
-    <aura:attribute name="status" type="String" default=""/>
-    <aura:attribute name="individualTestUrl" type="String" default=""/>
+    <aura:attribute name="status" type="String" default="" serializeTo="NONE"/>
 
     <aura:set attribute="scroll" value="false"/>
 
@@ -40,12 +37,12 @@
     <aura:set attribute="body">
         <section class="results">
             <aura:if isTrue="{!v.status == 'pass' || v.status == 'fail'}">
-                <h1>{! v.status == 'pass' ? 'Passed ' : 'Failed '}<sub>{!v.case.name}{!v.runTime}</sub></h1>
+                <h1>{! v.status == 'pass' ? 'Passed ' : 'Failed '}<sub>{!v.name}{!v.runTime}</sub></h1>
                 <div class="action">
                     <a onclick="{!c.rerun}">Re-run</a>&nbsp;
-                    <a href="{!v.individualTestUrl}" target="_">Run in a new tab</a>
+                    <a href="{!v.url}" target="_">Run in a new tab</a>
                 </div>
-                <aura:set attribute="else"><h1>Running Test <sub>{!v.case.name}</sub></h1></aura:set>
+                <aura:set attribute="else"><h1>Running Test <sub>{!v.name}</sub></h1></aura:set>
             </aura:if>
             <div aura:id="results" class="results"></div>
         </section>

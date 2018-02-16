@@ -30,7 +30,7 @@
      * Iteration body is rendered by renderIf
      */
     testSanity:{
-        attributes:{ items:"alpha,omega" },
+        attributes:{ items: [ "alpha", "omega" ] },
         test:function(cmp){
         	// Verify renderIf
             var value = cmp.find("if").get("v.body");
@@ -61,7 +61,7 @@
      * Iteration body is not rendered by renderIf
      */
     testNotRendered:{
-        attributes:{ showIteration:false, items:"alpha,omega" },
+        attributes:{ showIteration:false, items: [ "alpha", "omega" ] },
         test:function(cmp){
             // Verify renderIf
             var value = cmp.find("if").get("v.body");
@@ -84,7 +84,7 @@
     },
 
     testStartAndEnd:{
-        attributes:{ items:"a,b,c,d,e", start:2, end:3 },
+        attributes:{ items: [ "a", "b", "c", "d", "e" ], start:2, end:3 },
         test:function(cmp){
             this.assertTemplateComponentDefRef(cmp);
             var body = cmp.find("iteration").get("v.body");
@@ -99,7 +99,7 @@
      * Iteration is empty if start greater than items length
      */
     testStartGreaterThanLength:{
-        attributes:{ items:"a,b,c,d,e", start:99 },
+        attributes:{ items: [ "a", "b", "c", "d", "e" ], start:99 },
         test:function(cmp){
             this.assertTemplateComponentDefRef(cmp);
             var body = cmp.find("iteration").get("v.body");
@@ -112,7 +112,7 @@
      * Iteration is empty if start greater than end
      */
     testStartGreaterThanEnd:{
-        attributes:{ items:"a,b,c,d,e", start:3, end:2 },
+        attributes:{ items: [ "a", "b", "c", "d", "e" ], start:3, end:2 },
         test:function(cmp){
             this.assertTemplateComponentDefRef(cmp);
             var body = cmp.find("iteration").get("v.body");
@@ -125,7 +125,7 @@
      * Iteration starts at start and contains remainder of list, without end
      */
     testStartWithoutEnd:{
-        attributes:{ items:"a,b,c,d,e", start:3 },
+        attributes:{ items: [ "a", "b", "c", "d", "e" ], start:3 },
         test:function(cmp){
             this.assertTemplateComponentDefRef(cmp);
             var body = cmp.find("iteration").get("v.body");
@@ -141,7 +141,7 @@
      * Iteration starts with first item and ends before end, without start
      */
     testEndWithoutStart:{
-        attributes:{ items:"a,b,c,d,e", end:3 },
+        attributes:{ items: [ "a", "b", "c", "d", "e" ], end:3 },
         test:function(cmp){
             this.assertTemplateComponentDefRef(cmp);
             var body = cmp.find("iteration").get("v.body");
@@ -156,7 +156,7 @@
     },
 
     testEndZero:{
-        attributes:{ items:"a,b,c,d,e", end:0 },
+        attributes:{ items: [ "a", "b", "c", "d", "e" ], end:0 },
         test:function(cmp){
             this.assertTemplateComponentDefRef(cmp);
             var body = cmp.find("iteration").get("v.body");
@@ -168,7 +168,7 @@
      * Iteration starts with first item and ends before end, without start
      */
     testStartNegative:{
-        attributes:{ items:"delta,gamma", start:-3 },
+        attributes:{ items: ["delta", "gamma" ], start:-3 },
         test:function(cmp){
             this.assertTemplateComponentDefRef(cmp);
             var body = cmp.find("iteration").get("v.body");
@@ -184,7 +184,7 @@
      * Iteration with decimal start value is treated as integer
      */
     testStartDecimal:{
-        attributes:{ items:"alpha,beta", start: 0.000001 },
+        attributes:{ items: ["alpha" ,"beta" ], start: 0.000001 },
         test:function(cmp){
         	this.assertTemplateComponentDefRef(cmp);
             var body = cmp.find("iteration").get("v.body");
@@ -198,7 +198,7 @@
 
     /** Iteration rerender stays stable */
     testEmptyAndFill:{
-        attributes:{ items:"alpha,beta" },
+        attributes:{ items: [ "alpha", "beta" ] },
         test:[function(cmp) {
             var items = cmp.get("v.items");
             items.splice(0,1);
@@ -237,7 +237,7 @@
     },
 
     testChangeTemplate:{
-        attributes:{items:"a,b,c,d,e"},
+        attributes:{items: [ "a", "b", "c", "d", "e" ]},
         test:[
             function assertInitialState(cmp){
                 var expected="0:a,1:b,2:c,3:d,4:e,";
@@ -265,7 +265,7 @@
      */
     testIterationCompleteEvent_onLoad: {
         attributes: {
-            items: "a,b,c,d,e"
+            items: [ "a", "b", "c", "d", "e" ]
         },
         test: function(cmp) {
             // Initialize operation fired on load
@@ -285,7 +285,7 @@
 
     testIterationCompleteEvent_listChange: {
         attributes: {
-            items: "a,b,c,d,e"
+            items: [ "a", "b", "c", "d", "e" ]
         },
         test: function(cmp) {
             // Clear any attribute changes from loading component
@@ -307,7 +307,7 @@
 
     testIterationCompleteEventList_setSameValues: {
         attributes: {
-            items: "a,b,c,d,e"
+            items: [ "a", "b", "c", "d", "e" ]
         },
         test: function(cmp) {
             // Clear any attribute changes from loading component
@@ -329,7 +329,7 @@
 
     testIterationCompleteEventList_changeTemplate: {
         attributes: {
-            items: "a,b,c,d,e"
+            items: [ "a", "b", "c", "d", "e" ]
         },
         test: function(cmp) {
             // Clear any attribute changes from loading component

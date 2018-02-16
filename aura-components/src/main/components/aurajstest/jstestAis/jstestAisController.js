@@ -14,12 +14,64 @@
  * limitations under the License.
  */
 ({
-	testDone : function(cmp, evt, helper){
-		helper.runNextTest(cmp);
-	},
+    init  : function(cmp) {
+        var descriptor = cmp.get("v.descriptor");
+        var defType = cmp.get("v.defType").toUpperCase();
+        var a = cmp.get("c.getTestCases");
+        var params = {
+            "descriptor" : descriptor,
+            "defType" : defType
+        };
+        var testFilter = cmp.get("v.test");
+        if (!$A.util.isUndefinedOrNull(testFilter)) {
+            params["test"] = testFilter;
+        }
+        a.setParams(params);
+        a.setCallback(this, function(action){
+            if (action.getState() === "SUCCESS") {
+                var mode = ($A.getContext().getMode().indexOf("DEBUG") > 0) ? "AUTOJSTESTDEBUG" : "AUTOJSTEST";
+                var tests = action.getReturnValue();
+                for (var i=0; i < tests.length; i++) {
+                    var test = tests[i];
+                    if ( defType === "APPLICATION" ) {
+                        test["url"] = "/" + descriptor.replace(":","/") + ".app?aura.jstestrun=" + test["name"] +
+                            "&aura.mode=" + mode +
+                            "&aura.testReset=true";
+                    } else {
+                        test["url"] = "/auratest/test.app?testName=" + test["name"] +
+                            "&descriptor=" + descriptor +
+                            "&aura.mode=" + mode +
+                            "&aura.testReset=true";
+                    }
+                }
+                cmp.set("v.testCases", tests);
+            } else if (action.getState() === "ERROR") {
+                throw new Error(action.getError()[0].message);
+            }
+        });
+        $A.enqueueAction(a);
+    },
+    
+    testDone : function(cmp, evt, helper) {
+        helper.runNextTest(cmp);
+    },
 
     toggleCode: function(cmp) {
         var codeEl = cmp.find("test-suite-code").getElement();
         $A.util.toggleClass(codeEl, "show");
+
+        var code = cmp.get("v.testSuiteCode");
+        if ($A.util.isUndefinedOrNull(code)){
+            var a = cmp.get("c.getSource");
+            a.setParams({
+                "descriptor" : cmp.get("v.descriptor"),
+                "defType" : cmp.get("v.defType") 
+            });
+            a.setCallback(this, function(action){
+                cmp.set("v.testSuiteCode", action.getReturnValue());
+            });
+            $A.enqueueAction(a);
+        }
     }
+
 })// eslint-disable-line semi

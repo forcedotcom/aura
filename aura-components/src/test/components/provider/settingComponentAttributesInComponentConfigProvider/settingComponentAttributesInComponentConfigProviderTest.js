@@ -33,7 +33,6 @@
      * it becomes undefined on concrete component.
      */
     testAttributeIsUndefinedIfSetAsNullInJavaProvider: {
-        attributes: {'nullValue': 'string value'},
         test: function(cmp) {
             var actual = cmp.get("v.nullValue");
             $A.test.assertUndefined(actual);

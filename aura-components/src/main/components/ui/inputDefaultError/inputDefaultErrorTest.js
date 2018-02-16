@@ -89,7 +89,7 @@
 
     testSingleValue : {
         attributes : {
-            "value" : "single"
+            "value" : [ "single" ]
         },
         test : function(cmp) {
             var ul = cmp.getElement();
@@ -119,7 +119,7 @@
 
     testMultipleValues : {
         attributes : {
-            "value" : "first,second,third"
+            "value" : [ "first", "second", "third" ]
         },
         test : function(cmp) {
             var ul = cmp.getElement();
@@ -213,7 +213,7 @@
 
     testClearValueWithEmptyList : {
         attributes : {
-            "value" : "first,second"
+            "value" : [ "first", "second" ]
         },
         test : [ function(cmp) {
             var ul = cmp.getElement();
@@ -228,7 +228,7 @@
 
     testClearValueWithUndefined : {
         attributes : {
-            "value" : "first"
+            "value" : [ "first" ]
         },
         test : [ function(cmp) {
             var ul = cmp.getElement();
@@ -242,7 +242,7 @@
 
     testClearValueWithNull : {
         attributes : {
-            "value" : "first"
+            "value" : [ "first" ]
         },
         test : [ function(cmp) {
             var ul = cmp.getElement();

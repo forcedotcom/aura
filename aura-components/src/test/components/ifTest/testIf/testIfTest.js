@@ -21,14 +21,14 @@
     },
 
     testTrue: {
-        attributes : {thang : 'true'},
+        attributes : {thang : true},
         test: function(component){
             this.whatItIs(component, "true", true);
         }
     },
 
     testFalse: {
-        attributes : {thang : 'false'},
+        attributes : {thang : false},
         test: function(component){
             this.whatItIs(component, "false", false);
         }
@@ -43,7 +43,7 @@
 
     // TODO(W-1419175): onchange events don't fire across function expressions
     _testRerender: {
-        attributes : {thang : "true"},
+        attributes : {thang : true},
         test: function(component){
             this.whatItIs(component, "Testing Renrender: true", true);
             component.set("v.thang", false);

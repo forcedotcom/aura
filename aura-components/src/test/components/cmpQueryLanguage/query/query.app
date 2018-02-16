@@ -13,10 +13,8 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
--->
 
-<aura:component template="gvpTest:customGVPTemplate">
-    <aura:attribute name="valueChanged" type="Boolean" default="false" />
-    <aura:attribute name="gvpValue" type="String" default="{!$CustomInitInTemplate.task_mode_today}"/>
-    <aura:handler name="change" value="{!v.gvpValue}" action="{!c.valueChanged}" />
-</aura:component>
+-->
+<aura:application render="client" model="java://org.auraframework.components.test.java.model.TestJavaModel">
+    <aura:dependency resource="provider:*" />
+</aura:application>

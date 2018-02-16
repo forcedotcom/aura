@@ -1,4 +1,4 @@
-<aura:component template="auraStorageTest:versionTemplate">
+<aura:application template="auraStorageTest:versionTemplate">
 
     <aura:attribute name="defaultExpiration" type="Integer" default="50"/>
     <aura:attribute name="defaultAutoRefreshInterval" type="Integer" default="60"/>
@@ -13,4 +13,4 @@
         defaultExpiration="{!v.defaultExpiration}"
         defaultAutoRefreshInterval="{!v.defaultAutoRefreshInterval}"
         version="{!v.version}"/>
-</aura:component>
+</aura:application>

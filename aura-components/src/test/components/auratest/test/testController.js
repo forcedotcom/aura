@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    afterRender : function(cmp, helper){
-    	helper.runNextTest(cmp);
+    init : function(component, event, helper) {
+        //
     }
 })// eslint-disable-line semi

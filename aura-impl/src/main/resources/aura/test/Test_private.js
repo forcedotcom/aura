@@ -387,21 +387,6 @@ TestInstance.prototype.getDump = function(clearSessionStorage) {
     	    	
     	if(!Aura) {
     		status += "Aura framework not ready !!!\n";
-    	} else {
-    		if (!Aura["bootstrap"]){
-        		status += "Aura bootstrap info not available !!!\n";
-        	} else {
-        		status += "From Aura.bootstrap:\n";
-        		for(var it in Aura["bootstrap"]) { status+=it+":"+Aura["bootstrap"][it]+"; "; }
-            	status += "\n";
-        	}
-    		if(Aura['afterBootstrapReady'] && Aura['afterBootstrapReady'] instanceof Array) {
-    			status += "What's in Aura.afterBootstrapReady?\n";
-    			for(var idx=0; idx < Aura['afterBootstrapReady'].length; idx++) {
-    				status += Aura['afterBootstrapReady'][idx] + '\n';
-    			}
-    			status += "\n";
-    		}
     	}
     		
         status += "URL: " + window.location +  "\n";

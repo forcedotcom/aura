@@ -39,9 +39,11 @@ public class JavascriptTestSuiteDef extends DefinitionImpl<TestSuiteDef> impleme
 
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
-        if (Aura.getConfigAdapter().isProduction()) {
-            return;
-        }
+        try {
+            if (Aura.getConfigAdapter().isProduction()) {
+                return;
+            }
+        } catch (Throwable t) {}
         for (TestCaseDef def : caseDefs) {
             def.validateReferences(validationContext);
         }

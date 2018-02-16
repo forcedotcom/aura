@@ -45,23 +45,6 @@
     },
 
     /**
-     * Application that is not preloaded will appear in loaded set.
-     */
-    testLoaded_UnloadedApplicationIsLoaded : {
-        test : [ function(c) {
-            this.assertNoUid("APPLICATION@markup://aura:application");
-            //
-            // Note that we should not get a component config here, as there is nothing interesting to send
-            // back from the server. DO NOT CHANGE! The last false is testing the correct behaviour.
-            // If there were server side dependencies (model/renderer/provider) a config would come back.
-            //
-            this.doGet(false, "aura:application", false);
-        }, function(c) {
-            this.assertUid("APPLICATION@markup://aura:application");
-        } ]
-    },
-
-    /**
      * Component that is preloaded, because it is an implicit dependency, will not appear in loaded set.
      */
     testLoaded_UnloadedImplicitDependencyIsNotLoaded : {

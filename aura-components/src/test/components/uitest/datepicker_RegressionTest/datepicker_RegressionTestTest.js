@@ -165,7 +165,7 @@
     // test date picker focus on initial render when setFocus = false
     testDatePickerSetFocusFalse: {
         browsers: ['DESKTOP'],
-        attributes: {"renderItem": "testDatepickerSetFocus", "setFocus": "false"},
+        attributes: {"renderItem": "testDatepickerSetFocus", "setFocus": false},
         test: function(cmp) {
 
             $A.test.addWaitFor(true, function(){return !!document.querySelector("td.slds-is-today.slds-is-selected")},
@@ -181,7 +181,7 @@
     // test date picker focus on initial render when setFocus = true
     testDatePickerSetFocusTrue: {
         browsers: ['DESKTOP'],
-        attributes: {"renderItem": "testDatepickerSetFocus", "setFocus": "true"},
+        attributes: {"renderItem": "testDatepickerSetFocus", "setFocus": true},
         test: [function(cmp) {
             $A.test.addWaitForWithFailureMessage(true, function(){
                 var actualTagName = $A.test.getActiveElement().tagName;

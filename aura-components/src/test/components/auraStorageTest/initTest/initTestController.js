@@ -3,7 +3,7 @@
         var _testName = cmp._testName;
         var actionName = "c.fetchDataRecord";
         var param = {
-            testName: (!_testName?"fetchCounterValue":_testName)
+            testName: (!_testName ? "fetchCounterValue" : _testName)
         };
         helper.executeAction(cmp, actionName, param);
     },
@@ -12,7 +12,7 @@
         var _testName = cmp._testName;
         var actionName = "c.fetchDataRecord";
         var param = {
-            testName: (!_testName?"fetchCounterValue":_testName)
+            testName: (!_testName ? "fetchCounterValue" : _testName)
         };
         var additionalProperties = function(a){
             a.setStorable();
@@ -20,14 +20,14 @@
         helper.executeAction(cmp, actionName, param, additionalProperties);
     },
 
-    fetchActionFromStorage:function(cmp,evt,helper){
+    fetchActionFromStorage:function(cmp, evt, helper){
         var _testName = cmp._testName;
         var actionName = "c.fetchDataRecord";
         var param = {
-            testName: (!_testName?"fetchCounterValue":_testName)
+            testName: (!_testName ? "fetchCounterValue" : _testName)
         };
         var additionalProperties = function(a){
-            a.setStorable({"ignoreExisting":false,"refresh":5});
+            a.setStorable({"ignoreExisting":false, "refresh":5});
         };
         helper.executeAction(cmp, actionName, param, additionalProperties);
     },
@@ -42,8 +42,10 @@
     },
 
     doneWaiting:function(cmp, evt, helper){
-        helper.findAndSetText(cmp, "waiting", "");
-        helper.findAndSetText(cmp, "doneWaiting", "doneWaiting");
+        setTimeout($A.getCallback(function(){
+            helper.findAndSetText(cmp, "waiting", "");
+            helper.findAndSetText(cmp, "doneWaiting", "doneWaiting");
+        }));
     },
 
     refreshBegin:function(cmp, evt, helper){
@@ -60,11 +62,11 @@
         helper.findAndSetText(cmp, "storageModified", new Date().getTime());
     },
 
-    setHost : function(component, event, helper) {
+    setHost : function(component) {
         $A.clientService.initHost(component.get("v.host"));
     },
 
-    testConnection: function(component, event, helper) {
+    testConnection: function(component) {
         component.set("v.actionStatus", "");
         var a = component.get("c.getInt");
         a.setParams({ param : 66 });

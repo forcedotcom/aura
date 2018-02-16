@@ -116,6 +116,15 @@
                      class="errorFromUnrenderButton"/>
         </td>
     </tr>
+    <tr>
+        <td>Throw Error: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwError}"
+                     class="errorFromButton"/>
+          <div aura:id="target">initial</div>
+        </td>
+    </tr>
     </table>
 
     systemError Event is handled on component: <div id="eventHandledOnCmp">{!v.eventHandled}</div>

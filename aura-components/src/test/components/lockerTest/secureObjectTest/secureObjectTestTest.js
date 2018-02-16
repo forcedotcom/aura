@@ -26,7 +26,7 @@
                         "Failed to dynamically create initial components",
                         function() {
                             var expected = "Instance #1Instance #2Instance #3";
-                            var actual = $A.util.getText($A.getRoot().find("content").getElement());
+                            var actual = $A.util.getText(cmp.find("content").getElement());
                             $A.test.assertEquals(expected, actual, "Unexpected content of initial components dynamically created")
                         }
                 );
@@ -42,7 +42,7 @@
                         "Failed to remove first and last dynamically created components from list",
                         function() {
                             var expected = "Instance #2";
-                            var actual = $A.util.getText($A.getRoot().find("content").getElement());
+                            var actual = $A.util.getText(cmp.find("content").getElement());
                             $A.test.assertEquals(expected, actual);
                         }
                 );
@@ -57,7 +57,7 @@
                         "Failed to add an additional dynamically created component to list",
                         function() {
                             var expected = "Instance #2Instance #4";
-                            var actual = $A.util.getText($A.getRoot().find("content").getElement());
+                            var actual = $A.util.getText(cmp.find("content").getElement());
                             $A.test.assertEquals(expected, actual, "Unexpected content after adding additional dynamically created component")
                         }
                 );

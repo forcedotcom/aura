@@ -16,7 +16,7 @@
 ({
 
     init: function(cmp) {
-        var testName = cmp.get("v.case.name");
+        var testName = cmp.get("v.name");
         if (testName && testName.indexOf("test") === 0) {
             var shortName = testName.substring(4);
             cmp.set("v.title", shortName);

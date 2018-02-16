@@ -18,7 +18,7 @@
         if (!cmp._testLoaded) {
             cmp._testLoaded = true;
             var frame = document.createElement("iframe");
-            frame.src = cmp.get("m.url");
+            frame.src = cmp.get("v.url") + "&aura.nonce=" + new Date().getTime();
             frame.scrolling = "auto";
             $A.util.on(frame, "load", function () {
                 cmp.getDef().getHelper().runTest(cmp);
@@ -77,10 +77,6 @@
         }
 
         cmp.set("v.runTime", " in " + (new Date().getTime() - cmp._startTime) + "ms");
-        var url = cmp.get("m.url");
-        var baseUrl = url.substring(0, url.indexOf('?'));
-        var individualTestUrl = baseUrl + "?aura.mode=JSTESTDEBUG&test=" + cmp.get("v.case.name");
-        cmp.set("v.individualTestUrl", individualTestUrl);
 
         cmp.get("e.done").fire();
     }

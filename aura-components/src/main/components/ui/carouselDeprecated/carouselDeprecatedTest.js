@@ -32,7 +32,7 @@
 	},
 	
 	testContinousFlowNavigationIndicatorsDoNotDisplay: {
-		attributes : {continuousFlow : 'true'},
+		attributes : {continuousFlow : true},
 		test : function(component){
 			var nav = component.find('navContainer');
 			$A.test.assertTrue($A.util.isUndefinedOrNull(nav,'Navigation indicators should not be displayed'));

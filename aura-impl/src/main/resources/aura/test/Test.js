@@ -2021,7 +2021,7 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
     }
 
     var continueRun = this.runInternal.bind(this, name);
-    setTimeout(this.waitForRoot.bind(this, continueRun), 1);
+    setTimeout(this.waitForRoot.bind(this, name, continueRun), 1);
 };
 
 /**
@@ -2036,13 +2036,25 @@ TestInstance.prototype.getTestName = function () {
 /**
  * @private
  */
-TestInstance.prototype.waitForRoot = function(callback) {
+TestInstance.prototype.waitForRoot = function(testName, callback) {
     var that = this;
-    if ($A.getRoot()) {
-        setTimeout(callback, 1); // give browser a moment to settle down
+    var root = $A.getRoot();
+    if (root) {
+        if (root.getDef().getDescriptor().getFullName() === "auratest:test") {
+            var testCase = this.suite[testName];
+            var descriptor = root.get("v.descriptor");
+            var attributes = testCase.hasOwnProperty("attributes") ? testCase["attributes"] : {};
+            $A.clientService.setCurrentAccess(root);
+            $A.createComponent(descriptor, attributes, $A.getCallback(function(newComponent) {
+                root.set("v.target", newComponent);
+                setTimeout(callback, 1); // give browser a moment to settle down
+            }));
+        } else {
+            setTimeout(callback, 1); // give browser a moment to settle down
+        }
         return;
     }
-    setTimeout(that.waitForRoot.bind(that, callback), 50);
+    setTimeout(that.waitForRoot.bind(that, testName, callback), 50);
 };
 
 /**
@@ -2052,22 +2064,28 @@ TestInstance.prototype.waitForRoot = function(callback) {
 TestInstance.prototype.runInternal = function(name) {
     var that = this;
 
-    this.cmp = $A.getRoot();
+    var testCase = this.suite[name];
+    var root = $A.getRoot();
+    if (root.getType() === "auratest:test") {
+        this.cmp = root.get("v.target");
+    } else {
+        this.cmp = root;
+    }
     $A.clientService.setCurrentAccess(this.cmp);
     var useLabel = function(labelName) {
         var suiteLevel = that.suite[labelName] || false;
-        var testLevel = that.suite[name][labelName];
+        var testLevel = testCase[labelName];
         return (testLevel === undefined) ? suiteLevel : testLevel;
     };
 
     this.failOnWarning = useLabel("failOnWarning");
     this.doNotWrapInAuraRun = useLabel("doNotWrapInAuraRun");
 
-    this.stages = this.suite[name]["test"];
+    this.stages = testCase["test"];
     this.stages = $A.util.isArray(this.stages) ? this.stages : [ this.stages ];
 
-    var auraErrorsExpectedDuringInit = this.suite[name]["auraErrorsExpectedDuringInit"] || [];
-    var auraWarningsExpectedDuringInit = this.suite[name]["auraWarningsExpectedDuringInit"] || [];
+    var auraErrorsExpectedDuringInit = testCase["auraErrorsExpectedDuringInit"] || [];
+    var auraWarningsExpectedDuringInit = testCase["auraWarningsExpectedDuringInit"] || [];
 
     function checkErrors() {
       try {

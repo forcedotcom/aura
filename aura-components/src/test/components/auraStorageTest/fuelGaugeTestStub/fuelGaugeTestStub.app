@@ -1,4 +1,4 @@
-<aura:component render="client" template="auraStorageTest:namedStorageTemplate">
+<aura:application render="client" template="auraStorageTest:namedStorageTemplate">
     <auraStorage:fuelGauge storageName="actions" aura:id="actionsGauge"/>
     <auraStorage:fuelGauge storageName="savings" aura:id="savingsGauge"/>
 
@@ -7,4 +7,4 @@
 
     <auraStorage:fuelGauge storageName="bogus" aura:id="bogusGauge"/>
     <auraStorage:fuelGauge storageName="" aura:id="noName"/>
-</aura:component>
+</aura:application>

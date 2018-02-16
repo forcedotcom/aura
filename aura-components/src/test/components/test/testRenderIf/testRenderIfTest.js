@@ -30,7 +30,7 @@
     },
 
     testTrue: {
-        attributes : {thang : 'true'},
+        attributes : {thang : true},
 
         test: function(component){
             this.whatItIs(component, "true", true);
@@ -39,7 +39,7 @@
     },
 
     testFalse: {
-        attributes : {thang : 'false'},
+        attributes : {thang : false},
 
         test: function(component){
             this.whatItIs(component, "false", false);
@@ -48,7 +48,6 @@
     },
 
     testLiterals: {
-
         test: function(component){
             aura.test.assertNull($A.test.getElementByClass("itIsLiterallyFalse"), "Literal false didn't evaluate as false");
             aura.test.assertNotNull($A.test.getElementByClass("itIsLiterallyNotFalse"), "Literal true evaluated as false");

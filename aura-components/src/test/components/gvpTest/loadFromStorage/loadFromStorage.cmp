@@ -1,3 +1,0 @@
-<aura:component render="client" template="gvpTest:loadFromStorageTemplate">
-
-</aura:component>

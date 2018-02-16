@@ -15,14 +15,11 @@
  */
 ({
     runNextTest : function(cmp){
-        var tests = cmp.find("test");
-        tests = $A.util.isArray(tests) ? tests : [tests];
-        
-        var index = parseInt(cmp.get("v.index"));
-        if(index >= tests.length){
-        	return;
+        var newIndex = parseInt(cmp.get("v.index"), 10) + 1;
+        if (newIndex > cmp.get("v.testCases.length")) {
+            return;
         }
-        cmp.find("tabs").get("e.activateTab").setParams({"index": index}).fire();
-        cmp.set("v.index", index + 1);
+        cmp.find("tabs").get("e.activateTab").setParams({"index": newIndex}).fire();
+        cmp.set("v.index", newIndex);
     }
 })// eslint-disable-line semi

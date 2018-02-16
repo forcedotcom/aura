@@ -13,8 +13,8 @@
                 $A.test.assertEquals(expectedComponent, actualComponent);
 
                 var actualComponentStack = cmp['_auraError']['componentStack'];
-                var expectedComponentStack = [ '[', cmp.getType(), ']' ].join('');
-                $A.test.assertEquals(actualComponentStack, expectedComponentStack);
+                var expectedComponentStack = '[moduleTest:interopErrorTest]';
+                $A.test.assertEquals(expectedComponentStack, actualComponentStack);
             }
         ]
     }

@@ -24,9 +24,9 @@
      * Passing interval as '' should set interval to the default value: 30
      */
     testEmptyInterval: {
-        attributes: {timeFormat: 'hh:mma', interval: '', visible: 'true'},
+        attributes: {timeFormat: 'hh:mma', interval: '', visible: true},
         test: function(cmp) {
-            this.checkIntervals(cmp);
+            this.checkIntervals(cmp.find("target"));
         }
     },
 
@@ -34,9 +34,9 @@
      * Not specifying interval should set interval to the default value: 30
      */
     testDefaultInterval: {
-        attributes: {timeFormat: 'hh:mma', visible: 'true'},
+        attributes: {timeFormat: 'hh:mma', visible: true},
         test: function(cmp) {
-            this.checkIntervals(cmp);
+            this.checkIntervals(cmp.find("target"));
         }
     },
 
@@ -44,9 +44,9 @@
      * Passing interval as '15' and check if timePicker's values are correct
      */
     testValidInterval: {
-        attributes: {timeFormat: 'hh:mma', interval: '15', visible: 'true'},
+        attributes: {timeFormat: 'hh:mma', interval: 15, visible: true},
         test: function(cmp) {
-            this.checkIntervals(cmp);
+            this.checkIntervals(cmp.find("target"));
         }
     },
 

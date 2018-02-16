@@ -19,6 +19,5 @@
 <aura:component render="client">
     <aura:handler name="destroy" value="{!this}" action="{!c.doDestroy}"/>
 
-    <componentTest:cmpWithDestroyHandler aura:id="cmpWithDestroyHandler">
-    </componentTest:cmpWithDestroyHandler>
+    <componentTest:cmpWithDestroyHandler aura:id="cmpWithDestroyHandler"/>
 </aura:component>

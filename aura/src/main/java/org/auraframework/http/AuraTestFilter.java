@@ -207,7 +207,14 @@ public class AuraTestFilter {
             DefDescriptor<?> targetDescriptor = getTargetDescriptor(request);
             if (targetDescriptor != null) {
                 // Check if a single jstest is being requested.
-                String testToRun = jstestToRun.get(request);
+                String testToRun;
+                if ("auratest:test".equals(targetDescriptor.getDescriptorName())) {
+                    String descriptor = request.getParameter("descriptor");
+                    targetDescriptor = definitionService.getDefDescriptor(descriptor, ComponentDef.class);
+                    testToRun = request.getParameter("testName");
+                } else {
+                    testToRun = jstestToRun.get(request);
+                }
                 if (testToRun != null && !testToRun.isEmpty() && !NO_RUN.equals(testToRun)) {
                     AuraContext context = contextService.getCurrentContext();
                     Format format = context.getFormat();
@@ -650,9 +657,9 @@ public class AuraTestFilter {
             if (name == null) {
                 Matcher matcher = AuraRewriteFilter.DESCRIPTOR_PATTERN.matcher(path);
                 if (matcher.matches()) {
-                    type = "app".equals(matcher.group(3)) ? DefType.APPLICATION : DefType.COMPONENT;
                     namespace = matcher.group(1);
                     name = matcher.group(2);
+                    type = "app".equals(matcher.group(3)) ? DefType.APPLICATION : DefType.COMPONENT;
                 }
             }
 

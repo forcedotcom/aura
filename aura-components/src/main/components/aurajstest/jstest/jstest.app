@@ -15,19 +15,27 @@
     limitations under the License.
 
 -->
-<aura:application access="GLOBAL" model="java://org.auraframework.components.aurajstest.JSTestModel">
+<aura:application access="GLOBAL" controller="java://org.auraframework.components.aurajstest.JSTestController">
     <aura:attribute name="descriptor" type="String" default="ui:button"/>
     <aura:attribute name="defType" type="String" default="COMPONENT"/>
-    <aura:attribute name="index" type="Integer" default="0"/>
     <aura:attribute name="test" type="String"/>
-    <ui:tabset aura:id="tabs" class="jstestTabset">
-        <aura:iteration items="{!m.testCases}" var="case">
-            <aurajstest:jstestCase aura:id="test" case="{!case}" url="{!m.url}" done="{!c.testDone}"/>
-        </aura:iteration>
-    </ui:tabset>
+    
+    <aura:attribute name="index" type="Integer" default="0"/>
+    <aura:attribute name="testCases" type="List" default="" access="PRIVATE"/>
+    <aura:attribute name="testSuiteCode" type="String" access="PRIVATE"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    
+    <aura:if isTrue="{!v.testCases.length}">
+        <ui:tabset aura:id="tabs" class="jstestTabset">
+            <aura:iteration items="{!v.testCases}" var="case">
+                <aurajstest:jstestCase aura:id="test" name="{!case.name}" url="{!case.url}" done="{!c.testDone}"/>
+            </aura:iteration>
+        </ui:tabset>
+    </aura:if>
 
     <section class="suiteCode">
         <h1 onclick="{!c.toggleCode}">Sources <sub>click or tap to view</sub></h1>
-        <div><pre aura:id="test-suite-code" class="hidden">{!m.testSuite.code}</pre></div>
+        <div><pre aura:id="test-suite-code" class="hidden">{!v.testSuiteCode}</pre></div>
     </section>
 </aura:application>

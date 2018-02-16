@@ -24,48 +24,9 @@
         }
     },
 
-    // we can pass string to Integer attribute, it will get converted into number
-    // we can pass number to String attribute, it will get converted into String
-    testIntegerTypeWithString: {
-        attributes: {
-            typeInteger: "123",
-            typeString: 123
-        },
-        test: function(cmp) {
-            var value = cmp.get("v.typeInteger");
-            $A.test.assertEquals("number", typeof value);
-
-            var valueStr = cmp.get("v.typeString");
-            $A.test.assertEquals("string", typeof valueStr);
-        }
-    },
-
     testMapTypeFromRawObject: {
         attributes: {
             typeMap: { "k1":"value", k2: "v2", k3: { k4:"v4", 'k5':"v5" }, k6: [{ k7:"v7" }, 999] }
-        },
-        test: [
-            function(cmp) {
-                var value = cmp.get("v.typeMap");
-                $A.test.assertEquals("object", typeof value);
-
-                $A.test.assertEquals("value", value.k1);
-
-                $A.test.assertEquals("v2", value.k2);
-
-                $A.test.assertEquals("v4", value.k3.k4);
-                $A.test.assertEquals("v5", value.k3.k5);
-
-                $A.test.assertTrue($A.util.isArray(value.k6));
-                $A.test.assertEquals("v7", value.k6[0].k7);
-                $A.test.assertEquals(999, value.k6[1]);
-            }
-        ]
-    },
-
-    testMapTypeFromString: {
-        attributes: {
-            typeMap: "{ 'k1':'value', k2: 'v2', k3: { k4:'v4', 'k5':'v5' }, k6: [{ k7:'v7' }, 999] }"
         },
         test: [
             function(cmp) {
@@ -141,44 +102,9 @@
         ]
     },
 
-    testListFromString: {
-        attributes: {
-            typeList: "[1,2,{k1:'11','k2':22},[111,222,{'k3': 333, k4:'444'}]]"
-        },
-        test: [
-            function(cmp) {
-                var value = cmp.get("v.typeList");
-                $A.test.assertTrue($A.util.isArray(value));
-
-                $A.test.assertEquals(1, value[0]);
-                $A.test.assertEquals(2, value[1]);
-
-                $A.test.assertEquals('11', value[2].k1);
-                $A.test.assertEquals(22, value[2].k2);
-
-                $A.test.assertEquals(333, value[3][2].k3);
-                $A.test.assertEquals('444', value[3][2].k4);
-
-            }
-        ]
-    },
-
     testEmptyList: {
         attributes: {
             typeList: []
-        },
-        test: [
-            function(cmp) {
-                var value = cmp.get("v.typeList");
-                $A.test.assertTrue($A.util.isArray(value));
-                $A.test.assertEquals(0, value.length);
-            }
-        ]
-    },
-
-    testEmptyListFromString: {
-        attributes: {
-            typeList: "[]"
         },
         test: [
             function(cmp) {
@@ -217,17 +143,27 @@
         }
     },
 
-    testSetTypeWithDupElements : {
-        attributes : {
-            typeSet : "['1','1', 1]"  // must be a string to pass through converters
-        },
-        test : function(cmp) {
-            var except = ['1', 1];
-            var actual = cmp.get("v.typeSet");
-            $A.test.assertTrue($A.util.isArray(actual), "v.typeSet should be an array");
-
-            var result = $A.test.compareValues(except.sort(), actual.sort());
-            $A.test.assertTrue(result['match'], JSON.stringify(result['reasons']));
+    testCustomTypeDefault:{
+        test:function(cmp){
+            var customAttrValue = cmp.get('v.pairAttr');
+            $A.test.assertNotNull(customAttrValue);
+            //Verify the type and value of attribute value
+            $A.test.assertEquals(300, customAttrValue.intMember,
+                    "Failed to construct attribute value of custom type.");
+            $A.test.assertEquals("HouseNo", customAttrValue.strMember,
+                    "Failed to construct String attribute value of custom type.");
+        }
+    },
+    
+    testSetBodyAsNonArray: {
+        test: function(cmp) {
+            var body = "text";
+            var value;
+            
+            cmp.set("v.body", body);
+            value = cmp.get("v.body");
+            
+            $A.test.assert($A.util.isArray(value), "Body was of the wrong type, it was of type " + typeof value);
         }
     }
 })

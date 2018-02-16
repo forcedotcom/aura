@@ -40,6 +40,9 @@
                 component.find("outputValue").set("v.value", retValue);
 
                 var inputCmp = $A.getRoot().getSuper().getConcreteComponent().find(cmpType);
+                if (!inputCmp) {
+                    inputCmp = $A.getRoot().get("v.target").find(cmpType);
+                }
                 inputCmp.set("v.errors", errors);
             });
 

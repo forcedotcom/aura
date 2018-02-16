@@ -96,16 +96,16 @@
     /**
      * Verify customized destroy handler gets called when component gets destroyed.
      */
-    testCustomizedDestroyHanlder : {
+    testCustomizedDestroyHandler : {
         test : function(cmp) {
-                component = cmp.find("cmpWithDestroyHandlerWrapper");
-                component.destroy();
+            component = cmp.find("cmpWithDestroyHandlerWrapper");
+            component.destroy();
 
-                $A.test.assertTrue(cmp.get("v.cmpDestroyed"),
-                        "Destroy handler didn't get called when component gets destroyed");
-                $A.test.assertTrue(cmp.get("v.childCmpDestroyed"),
-                        "Child component's Destroy handler didn't get called when parent component gets destroyed");
-            }
+            $A.test.assertTrue(top["componentTest_cmpWithDestroyHandlerWrapper"],
+                    "Destroy handler didn't get called when component gets destroyed");
+            $A.test.assertTrue(top["componentTest_cmpWithDestroyHandlerWrapper"],
+                    "Child component's Destroy handler didn't get called when parent component gets destroyed");
+        }
      },
 
     /**

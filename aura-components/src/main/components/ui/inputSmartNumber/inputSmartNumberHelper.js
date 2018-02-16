@@ -116,12 +116,12 @@
             if (typeof value === "string" && !$A.util.isEmpty(value)){
                 cmp.set("v.value", Number(value));
             }
-            
+
             this.formatInputValue(cmp);
             this.updateLastInputValue(cmp);
         } else {
             this.setValueEmpty(cmp);
-            $A.logger.warning('Invalid value was passed(' + value + ')');
+            $A.warning('Invalid value was passed(' + value + ')');
         }
     },
     setValueEmpty : function (cmp) {
@@ -185,7 +185,7 @@
     hasChangedValue : function (cmp) {
         var value = String(cmp.get('v.value'));
         var inputValue = cmp.get("v.inputValue");
-        
+
         // convertInputValueToInternalValue() returns 0 whenever inputValue is ""
         return String(this.convertInputValueToInternalValue(cmp)) !== value
             || (inputValue === '' && value === '0');

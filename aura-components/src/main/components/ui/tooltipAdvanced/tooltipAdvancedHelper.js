@@ -19,9 +19,9 @@
 	},
 
 	initStyle: function(component) {
-		this.ttLib.tooltip.computeTooltipStyle(component);     
+		this.ttLib.tooltip.computeTooltipStyle(component);
 	},
-	
+
 	setStyle: function(component) {
 	    var tooltip = component.find("tooltip");
         var tooltipStyle = component.get("v.tooltipStyle");
@@ -57,7 +57,7 @@
 		if(cmp.isValid()) {
 			cmp.set('v.classList', this.ttLib.tooltip.getClassList(cmp).join(' '));
 		}
-		
+
 	},
 
 	position: function(component) {
@@ -67,7 +67,7 @@
 		var ttbodyNode = component.find('tooltipbody').getElement();
 		var ttWrapper = component.find('tooltipwrapper').getElement();
 		var classList = component.get('v.classList');
-		
+
 		var pointer = node.querySelector('.pointer');
 		var target = $A.getComponent(component.get('v.target')).getElement();
 
@@ -88,7 +88,7 @@
 			boundingElement = document.querySelector(boundingElementSelector);
 			if(!boundingElement) {
 				boundingElement = window;
-				$A.logger.warning('boundingElementSelector "'+ boundingElementSelector +'" matched no elements, falling back to window');
+				$A.warning('boundingElementSelector "'+ boundingElementSelector +'" matched no elements, falling back to window');
 			}
 		}
 
@@ -98,7 +98,7 @@
 			direction = 'north';
 		}
 
-		
+
 		classArr = classArr.filter(function(item) {
 			if(item.match(/north|east|west|south/)) {
 				return false;
@@ -107,7 +107,7 @@
 			}
 		});
 
-		
+
 		classArr.push(direction);
 		component.set('v.direction', direction);
 		component.set('v.classList', classArr.join(' '));
@@ -151,7 +151,7 @@
 
 		component.originalDirection = direction;
 		/*
-		
+
 		IMPORTANT. The order in which constraints
 		are applied matters. The last constraint applied
 		has the highest priority.
@@ -183,7 +183,7 @@
 		});
 
 		for(thisConstraint in constraintMap) {
-		
+
 			component.constraints[thisConstraint + '_pointer'] = lib.createRelationship({
 				element:pointer,
 				target:target,
@@ -196,7 +196,7 @@
 		}
 
 
-	       
+
 
 		for(thisConstraint in constraintMap) {
 
@@ -221,7 +221,7 @@
 				pad: 0
 
 			});
-		
+
 		}
 
 		component.constraints.eastPointerOverlap = lib.createRelationship({

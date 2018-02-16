@@ -22,7 +22,7 @@ function TypeDefRegistry(){
 }
 
 TypeDefRegistry.prototype.getDef = function(config) {
-    aura.assert(config, "TypeDef Config required for registration");
+    $A.assert(config, "TypeDef Config required for registration");
     // We don't re-register (or modify in any way) once we've registered
     var descriptor = config["descriptor"];
     var ret = this.typeDefs[descriptor];

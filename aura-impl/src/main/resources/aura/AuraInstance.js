@@ -679,7 +679,7 @@ AuraInstance.prototype.finishInit = function(doNotInitializeServices) {
  * @deprecated throw new Error(msg) instead
  */
 AuraInstance.prototype.error = function(msg, e){
-    this.logger.error(msg, e);
+    this.logger.logError(msg, e);
 };
 
 /**
@@ -1223,7 +1223,7 @@ AuraInstance.prototype.run = function(func, name) {
  * @param {String} assertMessage A message to be displayed when condition is false
  */
 AuraInstance.prototype.assert = function(condition, assertMessage) {
-    this.logger.assert(condition, assertMessage);
+    this.logger.logAssert(condition, assertMessage);
 };
 
 /**

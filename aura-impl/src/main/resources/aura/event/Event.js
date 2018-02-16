@@ -394,7 +394,7 @@ Aura.Event.Event.prototype.fire = function(params) {
     var self = this;
 
     if (this.fired) {
-        aura.assert(false, "Event.fire(): Unable to fire event. Event has already been fired.");
+        $A.assert(false, "Event.fire(): Unable to fire event. Event has already been fired.");
     }
 
     if (params) {

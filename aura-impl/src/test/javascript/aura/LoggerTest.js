@@ -162,7 +162,7 @@ Test.Aura.LoggerTest = function() {
                 condition = false;
             logger.subscribe(expectedLevel, cb);
             mockGlobal(function() {
-                logger.assert(false, expectedMsg);
+                logger.logAssert(false, expectedMsg);
             });
 
             Assert.Equal("Assertion Failed!: " + expectedMsg + " : " + condition, message);
@@ -175,7 +175,7 @@ Test.Aura.LoggerTest = function() {
                 called = true;
             };
 
-            logger.assert(true, "blah");
+            logger.logAssert(true, "blah");
 
             Assert.False(called);
         }
@@ -195,7 +195,7 @@ Test.Aura.LoggerTest = function() {
             logger.subscribe(expectedLevel, function(level, message, error){actual = level;});
 
             mockGlobal(function() {
-                logger.error(expectedMsg);
+                logger.logError(expectedMsg);
             });
 
             Assert.Equal(expected, actual);
@@ -208,7 +208,7 @@ Test.Aura.LoggerTest = function() {
             logger.subscribe("ERROR", function(level, message, error){actual = message;});
 
             mockGlobal(function() {
-                logger.error(expected);
+                logger.logError(expected);
             });
 
             Assert.Contains(expected, actual);
@@ -230,7 +230,7 @@ Test.Aura.LoggerTest = function() {
             logger.subscribe("ERROR", function(level, message, error){ actual = error; });
 
             mockGlobal(function() {
-                logger.error("error");
+                logger.logError("error");
             });
 
             Assert.NotNull(actual.stack);
@@ -243,7 +243,7 @@ Test.Aura.LoggerTest = function() {
             logger.subscribe(expectedLevel, function(level, message, error){});
             showErrors = false;
             mockGlobal(function() {
-                logger.error(expectedMsg);
+                logger.logError(expectedMsg);
             });
 
             Assert.False(messageCalled);

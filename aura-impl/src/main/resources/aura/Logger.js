@@ -66,9 +66,8 @@ Logger.prototype.warning = function(warning, error) {
  *
  * @param {Boolean} condition check
  * @param {String} assertMessage message when assertion fails
- * @export
  */
-Logger.prototype.assert = function(condition, assertMessage) {
+Logger.prototype.logAssert = function(condition, assertMessage) {
     if (!condition) {
         var message = "Assertion Failed!: " + assertMessage + " : " + condition;
         this.log(this.ASSERT, message);
@@ -80,12 +79,8 @@ Logger.prototype.assert = function(condition, assertMessage) {
  *
  * @param {String} msg error message
  * @param {Error} [e] error
- * @deprecated
- * @export
  */
-Logger.prototype.error = function(msg, e) {
-    $A.deprecated("Logger.error is no longer supported.", null, "Logger.error");
-
+Logger.prototype.logError = function(msg, e) {
     var logMsg = msg || "";
 
     if (!e) {
@@ -309,11 +304,8 @@ Logger.prototype.notify = function(level, msg, error) {
  * @param {Error} e error
  * @param {Number} [remove]
  * @returns {String|null} stack
- * @export
  */
 Logger.prototype.getStackTrace = function(e, remove) {
-    $A.deprecated("Logger.getStackTrace is no longer supported.", null, "Logger.getStackTrace");
-
     // instances of $A.auraError keep stack in stackTrace property.
     if (e && e instanceof $A.auraError) {
         return e.stackTrace;
@@ -360,7 +352,6 @@ Logger.prototype.getStackTrace = function(e, remove) {
  * @param {Error} error
  * @param {Array} trace
  * @returns {String} string log
- * @export
  */
 Logger.prototype.stringVersion = function(logMsg, error, trace) {
     var stringVersion = !$A.util.isUndefinedOrNull(logMsg) ? logMsg : "" ;

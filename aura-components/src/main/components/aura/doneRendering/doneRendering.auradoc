@@ -25,11 +25,11 @@
   <aura:meta name="classification" value="Rendering" />
 
   <aura:description>
-    <p class="note">We don't recommend using the legacy <code>aura:doneRendering</code> event except as a last resort. 
-    Unless your component is running in complete isolation in a standalone app and not included in complex apps, such as Lightning Experience or the Salesforce app, 
-    you probably don’t want to handle this application event. The container app may trigger your event handler multiple times.</p>
-    <p>This event is automatically fired if no more components need to be rendered or rerendered due to any attribute value changes. 
-    The <code>aura:doneRendering</code> event is handled by a client-side controller. A component can have only one <code>&lt;aura:handler&gt;</code> tag to handle this event.</p>
+    <p class="note">The <code>aura:doneRendering</code> event is deprecated.  Use the <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_render_handler.htm" target="_blank">render event</a> instead.
+    Unless your component is running in complete isolation in a standalone app and not included in complex apps, such as Lightning Experience or the Salesforce mobile app, 
+    the container app may trigger your event handler multiple times. This behavior makes it difficult to handle each event appropriately.</p>
+    <p>This event is automatically fired if no more components need to be rendered or rerendered due to any attribute value changes.</p> 
+    <p>Handle the <code>aura:doneRendering</code> event in a client-side controller. A component can have only one <code>&lt;aura:handler&gt;</code> tag to handle this event.</p>
     <pre>&lt;aura:handler event="aura:doneRendering" action="{!c.doneRendering}"/></pre>
     <p>For example, you want to customize the behavior of your app after it’s finished rendering the first time but not after subsequent rerenderings. 
     Create an attribute to determine if it’s the first rendering.</p>

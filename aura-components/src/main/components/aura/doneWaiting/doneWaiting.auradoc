@@ -25,12 +25,11 @@
   <aura:meta name="classification" value="Rendering" />
 
   <aura:description>
-    <p class="note">We don't recommend using the legacy <code>aura:doneWaiting</code> event except as a last resort. 
+      <p class="note">The <code>aura:doneWaiting</code> event is deprecated. To determine when an action is complete, use the response status in an action's callback instead.
     The <code>aura:doneWaiting</code> application event is fired for every server response, even for responses from other components in your app. 
-    Unless your component is running in complete isolation in a standalone app and not included in Lightning Experience or the Salesforce app, you probably don’t want to handle this application event. 
-    The container app may fire server-side actions and trigger your event handler multiple times.</p>
-    <p>This event is automatically fired if no more response from the server is expected.  
-    The <code>aura:doneWaiting</code> event is handled by a client-side controller. A component can have only one <code>&lt;aura:handler&gt;</code> tag to handle this event.</p>
+        Unless your component is running in complete isolation in a standalone app and not included in Lightning Experience or the Salesforce mobile app, the container app may trigger your event handler multiple times. This behavior makes it difficult to handle each event appropriately.</p>
+    <p>This event is automatically fired if no more response from the server is expected.</p>
+    <p>Handle the <code>aura:doneWaiting</code> event in a client-side controller. A component can have only one <code>&lt;aura:handler&gt;</code> tag to handle this event.</p>
     <pre>&lt;aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/></pre>
     <p>This example hides a spinner when <code>aura:doneWaiting</code> is fired.</p>
     <pre>&lt;aura:component>

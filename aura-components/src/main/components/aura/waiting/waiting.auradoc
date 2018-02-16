@@ -25,12 +25,10 @@
   <aura:meta name="classification" value="Rendering" />
 
   <aura:description>
-    <p class="note">We don't recommend using the legacy <code>aura:waiting</code> event except as a last resort. 
-    The <code>aura:doneWaiting</code> application event is fired for every server request, even for requestse from other components in your app. 
-    Unless your component is running in complete isolation in a standalone app and not included in Lightning Experience or the Salesforce app, you probably don’t want to handle this application event. 
-    The container app may fire server-side actions and trigger your event handler multiple times.</p>
-    <p>This event is automatically fired when a server-side action is added using <code>$A.enqueueAction()</code> and subsequently run, or when it’s expecting a response from an Apex controller.   
-    The <code>aura:waiting</code> event is handled by a client-side controller. A component can have only one <code>&lt;aura:handler&gt;</code> tag to handle this event.</p>
+      <p class="note">The <code>aura:waiting</code> event is deprecated. Execute logic after queueing an action instead of using this event. A component is waiting for a response for an action until the action’s callback is invoked.
+    The <code>aura:doneWaiting</code> application event is fired for every server request, even for requests from other components in your app. 
+          Unless your component is running in complete isolation in a standalone app and not included in Lightning Experience or the Salesforce mobile app, the container app may trigger your event handler multiple times. This behavior makes it difficult to handle each event appropriately.</p>
+    <p>Handle the <code>aura:waiting</code> event in a client-side controller. A component can have only one <code>&lt;aura:handler&gt;</code> tag to handle this event.</p>
     <pre>&lt;aura:handler event="aura:waiting" action="{!c.showSpinner}"/></pre>
     <p>This example shows a spinner when <code>aura:waiting</code> is fired.</p>
     <pre>&lt;aura:component>

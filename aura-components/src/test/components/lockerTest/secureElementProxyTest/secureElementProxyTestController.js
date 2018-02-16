@@ -159,5 +159,16 @@
         testUtils.assertEquals("white", node.value, "Custom node 'value' attribute getter returned wrong value");
 
         return node;
+    },
+
+    /**
+     * Automation for W-4701252
+     * @param cmp
+     */
+    testValuePropertyOnNonInputElement: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var aTag = document.getElementById("anchorWithValue");
+        testUtils.assertNull(aTag.getAttribute("value"), "Accessing invalid attribute values should continue to return null");
     }
 })

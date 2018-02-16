@@ -84,5 +84,11 @@
             var node = cmp.testDefineValueProperty();
             $A.test.assertEquals("white", node.value, "Custom setter for node attribute 'value' should change the raw node");
         }
+    },
+
+    testValuePropertyOnNonInputElement: {
+        test: function(cmp) {
+            cmp.testValuePropertyOnNonInputElement();
+        }
     }
 })

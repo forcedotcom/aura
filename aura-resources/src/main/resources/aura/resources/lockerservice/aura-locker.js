@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-02-07
- * Version: 0.3.11
+ * Generated: 2018-02-14
+ * Version: 0.3.12
  */
 
 (function (global, factory) {
@@ -2974,9 +2974,8 @@ function SecureElement(el, key) {
     // See inputValueTracking.js
     // https://github.com/facebook/react/blob/master/packages/react-dom/src/client/inputValueTracking.js
     ['checked', 'value'].forEach(prop => {
-      if (prop in el) {
-        const descriptor = Object.getOwnPropertyDescriptor(el.constructor.prototype, prop);
-
+      const descriptor = Object.getOwnPropertyDescriptor(el.constructor.prototype, prop);
+      if (descriptor) {
         Object.defineProperty(prototype.constructor.prototype, prop, {
           configurable: descriptor.configurable,
           enumerable: true,

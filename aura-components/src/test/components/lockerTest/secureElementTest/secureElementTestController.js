@@ -514,6 +514,15 @@
         testUtils.assertNull(button.getAttribute("href"), "Accessing invalid attribute values should continue to return undefined");
     },
 
+    testGetSetValueAttributeOnNonInputElement: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.expectAuraWarning('SecureElement: javascript:void(0);{ key: {"namespace":"lockerTest"} } does not allow getting/setting the value attribute, ignoring!');
+        var aTag = document.getElementById("anchorWithValue");
+        testUtils.assertNull(aTag.getAttribute("value"), "");
+        testUtils.assertUndefined(aTag.setAttribute("value", "New Value"), "Should return undefined when trying to set invalid attributes on dom element");
+        testUtils.assertNull(aTag.getAttribute("value"), "Accessing invalid attribute values should continue to return null");
+    },
+
     testLabelForInput: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var labelElement = cmp.find("labelFor").getElement();

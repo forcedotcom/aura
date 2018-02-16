@@ -73,6 +73,7 @@
     <aura:method name="testAriaAttributesAccessible" action="{!c.testAriaAttributesAccessible}"/>
     <aura:method name="testAttributesPropertyContainsData" action="{!c.testAttributesPropertyContainsData}"/>
     <aura:method name="testGetSetInvalidAttributes"/>
+    <aura:method name="testGetSetValueAttributeOnNonInputElement"/>
     <aura:method name="testLabelForInput"/>
     <aura:method name="testForAttributeAllowedOnLabelOnly"/>
     <aura:method name="testPropertyMeta"/>
@@ -152,4 +153,5 @@
         <p id="insideDiv"/>
     </div>
     <p id="outsideDiv"/>
+    <a value="Anchor with a value prop" id="anchorWithValue"></a>
 </aura:component>

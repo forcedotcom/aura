@@ -30,7 +30,11 @@
     <aura:method name="testAddOptionsToSelect"/>
     <aura:method name="testDefineCheckedProperty"/>
     <aura:method name="testDefineValueProperty"/>
+    <aura:method name="testValuePropertyOnNonInputElement"/>
 
+    <!--Note: This anchor tag has to be the first anchor tag on the component to repro W-4701252-->
+    <a value="Anchor with a value prop" id="anchorWithValue"></a>
     <div aura:id="title" class="title" id="title">SecureElement Proxy test</div>
     <select aura:id="selectContainer" id="selectContainer"><option value="1">1</option></select>
+
 </aura:component>

@@ -589,9 +589,14 @@
     },
 
     testGetSetInvalidAttributes: {
-        test: function(cmp) {
+        test: [
+          function(cmp) {
             cmp.testGetSetInvalidAttributes();
-        }
+          },
+          function(cmp) {
+            cmp.testGetSetValueAttributeOnNonInputElement();
+          }
+        ]
     },
 
     testRecursiveTraversal: {

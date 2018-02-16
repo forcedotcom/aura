@@ -1273,13 +1273,11 @@ AuraInstance.prototype.trace = function() {
  *
  * @param {String} message - The message to provide the developer indicating the method or behavior which has been or is being deprecated.
  * @param {String} workaround - Any known or suggested workaround to accomplish the behavior being deprecated.
- * @param {Date} sinceDate - The date since when the calling method has entered the deprecation pipeline. If omitted, deprecation is considered immediate.
- * @param {Date} dueDate - The date at which the calling method is considered deprecated, and becomes an error. If omitted, deprecation is considered due upon the elapse of a default time period after 'sinceDate'.
  * @param {String} reportSignature - The deprecated function name if deprecating an API, or function signature if deprecating a function signature.
  *
  * @private
  * */
-AuraInstance.prototype.deprecated = function(message, workaround, sinceDate, dueDate, reportSignature) {
+AuraInstance.prototype.deprecated = function(message, workaround, reportSignature) {
 
     // JBUCH: TEMPORARILY IGNORE CALLS BY ui: and aura: NAMESPACES.
     // REMOVE WHEN VIEW LOGIC IS COMPILED WITH FRAMEWORK.
@@ -1297,13 +1295,22 @@ AuraInstance.prototype.deprecated = function(message, workaround, sinceDate, due
     }
 
     // TODO: This filter may have false positive when a function is installed a override
-    // It assumes the stack strace is formatted as:
+    // In most cases, the stack strace is formatted as:
     //      Error: error message
     //          at AuraInstance.$deprecated$
     //          at [The Deprecated API]
     //          at [The Caller]
-    var caller = callStack.split('\n', 4)[3];
-    if (!caller || caller.indexOf("/aura_") > -1) {
+    var frames = callStack.split('\n', 5);
+    var caller = frames[3];
+    if (!caller) {
+        return;
+    }
+    // if the caller is wrapped by locker
+    if (caller.indexOf("Proxy.SecureFunction") > -1) {
+        caller = frames[4];
+    }
+
+    if (caller.indexOf("/aura_") > -1) {
         return;
     }
 

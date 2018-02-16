@@ -32,7 +32,6 @@ Aura.Layouts    = {};
 Aura.Controller = {};
 Aura.Attribute  = {};
 Aura.Method     = {};
-Aura.L10n       = {};
 Aura.Services   = {};
 Aura.Storage    = {};
 Aura.Locker     = {};

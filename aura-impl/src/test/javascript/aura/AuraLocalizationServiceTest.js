@@ -18,8 +18,8 @@ Function.RegisterNamespace("Test.Aura");
 [Fixture]
 Test.Aura.AuraLocalizationServiceTest = function() {
     var Aura = {
-        Services: {
-        }
+        Services: {},
+        Utils: {}
     };
 
     // Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
@@ -28,6 +28,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         "AuraLocalizationService":function(){}
     })(function() {
         [Import("aura-impl/src/main/resources/aura/AuraLocalizationService.js")]
+        [Import("aura-impl/src/main/resources/aura/util/Duration.js")]
     });
 
     var targetService = new Aura.Services.AuraLocalizationService();
@@ -47,33 +48,36 @@ Test.Aura.AuraLocalizationServiceTest = function() {
     var targetPercentFormat = "pFormat";
     var targetCurrencyFormat = "cFormat";
 
-    var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
-        assert: function () {},
-        deprecated: function() {},
-        auraError: function() {},
-        get:function(value){
-            if(value === "$Locale.dateFormat") return targetDateFormat;
-            if(value === "$Locale.datetimeFormat") return targetDateTimeFormat;
-            if(value === "$Locale.timeFormat") return targetTimeFormat;
-            if(value === "$Locale.timezone") return targetTimezone;
-            if(value === "$Locale.numberFormat") return targetNumberFormat;
-            if(value === "$Locale.percentFormat") return targetPercentFormat;
-            if(value === "$Locale.currencyFormat") return targetCurrencyFormat;
+    var mockUtil = Mocks.GetMocks(Object.Global(), {
+        "$A": {
+            assert: function () {},
+            deprecated: function() {},
+            auraError: function() {},
+            get:function(value){
+                if(value === "$Locale.dateFormat") return targetDateFormat;
+                if(value === "$Locale.datetimeFormat") return targetDateTimeFormat;
+                if(value === "$Locale.timeFormat") return targetTimeFormat;
+                if(value === "$Locale.timezone") return targetTimezone;
+                if(value === "$Locale.numberFormat") return targetNumberFormat;
+                if(value === "$Locale.percentFormat") return targetPercentFormat;
+                if(value === "$Locale.currencyFormat") return targetCurrencyFormat;
+            },
+            clientService: {
+                loadClientLibrary: function (name, callback) {
+                    callback();
+                }
+            },
+            lockerService: {
+                instanceOf: function(value, type) {
+                    return value instanceof type;
+                }
+            },
+            logger: {
+                reportError: function(){}
+            },
+            warning: function(){}
         },
-        clientService: {
-            loadClientLibrary: function (name, callback) {
-                callback();
-            }
-        },
-        lockerService: {
-            instanceOf: function(value, type) {
-                return value instanceof type;
-            }
-        },
-        logger: {
-            reportError: function(){}
-        },
-        warning: function(){}
+        "Aura": Aura
     });
 
     var mockDate = {
@@ -99,297 +103,341 @@ Test.Aura.AuraLocalizationServiceTest = function() {
 
 
     [Fixture]
-    function displayDuration(){
-
-        var targetNoSuffix = "noSuffix";
-        var targetDuration={
-            humanize:function(noSuffix){
-                if(noSuffix === targetNoSuffix)return true;
-            },
-            asDays:function(){
-                return "365";
-            },
-            asHours:function(){
-                return "24";
-            },
-            asMilliseconds:function(){
-                return "3600000";
-            },
-            asMinutes:function(){
-                return "60";
-            },
-            asMonths:function(){
-                return "12";
-            },
-            asSeconds:function(){
-                return "3600";
-            },
-            asYears:function(){
-                return "2013";
-            },
-            days:function(){
-                return "365";
-            },
-            hours:function(){
-                return "24";
-            },
-            milliseconds:function(){
-                return "3600000";
-            },
-            minutes:function(){
-                return "60";
-            },
-            months:function(){
-                return "12";
-            },
-            seconds:function(){
-                return "3600";
-            },
-            years:function(){
-                return "2013";
-            }
-        };
+    function displayDuration() {
 
         [Fact]
-        function displayDuration(){
+        function displayDuration() {
             // Arrange
-            var expected = true;
-            var actual;
+            var mockHumanize = Stubs.GetMethod();
+            var mockMomentDuration = {
+                humanize: mockHumanize
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.displayDuration(targetDuration, targetNoSuffix);
+            mockUtil(function() {
+                targetService.displayDuration(duration);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockHumanize.Calls.length);
         }
 
         [Fact]
-        function displayDurationInDays(){
+        function displayDurationWithSuffix() {
             // Arrange
-            var expected = "365";
             var actual;
+            var mockMomentDuration = {
+                // moment duration uses with suffix as param
+                humanize: function(withSuffix) {
+                    actual = withSuffix
+                }
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.displayDurationInDays(targetDuration);
+            mockUtil(function() {
+                // we use noSuffix as param
+                targetService.displayDuration(duration, true);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function displayDurationInDays() {
+            // Arrange
+            var mockAsDays = Stubs.GetMethod();
+            var mockMomentDuration = {
+                asDays: mockAsDays
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
+
+            // Act
+            mockUtil(function() {
+                targetService.displayDurationInDays(duration);
+            });
+
+            // Assert
+            Assert.Equal(1, mockAsDays.Calls.length);
         }
 
         [Fact]
         function displayDurationInHours(){
             // Arrange
-            var expected = "24";
-            var actual;
+            var mockAsHours = Stubs.GetMethod();
+            var mockMomentDuration = {
+                asHours: mockAsHours
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.displayDurationInHours(targetDuration);
+            mockUtil(function() {
+                targetService.displayDurationInHours(duration);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockAsHours.Calls.length);
         }
 
         [Fact]
         function displayDurationInMilliseconds(){
             // Arrange
-            var expected = "3600000";
-            var actual;
+            var mockAsMilliseconds = Stubs.GetMethod();
+            var mockMomentDuration = {
+                asMilliseconds: mockAsMilliseconds
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.displayDurationInMilliseconds(targetDuration);
+            mockUtil(function() {
+                targetService.displayDurationInMilliseconds(duration);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockAsMilliseconds.Calls.length);
         }
 
         [Fact]
         function displayDurationInMinutes(){
             // Arrange
-            var expected = "60";
-            var actual;
+            var mockAsMinutes = Stubs.GetMethod();
+            var mockMomentDuration = {
+                asMinutes: mockAsMinutes
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.displayDurationInMinutes(targetDuration);
+            mockUtil(function() {
+                targetService.displayDurationInMinutes(duration);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockAsMinutes.Calls.length);
         }
 
         [Fact]
-        function displayDurationInMonths(){
+        function displayDurationInMonths() {
             // Arrange
-            var expected = "12";
-            var actual;
+            var mockAsMonths = Stubs.GetMethod();
+            var mockMomentDuration = {
+                asMonths: mockAsMonths
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.displayDurationInMonths(targetDuration);
+            mockUtil(function() {
+                targetService.displayDurationInMonths(duration);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockAsMonths.Calls.length);
         }
 
         [Fact]
-        function displayDurationInSeconds(){
+        function displayDurationInSeconds() {
             // Arrange
-            var expected = "3600";
-            var actual;
+            var mockAsSeconds = Stubs.GetMethod();
+            var mockMomentDuration = {
+                asSeconds: mockAsSeconds
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.displayDurationInSeconds(targetDuration);
+            mockUtil(function() {
+                targetService.displayDurationInSeconds(duration);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockAsSeconds.Calls.length);
         }
 
         [Fact]
-        function displayDurationInYears(){
+        function displayDurationInYears() {
             // Arrange
-            var expected = "2013";
-            var actual;
+            var mockAsYears = Stubs.GetMethod();
+            var mockMomentDuration = {
+                asYears: mockAsYears
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.displayDurationInYears(targetDuration);
+            mockUtil(function() {
+                targetService.displayDurationInYears(duration);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockAsYears.Calls.length);
         }
 
         [Fact]
-        function getDaysInDuration(){
+        function getDaysInDuration() {
             // Arrange
-            var expected = "365";
-            var actual;
+            var mockDays = Stubs.GetMethod();
+            var mockMomentDuration = {
+                days: mockDays
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.getDaysInDuration(targetDuration);
+            mockUtil(function() {
+                targetService.getDaysInDuration(duration);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockDays.Calls.length);
         }
 
         [Fact]
-        function getHoursInDuration(){
+        function getHoursInDuration() {
             // Arrange
-            var expected = "24";
-            var actual;
+            var mockHours = Stubs.GetMethod();
+            var mockMomentDuration = {
+                hours: mockHours
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.getHoursInDuration(targetDuration);
+            mockUtil(function() {
+                targetService.getHoursInDuration(duration);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockHours.Calls.length);
         }
 
         [Fact]
         function getMillisecondsInDuration(){
             // Arrange
-            var expected = "3600000";
-            var actual;
+            var mockMilliseconds = Stubs.GetMethod();
+            var mockMomentDuration = {
+                milliseconds: mockMilliseconds
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.getMillisecondsInDuration(targetDuration);
+            mockUtil(function() {
+                targetService.getMillisecondsInDuration(duration);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockMilliseconds.Calls.length);
         }
 
         [Fact]
         function getMinutesInDuration(){
             // Arrange
-            var expected = "60";
-            var actual;
+            var mockMinutes = Stubs.GetMethod();
+            var mockMomentDuration = {
+                minutes: mockMinutes
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.getMinutesInDuration(targetDuration);
+            mockUtil(function() {
+                targetService.getMinutesInDuration(duration);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockMinutes.Calls.length);
         }
 
         [Fact]
         function getMonthsInDuration(){
             // Arrange
-            var expected = "12";
-            var actual;
+            var mockMonths = Stubs.GetMethod();
+            var mockMomentDuration = {
+                months: mockMonths
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.getMonthsInDuration(targetDuration);
+            mockUtil(function() {
+                targetService.getMonthsInDuration(duration);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockMonths.Calls.length);
         }
 
         [Fact]
-        function getSecondsInDuration(){
+        function getSecondsInDuration() {
             // Arrange
-            var expected = "3600";
-            var actual;
+            var mockSeconds = Stubs.GetMethod();
+            var mockMomentDuration = {
+                seconds: mockSeconds
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.getSecondsInDuration(targetDuration);
+            mockUtil(function() {
+                targetService.getSecondsInDuration(duration);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockSeconds.Calls.length);
         }
 
         [Fact]
-        function getYearsInDuration(){
+        function getYearsInDuration() {
             // Arrange
-            var expected = "2013";
-            var actual;
+            var mockYears = Stubs.GetMethod();
+            var mockMomentDuration = {
+                years: mockYears
+            };
+            var duration = new Aura.Utils.Duration(mockMomentDuration);
 
             // Act
-            actual = targetService.getYearsInDuration(targetDuration);
+            mockUtil(function() {
+                targetService.getYearsInDuration(duration);
+            });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockYears.Calls.length);
         }
     }
 
     [Fixture]
-    function duration(){
-
-        var targetNum = "Num";
-        var targetUnit = "Unit";
-
-        var mockMoment = {
-            duration:function(num, unit){
-                if(unit){
-                    if(num === targetNum && unit === targetUnit)return "With Unit";
-                }
-                else{
-                    if(num === targetNum)return "Without Unit";
-                }
-            }
-        };
-
-        var createTargetService = function() {
-            var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
-            return targetService;
-        }
+    function duration() {
 
         [Fact]
-        function durationWithoutUnit(){
+        function RespectsNumParam() {
             // Arrange
-            var expected = "Without Unit";
-            var targetService = createTargetService();
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var expected = "expectedNum";
+            var actual;
+            targetService.moment = {
+                duration: function(num, unit) {
+                    actual = num;
+                }
+            };
 
             // Act
-            var actual = targetService.duration(targetNum, undefined);
+            mockUtil(function() {
+                targetService.duration(expected);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        function durationWithUnit(){
+        function RespectsUnitParam() {
             // Arrange
-            var expected = "With Unit";
-            var targetService = createTargetService();
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var expected = "expectedUnit";
+            var actual;
+            targetService.moment = {
+                duration: function(num, unit) {
+                    actual = unit;
+                }
+            };
 
             // Act
-            var actual = targetService.duration(targetNum, targetUnit);
+            mockUtil(function() {
+                targetService.duration(30, expected);
+            });
 
             // Assert
             Assert.Equal(expected, actual);

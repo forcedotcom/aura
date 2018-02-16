@@ -121,6 +121,7 @@ function noop() {}
 // -- Utils ------------------------------------------------------------
 // #include aura.util.Style
 // #include aura.util.Bitset
+// #include aura.util.Duration
 // #include aura.util.NumberFormat
 // #include aura.util.Mutex
 // #include aura.util.DocLevelHandler

@@ -637,7 +637,7 @@ var AuraDevToolService = function() {
                          }
                          // if this inputID has already been encountered and
                          // if it is not the same label to input mapping, then mark as an error tag
-                         else if($A.util.getElementAttributeValue(dict[inputID], "data-aura-rendered-by") !== 
+                         else if($A.util.getElementAttributeValue(dict[inputID], "data-aura-rendered-by") !==
                         	 	 $A.util.getElementAttributeValue(label, "data-aura-rendered-by")){
                              errorArray.push(dict[inputID]);
                              errorArray.push(label);
@@ -1421,7 +1421,7 @@ var AuraDevToolService = function() {
             return result;
         },
         help : function(){
-            $A.deprecated("$A.qhelp and $A.devToolService.help are not supported.",null,"2017/01/06","2017/02/17");
+            $A.deprecated("$A.qhelp and $A.devToolService.help are not supported.");
             var ret = [];
             ret.push("\n COQL Usage");
             var txt = this.helpText;

@@ -166,9 +166,9 @@ AuraLocalizationService.prototype.getDefaultCurrencyFormat = function() {
 
 /**
  * Displays a length of time.
- * @param {Duration} d - The duration object returned by localizationService.duration
- * @param {Boolean} noSuffix - Set to true if the token should be displayed without a suffix
- * @return {String} A duration object
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
+ * @param {Boolean} withSuffix - If true, returns value with the suffix
+ * @return {String} a String of a length of time
  * @memberOf AuraLocalizationService
  * @public
  * @example
@@ -178,13 +178,20 @@ AuraLocalizationService.prototype.getDefaultCurrencyFormat = function() {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.displayDuration = function(d, noSuffix) {
-    return d["humanize"](noSuffix);
+AuraLocalizationService.prototype.displayDuration = function(duration, withSuffix) {
+    $A.deprecated("$A.localizationService.displayDuration(): The String from this method are no longer supported. This method will be removed in an upcoming release.",
+                null, "AuraLocalizationService.displayDuration");
+
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    }
+
+    return duration["humanize"](withSuffix);
 };
 
 /**
  * Displays a length of time in days.
- * @param {Duration} d - The duration object returned by localizationService.duration
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
  * @return {Number} The length of time in days.
  * @memberOf AuraLocalizationService
  * @public
@@ -195,13 +202,19 @@ AuraLocalizationService.prototype.displayDuration = function(d, noSuffix) {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.displayDurationInDays = function(d) {
-    return d["asDays"]();
+AuraLocalizationService.prototype.displayDurationInDays = function(duration) {
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    } else {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInDays");
+    }
+    return duration["asDays"]();
 };
 
 /**
  * Displays a length of time in hours.
- * @param {Duration} d - The duration object returned by localizationService.duration
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
  * @return {Number} The length of time in hours.
  * @memberOf AuraLocalizationService
  * @example
@@ -212,13 +225,19 @@ AuraLocalizationService.prototype.displayDurationInDays = function(d) {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.displayDurationInHours = function(d) {
-    return d["asHours"]();
+AuraLocalizationService.prototype.displayDurationInHours = function(duration) {
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    } else {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInHours");
+    }
+    return duration["asHours"]();
 };
 
 /**
  * Displays a length of time in milliseconds.
- * @param {Duration} d - The duration object returned by localizationService.duration
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
  * @return {Number} The length of time in milliseconds.
  * @memberOf AuraLocalizationService
  * @example
@@ -229,13 +248,19 @@ AuraLocalizationService.prototype.displayDurationInHours = function(d) {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.displayDurationInMilliseconds = function(d) {
-    return d["asMilliseconds"]();
+AuraLocalizationService.prototype.displayDurationInMilliseconds = function(duration) {
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    } else {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInMilliseconds");
+    }
+    return duration["asMilliseconds"]();
 };
 
 /**
  * Displays a length of time in minutes.
- * @param {Duration} d - The duration object returned by localizationService.duration
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
  * @return {Number} The length of time in minutes.
  * @memberOf AuraLocalizationService
  * @example
@@ -246,13 +271,19 @@ AuraLocalizationService.prototype.displayDurationInMilliseconds = function(d) {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.displayDurationInMinutes = function(d) {
-    return d["asMinutes"]();
+AuraLocalizationService.prototype.displayDurationInMinutes = function(duration) {
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    } else {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInMinutes");
+    }
+    return duration["asMinutes"]();
 };
 
 /**
  * Displays a length of time in months.
- * @param {Duration} d - The duration object returned by localizationService.duration
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
  * @return {Number} The length of time in months.
  * @memberOf AuraLocalizationService
  * @example
@@ -263,13 +294,19 @@ AuraLocalizationService.prototype.displayDurationInMinutes = function(d) {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.displayDurationInMonths = function(d) {
-    return d["asMonths"]();
+AuraLocalizationService.prototype.displayDurationInMonths = function(duration) {
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    } else {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInMonths");
+    }
+    return duration["asMonths"]();
 };
 
 /**
  * Displays a length of time in seconds.
- * @param {Duration} d - The duration object returned by localizationService.duration
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
  * @return {Number} The length of time in seconds.
  * @memberOf AuraLocalizationService
  * @example
@@ -280,13 +317,19 @@ AuraLocalizationService.prototype.displayDurationInMonths = function(d) {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.displayDurationInSeconds = function(d) {
-    return d["asSeconds"]();
+AuraLocalizationService.prototype.displayDurationInSeconds = function(duration) {
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    } else {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInSeconds");
+    }
+    return duration["asSeconds"]();
 };
 
 /**
  * Displays a length of time in years.
- * @param {Duration} d - The duration object returned by localizationService.duration
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
  * @return {Number} The length of time in years.
  * @memberOf AuraLocalizationService
  * example
@@ -297,8 +340,14 @@ AuraLocalizationService.prototype.displayDurationInSeconds = function(d) {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.displayDurationInYears = function(d) {
-    return d["asYears"]();
+AuraLocalizationService.prototype.displayDurationInYears = function(duration) {
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    } else {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInYears");
+    }
+    return duration["asYears"]();
 };
 
 /**
@@ -309,16 +358,13 @@ AuraLocalizationService.prototype.displayDurationInYears = function(d) {
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(1, 'day');
- * // dur._days returns 1
  * @public
  * @export
  * @platform
  */
 AuraLocalizationService.prototype.duration = function(num, unit) {
     var duration = this.moment["duration"](num, unit);
-
-    // TODO: figure out if users are calling the APIs on it
-    return duration;
+    return new Aura.Utils.Duration(duration);
 };
 
 /**
@@ -328,10 +374,10 @@ AuraLocalizationService.prototype.duration = function(num, unit) {
  * @return {Date} A JavaScript Date object
  * @memberOf AuraLocalizationService
  * @example
- * var d = new Date();
+ * var date = new Date();
  * // Returns the time at the end of the day
  * // in the format "Fri Oct 09 2015 23:59:59 GMT-0700 (PDT)"
- * var day = $A.localizationService.endOf(d, 'day')
+ * var day = $A.localizationService.endOf(date, 'day')
  * @public
  * @export
  * @platform
@@ -351,9 +397,9 @@ AuraLocalizationService.prototype.endOf = function(date, unit) {
  * @return {String} A formatted and localized date string
  * @memberOf AuraLocalizationService
  * @example
- * var d = new Date();
+ * var date = new Date();
  * // Returns date in the format "Oct 9, 2015"
- * $A.localizationService.formatDate(d);
+ * $A.localizationService.formatDate(date);
  * @public
  * @export
  * @platform
@@ -398,9 +444,9 @@ AuraLocalizationService.prototype.formatDate = function(date, formatString, loca
  * @return {String} A formatted and localized date string
  * @memberOf AuraLocalizationService
  * @example
- * var d = new Date();
+ * var date = new Date();
  * // Returns date in UTC in the format "Oct 9, 2015"
- * $A.localizationService.formatDateUTC(d);
+ * $A.localizationService.formatDateUTC(date);
  * @public
  * @export
  * @platform
@@ -445,9 +491,9 @@ AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, l
  * @return {String} A formatted and localized datetime string
  * @memberOf AuraLocalizationService
  * @example
- * var d = new Date();
+ * var date = new Date();
  * // Returns datetime in the format "Oct 9, 2015 9:00:00 AM"
- * $A.localizationService.formatDateTime(d);
+ * $A.localizationService.formatDateTime(date);
  * @public
  * @export
  * @platform
@@ -491,9 +537,9 @@ AuraLocalizationService.prototype.formatDateTime = function(date, formatString, 
  * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
  * @return {String} A formatted and localized datetime string
  * @example
- * var d = new Date();
+ * var date = new Date();
  * // Returns datetime in UTC in the format "Oct 9, 2015 4:00:00 PM"
- * $A.localizationService.formatDateTimeUTC(d);
+ * $A.localizationService.formatDateTimeUTC(date);
  * @public
  * @export
  * @platform
@@ -538,9 +584,9 @@ AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatStrin
  * @return {String} A formatted and localized time string
  * @memberOf AuraLocalizationService
  * @example
- * var d = new Date();
+ * var date = new Date();
  * // Returns a date in the format "9:00:00 AM"
- * var now = $A.localizationService.formatTime(d);
+ * var now = $A.localizationService.formatTime(date);
  * @public
  * @export
  * @platform
@@ -588,9 +634,9 @@ AuraLocalizationService.prototype.formatTime = function(date, formatString, loca
  * @return {String} a formatted and localized time string
  * @memberOf AuraLocalizationService
  * @example
- * var d = new Date();
+ * var date = new Date();
  * // Returns time in UTC in the format "4:00:00 PM"
- * $A.localizationService.formatTimeUTC(d);
+ * $A.localizationService.formatTimeUTC(date);
  * @public
  * @export
  * @platform
@@ -629,8 +675,8 @@ AuraLocalizationService.prototype.formatTimeUTC = function(date, formatString, l
 
 /**
  * Gets the number of days in a duration.
- * @param {Duration} d - The duration object returned by this.duration
- * @return {Number} The number of days in d.
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
+ * @return {Number} The number of days in duration.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(48, 'hour');
@@ -640,14 +686,20 @@ AuraLocalizationService.prototype.formatTimeUTC = function(date, formatString, l
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.getDaysInDuration = function(d) {
-    return d["days"]();
+AuraLocalizationService.prototype.getDaysInDuration = function(duration) {
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    } else {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getDaysInDuration");
+    }
+    return duration["days"]();
 };
 
 /**
  * Gets the number of hours in a duration.
- * @param {Duration} d - The duration object returned by this.duration
- * @return {Number} The number of hours in d.
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
+ * @return {Number} The number of hours in duration.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(60, 'minute');
@@ -657,8 +709,14 @@ AuraLocalizationService.prototype.getDaysInDuration = function(d) {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.getHoursInDuration = function(d) {
-    return d["hours"]();
+AuraLocalizationService.prototype.getHoursInDuration = function(duration) {
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    } else {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getHoursInDuration");
+    }
+    return duration["hours"]();
 };
 
 /**
@@ -672,7 +730,7 @@ AuraLocalizationService.prototype.getHoursInDuration = function(d) {
  */
 AuraLocalizationService.prototype.getLocalizedDateTimeLabels = function() {
     $A.deprecated("$A.localizationService.getLocalizedDateTimeLabels(): The labels from this method are no longer supported. This method will be removed in an upcoming release.",
-            null, null, null, "AuraLocalizationService.getLocalizedDateTimeLabels");
+            null, "AuraLocalizationService.getLocalizedDateTimeLabels");
 
     var langLocale = $A.get("$Locale.langLocale");
     var l = this.getAvailableMomentLocale(langLocale);
@@ -702,9 +760,9 @@ AuraLocalizationService.prototype.getToday = function(timezone, callback) {
  * @memberOf AuraLocalizationService
  * @example
  * var timezone = $A.get("$Locale.timezone");
- * var d = new Date();
+ * var date = new Date();
  * // Returns the date string in the format "2015-10-9"
- * $A.localizationService.getDateStringBasedOnTimezone(timezone, d, function(today){
+ * $A.localizationService.getDateStringBasedOnTimezone(timezone, date, function(today){
  *    console.log(today);
  * });
  * @public
@@ -723,21 +781,27 @@ AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timezo
 
 /**
  * Gets the number of milliseconds in a duration.
- * @param {Duration} d - The duration object returned by localizationService.duration
- * @return {Number} The number of milliseconds in d.
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
+ * @return {Number} The number of milliseconds in duration.
  * @memberOf AuraLocalizationService
  * @public
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.getMillisecondsInDuration = function(d) {
-    return d["milliseconds"]();
+AuraLocalizationService.prototype.getMillisecondsInDuration = function(duration) {
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    } else {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getMillisecondsInDuration");
+    }
+    return duration["milliseconds"]();
 };
 
 /**
  * Gets the number of minutes in a duration.
- * @param {Duration} d - The duration object returned by localizationService.duration
- * @return {Number} The number of minutes in d.
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
+ * @return {Number} The number of minutes in duration.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(60, 'second');
@@ -747,14 +811,20 @@ AuraLocalizationService.prototype.getMillisecondsInDuration = function(d) {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.getMinutesInDuration = function(d) {
-    return d["minutes"]();
+AuraLocalizationService.prototype.getMinutesInDuration = function(duration) {
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    } else {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getMinutesInDuration");
+    }
+    return duration["minutes"]();
 };
 
 /**
  * Gets the number of months in a duration.
- * @param {Duration} d - The duration object returned by localizationService.duration
- * @return {Number} The number of months in d.
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
+ * @return {Number} The number of months in duration.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(70, 'day');
@@ -764,14 +834,20 @@ AuraLocalizationService.prototype.getMinutesInDuration = function(d) {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.getMonthsInDuration = function(d) {
-    return d["months"]();
+AuraLocalizationService.prototype.getMonthsInDuration = function(duration) {
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    } else {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getMonthsInDuration");
+    }
+    return duration["months"]();
 };
 
 /**
  * Gets the number of seconds in a duration.
- * @param {Duration} d - The duration object returned by localizationService.duration
- * @return {Number} The number of seconds in d.
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
+ * @return {Number} The number of seconds in duration.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(3000, 'millisecond');
@@ -781,14 +857,20 @@ AuraLocalizationService.prototype.getMonthsInDuration = function(d) {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.getSecondsInDuration = function(d) {
-    return d["seconds"]();
+AuraLocalizationService.prototype.getSecondsInDuration = function(duration) {
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    } else {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getSecondsInDuration");
+    }
+    return duration["seconds"]();
 };
 
 /**
  * Gets the number of years in a duration.
- * @param {Duration} d - The duration object returned by localizationService.duration
- * @return {Number} The number of years in d.
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
+ * @return {Number} The number of years in duration.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(24, 'month');
@@ -798,8 +880,14 @@ AuraLocalizationService.prototype.getSecondsInDuration = function(d) {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.getYearsInDuration = function(d) {
-    return d["years"]();
+AuraLocalizationService.prototype.getYearsInDuration = function(duration) {
+    if (duration.getMomentDuration) {
+        duration = duration.getMomentDuration();
+    } else {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getYearsInDuration");
+    }
+    return duration["years"]();
 };
 
 /**
@@ -808,9 +896,9 @@ AuraLocalizationService.prototype.getYearsInDuration = function(d) {
  * @return {Boolean} Returns true if it uses period time view.
  * @memberOf AuraLocalizationService
  * @example
- * var d = new Date();
+ * var date = new Date();
  * // Returns false
- * $A.localizationService.isPeriodTimeView(d);
+ * $A.localizationService.isPeriodTimeView(date);
  * @public
  * @export
  * @platform
@@ -843,10 +931,10 @@ AuraLocalizationService.prototype.isPeriodTimeView = function(pattern) {
  * @return {Boolean} Returns true if date1 is after date2, or false otherwise.
  * @memberOf AuraLocalizationService
  * @example
- * var d = new Date();
- * var day = $A.localizationService.endOf(d, 'day');
- * // Returns false, since d is before day
- * $A.localizationService.isAfter(d, day);
+ * var date = new Date();
+ * var day = $A.localizationService.endOf(date, 'day');
+ * // Returns false, since date is before day
+ * $A.localizationService.isAfter(date, day);
  * @public
  * @export
  * @platform
@@ -864,10 +952,10 @@ AuraLocalizationService.prototype.isAfter = function(date1, date2, unit) {
  * @return {Boolean} Returns true if date1 is before date2, or false otherwise.
  * @memberOf AuraLocalizationService
  * @example
- * var d = new Date();
- * var day = $A.localizationService.endOf(d, 'day');
- * // Returns true, since d is before day
- * $A.localizationService.isBefore(d, day);
+ * var date = new Date();
+ * var day = $A.localizationService.endOf(date, 'day');
+ * // Returns true, since date is before day
+ * $A.localizationService.isBefore(date, day);
  * @public
  * @export
  * @platform
@@ -885,12 +973,12 @@ AuraLocalizationService.prototype.isBefore = function(date1, date2, unit) {
  * @return {Boolean} Returns true if date1 is the same as date2, or false otherwise.
  * @memberOf AuraLocalizationService
  * @example
- * var d = new date();
- * var day = $A.localizationService.endOf(d, 'day');
+ * var date = new date();
+ * var day = $A.localizationService.endOf(date, 'day');
  * // Returns false
- * $A.localizationService.isSame(d, day, 'hour');
+ * $A.localizationService.isSame(date, day, 'hour');
  * // Returns true
- * $A.localizationService.isSame(d, day, 'day');
+ * $A.localizationService.isSame(date, day, 'day');
  * @public
  * @export
  * @platform
@@ -928,7 +1016,7 @@ AuraLocalizationService.prototype.isBetween = function(date, fromDate, toDate, u
  * @param {String} dateTimeString - The datetime string to be parsed.
  * @param {String} parseFormat - A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
  * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
- * @param {Boolean} [strictParsing] - (optional) Set to true to turn off moment's forgiving parsing and use strict validation.
+ * @param {Boolean} [strictParsing] - (optional) Set to true to turn off forgiving parsing and use strict validation.
  * @return {Date} A JavaScript Date object, or null if dateTimeString is invalid
  * @memberOf AuraLocalizationService
  * @public
@@ -998,13 +1086,13 @@ AuraLocalizationService.prototype.parseDateTimeISO8601 = function(dateTimeString
  * @param {String} dateTimeString - The datetime string to be parsed
  * @param {String} parseFormat - A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
  * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
- * @param {Boolean} [strictParsing] - (optional) Set to true to turn off moment's forgiving parsing and use strict validation.
+ * @param {Boolean} [strictParsing] - (optional) Set to true to turn off forgiving parsing and use strict validation.
  * @return {Date} A JavaScript Date object, or null if dateTimeString is invalid
  * @memberOf AuraLocalizationService
  * @example
- * var d = "2015-10-9";
+ * var date = "2015-10-9";
  * // Returns "Thu Oct 08 2015 17:00:00 GMT-0700 (PDT)"
- * $A.localizationService.parseDateTimeUTC(d);
+ * $A.localizationService.parseDateTimeUTC(date);
  * @public
  * @export
  * @platform
@@ -1053,9 +1141,9 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, pa
  * @return {Date} A JavaScript Date object
  * @memberOf AuraLocalizationService
  * @example
- * var d = "2015-10-9";
+ * var date = "2015-10-9";
  * // Returns "Thu Oct 01 2015 00:00:00 GMT-0700 (PDT)"
- * $A.localizationService.startOf(d, 'month');
+ * $A.localizationService.startOf(date, 'month');
  * @public
  * @export
  * @platform
@@ -1070,9 +1158,9 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
  * @return {String} An ISO8601 string to represent passed in Date object.
  * @memberOf AuraLocalizationService
  * @example
- * var d = new Date();
+ * var date = new Date();
  * // Returns "2015-10-09T20:47:17.590Z"
- * $A.localizationService.toISOString(d);
+ * $A.localizationService.toISOString(date);
  * @deprecated
  * @public
  * @export
@@ -1080,7 +1168,7 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
  */
 AuraLocalizationService.prototype.toISOString = function(date) {
     $A.deprecated("$A.localizationService.toISOString(): The method is no longer supported by framework, and will be removed in an upcoming release.",
-            "Use native method Date.toISOString() instead", null, null, "AuraLocalizationService.toISOString");
+            "Use native method Date.toISOString() instead", "AuraLocalizationService.toISOString");
     if (date && $A.lockerService.instanceOf(date, Date)) {
         if (date.toISOString) {
             return date.toISOString();
@@ -1213,8 +1301,8 @@ AuraLocalizationService.prototype.translateToOtherCalendar = function(date) {
  * format = format.replace(":ss", "");
  * var langLocale = $A.get("$Locale.langLocale");
  * var timezone = $A.get("$Locale.timezone");
- * var d = new Date();
- * $A.localizationService.UTCToWallTime(d, timezone, function(walltime) {
+ * var date = new Date();
+ * $A.localizationService.UTCToWallTime(date, timezone, function(walltime) {
  *    // Returns the local time without the seconds, for example, 9:00 PM
  *    displayValue = $A.localizationService.formatDateTimeUTC(walltime, format, langLocale);
  * })
@@ -1277,7 +1365,7 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
  * @param {Function} callback - A function to be called after the conversion is done
  * @memberOf AuraLocalizationService
  * @example
- * $A.localizationService.WallTimeToUTC(d, timezone, function(utc) {
+ * $A.localizationService.WallTimeToUTC(date, timezone, function(utc) {
  *     displayDate = $A.localizationService.formatDateTime(utc, format, langLocale);
  * })
  * @public

@@ -1108,7 +1108,7 @@ AuraEventService.prototype.addEventHandler=function(component,eventDef,handler,p
  * @deprecated use <code>addEventHandler</code> instead.
  */
 AuraEventService.prototype.addHandler = function(config) {
-    //$A.deprecated("$A.eventService.addHandler(config) is no longer supported.","Please use Component#addEventHandler(event,handler,phase,includeFacets) instead.","2016/12/31","2017/07/13");
+    //$A.deprecated("$A.eventService.addHandler(config) is no longer supported.","Please use Component#addEventHandler(event,handler,phase,includeFacets) instead.");
     var includeFacets=config["includeFacets"];
     includeFacets=includeFacets !== undefined && includeFacets !== null && includeFacets !== false && includeFacets !== 0 && includeFacets !== "false" && includeFacets !== "" && includeFacets !== "f";
     var component=$A.getComponent(config["globalId"]);
@@ -1178,7 +1178,7 @@ AuraEventService.prototype.removeEventHandler=function(component,eventDef,handle
  * @export
  */
 AuraEventService.prototype.removeHandler = function(config) {
-    //$A.deprecated("$A.eventService.removeHandler(config) is no longer supported.","Please use $A.removeEventHandler(event,handler,phase) instead.","2016/12/31","2017/07/13");
+    //$A.deprecated("$A.eventService.removeHandler(config) is no longer supported.","Please use $A.removeEventHandler(event,handler,phase) instead.");
 
 //    config["event"] = DefDescriptor.normalize(config["event"]);
 

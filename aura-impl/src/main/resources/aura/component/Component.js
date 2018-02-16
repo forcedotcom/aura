@@ -605,7 +605,7 @@ Component.prototype.addEventHandler=function(event,handler,phase,includeFacets){
  */
 Component.prototype.addHandler = function(eventName, valueProvider, actionExpression, insert, phase, includeFacets) {
 // JBUCH:TODO
-//    $A.deprecated("Component.addHandler() is no longer supported.","Please use Component.addEventHandler() instead.","2016/12/31","2017/07/13");
+//    $A.deprecated("Component.addHandler() is no longer supported.","Please use Component.addEventHandler() instead.");
 //     if(!$A.util.isExpression(actionExpression)){
 //         actionExpression=valueProvider.getReference(actionExpression);
 //     }

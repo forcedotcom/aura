@@ -84,7 +84,7 @@ Logger.prototype.assert = function(condition, assertMessage) {
  * @export
  */
 Logger.prototype.error = function(msg, e) {
-    $A.deprecated("Logger.error is no longer supported.", null, "2017/09/20","2017/10/20", "Logger.error");
+    $A.deprecated("Logger.error is no longer supported.", null, "Logger.error");
 
     var logMsg = msg || "";
 
@@ -312,7 +312,7 @@ Logger.prototype.notify = function(level, msg, error) {
  * @export
  */
 Logger.prototype.getStackTrace = function(e, remove) {
-    $A.deprecated("Logger.getStackTrace is no longer supported.", null, "2017/09/20","2017/10/20", "Logger.getStackTrace");
+    $A.deprecated("Logger.getStackTrace is no longer supported.", null, "Logger.getStackTrace");
 
     // instances of $A.auraError keep stack in stackTrace property.
     if (e && e instanceof $A.auraError) {

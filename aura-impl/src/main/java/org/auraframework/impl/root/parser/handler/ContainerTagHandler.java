@@ -45,7 +45,9 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public abstract class ContainerTagHandler<T extends Definition> extends XMLHandler<T>
         implements ExpressionContainerHandler {
     public static final String SCRIPT_TAG = "script";
+    public static final String AURA_HTML_TAG = "aura:html";
     public static final String ATTRIBUTE_ACCESS = "access";
+    public static final String ATTRIBUTE_TAG = "tag";
     protected final boolean isInInternalNamespace;
     protected DefDescriptor<T> defDescriptor;
 
@@ -146,7 +148,9 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
             ContainerTagHandler<P> parentHandler) throws DefinitionNotFoundException {
         String tag = getTagName();
         if (HtmlTag.allowed(tag)) {
-            if (!parentHandler.getAllowsScript() && SCRIPT_TAG.equals(tag.toLowerCase())) {
+            String lowerTag = tag.toLowerCase();
+            boolean isScript = SCRIPT_TAG.equals(lowerTag) || (AURA_HTML_TAG.equals(lowerTag) && SCRIPT_TAG.equalsIgnoreCase(getAttributeValue(ATTRIBUTE_TAG)));
+            if (!parentHandler.getAllowsScript() && isScript) {
                 throw new AuraRuntimeException("script tags only allowed in templates", getLocation());
             }
             return new HTMLComponentDefRefHandler<>(parentHandler, tag, xmlReader, source, isInInternalNamespace,

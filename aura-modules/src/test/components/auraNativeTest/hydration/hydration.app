@@ -16,10 +16,10 @@
     limitations under the License.
 -->
 <aura:application
-    template="nativeTest:template"
+    template="auraNativeTest:template"
     access="global"
     useAppcache="false"
-    services="nativeTest:primerService"
+    services="auraNativeTest:primerService"
     controller="java://org.auraframework.impl.java.controller.ComponentTestController">
 
     <aura:attribute name="currentLabelValue" type="String" default="" />
@@ -27,7 +27,7 @@
 
     <section>
         <!-- We can also use the service as a regular library  -->
-        <nativeTest:primerService aura:id="primer" />
+        <auraNativeTest:primerService aura:id="primer" />
 
         <div class="examples">
 

@@ -9,6 +9,7 @@ function tmpl($api, $cmp, $slotset, $ctx) {
   } = $api;
 
   return [api_custom_element("x-test", _xTest, {
+    key: 1,
     "slotset": {
       "$default$": [api_dynamic($cmp.test)]
     }

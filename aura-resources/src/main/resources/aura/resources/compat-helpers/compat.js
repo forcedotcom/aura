@@ -44,7 +44,7 @@ function patchedAssign(replicaOrAny) {
                     setKey(to, nextKey, getKey(nextSource, nextKey));
                 }
             }
-            
+
         }
     }
     return to;
@@ -653,7 +653,7 @@ var FinalProxy$1 = FinalProxy;
 return FinalProxy$1;
 
 })));
-/** version: 0.17.15 */
+/** version: 0.17.17 */
 
 /* Transformed Polyfills + Babel helpers */
 // THIS POLYFILL HAS BEEN MODIFIED FROM THE SOURCE

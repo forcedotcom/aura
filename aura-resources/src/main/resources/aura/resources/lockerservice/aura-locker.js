@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-02-14
+ * Generated: 2018-02-22
  * Version: 0.3.12
  */
 
@@ -1377,29 +1377,58 @@ const metadata$4 = {
   removeEventListener: FUNCTION
 };
 
+const CALLBACK_ERROR = `Failed to execute 'addEventListener' on 'EventTarget': The callback provided as parameter 2 is not an object.`;
+
+function createSecureListener(st, listener, key) {
+  // If the listener is a function, we need to ignore any
+  // handleEvent property set on it.
+  if (typeof listener === 'function') {
+    return function(e) {
+      verifyAccess(st, listener, true);
+      const se = e && SecureDOMEvent(e, key);
+      listener.call(st, se);
+    };
+  }
+
+  if (typeof listener === 'object') {
+    // capture the pointer to prevent shape-shifting
+    const handleEvent = listener.handleEvent;
+    if (typeof handleEvent === 'function') {
+      return function(e) {
+        verifyAccess(st, listener, true);
+        const se = e && SecureDOMEvent(e, key);
+        handleEvent.call(listener, se);
+      };
+    }
+  }
+
+  return undefined;
+}
+
+function getSecureListener(st, listener, key) {
+  let sListener = getFromCache(listener, key);
+  if (!sListener) {
+    sListener = createSecureListener(st, listener, key);
+    addToCache(listener, sListener, key);
+    setKey(listener, key);
+  }
+  return sListener;
+}
+
 function createAddEventListenerDescriptor(st, el, key) {
   return {
     writable: true,
-    value: function(event, callback, useCapture) {
-      if (!callback) {
+    value: function(event, listener, useCapture) {
+      if (!listener) {
         return; // by spec, missing callback argument does not throw,
         // just ignores it.
       }
-
-      let sCallback = getFromCache(callback, key);
-      if (!sCallback) {
-        sCallback = function(e) {
-          verifyAccess(st, callback, true);
-          const se = e && SecureDOMEvent(e, key);
-          callback.call(st, se);
-        };
-
-        // Back reference for removeEventListener() support
-        addToCache(callback, sCallback, key);
-        setKey(callback, key);
+      if (Object(listener) !== listener) {
+        throw new TypeError(CALLBACK_ERROR);
       }
 
-      el.addEventListener(event, sCallback, useCapture);
+      const sListener = getSecureListener(st, listener, key);
+      el.addEventListener(event, sListener, useCapture);
     }
   };
 }
@@ -1426,29 +1455,21 @@ function addEventTargetMethods(st, raw, key) {
 
 function createAddEventListenerDescriptorStateless() {
   return {
-    value: function(event, callback, useCapture) {
-      if (!callback) {
+    value: function(event, listener, useCapture) {
+      if (!listener) {
         return; // by spec, missing callback argument does not throw,
         // just ignores it.
+      }
+      if (Object(listener) !== listener) {
+        throw new TypeError(CALLBACK_ERROR);
       }
 
       const so = this;
       const el = SecureObject.getRaw(so);
       const key = getKey(so);
-      let sCallback = getFromCache(callback, key);
-      if (!sCallback) {
-        sCallback = function(e) {
-          verifyAccess(so, callback, true);
-          const se = e && SecureDOMEvent(e, key);
-          callback.call(so, se);
-        };
 
-        // Back reference for removeEventListener() support
-        addToCache(callback, sCallback, key);
-        setKey(callback, key);
-      }
-
-      el.addEventListener(event, sCallback, useCapture);
+      const sListener = getSecureListener(so, listener, key);
+      el.addEventListener(event, sListener, useCapture);
     }
   };
 }

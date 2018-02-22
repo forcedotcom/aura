@@ -260,21 +260,23 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
      */
     @Override
     public synchronized void start() {
-        if (configAdapter.isFileMonitorEnabled() && !isStarted()) {
-            try {
-                watchService = FileSystems.getDefault().newWatchService();
-                setTerminateThread(false);
-                watchServiceThread = new Thread(this);
-                watchServiceThread.setDaemon(true);
-                watchServiceThread.start();
-                loggingService.info("[FileMonitorImpl] Aura file monitor started");
-            } catch (Exception e) {
-                loggingService.error("[FileMonitorImpl] Could not create aura WatchService.  File changes will not be noticed.", e);
-                if (watchService != null) {
-                    try {
-                        watchService.close();
-                    } catch (Exception e2) {}
-                    watchService = null;
+        if (configAdapter.isFileMonitorEnabled()) {
+            if (!isStarted()) {
+                try {
+                    watchService = FileSystems.getDefault().newWatchService();
+                    setTerminateThread(false);
+                    watchServiceThread = new Thread(this);
+                    watchServiceThread.setDaemon(true);
+                    watchServiceThread.start();
+                    loggingService.info("[FileMonitorImpl] Aura file monitor started");
+                } catch (Exception e) {
+                    loggingService.error("[FileMonitorImpl] Could not create aura WatchService.  File changes will not be noticed.", e);
+                    if (watchService != null) {
+                        try {
+                            watchService.close();
+                        } catch (Exception e2) {}
+                        watchService = null;
+                    }
                 }
             }
         } else {

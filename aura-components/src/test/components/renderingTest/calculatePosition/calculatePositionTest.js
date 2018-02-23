@@ -162,7 +162,7 @@
             for (var i = 0, len = elementsOnDOM.length; i < len; i++) {
                 var element = elementsOnDOM[i];
                 outputElement.removeChild(element);
-                fragment.insertBefore(element, fragment.firstElementChild)
+                fragment.insertBefore(element, fragment.firstChild)
             }
             outputElement.appendChild(fragment, previousSibling);
 

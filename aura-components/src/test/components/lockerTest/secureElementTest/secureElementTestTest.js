@@ -494,6 +494,30 @@
         }
     },
 
+    testAddEventListenerFunctionListener: {
+        test: function(cmp) {
+            cmp.testAddEventListenerFunctionListener();
+        }
+    },
+
+    testAddEventListenerObjectListener: {
+        test: function(cmp) {
+            cmp.testAddEventListenerObjectListener();
+        }
+    },
+
+    testAddEventListenerStaticMethod: {
+        test: function(cmp) {
+            cmp.testAddEventListenerStaticMethod();
+        }
+    },
+
+    testAddEventListenerThrowsInvalidListener: {
+        test: function(cmp) {
+            cmp.testAddEventListenerThrowsInvalidListener();
+        }
+    },
+
     testSvgGetBBox: {
         test: function(cmp) {
             cmp.testSvgGetBBox();

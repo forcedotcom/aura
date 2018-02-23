@@ -41,6 +41,10 @@
     <aura:method name="testInnerHTMLSupportsUseTagForSvgElement" action="{!c.testInnerHTMLSupportsUseTagForSvgElement}"/>
     <aura:method name="testTextContent" action="{!c.testTextContent}"/>
     <aura:method name="testInnerText" action="{!c.testInnerText}"/>
+    <aura:method name="testAddEventListenerFunctionListener" action="{!c.testAddEventListenerFunctionListener}"/>
+    <aura:method name="testAddEventListenerObjectListener" action="{!c.testAddEventListenerObjectListener}"/>
+    <aura:method name="testAddEventListenerStaticMethod" action="{!c.testAddEventListenerStaticMethod}"/>
+    <aura:method name="testAddEventListenerThrowsInvalidListener" action="{!c.testAddEventListenerThrowsInvalidListener}"/>
     <aura:method name="testAddEventListenerMultipleCalls" action="{!c.testAddEventListenerMultipleCalls}"/>
     <aura:method name="testSvgGetBBox" action="{!c.testSvgGetBBox}"/>r
     <aura:method name="testScalarExpression" action="{!c.testScalarExpression}"/>

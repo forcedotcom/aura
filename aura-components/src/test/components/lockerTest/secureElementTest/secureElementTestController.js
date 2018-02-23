@@ -286,6 +286,86 @@
         testUtils.assertEquals(1.3, counter);
     },
 
+    testAddEventListenerFunctionListener: function(cmp, event, helper) {        
+        var testUtils = cmp.get("v.testUtils");
+        var element = cmp.find("title").getElement();
+
+        var handlerClicked = false;
+        var listener = function(ev) {
+            testUtils.assertEquals(this, element, "Execution scope for function listener must be element");
+            handlerClicked = true;
+        }
+        element.addEventListener('click', listener);
+        testUtils.addWaitForWithFailureMessage(
+            true,
+            function() { return handlerClicked; },
+            "Event handler was not called"
+        );
+        testUtils.clickOrTouch(element);
+        element.removeEventListener('click', listener);
+    },
+
+    testAddEventListenerObjectListener: function(cmp, event, help) {
+        var testUtils = cmp.get("v.testUtils");
+        var element = cmp.find("title").getElement();
+
+        var handlerClicked = false;
+        var listener = {
+            handleEvent: function(ev) {
+                testUtils.assertEquals(this, listener, "Execution scope for function listener must be listener object");
+                handlerClicked = true;    
+            }
+        };
+        
+        element.addEventListener('click', listener);
+        testUtils.addWaitForWithFailureMessage(
+            true,
+            function() { return handlerClicked; },
+            "Event handler was not called"
+        );
+        testUtils.clickOrTouch(element);
+        element.removeEventListener('click', listener);
+    },
+
+    testAddEventListenerStaticMethod: function(cmp, event, helper) {
+        var testUtils = cmp.get("v.testUtils");
+        var element = cmp.find("title").getElement();
+
+        var handlerClicked = false;
+        var listener = function() {
+            testUtils.assertEquals(this, element, "Execution scope for function listener must be element");
+            handlerClicked = true;
+        };
+        listener.handleEvent = function() {
+            handlerClicked = false;
+        }
+              
+        element.addEventListener('click', listener);
+        testUtils.addWaitForWithFailureMessage(
+            true,
+            function() { return handlerClicked; },
+            "Event handler was not called"
+        );
+        testUtils.clickOrTouch(element);
+        element.removeEventListener('click', listener);
+    },
+
+    testAddEventListenerThrowsInvalidListener: function(cmp, event, helper) {
+        var testUtils = cmp.get("v.testUtils");        
+        var element = cmp.find("title").getElement();
+
+        try {
+            element.addEventListener('click', 1);
+        } catch(e) {
+            testUtils.assertEquals(
+                e.message, 
+                "Failed to execute 'addEventListener' on 'EventTarget': The callback provided as parameter 2 is not an object.",
+                "Invalid error message was thrown"
+            );
+            testUtils.assertTrue(e instanceof TypeError, "Error type must be TypeError");
+        }
+    },
+
     testSvgGetBBox: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var expected = {

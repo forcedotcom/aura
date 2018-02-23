@@ -437,6 +437,9 @@ InteropComponent.prototype.render = function () {
 };
 
 InteropComponent.prototype.setupInteropInstance = function () {
+    // W-4708703 This cache needs to be init/reset whenever we setup an interop instance
+    this.currentClassMap = {};
+
     var Ctor = this.interopClass;
     var element = $A.componentService.moduleEngine['createElement'](this.componentDef.elementName, { 'is': Ctor });
     var cmp = this;

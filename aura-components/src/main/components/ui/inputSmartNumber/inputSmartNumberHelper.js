@@ -81,7 +81,7 @@
         return lib.formatNumber(lib.unFormatNumber(string, formatter), formatter) === string;
     },
     isPercentStyle : function (cmp) {
-        return cmp.get('v.format').indexOf('%') !== -1;
+        return (cmp.get('v.format') || '').indexOf('%') !== -1;
     },
     hasInputElementFocus : function (cmp) {
        return this.getElementInput(cmp) ===  document.activeElement;

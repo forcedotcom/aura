@@ -10516,7 +10516,7 @@ return {
                     "target":"ui:tabBar",
                     "path":"v.class"
                   },
-                  "role":"application tablist"
+                  "role":"tablist"
                 }
               },
               "tag":{

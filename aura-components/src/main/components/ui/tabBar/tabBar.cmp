@@ -55,7 +55,7 @@
         <ui:resizeObserver onresize="{!c.onResize}"/>
     </aura:if>
 
-    <div class="{!v.class}" aura:id="div" role="application tablist">
+    <div class="{!v.class}" aura:id="div" role="tablist">
         <ul class="tabs__nav" aura:id="tabItemsContainer" role="presentation" onkeydown="{!c.onKeyDown}">
             {!v.tabHeaders}
             <aura:if isTrue="{!v.useOverflowMenu}">

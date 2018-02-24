@@ -23,13 +23,7 @@ Aura.ExportsModule = {
         }
     },
 
-    "labels": function (obj) {
-        return Object.keys(obj).reduce(function(r, cmpKey) {
-            var key = obj[cmpKey];
-            r[cmpKey] = $A.get('$Label.' + key);
-            return r;
-        }, {});
-    },
+    "labels": function () {},
 
     /**
      * Execute a global controller action.
@@ -92,15 +86,5 @@ Aura.ExportsModule = {
             $A.clientService.releaseCurrentAccess();
         }
     },
-    "logInteraction": function (target, scope, context, eventSource) {
-        $A.metricsService.transaction("ltng", "interaction", { "context": {
-            "eventSource" : eventSource || "click",
-            "eventType"   : "user",
-            "locator"     : {
-                    "target"  : target,
-                    "scope"   : scope,
-                    "context" : context
-            }
-        }});
-    }
+    "logInteraction": function () {}
 };

@@ -198,7 +198,23 @@ const LABEL_EXAMPLE_MOCK =
   }
 }`;
 
-const PRIMED_ACTIONS = [LABEL_EXAMPLE_MOCK]; // This will come from bridge
+const ERROR_MOCK1_HTTP_STATUS_CODE = 200;
+const ERROR_MOCK1_CONTENT =
+`while(1);
+*/{
+  "event":{
+    "descriptor":"markup://aura:invalidSession",
+    "attributes":{
+      "values":{
+        "newToken":"HCQAHBgEMTAwMBQCGAcxMDAwMjA2GAcxMDAwMjA2ABQCGfMQlptS_K3a_z6Oder_yrUSnhb8pYKjtVgAGfMgjPuTfWw-1vmE8Yszmy8Grk3L6AqoWwc_TAJBFZtfn8cA"
+      }
+    }
+  },
+  "exceptionEvent":true
+}/*ERROR*/`;
+
+const PRIMED_ACTIONS = [{status:200, responseText:LABEL_EXAMPLE_MOCK}]; // This will come from bridge
+const ERROR_RESULT =   [{status: ERROR_MOCK1_HTTP_STATUS_CODE, responseText: ERROR_MOCK1_CONTENT}];
 
 // Returns a promise for when the bridge return the actions from native land
 export async function getActionsFromBridge() {
@@ -209,4 +225,8 @@ export async function getActionsFromBridge() {
 export async function sendActionsToBridge() {
     // TODO: connect wit the real cordova
     return true;
+}
+
+export async function getErrorResponse() {
+    return ERROR_RESULT;
 }

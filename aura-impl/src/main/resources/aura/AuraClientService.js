@@ -3354,33 +3354,38 @@ AuraClientService.prototype.hydrateActions = function(actions, preloadMapId, res
  * It gets the actions that were preloaded ahead of time, a map with actionIds, and the prelaod XHR response object
  * Basically is like a regular server action but re-wiring the server results manually
  *
+ * @param {Object[]} rawResponses - collection of rawResponse objects with shape {{Number}status, {String}responseText}
  * @return {Promise<ReifyResult>} a promise that resolves to the actions contained in the rawResponse
  */
 AuraClientService.prototype.reifyActions = function(rawResponses) {
     var context = $A.getContext();
-    var actionsToPersist = [], nonStorableActions = [];
+    var actionsToPersist = [], nonStorableActions = [], error = null;
     rawResponses.forEach(function (rawResponse) {
-        var response = this.decode({ "status": 200, "responseText" : rawResponse });
-        var reponsePayload = response["message"];
-        var responseContext = reponsePayload["context"];
-        var responseActions = reponsePayload["actions"];
-
-        // Merge Context
-        context['merge'](responseContext, true /* ignoreMissmatch */);
-        $A.componentService.saveDefsToStorage(responseContext, context);
-
-        responseActions.forEach(function (responseAction) {
-            var action = this.buildStorableServerAction(responseAction);
-            if (action) {
-                actionsToPersist.push(action);
-            } else {
-                nonStorableActions.push(responseAction);
-            }
-        }, this);
+        var response = this.decode(rawResponse);
+        if (response["status"] === "SUCCESS") {
+            var reponsePayload = response["message"];
+            var responseContext = reponsePayload["context"];
+            var responseActions = reponsePayload["actions"];
+    
+            // Merge Context
+            context['merge'](responseContext, true /* ignoreMissmatch */);
+            $A.componentService.saveDefsToStorage(responseContext, context);
+    
+            responseActions.forEach(function (responseAction) {
+                var action = this.buildStorableServerAction(responseAction);
+                if (action) {
+                    actionsToPersist.push(action);
+                } else {
+                    nonStorableActions.push(responseAction);
+                }
+            }, this);
+        } else {
+            error = {"status": response["status"], "message": response["message"]};
+        }
     }, this);
 
     return this.persistStorableActions(actionsToPersist).then(function () {
-        return { "storableActions": actionsToPersist, "nonStorableActions": nonStorableActions };
+        return { "storableActions": actionsToPersist, "nonStorableActions": nonStorableActions, "error": error };
     });
 };
 

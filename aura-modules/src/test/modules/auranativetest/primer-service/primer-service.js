@@ -1,4 +1,4 @@
-import { getActionsFromBridge, sendActionsToBridge } from "./cordova-bridge";
+import { getActionsFromBridge, sendActionsToBridge, getErrorResponse } from "./cordova-bridge";
 
 let reifyApi;
 let prepareRequestApi;
@@ -20,11 +20,17 @@ export default function ActionHydration({ reifyActions, prepareRequest }) {
 
 export async function primeAuraActions(auraActions) {
     const result = await fetchActionsToPrime(auraActions);
-    const results = [result];
+    const results = [{status:200, responseText:result}];
     await sendActionsToBridge(results);
     const reifyResult = await reifyApi(results);
     // console.log('>> storable actions returned: ', reifyResult.storableActions.length);
     return reifyResult.storableActions;
+}
+
+export async function submitError() {
+    const mockError = await getErrorResponse();
+    const reifyResult = await reifyApi(mockError);
+    return reifyResult.error;
 }
 
 /*

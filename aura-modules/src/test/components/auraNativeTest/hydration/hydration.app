@@ -24,6 +24,8 @@
 
     <aura:attribute name="currentLabelValue" type="String" default="" />
     <aura:attribute name="otherLabel" type="String" default="" />
+    <aura:attribute name="error" type="Map" default="" />
+    <aura:attribute name="stringifiedError" type="String" default="" />
 
     <section>
         <!-- We can also use the service as a regular library  -->
@@ -36,7 +38,7 @@
                 <p>Label (If priming is correct value should be "Today"): <span>{!v.currentLabelValue}</span></p>
             </div>
 
-            <div style="margin: 10px;padding: 10px; border:1px solid red">
+            <div style="margin: 10px;padding: 10px; border:1px solid black">
                 <ui:button press="{!c.primeAnAction}" label="Test prime an action" />
                 <ui:button press="{!c.runAction}" label="Run an action" />
                 <p>Once primed we should see no request</p>
@@ -46,6 +48,12 @@
                 <ui:button press="{!c.primeLabel}" label="Test priming a label" />
                 <ui:button press="{!c.runLabel}" label="Show label" />
                 <p>Once primed we should see no request <span>{!v.otherLabel}</span></p>
+            </div>
+
+            <div style="margin: 10px;padding: 10px; border:1px solid red">
+                <ui:button press="{!c.submitErrorToPrimingService}" label="Test Aura Servlet error" />
+                <ui:button press="{!c.showErrorResult}" label="Show Error Result" />
+                <p>Priming service should parse the Servlet's error payload <span>{!v.stringifiedError}</span></p>
             </div>
         </div>
     </section>

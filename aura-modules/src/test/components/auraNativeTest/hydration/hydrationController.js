@@ -36,5 +36,16 @@
         var GPV = '$Label';
         var label = $A.get(GPV + ".Related_Lists.task_mode_today");
         cmp.set('v.otherLabel', label);
+    },
+    
+    submitErrorToPrimingService: function (cmp) {
+        var primer = cmp.find('primer');
+        primer.submitError().then(function(errResult){
+            cmp.set('v.error', errResult);
+        });
+    },
+    
+    showErrorResult: function (cmp) {
+        cmp.set('v.stringifiedError', JSON.stringify(cmp.get('v.error')));
     }
 })

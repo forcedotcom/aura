@@ -41,6 +41,7 @@ import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.modules.impl.metadata.ModulesMetadataService;
 import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.Location;
@@ -157,13 +158,10 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setValidTags(this.validTags);
 
         Set<String> publicProperties = compilerData.publicProperties;
-        if (publicProperties != null) {
-            Iterator<String> iter = publicProperties.iterator();
-            while (iter.hasNext()) {
-                DefDescriptor<AttributeDef> attributeDefDesc = new DefDescriptorImpl<>(null, null, iter.next(), AttributeDef.class);
-                AttributeDef attributeDef = new AttributeDefImpl(attributeDefDesc, null, null, null, false, null, null, null);
-                builder.addAttributeDef(attributeDefDesc, attributeDef);
-            }
+        for (String attribute : publicProperties) {
+            DefDescriptor<AttributeDef> attributeDefDesc = new DefDescriptorImpl<>(null, null, attribute, AttributeDef.class);
+            AttributeDef attributeDef = new AttributeDefImpl(attributeDefDesc, null, null, null, false, null, null, new DefinitionAccessImpl(Access.GLOBAL));
+            builder.addAttributeDef(attributeDefDesc, attributeDef);
         }
 
         // json metadata (lightning.json)

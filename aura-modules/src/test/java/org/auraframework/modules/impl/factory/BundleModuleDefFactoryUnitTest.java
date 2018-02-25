@@ -26,11 +26,13 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
+import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
@@ -123,7 +125,7 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.PROD_COMPAT, mockCompiled);
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
-        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet());
+        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet("prop1", "prop2", "prop3"), Sets.newHashSet());
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
@@ -154,6 +156,9 @@ public class BundleModuleDefFactoryUnitTest {
 
         assertEquals("minVersion from json file is different", new Double(12.3), moduleDef.getMinVersion());
         assertTrue("access should be global with json file", moduleDef.getAccess().isGlobal());
+
+        Collection<AttributeDef> attributes = moduleDef.getAttributeDefs().values();
+        assertEquals("Module should have 3 attributes", 3, attributes.size());
     }
 
     @Test

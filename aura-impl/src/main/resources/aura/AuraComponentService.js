@@ -704,8 +704,18 @@ AuraComponentService.prototype.addComponentClass = function(descriptor, exporter
 AuraComponentService.prototype.initModuleDefs = function(modules) {
     var moduleDefRegistry = this.moduleDefRegistry;
 
+    var code = Json.ApplicationKey.CODE;
+    var minVersion = Json.ApplicationKey.MINVERSION;
+    var access = Json.ApplicationKey.ACCESS;
+    var requireLocker = Json.ApplicationKey.REQUIRELOCKER;
+    var attributeDefs = Json.ApplicationKey.ATTRIBUTEDEFS;
+
     modules.forEach(function (module) {
-        var exporter = { "exporter": module[Json.ApplicationKey.CODE], "minVersion": module[Json.ApplicationKey.MINVERSION], "access": module[Json.ApplicationKey.ACCESS], "requireLocker": module[Json.ApplicationKey.REQUIRELOCKER] };
+        var exporter = { "exporter": module[code] };
+        exporter[minVersion] = module[minVersion];
+        exporter[access] = module[access];
+        exporter[requireLocker] = module[requireLocker];
+        exporter[attributeDefs] = module[attributeDefs];
         moduleDefRegistry[module[Json.ApplicationKey.DESCRIPTOR]] = moduleDefRegistry[module[Json.ApplicationKey.NAME]] = exporter;
     });
 };
@@ -822,7 +832,7 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
     var isInternalNamespace = $A.clientService.isInternalNamespace(namespace);
     if (entry.definition && $A.util.isFunction(entry.definition)) {
         // Decide whether the module should be lockerized or not
-        if ((!isInternalNamespace || (isInternalNamespace && entry["requireLocker"]))) {
+        if ((!isInternalNamespace || (isInternalNamespace && entry[Json.ApplicationKey.REQUIRELOCKER]))) {
             // Eval the definition in a restricted scope
             entry.definition = $A.lockerService.createForModule(entry.definition.toString(), defDescriptor);
 
@@ -870,8 +880,9 @@ AuraComponentService.prototype.createInteropComponentDef = function (descriptor)
         definition   : module.definition,
         descriptor   : module.descriptor,
         moduleName   : module.moduleName,
-        access       : module["access"],
-        minVersion   : module["minVersion"],
+        access       : module[Json.ApplicationKey.ACCESS],
+        minVersion   : module[Json.ApplicationKey.MINVERSION],
+        attributeDefs: module[Json.ApplicationKey.ATTRIBUTEDEFS],
         interopClass : Ctor
     });
 

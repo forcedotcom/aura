@@ -134,7 +134,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
             json.writeLiteral(",");
             json.writeValue(defaultValue.getValue());
         }
-        else {
+        else if (typeDefDescriptor != null) {
             if (typeDefDescriptor.getQualifiedName().equals("aura://List") || typeDefDescriptor.getName().endsWith("[]")) {
                 json.writeLiteral(",[]");
             }

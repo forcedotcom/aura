@@ -35,6 +35,7 @@ function InteropComponentDef(config) {
     this.elementName      = this.moduleName;
     this.interopClassName = this.descriptor.getNamespace() + "$" + this.descriptor.getName();
     this.minVersion       = config.minVersion;
+    this.attributeDefs    = new AttributeDefSet(config.attributeDefs, this.descriptor.getNamespace());
 
     if (typeof this.interopClass === 'function') {
         this.interopDef = $A.componentService.moduleEngine['getComponentDef'](this.interopClass);

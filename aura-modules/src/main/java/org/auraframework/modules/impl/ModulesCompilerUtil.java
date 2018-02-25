@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -152,7 +153,7 @@ public final class ModulesCompilerUtil {
 
     static Set<String> parsePublicProperties(JSONArray input) {
         if (input == null) {
-            return null;
+            return Collections.emptySet();
         }
 
         Set<String> ret = new HashSet<>();
@@ -174,7 +175,7 @@ public final class ModulesCompilerUtil {
 
     static Set<WireDecoration> parseWireDecorations(JSONArray input) {
         if (input == null) {
-            return null;
+            return Collections.emptySet();
         }
 
         Set<WireDecoration> wireDecorations = new HashSet<>();
@@ -258,8 +259,8 @@ public final class ModulesCompilerUtil {
         }
 
         JSONArray bundleDecorators = metadata.getJSONArray("decorators");
-        Set<String> publicProperties = null;
-        Set<WireDecoration> wireDecorations = null;
+        Set<String> publicProperties = Collections.emptySet();
+        Set<WireDecoration> wireDecorations = Collections.emptySet();
         for (int i = 0; i < bundleDecorators.length(); i++) {
             JSONObject decorator = bundleDecorators.getJSONObject(i);
             String type = decorator.getString("type");

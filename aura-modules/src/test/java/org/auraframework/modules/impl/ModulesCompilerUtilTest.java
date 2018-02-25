@@ -86,8 +86,8 @@ public class ModulesCompilerUtilTest extends UnitTestCase {
     }
 
     @Test
-    public void testParsePublicPropertiesWithNullReturnsNull() {
-        assertNull(ModulesCompilerUtil.parsePublicProperties(null));
+    public void testParsePublicPropertiesWithNullReturnsEmpty() {
+        assertNotNull(ModulesCompilerUtil.parsePublicProperties(null));
     }
 
     @Test
@@ -112,8 +112,8 @@ public class ModulesCompilerUtilTest extends UnitTestCase {
     }
 
     @Test
-    public void testParseWireDecorationsWithNullReturnsNull() {
-        assertNull(ModulesCompilerUtil.parseWireDecorations(null));
+    public void testParseWireDecorationsWithNullReturnsEmpty() {
+        assertNotNull(ModulesCompilerUtil.parseWireDecorations(null));
     }
 
     @Test

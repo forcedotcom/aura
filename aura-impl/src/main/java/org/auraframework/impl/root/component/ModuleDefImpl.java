@@ -38,6 +38,7 @@ import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -52,7 +53,7 @@ import com.google.common.collect.Sets;
  */
 public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleDef {
 
-    private static final long serialVersionUID = 1174771515578634863L;
+    private static final long serialVersionUID = -5852365757969305423L;
 
     private String path;
     private final Set<String> moduleDependencies;
@@ -113,21 +114,33 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
                 ( minified ? CodeType.PROD : CodeType.DEV );
         String code = this.codes.get(codeType);
 
-        json.writeMapBegin();
-        json.writeMapEntry(ApplicationKey.DESCRIPTOR, getDescriptor().getQualifiedName());
-        json.writeMapEntry(ApplicationKey.NAME, this.customElementName);
-        json.writeValue(getAccess());
-        json.writeMapEntry(ApplicationKey.CODE, code);
-        if (this.minVersion != null) {
-            json.writeMapEntry(ApplicationKey.MINVERSION, this.minVersion);
+        try {
+
+            json.writeMapBegin();
+            json.writeMapEntry(ApplicationKey.DESCRIPTOR, getDescriptor().getQualifiedName());
+            json.writeMapEntry(ApplicationKey.NAME, this.customElementName);
+            json.writeValue(getAccess());
+            json.writeMapEntry(ApplicationKey.CODE, code);
+            if (this.minVersion != null) {
+                json.writeMapEntry(ApplicationKey.MINVERSION, this.minVersion);
+            }
+            if (this.apiVersion != null) {
+                json.writeMapEntry(ApplicationKey.APIVERSION, this.apiVersion);
+            }
+            if (this.requireLocker) {
+                json.writeMapEntry(ApplicationKey.REQUIRELOCKER, this.requireLocker);
+            }
+
+            Collection<AttributeDef> attributeDefs = this.getAttributeDefs().values();
+            if (!attributeDefs.isEmpty()) {
+                json.writeMapEntry(ApplicationKey.ATTRIBUTEDEFS, attributeDefs);
+            }
+
+            json.writeMapEnd();
+
+        } catch (QuickFixException qfe) {
+            throw new AuraUnhandledException("Unhandled module exception", qfe);
         }
-        if (this.apiVersion != null) {
-            json.writeMapEntry(ApplicationKey.APIVERSION, this.apiVersion);
-        }
-        if (this.requireLocker) {
-            json.writeMapEntry(ApplicationKey.REQUIRELOCKER, this.requireLocker);
-        }
-        json.writeMapEnd();
     }
 
     @Override

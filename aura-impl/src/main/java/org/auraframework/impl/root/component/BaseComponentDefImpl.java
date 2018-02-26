@@ -155,6 +155,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     private transient Boolean localDeps = null;
     private transient QuickFixException componentBuildError;
+    protected transient String serializedJSON;
 
     private static <X extends Definition> DefDescriptor<X> getFirst(List<DefDescriptor<X>> list) {
         return (list != null && list.size() > 0) ? list.get(0) : null;
@@ -1017,6 +1018,28 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         return false;
     }
 
+    protected void serializeStyles(Json json) throws IOException {
+        json.writeMapEntry(ApplicationKey.STYLEDEF, getStyleDef());
+        if (flavoredStyle != null) {
+            json.writeMapEntry(ApplicationKey.FLAVOREDSTYLEDEF, flavoredStyle);
+        }
+    }
+    
+    protected void serializeContextDependencies(AuraContext context, Json json) throws IOException {
+        boolean preloading = context.isPreloading();
+        if (preloading) {
+            json.writeMapEntry(ApplicationKey.CSSPRELOADED, preloading);
+        }
+        
+        if(!context.getClientClassLoaded(descriptor)) {
+            boolean minify = context.getMode().minify();
+            String code = getCode(minify);
+            if (!AuraTextUtil.isNullEmptyOrWhitespace(code)) {
+                json.writeMapEntry(ApplicationKey.COMPONENTCLASS, code);
+            }
+        }
+    }
+    
     /**
      * Serialize this component to json. The output will include all of the attributes, events, and handlers inherited.
      * It doesn't yet include inherited ComponentDefRefs, but maybe it should.
@@ -1037,25 +1060,18 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 json.writeValue(getAccess());
                 json.writeMapEntry(ApplicationKey.DESCRIPTOR, descriptor);
 
-                json.writeMapEntry(ApplicationKey.STYLEDEF, getStyleDef());
-                if (flavoredStyle != null) {
-                    json.writeMapEntry(ApplicationKey.FLAVOREDSTYLEDEF, flavoredStyle);
-                }
-
+                serializeStyles(json);
+                
+                json.startCapturing();
                 ControllerDef controllerDef = getControllerDef();
                 if (controllerDef != null && hasServerAction(controllerDef)) {
                     json.writeMapEntry(ApplicationKey.CONTROLLERDEF, controllerDef);
                 }
-
+                
                 json.writeMapEntry(ApplicationKey.MODELDEF, getModelDef());
 
                 if (getSuperDef() != null && !getSuperDef().getDescriptor().getQualifiedName().equals("markup://aura:component")) {
                     json.writeMapEntry(ApplicationKey.SUPERDEF, getSuperDef().getDescriptor());
-                }
-
-                boolean preloading = context.isPreloading();
-                if (preloading) {
-                    json.writeMapEntry(ApplicationKey.CSSPRELOADED, preloading);
                 }
 
                 Collection<AttributeDef> attributeDefs = getAttributeDefs().values();
@@ -1124,21 +1140,16 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry(ApplicationKey.DYNAMICALLYFLAVORABLE, dynamicallyFlavorable);
                 }
 
-                if(!context.getClientClassLoaded(descriptor)) {
-                    boolean minify = context.getMode().minify();
-                    String code = getCode(minify);
-                    if (!AuraTextUtil.isNullEmptyOrWhitespace(code)) {
-                        json.writeMapEntry(ApplicationKey.COMPONENTCLASS, code);
-                    }
-                }
-
                 if(this.minVersion != null) {
                     json.writeMapEntry(ApplicationKey.MINVERSION, this.minVersion);
                 }
 
                 serializeFields(json);
+                serializedJSON = json.stopCapturing();
+                
+                serializeContextDependencies(context, json);
+                
                 json.writeMapEnd();
-
                 serializationContext.setSerializing(false);
             }
         } catch (QuickFixException e) {

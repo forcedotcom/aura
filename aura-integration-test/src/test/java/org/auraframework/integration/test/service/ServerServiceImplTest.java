@@ -32,7 +32,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -58,13 +57,10 @@ import org.auraframework.system.Message;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonReader;
-import org.auraframework.util.json.JsonStreamReader;
+import org.auraframework.util.json.*;
 import org.auraframework.validation.ReferenceValidationContext;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -611,7 +607,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = definitionService
                 .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);
         AuraContext context = contextService
-                .startContext(Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, cmpDesc);
+                .startContext(Mode.UTEST, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, cmpDesc);
         final String uid = definitionService.getUid(null, cmpDesc);
         context.addLoaded(cmpDesc, uid);
         Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
@@ -727,8 +723,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         }
         source.append("</aura:application>");
 
-        getDefinitionsOutput(source.toString(),
-                AuraContext.Mode.PROD);
+        getDefinitionsOutput(source.toString(), AuraContext.Mode.UTEST);
 //        assertFalse(
 //                "There are syntax errors preventing compression of application javascript",
 //                js.contains("There are errors preventing this file from being minimized!"));

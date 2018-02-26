@@ -706,7 +706,6 @@ return {
 return {
   "xs":"G",
   "descriptor":"markup://aura:text",
-  "css":true,
   "ad":[
     ["value","aura://String","G",false],
     ["truncate","aura://Integer","I",false],
@@ -715,7 +714,8 @@ return {
   ],
   "i":[
     "markup://aura:rootComponent"
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://aura:placeholder", (function (){/*$A.componentService.addComponentClass("markup://aura:placeholder",function() {
 return {
@@ -818,7 +818,6 @@ return {
     "descriptor":"css://aura.placeholder",
     "cl":"auraPlaceholder"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","I",false,[
       {
@@ -870,7 +869,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://aura:component", (function (){/*$A.componentService.addComponentClass("markup://aura:component",function() {
 return {
@@ -900,14 +900,14 @@ return {
 return {
   "xs":"G",
   "descriptor":"markup://aura:component",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]]
   ],
   "i":[
     "markup://aura:rootComponent"
   ],
-  "ab":true
+  "ab":true,
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://aura:expression", (function (){/*$A.componentService.addComponentClass("markup://aura:expression",function() {
 return {
@@ -919,13 +919,13 @@ return {
 return {
   "xs":"G",
   "descriptor":"markup://aura:expression",
-  "css":true,
   "ad":[
     ["value","aura://String","G",false]
   ],
   "i":[
     "markup://aura:rootComponent"
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://aura:html", (function (){/*$A.componentService.addComponentClass("markup://aura:html",function() {
 return {
@@ -937,7 +937,6 @@ return {
 return {
   "xs":"G",
   "descriptor":"markup://aura:html",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["tag","aura://String","G",false],
@@ -945,7 +944,8 @@ return {
   ],
   "i":[
     "markup://aura:rootComponent"
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://aura:if", (function (){/*$A.componentService.addComponentClass("markup://aura:if",function() {
 return {
@@ -983,7 +983,6 @@ return {
 return {
   "xs":"G",
   "descriptor":"markup://aura:if",
-  "css":true,
   "ad":[
     ["isTrue","aura://Boolean","G",true],
     ["body","aura://Aura.ComponentDefRef[]","G",true,[]],
@@ -1020,7 +1019,8 @@ return {
       },
       "n":"change"
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:actionMenuItem", (function (){/*$A.componentService.addComponentClass("markup://ui:actionMenuItem",function() {
 return {
@@ -1087,7 +1087,6 @@ return {
   "xs":"G",
   "descriptor":"markup://ui:actionMenuItem",
   "su":"markup://ui:menuItem",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -1280,7 +1279,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:checkboxMenuItem", (function (){/*$A.componentService.addComponentClass("markup://ui:checkboxMenuItem",function() {
 return {
@@ -1372,7 +1372,6 @@ return {
     "cl":"uiCheckboxMenuItem"
   },
   "su":"markup://ui:menuItem",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -1563,7 +1562,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:interactive", (function (){/*$A.componentService.addComponentClass("markup://ui:interactive",function() {
 return {
@@ -1750,7 +1750,6 @@ return {
 return {
   "xs":"I",
   "descriptor":"markup://ui:interactive",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -1860,7 +1859,8 @@ return {
       ]
     }
   ],
-  "ab":true
+  "ab":true,
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:menuItemSeparator", (function (){/*$A.componentService.addComponentClass("markup://ui:menuItemSeparator",function() {
 return {
@@ -1877,7 +1877,6 @@ return {
     "descriptor":"css://ui.menuItemSeparator",
     "cl":"uiMenuItemSeparator"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -1961,7 +1960,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:radioMenuItem", (function (){/*$A.componentService.addComponentClass("markup://ui:radioMenuItem",function() {
 return {
@@ -2062,7 +2062,6 @@ return {
     "cl":"uiRadioMenuItem"
   },
   "su":"markup://ui:menuItem",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -2254,7 +2253,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://aura:iteration", (function (){/*$A.componentService.addComponentClass("markup://aura:iteration",function() {
 return {
@@ -2274,7 +2274,6 @@ return {
 return {
   "xs":"G",
   "descriptor":"markup://aura:iteration",
-  "css":true,
   "ad":[
     ["items","aura://List","G",true,[]],
     ["var","aura://String","G",true],
@@ -2362,7 +2361,8 @@ return {
       },
       "n":"change"
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:menuItem", (function (){/*$A.componentService.addComponentClass("markup://ui:menuItem",function() {
 return {
@@ -2502,7 +2502,6 @@ return {
     "descriptor":"css://ui.menuItem",
     "cl":"uiMenuItem"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -2632,7 +2631,8 @@ return {
       ]
     }
   ],
-  "ab":true
+  "ab":true,
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:popup", (function (){/*$A.componentService.addComponentClass("markup://ui:popup",function() {
 return {
@@ -2800,7 +2800,6 @@ return {
 return {
   "xs":"PP",
   "descriptor":"markup://ui:popup",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -2986,7 +2985,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:popupTarget", (function (){/*$A.componentService.addComponentClass("markup://ui:popupTarget",function() {
 return {
@@ -3402,7 +3402,6 @@ return {
     "descriptor":"css://ui.popupTarget",
     "cl":"uiPopupTarget"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -3707,7 +3706,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:popupTrigger", (function (){/*$A.componentService.addComponentClass("markup://ui:popupTrigger",function() {
 return {
@@ -3828,7 +3828,6 @@ return {
     "cl":"uiPopupTrigger"
   },
   "su":"markup://ui:interactive",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -4240,7 +4239,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:inputDefaultError", (function (){/*$A.componentService.addComponentClass("markup://ui:inputDefaultError",function() {
 return {
@@ -4267,7 +4267,6 @@ return {
     "descriptor":"css://ui.inputDefaultError",
     "cl":"uiInputDefaultError"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -4558,7 +4557,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:label", (function (){/*$A.componentService.addComponentClass("markup://ui:label",function() {
 return {
@@ -4618,7 +4618,6 @@ return {
     "descriptor":"css://ui.label",
     "cl":"uiLabel"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["label","aura://String","PP",false],
@@ -4779,7 +4778,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:legend", (function (){/*$A.componentService.addComponentClass("markup://ui:legend",function() {
 return {
@@ -4796,7 +4796,6 @@ return {
     "descriptor":"css://ui.legend",
     "cl":"uiLegend"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["legend","aura://String","I",false],
@@ -4937,7 +4936,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:menu", (function (){/*$A.componentService.addComponentClass("markup://ui:menu",function() {
 return {
@@ -4989,7 +4989,6 @@ return {
     "cl":"uiMenu"
   },
   "su":"markup://ui:popup",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -5090,7 +5089,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:menuList", (function (){/*$A.componentService.addComponentClass("markup://ui:menuList",function() {
 return {
@@ -5430,7 +5430,6 @@ return {
     "descriptor":"css://ui.menuList"
   },
   "su":"markup://ui:popupTarget",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -5903,7 +5902,8 @@ return {
     }
   ],
   "df":"default",
-  "dyf":true
+  "dyf":true,
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:menuTriggerLink", (function (){/*$A.componentService.addComponentClass("markup://ui:menuTriggerLink",function() {
 return {
@@ -5999,7 +5999,6 @@ return {
   "xs":"G",
   "descriptor":"markup://ui:menuTriggerLink",
   "su":"markup://ui:popupTrigger",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -6321,7 +6320,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:picklistLabel", (function (){/*$A.componentService.addComponentClass("markup://ui:picklistLabel",function() {
 return {
@@ -6338,7 +6338,6 @@ return {
     "descriptor":"css://ui.picklistLabel",
     "cl":"uiPicklistLabel"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["label","aura://String","I",false],
@@ -6479,7 +6478,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:button", (function (){/*$A.componentService.addComponentClass("markup://ui:button",function() {
 return {
@@ -6597,7 +6597,6 @@ return {
   "fst":{
     "descriptor":"css://ui.button"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["buttonTitle","aura://String","G",false],
@@ -7060,7 +7059,8 @@ return {
     }
   ],
   "df":"default",
-  "fc":true
+  "fc":true,
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:input", (function (){/*$A.componentService.addComponentClass("markup://ui:input",function() {
 return {
@@ -7625,7 +7625,6 @@ return {
   "fst":{
     "descriptor":"css://ui.input"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -7957,7 +7956,8 @@ return {
   ],
   "ab":true,
   "df":"default",
-  "dyf":true
+  "dyf":true,
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:resizeObserver", (function (){/*$A.componentService.addComponentClass("markup://ui:resizeObserver",function() {
 return {
@@ -8095,7 +8095,6 @@ return {
 return {
   "xs":"PP",
   "descriptor":"markup://ui:resizeObserver",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["onresize","aura://Aura.Action","PP",false,null]
@@ -8117,7 +8116,8 @@ return {
         "path":"c.updateSize"
       }
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:tabItem", (function (){/*$A.componentService.addComponentClass("markup://ui:tabItem",function() {
 return {
@@ -8256,7 +8256,6 @@ return {
     "descriptor":"css://ui.tabItem",
     "cl":"uiTabItem"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","I",false],
@@ -8669,7 +8668,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:tabOverflowMenuItem", (function (){/*$A.componentService.addComponentClass("markup://ui:tabOverflowMenuItem",function() {
 return {
@@ -8772,7 +8772,6 @@ return {
     "descriptor":"css://ui.tabOverflowMenuItem",
     "cl":"uiTabOverflowMenuItem"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","I",false],
@@ -8947,7 +8946,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:inputSearch", (function (){/*$A.componentService.addComponentClass("markup://ui:inputSearch",function() {
 return {
@@ -9044,7 +9044,6 @@ return {
     "cl":"uiInputSearch"
   },
   "su":"markup://ui:input",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -9439,7 +9438,8 @@ return {
       ]
     }
   ],
-  "df":"default, input"
+  "df":"default, input",
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:stamp", (function (){/*$A.componentService.addComponentClass("markup://ui:stamp",function() {
 return {
@@ -9456,7 +9456,6 @@ return {
     "descriptor":"css://ui.stamp",
     "cl":"uiStamp"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","G",false],
@@ -9596,7 +9595,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:tab", (function (){/*$A.componentService.addComponentClass("markup://ui:tab",function() {
 return {
@@ -9638,7 +9638,6 @@ return {
     "descriptor":"css://ui.tab",
     "cl":"uiTab"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","I",false],
@@ -9766,7 +9765,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:tabBar", (function (){/*$A.componentService.addComponentClass("markup://ui:tabBar",function() {
 return {
@@ -10340,7 +10340,6 @@ return {
     "descriptor":"css://ui.tabBar",
     "cl":"uiTabBar"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["tabs","aura://List","I",false,[]],
@@ -10643,7 +10642,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:treeNode", (function (){/*$A.componentService.addComponentClass("markup://ui:treeNode",function() {
 return {
@@ -10876,7 +10876,6 @@ return {
     "descriptor":"css://ui.treeNode",
     "cl":"uiTreeNode"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["href","aura://String","I",false],
@@ -11343,7 +11342,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://auradocs:navLink", (function (){/*$A.componentService.addComponentClass("markup://auradocs:navLink",function() {
 return {
@@ -11356,7 +11356,6 @@ return {
 return {
   "xs":"I",
   "descriptor":"markup://auradocs:navLink",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["location","aura://String","I",true]
@@ -11421,7 +11420,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://auradocs:openTopicTree", (function (){/*$A.componentService.addComponentClass("markup://auradocs:openTopicTree",function() {
 return {
@@ -11566,7 +11566,6 @@ return {
 return {
   "xs":"I",
   "descriptor":"markup://auradocs:openTopicTree",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["layoutToken","aura://String","I",false],
@@ -11635,7 +11634,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://auradocs:searchFilterTree", (function (){/*$A.componentService.addComponentClass("markup://auradocs:searchFilterTree",function() {
 return {
@@ -11769,7 +11769,6 @@ return {
 return {
   "xs":"I",
   "descriptor":"markup://auradocs:searchFilterTree",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["tree","aura://Aura.Component","I",false,null]
@@ -11866,7 +11865,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://auradocs:sidebar", (function (){/*$A.componentService.addComponentClass("markup://auradocs:sidebar",function() {
 return {
@@ -11883,7 +11883,6 @@ return {
     "descriptor":"css://auradocs.sidebar",
     "cl":"auradocsSidebar"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["toolbar","aura://Aura.Component[]","I",false,[]]
@@ -11912,7 +11911,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://auraStorage:fuelGauge", (function (){/*$A.componentService.addComponentClass("markup://auraStorage:fuelGauge",function() {
 return {
@@ -12020,7 +12020,6 @@ return {
     "descriptor":"css://auraStorage.fuelGauge",
     "cl":"auraStorageFuelGauge"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["storageName","aura://String","I",true],
@@ -12149,7 +12148,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://auraStorage:init", (function (){/*$A.componentService.addComponentClass("markup://auraStorage:init",function() {
 return {
@@ -12208,7 +12208,6 @@ return {
 return {
   "xs":"G",
   "descriptor":"markup://auraStorage:init",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["name","aura://String","G",true],
@@ -12256,7 +12255,8 @@ return {
       }
     }
   ],
-  "hs":true
+  "hs":true,
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:image", (function (){/*$A.componentService.addComponentClass("markup://ui:image",function() {
 return {
@@ -12373,7 +12373,6 @@ return {
     "descriptor":"css://ui.image",
     "cl":"uiImage"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["title","aura://String","I",false],
@@ -12438,7 +12437,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:tabset", (function (){/*$A.componentService.addComponentClass("markup://ui:tabset",function() {
 return {
@@ -12922,7 +12922,6 @@ return {
   "fst":{
     "descriptor":"css://ui.tabset"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["class","aura://String","PP",false],
@@ -13248,7 +13247,8 @@ return {
     }
   ],
   "df":"default",
-  "fc":true
+  "fc":true,
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://ui:tree", (function (){/*$A.componentService.addComponentClass("markup://ui:tree",function() {
 return {
@@ -13301,7 +13301,6 @@ return {
     "descriptor":"css://ui.tree",
     "cl":"uiTree"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["nodes","java://List<aura.components.ui.TreeNode>","I",false,null],
@@ -13441,7 +13440,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://aura:application", (function (){/*$A.componentService.addComponentClass("markup://aura:application",function() {
 return {
@@ -13470,7 +13470,6 @@ return {
 });
 return {
   "descriptor":"markup://aura:application",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]]
   ],
@@ -13480,7 +13479,8 @@ return {
   "ab":true,
   "lc":{
     "descriptor":"markup://aura:locationChange"
-  }
+  },
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://auradocs:nav", (function (){/*$A.componentService.addComponentClass("markup://auradocs:nav",function() {
 return {
@@ -13526,7 +13526,6 @@ return {
     "descriptor":"css://auradocs.nav",
     "cl":"auradocsNav"
   },
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["referenceOnly","aura://Boolean","I",false,false]
@@ -13863,7 +13862,8 @@ return {
         }
       ]
     }
-  ]
+  ],
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://auradocs:referenceTree", (function (){/*$A.componentService.addComponentClass("markup://auradocs:referenceTree",function() {
 return {
@@ -13897,7 +13897,6 @@ return {
     ]
   },
   "su":"markup://auradocs:sidebar",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["toolbar","aura://Aura.Component[]","I",false,[]]
@@ -14229,7 +14228,8 @@ return {
       ]
     }
   ],
-  "hs":true
+  "hs":true,
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://auraStorage:crypto", (function (){/*$A.componentService.addComponentClass("markup://auraStorage:crypto",function() {
 return {
@@ -14242,12 +14242,12 @@ return {
 return {
   "xs":"I",
   "descriptor":"markup://auraStorage:crypto",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["debugLoggingEnabled","aura://Boolean","I",false,false]
   ],
-  "hs":true
+  "hs":true,
+  "css":true
 };*/}));
 $A.componentService.addComponent("markup://auradocs:docs", (function (){/*$A.componentService.addComponentClass("markup://auradocs:docs",function() {
 return {
@@ -14418,7 +14418,6 @@ return {
     ]
   },
   "su":"markup://aura:application",
-  "css":true,
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
     ["waitingCount","aura://Integer","p",false,0]
@@ -14627,7 +14626,8 @@ return {
   ],
   "lc":{
     "descriptor":"markup://auradocs:locationChange"
-  }
+  },
+  "css":true
 };*/}));
 $A.componentService.initEventDefs([
   {

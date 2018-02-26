@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-02-22
- * Version: 0.3.12
+ * Generated: 2018-02-25
+ * Version: 0.3.14
  */
 
 (function (global, factory) {
@@ -414,23 +414,31 @@ function SecureCanvasRenderingContext2D(ctx, key) {
 // improves both consitency and minification. Unused declarations are dropped
 // by the tree shaking process.
 
-const { getPrototypeOf, setPrototypeOf, defineProperty, deleteProperty, ownKeys } = Reflect;
+
 
 const {
+  assign,
+  create: create$1,
   defineProperties,
-  hasOwnProperty,
+  freeze,
   getOwnPropertyDescriptor,
   getOwnPropertyDescriptors,
   getOwnPropertyNames,
-  create: create$1,
-  assign,
-  freeze,
   seal
 } = Object;
 
+const {
+  defineProperty,
+  deleteProperty,
+  getPrototypeOf,
+  has,
+  ownKeys,
+  setPrototypeOf
+} = Reflect;
 
 
 const objectToString = Object.prototype.toString;
+const objectHasOwnProperty = Object.prototype.hasOwnProperty;
 
 /*
  * Copyright (C) 2017 salesforce.com, inc.
@@ -453,13 +461,15 @@ const objectToString = Object.prototype.toString;
 // https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
 // https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
 
-function repairAccessors(global) {
+function repairAccessors(lockerRec) {
+  const { unsafeGlobal } = lockerRec;
+
   // W-2961201 Prevent execution in the global context.
 
   // Fixing properties of Object to comply with strict mode
   // and ES2016 semantics, we do this by redefining them while in 'use strict'
   // https://tc39.github.io/ecma262/#sec-object.prototype.__defineGetter__
-  defineProperties(global.Object.prototype, {
+  defineProperties(unsafeGlobal.Object.prototype, {
     __defineGetter__: {
       value: function(prop, func) {
         return defineProperty(this, prop, {
@@ -517,118 +527,739 @@ function repairAccessors(global) {
  * limitations under the License.
  */
 
-let initalized = false;
+// Adapted from SES/Caja
+// Copyright (C) 2011 Google Inc.
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
+
+// Mitigate proxy-related security issues
+// https://github.com/tc39/ecma262/issues/272
+
+// Objects that are deeply frozen
+const frozenSet = new WeakSet();
 
 /**
- * Stores (key => value) where "key" is the current secureWindow context and
- * "value" is the secureEvaluator which is scoped to that secureWindow context.
+ * "deepFreeze()" acts like "Object.freeze()", except that:
+ *
+ * 1. To deepFreeze an object is to freeze it and all objects transitively
+ * reachable from it via transitive reflective property and prototype
+ * traversal.
+ *
+ * 2. For a special set of properties (defined below), it ensures that the
+ * effect of freezing does not suppress the ability to override these
+ * properties on derived objects by simple assignment.
+ *
+ * Because of lack of sufficient foresight at the time, ES5 unfortunately
+ * specified that a simple assignment to a non-existent property must fail if
+ * it would override a non-writable data property of the same name. (In
+ * retrospect, this was a mistake, but it is now too late and we must live
+ * with the consequences.) As a result, simply freezing an object to make it
+ * tamper proof has the unfortunate side effect of breaking previously correct
+ * code that is considered to have followed JS best practices, if this
+ * previous code used assignment to override.
+ *
+ * To work around this mistake, deepFreeze(), prior to freezing, replaces
+ * selected configurable own data properties with accessor properties which
+ * simulate what we should have specified -- that assignments to derived
+ * objects succeed if otherwise possible.
+ *
+ * We provide no detection mechanism. An optional parameter,
+ * "propertiesByObject", must be provided instead to specify which
+ * properties should be replaced using the complex workaround. In this case, a
+ * lookup on propertiesByObject using the object as a key must return a list
+ * of all non-writables data properties to be replaced on that object.
  */
-const keyToEvaluator = new Map();
+function deepFreeze(node, replacementsByObject) {
+  // Objects that we're attempting to freeze.
+  const freezingSet = new Set();
+
+  // If val is something we should be freezing but aren't yet,
+  // add it to freezingSet.
+  function enqueue(val) {
+    if (Object(val) !== val) {
+      // ignore primitives
+      return;
+    }
+    const type = typeof val;
+    if (type !== 'object' && type !== 'function') {
+      // future proof: break until someone figures out what it should do
+      throw new TypeError(`Unexpected typeof: ${type}`);
+    }
+    if (frozenSet.has(val) || freezingSet.has(val)) {
+      // Ignore if already frozen or freezing
+      return;
+    }
+    freezingSet.add(val);
+  }
+
+  function tamperProof(obj, replacements) {
+    const descs = getOwnPropertyDescriptors(obj);
+    ownKeys(descs).forEach(name => {
+      const desc = descs[name];
+      if ('value' in desc) {
+        if (desc.configurable && replacements.includes(name)) {
+          const value = desc.value;
+
+          // eslint-disable-next-line no-inner-declarations
+          function getter() {
+            return value;
+          }
+          // eslint-disable-next-line no-inner-declarations
+          function setter(newValue) {
+            if (obj === this) {
+              throw new TypeError(
+                `Cannot assign to read only property '${name}' of object '${obj.name}'`
+              );
+            }
+            if (objectHasOwnProperty.call(this, name)) {
+              this[name] = newValue;
+            } else {
+              defineProperty(this, name, {
+                value: newValue,
+                writable: true,
+                enumerable: desc.enumerable,
+                configurable: desc.configurable
+              });
+            }
+          }
+
+          defineProperty(obj, name, {
+            get: getter,
+            set: setter,
+            enumerable: desc.enumerable,
+            configurable: desc.configurable
+          });
+
+          enqueue(getter);
+          enqueue(setter);
+          enqueue(value);
+        } else {
+          enqueue(desc.value);
+        }
+      } else {
+        enqueue(desc.get);
+        enqueue(desc.set);
+      }
+    });
+  }
+
+  function simpleTamperProof(obj) {
+    const descs = getOwnPropertyDescriptors(obj);
+    ownKeys(descs).forEach(name => {
+      const desc = descs[name];
+      if ('value' in desc) {
+        enqueue(desc.value);
+      } else {
+        enqueue(desc.get);
+        enqueue(desc.set);
+      }
+    });
+  }
+
+  // Process the freezingSet.
+  function dequeue() {
+    // New values added before forEach() has finished will be visited.
+    freezingSet.forEach(obj => {
+      const replacements = replacementsByObject && replacementsByObject.get(obj);
+
+      if (replacements) {
+        tamperProof(obj, replacements);
+      } else {
+        simpleTamperProof(obj);
+      }
+      freeze(obj);
+      frozenSet.add(obj);
+
+      enqueue(getPrototypeOf(obj));
+    });
+  }
+
+  enqueue(node);
+  dequeue();
+
+  return node;
+}
+
+/*
+ * Copyright (C) 2017 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * Get all intrinsics:
+ *
+ * 1. Named intrinsics: available as data properties of
+ * the global object.
+ *
+ * 2. Anonymous intrinsics: not otherwise reachable by own property
+ * name traversal.
+ *
+ * https://tc39.github.io/ecma262/#table-7
+ */
+function getIntrinsics(lockerRec) {
+  const { unsafeGlobal: global } = lockerRec;
+
+  // Anonymous intrinsics.
+
+  const SymbolIterator = (typeof global.Symbol && global.Symbol.iterator) || '@@iterator';
+
+  const ArrayIteratorInstance = new global.Array()[SymbolIterator]();
+  const ArrayIteratorPrototype = getPrototypeOf(ArrayIteratorInstance);
+  const IteratorPrototype = getPrototypeOf(ArrayIteratorPrototype);
+
+  const AsyncFunctionInstance = global.eval('(async function(){})');
+  const AsyncFunction = AsyncFunctionInstance.constructor;
+  const AsyncFunctionPrototype = AsyncFunction.prototype;
+
+  const GeneratorFunctionInstance = global.eval('(function*(){})');
+  const GeneratorFunction = GeneratorFunctionInstance.constructor;
+  const Generator = GeneratorFunction.prototype;
+  const GeneratorPrototype = Generator.prototype;
+
+  const hasAsyncIteration = typeof global.Symbol.asyncIterator !== 'undefined';
+
+  const AsyncGeneratorFunctionInstance = hasAsyncIteration && global.eval('(async function*(){})');
+  const AsyncGeneratorFunction = hasAsyncIteration && AsyncGeneratorFunctionInstance.constructor;
+  const AsyncGenerator = hasAsyncIteration && AsyncGeneratorFunction.prototype;
+  const AsyncGeneratorPrototype = hasAsyncIteration && AsyncGenerator.prototype;
+
+  const AsyncFromSyncIteratorPrototype = hasAsyncIteration && undefined; // TODO
+  const AsyncIteratorPrototype = hasAsyncIteration && getPrototypeOf(AsyncGeneratorPrototype);
+
+  const MapIteratorObject = new global.Map()[SymbolIterator]();
+  const MapIteratorPrototype = getPrototypeOf(MapIteratorObject);
+
+  const SetIteratorObject = new global.Set()[SymbolIterator]();
+  const SetIteratorPrototype = getPrototypeOf(SetIteratorObject);
+
+  const StringIteratorObject = new global.String()[SymbolIterator]();
+  const StringIteratorPrototype = getPrototypeOf(StringIteratorObject);
+
+  const ThrowTypeError = global.eval(
+    '(function () { "use strict"; return Object.getOwnPropertyDescriptor(arguments, "callee").get; })()'
+  );
+
+  const TypedArray = getPrototypeOf(Int8Array);
+  const TypedArrayPrototype = TypedArray.prototype;
+
+  // Named intrinsics
+
+  return {
+    // *** Table 7
+
+    // %Array%
+    Array: global.Array,
+    // %ArrayBuffer%
+    ArrayBuffer: global.ArrayBuffer,
+    // %ArrayBufferPrototype%
+    ArrayBufferPrototype: global.ArrayBuffer.prototype,
+    // %ArrayIteratorPrototype%
+    ArrayIteratorPrototype,
+    // %ArrayPrototype%
+    ArrayPrototype: global.Array.prototype,
+    // %ArrayProto_entries%
+    ArrayProto_entries: global.Array.prototype.entries,
+    // %ArrayProto_foreach%
+    ArrayProto_foreach: global.Array.prototype.forEach,
+    // %ArrayProto_keys%
+    ArrayProto_keys: global.Array.prototype.forEach,
+    // %ArrayProto_values%
+    ArrayProto_values: global.Array.prototype.values,
+    // %AsyncFromSyncIteratorPrototype%
+    AsyncFromSyncIteratorPrototype,
+    // %AsyncFunction%
+    AsyncFunction,
+    // %AsyncFunctionPrototype%
+    AsyncFunctionPrototype,
+    // %AsyncGenerator%
+    AsyncGenerator,
+    // %AsyncGeneratorFunction%
+    AsyncGeneratorFunction,
+    // %AsyncGeneratorPrototype%
+    AsyncGeneratorPrototype,
+    // %AsyncIteratorPrototype%
+    AsyncIteratorPrototype,
+    // %Atomics%
+    Atomics: global.Atomics,
+    // %Boolean%
+    Boolean: global.Boolean,
+    // %BooleanPrototype%
+    BooleanPrototype: global.Boolean.prototype,
+    // %DataView%
+    DataView: global.DataView,
+    // %DataViewPrototype%
+    DataViewPrototype: global.DataView.prototype,
+    // %Date%
+    Date: global.Date,
+    // %DatePrototype%
+    DatePrototype: global.Date.prototype,
+    // %decodeURI%
+    decodeURI: global.decodeURI,
+    // %decodeURIComponent%
+    decodeURIComponent: global.decodeURIComponent,
+    // %encodeURI%
+    encodeURI: global.encodeURI,
+    // %encodeURIComponent%
+    encodeURIComponent: global.encodeURIComponent,
+    // %Error%
+    Error: global.Error,
+    // %ErrorPrototype%
+    ErrorPrototype: global.Error.prototype,
+    // %eval%
+    // eval: sandbox.eval,
+    // %EvalError%
+    EvalError: global.EvalError,
+    // %EvalErrorPrototype%
+    EvalErrorPrototype: global.EvalError.prototype,
+    // %Float32Array%
+    Float32Array: global.Float32Array,
+    // %Float32ArrayPrototype%
+    Float32ArrayPrototype: global.Float32Array.prototype,
+    // %Float64Array%
+    Float64Array: global.Float64Array,
+    // %Float64ArrayPrototype%
+    Float64ArrayPrototype: global.Float64Array.prototype,
+    // %Function%
+    Function: global.Function,
+    // %FunctionPrototype%
+    FunctionPrototype: Function.prototype,
+    // %Generator%
+    Generator,
+    // %GeneratorFunction%
+    GeneratorFunction,
+    // %GeneratorPrototype%
+    GeneratorPrototype,
+    // %Int8Array%
+    Int8Array: global.Int8Array,
+    // %Int8ArrayPrototype%
+    Int8ArrayPrototype: global.Int8Array.prototype,
+    // %Int16Array%
+    Int16Array: global.Int16Array,
+    // %Int16ArrayPrototype%,
+    Int16ArrayPrototype: global.Int16Array.prototype,
+    // %Int32Array%
+    Int32Array: global.Int32Array,
+    // %Int32ArrayPrototype%
+    Int32ArrayPrototype: global.Int32Array.prototype,
+    // %isFinite%
+    isFinite: global.Number.isFinite,
+    // %isNaN%
+    isNaN: global.Number.isNaN,
+    // %IteratorPrototype%
+    IteratorPrototype,
+    // %JSON%
+    JSON: global.JSON,
+    // %JSONParse%
+    JSONParse: global.JSON.parse,
+    // %Map%
+    Map: global.Map,
+    // %MapIteratorPrototype%
+    MapIteratorPrototype,
+    // %MapPrototype%
+    MapPrototype: global.Map.prototype,
+    // %Math%
+    Math: global.Math,
+    // %Number%
+    Number: global.Number,
+    // %NumberPrototype%
+    NumberPrototype: global.Number.prototype,
+    // %Object%
+    Object: global.Object,
+    // %ObjectPrototype%
+    ObjectPrototype: global.Object.prototype,
+    // %ObjProto_toString%
+    ObjProto_toString: global.Object.prototype.toString,
+    // %ObjProto_valueOf%
+    ObjProto_valueOf: global.Object.prototype.valueOf,
+    // %parseFloat%
+    parseFloat: global.parseFloat,
+    // %parseInt%
+    parseInt: global.parseInt,
+    // %Promise%
+    Promise: global.Promise,
+    // %Promise_all%
+    Promise_all: global.Promise.all,
+    // %Promise_reject%
+    Promise_reject: global.Promise.reject,
+    // %Promise_resolve%
+    Promise_resolve: global.Promise.resolve,
+    // %PromiseProto_then%
+    PromiseProto_then: global.Promise.prototype.then,
+    // %PromisePrototype%
+    PromisePrototype: global.Promise.prototype,
+    // %Proxy%
+    Proxy: global.Proxy,
+    // %RangeError%
+    RangeError: global.RangeError,
+    // %RangeErrorPrototype%
+    RangeErrorPrototype: global.RangeError.prototype,
+    // %ReferenceError%
+    ReferenceError: global.ReferenceError,
+    // %ReferenceErrorPrototype%
+    ReferenceErrorPrototype: global.ReferenceError.prototype,
+    // %Reflect%
+    Reflect: global.Reflect,
+    // %RegExp%
+    RegExp: global.RegExp,
+    // %RegExpPrototype%
+    RegExpPrototype: global.RegExp.prototype,
+    // %Set%
+    Set: global.Set,
+    // %SetIteratorPrototype%
+    SetIteratorPrototype,
+    // %SetPrototype%
+    SetPrototype: global.Set.prototype,
+    // %SharedArrayBuffer%
+    // SharedArrayBuffer: undefined, // Deprecated on Jan 5, 2018
+    // %SharedArrayBufferPrototype%
+    // SharedArrayBufferPrototype: undefined, // Deprecated on Jan 5, 2018
+    // %String%
+    String: global.String,
+    // %StringIteratorPrototype%
+    StringIteratorPrototype,
+    // %StringPrototype%
+    StringPrototype: global.String.prototype,
+    // %Symbol%
+    Symbol: global.Symbol,
+    // %SymbolPrototype%
+    SymbolPrototype: global.Symbol.prototype,
+    // %SyntaxError%
+    SyntaxError: global.SyntaxError,
+    // %SyntaxErrorPrototype%
+    SyntaxErrorPrototype: global.SyntaxError.prototype,
+    // %ThrowTypeError%
+    ThrowTypeError,
+    // %TypedArray%
+    TypedArray,
+    // %TypedArrayPrototype%
+    TypedArrayPrototype,
+    // %TypeError%
+    TypeError: global.TypeError,
+    // %TypeErrorPrototype%
+    TypeErrorPrototype: global.TypeError.prototype,
+    // %Uint8Array%
+    Uint8Array: global.Uint8Array,
+    // %Uint8ArrayPrototype%
+    Uint8ArrayPrototype: global.Uint8Array.prototype,
+    // %Uint8ClampedArray%
+    Uint8ClampedArray: global.Uint8ClampedArray,
+    // %Uint8ClampedArrayPrototype%
+    Uint8ClampedArrayPrototype: global.Uint8ClampedArray.prototype,
+    // %Uint16Array%
+    Uint16Array: global.Uint16Array,
+    // %Uint16ArrayPrototype%
+    Uint16ArrayPrototype: Uint16Array.prototype,
+    // %Uint32Array%
+    Uint32Array: global.Uint32Array,
+    // %Uint32ArrayPrototype%
+    Uint32ArrayPrototype: global.Uint32Array.prototype,
+    // %URIError%
+    URIError: global.URIError,
+    // %URIErrorPrototype%
+    URIErrorPrototype: global.URIError.prototype,
+    // %WeakMap%
+    WeakMap: global.WeakMap,
+    // %WeakMapPrototype%
+    WeakMapPrototype: global.WeakMap.prototype,
+    // %WeakSet%
+    WeakSet: global.WeakSet,
+    // %WeakSetPrototype%
+    WeakSetPrototype: global.WeakSet.prototype,
+
+    // *** Annex B
+
+    // %escape%
+    escape: global.escape,
+    // %unescape%
+    unescape: global.unescape
+
+    // TODO: other special cases
+  };
+}
+
+const sanitized = new WeakSet();
+
+function freezeIntrinsics(lockerRec) {
+  const intrinsics = getIntrinsics(lockerRec);
+  const { unsafeGlobal } = lockerRec;
+
+  /**
+   * These properties are subject to the override mistake.
+   * A better way to handle this could be to create a "repair"
+   * function to early convert specific data properties to getters
+   * and setters and always use simpleTamperProof.
+   */
+  const replacementsyObject = new Map([
+    [unsafeGlobal.Object.prototype, ['toString']],
+    [unsafeGlobal.Error.prototype, ['message']],
+    [unsafeGlobal.EvalError.prototype, ['message']],
+    [unsafeGlobal.RangeError.prototype, ['message']],
+    [unsafeGlobal.ReferenceError.prototype, ['message']],
+    [unsafeGlobal.SyntaxError.prototype, ['message']],
+    [unsafeGlobal.TypeError.prototype, ['message']],
+    [unsafeGlobal.URIError.prototype, ['message']]
+  ]);
+  deepFreeze(intrinsics, replacementsyObject);
+}
+
+function freezeIntrinsicsDeprecated(lockerRec) {
+  const { unsafeGlobal } = lockerRec;
+  seal(unsafeGlobal.Object.prototype);
+}
+
+// locking down the environment
+function sanitize(lockerRec) {
+  if (sanitized.has(lockerRec)) {
+    return;
+  }
+
+  repairAccessors(lockerRec);
+
+  if (lockerRec.isFrozen) {
+    freezeIntrinsics(lockerRec);
+  } else {
+    freezeIntrinsicsDeprecated(lockerRec);
+  }
+
+  sanitized.add(lockerRec);
+}
+
+/*
+ * Copyright (C) 2017 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the 'License');
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an 'AS IS' BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 /**
- * Defines a list of intrinsics (properties on window) which
- * we want to be accessible via rapid lookup of pointer rather than
- * having to search for them whenever they are accessed.
+ * This whilelist represents properties of the global object
+ * which, by definition, do not provide authority or access to globals.
+ *
+ * We want to declare these globals as constants to prevent de-optimization
+ * by the with() and the Proxy() of the  evaluator.
  */
-const constants = ['Object', 'Array'];
+const stdlib = [
+  // *** 18.2 Function Properties of the Global Object
 
-/**
- * Used to generate the secureEvalFactory
- * which build secureEval functions scoped to secureWindows.
+  // 'eval', // This property must be disabled to allow Proxy() switching.
+  'isFinite',
+  'isNaN',
+  'parseFloat',
+  'parseInt',
+
+  'decodeURI',
+  'decodeURIComponent',
+  'encodeURI',
+  'encodeURIComponent',
+
+  // *** 18.3 Constructor Properties of the Global Object
+
+  'Array',
+  'ArrayBuffer',
+  'Boolean',
+  'DataView',
+  'Date',
+  'Error',
+  'EvalError',
+  'Float32Array',
+  'Float64Array',
+  'Function', // Must be declared on the confinedGlobal.
+  'Int8Array',
+  'Int16Array',
+  'Int32Array',
+  'Map',
+  'Number',
+  'Object',
+  'Promise',
+  'Proxy',
+  'RangeError',
+  'ReferenceError',
+  'RegExp',
+  'Set',
+  // 'SharedArrayBuffer', / Deprecated on Jan 5, 2018
+  'String',
+  'Symbol',
+  'SyntaxError',
+  'TypeError',
+  'Uint8Array',
+  'Uint8ClampedArray',
+  'Uint16Array',
+  'Uint32Array',
+  'URIError',
+  'WeakMap',
+  'WeakSet',
+
+  // *** 18.4 Other Properties of the Global Object
+
+  'Atomics',
+  'JSON',
+  'Math',
+  'Reflect',
+
+  // *** Annex B
+
+  'escape',
+  'unescape',
+
+  // *** ECMA-402
+
+  'Intl'
+];
+
+/*
+ * Copyright (C) 2017 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the 'License');
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an 'AS IS' BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-const evaluatorFactorySource = `
-  (function() {
+let evalEvaluatorFactory;
+
+function createEvalEvaluatorFactory(sandbox) {
+  return sandbox.unsafeFunction(`
     with (arguments[0]) {
-      const {${constants.join(',')}} = arguments[0];
-      return function(){
-        "use strict";
+      const {${stdlib.join(',')}} = arguments[0];
+      return function() {
+        'use strict';
         return eval(arguments[0]);
       };
     }
-  })
-`;
-
-const evaluatorFactory = (0, eval)(evaluatorFactorySource);
-
-// Immutable Prototype Exotic Objects
-// https://github.com/tc39/ecma262/issues/272
-function freezeIntrinsics(global) {
-  seal(global.Object.prototype);
+  `);
 }
 
-/**
- * Generates a makeEvaluator object which can be be used to generate
- * secureEval() functions which are bound in scope to a secureWindow.
- *
- * secureEval functions are unique in that they have the following traits:
- *
- * 1. Operate as a standard eval() call but with a limited scope - this prevents hackers from accessing
- * global data that we do not provide in the first with() or the list of constants.
- *
- * 2. Improved performance over safeEval() by exposing a list of consts to the inner width we reduce
- * DOM tree traversal when searching for window properties.
- *
- * 3. Improved debugability. Rather than seeing the entire secureEval in the debugger,
- * the innermost function is exposed during debugging instead of the entire function.
- */
-function makeEvaluator(win) {
+function createEvalEvaluator(sandbox) {
+  const { globalObject, unsafeGlobal } = sandbox;
+
+  // This sentinel allows one scoped direct eval.
   let isInternalEval = false;
 
-  const proxy = new Proxy(win, {
-    has: (target, prop) => {
+  // This proxy has several functions:
+  // 1. works with the sentinel to alternate between direct eval and confined eval.
+  // 2. shadows all properties of the hidden global by declaring them as undefined.
+  // 3. resolves all existing properties of the secure global.
+  const proxy = new Proxy(globalObject, {
+    get(target, prop) {
       if (prop === 'eval') {
         if (isInternalEval) {
           isInternalEval = false;
-          return false;
+          return unsafeGlobal.eval;
         }
+        return globalObject.eval;
       }
-      return prop !== 'arguments' && (prop in target || prop in window);
+      return globalObject[prop];
+    },
+    has(target, prop) {
+      if (prop === 'eval') {
+        return true;
+      }
+      if (prop === 'arguments') {
+        return false;
+      }
+      if (prop in target) {
+        return true;
+      }
+      if (prop in unsafeGlobal) {
+        return true;
+      }
+      return false;
     }
   });
 
-  const scopedEvaluator = evaluatorFactory(proxy);
+  // Lazy define and use the factory.
+  if (!evalEvaluatorFactory) {
+    evalEvaluatorFactory = createEvalEvaluatorFactory(sandbox);
+  }
+  const scopedEvaluator = evalEvaluatorFactory(proxy);
 
   function evaluator(src) {
     isInternalEval = true;
-    const result = scopedEvaluator.call(win, src);
+    // Ensure that "this" resolves to the secure global.
+    const result = scopedEvaluator.call(globalObject, src);
     isInternalEval = false;
     return result;
   }
 
-  // Define eval.toString() as a non configurable, non writable property to prevent tampering.
-  Object.defineProperty(evaluator, 'toString', {
-    value: () => 'function eval() { [native code] }'
+  // Mimic the native eval() function.
+  defineProperties(evaluator, {
+    name: {
+      value: 'eval'
+    },
+    toString: {
+      value: () => 'function eval() { [native code] }'
+    }
   });
 
-  win.eval = evaluator;
-  return evaluator;
+  return freeze(evaluator);
 }
 
-/**
- * Generates a secureEval function and builds the required
- * resources for generating a secureEval function if they do not currently exist.
+/*
+ * Copyright (C) 2017 salesforce.com, inc.
  *
- * Returns secureEval() to the caller.
+ * Licensed under the Apache License, Version 2.0 (the 'License');
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @return function secureEval
- * @param key a key used by getEnv to produce a reference to the current secureWindow context
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an 'AS IS' BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-function getSecureEval(key) {
-  let evaluator = keyToEvaluator.get(key);
+const keyToSandbox = new Map();
 
-  if (!initalized) {
-    repairAccessors(window);
-    freezeIntrinsics(window);
-    initalized = true;
+function createSandbox(key, lockerRec) {
+  // Lazy sanitize the execution environment.
+  sanitize(lockerRec);
+
+  const { unsafeGlobal, unsafeEval, unsafeFunction } = lockerRec;
+  const sandbox = { unsafeGlobal, unsafeEval, unsafeFunction };
+
+  sandbox.globalObject = SecureWindow(unsafeGlobal, key);
+  sandbox.evalEvaluator = createEvalEvaluator(sandbox);
+
+  sandbox.globalObject.eval = sandbox.evalEvaluator;
+
+  return freeze(sandbox);
+}
+
+function getSandbox(key, lockerRec) {
+  let sandbox = keyToSandbox.get(key);
+
+  if (!sandbox) {
+    sandbox = createSandbox(key, lockerRec);
+    keyToSandbox.set(key, sandbox);
   }
 
-  if (!evaluator) {
-    const win = getEnv$1(key);
-    evaluator = makeEvaluator(win);
-    keyToEvaluator.set(key, evaluator);
-  }
-
-  return evaluator;
+  return sandbox;
 }
 
 /**
@@ -679,26 +1310,36 @@ function sanitizeURLForElement(url) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const keyToEnvironment = new Map();
+const lockerRec = {};
+function init(options) {
+  // The frozen/unfrozen status of the Locker is set at creation.
+  lockerRec.isFrozen = options.isFrozen;
+
+  /**
+   * The unsafe* variables hold precious values that must not escape
+   * to untrusted code. When eval is invoked via unsafeEval, this is
+   * a call to the indirect eval function, not the direct eval operator.
+   */
+  lockerRec.unsafeGlobal = options.unsafeGlobal;
+  lockerRec.unsafeEval = options.unsafeGlobal.eval;
+  lockerRec.unsafeFunction = options.unsafeGlobal.Function;
+
+  // None of these values can change after initialization.
+  freeze(lockerRec);
+}
 
 function getEnv$1(key) {
-  let env = keyToEnvironment.get(key);
-
-  if (!env) {
-    env = SecureWindow(window, key);
-    keyToEnvironment.set(key, env);
-  }
-
-  return env;
+  const sandbox = getSandbox(key, lockerRec);
+  return sandbox.globalObject;
 }
 
 /**
- * Evaluates a string using secureEval rather than eval.
+ * Evaluates a string using secure eval rather than eval.
  * Sanitizes the input string and attaches a sourceURL so the
  * result can be easily found in browser debugging tools.
  */
 function evaluate(src, key, sourceURL) {
-  const secureEval = getSecureEval(key);
+  const sandbox = getSandbox(key, lockerRec);
 
   // Sanitize the URL
   if (sourceURL) {
@@ -706,7 +1347,7 @@ function evaluate(src, key, sourceURL) {
     src += `\n//# sourceURL=${sourceURL}`;
   }
 
-  return secureEval(src);
+  return sandbox.evalEvaluator(src);
 }
 
 const assert = {
@@ -6457,76 +7098,6 @@ function registerAddPropertiesHook$$1(hook) {
   addPropertiesHook = hook;
 }
 
-// This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
-// which, by definition, do not provide authority or access to globals.
-const whitelist = [
-  // Accessible Intrinsics (not reachable by own property name traversal)
-  // -> from ES5
-  'ThrowTypeError',
-  // -> from ES6.
-  'IteratorPrototype',
-  'ArrayIteratorPrototype',
-  'StringIteratorPrototype',
-  'MapIteratorPrototype',
-  'SetIteratorPrototype',
-  'GeneratorFunction',
-  'TypedArray',
-
-  // Intrinsics
-  // -> from ES5
-  'Function',
-  'WeakMap',
-  'StringMap',
-  // Proxy,
-  'escape',
-  'unescape',
-  'Object',
-  'NaN',
-  'Infinity',
-  'undefined',
-  // eval,
-  'parseInt',
-  'parseFloat',
-  'isNaN',
-  'isFinite',
-  'decodeURI',
-  'decodeURIComponent',
-  'encodeURI',
-  'encodeURIComponent',
-  'Function',
-  'Array',
-  'String',
-  'Boolean',
-  'Number',
-  'Math',
-  'Date',
-  'RegExp',
-  'Error',
-  'EvalError',
-  'RangeError',
-  'ReferenceError',
-  'SyntaxError',
-  'TypeError',
-  'URIError',
-  'JSON',
-  // -> from ES6
-  'ArrayBuffer',
-  'Int8Array',
-  'Uint8Array',
-  'Uint8ClampedArray',
-  'Int16Array',
-  'Uint16Array',
-  'Int32Array',
-  'Uint32Array',
-  'Float32Array',
-  'Float64Array',
-  'DataView',
-  'Promise',
-
-  // Misc
-  'Intl'
-];
-
 const metadata$$1 = {
   prototypes: {
     Window: {
@@ -7169,9 +7740,11 @@ function SecureWindow(win, key) {
   }
 
   // Create prototype to allow basic object operations like hasOwnProperty etc
-  const emptyProto = {};
-  // Do not treat window like a plain object, $A.util.isPlainObject() returns true if we leave the constructor intact
-  emptyProto.constructor = null;
+  const props = Object.getOwnPropertyDescriptors(Object.prototype);
+  // Do not treat window like a plain object, $A.util.isPlainObject() returns true if we leave the constructor intact.
+  delete props.constructor;
+  const emptyProto = Object.create(null, props);
+
   Object.freeze(emptyProto);
 
   o = Object.create(emptyProto, {
@@ -7397,12 +7970,13 @@ function SecureWindow(win, key) {
   addEventTargetMethods(o, win, key);
 
   // Has to happen last because it depends on the secure getters defined above that require the object to be keyed
-  whitelist.forEach(
+  stdlib.forEach(
     // These are direct passthrough's and should never be wrapped in a SecureObject
+    // They are non-writable to make them compatible with the evaluator.
     name =>
       Object.defineProperty(o, name, {
         enumerable: true,
-        writable: true,
+        writable: false,
         value: win[name]
       })
   );
@@ -8261,31 +8835,6 @@ function registerAuraTypes(types) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-let strictCSPStatus = true;
-
-
-
-function registerLockerAPI(api) {
-  if (api) {
-    strictCSPStatus = api.isStrictCSP;
-  }
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 const service = {
   piercing: (component, data, def, context, target, key, value, callback) => {
     if (value === EventTarget.prototype.dispatchEvent && SecureObject.isDOMElementOrNode(target)) {
@@ -8495,9 +9044,17 @@ function initialize(types, api) {
     return;
   }
 
+  init({
+    // TODO: disabled until W-4733987 is resolved
+    // isFrozen: api.isStrictCSP,
+    isFrozen: false,
+    unsafeGlobal: window,
+    unsafeEval: window.eval,
+    unsafeFunction: window.Function
+  });
+
   registerAuraTypes(types);
   registerAuraAPI(api);
-  registerLockerAPI(api);
   registerReportAPI(api);
   registerEngineAPI(api);
   registerFilterTypeHook(filterTypeHook);

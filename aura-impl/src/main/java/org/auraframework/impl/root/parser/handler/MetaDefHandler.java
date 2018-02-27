@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.MetaDef;
 import org.auraframework.impl.root.MetaDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
@@ -77,14 +78,15 @@ public class MetaDefHandler extends ParentedTagHandler<MetaDefImpl, Documentatio
     @Override
     protected void readAttributes() throws InvalidAccessValueException {
         String name = getAttributeValue(ATTRIBUTE_NAME);
+        builder.setDescriptor(definitionService.getDefDescriptor(name, MetaDef.class));
+        
         String value = getAttributeValue(ATTRIBUTE_VALUE);
-
-        builder.setMetaName(name);
-        builder.setMetaValue(value);
+        builder.setValue(value);
     }
 
     @Override
     protected void finishDefinition() throws QuickFixException {
+        builder.setLocation(getLocation());
     }
 
     @Override

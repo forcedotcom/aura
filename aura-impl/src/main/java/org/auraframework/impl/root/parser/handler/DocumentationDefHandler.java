@@ -28,6 +28,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DescriptionDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ExampleDef;
+import org.auraframework.def.MetaDef;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
@@ -93,10 +94,9 @@ public class DocumentationDefHandler extends FileTagHandler<DocumentationDef> {
             builder.addExample(name, ex);
 
         } else if (MetaDefHandler.TAG.equalsIgnoreCase(tag)) {
-            // The appropriate handler must call getElement()
-            // MetaDef is not currently used
-            new MetaDefHandler(this, xmlReader, source, isInInternalNamespace, definitionService,
+            MetaDef meta = new MetaDefHandler(this, xmlReader, source, isInInternalNamespace, definitionService,
                     configAdapter, definitionParserAdapter).getElement();
+            builder.addMeta(meta.getName(), meta);
         } else {
             throw new XMLStreamException(String.format("<%s> cannot contain tag %s", getHandledTag(), tag));
         }

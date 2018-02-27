@@ -145,6 +145,7 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         DOCUMENTATION(DocumentationDef.class), //
         DESCRIPTION(DescriptionDef.class), //
         EXAMPLE(ExampleDef.class), //
+        META(MetaDef.class), //
         TESTSUITE(TestSuiteDef.class), //
         TESTCASE(TestCaseDef.class), //
         PROVIDER(ProviderDef.class), //

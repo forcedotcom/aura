@@ -15,42 +15,33 @@
  */
 package org.auraframework.impl.root;
 
-import com.google.common.collect.ImmutableSet;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.auraframework.def.MetaDef;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import java.io.IOException;
-import java.util.Set;
-
 /**
  * Represents <aura:meta>
- */
-public class MetaDefImpl extends DefinitionImpl<MetaDef> implements MetaDef {
-
+ */   
+public final class MetaDefImpl extends DefinitionImpl<MetaDef> implements MetaDef {
     private static final long serialVersionUID = -2427311273356072872L;
-
-    public static final String OWNER = "owner";
-
-    private static final Set<String> ALLOWED_NAMES = new ImmutableSet.Builder<String>().add(OWNER).build();
-    private String name;
-    private String value;
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z_].[-a-zA-Z0-9_]*$");
+    
+    private final String value;
 
     protected MetaDefImpl(Builder builder) {
         super(builder);
-        this.name = builder.name;
         this.value = builder.value;
     }
 
     @Override
-    public String getMetaName() {
-        return this.name;
-    }
-
-    @Override
-    public String getMetaValue() {
+    public String getEscapedValue() {
         return StringEscapeUtils.escapeHtml4(this.value);
     }
 
@@ -58,27 +49,30 @@ public class MetaDefImpl extends DefinitionImpl<MetaDef> implements MetaDef {
     public void serialize(Json json) throws IOException {
 
     }
-
+    
     @Override
-    public boolean isValid() {
-        return ALLOWED_NAMES.contains(getMetaName());
+    public void validateDefinition() throws QuickFixException {
+        super.validateDefinition();
+        
+        String name = getName();
+        Matcher matcher = NAME_PATTERN.matcher(name);
+        if (!matcher.matches()) {
+            throw new InvalidDefinitionException(String.format("Invalid name '%s' for aura:meta tag.", name), getLocation());
+        }
+        
+        if (value == null) {
+            throw new InvalidDefinitionException(String.format("Missing value for aura:meta tag '%s'", name), getLocation());
+        }
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<MetaDef> {
-
-        private String name;
         private String value;
 
         public Builder() {
             super(MetaDef.class);
         }
 
-        public Builder setMetaName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Builder setMetaValue(String value) {
+        public Builder setValue(String value) {
             this.value = value;
             return this;
         }

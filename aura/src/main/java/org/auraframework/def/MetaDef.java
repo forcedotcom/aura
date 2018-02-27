@@ -24,16 +24,7 @@ public interface MetaDef extends Definition {
     DefDescriptor<MetaDef> getDescriptor();
 
     /**
-     * Name of meta information
-     *
-     * @return name
+     * Gets the metadata value with HTML entities escaped.
      */
-    String getMetaName();
-
-    /**
-     * Value of named meta information
-     *
-     * @return value
-     */
-    String getMetaValue();
+    String getEscapedValue();
 }

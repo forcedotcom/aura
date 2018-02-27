@@ -150,6 +150,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case LIBRARY:
             case DOCUMENTATION:
             case EXAMPLE:
+            case META:
             case TOKENS:
             case DESIGN:
             case SVG:

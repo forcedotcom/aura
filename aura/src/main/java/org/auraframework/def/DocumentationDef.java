@@ -43,4 +43,9 @@ public interface DocumentationDef extends Definition {
      * @return map from ExampleDef name to ExampleDef
      */
     Map<String, ExampleDef> getExampleDefsAsMap();
+    
+    /**
+     * Gets the {@link MetaDef} within this documentation.
+     */
+    Map<String, MetaDef> getMetaDefsAsMap();
 }

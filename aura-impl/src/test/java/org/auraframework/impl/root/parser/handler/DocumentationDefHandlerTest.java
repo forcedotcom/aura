@@ -219,6 +219,21 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
         }
 
     }
+    
+    @Test
+    public void testParsesMetaDefs() throws Exception {
+        String docDefSource = "<aura:documentation>"
+                + "<aura:meta name='name1' value='value1'/>"
+                + "<aura:meta name='name2' value='value2'/>"
+                + "</aura:documentation>";
+        
+        DocumentationDef dd = parse(docDefSource);
+        
+        int expected = 2;
+        int actual = dd.getMetaDefsAsMap().size();
+        
+        assertEquals("Did not add expected number of aura:meta defs", expected, actual);            
+    }
 
     private DocumentationDef parse(String markup) throws QuickFixException {
         StringSource<DocumentationDef> source = new StringSource<>(vendor.getDocumentationDefDescriptor(), markup, "myID", Format.XML);

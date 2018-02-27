@@ -25,7 +25,9 @@ import org.auraframework.builder.DocumentationDefBuilder;
 import org.auraframework.def.DescriptionDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ExampleDef;
+import org.auraframework.def.MetaDef;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -36,14 +38,16 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
 
     private static final long serialVersionUID = 7808842576422413967L;
 
-    private final LinkedHashMap<String, DescriptionDef> descriptionDefs;
-    private final LinkedHashMap<String, ExampleDef> exampleDefs;
+    private final Map<String, DescriptionDef> descriptionDefs;
+    private final Map<String, ExampleDef> exampleDefs;
+    private final Map<String, MetaDef> metaDefs;
 
     protected DocumentationDefImpl(Builder builder) {
         super(builder);
 
-        this.descriptionDefs = builder.descriptionMap;
-        this.exampleDefs = builder.exampleMap;
+        this.descriptionDefs = AuraUtil.immutableMap(builder.descriptionMap);
+        this.exampleDefs = AuraUtil.immutableMap(builder.exampleMap);
+        this.metaDefs = AuraUtil.immutableMap(builder.metaMap);
     }
 
     @Override
@@ -76,6 +80,11 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
     public Map<String, ExampleDef> getExampleDefsAsMap() {
         return exampleDefs;
     }
+       
+    @Override
+    public Map<String, MetaDef> getMetaDefsAsMap() {
+        return metaDefs;
+    }
 
     @Override
     public void serialize(Json json) throws IOException {
@@ -89,6 +98,10 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
         if (descriptionDefs.isEmpty()) {
             throw new InvalidDefinitionException("<aura:documentation> must contain at least one <aura:description>", getLocation());
         }
+        
+        for (MetaDef metaDef : metaDefs.values()) {
+            metaDef.validateDefinition();
+        }
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<DocumentationDef> implements DocumentationDefBuilder {
@@ -98,6 +111,7 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
 
         private final LinkedHashMap<String, DescriptionDef> descriptionMap = new LinkedHashMap<>();
         private final LinkedHashMap<String, ExampleDef> exampleMap = new LinkedHashMap<>();
+        private final LinkedHashMap<String, MetaDef> metaMap = new LinkedHashMap<>();
 
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
@@ -118,5 +132,11 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
             this.exampleMap.put(id, example);
             return this;
         }
+
+        @Override
+        public DocumentationDefBuilder addMeta(String id, MetaDef metaDef) {
+            this.metaMap.put(id, metaDef);
+            return this;
+        }       
     }
 }

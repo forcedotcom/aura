@@ -46,13 +46,9 @@
 
         // 'get' on unsupported property works but 'set' throws an error
         testUtils.assertUndefined(div.shadowRoot);
-        try {
-            div.shadowRoot = "foo";
-            testUtils.fail("Expected error trying to set unsupported property");
-        } catch (e) {
-            testUtils.assertEquals("SecureElement does not allow access to shadowRoot", e.message, "Unexpected error" +
-                    " message setting unsupported property");
-        }
+        testUtils.expectAuraWarning('SecureElement does not allow access to shadowRoot');
+        div.shadowRoot = "foo";
+        testUtils.assertUndefined(div.shadowRoot);
     },
 
     testInOperation: function(cmp) {

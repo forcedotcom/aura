@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-02-25
- * Version: 0.3.14
+ * Generated: 2018-02-26
+ * Version: 0.3.15
  */
 
 (function (global, factory) {
@@ -3538,7 +3538,9 @@ function SecureElement(el, key) {
       set: function(target, property, value) {
         if (property in basePrototype) {
           if (!propertyIsSupported(target, property)) {
-            throw new Error(`SecureElement does not allow access to ${property}`);
+            warn(`SecureElement does not allow access to ${property}`);
+            // setters on proxy trap must return true or throw
+            return true;
           }
 
           target[property] = value;

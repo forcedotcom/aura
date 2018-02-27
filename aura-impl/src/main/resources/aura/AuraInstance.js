@@ -1344,6 +1344,7 @@ AuraInstance.prototype.deprecated = function(message, workaround, reportSignatur
             reportAction.setParams({
                 "usages": $A.util.apply({}, this.deprecationUsages)
             });
+            reportAction.setCaboose();
 
             $A.clientService.enqueueAction(reportAction);
 

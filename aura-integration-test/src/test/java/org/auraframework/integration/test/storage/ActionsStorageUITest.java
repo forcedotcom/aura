@@ -35,7 +35,7 @@ public class ActionsStorageUITest extends WebDriverTestCase {
 
     @Override
     public Mode getAuraModeForCurrentBrowser() {
-        return Mode.PRODDEBUG;
+        return Mode.SELENIUMDEBUG;
     }
 
     private ExpectedCondition<Boolean> valueToContain(final WebElement element, final String text) {

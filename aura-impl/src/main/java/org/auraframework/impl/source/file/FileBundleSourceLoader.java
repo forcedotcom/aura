@@ -310,28 +310,41 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
 
         try {
             PathMatchingResourcePatternResolver p = new PathMatchingResourcePatternResolver(resourceLoader);
-            Resource[] res = p.getResources("classpath*:/" + basePackage + "/*/*/*.*");
+            Resource[] res = p.getResources("classpath*:/" + basePackage + "/**/*.*");
             for (Resource r : res) {
                 //
                 // TOTAL HACK: Move this to getAllDescriptors later.
                 //
                 String filename = r.getURL().toString();
                 List<String> names = AuraTextUtil.splitSimple("/", filename);
-                if (names.size() < 3) {
+
+                int namesSize = names.size();
+                int packagePosition = names.indexOf(basePackage);
+
+                if (namesSize < 3 || packagePosition == -1 || namesSize - 1 < packagePosition + 3) {
+                    // ensure resource has at least namespace folder, bundle folder, bundle file
                     continue;
                 }
-                String last = names.get(names.size() - 1);
-                String name = names.get(names.size() - 2);
-                String ns = names.get(names.size() - 3);
+
+                String ns = names.get(packagePosition + 1);
                 File nsDir = new File(directory, ns);
                 if (!nsDir.exists()) {
                     nsDir.mkdir();
                 }
-                File nameDir = new File(nsDir, name);
-                if (!nameDir.exists()) {
-                    nameDir.mkdir();
+
+                File parent = nsDir;
+                for (int i = packagePosition + 2; i < namesSize - 1; i++) {
+                    // create nested folders
+                    String folder = names.get(i);
+                    File dir = new File(parent, folder);
+                    if (!dir.exists()) {
+                        dir.mkdir();
+                    }
+                    parent = dir;
                 }
-                File target = new File(nameDir, last);
+
+                String file = names.get(namesSize - 1);
+                File target = new File(parent, file);
                 try (
                     InputStream resourceStream = r.getInputStream();
                     FileOutputStream targetStream = new FileOutputStream(target)

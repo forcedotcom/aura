@@ -116,6 +116,10 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
         for (File file : base.listFiles()) {
 
             if (file.isDirectory()) {
+                if (file.getName().startsWith("__")) {
+                    // ignore files not needed for modules ie tests, snapshots, etc
+                    continue;
+                }
                 processBundle(file, sourceMap, moduleDescriptor, moduleDescriptorFilePath, namespace);
                 continue;
             }

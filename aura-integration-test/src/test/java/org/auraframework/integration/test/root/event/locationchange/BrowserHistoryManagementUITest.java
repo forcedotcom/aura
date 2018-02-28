@@ -18,7 +18,6 @@ package org.auraframework.integration.test.root.event.locationchange;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -31,93 +30,6 @@ import org.openqa.selenium.WebElement;
 // History Service is not supported in IE7 or IE8
 @ExcludeBrowsers({ BrowserType.IE8 })
 public class BrowserHistoryManagementUITest extends WebDriverTestCase {
-    /**
-     * A basic component which has specified a event to be fired for location change but has no handler.
-     * 
-     * @exception Changes the URL to the location specified in the client action but nothing else.
-     */
-    @Test
-    public void testNoHandlerForLocationChange() throws Exception {
-        open("/test/test_LocChng_NoHandler.app");
-        String content = getBodyText();
-        findByCssSelector(".identifier").click();
-        assertEquals("Contents on the page changed even though location change event was not handled", content,
-                getBodyText());
-        assertEquals("WillDoNothing", getAuraUITestingUtil().getEval("return window.aura.historyService.get().token"));
-    }
-
-    private String getBodyText() {
-        return getDriver().findElement(By.tagName("body")).getText();
-    }
-
-    /**
-     * Verify that browser History events are fired with a simple component. Have a simple component which has
-     * registered an event for handling Location Change. Have a handler which handles this location change event. Verify
-     * that the handler was evoked when aura.historyService.set()
-     */
-    @Test
-    public void testBrowserHistoryInteractionInSimpleComponent() throws Exception {
-        open("/test/test_LocChng_SimpleComponent.app");
-        findByCssSelector(".SimpleComponent").click();
-        assertTrue(
-                "Location change event failed to evoke the right client action",
-                "test_LocChng_SimpleComponent#aura:locationChange".equals(findByCssSelector(".SimpleComponent")
-                        .getText()));
-        assertEquals("ButtonClickedSimpleComponent",
-                getAuraUITestingUtil().getEval("return window.aura.historyService.get().token"));
-        assertEquals("1", getAuraUITestingUtil().getEval("return window.aura.historyService.get().num"));
-    }
-
-    /**
-     * Verify that browser History events in a complex component with multiple handlers. Have a simple component which
-     * has registered an event for handling Location Change. Have a Bigger component which has registered an event for
-     * handling Location Change and also includes the simple component within it's body. Have 2 handlers which handle
-     * both location change events. Verify that the handler was evoked when aura.historyService.set() This also tests
-     * that all handlers registered for the location change event are invoked.
-     */
-    @Test
-    public void testBrowserHistoryInteractionInComplexComponent() throws Exception {
-        open("/test/test_LocChng_CompositeComponent.app");
-        String compositeCmp = ".CompositeComponent";
-        findByCssSelector(compositeCmp).click();
-        assertTrue("Location change event failed to evoke the right client action",
-                "test_LocChng_Composite:test:test_LocChng_Event2".equals(findByCssSelector(compositeCmp).getText()));
-        /*
-         * For Future: When applications can be included as FACETS &&
-         * "test_LocChng_SimpleComponent#test:test_LocChng_Event2"
-         * .equals(this.getText("//div[contains(@class,'SimpleComponent')]"))
-         */
-        assertEquals("ButtonClickedCompositeComponent",
-                getAuraUITestingUtil().getEval("return window.aura.historyService.get().token"));
-        assertEquals("1", getAuraUITestingUtil().getEval("return window.aura.historyService.get().locator"));
-
-    }
-
-    /**
-     * For Future: When Application can be included as FACETS
-     */
-    @Test
-    @Ignore
-    public void testBrowserHistoryInteractionInComplexComponent2() throws Exception {
-        /*
-         * This verifies that even though the Inner component has its own location change event, in the context of
-         * another bigger component, only the root component's location change event is fired. In this case
-         * test:test_LocChng_Event2
-         */
-        open("/test/test_LocChng_CompositeComponent.app");
-        findByCssSelector(".SimpleComponent").click();
-
-        assertEquals("Location change event failed to evoke the right client action",
-                "test_LocChng_Composite:test:test_LocChng_Event2",
-                findByCssSelector(".CompositeComponent").getText());
-        assertEquals("Location change event failed to evoke the right client action",
-                "test_LocChng_SimpleComponent#test:test_LocChng_Event2",
-                findByCssSelector(".SimpleComponent").getText());
-        assertEquals("ButtonClickedSimpleComponent",
-                getAuraUITestingUtil().getEval("return window.aura.historyService.get().token"));
-        assertEquals("1", getAuraUITestingUtil().getEval("return window.aura.historyService.get().locator"));
-
-    }
 
     /**
      * Verify the functionality of "aura.historyService.back()" and "aura.historyService.forward()". The component has 3

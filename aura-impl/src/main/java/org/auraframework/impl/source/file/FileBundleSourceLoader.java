@@ -310,38 +310,28 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
 
         try {
             PathMatchingResourcePatternResolver p = new PathMatchingResourcePatternResolver(resourceLoader);
-            Resource[] res = p.getResources("classpath*:/" + basePackage + "/**/*.*");
+            Resource[] res = p.getResources("classpath*:/" + basePackage + "/*/*/*.*");
             for (Resource r : res) {
                 //
                 // TOTAL HACK: Move this to getAllDescriptors later.
                 //
                 String filename = r.getURL().toString();
                 List<String> names = AuraTextUtil.splitSimple("/", filename);
-                int namesSize = names.size();
-                if (namesSize < 3) {
+                if (names.size() < 3) {
                     continue;
                 }
-                int packagePosition = names.indexOf(basePackage);
-
-                String ns = names.get(packagePosition + 1);
+                String last = names.get(names.size() - 1);
+                String name = names.get(names.size() - 2);
+                String ns = names.get(names.size() - 3);
                 File nsDir = new File(directory, ns);
                 if (!nsDir.exists()) {
                     nsDir.mkdir();
                 }
-
-                File parent = nsDir;
-                for (int i = packagePosition + 2; i < namesSize - 1; i++) {
-                    // create nested folders
-                    String folder = names.get(i);
-                    File dir = new File(parent, folder);
-                    if (!dir.exists()) {
-                        dir.mkdir();
-                    }
-                    parent = dir;
+                File nameDir = new File(nsDir, name);
+                if (!nameDir.exists()) {
+                    nameDir.mkdir();
                 }
-
-                String file = names.get(namesSize - 1);
-                File target = new File(parent, file);
+                File target = new File(nameDir, last);
                 try (
                     InputStream resourceStream = r.getInputStream();
                     FileOutputStream targetStream = new FileOutputStream(target)

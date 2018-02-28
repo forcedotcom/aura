@@ -239,6 +239,8 @@ public class ModuleDefFileBundleBuilderUnitTest {
         when(mockNestFolder.getName()).thenReturn("nest");
         when(mockNestFolder.getParentFile()).thenReturn(mockBaseFile);
 
+        File[] baseListFiles = new File[] { mockJsFile, mockCssFile, mockTemplateFile, mockUtilJsFile, mockDataJsFile, mockNestFolder };
+
         File mockNestUtilJsFile = mock(File.class);
         setupMockFile(mockNestUtilJsFile, mockBaseFile, "nest/utils.js");
         when(mockNestUtilJsFile.getParent()).thenReturn("nest");
@@ -250,22 +252,6 @@ public class ModuleDefFileBundleBuilderUnitTest {
         when(mockNestDataJsFile.getParent()).thenReturn("nest");
         when(mockNestDataJsFile.getParentFile()).thenReturn(mockNestFolder);
         DefDescriptor<ModuleDef> nestedDataJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-nest-data", ModuleDef.class, module);
-
-        // TESTS (IGNORED)
-
-        File mockTestFolder = mock(File.class);
-        when(mockTestFolder.isDirectory()).thenReturn(true);
-        when(mockTestFolder.getName()).thenReturn("__tests__");
-        when(mockTestFolder.getParentFile()).thenReturn(mockBaseFile);
-
-        File[] baseListFiles = new File[] { mockJsFile, mockCssFile, mockTemplateFile, mockUtilJsFile, mockDataJsFile, mockNestFolder, mockTestFolder };
-
-        File mockTestFile = mock(File.class);
-        setupMockFile(mockTestFile, mockBaseFile, "__tests__/test.test.js");
-        when(mockTestFile.getParent()).thenReturn("__tests__");
-        when(mockTestFile.getParentFile()).thenReturn(mockNestFolder);
-
-        File[] nestTestFiles = new File[] { mockTestFolder, mockTestFile };
 
         // SECOND NESTED
 
@@ -292,7 +278,6 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         when(mockBaseFile.listFiles()).thenReturn(baseListFiles);
         when(mockNestFolder.listFiles()).thenReturn(nestListFiles);
-        when(mockTestFolder.listFiles()).thenReturn(nestTestFiles);
         when(mockSecondNestFolder.listFiles()).thenReturn(secondNestListFiles);
 
         ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);

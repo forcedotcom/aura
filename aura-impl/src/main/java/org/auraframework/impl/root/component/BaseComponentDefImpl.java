@@ -155,7 +155,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     private transient Boolean localDeps = null;
     private transient QuickFixException componentBuildError;
-    protected transient String serializedJSON;
+    protected transient Map<String,String> serializedJSON;
 
     private static <X extends Definition> DefDescriptor<X> getFirst(List<DefDescriptor<X>> list) {
         return (list != null && list.size() > 0) ? list.get(0) : null;
@@ -1145,7 +1145,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 }
 
                 serializeFields(json);
-                serializedJSON = json.stopCapturing();
+                if (serializedJSON == null) {
+                    synchronized (this) {
+                        if (serializedJSON == null) {
+                            serializedJSON = new HashMap<>();
+                        }
+                    }
+                }
+                serializedJSON.put(json.getIndent(), json.stopCapturing());
                 
                 serializeContextDependencies(context, json);
                 

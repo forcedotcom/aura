@@ -98,7 +98,7 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
 
         boolean preloaded = context.isPreloaded(getDescriptor());
 
-        if (serializedJSON != null && !preloaded && !serializationContext.isSerializing()) {
+        if (serializedJSON != null && serializedJSON.containsKey(json.getIndent()) && !preloaded && !serializationContext.isSerializing()) {
             serializationContext.setSerializing(true);
             
             json.writeMapBegin();
@@ -107,7 +107,7 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
 
             serializeStyles(json);
 
-            json.getAppendable().append(serializedJSON);
+            json.getAppendable().append(serializedJSON.get(json.getIndent()));
             
             serializeContextDependencies(context, json);
             json.writeMapEnd();

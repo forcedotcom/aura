@@ -26,11 +26,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.TimeZone;
 
 import javax.annotation.Nonnull;
@@ -131,7 +131,7 @@ public class JsonEncoder implements Json {
         // the "main" Appendable that is always written to
         private final Appendable all;
         // the optional/capturing Appendable that is non-empty only if capturing is in progress
-        private Optional<StringBuilder> captured = Optional.empty();
+        private Deque<StringBuilder> captured = new ArrayDeque<>();
         
         CapturableAppendable(Appendable out) {
             this.all = out;
@@ -140,8 +140,8 @@ public class JsonEncoder implements Json {
         @Override
         public Appendable append(CharSequence csq) throws IOException {
             all.append(csq);
-            if (captured.isPresent()) {
-                captured.get().append(csq);
+            if (!captured.isEmpty()) {
+                captured.getFirst().append(csq);
             }
             return this;
         }
@@ -149,8 +149,8 @@ public class JsonEncoder implements Json {
         @Override
         public Appendable append(CharSequence csq, int start, int end) throws IOException {
             all.append(csq, start, end);
-            if (captured.isPresent()) {
-                captured.get().append(csq, start, end);
+            if (!captured.isEmpty()) {
+                captured.getFirst().append(csq, start, end);
             }
             return this;
         }
@@ -158,8 +158,8 @@ public class JsonEncoder implements Json {
         @Override
         public Appendable append(char c) throws IOException {
             all.append(c);
-            if (captured.isPresent()) {
-                captured.get().append(c);
+            if (!captured.isEmpty()) {
+                captured.getFirst().append(c);
             }
             return this;
         }
@@ -168,7 +168,7 @@ public class JsonEncoder implements Json {
          * Initializes the capturing buffer
          */
         void startCapturing() {
-            captured = Optional.of(new StringBuilder());
+            captured.addFirst(new StringBuilder());
         }
         
         /**
@@ -178,9 +178,11 @@ public class JsonEncoder implements Json {
          */
         String stopCapturing() {
             String result = null;
-            if (captured.isPresent()) {
-                result = captured.get().toString();
-                captured = Optional.empty();
+            if (!captured.isEmpty()) {
+                result = captured.removeFirst().toString();
+                if (!captured.isEmpty()) {
+                    captured.getFirst().append(result);
+                }
             }
             return result;
         }

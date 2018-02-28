@@ -748,4 +748,25 @@ public class JsonTest extends UnitTestCase {
         jsonSkipNull.close();
         assertEquals("fail with Json Stream Skip null", expect2, new String(baos.toByteArray(), Charsets.UTF_8) );
     }
+
+    @Test
+    public void testNestedStartStopCapturing() throws IOException {
+        JsonEncoder json = new JsonEncoder(new StringBuilder(), new NoSerializerContext());
+
+        json.startCapturing();
+        json.writeMapBegin();
+
+        json.startCapturing();
+        json.writeMapEntry("k", "v");
+        // assert nested start/stop capturing
+        assertEquals("\"k\":\"v\"", json.stopCapturing());
+
+        json.writeMapEnd();
+
+        // assert outer start/stop capturing
+        assertEquals("{\"k\":\"v\"}", json.stopCapturing());
+
+        // assert overall json
+        assertEquals("{\"k\":\"v\"}", json.getAppendable().toString());
+    }
 }

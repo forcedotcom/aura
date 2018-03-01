@@ -385,7 +385,7 @@ public class InputTextUITest extends WebDriverTestCase {
         assertEquals("Value of Input text shoud be updated", inputText, actualText);
     }
 
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     @Test
     public void testInputTextWithEmptyLabel() throws Exception {
         open(TEST_CMP_WITH_LABELS);

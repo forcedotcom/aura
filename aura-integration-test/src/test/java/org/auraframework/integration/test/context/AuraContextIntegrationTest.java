@@ -55,6 +55,7 @@ import org.auraframework.util.json.JsonSerializable;
 import org.auraframework.util.json.JsonSerializerFactory;
 import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceType;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
@@ -67,6 +68,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@ThreadHostileTest("Tests modify if locker service is enabled")
 public class AuraContextIntegrationTest extends AuraImplTestCase {
 
     @Inject
@@ -814,6 +816,7 @@ public class AuraContextIntegrationTest extends AuraImplTestCase {
      * Verify action-public-caching-enabled (acpe) and action-public-cache-key properties are added to JSON when action 
      * public caching is enabled in Full encoding style
      */
+    @ThreadHostileTest("Tests modify if public action caching enabled")
     @Test
     public void testSerializeWithActionPublicCaching() throws Exception {
         getMockConfigAdapter().setActionPublicCachingEnabled(true);

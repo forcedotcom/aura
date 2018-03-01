@@ -57,7 +57,10 @@ import org.auraframework.system.Message;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.*;
+import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.json.JsonStreamReader;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.validation.ReferenceValidationContext;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
@@ -602,6 +605,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     /**
      * Verify that toggling whether LockerService is enabled or not returns a different result from writeDefinitions
      */
+    @ThreadHostileTest("Modifies if locker service is enabled")
     @Test
     public void testWriteDefinitionsLockerServiceCacheBuster() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = definitionService
@@ -631,6 +635,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     /**
      * Verify that metrics service writes data out.
      */
+    @ThreadHostileTest("PRODUCTION")
     @Test
     public void testWriteDefinitionsMetricsWithDevMode() throws Exception {
         Action action = new EmptyAction(definitionService);
@@ -655,6 +660,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     /**
      * Verify that metrics service does not write anything out.
      */
+    @ThreadHostileTest("PRODUCTION")
     @Test
     public void testWriteDefinitionsNoMetricsWithProdMode() throws Exception {
         Action action = new EmptyAction(definitionService);

@@ -649,6 +649,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     /**
      * Test GET of publicly cacheable action returns caching headers
      */
+    @ThreadHostileTest("Tests modify if public action caching enabled")
     @Test
     public void testGetPubliclyCacheableActionHasCachingHeaders() throws Exception {
         MockConfigAdapter mca = getMockConfigAdapter();
@@ -667,6 +668,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     /**
      * Test GET of publicly cacheable action returns expected return value
      */
+    @ThreadHostileTest("Tests modify if public action caching enabled")
     @Test
     @SuppressWarnings("unchecked")
     public void testGetPubliclyCacheableActionReturnValue() throws Exception {
@@ -700,6 +702,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     /**
      * Test GET of publicly cacheable action with an error is returned with no-cache headers
      */
+    @ThreadHostileTest("Tests modify if public action caching enabled")
     @Test
     public void testGetPubliclyCacheableActionWithExceptionSendsNoCacheHeaders() throws Exception {
         MockConfigAdapter mca = getMockConfigAdapter();
@@ -714,6 +717,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     /**
      * Test GET of publicly cacheable action with different cache key from server is returned with no-cache headers
      */
+    @ThreadHostileTest("Tests modify if public action caching enabled")
     @Test
     public void testGetPubliclyCacheableActionWithNewCacheKeySendsNoCache() throws Exception {
         MockConfigAdapter mca = getMockConfigAdapter();

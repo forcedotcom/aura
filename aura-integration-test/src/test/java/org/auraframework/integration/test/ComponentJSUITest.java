@@ -206,8 +206,9 @@ public class ComponentJSUITest extends TestSuite {
          * The URL for loading the test within the aurajstest:jstest app. Used primarily by test:runner.
          */
         public String getAppUrl() {
-            DefType defType = caseDef.getDefType();
-            return suite.getUrl(defType) + "?aura.jstest=" + caseDef.getName() + "&aura.testReset=true";
+            String defType = DefType.APPLICATION.equals(caseDef.getDefType()) ? "app" : "cmp";
+            return String.format("/%s/%s.%s?aura.jstest=%s&aura.mode=JSTESTDEBUG&aura.testReset=true", suite.descriptor.getNamespace(),
+                    suite.descriptor.getName(), defType, caseDef.getName());
         }
 
         @Override

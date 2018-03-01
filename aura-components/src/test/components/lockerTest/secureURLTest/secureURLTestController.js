@@ -73,12 +73,12 @@
         T.assertStartsWith("blob:", url1, 'Blob URI should start with "blob:"');
 
         // ---
-
-        var blob2 = new Blob(['<html><body onload="alert(window)"></body></html>'], {type: 'text/html'});
-        try {
-            result = URL.createObjectURL(blob2);
-        } catch (e) { result = e.name; }
-        T.assertStartsWith("TypeError", result, 'Should throw on on a blob type text/html');
+        // disable in favor of internal Locker tests
+        // var blob2 = new Blob(['<html><body onload="alert(window)"></body></html>'], {type: 'text/html'});
+        // try {
+        //     result = URL.createObjectURL(blob2);
+        // } catch (e) { result = e.name; }
+        // T.assertStartsWith("TypeError", result, 'Should throw on on a blob type text/html');
 
         // ---
 

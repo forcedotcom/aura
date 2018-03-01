@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-02-26
- * Version: 0.3.15
+ * Generated: 2018-02-28
+ * Version: 0.3.16
  */
 
 (function (global, factory) {
@@ -532,20 +532,77 @@ function repairAccessors(lockerRec) {
 // https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
 // https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
 
-// Mitigate proxy-related security issues
-// https://github.com/tc39/ecma262/issues/272
+/**
+ * The process to repair constructors:
+ * 1. Obtain the prototype from an instance
+ * 2. Create a substitute noop constructor
+ * 3. Replace its prototype property with the original prototype
+ * 4. Replace its prototype property's constructor with itself
+ * 5. Replace its [[Prototype]] slot with the noop constructor of Function
+ */
+function repairRootFunction(lockerRec, functionName, functionDecl) {
+  const { unsafeGlobal, unsafeEval, unsafeFunction } = lockerRec;
 
-// Objects that are deeply frozen
-const frozenSet = new WeakSet();
+  const RootFunctionInstance = unsafeEval(`(${functionDecl}(){})`);
+  const RootFunctionPrototype = getPrototypeOf(RootFunctionInstance);
+
+  const NoopFunction = unsafeFunction('return function(){}');
+  defineProperties(NoopFunction, {
+    name: {
+      value: functionName
+    },
+    toString: {
+      value: () => `function ${functionName}() { [native code] }`
+    }
+  });
+
+  defineProperty(NoopFunction, 'prototype', { value: RootFunctionPrototype });
+  defineProperty(RootFunctionPrototype, 'constructor', { value: NoopFunction });
+
+  // Prevent loop in case of Function.
+  if (NoopFunction !== unsafeGlobal.Function.prototype.constructor) {
+    setPrototypeOf(NoopFunction, unsafeGlobal.Function.prototype.constructor);
+  }
+}
 
 /**
- * "deepFreeze()" acts like "Object.freeze()", except that:
+ * This block replaces the original Function constructor, and the original
+ * %GeneratorFunction% %AsyncFunction% and %AsyncGeneratorFunction%, with
+ * safe replacements that preserve SES confinement. After this block is done,
+ * the originals should no longer be reachable.
+ */
+function repairFunctions(lockerRec) {
+  const { unsafeGlobal } = lockerRec;
+  const hasAsyncIteration = typeof unsafeGlobal.Symbol.asyncIterator !== 'undefined';
+
+  // Here, the order of operation is important: Function needs to be
+  // repaired first since the other constructors need it.
+  repairRootFunction(lockerRec, 'Function', 'function');
+  repairRootFunction(lockerRec, 'GeneratorFunction', 'function*');
+  repairRootFunction(lockerRec, 'AsyncFunction', 'async function');
+  if (hasAsyncIteration) {
+    repairRootFunction(lockerRec, 'AsyncGeneratorFunction', 'async function*');
+  }
+}
+
+/*
+ * Copyright (C) 2017 salesforce.com, inc.
  *
- * 1. To deepFreeze an object is to freeze it and all objects transitively
- * reachable from it via transitive reflective property and prototype
- * traversal.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * 2. For a special set of properties (defined below), it ensures that the
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * For a special set of properties (defined below), it ensures that the
  * effect of freezing does not suppress the ability to override these
  * properties on derived objects by simple assignment.
  *
@@ -562,14 +619,104 @@ const frozenSet = new WeakSet();
  * selected configurable own data properties with accessor properties which
  * simulate what we should have specified -- that assignments to derived
  * objects succeed if otherwise possible.
- *
- * We provide no detection mechanism. An optional parameter,
- * "propertiesByObject", must be provided instead to specify which
- * properties should be replaced using the complex workaround. In this case, a
- * lookup on propertiesByObject using the object as a key must return a list
- * of all non-writables data properties to be replaced on that object.
  */
-function deepFreeze(node, replacementsByObject) {
+
+function tamperProof(obj, prop) {
+  const desc = getOwnPropertyDescriptor(obj, prop);
+  if ('value' in desc && desc.configurable) {
+    const value = desc.value;
+
+    // eslint-disable-next-line no-inner-declarations
+    function getter() {
+      return value;
+    }
+
+    // eslint-disable-next-line no-inner-declarations
+    function setter(newValue) {
+      if (obj === this) {
+        throw new TypeError(
+          `Cannot assign to read only property '${prop}' of object '${obj.name}'`
+        );
+      }
+      if (objectHasOwnProperty.call(this, prop)) {
+        this[prop] = newValue;
+      } else {
+        defineProperty(this, prop, {
+          value: newValue,
+          writable: true,
+          enumerable: desc.enumerable,
+          configurable: desc.configurable
+        });
+      }
+    }
+
+    defineProperty(obj, prop, {
+      get: getter,
+      set: setter,
+      enumerable: desc.enumerable,
+      configurable: desc.configurable
+    });
+  }
+}
+
+/**
+ * These properties are subject to the override mistake.
+ * We "repair" these data properties to getters
+ * and setters.
+ */
+function repairDataProperties(lockerRec) {
+  const { unsafeGlobal: _ } = lockerRec;
+
+  // Intentionally avoid loops and data structures.
+  tamperProof(_.Object.prototype, 'toString');
+  tamperProof(_.Error.prototype, 'message');
+  tamperProof(_.EvalError.prototype, 'message');
+  tamperProof(_.RangeError.prototype, 'message');
+  tamperProof(_.ReferenceError.prototype, 'message');
+  tamperProof(_.SyntaxError.prototype, 'message');
+  tamperProof(_.TypeError.prototype, 'message');
+  tamperProof(_.URIError.prototype, 'message');
+}
+
+/*
+ * Copyright (C) 2017 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Adapted from SES/Caja
+// Copyright (C) 2011 Google Inc.
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
+
+// Mitigate proxy-related security issues
+// https://github.com/tc39/ecma262/issues/272
+
+// Objects that are deeply frozen
+const frozenSet = new WeakSet();
+
+/**
+ * "deepFreeze()" acts like "Object.freeze()", except that:
+ *
+ * To deepFreeze an object is to freeze it and all objects transitively
+ * reachable from it via transitive reflective property and prototype
+ * traversal.
+ */
+function deepFreeze(node) {
+  if (frozenSet.has(node)) {
+    return;
+  }
+
   // Objects that we're attempting to freeze.
   const freezingSet = new Set();
 
@@ -592,58 +739,7 @@ function deepFreeze(node, replacementsByObject) {
     freezingSet.add(val);
   }
 
-  function tamperProof(obj, replacements) {
-    const descs = getOwnPropertyDescriptors(obj);
-    ownKeys(descs).forEach(name => {
-      const desc = descs[name];
-      if ('value' in desc) {
-        if (desc.configurable && replacements.includes(name)) {
-          const value = desc.value;
-
-          // eslint-disable-next-line no-inner-declarations
-          function getter() {
-            return value;
-          }
-          // eslint-disable-next-line no-inner-declarations
-          function setter(newValue) {
-            if (obj === this) {
-              throw new TypeError(
-                `Cannot assign to read only property '${name}' of object '${obj.name}'`
-              );
-            }
-            if (objectHasOwnProperty.call(this, name)) {
-              this[name] = newValue;
-            } else {
-              defineProperty(this, name, {
-                value: newValue,
-                writable: true,
-                enumerable: desc.enumerable,
-                configurable: desc.configurable
-              });
-            }
-          }
-
-          defineProperty(obj, name, {
-            get: getter,
-            set: setter,
-            enumerable: desc.enumerable,
-            configurable: desc.configurable
-          });
-
-          enqueue(getter);
-          enqueue(setter);
-          enqueue(value);
-        } else {
-          enqueue(desc.value);
-        }
-      } else {
-        enqueue(desc.get);
-        enqueue(desc.set);
-      }
-    });
-  }
-
-  function simpleTamperProof(obj) {
+  function doFreeze(obj) {
     const descs = getOwnPropertyDescriptors(obj);
     ownKeys(descs).forEach(name => {
       const desc = descs[name];
@@ -654,30 +750,21 @@ function deepFreeze(node, replacementsByObject) {
         enqueue(desc.set);
       }
     });
+    freeze(obj);
+    frozenSet.add(obj);
   }
 
   // Process the freezingSet.
   function dequeue() {
     // New values added before forEach() has finished will be visited.
     freezingSet.forEach(obj => {
-      const replacements = replacementsByObject && replacementsByObject.get(obj);
-
-      if (replacements) {
-        tamperProof(obj, replacements);
-      } else {
-        simpleTamperProof(obj);
-      }
-      freeze(obj);
-      frozenSet.add(obj);
-
+      doFreeze(obj);
       enqueue(getPrototypeOf(obj));
     });
   }
 
   enqueue(node);
   dequeue();
-
-  return node;
 }
 
 /*
@@ -707,28 +794,28 @@ function deepFreeze(node, replacementsByObject) {
  * https://tc39.github.io/ecma262/#table-7
  */
 function getIntrinsics(lockerRec) {
-  const { unsafeGlobal: global } = lockerRec;
+  const { unsafeGlobal: _ } = lockerRec;
 
   // Anonymous intrinsics.
 
-  const SymbolIterator = (typeof global.Symbol && global.Symbol.iterator) || '@@iterator';
+  const SymbolIterator = (typeof _.Symbol && _.Symbol.iterator) || '@@iterator';
 
-  const ArrayIteratorInstance = new global.Array()[SymbolIterator]();
+  const ArrayIteratorInstance = new _.Array()[SymbolIterator]();
   const ArrayIteratorPrototype = getPrototypeOf(ArrayIteratorInstance);
   const IteratorPrototype = getPrototypeOf(ArrayIteratorPrototype);
 
-  const AsyncFunctionInstance = global.eval('(async function(){})');
+  const AsyncFunctionInstance = _.eval('(async function(){})');
   const AsyncFunction = AsyncFunctionInstance.constructor;
   const AsyncFunctionPrototype = AsyncFunction.prototype;
 
-  const GeneratorFunctionInstance = global.eval('(function*(){})');
+  const GeneratorFunctionInstance = _.eval('(function*(){})');
   const GeneratorFunction = GeneratorFunctionInstance.constructor;
   const Generator = GeneratorFunction.prototype;
   const GeneratorPrototype = Generator.prototype;
 
-  const hasAsyncIteration = typeof global.Symbol.asyncIterator !== 'undefined';
+  const hasAsyncIteration = typeof _.Symbol.asyncIterator !== 'undefined';
 
-  const AsyncGeneratorFunctionInstance = hasAsyncIteration && global.eval('(async function*(){})');
+  const AsyncGeneratorFunctionInstance = hasAsyncIteration && _.eval('(async function*(){})');
   const AsyncGeneratorFunction = hasAsyncIteration && AsyncGeneratorFunctionInstance.constructor;
   const AsyncGenerator = hasAsyncIteration && AsyncGeneratorFunction.prototype;
   const AsyncGeneratorPrototype = hasAsyncIteration && AsyncGenerator.prototype;
@@ -736,16 +823,16 @@ function getIntrinsics(lockerRec) {
   const AsyncFromSyncIteratorPrototype = hasAsyncIteration && undefined; // TODO
   const AsyncIteratorPrototype = hasAsyncIteration && getPrototypeOf(AsyncGeneratorPrototype);
 
-  const MapIteratorObject = new global.Map()[SymbolIterator]();
+  const MapIteratorObject = new _.Map()[SymbolIterator]();
   const MapIteratorPrototype = getPrototypeOf(MapIteratorObject);
 
-  const SetIteratorObject = new global.Set()[SymbolIterator]();
+  const SetIteratorObject = new _.Set()[SymbolIterator]();
   const SetIteratorPrototype = getPrototypeOf(SetIteratorObject);
 
-  const StringIteratorObject = new global.String()[SymbolIterator]();
+  const StringIteratorObject = new _.String()[SymbolIterator]();
   const StringIteratorPrototype = getPrototypeOf(StringIteratorObject);
 
-  const ThrowTypeError = global.eval(
+  const ThrowTypeError = _.eval(
     '(function () { "use strict"; return Object.getOwnPropertyDescriptor(arguments, "callee").get; })()'
   );
 
@@ -758,23 +845,23 @@ function getIntrinsics(lockerRec) {
     // *** Table 7
 
     // %Array%
-    Array: global.Array,
+    Array: _.Array,
     // %ArrayBuffer%
-    ArrayBuffer: global.ArrayBuffer,
+    ArrayBuffer: _.ArrayBuffer,
     // %ArrayBufferPrototype%
-    ArrayBufferPrototype: global.ArrayBuffer.prototype,
+    ArrayBufferPrototype: _.ArrayBuffer.prototype,
     // %ArrayIteratorPrototype%
     ArrayIteratorPrototype,
     // %ArrayPrototype%
-    ArrayPrototype: global.Array.prototype,
+    ArrayPrototype: _.Array.prototype,
     // %ArrayProto_entries%
-    ArrayProto_entries: global.Array.prototype.entries,
+    ArrayProto_entries: _.Array.prototype.entries,
     // %ArrayProto_foreach%
-    ArrayProto_foreach: global.Array.prototype.forEach,
+    ArrayProto_foreach: _.Array.prototype.forEach,
     // %ArrayProto_keys%
-    ArrayProto_keys: global.Array.prototype.forEach,
+    ArrayProto_keys: _.Array.prototype.forEach,
     // %ArrayProto_values%
-    ArrayProto_values: global.Array.prototype.values,
+    ArrayProto_values: _.Array.prototype.values,
     // %AsyncFromSyncIteratorPrototype%
     AsyncFromSyncIteratorPrototype,
     // %AsyncFunction%
@@ -790,47 +877,47 @@ function getIntrinsics(lockerRec) {
     // %AsyncIteratorPrototype%
     AsyncIteratorPrototype,
     // %Atomics%
-    Atomics: global.Atomics,
+    Atomics: _.Atomics,
     // %Boolean%
-    Boolean: global.Boolean,
+    Boolean: _.Boolean,
     // %BooleanPrototype%
-    BooleanPrototype: global.Boolean.prototype,
+    BooleanPrototype: _.Boolean.prototype,
     // %DataView%
-    DataView: global.DataView,
+    DataView: _.DataView,
     // %DataViewPrototype%
-    DataViewPrototype: global.DataView.prototype,
+    DataViewPrototype: _.DataView.prototype,
     // %Date%
-    Date: global.Date,
+    Date: _.Date,
     // %DatePrototype%
-    DatePrototype: global.Date.prototype,
+    DatePrototype: _.Date.prototype,
     // %decodeURI%
-    decodeURI: global.decodeURI,
+    decodeURI: _.decodeURI,
     // %decodeURIComponent%
-    decodeURIComponent: global.decodeURIComponent,
+    decodeURIComponent: _.decodeURIComponent,
     // %encodeURI%
-    encodeURI: global.encodeURI,
+    encodeURI: _.encodeURI,
     // %encodeURIComponent%
-    encodeURIComponent: global.encodeURIComponent,
+    encodeURIComponent: _.encodeURIComponent,
     // %Error%
-    Error: global.Error,
+    Error: _.Error,
     // %ErrorPrototype%
-    ErrorPrototype: global.Error.prototype,
+    ErrorPrototype: _.Error.prototype,
     // %eval%
     // eval: sandbox.eval,
     // %EvalError%
-    EvalError: global.EvalError,
+    EvalError: _.EvalError,
     // %EvalErrorPrototype%
-    EvalErrorPrototype: global.EvalError.prototype,
+    EvalErrorPrototype: _.EvalError.prototype,
     // %Float32Array%
-    Float32Array: global.Float32Array,
+    Float32Array: _.Float32Array,
     // %Float32ArrayPrototype%
-    Float32ArrayPrototype: global.Float32Array.prototype,
+    Float32ArrayPrototype: _.Float32Array.prototype,
     // %Float64Array%
-    Float64Array: global.Float64Array,
+    Float64Array: _.Float64Array,
     // %Float64ArrayPrototype%
-    Float64ArrayPrototype: global.Float64Array.prototype,
+    Float64ArrayPrototype: _.Float64Array.prototype,
     // %Function%
-    Function: global.Function,
+    Function: _.Function,
     // %FunctionPrototype%
     FunctionPrototype: Function.prototype,
     // %Generator%
@@ -840,103 +927,103 @@ function getIntrinsics(lockerRec) {
     // %GeneratorPrototype%
     GeneratorPrototype,
     // %Int8Array%
-    Int8Array: global.Int8Array,
+    Int8Array: _.Int8Array,
     // %Int8ArrayPrototype%
-    Int8ArrayPrototype: global.Int8Array.prototype,
+    Int8ArrayPrototype: _.Int8Array.prototype,
     // %Int16Array%
-    Int16Array: global.Int16Array,
+    Int16Array: _.Int16Array,
     // %Int16ArrayPrototype%,
-    Int16ArrayPrototype: global.Int16Array.prototype,
+    Int16ArrayPrototype: _.Int16Array.prototype,
     // %Int32Array%
-    Int32Array: global.Int32Array,
+    Int32Array: _.Int32Array,
     // %Int32ArrayPrototype%
-    Int32ArrayPrototype: global.Int32Array.prototype,
+    Int32ArrayPrototype: _.Int32Array.prototype,
     // %isFinite%
-    isFinite: global.Number.isFinite,
+    isFinite: _.isFinite,
     // %isNaN%
-    isNaN: global.Number.isNaN,
+    isNaN: _.isNaN,
     // %IteratorPrototype%
     IteratorPrototype,
     // %JSON%
-    JSON: global.JSON,
+    JSON: _.JSON,
     // %JSONParse%
-    JSONParse: global.JSON.parse,
+    JSONParse: _.JSON.parse,
     // %Map%
-    Map: global.Map,
+    Map: _.Map,
     // %MapIteratorPrototype%
     MapIteratorPrototype,
     // %MapPrototype%
-    MapPrototype: global.Map.prototype,
+    MapPrototype: _.Map.prototype,
     // %Math%
-    Math: global.Math,
+    Math: _.Math,
     // %Number%
-    Number: global.Number,
+    Number: _.Number,
     // %NumberPrototype%
-    NumberPrototype: global.Number.prototype,
+    NumberPrototype: _.Number.prototype,
     // %Object%
-    Object: global.Object,
+    Object: _.Object,
     // %ObjectPrototype%
-    ObjectPrototype: global.Object.prototype,
+    ObjectPrototype: _.Object.prototype,
     // %ObjProto_toString%
-    ObjProto_toString: global.Object.prototype.toString,
+    ObjProto_toString: _.Object.prototype.toString,
     // %ObjProto_valueOf%
-    ObjProto_valueOf: global.Object.prototype.valueOf,
+    ObjProto_valueOf: _.Object.prototype.valueOf,
     // %parseFloat%
-    parseFloat: global.parseFloat,
+    parseFloat: _.parseFloat,
     // %parseInt%
-    parseInt: global.parseInt,
+    parseInt: _.parseInt,
     // %Promise%
-    Promise: global.Promise,
+    Promise: _.Promise,
     // %Promise_all%
-    Promise_all: global.Promise.all,
+    Promise_all: _.Promise.all,
     // %Promise_reject%
-    Promise_reject: global.Promise.reject,
+    Promise_reject: _.Promise.reject,
     // %Promise_resolve%
-    Promise_resolve: global.Promise.resolve,
+    Promise_resolve: _.Promise.resolve,
     // %PromiseProto_then%
-    PromiseProto_then: global.Promise.prototype.then,
+    PromiseProto_then: _.Promise.prototype.then,
     // %PromisePrototype%
-    PromisePrototype: global.Promise.prototype,
+    PromisePrototype: _.Promise.prototype,
     // %Proxy%
-    Proxy: global.Proxy,
+    Proxy: _.Proxy,
     // %RangeError%
-    RangeError: global.RangeError,
+    RangeError: _.RangeError,
     // %RangeErrorPrototype%
-    RangeErrorPrototype: global.RangeError.prototype,
+    RangeErrorPrototype: _.RangeError.prototype,
     // %ReferenceError%
-    ReferenceError: global.ReferenceError,
+    ReferenceError: _.ReferenceError,
     // %ReferenceErrorPrototype%
-    ReferenceErrorPrototype: global.ReferenceError.prototype,
+    ReferenceErrorPrototype: _.ReferenceError.prototype,
     // %Reflect%
-    Reflect: global.Reflect,
+    Reflect: _.Reflect,
     // %RegExp%
-    RegExp: global.RegExp,
+    RegExp: _.RegExp,
     // %RegExpPrototype%
-    RegExpPrototype: global.RegExp.prototype,
+    RegExpPrototype: _.RegExp.prototype,
     // %Set%
-    Set: global.Set,
+    Set: _.Set,
     // %SetIteratorPrototype%
     SetIteratorPrototype,
     // %SetPrototype%
-    SetPrototype: global.Set.prototype,
+    SetPrototype: _.Set.prototype,
     // %SharedArrayBuffer%
     // SharedArrayBuffer: undefined, // Deprecated on Jan 5, 2018
     // %SharedArrayBufferPrototype%
     // SharedArrayBufferPrototype: undefined, // Deprecated on Jan 5, 2018
     // %String%
-    String: global.String,
+    String: _.String,
     // %StringIteratorPrototype%
     StringIteratorPrototype,
     // %StringPrototype%
-    StringPrototype: global.String.prototype,
+    StringPrototype: _.String.prototype,
     // %Symbol%
-    Symbol: global.Symbol,
+    Symbol: _.Symbol,
     // %SymbolPrototype%
-    SymbolPrototype: global.Symbol.prototype,
+    SymbolPrototype: _.Symbol.prototype,
     // %SyntaxError%
-    SyntaxError: global.SyntaxError,
+    SyntaxError: _.SyntaxError,
     // %SyntaxErrorPrototype%
-    SyntaxErrorPrototype: global.SyntaxError.prototype,
+    SyntaxErrorPrototype: _.SyntaxError.prototype,
     // %ThrowTypeError%
     ThrowTypeError,
     // %TypedArray%
@@ -944,44 +1031,44 @@ function getIntrinsics(lockerRec) {
     // %TypedArrayPrototype%
     TypedArrayPrototype,
     // %TypeError%
-    TypeError: global.TypeError,
+    TypeError: _.TypeError,
     // %TypeErrorPrototype%
-    TypeErrorPrototype: global.TypeError.prototype,
+    TypeErrorPrototype: _.TypeError.prototype,
     // %Uint8Array%
-    Uint8Array: global.Uint8Array,
+    Uint8Array: _.Uint8Array,
     // %Uint8ArrayPrototype%
-    Uint8ArrayPrototype: global.Uint8Array.prototype,
+    Uint8ArrayPrototype: _.Uint8Array.prototype,
     // %Uint8ClampedArray%
-    Uint8ClampedArray: global.Uint8ClampedArray,
+    Uint8ClampedArray: _.Uint8ClampedArray,
     // %Uint8ClampedArrayPrototype%
-    Uint8ClampedArrayPrototype: global.Uint8ClampedArray.prototype,
+    Uint8ClampedArrayPrototype: _.Uint8ClampedArray.prototype,
     // %Uint16Array%
-    Uint16Array: global.Uint16Array,
+    Uint16Array: _.Uint16Array,
     // %Uint16ArrayPrototype%
     Uint16ArrayPrototype: Uint16Array.prototype,
     // %Uint32Array%
-    Uint32Array: global.Uint32Array,
+    Uint32Array: _.Uint32Array,
     // %Uint32ArrayPrototype%
-    Uint32ArrayPrototype: global.Uint32Array.prototype,
+    Uint32ArrayPrototype: _.Uint32Array.prototype,
     // %URIError%
-    URIError: global.URIError,
+    URIError: _.URIError,
     // %URIErrorPrototype%
-    URIErrorPrototype: global.URIError.prototype,
+    URIErrorPrototype: _.URIError.prototype,
     // %WeakMap%
-    WeakMap: global.WeakMap,
+    WeakMap: _.WeakMap,
     // %WeakMapPrototype%
-    WeakMapPrototype: global.WeakMap.prototype,
+    WeakMapPrototype: _.WeakMap.prototype,
     // %WeakSet%
-    WeakSet: global.WeakSet,
+    WeakSet: _.WeakSet,
     // %WeakSetPrototype%
-    WeakSetPrototype: global.WeakSet.prototype,
+    WeakSetPrototype: _.WeakSet.prototype,
 
     // *** Annex B
 
     // %escape%
-    escape: global.escape,
+    escape: _.escape,
     // %unescape%
-    unescape: global.unescape
+    unescape: _.unescape
 
     // TODO: other special cases
   };
@@ -991,25 +1078,7 @@ const sanitized = new WeakSet();
 
 function freezeIntrinsics(lockerRec) {
   const intrinsics = getIntrinsics(lockerRec);
-  const { unsafeGlobal } = lockerRec;
-
-  /**
-   * These properties are subject to the override mistake.
-   * A better way to handle this could be to create a "repair"
-   * function to early convert specific data properties to getters
-   * and setters and always use simpleTamperProof.
-   */
-  const replacementsyObject = new Map([
-    [unsafeGlobal.Object.prototype, ['toString']],
-    [unsafeGlobal.Error.prototype, ['message']],
-    [unsafeGlobal.EvalError.prototype, ['message']],
-    [unsafeGlobal.RangeError.prototype, ['message']],
-    [unsafeGlobal.ReferenceError.prototype, ['message']],
-    [unsafeGlobal.SyntaxError.prototype, ['message']],
-    [unsafeGlobal.TypeError.prototype, ['message']],
-    [unsafeGlobal.URIError.prototype, ['message']]
-  ]);
-  deepFreeze(intrinsics, replacementsyObject);
+  deepFreeze(intrinsics);
 }
 
 function freezeIntrinsicsDeprecated(lockerRec) {
@@ -1026,6 +1095,8 @@ function sanitize(lockerRec) {
   repairAccessors(lockerRec);
 
   if (lockerRec.isFrozen) {
+    repairFunctions(lockerRec);
+    repairDataProperties(lockerRec);
     freezeIntrinsics(lockerRec);
   } else {
     freezeIntrinsicsDeprecated(lockerRec);
@@ -1060,7 +1131,7 @@ function sanitize(lockerRec) {
 const stdlib = [
   // *** 18.2 Function Properties of the Global Object
 
-  // 'eval', // This property must be disabled to allow Proxy() switching.
+  // 'eval', // This property must be sanitized.
   'isFinite',
   'isNaN',
   'parseFloat',
@@ -1082,7 +1153,7 @@ const stdlib = [
   'EvalError',
   'Float32Array',
   'Float64Array',
-  'Function', // Must be declared on the confinedGlobal.
+  // 'Function', // This property must be sanitized.
   'Int8Array',
   'Int16Array',
   'Int32Array',
@@ -1142,10 +1213,18 @@ const stdlib = [
  */
 let evalEvaluatorFactory;
 
+/**
+ * This ecaluator declares commonly used references like
+ * "window" and the JS standard lib as constants to allow
+ * the JIT optimizer to link to static references.
+ */
 function createEvalEvaluatorFactory(sandbox) {
+  // Function and eval are not in our standard lib. Only Function
+  // is added here since eval needs to context switch and can't be
+  // a constant.
   return sandbox.unsafeFunction(`
     with (arguments[0]) {
-      const {${stdlib.join(',')}} = arguments[0];
+      const {${stdlib.join(',')}, Function, window} = arguments[0];
       return function() {
         'use strict';
         return eval(arguments[0]);
@@ -1219,6 +1298,43 @@ function createEvalEvaluator(sandbox) {
   return freeze(evaluator);
 }
 
+/**
+ * A safe version of the native Function which relies on
+ * the safety of evalEvaluator for confinement.
+ */
+function createFunctionEvaluator(sandbox) {
+  const evaluator = function(...params) {
+    const body = params.pop() || '';
+    const src = `
+(function(${params.join(',')}) {
+  ${body}
+})`;
+    // evalEvaluator is created after FunctionEvaluator,
+    // so we can't link directly to it.
+    return sandbox.evalEvaluator(src);
+  };
+
+  // Ensure that the different Function instances of the different
+  // sandboxes all answer properly when used with the instanceof
+  // operator to preserve indentity.
+  const NoopFunction = sandbox.unsafeFunction.prototype.constructor;
+
+  // Mimic the native signature.
+  defineProperties(evaluator, {
+    name: {
+      value: 'Function'
+    },
+    toString: {
+      value: () => 'function Function() { [native code] }'
+    },
+    [Symbol.hasInstance]: {
+      value: v => v instanceof NoopFunction
+    }
+  });
+
+  return freeze(evaluator);
+}
+
 /*
  * Copyright (C) 2017 salesforce.com, inc.
  *
@@ -1243,10 +1359,28 @@ function createSandbox(key, lockerRec) {
   const { unsafeGlobal, unsafeEval, unsafeFunction } = lockerRec;
   const sandbox = { unsafeGlobal, unsafeEval, unsafeFunction };
 
+  /**
+   * The sequencing of the following operations is curcial. We
+   * need "Function" available on global when we create "eval"
+   * in order for the constant to link to it.
+   * 1. We create the global, minus "eval" and "Function".
+   * 2. We create "Function" and expose it on the global.
+   * 3. We create "eval" and expose it on the global.
+   */
   sandbox.globalObject = SecureWindow(unsafeGlobal, key);
-  sandbox.evalEvaluator = createEvalEvaluator(sandbox);
 
-  sandbox.globalObject.eval = sandbox.evalEvaluator;
+  sandbox.FunctionEvaluator = createFunctionEvaluator(sandbox);
+  defineProperty(sandbox.globalObject, 'Function', {
+    value: sandbox.FunctionEvaluator
+  });
+
+  // The "eval" property needs to be configurable to comply with the
+  // Proxy invariants.
+  sandbox.evalEvaluator = createEvalEvaluator(sandbox);
+  defineProperty(sandbox.globalObject, 'eval', {
+    value: sandbox.evalEvaluator,
+    configurable: true
+  });
 
   return freeze(sandbox);
 }
@@ -3920,6 +4054,10 @@ function SecureElement(el, key) {
 }
 
 SecureElement.isValidAttributeName = function(raw, name, prototype, caseInsensitiveAttributes) {
+  if (typeof name !== 'string') {
+    return false;
+  }
+
   // Reason: [W-4210397] Locker does not allow setting custom HTTP headers.
   if (raw.tagName === 'META' && name.toLowerCase() === 'http-equiv') {
     return false;
@@ -4243,9 +4381,7 @@ SecureElement.createAttributeAccessMethodConfig = function(
         name = name[nameProp];
       }
       if (!SecureElement.isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes)) {
-        warn(
-          `${this} does not allow getting/setting the ${name.toLowerCase()} attribute, ignoring!`
-        );
+        warn(`${this} does not allow getting/setting the ${name} attribute, ignoring!`);
         return invalidAttributeReturnValue;
       }
 
@@ -7108,8 +7244,6 @@ const metadata$$1 = {
       AppBannerPromptResult: FUNCTION,
       ApplicationCache: FUNCTION,
       ApplicationCacheErrorEvent: FUNCTION,
-      Array: RAW,
-      ArrayBuffer: RAW,
       Attr: RAW,
       Audio: CTOR,
       AudioBuffer: FUNCTION,
@@ -7127,7 +7261,6 @@ const metadata$$1 = {
       BeforeUnloadEvent: FUNCTION,
       BiquadFilterNode: FUNCTION,
       BlobEvent: FUNCTION,
-      Boolean: FUNCTION,
       CDATASection: FUNCTION,
       CSS: FUNCTION,
       CSSFontFaceRule: FUNCTION,
@@ -7174,8 +7307,6 @@ const metadata$$1 = {
       DataTransfer: FUNCTION,
       DataTransferItem: FUNCTION,
       DataTransferItemList: FUNCTION,
-      DataView: FUNCTION,
-      Date: RAW,
       DelayNode: FUNCTION,
       DeviceMotionEvent: FUNCTION,
       DeviceOrientationEvent: FUNCTION,
@@ -7186,9 +7317,7 @@ const metadata$$1 = {
       DynamicsCompressorNode: FUNCTION,
       ES6Promise: DEFAULT,
       Element: RAW,
-      Error: FUNCTION,
       ErrorEvent: FUNCTION,
-      EvalError: FUNCTION,
       Event: CTOR,
       EventSource: FUNCTION,
       EventTarget: RAW,
@@ -7196,11 +7325,8 @@ const metadata$$1 = {
       FileError: FUNCTION,
       FileList: RAW,
       FileReader: RAW,
-      Float32Array: RAW,
-      Float64Array: RAW,
       FocusEvent: FUNCTION,
       FontFace: FUNCTION,
-      Function: FUNCTION,
       GainNode: FUNCTION,
       HTMLAllCollection: FUNCTION,
       HTMLAnchorElement: RAW,
@@ -7285,11 +7411,6 @@ const metadata$$1 = {
       ImageData: FUNCTION,
       Infinity: DEFAULT,
       InputDeviceCapabilities: FUNCTION,
-      Int16Array: FUNCTION,
-      Int32Array: FUNCTION,
-      Int8Array: FUNCTION,
-      Intl: DEFAULT,
-      JSON: DEFAULT,
       KeyboardEvent: FUNCTION,
       Location: FUNCTION,
       MIDIAccess: FUNCTION,
@@ -7300,8 +7421,6 @@ const metadata$$1 = {
       MIDIOutput: FUNCTION,
       MIDIOutputMap: FUNCTION,
       MIDIPort: FUNCTION,
-      Map: RAW,
-      Math: DEFAULT,
       MediaDevices: DEFAULT,
       MediaElementAudioSourceNode: FUNCTION,
       MediaEncryptedEvent: FUNCTION,
@@ -7335,8 +7454,6 @@ const metadata$$1 = {
       NodeFilter: FUNCTION,
       NodeIterator: FUNCTION,
       NodeList: FUNCTION,
-      Number: FUNCTION,
-      Object: FUNCTION,
       OfflineAudioCompletionEvent: FUNCTION,
       OfflineAudioContext: FUNCTION,
       Option: CTOR,
@@ -7362,19 +7479,14 @@ const metadata$$1 = {
       PresentationRequest: FUNCTION,
       ProcessingInstruction: FUNCTION,
       ProgressEvent: FUNCTION,
-      Promise: FUNCTION,
       PromiseRejectionEvent: FUNCTION,
       RTCCertificate: FUNCTION,
       RTCIceCandidate: FUNCTION,
       RTCSessionDescription: CTOR,
       RadioNodeList: FUNCTION,
       Range: FUNCTION,
-      RangeError: FUNCTION,
       ReadableByteStream: FUNCTION,
       ReadableStream: FUNCTION,
-      ReferenceError: FUNCTION,
-      Reflect: DEFAULT,
-      RegExp: FUNCTION,
       Request: FUNCTION,
       Response: FUNCTION,
       SVGAElement: FUNCTION,
@@ -7482,17 +7594,13 @@ const metadata$$1 = {
       ScreenOrientation: FUNCTION,
       SecurityPolicyViolationEvent: FUNCTION,
       Selection: FUNCTION,
-      Set: RAW,
       SourceBuffer: FUNCTION,
       SourceBufferList: FUNCTION,
       SpeechSynthesisEvent: FUNCTION,
       SpeechSynthesisUtterance: FUNCTION,
-      String: RAW,
       StyleSheet: FUNCTION,
       StyleSheetList: FUNCTION,
       SubtleCrypto: FUNCTION,
-      Symbol: RAW,
-      SyntaxError: FUNCTION,
       TEMPORARY: DEFAULT,
       Text: CTOR,
       TextDecoder: FUNCTION,
@@ -7510,21 +7618,13 @@ const metadata$$1 = {
       TrackEvent: FUNCTION,
       TransitionEvent: FUNCTION,
       TreeWalker: FUNCTION,
-      TypeError: FUNCTION,
       UIEvent: FUNCTION,
-      URIError: FUNCTION,
       // Replaced by SecureURL
       // "URL":                                  RAW,
       URLSearchParams: FUNCTION,
-      Uint16Array: RAW,
-      Uint32Array: RAW,
-      Uint8Array: RAW,
-      Uint8ClampedArray: RAW,
       VTTCue: FUNCTION,
       ValidityState: FUNCTION,
       WaveShaperNode: FUNCTION,
-      WeakMap: RAW,
-      WeakSet: RAW,
       WebGLActiveInfo: FUNCTION,
       WebGLBuffer: FUNCTION,
       WebGLContextEvent: FUNCTION,
@@ -7567,15 +7667,10 @@ const metadata$$1 = {
       console: RAW,
       createImageBitmap: FUNCTION,
       crypto: DEFAULT,
-      decodeURI: FUNCTION,
-      decodeURIComponent: FUNCTION,
       defaultStatus: DEFAULT,
       defaultstatus: DEFAULT,
       devicePixelRatio: DEFAULT,
       document: DEFAULT,
-      encodeURI: FUNCTION,
-      encodeURIComponent: FUNCTION,
-      escape: FUNCTION,
       fetch: FUNCTION,
       find: FUNCTION,
       focus: FUNCTION,
@@ -7587,8 +7682,6 @@ const metadata$$1 = {
       history: RAW,
       innerHeight: DEFAULT,
       innerWidth: DEFAULT,
-      isFinite: FUNCTION,
-      isNaN: FUNCTION,
       isSecureContext: DEFAULT,
       length: DEFAULT,
       localStorage: DEFAULT,
@@ -7694,8 +7787,6 @@ const metadata$$1 = {
       pageXOffset: DEFAULT,
       pageYOffset: DEFAULT,
       parent: DEFAULT,
-      parseFloat: FUNCTION,
-      parseInt: FUNCTION,
       performance: RAW,
       personalbar: DEFAULT,
       postMessage: FUNCTION,
@@ -7727,8 +7818,6 @@ const metadata$$1 = {
       styleMedia: DEFAULT,
       toolbar: DEFAULT,
       top: DEFAULT,
-      undefined: DEFAULT,
-      unescape: FUNCTION,
       window: DEFAULT
     },
     EventTarget: metadata$4
@@ -8995,7 +9084,15 @@ function createForDef(src, def) {
   // Key this def so we can transfer the key to component instances
   setKey(def, key);
 
-  return evaluate(`(function () {${src}}())`, key, sourceURL);
+  // Accelerate the reference to $A
+  src = `(function() {
+  const {$A} = window;
+
+  ${src}
+
+}())`;
+
+  return evaluate(src, key, sourceURL);
 }
 
 function createForModule(src, defDescriptor) {

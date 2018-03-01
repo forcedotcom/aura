@@ -67,7 +67,7 @@
 
         // ---
 
-        var blob1 = new Blob(["Hello"], {type: "text"});
+        var blob1 = new Blob(["Hello"], {type: "text/plain"});
         var url1 = URL.createObjectURL(blob1);
         T.assertEquals("string", typeof url1, 'Blob URI should be typeof string');
         T.assertStartsWith("blob:", url1, 'Blob URI should start with "blob:"');

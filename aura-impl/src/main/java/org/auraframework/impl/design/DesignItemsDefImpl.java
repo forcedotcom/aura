@@ -79,6 +79,7 @@ public class DesignItemsDefImpl extends BaseXmlElementImpl implements DesignItem
             return new DesignItemsDefImpl(this);
         }
 
+        @SuppressWarnings("unlikely-arg-type")
         public void addAttribute(DesignLayoutAttributeDef item) {
             if (items.contains(item)) {
                 setParseError(new XMLParseException(String.format(
@@ -87,6 +88,7 @@ public class DesignItemsDefImpl extends BaseXmlElementImpl implements DesignItem
             items.add(new DesignLayoutItemDefImpl(item));
         }
 
+        @SuppressWarnings("unlikely-arg-type")
         public void addComponent(DesignLayoutComponentDef cmp) {
             if (items.contains(cmp)) {
                 setParseError(new InvalidDefinitionException(String.format(

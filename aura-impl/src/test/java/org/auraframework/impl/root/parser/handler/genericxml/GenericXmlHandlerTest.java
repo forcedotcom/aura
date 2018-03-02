@@ -21,7 +21,7 @@ import com.google.common.collect.Sets;
 import org.auraframework.def.genericxml.GenericXmlElement;
 import org.auraframework.def.genericxml.GenericXmlValidator;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.factory.XMLParser;
+import org.auraframework.impl.factory.XMLParserBase;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -52,7 +52,7 @@ public class GenericXmlHandlerTest extends AuraImplTestCase {
 
     private static GenericXmlElementHandler createGenericXmlHandler(String xml, GenericXmlValidator validator) throws Exception {
         Reader stringReader = new StringReader(xml);
-        XMLStreamReader reader = XMLParser.createXMLStreamReader(stringReader);
+        XMLStreamReader reader = XMLParserBase.createXMLStreamReader(stringReader);
         reader.next();
         StringSource<?> source = new StringSource<>(
                 null,

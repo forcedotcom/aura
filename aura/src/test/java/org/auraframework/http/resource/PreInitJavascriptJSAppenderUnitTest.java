@@ -21,6 +21,7 @@ import org.auraframework.javascript.PreInitJavascript;
 import org.auraframework.system.AuraContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -115,7 +116,7 @@ public class PreInitJavascriptJSAppenderUnitTest {
 
     private PreInitJavascriptJSAppender setupMockPreInitJavascriptAppender() throws Exception {
         ConfigAdapter configAdapter = mock(ConfigAdapter.class);
-        Mockito.when(configAdapter.validateBootstrap(Mockito.anyString())).thenReturn(true);
+        Mockito.when(configAdapter.validateBootstrap(Matchers.anyString())).thenReturn(true);
 
         PreInitJavascriptJSAppender inline = new PreInitJavascriptJSAppender();
         PreInitJavascriptJSAppender inlineSpy = PowerMockito.spy(inline);

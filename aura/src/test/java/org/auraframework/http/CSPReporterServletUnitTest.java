@@ -25,9 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.auraframework.service.LoggingService;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
 /**
  * Simple (non-integration) test case for {@link CSPReporterServlet}.
@@ -65,7 +63,7 @@ public class CSPReporterServletUnitTest {
         servlet.testDoPost(request, response);
 
         Mockito.verify(loggingService, Mockito.times(1)).establish();
-        Mockito.verify(loggingService, Mockito.times(1)).logCSPReport(Mockito.any());
+        Mockito.verify(loggingService, Mockito.times(1)).logCSPReport(Matchers.any());
         Mockito.verify(loggingService, Mockito.times(1)).release();
     }
 
@@ -78,7 +76,7 @@ public class CSPReporterServletUnitTest {
 
         servlet.testDoPost(request, response);
 
-        Mockito.verify(loggingService, Mockito.times(0)).logCSPReport(Mockito.any());
+        Mockito.verify(loggingService, Mockito.times(0)).logCSPReport(Matchers.any());
     }
 
     @Test
@@ -90,7 +88,7 @@ public class CSPReporterServletUnitTest {
 
         servlet.testDoPost(request, response);
 
-        Mockito.verify(loggingService, Mockito.times(0)).logCSPReport(Mockito.any());
+        Mockito.verify(loggingService, Mockito.times(0)).logCSPReport(Matchers.any());
     }
 
     @Test
@@ -102,6 +100,6 @@ public class CSPReporterServletUnitTest {
 
         servlet.testDoPost(request, response);
 
-        Mockito.verify(loggingService, Mockito.times(0)).logCSPReport(Mockito.any());
+        Mockito.verify(loggingService, Mockito.times(0)).logCSPReport(Matchers.any());
     }
 }

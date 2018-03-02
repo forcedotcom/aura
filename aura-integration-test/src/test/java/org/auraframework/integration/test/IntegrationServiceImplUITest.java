@@ -26,8 +26,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.test.util.AuraTestingMarkupUtil;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.AuraTextUtil;
@@ -321,7 +321,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                                 "'Apple,Orange'", "'Melon,Berry,Grapes'", "", "", "");
 
         DefDescriptor<ComponentDef> cmpToInject = addSourceAutoCleanup(ComponentDef.class,
-                String.format(AuraImplTestCase.baseComponentTag, "", attributeMarkup + attributeWithDefaultsMarkup));
+                String.format(AuraTestCase.baseComponentTag, "", attributeMarkup + attributeWithDefaultsMarkup));
 
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("strAttr", "Oranges");
@@ -431,7 +431,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 + "<div class='click2_t' onclick='{!c.click2Hndlr}'>Click Me2</div>"
                 + "<div class='click3_t' onclick='{!c.click3Hndlr}'>Click Me3</div>";
         DefDescriptor<ComponentDef> cmpToInject = addSourceAutoCleanup(ComponentDef.class,
-                String.format(AuraImplTestCase.baseComponentTag, "", bodyMarkup));
+                String.format(AuraTestCase.baseComponentTag, "", bodyMarkup));
         DefDescriptor<ControllerDef> jsControllerdesc = definitionService
                 .getDefDescriptor(
                         String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, cmpToInject.getNamespace(),
@@ -507,7 +507,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 + "<div class='divDefault'>Div as default</div>"
                 + "<span class='spanDefault'>Span component as default</span>" + "</aura:attribute>{!v.cmpsDefault}";
         DefDescriptor<ComponentDef> cmpToInject = addSourceAutoCleanup(ComponentDef.class,
-                String.format(AuraImplTestCase.baseComponentTag, "", attributeMarkup + attributeWithDefaultsMarkup));
+                String.format(AuraTestCase.baseComponentTag, "", attributeMarkup + attributeWithDefaultsMarkup));
 
         DefDescriptor<ComponentDef> customStub = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -567,7 +567,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
     private void verifyMissingPlaceholder(DefDescriptor<ComponentDef> stub, String locatorName) throws Exception {
         DefDescriptor<ComponentDef> cmpToInject = addSourceAutoCleanup(ComponentDef.class,
-                String.format(AuraImplTestCase.baseComponentTag, "", ""));
+                String.format(AuraTestCase.baseComponentTag, "", ""));
 
         String badPlaceholder = "fooBared";
         String expectedErrorMessage = String.format(
@@ -653,7 +653,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
     private void verifyExceptionDuringComponentInitialization(DefDescriptor<ComponentDef> stub) throws Exception {
         DefDescriptor<ComponentDef> cmpWithReqAttr = addSourceAutoCleanup(ComponentDef.class,
-                String.format(AuraImplTestCase.baseComponentTag, "",
+                String.format(AuraTestCase.baseComponentTag, "",
                         "<aura:attribute name='reqAttr' required='true' type='String'/>"));
         Map<String, Object> attributes = Maps.newHashMap();
         String expectedErrorMessage = "is missing required attribute 'reqAttr'";
@@ -686,7 +686,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         }
 
         DefDescriptor<ComponentDef> customStubCmp = addSourceAutoCleanup(ComponentDef.class,
-                String.format(AuraImplTestCase.baseComponentTag, "render='server'", facetMarkup));
+                String.format(AuraTestCase.baseComponentTag, "render='server'", facetMarkup));
 
         openIntegrationStub(customStubCmp, cmpToInject, null, null);
         assertTrue(isElementPresent(By.xpath("//div//script[contains(@src,'aura_dev.js')]")));

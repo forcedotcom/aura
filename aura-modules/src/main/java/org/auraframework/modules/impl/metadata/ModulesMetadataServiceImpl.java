@@ -19,7 +19,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.DefinitionAccessImpl;
-import org.auraframework.impl.factory.XMLParser;
+import org.auraframework.impl.factory.XMLParserBase;
 import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
 import org.auraframework.modules.impl.metadata.xml.ModuleMetadataXMLHandler;
 import org.auraframework.system.AuraContext.Access;
@@ -46,7 +46,7 @@ import java.util.Set;
 @ServiceComponent
 public class ModulesMetadataServiceImpl implements ModulesMetadataService {
 
-    private Map<String, ModuleMetadataXMLHandler> elementHandlers = new HashMap();
+    private Map<String, ModuleMetadataXMLHandler> elementHandlers = new HashMap<>();
 
     protected static final Gson GSON = new Gson();
 
@@ -121,7 +121,7 @@ public class ModulesMetadataServiceImpl implements ModulesMetadataService {
             }
         } catch (XMLStreamException e) {
             throw new InvalidDefinitionException("XML parse error: " + e.getMessage(),
-                    XMLParser.getLocation(reader, source));
+                    XMLParserBase.getLocation(reader, source));
         }
     }
 

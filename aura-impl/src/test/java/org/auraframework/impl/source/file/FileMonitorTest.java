@@ -22,8 +22,7 @@ import org.auraframework.util.IOUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import org.mockito.*;
 
 import test.org.auraframework.impl.adapter.MockConfigAdapterImpl;
 
@@ -69,7 +68,7 @@ public class FileMonitorTest extends AuraImplTestCase {
 
         assertEquals("Should not have any errors or warnings", Arrays.asList(), argumentCaptor.getAllValues());
 
-        Mockito.verify(listenerMock, Mockito.atLeastOnce()).fileChanged(Mockito.anyObject());
+        Mockito.verify(listenerMock, Mockito.atLeastOnce()).fileChanged(Matchers.anyObject());
     }
 
     @Test
@@ -84,7 +83,7 @@ public class FileMonitorTest extends AuraImplTestCase {
         // the far future! Just has to be beyond the last modified time of the files we just created
         fileMonitor.addDirectory(tmpDir.toString(), System.currentTimeMillis() + 10);
 
-        Mockito.verify(listenerMock, Mockito.never()).fileChanged(Mockito.anyObject());
+        Mockito.verify(listenerMock, Mockito.never()).fileChanged(Matchers.anyObject());
     }
 
     @Test
@@ -98,6 +97,6 @@ public class FileMonitorTest extends AuraImplTestCase {
 
         fileMonitor.addDirectory(tmpDir.toString(), null);
 
-        Mockito.verify(listenerMock, Mockito.never()).fileChanged(Mockito.anyObject());
+        Mockito.verify(listenerMock, Mockito.never()).fileChanged(Matchers.anyObject());
     }
 }

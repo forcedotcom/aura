@@ -15,12 +15,11 @@
  */
 package org.auraframework.modules.impl.metadata.xml;
 
+import javax.xml.stream.*;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
 import org.auraframework.system.TextSource;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 @ServiceComponent
 public class TagsElementHandler implements ModuleMetadataXMLHandler {
@@ -35,13 +34,13 @@ public class TagsElementHandler implements ModuleMetadataXMLHandler {
         while (reader.hasNext()) {
             int eventType = reader.next();
             switch (eventType) {
-                case XMLStreamReader.START_ELEMENT:
+                case XMLStreamConstants.START_ELEMENT:
                     String elementName = reader.getLocalName();
                     if (elementName.equals("tag")) {
                         moduleBuilder.addTag(ModuleMetadataXMLParserUtil.readCharacters(reader));
                     }
                     break;
-                case XMLStreamReader.END_ELEMENT:
+                case XMLStreamConstants.END_ELEMENT:
                     return;
             }
         }

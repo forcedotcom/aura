@@ -28,7 +28,7 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.root.parser.handler.FileTagHandler;
-import org.auraframework.impl.source.AbstractTextSourceImpl;
+import org.auraframework.impl.source.AbstractSourceImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
@@ -54,7 +54,7 @@ public abstract class XMLParser<D extends Definition> extends XMLParserBase
 
     @Override
     public String getMimeType() {
-        return AbstractTextSourceImpl.MIME_XML;
+        return AbstractSourceImpl.MIME_XML;
     }
 
     @Override

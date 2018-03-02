@@ -23,8 +23,7 @@ import java.util.Set;
 import org.auraframework.cache.Cache;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mockito;
+import org.mockito.*;
 
 public class CacheImplTest {
 
@@ -142,7 +141,7 @@ public class CacheImplTest {
         backingCache.put("someKey", "someValue");
         cache.invalidatePartial(" ");
         Mockito.verify(backingCache, Mockito.never()).invalidate(
-                Mockito.anyCollection());
+                Matchers.anyCollection());
     }
 
     @Test
@@ -153,7 +152,7 @@ public class CacheImplTest {
         backingCache.put("someKey", "someValue");
         cache.invalidatePartial("someKey");
         Mockito.verify(backingCache, Mockito.times(1)).invalidate(
-                Mockito.argThat(new CollectionContainsAllMatcher<Object>("someKey")));
+                Matchers.argThat(new CollectionContainsAllMatcher<Object>("someKey")));
     }
 
     @Test
@@ -168,7 +167,7 @@ public class CacheImplTest {
 
         cache.invalidatePartial("some");
         Mockito.verify(backingCache, Mockito.times(1)).invalidate(
-                Mockito.argThat(new CollectionContainsAllMatcher<Object>("someKey",
+                Matchers.argThat(new CollectionContainsAllMatcher<Object>("someKey",
                         "someOtherKey", "someThing")));
     }
 
@@ -180,6 +179,6 @@ public class CacheImplTest {
         backingCache.put("someKey", "someValue");
         cache.invalidatePartial("otherKey");
         Mockito.verify(backingCache, Mockito.never()).invalidate(
-                Mockito.anyCollection());
+                Matchers.anyCollection());
     }
 }

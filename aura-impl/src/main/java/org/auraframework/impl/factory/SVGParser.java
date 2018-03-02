@@ -33,7 +33,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.SVGDef;
 import org.auraframework.impl.root.parser.handler.SVGDefHandler;
-import org.auraframework.impl.source.AbstractTextSourceImpl;
+import org.auraframework.impl.source.AbstractSourceImpl;
 import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -117,21 +117,21 @@ public class SVGParser implements DefinitionFactory<TextSource<SVGDef>, SVGDef> 
                                 if (DISSALOWED_LIST.matcher(reader.getText()).matches()) {
                                     throw new InvalidDefinitionException(String.format(
                                             "Text contains disallowed symbols: %s", reader.getText()),
-                                            XMLParser.getLocation(reader, source));
+                                            XMLParserBase.getLocation(reader, source));
                                 }
                                 break;
                             case XMLStreamConstants.START_ELEMENT:
                                 String name = reader.getName().toString().toLowerCase();
                                 if (!SVG_TAG_WHITELIST.contains(name)) {
                                     throw new InvalidDefinitionException(String.format("Invalid SVG tag specified: %s", name),
-                                            XMLParser.getLocation(reader, source));
+                                            XMLParserBase.getLocation(reader, source));
                                 }
                                 for(int i = 0; i < reader.getAttributeCount(); i++) {
                                     QName qAttr = reader.getAttributeName(i);
                                     String attr = qAttr.getLocalPart();
                                     if (SVG_ATTR_BLACKLIST.contains(attr)) {
                                         throw new InvalidDefinitionException(String.format("Invalid SVG attribute specified: %s", attr),
-                                                XMLParser.getLocation(reader, source));
+                                                XMLParserBase.getLocation(reader, source));
                                     }
                                 }
                                 break;
@@ -143,7 +143,7 @@ public class SVGParser implements DefinitionFactory<TextSource<SVGDef>, SVGDef> 
                             default:
                                 throw new InvalidDefinitionException(String.format(
                                         "Found unexpected element in xml."),
-                                        XMLParser.getLocation(reader, source));
+                                        XMLParserBase.getLocation(reader, source));
                             }
                         }
                 }
@@ -175,6 +175,6 @@ public class SVGParser implements DefinitionFactory<TextSource<SVGDef>, SVGDef> 
 
     @Override
     public String getMimeType() {
-        return AbstractTextSourceImpl.MIME_SVG;
+        return AbstractSourceImpl.MIME_SVG;
     }
 }

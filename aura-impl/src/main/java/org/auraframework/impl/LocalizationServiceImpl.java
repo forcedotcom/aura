@@ -870,7 +870,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     @Override
     public String getPercentFormatPattern() {
         AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
-        DecimalFormat pdf = (DecimalFormat) DecimalFormat.getPercentInstance(auraLocale.getNumberLocale());
+        DecimalFormat pdf = (DecimalFormat) NumberFormat.getPercentInstance(auraLocale.getNumberLocale());
         return pdf.toPattern();
     }
 
@@ -897,7 +897,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     private DecimalFormat getDecimalFormatForNumber() {
         AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
         // Why do we use ICU for numbers and java for Dates ?
-        return (DecimalFormat) DecimalFormat.getNumberInstance(auraLocale.getNumberLocale());
+        return (DecimalFormat) NumberFormat.getNumberInstance(auraLocale.getNumberLocale());
     }
 
     private DecimalFormatSymbols getDecimalFormatSymbolsForNumber() {
@@ -907,7 +907,7 @@ public class LocalizationServiceImpl implements LocalizationService {
 
     private DecimalFormat getDecimalFormatForCurrency() {
         AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
-        return (DecimalFormat) DecimalFormat.getCurrencyInstance(auraLocale.getCurrencyLocale());
+        return (DecimalFormat) NumberFormat.getCurrencyInstance(auraLocale.getCurrencyLocale());
     }
 
     private DecimalFormatSymbols getDecimalFormatSymbolsForCurrency() {

@@ -19,7 +19,7 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.javascript.parser.handler.JavascriptTestSuiteDefHandler;
-import org.auraframework.impl.source.AbstractTextSourceImpl;
+import org.auraframework.impl.source.AbstractSourceImpl;
 import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -44,6 +44,6 @@ public class JavascriptTestSuiteParser implements DefinitionFactory<TextSource<T
 
     @Override
     public String getMimeType() {
-        return AbstractTextSourceImpl.MIME_JAVASCRIPT;
+        return AbstractSourceImpl.MIME_JAVASCRIPT;
     }
 }

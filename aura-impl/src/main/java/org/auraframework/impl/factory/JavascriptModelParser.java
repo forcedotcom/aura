@@ -19,7 +19,7 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ModelDef;
 import org.auraframework.impl.javascript.parser.handler.JavascriptModelDefHandler;
-import org.auraframework.impl.source.AbstractTextSourceImpl;
+import org.auraframework.impl.source.AbstractSourceImpl;
 import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -44,6 +44,6 @@ public class JavascriptModelParser implements DefinitionFactory<TextSource<Model
 
     @Override
     public String getMimeType() {
-        return AbstractTextSourceImpl.MIME_JAVASCRIPT;
+        return AbstractSourceImpl.MIME_JAVASCRIPT;
     }
 }

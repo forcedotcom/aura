@@ -30,7 +30,7 @@ import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.css.flavor.FlavoredStyleDefImpl;
 import org.auraframework.impl.css.parser.CssPreprocessor;
 import org.auraframework.impl.css.parser.CssPreprocessor.ParserResult;
-import org.auraframework.impl.source.AbstractTextSourceImpl;
+import org.auraframework.impl.source.AbstractSourceImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
@@ -87,6 +87,6 @@ public final class FlavoredStyleParser implements DefinitionFactory<TextSource<F
 
     @Override
     public String getMimeType() {
-        return AbstractTextSourceImpl.MIME_CSS;
+        return AbstractSourceImpl.MIME_CSS;
     }
 }

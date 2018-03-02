@@ -38,15 +38,13 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.RegistryService;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.DefRegistry;
-import org.auraframework.system.RegistrySet;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -296,7 +294,7 @@ public class RegistrySerializer {
         if (modulesEnabled) {
             root_nsf = new DescriptorFilter(namespace, Lists.newArrayList(DefType.MODULE));
         } else {
-            root_nsf = new DescriptorFilter(namespace, Lists.newArrayList(BundleSourceImpl.bundleDefTypes));
+            root_nsf = new DescriptorFilter(namespace, Lists.newArrayList(BundleSource.bundleDefTypes));
         }
         descriptors = master.find(root_nsf);
         for (DefDescriptor<?> desc : descriptors) {

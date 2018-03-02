@@ -42,6 +42,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -128,8 +129,8 @@ public class AppCssTest {
         AppCss appCss = new AppCss();
         appCss.setServletUtilAdapter(servletUtilAdapter);
         appCss.setServerService(serverService);
-        Mockito.when(servletUtilAdapter.verifyTopLevel(Mockito.any(HttpServletRequest.class),
-                    Mockito.any(HttpServletResponse.class), Mockito.any(AuraContext.class)))
+        Mockito.when(servletUtilAdapter.verifyTopLevel(Matchers.any(HttpServletRequest.class),
+                    Matchers.any(HttpServletResponse.class), Matchers.any(AuraContext.class)))
             .thenReturn(null);
 
         appCss.write(null, null, null);
@@ -137,8 +138,8 @@ public class AppCssTest {
         //
         // This is the known call to get the null.
         // 
-        Mockito.verify(servletUtilAdapter, Mockito.times(1)).verifyTopLevel(Mockito.any(HttpServletRequest.class),
-                    Mockito.any(HttpServletResponse.class), Mockito.any(AuraContext.class));
+        Mockito.verify(servletUtilAdapter, Mockito.times(1)).verifyTopLevel(Matchers.any(HttpServletRequest.class),
+                    Matchers.any(HttpServletResponse.class), Matchers.any(AuraContext.class));
 
         //
         // Nothing else should happen.

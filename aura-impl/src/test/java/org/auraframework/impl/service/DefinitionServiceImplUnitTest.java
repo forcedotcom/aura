@@ -57,9 +57,7 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -232,7 +230,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         registries.setupRegistryFor(descriptor, registry1, definition);
         assertEquals(definition, definitionService.getDefinition(descriptor));
         Mockito.verify(definition, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition, Mockito.times(1)).validateReferences(Mockito.any());
+        Mockito.verify(definition, Mockito.times(1)).validateReferences(Matchers.any());
     }
 
     @Test
@@ -264,7 +262,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         DefDescriptor<Definition> descriptor = getMockDescriptor();
         Definition definition = Mockito.spy(new MockDefinition(descriptor));
 
-        Mockito.doThrow(expected).when(definition).validateReferences(Mockito.any());
+        Mockito.doThrow(expected).when(definition).validateReferences(Matchers.any());
         registries.setupRegistryFor(descriptor, registry1, definition);
         Exception actual = null;
 
@@ -293,10 +291,10 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         registries.setupRegistryFor(descriptor2, registry1, definition2);
         assertEquals(definition1, definitionService.getDefinition(descriptor1));
         Mockito.verify(definition1, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition1, Mockito.times(1)).validateReferences(Mockito.any());
+        Mockito.verify(definition1, Mockito.times(1)).validateReferences(Matchers.any());
         Mockito.verify(definition1, Mockito.times(1)).markValid();
         Mockito.verify(definition2, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition2, Mockito.times(1)).validateReferences(Mockito.any());
+        Mockito.verify(definition2, Mockito.times(1)).validateReferences(Matchers.any());
         Mockito.verify(definition2, Mockito.times(1)).markValid();
     }
 
@@ -328,10 +326,10 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         // When we fail due to an error we should call validateDefinition(), but no validateReferences()
         //
         Mockito.verify(definition1, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition1, Mockito.times(0)).validateReferences(Mockito.any());
+        Mockito.verify(definition1, Mockito.times(0)).validateReferences(Matchers.any());
         Mockito.verify(definition1, Mockito.times(0)).markValid();
         Mockito.verify(definition2, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition2, Mockito.times(0)).validateReferences(Mockito.any());
+        Mockito.verify(definition2, Mockito.times(0)).validateReferences(Matchers.any());
         Mockito.verify(definition2, Mockito.times(0)).markValid();
     }
 
@@ -347,7 +345,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         unmocked1.addDependency(descriptor2);
         Definition definition1 = Mockito.spy(unmocked1);
         Definition definition2 = Mockito.spy(unmocked2);
-        Mockito.doThrow(expected).when(definition2).validateReferences(Mockito.any());
+        Mockito.doThrow(expected).when(definition2).validateReferences(Matchers.any());
         registries.setupRegistryFor(descriptor1, registry1, definition1);
         registries.setupRegistryFor(descriptor2, registry1, definition2);
 
@@ -366,7 +364,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         //Mockito.verify(definition1, Mockito.times(0)).validateReferences(); - no guarantee
         Mockito.verify(definition1, Mockito.times(0)).markValid();
         Mockito.verify(definition2, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition2, Mockito.times(1)).validateReferences(Mockito.any());
+        Mockito.verify(definition2, Mockito.times(1)).validateReferences(Matchers.any());
         Mockito.verify(definition2, Mockito.times(0)).markValid();
     }
 
@@ -392,9 +390,9 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         registries.setupRegistryFor(descriptor1, registry1, definition1);
         assertEquals(definition1, definitionService.getUnlinkedDefinition(descriptor1));
         Mockito.verify(definition1, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition1, Mockito.times(0)).validateReferences(Mockito.any());
+        Mockito.verify(definition1, Mockito.times(0)).validateReferences(Matchers.any());
         Mockito.verify(definition1, Mockito.times(0)).markValid();
-        Mockito.verify(definition1, Mockito.times(0)).appendDependencies(Mockito.any());
+        Mockito.verify(definition1, Mockito.times(0)).appendDependencies(Matchers.any());
     }
 
     @Test
@@ -419,9 +417,9 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
 
         assertEquals(expected, actual);
         Mockito.verify(definition1, Mockito.times(1)).validateDefinition();
-        Mockito.verify(definition1, Mockito.times(0)).validateReferences(Mockito.any());
+        Mockito.verify(definition1, Mockito.times(0)).validateReferences(Matchers.any());
         Mockito.verify(definition1, Mockito.times(0)).markValid();
-        Mockito.verify(definition1, Mockito.times(0)).appendDependencies(Mockito.any());
+        Mockito.verify(definition1, Mockito.times(0)).appendDependencies(Matchers.any());
     }
 
     @Test
@@ -436,9 +434,9 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
 
         assertEquals(definition1, definitionService.getUnlinkedDefinition(descriptor1));
         Mockito.verify(definition1, Mockito.times(0)).validateDefinition();
-        Mockito.verify(definition1, Mockito.times(0)).validateReferences(Mockito.any());
+        Mockito.verify(definition1, Mockito.times(0)).validateReferences(Matchers.any());
         Mockito.verify(definition1, Mockito.times(0)).markValid();
-        Mockito.verify(definition1, Mockito.times(0)).appendDependencies(Mockito.any());
+        Mockito.verify(definition1, Mockito.times(0)).appendDependencies(Matchers.any());
     }
 
 //<D extends Definition> boolean exists(DefDescriptor<D> descriptor);
@@ -526,7 +524,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         // registry must have 'hasFind()', and must have a namespace that matches.
         Mockito.when(registry1.hasFind()).thenReturn(true);
         Mockito.when(registry1.getNamespaces()).thenReturn(Sets.newHashSet(namespace));
-        Mockito.when(registry1.find(Mockito.any())).thenReturn(Sets.newHashSet());
+        Mockito.when(registry1.find(Matchers.any())).thenReturn(Sets.newHashSet());
         definitionService.find(filter);
         Mockito.verify(registry1, Mockito.times(1)).find(filter);
 
@@ -548,8 +546,8 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         Mockito.when(registry1.hasFind()).thenReturn(true);
         Mockito.when(registry1.getNamespaces()).thenReturn(Sets.newHashSet(namespace));
         Mockito.when(registry1.isCacheable()).thenReturn(true);
-        Mockito.when(registry1.find(Mockito.any())).thenReturn(Sets.newHashSet());
-        Mockito.when(configAdapter.isCacheable(Mockito.any())).thenReturn(true);
+        Mockito.when(registry1.find(Matchers.any())).thenReturn(Sets.newHashSet());
+        Mockito.when(configAdapter.isCacheable(Matchers.any())).thenReturn(true);
         definitionService.find(filter);
         Mockito.verify(registry1, Mockito.times(1)).find(filter);
 
@@ -572,7 +570,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         // registry must have 'hasFind()', and must have a namespace that matches.
         Mockito.when(registry1.hasFind()).thenReturn(true);
         Mockito.when(registry1.getNamespaces()).thenReturn(Sets.newHashSet(namespace));
-        Mockito.when(registry1.find(Mockito.any())).thenReturn(Sets.newHashSet());
+        Mockito.when(registry1.find(Matchers.any())).thenReturn(Sets.newHashSet());
         definitionService.find(filter);
         Mockito.verify(registry1, Mockito.times(1)).find(filter);
 
@@ -595,9 +593,9 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         // registry must have 'hasFind()', and must have a namespace that matches.
         Mockito.when(registry1.hasFind()).thenReturn(true);
         Mockito.when(registry1.getNamespaces()).thenReturn(Sets.newHashSet(namespace));
-        Mockito.when(registry1.find(Mockito.any())).thenReturn(Sets.newHashSet());
+        Mockito.when(registry1.find(Matchers.any())).thenReturn(Sets.newHashSet());
         Mockito.when(registry1.isCacheable()).thenReturn(true);
-        Mockito.when(configAdapter.isCacheable(Mockito.any())).thenReturn(true);
+        Mockito.when(configAdapter.isCacheable(Matchers.any())).thenReturn(true);
         definitionService.find(filter);
         Mockito.verify(registry1, Mockito.times(1)).find(filter);
 
@@ -619,7 +617,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         // registry must have 'hasFind()', and must have a namespace that matches.
         Mockito.when(registry1.hasFind()).thenReturn(true);
         Mockito.when(registry1.getNamespaces()).thenReturn(Sets.newHashSet(namespace));
-        Mockito.when(registry1.find(Mockito.any())).thenReturn(Sets.newHashSet());
+        Mockito.when(registry1.find(Matchers.any())).thenReturn(Sets.newHashSet());
         definitionService.find(filter);
         Mockito.verify(registry1, Mockito.times(1)).find(filter);
 
@@ -762,6 +760,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
         Mockito.when(globalControllerDefRegistry.getAll()).thenReturn(ImmutableMap.of());        
         String name = "test_"+counter.getAndIncrement();
+        @SuppressWarnings("unchecked")
         DefDescriptor<Definition> descriptor = Mockito.mock(DefDescriptor.class);
         Mockito.when(descriptor.getDefType()).thenReturn(DefType.APPLICATION);
         Mockito.when(descriptor.getName()).thenReturn(name);
@@ -810,6 +809,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         List<ClientLibraryDef> clientLibraries = new ArrayList<>();
         DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries, false, null);
         String name = "test_"+ counter.getAndIncrement();
+        @SuppressWarnings("unchecked")
         DefDescriptor<Definition> descriptor = Mockito.mock(DefDescriptor.class);
         Mockito.when(descriptor.getDefType()).thenReturn(DefType.COMPONENT);
         Mockito.when(descriptor.getName()).thenReturn(name);

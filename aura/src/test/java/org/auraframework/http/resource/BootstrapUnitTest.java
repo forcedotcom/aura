@@ -37,6 +37,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.util.json.DefaultJsonSerializationContext;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Maps;
@@ -230,8 +231,8 @@ public class BootstrapUnitTest {
 
         bootstrap.write(request, response, context);
 
-        Mockito.verify(servletUtilAdapter, Mockito.times(1)).send404(Mockito.any(), Mockito.eq(request),
-                Mockito.eq(response));
+        Mockito.verify(servletUtilAdapter, Mockito.times(1)).send404(Matchers.any(), Matchers.eq(request),
+                Matchers.eq(response));
     }
 
     /**
@@ -264,10 +265,10 @@ public class BootstrapUnitTest {
         bootstrap.setCacheHeaders(response, appDefDesc);
 
         if (shouldCache) {
-            Mockito.verify(servletUtilAdapter).setCacheTimeout(Mockito.any(HttpServletResponse.class),
-                    Mockito.eq(expirationSetting.longValue() * 1000), Mockito.eq(false));
+            Mockito.verify(servletUtilAdapter).setCacheTimeout(Matchers.any(HttpServletResponse.class),
+                    Matchers.eq(expirationSetting.longValue() * 1000), Matchers.eq(false));
         } else {
-            Mockito.verify(servletUtilAdapter).setNoCache(Mockito.any(HttpServletResponse.class));
+            Mockito.verify(servletUtilAdapter).setNoCache(Matchers.any(HttpServletResponse.class));
         }
         Mockito.verifyNoMoreInteractions(servletUtilAdapter);
     }

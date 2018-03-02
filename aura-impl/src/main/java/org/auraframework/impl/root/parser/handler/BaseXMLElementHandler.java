@@ -23,7 +23,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.impl.factory.XMLParser;
+import org.auraframework.impl.factory.XMLParserBase;
 import org.auraframework.system.Location;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -89,7 +89,7 @@ public abstract class BaseXMLElementHandler {
     }
 
     protected org.auraframework.system.Location getLocation() {
-        return XMLParser.getLocation(xmlReader, source);
+        return XMLParserBase.getLocation(xmlReader, source);
     }
 
     protected String getAttributeValue(String name) {

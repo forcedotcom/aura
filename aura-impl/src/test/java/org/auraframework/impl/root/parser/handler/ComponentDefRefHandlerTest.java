@@ -24,7 +24,7 @@ import org.auraframework.def.DefinitionReference.Load;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
-import org.auraframework.impl.factory.XMLParser;
+import org.auraframework.impl.factory.XMLParserBase;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -50,7 +50,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(
                 desc,
                 "<fake:component attr='attr value'>Child Text<aura:foo/><aura:set attribute='header'>Header Value</aura:set></fake:component>", "myID", Format.XML);
-        xmlReader = XMLParser.createXMLStreamReader(source.getReader());
+        xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService, contextService,
                 configAdapter, definitionParserAdapter);
@@ -162,7 +162,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("fake:component",
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(desc, markup, "myID", Format.XML);
-        xmlReader = XMLParser.createXMLStreamReader(source.getReader());
+        xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService, contextService,
                 configAdapter, definitionParserAdapter);

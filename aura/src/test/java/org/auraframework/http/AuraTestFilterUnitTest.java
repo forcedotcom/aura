@@ -45,9 +45,7 @@ import org.auraframework.test.TestContextAdapter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
 import com.google.common.collect.Lists;
 
@@ -148,10 +146,10 @@ public class AuraTestFilterUnitTest {
         Mockito.doReturn("someTest").when(testCaseDef).getName();
         
         Mockito.doReturn(requestServletContext).when(request).getServletContext();
-        Mockito.doReturn(testServletContext).when(requestServletContext).getContext(Mockito.anyString());
+        Mockito.doReturn(testServletContext).when(requestServletContext).getContext(Matchers.anyString());
         
-        Mockito.doReturn(dispatcher).when(testServletContext).getRequestDispatcher(Mockito.startsWith("/aura?"));
-        Mockito.doReturn(dispatcher).when(request).getRequestDispatcher(Mockito.startsWith("/aura?"));
+        Mockito.doReturn(dispatcher).when(testServletContext).getRequestDispatcher(Matchers.startsWith("/aura?"));
+        Mockito.doReturn(dispatcher).when(request).getRequestDispatcher(Matchers.startsWith("/aura?"));
         
         String renderedTargetComponent = "RENDEREDTARGETCOMPONENT";
         SimpleTestRequestDispatcher simpleReqDispatcher = new SimpleTestRequestDispatcher() {
@@ -160,8 +158,8 @@ public class AuraTestFilterUnitTest {
                 res.getWriter().write(renderedTargetComponent);
             }
         };
-        Mockito.doReturn(simpleReqDispatcher).when(testServletContext).getRequestDispatcher(Mockito.startsWith("/aura?"));
-        Mockito.doReturn(simpleReqDispatcher).when(request).getRequestDispatcher(Mockito.startsWith("/aura?"));
+        Mockito.doReturn(simpleReqDispatcher).when(testServletContext).getRequestDispatcher(Matchers.startsWith("/aura?"));
+        Mockito.doReturn(simpleReqDispatcher).when(request).getRequestDispatcher(Matchers.startsWith("/aura?"));
 
         FilterChain chain = (req, res) -> {};
         filter.doFilter(request, response, chain);
@@ -246,7 +244,7 @@ public class AuraTestFilterUnitTest {
         Mockito.doReturn("someTest").when(testCaseDef).getName();
         
         Mockito.doReturn(requestServletContext).when(request).getServletContext();
-        Mockito.doReturn(testServletContext).when(requestServletContext).getContext(Mockito.anyString());
+        Mockito.doReturn(testServletContext).when(requestServletContext).getContext(Matchers.anyString());
 
         SimpleTestRequestDispatcher simpleReqDispatcher = new SimpleTestRequestDispatcher() {
             @Override
@@ -254,8 +252,8 @@ public class AuraTestFilterUnitTest {
                 ((HttpServletResponse)res).sendRedirect(redirectionUrl);
             }
         };
-        Mockito.doReturn(simpleReqDispatcher).when(testServletContext).getRequestDispatcher(Mockito.startsWith("/aura?"));
-        Mockito.doReturn(simpleReqDispatcher).when(request).getRequestDispatcher(Mockito.startsWith("/aura?"));
+        Mockito.doReturn(simpleReqDispatcher).when(testServletContext).getRequestDispatcher(Matchers.startsWith("/aura?"));
+        Mockito.doReturn(simpleReqDispatcher).when(request).getRequestDispatcher(Matchers.startsWith("/aura?"));
 
 
         FilterChain chain = (req, res) -> {};

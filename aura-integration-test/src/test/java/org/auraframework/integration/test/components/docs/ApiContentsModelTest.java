@@ -24,6 +24,7 @@ import org.auraframework.docs.ApiContentsModel;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.util.resource.ResourceLoader;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 public class ApiContentsModelTest extends AuraImplTestCase {
@@ -53,7 +54,7 @@ public class ApiContentsModelTest extends AuraImplTestCase {
 
         InputStream stream = new ByteArrayInputStream(nodes.getBytes(StandardCharsets.UTF_8));
         ResourceLoader loader = Mockito.mock(ResourceLoader.class);
-        Mockito.when(loader.getResourceAsStream(Mockito.eq("jsdoc/symbolSet.json"))).thenReturn(stream);
+        Mockito.when(loader.getResourceAsStream(Matchers.eq("jsdoc/symbolSet.json"))).thenReturn(stream);
 
         ApiContentsModel.refreshSymbols(loader);
 
@@ -67,7 +68,7 @@ public class ApiContentsModelTest extends AuraImplTestCase {
         String nodes = "[{'description':'This, $A, is supposed to be our ONLY window-polluting top-level variable. Everything else in Aura is attached to it.', 'kind':'namespace', 'alias':'$A', 'name':'$A', 'longname':'$A', 'scope':'global'}]";
         InputStream stream = new ByteArrayInputStream(nodes.getBytes(StandardCharsets.UTF_8));
         ResourceLoader loader = Mockito.mock(ResourceLoader.class);
-        Mockito.when(loader.getResourceAsStream(Mockito.eq("jsdoc/symbolSet.json"))).thenReturn(stream);
+        Mockito.when(loader.getResourceAsStream(Matchers.eq("jsdoc/symbolSet.json"))).thenReturn(stream);
 
         ApiContentsModel.refreshSymbols(loader);
 

@@ -34,6 +34,7 @@ import org.auraframework.util.json.JsonEncoder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
@@ -48,7 +49,7 @@ public class InstanceStackTest {
     @Before
     public void setUp() {
         mci = Mockito.mock(ConfigAdapter.class);
-        Mockito.when(mci.isInternalNamespace((String) Mockito.any())).thenReturn(true);
+        Mockito.when(mci.isInternalNamespace((String) Matchers.any())).thenReturn(true);
     }
 
     //

@@ -29,7 +29,7 @@ import org.auraframework.impl.css.parser.CssPreprocessor;
 import org.auraframework.impl.css.parser.CssPreprocessor.ParserResult;
 import org.auraframework.impl.css.style.StyleDefImpl;
 import org.auraframework.impl.css.util.Styles;
-import org.auraframework.impl.source.AbstractTextSourceImpl;
+import org.auraframework.impl.source.AbstractSourceImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.system.DefinitionFactory;
@@ -81,7 +81,7 @@ public abstract class StyleParser implements DefinitionFactory<TextSource<StyleD
 
         @Override
         public String getMimeType() {
-            return AbstractTextSourceImpl.MIME_TEMPLATE_CSS;
+            return AbstractSourceImpl.MIME_TEMPLATE_CSS;
         }
     }
 
@@ -129,6 +129,6 @@ public abstract class StyleParser implements DefinitionFactory<TextSource<StyleD
 
     @Override
     public String getMimeType() {
-        return AbstractTextSourceImpl.MIME_CSS;
+        return AbstractSourceImpl.MIME_CSS;
     }
 }

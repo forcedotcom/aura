@@ -38,6 +38,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Sets;
@@ -70,7 +71,7 @@ public class FileBundleSourceLoaderTest {
         File tmpDir = new File(IOUtil.newTempDir("fileSourceLoaderTest"));
         FileMonitor fileMonitor = Mockito.mock(FileMonitor.class);
         new FileBundleSourceLoader(tmpDir, fileMonitor, null);
-        Mockito.verify(fileMonitor, Mockito.times(1)).subscribeToChangeNotification(Mockito.any());
+        Mockito.verify(fileMonitor, Mockito.times(1)).subscribeToChangeNotification(Matchers.any());
     }
     
     @Test

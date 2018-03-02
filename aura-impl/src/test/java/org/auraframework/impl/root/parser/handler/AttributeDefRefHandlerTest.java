@@ -23,7 +23,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
-import org.auraframework.impl.factory.XMLParser;
+import org.auraframework.impl.factory.XMLParserBase;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.junit.Test;
@@ -61,7 +61,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         DefDescriptor<AttributeDef> desc = definitionService.getDefDescriptor("mystring", AttributeDef.class);
         StringSource<AttributeDef> source = new StringSource<>(
                 desc, "<aura:set attribute='mystring' value='testing'/>", "myID", Format.XML);
-        XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(source.getReader());
+        XMLStreamReader xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<>(null, xmlReader,
                 source, true, definitionService, configAdapter, definitionParserAdapter);
@@ -76,7 +76,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         DefDescriptor<AttributeDef> desc = definitionService.getDefDescriptor("mystring", AttributeDef.class);
         StringSource<AttributeDef> source = new StringSource<>(
                 desc, "<aura:set attribute='mystring'><aura:foo/></aura:set>", "myID", Format.XML);
-        XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(source.getReader());
+        XMLStreamReader xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<>(null, xmlReader,
                 source, true, definitionService, configAdapter, definitionParserAdapter);
@@ -90,7 +90,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         DefDescriptor<AttributeDef> desc = definitionService.getDefDescriptor("mystring", AttributeDef.class);
         StringSource<AttributeDef> source = new StringSource<>(
                 desc, "<aura:set attribute='mystring'>Child Text</aura:set>", "myID", Format.XML);
-        XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(source.getReader());
+        XMLStreamReader xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<>(null, xmlReader,
                 source, true, definitionService, configAdapter, definitionParserAdapter);

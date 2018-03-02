@@ -29,6 +29,7 @@ import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.util.type.ConversionException;
 import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import com.google.common.collect.ImmutableList;
@@ -129,7 +130,7 @@ public class AttributeDefRefTest extends AuraImplTestCase {
         ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         Definition value = Mockito.mock(Definition.class);
         AttributeDefRefImpl adr = vendor.makeAttributeDefRef(testAttributeDescriptorName, value, null);
-        Mockito.verify(value, Mockito.times(0)).validateReferences(Mockito.any());
+        Mockito.verify(value, Mockito.times(0)).validateReferences(Matchers.any());
         adr.validateReferences(validationContext);
         Mockito.verify(value, Mockito.times(1)).validateReferences(validationContext);
     }
@@ -140,7 +141,7 @@ public class AttributeDefRefTest extends AuraImplTestCase {
         Definition value = Mockito.mock(Definition.class);
         AttributeDefRefImpl adr = vendor
                 .makeAttributeDefRef(testAttributeDescriptorName, ImmutableList.of(value), null);
-        Mockito.verify(value, Mockito.times(0)).validateReferences(Mockito.any());
+        Mockito.verify(value, Mockito.times(0)).validateReferences(Matchers.any());
         adr.validateReferences(validationContext);
         Mockito.verify(value, Mockito.times(1)).validateReferences(validationContext);
     }
@@ -149,20 +150,20 @@ public class AttributeDefRefTest extends AuraImplTestCase {
     public void testAppendDependenciesChainsToValue() throws Exception {
         Definition value = Mockito.mock(Definition.class);
         AttributeDefRefImpl adr = vendor.makeAttributeDefRef(testAttributeDescriptorName, value, null);
-        Mockito.verify(value, Mockito.times(0)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any());
+        Mockito.verify(value, Mockito.times(0)).appendDependencies(Matchers.<Set<DefDescriptor<?>>> any());
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         adr.appendDependencies(dependencies);
-        Mockito.verify(value, Mockito.times(1)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any());
+        Mockito.verify(value, Mockito.times(1)).appendDependencies(Matchers.<Set<DefDescriptor<?>>> any());
     }
 
     @Test
     public void testAppendDependenciesChainsThroughCollection() throws Exception {
         Definition value = Mockito.mock(Definition.class);
         AttributeDefRefImpl adr = vendor.makeAttributeDefRef(testAttributeDescriptorName, Sets.newHashSet(value), null);
-        Mockito.verify(value, Mockito.times(0)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any());
+        Mockito.verify(value, Mockito.times(0)).appendDependencies(Matchers.<Set<DefDescriptor<?>>> any());
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         adr.appendDependencies(dependencies);
-        Mockito.verify(value, Mockito.times(1)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any());
+        Mockito.verify(value, Mockito.times(1)).appendDependencies(Matchers.<Set<DefDescriptor<?>>> any());
     }
 
     /**

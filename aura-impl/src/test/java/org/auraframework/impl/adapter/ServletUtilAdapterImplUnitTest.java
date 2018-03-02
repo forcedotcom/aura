@@ -46,8 +46,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.google.common.collect.Lists;
@@ -93,7 +92,7 @@ public class ServletUtilAdapterImplUnitTest {
         sua = Mockito.spy(sua);
 
         Mockito.when(response.getStatus()).thenReturn(HttpStatus.SC_OK);
-        Mockito.doThrow(new Error()).when(response).setHeader(Mockito.any(), Mockito.any());
+        Mockito.doThrow(new Error()).when(response).setHeader(Matchers.any(), Matchers.any());
 
         Throwable expected = null;
         try {

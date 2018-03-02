@@ -248,7 +248,7 @@ public class AuraServletTest extends UnitTestCase {
         QuickFixException actual = null;
         ActionDef myActionDef = getActionDef(actionName);
         Mockito.doReturn(myActionDef).when(definitionService).getDefinition(actionName, ActionDef.class);
-        Mockito.doThrow(expected).when(instanceService).getInstance(Mockito.eq(myActionDef), Mockito.any());
+        Mockito.doThrow(expected).when(instanceService).getInstance(Matchers.eq(myActionDef), Matchers.any());
         try {
             originalServlet.readMessage("{'actions':[{'descriptor':'"+actionName+"'}]}");
         } catch (QuickFixException qfe) {
@@ -288,10 +288,10 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
         
         ClientOutOfSyncException coos = new ClientOutOfSyncException("throw from test");
-        Mockito.doThrow(coos).when(definitionService).updateLoaded(Mockito.any());        
+        Mockito.doThrow(coos).when(definitionService).updateLoaded(Matchers.any());        
         
         DefinitionNotFoundException qfe = Mockito.mock(DefinitionNotFoundException.class);
-        Mockito.doThrow(qfe).when(servlet).readMessage(Mockito.any());
+        Mockito.doThrow(qfe).when(servlet).readMessage(Matchers.any());
         
         servlet.doPost(request, response);
         
@@ -585,13 +585,13 @@ public class AuraServletTest extends UnitTestCase {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         Message message = new Message(Arrays.asList(getAction("someAction")));
-        Mockito.doReturn(message).when(servlet).readMessage(Mockito.any());
+        Mockito.doReturn(message).when(servlet).readMessage(Matchers.any());
 
         // Act
         servlet.doPost(request, response);
         
         // Assert
-        Mockito.verify(serverService).run(Mockito.same(message), Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.verify(serverService).run(Matchers.same(message), Matchers.any(), Matchers.any(), Matchers.any());
     }
     
     @Test
@@ -607,7 +607,7 @@ public class AuraServletTest extends UnitTestCase {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         Message message = new Message(Arrays.asList(getAction("someAction")));
-        Mockito.doReturn(message).when(servlet).readMessage(Mockito.any());
+        Mockito.doReturn(message).when(servlet).readMessage(Matchers.any());
 
         Mockito.when(configAdapter.isActionPublicCachingEnabled()).thenReturn(true);
 
@@ -615,7 +615,7 @@ public class AuraServletTest extends UnitTestCase {
         servlet.doGet(request, response);
 
         // Assert
-        Mockito.verify(servletUtilAdapter).handleServletException(Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+        Mockito.verify(servletUtilAdapter).handleServletException(Matchers.any(), Matchers.anyBoolean(), Matchers.any(), Matchers.any(), Matchers.any(), Matchers.anyBoolean());
     }
 
     @Test
@@ -631,7 +631,7 @@ public class AuraServletTest extends UnitTestCase {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         Message message = new Message(Arrays.asList(getAction("someAction")));
-        Mockito.doReturn(message).when(servlet).readMessage(Mockito.any());
+        Mockito.doReturn(message).when(servlet).readMessage(Matchers.any());
 
         Mockito.when(configAdapter.isActionPublicCachingEnabled()).thenReturn(false);
 
@@ -639,7 +639,7 @@ public class AuraServletTest extends UnitTestCase {
         servlet.doGet(request, response);
 
         // Assert
-        Mockito.verify(servletUtilAdapter).handleServletException(Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+        Mockito.verify(servletUtilAdapter).handleServletException(Matchers.any(), Matchers.anyBoolean(), Matchers.any(), Matchers.any(), Matchers.any(), Matchers.anyBoolean());
     }
 
     @Test
@@ -655,7 +655,7 @@ public class AuraServletTest extends UnitTestCase {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         Message message = new Message(Arrays.asList(getAction("someAction")));
-        Mockito.doReturn(message).when(servlet).readMessage(Mockito.anyString());
+        Mockito.doReturn(message).when(servlet).readMessage(Matchers.anyString());
 
         Mockito.when(configAdapter.isActionPublicCachingEnabled()).thenReturn(true);
         Mockito.when(servletUtilAdapter.isPubliclyCacheableAction(message)).thenReturn(true);
@@ -668,7 +668,7 @@ public class AuraServletTest extends UnitTestCase {
         servlet.doGet(request, response);
 
         // Assert
-        Mockito.verify(serverService).run(Mockito.same(message), Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.verify(serverService).run(Matchers.same(message), Matchers.any(), Matchers.any(), Matchers.any());
         assertFalse("Publicly cached action should not have Browser GVP in the context.", 
                 context.getGlobalProviders().containsKey(AuraValueProviderType.BROWSER.getPrefix()));
     }
@@ -692,7 +692,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.when(actionDescriptor.getQualifiedName()).thenReturn("someName");
 
         Message message = new Message(Arrays.asList(action));
-        Mockito.doReturn(message).when(servlet).readMessage(Mockito.any());
+        Mockito.doReturn(message).when(servlet).readMessage(Matchers.any());
 
         Mockito.when(configAdapter.isActionPublicCachingEnabled()).thenReturn(true);
         Mockito.when(servletUtilAdapter.isPubliclyCacheableAction(message)).thenReturn(true);
@@ -730,7 +730,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.when(actionDescriptor.getQualifiedName()).thenReturn("someName");
 
         Message message = new Message(Arrays.asList(action));
-        Mockito.doReturn(message).when(servlet).readMessage(Mockito.any());
+        Mockito.doReturn(message).when(servlet).readMessage(Matchers.any());
 
         context.setActionPublicCacheKey("someKey");
         Mockito.when(configAdapter.getActionPublicCacheKey()).thenReturn("someOtherKey");

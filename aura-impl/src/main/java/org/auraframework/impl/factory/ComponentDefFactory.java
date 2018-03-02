@@ -29,8 +29,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
-import org.auraframework.impl.source.AbstractTextSourceImpl;
-import org.auraframework.impl.source.CopiedTextSourceImpl;
+import org.auraframework.impl.source.*;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -90,7 +89,7 @@ public class ComponentDefFactory extends BaseComponentDefFactory<ComponentDef> {
                 if (cssSource != null) {
                     DefDescriptor<StyleDef> newDesc = new DefDescriptorImpl<StyleDef>("templateCss",
                             descriptor.getNamespace(), descriptor.getName(), StyleDef.class);
-                    cssSource = new CopiedTextSourceImpl<>(newDesc, cssSource, AbstractTextSourceImpl.MIME_TEMPLATE_CSS);
+                    cssSource = new CopiedTextSourceImpl<>(newDesc, cssSource, AbstractSourceImpl.MIME_TEMPLATE_CSS);
 
                     newSourceMap = Maps.newHashMap(newSourceMap);
                     newSourceMap.remove(oldDesc);

@@ -21,7 +21,7 @@ import org.auraframework.def.genericxml.GenericXmlCapableDef;
 import org.auraframework.def.genericxml.GenericXmlElement;
 import org.auraframework.def.genericxml.RootLevelGenericXmlValidator;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.factory.XMLParser;
+import org.auraframework.impl.factory.XMLParserBase;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser;
 import org.junit.Test;
@@ -74,7 +74,7 @@ public class GenericXmlElementHandlerProviderTest extends AuraImplTestCase {
                                                 String tag, boolean isInternalNamespace) throws Exception {
         String xml = String.format("<%s/>", tag);
         Reader stringReader = new StringReader(xml);
-        XMLStreamReader reader = XMLParser.createXMLStreamReader(stringReader);
+        XMLStreamReader reader = XMLParserBase.createXMLStreamReader(stringReader);
         reader.next();
         StringSource<?> source = new StringSource<>(
                 null,

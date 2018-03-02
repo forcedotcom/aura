@@ -24,7 +24,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.impl.factory.XMLParser;
+import org.auraframework.impl.factory.XMLParserBase;
 import org.auraframework.impl.root.parser.handler.FlavorIncludeDefHandler;
 import org.auraframework.impl.root.parser.handler.FlavorsDefHandler;
 import org.auraframework.impl.source.StringSource;
@@ -101,14 +101,14 @@ public class FlavorIncludeDefHandlerTest extends StyleTestCase {
         DefDescriptor<FlavorsDef> parentDesc = definitionService.getDefDescriptor("test:tmp",
                 FlavorsDef.class);
         StringSource<FlavorsDef> parentSource = new StringSource<>(parentDesc, "<aura:flavors/>", "myID", Format.XML);
-        XMLStreamReader parentReader = XMLParser.createXMLStreamReader(parentSource.getReader());
+        XMLStreamReader parentReader = XMLParserBase.createXMLStreamReader(parentSource.getReader());
         parentReader.next();
         FlavorsDefHandler parent = new FlavorsDefHandler(parentDesc, parentSource, parentReader, true, definitionService,
                 configAdapter, definitionParserAdapter);
 
         DefDescriptor<FlavorIncludeDef> desc = definitionService.getDefDescriptor("test", FlavorIncludeDef.class);
         StringSource<FlavorIncludeDef> ss = new StringSource<>(desc, src, "myID", Format.XML);
-        XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(ss.getReader());
+        XMLStreamReader xmlReader = XMLParserBase.createXMLStreamReader(ss.getReader());
         xmlReader.next();
         FlavorIncludeDefHandler handler = new FlavorIncludeDefHandler(parent, xmlReader, ss, true,
                 definitionService, configAdapter, definitionParserAdapter);

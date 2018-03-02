@@ -24,7 +24,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
-import org.auraframework.impl.factory.XMLParser;
+import org.auraframework.impl.factory.XMLParserBase;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
                 desc, "<div class='MyClass'>Child Text<br/></div>", "myID", Format.XML);
-        xmlReader = XMLParser.createXMLStreamReader(source.getReader());
+        xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService, contextService,
                 configAdapter, definitionParserAdapter);
@@ -87,7 +87,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
                 desc, "<div><aura:set attribute='header' value='false'/></div>", "myID", Format.XML);
-        xmlReader = XMLParser.createXMLStreamReader(source.getReader());
+        xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService, contextService,
                 configAdapter, definitionParserAdapter);
@@ -96,7 +96,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
         htmlHandler.readAttributes();
         xmlReader.next();
         htmlHandler.handleChildTag();
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "unchecked", "unlikely-arg-type" })
         String value = (String) ((Map<String, Object>) htmlHandler.createDefinition()
                 .getAttributeDefRef("HTMLAttributes").getValue()).get(definitionService.getDefDescriptor(
                 "header", AttributeDef.class));
@@ -136,7 +136,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
     public void testReadFlavorable() throws Exception {
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("fake:component", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(desc, "<div aura:flavorable='true'></div>", "myID", Format.XML);
-        xmlReader = XMLParser.createXMLStreamReader(source.getReader());
+        xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService, contextService,
                 configAdapter, definitionParserAdapter);

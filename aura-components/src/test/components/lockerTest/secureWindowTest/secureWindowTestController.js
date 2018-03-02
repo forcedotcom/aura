@@ -190,23 +190,6 @@
         testUtils.assertEquals('application/json', blob.type);
     },
 
-    testBlob_WithScriptTagsBlocked: function(cmp) {
-        var testUtils = cmp.get("v.testUtils");
-        var scripts = [
-            "<script>alert(window)</script>",
-            "<script  >alert(window)</script  >",
-            "<SCRIPT>alert(window)</SCRIPT>"
-        ];
-        scripts.forEach(function(script){
-            try {
-                var blob = new Blob([script], {type:'text/html'});
-                testUtils.fail("Expect to block script tags while creating Blob:"+script);
-            } catch (e) {
-                testUtils.assertEquals("Blob creation failed: <script> tags are blocked", e.message);
-            }
-        });
-    },
-
     testFile: function(cmp) {
         var testUtils = cmp.get("v.testUtils"),
             expectedFileName = 'test.html',

@@ -147,12 +147,6 @@
         }
     },
 
-    testBlob_WithScriptTagsBlocked: {
-        test: function (cmp) {
-            cmp.testBlob_WithScriptTagsBlocked();
-        }
-    },
-
     testFile: {
         // window.File is not implemented correctly in iOS 9.2
         test: function(cmp) {

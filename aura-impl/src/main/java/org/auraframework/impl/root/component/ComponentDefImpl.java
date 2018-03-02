@@ -107,7 +107,10 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
 
             serializeStyles(json);
 
-            json.getAppendable().append(serializedJSON.get(json.getIndent()));
+            String preSerializedJSON = serializedJSON.get(json.getIndent());
+            if (preSerializedJSON != null) {
+                json.getAppendable().append(preSerializedJSON);
+            }
             
             serializeContextDependencies(context, json);
             json.writeMapEnd();

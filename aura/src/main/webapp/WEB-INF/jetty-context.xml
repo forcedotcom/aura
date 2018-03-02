@@ -5,5 +5,6 @@
   <Call name="setAttribute">
         <Arg>org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern</Arg>
         <Arg>.*/spring-security[^/]*\.jar$|.*/spring-web[^/]*\.jar$|.*/classes/.*</Arg>
-    </Call>
+  </Call>
+  <Set name="maxFormContentSize" type="int">600000</Set>
 </Configure>

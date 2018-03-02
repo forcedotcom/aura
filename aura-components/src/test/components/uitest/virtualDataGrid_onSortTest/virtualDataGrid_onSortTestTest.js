@@ -89,7 +89,7 @@
 	  var ths = thead.getElementsByTagName("th");
 	  var anchor = ths[index].children[0];
 	  if (anchor.nodeType != 3) {
-		  return $A.test.getText(anchor.getElementsByTagName("span")[1]);
+		  return $A.test.getText(anchor.nextSibling);
 	  }
 	  return "";
   },

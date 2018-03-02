@@ -100,7 +100,8 @@
 
 			  if (expectedHeader.isEnabled) {
 				  var expectedSort = expectedHeader.sort;
-				  var actualSort = $A.test.getText(header.getElementsByTagName("span")[1]).toUpperCase();
+				  console.log(header.nextSibling);
+				  var actualSort = $A.test.getText(header.nextSibling).toUpperCase();
 				  $A.test.assertEquals(expectedSort, actualSort , "Sort direction incorrect");
 			  } else {
 				  var headerClass = $A.util.getElementAttributeValue(header, "class");

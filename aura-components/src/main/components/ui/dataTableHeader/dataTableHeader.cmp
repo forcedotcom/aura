@@ -79,11 +79,10 @@
                     <span class="slds-assistive-text">{! (v.disabled ? '' : v.assistiveSortText) } </span>
                     {!v.icon}
                     <span class="slds-truncate" title="{!v.label}">{!(!v.hideLabel) ? v.label : ''}</span>
-                    <span class="slds-assistive-text">{! v.disabled ? ''
-                                                        : ((v.direction == 'ascending') ? v.ascLabel 
-                                                        : ((v.direction == 'descending') ? v.descLabel : v.direction))}</span>
                 </a>
-                
+                <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true">{! v.disabled ? ''
+                    : ((v.direction == 'ascending') ? v.ascLabel
+                    : ((v.direction == 'descending') ? v.descLabel : v.direction))}</span>
                 <aura:set attribute="else">
                     <div class="slds-th__action">
                         {!v.icon}

@@ -66,11 +66,10 @@
                     <span class="assistiveText">{! (v.disabled ? '' : v.assistiveSortText) + ' '
                                                     + (v.hideLabel ? v.label : '') } </span>
                     {!(!v.hideLabel) ? v.label : ''}
-                    <span class="assistiveText">{! v.disabled ? ''
-                                                    : ((v.direction == 'ascending') ? v.ascLabel 
-                                                        : ((v.direction == 'descending') ? v.descLabel : v.direction))}</span>
                 </a>
-                
+				<span class="assistiveText" aria-live="assertive" aria-atomic="true">{! v.disabled ? ''
+					: ((v.direction == 'ascending') ? v.ascLabel
+					: ((v.direction == 'descending') ? v.descLabel : v.direction))}</span>
                 <aura:set attribute="else">
                     {!(!v.hideLabel) ? v.label : ''}
                     <span class="assistiveText">{! (v.hideLabel ? v.label : '') }</span>

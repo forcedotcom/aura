@@ -157,7 +157,7 @@
 			  
 			  if (expectedHeader.isEnabled) {
 				  var expectedSort = expectedHeader.sort;
-				  var actualSort = $A.test.getText(header.getElementsByTagName("span")[1]);
+				  var actualSort = $A.test.getText(header.nextSibling);
 				  $A.test.assertEquals(expectedSort, actualSort , "Sort direction incorrect");
 			  } else {
 				  var headerClass = $A.util.getElementAttributeValue(header, "class");

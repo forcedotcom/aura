@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-02-28
- * Version: 0.3.16
+ * Generated: 2018-03-02
+ * Version: 0.3.17
  */
 
 (function (global, factory) {
@@ -34,6 +34,52 @@ const FUNCTION_RAW_ARGS = { type: 'function', rawArguments: true };
 const CTOR = { type: '@ctor' };
 const RAW = { type: '@raw' };
 const READ_ONLY_PROPERTY = { writable: false };
+
+const domPurifyConfig = {
+  // Allow SVG <use> element
+  ADD_TAGS: ['use'],
+  ADD_ATTR: [
+    'aria-activedescendant',
+    'aria-atomic',
+    'aria-autocomplete',
+    'aria-busy',
+    'aria-checked',
+    'aria-controls',
+    'aria-describedby',
+    'aria-disabled',
+    'aria-readonly',
+    'aria-dropeffect',
+    'aria-expanded',
+    'aria-flowto',
+    'aria-grabbed',
+    'aria-haspopup',
+    'aria-hidden',
+    'aria-disabled',
+    'aria-invalid',
+    'aria-label',
+    'aria-labelledby',
+    'aria-level',
+    'aria-live',
+    'aria-multiline',
+    'aria-multiselectable',
+    'aria-orientation',
+    'aria-owns',
+    'aria-posinset',
+    'aria-pressed',
+    'aria-readonly',
+    'aria-relevant',
+    'aria-required',
+    'aria-selected',
+    'aria-setsize',
+    'aria-sort',
+    'aria-valuemax',
+    'aria-valuemin',
+    'aria-valuenow',
+    'aria-valuetext',
+    'role',
+    'target'
+  ]
+};
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -86,6 +132,8 @@ const objectToKeyedData = newWeakMap();
 const secureProxy = newWeakMap();
 const filteringProxy = newWeakMap();
 const secureFunction = newWeakMap();
+
+const secureBlobTypes = newWeakMap();
 
 function getKey(thing) {
   return keychain.get(thing);
@@ -205,6 +253,16 @@ function registerSecureFunction(st) {
 function isSecureFunction(st) {
   return secureFunction.get(st) === true;
 }
+
+function registerSecureBlob(st, type) {
+  secureBlobTypes.set(st, type);
+}
+
+function isSecureBlob(st) {
+  return secureBlobTypes.has(st);
+}
+
+
 
 function unwrap$1(from, st) {
   if (!st) {
@@ -440,6 +498,36 @@ const {
 const objectToString = Object.prototype.toString;
 const objectHasOwnProperty = Object.prototype.hasOwnProperty;
 
+/**
+ * Converts ArrayBuffer to UTF-8 String
+ * @param {ArrayBuffer} buf
+ */
+function ab2str(buf) {
+  if (typeof TextDecoder !== 'undefined') {
+    const dec = new TextDecoder('utf-8');
+    return dec.decode(buf);
+  }
+
+  let str = '';
+  const abLen = buf.byteLength;
+  let offset = 0;
+  const CHUNK_SIZE = 2 ** 16;
+
+  do {
+    const len = Math.min(CHUNK_SIZE, abLen - offset);
+    const part = new Uint8Array(buf.slice(offset, offset + len));
+    str += String.fromCharCode.apply(null, part);
+    offset += len;
+  } while (offset < abLen);
+  return str;
+}
+
+/**
+ * Converts String to ArrayBuffer
+ * https://github.com/dfcreative/string-to-arraybuffer/blob/master/index.js
+ * @param {String} str
+ */
+
 /*
  * Copyright (C) 2017 salesforce.com, inc.
  *
@@ -461,8 +549,8 @@ const objectHasOwnProperty = Object.prototype.hasOwnProperty;
 // https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
 // https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
 
-function repairAccessors(lockerRec) {
-  const { unsafeGlobal } = lockerRec;
+function repairAccessors(realmRec) {
+  const { unsafeGlobal } = realmRec;
 
   // W-2961201 Prevent execution in the global context.
 
@@ -540,14 +628,14 @@ function repairAccessors(lockerRec) {
  * 4. Replace its prototype property's constructor with itself
  * 5. Replace its [[Prototype]] slot with the noop constructor of Function
  */
-function repairRootFunction(lockerRec, functionName, functionDecl) {
-  const { unsafeGlobal, unsafeEval, unsafeFunction } = lockerRec;
+function repairFunction(realmRec, functionName, functionDecl) {
+  const { unsafeGlobal, unsafeEval, unsafeFunction } = realmRec;
 
-  const RootFunctionInstance = unsafeEval(`(${functionDecl}(){})`);
-  const RootFunctionPrototype = getPrototypeOf(RootFunctionInstance);
+  const FunctionInstance = unsafeEval(`(${functionDecl}(){})`);
+  const FunctionPrototype = getPrototypeOf(FunctionInstance);
 
-  const NoopFunction = unsafeFunction('return function(){}');
-  defineProperties(NoopFunction, {
+  const RealmFunction = unsafeFunction('return function(){}');
+  defineProperties(RealmFunction, {
     name: {
       value: functionName
     },
@@ -556,12 +644,12 @@ function repairRootFunction(lockerRec, functionName, functionDecl) {
     }
   });
 
-  defineProperty(NoopFunction, 'prototype', { value: RootFunctionPrototype });
-  defineProperty(RootFunctionPrototype, 'constructor', { value: NoopFunction });
+  defineProperty(RealmFunction, 'prototype', { value: FunctionPrototype });
+  defineProperty(FunctionPrototype, 'constructor', { value: RealmFunction });
 
   // Prevent loop in case of Function.
-  if (NoopFunction !== unsafeGlobal.Function.prototype.constructor) {
-    setPrototypeOf(NoopFunction, unsafeGlobal.Function.prototype.constructor);
+  if (RealmFunction !== unsafeGlobal.Function.prototype.constructor) {
+    setPrototypeOf(RealmFunction, unsafeGlobal.Function.prototype.constructor);
   }
 }
 
@@ -571,17 +659,17 @@ function repairRootFunction(lockerRec, functionName, functionDecl) {
  * safe replacements that preserve SES confinement. After this block is done,
  * the originals should no longer be reachable.
  */
-function repairFunctions(lockerRec) {
-  const { unsafeGlobal } = lockerRec;
+function repairFunctions(realmRec) {
+  const { unsafeGlobal } = realmRec;
   const hasAsyncIteration = typeof unsafeGlobal.Symbol.asyncIterator !== 'undefined';
 
   // Here, the order of operation is important: Function needs to be
   // repaired first since the other constructors need it.
-  repairRootFunction(lockerRec, 'Function', 'function');
-  repairRootFunction(lockerRec, 'GeneratorFunction', 'function*');
-  repairRootFunction(lockerRec, 'AsyncFunction', 'async function');
+  repairFunction(realmRec, 'Function', 'function');
+  repairFunction(realmRec, 'GeneratorFunction', 'function*');
+  repairFunction(realmRec, 'AsyncFunction', 'async function');
   if (hasAsyncIteration) {
-    repairRootFunction(lockerRec, 'AsyncGeneratorFunction', 'async function*');
+    repairFunction(realmRec, 'AsyncGeneratorFunction', 'async function*');
   }
 }
 
@@ -664,8 +752,8 @@ function tamperProof(obj, prop) {
  * We "repair" these data properties to getters
  * and setters.
  */
-function repairDataProperties(lockerRec) {
-  const { unsafeGlobal: _ } = lockerRec;
+function repairDataProperties(realmRec) {
+  const { unsafeGlobal: _ } = realmRec;
 
   // Intentionally avoid loops and data structures.
   tamperProof(_.Object.prototype, 'toString');
@@ -793,8 +881,8 @@ function deepFreeze(node) {
  *
  * https://tc39.github.io/ecma262/#table-7
  */
-function getIntrinsics(lockerRec) {
-  const { unsafeGlobal: _ } = lockerRec;
+function getIntrinsics(realmRec) {
+  const { unsafeGlobal: _ } = realmRec;
 
   // Anonymous intrinsics.
 
@@ -1076,33 +1164,33 @@ function getIntrinsics(lockerRec) {
 
 const sanitized = new WeakSet();
 
-function freezeIntrinsics(lockerRec) {
-  const intrinsics = getIntrinsics(lockerRec);
+function freezeIntrinsics(realmRec) {
+  const intrinsics = getIntrinsics(realmRec);
   deepFreeze(intrinsics);
 }
 
-function freezeIntrinsicsDeprecated(lockerRec) {
-  const { unsafeGlobal } = lockerRec;
+function freezeIntrinsicsDeprecated(realmRec) {
+  const { unsafeGlobal } = realmRec;
   seal(unsafeGlobal.Object.prototype);
 }
 
 // locking down the environment
-function sanitize(lockerRec) {
-  if (sanitized.has(lockerRec)) {
+function sanitize(realmRec) {
+  if (sanitized.has(realmRec)) {
     return;
   }
 
-  repairAccessors(lockerRec);
+  repairAccessors(realmRec);
 
-  if (lockerRec.isFrozen) {
-    repairFunctions(lockerRec);
-    repairDataProperties(lockerRec);
-    freezeIntrinsics(lockerRec);
+  if (realmRec.isFrozen) {
+    repairFunctions(realmRec);
+    repairDataProperties(realmRec);
+    freezeIntrinsics(realmRec);
   } else {
-    freezeIntrinsicsDeprecated(lockerRec);
+    freezeIntrinsicsDeprecated(realmRec);
   }
 
-  sanitized.add(lockerRec);
+  sanitized.add(realmRec);
 }
 
 /*
@@ -1224,7 +1312,7 @@ function createEvalEvaluatorFactory(sandbox) {
   // a constant.
   return sandbox.unsafeFunction(`
     with (arguments[0]) {
-      const {${stdlib.join(',')}, Function, window} = arguments[0];
+      const {${stdlib.join(',')}, Function, window, document} = arguments[0];
       return function() {
         'use strict';
         return eval(arguments[0]);
@@ -1305,10 +1393,7 @@ function createEvalEvaluator(sandbox) {
 function createFunctionEvaluator(sandbox) {
   const evaluator = function(...params) {
     const body = params.pop() || '';
-    const src = `
-(function(${params.join(',')}) {
-  ${body}
-})`;
+    const src = `(function(${params.join(',')}\n){\n${body}\n})`;
     // evalEvaluator is created after FunctionEvaluator,
     // so we can't link directly to it.
     return sandbox.evalEvaluator(src);
@@ -1317,7 +1402,7 @@ function createFunctionEvaluator(sandbox) {
   // Ensure that the different Function instances of the different
   // sandboxes all answer properly when used with the instanceof
   // operator to preserve indentity.
-  const NoopFunction = sandbox.unsafeFunction.prototype.constructor;
+  const RealmFunction = sandbox.unsafeFunction.prototype.constructor;
 
   // Mimic the native signature.
   defineProperties(evaluator, {
@@ -1328,7 +1413,7 @@ function createFunctionEvaluator(sandbox) {
       value: () => 'function Function() { [native code] }'
     },
     [Symbol.hasInstance]: {
-      value: v => v instanceof NoopFunction
+      value: v => v instanceof RealmFunction
     }
   });
 
@@ -1352,11 +1437,11 @@ function createFunctionEvaluator(sandbox) {
  */
 const keyToSandbox = new Map();
 
-function createSandbox(key, lockerRec) {
+function createSandbox(key, realmRec) {
   // Lazy sanitize the execution environment.
-  sanitize(lockerRec);
+  sanitize(realmRec);
 
-  const { unsafeGlobal, unsafeEval, unsafeFunction } = lockerRec;
+  const { unsafeGlobal, unsafeEval, unsafeFunction } = realmRec;
   const sandbox = { unsafeGlobal, unsafeEval, unsafeFunction };
 
   /**
@@ -1385,11 +1470,11 @@ function createSandbox(key, lockerRec) {
   return freeze(sandbox);
 }
 
-function getSandbox(key, lockerRec) {
+function getSandbox(key, realmRec) {
   let sandbox = keyToSandbox.get(key);
 
   if (!sandbox) {
-    sandbox = createSandbox(key, lockerRec);
+    sandbox = createSandbox(key, realmRec);
     keyToSandbox.set(key, sandbox);
   }
 
@@ -1444,26 +1529,26 @@ function sanitizeURLForElement(url) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const lockerRec = {};
+const realmRec = {};
 function init(options) {
   // The frozen/unfrozen status of the Locker is set at creation.
-  lockerRec.isFrozen = options.isFrozen;
+  realmRec.isFrozen = options.isFrozen;
 
   /**
    * The unsafe* variables hold precious values that must not escape
    * to untrusted code. When eval is invoked via unsafeEval, this is
    * a call to the indirect eval function, not the direct eval operator.
    */
-  lockerRec.unsafeGlobal = options.unsafeGlobal;
-  lockerRec.unsafeEval = options.unsafeGlobal.eval;
-  lockerRec.unsafeFunction = options.unsafeGlobal.Function;
+  realmRec.unsafeGlobal = options.unsafeGlobal;
+  realmRec.unsafeEval = options.unsafeGlobal.eval;
+  realmRec.unsafeFunction = options.unsafeGlobal.Function;
 
   // None of these values can change after initialization.
-  freeze(lockerRec);
+  freeze(realmRec);
 }
 
 function getEnv$1(key) {
-  const sandbox = getSandbox(key, lockerRec);
+  const sandbox = getSandbox(key, realmRec);
   return sandbox.globalObject;
 }
 
@@ -1473,7 +1558,7 @@ function getEnv$1(key) {
  * result can be easily found in browser debugging tools.
  */
 function evaluate(src, key, sourceURL) {
-  const sandbox = getSandbox(key, lockerRec);
+  const sandbox = getSandbox(key, realmRec);
 
   // Sanitize the URL
   if (sourceURL) {
@@ -3553,52 +3638,6 @@ function trustChildNodes(from, node) {
 }
 
 const KEY_TO_PROTOTYPES = typeof Map !== 'undefined' ? new Map() : undefined;
-
-const domPurifyConfig = {
-  // Allow SVG <use> element
-  ADD_TAGS: ['use'],
-  ADD_ATTR: [
-    'aria-activedescendant',
-    'aria-atomic',
-    'aria-autocomplete',
-    'aria-busy',
-    'aria-checked',
-    'aria-controls',
-    'aria-describedby',
-    'aria-disabled',
-    'aria-readonly',
-    'aria-dropeffect',
-    'aria-expanded',
-    'aria-flowto',
-    'aria-grabbed',
-    'aria-haspopup',
-    'aria-hidden',
-    'aria-disabled',
-    'aria-invalid',
-    'aria-label',
-    'aria-labelledby',
-    'aria-level',
-    'aria-live',
-    'aria-multiline',
-    'aria-multiselectable',
-    'aria-orientation',
-    'aria-owns',
-    'aria-posinset',
-    'aria-pressed',
-    'aria-readonly',
-    'aria-relevant',
-    'aria-required',
-    'aria-selected',
-    'aria-setsize',
-    'aria-sort',
-    'aria-valuemax',
-    'aria-valuemin',
-    'aria-valuenow',
-    'aria-valuetext',
-    'role',
-    'target'
-  ]
-};
 
 function propertyIsSupported(target, property) {
   // If the SecureElement prototype does not have the property directly on it then this
@@ -6223,7 +6262,8 @@ function getUnfilteredTypes() {
     'ValidityState',
     'Crypto',
     'DOMTokenList',
-    'ArrayBuffer'
+    'ArrayBuffer',
+    'Blob'
   ];
   unfilteredTypesMeta.forEach(unfilteredType => {
     if (typeof window[unfilteredType] !== 'undefined') {
@@ -7164,19 +7204,14 @@ function SecureStorage(storage, type, key) {
 // https://developer.microsoft.com/en-us/microsoft-edge/platform/status/urlapi/
 
 // Only FireFox implements the correct behavior.
-
 function SecureURL(raw) {
   const SecureURLMethods = Object.create(null, {
     createObjectURL: {
       value: function(object) {
         if (Object.prototype.toString.call(object) === '[object Blob]') {
-          if (object.type === 'text/html') {
-            // There are no relible ways to convert syncronously
-            // a blob back to a string. Disallow until
-            // <rdar://problem/33575448> is declassified
-            throw new TypeError(
-              `SecureURL does not allow creation of Object URL from blob type ${object.type}`
-            );
+          // do not use any Blob instance that Locker hasn't looked at prior to this
+          if (!isSecureBlob(object)) {
+            throw new error('Unrecognized object');
           }
         }
         // IMPORTANT: thisArg is the target of the proxy.
@@ -7214,6 +7249,122 @@ function SecureURL(raw) {
     }
   });
 }
+
+const HTML_MAX_BUF_SIZE = 32768;
+
+const WHITELISTED_MIME_TYPES = [
+  'application/',
+  'video/',
+  'audio/',
+  'image/',
+  'font/',
+  'text/plain',
+  'text/markdown'
+];
+
+const HTML_MIME_TYPES = ['text/html', 'image/svg+xml', 'text/xml'];
+
+function sanitizeHTMLParts(arr) {
+  const out = [];
+  let i = 0;
+  do {
+    let entry = arr[i];
+    if (typeof entry !== 'string') {
+      entry = ab2str(entry);
+    }
+    entry = DOMPurify.sanitize(entry, domPurifyConfig);
+    out.push(entry);
+    i += 1;
+  } while (i < arr.length);
+  return out;
+}
+
+function isWhitelistedMIMEType(type = '') {
+  for (let i = 0; i < WHITELISTED_MIME_TYPES.length; i++) {
+    if (type.startsWith(WHITELISTED_MIME_TYPES[i], 0)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isSafeArrayBuffer(buf) {
+  if (buf.byteLength > HTML_MAX_BUF_SIZE) {
+    warn(`Content validation failed. Max size is ${HTML_MAX_BUF_SIZE}`);
+    return false;
+  }
+  return true;
+}
+
+/**
+ * There are no relible ways to convert syncronously
+ * a blob back to a string. Disallow until
+ * <rdar://problem/33575448> is declassified
+ * @returns {Boolean}
+ */
+function isSafeBlob() {
+  return false;
+}
+
+/**
+ * Validates if all blobParts contain safe content.
+ * @param {Array} blobParts
+ * @return {Boolean}
+ */
+function canCreateFromHTML(blobParts) {
+  if (blobParts && blobParts.length) {
+    for (let i = 0; i < blobParts.length; i++) {
+      const entry = blobParts[i];
+      if (entry instanceof ArrayBuffer && !isSafeArrayBuffer(entry)) {
+        return false;
+      } else if (entry instanceof Blob && !isSafeBlob(entry)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+function SecureBlob(blobParts = [], opts) {
+  // prevent array index accessor hijacking
+  blobParts = [].concat(blobParts);
+
+  // prevent property getters hijacking
+  opts = Object.assign({}, opts);
+
+  if (typeof opts.type === 'undefined') {
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types
+    opts.type = 'application/octet-stream';
+  }
+
+  if (HTML_MIME_TYPES.includes(opts.type)) {
+    if (canCreateFromHTML(blobParts)) {
+      const instance = new Blob(sanitizeHTMLParts(blobParts), opts);
+
+      // fix instanceof checks
+      instance.constructor = SecureBlob;
+
+      registerSecureBlob(instance, opts.type);
+      return instance;
+    }
+    throw new error('Validation failed, cannot create Blob.');
+  }
+
+  if (isWhitelistedMIMEType(opts.type)) {
+    // whitelisted MIME types do not need sanitization
+    const instance = new Blob(blobParts, opts);
+
+    // fix instanceof checks
+    instance.constructor = SecureBlob;
+
+    registerSecureBlob(instance, opts.type);
+    return instance;
+  }
+
+  throw new error('Unsupported MIME type.');
+}
+
+SecureBlob.prototype = Blob.prototype;
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -8006,57 +8157,62 @@ function SecureWindow(win, key) {
     });
   }
 
-  ['Blob', 'File'].forEach(name => {
-    if (name in win) {
-      let valueOverride;
-      Object.defineProperty(o, name, {
-        get: function() {
-          return (
-            valueOverride ||
-            function() {
-              const cls = win[name];
-              const args = Array.prototype.slice.call(arguments);
-              let result;
+  if ('Blob' in win) {
+    Object.defineProperty(o, 'Blob', {
+      enumerable: true,
+      value: SecureBlob
+    });
+  }
 
-              const scriptTagsRegex = /<script[\s\S]*?>[\s\S]*?<\/script[\s]*?>/gi;
-              if (scriptTagsRegex.test(args[0])) {
-                throw new error(`${name} creation failed: <script> tags are blocked`);
-              }
-              if (typeof cls === 'function') {
-                //  Function.prototype.bind.apply is being used to invoke the constructor and to pass all the arguments provided by the caller
-                // TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
-                result = new (Function.prototype.bind.apply(cls, [null].concat(args)))();
-              } else {
-                // For browsers that use a constructor that's not a function, invoke the constructor directly.
-                // For example, on Mobile Safari window["Blob"] returns an object called BlobConstructor
-                // Invoke constructor with specific arguments, handle up to 3 arguments(Blob accepts 2 param, File accepts 3 param)
-                switch (args.length) {
-                  case 0:
-                    result = new cls();
-                    break;
-                  case 1:
-                    result = new cls(args[0]);
-                    break;
-                  case 2:
-                    result = new cls(args[0], args[1]);
-                    break;
-                  case 3:
-                    result = new cls(args[0], args[1], args[2]);
-                    break;
-                  default:
-                    break;
-                }
-              }
-              return result;
+  if ('File' in win) {
+    let valueOverride;
+    Object.defineProperty(o, 'File', {
+      get: function() {
+        return (
+          valueOverride ||
+          function() {
+            const cls = win['File'];
+            const args = Array.prototype.slice.call(arguments);
+            let result;
+
+            const scriptTagsRegex = /<script[\s\S]*?>[\s\S]*?<\/script[\s]*?>/gi;
+            if (scriptTagsRegex.test(args[0])) {
+              throw new error('File creation failed: <script> tags are blocked');
             }
-          );
-        },
-        set: function(value) {
-          valueOverride = value;
-        }
-      });
-    }
-  });
+            if (typeof cls === 'function') {
+              //  Function.prototype.bind.apply is being used to invoke the constructor and to pass all the arguments provided by the caller
+              // TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
+              result = new (Function.prototype.bind.apply(cls, [null].concat(args)))();
+            } else {
+              // For browsers that use a constructor that's not a function, invoke the constructor directly.
+              // For example, on Mobile Safari window["Blob"] returns an object called BlobConstructor
+              // Invoke constructor with specific arguments, handle up to 3 arguments(Blob accepts 2 param, File accepts 3 param)
+              switch (args.length) {
+                case 0:
+                  result = new cls();
+                  break;
+                case 1:
+                  result = new cls(args[0]);
+                  break;
+                case 2:
+                  result = new cls(args[0], args[1]);
+                  break;
+                case 3:
+                  result = new cls(args[0], args[1], args[2]);
+                  break;
+                default:
+                  break;
+              }
+            }
+            return result;
+          }
+        );
+      },
+      set: function(value) {
+        valueOverride = value;
+      }
+    });
+  }
 
   addEventTargetMethods(o, win, key);
 

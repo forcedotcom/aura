@@ -151,6 +151,7 @@ function AuraClientService (util) {
     this._token = null;
     this._isDisconnected = false;
     this._parallelBootstrapLoad = true;
+    this.authorizationToken = undefined;
     this.auraStack = [];
     this.actionStorage = new Aura.Controller.ActionStorage();
     this.appcacheDownloadingEventFired = false;
@@ -3116,6 +3117,9 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
         }
     }
 
+    if (this.authorizationToken) {
+        auraXHR.request.setRequestHeader('Authorization', this.authorizationToken);
+    }
     if (qs && method === "POST") {
         auraXHR.request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=ISO-8859-13');
         auraXHR.request["send"](qs);
@@ -4501,6 +4505,16 @@ AuraClientService.prototype.getCurrentAccessGlobalId = function () {
     }
 
     return owner;
+};
+
+/**
+ * If set, an Authorization header will be set with the value of the given token for every request. 
+ * 
+ * @param {String} token value to be set for every request
+ * @export
+ */
+AuraClientService.prototype.setAuthorizationToken = function (token) {
+    this.authorizationToken = token;
 };
 
 Aura.Services.AuraClientService = AuraClientService;

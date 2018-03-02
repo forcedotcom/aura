@@ -431,6 +431,10 @@ Test.Aura.AuraClientServiceTest = function() {
         this.isPubliclyCacheable = function() {
             return this.def.isPublicCachingEnabled() && this.def.getPublicCachingExpiration() > 0;
         }
+        
+        this.callAllAboardCallback = function() { return true; }
+        this.isChained = function() { return false; }
+        this.prepareToSend = function() {}
 
         if (type === "clientbackground") {
             this.isBackground = Stubs.GetMethod(true);
@@ -3238,6 +3242,92 @@ Test.Aura.AuraClientServiceTest = function() {
             target.actionsDeferred = actions;
             target.sendActionXHRs();
             Assert.Equal(expected, target.actionsDeferred);
+        }
+    }
+
+    [Fixture]
+    function setAuthorizationToken() {
+
+        [Fact]
+        function setsXhrHeaderIfSet() {
+        	var expected = "OAuth token";
+        	var actual = undefined;
+            var action = new MockAction();
+
+            var mockAuraXHR = {
+                addAction: function () {}
+            };
+
+            var mockXHR = Stubs.GetObject({
+                open: function (method, url) {},
+                setRequestHeader: function (name, value) {
+                	if (name === "Authorization") {
+                		actual = value;
+                	}
+                },
+                send: function () {}
+            });
+
+            var mockSetTimeout = Mocks.GetMocks(Object.Global(), {
+                setTimeout: function() {}
+            });
+
+            mockSetTimeout(function() {
+                mockGlobal(function () {
+                    var target = new Aura.Services.AuraClientService();
+                    target.buildActionNameList = function (action) {
+                        return action;
+                    };
+                    target.createXHR = function () {
+                        return mockXHR;
+                    };
+                    target.setAuthorizationToken(expected);
+
+                    target.send(mockAuraXHR, [action], "POST");
+                });
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function doesNotSetXhrHeaderIfNotSet() {
+        	var expected = undefined;
+        	var actual = undefined;
+            var action = new MockAction();
+
+            var mockAuraXHR = {
+                addAction: function () {}
+            };
+
+            var mockXHR = Stubs.GetObject({
+                open: function (method, url) {},
+                setRequestHeader: function (name, value) {
+                	if (name === "Authorization") {
+                		actual = value;
+                	}
+                },
+                send: function () {}
+            });
+
+            var mockSetTimeout = Mocks.GetMocks(Object.Global(), {
+                setTimeout: function() {}
+            });
+
+            mockSetTimeout(function() {
+                mockGlobal(function () {
+                    var target = new Aura.Services.AuraClientService();
+                    target.buildActionNameList = function (action) {
+                        return action;
+                    };
+                    target.createXHR = function () {
+                        return mockXHR;
+                    };
+                    target.send(mockAuraXHR, [action], "POST");
+                });
+            });
+
+            Assert.Equal(expected, actual);
         }
     }
 

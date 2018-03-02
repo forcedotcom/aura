@@ -5,7 +5,7 @@
         cmp.set('v.testUtils', $A.test);
     },
     
-    _testSecureEvalIsLockerized: {
+    testSecureEvalIsLockerized: {
       test: function(component) {
           component.testSecureEvalIsLockerized(component);
       }

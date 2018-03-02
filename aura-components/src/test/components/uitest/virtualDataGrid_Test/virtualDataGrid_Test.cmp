@@ -54,8 +54,7 @@
             	sortBy="{!v.sortBy}"
             	pageSize="{!v.pageSize}"
                 currentPage="{!v.currentPage}"
-                totalPages="{!v.totalPages}"
-                totalItems="{!v.totalItems}"/>
+                totalPages="{!v.totalPages}"/>
         </aura:set>
     </ui:virtualDataGrid>
 

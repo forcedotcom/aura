@@ -698,21 +698,51 @@ Component.prototype.addValueHandler = function(config) {
         this.addHandler(eventQName, this, config["action"], false, "default");
         return;
     }
+
+    var expression = config["value"];
+    if($A.util.isExpression(expression)) {
+        expression = expression.getExpression();
+    }
+    expression=expression+'';
+    var component=this.getConcreteComponent();
+    if(expression.indexOf("v.")===0){
+        var attribute=expression.split('.')[1];
+        var defs=AttributeSet.getDef(attribute,this);
+        if(!$A.clientService.allowAccess(defs[0], defs[1])){
+            var message="Access Check Failed! Component.addValueHandler(): attribute '"+attribute+"' of component '"+component+"' is not visible to '"+$A.clientService.currentAccess+"'.";
+            if($A.clientService.enableAccessChecks){
+                if($A.clientService.logAccessFailures){
+                    $A.error(null,new $A.auraError(message));
+                }
+                return;
+            }else{
+                if($A.clientService.logAccessFailures){
+                    $A.warning(message);
+                }
+            }
+        }
+    }
+    this.addChangeHandler(config);    
+};
+
+// PRIVATE
+Component.prototype.addChangeHandler = function(config){
+    var expression = config["value"];
+    var component=this.getConcreteComponent();
+    if($A.util.isExpression(expression)) {
+        expression = expression.getExpression();
+    }
+
     if(config["action"]&&!config["method"]){
         config["method"]=this.getActionCaller(this, config["action"].getExpression());
     }
 
-    var component=this.getConcreteComponent();
     var event = config["event"];
     var handlers = component.handlers[event];
     if (!handlers) {
         handlers = component.handlers[event] = {};
     }
 
-    var expression = config["value"];
-    if($A.util.isExpression(expression)) {
-        expression = expression.getExpression();
-    }
     if (!handlers[expression]) {
         handlers[expression] = [];
     }
@@ -2660,14 +2690,19 @@ Component.prototype.setupValueEventHandlers = function(cmp) {
     // Handle value-level events
     var handlerDefs = this.componentDef.getValueHandlerDefs();
     if (handlerDefs) {
-        for (var i = 0; i < handlerDefs.length; i++) {
-            var handlerDef = handlerDefs[i];
-            var handlerConfig = {};
-            handlerConfig["action"] = valueFactory.create(handlerDef["action"],cmp);
-            handlerConfig["value"] = valueFactory.create(handlerDef["value"],cmp);
-            handlerConfig["event"] = handlerDef["name"];
-            cmp.addValueHandler(handlerConfig);
-        }
+        $A.clientService.setCurrentAccess(this);
+        try {
+            for (var i = 0; i < handlerDefs.length; i++) {
+                var handlerDef = handlerDefs[i];
+                var handlerConfig = {};
+                handlerConfig["action"] = valueFactory.create(handlerDef["action"],cmp);
+                handlerConfig["value"] = valueFactory.create(handlerDef["value"],cmp);
+                handlerConfig["event"] = handlerDef["name"];
+                cmp.addValueHandler(handlerConfig);
+            }
+        } finally {
+            $A.clientService.releaseCurrentAccess();
+        }            
     }
 };
 

@@ -88,7 +88,7 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method, reb
     }
     var valueProvider=this.valueProvider;
     var expression = this.expression;
-    if(valueProvider.addValueHandler&&(valueProvider!==cmp||expression!==key)) {
+    if(valueProvider.addChangeHandler&&(valueProvider!==cmp||expression!==key)) {
         if(!method){
             method=function PropertyReferenceValue$changeHandler(event) {
             	// If not valid, don't fire change events
@@ -103,7 +103,7 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method, reb
         method.id=cmp.getGlobalId();
         method.key=key;
         var config={"event": "change", "value": expression, "method": method, "cmp": cmp};
-        this.valueProvider.addValueHandler(config);
+        this.valueProvider.addChangeHandler(config);
 
         // if(this.valueProvider instanceof PassthroughValue) {
         //     this.valueProvider.addValueHandler({"event": "change", "value": this.expression, "method": method});

@@ -71,7 +71,6 @@
                              label="{!item.label}"
                              id="{!item.id}"
                              showDelete="{!v.allowRemove}"
-                             maxCharacters="{!v.maxCharactersInPill}"
                              onHandledEvent="{!c.handlePillEvent}"
                              focus="{!c.relayPillEvent}"
                              blur="{!c.relayPillEvent}"/>

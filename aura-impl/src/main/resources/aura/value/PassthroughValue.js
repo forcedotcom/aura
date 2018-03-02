@@ -44,6 +44,15 @@ PassthroughValue.prototype.addValueHandler = function(config) {
         this.component.addValueHandler(config);
         return;
     }
+    this.addChangeHandler(config);
+};
+
+PassthroughValue.prototype.addChangeHandler=function(config){
+    var path = config.value.split(".");
+    if(!this.primaryProviders.hasOwnProperty(path[0])) {
+        this.component.addChangeHandler(config);
+        return;
+    }
 
     var provider = this.primaryProviders[path[0]];
 
@@ -79,6 +88,7 @@ PassthroughValue.prototype.addValueHandler = function(config) {
     }
     handlers[expression].push(config["method"]);
 };
+
 
 /**
  * Delegates de-indexing logic to the wrapped value provider.

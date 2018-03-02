@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-03-02
- * Version: 0.3.17
+ * Version: 0.3.18
  */
 
 (function (global, factory) {
@@ -635,16 +635,18 @@ function repairFunction(realmRec, functionName, functionDecl) {
   const FunctionPrototype = getPrototypeOf(FunctionInstance);
 
   const RealmFunction = unsafeFunction('return function(){}');
+
   defineProperties(RealmFunction, {
     name: {
       value: functionName
+    },
+    prototype: {
+      value: FunctionPrototype
     },
     toString: {
       value: () => `function ${functionName}() { [native code] }`
     }
   });
-
-  defineProperty(RealmFunction, 'prototype', { value: FunctionPrototype });
   defineProperty(FunctionPrototype, 'constructor', { value: RealmFunction });
 
   // Prevent loop in case of Function.
@@ -1392,8 +1394,11 @@ function createEvalEvaluator(sandbox) {
  */
 function createFunctionEvaluator(sandbox) {
   const evaluator = function(...params) {
-    const body = params.pop() || '';
-    const src = `(function(${params.join(',')}\n){\n${body}\n})`;
+    const functionBody = params.pop() || '';
+    // Conditionaly appends a new line to prevent execution during
+    // construction.
+    const functionParams = params.join(',') + (params.length > 0 ? '\n' : '');
+    const src = `(function(${functionParams}){\n${functionBody}\n})`;
     // evalEvaluator is created after FunctionEvaluator,
     // so we can't link directly to it.
     return sandbox.evalEvaluator(src);
@@ -1402,18 +1407,18 @@ function createFunctionEvaluator(sandbox) {
   // Ensure that the different Function instances of the different
   // sandboxes all answer properly when used with the instanceof
   // operator to preserve indentity.
-  const RealmFunction = sandbox.unsafeFunction.prototype.constructor;
+  const FunctionPrototype = sandbox.unsafeFunction.prototype;
 
   // Mimic the native signature.
   defineProperties(evaluator, {
     name: {
       value: 'Function'
     },
+    prototype: {
+      value: FunctionPrototype
+    },
     toString: {
       value: () => 'function Function() { [native code] }'
-    },
-    [Symbol.hasInstance]: {
-      value: v => v instanceof RealmFunction
     }
   });
 

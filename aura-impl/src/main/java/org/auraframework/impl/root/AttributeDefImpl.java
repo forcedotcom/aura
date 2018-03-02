@@ -79,6 +79,10 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
      */
     @Override
     public TypeDef getTypeDef() throws QuickFixException {
+        if (typeDefDescriptor == null) {
+            return null;
+        }
+
         return typeDefDescriptor.getDef();
     }
 

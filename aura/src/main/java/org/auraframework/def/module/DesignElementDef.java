@@ -55,7 +55,7 @@ public interface DesignElementDef extends Serializable {
      * @param designElementClass
      * @return Child Elements which are instances of designElementClass.
      */
-    <T> List<T> getChildren(Class<? extends DesignElementDef> designElementClass);
+    <T extends DesignElementDef> List<T> getChildren(Class<T> designElementClass);
 
     /**
      * 

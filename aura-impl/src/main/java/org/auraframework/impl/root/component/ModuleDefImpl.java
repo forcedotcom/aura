@@ -334,8 +334,8 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
             return this.moduleDesignDef;
         }
 
-        public Set<String> getValidTags(){
-            return this.validTags;
+        public Set<String> getTags(){
+            return this.tags;
         }
 
         @Override

@@ -4078,7 +4078,7 @@ AuraClientService.prototype.enqueueAction = function(action, background) {
         // - does not have a cache hit (if storage is persistent but failed to populate stored actions, then assume a cache miss)
         //                             (if actions filter has not been set up yet, assume a cache miss)
         var isServerAction = action.getDef().isServerAction() && !action.isRefreshAction();
-        if (isServerAction && this.isActionAbsentFromStorage(action)) {
+        if (isServerAction && !action.isCaboose() && this.isActionAbsentFromStorage(action)) {
             var auraXHR = this.getAvailableXHR(false);
             if (auraXHR) {
                 if (!this.send(auraXHR, [action], action.isPubliclyCacheable() ? "GET" : "POST")) {

@@ -23,6 +23,8 @@
         } else {
             cmp.set("v.title", testName);
         }
+        cmp.set("v.individualUrl", window.location.pathname + "?test="
+            + testName + "&aura.mode=JSTESTDEBUG&aura.testReset=true");
     },
 
     runTest : function(cmp, evt, helper){

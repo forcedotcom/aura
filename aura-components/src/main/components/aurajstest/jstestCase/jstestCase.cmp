@@ -22,6 +22,7 @@
 
 	<!-- PRIVATE ATTRIBUTE(S) -->
     <aura:attribute name="status" type="String" default="" serializeTo="NONE"/>
+    <aura:attribute name="individualUrl" type="String" access="PRIVATE" serializeTo="NONE"/>
 
     <aura:set attribute="scroll" value="false"/>
 
@@ -40,7 +41,7 @@
                 <h1>{! v.status == 'pass' ? 'Passed ' : 'Failed '}<sub>{!v.name}{!v.runTime}</sub></h1>
                 <div class="action">
                     <a onclick="{!c.rerun}">Re-run</a>&nbsp;
-                    <a href="{!v.url}" target="_">Run in a new tab</a>
+                    <a href="{!v.individualUrl}" target="_">Run in a new tab</a>
                 </div>
                 <aura:set attribute="else"><h1>Running Test <sub>{!v.name}</sub></h1></aura:set>
             </aura:if>

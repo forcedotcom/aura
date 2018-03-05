@@ -42,7 +42,7 @@
 }
 
 .THIS .label{
-    white-space:nowrap;
+    white-space:normal;
     color: #3A3D42;
 }
 .THIS:hover .label,

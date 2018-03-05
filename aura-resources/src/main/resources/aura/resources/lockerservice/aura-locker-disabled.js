@@ -14,15 +14,12 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-03-02
- * Version: 0.3.18
+ * Generated: 2018-03-05
+ * Version: 0.3.19
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.AuraLockerDisabled = global.AuraLockerDisabled || {})));
-}(this, (function (exports) { 'use strict';
+(function (exports) {
+'use strict';
 
 /* eslint-disable no-unused-vars, prefer-template */
 /*
@@ -143,6 +140,4 @@ exports.wrapComponent = wrapComponent;
 exports.wrapComponentEvent = wrapComponentEvent;
 exports.wrapEngine = wrapEngine;
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
-})));
+}((this.AuraLockerDisabled = this.AuraLockerDisabled || {})));

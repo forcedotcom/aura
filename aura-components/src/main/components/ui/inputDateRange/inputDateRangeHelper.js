@@ -75,7 +75,7 @@
         component.set("v.startDate", newValue);
         var endDate = component.get("v.endDate");
 
-        var shouldResetEndDate = !$A.util.isEmpty(endDate) && this.dateCompare(newValue, endDate) > 0;
+        var shouldResetEndDate = !$A.util.isEmpty(endDate) && $A.localizationService.isAfter(newValue, endDate);
         if (shouldResetEndDate) {
             component.set("v.endDate", "");
         }
@@ -92,7 +92,8 @@
     setEndDateValue: function(component, newValue) {
         component.set("v.endDate", newValue);
         var startDate = component.get("v.startDate");
-        var resetStartDate = !$A.util.isEmpty(startDate) && this.dateCompare(newValue, startDate) < 0;
+        // newValue and startDate are formatted in "YYYY-MM-DD"
+        var resetStartDate = !$A.util.isEmpty(startDate) && $A.localizationService.isBefore(newValue, startDate);
         if (resetStartDate) {
             component.set("v.startDate", "");
         }
@@ -140,30 +141,6 @@
 
     getDateString: function(date) {
         return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-    },
-
-    dateCompare: function(date1, date2) {
-        var jsDate1 = this.getDateFromString(date1),
-            jsDate2 = this.getDateFromString(date2);
-
-        if (jsDate1.getFullYear() !== jsDate2.getFullYear()) {
-            return jsDate1.getFullYear() - jsDate2.getFullYear();
-        } else {
-            if (jsDate1.getMonth() !== jsDate2.getMonth()) {
-                return jsDate1.getMonth() - jsDate2.getMonth();
-            } else {
-                return jsDate1.getDate() - jsDate2.getDate();
-            }
-        }
-    },
-
-    getDateFromString: function(date) {
-        if (date) {
-            var mDate = moment(date, "YYYY-MM-DD");
-            if (mDate.isValid()) {
-                return mDate.toDate();
-            }
-        }
-        return null;
     }
+
 })// eslint-disable-line semi

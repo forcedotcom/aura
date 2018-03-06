@@ -59,13 +59,18 @@
     testInvalidFormat: {
         browsers: ['DESKTOP'],
         attributes: {displayDatePicker: 'true', format: 'KKKKKK', loadDatePicker: 'true'},
-        test: [function (cmp) {
+        test: function (cmp) {
             cmp.find("datePicker").find("grid").selectToday();
-        }, function (cmp) {
-            var inputDateStr = cmp.find("inputText").getElement().value;
-            var dt = moment().format('KKKKKK');
-            $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
-        }]
+
+            var inputElement = cmp.find("inputText").getElement();
+            $A.test.addWaitFor(true, function() {
+                    return !!inputElement.value;
+                }, function() {
+                    var actual = inputElement.value;
+                    // this is moment.format behavior
+                    $A.test.assertEquals("KKKKKK", actual, "Dates are not the same and they should be");
+                });
+        }
     },
 
     /**
@@ -123,14 +128,20 @@
     testToday: {
         browsers: ['DESKTOP'],
         attributes: {displayDatePicker: 'true', format: 'MMM dd, yyyy', loadDatePicker: 'true'},
-        test: [function (cmp) {
+        test: function (cmp) {
             cmp.find("datePicker").find("grid").selectToday();
-        }, function (cmp) {
-            var inputDateStr = cmp.find("inputText").getElement().value;
-            var todayStr = cmp.find("datePicker").find("grid").get('v._today');
-            var dt = moment(todayStr).format('MMM DD, YYYY');
-            $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
-        }]
+
+            var inputElement = cmp.find("inputText").getElement();
+            $A.test.addWaitFor(true, function() {
+                    return !!inputElement.value;
+                }, function() {
+                    var todayStr = cmp.find("datePicker").find("grid").get('v._today');
+                    var expected = $A.localizationService.formatDate(todayStr, "MMM DD, YYYY");
+
+                    var actual = inputElement.value;
+                    $A.test.assertEquals(expected, actual, "Dates are not the same and they should be");
+                });
+        }
     },
 
     /**
@@ -139,14 +150,20 @@
     testTodayDifferentFormat: {
         browsers: ['DESKTOP'],
         attributes: {displayDatePicker: 'true', format: 'DD/MM/YYYY',  loadDatePicker: 'true'},
-        test: [function (cmp) {
+        test: function (cmp) {
             cmp.find("datePicker").find("grid").selectToday();
-        }, function (cmp) {
-            var inputDateStr = cmp.find("inputText").getElement().value;
-            var todayStr = cmp.find("datePicker").find("grid").get('v._today');
-            var dt = moment(todayStr).format('DD/MM/YYYY');
-            $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
-        }]
+
+            var inputElement = cmp.find("inputText").getElement();
+            $A.test.addWaitFor(true, function() {
+                    return !!inputElement.value;
+                }, function() {
+                    var todayStr = cmp.find("datePicker").find("grid").get('v._today');
+                    var expected = $A.localizationService.formatDate(todayStr, "DD/MM/YYYY");
+
+                    var actual = inputElement.value;
+                    $A.test.assertEquals(expected, actual, "Dates are not the same and they should be");
+                });
+        }
     },
 
     /**

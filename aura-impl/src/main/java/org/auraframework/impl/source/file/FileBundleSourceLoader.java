@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.JarURLConnection;
+import java.net.URLConnection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -315,7 +317,22 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
                 //
                 // TOTAL HACK: Move this to getAllDescriptors later.
                 //
-                String filename = r.getURL().toString();
+                /**
+                 * r.getURL().toString(); and then tokenizing it on "/" and looking for basePackage name is hacky. It depends
+                 * on the location of the jar file on the file system. Changing this to use relative paths for files
+                 * within jar files to remove the above mentioned vulnerability.
+                 */
+                String filename;
+                try {
+                    URLConnection conn = r.getURL().openConnection();
+                    if (conn instanceof JarURLConnection) {
+                        filename = ((JarURLConnection) conn).getEntryName();
+                    } else {
+                        filename = r.getURL().toString();
+                    }
+                } catch (Exception e) {
+                    filename = r.getURL().toString();
+                }
                 List<String> names = AuraTextUtil.splitSimple("/", filename);
 
                 int namesSize = names.size();

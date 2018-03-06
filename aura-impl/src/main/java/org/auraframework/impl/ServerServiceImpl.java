@@ -43,6 +43,7 @@ import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.http.ManifestUtil;
+import org.auraframework.impl.css.CssVariableWriter;
 import org.auraframework.impl.css.StyleDefWriter;
 import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.instance.Action;
@@ -317,6 +318,7 @@ public class ServerServiceImpl implements ServerService {
     private String getAppCssString(Set<DefDescriptor<?>> dependencies) throws QuickFixException, IOException {
         Collection<BaseStyleDef> orderedStyleDefs = filterAndLoad(BaseStyleDef.class, dependencies, null);
         StringBuffer sb = new StringBuffer();
+        new CssVariableWriter(definitionService, contextService).write(sb);
         new StyleDefWriter(definitionService, styleAdapter, contextService.getCurrentContext())
             .writeStyleDefs(orderedStyleDefs, sb);
         return sb.toString();

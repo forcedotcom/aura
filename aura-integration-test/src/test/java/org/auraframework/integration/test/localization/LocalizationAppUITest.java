@@ -21,6 +21,7 @@ import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
@@ -45,26 +46,13 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         assertEquals("outputDate component rendered with wrong value", "Sep 23, 2004", elementoutput.getText());
 
         // Tab out
-        elementInput.click();
-        elementInput.clear();
-        elementInput.sendKeys("Sep 23, 2005");
-        getAuraUITestingUtil().pressTab(elementInput);
-
+        typeInputAndBlur(elementInput, "Sep 23, 2005");
         assertEquals("InputDate component rendered with wrong value", "Sep 23, 2005",
                 elementInput.getAttribute("value"));
         assertEquals("outputDate component rendered with wrong value", "Sep 23, 2005", elementoutput.getText());
 
         // Submit click
-        elementInput.click();
-        elementInput.clear();
-        elementInput.sendKeys("Sep 23, 2006");
-        // Hide the datepicker
-        WebElement yearSelector = findDomElement(By.cssSelector(".visible select"));
-        yearSelector.sendKeys(Keys.ESCAPE);
-
-        WebElement elementButton = findDomElement(By.cssSelector("button[title~='Date']"));
-        elementButton.click();
-
+        typeInputAndBlur(elementInput, "Sep 23, 2006", "button[title~='Date']");
         assertEquals("InputDate component rendered with wrong value", "Sep 23, 2006",
                 elementInput.getAttribute("value"));
         assertEquals("outputDate component rendered with wrong value", "Sep 23, 2006", elementoutput.getText());
@@ -86,45 +74,33 @@ public class LocalizationAppUITest extends WebDriverTestCase {
                 elementInputDate.getAttribute("value"));
         assertEquals("InputDateTime component rendered with wrong value", "4:30 PM",
                 elementInputTime.getAttribute("value"));
-        assertEquals("outputDateTime component rendered with wrong value", "Oct 23, 2004 4:30:00 PM",
+        assertEquals("outputDateTime component rendered with wrong value", "Oct 23, 2004, 4:30:00 PM",
                 elementoutput.getText());
 
         // Tab out
-        elementInputDate.click();
         elementInputDate.clear();
         elementInputTime.clear();
-        elementInputDate.sendKeys("Oct 23, 2005");
-        getAuraUITestingUtil().pressTab(elementInputDate);
-        elementInputTime.click();
-        elementInputTime.clear();
-        elementInputTime.sendKeys("9:30 AM");
-        getAuraUITestingUtil().pressTab(elementInputTime);
+        typeInputAndBlur(elementInputDate, "Oct 23, 2005");
+        typeInputAndBlur(elementInputTime, "9:30 AM");
 
         assertEquals("InputDateTime component rendered with wrong value", "Oct 23, 2005",
                 elementInputDate.getAttribute("value"));
         assertEquals("InputDateTime component rendered with wrong value", "9:30 AM",
                 elementInputTime.getAttribute("value"));
-        assertEquals("outputDateTime component rendered with wrong value", "Oct 23, 2005 9:30:00 AM",
+        assertEquals("outputDateTime component rendered with wrong value", "Oct 23, 2005, 9:30:00 AM",
                 elementoutput.getText());
 
         // Submit click
-        elementInputDate.click();
         elementInputDate.clear();
         elementInputTime.clear();
-        elementInputDate.sendKeys("Oct 23, 2006");
-        getAuraUITestingUtil().pressTab(elementInputDate);
-        elementInputTime.click();
-        elementInputTime.clear();
-        elementInputTime.sendKeys("9:30 AM");
-        getAuraUITestingUtil().pressTab(elementInputTime);
-        WebElement elementButton = findDomElement(By.cssSelector("button[title~='DateTime']"));
-        elementButton.click();
+        typeInputAndBlur(elementInputDate, "Oct 23, 2006");
+        typeInputAndBlur(elementInputTime, "9:30 AM", "button[title~='DateTime']");
 
         assertEquals("InputDateTime component rendered with wrong value", "Oct 23, 2006",
                 elementInputDate.getAttribute("value"));
         assertEquals("InputDateTime component rendered with wrong value", "9:30 AM",
                 elementInputTime.getAttribute("value"));
-        assertEquals("outputDateTime component rendered with wrong value", "Oct 23, 2006 9:30:00 AM",
+        assertEquals("outputDateTime component rendered with wrong value", "Oct 23, 2006, 9:30:00 AM",
                 elementoutput.getText());
     }
 
@@ -144,21 +120,12 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         assertEquals("outputNumber component rendered with wrong value", "411", elementoutput.getText());
 
         // Tab out
-        elementInput.click();
-        elementInput.clear();
-        elementInput.sendKeys("511");
-        getAuraUITestingUtil().pressTab(elementInput);
-
+        typeInputAndBlur(elementInput, "511");
         assertEquals("InputNumber component rendered with wrong value", "511", elementInput.getAttribute("value"));
         assertEquals("outputNumber component rendered with wrong value", "511", elementoutput.getText());
 
         // Submit click
-        elementInput.click();
-        elementInput.clear();
-        elementInput.sendKeys("611");
-        WebElement elementButton = findDomElement(By.cssSelector("button[title~='Number']"));
-        elementButton.click();
-
+        typeInputAndBlur(elementInput, "611", "button[title~='Number']");
         assertEquals("InputNumber component rendered with wrong value", "611", elementInput.getAttribute("value"));
         assertEquals("outputNumber component rendered with wrong value", "611", elementoutput.getText());
     }
@@ -179,21 +146,12 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         assertEquals("outputPercent component rendered with wrong value", "1,235%", elementoutput.getText());
 
         // Tab out
-        elementInput.click();
-        elementInput.sendKeys(Keys.HOME, Keys.chord(Keys.SHIFT, Keys.END));
-        elementInput.sendKeys("22.35");
-        getAuraUITestingUtil().pressTab(elementInput);
-
+        typeInputAndBlur(elementInput, "22.35");
         getAuraUITestingUtil().waitForElementText(outputSelector, "22%", true, "outputPercent component rendered with wrong value");
         assertEquals("InputPercent component rendered with wrong value", "22%", elementInput.getAttribute("value"));
 
         // Submit click
-        elementInput.click();
-        elementInput.sendKeys(Keys.HOME, Keys.chord(Keys.SHIFT, Keys.END));
-        elementInput.sendKeys("1.2235");
-        WebElement elementButton = findDomElement(By.cssSelector("button[title~='Percent']"));
-        elementButton.click();
-
+        typeInputAndBlur(elementInput, "1.2235", "button[title~='Percent']");
         getAuraUITestingUtil().waitForElementText(outputSelector,"1%",true,"outputPercent component rendered with wrong value");
         assertEquals("InputPercent component rendered with wrong value", "1%", elementInput.getAttribute("value"));
     }
@@ -215,22 +173,51 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         assertEquals("outputCurrency component rendered with wrong value", "$123,456.79", elementOutput.getText());
 
         // Tab out
-        elementInput.click();
-        elementInput.sendKeys(Keys.HOME, Keys.chord(Keys.SHIFT, Keys.END));
-        elementInput.sendKeys("123456");
-        getAuraUITestingUtil().pressTab(elementInput);
-
+        typeInputAndBlur(elementInput, "123456");
         getAuraUITestingUtil().waitForElementText(outputSelector, "$123,456.00", true, "OutputCurrency component rendered with wrong value");
         assertEquals("InputCurrency component rendered with wrong value", "$123,456.00", elementInput.getAttribute("value"));
 
         // Submit click
-        elementInput.click();
-        elementInput.sendKeys(Keys.HOME, Keys.chord(Keys.SHIFT, Keys.END));
-        elementInput.sendKeys("123.45");
-        WebElement elementButton = findDomElement(By.cssSelector("button[title~='Currency']"));
-        elementButton.click();
-
+        typeInputAndBlur(elementInput, "123.45", "button[title~='Currency']");
         getAuraUITestingUtil().waitForElementText(outputSelector, "$123.45", true, "OutputCurrency component rendered with wrong value");
         assertEquals("InputCurrency component rendered with wrong value", "$123.45", elementInput.getAttribute("value"));
+    }
+
+    private void typeInputAndBlur(WebElement elementInput, String keys) {
+        typeInputAndBlur(elementInput, keys, null);
+    }
+    
+    private void typeInputAndBlur(WebElement elementInput, String keys, String clickoutTargetSel) {
+        JavascriptExecutor jsexe = (JavascriptExecutor) getDriver();
+
+        elementInput.click();
+
+        elementInput.clear();
+        // clear does nothing in FF > 57
+        if (getBrowserType() == BrowserType.FIREFOX) {
+            String triggerClearScript = "arguments[0].value = '';"
+                    + "$A.test.fireDomEvent(arguments[0], 'change');";
+            jsexe.executeScript(triggerClearScript, elementInput);
+        }
+
+        elementInput.sendKeys(keys);
+        if (getBrowserType() == BrowserType.FIREFOX) {
+            String triggerChangeScript = "$A.test.fireDomEvent(arguments[0], 'change');";
+            jsexe.executeScript(triggerChangeScript, elementInput);
+        }
+
+        if (clickoutTargetSel == null) {
+            elementInput.sendKeys(Keys.TAB);
+        } else {
+            WebElement elementButton = findDomElement(By.cssSelector(clickoutTargetSel));
+            elementButton.click();
+        }
+
+        // tab doesn't blur in FF > 57, only fires blur event
+        if (getBrowserType() == BrowserType.FIREFOX) {
+            String triggerBlurScript = "arguments[0].blur();"
+                    + "$A.test.fireDomEvent(arguments[0], 'blur');";
+            jsexe.executeScript(triggerBlurScript, elementInput);
+        }
     }
 }

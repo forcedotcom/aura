@@ -23,32 +23,32 @@
     </div>
 
     <div>Input Date</div>
-    enter Date: <ui:inputDate aura:id="inDate" displayDatePicker="true" value="{!m.dateOnly}"/> <br/>
     <ui:button buttonTitle="Date" label="submit" press="{!c.submit}"/> <br/>
+    enter Date: <ui:inputDate aura:id="inDate" displayDatePicker="true" value="{!m.dateOnly}"/> <br/>
     your Date value is: <ui:outputDate aura:id="outDate" value="{!m.dateOnly}"/> <br/>
     <br/>
 
     <div>Input DateTime</div>
-    enter DateTime: <ui:inputDateTime aura:id="inDateTime" value="{!m.dateTimeISOString}" timezone="GMT"/> <br/>
     <ui:button buttonTitle="DateTime" label="submit" press="{!c.submit}"/> <br/>
-    your DateTime value is: <ui:outputDateTime aura:id="outDateTime" value="{!m.dateTimeISOString}" timezone="GMT"/> <br/>
+    enter DateTime: <ui:inputDateTime aura:id="inDateTime" value="{!m.dateTimeISOString}" timezone="GMT"/> <br/>
+    your DateTime value is: <ui:outputDateTime aura:id="outDateTime" value="{!m.dateTimeISOString}" timezone="GMT" format="MMM dd, yyyy, h:mm:ss a"/> <br/>
     <br/>
 
     <div>Input Number</div>
-    enter Number: <ui:inputNumber aura:id="inNumber" value="{!m.integer}"/> <br/>
     <ui:button buttonTitle="Number" label="submit" press="{!c.submit}"/> <br/>
+    enter Number: <ui:inputNumber aura:id="inNumber" value="{!m.integer}"/> <br/>
     your Number value is: <ui:outputNumber aura:id="outNumber" value="{!m.integer}"/> <br/>
     <br/>
 
     <div>Input Percent</div>
-    enter Percent: <ui:inputPercent aura:id="inPercent" value="{!m.percent}"/> <br/>
     <ui:button buttonTitle="Percent" label="submit" press="{!c.submit}"/> <br/>
+    enter Percent: <ui:inputPercent aura:id="inPercent" value="{!m.percent}"/> <br/>
     your Percent value is: <ui:outputPercent aura:id="outPercent" value="{!m.percent}"/> <br/>
     <br/>
 
 	<div>Input Currency</div>
+	<ui:button buttonTitle="Currency" label="submit" press="{!c.submit}"/> <br/>
     enter Currency: <span id="MyCurrency"><ui:inputCurrency aura:id="inCurrency" value="{!m.currency}"/></span> <br/>
-    <ui:button buttonTitle="Currency" label="submit" press="{!c.submit}"/> <br/>
     your Currency value is: <ui:outputCurrency aura:id="outCurrency" value="{!m.currency}"/> <br/>
     <br/>
 

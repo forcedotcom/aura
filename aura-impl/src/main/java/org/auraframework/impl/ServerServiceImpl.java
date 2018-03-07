@@ -43,6 +43,7 @@ import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.http.ManifestUtil;
+import org.auraframework.http.BootstrapUtil;
 import org.auraframework.impl.css.CssVariableWriter;
 import org.auraframework.impl.css.StyleDefWriter;
 import org.auraframework.impl.util.TemplateUtil;
@@ -50,6 +51,8 @@ import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.Event;
+import org.auraframework.instance.Instance;
+import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -71,7 +74,10 @@ import org.auraframework.util.json.JsonSerializationContext;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
@@ -109,6 +115,12 @@ public class ServerServiceImpl implements ServerService {
 
     @Inject
     private InstanceService instanceService;
+
+    @Inject
+    private BootstrapUtil bootstrapUtil;
+
+    @Inject
+    protected CSPInliningService cspInliningService;
 
     private ManifestUtil manifestUtil;
 
@@ -611,6 +623,54 @@ public class ServerServiceImpl implements ServerService {
 
     private TemplateUtil templateUtil = new TemplateUtil();
 
+    private String serializeInlineContext(AuraContext context) throws QuickFixException, IOException {
+        // ensure all labels are loaded in context before serializing GVPs
+        bootstrapUtil.loadLabels(context);
+
+        JsonSerializationContext serializationContext = context.getJsonSerializationContext();
+        StringWriter writer = new StringWriter();
+        JsonEncoder json = JsonEncoder.createJsonStream(writer, serializationContext);
+        json.writeValue(context);
+        writer.flush();
+        writer.close();
+
+        return writer.toString();
+    }
+
+    private String serializeAppBootstrap(Instance<?> appInstance, AuraContext context) throws IOException {
+        JsonSerializationContext serializationContext = context.getJsonSerializationContext();
+        StringWriter writer = new StringWriter();
+        JsonEncoder json = JsonEncoder.createJsonStream(writer, serializationContext);
+        writer.append("window.Aura.appBootstrap = ");
+        json.writeMapBegin();
+        json.writeMapEntry("inlined", true);
+        json.writeMapKey("data");
+        json.writeMapBegin();
+        json.writeMapEntry("app", appInstance);
+        json.writeMapEnd();
+        json.writeMapEnd();
+        writer.write(bootstrapUtil.getAppendScript());
+        writer.flush();
+        writer.close();
+
+        return writer.toString();
+    }
+
+    private String writeError(Throwable t, AuraContext context) throws IOException {
+        JsonSerializationContext serializationContext = context.getJsonSerializationContext();
+        StringWriter writer = new StringWriter();
+        JsonEncoder json = JsonEncoder.createJsonStream(writer, serializationContext);
+        writer.append("window.Aura.appBootstrap = ");
+        json.writeMapBegin();
+        json.writeMapEntry("error", t);
+        json.writeMapEnd();
+        writer.write(bootstrapUtil.getAppendScript());
+        writer.flush();
+        writer.close();
+
+        return writer.toString();
+    }
+
     @Override
     public <T extends BaseComponentDef> Component writeTemplate(AuraContext context,
             T value, Map<String, Object> componentAttributes, Appendable out)
@@ -619,8 +679,30 @@ public class ServerServiceImpl implements ServerService {
         ComponentDef templateDef = value.getTemplateDef();
         Map<String, Object> attributes = Maps.newHashMap();
         Mode mode = context.getMode();
-
         StringBuilder sb = new StringBuilder();
+        String serializedContext = null;
+
+        if (configAdapter.isBootstrapInliningEnabled() &&
+               (context.getFormat() == AuraContext.Format.JS || cspInliningService.getInlineMode() != CSPInliningService.InlineScriptMode.UNSUPPORTED)) {
+            // ensure app dependencies are excluded from context serialization
+            try {
+                DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
+                Instance<?> appInstance = instanceService.getInstance(app, componentAttributes);
+                context.addPreloadedDefinitions(definitionService.getDependencies(definitionService.getUid(null, app)));
+
+                serializedContext = serializeInlineContext(context);
+                String appBootstrap = serializeAppBootstrap(appInstance, context);
+                attributes.put("appBootstrap", appBootstrap);
+            }
+            catch (Throwable t) {
+                // if there was an error initializing and serializing the app, fallback to the less verbose context
+                // serialization and include the error to display during init
+                serializedContext = context.serialize(AuraContext.EncodingStyle.Full);
+                attributes.put("appBootstrap", writeError(t, context));
+            }
+        } else {
+            serializedContext = context.serialize(AuraContext.EncodingStyle.Full);
+        }
 
         templateUtil.writePreloadLinkTags(servletUtilAdapter.getCssPreloadUrls(context), sb);
         templateUtil.writePreloadScriptTags(servletUtilAdapter.getJsPreloadUrls(context), sb);
@@ -682,7 +764,7 @@ public class ServerServiceImpl implements ServerService {
             auraInit.put("MaxParallelXHRCount", configAdapter.getMaxParallelXHRCount());
             auraInit.put("XHRExclusivity", configAdapter.getXHRExclusivity());
 
-            auraInit.put("context", new Literal(context.serialize(AuraContext.EncodingStyle.Full)));
+            auraInit.put("context", new Literal(serializedContext));
             attributes.put("auraInit", JsonEncoder.serialize(auraInit));
         }
 

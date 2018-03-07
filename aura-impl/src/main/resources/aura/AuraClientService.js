@@ -1973,16 +1973,20 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
             this.broadcastToken(this._token);
         }
         this.checkBootstrapUIDs(Aura["appBootstrapCache"]);
-        this.saveBootstrapToStorage(boot);
+        if (!boot["inlined"]) {
+            this.saveBootstrapToStorage(boot);
+        }
     }
 
     try {
         // can have a mismatch if we are upgrading framework or mode
-        if (boot["data"]["components"]) {
+        if (boot["data"] && boot["data"]["components"]) {
             // need to use the resolvedRefs for AuraContext components (componentConfigs aka partialConfigs)
             boot["context"]["components"] = boot["data"]["components"];
         }
-        $A.getContext()["merge"](boot["context"]);
+        if (boot["context"]) {
+            $A.getContext()["merge"](boot["context"]);
+        }
     } catch(e) {
         if (bootstrap.source === "cache" && this.getParallelBootstrapLoad() && Aura["appBootstrapStatus"] !== "failed") {
             $A.warning("Bootstrap cache merge failed, waiting for bootstrap.js from network");

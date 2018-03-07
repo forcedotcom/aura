@@ -482,7 +482,9 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         }
 
         templateUtil.writeHtmlScript(context, this.getAppJsUrl(context, null), Script.SYNC, sb);
-        templateUtil.writeHtmlScript(context, this.getBootstrapUrl(context, componentAttributes), Script.SYNC, sb);
+        if (!configAdapter.isBootstrapInliningEnabled()) {
+            templateUtil.writeHtmlScript(context, this.getBootstrapUrl(context, componentAttributes), Script.SYNC, sb);
+        }
     }
 
     public String getInteropEngineUrl(AuraContext context) {

@@ -37,6 +37,7 @@
 
     <aura:attribute name="autoInitialize"           type="String" default="true" description="Denotes whether Aura should auto-initialize (true) or not (false)."/>
     <aura:attribute name="autoInitializeSync"       type="String" default="false" />
+    <aura:attribute name="appBootstrap"             type="String" description="Inline bootstrap application config"/>
     <aura:attribute name="bootstrapInlineJs"        type="String" description="Allow inlineJS execution within the context of bootsttrap script"/>
 
     <aura:attribute name="prefetchTags"             type="String" description="Prefetch resources tags"/>
@@ -115,6 +116,7 @@
     window.pageStartTime = (new Date()).getTime();
     window.Aura || (window.Aura = {});
     window.Aura.bootstrap || (window.Aura.bootstrap = {});
+    {!v.appBootstrap}
 
     var time = window.performance &amp;&amp; window.performance.now ? window.performance.now.bind(performance) : function(){return Date.now();};
     window.Aura.bootstrap.execInlineJs = time();
@@ -204,7 +206,6 @@
         current.addEventListener('error',onLoadStyleSheets);
         current.href = current.getAttribute("data-href");
     }
-
 }());
 
     </script>

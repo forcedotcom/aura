@@ -107,6 +107,11 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             json.writeMapEntry("contextPath", contextPath);
         }
 
+        String currentPathPrefix = ctx.getPathPrefix();
+        if (currentPathPrefix != null) {
+            json.writeMapEntry("pathPrefix", currentPathPrefix);
+        }
+
         if (testContextAdapter != null) {
             TestContext testContext = testContextAdapter.getTestContext();
             if (testContext != null) {
@@ -222,6 +227,10 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         // JBUCH: TEMPORARY CRUC FIX FOR 202. REMOVE IN 204
         json.writeMapEntry("enableAccessChecks",((AuraContextImpl)ctx).enableAccessChecks);
 
+        if (configAdapter.isActionPublicCachingEnabled()) {
+            json.writeMapEntry("apce", 1);
+            json.writeMapEntry("apck", ctx.getActionPublicCacheKey());
+        }
 
         if (configAdapter.isLockerServiceEnabled()) {
             json.writeMapEntry("ls", 1);

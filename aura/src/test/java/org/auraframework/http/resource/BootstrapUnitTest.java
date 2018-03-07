@@ -28,6 +28,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.http.BootstrapUtil;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -82,6 +83,8 @@ public class BootstrapUnitTest {
             protected void loadLabels(AuraContext context) {
             }
         };
+
+        bootstrap.setBootstrapUtil(new BootstrapUtil());
 
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         StringWriter writer = new StringWriter();

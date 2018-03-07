@@ -182,6 +182,12 @@ public interface ConfigAdapter extends AuraAdapter {
     boolean isStrictCSPEnforced();
 
     /**
+     * If true bootstrap.js will not be served but rather it's contents rendered inline (or inline.js as a fallback)
+     * @return
+     */
+    boolean isBootstrapInliningEnabled();
+
+    /**
      * @return max number of parallel XHRs used to execute server actions, must be 2 or more
      */
     int getMaxParallelXHRCount();

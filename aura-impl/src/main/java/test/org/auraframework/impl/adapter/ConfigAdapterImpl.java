@@ -712,6 +712,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
+    public boolean isBootstrapInliningEnabled() {
+        return true;
+    }
+
+    @Override
     public boolean requireLocker(RootDefinition def) {
         boolean requireLocker = !isInternalNamespace(def.getDescriptor().getNamespace());
         if (!requireLocker) {

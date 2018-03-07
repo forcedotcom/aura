@@ -20,10 +20,8 @@ import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,48 +31,30 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.expression.PropertyReference;
-import org.auraframework.instance.AuraValueProviderType;
-import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.instance.Instance;
+import org.auraframework.http.BootstrapUtil;
+import org.auraframework.instance.*;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraJWTError;
-import org.auraframework.throwable.quickfix.CompositeValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * Handles /l/{}/bootstrap.js requests to retrieve bootstrap.js.
  */
 @ServiceComponent
 public class Bootstrap extends AuraResourceImpl {
+    private BootstrapUtil bootstrapUtil;
+
+    @Inject
+    protected void setBootstrapUtil(BootstrapUtil bootstrapUtil) {
+        this.bootstrapUtil = bootstrapUtil;
+    }
 
     public Bootstrap() {
         super("bootstrap.js", Format.JS);
     }
-
-    // note: these code blocks must stay in sync with fallback.bootstrap.js
-    private final static String PREPEND_JS = "window.Aura || (window.Aura = {});\n" +
-            "window.Aura.bootstrap || (window.Aura.bootstrap = {});\n" +
-            "window.Aura.appBootstrap = ";
-    private final static String APPEND_JS = ";\n" +
-            ";(function() {\n" +
-            "    window.Aura.bootstrap.execBootstrapJs = window.performance && window.performance.now ? window.performance.now() : Date.now();\n" +
-            "    window.Aura.appBootstrapStatus = \"loaded\";\n" +
-            "    if (window.Aura.afterBootstrapReady && window.Aura.afterBootstrapReady.length) {\n" +
-            "        var queue = window.Aura.afterBootstrapReady;\n" +
-            "        window.Aura.afterBootstrapReady = [];\n" +
-            "        for (var i = 0; i < queue.length; i++) {\n" +
-        "                queue[i]();\n" +
-            "        }\n" +
-            "    }\n" +
-            "}());";
 
     protected void setCacheHeaders(HttpServletResponse response, DefDescriptor<? extends BaseComponentDef> appDesc)
             throws QuickFixException {
@@ -92,23 +72,7 @@ public class Bootstrap extends AuraResourceImpl {
     }
 
     protected void loadLabels(AuraContext context) throws QuickFixException {
-        String uid = definitionService.getUid(null, context.getApplicationDescriptor());
-        String root = AuraValueProviderType.LABEL.getPrefix();
-        GlobalValueProvider provider = context.getGlobalProviders().get(root);
-        Map<Throwable, Collection<Location>> errors = Maps.newLinkedHashMap();
-        Set<PropertyReference> labels = definitionService.getGlobalReferences(uid, root);
-        if (labels != null) {
-            for (PropertyReference label : labels) {
-                try {
-                    provider.getValue(label);
-                } catch (Throwable t) {
-                    errors.put(t, Sets.newHashSet(new Location(label.toString(), 0)));
-                }
-            }
-        }
-        if (errors.size() > 0) {
-            throw new CompositeValidationException("Unable to load values for "+root, errors);
-        }
+        bootstrapUtil.loadLabels(context);
     }
 
     @Override
@@ -133,7 +97,7 @@ public class Bootstrap extends AuraResourceImpl {
             JsonSerializationContext serializationContext = context.getJsonSerializationContext();
 
             WrappedPrintWriter out = new WrappedPrintWriter(response.getWriter());
-            out.append(PREPEND_JS);
+            out.append(bootstrapUtil.getPrependScript());
             JsonEncoder json = JsonEncoder.createJsonStream(out, serializationContext);
             json.writeMapBegin();
             json.writeMapKey("data");
@@ -152,7 +116,7 @@ public class Bootstrap extends AuraResourceImpl {
             }
 
             json.writeMapEnd();
-            out.append(APPEND_JS);
+            out.append(bootstrapUtil.getAppendScript());
         } catch (Throwable t) {
             if (t instanceof AuraJWTError) {
                 // If jwt validation fails, just 404. Do not gack.
@@ -216,12 +180,12 @@ public class Bootstrap extends AuraResourceImpl {
         response.resetBuffer();
         servletUtilAdapter.setNoCache(response);
         PrintWriter out = response.getWriter();
-        out.print(PREPEND_JS);
+        out.print(bootstrapUtil.getPrependScript());
         JsonEncoder json = JsonEncoder.createJsonStream(out, context.getJsonSerializationContext());
         json.writeMapBegin();
         json.writeMapEntry("error", t);
         json.writeMapEnd();
-        out.print(APPEND_JS);
+        out.print(bootstrapUtil.getAppendScript());
     }
 
 }

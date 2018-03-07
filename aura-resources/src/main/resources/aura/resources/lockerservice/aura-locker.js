@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-03-05
- * Version: 0.3.19
+ * Generated: 2018-03-07
+ * Version: 0.3.20
  */
 
 (function (exports) {
@@ -479,6 +479,7 @@ const {
   getOwnPropertyDescriptor,
   getOwnPropertyDescriptors,
   getOwnPropertyNames,
+  isFrozen,
   seal
 } = Object;
 
@@ -1161,37 +1162,6 @@ function getIntrinsics(realmRec) {
   };
 }
 
-const sanitized = new WeakSet();
-
-function freezeIntrinsics(realmRec) {
-  const intrinsics = getIntrinsics(realmRec);
-  deepFreeze(intrinsics);
-}
-
-function freezeIntrinsicsDeprecated(realmRec) {
-  const { unsafeGlobal } = realmRec;
-  seal(unsafeGlobal.Object.prototype);
-}
-
-// locking down the environment
-function sanitize(realmRec) {
-  if (sanitized.has(realmRec)) {
-    return;
-  }
-
-  repairAccessors(realmRec);
-
-  if (realmRec.isFrozen) {
-    repairFunctions(realmRec);
-    repairDataProperties(realmRec);
-    freezeIntrinsics(realmRec);
-  } else {
-    freezeIntrinsicsDeprecated(realmRec);
-  }
-
-  sanitized.add(realmRec);
-}
-
 /*
  * Copyright (C) 2017 salesforce.com, inc.
  *
@@ -1300,16 +1270,24 @@ const stdlib = [
  */
 let evalEvaluatorFactory;
 
+// Remove when SecureWindow is refactored to use sandbox
+let unfrozenSet;
+function setUnfrozenSet(names) {
+  unfrozenSet = new Set(names);
+}
+
 /**
  * This ecaluator declares commonly used references like
  * "window" and the JS standard lib as constants to allow
  * the JIT optimizer to link to static references.
  */
 function createEvalEvaluatorFactory(sandbox) {
+  const { realmRec: { unsafeFunction } } = sandbox;
+
   // Function and eval are not in our standard lib. Only Function
   // is added here since eval needs to context switch and can't be
   // a constant.
-  return sandbox.unsafeFunction(`
+  return unsafeFunction(`
     with (arguments[0]) {
       const {${stdlib.join(',')}, Function, window, document} = arguments[0];
       return function() {
@@ -1320,43 +1298,66 @@ function createEvalEvaluatorFactory(sandbox) {
   `);
 }
 
-function createEvalEvaluator(sandbox) {
-  const { globalObject, unsafeGlobal } = sandbox;
+class FreezingHandler {
+  constructor(sandbox) {
+    const { realmRec: { unsafeGlobal } } = sandbox;
+    this.unsafeGlobal = unsafeGlobal;
+  }
+  setInternalEval() {
+    // This sentinel allows one scoped direct eval.
+    this.isInternalEval = true;
+  }
+  clearInternalEval() {
+    // Return to safe eval.
+    this.isInternalEval = false;
+  }
+  get(target, prop) {
+    // Special treatment for eval.
+    if (prop === 'eval') {
+      if (this.isInternalEval) {
+        this.isInternalEval = false;
+        return this.unsafeGlobal.eval;
+      }
+      return target.eval;
+    }
+    // Properties of global.
+    if (prop in target) {
+      const value = target[prop];
+      if (unfrozenSet && unfrozenSet.has(prop)) {
+        deepFreeze(value);
+        unfrozenSet.delete(prop);
+      }
+      return value;
+    }
+    // Prevent a lookup for other properties.
+    return undefined;
+  }
+  has(target, prop) {
+    if (prop === 'eval') {
+      return true;
+    }
+    if (prop === 'arguments') {
+      return false;
+    }
+    if (prop in target) {
+      return true;
+    }
+    if (prop in this.unsafeGlobal) {
+      return true;
+    }
+    return false;
+  }
+}
 
-  // This sentinel allows one scoped direct eval.
-  let isInternalEval = false;
+function createEvalEvaluator(sandbox) {
+  const { globalObject } = sandbox;
 
   // This proxy has several functions:
   // 1. works with the sentinel to alternate between direct eval and confined eval.
   // 2. shadows all properties of the hidden global by declaring them as undefined.
   // 3. resolves all existing properties of the secure global.
-  const proxy = new Proxy(globalObject, {
-    get(target, prop) {
-      if (prop === 'eval') {
-        if (isInternalEval) {
-          isInternalEval = false;
-          return unsafeGlobal.eval;
-        }
-        return globalObject.eval;
-      }
-      return globalObject[prop];
-    },
-    has(target, prop) {
-      if (prop === 'eval') {
-        return true;
-      }
-      if (prop === 'arguments') {
-        return false;
-      }
-      if (prop in target) {
-        return true;
-      }
-      if (prop in unsafeGlobal) {
-        return true;
-      }
-      return false;
-    }
-  });
+  const handler = new FreezingHandler(sandbox);
+  const proxy = new Proxy(globalObject, handler);
 
   // Lazy define and use the factory.
   if (!evalEvaluatorFactory) {
@@ -1365,14 +1366,15 @@ function createEvalEvaluator(sandbox) {
   const scopedEvaluator = evalEvaluatorFactory(proxy);
 
   function evaluator(src) {
-    isInternalEval = true;
+    handler.setInternalEval();
     // Ensure that "this" resolves to the secure global.
     const result = scopedEvaluator.call(globalObject, src);
-    isInternalEval = false;
+    handler.clearInternalEval();
     return result;
   }
 
-  // Mimic the native eval() function.
+  // Mimic the native eval() function. New properties are
+  // by default non-writable and non-configurable.
   defineProperties(evaluator, {
     name: {
       value: 'eval'
@@ -1382,7 +1384,9 @@ function createEvalEvaluator(sandbox) {
     }
   });
 
-  return freeze(evaluator);
+  // This instance is namespace-specific, and therefore doesn't
+  // need to be frozen (only the objects reachable from it).
+  return evaluator;
 }
 
 /**
@@ -1390,6 +1394,8 @@ function createEvalEvaluator(sandbox) {
  * the safety of evalEvaluator for confinement.
  */
 function createFunctionEvaluator(sandbox) {
+  const { realmRec: { unsafeFunction } } = sandbox;
+
   const evaluator = function(...params) {
     const functionBody = params.pop() || '';
     // Conditionaly appends a new line to prevent execution during
@@ -1404,9 +1410,10 @@ function createFunctionEvaluator(sandbox) {
   // Ensure that the different Function instances of the different
   // sandboxes all answer properly when used with the instanceof
   // operator to preserve indentity.
-  const FunctionPrototype = sandbox.unsafeFunction.prototype;
+  const FunctionPrototype = unsafeFunction.prototype;
 
-  // Mimic the native signature.
+  // Mimic the native signature. New properties are
+  // by default non-writable and non-configurable.
   defineProperties(evaluator, {
     name: {
       value: 'Function'
@@ -1419,520 +1426,10 @@ function createFunctionEvaluator(sandbox) {
     }
   });
 
-  return freeze(evaluator);
+  // This instance is namespace-specific, and therefore doesn't
+  // need to be frozen (only the objects reachable from it).
+  return evaluator;
 }
-
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-const keyToSandbox = new Map();
-
-function createSandbox(key, realmRec) {
-  // Lazy sanitize the execution environment.
-  sanitize(realmRec);
-
-  const { unsafeGlobal, unsafeEval, unsafeFunction } = realmRec;
-  const sandbox = { unsafeGlobal, unsafeEval, unsafeFunction };
-
-  /**
-   * The sequencing of the following operations is curcial. We
-   * need "Function" available on global when we create "eval"
-   * in order for the constant to link to it.
-   * 1. We create the global, minus "eval" and "Function".
-   * 2. We create "Function" and expose it on the global.
-   * 3. We create "eval" and expose it on the global.
-   */
-  sandbox.globalObject = SecureWindow(unsafeGlobal, key);
-
-  sandbox.FunctionEvaluator = createFunctionEvaluator(sandbox);
-  defineProperty(sandbox.globalObject, 'Function', {
-    value: sandbox.FunctionEvaluator
-  });
-
-  // The "eval" property needs to be configurable to comply with the
-  // Proxy invariants.
-  sandbox.evalEvaluator = createEvalEvaluator(sandbox);
-  defineProperty(sandbox.globalObject, 'eval', {
-    value: sandbox.evalEvaluator,
-    configurable: true
-  });
-
-  return freeze(sandbox);
-}
-
-function getSandbox(key, realmRec) {
-  let sandbox = keyToSandbox.get(key);
-
-  if (!sandbox) {
-    sandbox = createSandbox(key, realmRec);
-    keyToSandbox.set(key, sandbox);
-  }
-
-  return sandbox;
-}
-
-/**
- * Sanitizes a URL string . Will prevent:
- * - usage of UTF-8 control characters. Update BLACKLIST constant to support more
- * - usage of \n, \t in url strings
- * @param {String} urlString
- * @returns {String}
- */
-function sanitizeURLString(urlString) {
-  const BLACKLIST = /[\u2029\u2028\n\r\t]/gi;
-
-  // false, '', undefined, null
-  if (!urlString) {
-    return urlString;
-  }
-
-  if (typeof urlString !== 'string') {
-    throw new TypeError('URL argument is not a string');
-  }
-
-  return urlString.replace(BLACKLIST, '');
-}
-
-/**
- * Sanitizes for a DOM element. Typical use would be when wanting to sanitize for
- * an href or src attribute of an element or window.open
- * @param {*} url
- */
-function sanitizeURLForElement(url) {
-  const normalized = document.createElement('a');
-  normalized.href = url;
-  return sanitizeURLString(normalized.href);
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-const realmRec = {};
-function init(options) {
-  // The frozen/unfrozen status of the Locker is set at creation.
-  realmRec.isFrozen = options.isFrozen;
-
-  /**
-   * The unsafe* variables hold precious values that must not escape
-   * to untrusted code. When eval is invoked via unsafeEval, this is
-   * a call to the indirect eval function, not the direct eval operator.
-   */
-  realmRec.unsafeGlobal = options.unsafeGlobal;
-  realmRec.unsafeEval = options.unsafeGlobal.eval;
-  realmRec.unsafeFunction = options.unsafeGlobal.Function;
-
-  // None of these values can change after initialization.
-  freeze(realmRec);
-}
-
-function getEnv$1(key) {
-  const sandbox = getSandbox(key, realmRec);
-  return sandbox.globalObject;
-}
-
-/**
- * Evaluates a string using secure eval rather than eval.
- * Sanitizes the input string and attaches a sourceURL so the
- * result can be easily found in browser debugging tools.
- */
-function evaluate(src, key, sourceURL) {
-  const sandbox = getSandbox(key, realmRec);
-
-  // Sanitize the URL
-  if (sourceURL) {
-    sourceURL = sanitizeURLForElement(sourceURL);
-    src += `\n//# sourceURL=${sourceURL}`;
-  }
-
-  return sandbox.evalEvaluator(src);
-}
-
-const assert = {
-  block: fn => fn(),
-  isTrue: (condition, message) => {
-    if (!condition) {
-      throw new Error(`Assertion failed: ${message}`);
-    }
-  },
-  isFalse: (condition, message) => {
-    if (condition) {
-      throw new Error(`Assertion failed: ${message}`);
-    }
-  },
-  invariant: (condition, message) => {
-    if (!condition) {
-      throw new Error(`Invariant violation: ${message}`);
-    }
-  }
-};
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-let warn = window.console.warn;
-let error = Error;
-
-function registerReportAPI(api) {
-  if (api) {
-    warn = api.warn;
-    error = api.error;
-  }
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-function assert$2(condition) {
-  if (!condition) {
-    throw new Error();
-  }
-}
-
-// TODO: remove these functions. Our filtering mechanism should not
-// rely on the more expensive operation.
-
-function isObjectObject(value) {
-  return (
-    typeof value === 'object' && value !== null && objectToString.call(value) === '[object Object]'
-  );
-}
-
-// https://github.com/jonschlinkert/is-plain-object
-// Copyright © 2017, Jon Schlinkert. Released under the MIT License.
-function isPlainObject(value) {
-  if (isObjectObject(value) === false) {
-    return false;
-  }
-
-  // If has modified constructor
-  const ctor = value.constructor;
-  if (typeof ctor !== 'function') {
-    return false;
-  }
-
-  try {
-    // If has modified prototype
-    const proto = ctor.prototype;
-    if (isObjectObject(proto) === false) {
-      return false;
-    }
-    // If constructor does not have an Object-specific method
-    if (proto.hasOwnProperty('isPrototypeOf') === false) {
-      return false;
-    }
-  } catch (e) {
-    /* Assume is  object when throws */
-  }
-
-  // Most likely a plain Object
-  return true;
-}
-
-/**
- * Basic URL Scheme checking utility.
- * Checks for http: and https: url schemes.
- * @param {String} url
- * @return {Boolean}
- */
-function isValidURLScheme(url) {
-  const normalized = document.createElement('a');
-  normalized.href = url;
-  return normalized.protocol === 'https:' || normalized.protocol === 'http:';
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-const SecureIFrameElement = {
-  addMethodsAndProperties: function(prototype) {
-    Object.defineProperties(prototype, {
-      // Standard HTMLElement methods
-      // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
-      blur: SecureObject.createFilteredMethodStateless('blur', prototype),
-      focus: SecureObject.createFilteredMethodStateless('focus', prototype),
-      contentWindow: {
-        get: function() {
-          const raw = SecureObject.getRaw(this);
-          return raw.contentWindow
-            ? SecureIFrameElement.SecureIFrameContentWindow(raw.contentWindow, getKey(this))
-            : raw.contentWindow;
-        }
-      },
-      // Reason: [W-4437391] Cure53 Report SF-04-004: Window access via encoded path segments.
-      src: {
-        get: function() {
-          const raw = SecureObject.getRaw(this);
-          return raw.src;
-        },
-        set: function(url) {
-          const urlString = sanitizeURLForElement(url);
-          if (urlString.length > 0) {
-            if (!isValidURLScheme(urlString)) {
-              warn(
-                'SecureIframeElement.src supports http://, https:// schemes and relative urls.'
-              );
-            } else {
-              const raw = SecureObject.getRaw(this);
-              raw.src = urlString;
-            }
-          }
-        }
-      }
-    });
-
-    // Standard list of iframe's properties from:
-    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
-    // Note: Ignoring 'contentDocument', 'sandbox' and 'srcdoc' from the list above.
-    ['height', 'width', 'name'].forEach(name =>
-      Object.defineProperty(
-        prototype,
-        name,
-        SecureObject.createFilteredPropertyStateless(name, prototype)
-      )
-    );
-  },
-
-  // TODO: Move this function into a separate file
-  SecureIFrameContentWindow: function(w, key) {
-    let sicw = getFromCache(w, key);
-    if (sicw) {
-      return sicw;
-    }
-    sicw = Object.create(null, {
-      toString: {
-        value: function() {
-          return `SecureIFrameContentWindow: ${w}{ key: ${JSON.stringify(key)} }`;
-        }
-      }
-    });
-
-    Object.defineProperties(sicw, {
-      postMessage: SecureObject.createFilteredMethod(sicw, w, 'postMessage', { rawArguments: true })
-    });
-
-    setRef(sicw, w, key);
-    addToCache(w, sicw, key);
-    registerProxy(sicw);
-
-    return sicw;
-  }
-};
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-function SecureDOMEvent(event, key) {
-  assert.invariant(event, 'Wrapping an undefined event is prohibited.');
-  let o = getFromCache(event, key);
-  if (o) {
-    return o;
-  }
-
-  o = Object.create(null, {
-    toString: {
-      value: function() {
-        return `SecureDOMEvent: ${event}{ key: ${JSON.stringify(key)} }`;
-      }
-    }
-  });
-
-  const DOMEventSecureDescriptors = {
-    // Events properties that are DOM Elements were compiled from
-    // https://developer.mozilla.org/en-US/docs/Web/Events
-    target: SecureObject.createFilteredProperty(o, event, 'target'),
-    currentTarget: SecureObject.createFilteredProperty(o, event, 'currentTarget'),
-
-    initEvent: SecureObject.createFilteredMethod(o, event, 'initEvent'),
-    // Touch Events are special on their own:
-    // https://developer.mozilla.org/en-US/docs/Web/API/Touch
-    touches: SecureDOMEvent.filterTouchesDescriptor(o, event, 'touches'),
-    targetTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, 'targetTouches'),
-    changedTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, 'changedTouches'),
-
-    view: {
-      get: function() {
-        const key = getKey(o);
-        const swin = getEnv$1(key);
-        const win = getRef(swin, key);
-        return win === event.view ? swin : undefined;
-      }
-    }
-  };
-
-  ['preventDefault', 'stopImmediatePropagation', 'stopPropagation'].forEach(method =>
-    SecureObject.addMethodIfSupported(o, event, method)
-  );
-
-  // non-standard properties and aliases
-  ['relatedTarget', 'srcElement', 'explicitOriginalTarget', 'originalTarget'].forEach(property =>
-    SecureObject.addPropertyIfSupported(o, event, property)
-  );
-
-  // For MessageEvent, special handling if the message is from a cross origin iframe
-  if (event instanceof MessageEvent) {
-    let xorigin = false;
-    const eventSource = event.source;
-    try {
-      xorigin = !!(eventSource && eventSource.nodeType);
-    } catch (e) {
-      xorigin = true;
-    }
-    // If the MessageEvent object is from a different domain,
-    // and accessing the nodeType property triggers an exception, then the source is a content window,
-    // wrap the source in a SecureIFrameContentWindow
-    if (xorigin) {
-      Object.defineProperty(o, 'source', {
-        enumerable: true,
-        value: SecureIFrameElement.SecureIFrameContentWindow(eventSource, key)
-      });
-    }
-  }
-
-  // re-exposing externals
-  // TODO: we might need to include non-enumerables
-  for (const name in event) {
-    if (!(name in o)) {
-      // every DOM event has a different shape, we apply filters when possible,
-      // and bypass when no secure filter is found.
-      Object.defineProperty(
-        o,
-        name,
-        DOMEventSecureDescriptors[name] || SecureObject.createFilteredProperty(o, event, name)
-      );
-    }
-  }
-
-  setRef(o, event, key);
-  addToCache(event, o, key);
-  registerProxy(o);
-
-  return o;
-}
-
-SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
-  let valueOverride;
-  // descriptor to produce a new collection of touches where the target of each
-  // touch is a secure element
-  return {
-    get: function() {
-      if (valueOverride) {
-        return valueOverride;
-      }
-      // perf hard-wired in case there is not a touches to wrap
-      const touches = event[propName];
-      if (!touches) {
-        return touches;
-      }
-      // touches, of type ToucheList does not implement "map"
-      return Array.prototype.map.call(touches, touch => {
-        // touches is normally a big big collection of touch objects,
-        // we do not want to pre-process them all, just create the getters
-        // and process the accessor on the spot. e.g.:
-        // https://developer.mozilla.org/en-US/docs/Web/Events/touchstart
-        let keys = [];
-        let touchShape = touch;
-        // Walk up the prototype chain and gather all properties
-        do {
-          keys = keys.concat(Object.keys(touchShape));
-        } while (
-          (touchShape = Object.getPrototypeOf(touchShape)) &&
-          touchShape !== Object.prototype
-        );
-
-        // Create a stub object with all the properties
-        return keys.reduce(
-          (o, p) =>
-            Object.defineProperty(o, p, {
-              // all props in a touch object are readonly by spec:
-              // https://developer.mozilla.org/en-US/docs/Web/API/Touch
-              get: function() {
-                return SecureObject.filterEverything(se, touch[p]);
-              }
-            }),
-          {}
-        );
-      });
-    },
-    set: function(value) {
-      valueOverride = value;
-    }
-  };
-};
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -2169,6 +1666,229 @@ SecureScriptElement.run = function(st) {
  * limitations under the License.
  */
 
+let warn = window.console.warn;
+let error = Error;
+
+function registerReportAPI(api) {
+  if (api) {
+    warn = api.warn;
+    error = api.error;
+  }
+}
+
+/**
+ * Sanitizes a URL string . Will prevent:
+ * - usage of UTF-8 control characters. Update BLACKLIST constant to support more
+ * - usage of \n, \t in url strings
+ * @param {String} urlString
+ * @returns {String}
+ */
+function sanitizeURLString(urlString) {
+  const BLACKLIST = /[\u2029\u2028\n\r\t]/gi;
+
+  // false, '', undefined, null
+  if (!urlString) {
+    return urlString;
+  }
+
+  if (typeof urlString !== 'string') {
+    throw new TypeError('URL argument is not a string');
+  }
+
+  return urlString.replace(BLACKLIST, '');
+}
+
+/**
+ * Sanitizes for a DOM element. Typical use would be when wanting to sanitize for
+ * an href or src attribute of an element or window.open
+ * @param {*} url
+ */
+function sanitizeURLForElement(url) {
+  const normalized = document.createElement('a');
+  normalized.href = url;
+  return sanitizeURLString(normalized.href);
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+function assert(condition) {
+  if (!condition) {
+    throw new Error();
+  }
+}
+
+// TODO: remove these functions. Our filtering mechanism should not
+// rely on the more expensive operation.
+
+function isObjectObject(value) {
+  return (
+    typeof value === 'object' && value !== null && objectToString.call(value) === '[object Object]'
+  );
+}
+
+// https://github.com/jonschlinkert/is-plain-object
+// Copyright © 2017, Jon Schlinkert. Released under the MIT License.
+function isPlainObject(value) {
+  if (isObjectObject(value) === false) {
+    return false;
+  }
+
+  // If has modified constructor
+  const ctor = value.constructor;
+  if (typeof ctor !== 'function') {
+    return false;
+  }
+
+  try {
+    // If has modified prototype
+    const proto = ctor.prototype;
+    if (isObjectObject(proto) === false) {
+      return false;
+    }
+    // If constructor does not have an Object-specific method
+    if (proto.hasOwnProperty('isPrototypeOf') === false) {
+      return false;
+    }
+  } catch (e) {
+    /* Assume is  object when throws */
+  }
+
+  // Most likely a plain Object
+  return true;
+}
+
+/**
+ * Basic URL Scheme checking utility.
+ * Checks for http: and https: url schemes.
+ * @param {String} url
+ * @return {Boolean}
+ */
+function isValidURLScheme(url) {
+  const normalized = document.createElement('a');
+  normalized.href = url;
+  return normalized.protocol === 'https:' || normalized.protocol === 'http:';
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+const SecureIFrameElement = {
+  addMethodsAndProperties: function(prototype) {
+    Object.defineProperties(prototype, {
+      // Standard HTMLElement methods
+      // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
+      blur: SecureObject.createFilteredMethodStateless('blur', prototype),
+      focus: SecureObject.createFilteredMethodStateless('focus', prototype),
+      contentWindow: {
+        get: function() {
+          const raw = SecureObject.getRaw(this);
+          return raw.contentWindow
+            ? SecureIFrameElement.SecureIFrameContentWindow(raw.contentWindow, getKey(this))
+            : raw.contentWindow;
+        }
+      },
+      // Reason: [W-4437391] Cure53 Report SF-04-004: Window access via encoded path segments.
+      src: {
+        get: function() {
+          const raw = SecureObject.getRaw(this);
+          return raw.src;
+        },
+        set: function(url) {
+          const urlString = sanitizeURLForElement(url);
+          if (urlString.length > 0) {
+            if (!isValidURLScheme(urlString)) {
+              warn(
+                'SecureIframeElement.src supports http://, https:// schemes and relative urls.'
+              );
+            } else {
+              const raw = SecureObject.getRaw(this);
+              raw.src = urlString;
+            }
+          }
+        }
+      }
+    });
+
+    // Standard list of iframe's properties from:
+    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
+    // Note: Ignoring 'contentDocument', 'sandbox' and 'srcdoc' from the list above.
+    ['height', 'width', 'name'].forEach(name =>
+      Object.defineProperty(
+        prototype,
+        name,
+        SecureObject.createFilteredPropertyStateless(name, prototype)
+      )
+    );
+  },
+
+  // TODO: Move this function into a separate file
+  SecureIFrameContentWindow: function(w, key) {
+    let sicw = getFromCache(w, key);
+    if (sicw) {
+      return sicw;
+    }
+    sicw = Object.create(null, {
+      toString: {
+        value: function() {
+          return `SecureIFrameContentWindow: ${w}{ key: ${JSON.stringify(key)} }`;
+        }
+      }
+    });
+
+    Object.defineProperties(sicw, {
+      postMessage: SecureObject.createFilteredMethod(sicw, w, 'postMessage', { rawArguments: true })
+    });
+
+    setRef(sicw, w, key);
+    addToCache(w, sicw, key);
+    registerProxy(sicw);
+
+    return sicw;
+  }
+};
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 const metadata$3 = {
   ATTRIBUTE_NODE: DEFAULT,
   CDATA_SECTION_NODE: DEFAULT,
@@ -2355,6 +2075,25 @@ function createEventTargetMethodsStateless(config, prototype) {
   };
 }
 
+const assert$1 = {
+  block: fn => fn(),
+  isTrue: (condition, message) => {
+    if (!condition) {
+      throw new Error(`Assertion failed: ${message}`);
+    }
+  },
+  isFalse: (condition, message) => {
+    if (condition) {
+      throw new Error(`Assertion failed: ${message}`);
+    }
+  },
+  invariant: (condition, message) => {
+    if (!condition) {
+      throw new Error(`Invariant violation: ${message}`);
+    }
+  }
+};
+
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
@@ -2418,6 +2157,12 @@ window.devtoolsFormatters.push(lsProxyFormatter);
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// Remove when SecureElement is refactored to use sandbox
+let shouldFreeze;
+function setElementRealm(realmRec) {
+  shouldFreeze = realmRec.shouldFreeze;
+}
 
 /* import { isValidURLScheme } from '../utils/checks';
 import { sanitizeURLForElement } from '../utils/sanitize';
@@ -3781,6 +3526,9 @@ function SecureElement(el, key) {
       },
 
       getPrototypeOf: function() {
+        if (shouldFreeze && !isFrozen(basePrototype)) {
+          deepFreeze(basePrototype);
+        }
         return basePrototype;
       },
 
@@ -4088,7 +3836,7 @@ function SecureElement(el, key) {
   addToCache(el, o, key);
   registerProxy(o);
   // Mark the proxy to be unwrapped by custom formatter
-  assert.block(() => {
+  assert$1.block(() => {
     addProxy(o, el);
   });
   return o;
@@ -4455,6 +4203,320 @@ SecureElement.secureQuerySelector = function(el, key, selector) {
   return null;
 };
 
+const sanitized = new WeakSet();
+
+function freezeIntrinsics(realmRec) {
+  const intrinsics = getIntrinsics(realmRec);
+  deepFreeze(intrinsics);
+}
+
+function freezeIntrinsicsDeprecated(realmRec) {
+  const { unsafeGlobal } = realmRec;
+  seal(unsafeGlobal.Object.prototype);
+}
+
+// locking down the environment
+function sanitize(realmRec) {
+  if (sanitized.has(realmRec)) {
+    return;
+  }
+
+  repairAccessors(realmRec);
+
+  if (realmRec.shouldFreeze) {
+    repairFunctions(realmRec);
+    repairDataProperties(realmRec);
+    freezeIntrinsics(realmRec);
+
+    // Temporary until SecureWindow is refactored
+    const { prototypes: { Window } } = metadata$$1;
+    const names = [];
+    for (const name in Window) {
+      if (Window[name] === RAW) {
+        names.push(name);
+      }
+    }
+    setUnfrozenSet(names);
+
+    // Temporary until SecureElement is refactored
+    setElementRealm(realmRec);
+  } else {
+    freezeIntrinsicsDeprecated(realmRec);
+  }
+
+  sanitized.add(realmRec);
+}
+
+/*
+ * Copyright (C) 2017 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the 'License');
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an 'AS IS' BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+const keyToSandbox = new Map();
+
+function createSandbox(key, realmRec) {
+  // Lazy sanitize the execution environment.
+  sanitize(realmRec);
+
+  const sandbox = { realmRec };
+
+  /**
+   * The sequencing of the following operations is curcial. We
+   * need "Function" available on global when we create "eval"
+   * in order for the constant to link to it.
+   * 1. We create the global, minus "eval" and "Function".
+   * 2. We create "Function" and expose it on the global.
+   * 3. We create "eval" and expose it on the global.
+   */
+  sandbox.globalObject = SecureWindow(sandbox, key);
+
+  sandbox.FunctionEvaluator = createFunctionEvaluator(sandbox);
+  defineProperty(sandbox.globalObject, 'Function', {
+    value: sandbox.FunctionEvaluator
+  });
+
+  // The "eval" property needs to be configurable to comply with the
+  // Proxy invariants.
+  sandbox.evalEvaluator = createEvalEvaluator(sandbox);
+  defineProperty(sandbox.globalObject, 'eval', {
+    value: sandbox.evalEvaluator,
+    configurable: true
+  });
+
+  return freeze(sandbox);
+}
+
+function getSandbox(key, realmRec) {
+  let sandbox = keyToSandbox.get(key);
+
+  if (!sandbox) {
+    sandbox = createSandbox(key, realmRec);
+    keyToSandbox.set(key, sandbox);
+  }
+
+  return sandbox;
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the 'License');
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an 'AS IS' BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+const realmRec = {};
+function init(options) {
+  // The frozen/unfrozen status of the Locker is set at creation.
+  // Keep options.isFrozen until playground is updated.
+  realmRec.shouldFreeze = options.shouldFreeze || options.isFrozen;
+
+  /**
+   * The unsafe* variables hold precious values that must not escape
+   * to untrusted code. When eval is invoked via unsafeEval, this is
+   * a call to the indirect eval function, not the direct eval operator.
+   */
+  realmRec.unsafeGlobal = options.unsafeGlobal;
+  realmRec.unsafeEval = options.unsafeGlobal.eval;
+  realmRec.unsafeFunction = options.unsafeGlobal.Function;
+
+  // None of these values can change after initialization.
+  freeze(realmRec);
+}
+
+function getEnv$1(key) {
+  const sandbox = getSandbox(key, realmRec);
+  return sandbox.globalObject;
+}
+
+/**
+ * Evaluates a string using secure eval rather than eval.
+ * Sanitizes the input string and attaches a sourceURL so the
+ * result can be easily found in browser debugging tools.
+ */
+function evaluate(src, key, sourceURL) {
+  const sandbox = getSandbox(key, realmRec);
+
+  // Sanitize the URL
+  if (sourceURL) {
+    sourceURL = sanitizeURLForElement(sourceURL);
+    src += `\n//# sourceURL=${sourceURL}`;
+  }
+
+  return sandbox.evalEvaluator(src);
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+function SecureDOMEvent(event, key) {
+  assert$1.invariant(event, 'Wrapping an undefined event is prohibited.');
+  let o = getFromCache(event, key);
+  if (o) {
+    return o;
+  }
+
+  o = Object.create(null, {
+    toString: {
+      value: function() {
+        return `SecureDOMEvent: ${event}{ key: ${JSON.stringify(key)} }`;
+      }
+    }
+  });
+
+  const DOMEventSecureDescriptors = {
+    // Events properties that are DOM Elements were compiled from
+    // https://developer.mozilla.org/en-US/docs/Web/Events
+    target: SecureObject.createFilteredProperty(o, event, 'target'),
+    currentTarget: SecureObject.createFilteredProperty(o, event, 'currentTarget'),
+
+    initEvent: SecureObject.createFilteredMethod(o, event, 'initEvent'),
+    // Touch Events are special on their own:
+    // https://developer.mozilla.org/en-US/docs/Web/API/Touch
+    touches: SecureDOMEvent.filterTouchesDescriptor(o, event, 'touches'),
+    targetTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, 'targetTouches'),
+    changedTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, 'changedTouches'),
+
+    view: {
+      get: function() {
+        const key = getKey(o);
+        const swin = getEnv$1(key);
+        const win = getRef(swin, key);
+        return win === event.view ? swin : undefined;
+      }
+    }
+  };
+
+  ['preventDefault', 'stopImmediatePropagation', 'stopPropagation'].forEach(method =>
+    SecureObject.addMethodIfSupported(o, event, method)
+  );
+
+  // non-standard properties and aliases
+  ['relatedTarget', 'srcElement', 'explicitOriginalTarget', 'originalTarget'].forEach(property =>
+    SecureObject.addPropertyIfSupported(o, event, property)
+  );
+
+  // For MessageEvent, special handling if the message is from a cross origin iframe
+  if (event instanceof MessageEvent) {
+    let xorigin = false;
+    const eventSource = event.source;
+    try {
+      xorigin = !!(eventSource && eventSource.nodeType);
+    } catch (e) {
+      xorigin = true;
+    }
+    // If the MessageEvent object is from a different domain,
+    // and accessing the nodeType property triggers an exception, then the source is a content window,
+    // wrap the source in a SecureIFrameContentWindow
+    if (xorigin) {
+      Object.defineProperty(o, 'source', {
+        enumerable: true,
+        value: SecureIFrameElement.SecureIFrameContentWindow(eventSource, key)
+      });
+    }
+  }
+
+  // re-exposing externals
+  // TODO: we might need to include non-enumerables
+  for (const name in event) {
+    if (!(name in o)) {
+      // every DOM event has a different shape, we apply filters when possible,
+      // and bypass when no secure filter is found.
+      Object.defineProperty(
+        o,
+        name,
+        DOMEventSecureDescriptors[name] || SecureObject.createFilteredProperty(o, event, name)
+      );
+    }
+  }
+
+  setRef(o, event, key);
+  addToCache(event, o, key);
+  registerProxy(o);
+
+  return o;
+}
+
+SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
+  let valueOverride;
+  // descriptor to produce a new collection of touches where the target of each
+  // touch is a secure element
+  return {
+    get: function() {
+      if (valueOverride) {
+        return valueOverride;
+      }
+      // perf hard-wired in case there is not a touches to wrap
+      const touches = event[propName];
+      if (!touches) {
+        return touches;
+      }
+      // touches, of type ToucheList does not implement "map"
+      return Array.prototype.map.call(touches, touch => {
+        // touches is normally a big big collection of touch objects,
+        // we do not want to pre-process them all, just create the getters
+        // and process the accessor on the spot. e.g.:
+        // https://developer.mozilla.org/en-US/docs/Web/Events/touchstart
+        let keys = [];
+        let touchShape = touch;
+        // Walk up the prototype chain and gather all properties
+        do {
+          keys = keys.concat(Object.keys(touchShape));
+        } while (
+          (touchShape = Object.getPrototypeOf(touchShape)) &&
+          touchShape !== Object.prototype
+        );
+
+        // Create a stub object with all the properties
+        return keys.reduce(
+          (o, p) =>
+            Object.defineProperty(o, p, {
+              // all props in a touch object are readonly by spec:
+              // https://developer.mozilla.org/en-US/docs/Web/API/Touch
+              get: function() {
+                return SecureObject.filterEverything(se, touch[p]);
+              }
+            }),
+          {}
+        );
+      });
+    },
+    set: function(value) {
+      valueOverride = value;
+    }
+  };
+};
+
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
@@ -4631,7 +4693,7 @@ SecureObject.filterEverything = function(st, raw, options) {
       setRef(swallowed, raw, key);
       mutated = true;
     } else {
-      assert$2(key, 'A secure object should always have a key.');
+      assert(key, 'A secure object should always have a key.');
       if (filterTypeHook$1) {
         swallowed = filterTypeHook$1(raw, key, belongsToLocker);
       }
@@ -7977,7 +8039,9 @@ const metadata$$1 = {
   }
 };
 
-function SecureWindow(win, key) {
+function SecureWindow(sandbox, key) {
+  const { realmRec: { unsafeGlobal: win } } = sandbox;
+
   let o = getFromCache(win, key);
   if (o) {
     return o;
@@ -8225,7 +8289,6 @@ function SecureWindow(win, key) {
     name =>
       Object.defineProperty(o, name, {
         enumerable: true,
-        writable: false,
         value: win[name]
       })
   );
@@ -9303,8 +9366,8 @@ function initialize(types, api) {
 
   init({
     // TODO: disabled until W-4733987 is resolved
-    // isFrozen: api.isStrictCSP,
-    isFrozen: false,
+    // shouldFreeze: api.isStrictCSP,
+    shouldFreeze: false,
     unsafeGlobal: window,
     unsafeEval: window.eval,
     unsafeFunction: window.Function

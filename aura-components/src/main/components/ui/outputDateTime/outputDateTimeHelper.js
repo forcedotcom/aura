@@ -51,6 +51,11 @@
         var langLocale = concreteCmp.get("v.langLocale");
 
         var d = $A.localizationService.parseDateTimeISO8601(value);
+        if (!this.isValidDate(d)) {
+            _helper.displayDateTime(concreteCmp, "Invalid date time value");
+            return;
+        }
+
         var timezone = _helper.getTimeZone(concreteCmp);
         $A.localizationService.UTCToWallTime(d, timezone, function(walltime) {
             try {
@@ -61,5 +66,9 @@
                 _helper.displayDateTime(concreteCmp, e.message);
             }
         });
+    },
+
+    isValidDate: function(date) {
+        return (date instanceof Date) && !isNaN(date.getTime());
     }
 })// eslint-disable-line semi

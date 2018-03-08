@@ -15,184 +15,6 @@
  */
 ({
 
-    testUTCToWallTime: {
-        test: function() {
-            var date = $A.localizationService.parseDateTimeISO8601("2013-12-03T06:01:00.000Z");
-            var format = "MMM d, yyyy h:mm:ss a";
-            var expected = "Dec 3, 2013 1:01:00 AM";
-
-            $A.localizationService.UTCToWallTime(date, "America/New_York", function(walltime) {
-                var actual = $A.localizationService.formatDateTimeUTC(walltime, format);
-                $A.test.assertEquals(expected, actual);
-            });
-        }
-    },
-
-    testUTCToWallTimeWhenGlobalMomentGetsOverridden: {
-        test: function() {
-            var momentJs = window.moment;
-            $A.test.addCleanup(function() { window.moment = momentJs });
-            window.moment = {};
-
-            var date = $A.localizationService.parseDateTimeISO8601("2013-12-03T06:01:00.000Z");
-            var format = "MMM d, yyyy h:mm:ss a";
-            var expected = "Dec 3, 2013 1:01:00 AM";
-
-            $A.localizationService.UTCToWallTime(date, "America/New_York", function(walltime) {
-                var actual = $A.localizationService.formatDateTimeUTC(walltime, format);
-                $A.test.assertEquals(expected, actual);
-            });
-        }
-    },
-
-    testUTCToWallTimeWithTimeInDST: {
-        test: function() {
-            var date = $A.localizationService.parseDateTimeISO8601("2013-10-03T06:01:00.000Z");
-            var format = "MMM d, yyyy h:mm:ss a";
-            var expected = "Oct 3, 2013 2:01:00 AM";
-
-            $A.localizationService.UTCToWallTime(date, "America/New_York", function(walltime) {
-                var actual = $A.localizationService.formatDateTimeUTC(walltime, format);
-                $A.test.assertEquals(expected, actual,
-                    "Incorrect time from UTCToWallTime when given time is in DST.");
-            });
-        }
-    },
-
-    /*
-     * Verify UTCToWallTime conversion for the time during the Daylight Saving Time change.
-     * This is an edge case but important. Since date object includes browser's timezone offset,
-     * the test is verify DST is applied for given timezone vs for browser's timezone.
-     *
-     * In the case, for zone "America/New_York", 2:00:00 am clocks were turned backward 1 hour to
-     * 1:00:00 am on Nov 3, 2013.
-     */
-    testUTCToWallTimeWithTimeDuringDSTChange: {
-        test: function() {
-            var dateInDST = $A.localizationService.parseDateTimeISO8601("2013-11-03T05:01:00.000Z");
-            var dateOutOfDST = $A.localizationService.parseDateTimeISO8601("2013-11-03T06:01:00.000Z");
-            var format = "MMM d, yyyy h:mm:ss a";
-            var expected = "Nov 3, 2013 1:01:00 AM";
-
-            $A.localizationService.UTCToWallTime(dateInDST, "America/New_York", function(walltime) {
-                var actual = $A.localizationService.formatDateTimeUTC(walltime, format);
-                $A.test.assertEquals(expected, actual,
-                        "Incorrect time from UTCToWallTime when given time is right before DST ends");
-            });
-
-            $A.localizationService.UTCToWallTime(dateOutOfDST, "America/New_York", function(walltime) {
-                var actual = $A.localizationService.formatDateTimeUTC(walltime, format);
-                $A.test.assertEquals(expected, actual,
-                        "Incorrect time from UTCToWallTime when given time is right after DST ends");
-            });
-        }
-    },
-
-    testUTCToWallTimeForZoneWithPositiveOffset: {
-        test: function() {
-            var date = $A.localizationService.parseDateTimeISO8601("2013-12-03T06:01:00.000Z");
-            var format = "MMM d, yyyy h:mm:ss a";
-            var expected = "Dec 3, 2013 7:01:00 AM";
-
-            $A.localizationService.UTCToWallTime(date, "Europe/Berlin", function(walltime) {
-                var actual = $A.localizationService.formatDateTimeUTC(walltime, format);
-                $A.test.assertEquals(expected, actual,
-                        "Incorrect time from UTCToWallTime when given zone has positive offset");
-            });
-        }
-    },
-
-    testUTCToWallTimeForGMT: {
-        test: function() {
-            var date = $A.localizationService.parseDateTimeISO8601("2013-12-03T06:01:00.000Z");
-            var format = "MMM d, yyyy h:mm:ss a";
-            var expected = "Dec 3, 2013 6:01:00 AM";
-
-            $A.localizationService.UTCToWallTime(date, "GMT", function(walltime) {
-                var actual = $A.localizationService.formatDateTimeUTC(walltime, format);
-                $A.test.assertEquals(expected, actual,
-                        "Incorrect time from UTCToWallTime when given zone is GMT");
-            });
-        }
-    },
-
-    testWallTimeToUTC: {
-        test: function() {
-            var format = "MMM DD, YYYY h:mm:ss A";
-            var date = $A.localizationService.parseDateTime("Dec 23, 2013 3:30:00 PM", format);
-            var expected = "Dec 23, 2013 11:30:00 PM";
-
-            $A.localizationService.WallTimeToUTC(date, "America/Los_Angeles", function(utc) {
-                var actual = $A.localizationService.formatDateTime(utc, format);
-                $A.test.assertEquals(expected, actual, "Incorrect time from WallTimeToUTC");
-            });
-        }
-    },
-
-    testWallTimeToUTCWithTimeInDST: {
-        test: function() {
-            var format = "MMM DD, YYYY h:mm:ss A";
-            var date = $A.localizationService.parseDateTime("Sep 23, 2013 4:30:00 PM", format);
-            var expected = "Sep 23, 2013 11:30:00 PM";
-
-            $A.localizationService.WallTimeToUTC(date, "America/Los_Angeles", function(utc) {
-                var actual = $A.localizationService.formatDateTime(utc, format);
-                $A.test.assertEquals(expected, actual,
-                        "Incorrect time from WallTimeToUTC when given time is in DST");
-            });
-        }
-    },
-
-    testWallTimeToUTCForZoneWithPositiveOffset: {
-        test: function() {
-            var format = "MMM DD, YYYY h:mm:ss A";
-            var date = $A.localizationService.parseDateTime("Dec 24, 2013 12:30:00 AM", format);
-            var expected = "Dec 23, 2013 11:30:00 PM";
-
-            $A.localizationService.WallTimeToUTC(date, "Europe/Berlin", function(utc) {
-                var actual = $A.localizationService.formatDateTime(utc, format);
-                $A.test.assertEquals(expected, actual,
-                        "Incorrect time from WallTimeToUTC when given zone has positive offset");
-            });
-        }
-    },
-
-    /*
-     * Verify WallTimeToUTC conversion for the time during the Daylight Saving Time change.
-     * This is an edge case but important. Since date object includes browser's timezone offset,
-     * the test is verify DST is applied for given timezone vs for browser's timezone.
-     *
-     * In the case, for zone "Europe/Berlin", 3:00:00 am clocks were turned backward 1 hour to
-     * 2:00:00 am am on Oct 27, 2013.
-     */
-    testWallTimeToUTCWithTimeDuringDSTChange: {
-        test: function() {
-            var format = "MMM d, yyyy h:mm:ss a";
-            var date = $A.localizationService.parseDateTime("Oct 27, 2013 02:30:00 AM", format);
-            var expected = "Oct 27, 2013 1:30:00 AM";
-
-            $A.localizationService.WallTimeToUTC(date, "Europe/Berlin", function(utc) {
-                var actual = $A.localizationService.formatDateTime(utc, format);
-                $A.test.assertEquals(expected, actual,
-                        "Incorrect time from WallTimeToUTC when given time is during DST ends");
-            });
-        }
-    },
-
-    testWallTimeToUTCForGMT: {
-        test: function() {
-            var format = "MMM DD, YYYY h:mm:ss A";
-            var date = $A.localizationService.parseDateTime("Dec 23, 2013 3:30:00 PM", format);
-            var expected = "Dec 23, 2013 3:30:00 PM";
-
-            $A.localizationService.WallTimeToUTC(date, "GMT", function(utc) {
-                var actual = $A.localizationService.formatDateTime(utc, format);
-                $A.test.assertEquals(expected, actual,
-                        "Incorrect time from WallTimeToUTC when given zone is GMT");
-            });
-        }
-    },
-
     testParseDateTime: {
         test: function() {
             var format =  "MMM DD, YYYY h:mm:ss A";
@@ -231,28 +53,17 @@
             var date = $A.localizationService.parseDateTimeISO8601(dateTimeString);
 
             var actual = $A.localizationService.formatDateTime(date, format);
-            $A.test.assertEquals(actual, expected, "parseDateTimeISO8601() returns a incorrect date");
+            $A.test.assertEquals(expected, actual, "parseDateTimeISO8601() returns a incorrect date");
         }
     },
 
-    testGetDateStringBasedOnTimezoneForSameZone: {
+    testParseDateTimeISO8601ForInvalidDatetimeString: {
         test: function() {
-            var expected = "2015-07-06";
-            var date = $A.localizationService.parseDateTimeISO8601("2015-07-06T00:00:00+02:00");
-            $A.localizationService.getDateStringBasedOnTimezone("Europe/Berlin", date, function(dateString) {
-                $A.test.assertEquals(expected, dateString);
-            });
-        }
-    },
+            var dateTimeString = "2014-09-43";
 
-    testGetDateStringBasedOnTimezoneForDifferentZones: {
-        test: function() {
-            var expected = "2015-07-05";
-            var date = $A.localizationService.parseDateTimeISO8601("2015-07-06T00:00:00+02:00");
-            // Zone "America/Los_Angeles" is still on 2015-7-5
-            $A.localizationService.getDateStringBasedOnTimezone("America/Los_Angeles", date, function(dateString) {
-                $A.test.assertEquals(expected, dateString);
-            });
+            var actual = $A.localizationService.parseDateTimeISO8601(dateTimeString);
+
+            $A.test.assertNull(actual, "parseDateTimeISO8601() should return null for invalid datetime");
         }
     },
 
@@ -277,18 +88,6 @@
                 $A.test.assertEquals(expected, e.message);
             }
 
-        }
-    },
-
-    testFormatDateForDateWithTimezone: {
-        test: function() {
-            var expected = "Sep 22, 2004";
-            // the formatDate() uses browser's timezone
-            var timeZoneOffset = moment().format("Z");
-            var dateString = "2004-09-22T18:00:00" + timeZoneOffset;
-
-            var actual = $A.localizationService.formatDate(dateString, "MMM DD, YYYY");
-            $A.test.assertEquals(expected, actual, "formatDate() returns an unexpected date string");
         }
     },
 
@@ -450,7 +249,7 @@
             var format =  "h:mm:ss A";
             var expected = "4:30:00 PM";
 
-            var actual = $A.localizationService.formatTimeUTC("2014-09-23T16:30:00", format);
+            var actual = $A.localizationService.formatTimeUTC("2014-09-23T16:30:00Z", format);
 
             $A.test.assertEquals(expected, actual, "formatTimeUTC() returns an unexpected date string");
         }

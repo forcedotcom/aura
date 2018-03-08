@@ -15,13 +15,12 @@
  */
 ({
     afterRender: function (component) {
-        var _helper = component.getConcreteComponent().getDef().getHelper();
+        this.superAfterRender();
 
+        var _helper = component.getConcreteComponent().getDef().getHelper();
         _helper.displayValue(component);
         _helper.togglePickerIcon(component);
         _helper.initializeDatePicker(component);
-
-        return this.superAfterRender();
     },
 
     rerender: function (component) {

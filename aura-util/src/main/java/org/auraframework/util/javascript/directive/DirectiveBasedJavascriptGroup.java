@@ -57,7 +57,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
         @SuppressWarnings("unlikely-arg-type")
         public CompositeRuntimeException(String message, Map<String, Throwable> errors) {
-            super(message, errors == null || errors.isEmpty() ? null : errors.get(0));
+            super(message, errors == null || errors.isEmpty() ? null : errors.entrySet().iterator().next().getValue());
             this.errors = errors;
         }
 
@@ -114,6 +114,8 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
     private String librariesContent = "";
     private String librariesContentMin = "";
+    private String compatLibrariesContent = "";
+    private String compatLibrariesContentMin = "";
 
     private String locker = "";
     private String lockerMin = "";
@@ -193,7 +195,6 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     private void fetchIncludedSources() throws MalformedURLException {
         List<String> libraries = new ArrayList<>();
         libraries.add("aura/resources/moment/moment");
-        libraries.add("aura/resources/moment-timezone/moment-timezone-with-data-1999-2020");
         libraries.add("aura/resources/DOMPurify/DOMPurify");
 
         StringJoiner libs = new StringJoiner("\n");
@@ -214,13 +215,34 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
             }
         });
 
-        String libsContent = libs.toString();
-        if (!libsContent.isEmpty()) {
-            this.librariesContent = "\nAura.externalLibraries = function() {\n" + libsContent + "\n};";
+        if (libs.length() != 0) {
+            this.librariesContent = "\nAura.externalLibraries = function() {\n" + libs.toString() + "\n};";
         }
-        String libsContentMin = libsMin.toString();
-        if (!libsContentMin.isEmpty()) {
-            this.librariesContentMin = "\nAura.externalLibraries = function() {\n" + libsContentMin + "\n};";
+        if (libsMin.length() != 0) {
+            this.librariesContentMin = "\nAura.externalLibraries = function() {\n" + libsMin.toString() + "\n};";
+        }
+
+        List<String> compatLibraries = new ArrayList<>();
+        compatLibraries.add("aura/resources/IntlTimeZonePolyfill/IntlTimeZonePolyfill");
+        compatLibraries.forEach( (path) -> {
+            String source = null;
+            String minSource = null;
+            try {
+                source = getSource(path + ".js");
+                minSource = getSource(path +".min.js");
+            } catch (MalformedURLException e) {}
+            if (source != null) {
+                libs.add(source);
+            }
+            if (minSource != null) {
+                libsMin.add(minSource);
+            }
+        });
+        if (libs.length() != 0) {
+            this.compatLibrariesContent = "\nAura.externalLibraries = function() {\n" + libs.toString() + "\n};";
+        }
+        if (libsMin.length() != 0) {
+            this.compatLibrariesContentMin = "\nAura.externalLibraries = function() {\n" + libsMin.toString() + "\n};";
         }
 
         // Locker
@@ -352,7 +374,6 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                 Writer writer = null;
                 JavascriptWriter jsWriter = mode.getJavascriptWriter();
                 boolean minified = jsWriter == JavascriptWriter.CLOSURE_AURA_PROD;
-                String libs = minified ? librariesContentMin : librariesContent;
 
                 StringWriter stringWriter = new StringWriter();
                 jsWriter.compress(everything, stringWriter, modeJs.getName());
@@ -360,9 +381,6 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
                 // strip out spaces and comments for external libraries
                 JavascriptWriter libsJsWriter = JavascriptWriter.CLOSURE_WHITESPACE_ONLY;
-                StringWriter libsWriter = new StringWriter();
-                libsJsWriter.compress(libs, libsWriter, modeJs.getName());
-                String libsCompressed = libsWriter.toString();
 
                 for (File output : filesToWrite) {
                     if (writtenFiles.contains(output)) continue;
@@ -388,7 +406,14 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                         }
 
                         writer.append(compressed).append("\n");
-                        writer.append(libsCompressed).append("\n");
+
+                        // external libraries
+                        String libs = minified ? 
+                                (isCompat ? this.compatLibrariesContentMin : this.librariesContentMin) :
+                                (isCompat ? this.compatLibrariesContent : librariesContent);
+                        StringWriter libsWriter = new StringWriter();
+                        libsJsWriter.compress(libs, libsWriter, output.getName());
+                        writer.append(libsWriter.toString()).append("\n");
 
                     } finally {
                         if (writer != null) {

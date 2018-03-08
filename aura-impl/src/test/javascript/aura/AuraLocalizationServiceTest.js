@@ -82,7 +82,8 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         },
         toDate:function(){
             return targetDateTime;
-        }
+        },
+        getTime: function() {}
     };
 
 
@@ -2344,46 +2345,10 @@ Test.Aura.AuraLocalizationServiceTest = function() {
     [Fixture]
     function UTCToWallTime() {
 
-        var createTargetService = function() {
-            var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = {
-                tz: {
-                    zone: function(timezone) {
-                        if (timezone === "unsupported") {
-                            return null;
-                        }
-                        return Stubs.GetObject({});
-                    }
-                }
-            };
-
-            return targetService;
-        }
-
-        [Fact]
-        function CallbackWithOriginalDateWhenTimezoneLibIsMissing() {
-            // Arrange
-            var targetService = new Aura.Services.AuraLocalizationService();
-            var expected = Stubs.GetObject({});
-            var actual;
-
-            targetService.moment = {};
-
-            // Act
-            mockUtil(function () {
-                targetService.UTCToWallTime(expected, "GMT", function(date) {
-                    actual = date;
-                });
-            });
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
         [Fact]
         function CallbackWithOriginalDateWhenZoneIsGMT() {
             // Arrange
-            var targetService = createTargetService();
+            var targetService = new Aura.Services.AuraLocalizationService();
             var expected = Stubs.GetObject({});
             var actual;
 
@@ -2401,51 +2366,66 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         [Fact]
         function UsesUserTimezoneIfTimeZoneIsFalsy() {
             // Arrange
-            var targetService = createTargetService();
-            var expected = targetDateTime;
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var mockGet = Stubs.GetMethod("$Locale.timezone", "UTC");
             var actual;
 
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
-                get:function(value){
-                    if(value === "$Locale.timezone") return "UTC";
-                },
                 assert: function () {},
-                warning: function() {}
+                get: mockGet
             });
 
             // Act
             mockUtil(function() {
                 // when timezone is UTC, callback gets called with the original date
-                targetService.UTCToWallTime(mockDateTime, undefined, function(date) {
-                    actual = date;
-                });
+                targetService.UTCToWallTime(mockDateTime, undefined, function() {});
             });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockGet.Calls.length);
         }
 
         [Fact]
-        function UsesUserTimezoneIfTimeZoneIsUnsupported(){
+        function UsesUserTimeZoneIfTimeZoneIsUnsupported() {
             // Arrange
-            var targetService = createTargetService();
-            var expected = targetDateTime;
-            var actual;
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var timeZone = "America/Los_Angeles";
+            var mockGet = Stubs.GetMethod("$Locale.timezone", timeZone);
 
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
-                get:function(value){
-                    if(value === "$Locale.timezone") return "UTC";
-                },
                 assert: function () {},
-                warning: function() {}
+                warning: function() {},
+                get: mockGet
             });
 
             // Act
             mockUtil(function() {
-                // when timezone is UTC, callback gets called with the original date
-                targetService.UTCToWallTime(mockDateTime, "unsupported", function(date) {
-                    actual = date;
-                });
+                targetService.UTCToWallTime(new Date(), "unsupported", function() {});
+            });
+
+            // Assert
+            Assert.Equal(1, mockGet.Calls.length);
+        }
+
+        [Fact]
+        function ConvertsTimeBasedOnTimeZone() {
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var date = new Date(Date.UTC(2017, 1, 3, 20, 30));
+             // minus 8 hours
+            var expected = new Date(Date.UTC(2017, 1, 3, 12, 30)).toISOString();
+            var actual;
+
+            var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
+                assert: function () {},
+            });
+
+            // Act
+            mockUtil(function() {
+                targetService.UTCToWallTime(date, "America/Los_Angeles",
+                    function(WallTime) {
+                        actual = WallTime.toISOString();
+                    });
             });
 
             // Assert
@@ -2456,46 +2436,10 @@ Test.Aura.AuraLocalizationServiceTest = function() {
     [Fixture]
     function WallTimeToUTC(){
 
-        var createTargetService = function() {
-            var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = {
-                tz: {
-                    zone: function(timezone) {
-                        if (timezone === "unsupported") {
-                            return null;
-                        }
-                        return Stubs.GetObject({});
-                    }
-                }
-            };
-
-            return targetService;
-        }
-
-        [Fact]
-        function CallbackWithOriginalDateWhenTimezoneLibIsMissing() {
-            // Arrange
-            var targetService = new Aura.Services.AuraLocalizationService();
-            var expected = Stubs.GetObject({});
-            var actual;
-
-            targetService.moment = {};
-
-            // Act
-            mockUtil(function () {
-                targetService.WallTimeToUTC(expected, "GMT", function(date) {
-                    actual = date;
-                });
-            });
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
         [Fact]
         function CallbackWithOriginalDateWhenZoneIsGMT() {
             // Arrange
-            var targetService = createTargetService();
+            var targetService = new Aura.Services.AuraLocalizationService();
             var expected = Stubs.GetObject({});
             var actual;
 
@@ -2511,53 +2455,68 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         }
 
         [Fact]
-        function UsesUserTimezoneIfTimeZoneIsFalsy(){
+        function UsesUserTimezoneIfTimeZoneIsFalsy() {
             // Arrange
-            var targetService = createTargetService();
-            var expected = targetDateTime;
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var mockGet = Stubs.GetMethod("$Locale.timezone", "UTC");
             var actual;
 
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
-                get:function(value){
-                    if(value === "$Locale.timezone") return "UTC";
-                },
                 assert: function () {},
-                warning: function() {}
+                get: mockGet
             });
 
             // Act
             mockUtil(function() {
                 // when timezone is UTC, callback gets called with the original date
-                targetService.WallTimeToUTC(mockDateTime, undefined, function(date) {
-                    actual = date;
-                });
+                targetService.WallTimeToUTC(mockDateTime, undefined, function() {});
             });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(1, mockGet.Calls.length);
         }
 
         [Fact]
-        function UsesUserTimezoneIfTimeZoneIsUnsupported(){
+        function UsesUserTimeZoneIfTimeZoneIsUnsupported() {
             // Arrange
-            var targetService = createTargetService();
-            var expected = targetDateTime;
-            var actual;
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var timeZone = "America/Los_Angeles";
+            var mockGet = Stubs.GetMethod("$Locale.timezone", timeZone);
 
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
-                get:function(value){
-                    if(value === "$Locale.timezone") return "UTC";
-                },
                 assert: function () {},
-                warning: function() {}
+                warning: function() {},
+                get: mockGet
             });
 
             // Act
             mockUtil(function() {
-                // when timezone is UTC, callback gets called with the original date
-                targetService.WallTimeToUTC(mockDateTime, "unsupported", function(date) {
-                    actual = date;
-                });
+                targetService.WallTimeToUTC(new Date(), "unsupported", function() {});
+            });
+
+            // Assert
+            Assert.Equal(1, mockGet.Calls.length);
+        }
+
+        [Fact]
+        function ConvertsTimeBasedOnTimeZone() {
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var date = new Date(Date.UTC(2017, 1, 3, 20, 30));
+            // plus 8 hours
+            var expected = new Date(Date.UTC(2017, 1, 4, 4, 30)).toISOString();
+            var actual;
+
+            var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
+                assert: function () {},
+            });
+
+            // Act
+            mockUtil(function() {
+                targetService.WallTimeToUTC(date, "America/Los_Angeles",
+                    function(WallTime) {
+                        actual = WallTime.toISOString();
+                    });
             });
 
             // Assert

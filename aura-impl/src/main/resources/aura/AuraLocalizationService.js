@@ -24,11 +24,13 @@ function AuraLocalizationService() {
     this.numberFormat = undefined;
     this.percentFormat = undefined;
     this.currencyFormat = undefined;
-    // moment.js, moment-timezone.js and timezone data must be loaded before we can use date/time related APIs
+    // moment.js must be loaded before we can use date/time related APIs
 
     this.ZERO = "0";
 
     this.localeCache = {};
+
+    this.timeZoneFormatCache = {};
 
     this.cache = {
         format : {},
@@ -39,6 +41,25 @@ function AuraLocalizationService() {
     this.dateTimeUnitAlias = {};
     this.ISO_REGEX = /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
     this.ISO_REGEX_NO_DASH = /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+    // month/day/year, hour:minute
+    this.EN_US_DATETIME_PATTERN = /(\d{1,2})\/(\d{1,2})\/(\d{4})\D+(\d{1,2}):(\d{1,2})/;
+
+    // common time zones which are not supported by Intl API
+    this.timeZoneMap = {
+        "US/Alaska": "America/Anchorage",
+        "US/Aleutian": "America/Adak",
+        "US/Arizona": "America/Phoenix",
+        "US/Central": "America/Chicago",
+        "US/East-Indiana": "America/Fort_Wayne",
+        "US/Eastern": "America/New_York",
+        "US/Hawaii": "Pacific/Honolulu",
+        "US/Indiana-Starke": "America/Indiana/Knox",
+        "US/Michigan": "America/Detroit",
+        "US/Mountain": "America/Denver",
+        "US/Pacific": "America/Los_Angeles",
+        "US/Samoa": "Pacific/Pago_Pago",
+        "Pacific-New": "America/Los_Angeles"
+    };
 }
 
 /**
@@ -741,8 +762,8 @@ AuraLocalizationService.prototype.getToday = function(timezone, callback) {
 /**
  * Get the date's date string based on a time zone.
  * @param {String} timezone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
- * @param {Date} dateObj - A date object
- * @param {Function} callback - A function to be called after the "today" value is obtained
+ * @param {Date} date - A Date object
+ * @param {Function} callback - A function to be called after the date string is obtained
  * @memberOf AuraLocalizationService
  * @example
  * var timezone = $A.get("$Locale.timezone");
@@ -755,15 +776,16 @@ AuraLocalizationService.prototype.getToday = function(timezone, callback) {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timezone, dateObj, callback) {
-    dateObj.setTime(dateObj.getTime() + dateObj.getTimezoneOffset() * 60 * 1000); // time in UTC
+AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timezone, date, callback) {
+    $A.assert(date instanceof Date, "AuraLocalizationService.getDateStringBasedOnTimezone(): 'date' must be a Date object.");
+    $A.assert(typeof callback === "function", "AuraLocalizationService.getDateStringBasedOnTimezone(): 'callback' must be a function.");
+
+    // remove browser timezone offset
+    var utcDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
     var tz = timezone ? timezone : $A.get("$Locale.timezone");
-    this.UTCToWallTime(dateObj, tz, function(date) {
-        callback(date.getFullYear() + "-" + this.pad(date.getMonth() + 1) + "-" + this.pad(date.getDate()));
-    }.bind(this));
+
+    callback(this.formatDateWithTimeZone(utcDate, tz));
 };
-
-
 
 /**
  * Gets the number of milliseconds in a duration.
@@ -1406,30 +1428,10 @@ AuraLocalizationService.prototype.translateToOtherCalendar = function(date) {
  * @platform
  */
 AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callback) {
-    $A.assert(callback, 'Callback is required');
-
-    if (typeof callback !== 'function') {
-        $A.warning("AuraLocalizationService.UTCToWallTime(): callback must be a function.");
-        return;
-    }
-
-    if (!this.moment["tz"]) {
-        var message = "AuraLocalizationService.UTCToWallTime(): moment-timezone lib is missing on moment. " +
-                      "It could be overridden by another version of moment-js in userland code. Current moment-js version: " + this.moment["version"];
-        $A.warning(message);
-        $A.logger.reportError(new $A.auraError(message), null, "WARNING");
-
-        callback(date);
-        return;
-    }
+    $A.assert(date instanceof Date, "AuraLocalizationService.UTCToWallTime(): 'date' must be a Date object.");
+    $A.assert(typeof callback === "function", "AuraLocalizationService.UTCToWallTime(): 'callback' must be a function.");
 
     if (!timezone) {
-        timezone = $A.get("$Locale.timezone");
-    }
-
-    if (!this.moment["tz"]["zone"](timezone)) {
-        $A.warning("AuraLocalizationService.UTCToWallTime(): unsupported time zone: " +
-            timezone + ". Fallback to default timezone.");
         timezone = $A.get("$Locale.timezone");
     }
 
@@ -1438,19 +1440,8 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
         return;
     }
 
-    var walltimeDate = date;
-    try {
-        var zone = this.moment["tz"]["zone"](timezone);
-        var offset = zone["offset"](date.getTime());
-        var walltime = this.moment(date)["subtract"](offset, "minutes");
-        walltimeDate = walltime["toDate"]();
-    } catch (e) {
-        // the try-catch block is just for backward compatibility, so that there is no any error
-        // thrown during date time conversion.
-        $A.warning("AuraLocalizationService.UTCToWallTime(): error occurred during time conversion", e);
-    }
-
-    callback(walltimeDate);
+    var offset = this.getTimeZoneOffsetByDate(date, timezone);
+    callback(new Date(date.getTime() + offset));
 };
 
 /**
@@ -1468,30 +1459,10 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
  * @platform
  */
 AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callback) {
-    $A.assert(callback, 'Callback is required');
-
-    if (typeof callback !== 'function') {
-        $A.warning("AuraLocalizationService.WallTimeToUTC(): callback must be a function.");
-        return;
-    }
-
-    if (!this.moment["tz"]) {
-        var message = "AuraLocalizationService.WallTimeToUTC(): moment-timezone lib is missing on moment. " +
-                      "It could be overridden by another version of moment-js in userland code. Current moment-js version: " + this.moment["version"];
-        $A.warning(message);
-        $A.logger.reportError(new $A.auraError(message), null, "WARNING");
-
-        callback(date);
-        return;
-    }
+    $A.assert(date instanceof Date, "AuraLocalizationService.WallTimeToUTC(): 'date' must be a Date object.");
+    $A.assert(typeof callback === "function", "AuraLocalizationService.WallTimeToUTC(): callback must be a function.");
 
     if (!timezone) {
-        timezone = $A.get("$Locale.timezone");
-    }
-
-    if (!this.moment["tz"]["zone"](timezone)) {
-        $A.warning("AuraLocalizationService.WallTimeToUTC(): unsupported time zone: " +
-            timezone + ". Fallback to default timezone.");
         timezone = $A.get("$Locale.timezone");
     }
 
@@ -1500,19 +1471,8 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
         return;
     }
 
-    var utcDate = date;
-    try {
-        var zone = this.moment["tz"]["zone"](timezone);
-        var offset = zone["offset"](date.getTime());
-        var utc = this.moment(date)["add"](offset, "minutes");
-        utcDate = utc["toDate"]();
-    } catch (e) {
-        // the try-catch block is just for backward compatibility, so that there is no any error
-        // thrown during date time conversion.
-        $A.warning("AuraLocalizationService.WallTimeToUTC(): error occurred during time conversion", e);
-    }
-
-    callback(utcDate);
+    var offset = this.getTimeZoneOffsetByDate(date, timezone);
+    callback(new Date(date.getTime() - offset));
 };
 
 /**---------- Private functions ----------*/
@@ -1553,6 +1513,117 @@ AuraLocalizationService.prototype.init = function() {
     this.moment.locale(this.localeCache[langLocale]);
 
     this.setupDateTimeUnitAlias();
+};
+
+/**
+ * Formats a Date object to the ISO8601 date string.
+ *
+ * This method assumes the browser supports Intl API with time zone data.
+ * @private
+ */
+AuraLocalizationService.prototype.formatDateWithTimeZone = function(date, timeZone) {
+    var timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
+    if (timeZoneFormat === null) {
+        $A.warning("Unsupported time zone: " + timeZone + ". Fallback to default time zone.");
+
+        timeZone = $A.get("$Locale.timezone");
+        timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
+        // if the time zone in label is not supported, then fallback to UTC
+        if (timeZoneFormat === null) {
+            var message = "Unsupported time zone value in GVP: " + timeZone;
+            $A.warning(message);
+            // sending Gack to server if the time zone in GVP is not supported by browsers
+            $A.logger.reportError(new $A.auraError(message));
+            // fallback to UTC
+            timeZoneFormat = this.createDateTimeFormatByTimeZone("UTC");
+        }
+    }
+
+    var dateTimeString = timeZoneFormat["format"](date);
+    // IE11 adds LTR / RTL mark in the formatted date time string
+    var match = this.EN_US_DATETIME_PATTERN.exec(dateTimeString.replace(/[\u200E\u200F]/g,''));
+
+    return match[3] + "-" + match[1] + "-" + match[2];
+};
+
+/**
+ * Get the time zone offset in millisecond at the given datetime
+ *
+ * @private
+ */
+AuraLocalizationService.prototype.getTimeZoneOffsetByDate = function(date, timeZone) {
+    var utcFormat = this.createDateTimeFormatByTimeZone("UTC");
+    var timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
+    if (timeZoneFormat === null) {
+        $A.warning("Unsupported time zone: " + timeZone + ". Fallback to default time zone.");
+
+        timeZone = $A.get("$Locale.timezone");
+        timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
+        // if the time zone in label is not supported, then fallback to UTC
+        if (timeZoneFormat === null) {
+            var message = "Unsupported time zone value in GVP: " + timeZone;
+            $A.warning(message);
+            // sending Gack to server if the time zone in GVP is not supported by browsers
+            $A.logger.reportError(new $A.auraError(message));
+            return 0;
+        }
+    }
+
+    var timeZoneString = timeZoneFormat["format"](date);
+    var utcString = utcFormat["format"](date);
+
+    var offset = this.parseEnUSDateTimeString(timeZoneString) - this.parseEnUSDateTimeString(utcString);
+    return offset;
+};
+
+/**
+ * Parse a datetime string in en-US format, "month/day/year, hour:minute", to a timestamp in millisecond in UTC
+ *
+ * @param {String} dateTimeString - a datetime string in en-US format, "month/day/year, hour:minute"
+ * @returns {Number} timestamp in millisecond
+ *
+ * @private
+ */
+AuraLocalizationService.prototype.parseEnUSDateTimeString = function(dateTimeString) {
+    // IE11 adds LTR / RTL mark in the formatted date time string
+    var match = this.EN_US_DATETIME_PATTERN.exec(dateTimeString.replace(/[\u200E\u200F]/g,''));
+    if (match === null) {
+        return null;
+    }
+
+    return Date.UTC(match[3], match[1], match[2], match[4], match[5]);
+};
+
+AuraLocalizationService.prototype.createDateTimeFormatByTimeZone = function(timeZone) {
+    var timeZoneFormat = this.timeZoneFormatCache[timeZone];
+    if (timeZoneFormat !== undefined) {
+        return timeZoneFormat;
+    }
+
+    var supportedTimeZone = timeZone;
+    if (this.timeZoneMap.hasOwnProperty(timeZone)) {
+        supportedTimeZone = this.timeZoneMap[timeZone];
+    }
+
+    try {
+        // we rely en-US format to parse the datetime string
+        timeZoneFormat = Intl["DateTimeFormat"]("en-US", {
+            "timeZone": supportedTimeZone,
+            "hour12": false, // 24-hour time is needed for parsing the datetime string
+            "year": "numeric",
+            "month": "2-digit",
+            "day": "2-digit",
+            "hour": "2-digit",
+            "minute": "2-digit"
+        });
+    } catch (e) {
+        timeZoneFormat = null;
+    }
+
+    // cache the format for the time zone
+    this.timeZoneFormatCache[timeZone] = timeZoneFormat;
+
+    return timeZoneFormat;
 };
 
 /**

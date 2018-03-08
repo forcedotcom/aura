@@ -664,7 +664,7 @@
                 $A.util.on(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
                 $A.util.on(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
 
-                if (onVisibleChange) {
+                if (onVisibleChange || component._onVisibleChangeRequested) {
 	                //push this even to the end of the queue to ensure that the interation in the component body is complete
 	                window.setTimeout($A.getCallback(function () {
 	                    if (component.isValid()) {
@@ -675,6 +675,9 @@
 
             }
 
+            // we have now handled any onVisibleChanges that were requested while the component was not displayed yet.
+            component._onVisibleChangeRequested = false;
+
 
             // Update accessibility attributes
             var updateAriaEvt = component.get("e.updateAriaAttributes");
@@ -684,6 +687,10 @@
                 });
                 updateAriaEvt.fire();
             }
+        } else if (onVisibleChange) {
+            // Due to the lazy loading of the list component with usePanel the component may not be displayed yet when the visibility is
+            // changed to display the drop down, causing the list to never show. Save the fact we requested the panel to open for later.
+            component._onVisibleChangeRequested = true;
         }
     },
 

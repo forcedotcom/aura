@@ -434,35 +434,38 @@ Test.Aura.AuraLocalizationServiceTest = function() {
     function endOf() {
 
         [Fact]
-        function ReturnsOriginalDateIfUnitIsFalsy() {
+        function ReturnsParsedlDateIfUnitIsFalsy() {
             // Arrange
             var targetService = new Aura.Services.AuraLocalizationService();
             var expected = new Date();
+            var date = "date";
             var actual;
+
+            targetService.normalizeDateTimeInput = Stubs.GetMethod(date, expected);
 
             // Act
             mockUtil(function() {
-                actual = targetService.endOf(expected, undefined);
+                actual = targetService.endOf(date, undefined);
             });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.True(expected === actual);
         }
 
         [Fact]
-        function ReturnsOriginalInputForInvalidDateType() {
+        function ReturnsInvalidlDateForInvalidDateType() {
             // Arrange
             var targetService = new Aura.Services.AuraLocalizationService();
-            var expected = [new Date()];
+            var expected = "Invalid Date";
             var actual;
 
             // Act
             mockUtil(function() {
-                actual = targetService.endOf(expected, "month");
+                actual = targetService.endOf([new Date()], "month");
             });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, actual.toString());
         }
 
         [Fact]
@@ -604,35 +607,38 @@ Test.Aura.AuraLocalizationServiceTest = function() {
     function startOf() {
 
         [Fact]
-        function ReturnsOriginalDateIfUnitIsFalsy() {
-            // Arrange
-            var targetService = new Aura.Services.AuraLocalizationService();
-            var expected = new Date();
-            var actual;
+        function ReturnsParsedDateIfUnitIsFalsy() {
+             // Arrange
+             var targetService = new Aura.Services.AuraLocalizationService();
+             var expected = new Date();
+             var date = "date";
+             var actual;
 
-            // Act
-            mockUtil(function() {
-                actual = targetService.startOf(expected, undefined);
-            });
+             targetService.normalizeDateTimeInput = Stubs.GetMethod(date, expected);
 
-            // Assert
-            Assert.Equal(expected, actual);
+             // Act
+             mockUtil(function() {
+                 actual = targetService.startOf(date, undefined);
+             });
+
+             // Assert
+             Assert.True(expected === actual);
         }
 
         [Fact]
-        function ReturnsOriginalInputForInvalidDateType() {
+        function ReturnsInvalidDateForInvalidDateType() {
             // Arrange
             var targetService = new Aura.Services.AuraLocalizationService();
-            var expected = [new Date()];
+            var expected = "Invalid Date";
             var actual;
 
             // Act
             mockUtil(function() {
-                actual = targetService.startOf(expected, "month");
+                actual = targetService.endOf([new Date()], "month");
             });
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, actual.toString());
         }
 
         [Fact]

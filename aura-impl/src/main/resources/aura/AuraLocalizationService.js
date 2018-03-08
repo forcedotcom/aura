@@ -378,8 +378,8 @@ AuraLocalizationService.prototype.displayDurationInYears = function(duration) {
 
 /**
  * Creates an object representing a length of time.
- * @param {Number|Object} num - The length of milliseconds/unit
- * @param {String} unit - The unit of measurement of time
+ * @param {Number} num - The length of time in a given unit
+ * @param {String} unit - A datetime unit. The default is milliseconds. Options: years, months, weeks, days, hours, minutes, seconds, milliseconds
  * @return {Object} A duration object
  * @memberOf AuraLocalizationService
  * @example
@@ -931,8 +931,7 @@ AuraLocalizationService.prototype.isPeriodTimeView = function(pattern) {
  * Checks if date1 is after date2.
  * @param {String|Number|Date} date1 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  * @param {String|Number|Date} date2 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String} unit - The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
- *                 By default, millisecond is used.
+ * @param {String} unit - A datetime unit. The default is millisecond. Options: year, month, week, day, hour, minute, second, millisecond.
  * @return {Boolean} Returns true if date1 is after date2, or false otherwise.
  * @memberOf AuraLocalizationService
  * @example
@@ -965,8 +964,7 @@ AuraLocalizationService.prototype.isAfter = function(date1, date2, unit) {
  * Checks if date1 is before date2.
  * @param {String|Number|Date} date1 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  * @param {String|Number|Date} date2 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String} unit - The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
- *                 By default, millisecond is used.
+ * @param {String} unit - A datetime unit. The default is millisecond. Options: year, month, week, day, hour, minute, second, millisecond.
  * @return {Boolean} Returns true if date1 is before date2, or false otherwise.
  * @memberOf AuraLocalizationService
  * @example
@@ -999,8 +997,7 @@ AuraLocalizationService.prototype.isBefore = function(date1, date2, unit) {
  * Checks if date1 is the same as date2.
  * @param {String|Number|Date} date1 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  * @param {String|Number|Date} date2 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String} unit - The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
- *                 By default, millisecond is used.
+ * @param {String} unit - A datetime unit. The default is millisecond. Options: year, month, week, day, hour, minute, second, millisecond.
  * @return {Boolean} Returns true if date1 is the same as date2, or false otherwise.
  * @memberOf AuraLocalizationService
  * @example
@@ -1035,8 +1032,7 @@ AuraLocalizationService.prototype.isSame = function(date1, date2, unit) {
  * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  * @param {String|Number|Date} fromDate - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  * @param {String|Number|Date} toDate - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String} unit - The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
- *                 By default, millisecond is used.
+ * @param {String} unit - A datetime unit. The default is millisecond. Options: year, month, week, day, hour, minute, second, millisecond.
  * @return {Boolean} Returns true if date is between fromDate and toDate, or false otherwise.
  * @memberOf AuraLocalizationService
  * @example
@@ -1185,8 +1181,8 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, pa
 /**
  * Get a date which is the start of a unit of time for the given date.
  * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String} unit - A datetime unit, options: year, month, week, day, hour, minute or second
- * @return {Date} A JavaScript Date object
+ * @param {String} unit - A datetime unit. Options: year, month, week, day, hour, minute or second.
+ * @return {Date} A JavaScript Date object. It returns a parsed Date if unit is not provided.
  * @memberOf AuraLocalizationService
  * @example
  * var date = "2015-10-9";
@@ -1201,7 +1197,7 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
     var normalizedDate = this.normalizeDateTimeInput(date);
     unit = this.normalizeDateTimeUnit(unit);
     if (!unit || !this.isValidDate(normalizedDate)) {
-        return date;
+        return normalizedDate;
     }
 
     switch (unit) {
@@ -1240,8 +1236,8 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
 /**
  * Get a date which is the end of a unit of time for the given date.
  * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String} unit - A datetime unit, options: year, month, week, day, hour, minute or second
- * @return {Date} A JavaScript Date object
+ * @param {String} unit - A datetime unit. Options: year, month, week, day, hour, minute or second.
+ * @return {Date} A JavaScript Date object. It returns a parsed Date if unit is not provided.
  * @memberOf AuraLocalizationService
  * @example
  * var date = new Date();
@@ -1256,7 +1252,7 @@ AuraLocalizationService.prototype.endOf = function(date, unit) {
     var normalizedDate = this.normalizeDateTimeInput(date);
     unit = this.normalizeDateTimeUnit(unit);
     if (!unit || !this.isValidDate(normalizedDate)) {
-        return date;
+        return normalizedDate;
     }
 
     normalizedDate = this.startOf(normalizedDate, unit);
@@ -1847,7 +1843,7 @@ AuraLocalizationService.prototype.normalizeDateTimeInput = function(datetime) {
         return new Date(datetime.getTime());
     }
 
-    return null;
+    return new Date("Invalid Date");
 };
 
 /**

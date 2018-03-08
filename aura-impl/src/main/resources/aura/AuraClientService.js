@@ -1163,7 +1163,7 @@ AuraClientService.prototype.showErrorDialogWithReload = function(e, additionalLo
             if (additionalLoggedMessage) {
                 e.message = e.message + " " + additionalLoggedMessage;
             }
-            $A.logger.reportError(e, undefined, "ERROR", true);
+            $A.logger.reportError(e, undefined, "WARNING", true);
         } catch (e2) {
             // we've failed utterly. One possible scenario is if inline.js failed to load, since it defines the context / fwuid, which reportError relies upon
             // Let's try to manually send an XHR down, since we don't care about the response format
@@ -3374,11 +3374,11 @@ AuraClientService.prototype.reifyActions = function(rawResponses) {
             var reponsePayload = response["message"];
             var responseContext = reponsePayload["context"];
             var responseActions = reponsePayload["actions"];
-    
+
             // Merge Context
             context['merge'](responseContext, true /* ignoreMissmatch */);
             $A.componentService.saveDefsToStorage(responseContext, context);
-    
+
             responseActions.forEach(function (responseAction) {
                 var action = this.buildStorableServerAction(responseAction);
                 if (action) {

@@ -1230,8 +1230,7 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
 
     // for 'week', we adjust days after resetting the time above
     if (unit === "week") {
-        // TODO: we need our own data to determine first day of week for locale
-        var firstDayOfWeek = this.moment["localeData"]()["_week"]["dow"];
+        var firstDayOfWeek = $A.get("$Locale.firstDayOfWeek");
         var weekday = (normalizedDate.getDay() + 7 - firstDayOfWeek) % 7;
         var offset = weekday * 24 * 60 * 60 * 1000;
 

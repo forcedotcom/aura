@@ -60,6 +60,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
                 if(value === "$Locale.numberFormat") return targetNumberFormat;
                 if(value === "$Locale.percentFormat") return targetPercentFormat;
                 if(value === "$Locale.currencyFormat") return targetCurrencyFormat;
+                if(value === "$Locale.firstDayOfWeek") return 1;
             },
             logger: {
                 reportError: function(){}
@@ -773,13 +774,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             // Arrange
             var targetService = new Aura.Services.AuraLocalizationService();
             targetService.setupDateTimeUnitAlias();
-            targetService.moment = {
-                localeData: function() {
-                    return {
-                        "_week": {"dow": 1}
-                    }
-                }
-            }
+
             // 2018-03-01
             var expected = new Date(2018, 1, 26).toISOString();
             var actual;
@@ -1828,14 +1823,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             // Arrange
             var targetService = new Aura.Services.AuraLocalizationService();
             targetService.setupDateTimeUnitAlias();
-            targetService.moment = {
-                localeData: function() {
-                    return {
-                        // Sunday is the first day of week
-                        "_week": {"dow": 0}
-                    }
-                }
-            }
+
             var fromDate = new Date(2018, 1, 26);
             var toDate = new Date(2018, 2, 16);
             var date = new Date(2018, 2, 1);

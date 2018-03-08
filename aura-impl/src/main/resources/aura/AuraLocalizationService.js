@@ -761,7 +761,7 @@ AuraLocalizationService.prototype.getToday = function(timezone, callback) {
 
 /**
  * Get the date's date string based on a time zone.
- * @param {String} timezone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
+ * @param {String} timeZone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
  * @param {Date} date - A Date object
  * @param {Function} callback - A function to be called after the date string is obtained
  * @memberOf AuraLocalizationService
@@ -776,15 +776,12 @@ AuraLocalizationService.prototype.getToday = function(timezone, callback) {
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timezone, date, callback) {
+AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timeZone, date, callback) {
     $A.assert(date instanceof Date, "AuraLocalizationService.getDateStringBasedOnTimezone(): 'date' must be a Date object.");
     $A.assert(typeof callback === "function", "AuraLocalizationService.getDateStringBasedOnTimezone(): 'callback' must be a function.");
 
-    // remove browser timezone offset
-    var utcDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
-    var tz = timezone ? timezone : $A.get("$Locale.timezone");
-
-    callback(this.formatDateWithTimeZone(utcDate, tz));
+    var tz = timeZone ? timeZone : $A.get("$Locale.timezone");
+    callback(this.formatDateWithTimeZone(date, tz));
 };
 
 /**

@@ -1,4 +1,12 @@
 ({
+    // These tests assume create component is an action call, disabling uri-defs
+    setUp: function() {
+        this.currentURIDefsState = $A.test.setURIDefsState(null);
+    },
+    tearDown: function() {
+        $A.test.setURIDefsState(this.currentURIDefsState);
+    },
+
     /**
      * Dynamically create component on server and verify labels in markup of created component are present.
      */
@@ -12,7 +20,7 @@
                         "Failed to add Labels from dynamically created components");
                     $A.test.assertEquals("Today + Overdue", $A.get("$Label.Related_Lists.task_mode_today_overdue"),
                         "Failed to add all labels from dynamically created components");
-                    cmp.find("container").set("v.body", newCmp);
+                    cmp.find("container").set("v.body", [newCmp]);
                 }
             );
 
@@ -37,7 +45,7 @@
                     // Component should be sent back from server with necessary labels
                     $A.test.assertEquals("Tomorrow", $A.get("$Label.Related_Lists.task_mode_tomorrow"),
                         "Failed to add labels from inner cmp on dynamically created component");
-                    cmp.find("container").set("v.body", newCmp);
+                    cmp.find("container").set("v.body", [newCmp]);
                 }
             );
 
@@ -68,7 +76,7 @@
                         "Failed to add labels from inner cmp on dynamically created component");
                     $A.test.assertEquals("Renderer", $A.get("$Label.Section1.renderer"),
                         "Failed to add labels from declared dependency on dynamically created component");
-                    cmp.find("container").set("v.body", newCmp);
+                    cmp.find("container").set("v.body", [newCmp]);
                 }
             );
 

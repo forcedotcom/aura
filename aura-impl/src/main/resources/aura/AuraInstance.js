@@ -433,6 +433,10 @@ AuraInstance.prototype.initAsync = function(config) {
             return;
         }
 
+        if ($A.util.getURIDefsState()) {
+            Aura.Component.ComponentDefStorage.prototype.useDefStore = false;
+        }
+
         $A.clientService.initHost(config["host"]);
         $A.clientService.setToken(config["token"]);
         $A.metricsService.initialize();
@@ -529,6 +533,9 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
         // creating context.
         $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
             $A.context = context;
+            if ($A.util.getURIDefsState()) {
+                Aura.Component.ComponentDefStorage.prototype.useDefStore = false;
+            }
             $A.clientService.initDefs();
             $A.metricsService.initialize();
             $A.initPriv(config["instance"], config["token"], null, doNotInitializeServices);

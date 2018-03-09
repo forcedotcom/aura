@@ -229,4 +229,6 @@ public interface ConfigAdapter extends AuraAdapter {
      * @return factory for the nodejs service
      */
     NodeLambdaFactory nodeServiceFactory();
+    
+    boolean uriAddressableDefsEnabled();
 }

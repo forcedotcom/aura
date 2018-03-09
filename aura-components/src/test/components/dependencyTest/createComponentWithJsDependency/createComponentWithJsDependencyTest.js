@@ -20,7 +20,7 @@
     testShortDescriptorNotPreLoaded:{
         test: function(cmp) {
             var expected = 2;
-            var initialRequestCount = $A.test.getSentRequestCount();
+            var initialRequestCount = $A.test.getRequestedComponentDefCount();
             var status;
 
             $A.test.addEventHandler('markup://dependencyTest:notify',
@@ -40,7 +40,7 @@
                     return !$A.util.isEmpty(status);
                 },
                 function() {
-                    var actual = $A.test.getSentRequestCount() - initialRequestCount;
+                    var actual = $A.test.getRequestedComponentDefCount() - initialRequestCount;
                     $A.test.assertEquals(expected, actual, "Two XHRs to the server should have been sent.");
                 }
             );
@@ -52,7 +52,7 @@
     testFullDescriptorPreLoaded:{
         test: function(cmp) {
             var expected = 1;
-            var initialRequestCount = $A.test.getSentRequestCount();
+            var initialRequestCount = $A.test.getRequestedComponentDefCount();
             var status;
 
             $A.test.addEventHandler('markup://dependencyTest:notify',
@@ -72,7 +72,7 @@
                     return !$A.util.isEmpty(status);
                 },
                 function() {
-                    var actual = $A.test.getSentRequestCount() - initialRequestCount;
+                    var actual = $A.test.getRequestedComponentDefCount() - initialRequestCount;
                     $A.test.assertEquals(expected, actual, "A single XHR to the server should have been sent.");
                 }
             );
@@ -84,7 +84,7 @@
     testShortDescriptorNotFound:{
         test: function(cmp) {
             var expected = 2;
-            var initialRequestCount = $A.test.getSentRequestCount();
+            var initialRequestCount = $A.test.getRequestedComponentDefCount();
             var status;
 
             $A.test.addEventHandler('markup://dependencyTest:notify',
@@ -104,7 +104,7 @@
                     return !$A.util.isEmpty(status);
                 },
                 function() {
-                    var actual = $A.test.getSentRequestCount() - initialRequestCount;
+                    var actual = $A.test.getRequestedComponentDefCount() - initialRequestCount;
                     $A.test.assertEquals(expected, actual, "Two XHRs to the server should have been sent.");
                 }
             );
@@ -116,7 +116,7 @@
     testFullDescriptorNotFound:{
         test: function(cmp) {
             var expected = 2;
-            var initialRequestCount = $A.test.getSentRequestCount();
+            var initialRequestCount = $A.test.getRequestedComponentDefCount();
             var status;
 
             $A.test.addEventHandler('markup://dependencyTest:notify',
@@ -136,7 +136,7 @@
                     return !$A.util.isEmpty(status);
                 },
                 function() {
-                    var actual = $A.test.getSentRequestCount() - initialRequestCount;
+                    var actual = $A.test.getRequestedComponentDefCount() - initialRequestCount;
                     $A.test.assertEquals(expected, actual, "Two XHRs to the server should have been sent.");
                 }
             );

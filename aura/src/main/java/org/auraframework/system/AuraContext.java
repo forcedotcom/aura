@@ -336,6 +336,11 @@ public interface AuraContext {
     void addDynamicNamespace(String namespace);
 
     /**
+     * Set of namespaces that should only be served to authentication users.
+     */
+    Set<String> getRestrictedNamespaces();
+
+    /**
      * Set the incoming loaded descriptors.
      *
      * @param clientLoaded the set of loaded descriptors from the client.
@@ -806,4 +811,11 @@ public interface AuraContext {
      * Get the current local store.
      */
     AuraLocalStore getAuraLocalStore();
+
+    /**
+     * URI-definitions enabled
+     * @param uriDefsEnabled
+     */
+    void setUriDefsEnabled(Boolean uriDefsEnabled);
+    Boolean getUriDefsEnabled();
 }

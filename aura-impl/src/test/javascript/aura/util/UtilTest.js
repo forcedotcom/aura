@@ -1256,4 +1256,68 @@ Test.Aura.Util.UtilTest = function() {
             Assert.Equal(expected, actual);
         }
     }
+
+    [Fixture]
+    function getHashCode() {
+
+        [Fact]
+        function returnsExpectedStringOne() {
+            var str = "Hello";
+
+            //based on Java's String.hashCode() result
+            var expected = 69609650;
+
+            var actual = targetUtil.getHashCode(str);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function returnsExpectedStringTwo() {
+            var str = "";
+
+            //based on Java's String.hashCode() result
+            var expected = 0;
+
+            var actual = targetUtil.getHashCode(str);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function returnsExpectedStringThree() {
+            var str = "`~!@#$%^&*()_-+={}[];',./<>?:|\"";
+
+            //based on Java's String.hashCode() result
+            var expected = -1703803484;
+
+            var actual = targetUtil.getHashCode(str);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function returnsExpectedStringFour() {
+            var str = "qwertyuiopasdfghjklzxcvbnm1234567890";
+
+            //based on Java's String.hashCode() result
+            var expected = 1306960482;
+
+            var actual = targetUtil.getHashCode(str);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function returnsExpectedStringFive() {
+            var str = "2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z2019-01-18T22%3A09%3A34Z";
+
+            //based on Java's String.hashCode() result
+            var expected = -461051314;
+
+            var actual = targetUtil.getHashCode(str);
+
+            Assert.Equal(expected, actual);
+        }
+    }
 };

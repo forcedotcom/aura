@@ -28,6 +28,13 @@
         "#F012BE": "rgb(240, 18, 190)",
         "#776C8E": "rgb(119, 108, 142)"
     },
+    
+    tearDown: function() {
+        if (this.currentURIDefsState !== undefined) {
+            $A.test.setURIDefsState(this.currentURIDefsState);
+            this.currentURIDefsState = undefined;
+        }
+    },
 
     /** test utility */
     assertColors: function(elements, color1, color2, color3, color4, color5) {
@@ -178,6 +185,7 @@
         test: function(component) {
             var loaded = false;
             var addedCmp;
+            this.currentURIDefsState = $A.test.setURIDefsState(null);
 
             // dynamically load a cmp
             $A.createComponent(

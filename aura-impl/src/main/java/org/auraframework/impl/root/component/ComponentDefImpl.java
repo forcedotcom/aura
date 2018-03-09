@@ -39,9 +39,12 @@ import org.auraframework.validation.ReferenceValidationContext;
 public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> implements ComponentDef {
 
     private static final long serialVersionUID = -8833271874946123511L;
+    
+    private final boolean dynamicallyGenerated;
 
     protected ComponentDefImpl(Builder builder) {
         super(builder);
+        dynamicallyGenerated = builder.dynamicallyGenerated;
     }
 
     /**
@@ -52,7 +55,7 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
             "component", ComponentDef.class);
 
     public static class Builder extends BaseComponentDefImpl.Builder<ComponentDef> implements ComponentDefBuilder {
-
+        
         public Builder() {
             super(ComponentDef.class);
         }
@@ -128,5 +131,10 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
 
     @Override
     protected void serializeFields(Json json) throws IOException {
+    }
+    
+    @Override
+    public boolean isDynamicallyGenerated() {
+        return dynamicallyGenerated;
     }
 }

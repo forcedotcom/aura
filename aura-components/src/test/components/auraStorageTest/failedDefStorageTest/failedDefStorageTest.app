@@ -1,4 +1,4 @@
-<aura:application template="auraStorageTest:failedDefStorageTemplate">
+<aura:application template="auraStorageTest:failedDefStorageTemplate" implements="aura:uriDefinitionsDisabled">
     <aura:attribute name="dynamicallyCreated" type="Aura.Component[]"/>
 
     <aura:import library="auraStorageTest:storageTestLib" property="storageTestLib" />

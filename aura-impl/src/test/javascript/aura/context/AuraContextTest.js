@@ -60,7 +60,8 @@ Test.Aura.Context.AuraContextTest = function() {
                     encode: function(value) {
                         return value;
                     }
-                }
+                },
+                getURIDefsState: function(){}
             }, 
             services: {
                 component: {
@@ -106,7 +107,8 @@ Test.Aura.Context.AuraContextTest = function() {
                     mode: 'mode',
                     fwuid: 'fwuid',
                     app: 'app',
-                    loaded: { loadedOriginal: 'loadedOriginal' }
+                    loaded: { loadedOriginal: 'loadedOriginal' },
+                    uad: false
                 }, 
                 actual;
 
@@ -132,7 +134,8 @@ Test.Aura.Context.AuraContextTest = function() {
                     app: 'app',
                     loaded: { loadedOriginal: 'loadedOriginal', loaded: 'loaded' },
                     dn: 'dn',
-                    globals: '$Global'
+                    globals: '$Global',
+                    uad: false
                 }, 
                 actual;
 
@@ -161,7 +164,8 @@ Test.Aura.Context.AuraContextTest = function() {
                     fwuid: 'fwuid',
                     app: 'app',
                     loaded: { loadedOriginal : 'loadedOriginal' },
-                    apck: 'actionPublicCacheKey'
+                    apck: 'actionPublicCacheKey',
+                    uad: false
                 }, 
                 actual;
 

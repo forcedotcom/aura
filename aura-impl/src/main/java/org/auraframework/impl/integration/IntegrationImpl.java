@@ -247,7 +247,17 @@ public class IntegrationImpl implements Integration {
                         Map<String, Object> messageMap = Maps.newHashMap();
                         messageMap.put("actions", Lists.newArrayList(action));
                         messageMap.put("context", context);
-                        JsonEncoder.serialize(messageMap, init, context.getJsonSerializationContext());
+
+                        // need to serialize the definitions on the context here, but not using 'preloading'
+                        // because preloading excludes css, but these need to have the css included since they
+                        // won't show up in app.css
+                        Boolean uriDefsEnabled = context.getUriDefsEnabled();
+                        context.setUriDefsEnabled(false);
+                        try {
+                            JsonEncoder.serialize(messageMap, init, context.getJsonSerializationContext());
+                        } finally {
+                            context.setUriDefsEnabled(uriDefsEnabled);
+                        }
                         init.append(";\n");
 
                         if (!actionEventHandlers.isEmpty()) {
@@ -381,6 +391,7 @@ public class IntegrationImpl implements Integration {
 
             StringBuilder contextWriter = new StringBuilder();
 
+            context.setPreloading(true);
             JsonEncoder.serialize(context, contextWriter, context.getJsonSerializationContext());
 
             auraInit.put("context", new Literal(contextWriter.toString()));

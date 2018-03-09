@@ -35,6 +35,7 @@ Test.Aura.AuraComponentServiceTest = function(){
     var Aura = {
         Services: {},
         Component: {
+            ComponentDefLoader: function() {},
             ComponentDefStorage: function () {},
             ComponentClassRegistry: function () {}
         },
@@ -88,6 +89,7 @@ Test.Aura.AuraComponentServiceTest = function(){
                     if(!condition)throw message;
                 },
                 enqueueAction:function(){},
+                getCallback:function(f){return f;},
                 util:{
                     isString:function(obj){
                         return typeof obj === 'string';
@@ -97,6 +99,9 @@ Test.Aura.AuraComponentServiceTest = function(){
                     },
                     isFunction:function(obj){
                         return !!obj && Object.prototype.toString.apply(obj) === '[object Function]';
+                    },
+                    getURIDefsState: function() {
+                        return {createCmp:true};
                     }
                 },
                 clientService: {
@@ -158,10 +163,9 @@ Test.Aura.AuraComponentServiceTest = function(){
                     "configuration": config
                 }
             };
-            targetService.requestComponent = function() {
+            targetService.componentDefLoader.loadComponentDef = function() {
                 actual = true;
-                return Stubs.Aura.GetAction();
-            }
+            };
 
             $Amock(function(){
                 targetService.createComponent("test",null,function(){});
@@ -176,12 +180,9 @@ Test.Aura.AuraComponentServiceTest = function(){
             var def = {
                     hasRemoteDependencies: function() { return true;}
             };
-            targetService.getComponentConfigs = function(config) {
-                return {
-                    "definition": def,
-                    "descriptor": "blah",
-                    "configuration": config
-                }
+            var orig = targetService.getComponentDef;
+            targetService.getComponentDef = function() {
+                return def;
             };
             targetService.requestComponent = function() {
                 actual = true;
@@ -192,6 +193,7 @@ Test.Aura.AuraComponentServiceTest = function(){
                 targetService.createComponent("test",null,function(){});
             });
 
+            targetService.getComponentDef = orig;
             Assert.True(actual);
         }
     }

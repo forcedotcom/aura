@@ -2533,6 +2533,62 @@ Aura.Utils.Util.prototype.hasSourceURL = function() {
     return this.sourceURLsupported;
 };
 
+/**
+ * config flags for using uri based definitions
+ * @returns {Object} uri defs state object
+ * @private
+ */
+Aura.Utils.Util.prototype.getURIDefsState = function() {
+    if (this.uriDefsState === undefined) {
+        var state = window.location.search.split("uriDefsState=");
+        if (state.length >= 2 && state[1].length > 0) {
+            this.uriDefsState = JSON.parse(decodeURIComponent(state[1].split("&")[0]));
+        } else if ($A.getContext().isURIAddressableDefsEnabled()) {
+            this.uriDefsState = {};
+        } else {
+            this.uriDefsState = null;
+            return this.uriDefsState;
+        }
+
+        if (this.uriDefsState["createCmp"] === undefined) {
+            this.uriDefsState.createCmp = true;
+        } else {
+            this.uriDefsState.createCmp = this.uriDefsState["createCmp"];
+        }
+        if (this.uriDefsState["hydration"] === undefined) {
+            this.uriDefsState.hydration = "one";
+        } else {
+            this.uriDefsState.hydration = this.uriDefsState["hydration"];
+        }
+        if (this.uriDefsState["bundleRequests"] === undefined) {
+            this.uriDefsState.bundleRequests = true;
+        } else {
+            this.uriDefsState.bundleRequests = this.uriDefsState["bundleRequests"];
+        }
+    }
+
+    return this.uriDefsState;
+};
+
+/**
+ * Returns a hash for a passed in string.
+ * Replicates Java's hashCode method (https://docs.oracle.com/javase/7/docs/api/java/lang/String.html#hashCode()).
+ * @param {String} a string to be hashed.
+ * @returns {Number} a hashed representation of the passed in string.
+ * @private
+ */
+Aura.Utils.Util.prototype.getHashCode = function(value) {
+    var hash = 0;
+    if (!value || !value.length) {
+        return hash;
+    }
+    for (var i = 0; i < value.length; i++) {
+        hash = ((hash << 5) - hash) + value.charCodeAt(i);
+        hash = hash & hash;
+    }
+    return hash;
+};
+
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     /**
      * Gets the aura debug tool component whether in an iframe or not.

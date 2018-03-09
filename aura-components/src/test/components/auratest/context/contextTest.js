@@ -1,5 +1,17 @@
 ({
     labels : [ "auraSanity" ],
+
+    setUp: function(){
+        this.currentURIDefsState = $A.test.setURIDefsState(null);
+    },
+
+    tearDown: function() {
+        if (this.currentURIDefsState !== undefined) {
+            $A.test.setURIDefsState(this.currentURIDefsState);
+            this.currentURIDefsState = undefined;
+        }
+    },
+
     //
     // Get a component, clearing the configs if necessary.
     //

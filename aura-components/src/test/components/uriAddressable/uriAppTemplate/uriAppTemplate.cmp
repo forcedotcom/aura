@@ -1,0 +1,2 @@
+<aura:component isTemplate="true" extends="aura:template">
+</aura:component>

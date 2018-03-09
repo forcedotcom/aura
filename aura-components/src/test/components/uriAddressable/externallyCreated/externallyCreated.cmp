@@ -1,0 +1,4 @@
+<aura:component>
+    <div aura:id="content">externallyCreated</div>
+    <uriAddressable:dependencyA/>
+</aura:component>

@@ -48,6 +48,7 @@ public final class StyleContextImpl implements StyleContext {
     private static final String EXTRA = "x";
     private static final String TOKENS = "tokens";
     private static final String TOKENS_UID = "tuid";
+    private static final String COMPOSITE_UID = "cuid";
 
     private final String client;
     private final Set<String> extraTrueConditions;
@@ -93,14 +94,17 @@ public final class StyleContextImpl implements StyleContext {
 
     @Override
     public void serialize(Json json) throws IOException {
+        StringBuilder key = new StringBuilder();
         json.writeMapBegin();
 
         // browser
         json.writeMapEntry(CLIENT, getClientType());
+        key.append(getClientType());
 
         // extra true conditions
         if (!extraTrueConditions.isEmpty()) {
             json.writeMapEntry(EXTRA, extraTrueConditions);
+            extraTrueConditions.stream().forEach(key::append);
         }
 
         // token descriptors-- for token descriptor providers we want to serialize the exact provided
@@ -111,6 +115,7 @@ public final class StyleContextImpl implements StyleContext {
                 stringed.add(desc.getQualifiedName());
             }
             json.writeMapEntry(TOKENS, stringed);
+            stringed.stream().forEach(key::append);
         }
 
         // add a uid for tokens, which takes into account provided descriptors and map-provided token values.
@@ -118,12 +123,15 @@ public final class StyleContextImpl implements StyleContext {
         try {
             tokensUid = tokens.getTokensUid();
             if (tokensUid.isPresent()) {
-                json.writeMapEntry(TOKENS_UID, tokensUid.get());
+                String tokenUid = tokensUid.get();
+                json.writeMapEntry(TOKENS_UID, tokenUid);
+                key.append(tokenUid);
             }
         } catch (QuickFixException e) {
             throw new AuraRuntimeException("unable to generate tokens uid", e);
-        }       
+        }
 
+        json.writeMapEntry(COMPOSITE_UID, key.toString().hashCode());
         json.writeMapEnd();
     }
 

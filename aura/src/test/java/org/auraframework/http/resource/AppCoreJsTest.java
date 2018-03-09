@@ -16,6 +16,25 @@
 
 package org.auraframework.http.resource;
 
+import org.auraframework.adapter.AppJsUtilAdapter;
+import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.http.resource.AuraResourceImpl.AuraResourceException;
+import org.auraframework.service.ServerService;
+import org.auraframework.service.ServerService.HYDRATION_TYPE;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Format;
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.mock.web.MockHttpServletResponse;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
@@ -27,25 +46,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
-import java.io.PrintWriter;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.auraframework.adapter.AppJsUtilAdapter;
-import org.auraframework.adapter.ExceptionAdapter;
-import org.auraframework.adapter.ServletUtilAdapter;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.http.resource.AuraResourceImpl.AuraResourceException;
-import org.auraframework.service.ServerService;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Format;
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * Simple (non-integration) test case for {@link AppCoreJs}, most useful for exercising hard-to-reach error
@@ -97,7 +97,7 @@ public class AppCoreJsTest {
             .thenReturn(dependencies);
 
         Throwable expectedException = new RuntimeException();
-        doThrow(expectedException).when(serverService).writeDefinitions(eq(dependencies), any(PrintWriter.class), eq(true), eq(0));
+        doThrow(expectedException).when(serverService).writeDefinitions(eq(dependencies), any(PrintWriter.class), eq(true), eq(0), any(HYDRATION_TYPE.class));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -113,7 +113,7 @@ public class AppCoreJsTest {
         verify(exceptionAdapter, times(1)).handleException(any(AuraResourceException.class));
 
         // Knock off the known calls. These are mocked above, and are internal implementation dependent.
-        verify(serverService, times(1)).writeDefinitions(same(dependencies), any(PrintWriter.class), eq(true), eq(0));
+        verify(serverService, times(1)).writeDefinitions(same(dependencies), any(PrintWriter.class), eq(true), eq(0), any(HYDRATION_TYPE.class));
 
         // Make sure nothing else happens.
         verifyNoMoreInteractions(serverService);

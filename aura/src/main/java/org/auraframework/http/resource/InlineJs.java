@@ -19,14 +19,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.List;
-
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -41,8 +38,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.resource.ResourceLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.Resources;
 
 @ServiceComponent
 public class InlineJs extends AuraResourceImpl {
@@ -76,6 +75,7 @@ public class InlineJs extends AuraResourceImpl {
         servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
         context.setApplicationDescriptor(defDescriptor);
         definitionService.updateLoaded(defDescriptor);
+        context.setPreloading(true);
 
         // Knowing the app, we can do the HTTP headers, so of which depend on
         // the app in play, so we couldn't do this earlier.

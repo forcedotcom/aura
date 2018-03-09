@@ -141,11 +141,8 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
             throw new RuntimeException("Failed to parse: "+componentInJson, e);
         }
         Map<String,Object> context = (Map<String,Object>) outerMap.get("context");
-        List<Object> componentDefs = (List<Object>) context.get("componentDefs");
-        Map<String,Object> componentDef = (Map<String,Object>)componentDefs.get(0);
-        Object value = componentDef.get("value");
-        if(value instanceof String) {
-        	assertEquals((String)value,"layout://rl_001_VIEW_ACCOUNT_HASH.c");
-        }
+        Map<String,String> componentUids = (Map<String,String>) context.get("descriptorUids");
+        assertTrue("should have received layout descriptor in context descriptorUids, only found: " + String.join(", ", componentUids.keySet()),
+                componentUids.containsKey("layout://rl_001_VIEW_ACCOUNT_HASH.c"));
     }
 }

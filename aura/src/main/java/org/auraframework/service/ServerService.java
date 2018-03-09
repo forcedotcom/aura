@@ -15,11 +15,6 @@
  */
 package org.auraframework.service;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Map;
-import java.util.Set;
-
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -29,6 +24,11 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * <p>
  * Service for responding to requests from a Aura Client.
@@ -37,6 +37,14 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * and should be expanded to include more of the support routines from the servlets.
  */
 public interface ServerService extends AuraService {
+
+
+    enum HYDRATION_TYPE {
+        none,
+        one,
+        all
+    }
+
     /**
      * Run an set of actions and write out the results.
      * 
@@ -89,5 +97,12 @@ public interface ServerService extends AuraService {
      * 
      * This generates a complete set of definitions for an app in JS+JSON.
      */
-    void writeDefinitions(Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex) throws IOException, QuickFixException;
+    void writeDefinitions(Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex, HYDRATION_TYPE hydrationType) throws IOException, QuickFixException;
+    
+    default void writeDefinitions(Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex) throws IOException, QuickFixException {
+        writeDefinitions(dependencies, out, hasParts, partIndex, HYDRATION_TYPE.all, true);
+    }
+
+    void writeDefinitions(Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex,
+            HYDRATION_TYPE hydrationType, boolean preloading) throws IOException, QuickFixException;
 }

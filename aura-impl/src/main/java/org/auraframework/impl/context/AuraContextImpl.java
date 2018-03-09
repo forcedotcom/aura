@@ -15,9 +15,6 @@
  */
 package org.auraframework.impl.context;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +29,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.css.StyleContext;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -39,6 +37,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.ServerServiceImpl;
 import org.auraframework.impl.css.token.StyleContextImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -71,6 +70,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 public class AuraContextImpl implements AuraContext {
     // JBUCH: TEMPORARY FLAG FOR 202 CRUC. REMOVE IN 204.
@@ -148,6 +150,7 @@ public class AuraContextImpl implements AuraContext {
     private List<String> scriptHashes = new ArrayList<>();
     private String nonce;
     private String actionPublicCacheKey;
+    private Boolean uriDefsEnabled;
 
     private AuraLocalStore localStore;
 
@@ -156,6 +159,8 @@ public class AuraContextImpl implements AuraContext {
     private final Map<String, String> accessCheckCache;
 
     private final RegistrySet registries;
+
+    private final Set<String> restrictedNamespaces = new HashSet<>();
 
     public AuraContextImpl(Mode mode, RegistrySet registries, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
@@ -497,6 +502,11 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
+    public Set<String> getRestrictedNamespaces() {
+        return restrictedNamespaces;
+    }
+
+    @Override
     public void setRequestedLocales(List<Locale> requestedLocales) {
         this.requestedLocales = requestedLocales;
     }
@@ -823,7 +833,7 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
             
-            if (style == EncodingStyle.Css) {
+            if (style == EncodingStyle.Css || style == EncodingStyle.Full) {
                 // add contextual CSS information
                 if (styleContext == null) {
                     setStyleContext();
@@ -883,6 +893,23 @@ public class AuraContextImpl implements AuraContext {
 
             if (this.forceCompat()) {
                 json.writeMapEntry("fc", 1);
+            }
+
+            if (configAdapter.uriAddressableDefsEnabled()) {
+                boolean enabled = true;
+                Optional<? extends Definition> appDef = getLocalDef(appDesc);
+                if (appDef != null && appDef.isPresent() && appDef.get() instanceof ApplicationDef) {
+                    Set<DefDescriptor<InterfaceDef>> interfaces = ((ApplicationDef)appDef.get()).getInterfaces();
+                    if (interfaces != null && interfaces.size() > 0) {
+                        DefDescriptor<InterfaceDef> uriAddressableDisabled = definitionService.getDefDescriptor("aura:uriDefinitionsDisabled", InterfaceDef.class);
+                        if (interfaces.contains(uriAddressableDisabled)) {
+                            enabled = false;
+                        }
+                    }
+                }
+                if (enabled) {
+                    json.writeMapEntry("uad", 1);
+                }
             }
             
             json.writeMapEnd();
@@ -992,5 +1019,15 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public AuraLocalStore getAuraLocalStore() {
         return localStore;
+    }
+
+    @Override
+    public Boolean getUriDefsEnabled() {
+        return uriDefsEnabled;
+    }
+
+    @Override
+    public void setUriDefsEnabled(Boolean uriDefsEnabled) {
+        this.uriDefsEnabled = uriDefsEnabled;
     }
 }

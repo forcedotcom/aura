@@ -160,6 +160,7 @@ function noop() {}
 
 // -- Component ---------------------------------------------------------
 // #include aura.component.ComponentClassRegistry
+// #include aura.component.ComponentDefLoader
 // #include aura.component.ComponentDefStorage
 // #include aura.component.Component
 // #include aura.component.BaseComponent

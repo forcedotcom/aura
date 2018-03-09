@@ -15,12 +15,19 @@
  */
 package org.auraframework.impl;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
@@ -42,8 +49,8 @@ import org.auraframework.def.LibraryDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.module.ModuleDef;
-import org.auraframework.http.ManifestUtil;
 import org.auraframework.http.BootstrapUtil;
+import org.auraframework.http.ManifestUtil;
 import org.auraframework.impl.css.CssVariableWriter;
 import org.auraframework.impl.css.StyleDefWriter;
 import org.auraframework.impl.util.TemplateUtil;
@@ -72,19 +79,12 @@ import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
+import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 @ServiceComponent
 public class ServerServiceImpl implements ServerService {
@@ -384,12 +384,18 @@ public class ServerServiceImpl implements ServerService {
     }
 
     @Override
-    public void writeDefinitions(final Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex)
+    public void writeDefinitions(final Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex, HYDRATION_TYPE hydrationType)
+            throws IOException, QuickFixException {
+        writeDefinitions(dependencies, out, hasParts, partIndex, hydrationType, true);
+    }
+    
+    @Override
+    public void writeDefinitions(final Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex, HYDRATION_TYPE hydrationType, boolean preloading)
             throws IOException, QuickFixException {
         AuraContext context = contextService.getCurrentContext();
         final boolean minify = context.getMode().minify();
 
-        context.setPreloading(true);
+        context.setPreloading(preloading);
         DefDescriptor<? extends BaseComponentDef> appDesc = context.getLoadingApplicationDescriptor();
 
         final String mKey = minify ? "MIN:" : "DEV:";
@@ -399,7 +405,7 @@ public class ServerServiceImpl implements ServerService {
         final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + ":" + lockerService + compat;
 
         final Callable<String> buildFunction = () -> {
-            String res = getDefinitionsString(dependencies, key);
+            String res = getDefinitionsString(dependencies, hydrationType);
             //log the cache miss here
             cachingService.getAltStringsCache().logCacheStatus("cache miss for key: "+key+";");
             return res;
@@ -420,7 +426,7 @@ public class ServerServiceImpl implements ServerService {
         }
     }
 
-    private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, String key)
+    private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, HYDRATION_TYPE hydrationType)
             throws QuickFixException, IOException {
 
         AuraContext context = contextService.getCurrentContext();
@@ -431,6 +437,8 @@ public class ServerServiceImpl implements ServerService {
 
         StringBuilder sb = new StringBuilder();
         JSONEscapedFunctionStringBuilder escapedHydrationFunctionStringBuilder = new JSONEscapedFunctionStringBuilder(sb);
+
+        Set<String> serverSideDescriptor = new HashSet<>();
 
         // Process Libraries with a lower granularity level, to prevent duplication of external includes.
         Collection<LibraryDef> libraryDefs = filterAndLoad(LibraryDef.class, dependencies, null);
@@ -454,49 +462,86 @@ public class ServerServiceImpl implements ServerService {
             if (def.isTemplate()) {
                 continue;
             }
+            serverSideDescriptor.add(def.getDescriptor().toString());
 
-            sb.append("$A.componentService.addComponent(\"" + def.getDescriptor() + "\", (function (){/*");
+            // force hydration if this is a restricted namespace (requires an authenticated users)
+            Boolean hydrationEnabled = hydrationType == HYDRATION_TYPE.all ||
+                    context.getRestrictedNamespaces().contains(def.getDescriptor().getNamespace());
 
-            // Mark class as loaded in the client
-            context.setClientClassLoaded(def.getDescriptor(), true);
+            if (hydrationEnabled) {
+                sb.append("$A.componentService.addComponent(\"")
+                    .append(def.getDescriptor())
+                    .append("\", ")
+                    .append("(function (){/*");
 
-            // Component Class
-            escapedHydrationFunctionStringBuilder.append(def.getCode(minify));
+                // Mark class as loaded in the client
+                context.setClientClassLoaded(def.getDescriptor(), true);
 
-            // Component definition
-            sb.append("return ");
-            JsonEncoder.serialize(def, escapedHydrationFunctionStringBuilder, context.getJsonSerializationContext());
-            sb.append(";");
+                // Component Class
+                escapedHydrationFunctionStringBuilder.append(def.getCode(minify));
 
-            sb.append("*/}));\n");
+                // Component definition
+                sb.append("return ");
+                JsonEncoder.serialize(def, escapedHydrationFunctionStringBuilder, context.getJsonSerializationContext());
+                sb.append(";");
+
+                sb.append("*/}));\n");
+            } else {
+                sb.append(def.getCode(minify));
+
+                sb.append("$A.componentService.addComponent(\"")
+                        .append(def.getDescriptor())
+                        .append("\", ");
+                JsonEncoder.serialize(def, sb, context.getJsonSerializationContext());
+                sb.append(");\n");
+            }
         }
 
         // Append event definitions
-        sb.append("$A.componentService.initEventDefs(");
-        Collection<EventDef> events = filterAndLoad(EventDef.class, dependencies, null);
-        JsonEncoder.serialize(events, sb, context.getJsonSerializationContext());
-        sb.append(");\n");
+        writeDefinitionStringToBuilder(EventDef.class, dependencies, null, context, sb, "$A.componentService.initEventDefs(", serverSideDescriptor);
 
         // Append library definitions
-        sb.append("$A.componentService.initLibraryDefs(");
-        JsonEncoder.serialize(libraryDefs, sb, context.getJsonSerializationContext());
-        sb.append(");\n");
+        writeDefinitionStringToBuilder(libraryDefs, context, sb, "$A.componentService.initLibraryDefs(", serverSideDescriptor);
 
         // Append controller definitions
         // Dunno how this got to be this way. The code in the Format adaptor was twisted and stupid,
         // as it walked the namespaces looking up the same descriptor, with a string.format that had
         // the namespace but did not use it. This ends up just getting a single controller.
-        sb.append("$A.componentService.initControllerDefs(");
-        Collection<ControllerDef> controllers = filterAndLoad(ControllerDef.class, dependencies, ACF);
-        JsonEncoder.serialize(controllers, sb, context.getJsonSerializationContext());
-        sb.append(");\n");
+        writeDefinitionStringToBuilder(ControllerDef.class, dependencies, ACF, context, sb, "$A.componentService.initControllerDefs(", serverSideDescriptor);
 
-        sb.append("$A.componentService.initModuleDefs(");
-        Collection<ModuleDef> modules = filterAndLoad(ModuleDef.class, dependencies, null);
-        JsonEncoder.serialize(modules, sb, context.getJsonSerializationContext());
-        sb.append(");\n");
+        writeDefinitionStringToBuilder(ModuleDef.class, dependencies, null, context, sb, "$A.componentService.initModuleDefs(", serverSideDescriptor);
+
+        for (DefDescriptor dependency : dependencies) {
+            String name = dependency.getQualifiedName();
+            if (!serverSideDescriptor.contains(name)) {
+                java.util.Optional<String> match = serverSideDescriptor.stream().filter((d)->name.equalsIgnoreCase(d)).findFirst();
+                if (match.isPresent()) {
+                    sb.append("$A.componentService.addDescriptorCaseMapping(\"")
+                            .append(name)
+                            .append("\",\"")
+                            .append(match.get())
+                            .append("\");\n");
+                }
+            }
+        }
 
         return sb.toString();
+    }
+
+    private void writeDefinitionStringToBuilder(Class defType, Set<DefDescriptor<?>> dependencies, TempFilter extraFilter,
+                                                AuraContext context, StringBuilder sb, String prefix, Set<String> serverSideDescriptor) {
+        Collection<Definition> definitions = filterAndLoad(defType, dependencies, extraFilter);
+        writeDefinitionStringToBuilder(definitions, context, sb, prefix, serverSideDescriptor);
+    }
+
+    private void writeDefinitionStringToBuilder(Collection<? extends Definition> definitions, AuraContext context, StringBuilder sb,
+                                                String prefix, Set<String> serverSideDescriptor) {
+        if (definitions.size() > 0) {
+            sb.append(prefix);
+            JsonEncoder.serialize(definitions, sb, context.getJsonSerializationContext());
+            sb.append(");\n");
+            definitions.stream().forEach((def -> serverSideDescriptor.add(def.getDescriptor().toString())));
+        }
     }
 
     /**
@@ -638,6 +683,9 @@ public class ServerServiceImpl implements ServerService {
     }
 
     private String serializeAppBootstrap(Instance<?> appInstance, AuraContext context) throws IOException {
+        // reduce verbosity of serialization
+        context.setPreloading(false);
+
         JsonSerializationContext serializationContext = context.getJsonSerializationContext();
         StringWriter writer = new StringWriter();
         JsonEncoder json = JsonEncoder.createJsonStream(writer, serializationContext);
@@ -691,6 +739,7 @@ public class ServerServiceImpl implements ServerService {
                 context.addPreloadedDefinitions(definitionService.getDependencies(definitionService.getUid(null, app)));
 
                 serializedContext = serializeInlineContext(context);
+
                 String appBootstrap = serializeAppBootstrap(appInstance, context);
                 attributes.put("appBootstrap", appBootstrap);
             }

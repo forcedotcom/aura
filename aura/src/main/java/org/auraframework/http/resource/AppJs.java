@@ -16,19 +16,19 @@
 
 package org.auraframework.http.resource;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Set;
+import org.auraframework.adapter.AppJsUtilAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.service.ServerService.HYDRATION_TYPE;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Format;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.auraframework.adapter.AppJsUtilAdapter;
-import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Format;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Set;
 
 @ServiceComponent
 public class AppJs extends AuraResourceImpl {
@@ -54,10 +54,10 @@ public class AppJs extends AuraResourceImpl {
             writer.append(AppJsUtilAdapter.APPJS_PREREQ);
 
             if (isSplitEnabled) {
-                serverService.writeDefinitions(dependencies, writer, true, 1);
+                serverService.writeDefinitions(dependencies, writer, true, 1, HYDRATION_TYPE.all);
                 writer.append(AppJsUtilAdapter.APPJS_APPEND);
             } else {
-                serverService.writeDefinitions(dependencies, writer, false, -1);
+                serverService.writeDefinitions(dependencies, writer, false, -1, HYDRATION_TYPE.all);
                 writer.append(AppJsUtilAdapter.APPJS_APPEND);
                 writer.append(AppJsUtilAdapter.APPCOREJS_READY);
             }

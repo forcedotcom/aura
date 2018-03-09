@@ -80,4 +80,12 @@ public interface Definition extends JsonSerializable, BaseXmlElement {
     default Collection<PropertyReference> getPropertyReferences() {
         return null;
     }
+    
+    /**
+     * If the definition is generated on-the-fly and not from a source location
+     * @return Boolean true if the definition did not come from a source
+     */
+    default boolean isDynamicallyGenerated() {
+        return false;
+    }
 }

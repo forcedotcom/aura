@@ -805,6 +805,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public boolean cdnEnabled() {
         return false;
     }
+    
+    @Override
+    public boolean uriAddressableDefsEnabled() {
+        return true;	
+    }
 
     @Override
     public Map<String, String> getModuleNamespaceAliases() {

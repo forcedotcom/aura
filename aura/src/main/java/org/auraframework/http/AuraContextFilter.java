@@ -15,12 +15,13 @@
  */
 package org.auraframework.http;
 
+import com.google.common.collect.Maps;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.servlet.Filter;
@@ -56,8 +57,6 @@ import org.auraframework.system.Client;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-
-import com.google.common.collect.Maps;
 
 public class AuraContextFilter implements Filter {
     public static final EnumParam<AuraContext.Mode> mode = new EnumParam<>(AuraServlet.AURA_PREFIX
@@ -208,7 +207,9 @@ public class AuraContextFilter implements Filter {
         // a fixed format, so we should have a way of getting that.
         //
         if (f == null) {
-            if ("GET".equals(request.getMethod()) && !isActionParam.get(request, false)) {
+            if (AuraComponentDefinitionServlet.URI_DEFINITIONS_PATH.equals(request.getServletPath())) {
+                f = Format.JSON;
+            } else if ("GET".equals(request.getMethod()) && !isActionParam.get(request, false)) {
                 f = Format.HTML;
             } else {
                 f = Format.JSON;
@@ -254,6 +255,14 @@ public class AuraContextFilter implements Filter {
             if (gvp != null) {
                 for (Map.Entry<String, Object> entry : gvp.entrySet()) {
                     context.setGlobalValue(entry.getKey(), entry.getValue());
+                }
+            }
+
+            if (configMap.containsKey("uad")) {
+                if (configMap.get("uad") instanceof Number) {
+                    context.setUriDefsEnabled(((Number)configMap.get("uad")).intValue() != 0);
+                } else if (configMap.get("uad") instanceof Boolean) {
+                    context.setUriDefsEnabled((Boolean) configMap.get("uad"));
                 }
             }
         }

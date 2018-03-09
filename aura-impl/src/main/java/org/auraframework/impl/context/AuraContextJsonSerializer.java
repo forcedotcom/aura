@@ -15,7 +15,13 @@
  */
 package org.auraframework.impl.context;
 
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -23,6 +29,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
@@ -35,29 +42,30 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * AuraContext JSON Serializer
  */
 public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
-    
+
     public static interface AuraContextJsonSerializerProvider {
         AuraContextJsonSerializer createAuraContextJsonSerializer(ConfigAdapter configAdapter,
                 TestContextAdapter testContextAdapter, DefinitionService definitionService);
     }
-    
+
     public static final String DELETED = "deleted";
 
     protected final TestContextAdapter testContextAdapter;
     protected final ConfigAdapter configAdapter;
     private final DefinitionService definitionService;
+    private static final Set<DefType> SERIALIZEABLE_DEF_TYPES = Sets.immutableEnumSet(
+            DefType.COMPONENT,
+            DefType.APPLICATION,
+            DefType.EVENT,
+            DefType.LIBRARY,
+            DefType.MODULE);
 
     public AuraContextJsonSerializer(ConfigAdapter configAdapter, TestContextAdapter testContextAdapter,
             DefinitionService definitionService) {
@@ -87,6 +95,11 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
     @SuppressWarnings("unchecked")
     protected void serialize(Json json, AuraContext ctx, String fwuid, Map<DefDescriptor<? extends Definition>, Definition> defMap) throws IOException {
         
+        Boolean uriEnabled = ctx.getUriDefsEnabled();
+        if (uriEnabled == null) {
+            uriEnabled = configAdapter.uriAddressableDefsEnabled();
+        }
+
         json.writeMapBegin();
         json.writeMapEntry("mode", ctx.getMode());
         boolean isApplication = false;
@@ -98,6 +111,18 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
                 isApplication = true;
             } else {
                 json.writeMapEntry("cmp", String.format("%s:%s", appDesc.getNamespace(), appDesc.getName()));
+            }
+
+            try {
+                Set<DefDescriptor<InterfaceDef>> interfaces = definitionService.getDefinition(appDesc).getInterfaces();
+                if (interfaces != null && interfaces.size() > 0) {
+                    DefDescriptor<InterfaceDef> uriAddressableDisabled = definitionService.getDefDescriptor("aura:uriDefinitionsDisabled", InterfaceDef.class);
+                    if (interfaces.contains(uriAddressableDisabled)) {
+                        uriEnabled = false;
+                    }
+                }
+            } catch (QuickFixException qfe) {
+                // ignore
             }
         }
 
@@ -121,6 +146,16 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
 
         json.writeMapEntry("fwuid", fwuid);
 
+        if (uriEnabled) {
+            json.writeMapEntry("uad", 1);
+        }
+
+        // add contextual CSS information
+        if (ctx.getStyleContext() == null) {
+            ctx.setStyleContext();
+        }
+        json.writeMapEntry("styleContext", ctx.getStyleContext());
+
         //
         // Now comes the tricky part, we have to serialize all of the definitions that are
         // required on the client side, and, of all types. This way, we won't have to handle
@@ -129,40 +164,87 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         // to be updated as well, but that needs to happen prior to this.
         //
         if (defMap.size() > 0) {
-            List<Definition> componentDefs = Lists.newArrayList();
-            List<Definition> eventDefs = Lists.newArrayList();
-            List<Definition> libraryDefs = Lists.newArrayList();
-            List<Definition> moduleDefs = Lists.newArrayList();
 
             try {
                 definitionService.populateGlobalValues(AuraValueProviderType.LABEL.getPrefix(), defMap);
             } catch (QuickFixException qfe) {
                 // this should not throw a QFE
             }
-            for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
-                DefDescriptor<? extends Definition> desc = entry.getKey();
-                DefType dt = desc.getDefType();
-                Definition d = entry.getValue();
-                //
-                // Ignore defs that ended up not being valid. This is arguably something
-                // that the MDR should have done when filtering.
-                //
-                if (d != null) {
-                    if (DefType.COMPONENT.equals(dt) || DefType.APPLICATION.equals(dt)) {
-                        componentDefs.add(d);
-                    } else if (DefType.EVENT.equals(dt)) {
-                        eventDefs.add(d);
-                    } else if (DefType.LIBRARY.equals(dt)) {
-                        libraryDefs.add(d);
-                    } else if (DefType.MODULE.equals(dt)) {
-                        moduleDefs.add(d);
+
+            List<Definition> componentDefs = Lists.newArrayList();
+            List<Definition> moduleDefs = Lists.newArrayList();
+            
+            if (uriEnabled && !ctx.isPreloading()) {
+                json.writeMapKey("descriptorUids");
+                json.writeMapBegin();
+
+                for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
+                    Definition def = entry.getValue();
+
+                    if (def != null && SERIALIZEABLE_DEF_TYPES.contains(entry.getKey().getDefType())) {
+                        if (def.isDynamicallyGenerated()) {
+                            DefType dt = entry.getKey().getDefType();
+                            if (DefType.COMPONENT.equals(dt) || DefType.APPLICATION.equals(dt)) {
+                                componentDefs.add(def);
+                            } else if (DefType.MODULE.equals(dt)) {
+                                moduleDefs.add(def);
+                            }
+                            continue;
+                        }
+                        try {
+                            json.writeMapEntry(def.getDescriptor(), definitionService.getUid(null, def.getDescriptor()));
+                        } catch (Exception ex) {
+                            //TODO: error handling, surface the exception
+                        }
                     }
                 }
+                json.writeMapEnd();
+                
+                if (componentDefs.size() > 0) {
+                    writeDefs(json, "componentDefs", componentDefs);
+                }
+                if (moduleDefs.size() > 0) {
+                    writeDefs(json, "moduleDefs", moduleDefs);
+                }
+
+            } else {
+
+                List<Definition> eventDefs = Lists.newArrayList();
+                List<Definition> libraryDefs = Lists.newArrayList();
+
+                for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
+                    DefDescriptor<? extends Definition> desc = entry.getKey();
+                    DefType dt = desc.getDefType();
+                    Definition d = entry.getValue();
+                    //
+                    // Ignore defs that ended up not being valid. This is arguably something
+                    // that the MDR should have done when filtering.
+                    //
+                    if (d != null) {
+                        if (DefType.COMPONENT.equals(dt) || DefType.APPLICATION.equals(dt)) {
+                            componentDefs.add(d);
+                        } else if (DefType.EVENT.equals(dt)) {
+                            eventDefs.add(d);
+                        } else if (DefType.LIBRARY.equals(dt)) {
+                            libraryDefs.add(d);
+                        } else if (DefType.MODULE.equals(dt)) {
+                            moduleDefs.add(d);
+                        }
+                    }
+                }
+                if (eventDefs.size() > 0) {
+                    writeDefs(json, "eventDefs", eventDefs);
+                }
+                if (libraryDefs.size() > 0) {
+                    writeDefs(json, "libraryDefs", libraryDefs);
+                }
+                if (componentDefs.size() > 0) {
+                    writeDefs(json, "componentDefs", componentDefs);
+                }
+                if (moduleDefs.size() > 0) {
+                    writeDefs(json, "moduleDefs", moduleDefs);
+                }
             }
-            writeDefs(json, "eventDefs", eventDefs);
-            writeDefs(json, "libraryDefs", libraryDefs);
-            writeDefs(json, "componentDefs", componentDefs);
-            writeDefs(json, "moduleDefs", moduleDefs);
         }
 
         try {
@@ -191,7 +273,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             loadedStrings.put(String.format("%s@%s", deleted.getDefType().toString(),
                     deleted.getQualifiedName()), DELETED);
         }
-        if (loadedStrings.size() > 0) {
+        if ((!uriEnabled || ctx.isPreloading()) && loadedStrings.size() > 0) {
             json.writeMapKey("loaded");
             json.writeMap(loadedStrings);
         }

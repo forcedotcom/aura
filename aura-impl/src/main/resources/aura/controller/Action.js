@@ -58,6 +58,7 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.allAboardCallback = undefined;
     this.abortable = false;
     this.deferred = false;
+    this.defDependencies = undefined;
 
     this.returnValue = undefined;
     this.returnValueUserland = undefined;
@@ -924,10 +925,7 @@ Action.prototype.finishAction = function(context) {
                         try {
                             this.parseAndFireEvent(this.events[x]);
                         } catch (e) {
-                            var eventFailedMessage = "Events failed: "+(this.def?this.def.toString():"");
-                            $A.warning(eventFailedMessage, e);
-                            e.message = e.message ? (e.message + '\n' + eventFailedMessage) : eventFailedMessage;
-                            error = e;
+                            error = this.processFinishActionException(e, "Events failed: ");
                         }
                     }
                 }
@@ -937,14 +935,51 @@ Action.prototype.finishAction = function(context) {
 
                 try {
                     if (cb) {
-                        cb["fn"].call(cb["s"], this, this.cmp);
+                        if (this.defDependencies && $A.util.getURIDefsState()) {
+                            var that = this;
+                            var previousClearComponents = clearComponents;
+                            clearComponents = false;
+                            var componentsToFinish = this.components;
+                            this.components = undefined;
+                            var access = $A.clientService.currentAccess;
+                            $A.componentService.loadComponentDefs(this.defDependencies, function(err) {
+                                var previousAction = context.setCurrentAction(that);
+                                $A.clientService.setCurrentAccess(access);
+                                if (componentsToFinish) {
+                                    that.components = componentsToFinish;
+                                }
+                                try {
+                                    cb["fn"].call(cb["s"], that, that.cmp);
+                                } catch (e) {
+                                    that.processFinishActionException(e, "Callback failed: ", err, true);
+                                } finally {
+                                    $A.clientService.releaseCurrentAccess();
+                                    if (that.components && !that.storable && !this.remaining) {
+                                        context.finishComponentConfigs(id);
+                                        previousClearComponents = false;
+                                    }
+                                    context.setCurrentAction(previousAction);
+                                    if (previousClearComponents) {
+                                        context.clearComponentConfigs(id);
+                                    }
+                                }
+                                if (err) {
+                                    throw err;
+                                }
+                            });
+                        } else {
+                            cb["fn"].call(cb["s"], this, this.cmp);
+                        }
+                    } else if (this.defDependencies) {
+                        $A.componentService.loadComponentDefs(this.defDependencies, function(err) {
+                            if (err) {
+                                throw err;
+                            }
+                        });
                     }
                 } catch (e) {
-                    var callbackFailedMessage = "Callback failed: " + (this.def?this.def.toString():"");
-                    $A.warning(callbackFailedMessage, e);
-                    e.message = e.message ? (e.message + '\n' + callbackFailedMessage) : callbackFailedMessage;
                     if (!error) {
-                        error = e;
+                        error = this.processFinishActionException(e, "Callback failed: ");
                     }
                 }
 
@@ -956,11 +991,8 @@ Action.prototype.finishAction = function(context) {
                 this.abort();
             }
         } catch (e) {
-            var actionFailedMessage = "Action failed: " + (this.def?this.def.toString():"");
-            $A.warning(actionFailedMessage, e);
-            e.message = e.message ? (e.message + '\n' + actionFailedMessage) : actionFailedMessage;
             if (!error) {
-                error = e;
+                error = this.processFinishActionException(e, "Action failed: ");
             }
 
             clearComponents = true;
@@ -982,6 +1014,31 @@ Action.prototype.finishAction = function(context) {
             throw new $A.auraError("Action.prototype.finishAction Error ", error);
         }
     }
+};
+
+/**
+ *
+ * @param e - the exception to handle
+ * @param err - additional error
+ * @param raise - boolean flag to tell it to throw now
+ * @private
+ */
+Action.prototype.processFinishActionException = function(e, message, err, raise) {
+    var failedMessage = message + (this.def?this.def.toString():"");
+    if (err) {
+        failedMessage += "\nAdditionally, Component Definition loader failure: " + err;
+    }
+    $A.warning(failedMessage, e);
+    e.message = e.message ? (e.message + '\n' + failedMessage) : failedMessage;
+
+    if (raise) {
+        if ($A.clientService.inAuraLoop() || e instanceof $A.auraFriendlyError) {
+            throw e;
+        } else {
+            throw new $A.auraError("Action.prototype.finishAction Error ", e);
+        }
+    }
+    return e;
 };
 
 /**

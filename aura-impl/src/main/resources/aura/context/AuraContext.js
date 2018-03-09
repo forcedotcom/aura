@@ -38,6 +38,9 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.moduleServices = config["services"];
     this.num = 0;
     this.scriptNonce = config["scriptNonce"];
+    this.styleContext = {};
+    this.styleContext.cuid = config["styleContext"] ? config["styleContext"]["cuid"] : undefined;
+
 
     // To keep track of re-rendering service call
     this.renderNum = 0;
@@ -58,7 +61,8 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     if (this.actionPublicCachingEnabled) {
         this.actionPublicCacheKey = config["apck"];
     }
-
+    this.uriAddressableDefsEnabled = !!config["uad"];
+    
     var that = this;
 
     this.initGlobalValueProviders(config["globalValueProviders"], function(gvps) {
@@ -221,6 +225,7 @@ Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic, in
     if(this.useCompatSource) {
         contextToSend["c"] = 1;
     }
+    contextToSend["uad"] = !!this.uriAddressableDefsEnabled;
     return $A.util.json.encode(contextToSend);
 };
 
@@ -629,6 +634,13 @@ Aura.Context.AuraContext.prototype.isActionPublicCachingEnabled = function() {
  */
 Aura.Context.AuraContext.prototype.getActionPublicCacheKey = function() {
     return this.actionPublicCacheKey;
+};
+
+/**
+ * @return {boolean} if URI Addressable Defs enabled or not
+ */
+Aura.Context.AuraContext.prototype.isURIAddressableDefsEnabled = function() {
+    return this.uriAddressableDefsEnabled;
 };
 
 /**

@@ -655,7 +655,7 @@ public class ServletUtilAdapterImplUnitTest {
 
         String expectedVary = Arrays.asList("Accept-Encoding").toString();
         Assert.assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
-        String expectedCacheControl = Arrays.asList("max-age=3888000", "public", "immutable").toString();
+        String expectedCacheControl = "[" + String.join(",", Arrays.asList("max-age=3888000", "public", "immutable")) + "]";
         Assert.assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
     }
 
@@ -668,7 +668,7 @@ public class ServletUtilAdapterImplUnitTest {
 
         String expectedVary = Arrays.asList("Accept-Encoding").toString();
         Assert.assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
-        String expectedCacheControl = Arrays.asList("max-age=86400", "public").toString();
+        String expectedCacheControl = "[" + String.join(",", Arrays.asList("max-age=86400", "public")) + "]";
         Assert.assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
     }
 
@@ -684,7 +684,7 @@ public class ServletUtilAdapterImplUnitTest {
         // Assert
         String expectedVary = Arrays.asList("Accept-Encoding").toString();
         Assert.assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
-        String expectedCacheControl = Arrays.asList("max-age=100", "public", "immutable").toString();
+        String expectedCacheControl = "[" + String.join(",", Arrays.asList("max-age=100", "public", "immutable")) + "]";
         Assert.assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
 
         // Expires header loses ms precision, so adding in a slight buffer.
@@ -710,7 +710,7 @@ public class ServletUtilAdapterImplUnitTest {
         // Assert
         String expectedVary = Arrays.asList("Accept-Encoding").toString();
         Assert.assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
-        String expectedCacheControl = Arrays.asList("max-age=10000000", "public", "immutable").toString();
+        String expectedCacheControl = "[" + String.join(",", Arrays.asList("max-age=10000000", "public", "immutable")) + "]";
         Assert.assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
     }
 

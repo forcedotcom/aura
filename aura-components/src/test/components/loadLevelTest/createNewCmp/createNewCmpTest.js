@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 ({
+    // These tests fake offline usubg http://offline which causes CSP errors with uri defs
+    setUp: function() {
+        this.currentURIDefsState = $A.test.setURIDefsState(null);
+    },
+    tearDown: function() {
+        $A.test.setURIDefsState(this.currentURIDefsState);
+    },
+    
     /**
      * Verify creation of a component whose definition is available at the client.
      */

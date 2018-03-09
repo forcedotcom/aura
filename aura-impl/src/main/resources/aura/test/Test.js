@@ -223,6 +223,15 @@ TestInstance.prototype.getSentRequestCount = function() {
 };
 
 /**
+ * Get the total number of uri-addressable definitions that have been requested
+ * @export
+ */
+TestInstance.prototype.getRequestedComponentDefCount = function() {
+    return $A.componentService.componentDefLoader.counter;
+};
+
+
+/**
  * Check to see if an array of actions have all completed.
  *
  * @export
@@ -239,7 +248,7 @@ TestInstance.prototype.areActionsComplete = function(actions) {
             return false;
         }
     }
-    return true;
+    return $A.componentService.componentDefLoader.loading === 0;
 };
 
 /**
@@ -380,7 +389,7 @@ TestInstance.prototype.clearAndAssertComponentConfigs = function(a) {
  * @function Test#isActionPending
  */
 TestInstance.prototype.isActionPending = function() {
-    return !$A.clientService.idle();
+    return !$A.clientService.idle() || $A.componentService.componentDefLoader.loading !== 0;
 };
 
 /**
@@ -2312,6 +2321,19 @@ TestInstance.prototype.checkGlobalNamespacePollution = function(whitelistedPollu
         }
     }
     return (pollutants.length ? "New global variables found: " + pollutants.join(",") + "." : "");
+};
+
+/**
+ * sets the uri addressable definitions state
+ * @param newState
+ * @return previous state
+ * @export
+ */
+TestInstance.prototype.setURIDefsState = function(newState) {
+    var oldState = $A.util.uriDefsState;
+    $A.util.uriDefsState = newState;
+    $A.getContext().uriAddressableDefsEnabled = !!newState;
+    return oldState;
 };
 
 /**

@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:application render="client" track="dependencyTest:cmpTracked">
+<aura:application render="client" track="dependencyTest:cmpTracked" implements="aura:uriDefinitionsDisabled">
     {!v.body}
 </aura:application>

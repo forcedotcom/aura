@@ -45,6 +45,7 @@
     <filter-mapping>
         <filter-name>AuraContextFilter</filter-name>
         <url-pattern>/aura</url-pattern>
+        <url-pattern>/auraCmpDef</url-pattern>
         <url-pattern>/auraAnalytics</url-pattern>
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>INCLUDE</dispatcher>
@@ -69,6 +70,18 @@
         <url-pattern>*.cmp</url-pattern>
         <url-pattern>*.app</url-pattern>
     </filter-mapping>
+
+
+    <servlet>
+        <servlet-name>AuraComponentDefinitionServlet</servlet-name>
+        <servlet-class>org.auraframework.http.AuraComponentDefinitionServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AuraComponentDefinitionServlet</servlet-name>
+        <url-pattern>/auraCmpDef</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>AuraServlet</servlet-name>

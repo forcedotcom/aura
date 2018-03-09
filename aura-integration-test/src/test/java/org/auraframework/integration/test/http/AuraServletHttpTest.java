@@ -15,7 +15,20 @@
  */
 package org.auraframework.integration.test.http;
 
-import com.google.common.collect.ImmutableMap;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import javax.inject.Inject;
+
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -36,26 +49,13 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
-import javax.inject.Inject;
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Automation to verify the handling of AuraServlet requests.
@@ -168,34 +168,6 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         Integer posActions = rawRes.indexOf("actions");
         Integer posContex = rawRes.indexOf("context");
         assertTrue(posActions < posContex);
-    }
-
-    /**
-     * When we request a component from the server we should get back it's component class, but only a single occurrence
-     * of it to minimize payload.
-     */
-    @Test
-    public void testGetComponentActionReturnsSingleComponentClass() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component></aura:component>");
-
-        Map<String, Object> actionParams = new HashMap<>();
-        actionParams.put("name", cmpDesc.getQualifiedName());
-        ServerAction a = new ServerAction(
-                "java://org.auraframework.impl.controller.ComponentController/ACTION$getComponent",
-                actionParams);
-        a.run();
-        String rawRes = a.getRawResponse();
-        
-        final String key = '"' + Json.ApplicationKey.COMPONENTCLASS.toString() + '"';
-        
-        int firstOccurrence = rawRes.indexOf(key);
-        int lastOccurrence = rawRes.lastIndexOf(key);
-
-        assertTrue("Component class should be returned in server response when requesting component",
-                firstOccurrence != -1);
-        assertTrue("Server response should only return a single componentClass for a component, but got <" + rawRes
-                + ">", firstOccurrence == lastOccurrence);
     }
 
     @Test

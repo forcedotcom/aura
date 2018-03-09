@@ -35,4 +35,6 @@ public interface DefBuilder<PrimaryIntf extends Definition, DefOrRefType extends
     DefDescriptor<PrimaryIntf> getDescriptor();
 
     DefBuilder<PrimaryIntf, DefOrRefType> setDescriptor(DefDescriptor<PrimaryIntf> desc);
+    
+    void setIsDynamicallyGenerated();
 }

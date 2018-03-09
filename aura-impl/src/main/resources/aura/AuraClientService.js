@@ -2434,30 +2434,58 @@ AuraClientService.prototype.collectStorableAction = function(action, index) {
 };
 
 /**
- * TODO: lukeis HACK! to be refactored with uri addressable defs
+ * @param actionItem
  * @param response
- * @returns {boolean}
+ * @param callback who's first parameter is a boolean
+ * @private
  */
-AuraClientService.prototype.allDefsExistOnClient = function(response, actionName) {
-    var deps = response["defDependencies"];
-    if (deps && deps.length > 0) {
-        for (var i=0, length=deps.length; i<length;i++) {
-            var descriptor = deps[i];
-
-            if ( $A.componentService.getComponentDef(descriptor) ||
-                 $A.eventService.getEventDef(descriptor) ||
-                 $A.componentService.hasLibrary(descriptor) ||
-                 $A.componentService.hasModuleDefinition(descriptor)) {
-                // we have the definition on the client! Hadanza!
-                continue;
-            }  // else
-            $A.metricsService.transaction("aura", "performance:stored-action-missing-defs", { "context": {
-                "attributes" : {"action": actionName, "missingDef": descriptor, "requiredDefs": deps}
-            }});
-            return false;
-        }
+AuraClientService.prototype.allDefsExistOnClient = function(actionItem, response, callback) {
+    var exist = false;
+    if (response === undefined) {
+        callback(exist);
+        return;
     }
-    return true;
+    var deps = response["defDependencies"];
+    if ($A.util.isObject(deps)) {
+        var uriDefsEnabled = $A.util.getURIDefsState();
+        if (uriDefsEnabled) {
+            for (var dep in deps) {
+                // TODO check on this, type safety in JS is no bueno
+                if ($A.util.isObject(deps[dep])) {
+                    $A.componentService.saveComponentConfig(deps[dep]);
+                    // TODO is module?
+                    // $A.componentService.initModuleDefs(deps[dep]);
+                }
+            }
+            $A.componentService.loadComponentDefs(deps, function(err){
+                callback(!err, err);
+            });
+            return;
+        } else {
+            // TODO remove when uriDefs fully enabled
+            for (var descriptor in deps) {
+                if ($A.componentService.hasCacheableDefinitionOfAnyType(descriptor)) {
+                    // we have the definition on the client! Hadanza!
+                    continue;
+                }  // else
+                $A.metricsService.transaction("aura", "performance:stored-action-missing-defs", {
+                    "context": {
+                        "attributes": {
+                            "action": actionItem.action.def.descriptor,
+                            "missingDef": descriptor,
+                            "requiredDefs": Object.keys(deps)
+                        }
+                    }
+                });
+                callback(exist);
+                return;
+            }
+            exist = true;
+        }
+    } else {
+        exist = true;
+    }
+    callback(exist);
 };
 
 /**
@@ -2519,35 +2547,37 @@ AuraClientService.prototype.processStorableActions = function() {
     this.actionStorage.getAll(Object.keys(keysToActions))
         .then(
             function(items) {
-                var value;
+                var value, actionItem;
+                var existsCallback = function(exists) {
+                    try {
+                        if (exists) {
+                            that.executeStoredAction(actionItem.action, value, that.collector.collected, actionItem.index);
+                            that.collector.actionsToCollect -= 1;
+                            that.finishCollection();
+                        } else {
+                            that.collectServerAction(actionItem.action, actionItem.index);
+                        }
+                    } catch (e) {
+                        $A.logger.reportError(e);
+                    }
+                };
                 for (var k in keysToActions) {
                     arr = keysToActions[k];
                     value = items[k];
 
-                    for (i = 0; i < arr.length; i++) {
-                        try {
-                            // TODO FIXME HACK lukeis - remove check for allDefsExistOnClient
-                            if (value && that.allDefsExistOnClient(value, arr[i].action.def.descriptor)) {
-                                that.executeStoredAction(arr[i].action, value, that.collector.collected, arr[i].index);
-                                that.collector.actionsToCollect -= 1;
-                            } else {
-                                that.collectServerAction(arr[i].action, arr[i].index);
-                            }
-                        } catch (e) {
-                            // don't let one action's failure impact the others
-                            $A.logger.reportError(e);
-                        }
+                    for (var j = 0; j < arr.length; j++) {
+                        actionItem = arr[j];
+                        that.allDefsExistOnClient(actionItem, value, existsCallback);
                     }
-
-                    that.finishCollection();
                 }
+                that.finishCollection();
             },
             function(/*error*/) {
                 // error fetching from storage so all actions go to the server
-                for (var k in keysToActions) {
-                    arr = keysToActions[k];
-                    for (i = 0; i < arr.length; i++) {
-                        that.collectServerAction(arr[i].action, arr[i].index);
+                for (var keyToAction in keysToActions) {
+                    arr = keysToActions[keyToAction];
+                    for (var l = 0; l < arr.length; l++) {
+                        that.collectServerAction(arr[l].action, arr[l].index);
                     }
                 }
             }
@@ -3540,42 +3570,44 @@ AuraClientService.prototype.processSystemError = function(auraXHR) {
     }
 };
 
-// TODO lukeis refactor for uri-defs, include uids
-AuraClientService.prototype.extractAllDefs = function(config) {
-    var configs = [];
-    if (config["componentDefs"]) {
-        configs = config["componentDefs"];
-    }
-    if (config["libraryDefs"]) {
-        configs = configs.concat(config["libraryDefs"]);
-    }
-    if (config["eventDefs"]) {
-        configs = configs.concat(config["eventDefs"]);
-    }
-    if (config["moduleDefs"]) {
-        configs = configs.concat(config["moduleDefs"]);
-    }
-
-    var retConfigs = [];
-    for (var i=0,length=configs.length; i<length; i++) {
-        if (configs[i]["descriptor"]) {
-            retConfigs.push(configs[i]["descriptor"]);
+AuraClientService.prototype.addAllDefsToMap = function(defs, map) {
+    if ($A.util.isArray(defs)) {
+        for (var i=0, length=defs.length; i<length; i++) {
+            if (defs[i]["descriptor"]){
+                map[defs[i]["descriptor"]] = defs[i];
+            }
         }
+        return;
     }
+    for (var def in defs) {
+        map[def] = defs[def];
+    }
+};
+
+AuraClientService.prototype.extractAllDefs = function(config) {
+    var descriptors = {};
+
+    this.addAllDefsToMap(config["componentDefs"], descriptors);
+    this.addAllDefsToMap(config["libraryDefs"], descriptors);
+    this.addAllDefsToMap(config["eventDefs"], descriptors);
+    this.addAllDefsToMap(config["moduleDefs"], descriptors);
+
+    this.addAllDefsToMap(config["descriptorUids"], descriptors);
 
     // include loaded as actions to the server "safely" assume these already exist on the client
     var loaded = Object.keys($A.getContext().loaded);
-    for (i=0, length=loaded.length; i<length; i++) {
+    for (var i=0, length=loaded.length; i<length; i++) {
         var def = loaded[i];
         if ($A.util.isString(def)) {
             if (def.indexOf("@") >= 0) {
-                def = def.split("@")[1];
+                descriptors[def.split("@")[1]] = $A.getContext().loaded[def];
+            } else {
+                descriptors[def] = $A.getContext().loaded[def];
             }
-            retConfigs.push(def);
         }
     }
 
-    return retConfigs;
+    return descriptors;
 };
 
 AuraClientService.prototype.processResponses = function(auraXHR, responseMessage) {
@@ -3587,7 +3619,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
     }
     var context=$A.getContext();
     var priorAccess=this.currentAccess;
-    var allDefsInContextResponse = [];
+    var allDefsInContextResponse = {};
 
     if(!priorAccess){
         this.setCurrentAccess($A.getRoot());
@@ -3649,7 +3681,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             if (!action) {
                 throw new $A.auraError("Unable to find an action for "+response["id"]+": "+response);
             } else {
-                if (allDefsInContextResponse.length > 0) {
+                if (Object.keys(allDefsInContextResponse).length > 0) {
                     action.defDependencies = allDefsInContextResponse;
                 }
 

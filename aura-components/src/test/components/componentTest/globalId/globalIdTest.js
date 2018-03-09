@@ -1,12 +1,21 @@
 ({
+
+    tearDown: function() {
+        if (this.currentURIDefsState !== undefined) {
+            $A.test.setURIDefsState(this.currentURIDefsState);
+            this.currentURIDefsState = undefined;
+        }
+    },
+
     testGlobalIdOfComponetFromServerSuffixWithActionId: {
         test: function(cmp) {
             var targetComponent;
+            this.currentURIDefsState = $A.test.setURIDefsState(null);
             var action = cmp.get("c.createComponentsOnServer");
-            action.setParams({ descriptors: ["actionsTest:actionId"] });
-            action.setCallback(cmp, function(result) {
+            action.setParams({descriptors: ["actionsTest:actionId"]});
+            action.setCallback(cmp, function (result) {
                 $A.test.assertEquals("SUCCESS", result.getState(),
-                            "Failed to retrieve component configs from server.");
+                    "Failed to retrieve component configs from server.");
 
                 var configs = result.getReturnValue();
                 targetComponent = $A.createComponentFromConfig(configs[0]);
@@ -14,12 +23,14 @@
             $A.enqueueAction(action);
 
             var expected = action.getId();
-            $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action]); },
+            $A.test.addWaitFor(true, function () {
+                    return $A.test.areActionsComplete([action]);
+                },
                 function verifyActionIdExistsInGlobalId() {
                     var globalId = targetComponent.getGlobalId();
                     var actual = globalId.split(":")[1];
                     $A.test.assertEquals(expected, actual,
-                            "Failed to find action Id in component's global Id: " + globalId);
+                        "Failed to find action Id in component's global Id: " + globalId);
                 });
         }
     },
@@ -27,16 +38,17 @@
     testGlobalIdSuffixWithActionIdWhenMultiComponentsInSingleAction: {
         test: function(cmp) {
             var targetComponents = [];
+            var currentURIDefsState = $A.test.setURIDefsState(null);
             var action = cmp.get("c.createComponentsOnServer");
             action.setParams({
                 descriptors: [
                     "actionsTest:actionId",
                     "ui:button"
-                    ]
-                });
-            action.setCallback(cmp, function(result) {
+                ]
+            });
+            action.setCallback(cmp, function (result) {
                 $A.test.assertEquals("SUCCESS", result.getState(),
-                            "Failed to retrieve component configs from server.");
+                    "Failed to retrieve component configs from server.");
 
                 var configs = result.getReturnValue();
                 targetComponents.push($A.createComponentFromConfig(configs[0]));
@@ -45,19 +57,21 @@
             $A.enqueueAction(action);
 
             var expected = action.getId();
-            $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action]); },
+            $A.test.addWaitFor(true, function () {
+                    return $A.test.areActionsComplete([action]);
+                },
                 function verifyActionIdExistsInGlobalId() {
                     var targetComponent = targetComponents[0];
                     var globalId = targetComponent.getGlobalId();
                     var actual = globalId.split(":")[1];
                     $A.test.assertEquals(expected, actual,
-                            "Failed to find action Id in " + targetComponent.getType() + "'s global Id: " + globalId);
+                        "Failed to find action Id in " + targetComponent.getType() + "'s global Id: " + globalId);
 
                     targetComponent = targetComponents[1];
                     globalId = targetComponent.getGlobalId();
                     actual = globalId.split(":")[1];
                     $A.test.assertEquals(expected, actual,
-                            "Failed to find action Id in " + targetComponent.getType() + "'s global Id: " + globalId);
+                        "Failed to find action Id in " + targetComponent.getType() + "'s global Id: " + globalId);
                 });
         }
     },
@@ -70,15 +84,16 @@
         test: [
             function(cmp) {
                 var targetComponent;
+                var currentURIDefsState = $A.test.setURIDefsState(null);
                 // create two server actions
                 cmp._firstAction = cmp.get("c.createComponentsOnServer");
                 cmp._expectedActionId = cmp._firstAction.getId();
                 var secondAction = cmp.get("c.createComponentsOnServer");
 
-                secondAction.setParams({ descriptors: ["actionsTest:actionId"] });
-                secondAction.setCallback(cmp, function(result) {
+                secondAction.setParams({descriptors: ["actionsTest:actionId"]});
+                secondAction.setCallback(cmp, function (result) {
                     $A.test.assertEquals("SUCCESS", result.getState(),
-                                "Failed to retrieve component configs from server.");
+                        "Failed to retrieve component configs from server.");
 
                     var configs = result.getReturnValue();
                     targetComponent = $A.createComponentFromConfig(configs[0]);
@@ -87,12 +102,14 @@
                 $A.enqueueAction(secondAction);
 
                 var expected = secondAction.getId();
-                $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([secondAction]); },
-                    function() {
+                $A.test.addWaitFor(true, function () {
+                        return $A.test.areActionsComplete([secondAction]);
+                    },
+                    function () {
                         var globalId = targetComponent.getGlobalId();
                         var actual = globalId.split(":")[1];
                         $A.test.assertEquals(expected, actual,
-                                "Failed to find action Id in component's global Id: " + globalId);
+                            "Failed to find action Id in component's global Id: " + globalId);
                     });
             },
             function (cmp) {

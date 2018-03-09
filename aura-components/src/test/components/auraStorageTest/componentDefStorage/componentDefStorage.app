@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application template="auraStorageTest:componentDefStorageTemplate">
+<aura:application template="auraStorageTest:componentDefStorageTemplate" implements="aura:uriDefinitionsDisabled">
     <aura:attribute name="load" type="String" default="ui:scroller" description="Component to fetch or create"/>
     <aura:attribute name="status" type="String" default="" description="Last status message" />
     <aura:attribute name="log" type="String" default="" description="Log catcher" />

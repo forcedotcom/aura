@@ -193,7 +193,7 @@
 
     testReturnsActionErrorMessageForUnknownComponentType:{
         test:function(){
-            var expected="No COMPONENT named markup://bogus:bogus found";
+            var expected="Could not find def descriptor for: markup://bogus:bogus";
             var actual=null;
             var actionComplete = false;
 
@@ -293,11 +293,11 @@
         }
     },
 
-    testPassesINCOMPLETEIfOneComponentTimesoutWhenCreatingMultipleComponents:{
+    testPassesERRORIfOneComponentTimesoutWhenCreatingMultipleComponents:{
         // TODO(W-2537764): IE < 10 gives Access Denied error when trying to send XHRs after setServerReachable(false)
         browsers: ["-IE8", "-IE9"],
         test:function(){
-            var expected="INCOMPLETE";
+            var expected="ERROR";
             var actual;
             var actionComplete = false;
             $A.test.setServerReachable(false);
@@ -345,7 +345,7 @@
 
     testPassesStatusListWithDetailedInfoWhenCreatingMultipleComponents:{
         test:function(){
-            var expected="SUCCESS,SUCCESS,SUCCESS,ERROR,SUCCESS";
+            var expected="SUCCESS,ERROR,SUCCESS,ERROR,SUCCESS";
             var actual;
             var actionComplete = false;
 
@@ -372,7 +372,7 @@
 
     testPassesActionErrorMessageWhenCreatingMultipleComponents:{
         test:function(){
-            var expected="No COMPONENT named markup://bogus:bogus found";
+            var expected="Could not find def descriptor for: markup://bogus:bogus";
             var actual;
             var actionComplete = false;
 

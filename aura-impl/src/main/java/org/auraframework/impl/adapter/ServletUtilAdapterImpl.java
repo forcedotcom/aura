@@ -763,9 +763,9 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     @Override
     public void setCacheTimeout(HttpServletResponse response, long expiration, boolean immutable) {
         response.setHeader(HttpHeaders.VARY, "Accept-Encoding");
-        String cacheHeader = String.format("max-age=%s, public", expiration / 1000);
+        String cacheHeader = String.format("max-age=%s,public", expiration / 1000);
         if (immutable) {
-            cacheHeader += ", immutable";
+            cacheHeader += ",immutable";
         }
         response.setHeader(HttpHeaders.CACHE_CONTROL, cacheHeader.toString());
 

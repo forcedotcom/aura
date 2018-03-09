@@ -44,6 +44,7 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
 
     protected final DefDescriptor<T> descriptor;
     protected final Map<SubDefDescriptor<?, T>, Definition> subDefs;
+    private boolean dynamicallyGenerated = false;
 
     protected DefinitionImpl(DefDescriptor<T> descriptor, Location location, DefinitionAccess access) {
         this(descriptor, location, null, null, null, access, null, null);
@@ -52,6 +53,7 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
     protected DefinitionImpl(RefBuilderImpl<T, ?> builder) {
         this(builder.getDescriptor(), builder.getLocation(), builder.subDefs, builder.apiVersion, builder.description,
                 builder.getAccess(), builder.getOwnHash(), builder.getParseError());
+        dynamicallyGenerated = builder.dynamicallyGenerated;
     }
 
     DefinitionImpl(DefDescriptor<T> descriptor, Location location, Map<SubDefDescriptor<?, T>, Definition> subDefs,
@@ -109,6 +111,10 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
         }
     }
 
+    @Override
+    public boolean isDynamicallyGenerated() {
+        return dynamicallyGenerated;
+    }
 
 
     @Override
@@ -144,6 +150,7 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
         public DefDescriptor<T> descriptor;
         public Map<SubDefDescriptor<?, T>, Definition> subDefs;;
         private boolean descriptorLocked;
+        public boolean dynamicallyGenerated = false;
 
         protected RefBuilderImpl(Class<T> defClass) {
             super(defClass);
@@ -185,6 +192,11 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
                 this.descriptor = desc;
             }
             return this;
+        }
+        
+        @Override
+        public void setIsDynamicallyGenerated() {
+            dynamicallyGenerated = true;
         }
     }
 }

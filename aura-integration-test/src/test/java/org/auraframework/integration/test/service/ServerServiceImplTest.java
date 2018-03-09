@@ -48,6 +48,7 @@ import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.ServerService;
+import org.auraframework.service.ServerService.HYDRATION_TYPE;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -586,7 +587,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
         // prime def cache
         StringWriter output = new StringWriter();
-        serverService.writeDefinitions(dependencies, output, false, -1);
+        serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
         String text = output.toString();
         final String dupeCheck = "$A.clientService.initDefs(";
         if (text.indexOf(dupeCheck) != text.lastIndexOf(dupeCheck)) {
@@ -595,7 +596,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
         // now check that defs not re-written with unempty cache
         output = new StringWriter();
-        serverService.writeDefinitions(dependencies, output, false, -1);
+        serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
         text = output.toString();
         if (text.indexOf(dupeCheck) != text.lastIndexOf(dupeCheck)) {
             fail("found duplicated code in: " + text);
@@ -619,13 +620,13 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         // get defs with LockerService enabled
         getMockConfigAdapter().setLockerServiceEnabled(true);
         StringWriter output = new StringWriter();
-        serverService.writeDefinitions(dependencies, output, false, -1);
+        serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
         String firstOutput = output.toString();
 
         // now get defs with LockerService disabled
         getMockConfigAdapter().setLockerServiceEnabled(false);
         output = new StringWriter();
-        serverService.writeDefinitions(dependencies, output, false, -1);
+        serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
         String secondOutput = output.toString();
 
         assertFalse("Expected writeDefinitions output to change after modifying LockerService cache buster",
@@ -695,7 +696,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         definitionService.getDefinition(appDesc);
 
         StringWriter output = new StringWriter();
-        serverService.writeDefinitions(dependencies, output, false, -1);
+        serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
 
         String sourceNoWhitespace = output.toString().replaceAll("\\s", "");
 
@@ -814,7 +815,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
 
         StringWriter output = new StringWriter();
-        serverService.writeDefinitions(dependencies, output, false, -1);
+        serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
 
         return output.toString();
     }

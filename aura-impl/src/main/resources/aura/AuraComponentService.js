@@ -34,9 +34,11 @@ function AuraComponentService() {
     this.libraryRegistry        = new Aura.Library.LibraryRegistry();
     this.libraryIncludeRegistry = new Aura.Library.LibraryIncludeRegistry();
     this.componentClassRegistry = new Aura.Component.ComponentClassRegistry();
+    this.componentDefLoader     = new Aura.Component.ComponentDefLoader();
     this.componentDefStorage    = new Aura.Component.ComponentDefStorage();
     this.actionStorage          = new Aura.Controller.ActionStorage();
     this.moduleNameToDescriptorLookup = {};
+    this.descriptorCasingMap    = {};
 
     // holds a temporary list of collected styles
     this.moduleStyleBuffer = [];
@@ -114,6 +116,14 @@ AuraComponentService.prototype.initCoreModules = function () {
 };
 
 /**
+ * Adds to the mapping of case mismatched descriptors
+ * @export
+ */
+AuraComponentService.prototype.addDescriptorCaseMapping = function(descriptorFrom, descriptorTo) {
+    this.descriptorCasingMap[descriptorFrom] = descriptorTo;
+};
+
+/**
  * Gets an instance of a component from either a GlobalId or a DOM element that was created via a Component Render.
  * @param {Object} identifier that is either a globalId or an element.
  *
@@ -160,6 +170,12 @@ AuraComponentService.prototype.getDescriptorFromConfig = function(descriptorConf
     }
 
     $A.assert(descriptor, "Descriptor for Config required for registration");
+    if (this.descriptorCasingMap[descriptor]) {
+        $A.deprecated("Descriptor case sensitivity mismatch, descriptors are case sensitive.",
+            "Please find the reference to: " + descriptor + " and change it to: " + this.descriptorCasingMap[descriptor],
+            "getDescriptorFromConfig.descriptorCasingMap");
+        return this.descriptorCasingMap[descriptor];
+    }
     return descriptor;
 };
 
@@ -1040,6 +1056,28 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
     }
  };
 
+AuraComponentService.prototype.hasCacheableDefinitionOfAnyType = function(descriptor) {
+    return this.getComponentDef(descriptor) ||
+        this.hasLibrary(descriptor) ||
+        this.hasModuleDefinition(descriptor) ||
+        $A.eventService.getEventDef(descriptor);
+};
+
+AuraComponentService.prototype.loadComponentDefs = function(descriptorMap, callback) {
+    for (var descriptor in descriptorMap) {
+        if (this.hasCacheableDefinitionOfAnyType(descriptor)) {
+            delete descriptorMap[descriptor];
+        }
+    }
+
+    if (!$A.util.isObject(descriptorMap) || Object.keys(descriptorMap).length === 0) {
+        callback();
+        return;
+    }
+
+    this.componentDefLoader.loadComponentDefs(descriptorMap, callback);
+};
+
 /**
  * Request component from server.
  *
@@ -1859,20 +1897,43 @@ AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
 };
 
 
-AuraComponentService.prototype.createComponentPrivAsync = function (config, callback) {
+AuraComponentService.prototype.createComponentPrivAsync = function (config, callback, infiniteLoopProtection) {
     var descriptor = this.getDescriptorFromConfig(config["componentDef"]);
     var def = this.getComponentDef({ "descriptor" : descriptor });
-    var action;
     $A.assert(callback && typeof callback === 'function' , 'Callback');
 
-    if (def && !def.hasRemoteDependencies()) {
-        this.createComponentPriv(config, callback);
-        return;
+    // If we have the definition already, go ahead
+    // If we don't have the def and uri-addressable defs is enabled and should use the action.
+    // Otherwise use component def loader to bypass the action call
+    if (def || $A.util.getURIDefsState() == null || !$A.util.getURIDefsState().createCmp) {
+        if (def && !def.hasRemoteDependencies()) {
+            this.createComponentPriv(config, callback);
+            return;
+        } else {
+            //TODO: TW: remove this code path (including requestComponent) once URI addressable defs is done
+            var action;
+            action = this.requestComponent(callback, config, null, null, true);
+            action.setAbortable();
+            $A.enqueueAction(action);
+        }
+    } else {
+        var self = this;
+        this.componentDefLoader.loadComponentDef(descriptor, null, $A.getCallback(function(err) {
+            if (infiniteLoopProtection) {
+                err = "infinite loop error on fetching component definition for: " + descriptor;
+            }
+            if (err) {
+                callback(null, "ERROR", err.message?err.message:err);
+            } else {
+                // need to call recursively into this method just in case the new definition needs to be created on the server
+                try {
+                    self.createComponentPrivAsync(config, callback, true);
+                } catch (e) {
+                    callback(null, "ERROR", e);
+                }
+            }
+        }));
     }
-
-    action = this.requestComponent(callback, config, null, null, true);
-    action.setAbortable();
-    $A.enqueueAction(action);
 };
 
 AuraComponentService.prototype.createComponentPriv = function (config, callback) {

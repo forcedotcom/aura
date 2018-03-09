@@ -15,14 +15,11 @@
  */
 package org.auraframework.integration.test.def;
 
-import java.io.ByteArrayOutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.List;
-import java.util.Set;
-
-import javax.inject.Inject;
-
+import com.google.common.base.Charsets;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
@@ -32,6 +29,7 @@ import org.auraframework.impl.def.DefinitionTest;
 import org.auraframework.impl.root.library.LibraryDefImpl;
 import org.auraframework.impl.root.library.LibraryDefImpl.Builder;
 import org.auraframework.service.ServerService;
+import org.auraframework.service.ServerService.HYDRATION_TYPE;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -41,11 +39,12 @@ import org.auraframework.util.json.JsonEncoder;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import javax.inject.Inject;
+import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.List;
+import java.util.Set;
 
 public class LibraryDefTest extends DefinitionTest<LibraryDef> {
 
@@ -171,7 +170,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         Set<DefDescriptor<?>> descs = ImmutableSet.<DefDescriptor<?>> of(libDesc);
         definitionService.getDefinition(libDesc);
         Writer writer = new StringWriter();
-        serverService.writeDefinitions(descs, writer, false, -1);
+        serverService.writeDefinitions(descs, writer, false, -1, HYDRATION_TYPE.all);
         String actual = writer.toString();
         actual = actual.replaceFirst("//# sourceURL=libraries/string/thing[0-9]+/uncompressed[0-9]+\\.js\n", "");
         String expected = "function(){var a=\"truth\";window.blah&&(a+=\" hurts\");return a}";

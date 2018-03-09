@@ -3628,7 +3628,9 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
         if ("context" in responseMessage) {
             var responseContext = responseMessage["context"];
             context['merge'](responseContext);
-            $A.componentService.saveDefsToStorage(responseContext, context);
+            $A.componentService.saveDefsToStorage(responseContext, context).then(undefined,
+                // swallow any errors returned
+                function(){});
             allDefsInContextResponse = this.extractAllDefs(responseContext);
         }
     } catch (e) {

@@ -692,13 +692,6 @@ Component.prototype.removeEventHandler=function(event,handler,phase) {
  * @platform
  */
 Component.prototype.addValueHandler = function(config) {
-    var value = config["value"];
-    if ($A.util.isExpression(value)&&value.getExpression()==="this") {
-        var eventQName = this.componentDef.getEventDef(config["event"], true).getDescriptor().getQualifiedName();
-        this.addHandler(eventQName, this, config["action"], false, "default");
-        return;
-    }
-
     var expression = config["value"];
     if($A.util.isExpression(expression)) {
         expression = expression.getExpression();
@@ -721,6 +714,9 @@ Component.prototype.addValueHandler = function(config) {
                 }
             }
         }
+    }
+    if(config["method"]){
+        config["method"]=$A.getCallback(config["method"]);
     }
     this.addChangeHandler(config);    
 };
@@ -2690,19 +2686,23 @@ Component.prototype.setupValueEventHandlers = function(cmp) {
     // Handle value-level events
     var handlerDefs = this.componentDef.getValueHandlerDefs();
     if (handlerDefs) {
-        $A.clientService.setCurrentAccess(this);
-        try {
-            for (var i = 0; i < handlerDefs.length; i++) {
-                var handlerDef = handlerDefs[i];
-                var handlerConfig = {};
-                handlerConfig["action"] = valueFactory.create(handlerDef["action"],cmp);
-                handlerConfig["value"] = valueFactory.create(handlerDef["value"],cmp);
-                handlerConfig["event"] = handlerDef["name"];
-                cmp.addValueHandler(handlerConfig);
+        for (var i = 0; i < handlerDefs.length; i++) {
+            var handlerDef = handlerDefs[i];
+            var action=valueFactory.create(handlerDef["action"],cmp);
+            var event=handlerDef["name"];
+            var value = valueFactory.create(handlerDef["value"],cmp);
+            if ($A.util.isExpression(value)&&value.getExpression()==="this") {
+                var eventQName = this.componentDef.getEventDef(event, true).getDescriptor().getQualifiedName();
+                this.addHandler(eventQName, this, action, false, "default");
+            }else{
+                var handlerConfig = {
+                    "action":action,
+                    "event":event,
+                    "value":value
+                };
+                cmp.addChangeHandler(handlerConfig);
             }
-        } finally {
-            $A.clientService.releaseCurrentAccess();
-        }            
+        }
     }
 };
 

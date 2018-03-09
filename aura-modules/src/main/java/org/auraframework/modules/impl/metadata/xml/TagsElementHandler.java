@@ -20,6 +20,8 @@ import javax.xml.stream.*;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
 import org.auraframework.system.TextSource;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
 public class TagsElementHandler implements ModuleMetadataXMLHandler {
@@ -30,7 +32,11 @@ public class TagsElementHandler implements ModuleMetadataXMLHandler {
     }
 
     @Override
-    public void process(XMLStreamReader reader, Builder moduleBuilder, TextSource<?> source) throws XMLStreamException {
+    public void process(XMLStreamReader reader, Builder moduleBuilder, TextSource<?> source) throws XMLStreamException, QuickFixException {
+        if (moduleBuilder.getTags() != null && moduleBuilder.getTags().size() > 0) {
+            throw new InvalidDefinitionException("<tags> section is specified twice.", null);
+        }
+
         while (reader.hasNext()) {
             int eventType = reader.next();
             switch (eventType) {

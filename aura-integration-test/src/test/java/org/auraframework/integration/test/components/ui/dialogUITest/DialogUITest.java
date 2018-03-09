@@ -63,16 +63,17 @@ public class DialogUITest extends WebDriverTestCase {
 
     // Helper method used to make sure that enter is not used for Safari
     public void clickOnElementOrPressEnter(WebElement elm) {
-        if (BrowserType.SAFARI.equals(getBrowserType())) {
+        BrowserType type = getBrowserType();
+        if (BrowserType.SAFARI.equals(type)) {
             elm.click();
         } else {
-            getAuraUITestingUtil().pressEnter(elm);
+            elm.sendKeys(Keys.ENTER);
         }
     }
 
     public void openDialogBox(WebDriver driver) {
         WebElement element = driver.findElement(By.cssSelector(RESULT_LABEL));
-        getAuraUITestingUtil().pressTab(element);
+        element.sendKeys(Keys.TAB);
         element = driver.findElement(By.cssSelector("button[class*='" + LAUNCH_DIALOG + "']"));
 
         clickOnElementOrPressEnter(element);
@@ -204,7 +205,7 @@ public class DialogUITest extends WebDriverTestCase {
 
         classOfActiveElem = "button[title*='" + CONFIRM_STR + "']";
         element = driver.findElement(By.cssSelector(classOfActiveElem));
-        getAuraUITestingUtil().pressEnter(element);
+        element.sendKeys(Keys.ENTER);
 
         // Getting the input text box to grab the value that was put in it
         element = driver.findElement(By.cssSelector(RESULT_LABEL));
@@ -225,20 +226,19 @@ public class DialogUITest extends WebDriverTestCase {
         WebElement element = moveToNextActiveElement(driver);
         assertEquals("Went through all check boxees but did not get to the cancel button", CANCEL_STR,
                 element.getAttribute("title"));
-
-        getAuraUITestingUtil().pressTab(element);
+        element.sendKeys(Keys.TAB);
 
         // Getting Ok button
         element = moveToNextActiveElement(driver);
         assertEquals("Got to the cancel button but did not tab to confirm button", CONFIRM_STR,
                 element.getAttribute("title"));
-        getAuraUITestingUtil().pressTab(element);
+        element.sendKeys(Keys.TAB);
 
         // Getting close button
         element = moveToNextActiveElement(driver);
         assertEquals("Got to the confirm button but did not tab to close button", CLOSE_STR,
                 element.getAttribute("title"));
-        getAuraUITestingUtil().pressTab(element);
+        element.sendKeys(Keys.TAB);
 
         // Getting the item that called it
         String classOfActiveElem = "button[class*='" + getAuraUITestingUtil().getEval(CLASSNAME) + "']";
@@ -288,7 +288,7 @@ public class DialogUITest extends WebDriverTestCase {
         assertEquals("Went through all check boxees but did not get to the cancel button", CANCEL_STR,
                 element.getAttribute("title"));
 
-        getAuraUITestingUtil().pressTab(element);
+        element.sendKeys(Keys.TAB);
 
         // Getting Ok button
         element = moveToNextActiveElement(driver);

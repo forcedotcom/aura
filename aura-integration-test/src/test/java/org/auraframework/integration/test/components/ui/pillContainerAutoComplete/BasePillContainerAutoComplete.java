@@ -16,9 +16,7 @@
 package org.auraframework.integration.test.components.ui.pillContainerAutoComplete;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import java.util.List;
@@ -43,7 +41,7 @@ public class BasePillContainerAutoComplete extends WebDriverTestCase {
         open(CMP_URL);
         WebElement input = findDomElement(By.cssSelector(INPUT));
         input.sendKeys("khDmXpDDmALzDqhYeCvJgqEmjUPJqV");
-        getAuraUITestingUtil().pressEnter(input);
+        input.sendKeys(Keys.ENTER);
         verifyAutoCompleteListPresent("Auto complete List Content should not be visible", false);
         input.sendKeys("test");
         verifyAutoCompleteListPresent("Auto complete List Content should be visible", true);
@@ -61,7 +59,7 @@ public class BasePillContainerAutoComplete extends WebDriverTestCase {
         open(CMP_URL);
         WebElement input = findDomElement(By.cssSelector(INPUT));
         input.sendKeys("khDmXpDDmALzDqhYeCvJgqEmjUPJqV");
-        getAuraUITestingUtil().pressEnter(input);
+        input.sendKeys(Keys.ENTER);
         verifyAutoCompleteListPresent("Auto complete List Content should not be visible", false);
         input.sendKeys("test");
         verifyAutoCompleteListPresent("Auto complete List Content should be visible", true);

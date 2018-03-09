@@ -96,12 +96,13 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
     @ExcludeBrowsers({BrowserType.IPHONE, BrowserType.IPAD})
     public void testTabToBlur() throws Exception {
         open(URL);
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(INPUT_SEL), "");
         WebElement inputElm = findDomElement(By.cssSelector(INPUT_SEL));
 
         inputElm.click();
         verifyEventsFired(EVENTLIST_SEL, "focus");
 
-        getAuraUITestingUtil().pressTab(inputElm);
+        inputElm.sendKeys(Keys.TAB);
         verifyEventsFired(EVENTLIST_SEL, "blur");
     }
 

@@ -20,9 +20,7 @@ import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /* UnAdaptable because issue with sfdc environments with sendkeys in iframes
@@ -72,7 +70,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
         beforeLink.click();
 
         // tab into
-        getAuraUITestingUtil().pressTab(beforeLink);
+        beforeLink.sendKeys(Keys.TAB);
 
         // type into ck editor
         ckEditorInput.sendKeys(inputText);

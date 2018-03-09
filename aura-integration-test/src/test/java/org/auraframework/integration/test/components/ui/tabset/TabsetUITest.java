@@ -248,7 +248,7 @@ public class TabsetUITest extends WebDriverTestCase {
         waitForTabSelected("Did not switch over to " + OVERFLOW_TITLE_ARRAY[startIndex] + " tab", tab);
     	
         if(useTabKey) {
-        	getAuraUITestingUtil().pressTab(tab);
+        	tab.sendKeys(Keys.TAB);
         }
         else {
         	// Navigate only up to the overflow menu
@@ -373,7 +373,7 @@ public class TabsetUITest extends WebDriverTestCase {
         // Focus on tab and move to next focusable element
         WebElement element = findDomElement(By.partialLinkText("Accounts"));
         element.click();
-        getAuraUITestingUtil().pressTab(element);
+        element.sendKeys(Keys.TAB);
 
         // Verify anchor is focused on
         String activeElementText = getAuraUITestingUtil().getActiveElementText();
@@ -381,14 +381,14 @@ public class TabsetUITest extends WebDriverTestCase {
 
         // Move from anchor to next item (inputTextBox)
         element = findDomElement(By.xpath(createXPath(1) + "/a"));
-        getAuraUITestingUtil().pressTab(element);
+        element.sendKeys(Keys.TAB);
 
         // Verify inputTextBox (in tab section) is focused
         verifyElementFocus("inputTabTitle");
 
         // Tab to the next focusable area
         element = findDomElement(By.cssSelector("input[class*='inputTabTitle']"));
-        getAuraUITestingUtil().pressTab(element);
+        element.sendKeys(Keys.TAB);
 
         // Verify inputTextArea (outside of the tab) is focused
         verifyElementFocus("inputTabContent");

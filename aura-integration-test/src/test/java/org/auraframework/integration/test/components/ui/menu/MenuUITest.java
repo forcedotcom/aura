@@ -21,12 +21,7 @@ import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.PerfTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
 /**
@@ -626,8 +621,11 @@ public class MenuUITest extends WebDriverTestCase {
         WebDriver driver = this.getDriver();
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement menu = driver.findElement(By.className(menuName));
-        Actions a = new Actions(driver);
-        a.doubleClick(menuLabel).build().perform();
+        
+        if (BrowserType.FIREFOX.equals(getBrowserType())) {
+            ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView(true);", menuLabel);
+        }
+        new Actions(driver).doubleClick(menuLabel).perform();
         waitForMenuOpen(menu);
     }
 
@@ -747,7 +745,7 @@ public class MenuUITest extends WebDriverTestCase {
             // need a second tab to get to the next element
             getAnchor(item1Elm).sendKeys(Keys.TAB, Keys.TAB);
         } else {
-            getAuraUITestingUtil().pressTab(getAnchor(item1Elm));
+            getAnchor(item1Elm).sendKeys(Keys.TAB);
         }
 
         waitForFocusOnElement(nextFocusableElm);
@@ -763,7 +761,7 @@ public class MenuUITest extends WebDriverTestCase {
         if (getBrowserType() == BrowserType.IE11) {
             // on win 7 IE11, for some reason webdriver moves the focus to the
             // last element of the list when activating the menu through click()
-            getAuraUITestingUtil().pressEnter(menuLabel);
+            menuLabel.sendKeys(Keys.ENTER);
         } else {
             menuLabel.click();  
         }

@@ -269,7 +269,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
 
         // Tabbing to the next item and getting what is in focus
-        getAuraUITestingUtil().pressTab(element);
+        element.sendKeys(Keys.TAB);
 
         String classOfActiveElem = "" + getAuraUITestingUtil().getEval(CLASSNAME);
         element = findDomElement(By.cssSelector("td[class*='" + classOfActiveElem + "']"));
@@ -299,7 +299,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
 
         // Tabbing to the next item and getting what is in focus
-        getAuraUITestingUtil().pressTab(element);
+        element.sendKeys(Keys.TAB);
 
         element = findDomElement(By.cssSelector(OUTPUT_ST));
         // tab out does not fire value change event
@@ -337,7 +337,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
         element.click();
         element.sendKeys("20151111");
-        getAuraUITestingUtil().pressTab(element);
+        element.sendKeys(Keys.TAB);
 
         String classOfActiveElem = "a[class*='" + getAuraUITestingUtil().getEval(CLASSNAME) + "']";
         element = findDomElement(By.cssSelector(classOfActiveElem));
@@ -352,7 +352,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         elementClass = element.getAttribute("class");
         assertTrue("Tabbing did not take us to the selected date",
                 elementClass.indexOf("selectedDate") >= 0);
-        getAuraUITestingUtil().pressTab(element);
+        element.sendKeys(Keys.TAB);
 
         String shftTab = Keys.SHIFT + "" + Keys.TAB;
 

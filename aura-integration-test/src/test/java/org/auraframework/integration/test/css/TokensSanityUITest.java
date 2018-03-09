@@ -15,6 +15,9 @@
  */
 package org.auraframework.integration.test.css;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.CheckAccessibility;
 import org.junit.Test;
@@ -28,27 +31,34 @@ import org.openqa.selenium.By;
  */
 @CheckAccessibility(false)
 public class TokensSanityUITest extends WebDriverTestCase {
+
+    private String getRGBonly(String value) {
+        Pattern pattern = Pattern.compile("rgba?\\(((?:\\d+, ){2}\\d+)(, .+)?\\)");
+        Matcher matcher = pattern.matcher(value.toLowerCase());
+        return matcher.matches() ? "rgb(" + matcher.group(1) + ")" : value;
+    }
+    
     /**
      * Using token variables in CSS
      */
     @Test
     public void testTokenVariablesInCSS() throws Exception {
-        final String expectedBgColor = "rgba(0, 128, 0, 1)"; // green
-        final String expectedFgColor = "rgba(255, 0, 0, 1)"; // red
+        final String expectedBgColor = "rgb(0, 128, 0)"; // green
+        final String expectedFgColor = "rgb(255, 0, 0)"; // red
         final String expectedHeight = "300px";
 
         open("/tokenSanityTest/tokenVariable.cmp");
-        String actualBgColor = getDriver().findElement(By.cssSelector(".tokenSanityTestHeader")).getCssValue(
-                "background-color");
-        String actualFgColor = getDriver().findElement(By.cssSelector(".tokenSanityTestHeader")).getCssValue("color");
-        String actualHeight = getDriver().findElement(By.cssSelector(".tokenSanityTestHeader")).getCssValue("height");
+        String actualBgColor = getRGBonly(
+                getDriver().findElement(By.cssSelector(".tokenSanityTestHeader")).getCssValue("background-color"));
+        String actualFgColor = getRGBonly(
+                getDriver().findElement(By.cssSelector(".tokenSanityTestHeader")).getCssValue("color"));
+        String actualHeight = getDriver().findElement(By.cssSelector(".tokenSanityTestHeader")).getCssValue("height")
+                .toLowerCase();
 
-        assertTrue("Loaded app should have template css present for background-color.",
-                expectedBgColor.equalsIgnoreCase(actualBgColor));
-        assertTrue("Loaded app should have template css present for color.",
-                expectedFgColor.equalsIgnoreCase(actualFgColor));
-        assertTrue("Loaded app should have template css present for height.",
-                expectedHeight.equalsIgnoreCase(actualHeight));
+        assertEquals("Loaded app should have template css present for background-color.", expectedBgColor,
+                actualBgColor);
+        assertEquals("Loaded app should have template css present for color.", expectedFgColor, actualFgColor);
+        assertEquals("Loaded app should have template css present for height.", expectedHeight, actualHeight);
     }
 
     /**
@@ -60,33 +70,34 @@ public class TokensSanityUITest extends WebDriverTestCase {
     public void testTokenOverride() throws Exception {
         // base tokens
         final String expectedHeight1 = "300px";
-        final String expectedColor1 = "rgba(255, 0, 0, 1)"; // red
-        final String expectedBgColor1 = "rgba(0, 128, 0, 1)"; // green
+        final String expectedColor1 = "rgb(255, 0, 0)"; // red
+        final String expectedBgColor1 = "rgb(0, 128, 0)"; // green
 
         // overridden child tokens
-        final String expectedColor2 = "rgba(255, 255, 0, 1)"; // yellow
-        final String expectedBgColor2 = "rgba(0, 128, 0, 1)"; // green
+        final String expectedColor2 = "rgb(255, 255, 0)"; // yellow
+        final String expectedBgColor2 = "rgb(0, 128, 0)"; // green
 
         open("/tokenSanityTest/usingOverride.app");
 
-        String actualHeight1 = getDriver().findElement(By.cssSelector(".tokenSanityTestHeader")).getCssValue("height");
-        String actualColor1 = getDriver().findElement(By.cssSelector(".tokenSanityTestHeader")).getCssValue("color");
-        String actualBgColor1 = getDriver().findElement(By.cssSelector(".tokenSanityTestHeader")).getCssValue(
-                "background-color");
+        String actualHeight1 = getDriver().findElement(By.cssSelector(".tokenSanityTestHeader")).getCssValue("height")
+                .toLowerCase();
+        String actualColor1 = getRGBonly(
+                getDriver().findElement(By.cssSelector(".tokenSanityTestHeader")).getCssValue("color"));
+        String actualBgColor1 = getRGBonly(
+                getDriver().findElement(By.cssSelector(".tokenSanityTestHeader")).getCssValue("background-color"));
 
-        String actualColor2 = getDriver().findElement(By.cssSelector(".tokenSanityTestHeader2")).getCssValue("color");
-        String actualBgColor2 = getDriver().findElement(By.cssSelector(".tokenSanityTestHeader2")).getCssValue(
-                "background-color");
+        String actualColor2 = getRGBonly(
+                getDriver().findElement(By.cssSelector(".tokenSanityTestHeader2")).getCssValue("color"));
+        String actualBgColor2 = getRGBonly(
+                getDriver().findElement(By.cssSelector(".tokenSanityTestHeader2")).getCssValue("background-color"));
 
-        assertTrue("Loaded app should have base tokens applied for height",
-                expectedHeight1.equalsIgnoreCase(actualHeight1));
-        assertTrue("Loaded app should have base tokens applied for color", expectedColor1.equalsIgnoreCase(actualColor1));
-        assertTrue("Loaded app should have base tokens applied for background-color",
-                expectedBgColor1.equalsIgnoreCase(actualBgColor1));
+        assertEquals("Loaded app should have base tokens applied for height", expectedHeight1, actualHeight1);
+        assertEquals("Loaded app should have base tokens applied for color", expectedColor1, actualColor1);
+        assertEquals("Loaded app should have base tokens applied for background-color", expectedBgColor1,
+                actualBgColor1);
 
-        assertTrue("Loaded app should have overridden child tokens applied for color",
-                expectedColor2.equalsIgnoreCase(actualColor2));
-        assertTrue("Loaded app should have overridden child tokens applied for background-color",
-                expectedBgColor2.equalsIgnoreCase(actualBgColor2));
+        assertEquals("Loaded app should have overridden child tokens applied for color", expectedColor2, actualColor2);
+        assertEquals("Loaded app should have overridden child tokens applied for background-color", expectedBgColor2,
+                actualBgColor2);
     }
 }

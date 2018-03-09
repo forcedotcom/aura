@@ -69,7 +69,7 @@ public class CarouselUITest extends WebDriverTestCase {
         waitForCarouselPageSelected(page);
 
         // tab into carousel page
-        getAuraUITestingUtil().pressTab(navElement);
+        navElement.sendKeys(Keys.TAB);
         WebElement element1 = getMDMPageElement(page, 1);
         assertEquals("Should be focused on the first element on the carousel page.",
                 element1.getAttribute(AURA_RENDERED_BY_ID), getAuraUITestingUtil().getUniqueIdOfFocusedElement());
@@ -90,7 +90,7 @@ public class CarouselUITest extends WebDriverTestCase {
         element1.click();
 
         // tab to next element
-        getAuraUITestingUtil().pressTab(element1);
+        element1.sendKeys(Keys.TAB);
         assertEquals("Should be focused on the second element on the carousel page.",
                 element2.getAttribute(AURA_RENDERED_BY_ID), getAuraUITestingUtil().getUniqueIdOfFocusedElement());
 
@@ -139,7 +139,7 @@ public class CarouselUITest extends WebDriverTestCase {
         // actually tab out. Tabbing once, focus will go on nav bar of
         // the next carousel.
         navItem.click();
-        getAuraUITestingUtil().pressTab(navItem);
+        navItem.sendKeys(Keys.TAB);
         assertEquals("Should be focused on the next carousel page.",
                 expectedFocus.getAttribute(AURA_RENDERED_BY_ID), getAuraUITestingUtil().getUniqueIdOfFocusedElement());
 

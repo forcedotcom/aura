@@ -110,7 +110,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
         inputElement.click();
         String expectedText = "testing";
         inputElement.sendKeys(expectedText);
-        getAuraUITestingUtil().pressEnter(inputElement);
+        inputElement.sendKeys(Keys.ENTER);
         autoCompleteText = (String) getAuraUITestingUtil().getEval(expr);
         assertEquals("Input Value was not change after pressing Enter", expectedText, autoCompleteText);
     }
@@ -213,7 +213,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
         WebElement list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         waitForAutoCompleteListVisible(list, true);
 
-        getAuraUITestingUtil().pressTab(input);
+        input.sendKeys(Keys.TAB);
         list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         waitForAutoCompleteListVisible(list, false);
         assertEquals("Focus should be on the next input", nextInput.getAttribute("data-aura-rendered-by"),
@@ -238,7 +238,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
 
         // go to second option in list.
         input.sendKeys(Keys.ARROW_DOWN + "");
-        getAuraUITestingUtil().pressEnter(input);
+        input.sendKeys(Keys.ENTER);
         list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         waitForAutoCompleteListVisible(list, false);
         assertEquals("Wrong option was selected", "hello world2", input.getAttribute("value"));

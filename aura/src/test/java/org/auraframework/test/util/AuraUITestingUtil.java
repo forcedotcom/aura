@@ -28,13 +28,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Assert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -332,14 +326,6 @@ public class AuraUITestingUtil {
      */
     public String getValueFromCmpExpression(String cmp, String val) {
         return this.prepareReturnStatement(this.getCmpExpr(cmp) + ".get('" + val + "')");
-    }
-
-    public void pressEnter(WebElement e) {
-        e.sendKeys("\n");
-    }
-
-    public void pressTab(WebElement e) {
-        e.sendKeys("\t");
     }
 
     /**

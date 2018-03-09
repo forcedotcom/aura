@@ -56,7 +56,7 @@ public class VirtualMenuWrapperUITest extends WebDriverTestCase {
         open(TEST_CMP);
         String menuSel = MENU_WITH_TRIGGER_LABEL_SEL;
         String focusSel = menuSel + " a";
-        testTriggerAndFocus(menuSel, focusSel, trigger -> getAuraUITestingUtil().pressEnter(trigger));
+        testTriggerAndFocus(menuSel, focusSel, trigger -> trigger.sendKeys(Keys.ENTER));
     }
     
     @Test

@@ -18,9 +18,7 @@ package org.auraframework.integration.test.components.ui.inputSearch;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 /**
  * UI Tests for inputSearch Component
@@ -41,7 +39,7 @@ public class InputSearchUITest extends WebDriverTestCase {
         WebElement input = getAuraUITestingUtil().findElementAndTypeEventNameInIt("search");
         assertFalse("Search event should not have been triggered yet",
                 getAuraUITestingUtil().getBooleanEval(valueExpression));
-        getAuraUITestingUtil().pressEnter(input);
+        input.sendKeys(Keys.ENTER);
         waitForCondition(valueExpression);
         // test case for W-1545841
         assertEquals("Component value should be updated", "search", getAuraUITestingUtil().getEval(cmpValueExpression));
@@ -63,8 +61,8 @@ public class InputSearchUITest extends WebDriverTestCase {
         WebDriver d = getDriver();
         WebElement clearButton = d.findElement(By.cssSelector("button[class*='clear']"));
         assertTrue("input search clear button doesn't show up", clearButton.isDisplayed());
-
-        getAuraUITestingUtil().pressEnter(clearButton);
+ 
+        clearButton.click();
         assertEquals("The input search term should be cleared", "", input.getAttribute("value"));
         assertTrue("input Search Search event should have been triggered",
                 getAuraUITestingUtil().getBooleanEval(valueExpression));

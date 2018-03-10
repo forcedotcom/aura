@@ -46,14 +46,14 @@
         'EncodeURIComponent',
         'Error',
         'Error.prototype',
-        'eval', // eval is not defined on evaluatorFactorySource
+        // 'eval', // eval is not defined on evaluatorFactorySource
         'EvalError',
         'EvalError.prototype',
         'Float32Array',
         'Float32Array.prototype',
         'Float64Array',
         'Float64Array.prototype',
-        'Function',
+        // 'Function',
         'Function.prototype',
         'Int8Array',
         'Int8Array.prototype',

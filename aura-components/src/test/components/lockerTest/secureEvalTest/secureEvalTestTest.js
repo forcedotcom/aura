@@ -11,13 +11,13 @@
       }
     },
     
-    _testGlobalIntrinsics: {
+    testGlobalIntrinsics: {
         test: function(component) {
             component.testGlobalIntrinsics(component);
         }
     },
     
-    _testHiddenIntrinsics: {
+    testHiddenIntrinsics: {
         test: function(component) {
             component.testHiddenIntrinsics(component);
         }

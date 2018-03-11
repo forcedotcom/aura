@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-03-08
+ * Generated: 2018-03-07
  * Version: 0.3.20
  */
 
@@ -618,6 +618,14 @@ function repairAccessors(realmRec) {
 // https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
 // https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
 
+/**
+ * The process to repair constructors:
+ * 1. Obtain the prototype from an instance
+ * 2. Create a substitute noop constructor
+ * 3. Replace its prototype property with the original prototype
+ * 4. Replace its prototype property's constructor with itself
+ * 5. Replace its [[Prototype]] slot with the noop constructor of Function
+ */
 function repairFunction(realmRec, functionName, functionDecl) {
   const { unsafeGlobal, unsafeEval, unsafeFunction } = realmRec;
 
@@ -679,6 +687,26 @@ function repairFunctions(realmRec) {
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ */
+
+/**
+ * For a special set of properties (defined below), it ensures that the
+ * effect of freezing does not suppress the ability to override these
+ * properties on derived objects by simple assignment.
+ *
+ * Because of lack of sufficient foresight at the time, ES5 unfortunately
+ * specified that a simple assignment to a non-existent property must fail if
+ * it would override a non-writable data property of the same name. (In
+ * retrospect, this was a mistake, but it is now too late and we must live
+ * with the consequences.) As a result, simply freezing an object to make it
+ * tamper proof has the unfortunate side effect of breaking previously correct
+ * code that is considered to have followed JS best practices, if this
+ * previous code used assignment to override.
+ *
+ * To work around this mistake, deepFreeze(), prior to freezing, replaces
+ * selected configurable own data properties with accessor properties which
+ * simulate what we should have specified -- that assignments to derived
+ * objects succeed if otherwise possible.
  */
 
 function tamperProof(obj, prop) {
@@ -762,6 +790,7 @@ function repairDataProperties(realmRec) {
 // Mitigate proxy-related security issues
 // https://github.com/tc39/ecma262/issues/272
 
+// Objects that are deeply frozen
 const frozenSet = new WeakSet();
 
 /**
@@ -840,6 +869,17 @@ function deepFreeze(node) {
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ */
+/**
+ * Get all intrinsics:
+ *
+ * 1. Named intrinsics: available as data properties of
+ * the global object.
+ *
+ * 2. Anonymous intrinsics: not otherwise reachable by own property
+ * name traversal.
+ *
+ * https://tc39.github.io/ecma262/#table-7
  */
 function getIntrinsics(realmRec) {
   const { unsafeGlobal: _ } = realmRec;
@@ -2118,6 +2158,7 @@ window.devtoolsFormatters.push(lsProxyFormatter);
  * limitations under the License.
  */
 
+// Remove when SecureElement is refactored to use sandbox
 let shouldFreeze;
 function setElementRealm(realmRec) {
   shouldFreeze = realmRec.shouldFreeze;
@@ -9326,7 +9367,7 @@ function initialize(types, api) {
   init({
     // TODO: disabled until W-4733987 is resolved
     // shouldFreeze: api.isStrictCSP,
-    shouldFreeze: true,
+    shouldFreeze: false,
     unsafeGlobal: window,
     unsafeEval: window.eval,
     unsafeFunction: window.Function

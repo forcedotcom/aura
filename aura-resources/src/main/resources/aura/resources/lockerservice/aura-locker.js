@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-03-07
- * Version: 0.3.20
+ * Generated: 2018-03-11
+ * Version: 0.3.23
  */
 
 (function (exports) {
@@ -640,9 +640,6 @@ function repairFunction(realmRec, functionName, functionDecl) {
     },
     prototype: {
       value: FunctionPrototype
-    },
-    toString: {
-      value: () => `function ${functionName}() { [native code] }`
     }
   });
   defineProperty(FunctionPrototype, 'constructor', { value: RealmFunction });
@@ -1378,9 +1375,6 @@ function createEvalEvaluator(sandbox) {
   defineProperties(evaluator, {
     name: {
       value: 'eval'
-    },
-    toString: {
-      value: () => 'function eval() { [native code] }'
     }
   });
 
@@ -1420,9 +1414,6 @@ function createFunctionEvaluator(sandbox) {
     },
     prototype: {
       value: FunctionPrototype
-    },
-    toString: {
-      value: () => 'function Function() { [native code] }'
     }
   });
 
@@ -6460,7 +6451,7 @@ const metadata$5 = {
       head: DEFAULT,
       hidden: DEFAULT,
       images: DEFAULT,
-      implementation: DEFAULT,
+      // implementation: DEFAULT, Disable API W-4437359
       importNode: FUNCTION,
       inputEncoding: DEFAULT,
       lastElementChild: DEFAULT,
@@ -7515,7 +7506,7 @@ const metadata$$1 = {
       DOMError: FUNCTION,
       DOMException: FUNCTION,
       DOMImplementation: FUNCTION,
-      DOMParser: RAW,
+      // DOMParser: RAW, Disable API W-4437359
       DOMStringList: FUNCTION,
       DOMStringMap: FUNCTION,
       DOMTokenList: FUNCTION,

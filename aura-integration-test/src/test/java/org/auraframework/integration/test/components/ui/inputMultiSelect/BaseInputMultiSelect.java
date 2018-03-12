@@ -16,14 +16,11 @@
 package org.auraframework.integration.test.components.ui.inputMultiSelect;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
-import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
-import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-@ExcludeBrowsers({ BrowserType.FIREFOX } )
 public class BaseInputMultiSelect extends WebDriverTestCase {
     private final String URL;
     private final By outputLocator = By.xpath("//span[@class='uiOutputText']");

@@ -106,7 +106,7 @@ public class Bootstrap extends AuraResourceImpl {
             context.getInstanceStack().serializeAsPart(json);
             json.writeMapEnd();
             json.writeMapEntry("md5", out.getMD5());
-            context.setPreloading(true);
+            context.setPreloading(false);
             json.writeMapEntry("context", context);
 
             // CSRF token is usually handled in inline.js, but in the few cases

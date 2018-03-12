@@ -145,7 +145,24 @@
     },
 
     is24HourFormat: function (component) {
-        return !($A.localizationService.isPeriodTimeView(this.getDateTimeFormat(component)));
+        var format = this.getDateTimeFormat(component);
+        if (!format) {
+            return false;
+        }
+
+        var shouldEscape = false;
+        for (var i = 0; i < format.length; i++) {
+            var c = format.charAt(i);
+            if (c === 'h' && shouldEscape === false) {
+                return true;
+            }
+            if (c === '[') {
+                shouldEscape = true;
+            } else if (c === ']') {
+                shouldEscape = false;
+            }
+        }
+        return false;
     },
 
     popUpDatePicker: function (component, date, focusDatePicker) {

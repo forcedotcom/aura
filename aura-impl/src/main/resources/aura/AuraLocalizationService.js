@@ -900,16 +900,15 @@ AuraLocalizationService.prototype.getYearsInDuration = function(duration) {
  * @param {String} pattern - datetime pattern string
  * @return {Boolean} Returns true if it uses period time view.
  * @memberOf AuraLocalizationService
- * @example
- * var date = new Date();
- * // Returns false
- * $A.localizationService.isPeriodTimeView(date);
  * @public
  * @export
  * @platform
  */
 AuraLocalizationService.prototype.isPeriodTimeView = function(pattern) {
-    if (!pattern || typeof pattern  !== 'string') {
+    $A.deprecated("$A.localizationService.isPeriodTimeView(): The method is no longer supported by framework, and will be removed in an upcoming release.",
+            null, "AuraLocalizationService.isPeriodTimeView");
+
+    if (typeof pattern !== "string") {
         return false;
     }
     var shouldEscape = false;

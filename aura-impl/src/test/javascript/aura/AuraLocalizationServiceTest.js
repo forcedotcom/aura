@@ -2333,7 +2333,6 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             // Assert
             Assert.Equal(expected, actual);
         }
-
     }
 
     [Fixture]
@@ -2473,6 +2472,42 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             // Assert
             Assert.Equal(expected, actual);
         }
+
+        function ConvertsTimeAcrossDifferentMonths() {
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var date = new Date(Date.UTC(2017, 9, 1, 0, 0));
+             // minus 8 hours
+            var expected = new Date(Date.UTC(2017, 8, 30, 17, 0)).toISOString();
+
+            // Act
+            mockUtil(function() {
+                targetService.UTCToWallTime(date, "America/Los_Angeles", function(wallTime) {
+                        actual = wallTime.toISOString();
+                    });
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        function ConvertsTimeAcrossDifferentYears() {
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var date = new Date(Date.UTC(2018, 1, 1, 0, 0));
+             // minus 8 hours
+            var expected = new Date(Date.UTC(2017, 12, 31, 17, 0)).toISOString();
+
+            // Act
+            mockUtil(function() {
+                targetService.UTCToWallTime(date, "America/Los_Angeles", function(wallTime) {
+                        actual = wallTime.toISOString();
+                    });
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
     }
 
     [Fixture]
@@ -2605,6 +2640,42 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             // Act
             mockUtil(function() {
                 targetService.WallTimeToUTC(date, "Europe/Berlin", function(utc) {
+                        actual = utc.toISOString();
+                    });
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        function ConvertsTimeAcrossDifferentMonths() {
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var date = new Date(Date.UTC(2017, 8, 30, 17, 0));
+            // plus 8 hours
+            var expected = new Date(Date.UTC(2017, 9, 1, 0, 0)).toISOString();
+
+            //Act
+            mockUtil(function() {
+                targetService.WallTimeToUTC(date, "America/Los_Angeles", function(utc) {
+                        actual = utc.toISOString();
+                    });
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        function ConvertsTimeAcrossDifferentYears() {
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var date = new Date(Date.UTC(2017, 12, 31, 17, 0));
+            // plus 8 hours
+            var expected = new Date(Date.UTC(2018, 0, 1, 0, 0)).toISOString();
+
+            //Act
+            mockUtil(function() {
+                targetService.WallTimeToUTC(date, "America/Los_Angeles", function(utc) {
                         actual = utc.toISOString();
                     });
             });

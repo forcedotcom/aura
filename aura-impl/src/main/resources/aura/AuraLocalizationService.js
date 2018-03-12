@@ -1582,7 +1582,8 @@ AuraLocalizationService.prototype.parseEnUSDateTimeString = function(dateTimeStr
         return null;
     }
 
-    return Date.UTC(match[3], match[1], match[2], match[4], match[5]);
+    // month param is between 0 and 11
+    return Date.UTC(match[3], match[1] - 1, match[2], match[4], match[5]);
 };
 
 AuraLocalizationService.prototype.createDateTimeFormatByTimeZone = function(timeZone) {

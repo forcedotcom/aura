@@ -22,8 +22,9 @@ Aura.ExportsModule = {
             $A.clientService.releaseCurrentAccess();
         }
     },
-
-    "labels": function () {},
+    "getEventDef": function (eventDef, eventName, sourceCmp) {
+        return $A.eventService.newEvent(eventDef, eventName, sourceCmp);
+    },
 
     /**
      * Execute a global controller action.
@@ -85,6 +86,5 @@ Aura.ExportsModule = {
         } finally {
             $A.clientService.releaseCurrentAccess();
         }
-    },
-    "logInteraction": function () {}
+    }
 };

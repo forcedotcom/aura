@@ -40,5 +40,23 @@ Aura.ServiceApi = {
     },
     "prepareRequest": function (actions) {
         return $A.clientService.prepareRequest(actions);
+    },
+    "getPathPrefix": function () {
+        return $A.getContext().getPathPrefix();
+    },
+    "getToken": function (name) {
+        return $A.getToken(name);
+    },
+    "getLocale": function () {
+        return $A.get('$Locale');
+    },
+    "getLocalizationService": function () {
+        return $A.localizationService;
+    },
+    "sanitizeDOM": function (dirty, config) {
+        return $A.util.sanitizeDOM(dirty, config);
+    },
+    "getFormFactor": function() {
+        return $A.get('$Browser.formFactor');
     }
 };

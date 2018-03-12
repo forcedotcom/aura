@@ -3318,21 +3318,25 @@ AuraClientService.prototype.buildActionNameList = function(actions) {
     for (i = 0; i < actions.length; i++) {
         var actionDescriptor = actions[i]["descriptor"];
         var parts = actionDescriptor.split('/');
-        var controllerMethod = parts.pop().split('$').pop();
-        var controller = parts.pop();
+        var controllerMethod = parts.pop().split("$").pop();
+        var controllerParts = parts.pop().split(".");
+        var controller = controllerParts.pop();
         var index = controller.indexOf("Controller", controller.length - "Controller".length);
         if ( index > 0 ) {
             controller = controller.substring(0, index);
         }
-        var prefix = "";
-        if ( controller.indexOf('.') < 0 ){
+        var pkg;
+        if ( controllerParts.length === 0 ) {
             if ( parts[0] === "aura:" ) {
-                prefix = "aura.";
+                pkg = "aura";
             } else {
-                prefix = "other.";
+                pkg = "other";
             }
+        } else {
+            pkg = controllerParts.join("-");
         }
-        var actionName = prefix + controller + "." + controllerMethod;
+        
+        var actionName = pkg + "." + controller + "." + controllerMethod;
 
         map[actionName] = map[actionName] ? map[actionName] + 1 : 1;
     }

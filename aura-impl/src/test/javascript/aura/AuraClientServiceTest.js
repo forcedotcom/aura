@@ -4147,7 +4147,7 @@ Test.Aura.AuraClientServiceTest = function() {
         [Fact]
         function IncludesJavaPackage() {
             var input = [ { descriptor: "java://org.auraframework.ServerController/ACTION$doIt" } ];
-            var expected = "org.auraframework.Server.doIt=1";
+            var expected = "org-auraframework.Server.doIt=1";
             
             mockGlobal(function() {
                 var target = new Aura.Services.AuraClientService();
@@ -4204,7 +4204,7 @@ Test.Aura.AuraClientServiceTest = function() {
         [Fact]
         function TrimsLastControllerFragment() {
             var input = [ { descriptor: "prefix://some.Controller.CustomController/ACTION$doIt" } ];
-            var expected = "some.Controller.Custom.doIt=1";
+            var expected = "some-Controller.Custom.doIt=1";
             
             mockGlobal(function() {
                 var target = new Aura.Services.AuraClientService();
@@ -4230,16 +4230,16 @@ Test.Aura.AuraClientServiceTest = function() {
                 { descriptor: "java://org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict8/ACTION$doIt" },
                 { descriptor: "java://org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict9/ACTION$doIt" }
             ];
-            var expected = "org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict0.doIt=1"
-                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict1.doIt=1"
-                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict2.doIt=1"
-                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict3.doIt=1"
-                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict4.doIt=1"
-                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict5.doIt=1"
-                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict6.doIt=1"
-                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict7.doIt=1"
-                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict8.doIt=1"
-                + "&org.auraframework.very.long.package.name.is.essential.requirement.to.avoid.naming.conflict9.doIt=1";
+            var expected = "org-auraframework-very-long-package-name-is-essential-requirement-to-avoid-naming.conflict0.doIt=1"
+                + "&org-auraframework-very-long-package-name-is-essential-requirement-to-avoid-naming.conflict1.doIt=1"
+                + "&org-auraframework-very-long-package-name-is-essential-requirement-to-avoid-naming.conflict2.doIt=1"
+                + "&org-auraframework-very-long-package-name-is-essential-requirement-to-avoid-naming.conflict3.doIt=1"
+                + "&org-auraframework-very-long-package-name-is-essential-requirement-to-avoid-naming.conflict4.doIt=1"
+                + "&org-auraframework-very-long-package-name-is-essential-requirement-to-avoid-naming.conflict5.doIt=1"
+                + "&org-auraframework-very-long-package-name-is-essential-requirement-to-avoid-naming.conflict6.doIt=1"
+                + "&org-auraframework-very-long-package-name-is-essential-requirement-to-avoid-naming.conflict7.doIt=1"
+                + "&org-auraframework-very-long-package-name-is-essential-requirement-to-avoid-naming.conflict8.doIt=1"
+                + "&org-auraframework-very-long-package-name-is-essential-requirement-to-avoid-naming.conflict9.doIt=1";
             
             mockGlobal(function() {
                 var target = new Aura.Services.AuraClientService();

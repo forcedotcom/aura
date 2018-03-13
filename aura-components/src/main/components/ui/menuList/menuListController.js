@@ -14,9 +14,15 @@
  * limitations under the License.
  */
 ({
-    handleVisibilityChange: function (component) {
+    handleVisibilityChange: function (component, event, helper) {
         if (!component.get("v.hasMenuOpened") && component.get("v.visible")) {
             component.set("v.hasMenuOpened", true);
+        }
+
+        if (component.get("v.visible")) {
+            window.requestAnimationFrame($A.getCallback(function() {
+                helper.setMenuItemFocus(component, 0);
+            }));
         }
     },
 
@@ -35,9 +41,15 @@
         var upArrowKeyCode = 38;
         var keyCode = originalEvent.keyCode;
         if (keyCode === downArrowKeyCode || keyCode === upArrowKeyCode) {
+            // check if we need to move to the first or last item
+            var focusOnIndex = 0;
+            if (keyCode === upArrowKeyCode) {
+                focusOnIndex = component.get("v.childMenuItems").length - 1;
+            }
+
             originalEvent.preventDefault();
             window.requestAnimationFrame($A.getCallback(function() {
-                helper.setMenuItemFocus(component, 0);
+                helper.setMenuItemFocus(component, focusOnIndex);
             }));
         } else {
             var isPrintableCharacter =

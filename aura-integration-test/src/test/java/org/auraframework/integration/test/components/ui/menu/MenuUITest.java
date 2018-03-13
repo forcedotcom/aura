@@ -140,12 +140,12 @@ public class MenuUITest extends WebDriverTestCase {
 
     @Test
     public void testOpenMenuViaKeyboardDownKey() throws Exception {
-    	openMenuViaKeyboardAndTestActionMenu(MENUTEST_APP, Keys.DOWN, "actionItem1", "actionItem2");
+    	openMenuViaKeyboardAndTestActionMenu(MENUTEST_APP, Keys.DOWN, "actionItem1", "actionItem1");
     }
     
     @Test
     public void testOpenMenuViaKeyboardSpace() throws Exception {
-    	openMenuViaKeyboardAndTestActionMenu(MENUTEST_APP, Keys.SPACE, "trigger", "actionItem1");
+    	openMenuViaKeyboardAndTestActionMenu(MENUTEST_APP, Keys.SPACE, "actionItem1", "actionItem1");
     }
 
     /**
@@ -177,7 +177,7 @@ public class MenuUITest extends WebDriverTestCase {
      */
     @Test
     public void testFocusAfterTypeAheadOnNonexistentItem() throws Exception {
-        testFocusAfterKeysPressed(MENUTEST_APP, "b", "typeAheadMenu", "menuTrigger");
+        testFocusAfterKeysPressed(MENUTEST_APP, "b", "typeAheadMenu", "menuItem1");
     }
 
     private void testFocusAfterKeysPressed(String appName, CharSequence keys,
@@ -188,7 +188,15 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menuLabel = menu.findElement(By.className("menuTrigger"));
         WebElement menuList = menu.findElement(By.className("menuList"));
 
-        openMenu(menuLabel, menuList, keys);
+        // open the menu with the space key
+        openMenu(menuLabel, menuList, Keys.SPACE);
+        
+        // send key presses since they won't function before the menu is open
+        WebElement menuItem1 = menu.findElement(By.className("menuItem1"));
+        WebElement menuItem1Element = getAnchor(menuItem1);
+        waitForFocusOnElement(menuItem1Element);
+        
+        menuItem1Element.sendKeys(keys);
 
         WebElement expectedFocusedItem = menu.findElement(By.className(expectedFocusedItemClassName));
 
@@ -212,6 +220,7 @@ public class MenuUITest extends WebDriverTestCase {
         String label = "trigger" + appendString;
         String menuName = "actionMenu" + appendString;
         String menuItem1 = "actionItem1" + appendString;
+        String menuItem2 = "actionItem2" + appendString;
         String menuItem3 = "actionItem3" + appendString;
         String menuItem4 = "actionItem4" + appendString;
         WebElement menuLabel = driver.findElement(By.className(label));
@@ -221,22 +230,21 @@ public class MenuUITest extends WebDriverTestCase {
 
         WebElement actionItem1 = driver.findElement(By.className(menuItem1));
         WebElement actionItem1Element = getAnchor(actionItem1);
+        WebElement actionItem2 = driver.findElement(By.className(menuItem2));
+        WebElement actionItem2Element = getAnchor(actionItem2);
         WebElement actionItem3 = driver.findElement(By.className(menuItem3));
         WebElement actionItem3Element = getAnchor(actionItem3);
         WebElement actionItem4 = driver.findElement(By.className(menuItem4));
         WebElement actionItem4Element = getAnchor(actionItem4);
 
-
-        // default focus on trigger
-        assertEquals("Focus should be on the trigger", menuLabel.getText(), getAuraUITestingUtil().getActiveElementText());
+        // default focus on first menu item
+        assertEquals("Focus should be on the first menu item", actionItem1.getText(), getAuraUITestingUtil().getActiveElementText());
 
         // press down key once
         menuLabel.sendKeys(Keys.DOWN);
 
-        // focus should be one the first item
-        waitForFocusOnElement(actionItem1Element);
-
-        actionItem1Element.sendKeys(Keys.DOWN, Keys.DOWN);
+        // press down once
+        actionItem2Element.sendKeys(Keys.DOWN);
 
         // verify focus on action item3
         getAuraUITestingUtil().setHoverOverElement(menuItem3);
@@ -277,28 +285,18 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menuLabel = driver.findElement(By.className("trigger"));
         WebElement actionMenu = driver.findElement(By.className("actionMenu"));
           
-        // opening menu using keyboard return or space - focus would remain on the trigger
-
+        // opening menu using keyboard return or space - focus should be on 1st element
+        // opening menu using keyboard interaction down button - focus should be on 1st element
         WebElement focusAfterOpenElement;
 
-        if("trigger".equals(focusAfterOpen)) {
-            openMenu(menuLabel, actionMenu, openKey);
-            focusAfterOpenElement = menuLabel;
-        	assertEquals("Focus should be on the trigger", menuLabel.getText(), getAuraUITestingUtil().getActiveElementText());
-        }
-        
-        // opening menu using keyboard interaction down button - focus should be on 1st element
-        else {
-            openMenu(menuLabel, actionMenu, openKey);
-            WebElement focusAfterOpenItem = driver.findElement(By.className(focusAfterOpen));
-            focusAfterOpenElement = getAnchor(focusAfterOpenItem);
-            waitForFocusOnElement(focusAfterOpenElement);
-        }
+        openMenu(menuLabel, actionMenu, openKey);
+        WebElement focusAfterOpenItem = driver.findElement(By.className(focusAfterOpen));
+        focusAfterOpenElement = getAnchor(focusAfterOpenItem);
+        waitForFocusOnElement(focusAfterOpenElement);
 
         WebElement expectedItem = driver.findElement(By.className(itemExpected));
         WebElement expectedItemElement = getAnchor(expectedItem);
 
-        focusAfterOpenElement.sendKeys(Keys.DOWN);
         waitForFocusOnElement(expectedItemElement);
     }
 
@@ -639,6 +637,7 @@ public class MenuUITest extends WebDriverTestCase {
         WebDriver driver = this.getDriver();
         String label = "trigger";
         String menuName = "actionMenu";
+        String menuItem1 = "actionItem1";
         String menuItem2 = "actionItem2";
         String menuItem3 = "actionItem3";
         WebElement menuLabel = driver.findElement(By.className(label));
@@ -646,13 +645,15 @@ public class MenuUITest extends WebDriverTestCase {
 
         openMenu(menuLabel, actionMenu);
 
+        WebElement actionItem1 = driver.findElement(By.className(menuItem1));
+        WebElement actionItem1Element = getAnchor(actionItem1);
         WebElement actionItem2 = driver.findElement(By.className(menuItem2));
         WebElement actionItem2Element = getAnchor(actionItem2);
         WebElement actionItem3 = driver.findElement(By.className(menuItem3));
         WebElement actionItem3Element = getAnchor(actionItem3);
 
 
-        assertEquals("Focus should be on the trigger", menuLabel.getText(), getAuraUITestingUtil().getActiveElementText());
+        assertEquals("Focus should be on the 1st element", actionItem1Element.getText(), getAuraUITestingUtil().getActiveElementText());
 
         // verify focus on action item3
         getAuraUITestingUtil().setHoverOverElement(menuItem3);
@@ -728,16 +729,12 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menuElm = driver.findElement(By.className("actionMenu"));
         WebElement triggerElm = driver.findElement(By.className("trigger"));
 
-        // open menu and make sure focus is on the trigger label
+        // open menu and make sure focus is on the 1st menu item
         openMenu(triggerElm, menuElm);
-        waitForFocusOnElement(triggerElm);
-
         WebElement item1Elm = driver.findElement(By.className("actionItem1"));
-        WebElement nextFocusableElm = driver.findElement(By.className(nextFocusableElmClassName));
+        waitForFocusOnElement(getAnchor(item1Elm));
 
-        // move the focus to the menuList by moving to the first item
-        triggerElm.sendKeys(Keys.DOWN);
-        waitForFocusOnElement(item1Elm);
+        WebElement nextFocusableElm = driver.findElement(By.className(nextFocusableElmClassName));
 
         // tab out to close the menu and check the focus is set to the right element
         if (getBrowserType().equals(BrowserType.FIREFOX)) {

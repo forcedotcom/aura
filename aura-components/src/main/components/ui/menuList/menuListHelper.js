@@ -30,21 +30,51 @@
     },
 
     setHandlersOnMenuItems: function(component, items, children, existingChildren) {
-        for (var i = 0; i < items.length; i++) {
-            var child = items[i];
-            if (child.isInstanceOf("ui:menuItem")) {
-                if (existingChildren && existingChildren.indexOf(child) === -1) {
-                    child.addHandler("menuSelect", component, "c.onMenuItemSelected");
+        // guard against possible undefined value
+        if (!$A.util.isUndefinedOrNull(items)) {
+            for (var i = 0; i < items.length; i++) {
+                var child = items[i];
+                if (child.isInstanceOf("ui:menuItem")) {
+                    if (existingChildren && existingChildren.indexOf(child) === -1) {
+                        child.addHandler("menuSelect", component, "c.onMenuItemSelected");
+                    }
+                    children.push(child);
+                } else if (child.isInstanceOf("aura:iteration") || child.isInstanceOf("aura:if")) {
+                    this.setHandlersOnMenuItems(component, child.get("v.body"), children, existingChildren);
+                } else if (child.isInstanceOf("ui:menuListProvider")) {
+                    this.setHandlersOnMenuItems(component, child.getSuper().get("v.body"), children, existingChildren);
+                } else if (child.isInstanceOf("aura:expression")) {
+                    this.setHandlersOnMenuItems(component, child.get("v.value"), children, existingChildren);
                 }
-                children.push(child);
-            } else if (child.isInstanceOf("aura:iteration") || child.isInstanceOf("aura:if")) {
-                this.setHandlersOnMenuItems(component, child.get("v.body"), children, existingChildren);
-            } else if (child.isInstanceOf("ui:menuListProvider")) {
-                this.setHandlersOnMenuItems(component, child.getSuper().get("v.body"), children, existingChildren);
-            } else if (child.isInstanceOf("aura:expression")) {
-                this.setHandlersOnMenuItems(component, child.get("v.value"), children, existingChildren);
             }
         }
+    },
+
+    menuMutationObserver: function (cmp) {
+        var that = this;
+        var listElement = cmp.find('datalist').getElement();
+        var observer = new MutationObserver(function () {
+            // refresh the component
+            that.setEventHandlersOnChildren(cmp);
+
+            var menuItems = listElement.querySelectorAll('li');
+            // only refocus if we have menu items and the menu is visible
+            if (menuItems.length > 0 && cmp.get("v.visible")) {
+                var focusOnIndex = 0;
+                if (cmp._nextItemIndexToFocusOn === 'LAST') {
+                    focusOnIndex = cmp._items.length - 1;
+                }
+                that.setMenuItemFocus(cmp, focusOnIndex);
+                cmp._nextItemIndexToFocusOn = undefined; // reset value
+                return;
+            }
+        });
+
+        // start observing
+        observer.observe(listElement, {
+            childList: true,
+            subtree: true
+        });
     },
 
     getMenuItem: function(component, index) {

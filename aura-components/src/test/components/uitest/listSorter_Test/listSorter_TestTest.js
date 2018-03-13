@@ -203,15 +203,16 @@
         var selectedColumnAndSortOrder = this.getSelectedColumnsAndSortOrder(menuItems);
         var selectedColumn = selectedColumnAndSortOrder.split(":")[0];
         var selectedSortOrder = selectedColumnAndSortOrder.split(":")[1];
-        var defaultCoumn = "Column 2";
+        var defaultColumn = "Column 2";
         var defaultOrder = "Z-A";
 
         //verify by default column2 Z-A is selected
-        $A.test.assertEquals(defaultCoumn, selectedColumn, "Default Column selected is not correct");
+        $A.test.assertEquals(defaultColumn, selectedColumn, "Default Column selected is not correct");
         $A.test.assertEquals(defaultOrder, selectedSortOrder, "Default Sort Order selected is not correct");
-        //active element should be column 2
-        var activeElement = $A.test.getActiveElementText();
-        $A.test.assertTrue(activeElement.indexOf(defaultCoumn) >= 0, "By Default column 2 should be active element");
+        // selected element should be column 2
+        var menuCmp = listSorter.find("sorterMenuList");
+        var selectedElementLabel = menuCmp.getElement().querySelector('.uiMenuItem .selected .labelSpan').textContent;
+        $A.test.assertTrue(defaultColumn === selectedElementLabel, "By Default column 2 should be the selected element");
     },
 
     /**

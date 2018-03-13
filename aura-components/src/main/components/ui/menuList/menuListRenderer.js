@@ -23,6 +23,9 @@
         if (component.get("v.visible")) {
             component.set("v.hasMenuOpened", true);
         }
+
+        // add mutation observer
+        helper.menuMutationObserver(component);
     },
 
     rerender: function(component, helper) {

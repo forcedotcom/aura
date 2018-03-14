@@ -20,7 +20,6 @@
     <aura:attribute name="shouldTest_constructor_hook" type="Boolean" default="false" description="Flag to indicate which lifecycle is being tested"/>
     <aura:attribute name="shouldTest_connectedCallback_hook" type="Boolean" default="false" description="Flag to indicate which lifecycle is being tested"/>
     <aura:attribute name="shouldTest_disconnectedCallback_hook" type="Boolean" default="false" description="Flag to indicate which lifecycle is being tested"/>
-    <aura:attribute name="shouldTest_attributeChangedCallback_hook" type="Boolean" default="false" description="Flag to indicate which lifecycle is being tested"/>
     <aura:attribute name="shouldTest_renderedCallback_hook" type="Boolean" default="false" description="Flag to indicate which lifecycle is being tested"/>
     <aura:attribute name="title" type="Boolean" default="false"/>
     <secureModuleTest:componentLifecycleTester
@@ -28,7 +27,6 @@
             shouldTestConstructorHook="{!v.shouldTest_constructor_hook}"
             shouldTestConnectedCallbackHook="{!v.shouldTest_connectedCallback_hook}"
             shouldTestDisconnectedCallbackHook="{!v.shouldTest_disconnectedCallback_hook}"
-            shouldTestAttributeChangedCallbackHook="{!v.shouldTest_attributeChangedCallback_hook}"
             shouldTestRenderedCallbackHook="{!v.shouldTest_renderedCallback_hook}"
             title="{!v.title}"/>
     <aura:method name="componentLifecycleTester">

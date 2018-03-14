@@ -39,26 +39,6 @@ export default class ComponentLifecycleTester extends Element {
         }
     }
 
-    static observedAttributes = ['title'];
-    attributeChangedCallback(attributeName, oldValue, newValue) {
-        if (this.shouldTestAttributeChangedCallbackHook) {
-            // Verify that locker didn't interfere with function arguments
-            testUtil.assertEquals("title", attributeName);
-            testUtil.assertEquals(null, oldValue);
-            testUtil.assertEquals("invoked!", newValue);
-            // Verify that render method has access to secure wrappers when invoked through interop
-            testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
-                + " return SecureWindow in attributeChangedCallback");
-            testUtil.assertEquals("undefined", typeof $A, // eslint-disable-line lwc/no-aura
-                "Expected $A to be not accessible in attributeChangedCallback");
-            testUtil.assertStartsWith("SecureDocument", document.toString(), "Expected document to"
-                + " return SecureDocument in attributeChangedCallback");
-            testUtil.assertTrue(this instanceof ComponentLifecycleTester,
-                "Expected context to be an instance of the component class in attributeChangedCallback");
-            window.attributeChangedCallbackHookCalled = true;
-        }
-    }
-
     renderedCallback() {
         if (this.shouldTestRenderedCallbackHook) {
             // Verify that render method has access to secure wrappers when invoked through interop

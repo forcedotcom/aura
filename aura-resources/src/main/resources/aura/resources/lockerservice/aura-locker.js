@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-03-11
- * Version: 0.3.23
+ * Generated: 2018-03-14
+ * Version: 0.3.24
  */
 
 (function (exports) {
@@ -1440,6 +1440,9 @@ function createFunctionEvaluator(sandbox) {
 
 function SecureScriptElement() {}
 
+// TODO: this should be removed once Locker has a proper configuration mechanism in place
+const TRUSTED_CORS_DOMAINS = /\.lightning\.(|.*\.)force\.com$/g;
+
 SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
   function getAttributeName(name) {
     const lowercasedName = name.toLowerCase();
@@ -1634,10 +1637,17 @@ SecureScriptElement.run = function(st) {
 
   xhr.open('GET', scriptUrl, true);
 
-  // for relative urls enable sending credentials
-  if (scriptUrl.indexOf('/') === 0) {
+  // send credentials only when performing CORS requests
+  // TODO: this should be revisited once Locker has a proper configuration mechanism
+  const normalized = document.createElement('a');
+  normalized.href = scriptUrl;
+  if (
+    window.location.hostname !== normalized.hostname &&
+    normalized.hostname.match(TRUSTED_CORS_DOMAINS)
+  ) {
     xhr.withCredentials = true;
   }
+
   xhr.send();
 };
 
@@ -6451,7 +6461,7 @@ const metadata$5 = {
       head: DEFAULT,
       hidden: DEFAULT,
       images: DEFAULT,
-      // implementation: DEFAULT, Disable API W-4437359
+      implementation: DEFAULT,
       importNode: FUNCTION,
       inputEncoding: DEFAULT,
       lastElementChild: DEFAULT,
@@ -7506,7 +7516,7 @@ const metadata$$1 = {
       DOMError: FUNCTION,
       DOMException: FUNCTION,
       DOMImplementation: FUNCTION,
-      // DOMParser: RAW, Disable API W-4437359
+      DOMParser: RAW,
       DOMStringList: FUNCTION,
       DOMStringMap: FUNCTION,
       DOMTokenList: FUNCTION,

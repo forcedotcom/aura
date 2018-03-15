@@ -82,10 +82,20 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
         [Fact]
         function defaultVariablesDefined() {
             var actual;
-            var expect = "_uid,_def,aura.app,_hydration,_l,LATEST,/auraCmpDef?";
+            var expect = "_uid,_def,aura.app,_hydration,_l,LATEST,/auraCmpDef?,markup://,1800";
             mockAura(function () {
                 var defLoader = Aura.Component.ComponentDefLoader;
-                actual = [defLoader.UID_param, defLoader.DESCRIPTOR_param, defLoader.APP_param, defLoader.HYDRATION_param, defLoader.LOCKER_param, defLoader.UID_default, defLoader.BASE_PATH];
+                actual = [
+                    defLoader.UID_param,
+                    defLoader.DESCRIPTOR_param,
+                    defLoader.APP_param,
+                    defLoader.HYDRATION_param,
+                    defLoader.LOCKER_param,
+                    defLoader.UID_default,
+                    defLoader.BASE_PATH,
+                    defLoader.MARKUP_param,
+                    defLoader.IE_URI_MAX_LENGTH
+                ];
             });
 
             Assert.Equal(expect, actual.join(","));

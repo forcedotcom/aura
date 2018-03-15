@@ -33,6 +33,7 @@ ComponentDefLoader.LOCKER_param = "_l";
 ComponentDefLoader.STYLE_param = "_style";
 ComponentDefLoader.UID_default = "LATEST";
 ComponentDefLoader.BASE_PATH = "/auraCmpDef?";
+ComponentDefLoader.MARKUP_param = "markup://";
 ComponentDefLoader.IE_URI_MAX_LENGTH = 1800;
 
 ComponentDefLoader.prototype.buildComponentUri = function(descriptor, uid) {
@@ -54,7 +55,7 @@ ComponentDefLoader.prototype.buildComponentUri = function(descriptor, uid) {
 };
 
 ComponentDefLoader.prototype.buildURIAppParam = function() {
-    return ComponentDefLoader.APP_param + "=markup://" + $A.getRoot().getType();
+    return ComponentDefLoader.APP_param + "=" + ComponentDefLoader.MARKUP_param + $A.getRoot().getType();
 };
 
 ComponentDefLoader.prototype.buildURIHydrationParam = function(hydration) {

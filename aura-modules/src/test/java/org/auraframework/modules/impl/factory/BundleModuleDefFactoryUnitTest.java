@@ -25,6 +25,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -77,15 +78,15 @@ public class BundleModuleDefFactoryUnitTest {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         FileSource<ModuleDef> jsFileSource = mock(FileSource.class);
-        when(jsFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.js");
+        when(jsFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","namespace","module-cmp","module-cmp.js"));
         when(jsFileSource.getContents()).thenReturn("javascript code here");
 
         FileSource<ModuleDef> htmlFileSource = mock(FileSource.class);
-        when(htmlFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.html");
+        when(htmlFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","namespace","module-cmp","module-cmp.html"));
         when(htmlFileSource.getContents()).thenReturn("template code here");
 
         FileSource<ModuleDef> jsonFileSource = mock(FileSource.class);
-        when(jsonFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/lightning.json");
+        when(jsonFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","namespace","module-cmp","lightning.json"));
         when(jsonFileSource.getContents()).thenReturn("{ description: 'hello there', expose: 'true', minVersion: '12.3' }");
 
         String xml =
@@ -100,7 +101,7 @@ public class BundleModuleDefFactoryUnitTest {
                     "</tags>\n" +
                 "</LightningComponentBundle>";
         FileSource<ModuleDef> xmlMetadataFileSource = mock(FileSource.class);
-        when(xmlMetadataFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp-meta.xml");
+        when(xmlMetadataFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","namespace","module-cmp","module-cmp.js-meta.xml"));
         when(xmlMetadataFileSource.getContents()).thenReturn(xml);
 
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
@@ -166,11 +167,11 @@ public class BundleModuleDefFactoryUnitTest {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         FileSource<ModuleDef> jsFileSource = mock(FileSource.class);
-        when(jsFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/name-space/moduleCmp/moduleCmp.js");
+        when(jsFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","name-space","module-cmp","moduleCmp.js"));
         when(jsFileSource.getContents()).thenReturn("javascript code here");
 
         FileSource<ModuleDef> htmlFileSource = mock(FileSource.class);
-        when(htmlFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/name-space/moduleCmp/moduleCmp.html");
+        when(htmlFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","name-space","module-cmp","moduleCmp.html"));
         when(htmlFileSource.getContents()).thenReturn("template code here");
 
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "name-space", "modulecmp", ModuleDef.class);
@@ -198,11 +199,11 @@ public class BundleModuleDefFactoryUnitTest {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         FileSource<ModuleDef> jsFileSource = mock(FileSource.class);
-        when(jsFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/name-Space/moduleCmp/moduleCmp.js");
+        when(jsFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","name-Space","module-cmp","moduleCmp.js"));
         when(jsFileSource.getContents()).thenReturn("javascript code here");
 
         FileSource<ModuleDef> htmlFileSource = mock(FileSource.class);
-        when(htmlFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/name-Space/moduleCmp/moduleCmp.html");
+        when(htmlFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","name-Space","module-cmp","moduleCmp.html"));
         when(htmlFileSource.getContents()).thenReturn("template code here");
 
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "name-Space", "modulecmp", ModuleDef.class);
@@ -230,11 +231,11 @@ public class BundleModuleDefFactoryUnitTest {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         FileSource<ModuleDef> jsFileSource = mock(FileSource.class);
-        when(jsFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/moduleCmp/moduleCmp.js");
+        when(jsFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","namespace","module-Cmp","module-Cmp.js"));
         when(jsFileSource.getContents()).thenReturn("javascript code here");
 
         FileSource<ModuleDef> htmlFileSource = mock(FileSource.class);
-        when(htmlFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/moduleCmp/moduleCmp.html");
+        when(htmlFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","namespace","module-Cmp","module-Cmp.html"));
         when(htmlFileSource.getContents()).thenReturn("template code here");
 
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "namespace", "modulecmp", ModuleDef.class);
@@ -262,11 +263,11 @@ public class BundleModuleDefFactoryUnitTest {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         FileSource<ModuleDef> jsFileSource = mock(FileSource.class);
-        when(jsFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.js");
+        when(jsFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","namespace","module-cmp","module-cmp.js"));
         when(jsFileSource.getContents()).thenReturn("javascript code here");
 
         FileSource<ModuleDef> htmlFileSource = mock(FileSource.class);
-        when(htmlFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.html");
+        when(htmlFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","namespace","module-cmp","module-cmp.html"));
         when(htmlFileSource.getContents()).thenReturn("template code here");
 
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
@@ -303,11 +304,11 @@ public class BundleModuleDefFactoryUnitTest {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         FileSource<ModuleDef> jsFileSource = mock(FileSource.class);
-        when(jsFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.js");
+        when(jsFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","namespace","module-cmp","module-cmp.js"));
         when(jsFileSource.getContents()).thenReturn("javascript code here");
 
         FileSource<ModuleDef> htmlFileSource = mock(FileSource.class);
-        when(htmlFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.html");
+        when(htmlFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","namespace","module-cmp","module-cmp.html"));
         when(htmlFileSource.getContents()).thenReturn("template code here");
 
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);

@@ -19,7 +19,6 @@ import java.io.File;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -94,29 +93,28 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
         // compute base file path. baseClassSource must be FileSource to return path for systemId
         String baseFilePath = baseClassSource.getSystemId();
-        int start = baseFilePath.lastIndexOf('/', baseFilePath.lastIndexOf('/', baseFilePath.lastIndexOf('/') - 1) - 1);
+
+        int relativeStart = baseFilePath.lastIndexOf(File.separatorChar);
+        int nameStart = baseFilePath.lastIndexOf(File.separatorChar, relativeStart - 1);
+        int start = baseFilePath.lastIndexOf(File.separatorChar, nameStart - 1);
+
+        String name = baseFilePath.substring(nameStart + 1, relativeStart);
+        String namespace = baseFilePath.substring(start + 1, nameStart);
         String componentPath = baseFilePath.substring(start + 1);
 
         Location location = new Location(baseClassSource);
 
-        String[] paths = componentPath.split("/");
-        if (paths.length > 2) {
-            String namespace = paths[0];
-            String name = paths[1];
+        // ensure module folders adhere to web component (custom element) naming conventions.
+        if (CharMatcher.javaUpperCase().matchesAnyOf(namespace)) {
+            throw new InvalidDefinitionException("Use lowercase for module folder names. Not " + namespace, location);
+        }
 
-            // ensure module folders adhere to web component (custom element) naming conventions.
+        if (namespace.contains("-")) {
+            throw new InvalidDefinitionException("Namespace cannot have a hyphen. Not " + namespace, location);
+        }
 
-            if (CharMatcher.javaUpperCase().matchesAnyOf(namespace)) {
-                throw new InvalidDefinitionException("Use lowercase for module folder names. Not " + namespace, location);
-            }
-
-            if (namespace.contains("-")) {
-                throw new InvalidDefinitionException("Namespace cannot have a hyphen. Not " + namespace, location);
-            }
-
-            if (CharMatcher.javaUpperCase().matchesAnyOf(name)) {
-                throw new InvalidDefinitionException("Use lowercase and hyphens for module file names. Not " + name, location);
-            }
+        if (CharMatcher.javaUpperCase().matchesAnyOf(name)) {
+            throw new InvalidDefinitionException("Use lowercase and hyphens for module file names. Not " + name, location);
         }
 
         Map<String, String> sources = new HashMap<>();
@@ -142,7 +140,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
         // module
         builder.setPath(baseFilePath);
-        builder.setCustomElementName(getCustomElementName(componentPath));
+        builder.setCustomElementName(namespace + "-" + name);
 
         ModulesCompilerData compilerData;
         try {
@@ -276,22 +274,6 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                     .append("}");
         }
         return processedCode.toString();
-    }
-
-    /**
-     * Custom element tag name from path
-     * @param path file path
-     * @return custom element tag name
-     */
-    private String getCustomElementName(String path) {
-        String[] paths = path.split(File.separator);
-        int length = paths.length;
-        if (length > 2) {
-            String name = paths[1];
-            String namespace = paths[0];
-            return namespace + "-" + name;
-        }
-        return "";
     }
 
     /**

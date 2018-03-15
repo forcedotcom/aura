@@ -209,7 +209,8 @@
         var mask = this._findContainedComponent(cmp, 'modal-glass').getElement();
         
         if ($A.util.isUndefinedOrNull(this.global._originalOverflowStyle)) {
-            var overflowStyle = window.getComputedStyle(document.body, '').overflow;
+            var style = window.getComputedStyle(document.body, '');
+            var overflowStyle = style && style.overflow ? style.overflow : document.body.style.overflow;
             this.global._originalOverflowStyle = overflowStyle;
             // prevent scrolling of the body when modals are open
             document.body.style.overflow = 'hidden';

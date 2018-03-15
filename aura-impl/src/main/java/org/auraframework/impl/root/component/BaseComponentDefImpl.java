@@ -156,6 +156,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private transient Boolean localDeps = null;
     private transient QuickFixException componentBuildError;
     protected transient Map<String,String> serializedJSON;
+    protected final static String SERIALIZED_JSON_NO_FORMATTING_KEY = "no-format";
 
     private static <X extends Definition> DefDescriptor<X> getFirst(List<DefDescriptor<X>> list) {
         return (list != null && list.size() > 0) ? list.get(0) : null;
@@ -1152,7 +1153,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                         }
                     }
                 }
-                serializedJSON.put(json.getIndent(), json.stopCapturing());
+                String indent = SERIALIZED_JSON_NO_FORMATTING_KEY;
+                if (json.getSerializationContext().format()) {
+                    indent = json.getIndent();
+                }
+                serializedJSON.put(indent, json.stopCapturing());
                 
                 serializeContextDependencies(context, json);
                 

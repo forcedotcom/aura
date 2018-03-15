@@ -435,21 +435,6 @@ public class JsonEncoder implements Json {
     }
 
     /**
-     * Check the indent type.
-     *
-     * See the notes on performance on the class above.
-     *
-     * @param type the type of indent that should be on the stack.
-     * @param message the message for the throwable if it is wrong.
-     */
-    @Override
-    public void checkIndent(IndentType type, String message) {
-        if (this.indentStack.isEmpty() || !type.equals(this.indentStack.peek().getType())) {
-            throw new JsonException(message);
-        }
-    }
-
-    /**
      * Pop an indent off the stack.
      *
      * This both checks the type on the stack, and pulls it off. See the notes

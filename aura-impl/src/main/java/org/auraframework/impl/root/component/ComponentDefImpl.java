@@ -101,7 +101,11 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
 
         boolean preloaded = context.isPreloaded(getDescriptor());
 
-        if (serializedJSON != null && serializedJSON.containsKey(json.getIndent()) && !preloaded && !serializationContext.isSerializing()) {
+        String indent = SERIALIZED_JSON_NO_FORMATTING_KEY;
+        if (json.getSerializationContext().format()) {
+            indent = json.getIndent();
+        }
+        if (serializedJSON != null && serializedJSON.containsKey(indent) && !preloaded && !serializationContext.isSerializing()) {
             serializationContext.setSerializing(true);
             
             json.writeMapBegin();
@@ -110,7 +114,7 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
 
             serializeStyles(json);
 
-            String preSerializedJSON = serializedJSON.get(json.getIndent());
+            String preSerializedJSON = serializedJSON.get(indent);
             if (preSerializedJSON != null) {
                 json.getAppendable().append(preSerializedJSON);
             }

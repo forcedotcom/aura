@@ -168,7 +168,6 @@ public interface Json {
         }
     }
 
-    void checkIndent(IndentType type, String message);
     void close() throws IOException;
 
     Appendable getAppendable();

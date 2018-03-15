@@ -833,7 +833,7 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
             
-            if (style == EncodingStyle.Css || style == EncodingStyle.Full) {
+            if (style == EncodingStyle.Css || (style == EncodingStyle.Full && configAdapter.uriAddressableDefsEnabled())){
                 // add contextual CSS information
                 if (styleContext == null) {
                     setStyleContext();

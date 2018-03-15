@@ -599,6 +599,7 @@ public class AuraTestFilter {
         
         out.append(
                 String.format(
+                    "var suiteCode=%2$s\n;" +
                     "var testBootstrapFunction = function(testName, suiteProps, testTimeout) { \n"+
                             "if(!$A.test.isComplete()) {\n"+
                                 "if(window.sessionStorage) {\n"+
@@ -617,19 +618,19 @@ public class AuraTestFilter {
                          "&& window.$A && window.$A.test && window.$A.test.isComplete instanceof Function ) { \n"+//but the test wasn't
                          "if(window.sessionStorage) {\n"+
                                 //"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
-                                "sessionStorage.setItem('TestRunStatus','Run %s directly, as bootstrap finish before we can push test to its run-after, timeStamp#'+$A.test.time()+'.'); \n"+
+                                "sessionStorage.setItem('TestRunStatus','Run %1$s directly, as bootstrap finish before we can push test to its run-after, timeStamp#'+$A.test.time()+'.'); \n"+
                          "}\n"+
-                         "testBootstrapFunction('%s', %s, '%s'); \n"+
+                         "testBootstrapFunction('%1$s', suiteCode, '%3$s'); \n"+
                     "} else {\n"+
                         "if(window.sessionStorage) {\n"+
                             //"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
-                            "sessionStorage.setItem('TestRunStatus','Push %s to bootstrap run after, timeStamp#'+((window.$A && window.$A.test) ? $A.test.time():Date.now())+'.'); \n"+
+                            "sessionStorage.setItem('TestRunStatus','Push %1$s to bootstrap run after, timeStamp#'+((window.$A && window.$A.test) ? $A.test.time():Date.now())+'.'); \n"+
                         "}\n"+
                         "window.Aura || (window.Aura = {}); \n"+
                         "window.Aura.afterBootstrapReady || (window.Aura.afterBootstrapReady = []); \n"+
-                        "window.Aura.afterBootstrapReady.push(testBootstrapFunction.bind(this, '%s', %s, '%s')); \n"+
+                        "window.Aura.afterBootstrapReady.push(testBootstrapFunction.bind(this, '%1$s', suiteCode, '%3$s')); \n"+
                     "} \n"
-                    ,testName, testName, suiteDef.getCode()+"\t\n", testTimeout, testName, testName, suiteDef.getCode()+"\t\n", testTimeout)
+                    ,testName, suiteDef.getCode()+"\t\n", testTimeout)
         );
     }
 

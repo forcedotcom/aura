@@ -335,8 +335,8 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
 
             //endAnimationHandler: cleanup all classes and events
             var endAnimationHandler = $A.getCallback(function () {
-                // make sure the compoment is valid befdore  
-                // doining anything with it, because
+                // make sure the compoment is valid before  
+                // doing anything with it, because
                 // this is asynchronous
                 if(!cmp.isValid()) {
                     config.onFinish && config.onFinish();

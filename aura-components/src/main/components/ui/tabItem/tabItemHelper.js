@@ -95,9 +95,9 @@
 
     initWidth: function (cmp) {
         var el = cmp.getElement();
-        
-        if (el instanceof Element) {
-            var style = window.getComputedStyle(el, '');
+        // Firefox getComputedStyle could return null if element has display:none.
+        var style = (el instanceof Element) ? window.getComputedStyle(el, '') : null;
+        if (style) {
             var width = parseFloat(style.marginLeft) + parseFloat(style.marginRight) + el.offsetWidth;
             $A.util.setDataAttribute(el, "original-width", width);
         }

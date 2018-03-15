@@ -29,8 +29,8 @@
     testInputGetElementWithLabel: {
         attributes: {label: "text label"},
         test: [ function(component) {
-            var inputCmp = component.getSuper(),
-                helper = component.getDef().getHelper();
+            var inputCmp = component.getSuper();
+            var helper = component.getDef().getHelper();
             var inputElement = helper.getInputElement(inputCmp);
             $A.test.assertEquals("input", inputElement.tagName.toLowerCase(), "should find the correct input element");
         }]
@@ -38,8 +38,8 @@
 
     testInputGetElementWithoutLabel: {
         test: [ function(component) {
-            var inputCmp = component.getSuper(),
-                helper = component.getDef().getHelper();
+            var inputCmp = component.getSuper();
+            var helper = component.getDef().getHelper();
             var inputElement = helper.getInputElement(inputCmp);
             $A.test.assertEquals("input", inputElement.tagName.toLowerCase(), "should find the correct input element");
         }]
@@ -48,8 +48,8 @@
     testInputGetElementLabelDestroyed: {
         attributes: {label: "text label"},
         test: [ function(component) {
-            var inputCmp = component.getSuper(),
-                helper = component.getDef().getHelper();
+            var inputCmp = component.getSuper();
+            var helper = component.getDef().getHelper();
             inputCmp.find("inputLabel").destroy();
             var inputElement = helper.getInputElement(inputCmp);
             $A.test.assertEquals("input", inputElement.tagName.toLowerCase(), "should find the correct input element");
@@ -66,7 +66,27 @@
                 "When isCompound=true, v.label should be used for <legend/>");
         }]
     },
-
+    
+    testAriaRequiredWhenIsCompoundFieldSet: {
+        attributes: { isCompound: true, label: "inputLabel", required: "true" },
+        test: [function(component) {
+            var inputCmp = component.getSuper();
+            var helper = component.getDef().getHelper();
+            var inputElement = helper.getInputElement(inputCmp);
+            $A.test.assertUndefinedOrNull(inputElement.getAttribute("aria-required"), "Input should not have aria-required");
+        }]
+    },
+    
+    testAriaRequiredWhenIsSimpleInput: {
+        attributes: { isCompound: false, label: "inputLabel", required: "true" },
+        test: [function(component) {
+            var inputCmp = component.getSuper();
+            var helper = component.getDef().getHelper();
+            var inputElement = helper.getInputElement(inputCmp);
+            $A.test.assertNotUndefinedOrNull(inputElement.getAttribute("aria-required"), "Input should have aria-required");
+        }]
+    },
+    
     testLabelWhenIsSimpleInput: {
         attributes: { isCompound: false, label: "inputLabel" },
         test: [function(component) {

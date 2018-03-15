@@ -44,10 +44,15 @@ public class TagsElementHandler implements ModuleMetadataXMLHandler {
                     String elementName = reader.getLocalName();
                     if (elementName.equals("tag")) {
                         moduleBuilder.addTag(ModuleMetadataXMLParserUtil.readCharacters(reader));
+                    } else {
+                        throw new XMLStreamException("Unexpected element: " + elementName);
                     }
                     break;
                 case XMLStreamConstants.END_ELEMENT:
                     return;
+                case XMLStreamConstants.CHARACTERS:
+                    ModuleMetadataXMLParserUtil.handleWhitespace(reader);
+                    continue;
             }
         }
         throw new XMLStreamException("Premature end of XML");

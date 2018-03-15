@@ -35,7 +35,7 @@ public class ModuleMetadataXMLParserUtil {
                     return result.toString().trim();
                 case XMLStreamConstants.START_ELEMENT:
                     String elementName = reader.getLocalName();
-                    throw new XMLStreamException("Unexpected element " + elementName);
+                    throw new XMLStreamException("Unexpected element: " + elementName);
             }
         }
         throw new XMLStreamException("Premature end of XML");
@@ -53,5 +53,11 @@ public class ModuleMetadataXMLParserUtil {
     public static Boolean readBoolean(XMLStreamReader reader) throws XMLStreamException {
         String characters = readCharacters(reader);
         return Boolean.valueOf(characters);
+    }
+
+    public static void handleWhitespace(XMLStreamReader reader) throws XMLStreamException {
+        if (!reader.isWhiteSpace()) {
+            throw new XMLStreamException("Unexpected xml: " + reader.getText().trim());
+        }
     }
 }

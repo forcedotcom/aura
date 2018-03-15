@@ -22,6 +22,7 @@ import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.factory.XMLParserBase;
 import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
 import org.auraframework.modules.impl.metadata.xml.ModuleMetadataXMLHandler;
+import org.auraframework.modules.impl.metadata.xml.ModuleMetadataXMLParserUtil;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.Location;
 import org.auraframework.system.TextSource;
@@ -117,6 +118,10 @@ public class ModulesMetadataServiceImpl implements ModulesMetadataService {
                         break;
                     case XMLStreamConstants.END_ELEMENT:
                         break;
+                    case XMLStreamConstants.CHARACTERS:
+                        ModuleMetadataXMLParserUtil.handleWhitespace(reader);
+                        continue;
+
                 }
             }
         } catch (XMLStreamException e) {

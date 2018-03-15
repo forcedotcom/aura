@@ -149,7 +149,112 @@ public class ModulesMetadataServiceImplUnitTest {
             fail("bad xml should have thrown exception");
         } catch (QuickFixException qfe) {
             assertTrue("should be InvalidDefinitionException", qfe instanceof InvalidDefinitionException);
-            assertTrue("should be XML parse error", qfe.getMessage().contains("Unexpected element abc"));
+            assertTrue("should be XML parse error", qfe.getMessage().contains("Unexpected element: abc"));
+        }
+    }
+
+    @Test
+    public void processBadTagsXML() throws Exception {
+        String xml =
+                "<LightningComponentBundle> " +
+                        "  <isExposed>true</isExposed>\n" +
+                        "  <minApiVersion>41.0  </minApiVersion>\n" +
+                        "    <requireLocker>true  </requireLocker>\n" +
+                        "<tags>\n" +
+                        "   <nottag>random__tag</nottag>\n" +
+                        "   <tag>random__tag</tag>\n" +
+                        "   <tag>bob__tag</tag>" +
+                        "   <tag>home__tag</tag>\n" +
+                        "</tags>" +
+                        "</LightningComponentBundle>";
+
+        FileSource xmlSource = mock(FileSource.class);
+        when(xmlSource.getContents()).thenReturn(xml);
+        when(xmlSource.getLastModified()).thenReturn(1L);
+        when(xmlSource.getSystemId()).thenReturn("/fake/xml/file.xml");
+
+        ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
+        List<ModuleMetadataXMLHandler> xmlHandlers = getXmlHandlers();
+
+        ModulesMetadataServiceImpl modulesMetadataService = new ModulesMetadataServiceImpl();
+        modulesMetadataService.setModuleXMLHandlers(xmlHandlers);
+
+        try {
+            modulesMetadataService.processMetadata(xmlSource, builder);
+            fail("bad xml should have thrown exception");
+        } catch (QuickFixException qfe) {
+            assertTrue("should be InvalidDefinitionException", qfe instanceof InvalidDefinitionException);
+            assertTrue("should be XML parse error", qfe.getMessage().contains("Unexpected element: nottag"));
+        }
+    }
+
+    @Test
+    public void processRandomTextInTagsXML() throws Exception {
+        String xml =
+                "<LightningComponentBundle> " +
+                        "  <isExposed>true</isExposed>\n" +
+                        "  <minApiVersion>41.0  </minApiVersion>\n" +
+                        "    <requireLocker>true  </requireLocker>\n" +
+                        "<tags>\n" +
+                        "   <tag>random__tag</tag>\n" +
+                        "   <tag>bob__tag</tag>" +
+                        "  \n blah \n random \n" +
+                        "   <tag>home__tag</tag>\n" +
+                        "</tags>" +
+                        "</LightningComponentBundle>";
+
+        FileSource xmlSource = mock(FileSource.class);
+        when(xmlSource.getContents()).thenReturn(xml);
+        when(xmlSource.getLastModified()).thenReturn(1L);
+        when(xmlSource.getSystemId()).thenReturn("/fake/xml/file.xml");
+
+        ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
+        List<ModuleMetadataXMLHandler> xmlHandlers = getXmlHandlers();
+
+        ModulesMetadataServiceImpl modulesMetadataService = new ModulesMetadataServiceImpl();
+        modulesMetadataService.setModuleXMLHandlers(xmlHandlers);
+
+        try {
+            modulesMetadataService.processMetadata(xmlSource, builder);
+            fail("bad xml should have thrown exception");
+        } catch (QuickFixException qfe) {
+            assertTrue("should be InvalidDefinitionException", qfe instanceof InvalidDefinitionException);
+            assertTrue("should be XML parse error", qfe.getMessage().contains("Unexpected xml"));
+        }
+    }
+
+    @Test
+    public void processRandomTextXML() throws Exception {
+        String xml =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<LightningComponentBundle> \n\n" +
+                        "  <isExposed>true</isExposed>\n" +
+                        "  <minApiVersion>41.0  </minApiVersion>\n" +
+                        "    <requireLocker>true  </requireLocker>\n" +
+                        "<tags>\n" +
+                        "   <tag>random__tag</tag>\n" +
+                        "   <tag>bob__tag</tag>" +
+                        "   <tag>home__tag</tag>\n" +
+                        "</tags> \n  \n something random here \n\n\n" +
+                        "</LightningComponentBundle>";
+
+        FileSource xmlSource = mock(FileSource.class);
+        when(xmlSource.getContents()).thenReturn(xml);
+        when(xmlSource.getLastModified()).thenReturn(1L);
+        when(xmlSource.getSystemId()).thenReturn("/fake/xml/file.xml");
+
+        ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
+        List<ModuleMetadataXMLHandler> xmlHandlers = getXmlHandlers();
+
+        ModulesMetadataServiceImpl modulesMetadataService = new ModulesMetadataServiceImpl();
+        modulesMetadataService.setModuleXMLHandlers(xmlHandlers);
+
+        try {
+            modulesMetadataService.processMetadata(xmlSource, builder);
+            fail("bad xml should have thrown exception");
+        } catch (QuickFixException qfe) {
+            assertTrue("should be InvalidDefinitionException", qfe instanceof InvalidDefinitionException);
+            assertTrue("should be XML parse error", qfe.getMessage().contains("Unexpected xml"));
         }
     }
 

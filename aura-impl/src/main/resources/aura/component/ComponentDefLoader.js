@@ -160,7 +160,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
         } else {
             uri += additionalURI;
         }
-        for (var j=0, names_length=names.length; j < names_length; j++) {
+        for (var j=0; j < names.length; j++) {
             var def_uid = namespaceMap[namespaces[i]][names[j]];
             if ($A.util.isString(def_uid)) {
                 uid += def_uid;
@@ -171,7 +171,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     uris.push([uri, uid]);
 
     var processedURI = [];
-    for(var def=0, def_len=uris.length; def<def_len; def++) {
+    for(var def=0; def<uris.length; def++) {
         var finalURI = this.buildURIString(uris[def][0], uris[def][1], descriptors);
         Aura["componentDefLoaderError"][finalURI.uid] = [];
         processedURI.push(baseURI + finalURI.uriString);
@@ -232,7 +232,7 @@ ComponentDefLoader.prototype.retrievePending = function(pending) {
         }
         if (pending.callbacks.length === 0) {
             // there was no callbacks, the error should still be surfaced
-            throw e;
+            $A.reportError(e);
         }
     });
 };
@@ -280,9 +280,13 @@ ComponentDefLoader.prototype.generateScriptTag = function(scope, uri, resolve, r
     script["src"] = $A.clientService._host + uri;
     script["onload"] = function () {
         scope.checkForError(uri, resolve, reject);
+        script["onload"] = script["onerror"] = undefined;
+        document.body.removeChild(script);
     };
     script["onerror"] = function(){
         scope.onerror(uri, reject);
+        script["onload"] = script["onerror"] = undefined;
+        document.body.removeChild(script);
     };
     script["nonce"] = $A.getContext().scriptNonce;
     document.body.appendChild(script);
@@ -291,7 +295,6 @@ ComponentDefLoader.prototype.generateScriptTag = function(scope, uri, resolve, r
 ComponentDefLoader.prototype.schedulePending = function() {
     var that = this;
     this.pending = { callbacks: [], descriptorMap: {} };
-    //TODO: TW: meh
     window.setTimeout(function() {
         that.retrievePending.call(that, that.pending);
         that.pending = null;

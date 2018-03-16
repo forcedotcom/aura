@@ -45,8 +45,8 @@ function lib() { //eslint-disable-line no-unused-vars
         if (stackingCtxEl === parentNode || parentNode.tagName === 'BODY') {
             return el;
         }
-
-        while (parentNode.parentNode.tagName !== 'BODY') {
+        
+        while (parentNode.parentNode && parentNode.parentNode.tagName !== 'BODY') {
             parentNode = parentNode.parentNode;
         }
 

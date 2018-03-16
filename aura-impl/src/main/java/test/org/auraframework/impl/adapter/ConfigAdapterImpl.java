@@ -854,4 +854,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         IOUtil.markTempDirForDelete();
     }
 
+    @Override
+    public boolean isSecureRequest(HttpServletRequest request) {
+        return request.isSecure();
+    }
 }

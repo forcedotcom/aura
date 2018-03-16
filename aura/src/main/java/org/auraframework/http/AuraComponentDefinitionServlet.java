@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -63,6 +64,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     private LoggingService loggingService;
     private ServerService serverService;
     private ContextService contextService;
+    private ConfigAdapter configAdapter;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -116,7 +118,13 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 if ("null".equals(requestedUID)) {
                     throw new InvalidDefinitionException("requestedComponentUID can't be 'null'", null);
                 }
-                response.sendRedirect(new StringBuilder().append(request.getScheme()).append("://").append(request.getHeader("Host"))
+                String scheme;
+                if (configAdapter.isSecureRequest(request)) {
+                    scheme = "https";
+                } else {
+                    scheme = "http";
+                }
+                response.sendRedirect(new StringBuilder().append(scheme).append("://").append(request.getHeader("Host"))
                         .append(generateRedirectURI(descriptors, hydrationType, computedUID, appReferrrer)).toString());
                 return;
             }
@@ -266,5 +274,10 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     @Inject
     public void setContextService(ContextService contextService) {
         this.contextService = contextService;
+    }
+
+    @Inject
+    public void setConfigAdapter(ConfigAdapter configAdapter) {
+        this.configAdapter = configAdapter;
     }
 }

@@ -231,4 +231,6 @@ public interface ConfigAdapter extends AuraAdapter {
     NodeLambdaFactory nodeServiceFactory();
     
     boolean uriAddressableDefsEnabled();
+
+    boolean isSecureRequest(HttpServletRequest request);
 }

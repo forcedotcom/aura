@@ -122,11 +122,19 @@ public class TabsetUITest extends WebDriverTestCase {
      */
     private void closeTabAndVerify(String loc) {
         findDomElement(By.xpath(loc)).click();
-        int numberOfElement = findDomElements(By.xpath("//ul/li")).size();
-
+        
         // Subtracting total number of tabs that we expect by 1
-        --NUMBER_OF_TABS;
-        assertEquals("The number of tabs, after deleting a tab, do not match", numberOfElement, NUMBER_OF_TABS);
+        NUMBER_OF_TABS = NUMBER_OF_TABS - 1;
+        
+        WebDriverWait wait = new WebDriverWait(getDriver(), getAuraUITestingUtil().getTimeout());
+        wait.until(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return findDomElements(By.xpath("//ul/li")).size() == NUMBER_OF_TABS;
+            }
+        });
+
+        assertEquals("The number of tabs, after deleting a tab, do not match", findDomElements(By.xpath("//ul/li")).size(), NUMBER_OF_TABS);
     }
 
     /**

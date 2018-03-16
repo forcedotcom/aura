@@ -16,6 +16,7 @@
 
 -->
 <aura:component description="Represents the caption for a picklist.">
+    <aura:attribute name="domId" type="String" description="The DOM id for the label"/>
     <aura:attribute name="label" type="String" description="The label to use for the menu based inputSelect."/>
     <aura:attribute name="title" type="String" description="The text displayed in a tooltip when the mouse pointer hovers over the label."/>
     <aura:attribute name="class" type="String" description="A CSS style to be attached to the label."/>
@@ -23,7 +24,7 @@
     <aura:attribute name="requiredIndicator" type="Aura.Component[]" description="A component that displays the indicator for the required field. "/>
 
     <span class="{!v.class}" aura:id="spanElement">
-        <span title="{!v.title}" class="{!v.labelDisplay ? null : 'assistiveText' }">{!v.label}</span>
+        <span id="{!v.domId}" title="{!v.title}" class="{!v.labelDisplay ? null : 'assistiveText' }">{!v.label}</span>
         {!v.body}
         {!v.requiredIndicator}
     </span>

@@ -34,7 +34,7 @@
     <aura:set attribute="trigger">
         <div aura:id="menuTrigger">
             <!-- programatic dispatch of onblur="{!c.onblur}" onfocus="{!c.onfocus}" -->
-            <a aura:id="link" aria-label="{!v.ariaLabel}" aria-haspopup="true" aria-disabled="{!v.disabled}" aria-required="{!v.ariaRequired}"
+            <a aura:id="link" aria-label="{!v.ariaLabel}" aria-haspopup="true" aria-disabled="{!v.disabled}" aria-required="{!v.ariaRequired}" aria-describedby="{!v.ariaDescribedBy}"
                tabindex="{!v.disabled ? -1: 0}" class="{!v.class}" title="{!v.title}" onclick="{!c.onClick}" role="button">
 
                 <aura:if isTrue="{!v.body.length == 0}">

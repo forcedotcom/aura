@@ -6239,6 +6239,12 @@ return {
                               "target":"ui:menuTriggerLink",
                               "path":"v.disabled"
                             },
+                            "aria-describedby":{
+                              "exprType":"PROPERTY",
+                              "byValue":false,
+                              "target":"ui:menuTriggerLink",
+                              "path":"v.ariaDescribedBy"
+                            },
                             "aria-haspopup":"true",
                             "tabindex":{
                               "exprType":"FUNCTION",
@@ -6384,6 +6390,7 @@ return {
   },
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]],
+    ["domId","aura://String","I",false],
     ["label","aura://String","I",false],
     ["title","aura://String","I",false],
     ["class","aura://String","I",false],
@@ -6440,6 +6447,12 @@ return {
                                 }
                               ],
                               "byValue":false
+                            },
+                            "id":{
+                              "exprType":"PROPERTY",
+                              "byValue":false,
+                              "target":"ui:picklistLabel",
+                              "path":"v.domId"
                             },
                             "title":{
                               "exprType":"PROPERTY",
@@ -7290,6 +7303,7 @@ return {
         var innerBody = component.get("v.body");
 
         
+        var domId = this.getGlobalId(component);
         var labelPositionAttribute = this.checkValidPosition(component.get("v.labelPosition"));
         var labelClass = component.get("v.labelClass") + " uiPicklistLabel-" + labelPositionAttribute + " form-element__label";
         var labelDisplay = labelPositionAttribute !== "hidden";
@@ -7297,6 +7311,7 @@ return {
 
         
         $A.createComponent("markup://ui:picklistLabel", {
+            domId: domId + "-label",
             "aura:id": "inputLabel",
             label: labelAttribute,
             "class": labelClass,

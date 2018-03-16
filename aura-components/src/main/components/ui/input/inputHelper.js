@@ -113,6 +113,7 @@
         var innerBody = component.get("v.body");
 
         // setting attributes
+        var domId = this.getGlobalId(component);
         var labelPositionAttribute = this.checkValidPosition(component.get("v.labelPosition"));
         var labelClass = component.get("v.labelClass") + " uiPicklistLabel-" + labelPositionAttribute + " form-element__label";
         var labelDisplay = labelPositionAttribute !== "hidden";
@@ -120,6 +121,7 @@
 
         // creating picklistLabel component
         $A.createComponent("markup://ui:picklistLabel", {
+            domId: domId + "-label",
             "aura:id": "inputLabel",
             label: labelAttribute,
             "class": labelClass,

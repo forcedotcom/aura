@@ -39,7 +39,7 @@ public class ModulesCompilerTest extends UnitTestCase {
 
     // NOTE: use to specify which service type to use when running tests
     private static final NodeLambdaFactory FACTORY = NodeLambdaFactorySidecar.INSTANCE;
-
+    
     @Inject
     private LoggingService loggingService;
 
@@ -105,7 +105,7 @@ public class ModulesCompilerTest extends UnitTestCase {
             fail("should report a syntax error");
         } catch (Exception e) {
             String message = Throwables.getRootCause(e).getMessage();
-            assertTrue(message, message.contains("Error: modules/errorInJs/errorInJs.js: Unexpected token, expected \"{\" (2:4)"));
+            assertTrue(message, message.contains("Error: modules/errorInJs/errorInJs.js: Unexpected token (1:11)"));
         }
     }
 }

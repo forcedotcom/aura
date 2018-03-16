@@ -1,3 +1,3 @@
-export default class Bar
+export def ault class Bar {
     @prop min = D5;
 }

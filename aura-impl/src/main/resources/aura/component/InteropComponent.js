@@ -320,63 +320,6 @@ InteropComponent.prototype.updateClassAttribute = function (element, value) {
     this.currentClassMap = classMap;
 };
 
-// HTML Attribute name to DOM properties mappingg
-var HTML_ATTRS_TO_DOM_PROPS = {
-    'accesskey': 'accessKey',
-    'readonly': 'readOnly',
-    'tabindex': 'tabIndex',
-    'bgcolor': 'bgColor',
-    'colspan': 'colSpan',
-    'rowspan': 'rowSpan',
-    'contentEditable': 'contentEditable',
-    'crossorigin': 'crossOrigin',
-    'datetime': 'dateTime',
-    'formaction': 'formAction',
-    'ismap': 'isMap',
-    'maxlength': 'maxLength',
-    'minlength': 'minLength',
-    'novalidate': 'noValidate',
-    'usemap': 'useMap',
-    'for': 'htmlFor',
-
-    // Aria
-    'aria-autocomplete': 'ariaAutocomplete',
-    'aria-checked': 'ariaChecked',
-    'aria-current': 'ariaCurrent',
-    'aria-disabled': 'ariaDisabled',
-    'aria-expanded': 'ariaExpanded',
-    'aria-haspopup': 'ariaHasPopUp',
-    'aria-hidden': 'ariaHidden',
-    'aria-invalid': 'ariaInvalid',
-    'aria-label': 'ariaLabel',
-    'aria-level': 'ariaLevel',
-    'aria-multiline': 'ariaMultiline',
-    'aria-multiselectable': 'ariaMultiSelectable',
-    'aria-orientation': 'ariaOrientation',
-    'aria-pressed': 'ariaPressed',
-    'aria-readonly': 'ariaReadonly',
-    'aria-required': 'ariaRequired',
-    'aria-selected': 'ariaSelected',
-    'aria-sort': 'ariaSort',
-    'aria-valuemax': 'ariaValueMax',
-    'aria-valuemin': 'ariaValueMin',
-    'aria-valuenow': 'ariaValueNow',
-    'aria-valuetext': 'ariaValueText',
-    'aria-live': 'ariaLive',
-    'aria-relevant': 'ariaRelevant',
-    'aria-atomic': 'ariaAtomic',
-    'aria-busy': 'ariaBusy',
-    'aria-dropeffect': 'ariaDropEffect',
-    'aria-dragged': 'ariaDragged',
-    'aria-activedescendant': 'ariaActiveDescendant',
-    'aria-controls': 'ariaControls',
-    'aria-describedby': 'ariaDescribedBy',
-    'aria-flowto': 'ariaFlowTo',
-    'aria-labelledby': 'ariaLabelledBy',
-    'aria-owns': 'ariaOwns',
-    'aria-posinset': 'ariaPosInSet',
-    'aria-setsize': 'ariaSetSize'
-};
 
 /**
  * Implement special logic for set HTML Global Attributes
@@ -390,17 +333,14 @@ InteropComponent.prototype.setGlobalAttribute = function (element, attrName, val
         return;
     }
 
-    var propName = HTML_ATTRS_TO_DOM_PROPS[attrName] || attrName;
-
-    // data- attributes go through setAttribute
-    if (propName.indexOf('data-') === 0) {
-        element.setAttribute(propName, value);
+    if (value === true) {
+        element.setAttribute(attrName, "");
+    } else if (value === false || value === null || value === undefined) {
+        element.removeAttribute(attrName);
     } else {
-        element[propName] = value;
+        element.setAttribute(attrName, value);
     }
 };
-
-
 
 /**
  * Returns the value referenced using property syntax.

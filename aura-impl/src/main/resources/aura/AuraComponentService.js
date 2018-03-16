@@ -83,8 +83,7 @@ AuraComponentService.prototype.get = function(globalId) {
 };
 
 AuraComponentService.prototype.initCoreModules = function () {
-    var compat = window["Aura"] && window["Aura"]["compat"];
-    var babelHelpers = compat && compat["babelHelpers"];
+    var babelHelpers = window["EngineHelpers"] && window["EngineHelpers"]["babelHelpers"];
     var ProxyObject = window["Proxy"] || {};
 
     this.addModule("markup://engine", "engine", [], null, this.moduleEngine);
@@ -104,14 +103,14 @@ AuraComponentService.prototype.initCoreModules = function () {
 
     // Register compat modules
     if (babelHelpers) {
-        var babelHelpersPrefix = "babel-compat/helpers/";
+        var babelHelpersPrefix = "babel/helpers/";
         Object.keys(babelHelpers).forEach(function (helper) {
             var moduleName = babelHelpersPrefix + helper;
             this.addModule("markup://" + moduleName, moduleName, [], null, babelHelpers[helper]);
         }.bind(this));
 
         // Regenerator (for transpiling async stuff)
-        this.addModule("markup://babel-compat/regeneratorRuntime", "babel-compat/regenerator", [], null, compat["regenerator"]);
+        this.addModule("markup://babel/regeneratorRuntime", "babel/regenerator", [], null, babelHelpers["regeneratorRuntime"]);
     }
 
 };

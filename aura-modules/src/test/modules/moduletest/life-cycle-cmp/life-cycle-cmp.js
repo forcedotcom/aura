@@ -1,14 +1,14 @@
-import { Element, api, dangerousObjectMutation } from "engine";
+import { Element, api } from "engine";
 
 export default class LifeCycleCmp extends Element {
     @api lifeCycleLog = [];
 
     connectedCallback() {
-        dangerousObjectMutation(this.lifeCycleLog).push('module connected');
+        this.lifeCycleLog.push('module connected');
     }
 
     renderedCallback() {
-        dangerousObjectMutation(this.lifeCycleLog).push('module rendered');
+        this.lifeCycleLog.push('module rendered');
     }
 }
 

@@ -53,7 +53,7 @@ import com.google.common.collect.Sets;
  */
 public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleDef {
 
-    private static final long serialVersionUID = -5851115646969305423L;
+    private static final long serialVersionUID = -5852365757969305423L;
 
     private String path;
     private final Set<String> moduleDependencies;
@@ -90,7 +90,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     public String getPath() {
         return this.path;
     }
-
+    
     @Override
     public String getExternalReferences() {
         return externalReferences;
@@ -219,7 +219,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         return dependency != null &&
                 ("aura-instrumentation".equals(dependency) ||
                         "aura-storage".equals(dependency) ||
-                dependency.startsWith("proxy-compat") ||
+                dependency.startsWith("proxy-compat") || 
                 dependency.startsWith("@"));
     }
 
@@ -325,7 +325,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         public void setValidTags(Set<String> validTags) {
             this.validTags = validTags;
         }
-
+        
         public void setModuleDesignDef(ModuleDesignDef moduleDesignDef){
             this.moduleDesignDef = moduleDesignDef;
         }

@@ -7,44 +7,6 @@
 	(factory((global.Engine = {})));
 }(this, (function (exports) { 'use strict';
 
-var freeze = Object.freeze, seal = Object.seal, keys = Object.keys, create = Object.create, assign = Object.assign, defineProperty = Object.defineProperty, getPrototypeOf = Object.getPrototypeOf, getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor, getOwnPropertyNames = Object.getOwnPropertyNames, defineProperties = Object.defineProperties, hasOwnProperty = Object.hasOwnProperty;
-var isArray = Array.isArray;
-var _a = Array.prototype, ArrayFilter = _a.filter, ArraySlice = _a.slice, ArraySplice = _a.splice, ArrayUnshift = _a.unshift, ArrayIndexOf = _a.indexOf, ArrayPush = _a.push, ArrayMap = _a.map, forEach = _a.forEach, ArrayReduce = _a.reduce;
-var _b = String.prototype, StringReplace = _b.replace, StringToLowerCase = _b.toLowerCase, StringIndexOf = _b.indexOf, StringCharCodeAt = _b.charCodeAt, StringSlice = _b.slice, StringSplit = _b.split;
-function isUndefined(obj) {
-    return obj === undefined;
-}
-function isNull(obj) {
-    return obj === null;
-}
-function isTrue(obj) {
-    return obj === true;
-}
-function isFalse(obj) {
-    return obj === false;
-}
-function isFunction(obj) {
-    return typeof obj === 'function';
-}
-function isObject(obj) {
-    return typeof obj === 'object';
-}
-function isString(obj) {
-    return typeof obj === 'string';
-}
-var OtS = {}.toString;
-function toString(obj) {
-    if (obj && obj.toString) {
-        return obj.toString();
-    }
-    else if (typeof obj === 'object') {
-        return OtS.call(obj);
-    }
-    else {
-        return obj + '';
-    }
-}
-
 var compareDocumentPosition = Node.prototype.compareDocumentPosition;
 var DOCUMENT_POSITION_CONTAINS = Node.DOCUMENT_POSITION_CONTAINS;
 var assert = {
@@ -85,7 +47,7 @@ var assert = {
             throw new Error(msg);
         }
         catch (e) {
-            var stackTraceLines = StringSplit.call(e.stack, '\n');
+            var stackTraceLines = e.stack.split('\n');
             console.group("Warning: " + msg); // tslint:disable-line
             stackTraceLines.filter(function (trace) {
                 // Chrome adds the error message as the first item in the stack trace
@@ -106,87 +68,66 @@ var assert = {
     }
 };
 
-var nextTickCallbackQueue = [];
-var SPACE_CHAR = 32;
-var EmptyObject = seal(create(null));
-var EmptyArray = seal([]);
-var ViewModelReflection = Symbol();
-function flushCallbackQueue() {
-    {
-        assert.invariant(nextTickCallbackQueue.length, "If callbackQueue is scheduled, it is because there must be at least one callback on this pending queue instead of " + nextTickCallbackQueue + ".");
-    }
-    var callbacks = nextTickCallbackQueue;
-    nextTickCallbackQueue = []; // reset to a new queue
-    for (var i = 0, len = callbacks.length; i < len; i += 1) {
-        callbacks[i]();
-    }
+var freeze = Object.freeze;
+var seal = Object.seal;
+var keys = Object.keys;
+var create = Object.create;
+var assign = Object.assign;
+var defineProperty = Object.defineProperty;
+var getPrototypeOf = Object.getPrototypeOf;
+var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+var getOwnPropertyNames = Object.getOwnPropertyNames;
+var defineProperties = Object.defineProperties;
+var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+var hasOwnProperty = Object.hasOwnProperty;
+var preventExtensions = Object.preventExtensions;
+var isExtensible = Object.isExtensible;
+var isArray = Array.isArray;
+var _a$1 = Array.prototype;
+var ArrayConcat = _a$1.concat;
+var ArrayFilter = _a$1.filter;
+var ArraySlice = _a$1.slice;
+var ArraySplice = _a$1.splice;
+var ArrayUnshift = _a$1.unshift;
+var ArrayIndexOf = _a$1.indexOf;
+var ArrayPush = _a$1.push;
+var ArrayMap = _a$1.map;
+function isUndefined(obj) {
+    return obj === undefined;
 }
-function addCallbackToNextTick(callback) {
-    {
-        assert.isTrue(isFunction(callback), "addCallbackToNextTick() can only accept a function callback as first argument instead of " + callback);
-    }
-    if (nextTickCallbackQueue.length === 0) {
-        Promise.resolve().then(flushCallbackQueue);
-    }
-    // TODO: eventually, we might want to have priority when inserting callbacks
-    ArrayPush.call(nextTickCallbackQueue, callback);
+function isNull(obj) {
+    return obj === null;
 }
-var CAMEL_REGEX = /-([a-z])/g;
-var attrNameToPropNameMap = create(null);
-function getPropNameFromAttrName(attrName) {
-    var propName = attrNameToPropNameMap[attrName];
-    if (isUndefined(propName)) {
-        propName = StringReplace.call(attrName, CAMEL_REGEX, function (g) { return g[1].toUpperCase(); });
-        attrNameToPropNameMap[attrName] = propName;
-    }
-    return propName;
+function isTrue(obj) {
+    return obj === true;
 }
-var CAPS_REGEX = /[A-Z]/g;
-/**
- * This method maps between property names
- * and the corresponding attribute name.
- */
-function getAttrNameFromPropName(propName) {
-    // these are exceptions to the rule that cannot be inferred via `CAPS_REGEX`,
-    switch (propName) {
-        case 'className':
-            return 'class';
-        case 'htmlFor':
-            return 'for';
-        default:
-            // Few more exceptions where the attribute name matches the property in lowercase.
-            if (ArrayIndexOf.call(HTMLPropertyNamesWithLowercasedReflectiveAttributes, propName) >= 0) {
-                propName.toLocaleLowerCase();
-            }
-    }
-    // otherwise we do the regular canonical transformation.
-    return StringReplace.call(propName, CAPS_REGEX, function (match) { return '-' + match.toLowerCase(); });
+function isFalse(obj) {
+    return obj === false;
 }
-// According to the WC spec (https://dom.spec.whatwg.org/#dom-element-attachshadow), certain elements
-// are not allowed to attached a shadow dom, and therefore, we need to prevent setting forceTagName to
-// those, otherwise we will not be able to use shadowDOM when forceTagName is specified in the future.
-function assertValidForceTagName(Ctor) {
-    var forceTagName = Ctor.forceTagName;
-    if (isUndefined(forceTagName)) {
-        return;
-    }
-    var invalidTags = [
-        "article", "aside", "blockquote", "body", "div", "footer", "h1", "h2", "h3", "h4",
-        "h5", "h6", "header", "main", "nav", "p", "section", "span"
-    ];
-    if (ArrayIndexOf.call(invalidTags, forceTagName) !== -1) {
-        throw new RangeError("Invalid static forceTagName property set to \"" + forceTagName + "\" in component " + Ctor + ". None of the following tag names can be used: " + invalidTags.join(", ") + ".");
-    }
-    if (StringIndexOf.call(forceTagName, '-') !== -1) {
-        throw new RangeError("Invalid static forceTagName property set to \"" + forceTagName + "\" in component " + Ctor + ". It cannot have a dash (-) on it because that is reserved for existing custom elements.");
-    }
+function isFunction(obj) {
+    return typeof obj === 'function';
 }
-var usesNativeSymbols = typeof Symbol() === 'symbol';
+function isObject(obj) {
+    return typeof obj === 'object';
+}
+function isString(obj) {
+    return typeof obj === 'string';
+}
 
-var _a$1 = Element.prototype, addEventListener = _a$1.addEventListener, removeEventListener$1 = _a$1.removeEventListener, getAttribute = _a$1.getAttribute, getAttributeNS = _a$1.getAttributeNS, setAttribute = _a$1.setAttribute, setAttributeNS = _a$1.setAttributeNS, removeAttribute = _a$1.removeAttribute, removeAttributeNS = _a$1.removeAttributeNS, querySelector = _a$1.querySelector, querySelectorAll = _a$1.querySelectorAll;
-// These properties get added to LWCElement.prototype publicProps automatically
-var defaultDefHTMLPropertyNames = ['dir', 'id', 'accessKey', 'title', 'lang', 'hidden', 'draggable', 'tabIndex'];
-// Few more exceptions that are using the attribute name to match the property in lowercase.
+var OtS = {}.toString;
+function toString(obj) {
+    if (obj && obj.toString) {
+        return obj.toString();
+    }
+    else if (typeof obj === 'object') {
+        return OtS.call(obj);
+    }
+    else {
+        return obj + '';
+    }
+}
+
+// Few more execptions that are using the attribute name to match the property in lowercase.
 // this list was compiled from https://msdn.microsoft.com/en-us/library/ms533062(v=vs.85).aspx
 // and https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes
 // Note: this list most be in sync with the compiler as well.
@@ -204,79 +145,15 @@ var HTMLPropertyNamesWithLowercasedReflectiveAttributes = [
     'maxLength',
     'useMap',
 ];
-// this regular expression is used to transform aria props into aria attributes because
-// that doesn't follow the regular transformation process. e.g.: `aria-labeledby` <=> `ariaLabelBy`
-var ARIA_REGEX = /^aria/;
-function getAriaAttributeName(propName) {
-    return StringToLowerCase.call(StringReplace.call(propName, ARIA_REGEX, 'aria-'));
-}
-function attemptAriaAttributeFallback(vm, attrName) {
-    {
-        assert.vm(vm);
-    }
-    if (hasOwnProperty.call(AOMAttrNameToPropNameMap, attrName)) {
-        vm.hostAttrs[attrName] = undefined; // marking the set is needed for the AOM polyfill
-        var propName = AOMAttrNameToPropNameMap[attrName];
-        var shadowValue = vm.cmpRoot[propName];
-        if (shadowValue !== null) {
-            setAttribute.call(vm.elm, attrName, shadowValue);
-        }
-    }
-}
-// Global Aria and Role Properties derived from ARIA and Role Attributes with their
-// respective default value.
-// https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques
-var GlobalAOMProperties = {
-    ariaAutocomplete: null,
-    ariaChecked: null,
-    ariaCurrent: null,
-    ariaDisabled: null,
-    ariaExpanded: null,
-    ariaHasPopUp: null,
-    ariaHidden: null,
-    ariaInvalid: null,
-    ariaLabel: null,
-    ariaLevel: null,
-    ariaMultiline: null,
-    ariaMultiSelectable: null,
-    ariaOrientation: null,
-    ariaPressed: null,
-    ariaReadonly: null,
-    ariaRequired: null,
-    ariaSelected: null,
-    ariaSort: null,
-    ariaValueMax: null,
-    ariaValueMin: null,
-    ariaValueNow: null,
-    ariaValueText: null,
-    ariaLive: null,
-    ariaRelevant: null,
-    ariaAtomic: null,
-    ariaBusy: null,
-    ariaDropEffect: null,
-    ariaDragged: null,
-    ariaActiveDescendant: null,
-    ariaControls: null,
-    ariaDescribedBy: null,
-    ariaFlowTo: null,
-    ariaLabelledBy: null,
-    ariaOwns: null,
-    ariaPosInSet: null,
-    ariaSetSize: null,
-    role: null,
-};
-var OffsetPropertiesError = 'This property will round the value to an integer, and it is considered an anti-pattern. Instead, you can use \`this.getBoundingClientRect()\` to obtain `left`, `top`, `right`, `bottom`, `x`, `y`, `width`, and `height` fractional values describing the overall border-box in pixels.';
 // Global HTML Attributes & Properties
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes
 // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement
 var GlobalHTMLProperties = {
     id: {
         attribute: 'id',
-        reflective: true,
     },
     accessKey: {
         attribute: 'accesskey',
-        reflective: true,
     },
     accessKeyLabel: {
         readOnly: true,
@@ -287,7 +164,6 @@ var GlobalHTMLProperties = {
     },
     contentEditable: {
         attribute: 'contenteditable',
-        reflective: true,
     },
     isContentEditable: {
         readOnly: true,
@@ -297,16 +173,14 @@ var GlobalHTMLProperties = {
     },
     dataset: {
         readOnly: true,
-        error: 'Using property "dataset" is an anti-pattern. Components should not rely on dataset to implement its internal logic, nor use that as a communication channel.',
+        msg: 'Using property "dataset" is an anti-pattern. Instead declare `static observedAttributes = ["data-foo"]` and use `attributeChangedCallback(attrName, oldValue, newValue)` to get a notification each time the attribute changes.',
     },
     dir: {
         attribute: 'dir',
-        reflective: true,
     },
     draggable: {
         attribute: 'draggable',
         experimental: true,
-        reflective: true,
     },
     dropzone: {
         attribute: 'dropzone',
@@ -315,7 +189,6 @@ var GlobalHTMLProperties = {
     },
     hidden: {
         attribute: 'hidden',
-        reflective: true,
     },
     itemScope: {
         attribute: 'itemscope',
@@ -345,26 +218,26 @@ var GlobalHTMLProperties = {
     },
     lang: {
         attribute: 'lang',
-        reflective: true,
     },
     offsetHeight: {
         readOnly: true,
-        error: OffsetPropertiesError,
+        experimental: true,
     },
     offsetLeft: {
         readOnly: true,
-        error: OffsetPropertiesError,
+        experimental: true,
     },
     offsetParent: {
         readOnly: true,
+        experimental: true,
     },
     offsetTop: {
         readOnly: true,
-        error: OffsetPropertiesError,
+        experimental: true,
     },
     offsetWidth: {
         readOnly: true,
-        error: OffsetPropertiesError,
+        experimental: true,
     },
     properties: {
         readOnly: true,
@@ -372,7 +245,6 @@ var GlobalHTMLProperties = {
     },
     spellcheck: {
         experimental: true,
-        reflective: true,
     },
     style: {
         attribute: 'style',
@@ -380,11 +252,9 @@ var GlobalHTMLProperties = {
     },
     tabIndex: {
         attribute: 'tabindex',
-        reflective: true,
     },
     title: {
         attribute: 'title',
-        reflective: true,
     },
     translate: {
         experimental: true,
@@ -403,55 +273,6 @@ var GlobalHTMLProperties = {
 // https://developer.mozilla.org/en-US/docs/Web/API/Element
 // TODO: complete this list with Node properties
 // https://developer.mozilla.org/en-US/docs/Web/API/Node
-var AOMAttrNameToPropNameMap = create(null);
-var GlobalHTMLPropDescriptors = create(null);
-// Synthetic creation of all AOM property descriptors
-forEach.call(getOwnPropertyNames(GlobalAOMProperties), function (propName) {
-    var attrName = getAriaAttributeName(propName);
-    AOMAttrNameToPropNameMap[attrName] = propName;
-    function get() {
-        var vm = this[ViewModelReflection];
-        if (!hasOwnProperty.call(vm.cmpProps, propName)) {
-            return null;
-        }
-        return vm.cmpProps[propName];
-    }
-    function set(newValue) {
-        // TODO: fallback to the root's AOM default semantics
-        var vm = this[ViewModelReflection];
-        var value = vm.cmpProps[propName] = isNull(newValue) ? null : newValue + ''; // storing the normalized new value
-        if (isNull(value)) {
-            newValue = vm.component.root[propName];
-            vm.hostAttrs[attrName] = undefined;
-        }
-        else {
-            vm.hostAttrs[attrName] = 1;
-        }
-        if (isNull(newValue)) {
-            removeAttribute.call(this, attrName);
-        }
-        else {
-            setAttribute.call(this, attrName, newValue);
-        }
-    }
-    // TODO: eventually this descriptors should come from HTMLElement.prototype.*
-    GlobalHTMLPropDescriptors[propName] = {
-        set: set,
-        get: get,
-        configurable: true,
-        enumerable: true,
-    };
-});
-forEach.call(defaultDefHTMLPropertyNames, function (propName) {
-    var descriptor = getOwnPropertyDescriptor(HTMLElement.prototype, propName);
-    if (!isUndefined(descriptor)) {
-        GlobalHTMLPropDescriptors[propName] = descriptor;
-    }
-});
-if (isUndefined(GlobalHTMLPropDescriptors.id)) {
-    // In IE11, id property is on Element.prototype instead of HTMLElement
-    GlobalHTMLPropDescriptors.id = getOwnPropertyDescriptor(Element.prototype, 'id');
-}
 
 var TopLevelContextSymbol = Symbol();
 var currentContext = {};
@@ -459,6 +280,62 @@ currentContext[TopLevelContextSymbol] = true;
 function establishContext(ctx) {
     currentContext = ctx;
 }
+
+var nextTickCallbackQueue = [];
+var SPACE_CHAR = 32;
+var EmptyObject = seal(create(null));
+var EmptyArray = seal([]);
+function flushCallbackQueue() {
+    {
+        assert.invariant(nextTickCallbackQueue.length, "If callbackQueue is scheduled, it is because there must be at least one callback on this pending queue instead of " + nextTickCallbackQueue + ".");
+    }
+    var callbacks = nextTickCallbackQueue;
+    nextTickCallbackQueue = []; // reset to a new queue
+    for (var i = 0, len = callbacks.length; i < len; i += 1) {
+        callbacks[i]();
+    }
+}
+function addCallbackToNextTick(callback) {
+    {
+        assert.isTrue(isFunction(callback), "addCallbackToNextTick() can only accept a function callback as first argument instead of " + callback);
+    }
+    if (nextTickCallbackQueue.length === 0) {
+        Promise.resolve().then(flushCallbackQueue);
+    }
+    // TODO: eventually, we might want to have priority when inserting callbacks
+    ArrayPush.call(nextTickCallbackQueue, callback);
+}
+var CAMEL_REGEX = /-([a-z])/g;
+var attrNameToPropNameMap = create(null);
+function getPropNameFromAttrName(attrName) {
+    var propName = attrNameToPropNameMap[attrName];
+    if (isUndefined(propName)) {
+        propName = attrName.replace(CAMEL_REGEX, function (g) { return g[1].toUpperCase(); });
+        attrNameToPropNameMap[attrName] = propName;
+    }
+    return propName;
+}
+var CAPS_REGEX = /[A-Z]/g;
+/**
+ * This method maps between property names
+ * and the corresponding attribute name.
+ */
+function getAttrNameFromPropName(propName) {
+    switch (propName) {
+        case 'className':
+            return 'class';
+        case 'htmlFor':
+            return 'for';
+        default:
+            // Few more exceptions where the attribute name matches the property in lowercase.
+            if (ArrayIndexOf.call(HTMLPropertyNamesWithLowercasedReflectiveAttributes, propName) >= 0) {
+                propName.toLocaleLowerCase();
+            }
+    }
+    // otherwise we do the regular canonical transformation.
+    return propName.replace(CAPS_REGEX, function (match) { return '-' + match.toLowerCase(); });
+}
+var usesNativeSymbols = typeof Symbol() === 'symbol';
 
 var Services = create(null);
 var hooks = ['wiring', 'rendered', 'connected', 'disconnected', 'piercing'];
@@ -628,205 +505,18 @@ function pierce(vm, value) {
     return getReplica(membrane, value);
 }
 
-var vmBeingConstructed = null;
-function isBeingConstructed(vm) {
-    {
-        assert.vm(vm);
-    }
-    return vmBeingConstructed === vm;
-}
-function createComponent(vm, Ctor) {
-    {
-        assert.vm(vm);
-    }
-    // create the component instance
-    var vmBeingConstructedInception = vmBeingConstructed;
-    vmBeingConstructed = vm;
-    var component = invokeComponentConstructor(vm, Ctor);
-    vmBeingConstructed = vmBeingConstructedInception;
-    {
-        assert.isTrue(vm.component === component, "Invalid construction for " + vm + ", maybe you are missing the call to super() on classes extending Element.");
-        var track = getComponentDef(Ctor).track;
-        if ('state' in component && (!track || !track.state)) {
-            assert.logWarning("Non-trackable component state detected in " + component + ". Updates to state property will not be reactive. To make state reactive, add @track decorator.");
-        }
-    }
-}
-function linkComponent(vm) {
-    {
-        assert.vm(vm);
-    }
-    // wiring service
-    var wire = vm.def.wire;
-    if (wire) {
-        var wiring = Services.wiring;
-        if (wiring) {
-            invokeServiceHook(vm, wiring);
-        }
-    }
-}
-function clearReactiveListeners(vm) {
-    {
-        assert.vm(vm);
-    }
-    var deps = vm.deps;
-    var len = deps.length;
-    if (len) {
-        for (var i = 0; i < len; i += 1) {
-            var set = deps[i];
-            var pos = ArrayIndexOf.call(deps[i], vm);
-            {
-                assert.invariant(pos > -1, "when clearing up deps, the vm must be part of the collection.");
-            }
-            ArraySplice.call(set, pos, 1);
-        }
-        deps.length = 0;
-    }
-}
-function createComponentListener(vm) {
-    return function handler(event) {
-        handleComponentEvent(vm, event);
-    };
-}
-function addComponentEventListener(vm, eventName, newHandler) {
-    {
-        assert.vm(vm);
-        assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of " + vm + " by adding a new event listener for \"" + eventName + "\".");
-    }
-    var cmpEvents = vm.cmpEvents, cmpListener = vm.cmpListener;
-    if (isUndefined(cmpEvents)) {
-        // this piece of code must be in sync with modules/component-events
-        vm.cmpEvents = cmpEvents = create(null);
-        vm.cmpListener = cmpListener = createComponentListener(vm);
-    }
-    if (isUndefined(cmpEvents[eventName])) {
-        cmpEvents[eventName] = [];
-        var elm = vm.elm;
-        addEventListener.call(elm, eventName, cmpListener, false);
-    }
-    {
-        if (cmpEvents[eventName] && ArrayIndexOf.call(cmpEvents[eventName], newHandler) !== -1) {
-            assert.logWarning(vm + " has duplicate listeners for event \"" + eventName + "\". Instead add the event listener in the connectedCallback() hook.");
-        }
-    }
-    ArrayPush.call(cmpEvents[eventName], newHandler);
-}
-function removeComponentEventListener(vm, eventName, oldHandler) {
-    {
-        assert.vm(vm);
-        assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of " + vm + " by removing an event listener for \"" + eventName + "\".");
-    }
-    var cmpEvents = vm.cmpEvents, elm = vm.elm;
-    if (cmpEvents) {
-        var handlers = cmpEvents[eventName];
-        var pos = handlers && ArrayIndexOf.call(handlers, oldHandler);
-        if (handlers && pos > -1) {
-            if (handlers.length === 1) {
-                removeEventListener$1.call(elm, eventName, vm.cmpListener);
-                cmpEvents[eventName] = undefined;
-            }
-            else {
-                ArraySplice.call(cmpEvents[eventName], pos, 1);
-            }
-            return;
-        }
-    }
-    {
-        assert.logWarning("Did not find event listener " + oldHandler + " for event \"" + eventName + "\" on " + vm + ". Instead only remove an event listener once.");
-    }
-}
-function handleComponentEvent(vm, event) {
-    {
-        assert.vm(vm);
-        assert.invariant(event instanceof Event, "dispatchComponentEvent() must receive an event instead of " + event);
-        var eventType = event.type;
-        var cmpEvt = vm.cmpEvents;
-        var cmpEventsType = cmpEvt && cmpEvt[eventType];
-        assert.invariant(vm.cmpEvents && !isUndefined(cmpEventsType) && cmpEventsType.length, "handleComponentEvent() should only be invoked if there is at least one listener in queue for " + event.type + " on " + vm + ".");
-    }
-    var _a = vm.cmpEvents, cmpEvents = _a === void 0 ? EmptyObject : _a;
-    var type = event.type, stopImmediatePropagation = event.stopImmediatePropagation;
-    var handlers = cmpEvents[type];
-    if (isArray(handlers)) {
-        var uninterrupted_1 = true;
-        event.stopImmediatePropagation = function () {
-            uninterrupted_1 = false;
-            stopImmediatePropagation.call(event);
-        };
-        var e = pierce(vm, event);
-        for (var i = 0, len = handlers.length; uninterrupted_1 && i < len; i += 1) {
-            invokeComponentCallback(vm, handlers[i], [e]);
-        }
-        // restoring original methods
-        event.stopImmediatePropagation = stopImmediatePropagation;
-    }
-}
-function renderComponent(vm) {
-    {
-        assert.vm(vm);
-        assert.invariant(vm.isDirty, vm + " is not dirty.");
-    }
-    clearReactiveListeners(vm);
-    var vnodes = invokeComponentRenderMethod(vm);
-    vm.isDirty = false;
-    {
-        assert.invariant(isArray(vnodes), vm + ".render() should always return an array of vnodes instead of " + vnodes);
-    }
-    return vnodes;
-}
-function markComponentAsDirty(vm) {
-    {
-        assert.vm(vm);
-        assert.isFalse(vm.isDirty, "markComponentAsDirty() for " + vm + " should not be called when the component is already dirty.");
-        assert.isFalse(isRendering, "markComponentAsDirty() for " + vm + " cannot be called during rendering of " + vmBeingRendered + ".");
-    }
-    vm.isDirty = true;
-}
-function getCustomElementComponent(elmOrRoot) {
-    {
-        assert.vm(elmOrRoot[ViewModelReflection]);
-    }
-    return elmOrRoot[ViewModelReflection].component;
-}
-
-function getLinkedElement(root) {
+var _a$4 = Element.prototype;
+var querySelector = _a$4.querySelector;
+var querySelectorAll = _a$4.querySelectorAll;
+function getLinkedElement$1(root) {
     return getCustomElementVM(root).elm;
 }
-function createAccessibilityDescriptorForShadowRoot(propName, attrName, defaultValue) {
-    // we use value as the storage mechanism and as the default value for the property
-    return {
-        enumerable: false,
-        get: function () {
-            var vm = getCustomElementVM(this);
-            if (!hasOwnProperty.call(vm.rootProps, propName)) {
-                return defaultValue;
-            }
-            return vm.rootProps[propName];
-        },
-        set: function (newValue) {
-            var vm = getCustomElementVM(this);
-            vm.rootProps[propName] = newValue;
-            if (!isUndefined(vm.hostAttrs[attrName])) {
-                return;
-            }
-            if (isNull(newValue)) {
-                removeAttribute.call(vm.elm, attrName);
-                return;
-            }
-            setAttribute.call(vm.elm, attrName, newValue);
-        }
-    };
-}
-var RootDescriptors = create(null);
-// This routine will be a descriptor map for all AOM properties to be added
-// to ShadowRoot prototype to polyfill AOM capabilities.
-forEach.call(getOwnPropertyNames(GlobalAOMProperties), function (propName) { return RootDescriptors[propName] = createAccessibilityDescriptorForShadowRoot(propName, getAriaAttributeName(propName), GlobalAOMProperties[propName]); });
 function shadowRootQuerySelector(shadowRoot, selector) {
     var vm = getCustomElementVM(shadowRoot);
     {
         assert.isFalse(isBeingConstructed(vm), "this.root.querySelector() cannot be called during the construction of the custom element for " + vm + " because no content has been rendered yet.");
     }
-    var elm = getLinkedElement(shadowRoot);
+    var elm = getLinkedElement$1(shadowRoot);
     pierce(vm, elm);
     var piercedQuerySelector = piercingHook(vm.membrane, elm, 'querySelector', elm.querySelector);
     return piercedQuerySelector.call(elm, selector);
@@ -836,7 +526,7 @@ function shadowRootQuerySelectorAll(shadowRoot, selector) {
     {
         assert.isFalse(isBeingConstructed(vm), "this.root.querySelectorAll() cannot be called during the construction of the custom element for " + vm + " because no content has been rendered yet.");
     }
-    var elm = getLinkedElement(shadowRoot);
+    var elm = getLinkedElement$1(shadowRoot);
     pierce(vm, elm);
     var piercedQuerySelectorAll = piercingHook(vm.membrane, elm, 'querySelectorAll', elm.querySelectorAll);
     return piercedQuerySelectorAll.call(elm, selector);
@@ -898,7 +588,6 @@ var Root = /** @class */ (function () {
     };
     return Root;
 }());
-defineProperties(Root.prototype, RootDescriptors);
 function getFirstMatch(vm, elm, selector) {
     var nodeList = querySelectorAll.call(elm, selector);
     // search for all, and find the first node that is owned by the VM in question.
@@ -921,33 +610,42 @@ function isIframeContentWindow(key, value) {
     return (key === 'contentWindow') && value.window === value;
 }
 function wrapIframeWindow(win) {
-    return _a = {}, _a[TargetSlot] = win, _a.postMessage = function () {
+    return _a = {},
+        _a[TargetSlot] = win,
+        _a.postMessage = function () {
             return win.postMessage.apply(win, arguments);
-        }, _a.blur = function () {
+        },
+        _a.blur = function () {
             return win.blur.apply(win, arguments);
-        }, _a.close = function () {
+        },
+        _a.close = function () {
             return win.close.apply(win, arguments);
-        }, _a.focus = function () {
+        },
+        _a.focus = function () {
             return win.focus.apply(win, arguments);
-        }, Object.defineProperty(_a, "closed", {
+        },
+        Object.defineProperty(_a, "closed", {
             get: function () {
                 return win.closed;
             },
             enumerable: true,
             configurable: true
-        }), Object.defineProperty(_a, "frames", {
+        }),
+        Object.defineProperty(_a, "frames", {
             get: function () {
                 return win.frames;
             },
             enumerable: true,
             configurable: true
-        }), Object.defineProperty(_a, "length", {
+        }),
+        Object.defineProperty(_a, "length", {
             get: function () {
                 return win.length;
             },
             enumerable: true,
             configurable: true
-        }), Object.defineProperty(_a, "location", {
+        }),
+        Object.defineProperty(_a, "location", {
             get: function () {
                 return win.location;
             },
@@ -956,37 +654,43 @@ function wrapIframeWindow(win) {
             },
             enumerable: true,
             configurable: true
-        }), Object.defineProperty(_a, "opener", {
+        }),
+        Object.defineProperty(_a, "opener", {
             get: function () {
                 return win.opener;
             },
             enumerable: true,
             configurable: true
-        }), Object.defineProperty(_a, "parent", {
+        }),
+        Object.defineProperty(_a, "parent", {
             get: function () {
                 return win.parent;
             },
             enumerable: true,
             configurable: true
-        }), Object.defineProperty(_a, "self", {
+        }),
+        Object.defineProperty(_a, "self", {
             get: function () {
                 return win.self;
             },
             enumerable: true,
             configurable: true
-        }), Object.defineProperty(_a, "top", {
+        }),
+        Object.defineProperty(_a, "top", {
             get: function () {
                 return win.top;
             },
             enumerable: true,
             configurable: true
-        }), Object.defineProperty(_a, "window", {
+        }),
+        Object.defineProperty(_a, "window", {
             get: function () {
                 return win.window;
             },
             enumerable: true,
             configurable: true
-        }), _a;
+        }),
+        _a;
     var _a;
 }
 // Registering a service to enforce the shadowDOM semantics via the Raptor membrane implementation
@@ -1026,114 +730,18 @@ register({
     }
 });
 
-var TargetToReactiveRecordMap = new WeakMap();
-function notifyMutation(target, key) {
-    {
-        assert.invariant(!isRendering, "Mutating property " + toString(key) + " of " + toString(target) + " is not allowed during the rendering life-cycle of " + vmBeingRendered + ".");
-    }
-    var reactiveRecord = TargetToReactiveRecordMap.get(target);
-    if (!isUndefined(reactiveRecord)) {
-        var value = reactiveRecord[key];
-        if (value) {
-            var len = value.length;
-            for (var i = 0; i < len; i += 1) {
-                var vm = value[i];
-                {
-                    assert.vm(vm);
-                }
-                if (!vm.isDirty) {
-                    markComponentAsDirty(vm);
-                    scheduleRehydration(vm);
-                }
-            }
-        }
-    }
-}
-function observeMutation(target, key) {
-    if (isNull(vmBeingRendered)) {
-        return; // nothing to subscribe to
-    }
-    var vm = vmBeingRendered;
-    var reactiveRecord = TargetToReactiveRecordMap.get(target);
-    if (isUndefined(reactiveRecord)) {
-        var newRecord = create(null);
-        reactiveRecord = newRecord;
-        TargetToReactiveRecordMap.set(target, newRecord);
-    }
-    var value = reactiveRecord[key];
-    if (isUndefined(value)) {
-        value = [];
-        reactiveRecord[key] = value;
-    }
-    else if (value[0] === vm) {
-        return; // perf optimization considering that most subscriptions will come from the same vm
-    }
-    if (ArrayIndexOf.call(value, vm) === -1) {
-        ArrayPush.call(value, vm);
-        // we keep track of the sets that vm is listening from to be able to do some clean up later on
-        ArrayPush.call(vm.deps, value);
-    }
-}
-
-function getHTMLPropDescriptor(propName, descriptor) {
-    var get = descriptor.get, set = descriptor.set, enumerable = descriptor.enumerable, configurable = descriptor.configurable;
-    if (!isFunction(get)) {
-        {
-            assert.fail("Detected invalid public property descriptor for HTMLElement.prototype." + propName + " definition. Missing the standard getter.");
-        }
-        throw new TypeError();
-    }
-    if (!isFunction(set)) {
-        {
-            assert.fail("Detected invalid public property descriptor for HTMLElement.prototype." + propName + " definition. Missing the standard setter.");
-        }
-        throw new TypeError();
-    }
-    return {
-        enumerable: enumerable,
-        configurable: configurable,
-        get: function () {
-            var vm = this[ViewModelReflection];
-            {
-                assert.vm(vm);
-            }
-            if (isBeingConstructed(vm)) {
-                {
-                    assert.logError(vm + " constructor should not read the value of property \"" + propName + "\". The owner component has not yet set the value. Instead use the constructor to set default values for properties.");
-                }
-                return;
-            }
-            observeMutation(this, propName);
-            return get.call(vm.elm);
-        },
-        set: function (newValue) {
-            var vm = this[ViewModelReflection];
-            {
-                assert.vm(vm);
-                assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of " + vm + "." + propName);
-                assert.isFalse(isBeingConstructed(vm), "Failed to construct '" + this + "': The result must not have attributes.");
-                assert.invariant(!isObject(newValue) || isNull(newValue), "Invalid value \"" + newValue + "\" for \"" + propName + "\" of " + vm + ". Value cannot be an object, must be a primitive value.");
-            }
-            if (newValue !== vm.cmpProps[propName]) {
-                vm.cmpProps[propName] = newValue;
-                if (vm.idx > 0) {
-                    // perf optimization to skip this step if not in the DOM
-                    notifyMutation(this, propName);
-                }
-            }
-            return set.call(vm.elm, newValue);
-        }
-    };
-}
-var htmlElementDescriptors = ArrayReduce.call(getOwnPropertyNames(GlobalHTMLPropDescriptors), function (seed, propName) {
-    seed[propName] = getHTMLPropDescriptor(propName, GlobalHTMLPropDescriptors[propName]);
-    return seed;
-}, {});
-function getLinkedElement$1(cmp) {
+var _a$3 = Element.prototype;
+var getAttribute$1 = _a$3.getAttribute;
+var getAttributeNS$1 = _a$3.getAttributeNS;
+var removeAttribute$1 = _a$3.removeAttribute;
+var removeAttributeNS$1 = _a$3.removeAttributeNS;
+var setAttribute$1 = _a$3.setAttribute;
+var setAttributeNS$1 = _a$3.setAttributeNS;
+function getLinkedElement(cmp) {
     return cmp[ViewModelReflection].elm;
 }
 function querySelectorAllFromComponent(cmp, selectors) {
-    var elm = getLinkedElement$1(cmp);
+    var elm = getLinkedElement(cmp);
     return elm.querySelectorAll(selectors);
 }
 // This should be as performant as possible, while any initialization should be done lazily
@@ -1145,6 +753,10 @@ var LWCElement = /** @class */ (function () {
         {
             assert.vm(vmBeingConstructed);
             assert.invariant(vmBeingConstructed.elm instanceof HTMLElement, "Component creation requires a DOM element to be associated to " + vmBeingConstructed + ".");
+            var _a = vmBeingConstructed.def, observedAttrs = _a.observedAttrs, attributeChangedCallback = _a.attributeChangedCallback;
+            if (observedAttrs.length && isUndefined(attributeChangedCallback)) {
+                assert.logError(vmBeingConstructed + " has static observedAttributes set to [\"" + keys(observedAttrs).join('", "') + "\"] but it is missing the attributeChangedCallback() method to watch for changes on those attributes. Double check for typos on the name of the callback.");
+            }
         }
         var vm = vmBeingConstructed;
         var elm = vm.elm, def = vm.def;
@@ -1159,7 +771,7 @@ var LWCElement = /** @class */ (function () {
     }
     // HTML Element - The Good Parts
     LWCElement.prototype.dispatchEvent = function (event) {
-        var elm = getLinkedElement$1(this);
+        var elm = getLinkedElement(this);
         var vm = getCustomElementVM(this);
         {
             var evtName = event.type, composed = event.composed, bubbles = event.bubbles;
@@ -1206,42 +818,41 @@ var LWCElement = /** @class */ (function () {
         }
         // use cached setAttributeNS, because elm.setAttribute throws
         // when not called in template
-        return setAttributeNS.call(getLinkedElement$1(this), ns, attrName, value);
+        return setAttributeNS$1.call(getLinkedElement(this), ns, attrName, value);
     };
     LWCElement.prototype.removeAttributeNS = function (ns, attrName) {
         // use cached removeAttributeNS, because elm.setAttribute throws
         // when not called in template
-        return removeAttributeNS.call(getLinkedElement$1(this), ns, attrName);
+        return removeAttributeNS$1.call(getLinkedElement(this), ns, attrName);
     };
     LWCElement.prototype.removeAttribute = function (attrName) {
-        var vm = getCustomElementVM(this);
         // use cached removeAttribute, because elm.setAttribute throws
         // when not called in template
-        removeAttribute.call(vm.elm, attrName);
-        attemptAriaAttributeFallback(vm, attrName);
+        return removeAttribute$1.call(getLinkedElement(this), attrName);
     };
     LWCElement.prototype.setAttribute = function (attrName, value) {
-        var vm = getCustomElementVM(this);
         {
-            assert.isFalse(isBeingConstructed(vm), "Failed to construct '" + this + "': The result must not have attributes.");
+            assert.isFalse(isBeingConstructed(this[ViewModelReflection]), "Failed to construct '" + this + "': The result must not have attributes.");
         }
-        // marking the set is needed for the AOM polyfill
-        vm.hostAttrs[attrName] = 1;
         // use cached setAttribute, because elm.setAttribute throws
         // when not called in template
-        return setAttribute.call(getLinkedElement$1(this), attrName, value);
+        return setAttribute$1.call(getLinkedElement(this), attrName, value);
     };
     LWCElement.prototype.getAttributeNS = function (ns, attrName) {
-        return getAttributeNS.call(getLinkedElement$1(this), ns, attrName);
+        return getAttributeNS$1.call(getLinkedElement(this), ns, attrName);
     };
     LWCElement.prototype.getAttribute = function (attrName) {
-        // logging errors for experimental and special attributes
+        // logging errors for experimentals and special attributes
         {
             var vm = this[ViewModelReflection];
             assert.vm(vm);
             if (isString(attrName)) {
                 var propName = getPropNameFromAttrName(attrName);
-                if (GlobalHTMLProperties[propName] && GlobalHTMLProperties[propName].attribute) {
+                var publicPropsConfig = vm.def.props;
+                if (propName && publicPropsConfig[propName]) {
+                    throw new ReferenceError("Attribute \"" + attrName + "\" corresponds to public property " + propName + " from " + vm + ". Instead use `this." + propName + "`. Only use `getAttribute()` to access global HTML attributes.");
+                }
+                else if (GlobalHTMLProperties[propName] && GlobalHTMLProperties[propName].attribute) {
                     var _a = GlobalHTMLProperties[propName], error = _a.error, experimental = _a.experimental;
                     if (error) {
                         assert.logError(error);
@@ -1252,10 +863,10 @@ var LWCElement = /** @class */ (function () {
                 }
             }
         }
-        return getAttribute.apply(getLinkedElement$1(this), ArraySlice.call(arguments));
+        return getAttribute$1.apply(getLinkedElement(this), ArraySlice.call(arguments));
     };
     LWCElement.prototype.getBoundingClientRect = function () {
-        var elm = getLinkedElement$1(this);
+        var elm = getLinkedElement(this);
         {
             var vm = getCustomElementVM(this);
             assert.isFalse(isBeingConstructed(vm), "this.getBoundingClientRect() should not be called during the construction of the custom element for " + this + " because the element is not yet in the DOM, instead, you can use it in one of the available life-cycle hooks.");
@@ -1298,8 +909,30 @@ var LWCElement = /** @class */ (function () {
     };
     Object.defineProperty(LWCElement.prototype, "tagName", {
         get: function () {
-            var elm = getLinkedElement$1(this);
+            var elm = getLinkedElement(this);
             return elm.tagName + ''; // avoiding side-channeling
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(LWCElement.prototype, "tabIndex", {
+        get: function () {
+            var elm = getLinkedElement(this);
+            return elm.tabIndex;
+        },
+        set: function (value) {
+            var vm = getCustomElementVM(this);
+            {
+                assert.isFalse(isRendering, "Setting property \"tabIndex\" of " + toString(value) + " during the rendering process of " + vmBeingRendered + " is invalid. The render phase must have no side effects on the state of any component.");
+                if (isBeingConstructed(vm)) {
+                    assert.fail("Setting property \"tabIndex\" during the construction process of " + vm + " is invalid.");
+                }
+            }
+            if (isBeingConstructed(vm)) {
+                return;
+            }
+            var elm = getLinkedElement(this);
+            elm.tabIndex = value;
         },
         enumerable: true,
         configurable: true
@@ -1311,7 +944,7 @@ var LWCElement = /** @class */ (function () {
                 // TODO: this still fails in dev but works in production, eventually, we should just throw in all modes
                 assert.isFalse(isBeingConstructed(vm), "Failed to construct " + vm + ": The result must not have attributes. Adding or tampering with classname in constructor is not allowed in a web component, use connectedCallback() instead.");
             }
-            return getLinkedElement$1(this).classList;
+            return getLinkedElement(this).classList;
         },
         enumerable: true,
         configurable: true
@@ -1340,15 +973,14 @@ var LWCElement = /** @class */ (function () {
         }
         var elm = vm.elm;
         var tagName = elm.tagName;
-        var is = getAttribute.call(elm, 'is');
+        var is = getAttribute$1.call(elm, 'is');
         return "<" + tagName.toLowerCase() + (is ? ' is="${is}' : '') + ">";
     };
     return LWCElement;
 }());
-defineProperties(LWCElement.prototype, htmlElementDescriptors);
 // Global HTML Attributes
 {
-    forEach.call(getOwnPropertyNames(GlobalHTMLProperties), function (propName) {
+    getOwnPropertyNames(GlobalHTMLProperties).forEach(function (propName) {
         if (propName in LWCElement.prototype) {
             return; // no need to redefine something that we are already exposing
         }
@@ -1391,480 +1023,14 @@ function getCustomElementVM(elmOrCmp) {
     return elmOrCmp[ViewModelReflection];
 }
 
-/**
- * Copyright (C) 2017 salesforce.com, inc.
- */
-var isArray$1 = Array.isArray;
-var getPrototypeOf$1 = Object.getPrototypeOf, ObjectCreate = Object.create, ObjectDefineProperty = Object.defineProperty, ObjectDefineProperties = Object.defineProperties;
-var _a$2 = Array.prototype, ArrayPush$1 = _a$2.push, ArrayConcat$1 = _a$2.concat;
-var ObjectDotPrototype = Object.prototype;
-var OtS$1 = {}.toString;
-function toString$1(obj) {
-    if (obj && obj.toString) {
-        return obj.toString();
-    }
-    else if (typeof obj === 'object') {
-        return OtS$1.call(obj);
-    }
-    else {
-        return obj + '';
-    }
-}
-function isUndefined$1(obj) {
-    return obj === undefined;
-}
-var TargetSlot$1 = Symbol();
-// TODO: we are using a funky and leaky abstraction here to try to identify if
-// the proxy is a compat proxy, and define the unwrap method accordingly.
-// @ts-ignore
-var getKey$1 = Proxy.getKey;
-var unwrap$1 = getKey$1 ?
-    function (replicaOrAny) { return (replicaOrAny && getKey$1(replicaOrAny, TargetSlot$1)) || replicaOrAny; }
-    : function (replicaOrAny) { return (replicaOrAny && replicaOrAny[TargetSlot$1]) || replicaOrAny; };
-function isObservable(value) {
-    if (!value) {
-        return false;
-    }
-    if (isArray$1(value)) {
-        return true;
-    }
-    var proto = getPrototypeOf$1(value);
-    return (proto === ObjectDotPrototype || proto === null || getPrototypeOf$1(proto) === null);
-}
-function isObject$1(obj) {
-    return typeof obj === 'object';
-}
-
-var isArray$1$1 = Array.isArray;
-var getPrototypeOf$1$1 = Object.getPrototypeOf, isExtensible$1 = Object.isExtensible, getOwnPropertyDescriptor$1 = Object.getOwnPropertyDescriptor, getOwnPropertyNames$1 = Object.getOwnPropertyNames, getOwnPropertySymbols$1 = Object.getOwnPropertySymbols, defineProperty$1 = Object.defineProperty, preventExtensions$1 = Object.preventExtensions;
-var ArrayConcat$1$1 = Array.prototype.concat;
-// Unwrap property descriptors
-// We only need to unwrap if value is specified
-function unwrapDescriptor(descriptor) {
-    if ('value' in descriptor) {
-        descriptor.value = unwrap$1(descriptor.value);
-    }
-    return descriptor;
-}
-function wrapDescriptor(membrane, descriptor) {
-    if ('value' in descriptor) {
-        descriptor.value = isObservable(descriptor.value) ? membrane.getProxy(descriptor.value) : descriptor.value;
-    }
-    return descriptor;
-}
-function lockShadowTarget(membrane, shadowTarget, originalTarget) {
-    var targetKeys = ArrayConcat$1$1.call(getOwnPropertyNames$1(originalTarget), getOwnPropertySymbols$1(originalTarget));
-    targetKeys.forEach(function (key) {
-        var descriptor = getOwnPropertyDescriptor$1(originalTarget, key);
-        // We do not need to wrap the descriptor if not configurable
-        // Because we can deal with wrapping it when user goes through
-        // Get own property descriptor. There is also a chance that this descriptor
-        // could change sometime in the future, so we can defer wrapping
-        // until we need to
-        if (!descriptor.configurable) {
-            descriptor = wrapDescriptor(membrane, descriptor);
-        }
-        defineProperty$1(shadowTarget, key, descriptor);
-    });
-    preventExtensions$1(shadowTarget);
-}
-var ReactiveProxyHandler = /** @class */ (function () {
-    function ReactiveProxyHandler(membrane, value) {
-        this.originalTarget = value;
-        this.membrane = membrane;
-    }
-    ReactiveProxyHandler.prototype.get = function (shadowTarget, key) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        if (key === TargetSlot$1) {
-            return originalTarget;
-        }
-        var value = originalTarget[key];
-        observeMutation$1(membrane, originalTarget, key);
-        return membrane.getProxy(value);
-    };
-    ReactiveProxyHandler.prototype.set = function (shadowTarget, key, value) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        var oldValue = originalTarget[key];
-        if (oldValue !== value) {
-            originalTarget[key] = value;
-            notifyMutation$1(membrane, originalTarget, key);
-        }
-        else if (key === 'length' && isArray$1$1(originalTarget)) {
-            // fix for issue #236: push will add the new index, and by the time length
-            // is updated, the internal length is already equal to the new length value
-            // therefore, the oldValue is equal to the value. This is the forking logic
-            // to support this use case.
-            notifyMutation$1(membrane, originalTarget, key);
-        }
-        return true;
-    };
-    ReactiveProxyHandler.prototype.deleteProperty = function (shadowTarget, key) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        delete originalTarget[key];
-        notifyMutation$1(membrane, originalTarget, key);
-        return true;
-    };
-    ReactiveProxyHandler.prototype.apply = function (shadowTarget, thisArg, argArray) {
-        /* No op */
-    };
-    ReactiveProxyHandler.prototype.construct = function (target, argArray, newTarget) {
-        /* No op */
-    };
-    ReactiveProxyHandler.prototype.has = function (shadowTarget, key) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        observeMutation$1(membrane, originalTarget, key);
-        return key in originalTarget;
-    };
-    ReactiveProxyHandler.prototype.ownKeys = function (shadowTarget) {
-        var originalTarget = this.originalTarget;
-        return ArrayConcat$1$1.call(getOwnPropertyNames$1(originalTarget), getOwnPropertySymbols$1(originalTarget));
-    };
-    ReactiveProxyHandler.prototype.isExtensible = function (shadowTarget) {
-        var shadowIsExtensible = isExtensible$1(shadowTarget);
-        if (!shadowIsExtensible) {
-            return shadowIsExtensible;
-        }
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        var targetIsExtensible = isExtensible$1(originalTarget);
-        if (!targetIsExtensible) {
-            lockShadowTarget(membrane, shadowTarget, originalTarget);
-        }
-        return targetIsExtensible;
-    };
-    ReactiveProxyHandler.prototype.setPrototypeOf = function (shadowTarget, prototype) {
-        {
-            throw new Error("Invalid setPrototypeOf invocation for reactive proxy " + toString$1(this.originalTarget) + ". Prototype of reactive objects cannot be changed.");
-        }
-    };
-    ReactiveProxyHandler.prototype.getPrototypeOf = function (shadowTarget) {
-        var originalTarget = this.originalTarget;
-        return getPrototypeOf$1$1(originalTarget);
-    };
-    ReactiveProxyHandler.prototype.getOwnPropertyDescriptor = function (shadowTarget, key) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        // keys looked up via hasOwnProperty need to be reactive
-        observeMutation$1(membrane, originalTarget, key);
-        var desc = getOwnPropertyDescriptor$1(originalTarget, key);
-        if (isUndefined$1(desc)) {
-            return desc;
-        }
-        var shadowDescriptor = getOwnPropertyDescriptor$1(shadowTarget, key);
-        if (!desc.configurable && !shadowDescriptor) {
-            // If descriptor from original target is not configurable,
-            // We must copy the wrapped descriptor over to the shadow target.
-            // Otherwise, proxy will throw an invariant error.
-            // This is our last chance to lock the value.
-            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/getOwnPropertyDescriptor#Invariants
-            desc = wrapDescriptor(membrane, desc);
-            defineProperty$1(shadowTarget, key, desc);
-        }
-        return shadowDescriptor || desc;
-    };
-    ReactiveProxyHandler.prototype.preventExtensions = function (shadowTarget) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        lockShadowTarget(membrane, shadowTarget, originalTarget);
-        preventExtensions$1(originalTarget);
-        return true;
-    };
-    ReactiveProxyHandler.prototype.defineProperty = function (shadowTarget, key, descriptor) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        var configurable = descriptor.configurable;
-        // We have to check for value in descriptor
-        // because Object.freeze(proxy) calls this method
-        // with only { configurable: false, writeable: false }
-        // Additionally, method will only be called with writeable:false
-        // if the descriptor has a value, as opposed to getter/setter
-        // So we can just check if writable is present and then see if
-        // value is present. This eliminates getter and setter descriptors
-        if ('writable' in descriptor && !('value' in descriptor)) {
-            var originalDescriptor = getOwnPropertyDescriptor$1(originalTarget, key);
-            descriptor.value = originalDescriptor.value;
-        }
-        defineProperty$1(originalTarget, key, unwrapDescriptor(descriptor));
-        if (configurable === false) {
-            defineProperty$1(shadowTarget, key, wrapDescriptor(membrane, descriptor));
-        }
-        notifyMutation$1(membrane, originalTarget, key);
-        return true;
-    };
-    return ReactiveProxyHandler;
-}());
-
-var getOwnPropertyDescriptor$1$1 = Object.getOwnPropertyDescriptor, getOwnPropertyNames$1$1 = Object.getOwnPropertyNames, getOwnPropertySymbols$1$1 = Object.getOwnPropertySymbols, defineProperty$1$1 = Object.defineProperty;
-var ArrayConcat$2 = Array.prototype.concat;
-function wrapDescriptor$1(membrane, descriptor) {
-    if ('value' in descriptor) {
-        descriptor.value = isObservable(descriptor.value) ? membrane.getReadOnlyProxy(descriptor.value) : descriptor.value;
-    }
-    return descriptor;
-}
-var ReadOnlyHandler = /** @class */ (function () {
-    function ReadOnlyHandler(membrane, value) {
-        this.originalTarget = value;
-        this.membrane = membrane;
-    }
-    ReadOnlyHandler.prototype.get = function (shadowTarget, key) {
-        var _a = this, membrane = _a.membrane, originalTarget = _a.originalTarget;
-        if (key === TargetSlot$1) {
-            return originalTarget;
-        }
-        var value = originalTarget[key];
-        observeMutation$1(membrane, originalTarget, key);
-        return membrane.getReadOnlyProxy(value);
-    };
-    ReadOnlyHandler.prototype.set = function (shadowTarget, key, value) {
-        {
-            var originalTarget = this.originalTarget;
-            throw new Error("Invalid mutation: Cannot set \"" + key + "\" on \"" + originalTarget + "\". \"" + originalTarget + "\" is read-only.");
-        }
-        return false;
-    };
-    ReadOnlyHandler.prototype.deleteProperty = function (shadowTarget, key) {
-        {
-            var originalTarget = this.originalTarget;
-            throw new Error("Invalid mutation: Cannot delete \"" + key + "\" on \"" + originalTarget + "\". \"" + originalTarget + "\" is read-only.");
-        }
-        return false;
-    };
-    ReadOnlyHandler.prototype.apply = function (shadowTarget, thisArg, argArray) {
-        /* No op */
-    };
-    ReadOnlyHandler.prototype.construct = function (target, argArray, newTarget) {
-        /* No op */
-    };
-    ReadOnlyHandler.prototype.has = function (shadowTarget, key) {
-        var _a = this, membrane = _a.membrane, originalTarget = _a.originalTarget;
-        observeMutation$1(membrane, originalTarget, key);
-        return key in originalTarget;
-    };
-    ReadOnlyHandler.prototype.ownKeys = function (shadowTarget) {
-        var originalTarget = this.originalTarget;
-        return ArrayConcat$2.call(getOwnPropertyNames$1$1(originalTarget), getOwnPropertySymbols$1$1(originalTarget));
-    };
-    ReadOnlyHandler.prototype.setPrototypeOf = function (shadowTarget, prototype) {
-        {
-            var originalTarget = this.originalTarget;
-            throw new Error("Invalid prototype mutation: Cannot set prototype on \"" + originalTarget + "\". \"" + originalTarget + "\" prototype is read-only.");
-        }
-    };
-    ReadOnlyHandler.prototype.getOwnPropertyDescriptor = function (shadowTarget, key) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        // keys looked up via hasOwnProperty need to be reactive
-        observeMutation$1(membrane, originalTarget, key);
-        var desc = getOwnPropertyDescriptor$1$1(originalTarget, key);
-        if (isUndefined$1(desc)) {
-            return desc;
-        }
-        var shadowDescriptor = getOwnPropertyDescriptor$1$1(shadowTarget, key);
-        if (!desc.configurable && !shadowDescriptor) {
-            // If descriptor from original target is not configurable,
-            // We must copy the wrapped descriptor over to the shadow target.
-            // Otherwise, proxy will throw an invariant error.
-            // This is our last chance to lock the value.
-            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/getOwnPropertyDescriptor#Invariants
-            desc = wrapDescriptor$1(membrane, desc);
-            defineProperty$1$1(shadowTarget, key, desc);
-        }
-        return shadowDescriptor || desc;
-    };
-    ReadOnlyHandler.prototype.preventExtensions = function (shadowTarget) {
-        {
-            var originalTarget = this.originalTarget;
-            throw new Error("Invalid mutation: Cannot preventExtensions on " + originalTarget + "\". \"" + originalTarget + " is read-only.");
-        }
-        return false;
-    };
-    ReadOnlyHandler.prototype.defineProperty = function (shadowTarget, key, descriptor) {
-        {
-            var originalTarget = this.originalTarget;
-            throw new Error("Invalid mutation: Cannot defineProperty \"" + key + "\" on \"" + originalTarget + "\". \"" + originalTarget + "\" is read-only.");
-        }
-        return false;
-    };
-    return ReadOnlyHandler;
-}());
-
-var create$1 = Object.create, getPrototypeOf$2 = Object.getPrototypeOf, getOwnPropertyNames$2 = Object.getOwnPropertyNames, getOwnPropertySymbols$2 = Object.getOwnPropertySymbols;
-var isArray$2 = Array.isArray;
-function getTarget(item) {
-    return item && item[TargetSlot$1];
-}
-function extract(objectOrArray) {
-    if (isArray$2(objectOrArray)) {
-        return objectOrArray.map(function (item) {
-            var original = getTarget(item);
-            if (original) {
-                return extract(original);
-            }
-            return item;
-        });
-    }
-    var obj = create$1(getPrototypeOf$2(objectOrArray));
-    var names = getOwnPropertyNames$2(objectOrArray);
-    return ArrayConcat$1.call(names, getOwnPropertySymbols$2(objectOrArray))
-        .reduce(function (seed, key) {
-        var item = objectOrArray[key];
-        var original = getTarget(item);
-        if (original) {
-            seed[key] = extract(original);
-        }
-        else {
-            seed[key] = item;
-        }
-        return seed;
-    }, obj);
-}
-var formatter = {
-    header: function (plainOrProxy) {
-        var originalTarget = plainOrProxy[TargetSlot$1];
-        if (!originalTarget) {
-            return null;
-        }
-        var obj = extract(plainOrProxy);
-        return ['object', { object: obj }];
-    },
-    hasBody: function () {
-        return false;
-    },
-    body: function () {
-        return null;
-    }
-};
-function init() {
-    // Custom Formatter for Dev Tools
-    // To enable this, open Chrome Dev Tools
-    // Go to Settings,
-    // Under console, select "Enable custom formatters"
-    // For more information, https://docs.google.com/document/d/1FTascZXT9cxfetuPRT2eXPQKXui4nWFivUnS_335T3U/preview
-    var devWindow = window;
-    var devtoolsFormatters = devWindow.devtoolsFormatters || [];
-    ArrayPush$1.call(devtoolsFormatters, formatter);
-    devWindow.devtoolsFormatters = devtoolsFormatters;
-}
-
-{
-    init();
-}
-function invokeDistortion(membrane, value) {
-    return membrane.distortion(value);
-}
-function createShadowTarget(value) {
-    var shadowTarget = undefined;
-    if (isArray$1(value)) {
-        shadowTarget = [];
-    }
-    else if (isObject$1(value)) {
-        shadowTarget = {};
-    }
-    return shadowTarget;
-}
-function getReactiveState(membrane, value) {
-    var objectGraph = membrane.objectGraph;
-    value = unwrap$1(value);
-    var reactiveState = objectGraph.get(value);
-    if (reactiveState) {
-        return reactiveState;
-    }
-    reactiveState = ObjectDefineProperties(ObjectCreate(null), {
-        shadowTarget: {
-            get: function () {
-                var shadowTarget = createShadowTarget(value);
-                ObjectDefineProperty(this, 'shadowTarget', { value: shadowTarget });
-                return shadowTarget;
-            },
-            configurable: true,
-        },
-        reactive: {
-            get: function () {
-                var shadowTarget = this.shadowTarget;
-                var reactiveHandler = new ReactiveProxyHandler(membrane, value);
-                var proxy = new Proxy(shadowTarget, reactiveHandler);
-                ObjectDefineProperty(this, 'reactive', { value: proxy });
-                return proxy;
-            },
-            configurable: true,
-        },
-        readOnly: {
-            get: function () {
-                var shadowTarget = this.shadowTarget;
-                var readOnlyHandler = new ReadOnlyHandler(membrane, value);
-                var proxy = new Proxy(shadowTarget, readOnlyHandler);
-                ObjectDefineProperty(this, 'readOnly', { value: proxy });
-                return proxy;
-            },
-            configurable: true,
-        }
-    });
-    objectGraph.set(value, reactiveState);
-    return reactiveState;
-}
-function notifyMutation$1(membrane, obj, key) {
-    membrane.propertyMemberChange(obj, key);
-}
-function observeMutation$1(membrane, obj, key) {
-    membrane.propertyMemberAccess(obj, key);
-}
-var ReactiveMembrane = /** @class */ (function () {
-    function ReactiveMembrane(distrotion, eventMap) {
-        this.objectGraph = new WeakMap();
-        this.distortion = distrotion;
-        this.propertyMemberChange = eventMap.propertyMemberChange;
-        this.propertyMemberAccess = eventMap.propertyMemberAccess;
-    }
-    ReactiveMembrane.prototype.getProxy = function (value) {
-        var distorted = invokeDistortion(this, value);
-        if (isObservable(distorted)) {
-            return getReactiveState(this, distorted).reactive;
-        }
-        return distorted;
-    };
-    ReactiveMembrane.prototype.getReadOnlyProxy = function (value) {
-        var distorted = invokeDistortion(this, value);
-        if (isObservable(distorted)) {
-            return getReactiveState(this, distorted).readOnly;
-        }
-        return distorted;
-    };
-    return ReactiveMembrane;
-}());
-/** version: 0.18.0 */
-
-function format(value) {
-    return value;
-}
-var membrane = new ReactiveMembrane(format, {
-    propertyMemberChange: notifyMutation,
-    propertyMemberAccess: observeMutation,
-});
-var unwrapMethods = [
-    unwrap,
-    unwrap$1
-];
-var unwrapLength = unwrapMethods.length;
-function unwrap$2(value) {
-    for (var i = 0; i < unwrapLength; i += 1) {
-        var current = unwrapMethods[i];
-        var unwrapped = current(value);
-        if (unwrapped !== value) {
-            return unwrapped;
-        }
-    }
-    return value;
-}
-// TODO: REMOVE THIS https://github.com/salesforce/lwc/issues/129
-function dangerousObjectMutation(obj) {
-    {
-        assert.logWarning("Dangerously Mutating Object " + obj + ". This object was passed to you from a parent component, and should not be mutated here. This will be removed in the near future.");
-    }
-    return membrane.getProxy(unwrap$2(obj));
-}
-
 var CHAR_S = 115;
 var CHAR_V = 118;
 var CHAR_G = 103;
 var NamespaceAttributeForSVG = 'http://www.w3.org/2000/svg';
 var SymbolIterator = Symbol.iterator;
-var ELEMENT_NODE = Node.ELEMENT_NODE, TEXT_NODE = Node.TEXT_NODE, COMMENT_NODE = Node.COMMENT_NODE;
+var ELEMENT_NODE = Node.ELEMENT_NODE;
+var TEXT_NODE = Node.TEXT_NODE;
+var COMMENT_NODE = Node.COMMENT_NODE;
 var classNameToClassMap = create(null);
 function getMapFromClassName(className) {
     if (className === undefined) {
@@ -1876,18 +1042,18 @@ function getMapFromClassName(className) {
     }
     map = {};
     var start = 0;
-    var o;
+    var i;
     var len = className.length;
-    for (o = 0; o < len; o++) {
-        if (StringCharCodeAt.call(className, o) === SPACE_CHAR) {
-            if (o > start) {
-                map[StringSlice.call(className, start, o)] = true;
+    for (i = 0; i < len; i++) {
+        if (className.charCodeAt(i) === SPACE_CHAR) {
+            if (i > start) {
+                map[className.slice(start, i)] = true;
             }
-            start = o + 1;
+            start = i + 1;
         }
     }
-    if (o > start) {
-        map[StringSlice.call(className, start, o)] = true;
+    if (i > start) {
+        map[className.slice(start, i)] = true;
     }
     classNameToClassMap[className] = map;
     {
@@ -1975,7 +1141,7 @@ function h(sel, data, children) {
         if (data.style && !isString(data.style)) {
             assert.logWarning("Invalid 'style' attribute passed to <" + sel + "> should be a string value, and will be ignored.");
         }
-        forEach.call(children, function (childVnode) {
+        children.forEach(function (childVnode) {
             if (childVnode != null) {
                 assert.vnode(childVnode);
             }
@@ -1997,7 +1163,7 @@ function h(sel, data, children) {
         elm: elm,
         key: key,
     };
-    if (sel.length === 3 && StringCharCodeAt.call(sel, 0) === CHAR_S && StringCharCodeAt.call(sel, 1) === CHAR_V && StringCharCodeAt.call(sel, 2) === CHAR_G) {
+    if (sel.length === 3 && sel.charCodeAt(0) === CHAR_S && sel.charCodeAt(1) === CHAR_V && sel.charCodeAt(2) === CHAR_G) {
         addNS(vnode);
     }
     return vnode;
@@ -2088,8 +1254,8 @@ function i(iterable, factory) {
         }
         {
             var vnodes = isArray(vnode) ? vnode : [vnode];
-            forEach.call(vnodes, function (childVnode) {
-                if (!isNull(childVnode) && isObject(childVnode) && !isUndefined(childVnode.sel) && StringIndexOf.call(childVnode.sel, '-') > 0 && isUndefined(childVnode.key)) {
+            vnodes.forEach(function (childVnode) {
+                if (!isNull(childVnode) && isObject(childVnode) && !isUndefined(childVnode.sel) && childVnode.sel.indexOf('-') > 0 && isUndefined(childVnode.key)) {
                     // TODO - it'd be nice to log the owner component rather than the iteration children
                     assert.logWarning("Missing \"key\" attribute in iteration with child \"<" + childVnode.sel + ">\", index " + i + ". Instead set a unique \"key\" attribute value on all iteration children so internal state can be preserved during rehydration.");
                 }
@@ -2180,7 +1346,7 @@ function k(compilerKey, obj) {
             }
             // Slow path. We get here when element is inside iterator
             // but no key is specified.
-            var unwrapped = unwrap$2(obj);
+            var unwrapped = unwrap(obj);
             var objKey = objToKeyMap.get(unwrapped);
             if (isUndefined(objKey)) {
                 objKey = globalKey++;
@@ -2189,6 +1355,7 @@ function k(compilerKey, obj) {
             return compilerKey + ':' + objKey;
     }
 }
+
 
 
 var api = Object.freeze({
@@ -2244,7 +1411,7 @@ function validateFields(vm, html) {
         var component_1 = vm.component;
         // validating identifiers used by template that should be provided by the component
         var _a = html.ids, ids = _a === void 0 ? [] : _a;
-        forEach.call(ids, function (propName) {
+        ids.forEach(function (propName) {
             if (!(propName in component_1)) {
                 assert.logWarning("The template rendered by " + vm + " references `this." + propName + "`, which is not declared. This is likely a typo in the template.");
             }
@@ -2290,7 +1457,7 @@ function evaluateTemplate(vm, html) {
     }
     // TODO: add identity to the html functions
     var component = vm.component, context = vm.context, _a = vm.cmpSlots, cmpSlots = _a === void 0 ? EmptySlots : _a, cmpTemplate = vm.cmpTemplate;
-    // reset the cache memoizer for template when needed
+    // reset the cache momizer for template when needed
     if (html !== cmpTemplate) {
         if (!isUndefined(cmpTemplate)) {
             resetShadowRoot(vm);
@@ -2443,6 +1610,475 @@ function invokeComponentRenderMethod(vm) {
     }
     return result || [];
 }
+function invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue) {
+    var attributeChangedCallback = vm.def.attributeChangedCallback;
+    if (isUndefined(attributeChangedCallback)) {
+        return;
+    }
+    invokeComponentCallback(vm, attributeChangedCallback, [attrName, oldValue, newValue]);
+}
+
+var vmBeingConstructed = null;
+function isBeingConstructed(vm) {
+    {
+        assert.vm(vm);
+    }
+    return vmBeingConstructed === vm;
+}
+function createComponent(vm, Ctor) {
+    {
+        assert.vm(vm);
+    }
+    // create the component instance
+    var vmBeingConstructedInception = vmBeingConstructed;
+    vmBeingConstructed = vm;
+    var component = invokeComponentConstructor(vm, Ctor);
+    vmBeingConstructed = vmBeingConstructedInception;
+    {
+        assert.isTrue(vm.component === component, "Invalid construction for " + vm + ", maybe you are missing the call to super() on classes extending Element.");
+        var track = getComponentDef(Ctor).track;
+        if ('state' in component && (!track || !track.state)) {
+            assert.logWarning("Non-trackable component state detected in " + component + ". Updates to state property will not be reactive. To make state reactive, add @track decorator.");
+        }
+    }
+}
+function linkComponent(vm) {
+    {
+        assert.vm(vm);
+    }
+    // wiring service
+    var wire = vm.def.wire;
+    if (wire) {
+        var wiring = Services.wiring;
+        if (wiring) {
+            invokeServiceHook(vm, wiring);
+        }
+    }
+}
+function clearReactiveListeners(vm) {
+    {
+        assert.vm(vm);
+    }
+    var deps = vm.deps;
+    var len = deps.length;
+    if (len) {
+        for (var i = 0; i < len; i += 1) {
+            var set = deps[i];
+            var pos = ArrayIndexOf.call(deps[i], vm);
+            {
+                assert.invariant(pos > -1, "when clearing up deps, the vm must be part of the collection.");
+            }
+            ArraySplice.call(set, pos, 1);
+        }
+        deps.length = 0;
+    }
+}
+function createComponentListener(vm) {
+    return function handler(event) {
+        handleComponentEvent(vm, event);
+    };
+}
+function addComponentEventListener(vm, eventName, newHandler) {
+    {
+        assert.vm(vm);
+        assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of " + vm + " by adding a new event listener for \"" + eventName + "\".");
+    }
+    var cmpEvents = vm.cmpEvents, cmpListener = vm.cmpListener;
+    if (isUndefined(cmpEvents)) {
+        // this piece of code must be in sync with modules/component-events
+        vm.cmpEvents = cmpEvents = create(null);
+        vm.cmpListener = cmpListener = createComponentListener(vm);
+    }
+    if (isUndefined(cmpEvents[eventName])) {
+        cmpEvents[eventName] = [];
+        var elm = vm.elm;
+        elm.addEventListener(eventName, cmpListener, false);
+    }
+    {
+        if (cmpEvents[eventName] && ArrayIndexOf.call(cmpEvents[eventName], newHandler) !== -1) {
+            assert.logWarning(vm + " has duplicate listeners for event \"" + eventName + "\". Instead add the event listener in the connectedCallback() hook.");
+        }
+    }
+    ArrayPush.call(cmpEvents[eventName], newHandler);
+}
+function removeComponentEventListener(vm, eventName, oldHandler) {
+    {
+        assert.vm(vm);
+        assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of " + vm + " by removing an event listener for \"" + eventName + "\".");
+    }
+    var cmpEvents = vm.cmpEvents;
+    if (cmpEvents) {
+        var handlers = cmpEvents[eventName];
+        var pos = handlers && ArrayIndexOf.call(handlers, oldHandler);
+        if (handlers && pos > -1) {
+            ArraySplice.call(cmpEvents[eventName], pos, 1);
+            return;
+        }
+    }
+    {
+        assert.logWarning("Did not find event listener " + oldHandler + " for event \"" + eventName + "\" on " + vm + ". Instead only remove an event listener once.");
+    }
+}
+function handleComponentEvent(vm, event) {
+    {
+        assert.vm(vm);
+        assert.invariant(event instanceof Event, "dispatchComponentEvent() must receive an event instead of " + event);
+        assert.invariant(vm.cmpEvents && vm.cmpEvents[event.type] && vm.cmpEvents[event.type].length, "handleComponentEvent() should only be invoked if there is at least one listener in queue for " + event.type + " on " + vm + ".");
+    }
+    var _a = vm.cmpEvents, cmpEvents = _a === void 0 ? EmptyObject : _a;
+    var type = event.type, stopImmediatePropagation = event.stopImmediatePropagation;
+    var handlers = cmpEvents[type];
+    if (isArray(handlers)) {
+        var uninterrupted_1 = true;
+        event.stopImmediatePropagation = function () {
+            uninterrupted_1 = false;
+            stopImmediatePropagation.call(event);
+        };
+        var e = pierce(vm, event);
+        for (var i = 0, len = handlers.length; uninterrupted_1 && i < len; i += 1) {
+            invokeComponentCallback(vm, handlers[i], [e]);
+        }
+        // restoring original methods
+        event.stopImmediatePropagation = stopImmediatePropagation;
+    }
+}
+function renderComponent(vm) {
+    {
+        assert.vm(vm);
+        assert.invariant(vm.isDirty, vm + " is not dirty.");
+    }
+    clearReactiveListeners(vm);
+    var vnodes = invokeComponentRenderMethod(vm);
+    vm.isDirty = false;
+    {
+        assert.invariant(isArray(vnodes), vm + ".render() should always return an array of vnodes instead of " + vnodes);
+    }
+    return vnodes;
+}
+function markComponentAsDirty(vm) {
+    {
+        assert.vm(vm);
+        assert.isFalse(vm.isDirty, "markComponentAsDirty() for " + vm + " should not be called when the componet is already dirty.");
+        assert.isFalse(isRendering, "markComponentAsDirty() for " + vm + " cannot be called during rendering of " + vmBeingRendered + ".");
+    }
+    vm.isDirty = true;
+}
+function getCustomElementComponent(elmOrRoot) {
+    {
+        assert.vm(elmOrRoot[ViewModelReflection]);
+    }
+    return elmOrRoot[ViewModelReflection].component;
+}
+
+var TargetToReactiveRecordMap = new WeakMap();
+function notifyMutation(target, key) {
+    {
+        assert.invariant(!isRendering, "Mutating property " + toString(key) + " of " + toString(target) + " is not allowed during the rendering life-cycle of " + vmBeingRendered + ".");
+    }
+    var reactiveRecord = TargetToReactiveRecordMap.get(target);
+    if (!isUndefined(reactiveRecord)) {
+        var value = reactiveRecord[key];
+        if (value) {
+            var len = value.length;
+            for (var i = 0; i < len; i += 1) {
+                var vm = value[i];
+                {
+                    assert.vm(vm);
+                }
+                if (!vm.isDirty) {
+                    markComponentAsDirty(vm);
+                    scheduleRehydration(vm);
+                }
+            }
+        }
+    }
+}
+function observeMutation(target, key) {
+    if (isNull(vmBeingRendered)) {
+        return; // nothing to subscribe to
+    }
+    var vm = vmBeingRendered;
+    var reactiveRecord = TargetToReactiveRecordMap.get(target);
+    if (isUndefined(reactiveRecord)) {
+        var newRecord = create(null);
+        reactiveRecord = newRecord;
+        TargetToReactiveRecordMap.set(target, newRecord);
+    }
+    var value = reactiveRecord[key];
+    if (isUndefined(value)) {
+        value = [];
+        reactiveRecord[key] = value;
+    }
+    else if (value[0] === vm) {
+        return; // perf optimization considering that most subscriptions will come from the same vm
+    }
+    if (ArrayIndexOf.call(value, vm) === -1) {
+        ArrayPush.call(value, vm);
+        // we keep track of the sets that vm is listening from to be able to do some clean up later on
+        ArrayPush.call(vm.deps, value);
+    }
+}
+
+var create$1 = Object.create;
+var getPrototypeOf$1 = Object.getPrototypeOf;
+var getOwnPropertyNames$1 = Object.getOwnPropertyNames;
+var getOwnPropertySymbols$1 = Object.getOwnPropertySymbols;
+var isArray$1 = Array.isArray;
+function getTarget(item) {
+    return item && item[TargetSlot];
+}
+function extract(objectOrArray) {
+    if (isArray$1(objectOrArray)) {
+        return objectOrArray.map(function (item) {
+            var original = getTarget(item);
+            if (original) {
+                return extract(original);
+            }
+            return item;
+        });
+    }
+    var obj = create$1(getPrototypeOf$1(objectOrArray));
+    var names = getOwnPropertyNames$1(objectOrArray);
+    return ArrayConcat.call(names, getOwnPropertySymbols$1(objectOrArray))
+        .reduce(function (seed, key) {
+        var item = objectOrArray[key];
+        var original = getTarget(item);
+        if (original) {
+            seed[key] = extract(original);
+        }
+        else {
+            seed[key] = item;
+        }
+        return seed;
+    }, obj);
+}
+var formatter = {
+    header: function (plainOrProxy) {
+        var originalTarget = plainOrProxy[TargetSlot];
+        if (!originalTarget) {
+            return null;
+        }
+        var obj = extract(plainOrProxy);
+        return ['object', { object: obj }];
+    },
+    hasBody: function () {
+        return false;
+    },
+    body: function () {
+        return null;
+    }
+};
+function init() {
+    var devWindow = window;
+    var devtoolsFormatters = devWindow.devtoolsFormatters || [];
+    ArrayPush.call(devtoolsFormatters, formatter);
+    devWindow.devtoolsFormatters = devtoolsFormatters;
+}
+
+{
+    init();
+}
+var ReactiveMap = new WeakMap();
+var ObjectDotPrototype = Object.prototype;
+function lockShadowTarget(shadowTarget, originalTarget) {
+    var targetKeys = ArrayConcat.call(getOwnPropertyNames(originalTarget), getOwnPropertySymbols(originalTarget));
+    targetKeys.forEach(function (key) {
+        var descriptor = getOwnPropertyDescriptor(originalTarget, key);
+        // We do not need to wrap the descriptor if not configurable
+        // Because we can deal with wrapping it when user goes through
+        // Get own property descriptor. There is also a chance that this descriptor
+        // could change sometime in the future, so we can defer wrapping
+        // until we need to
+        if (!descriptor.configurable) {
+            descriptor = wrapDescriptor(descriptor);
+        }
+        defineProperty(shadowTarget, key, descriptor);
+    });
+    preventExtensions(shadowTarget);
+}
+function wrapDescriptor(descriptor) {
+    if ('value' in descriptor) {
+        descriptor.value = isObservable(descriptor.value) ? getReactiveProxy(descriptor.value) : descriptor.value;
+    }
+    return descriptor;
+}
+function isObservable(value) {
+    if (!value) {
+        return false;
+    }
+    if (isArray(value)) {
+        return true;
+    }
+    var proto = getPrototypeOf(value);
+    return (proto === ObjectDotPrototype || proto === null || getPrototypeOf(proto) === null);
+}
+// Unwrap property descriptors
+// We only need to unwrap if value is specified
+function unwrapDescriptor(descriptor) {
+    if ('value' in descriptor) {
+        descriptor.value = unwrap(descriptor.value);
+    }
+    return descriptor;
+}
+var ReactiveProxyHandler = /** @class */ (function () {
+    function ReactiveProxyHandler(value) {
+        this.originalTarget = value;
+    }
+    ReactiveProxyHandler.prototype.get = function (shadowTarget, key) {
+        if (key === MembraneSlot) {
+            return this;
+        }
+        var originalTarget = this.originalTarget;
+        if (key === TargetSlot) {
+            return originalTarget;
+        }
+        var value = originalTarget[key];
+        observeMutation(originalTarget, key);
+        var observable = isObservable(value);
+        {
+            if (!observable && value !== null && isObject(value)) {
+                if (isRendering) {
+                    assert.logWarning("Rendering a non-reactive value " + value + " from member property " + key + " of " + vmBeingRendered + " is not common because mutations on that value will not re-render the template.");
+                }
+                else {
+                    assert.logWarning("Returning a non-reactive value " + value + " to member property " + key + " of " + toString(originalTarget) + " is not common because mutations on that value cannot be observed.");
+                }
+            }
+        }
+        return observable ? getReactiveProxy(value) : value;
+    };
+    ReactiveProxyHandler.prototype.set = function (shadowTarget, key, value) {
+        var originalTarget = this.originalTarget;
+        if (isRendering) {
+            {
+                assert.logError("Setting property \"" + toString(key) + "\" of " + toString(shadowTarget) + " during the rendering process of " + vmBeingRendered + " is invalid. The render phase must have no side effects on the state of any component.");
+            }
+            return false;
+        }
+        var oldValue = originalTarget[key];
+        if (oldValue !== value) {
+            originalTarget[key] = value;
+            notifyMutation(originalTarget, key);
+        }
+        else if (key === 'length' && isArray(originalTarget)) {
+            // fix for issue #236: push will add the new index, and by the time length
+            // is updated, the internal length is already equal to the new length value
+            // therefore, the oldValue is equal to the value. This is the forking logic
+            // to support this use case.
+            notifyMutation(originalTarget, key);
+        }
+        return true;
+    };
+    ReactiveProxyHandler.prototype.deleteProperty = function (shadowTarget, key) {
+        var originalTarget = this.originalTarget;
+        delete originalTarget[key];
+        notifyMutation(originalTarget, key);
+        return true;
+    };
+    ReactiveProxyHandler.prototype.apply = function (target /*, thisArg: any, argArray?: any*/) {
+        {
+            assert.fail("invalid call invocation for property proxy " + toString(target));
+        }
+    };
+    ReactiveProxyHandler.prototype.construct = function (target, argArray, newTarget) {
+        {
+            assert.fail("invalid construction invocation for property proxy " + toString(target));
+        }
+    };
+    ReactiveProxyHandler.prototype.has = function (shadowTarget, key) {
+        var originalTarget = this.originalTarget;
+        observeMutation(originalTarget, key);
+        return key in originalTarget;
+    };
+    ReactiveProxyHandler.prototype.ownKeys = function (shadowTarget) {
+        var originalTarget = this.originalTarget;
+        return ArrayConcat.call(getOwnPropertyNames(originalTarget), getOwnPropertySymbols(originalTarget));
+    };
+    ReactiveProxyHandler.prototype.isExtensible = function (shadowTarget) {
+        var shadowIsExtensible = isExtensible(shadowTarget);
+        if (!shadowIsExtensible) {
+            return shadowIsExtensible;
+        }
+        var originalTarget = this.originalTarget;
+        var targetIsExtensible = isExtensible(originalTarget);
+        if (!targetIsExtensible) {
+            lockShadowTarget(shadowTarget, originalTarget);
+        }
+        return targetIsExtensible;
+    };
+    ReactiveProxyHandler.prototype.setPrototypeOf = function (shadowTarget, prototype) {
+        {
+            assert.fail("Invalid setPrototypeOf invocation for reactive proxy " + toString(this.originalTarget) + ". Prototype of reactive objects cannot be changed.");
+        }
+    };
+    ReactiveProxyHandler.prototype.getPrototypeOf = function (shadowTarget) {
+        var originalTarget = this.originalTarget;
+        return getPrototypeOf(originalTarget);
+    };
+    ReactiveProxyHandler.prototype.getOwnPropertyDescriptor = function (shadowTarget, key) {
+        var originalTarget = this.originalTarget;
+        // keys looked up via hasOwnProperty need to be reactive
+        observeMutation(originalTarget, key);
+        var desc = getOwnPropertyDescriptor(originalTarget, key);
+        if (isUndefined(desc)) {
+            return desc;
+        }
+        var shadowDescriptor = getOwnPropertyDescriptor(shadowTarget, key);
+        if (!desc.configurable && !shadowDescriptor) {
+            // If descriptor from original target is not configurable,
+            // We must copy the wrapped descriptor over to the shadow target.
+            // Otherwise, proxy will throw an invariant error.
+            // This is our last chance to lock the value.
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/getOwnPropertyDescriptor#Invariants
+            desc = wrapDescriptor(desc);
+            defineProperty(shadowTarget, key, desc);
+        }
+        return shadowDescriptor || desc;
+    };
+    ReactiveProxyHandler.prototype.preventExtensions = function (shadowTarget) {
+        var originalTarget = this.originalTarget;
+        lockShadowTarget(shadowTarget, originalTarget);
+        preventExtensions(originalTarget);
+        return true;
+    };
+    ReactiveProxyHandler.prototype.defineProperty = function (shadowTarget, key, descriptor) {
+        var originalTarget = this.originalTarget;
+        var configurable = descriptor.configurable;
+        // We have to check for value in descriptor
+        // because Object.freeze(proxy) calls this method
+        // with only { configurable: false, writeable: false }
+        // Additionally, method will only be called with writeable:false
+        // if the descriptor has a value, as opposed to getter/setter
+        // So we can just check if writable is present and then see if
+        // value is present. This eliminates getter and setter descriptors
+        if ('writable' in descriptor && !('value' in descriptor)) {
+            var originalDescriptor = getOwnPropertyDescriptor(originalTarget, key);
+            descriptor.value = originalDescriptor.value;
+        }
+        defineProperty(originalTarget, key, unwrapDescriptor(descriptor));
+        if (configurable === false) {
+            defineProperty(shadowTarget, key, wrapDescriptor(descriptor));
+        }
+        notifyMutation(originalTarget, key);
+        return true;
+    };
+    return ReactiveProxyHandler;
+}());
+function getReactiveProxy(value) {
+    {
+        assert.isTrue(isObservable(value), "perf-optimization: avoid calling this method with non-observable values.");
+    }
+    value = unwrap(value);
+    var proxy = ReactiveMap.get(value);
+    if (proxy) {
+        return proxy;
+    }
+    var handler = new ReactiveProxyHandler(value);
+    var shadowTarget = isArray(value) ? [] : {};
+    proxy = new Proxy(shadowTarget, handler);
+    ReactiveMap.set(value, proxy);
+    return proxy;
+}
 
 // stub function to prevent misuse of the @track decorator
 function track() {
@@ -2467,17 +2103,15 @@ function createTrackedPropertyDescriptor(proto, key, descriptor) {
                 assert.vm(vm);
                 assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of " + vm + "." + key);
             }
-            var reactiveOrAnyValue = membrane.getProxy(newValue);
-            if (reactiveOrAnyValue !== vm.cmpTrack[key]) {
+            var observable = isObservable(newValue);
+            newValue = observable ? getReactiveProxy(newValue) : newValue;
+            if (newValue !== vm.cmpTrack[key]) {
                 {
-                    // reactiveMembrane.getProxy(newValue) will return a different value (proxy)
-                    // Then newValue if newValue is observable (plain object or array)
-                    var isObservable = reactiveOrAnyValue !== newValue;
-                    if (!isObservable && newValue !== null && (isObject(newValue) || isArray(newValue))) {
+                    if (!observable && newValue !== null && (isObject(newValue) || isArray(newValue))) {
                         assert.logWarning("Property \"" + key + "\" of " + vm + " is set to a non-trackable object, which means changes into that object cannot be observed.");
                     }
                 }
-                vm.cmpTrack[key] = reactiveOrAnyValue;
+                vm.cmpTrack[key] = newValue;
                 if (vm.idx > 0) {
                     // perf optimization to skip this step if not in the DOM
                     notifyMutation(this, key);
@@ -2538,11 +2172,10 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
             }
             if (isTrue(vm.isRoot) || isBeingConstructed(vm)) {
                 vmBeingUpdated = vm;
+                var observable = isObservable(newValue);
+                newValue = observable ? getReactiveProxy(newValue) : newValue;
                 {
-                    // reactiveMembrane.getProxy(newValue) will return a different value (proxy)
-                    // Then newValue if newValue is observable (plain object or array)
-                    var isObservable = membrane.getProxy(newValue) !== newValue;
-                    if (!isObservable && !isNull(newValue) && isObject(newValue)) {
+                    if (!observable && !isNull(newValue) && isObject(newValue)) {
                         assert.logWarning("Assigning a non-reactive value " + newValue + " to member property " + key + " of " + vm + " is not common because mutations on that value cannot be observed.");
                     }
                 }
@@ -2550,7 +2183,7 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
             if (vmBeingUpdated === vm) {
                 // not need to wrap or check the value since that is happening somewhere else
                 vmBeingUpdated = null; // releasing the lock
-                vm.cmpProps[key] = membrane.getReadOnlyProxy(newValue);
+                vm.cmpProps[key] = newValue;
                 // avoid notification of observability while constructing the instance
                 if (vm.idx > 0) {
                     // perf optimization to skip this step if not in the DOM
@@ -2567,20 +2200,16 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
     });
 }
 function createPublicAccessorDescriptor(proto, key, descriptor) {
-    var get = descriptor.get, set = descriptor.set, enumerable = descriptor.enumerable;
-    if (!isFunction(get)) {
-        {
-            assert.fail("Invalid attempt to create public property descriptor " + key + " in " + proto + ". It is missing the getter declaration with @api get " + key + "() {} syntax.");
-        }
-        throw new TypeError();
-    }
+    var _a = descriptor || EmptyObject, get = _a.get, set = _a.set, enumerable = _a.enumerable;
     defineProperty(proto, key, {
         get: function () {
             {
                 var vm = getCustomElementVM(this);
                 assert.vm(vm);
             }
-            return get.call(this);
+            if (get) {
+                return get.call(this);
+            }
         },
         set: function (newValue) {
             var vm = getCustomElementVM(this);
@@ -2590,11 +2219,10 @@ function createPublicAccessorDescriptor(proto, key, descriptor) {
             }
             if (vm.isRoot || isBeingConstructed(vm)) {
                 vmBeingUpdated = vm;
+                var observable = isObservable(newValue);
+                newValue = observable ? getReactiveProxy(newValue) : newValue;
                 {
-                    // reactiveMembrane.getProxy(newValue) will return a different value (proxy)
-                    // Then newValue if newValue is observable (plain object or array)
-                    var isObservable = membrane.getProxy(newValue) !== newValue;
-                    if (!isObservable && !isNull(newValue) && isObject(newValue)) {
+                    if (!observable && !isNull(newValue) && isObject(newValue)) {
                         assert.logWarning("Assigning a non-reactive value " + newValue + " to member property " + key + " of " + vm + " is not common because mutations on that value cannot be observed.");
                     }
                 }
@@ -2603,7 +2231,7 @@ function createPublicAccessorDescriptor(proto, key, descriptor) {
                 // not need to wrap or check the value since that is happening somewhere else
                 vmBeingUpdated = null; // releasing the lock
                 if (set) {
-                    set.call(this, membrane.getReadOnlyProxy(newValue));
+                    set.call(this, newValue);
                 }
                 else {
                     assert.fail("Invalid attempt to set a new value for property " + key + " of " + vm + " that does not has a setter decorated with @api.");
@@ -2627,15 +2255,20 @@ function createPublicAccessorDescriptor(proto, key, descriptor) {
  * This structure can be used to synthetically create proxies, and understand the
  * shape of a component. It is also used internally to apply extra optimizations.
  */
+var ViewModelReflection = Symbol();
+var observableHTMLAttrs;
+{
+    observableHTMLAttrs = getOwnPropertyNames(GlobalHTMLProperties).reduce(function (acc, key) {
+        var globalProperty = GlobalHTMLProperties[key];
+        if (globalProperty && globalProperty.attribute) {
+            acc[globalProperty.attribute] = 1;
+        }
+        return acc;
+    }, create(null));
+}
 var CtorToDefMap = new WeakMap();
 var COMPUTED_GETTER_MASK = 1;
 var COMPUTED_SETTER_MASK = 2;
-function propertiesReducer(seed, propName) {
-    seed[propName] = { config: 3 };
-    return seed;
-}
-var reducedDefaultHTMLPropertyNames = ArrayReduce.call(defaultDefHTMLPropertyNames, propertiesReducer, create(null));
-var HTML_PROPS = ArrayReduce.call(getOwnPropertyNames(GlobalAOMProperties), propertiesReducer, reducedDefaultHTMLPropertyNames);
 function isElementComponent(Ctor, protoSet) {
     protoSet = protoSet || [];
     if (!Ctor || ArrayIndexOf.call(protoSet, Ctor) >= 0) {
@@ -2660,6 +2293,7 @@ function createComponentDef(Ctor) {
     var name = Ctor.name;
     var props = getPublicPropertiesHash(Ctor);
     var methods = getPublicMethodsHash(Ctor);
+    var observedAttrs = getObservedAttributesHash(Ctor);
     var wire$$1 = getWireHash(Ctor);
     var track$$1 = getTrackHash(Ctor);
     var proto = Ctor.prototype;
@@ -2681,7 +2315,6 @@ function createComponentDef(Ctor) {
                     assert.isTrue(mustHaveGetter, "Missing getter for property " + propName + " decorated with @api in " + name + ". You cannot have a setter without the corresponding getter.");
                 }
             }
-            // if it is configured as an accessor it must have a descriptor
             createPublicAccessorDescriptor(proto, propName, descriptor);
         }
         else {
@@ -2720,7 +2353,7 @@ function createComponentDef(Ctor) {
             createTrackedPropertyDescriptor(proto, propName, descriptor);
         }
     }
-    var connectedCallback = proto.connectedCallback, disconnectedCallback = proto.disconnectedCallback, renderedCallback = proto.renderedCallback, errorCallback = proto.errorCallback;
+    var connectedCallback = proto.connectedCallback, disconnectedCallback = proto.disconnectedCallback, renderedCallback = proto.renderedCallback, errorCallback = proto.errorCallback, attributeChangedCallback = proto.attributeChangedCallback;
     var superProto = getPrototypeOf(Ctor);
     var superDef = superProto !== LWCElement ? getComponentDef(superProto) : null;
     if (!isNull(superDef)) {
@@ -2731,8 +2364,8 @@ function createComponentDef(Ctor) {
         disconnectedCallback = disconnectedCallback || superDef.disconnectedCallback;
         renderedCallback = renderedCallback || superDef.renderedCallback;
         errorCallback = errorCallback || superDef.errorCallback;
+        attributeChangedCallback = attributeChangedCallback || superDef.attributeChangedCallback;
     }
-    props = assign(create(null), HTML_PROPS, props);
     var descriptors = createDescriptorMap(props, methods);
     var def = {
         name: name,
@@ -2740,17 +2373,20 @@ function createComponentDef(Ctor) {
         track: track$$1,
         props: props,
         methods: methods,
+        observedAttrs: observedAttrs,
         descriptors: descriptors,
         connectedCallback: connectedCallback,
         disconnectedCallback: disconnectedCallback,
         renderedCallback: renderedCallback,
         errorCallback: errorCallback,
+        attributeChangedCallback: attributeChangedCallback,
     };
     {
         freeze(Ctor.prototype);
         freeze(wire$$1);
         freeze(props);
         freeze(methods);
+        freeze(observedAttrs);
         for (var key in def) {
             defineProperty(def, key, {
                 configurable: false,
@@ -2776,50 +2412,79 @@ function createMethodCaller(key) {
         return component[key].apply(component, ArraySlice.call(arguments));
     };
 }
+var _a$2 = Element.prototype;
+var getAttribute = _a$2.getAttribute;
+var getAttributeNS = _a$2.getAttributeNS;
+var setAttribute = _a$2.setAttribute;
+var setAttributeNS = _a$2.setAttributeNS;
+var removeAttribute = _a$2.removeAttribute;
+var removeAttributeNS = _a$2.removeAttributeNS;
 function getAttributePatched(attrName) {
     {
         var vm = getCustomElementVM(this);
-        assertPublicAttributeCollision(vm, attrName);
+        assertPublicAttributeColission(vm, attrName);
     }
     return getAttribute.apply(this, ArraySlice.call(arguments));
 }
 function setAttributePatched(attrName, newValue) {
     var vm = getCustomElementVM(this);
-    // marking the set is needed for the AOM polyfill
-    vm.hostAttrs[attrName] = 1; // marking the set is needed for the AOM polyfill
     {
         assertTemplateMutationViolation(vm, attrName);
-        assertPublicAttributeCollision(vm, attrName);
+        assertPublicAttributeColission(vm, attrName);
     }
+    var isObserved = isAttrObserved(vm, attrName);
+    var oldValue = isObserved ? getAttribute.call(this, attrName) : null;
     setAttribute.apply(this, ArraySlice.call(arguments));
+    if (isObserved) {
+        newValue = getAttribute.call(this, attrName);
+        if (oldValue !== newValue) {
+            invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
+        }
+    }
 }
 function setAttributeNSPatched(attrNameSpace, attrName, newValue) {
     var vm = getCustomElementVM(this);
     {
         assertTemplateMutationViolation(vm, attrName);
-        assertPublicAttributeCollision(vm, attrName);
+        assertPublicAttributeColission(vm, attrName);
     }
+    var isObserved = isAttrObserved(vm, attrName);
+    var oldValue = isObserved ? getAttributeNS.call(this, attrNameSpace, attrName) : null;
     setAttributeNS.apply(this, ArraySlice.call(arguments));
+    if (isObserved) {
+        newValue = getAttributeNS.call(this, attrNameSpace, attrName);
+        if (oldValue !== newValue) {
+            invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValue);
+        }
+    }
 }
 function removeAttributePatched(attrName) {
     var vm = getCustomElementVM(this);
-    // marking the set is needed for the AOM polyfill
     {
         assertTemplateMutationViolation(vm, attrName);
-        assertPublicAttributeCollision(vm, attrName);
+        assertPublicAttributeColission(vm, attrName);
     }
+    var isObserved = isAttrObserved(vm, attrName);
+    var oldValue = isObserved ? getAttribute.call(this, attrName) : null;
     removeAttribute.apply(this, ArraySlice.call(arguments));
-    attemptAriaAttributeFallback(vm, attrName);
+    if (isObserved && oldValue !== null) {
+        invokeComponentAttributeChangedCallback(vm, attrName, oldValue, null);
+    }
 }
 function removeAttributeNSPatched(attrNameSpace, attrName) {
     var vm = getCustomElementVM(this);
     {
         assertTemplateMutationViolation(vm, attrName);
-        assertPublicAttributeCollision(vm, attrName);
+        assertPublicAttributeColission(vm, attrName);
     }
+    var isObserved = isAttrObserved(vm, attrName);
+    var oldValue = isObserved ? getAttributeNS.call(this, attrNameSpace, attrName) : null;
     removeAttributeNS.apply(this, ArraySlice.call(arguments));
+    if (isObserved && oldValue !== null) {
+        invokeComponentAttributeChangedCallback(vm, attrName, oldValue, null);
+    }
 }
-function assertPublicAttributeCollision(vm, attrName) {
+function assertPublicAttributeColission(vm, attrName) {
     var propName = isString(attrName) ? getPropNameFromAttrName(attrName.toLocaleLowerCase()) : null;
     var propsConfig = vm.def.props;
     if (propsConfig && propName && propsConfig[propName]) {
@@ -2833,6 +2498,9 @@ function assertTemplateMutationViolation(vm, attrName) {
     }
     // attribute change control must be released every time its value is checked
     resetAttributeChangeControl();
+}
+function isAttrObserved(vm, attrName) {
+    return attrName in vm.def.observedAttrs;
 }
 var controlledAttributeChange = false;
 var controlledAttributeName;
@@ -2892,7 +2560,7 @@ function createDescriptorMap(publicProps, publicMethodsConfig) {
 }
 function getTrackHash(target) {
     var track$$1 = target.track;
-    if (!getOwnPropertyDescriptor(target, 'track') || !track$$1 || !getOwnPropertyNames(track$$1).length) {
+    if (!track$$1 || !getOwnPropertyNames(track$$1).length) {
         return EmptyObject;
     }
     // TODO: check that anything in `track` is correctly defined in the prototype
@@ -2900,7 +2568,7 @@ function getTrackHash(target) {
 }
 function getWireHash(target) {
     var wire$$1 = target.wire;
-    if (!getOwnPropertyDescriptor(target, 'wire') || !wire$$1 || !getOwnPropertyNames(wire$$1).length) {
+    if (!wire$$1 || !getOwnPropertyNames(wire$$1).length) {
         return;
     }
     // TODO: check that anything in `wire` is correctly defined in the prototype
@@ -2908,14 +2576,13 @@ function getWireHash(target) {
 }
 function getPublicPropertiesHash(target) {
     var props = target.publicProps;
-    if (!getOwnPropertyDescriptor(target, 'publicProps') || !props || !getOwnPropertyNames(props).length) {
+    if (!props || !getOwnPropertyNames(props).length) {
         return EmptyObject;
     }
     return getOwnPropertyNames(props).reduce(function (propsHash, propName) {
         {
-            var globalHTMLProperty = GlobalHTMLProperties[propName];
-            if (globalHTMLProperty && globalHTMLProperty.attribute && globalHTMLProperty.reflective === false) {
-                var error = globalHTMLProperty.error, attribute = globalHTMLProperty.attribute, experimental = globalHTMLProperty.experimental;
+            if (GlobalHTMLProperties[propName] && GlobalHTMLProperties[propName].attribute) {
+                var _a = GlobalHTMLProperties[propName], error = _a.error, attribute = _a.attribute, experimental = _a.experimental;
                 var msg = [];
                 if (error) {
                     msg.push(error);
@@ -2937,7 +2604,7 @@ function getPublicPropertiesHash(target) {
 }
 function getPublicMethodsHash(target) {
     var publicMethods = target.publicMethods;
-    if (!getOwnPropertyDescriptor(target, 'publicMethods') || !publicMethods || !publicMethods.length) {
+    if (!publicMethods || !publicMethods.length) {
         return EmptyObject;
     }
     return publicMethods.reduce(function (methodsHash, methodName) {
@@ -2947,6 +2614,31 @@ function getPublicMethodsHash(target) {
             freeze(target.prototype[methodName]);
         }
         return methodsHash;
+    }, create(null));
+}
+function getObservedAttributesHash(target) {
+    var observedAttributes = target.observedAttributes;
+    if (!observedAttributes || !observedAttributes.length) {
+        return EmptyObject;
+    }
+    return observedAttributes.reduce(function (reducer, attrName) {
+        {
+            var propName = getPropNameFromAttrName(attrName);
+            // Check if it is a user defined public property
+            if (target.publicProps && target.publicProps[propName]) {
+                assert.fail("Invalid entry \"" + attrName + "\" in component " + target.name + " observedAttributes. To observe mutations of the public property \"" + propName + "\" you can define a public getter and setter decorated with @api in component " + target.name + ".");
+            }
+            else if (!observableHTMLAttrs[attrName] && (GlobalHTMLProperties[propName] && GlobalHTMLProperties[propName].attribute)) {
+                // Check for misspellings
+                assert.fail("Invalid entry \"" + attrName + "\" in component " + target.name + " observedAttributes. \"" + attrName + "\" is not a valid global HTML Attribute. Did you mean \"" + GlobalHTMLProperties[propName].attribute + "\"? See https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes");
+            }
+            else if (!observableHTMLAttrs[attrName] && (attrName.indexOf('data-') === -1 && attrName.indexOf('aria-') === -1)) {
+                // Attribute is not valid observable HTML Attribute
+                assert.fail("Invalid entry \"" + attrName + "\" in component " + target.name + " observedAttributes. \"" + attrName + "\" is not a valid global HTML Attribute. See https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes");
+            }
+        }
+        reducer[attrName] = 1;
+        return reducer;
     }, create(null));
 }
 function getComponentDef(Ctor) {
@@ -2964,9 +2656,6 @@ function getCtorByTagName(tagName) {
     /////// TODO: what is this?
 }
 function registerComponent(tagName, Ctor) {
-    {
-        assertValidForceTagName(Ctor);
-    }
     if (!isUndefined(TagNameToCtor[tagName])) {
         if (TagNameToCtor[tagName] === Ctor) {
             return;
@@ -2979,15 +2668,13 @@ function registerComponent(tagName, Ctor) {
     TagNameToCtor[tagName] = Ctor;
 }
 
-/* tslint:disable:one-variable-per-declaration no-shadowed-variable */
-var isArray$3 = Array.isArray;
-var ELEMENT_NODE$1 = 1, TEXT_NODE$1 = 3, COMMENT_NODE$1 = 8, DOCUMENT_FRAGMENT_NODE = 11;
-function isUndef(s) {
-    return s === undefined;
-}
-function isDef(s) {
-    return s !== undefined;
-}
+var isArray$2 = Array.isArray;
+var ELEMENT_NODE$1 = 1;
+var TEXT_NODE$1 = 3;
+var COMMENT_NODE$1 = 8;
+var DOCUMENT_FRAGMENT_NODE = 11;
+function isUndef(s) { return s === undefined; }
+function isDef(s) { return s !== undefined; }
 var emptyNode = {
     nt: 0,
     sel: '',
@@ -2998,9 +2685,7 @@ var emptyNode = {
     key: undefined,
 };
 function defaultCompareFn(vnode1, vnode2) {
-    return (vnode1.nt === vnode2.nt &&
-        vnode1.key === vnode2.key &&
-        vnode1.sel === vnode2.sel);
+    return vnode1.nt === vnode2.nt && vnode1.key === vnode2.key && vnode1.sel === vnode2.sel;
 }
 function isVNode(vnode) {
     return vnode != null;
@@ -3018,8 +2703,7 @@ function isCommentVNode(vnode) {
     return vnode.nt === COMMENT_NODE$1;
 }
 function createKeyToOldIdx(children, beginIdx, endIdx) {
-    var map = {};
-    var i, key, ch;
+    var i, map = {}, key, ch;
     for (i = beginIdx; i <= endIdx; ++i) {
         ch = children[i];
         if (isVNode(ch)) {
@@ -3031,17 +2715,9 @@ function createKeyToOldIdx(children, beginIdx, endIdx) {
     }
     return map;
 }
-var hooks$1 = [
-    'create',
-    'update',
-    'remove',
-    'destroy',
-    'pre',
-    'post',
-];
+var hooks$1 = ['create', 'update', 'remove', 'destroy', 'pre', 'post'];
 function init$1(modules, api, compareFn) {
-    var cbs = {};
-    var i, j;
+    var i, j, cbs = {};
     var sameVnode = isUndef(compareFn) ? defaultCompareFn : compareFn;
     for (i = 0; i < hooks$1.length; ++i) {
         cbs[hooks$1[i]] = [];
@@ -3064,23 +2740,22 @@ function init$1(modules, api, compareFn) {
         var i;
         var data = vnode.data;
         if (!isUndef(data)) {
-            if (isDef((i = data.hook)) && isDef((i = i.init))) {
+            if (isDef(i = data.hook) && isDef(i = i.init)) {
                 i(vnode);
             }
         }
         if (isElementVNode(vnode)) {
             var data_1 = vnode.data, tag = vnode.tag;
-            var elm = (vnode.elm = isDef((i = data_1.ns))
-                ? api.createElementNS(i, tag)
-                : api.createElement(tag));
-            if (isDef((i = data_1.hook)) && isDef(i.create)) {
+            var elm = vnode.elm = isDef(i = data_1.ns) ? api.createElementNS(i, tag)
+                : api.createElement(tag);
+            if (isDef(i = data_1.hook) && isDef(i.create)) {
                 i.create(emptyNode, vnode);
             }
             for (i = 0; i < cbs.create.length; ++i) {
                 cbs.create[i](emptyNode, vnode);
             }
             var children = vnode.children;
-            if (isArray$3(children)) {
+            if (isArray$2(children)) {
                 for (i = 0; i < children.length; ++i) {
                     var ch = children[i];
                     if (isVNode(ch)) {
@@ -3091,7 +2766,7 @@ function init$1(modules, api, compareFn) {
             else if (!isUndef(vnode.text)) {
                 api.appendChild(elm, api.createTextNode(vnode.text));
             }
-            if (isDef((i = data_1.hook)) && isDef(i.insert)) {
+            if (isDef(i = data_1.hook) && isDef(i.insert)) {
                 insertedVnodeQueue.push(vnode);
             }
         }
@@ -3118,9 +2793,8 @@ function init$1(modules, api, compareFn) {
         }
     }
     function invokeDestroyHook(vnode) {
-        var data = vnode.data;
-        var i, j;
-        if (isDef((i = data.hook)) && isDef((i = i.destroy))) {
+        var i, j, data = vnode.data;
+        if (isDef(i = data.hook) && isDef(i = i.destroy)) {
             i(vnode);
         }
         for (i = 0; i < cbs.destroy.length; ++i) {
@@ -3139,8 +2813,7 @@ function init$1(modules, api, compareFn) {
     }
     function removeVnodes(parentElm, vnodes, startIdx, endIdx) {
         for (; startIdx <= endIdx; ++startIdx) {
-            var ch = vnodes[startIdx];
-            var i_1 = void 0, listeners = void 0, rm = void 0;
+            var i_1 = void 0, listeners = void 0, rm = void 0, ch = vnodes[startIdx];
             // text nodes do not have logic associated to them
             if (isVNode(ch)) {
                 if (!isTextVNode(ch)) {
@@ -3150,7 +2823,7 @@ function init$1(modules, api, compareFn) {
                     for (i_1 = 0; i_1 < cbs.remove.length; ++i_1) {
                         cbs.remove[i_1](ch, rm);
                     }
-                    if (isDef((i_1 = ch.data.hook)) && isDef((i_1 = i_1.remove))) {
+                    if (isDef(i_1 = ch.data.hook) && isDef(i_1 = i_1.remove)) {
                         i_1(ch, rm);
                     }
                     else {
@@ -3199,14 +2872,12 @@ function init$1(modules, api, compareFn) {
                 newEndVnode = newCh[--newEndIdx];
             }
             else if (sameVnode(oldStartVnode, newEndVnode)) {
-                // Vnode moved right
                 patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue);
                 api.insertBefore(parentElm, oldStartVnode.elm, api.nextSibling(oldEndVnode.elm));
                 oldStartVnode = oldCh[++oldStartIdx];
                 newEndVnode = newCh[--newEndIdx];
             }
             else if (sameVnode(oldEndVnode, newStartVnode)) {
-                // Vnode moved left
                 patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue);
                 api.insertBefore(parentElm, oldEndVnode.elm, oldStartVnode.elm);
                 oldEndVnode = oldCh[--oldEndIdx];
@@ -3218,7 +2889,6 @@ function init$1(modules, api, compareFn) {
                 }
                 idxInOld = oldKeyToIdx[newStartVnode.key];
                 if (isUndef(idxInOld)) {
-                    // New element
                     api.insertBefore(parentElm, createElm(newStartVnode, insertedVnodeQueue), oldStartVnode.elm);
                     newStartVnode = newCh[++newStartIdx];
                 }
@@ -3251,13 +2921,13 @@ function init$1(modules, api, compareFn) {
     }
     function patchVnode(oldVnode, vnode, insertedVnodeQueue) {
         var i, hook;
-        if (isDef((i = vnode.data))) {
+        if (isDef(i = vnode.data)) {
             hook = i.hook;
         }
-        if (isDef(hook) && isDef((i = hook.prepatch))) {
+        if (isDef(hook) && isDef(i = hook.prepatch)) {
             i(oldVnode, vnode);
         }
-        var elm = (vnode.elm = oldVnode.elm);
+        var elm = vnode.elm = oldVnode.elm;
         if (oldVnode === vnode) {
             return;
         }
@@ -3265,7 +2935,7 @@ function init$1(modules, api, compareFn) {
             for (i = 0; i < cbs.update.length; ++i) {
                 cbs.update[i](oldVnode, vnode);
             }
-            if (isDef(hook) && isDef((i = hook.update))) {
+            if (isDef(hook) && isDef(i = hook.update)) {
                 i(oldVnode, vnode);
             }
         }
@@ -3293,7 +2963,7 @@ function init$1(modules, api, compareFn) {
         else if (oldVnode.text !== vnode.text) {
             api.setTextContent(elm, vnode.text);
         }
-        if (isDef(hook) && isDef((i = hook.postpatch))) {
+        if (isDef(hook) && isDef(i = hook.postpatch)) {
             i(oldVnode, vnode);
         }
     }
@@ -3329,7 +2999,7 @@ function init$1(modules, api, compareFn) {
         return vnode;
     };
     patch.children = function children(parentElm, oldCh, newCh) {
-        if (!isArray$3(oldCh) || !isArray$3(newCh)) {
+        if (!isArray$2(oldCh) || !isArray$2(newCh)) {
             throw new TypeError();
         }
         var i, n;
@@ -3377,13 +3047,13 @@ function update(oldVnode, vnode) {
         {
             if (old !== cur && !(key in elm)) {
                 // TODO: this should never really happen because the compiler should always validate
-                assert.fail("Unknown public property \"" + key + "\" of element <" + StringToLowerCase.call(elm.tagName) + ">. This is likely a typo on the corresponding attribute \"" + getAttrNameFromPropName(key) + "\".");
+                assert.fail("Unknown public property \"" + key + "\" of " + elm + ". This is likely a typo on the corresponding attribute \"" + getAttrNameFromPropName(key) + "\".");
             }
         }
         if (old !== cur && (key in elm) && (key !== 'value' || elm[key] !== cur)) {
             {
                 if (elm[key] === cur && old !== undefined) {
-                    console.warn("Unnecessary update of property \"" + key + "\" in element <" + StringToLowerCase.call(elm.tagName) + ">."); // tslint:disable-line
+                    console.warn("Unneccessary update of property \"" + key + "\" in " + elm + "."); // tslint:disable-line
                 }
             }
             if (!isUndefined(vm)) {
@@ -3433,11 +3103,11 @@ function updateAttrs(oldVnode, vnode) {
                 removeAttribute.call(elm, key);
             }
             else {
-                if (StringCharCodeAt.call(key, 3) === ColonCharCode) {
+                if (key.charCodeAt(3) === ColonCharCode) {
                     // Assume xml namespace
                     elm.setAttributeNS.call(elm, xmlNS, key, cur);
                 }
-                else if (StringCharCodeAt.call(key, 5) === ColonCharCode) {
+                else if (key.charCodeAt(5) === ColonCharCode) {
                     // Assume xlink namespace
                     elm.setAttributeNS.call(elm, xlinkNS, key, cur);
                 }
@@ -3453,6 +3123,7 @@ var attributesModule = {
     update: updateAttrs
 };
 
+var removeAttribute$2 = Element.prototype.removeAttribute;
 var DashCharCode = 45;
 function updateStyle(oldVnode, vnode) {
     var newStyle = vnode.data.style;
@@ -3470,7 +3141,7 @@ function updateStyle(oldVnode, vnode) {
     var elm = vnode.elm;
     var style = elm.style;
     if (isUndefined(newStyle) || newStyle === '') {
-        removeAttribute.call(elm, 'style');
+        removeAttribute$2.call(elm, 'style');
     }
     else if (isString(newStyle)) {
         style.cssText = newStyle;
@@ -3489,8 +3160,8 @@ function updateStyle(oldVnode, vnode) {
         for (name in newStyle) {
             var cur = newStyle[name];
             if (cur !== oldStyle[name]) {
-                if (StringCharCodeAt.call(name, 0) === DashCharCode && StringCharCodeAt.call(name, 1) === DashCharCode) {
-                    // if the name is prefixed with --, it will be considered a variable, and setProperty() is needed
+                if (name.charCodeAt(0) === DashCharCode && name.charCodeAt(1) === DashCharCode) {
+                    // if the name is prefied with --, it will be considered a variable, and setProperty() is needed
                     style.setProperty(name, cur);
                 }
                 else {
@@ -3558,7 +3229,7 @@ function removeAllEventListeners(vnode) {
         var elm = vnode.elm;
         var name = void 0;
         for (name in on) {
-            removeEventListener.call(elm, name, listener, false);
+            elm.removeEventListener(name, listener, false);
         }
         vnode.listener = undefined;
     }
@@ -3582,7 +3253,7 @@ function createAllEventListeners(oldVnode, vnode) {
     listener.vnode = vnode;
     var name;
     for (name in on) {
-        addEventListener.call(elm, name, listener, false);
+        elm.addEventListener(name, listener, false);
     }
 }
 // @ts-ignore
@@ -3603,13 +3274,13 @@ function updateToken(oldVnode, vnode) {
         {
             prepareForAttributeMutationFromTemplate(elm, oldToken);
         }
-        removeAttribute.call(elm, oldToken);
+        elm.removeAttribute(oldToken);
     }
     if (!isUndefined(newToken)) {
         {
             prepareForAttributeMutationFromTemplate(elm, newToken);
         }
-        setAttribute.call(elm, newToken, '');
+        elm.setAttribute(newToken, '');
     }
 }
 var tokenModule = {
@@ -3631,8 +3302,14 @@ var uidModule = {
     update: updateUID,
 };
 
-var createElement = document.createElement, createElementNS = document.createElementNS, createTextNode = document.createTextNode, createComment = document.createComment, createDocumentFragment = document.createDocumentFragment;
-var _a$3 = Node.prototype, insertBefore = _a$3.insertBefore, removeChild = _a$3.removeChild, appendChild = _a$3.appendChild;
+var createElement$1 = document.createElement;
+var createElementNS = document.createElementNS;
+var createTextNode = document.createTextNode;
+var createComment = document.createComment;
+var _a$5 = Node.prototype;
+var insertBefore$1 = _a$5.insertBefore;
+var removeChild$1 = _a$5.removeChild;
+var appendChild$1 = _a$5.appendChild;
 function parentNode(node) {
     return node.parentNode;
 }
@@ -3644,10 +3321,10 @@ function setTextContent(node, text) {
 }
 var htmlDomApi = {
     createFragment: function () {
-        return createDocumentFragment.call(document);
+        return document.createDocumentFragment();
     },
     createElement: function (tagName) {
-        return createElement.call(document, tagName);
+        return createElement$1.call(document, tagName);
     },
     createElementNS: function (namespaceURI, qualifiedName) {
         return createElementNS.call(document, namespaceURI, qualifiedName);
@@ -3659,18 +3336,21 @@ var htmlDomApi = {
         return createComment.call(document, text);
     },
     insertBefore: function (parent, newNode, referenceNode) {
-        insertBefore.call(parent, newNode, referenceNode);
+        insertBefore$1.call(parent, newNode, referenceNode);
     },
     removeChild: function (node, child) {
-        removeChild.call(node, child);
+        removeChild$1.call(node, child);
     },
     appendChild: function (node, child) {
-        appendChild.call(node, child);
+        appendChild$1.call(node, child);
     },
     parentNode: parentNode,
     nextSibling: nextSibling,
     setTextContent: setTextContent,
 };
+function vnodeCompareFn(vnode1, vnode2) {
+    return vnode1.nt === vnode2.nt && vnode1.key === vnode2.key;
+}
 var patchVNode = init$1([
     // Attrs need to be applied to element before props
     // IE11 will wipe out value on radio inputs if value
@@ -3682,11 +3362,11 @@ var patchVNode = init$1([
     eventListenersModule,
     tokenModule,
     uidModule,
-], htmlDomApi);
+], htmlDomApi, vnodeCompareFn);
 var patchChildren = patchVNode.children;
 
 var idx = 0;
-var uid$1 = 0;
+var uid = 0;
 var OwnerKey = usesNativeSymbols ? Symbol('key') : '$$OwnerKey$$';
 function addInsertionIndex(vm) {
     {
@@ -3775,9 +3455,9 @@ function createVM(tagName, elm, cmpSlots) {
     var Ctor = getCtorByTagName(tagName);
     var def = getComponentDef(Ctor);
     var isRoot = arguments.length === 2; // root elements can't provide slotset
-    uid$1 += 1;
+    uid += 1;
     var vm = {
-        uid: uid$1,
+        uid: uid,
         idx: 0,
         isScheduled: false,
         isDirty: true,
@@ -3787,7 +3467,6 @@ function createVM(tagName, elm, cmpSlots) {
         data: EmptyObject,
         context: create(null),
         cmpProps: create(null),
-        rootProps: create(null),
         cmpTrack: create(null),
         cmpState: undefined,
         cmpSlots: cmpSlots,
@@ -3797,7 +3476,6 @@ function createVM(tagName, elm, cmpSlots) {
         cmpRoot: undefined,
         component: undefined,
         children: EmptyArray,
-        hostAttrs: create(null),
         // used to track down all object-key pairs that makes this vm reactive
         deps: [],
     };
@@ -3867,8 +3545,8 @@ function patchShadowRoot(vm, children) {
             if (isUndefined(errorBoundaryVm)) {
                 throw error; // tslint:disable-line
             }
-            recoverFromLifeCycleError(vm, errorBoundaryVm, error);
-            // synchronously render error boundary's alternative view
+            recoverFromLifecyleError(vm, errorBoundaryVm, error);
+            // syncronously render error boundary's alternative view
             // to recover in the same tick
             if (errorBoundaryVm.isDirty) {
                 patchErrorBoundaryVm(errorBoundaryVm);
@@ -3922,14 +3600,14 @@ function flushRehydrationQueue() {
                 throw error; // tslint:disable-line
             }
             // we only recover if error boundary is present in the hierarchy
-            recoverFromLifeCycleError(vm, errorBoundaryVm, error);
+            recoverFromLifecyleError(vm, errorBoundaryVm, error);
             if (errorBoundaryVm.isDirty) {
                 patchErrorBoundaryVm(errorBoundaryVm);
             }
         }
     }
 }
-function recoverFromLifeCycleError(failedVm, errorBoundaryVm, error) {
+function recoverFromLifecyleError(failedVm, errorBoundaryVm, error) {
     if (isUndefined(error.wcStack)) {
         error.wcStack = getComponentStack(failedVm);
     }
@@ -4037,7 +3715,11 @@ function getComponentStack(vm) {
     return wcStack.reverse().join('\n\t');
 }
 
-var _a$4 = Node.prototype, removeChild$1 = _a$4.removeChild, appendChild$1 = _a$4.appendChild, insertBefore$1 = _a$4.insertBefore, replaceChild = _a$4.replaceChild;
+var _a = Node.prototype;
+var removeChild = _a.removeChild;
+var appendChild = _a.appendChild;
+var insertBefore = _a.insertBefore;
+var replaceChild = _a.replaceChild;
 var ConnectingSlot = Symbol();
 var DisconnectingSlot = Symbol();
 function callNodeSlot(node, slot) {
@@ -4053,15 +3735,15 @@ function callNodeSlot(node, slot) {
 // root elements created via createElement.
 assign(Node.prototype, {
     appendChild: function (newChild) {
-        var appendedNode = appendChild$1.call(this, newChild);
+        var appendedNode = appendChild.call(this, newChild);
         return callNodeSlot(appendedNode, ConnectingSlot);
     },
     insertBefore: function (newChild, referenceNode) {
-        var insertedNode = insertBefore$1.call(this, newChild, referenceNode);
+        var insertedNode = insertBefore.call(this, newChild, referenceNode);
         return callNodeSlot(insertedNode, ConnectingSlot);
     },
     removeChild: function (oldChild) {
-        var removedNode = removeChild$1.call(this, oldChild);
+        var removedNode = removeChild.call(this, oldChild);
         return callNodeSlot(removedNode, DisconnectingSlot);
     },
     replaceChild: function (newChild, oldChild) {
@@ -4082,7 +3764,7 @@ assign(Node.prototype, {
  * If the value of `is` attribute is not a constructor,
  * then it throws a TypeError.
  */
-function createElement$1(sel, options) {
+function createElement(sel, options) {
     if (options === void 0) { options = {}; }
     if (isUndefined(options) || !isFunction(options.is)) {
         throw new TypeError();
@@ -4122,12 +3804,11 @@ function createElement$1(sel, options) {
     return element;
 }
 
-exports.createElement = createElement$1;
+exports.createElement = createElement;
 exports.getComponentDef = getComponentDef;
 exports.Element = LWCElement;
 exports.register = register;
-exports.unwrap = unwrap$2;
-exports.dangerousObjectMutation = dangerousObjectMutation;
+exports.unwrap = unwrap;
 exports.api = api$1;
 exports.track = track;
 exports.wire = wire;
@@ -4135,4 +3816,4 @@ exports.wire = wire;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.18.0 */
+/** version: 0.17.17 */

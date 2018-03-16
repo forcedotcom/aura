@@ -191,15 +191,19 @@
             || (inputValue === '' && value === '0');
     },
     removeSymbols : function (string) {
+
         var decimalSeparator  = $A.get("$Locale.decimal");
         var groupingSeparator = $A.get("$Locale.grouping");
+        var currencySymbol = $A.get("$Locale.currency");
 
+        // remove currency symbol from the string
+        string = string.replace(currencySymbol, '');
         // case where parenthesis means negative
         string = string.replace(/(^\()(.+)(\)$)/,'-$2');
 
         var reg = '[^\\' + groupingSeparator + '\\' + decimalSeparator +'\\d\+\-]';
             reg = new RegExp(reg,'g');
-        return string.replace(reg,'');
+        return string.replace(reg, '');
     },
     isCompositionStart : function (cmp) {
         return cmp.get('v.compositionState') === 'start';

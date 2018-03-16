@@ -15,6 +15,18 @@
  */
 ({
     EMPTY_STRING : '',
+    currencySymbol: '',
+
+    setUp: function () {
+        // save the currency symbol
+        this.currencySymbol = $A.get('$Locale').currency;
+    },
+
+    tearDown: function () {
+        // restore the currency symbol.
+        $A.get('$Locale').currency = this.currencySymbol;
+    },
+
     /*
      * Pass nothing to component
      */
@@ -480,6 +492,113 @@
         }, function(component) {
             this.assertCmpElemValues(component, 123456, "$123,456.00");
         }]
+    },
+
+    /**
+     * test to make sure the currency of India (Rs.) with . in it being handled correctly.
+     */
+    testINRCurrencyWithDots: {
+        attributes: {
+            value: 0,
+            format: '¤#,##0.00'
+        },
+        test: [
+            function (component) {
+                $A.get('$Locale').currency = 'Rs.';
+                var inputElm = component.getElement();
+                inputElm.value = "123456";
+                $A.test.fireDomEvent(inputElm, "input");
+                $A.test.fireDomEvent(inputElm, "blur");
+            },
+            function (component) {
+                var inputElm = component.getElement();
+                $A.test.fireDomEvent(inputElm, "focus");
+                $A.test.fireDomEvent(inputElm, "blur");
+            },
+            function (component) {
+                this.assertCmpElemValues(component, 123456, "Rs.123,456.00");
+            }
+        ]
+    },
+
+    /**
+     * test to make sure the currency of Russia (дин.) with . in it being handled correctly.
+     */
+    testRSCurrencyWithDots: {
+        attributes: {
+            value: 0,
+            format: '¤#,##0.00'
+        },
+        test: [
+            function (component) {
+                $A.get('$Locale').currency = 'дин.‏';
+                var inputElm = component.getElement();
+                inputElm.value = "123456";
+                $A.test.fireDomEvent(inputElm, "input");
+                $A.test.fireDomEvent(inputElm, "blur");
+            },
+            function (component) {
+                var inputElm = component.getElement();
+                $A.test.fireDomEvent(inputElm, "focus");
+                $A.test.fireDomEvent(inputElm, "blur");
+            },
+            function (component) {
+                this.assertCmpElemValues(component, 123456, "дин.‏123,456.00");
+            }
+        ]
+    },
+
+    /**
+     * test to make sure the currency of Venezuela (Bs.F.‏) with . in it being handled correctly.
+     */
+    testVECurrencyWithDots: {
+        attributes: {
+            value: 0,
+            format: '¤#,##0.00'
+        },
+        test: [
+            function (component) {
+                $A.get('$Locale').currency = 'Bs.F.‏';
+                var inputElm = component.getElement();
+                inputElm.value = "123456";
+                $A.test.fireDomEvent(inputElm, "input");
+                $A.test.fireDomEvent(inputElm, "blur");
+            },
+            function (component) {
+                var inputElm = component.getElement();
+                $A.test.fireDomEvent(inputElm, "focus");
+                $A.test.fireDomEvent(inputElm, "blur");
+            },
+            function (component) {
+                this.assertCmpElemValues(component, 123456, "Bs.F.‏123,456.00");
+            }
+        ]
+    },
+
+    /**
+     * test to make sure the currency of United Arab Emirates (د.إ.‏) with . in it being handled correctly.
+     */
+    testAECurrencyWithDots: {
+        attributes: {
+            value: 0
+        },
+        test: [
+            function (component) {
+                $A.get('$Locale').currency = "د.إ.‏";
+                var inputElm = component.getElement();
+                inputElm.value = "123456";
+                $A.test.fireDomEvent(inputElm, "input");
+                $A.test.fireDomEvent(inputElm, "blur");
+            },
+            function (component) {
+                var inputElm = component.getElement();
+                $A.test.fireDomEvent(inputElm, "focus");
+                $A.test.fireDomEvent(inputElm, "blur");
+            },
+            function (component) {
+                this.assertCmpElemValues(component, 123456, "د.إ.‏123,456.00");
+            }
+        ]
     },
 
     /*****************

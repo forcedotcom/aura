@@ -73,7 +73,7 @@ import java.util.Map;
 @SuppressWarnings("deprecation")
 public abstract class AuraHttpTestCase extends IntegrationTestCase {
     @Inject
-    private ConfigAdapter configAdapter;
+    protected ConfigAdapter configAdapter;
     
     @Inject
     private InstanceBuilderProvider instanceBuilderProvider;

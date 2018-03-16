@@ -27,6 +27,7 @@ import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.AuraTestLabels;
+import org.junit.Assume;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
@@ -132,8 +133,10 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
     @SuppressWarnings("unchecked")
     @Test
     public void testDynamicNamespace() throws Exception {
-    	String response = obtainResponseCheckStatusDN();
-    	String componentInJson = response.substring(AuraBaseServlet.CSRF_PROTECT.length());
+        Assume.assumeTrue(configAdapter.uriAddressableDefsEnabled());
+
+        String response = obtainResponseCheckStatusDN();
+        String componentInJson = response.substring(AuraBaseServlet.CSRF_PROTECT.length());
         Map<String, Object> outerMap;
         try {
             outerMap = (Map<String, Object>) new JsonReader().read(componentInJson);
@@ -142,6 +145,7 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
         }
         Map<String,Object> context = (Map<String,Object>) outerMap.get("context");
         Map<String,String> componentUids = (Map<String,String>) context.get("descriptorUids");
+        assertNotNull("context should have had descriptorUids, but found none", componentUids);
         assertTrue("should have received layout descriptor in context descriptorUids, only found: " + String.join(", ", componentUids.keySet()),
                 componentUids.containsKey("layout://rl_001_VIEW_ACCOUNT_HASH.c"));
     }

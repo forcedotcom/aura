@@ -30,6 +30,7 @@ import org.auraframework.util.test.runner.AuraUnitTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -145,6 +146,8 @@ public abstract class UnitTestCase extends TestCase {
     public void runTest() throws Throwable {
         try {
             super.runTest();
+        } catch (AssumptionViolatedException ave) {
+            logger.info(String.format("junit assumption violation, ignoring test %s.%s", getClass().getName(), getName()));
         } catch (Throwable t) {
             System.out.println("ERROR: " + t.getMessage());
             throw t;

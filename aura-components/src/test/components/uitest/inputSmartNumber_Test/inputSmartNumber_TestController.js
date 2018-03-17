@@ -47,6 +47,9 @@
                 inputCmp.addHandler(evt, cmp, "c.updateEventList");
             });
         }
+        if (cmp.get('v.testInputCmp') === 'inputCurrency' && cmp.get('v.currencySymbol') !== null) {
+            $A.get('$Locale').currency = cmp.get('v.currencySymbol');
+        }
     },
     toggleDisabled: function (cmp) {
         var disabled = cmp.get("v.disabled");

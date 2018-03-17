@@ -64,6 +64,8 @@ function lib() { // eslint-disable-line no-unused-vars
             var decimalSeparator = $A.get("$Locale.decimal");
             var currencySymbol   = $A.get("$Locale.currency");
             var stringOriginal = string;
+            
+            string = string.replace(currencySymbol, '');
                      
             if (isNoZeroLeadingNumber(string)) {
                 string = injectZeroBeforeDecimalSeparator(string);

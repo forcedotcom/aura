@@ -29,6 +29,7 @@
     <aura:attribute name="min" type="Decimal" default="-99999999999999"/>
     <aura:attribute name="disabled" type="Boolean" default="false"/>
     <aura:attribute name="setValueToZeroDuringInit" type="Boolean" default="false"/>
+    <aura:attribute name="currencySymbol" type="String"/>
 
     <aura:handler name="init" value="{! this }" action="{! c.init }" />
 

@@ -117,7 +117,7 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
         } else {
             Throwable ex = t;
             if (wrap) {
-                ex = new AuraExecutionException(ex, new Location(controllerDescriptor.toString(), 0));
+                ex = new AuraExecutionException(ex, controllerDescriptor != null ? new Location(controllerDescriptor.toString(), 0) : null);
             }
             if (loggable) {
                 ex = exceptionAdapter.handleException(ex, this);

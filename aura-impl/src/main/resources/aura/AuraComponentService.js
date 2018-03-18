@@ -1057,16 +1057,20 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
  };
 
 AuraComponentService.prototype.hasCacheableDefinitionOfAnyType = function(descriptor) {
-    return this.getComponentDef(descriptor) ||
+    return this.hasModuleDefinition(descriptor) ||
+        this.getComponentDef(descriptor) ||
         this.hasLibrary(descriptor) ||
-        this.hasModuleDefinition(descriptor) ||
         $A.eventService.getEventDef(descriptor);
 };
 
 AuraComponentService.prototype.loadComponentDefs = function(descriptorMap, callback) {
     for (var descriptor in descriptorMap) {
-        if (this.hasCacheableDefinitionOfAnyType(descriptor)) {
-            delete descriptorMap[descriptor];
+        try {
+            if (this.hasCacheableDefinitionOfAnyType(descriptor)) {
+                delete descriptorMap[descriptor];
+            }
+        } catch (e) {
+           // ignore any exception raised
         }
     }
 

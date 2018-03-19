@@ -59,12 +59,89 @@ InteropComponentDef.prototype.setupPropAttrMap = function (interopMap, props) {
 
     for (var i = 0; i < propNames.length; i++) {
         propName = propNames[i];
-        attrName = interopPropOverride[propName] || propName;
+        attrName = (
+            interopPropOverride[propName] ||
+            InteropComponentDef.prototype.DOM_PROPS_TO_AURA_ATTRS[propName] ||
+            propName
+        );
 
         this.attrNameToPropMap[attrName] = propName;
         this.propNameToAttrMap[propName] = attrName;
     }
 };
+
+// Mapping taken from https://github.com/salesforce/lwc/blob/1ee756b5038c463d7b9fa0d7eace23fcd6acf0c3/packages/lwc-template-compiler/src/parser/constants.ts#L52-L109
+InteropComponentDef.prototype.HTML_ATTRS_TO_DOM_PROPS = {
+    'accesskey': 'accessKey',
+    'readonly': 'readOnly',
+    'tabindex': 'tabIndex',
+    'bgcolor': 'bgColor',
+    'colspan': 'colSpan',
+    'rowspan': 'rowSpan',
+    'contenteditable': 'contentEditable',
+    'crossorigin': 'crossOrigin',
+    'datetime': 'dateTime',
+    'formaction': 'formAction',
+    'ismap': 'isMap',
+    'maxlength': 'maxLength',
+    'minlength': 'minLength',
+    'novalidate': 'noValidate',
+    'usemap': 'useMap',
+    'for': 'htmlFor',
+
+    // Aria
+    'aria-autocomplete': 'ariaAutocomplete',
+    'aria-checked': 'ariaChecked',
+    'aria-current': 'ariaCurrent',
+    'aria-disabled': 'ariaDisabled',
+    'aria-expanded': 'ariaExpanded',
+    'aria-haspopup': 'ariaHasPopUp',
+    'aria-hidden': 'ariaHidden',
+    'aria-invalid': 'ariaInvalid',
+    'aria-label': 'ariaLabel',
+    'aria-level': 'ariaLevel',
+    'aria-multiline': 'ariaMultiline',
+    'aria-multiselectable': 'ariaMultiSelectable',
+    'aria-orientation': 'ariaOrientation',
+    'aria-pressed': 'ariaPressed',
+    'aria-readonly': 'ariaReadonly',
+    'aria-required': 'ariaRequired',
+    'aria-selected': 'ariaSelected',
+    'aria-sort': 'ariaSort',
+    'aria-valuemax': 'ariaValueMax',
+    'aria-valuemin': 'ariaValueMin',
+    'aria-valuenow': 'ariaValueNow',
+    'aria-valuetext': 'ariaValueText',
+    'aria-live': 'ariaLive',
+    'aria-relevant': 'ariaRelevant',
+    'aria-atomic': 'ariaAtomic',
+    'aria-busy': 'ariaBusy',
+    'aria-dropeffect': 'ariaDropEffect',
+    'aria-dragged': 'ariaDragged',
+    'aria-activedescendant': 'ariaActiveDescendant',
+    'aria-controls': 'ariaControls',
+    'aria-describedby': 'ariaDescribedBy',
+    'aria-flowto': 'ariaFlowTo',
+    'aria-labelledby': 'ariaLabelledBy',
+    'aria-owns': 'ariaOwns',
+    'aria-posinset': 'ariaPosInSet',
+    'aria-setsize': 'ariaSetSize'
+};
+
+// Invert the (attr => prop) map to (prop => attr) while filtering out
+// attribute names that are incompatible with Aura (e.g., aria-*). If we didn't
+// filter these out here, users would be able to <x:y aria-checked="mixed"/>
+// which is currently not supported in Aura. Side note: data-* attributes are
+// supported in Aura, but only on HTML elements.
+InteropComponentDef.prototype.DOM_PROPS_TO_AURA_ATTRS = Object.keys(
+    InteropComponentDef.prototype.HTML_ATTRS_TO_DOM_PROPS
+).reduce(function(map, attr) {
+    if (attr.indexOf('-') === -1) {
+        var prop = InteropComponentDef.prototype.HTML_ATTRS_TO_DOM_PROPS[attr];
+        map[prop] = attr;
+    }
+    return map;
+}, {});
 
 InteropComponentDef.prototype.hasInit = function() {
    

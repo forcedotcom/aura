@@ -54,6 +54,8 @@ function InteropComponent(config) {
     this.attributes = this.setupAttributes(config['attributes']);
     this.updateReadOnlyBoundProps = [];
     this.setupMethods();
+
+    this.HTML_ATTRS_TO_DOM_PROPS = this.componentDef.HTML_ATTRS_TO_DOM_PROPS;
 }
 
 // Prototype chain (instanceOf)
@@ -320,7 +322,6 @@ InteropComponent.prototype.updateClassAttribute = function (element, value) {
     this.currentClassMap = classMap;
 };
 
-
 /**
  * Implement special logic for set HTML Global Attributes
  * @param element {node}
@@ -333,14 +334,23 @@ InteropComponent.prototype.setGlobalAttribute = function (element, attrName, val
         return;
     }
 
-    if (value === true) {
-        element.setAttribute(attrName, "");
-    } else if (value === false || value === null || value === undefined) {
-        element.removeAttribute(attrName);
-    } else {
+    // data- attributes go through setAttribute
+    if (
+        attrName.charCodeAt(0) === 100 /* "d" character */ &&
+        attrName.indexOf('data-') === 0
+    ) {
         element.setAttribute(attrName, value);
+        return;
     }
+
+    // Map lower-case HTML global attributes to their camel-case DOM property
+    // equivalent (e.g., readonly => readOnly, tabindex => tabIndex, etc).
+    var propName = this.HTML_ATTRS_TO_DOM_PROPS[attrName] || attrName;
+
+    element[propName] = value;
 };
+
+
 
 /**
  * Returns the value referenced using property syntax.

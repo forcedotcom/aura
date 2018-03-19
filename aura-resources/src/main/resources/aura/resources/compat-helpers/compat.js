@@ -1,661 +1,4 @@
-/* proxy-compat */
-/**
- * Copyright (C) 2017 salesforce.com, inc.
- */
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define(factory) :
-	(global.Proxy = factory());
-}(this, (function () { 'use strict';
-
-function __extends(d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-}
-
-var ArrayConcat$2 = Array.prototype.concat;
-var getOwnPropertyNames = Object.getOwnPropertyNames;
-var _hasOwnProperty = Object.hasOwnProperty;
-function patchedGetOwnPropertyNames(replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.ownKeys().filter(function (key) { return key.constructor !== Symbol; }); // TODO: only strings
-    }
-    return getOwnPropertyNames(replicaOrAny);
-}
-// https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys
-// https://tc39.github.io/ecma262/#sec-ordinaryownpropertykeys
-function OwnPropertyKeys(O) {
-    return ArrayConcat$2.call(Object.getOwnPropertyNames(O), Object.getOwnPropertySymbols(O));
-}
-function patchedAssign(replicaOrAny) {
-    if (replicaOrAny == null) {
-        throw new TypeError('Cannot convert undefined or null to object');
-    }
-    var to = Object(replicaOrAny);
-    for (var index = 1; index < arguments.length; index++) {
-        var nextSource = arguments[index];
-        if (nextSource != null) {
-            var keys = OwnPropertyKeys(nextSource);
-            for (var i = 0; i < keys.length; i += 1) {
-                var nextKey = keys[i];
-                var descriptor = Object.getOwnPropertyDescriptor(nextSource, nextKey);
-                if (descriptor !== undefined && descriptor.enumerable === true) {
-                    setKey(to, nextKey, getKey(nextSource, nextKey));
-                }
-            }
-
-        }
-    }
-    return to;
-}
-function compatHasOwnProperty(key) {
-    if (isCompatProxy(this)) {
-        return !!this.getOwnPropertyDescriptor(key);
-    }
-    return _hasOwnProperty.call(this, key);
-}
-
-// RFC4122 version 4 uuid
-var ProxySlot = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-});
-var ArraySlot = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-});
-var ProxyIdentifier = function ProxyCompat() { };
-var create = Object.create;
-var defineProperty$1 = Object.defineProperty;
-var isExtensible$1 = Object.isExtensible;
-var getPrototypeOf$2 = Object.getPrototypeOf;
-var setPrototypeOf$1 = Object.setPrototypeOf;
-var getOwnPropertyDescriptor$1 = Object.getOwnPropertyDescriptor;
-var preventExtensions$1 = Object.preventExtensions;
-var _a$2 = Array.prototype;
-var ArraySlice$2 = _a$2.slice;
-var ArrayUnshift$2 = _a$2.unshift;
-var isArray$1 = Array.isArray;
-// Proto chain check might be needed because of usage of a limited polyfill
-// https://github.com/es-shims/get-own-property-symbols
-// In this case, because this polyfill is assing all the stuff to Object.prototype to keep
-// all the other invariants of Symbols, we need to do some manual checks here for the slow patch.
-var isNotNativeSymbol;
-var inOperator = function inOperatorCompat(obj, key) {
-    if (isNotNativeSymbol === undefined) {
-        if (typeof Symbol === 'undefined') {
-            throw new Error('Symbol is not available. Make sure to apply symbol polyfill before calling inOperator');
-        }
-        isNotNativeSymbol = typeof Symbol() === 'object';
-    }
-    if (isNotNativeSymbol) {
-        var getOwnPropertySymbols = Object.getOwnPropertySymbols;
-        if (key && key.constructor === Symbol) {
-            while (obj) {
-                if (getOwnPropertySymbols(obj).indexOf(key) !== -1) {
-                    return true;
-                }
-                obj = getPrototypeOf$2(obj);
-            }
-            return false;
-        }
-        return key in obj;
-    }
-    return key in obj;
-};
-var defaultHandlerTraps = {
-    get: function (target, key) {
-        return target[key];
-    },
-    set: function (target, key, newValue) {
-        target[key] = newValue;
-        return true;
-    },
-    apply: function (targetFn, thisArg, argumentsList) {
-        return targetFn.apply(thisArg, argumentsList);
-    },
-    construct: function (targetFn, argumentsList, newTarget) {
-        return new (targetFn.bind.apply(targetFn, [void 0].concat(argumentsList)))();
-    },
-    defineProperty: function (target, property, descriptor) {
-        defineProperty$1(target, property, descriptor);
-        return true;
-    },
-    deleteProperty: function (target, property) {
-        return delete target[property];
-    },
-    ownKeys: function (target) {
-        return OwnPropertyKeys(target);
-    },
-    has: function (target, propertyKey) {
-        return inOperator(target, propertyKey);
-    },
-    preventExtensions: function (target) {
-        preventExtensions$1(target);
-        return true;
-    },
-    getOwnPropertyDescriptor: getOwnPropertyDescriptor$1,
-    getPrototypeOf: getPrototypeOf$2,
-    isExtensible: isExtensible$1,
-    setPrototypeOf: setPrototypeOf$1,
-};
-var lastRevokeFn;
-var proxyTrapFalsyErrors = {
-    set: function (target, key) {
-        throw new TypeError("'set' on proxy: trap returned falsish for property '" + key + "'");
-    },
-    deleteProperty: function (target, key) {
-        throw new TypeError("'deleteProperty' on proxy: trap returned falsish for property '" + key + "'");
-    },
-    setPrototypeOf: function (target, proto) {
-        throw new TypeError("'setPrototypeOf' on proxy: trap returned falsish");
-    },
-    preventExtensions: function (target, proto) {
-        throw new TypeError("'preventExtensions' on proxy: trap returned falsish");
-    },
-    defineProperty: function (target, key, descriptor) {
-        throw new TypeError("'defineProperty' on proxy: trap returned falsish for property '" + key + "'");
-    }
-};
-function proxifyProperty(proxy, key, descriptor) {
-    var enumerable = descriptor.enumerable, configurable = descriptor.configurable;
-    defineProperty$1(proxy, key, {
-        enumerable: enumerable,
-        configurable: configurable,
-        get: function () {
-            return proxy.get(key);
-        },
-        set: function (value) {
-            proxy.set(key, value);
-        },
-    });
-}
-var XProxy = /** @class */ (function () {
-    function XProxy(target, handler) {
-        var targetIsFunction = typeof target === 'function';
-        var targetIsArray = isArray$1(target);
-        if ((typeof target !== 'object' || target === null) && !targetIsFunction) {
-            throw new Error("Cannot create proxy with a non-object as target");
-        }
-        if (typeof handler !== 'object' || handler === null) {
-            throw new Error("new XProxy() expects the second argument to an object");
-        }
-        // Construct revoke function, and set lastRevokeFn so that Proxy.revocable can steal it.
-        // The caller might get the wrong revoke function if a user replaces or wraps XProxy
-        // to call itself, but that seems unlikely especially when using the polyfill.
-        var throwRevoked = false;
-        lastRevokeFn = function () {
-            throwRevoked = true;
-        };
-        // Define proxy as Object, or Function (if either it's callable, or apply is set).
-        var proxy = this; // reusing the already created object, eventually the prototype will be resetted
-        if (targetIsFunction) {
-            proxy = function Proxy() {
-                var usingNew = (this && this.constructor === proxy);
-                var args = ArraySlice$2.call(arguments);
-                if (usingNew) {
-                    return proxy.construct(args, this);
-                }
-                else {
-                    return proxy.apply(this, args);
-                }
-            };
-        }
-        var _loop_1 = function (trapName) {
-            defineProperty$1(proxy, trapName, {
-                value: function () {
-                    if (throwRevoked) {
-                        throw new TypeError("Cannot perform '" + trapName + "' on a proxy that has been revoked");
-                    }
-                    var args = ArraySlice$2.call(arguments);
-                    ArrayUnshift$2.call(args, target);
-                    var h = handler[trapName] ? handler : defaultHandlerTraps;
-                    var value = h[trapName].apply(h, args);
-                    if (proxyTrapFalsyErrors[trapName] && value === false) {
-                        proxyTrapFalsyErrors[trapName].apply(proxyTrapFalsyErrors, args);
-                    }
-                    return value;
-                },
-                writable: false,
-                enumerable: false,
-                configurable: false,
-            });
-        };
-        for (var trapName in defaultHandlerTraps) {
-            _loop_1(trapName);
-        }
-        var proxyDefaultHasInstance;
-        var SymbolHasInstance = Symbol.hasInstance;
-        var FunctionPrototypeSymbolHasInstance = Function.prototype[SymbolHasInstance];
-        defineProperty$1(proxy, SymbolHasInstance, {
-            get: function () {
-                var hasInstance = proxy.get(SymbolHasInstance);
-                // We do not want to deal with any Symbol.hasInstance here
-                // because we need to do special things to check prototypes.
-                // Symbol polyfill adds Symbol.hasInstance to the function prototype
-                // so if we have that here, we need to return our own.
-                // If the value we get from this function is different, that means
-                // user has supplied custom function so we need to respect that.
-                if (hasInstance === FunctionPrototypeSymbolHasInstance) {
-                    return proxyDefaultHasInstance || (proxyDefaultHasInstance = function (inst) {
-                        return defaultHasInstance(inst, proxy);
-                    });
-                }
-                return hasInstance;
-            },
-            configurable: false,
-            enumerable: false
-        });
-        defineProperty$1(proxy, ProxySlot, {
-            value: ProxyIdentifier,
-            configurable: false,
-            enumerable: false,
-            writable: false,
-        });
-        defineProperty$1(proxy, 'forIn', {
-            value: function () {
-                return proxy.ownKeys().reduce(function (o, key) {
-                    o[key] = void 0;
-                    return o;
-                }, create(null));
-            },
-            configurable: false,
-            enumerable: false,
-            writable: false,
-        });
-        var SymbolIterator = Symbol.iterator;
-        defineProperty$1(proxy, SymbolIterator, {
-            enumerable: false,
-            configurable: true,
-            get: function () {
-                return this.get(SymbolIterator);
-            },
-            set: function (value) {
-                this.set(SymbolIterator, value);
-            },
-        });
-        if (targetIsArray) {
-            var trackedLength_1 = 0;
-            var adjustArrayIndex_1 = function (newLength) {
-                // removing old indexes from proxy when needed
-                while (trackedLength_1 > newLength) {
-                    delete proxy[--trackedLength_1];
-                }
-                // add new indexes to proxy when needed
-                for (var i = trackedLength_1; i < newLength; i += 1) {
-                    proxifyProperty(proxy, i, {
-                        enumerable: true,
-                        configurable: true,
-                    });
-                }
-                trackedLength_1 = newLength;
-            };
-            defineProperty$1(proxy, ArraySlot, {
-                value: ProxyIdentifier,
-                writable: true,
-                enumerable: false,
-                configurable: false,
-            });
-            defineProperty$1(proxy, 'length', {
-                enumerable: false,
-                configurable: true,
-                get: function () {
-                    var proxyLength = proxy.get('length');
-                    // check if the trackedLength matches the length of the proxy
-                    if (proxyLength !== trackedLength_1) {
-                        adjustArrayIndex_1(proxyLength);
-                    }
-                    return proxyLength;
-                },
-                set: function (value) {
-                    proxy.set('length', value);
-                },
-            });
-            // building the initial index. this is observable by the proxy
-            // because we access the length property during the construction
-            // of the proxy, but it should be fine...
-            adjustArrayIndex_1(proxy.get('length'));
-        }
-        return proxy;
-    }
-    XProxy.revocable = function (target, handler) {
-        var p = new XProxy(target, handler);
-        return {
-            proxy: p,
-            revoke: lastRevokeFn,
-        };
-    };
-    XProxy.prototype.push = function () {
-        var push = this.get('push');
-        if (push === Array.prototype.push) {
-            push = compatPush;
-        }
-        return push.apply(this, arguments);
-    };
-    XProxy.prototype.concat = function () {
-        var concat = this.get('concat');
-        if (concat === Array.prototype.concat) {
-            concat = compatConcat;
-        }
-        return concat.apply(this, arguments);
-    };
-    XProxy.prototype.unshift = function () {
-        var unshift = this.get('unshift');
-        if (unshift === Array.prototype.unshift) {
-            unshift = compatUnshift;
-        }
-        return unshift.apply(this, arguments);
-    };
-    return XProxy;
-}());
-
-function defaultHasInstance(instance, Type) {
-    // We have to grab getPrototypeOf here
-    // because caching it at the module level is too early.
-    // We need our shimmed version.
-    var getPrototypeOf = Object.getPrototypeOf;
-    var instanceProto = getPrototypeOf(instance);
-    var TypeProto = getKey(Type, 'prototype');
-    while (instanceProto !== null) {
-        if (instanceProto === TypeProto) {
-            return true;
-        }
-        instanceProto = getPrototypeOf(instanceProto);
-    }
-    return false;
-}
-function isCompatProxy(replicaOrAny) {
-    try {
-        return replicaOrAny && replicaOrAny[ProxySlot] === ProxyIdentifier;
-    }
-    catch (e) {
-        // some objects (iframe.contentWindow for example) throw an error trying
-        // to access random properties
-        return false;
-    }
-}
-var getKey = function (replicaOrAny, key) {
-    return isCompatProxy(replicaOrAny) ?
-        replicaOrAny.get(key) :
-        replicaOrAny[key];
-};
-var callKey = function (replicaOrAny, key, a1, a2, a3) {
-    var fn = getKey(replicaOrAny, key);
-    var l = arguments.length;
-    switch (l) {
-        case 2: return fn.call(replicaOrAny);
-        case 3: return fn.call(replicaOrAny, a1);
-        case 4: return fn.call(replicaOrAny, a1, a2);
-        case 5: return fn.call(replicaOrAny, a1, a2, a3);
-        default:
-            var args = [];
-            for (var i = 2; i < l; i++) {
-                args[i - 2] = arguments[i];
-            }
-            return fn.apply(replicaOrAny, args);
-    }
-};
-var setKey = function (replicaOrAny, key, newValue, originalReturnValue) {
-    if (isCompatProxy(replicaOrAny)) {
-        replicaOrAny.set(key, newValue);
-    }
-    else {
-        replicaOrAny[key] = newValue;
-    }
-    return arguments.length === 4 ? originalReturnValue : newValue;
-};
-var deleteKey = function (replicaOrAny, key) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.deleteProperty(key);
-    }
-    delete replicaOrAny[key];
-};
-var inKey = function (replicaOrAny, key) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.has(key);
-    }
-    return inOperator(replicaOrAny, key);
-};
-var iterableKey = function (replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.forIn();
-    }
-    return replicaOrAny;
-};
-function instanceOfKey(instance, Type) {
-    var instanceIsCompatProxy = isCompatProxy(instance);
-    if (!isCompatProxy(Type) && !instanceIsCompatProxy) {
-        return instance instanceof Type;
-    }
-    // TODO: Once polyfills are transpiled to compat
-    // We can probably remove the below check
-    if (instanceIsCompatProxy) {
-        return defaultHasInstance(instance, Type);
-    }
-    return Type[Symbol.hasInstance](instance);
-}
-
-var _isArray = Array.isArray;
-var _a$1 = Array.prototype;
-var ArraySlice$1 = _a$1.slice;
-var ArrayShift$1 = _a$1.shift;
-var ArrayUnshift$1 = _a$1.unshift;
-// Patched Functions:
-function isArray(replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny[ArraySlot] === ProxyIdentifier;
-    }
-    return _isArray(replicaOrAny);
-}
-// http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.7
-function compatPush() {
-    var O = Object(this);
-    var n = O.length;
-    var items = ArraySlice$1.call(arguments);
-    while (items.length) {
-        var E = ArrayShift$1.call(items);
-        setKey(O, n, E);
-        n += 1;
-    }
-    O.length = n;
-    return O.length;
-}
-// http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.4
-function compatConcat() {
-    var O = Object(this);
-    var A = [];
-    var N = 0;
-    var items = ArraySlice$1.call(arguments);
-    ArrayUnshift$1.call(items, O);
-    while (items.length) {
-        var E = ArrayShift$1.call(items);
-        if (isArray(E)) {
-            var k = 0;
-            var length = E.length;
-            for (k; k < length; k += 1, N += 1) {
-                var subElement = getKey(E, k);
-                A[N] = subElement;
-            }
-        }
-        else {
-            A[N] = E;
-            N += 1;
-        }
-    }
-    return A;
-}
-// http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.13
-function compatUnshift() {
-    var O = Object(this);
-    var len = O.length;
-    var argCount = arguments.length;
-    var k = len;
-    while (k > 0) {
-        var from = k - 1;
-        var to = k + argCount - 1;
-        var fromPresent = compatHasOwnProperty.call(O, from);
-        if (fromPresent) {
-            var fromValue = O[from];
-            setKey(O, to, fromValue);
-        }
-        else {
-            deleteKey(O, to);
-        }
-        k -= 1;
-    }
-    var j = 0;
-    var items = ArraySlice$1.call(arguments);
-    while (items.length) {
-        var E = ArrayShift$1.call(items);
-        setKey(O, j, E);
-        j += 1;
-    }
-    O.length = len + argCount;
-    return O.length;
-}
-
-function setPrototypeOf$2(obj, proto) {
-    obj.__proto__ = proto;
-    return obj;
-}
-
-if (!Object.setPrototypeOf || !({ __proto__: [] } instanceof Array)) {
-    Object.setPrototypeOf = setPrototypeOf$2;
-}
-var _keys = Object.keys;
-var _getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-var _preventExtensions = Object.preventExtensions;
-var _defineProperty = Object.defineProperty;
-var _isExtensible = Object.isExtensible;
-var _getPrototypeOf = Object.getPrototypeOf;
-var _setPrototypeOf = Object.setPrototypeOf;
-function keys(replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        var all = replicaOrAny.forIn(); // get all enumerables and filter by own
-        var result = [];
-        for (var prop_1 in all) {
-            var desc = replicaOrAny.getOwnPropertyDescriptor(prop_1);
-            if (desc && desc.enumerable === true) {
-                result.push(prop_1);
-            }
-        }
-        return result;
-    }
-    return _keys(replicaOrAny);
-}
-function getPrototypeOf(replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.getPrototypeOf();
-    }
-    return _getPrototypeOf(replicaOrAny);
-}
-function setPrototypeOf$$1(replicaOrAny, proto) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.setPrototypeOf(proto);
-    }
-    return _setPrototypeOf(replicaOrAny, proto);
-}
-function getOwnPropertyDescriptor(replicaOrAny, key) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.getOwnPropertyDescriptor(key);
-    }
-    return _getOwnPropertyDescriptor(replicaOrAny, key);
-}
-function preventExtensions(replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.preventExtensions();
-    }
-    return _preventExtensions(replicaOrAny);
-}
-function isExtensible(replicaOrAny) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.isExtensible();
-    }
-    return _isExtensible(replicaOrAny);
-}
-function defineProperty(replicaOrAny, key, descriptor) {
-    if (isCompatProxy(replicaOrAny)) {
-        return replicaOrAny.defineProperty(key, descriptor);
-    }
-    return _defineProperty(replicaOrAny, key, descriptor);
-}
-// patches
-// [*] Object.prototype.hasOwnProperty should be patched as a general rule
-// [ ] Object.propertyIsEnumerable should be patched
-// [*] Array.isArray
-Object.prototype.hasOwnProperty = compatHasOwnProperty;
-Array.isArray = isArray;
-// trap `preventExtensions` can be covered by a patched version of:
-// [*] Object.preventExtensions()
-// [ ] Reflect.preventExtensions()
-// trap `getOwnPropertyDescriptor` can be covered by a patched version of:
-// [*] Object.getOwnPropertyDescriptor()
-// [ ] Reflect.getOwnPropertyDescriptor()
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/defineProperty
-// trap `defineProperty` can be covered by a patched version of:
-// [*] Object.defineProperty()
-// [ ] Reflect.defineProperty()
-// trap `deleteProperty` can be covered by the transpilation and the patched version of:
-// [ ] Reflect.deleteProperty()
-// trap `ownKeys` can be covered by a patched version of:
-// [*] Object.getOwnPropertyNames()
-// [ ] Object.getOwnPropertySymbols()
-// [*] Object.keys()
-// [ ] Reflect.ownKeys()
-Object.defineProperty = defineProperty;
-Object.preventExtensions = preventExtensions;
-Object.getOwnPropertyDescriptor = getOwnPropertyDescriptor;
-Object.getOwnPropertyNames = patchedGetOwnPropertyNames;
-Object.isExtensible = isExtensible;
-// trap `getPrototypeOf` can be covered by a patched version of:
-// [x] Object.setPrototypeOf()
-// [ ] Reflect.setPrototypeOf()
-// trap `getPrototypeOf` can be covered by a patched version of:
-// [x] Object.getPrototypeOf()
-// [ ] Reflect.getPrototypeOf()
-Object.setPrototypeOf = setPrototypeOf$$1;
-Object.getPrototypeOf = getPrototypeOf;
-// Other necessary patches:
-// [*] Object.assign
-Object.assign = patchedAssign;
-// Object methods path
-Object.compatKeys = keys;
-// Array.prototype methods patches.
-Object.defineProperties(Array.prototype, {
-    compatUnshift: { value: compatUnshift, enumerable: false },
-    compatConcat: { value: compatConcat, enumerable: false },
-    compatPush: { value: compatPush, enumerable: false },
-});
-function overrideProxy() {
-    return Proxy.__COMPAT__;
-}
-// At this point Proxy can be the real Proxy (function) a noop-proxy (object with noop-keys) or undefined
-var FinalProxy = typeof Proxy !== 'undefined' ? Proxy : {};
-if (typeof FinalProxy !== 'function' || overrideProxy()) {
-    FinalProxy = /** @class */ (function (_super) {
-        __extends(Proxy, _super);
-        function Proxy() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        return Proxy;
-    }(XProxy));
-}
-FinalProxy.getKey = getKey;
-FinalProxy.callKey = callKey;
-FinalProxy.setKey = setKey;
-FinalProxy.deleteKey = deleteKey;
-FinalProxy.inKey = inKey;
-FinalProxy.iterableKey = iterableKey;
-FinalProxy.instanceOfKey = instanceOfKey;
-var FinalProxy$1 = FinalProxy;
-
-return FinalProxy$1;
-
-})));
-/** version: 0.17.17 */
-
-/* Transformed Polyfills + Babel helpers */
+/* proxy-compat-disable */
 // THIS POLYFILL HAS BEEN MODIFIED FROM THE SOURCE
 // https://github.com/eligrey/classList.js
 
@@ -1498,7 +841,7 @@ module.exports = function (it) {
 /* 16 */
 /***/ (function(module, exports) {
 
-var core = module.exports = { version: '2.5.1' };
+var core = module.exports = { version: '2.5.3' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 
@@ -2142,7 +1485,7 @@ module.exports = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE
   var VALUES_BUG = false;
   var proto = Base.prototype;
   var $native = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT];
-  var $default = $native || getMethod(DEFAULT);
+  var $default = (!BUGGY && $native) || getMethod(DEFAULT);
   var $entries = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined;
   var $anyNative = NAME == 'Array' ? proto.entries || $native : $native;
   var methods, key, IteratorPrototype;
@@ -3529,14 +2872,7 @@ var onUnhandled = function (promise) {
   });
 };
 var isUnhandled = function (promise) {
-  if (promise._h == 1) return false;
-  var chain = promise._a || promise._c;
-  var i = 0;
-  var reaction;
-  while (chain.length > i) {
-    reaction = chain[i++];
-    if (reaction.fail || !isUnhandled(reaction.promise)) return false;
-  } return true;
+  return promise._h !== 1 && (promise._a || promise._c).length === 0;
 };
 var onHandleUnhandled = function (promise) {
   task.call(global, function () {
@@ -3866,8 +3202,8 @@ module.exports = function () {
     notify = function () {
       process.nextTick(flush);
     };
-  // browsers with MutationObserver
-  } else if (Observer) {
+  // browsers with MutationObserver, except iOS Safari - https://github.com/zloirock/core-js/issues/339
+  } else if (Observer && !(global.navigator && global.navigator.standalone)) {
     var toggle = true;
     var node = document.createTextNode('');
     new Observer(flush).observe(node, { characterData: true }); // eslint-disable-line no-new
@@ -4161,4121 +3497,4689 @@ module.exports = function (hint) {
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 62);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = function(module) {
-	if(!module.webpackPolyfill) {
-		module.deprecate = function() {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if(!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_proxy_compat__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_proxy_compat__);
+var __getKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.getKey;var __setKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.setKey;var __callKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.callKey;var __iterableKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.iterableKey;var __inKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.inKey;var __deleteKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.deleteKey;var __instanceOfKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.instanceOfKey; /******/(function (modules) {// webpackBootstrap
+  /******/ // The module cache
+  /******/var installedModules = {};
+  /******/
+  /******/ // The require function
+  /******/function __webpack_require__(moduleId) {
+    /******/
+    /******/ // Check if module is in cache
+    /******/if (__getKey(installedModules, moduleId)) {
+      /******/return __getKey(__getKey(installedModules, moduleId), "exports");
+      /******/}
+    /******/ // Create a new module (and put it into the cache)
+    /******/var module = __setKey(installedModules, moduleId, {
+      /******/i: moduleId,
+      /******/l: false,
+      /******/exports: {}
+      /******/ });
+    /******/
+    /******/ // Execute the module function
+    /******/__callKey(__getKey(modules, moduleId), "call", __getKey(module, "exports"), module, __getKey(module, "exports"), __webpack_require__);
+    /******/
+    /******/ // Flag the module as loaded
+    /******/__setKey(module, "l", true);
+    /******/
+    /******/ // Return the exports of the module
+    /******/return __getKey(module, "exports");
+    /******/}
+  /******/
+  /******/
+  /******/ // expose the modules object (__webpack_modules__)
+  /******/__setKey(__webpack_require__, "m", modules);
+  /******/
+  /******/ // expose the module cache
+  /******/__setKey(__webpack_require__, "c", installedModules);
+  /******/
+  /******/ // define getter function for harmony exports
+  /******/__setKey(__webpack_require__, "d", function (exports, name, getter) {
+    /******/if (!__callKey(__webpack_require__, "o", exports, name)) {
+      /******/Object.defineProperty(exports, name, {
+        /******/configurable: false,
+        /******/enumerable: true,
+        /******/get: getter
+        /******/ });
+      /******/}
+    /******/});
+  /******/
+  /******/ // getDefaultExport function for compatibility with non-harmony modules
+  /******/__setKey(__webpack_require__, "n", function (module) {
+    /******/var getter = module && __getKey(module, "__esModule") ?
+    /******/function getDefault() {return __getKey(module, 'default');} :
+    /******/function getModuleExports() {return module;};
+    /******/__callKey(__webpack_require__, "d", getter, 'a', getter);
+    /******/return getter;
+    /******/});
+  /******/
+  /******/ // Object.prototype.hasOwnProperty.call
+  /******/__setKey(__webpack_require__, "o", function (object, property) {return __callKey(__getKey(Object.prototype, "hasOwnProperty"), "call", object, property);});
+  /******/
+  /******/ // __webpack_public_path__
+  /******/__setKey(__webpack_require__, "p", "");
+  /******/
+  /******/ // Load entry module and return exports
+  /******/return __webpack_require__(__setKey(__webpack_require__, "s", 61));
+  /******/})(
+/************************************************************************/
+/******/[
+/* 0 */
+/***/function (module, exports) {
 
+  __setKey(module, "exports", function (it) {
+    return typeof it === 'object' ? it !== null : typeof it === 'function';
+  });
+
+
+  /***/},
+/* 1 */
+/***/function (module, exports, __webpack_require__) {
+
+  var global = __webpack_require__(3);
+  var core = __webpack_require__(19);
+  var hide = __webpack_require__(13);
+  var redefine = __webpack_require__(14);
+  var ctx = __webpack_require__(15);
+  var PROTOTYPE = 'prototype';
+
+  var $export = function (type, name, source) {
+    var IS_FORCED = type & __getKey($export, "F");
+    var IS_GLOBAL = type & __getKey($export, "G");
+    var IS_STATIC = type & __getKey($export, "S");
+    var IS_PROTO = type & __getKey($export, "P");
+    var IS_BIND = type & __getKey($export, "B");
+    var target = IS_GLOBAL ? global : IS_STATIC ? __getKey(global, name) || __setKey(global, name, {}) : __getKey(__getKey(global, name) || {}, PROTOTYPE);
+    var exports = IS_GLOBAL ? core : __getKey(core, name) || __setKey(core, name, {});
+    var expProto = __getKey(exports, PROTOTYPE) || __setKey(exports, PROTOTYPE, {});
+    var key, own, out, exp;
+    if (IS_GLOBAL) source = name;
+    for (key in __iterableKey(source)) {
+      // contains in native
+      own = !IS_FORCED && target && __getKey(target, key) !== undefined;
+      // export native or passed
+      out = __getKey(own ? target : source, key);
+      // bind timers to global for call from export context
+      exp = IS_BIND && own ? ctx(out, global) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
+      // extend global
+      if (target) redefine(target, key, out, type & __getKey($export, "U"));
+      // export
+      if (__getKey(exports, key) != out) hide(exports, key, exp);
+      if (IS_PROTO && __getKey(expProto, key) != out) __setKey(expProto, key, out);
+    }
+  };
+  __setKey(global, "core", core);
+  // type bitmap
+  __setKey($export, "F", 1); // forced
+  __setKey($export, "G", 2); // global
+  __setKey($export, "S", 4); // static
+  __setKey($export, "P", 8); // proto
+  __setKey($export, "B", 16); // bind
+  __setKey($export, "W", 32); // wrap
+  __setKey($export, "U", 64); // safe
+  __setKey($export, "R", 128); // real proto method for `library`
+  __setKey(module, "exports", $export);
+
+
+  /***/},
+/* 2 */
+/***/function (module, exports, __webpack_require__) {
+
+  var store = __webpack_require__(27)('wks');
+  var uid = __webpack_require__(21);
+  var Symbol = __getKey(__webpack_require__(3), "Symbol");
+  var USE_SYMBOL = typeof Symbol == 'function';
+
+  var $exports = __setKey(module, "exports", function (name) {
+    return __getKey(store, name) || __setKey(store, name,
+    USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : uid)('Symbol.' + name));
+  });
+
+  __setKey($exports, "store", store);
+
+
+  /***/},
+/* 3 */
+/***/function (module, exports) {
+
+  // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+  var global = __setKey(module, "exports", typeof window != 'undefined' && __getKey(window, "Math") == Math ?
+  window : typeof self != 'undefined' && __getKey(self, "Math") == Math ? self
+  // eslint-disable-next-line no-new-func
+  : Function('return this')());
+  if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
+
+
+  /***/},
+/* 4 */
+/***/function (module, exports) {
+
+  var hasOwnProperty = __getKey({}, "hasOwnProperty");
+  __setKey(module, "exports", function (it, key) {
+    return __callKey(hasOwnProperty, "call", it, key);
+  });
+
+
+  /***/},
+/* 5 */
+/***/function (module, exports) {
+
+  __setKey(module, "exports", function (exec) {
+    try {
+      return !!exec();
+    } catch (e) {
+      return true;
+    }
+  });
+
+
+  /***/},
+/* 6 */
+/***/function (module, exports, __webpack_require__) {
+
+  var anObject = __webpack_require__(7);
+  var IE8_DOM_DEFINE = __webpack_require__(44);
+  var toPrimitive = __webpack_require__(26);
+  var dP = Object.defineProperty;
+
+  __setKey(exports, "f", __webpack_require__(9) ? Object.defineProperty : function defineProperty(O, P, Attributes) {
+    anObject(O);
+    P = toPrimitive(P, true);
+    anObject(Attributes);
+    if (IE8_DOM_DEFINE) try {
+      return dP(O, P, Attributes);
+    } catch (e) {/* empty */}
+    if (__inKey(Attributes, 'get') || __inKey(Attributes, 'set')) throw TypeError('Accessors not supported!');
+    if (__inKey(Attributes, 'value')) __setKey(O, P, __getKey(Attributes, "value"));
+    return O;
+  });
+
+
+  /***/},
+/* 7 */
+/***/function (module, exports, __webpack_require__) {
+
+  var isObject = __webpack_require__(0);
+  __setKey(module, "exports", function (it) {
+    if (!isObject(it)) throw TypeError(it + ' is not an object!');
+    return it;
+  });
+
+
+  /***/},
+/* 8 */
+/***/function (module, exports, __webpack_require__) {
+
+  // most Object methods by ES6 should accept primitives
+  var $export = __webpack_require__(1);
+  var core = __webpack_require__(19);
+  var fails = __webpack_require__(5);
+  __setKey(module, "exports", function (KEY, exec) {
+    var fn = __getKey(__getKey(core, "Object") || {}, KEY) || Object[KEY];
+    var exp = {};
+    __setKey(exp, KEY, exec(fn));
+    $export(__getKey($export, "S") + __getKey($export, "F") * fails(function () {fn(1);}), 'Object', exp);
+  });
+
+
+  /***/},
+/* 9 */
+/***/function (module, exports, __webpack_require__) {
+
+  // Thank's IE8 for his funny defineProperty
+  __setKey(module, "exports", !__webpack_require__(5)(function () {
+    return __getKey(Object.defineProperty({}, 'a', { get: function () {return 7;} }), "a") != 7;
+  }));
+
+
+  /***/},
+/* 10 */
+/***/function (module, exports, __webpack_require__) {
+
+  var META = __webpack_require__(21)('meta');
+  var isObject = __webpack_require__(0);
+  var has = __webpack_require__(4);
+  var setDesc = __getKey(__webpack_require__(6), "f");
+  var id = 0;
+  var isExtensible = Object.isExtensible || function () {
+    return true;
+  };
+  var FREEZE = !__webpack_require__(5)(function () {
+    return isExtensible(Object.preventExtensions({}));
+  });
+  var setMeta = function (it) {
+    setDesc(it, META, { value: {
+        i: 'O' + ++id, // object ID
+        w: {} // weak collections IDs
+      } });
+  };
+  var fastKey = function (it, create) {
+    // return primitive with prefix
+    if (!isObject(it)) return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
+    if (!has(it, META)) {
+      // can't set metadata to uncaught frozen object
+      if (!isExtensible(it)) return 'F';
+      // not necessary to add metadata
+      if (!create) return 'E';
+      // add missing metadata
+      setMeta(it);
+      // return object ID
+    }return __getKey(__getKey(it, META), "i");
+  };
+  var getWeak = function (it, create) {
+    if (!has(it, META)) {
+      // can't set metadata to uncaught frozen object
+      if (!isExtensible(it)) return true;
+      // not necessary to add metadata
+      if (!create) return false;
+      // add missing metadata
+      setMeta(it);
+      // return hash weak collections IDs
+    }return __getKey(__getKey(it, META), "w");
+  };
+  // add metadata on freeze-family methods calling
+  var onFreeze = function (it) {
+    if (FREEZE && __getKey(meta, "NEED") && isExtensible(it) && !has(it, META)) setMeta(it);
+    return it;
+  };
+  var meta = __setKey(module, "exports", {
+    KEY: META,
+    NEED: false,
+    fastKey: fastKey,
+    getWeak: getWeak,
+    onFreeze: onFreeze });
+
+
+
+  /***/},
+/* 11 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 7.1.13 ToObject(argument)
+  var defined = __webpack_require__(48);
+  __setKey(module, "exports", function (it) {
+    return Object(defined(it));
+  });
+
+
+  /***/},
+/* 12 */
+/***/function (module, exports, __webpack_require__) {
+
+  // to indexed object, toObject with fallback for non-array-like ES3 strings
+  var IObject = __webpack_require__(29);
+  var defined = __webpack_require__(48);
+  __setKey(module, "exports", function (it) {
+    return IObject(defined(it));
+  });
+
+
+  /***/},
+/* 13 */
+/***/function (module, exports, __webpack_require__) {
+
+  var dP = __webpack_require__(6);
+  var createDesc = __webpack_require__(20);
+  __setKey(module, "exports", __webpack_require__(9) ? function (object, key, value) {
+    return __callKey(dP, "f", object, key, createDesc(1, value));
+  } : function (object, key, value) {
+    __setKey(object, key, value);
+    return object;
+  });
+
+
+  /***/},
+/* 14 */
+/***/function (module, exports, __webpack_require__) {
+
+  var global = __webpack_require__(3);
+  var hide = __webpack_require__(13);
+  var has = __webpack_require__(4);
+  var SRC = __webpack_require__(21)('src');
+  var TO_STRING = 'toString';
+  var $toString = Function[TO_STRING];
+  var TPL = __callKey('' + $toString, "split", TO_STRING);
+
+  __setKey(__webpack_require__(19), "inspectSource", function (it) {
+    return __callKey($toString, "call", it);
+  });
+
+  __setKey(module, "exports", function (O, key, val, safe) {
+    var isFunction = typeof val == 'function';
+    if (isFunction) has(val, 'name') || hide(val, 'name', key);
+    if (__getKey(O, key) === val) return;
+    if (isFunction) has(val, SRC) || hide(val, SRC, __getKey(O, key) ? '' + __getKey(O, key) : __callKey(TPL, "join", String(key)));
+    if (O === global) {
+      __setKey(O, key, val);
+    } else if (!safe) {
+      __deleteKey(O, key);
+      hide(O, key, val);
+    } else if (__getKey(O, key)) {
+      __setKey(O, key, val);
+    } else {
+      hide(O, key, val);
+    }
+    // add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative
+  })(Function.prototype, TO_STRING, function toString() {
+    return typeof this == 'function' && __getKey(this, SRC) || __callKey($toString, "call", this);
+  });
+
+
+  /***/},
+/* 15 */
+/***/function (module, exports, __webpack_require__) {
+
+  // optional / simple context binding
+  var aFunction = __webpack_require__(63);
+  __setKey(module, "exports", function (fn, that, length) {
+    aFunction(fn);
+    if (that === undefined) return fn;
+    switch (length) {
+      case 1:return function (a) {
+          return __callKey(fn, "call", that, a);
+        };
+      case 2:return function (a, b) {
+          return __callKey(fn, "call", that, a, b);
+        };
+      case 3:return function (a, b, c) {
+          return __callKey(fn, "call", that, a, b, c);
+        };}
+
+    return function () /* ...args */{
+      return __callKey(fn, "apply", that, arguments);
+    };
+  });
+
+
+  /***/},
+/* 16 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 19.1.2.14 / 15.2.3.14 Object.keys(O)
+  var $keys = __webpack_require__(47);
+  var enumBugKeys = __webpack_require__(33);
+
+  __setKey(module, "exports", Object.compatKeys || function keys(O) {
+    return $keys(O, enumBugKeys);
+  });
+
+
+  /***/},
+/* 17 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 7.1.15 ToLength
+  var toInteger = __webpack_require__(50);
+  var min = Math.min;
+  __setKey(module, "exports", function (it) {
+    return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
+  });
+
+
+  /***/},
+/* 18 */
+/***/function (module, exports, __webpack_require__) {
+
+  var isObject = __webpack_require__(0);
+  __setKey(module, "exports", function (it, TYPE) {
+    if (!isObject(it) || __getKey(it, "_t") !== TYPE) throw TypeError('Incompatible receiver, ' + TYPE + ' required!');
+    return it;
+  });
+
+
+  /***/},
+/* 19 */
+/***/function (module, exports) {
+
+  var core = __setKey(module, "exports", { version: '2.5.3' });
+  if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
+
+
+  /***/},
+/* 20 */
+/***/function (module, exports) {
+
+  __setKey(module, "exports", function (bitmap, value) {
+    return {
+      enumerable: !(bitmap & 1),
+      configurable: !(bitmap & 2),
+      writable: !(bitmap & 4),
+      value: value };
+
+  });
+
+
+  /***/},
+/* 21 */
+/***/function (module, exports) {
+
+  var id = 0;
+  var px = Math.random();
+  __setKey(module, "exports", function (key) {
+    return 'Symbol('.concat(key === undefined ? '' : key, ')_', __callKey(++id + px, "toString", 36));
+  });
+
+
+  /***/},
+/* 22 */
+/***/function (module, exports) {
+
+  __setKey(exports, "f", __getKey({}, "propertyIsEnumerable"));
+
+
+  /***/},
+/* 23 */
+/***/function (module, exports, __webpack_require__) {
+
+  var def = __getKey(__webpack_require__(6), "f");
+  var has = __webpack_require__(4);
+  var TAG = __webpack_require__(2)('toStringTag');
+
+  __setKey(module, "exports", function (it, tag, stat) {
+    if (it && !has(it = stat ? it : __getKey(it, "prototype"), TAG)) def(it, TAG, { configurable: true, value: tag });
+  });
+
+
+  /***/},
+/* 24 */
+/***/function (module, exports) {
+
+  __setKey(exports, "f", Object.getOwnPropertySymbols);
+
+
+  /***/},
+/* 25 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  var global = __webpack_require__(3);
+  var $export = __webpack_require__(1);
+  var redefine = __webpack_require__(14);
+  var redefineAll = __webpack_require__(41);
+  var meta = __webpack_require__(10);
+  var forOf = __webpack_require__(43);
+  var anInstance = __webpack_require__(42);
+  var isObject = __webpack_require__(0);
+  var fails = __webpack_require__(5);
+  var $iterDetect = __webpack_require__(56);
+  var setToStringTag = __webpack_require__(23);
+  var inheritIfRequired = __webpack_require__(92);
+
+  __setKey(module, "exports", function (NAME, wrapper, methods, common, IS_MAP, IS_WEAK) {
+    var Base = __getKey(global, NAME);
+    var C = Base;
+    var ADDER = IS_MAP ? 'set' : 'add';
+    var proto = C && __getKey(C, "prototype");
+    var O = {};
+    var fixMethod = function (KEY) {
+      var fn = __getKey(proto, KEY);
+      redefine(proto, KEY,
+      KEY == 'delete' ? function (a) {
+        return IS_WEAK && !isObject(a) ? false : __callKey(fn, "call", this, a === 0 ? 0 : a);
+      } : KEY == 'has' ? function has(a) {
+        return IS_WEAK && !isObject(a) ? false : __callKey(fn, "call", this, a === 0 ? 0 : a);
+      } : KEY == 'get' ? function get(a) {
+        return IS_WEAK && !isObject(a) ? undefined : __callKey(fn, "call", this, a === 0 ? 0 : a);
+      } : KEY == 'add' ? function add(a) {__callKey(fn, "call", this, a === 0 ? 0 : a);return this;} :
+      function set(a, b) {__callKey(fn, "call", this, a === 0 ? 0 : a, b);return this;});
+
+    };
+    if (typeof C != 'function' || !(IS_WEAK || __getKey(proto, "forEach") && !fails(function () {
+      __callKey(__callKey(new C(), "entries"), "next");
+    }))) {
+      // create collection constructor
+      C = __callKey(common, "getConstructor", wrapper, NAME, IS_MAP, ADDER);
+      redefineAll(__getKey(C, "prototype"), methods);
+      __setKey(meta, "NEED", true);
+    } else {
+      var instance = new C();
+      // early implementations not supports chaining
+      var HASNT_CHAINING = __callKey(instance, ADDER, IS_WEAK ? {} : -0, 1) != instance;
+      // V8 ~  Chromium 40- weak-collections throws on primitives, but should return false
+      var THROWS_ON_PRIMITIVES = fails(function () {__callKey(instance, "has", 1);});
+      // most early implementations doesn't supports iterables, most modern - not close it correctly
+      var ACCEPT_ITERABLES = $iterDetect(function (iter) {new C(iter);}); // eslint-disable-line no-new
+      // for early implementations -0 and +0 not the same
+      var BUGGY_ZERO = !IS_WEAK && fails(function () {
+        // V8 ~ Chromium 42- fails only with 5+ elements
+        var $instance = new C();
+        var index = 5;
+        while (index--) __callKey($instance, ADDER, index, index);
+        return !__callKey($instance, "has", -0);
+      });
+      if (!ACCEPT_ITERABLES) {
+        C = wrapper(function (target, iterable) {
+          anInstance(target, C, NAME);
+          var that = inheritIfRequired(new Base(), target, C);
+          if (iterable != undefined) forOf(iterable, IS_MAP, __getKey(that, ADDER), that);
+          return that;
+        });
+        __setKey(C, "prototype", proto);
+        __setKey(proto, "constructor", C);
+      }
+      if (THROWS_ON_PRIMITIVES || BUGGY_ZERO) {
+        fixMethod('delete');
+        fixMethod('has');
+        IS_MAP && fixMethod('get');
+      }
+      if (BUGGY_ZERO || HASNT_CHAINING) fixMethod(ADDER);
+      // weak collections should not contains .clear method
+      if (IS_WEAK && __getKey(proto, "clear")) __deleteKey(proto, "clear");
+    }
+
+    setToStringTag(C, NAME);
+
+    __setKey(O, NAME, C);
+    $export(__getKey($export, "G") + __getKey($export, "W") + __getKey($export, "F") * (C != Base), O);
+
+    if (!IS_WEAK) __callKey(common, "setStrong", C, NAME, IS_MAP);
+
+    return C;
+  });
+
+
+  /***/},
+/* 26 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 7.1.1 ToPrimitive(input [, PreferredType])
+  var isObject = __webpack_require__(0);
+  // instead of the ES6 spec version, we didn't implement @@toPrimitive case
+  // and the second argument - flag - preferred type is a string
+  __setKey(module, "exports", function (it, S) {
+    if (!isObject(it)) return it;
+    var fn, val;
+    if (S && typeof (fn = __getKey(it, "toString")) == 'function' && !isObject(val = __callKey(fn, "call", it))) return val;
+    if (typeof (fn = __getKey(it, "valueOf")) == 'function' && !isObject(val = __callKey(fn, "call", it))) return val;
+    if (!S && typeof (fn = __getKey(it, "toString")) == 'function' && !isObject(val = __callKey(fn, "call", it))) return val;
+    throw TypeError("Can't convert object to primitive value");
+  });
+
+
+  /***/},
+/* 27 */
+/***/function (module, exports, __webpack_require__) {
+
+  var global = __webpack_require__(3);
+  var SHARED = '__core-js_shared__';
+  var store = __getKey(global, SHARED) || __setKey(global, SHARED, {});
+  __setKey(module, "exports", function (key) {
+    return __getKey(store, key) || __setKey(store, key, {});
+  });
+
+
+  /***/},
+/* 28 */
+/***/function (module, exports) {
+
+  __setKey(module, "exports", false);
+
+
+  /***/},
+/* 29 */
+/***/function (module, exports, __webpack_require__) {
+
+  // fallback for non-array-like ES3 and non-enumerable old V8 strings
+  var cof = __webpack_require__(30);
+  // eslint-disable-next-line no-prototype-builtins
+  __setKey(module, "exports", __callKey(Object('z'), "propertyIsEnumerable", 0) ? Object : function (it) {
+    return cof(it) == 'String' ? __callKey(it, "split", '') : Object(it);
+  });
+
+
+  /***/},
+/* 30 */
+/***/function (module, exports) {
+
+  var toString = __getKey({}, "toString");
+
+  __setKey(module, "exports", function (it) {
+    return __callKey(__callKey(toString, "call", it), "slice", 8, -1);
+  });
+
+
+  /***/},
+/* 31 */
+/***/function (module, exports, __webpack_require__) {
+
+  var toInteger = __webpack_require__(50);
+  var max = Math.max;
+  var min = Math.min;
+  __setKey(module, "exports", function (index, length) {
+    index = toInteger(index);
+    return index < 0 ? max(index + length, 0) : min(index, length);
+  });
+
+
+  /***/},
+/* 32 */
+/***/function (module, exports, __webpack_require__) {
+
+  var shared = __webpack_require__(27)('keys');
+  var uid = __webpack_require__(21);
+  __setKey(module, "exports", function (key) {
+    return __getKey(shared, key) || __setKey(shared, key, uid(key));
+  });
+
+
+  /***/},
+/* 33 */
+/***/function (module, exports) {
+
+  // IE 8- don't enum bug keys
+  __setKey(module, "exports", __callKey(
+  'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf', "split",
+  ','));
+
+
+  /***/},
+/* 34 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 7.2.2 IsArray(argument)
+  var cof = __webpack_require__(30);
+  __setKey(module, "exports", Array.isArray || function isArray(arg) {
+    return cof(arg) == 'Array';
+  });
+
+
+  /***/},
+/* 35 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
+  var anObject = __webpack_require__(7);
+  var dPs = __webpack_require__(66);
+  var enumBugKeys = __webpack_require__(33);
+  var IE_PROTO = __webpack_require__(32)('IE_PROTO');
+  var Empty = function () {/* empty */};
+  var PROTOTYPE = 'prototype';
+
+  // Create object with fake `null` prototype: use iframe Object with cleared prototype
+  var createDict = function () {
+    // Thrash, waste and sodomy: IE GC bug
+    var iframe = __webpack_require__(45)('iframe');
+    var i = __getKey(enumBugKeys, "length");
+    var lt = '<';
+    var gt = '>';
+    var iframeDocument;
+    __setKey(__getKey(iframe, "style"), "display", 'none');
+    __callKey(__webpack_require__(67), "appendChild", iframe);
+    __setKey(iframe, "src", 'javascript:'); // eslint-disable-line no-script-url
+    // createDict = iframe.contentWindow.Object;
+    // html.removeChild(iframe);
+    iframeDocument = __getKey(__getKey(iframe, "contentWindow"), "document");
+    __callKey(iframeDocument, "open");
+    __callKey(iframeDocument, "write", lt + 'script' + gt + 'document.F=Object' + lt + '/script' + gt);
+    __callKey(iframeDocument, "close");
+    createDict = __getKey(iframeDocument, "F");
+    while (i--) __deleteKey(__getKey(createDict, PROTOTYPE), __getKey(enumBugKeys, i));
+    return createDict();
+  };
+
+  __setKey(module, "exports", Object.create || function create(O, Properties) {
+    var result;
+    if (O !== null) {
+      __setKey(Empty, PROTOTYPE, anObject(O));
+      result = new Empty();
+      __setKey(Empty, PROTOTYPE, null);
+      // add "__proto__" for Object.getPrototypeOf polyfill
+      __setKey(result, IE_PROTO, O);
+    } else result = createDict();
+    return Properties === undefined ? result : dPs(result, Properties);
+  });
+
+
+  /***/},
+/* 36 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
+  var $keys = __webpack_require__(47);
+  var hiddenKeys = __webpack_require__(33).concat('length', 'prototype');
+
+  __setKey(exports, "f", Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
+    return $keys(O, hiddenKeys);
+  });
+
+
+  /***/},
+/* 37 */
+/***/function (module, exports, __webpack_require__) {
+
+  var pIE = __webpack_require__(22);
+  var createDesc = __webpack_require__(20);
+  var toIObject = __webpack_require__(12);
+  var toPrimitive = __webpack_require__(26);
+  var has = __webpack_require__(4);
+  var IE8_DOM_DEFINE = __webpack_require__(44);
+  var gOPD = Object.getOwnPropertyDescriptor;
+
+  __setKey(exports, "f", __webpack_require__(9) ? gOPD : function getOwnPropertyDescriptor(O, P) {
+    O = toIObject(O);
+    P = toPrimitive(P, true);
+    if (IE8_DOM_DEFINE) try {
+      return gOPD(O, P);
+    } catch (e) {/* empty */}
+    if (has(O, P)) return createDesc(!__callKey(__getKey(pIE, "f"), "call", O, P), __getKey(O, P));
+  });
+
+
+  /***/},
+/* 38 */
+/***/function (module, exports) {
+
+  __setKey(module, "exports", {});
+
+
+  /***/},
+/* 39 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  var $defineProperty = __webpack_require__(6);
+  var createDesc = __webpack_require__(20);
+
+  __setKey(module, "exports", function (object, index, value) {
+    if (__inKey(object, index)) __callKey($defineProperty, "f", object, index, createDesc(0, value));else
+    __setKey(object, index, value);
+  });
+
+
+  /***/},
+/* 40 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 22.1.3.31 Array.prototype[@@unscopables]
+  var UNSCOPABLES = __webpack_require__(2)('unscopables');
+  var ArrayProto = Array.prototype;
+  if (__getKey(ArrayProto, UNSCOPABLES) == undefined) __webpack_require__(13)(ArrayProto, UNSCOPABLES, {});
+  __setKey(module, "exports", function (key) {
+    __setKey(__getKey(ArrayProto, UNSCOPABLES), key, true);
+  });
+
+
+  /***/},
+/* 41 */
+/***/function (module, exports, __webpack_require__) {
+
+  var redefine = __webpack_require__(14);
+  __setKey(module, "exports", function (target, src, safe) {
+    for (var key in __iterableKey(src)) redefine(target, key, __getKey(src, key), safe);
+    return target;
+  });
+
+
+  /***/},
+/* 42 */
+/***/function (module, exports) {
+
+  __setKey(module, "exports", function (it, Constructor, name, forbiddenField) {
+    if (!__instanceOfKey(it, Constructor) || forbiddenField !== undefined && __inKey(it, forbiddenField)) {
+      throw TypeError(name + ': incorrect invocation!');
+    }return it;
+  });
+
+
+  /***/},
+/* 43 */
+/***/function (module, exports, __webpack_require__) {
+
+  var ctx = __webpack_require__(15);
+  var call = __webpack_require__(53);
+  var isArrayIter = __webpack_require__(54);
+  var anObject = __webpack_require__(7);
+  var toLength = __webpack_require__(17);
+  var getIterFn = __webpack_require__(55);
+  var BREAK = {};
+  var RETURN = {};
+  var exports = __setKey(module, "exports", function (iterable, entries, fn, that, ITERATOR) {
+    var iterFn = ITERATOR ? function () {return iterable;} : getIterFn(iterable);
+    var f = ctx(fn, that, entries ? 2 : 1);
+    var index = 0;
+    var length, step, iterator, result;
+    if (typeof iterFn != 'function') throw TypeError(iterable + ' is not iterable!');
+    // fast case for arrays with default iterator
+    if (isArrayIter(iterFn)) for (length = toLength(__getKey(iterable, "length")); length > index; index++) {
+      result = entries ? f(__getKey(anObject(step = __getKey(iterable, index)), 0), __getKey(step, 1)) : f(__getKey(iterable, index));
+      if (result === BREAK || result === RETURN) return result;
+    } else for (iterator = __callKey(iterFn, "call", iterable); !__getKey(step = __callKey(iterator, "next"), "done");) {
+      result = call(iterator, f, __getKey(step, "value"), entries);
+      if (result === BREAK || result === RETURN) return result;
+    }
+  });
+  __setKey(exports, "BREAK", BREAK);
+  __setKey(exports, "RETURN", RETURN);
+
+
+  /***/},
+/* 44 */
+/***/function (module, exports, __webpack_require__) {
+
+  __setKey(module, "exports", !__webpack_require__(9) && !__webpack_require__(5)(function () {
+    return __getKey(Object.defineProperty(__webpack_require__(45)('div'), 'a', { get: function () {return 7;} }), "a") != 7;
+  }));
+
+
+  /***/},
+/* 45 */
+/***/function (module, exports, __webpack_require__) {
+
+  var isObject = __webpack_require__(0);
+  var document = __getKey(__webpack_require__(3), "document");
+  // typeof document.createElement is 'object' in old IE
+  var is = isObject(document) && isObject(__getKey(document, "createElement"));
+  __setKey(module, "exports", function (it) {
+    return is ? __callKey(document, "createElement", it) : {};
+  });
+
+
+  /***/},
+/* 46 */
+/***/function (module, exports, __webpack_require__) {
+
+  __setKey(exports, "f", __webpack_require__(2));
+
+
+  /***/},
+/* 47 */
+/***/function (module, exports, __webpack_require__) {
+
+  var has = __webpack_require__(4);
+  var toIObject = __webpack_require__(12);
+  var arrayIndexOf = __webpack_require__(49)(false);
+  var IE_PROTO = __webpack_require__(32)('IE_PROTO');
+
+  __setKey(module, "exports", function (object, names) {
+    var O = toIObject(object);
+    var i = 0;
+    var result = [];
+    var key;
+    for (key in __iterableKey(O)) if (key != IE_PROTO) has(O, key) && result.push(key);
+    // Don't enum bug & hidden keys
+    while (__getKey(names, "length") > i) if (has(O, key = __getKey(names, i++))) {
+      ~arrayIndexOf(result, key) || result.push(key);
+    }
+    return result;
+  });
+
+
+  /***/},
+/* 48 */
+/***/function (module, exports) {
+
+  // 7.2.1 RequireObjectCoercible(argument)
+  __setKey(module, "exports", function (it) {
+    if (it == undefined) throw TypeError("Can't call method on  " + it);
+    return it;
+  });
+
+
+  /***/},
+/* 49 */
+/***/function (module, exports, __webpack_require__) {
+
+  // false -> Array#indexOf
+  // true  -> Array#includes
+  var toIObject = __webpack_require__(12);
+  var toLength = __webpack_require__(17);
+  var toAbsoluteIndex = __webpack_require__(31);
+  __setKey(module, "exports", function (IS_INCLUDES) {
+    return function ($this, el, fromIndex) {
+      var O = toIObject($this);
+      var length = toLength(__getKey(O, "length"));
+      var index = toAbsoluteIndex(fromIndex, length);
+      var value;
+      // Array#includes uses SameValueZero equality algorithm
+      // eslint-disable-next-line no-self-compare
+      if (IS_INCLUDES && el != el) while (length > index) {
+        value = __getKey(O, index++);
+        // eslint-disable-next-line no-self-compare
+        if (value != value) return true;
+        // Array#indexOf ignores holes, Array#includes - not
+      } else for (; length > index; index++) if (IS_INCLUDES || __inKey(O, index)) {
+        if (__getKey(O, index) === el) return IS_INCLUDES || index || 0;
+      }return !IS_INCLUDES && -1;
+    };
+  });
+
+
+  /***/},
+/* 50 */
+/***/function (module, exports) {
+
+  // 7.1.4 ToInteger
+  var ceil = Math.ceil;
+  var floor = Math.floor;
+  __setKey(module, "exports", function (it) {
+    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+  });
+
+
+  /***/},
+/* 51 */
+/***/function (module, exports, __webpack_require__) {
+
+  // fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
+  var toIObject = __webpack_require__(12);
+  var gOPN = __getKey(__webpack_require__(36), "f");
+  var toString = __getKey({}, "toString");
+
+  var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames ?
+  Object.getOwnPropertyNames(window) : [];
+
+  var getWindowNames = function (it) {
+    try {
+      return gOPN(it);
+    } catch (e) {
+      return __callKey(windowNames, "slice");
+    }
+  };
+
+  __setKey(__getKey(module, "exports"), "f", function getOwnPropertyNames(it) {
+    return windowNames && __callKey(toString, "call", it) == '[object Window]' ? getWindowNames(it) : gOPN(toIObject(it));
+  });
+
+
+  /***/},
+/* 52 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
+  var has = __webpack_require__(4);
+  var toObject = __webpack_require__(11);
+  var IE_PROTO = __webpack_require__(32)('IE_PROTO');
+  var ObjectProto = Object.prototype;
+
+  __setKey(module, "exports", Object.getPrototypeOf || function (O) {
+    O = toObject(O);
+    if (has(O, IE_PROTO)) return __getKey(O, IE_PROTO);
+    if (typeof __getKey(O, "constructor") == 'function' && __instanceOfKey(O, __getKey(O, "constructor"))) {
+      return __getKey(__getKey(O, "constructor"), "prototype");
+    }return __instanceOfKey(O, Object) ? ObjectProto : null;
+  });
+
+
+  /***/},
+/* 53 */
+/***/function (module, exports, __webpack_require__) {
+
+  // call something on iterator step with safe closing on error
+  var anObject = __webpack_require__(7);
+  __setKey(module, "exports", function (iterator, fn, value, entries) {
+    try {
+      return entries ? fn(__getKey(anObject(value), 0), __getKey(value, 1)) : fn(value);
+      // 7.4.6 IteratorClose(iterator, completion)
+    } catch (e) {
+      var ret = __getKey(iterator, 'return');
+      if (ret !== undefined) anObject(__callKey(ret, "call", iterator));
+      throw e;
+    }
+  });
+
+
+  /***/},
+/* 54 */
+/***/function (module, exports, __webpack_require__) {
+
+  // check on default Array iterator
+  var Iterators = __webpack_require__(38);
+  var ITERATOR = __webpack_require__(2)('iterator');
+  var ArrayProto = Array.prototype;
+
+  __setKey(module, "exports", function (it) {
+    return it !== undefined && (__getKey(Iterators, "Array") === it || __getKey(ArrayProto, ITERATOR) === it);
+  });
+
+
+  /***/},
+/* 55 */
+/***/function (module, exports, __webpack_require__) {
+
+  var classof = __webpack_require__(81);
+  var ITERATOR = __webpack_require__(2)('iterator');
+  var Iterators = __webpack_require__(38);
+  __setKey(module, "exports", __setKey(__webpack_require__(19), "getIteratorMethod", function (it) {
+    if (it != undefined) return __getKey(it, ITERATOR) || __getKey(
+    it, '@@iterator') || __getKey(
+    Iterators, classof(it));
+  }));
+
+
+  /***/},
+/* 56 */
+/***/function (module, exports, __webpack_require__) {
+
+  var ITERATOR = __webpack_require__(2)('iterator');
+  var SAFE_CLOSING = false;
+
+  try {
+    var riter = __callKey([7], ITERATOR);
+    __setKey(riter, 'return', function () {SAFE_CLOSING = true;});
+    // eslint-disable-next-line no-throw-literal
+    Array.from(riter, function () {throw 2;});
+  } catch (e) {/* empty */}
+
+  __setKey(module, "exports", function (exec, skipClosing) {
+    if (!skipClosing && !SAFE_CLOSING) return false;
+    var safe = false;
+    try {
+      var arr = [7];
+      var iter = __callKey(arr, ITERATOR);
+      __setKey(iter, "next", function () {return { done: safe = true };});
+      __setKey(arr, ITERATOR, function () {return iter;});
+      exec(arr);
+    } catch (e) {/* empty */}
+    return safe;
+  });
+
+
+  /***/},
+/* 57 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  var dP = __getKey(__webpack_require__(6), "f");
+  var create = __webpack_require__(35);
+  var redefineAll = __webpack_require__(41);
+  var ctx = __webpack_require__(15);
+  var anInstance = __webpack_require__(42);
+  var forOf = __webpack_require__(43);
+  var $iterDefine = __webpack_require__(88);
+  var step = __webpack_require__(90);
+  var setSpecies = __webpack_require__(91);
+  var DESCRIPTORS = __webpack_require__(9);
+  var fastKey = __getKey(__webpack_require__(10), "fastKey");
+  var validate = __webpack_require__(18);
+  var SIZE = DESCRIPTORS ? '_s' : 'size';
+
+  var getEntry = function (that, key) {
+    // fast case
+    var index = fastKey(key);
+    var entry;
+    if (index !== 'F') return __getKey(__getKey(that, "_i"), index);
+    // frozen object case
+    for (entry = __getKey(that, "_f"); entry; entry = __getKey(entry, "n")) {
+      if (__getKey(entry, "k") == key) return entry;
+    }
+  };
+
+  __setKey(module, "exports", {
+    getConstructor: function (wrapper, NAME, IS_MAP, ADDER) {
+      var C = wrapper(function (that, iterable) {
+        anInstance(that, C, NAME, '_i');
+        __setKey(that, "_t", NAME); // collection type
+        __setKey(that, "_i", create(null)); // index
+        __setKey(that, "_f", undefined); // first entry
+        __setKey(that, "_l", undefined); // last entry
+        __setKey(that, SIZE, 0); // size
+        if (iterable != undefined) forOf(iterable, IS_MAP, __getKey(that, ADDER), that);
+      });
+      redefineAll(__getKey(C, "prototype"), {
+        // 23.1.3.1 Map.prototype.clear()
+        // 23.2.3.2 Set.prototype.clear()
+        clear: function clear() {
+          for (var that = validate(this, NAME), data = __getKey(that, "_i"), entry = __getKey(that, "_f"); entry; entry = __getKey(entry, "n")) {
+            __setKey(entry, "r", true);
+            if (__getKey(entry, "p")) __setKey(entry, "p", __setKey(__getKey(entry, "p"), "n", undefined));
+            __deleteKey(data, __getKey(entry, "i"));
+          }
+          __setKey(that, "_f", __setKey(that, "_l", undefined));
+          __setKey(that, SIZE, 0);
+        },
+        // 23.1.3.3 Map.prototype.delete(key)
+        // 23.2.3.4 Set.prototype.delete(value)
+        'delete': function (key) {
+          var that = validate(this, NAME);
+          var entry = getEntry(that, key);
+          if (entry) {
+            var next = __getKey(entry, "n");
+            var prev = __getKey(entry, "p");
+            __deleteKey(__getKey(that, "_i"), __getKey(entry, "i"));
+            __setKey(entry, "r", true);
+            if (prev) __setKey(prev, "n", next);
+            if (next) __setKey(next, "p", prev);
+            if (__getKey(that, "_f") == entry) __setKey(that, "_f", next);
+            if (__getKey(that, "_l") == entry) __setKey(that, "_l", prev);
+            __setKey(that, SIZE, __getKey(that, SIZE) - 1, __getKey(that, SIZE));
+          }return !!entry;
+        },
+        // 23.2.3.6 Set.prototype.forEach(callbackfn, thisArg = undefined)
+        // 23.1.3.5 Map.prototype.forEach(callbackfn, thisArg = undefined)
+        forEach: function forEach(callbackfn /* , that = undefined */) {
+          validate(this, NAME);
+          var f = ctx(callbackfn, arguments.length > 1 ? arguments[1] : undefined, 3);
+          var entry;
+          while (entry = entry ? __getKey(entry, "n") : __getKey(this, "_f")) {
+            f(__getKey(entry, "v"), __getKey(entry, "k"), this);
+            // revert to the last existing entry
+            while (entry && __getKey(entry, "r")) entry = __getKey(entry, "p");
+          }
+        },
+        // 23.1.3.7 Map.prototype.has(key)
+        // 23.2.3.7 Set.prototype.has(value)
+        has: function has(key) {
+          return !!getEntry(validate(this, NAME), key);
+        } });
+
+      if (DESCRIPTORS) dP(__getKey(C, "prototype"), 'size', {
+        get: function () {
+          return __getKey(validate(this, NAME), SIZE);
+        } });
+
+      return C;
+    },
+    def: function (that, key, value) {
+      var entry = getEntry(that, key);
+      var prev, index;
+      // change existing entry
+      if (entry) {
+        __setKey(entry, "v", value);
+        // create new entry
+      } else {
+        __setKey(that, "_l", entry = {
+          i: index = fastKey(key, true), // <- index
+          k: key, // <- key
+          v: value, // <- value
+          p: prev = __getKey(that, "_l"), // <- previous entry
+          n: undefined, // <- next entry
+          r: false // <- removed
+        });
+        if (!__getKey(that, "_f")) __setKey(that, "_f", entry);
+        if (prev) __setKey(prev, "n", entry);
+        __setKey(that, SIZE, __getKey(that, SIZE) + 1, __getKey(that, SIZE));
+        // add to index
+        if (index !== 'F') __setKey(__getKey(that, "_i"), index, entry);
+      }return that;
+    },
+    getEntry: getEntry,
+    setStrong: function (C, NAME, IS_MAP) {
+      // add .keys, .values, .entries, [@@iterator]
+      // 23.1.3.4, 23.1.3.8, 23.1.3.11, 23.1.3.12, 23.2.3.5, 23.2.3.8, 23.2.3.10, 23.2.3.11
+      $iterDefine(C, NAME, function (iterated, kind) {
+        __setKey(this, "_t", validate(iterated, NAME)); // target
+        __setKey(this, "_k", kind); // kind
+        __setKey(this, "_l", undefined); // previous
+      }, function () {
+        var that = this;
+        var kind = __getKey(that, "_k");
+        var entry = __getKey(that, "_l");
+        // revert to the last existing entry
+        while (entry && __getKey(entry, "r")) entry = __getKey(entry, "p");
+        // get next entry
+        if (!__getKey(that, "_t") || !__setKey(that, "_l", entry = entry ? __getKey(entry, "n") : __getKey(__getKey(that, "_t"), "_f"))) {
+          // or finish the iteration
+          __setKey(that, "_t", undefined);
+          return step(1);
+        }
+        // return step by kind
+        if (kind == 'keys') return step(0, __getKey(entry, "k"));
+        if (kind == 'values') return step(0, __getKey(entry, "v"));
+        return step(0, [__getKey(entry, "k"), __getKey(entry, "v")]);
+      }, IS_MAP ? 'entries' : 'values', !IS_MAP, true);
+
+      // add [@@species], 23.1.2.2, 23.2.2.2
+      setSpecies(NAME);
+    } });
+
+
+
+  /***/},
+/* 58 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 0 -> Array#forEach
+  // 1 -> Array#map
+  // 2 -> Array#filter
+  // 3 -> Array#some
+  // 4 -> Array#every
+  // 5 -> Array#find
+  // 6 -> Array#findIndex
+  var ctx = __webpack_require__(15);
+  var IObject = __webpack_require__(29);
+  var toObject = __webpack_require__(11);
+  var toLength = __webpack_require__(17);
+  var asc = __webpack_require__(96);
+  __setKey(module, "exports", function (TYPE, $create) {
+    var IS_MAP = TYPE == 1;
+    var IS_FILTER = TYPE == 2;
+    var IS_SOME = TYPE == 3;
+    var IS_EVERY = TYPE == 4;
+    var IS_FIND_INDEX = TYPE == 6;
+    var NO_HOLES = TYPE == 5 || IS_FIND_INDEX;
+    var create = $create || asc;
+    return function ($this, callbackfn, that) {
+      var O = toObject($this);
+      var self = IObject(O);
+      var f = ctx(callbackfn, that, 3);
+      var length = toLength(__getKey(self, "length"));
+      var index = 0;
+      var result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined;
+      var val, res;
+      for (; length > index; index++) if (NO_HOLES || __inKey(self, index)) {
+        val = __getKey(self, index);
+        res = f(val, index, O);
+        if (TYPE) {
+          if (IS_MAP) __setKey(result, index, res); // map
+          else if (res) switch (TYPE) {
+              case 3:return true; // some
+              case 5:return val; // find
+              case 6:return index; // findIndex
+              case 2:result.push(val); // filter
+            } else if (IS_EVERY) return false; // every
+        }
+      }
+      return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
+    };
+  });
+
+
+  /***/},
+/* 59 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  var redefineAll = __webpack_require__(41);
+  var getWeak = __getKey(__webpack_require__(10), "getWeak");
+  var anObject = __webpack_require__(7);
+  var isObject = __webpack_require__(0);
+  var anInstance = __webpack_require__(42);
+  var forOf = __webpack_require__(43);
+  var createArrayMethod = __webpack_require__(58);
+  var $has = __webpack_require__(4);
+  var validate = __webpack_require__(18);
+  var arrayFind = createArrayMethod(5);
+  var arrayFindIndex = createArrayMethod(6);
+  var id = 0;
+
+  // fallback for uncaught frozen keys
+  var uncaughtFrozenStore = function (that) {
+    return __getKey(that, "_l") || __setKey(that, "_l", new UncaughtFrozenStore());
+  };
+  var UncaughtFrozenStore = function () {
+    __setKey(this, "a", []);
+  };
+  var findUncaughtFrozen = function (store, key) {
+    return arrayFind(__getKey(store, "a"), function (it) {
+      return __getKey(it, 0) === key;
+    });
+  };
+  __setKey(UncaughtFrozenStore, "prototype", {
+    get: function (key) {
+      var entry = findUncaughtFrozen(this, key);
+      if (entry) return __getKey(entry, 1);
+    },
+    has: function (key) {
+      return !!findUncaughtFrozen(this, key);
+    },
+    set: function (key, value) {
+      var entry = findUncaughtFrozen(this, key);
+      if (entry) __setKey(entry, 1, value);else
+      __getKey(this, "a").push([key, value]);
+    },
+    'delete': function (key) {
+      var index = arrayFindIndex(__getKey(this, "a"), function (it) {
+        return __getKey(it, 0) === key;
+      });
+      if (~index) __callKey(__getKey(this, "a"), "splice", index, 1);
+      return !!~index;
+    } });
+
+
+  __setKey(module, "exports", {
+    getConstructor: function (wrapper, NAME, IS_MAP, ADDER) {
+      var C = wrapper(function (that, iterable) {
+        anInstance(that, C, NAME, '_i');
+        __setKey(that, "_t", NAME); // collection type
+        __setKey(that, "_i", id++); // collection id
+        __setKey(that, "_l", undefined); // leak store for uncaught frozen objects
+        if (iterable != undefined) forOf(iterable, IS_MAP, __getKey(that, ADDER), that);
+      });
+      redefineAll(__getKey(C, "prototype"), {
+        // 23.3.3.2 WeakMap.prototype.delete(key)
+        // 23.4.3.3 WeakSet.prototype.delete(value)
+        'delete': function (key) {
+          if (!isObject(key)) return false;
+          var data = getWeak(key);
+          if (data === true) return __callKey(uncaughtFrozenStore(validate(this, NAME)), 'delete', key);
+          return data && $has(data, __getKey(this, "_i")) && __deleteKey(data, __getKey(this, "_i"));
+        },
+        // 23.3.3.4 WeakMap.prototype.has(key)
+        // 23.4.3.4 WeakSet.prototype.has(value)
+        has: function has(key) {
+          if (!isObject(key)) return false;
+          var data = getWeak(key);
+          if (data === true) return __callKey(uncaughtFrozenStore(validate(this, NAME)), "has", key);
+          return data && $has(data, __getKey(this, "_i"));
+        } });
+
+      return C;
+    },
+    def: function (that, key, value) {
+      var data = getWeak(anObject(key), true);
+      if (data === true) __callKey(uncaughtFrozenStore(that), "set", key, value);else
+      __setKey(data, __getKey(that, "_i"), value);
+      return that;
+    },
+    ufstore: uncaughtFrozenStore });
+
+
+
+  /***/},
+/* 60 */
+/***/function (module, exports, __webpack_require__) {
+
+  var getKeys = __webpack_require__(16);
+  var toIObject = __webpack_require__(12);
+  var isEnum = __getKey(__webpack_require__(22), "f");
+  __setKey(module, "exports", function (isEntries) {
+    return function (it) {
+      var O = toIObject(it);
+      var keys = getKeys(O);
+      var length = __getKey(keys, "length");
+      var i = 0;
+      var result = [];
+      var key;
+      while (length > i) if (__callKey(isEnum, "call", O, key = __getKey(keys, i++))) {
+        result.push(isEntries ? [key, __getKey(O, key)] : __getKey(O, key));
+      }return result;
+    };
+  });
+
+
+  /***/},
+/* 61 */
+/***/function (module, exports, __webpack_require__) {
+
+  __webpack_require__(62);
+  __webpack_require__(68);
+  __webpack_require__(69);
+  __webpack_require__(70);
+  __webpack_require__(71);
+  __webpack_require__(72);
+  __webpack_require__(73);
+  __webpack_require__(74);
+  __webpack_require__(75);
+  __webpack_require__(76);
+  __webpack_require__(77);
+  __webpack_require__(79);
+  __webpack_require__(80);
+  __webpack_require__(82);
+  __webpack_require__(83);
+  __webpack_require__(85);
+  __webpack_require__(87);
+  __webpack_require__(94);
+  __webpack_require__(95);
+  __webpack_require__(99);
+  __webpack_require__(100);
+  __webpack_require__(101);
+  __webpack_require__(103);
+  __setKey(module, "exports", __webpack_require__(104));
+
+
+  /***/},
+/* 62 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  // ECMAScript 6 symbols shim
+  var global = __webpack_require__(3);
+  var has = __webpack_require__(4);
+  var DESCRIPTORS = __webpack_require__(9);
+  var $export = __webpack_require__(1);
+  var redefine = __webpack_require__(14);
+  var META = __getKey(__webpack_require__(10), "KEY");
+  var $fails = __webpack_require__(5);
+  var shared = __webpack_require__(27);
+  var setToStringTag = __webpack_require__(23);
+  var uid = __webpack_require__(21);
+  var wks = __webpack_require__(2);
+  var wksExt = __webpack_require__(46);
+  var wksDefine = __webpack_require__(64);
+  var enumKeys = __webpack_require__(65);
+  var isArray = __webpack_require__(34);
+  var anObject = __webpack_require__(7);
+  var isObject = __webpack_require__(0);
+  var toIObject = __webpack_require__(12);
+  var toPrimitive = __webpack_require__(26);
+  var createDesc = __webpack_require__(20);
+  var _create = __webpack_require__(35);
+  var gOPNExt = __webpack_require__(51);
+  var $GOPD = __webpack_require__(37);
+  var $DP = __webpack_require__(6);
+  var $keys = __webpack_require__(16);
+  var gOPD = __getKey($GOPD, "f");
+  var dP = __getKey($DP, "f");
+  var gOPN = __getKey(gOPNExt, "f");
+  var $Symbol = __getKey(global, "Symbol");
+  var $JSON = __getKey(global, "JSON");
+  var _stringify = $JSON && __getKey($JSON, "stringify");
+  var PROTOTYPE = 'prototype';
+  var HIDDEN = wks('_hidden');
+  var TO_PRIMITIVE = wks('toPrimitive');
+  var isEnum = __getKey({}, "propertyIsEnumerable");
+  var SymbolRegistry = shared('symbol-registry');
+  var AllSymbols = shared('symbols');
+  var OPSymbols = shared('op-symbols');
+  var ObjectProto = Object[PROTOTYPE];
+  var USE_NATIVE = typeof $Symbol == 'function';
+  var QObject = __getKey(global, "QObject");
+  // Don't use setters in Qt Script, https://github.com/zloirock/core-js/issues/173
+  var setter = !QObject || !__getKey(QObject, PROTOTYPE) || !__getKey(__getKey(QObject, PROTOTYPE), "findChild");
+
+  // fallback for old Android, https://code.google.com/p/v8/issues/detail?id=687
+  var setSymbolDesc = DESCRIPTORS && $fails(function () {
+    return __getKey(_create(dP({}, 'a', {
+      get: function () {return __getKey(dP(this, 'a', { value: 7 }), "a");} })), "a") !=
+    7;
+  }) ? function (it, key, D) {
+    var protoDesc = gOPD(ObjectProto, key);
+    if (protoDesc) __deleteKey(ObjectProto, key);
+    dP(it, key, D);
+    if (protoDesc && it !== ObjectProto) dP(ObjectProto, key, protoDesc);
+  } : dP;
+
+  var wrap = function (tag) {
+    var sym = __setKey(AllSymbols, tag, _create(__getKey($Symbol, PROTOTYPE)));
+    __setKey(sym, "_k", tag);
+    return sym;
+  };
+
+  var isSymbol = USE_NATIVE && typeof __getKey($Symbol, "iterator") == 'symbol' ? function (it) {
+    return typeof it == 'symbol';
+  } : function (it) {
+    return __instanceOfKey(it, $Symbol);
+  };
+
+  var $defineProperty = function defineProperty(it, key, D) {
+    if (it === ObjectProto) $defineProperty(OPSymbols, key, D);
+    anObject(it);
+    key = toPrimitive(key, true);
+    anObject(D);
+    if (has(AllSymbols, key)) {
+      if (!__getKey(D, "enumerable")) {
+        if (!has(it, HIDDEN)) dP(it, HIDDEN, createDesc(1, {}));
+        __setKey(__getKey(it, HIDDEN), key, true);
+      } else {
+        if (has(it, HIDDEN) && __getKey(__getKey(it, HIDDEN), key)) __setKey(__getKey(it, HIDDEN), key, false);
+        D = _create(D, { enumerable: createDesc(0, false) });
+      }return setSymbolDesc(it, key, D);
+    }return dP(it, key, D);
+  };
+  var $defineProperties = function defineProperties(it, P) {
+    anObject(it);
+    var keys = enumKeys(P = toIObject(P));
+    var i = 0;
+    var l = __getKey(keys, "length");
+    var key;
+    while (l > i) $defineProperty(it, key = __getKey(keys, i++), __getKey(P, key));
+    return it;
+  };
+  var $create = function create(it, P) {
+    return P === undefined ? _create(it) : $defineProperties(_create(it), P);
+  };
+  var $propertyIsEnumerable = function propertyIsEnumerable(key) {
+    var E = __callKey(isEnum, "call", this, key = toPrimitive(key, true));
+    if (this === ObjectProto && has(AllSymbols, key) && !has(OPSymbols, key)) return false;
+    return E || !has(this, key) || !has(AllSymbols, key) || has(this, HIDDEN) && __getKey(__getKey(this, HIDDEN), key) ? E : true;
+  };
+  var $getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key) {
+    it = toIObject(it);
+    key = toPrimitive(key, true);
+    if (it === ObjectProto && has(AllSymbols, key) && !has(OPSymbols, key)) return;
+    var D = gOPD(it, key);
+    if (D && has(AllSymbols, key) && !(has(it, HIDDEN) && __getKey(__getKey(it, HIDDEN), key))) __setKey(D, "enumerable", true);
+    return D;
+  };
+  var $getOwnPropertyNames = function getOwnPropertyNames(it) {
+    var names = gOPN(toIObject(it));
+    var result = [];
+    var i = 0;
+    var key;
+    while (__getKey(names, "length") > i) {
+      if (!has(AllSymbols, key = __getKey(names, i++)) && key != HIDDEN && key != META) result.push(key);
+    }return result;
+  };
+  var $getOwnPropertySymbols = function getOwnPropertySymbols(it) {
+    var IS_OP = it === ObjectProto;
+    var names = gOPN(IS_OP ? OPSymbols : toIObject(it));
+    var result = [];
+    var i = 0;
+    var key;
+    while (__getKey(names, "length") > i) {
+      if (has(AllSymbols, key = __getKey(names, i++)) && (IS_OP ? has(ObjectProto, key) : true)) result.push(__getKey(AllSymbols, key));
+    }return result;
+  };
+
+  // 19.4.1.1 Symbol([description])
+  if (!USE_NATIVE) {
+    $Symbol = function Symbol() {
+      if (__instanceOfKey(this, $Symbol)) throw TypeError('Symbol is not a constructor!');
+      var tag = uid(arguments.length > 0 ? arguments[0] : undefined);
+      var $set = function (value) {
+        if (this === ObjectProto) __callKey($set, "call", OPSymbols, value);
+        if (has(this, HIDDEN) && has(__getKey(this, HIDDEN), tag)) __setKey(__getKey(this, HIDDEN), tag, false);
+        setSymbolDesc(this, tag, createDesc(1, value));
+      };
+      if (DESCRIPTORS && setter) setSymbolDesc(ObjectProto, tag, { configurable: true, set: $set });
+      return wrap(tag);
+    };
+    redefine(__getKey($Symbol, PROTOTYPE), 'toString', function toString() {
+      return __getKey(this, "_k");
+    });
+
+    __setKey($GOPD, "f", $getOwnPropertyDescriptor);
+    __setKey($DP, "f", $defineProperty);
+    __setKey(__webpack_require__(36), "f", __setKey(gOPNExt, "f", $getOwnPropertyNames));
+    __setKey(__webpack_require__(22), "f", $propertyIsEnumerable);
+    __setKey(__webpack_require__(24), "f", $getOwnPropertySymbols);
+
+    if (DESCRIPTORS && !__webpack_require__(28)) {
+      redefine(ObjectProto, 'propertyIsEnumerable', $propertyIsEnumerable, true);
+    }
+
+    __setKey(wksExt, "f", function (name) {
+      return wrap(wks(name));
+    });
+  }
+
+  $export(__getKey($export, "G") + __getKey($export, "W") + __getKey($export, "F") * !USE_NATIVE, { Symbol: $Symbol });
+
+  for (var es6Symbols = __callKey(
+  // 19.4.2.2, 19.4.2.3, 19.4.2.4, 19.4.2.6, 19.4.2.8, 19.4.2.9, 19.4.2.10, 19.4.2.11, 19.4.2.12, 19.4.2.13, 19.4.2.14
+  'hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables', "split",
+  ','), j = 0; __getKey(es6Symbols, "length") > j;) wks(__getKey(es6Symbols, j++));
+
+  for (var wellKnownSymbols = $keys(__getKey(wks, "store")), k = 0; __getKey(wellKnownSymbols, "length") > k;) wksDefine(__getKey(wellKnownSymbols, k++));
+
+  $export(__getKey($export, "S") + __getKey($export, "F") * !USE_NATIVE, 'Symbol', {
+    // 19.4.2.1 Symbol.for(key)
+    'for': function (key) {
+      return has(SymbolRegistry, key += '') ? __getKey(
+      SymbolRegistry, key) : __setKey(
+      SymbolRegistry, key, $Symbol(key));
+    },
+    // 19.4.2.5 Symbol.keyFor(sym)
+    keyFor: function keyFor(sym) {
+      if (!isSymbol(sym)) throw TypeError(sym + ' is not a symbol!');
+      for (var key in __iterableKey(SymbolRegistry)) if (__getKey(SymbolRegistry, key) === sym) return key;
+    },
+    useSetter: function () {setter = true;},
+    useSimple: function () {setter = false;} });
+
+
+  $export(__getKey($export, "S") + __getKey($export, "F") * !USE_NATIVE, 'Object', {
+    // 19.1.2.2 Object.create(O [, Properties])
+    create: $create,
+    // 19.1.2.4 Object.defineProperty(O, P, Attributes)
+    defineProperty: $defineProperty,
+    // 19.1.2.3 Object.defineProperties(O, Properties)
+    defineProperties: $defineProperties,
+    // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
+    getOwnPropertyDescriptor: $getOwnPropertyDescriptor,
+    // 19.1.2.7 Object.getOwnPropertyNames(O)
+    getOwnPropertyNames: $getOwnPropertyNames,
+    // 19.1.2.8 Object.getOwnPropertySymbols(O)
+    getOwnPropertySymbols: $getOwnPropertySymbols });
+
+
+  // 24.3.2 JSON.stringify(value [, replacer [, space]])
+  $JSON && $export(__getKey($export, "S") + __getKey($export, "F") * (!USE_NATIVE || $fails(function () {
+    var S = $Symbol();
+    // MS Edge converts symbol values to JSON as {}
+    // WebKit converts symbol values to JSON as null
+    // V8 throws on boxed symbols
+    return _stringify([S]) != '[null]' || _stringify({ a: S }) != '{}' || _stringify(Object(S)) != '{}';
+  })), 'JSON', {
+    stringify: function stringify(it) {
+      var args = [it];
+      var i = 1;
+      var replacer, $replacer;
+      while (arguments.length > i) args.push(arguments[i++]);
+      $replacer = replacer = __getKey(args, 1);
+      if (!isObject(replacer) && it === undefined || isSymbol(it)) return; // IE8 returns string on undefined
+      if (!isArray(replacer)) replacer = function (key, value) {
+        if (typeof $replacer == 'function') value = __callKey($replacer, "call", this, key, value);
+        if (!isSymbol(value)) return value;
+      };
+      __setKey(args, 1, replacer);
+      return __callKey(_stringify, "apply", $JSON, args);
+    } });
+
+
+  // 19.4.3.4 Symbol.prototype[@@toPrimitive](hint)
+  __getKey(__getKey($Symbol, PROTOTYPE), TO_PRIMITIVE) || __webpack_require__(13)(__getKey($Symbol, PROTOTYPE), TO_PRIMITIVE, __getKey(__getKey($Symbol, PROTOTYPE), "valueOf"));
+  // 19.4.3.5 Symbol.prototype[@@toStringTag]
+  setToStringTag($Symbol, 'Symbol');
+  // 20.2.1.9 Math[@@toStringTag]
+  setToStringTag(Math, 'Math', true);
+  // 24.3.3 JSON[@@toStringTag]
+  setToStringTag(__getKey(global, "JSON"), 'JSON', true);
+
+
+  /***/},
+/* 63 */
+/***/function (module, exports) {
+
+  __setKey(module, "exports", function (it) {
+    if (typeof it != 'function') throw TypeError(it + ' is not a function!');
+    return it;
+  });
+
+
+  /***/},
+/* 64 */
+/***/function (module, exports, __webpack_require__) {
+
+  var global = __webpack_require__(3);
+  var core = __webpack_require__(19);
+  var LIBRARY = __webpack_require__(28);
+  var wksExt = __webpack_require__(46);
+  var defineProperty = __getKey(__webpack_require__(6), "f");
+  __setKey(module, "exports", function (name) {
+    var $Symbol = __getKey(core, "Symbol") || __setKey(core, "Symbol", LIBRARY ? {} : __getKey(global, "Symbol") || {});
+    if (__callKey(name, "charAt", 0) != '_' && !__inKey($Symbol, name)) defineProperty($Symbol, name, { value: __callKey(wksExt, "f", name) });
+  });
+
+
+  /***/},
+/* 65 */
+/***/function (module, exports, __webpack_require__) {
+
+  // all enumerable object keys, includes symbols
+  var getKeys = __webpack_require__(16);
+  var gOPS = __webpack_require__(24);
+  var pIE = __webpack_require__(22);
+  __setKey(module, "exports", function (it) {
+    var result = getKeys(it);
+    var getSymbols = __getKey(gOPS, "f");
+    if (getSymbols) {
+      var symbols = getSymbols(it);
+      var isEnum = __getKey(pIE, "f");
+      var i = 0;
+      var key;
+      while (__getKey(symbols, "length") > i) if (__callKey(isEnum, "call", it, key = __getKey(symbols, i++))) result.push(key);
+    }return result;
+  });
+
+
+  /***/},
+/* 66 */
+/***/function (module, exports, __webpack_require__) {
+
+  var dP = __webpack_require__(6);
+  var anObject = __webpack_require__(7);
+  var getKeys = __webpack_require__(16);
+
+  __setKey(module, "exports", __webpack_require__(9) ? Object.defineProperties : function defineProperties(O, Properties) {
+    anObject(O);
+    var keys = getKeys(Properties);
+    var length = __getKey(keys, "length");
+    var i = 0;
+    var P;
+    while (length > i) __callKey(dP, "f", O, P = __getKey(keys, i++), __getKey(Properties, P));
+    return O;
+  });
+
+
+  /***/},
+/* 67 */
+/***/function (module, exports, __webpack_require__) {
+
+  var document = __getKey(__webpack_require__(3), "document");
+  __setKey(module, "exports", document && __getKey(document, "documentElement"));
+
+
+  /***/},
+/* 68 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 19.1.2.9 Object.getPrototypeOf(O)
+  var toObject = __webpack_require__(11);
+  var $getPrototypeOf = __webpack_require__(52);
+
+  __webpack_require__(8)('getPrototypeOf', function () {
+    return function getPrototypeOf(it) {
+      return $getPrototypeOf(toObject(it));
+    };
+  });
+
+
+  /***/},
+/* 69 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 19.1.2.14 Object.keys(O)
+  var toObject = __webpack_require__(11);
+  var $keys = __webpack_require__(16);
+
+  __webpack_require__(8)('keys', function () {
+    return function keys(it) {
+      return $keys(toObject(it));
+    };
+  });
+
+
+  /***/},
+/* 70 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 19.1.2.7 Object.getOwnPropertyNames(O)
+  __webpack_require__(8)('getOwnPropertyNames', function () {
+    return __getKey(__webpack_require__(51), "f");
+  });
+
+
+  /***/},
+/* 71 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 19.1.2.5 Object.freeze(O)
+  var isObject = __webpack_require__(0);
+  var meta = __getKey(__webpack_require__(10), "onFreeze");
+
+  __webpack_require__(8)('freeze', function ($freeze) {
+    return function freeze(it) {
+      return $freeze && isObject(it) ? $freeze(meta(it)) : it;
+    };
+  });
+
+
+  /***/},
+/* 72 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 19.1.2.17 Object.seal(O)
+  var isObject = __webpack_require__(0);
+  var meta = __getKey(__webpack_require__(10), "onFreeze");
+
+  __webpack_require__(8)('seal', function ($seal) {
+    return function seal(it) {
+      return $seal && isObject(it) ? $seal(meta(it)) : it;
+    };
+  });
+
+
+  /***/},
+/* 73 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 19.1.2.15 Object.preventExtensions(O)
+  var isObject = __webpack_require__(0);
+  var meta = __getKey(__webpack_require__(10), "onFreeze");
+
+  __webpack_require__(8)('preventExtensions', function ($preventExtensions) {
+    return function preventExtensions(it) {
+      return $preventExtensions && isObject(it) ? $preventExtensions(meta(it)) : it;
+    };
+  });
+
+
+  /***/},
+/* 74 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 19.1.2.12 Object.isFrozen(O)
+  var isObject = __webpack_require__(0);
+
+  __webpack_require__(8)('isFrozen', function ($isFrozen) {
+    return function isFrozen(it) {
+      return isObject(it) ? $isFrozen ? $isFrozen(it) : false : true;
+    };
+  });
+
+
+  /***/},
+/* 75 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 19.1.2.13 Object.isSealed(O)
+  var isObject = __webpack_require__(0);
+
+  __webpack_require__(8)('isSealed', function ($isSealed) {
+    return function isSealed(it) {
+      return isObject(it) ? $isSealed ? $isSealed(it) : false : true;
+    };
+  });
+
+
+  /***/},
+/* 76 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 19.1.2.11 Object.isExtensible(O)
+  var isObject = __webpack_require__(0);
+
+  __webpack_require__(8)('isExtensible', function ($isExtensible) {
+    return function isExtensible(it) {
+      return isObject(it) ? $isExtensible ? $isExtensible(it) : true : false;
+    };
+  });
+
+
+  /***/},
+/* 77 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 19.1.3.10 Object.is(value1, value2)
+  var $export = __webpack_require__(1);
+  $export(__getKey($export, "S"), 'Object', { is: __webpack_require__(78) });
+
+
+  /***/},
+/* 78 */
+/***/function (module, exports) {
+
+  // 7.2.9 SameValue(x, y)
+  __setKey(module, "exports", Object.is || function is(x, y) {
+    // eslint-disable-next-line no-self-compare
+    return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
+  });
+
+
+  /***/},
+/* 79 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
+  var $export = __webpack_require__(1);
+
+  $export(__getKey($export, "S"), 'Array', { isArray: __webpack_require__(34) });
+
+
+  /***/},
+/* 80 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  var ctx = __webpack_require__(15);
+  var $export = __webpack_require__(1);
+  var toObject = __webpack_require__(11);
+  var call = __webpack_require__(53);
+  var isArrayIter = __webpack_require__(54);
+  var toLength = __webpack_require__(17);
+  var createProperty = __webpack_require__(39);
+  var getIterFn = __webpack_require__(55);
+
+  $export(__getKey($export, "S") + __getKey($export, "F") * !__webpack_require__(56)(function (iter) {Array.from(iter);}), 'Array', {
+    // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
+    from: function from(arrayLike /* , mapfn = undefined, thisArg = undefined */) {
+      var O = toObject(arrayLike);
+      var C = typeof this == 'function' ? this : Array;
+      var aLen = arguments.length;
+      var mapfn = aLen > 1 ? arguments[1] : undefined;
+      var mapping = mapfn !== undefined;
+      var index = 0;
+      var iterFn = getIterFn(O);
+      var length, result, step, iterator;
+      if (mapping) mapfn = ctx(mapfn, aLen > 2 ? arguments[2] : undefined, 2);
+      // if object isn't iterable or it's array with default iterator - use simple case
+      if (iterFn != undefined && !(C == Array && isArrayIter(iterFn))) {
+        for (iterator = __callKey(iterFn, "call", O), result = new C(); !__getKey(step = __callKey(iterator, "next"), "done"); index++) {
+          createProperty(result, index, mapping ? call(iterator, mapfn, [__getKey(step, "value"), index], true) : __getKey(step, "value"));
+        }
+      } else {
+        length = toLength(__getKey(O, "length"));
+        for (result = new C(length); length > index; index++) {
+          createProperty(result, index, mapping ? mapfn(__getKey(O, index), index) : __getKey(O, index));
+        }
+      }
+      __setKey(result, "length", index);
+      return result;
+    } });
+
+
+
+  /***/},
+/* 81 */
+/***/function (module, exports, __webpack_require__) {
+
+  // getting tag from 19.1.3.6 Object.prototype.toString()
+  var cof = __webpack_require__(30);
+  var TAG = __webpack_require__(2)('toStringTag');
+  // ES3 wrong here
+  var ARG = cof(function () {return arguments;}()) == 'Arguments';
+
+  // fallback for IE11 Script Access Denied error
+  var tryGet = function (it, key) {
+    try {
+      return __getKey(it, key);
+    } catch (e) {/* empty */}
+  };
+
+  __setKey(module, "exports", function (it) {
+    var O, T, B;
+    return it === undefined ? 'Undefined' : it === null ? 'Null'
+    // @@toStringTag case
+    : typeof (T = tryGet(O = Object(it), TAG)) == 'string' ? T
+    // builtinTag case
+    : ARG ? cof(O)
+    // ES3 arguments fallback
+    : (B = cof(O)) == 'Object' && typeof __getKey(O, "callee") == 'function' ? 'Arguments' : B;
+  });
+
+
+  /***/},
+/* 82 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  var $export = __webpack_require__(1);
+  var createProperty = __webpack_require__(39);
+
+  // WebKit Array.of isn't generic
+  $export(__getKey($export, "S") + __getKey($export, "F") * __webpack_require__(5)(function () {
+    function F() {/* empty */}
+    return !__instanceOfKey(__callKey(Array.of, "call", F), F);
+  }), 'Array', {
+    // 22.1.2.3 Array.of( ...items)
+    of: function of() /* ...args */{
+      var index = 0;
+      var aLen = arguments.length;
+      var result = new (typeof this == 'function' ? this : Array)(aLen);
+      while (aLen > index) createProperty(result, index, arguments[index++]);
+      __setKey(result, "length", aLen);
+      return result;
+    } });
+
+
+
+  /***/},
+/* 83 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
+  var $export = __webpack_require__(1);
+
+  $export(__getKey($export, "P"), 'Array', { copyWithin: __webpack_require__(84) });
+
+  __webpack_require__(40)('copyWithin');
+
+
+  /***/},
+/* 84 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+  // 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
+
+  var toObject = __webpack_require__(11);
+  var toAbsoluteIndex = __webpack_require__(31);
+  var toLength = __webpack_require__(17);
+
+  __setKey(module, "exports", __getKey([], "copyWithin") || function copyWithin(target /* = 0 */, start /* = 0, end = @length */) {
+    var O = toObject(this);
+    var len = toLength(__getKey(O, "length"));
+    var to = toAbsoluteIndex(target, len);
+    var from = toAbsoluteIndex(start, len);
+    var end = arguments.length > 2 ? arguments[2] : undefined;
+    var count = Math.min((end === undefined ? len : toAbsoluteIndex(end, len)) - from, len - to);
+    var inc = 1;
+    if (from < to && to < from + count) {
+      inc = -1;
+      from += count - 1;
+      to += count - 1;
+    }
+    while (count-- > 0) {
+      if (__inKey(O, from)) __setKey(O, to, __getKey(O, from));else
+      __deleteKey(O, to);
+      to += inc;
+      from += inc;
+    }return O;
+  });
+
+
+  /***/},
+/* 85 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
+  var $export = __webpack_require__(1);
+
+  $export(__getKey($export, "P"), 'Array', { fill: __webpack_require__(86) });
+
+  __webpack_require__(40)('fill');
+
+
+  /***/},
+/* 86 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+  // 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
+
+  var toObject = __webpack_require__(11);
+  var toAbsoluteIndex = __webpack_require__(31);
+  var toLength = __webpack_require__(17);
+  __setKey(module, "exports", function fill(value /* , start = 0, end = @length */) {
+    var O = toObject(this);
+    var length = toLength(__getKey(O, "length"));
+    var aLen = arguments.length;
+    var index = toAbsoluteIndex(aLen > 1 ? arguments[1] : undefined, length);
+    var end = aLen > 2 ? arguments[2] : undefined;
+    var endPos = end === undefined ? length : toAbsoluteIndex(end, length);
+    while (endPos > index) __setKey(O, index++, value);
+    return O;
+  });
+
+
+  /***/},
+/* 87 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  var strong = __webpack_require__(57);
+  var validate = __webpack_require__(18);
+  var MAP = 'Map';
+
+  // 23.1 Map Objects
+  __setKey(module, "exports", __webpack_require__(25)(MAP, function (get) {
+    return function Map() {return get(this, arguments.length > 0 ? arguments[0] : undefined);};
+  }, {
+    // 23.1.3.6 Map.prototype.get(key)
+    get: function get(key) {
+      var entry = __callKey(strong, "getEntry", validate(this, MAP), key);
+      return entry && __getKey(entry, "v");
+    },
+    // 23.1.3.9 Map.prototype.set(key, value)
+    set: function set(key, value) {
+      return __callKey(strong, "def", validate(this, MAP), key === 0 ? 0 : key, value);
+    } },
+  strong, true));
+
+
+  /***/},
+/* 88 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  var LIBRARY = __webpack_require__(28);
+  var $export = __webpack_require__(1);
+  var redefine = __webpack_require__(14);
+  var hide = __webpack_require__(13);
+  var has = __webpack_require__(4);
+  var Iterators = __webpack_require__(38);
+  var $iterCreate = __webpack_require__(89);
+  var setToStringTag = __webpack_require__(23);
+  var getPrototypeOf = __webpack_require__(52);
+  var ITERATOR = __webpack_require__(2)('iterator');
+  var BUGGY = !(__getKey([], "keys") && __inKey(__callKey([], "keys"), 'next')); // Safari has buggy iterators w/o `next`
+  var FF_ITERATOR = '@@iterator';
+  var KEYS = 'keys';
+  var VALUES = 'values';
+
+  var returnThis = function () {return this;};
+
+  __setKey(module, "exports", function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED) {
+    $iterCreate(Constructor, NAME, next);
+    var getMethod = function (kind) {
+      if (!BUGGY && __inKey(proto, kind)) return __getKey(proto, kind);
+      switch (kind) {
+        case KEYS:return function keys() {return new Constructor(this, kind);};
+        case VALUES:return function values() {return new Constructor(this, kind);};}
+      return function entries() {return new Constructor(this, kind);};
+    };
+    var TAG = NAME + ' Iterator';
+    var DEF_VALUES = DEFAULT == VALUES;
+    var VALUES_BUG = false;
+    var proto = __getKey(Base, "prototype");
+    var $native = __getKey(proto, ITERATOR) || __getKey(proto, FF_ITERATOR) || DEFAULT && __getKey(proto, DEFAULT);
+    var $default = !BUGGY && $native || getMethod(DEFAULT);
+    var $entries = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined;
+    var $anyNative = NAME == 'Array' ? __getKey(proto, "entries") || $native : $native;
+    var methods, key, IteratorPrototype;
+    // Fix native
+    if ($anyNative) {
+      IteratorPrototype = getPrototypeOf(__callKey($anyNative, "call", new Base()));
+      if (IteratorPrototype !== Object.prototype && __getKey(IteratorPrototype, "next")) {
+        // Set @@toStringTag to native iterators
+        setToStringTag(IteratorPrototype, TAG, true);
+        // fix for some old engines
+        if (!LIBRARY && !has(IteratorPrototype, ITERATOR)) hide(IteratorPrototype, ITERATOR, returnThis);
+      }
+    }
+    // fix Array#{values, @@iterator}.name in V8 / FF
+    if (DEF_VALUES && $native && __getKey($native, "name") !== VALUES) {
+      VALUES_BUG = true;
+      $default = function values() {return __callKey($native, "call", this);};
+    }
+    // Define iterator
+    if ((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !__getKey(proto, ITERATOR))) {
+      hide(proto, ITERATOR, $default);
+    }
+    // Plug for library
+    __setKey(Iterators, NAME, $default);
+    __setKey(Iterators, TAG, returnThis);
+    if (DEFAULT) {
+      methods = {
+        values: DEF_VALUES ? $default : getMethod(VALUES),
+        keys: IS_SET ? $default : getMethod(KEYS),
+        entries: $entries };
+
+      if (FORCED) for (key in __iterableKey(methods)) {
+        if (!__inKey(proto, key)) redefine(proto, key, __getKey(methods, key));
+      } else $export(__getKey($export, "P") + __getKey($export, "F") * (BUGGY || VALUES_BUG), NAME, methods);
+    }
+    return methods;
+  });
+
+
+  /***/},
+/* 89 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  var create = __webpack_require__(35);
+  var descriptor = __webpack_require__(20);
+  var setToStringTag = __webpack_require__(23);
+  var IteratorPrototype = {};
+
+  // 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
+  __webpack_require__(13)(IteratorPrototype, __webpack_require__(2)('iterator'), function () {return this;});
+
+  __setKey(module, "exports", function (Constructor, NAME, next) {
+    __setKey(Constructor, "prototype", create(IteratorPrototype, { next: descriptor(1, next) }));
+    setToStringTag(Constructor, NAME + ' Iterator');
+  });
+
+
+  /***/},
+/* 90 */
+/***/function (module, exports) {
+
+  __setKey(module, "exports", function (done, value) {
+    return { value: value, done: !!done };
+  });
+
+
+  /***/},
+/* 91 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  var global = __webpack_require__(3);
+  var dP = __webpack_require__(6);
+  var DESCRIPTORS = __webpack_require__(9);
+  var SPECIES = __webpack_require__(2)('species');
+
+  __setKey(module, "exports", function (KEY) {
+    var C = __getKey(global, KEY);
+    if (DESCRIPTORS && C && !__getKey(C, SPECIES)) __callKey(dP, "f", C, SPECIES, {
+      configurable: true,
+      get: function () {return this;} });
+
+  });
+
+
+  /***/},
+/* 92 */
+/***/function (module, exports, __webpack_require__) {
+
+  var isObject = __webpack_require__(0);
+  var setPrototypeOf = __getKey(__webpack_require__(93), "set");
+  __setKey(module, "exports", function (that, target, C) {
+    var S = __getKey(target, "constructor");
+    var P;
+    if (S !== C && typeof S == 'function' && (P = __getKey(S, "prototype")) !== __getKey(C, "prototype") && isObject(P) && setPrototypeOf) {
+      setPrototypeOf(that, P);
+    }return that;
+  });
+
+
+  /***/},
+/* 93 */
+/***/function (module, exports, __webpack_require__) {
+
+  // Works with __proto__ only. Old v8 can't work with null proto objects.
+  /* eslint-disable no-proto */
+  var isObject = __webpack_require__(0);
+  var anObject = __webpack_require__(7);
+  var check = function (O, proto) {
+    anObject(O);
+    if (!isObject(proto) && proto !== null) throw TypeError(proto + ": can't set as prototype!");
+  };
+  __setKey(module, "exports", {
+    set: Object.setPrototypeOf || (__inKey({}, '__proto__') ? // eslint-disable-line
+    function (test, buggy, set) {
+      try {
+        set = __webpack_require__(15)(Function.call, __getKey(__callKey(__webpack_require__(37), "f", Object.prototype, '__proto__'), "set"), 2);
+        set(test, []);
+        buggy = !__instanceOfKey(test, Array);
+      } catch (e) {buggy = true;}
+      return function setPrototypeOf(O, proto) {
+        check(O, proto);
+        if (buggy) __setKey(O, "__proto__", proto);else
+        set(O, proto);
+        return O;
+      };
+    }({}, false) : undefined),
+    check: check });
+
+
+
+  /***/},
+/* 94 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  var strong = __webpack_require__(57);
+  var validate = __webpack_require__(18);
+  var SET = 'Set';
+
+  // 23.2 Set Objects
+  __setKey(module, "exports", __webpack_require__(25)(SET, function (get) {
+    return function Set() {return get(this, arguments.length > 0 ? arguments[0] : undefined);};
+  }, {
+    // 23.2.3.1 Set.prototype.add(value)
+    add: function add(value) {
+      return __callKey(strong, "def", validate(this, SET), value = value === 0 ? 0 : value, value);
+    } },
+  strong));
+
+
+  /***/},
+/* 95 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  var each = __webpack_require__(58)(0);
+  var redefine = __webpack_require__(14);
+  var meta = __webpack_require__(10);
+  var assign = __webpack_require__(98);
+  var weak = __webpack_require__(59);
+  var isObject = __webpack_require__(0);
+  var fails = __webpack_require__(5);
+  var validate = __webpack_require__(18);
+  var WEAK_MAP = 'WeakMap';
+  var getWeak = __getKey(meta, "getWeak");
+  var isExtensible = Object.isExtensible;
+  var uncaughtFrozenStore = __getKey(weak, "ufstore");
+  var tmp = {};
+  var InternalMap;
+
+  var wrapper = function (get) {
+    return function WeakMap() {
+      return get(this, arguments.length > 0 ? arguments[0] : undefined);
+    };
+  };
+
+  var methods = {
+    // 23.3.3.3 WeakMap.prototype.get(key)
+    get: function get(key) {
+      if (isObject(key)) {
+        var data = getWeak(key);
+        if (data === true) return __callKey(uncaughtFrozenStore(validate(this, WEAK_MAP)), "get", key);
+        return data ? __getKey(data, __getKey(this, "_i")) : undefined;
+      }
+    },
+    // 23.3.3.5 WeakMap.prototype.set(key, value)
+    set: function set(key, value) {
+      return __callKey(weak, "def", validate(this, WEAK_MAP), key, value);
+    } };
+
+
+  // 23.3 WeakMap Objects
+  var $WeakMap = __setKey(module, "exports", __webpack_require__(25)(WEAK_MAP, wrapper, methods, weak, true, true));
+
+  // IE11 WeakMap frozen keys fix
+  if (fails(function () {return __callKey(__callKey(new $WeakMap(), "set", (Object.freeze || Object)(tmp), 7), "get", tmp) != 7;})) {
+    InternalMap = __callKey(weak, "getConstructor", wrapper, WEAK_MAP);
+    assign(__getKey(InternalMap, "prototype"), methods);
+    __setKey(meta, "NEED", true);
+    each(['delete', 'has', 'get', 'set'], function (key) {
+      var proto = __getKey($WeakMap, "prototype");
+      var method = __getKey(proto, key);
+      redefine(proto, key, function (a, b) {
+        // store frozen objects on internal weakmap shim
+        if (isObject(a) && !isExtensible(a)) {
+          if (!__getKey(this, "_f")) __setKey(this, "_f", new InternalMap());
+          var result = __callKey(__getKey(this, "_f"), key, a, b);
+          return key == 'set' ? this : result;
+          // store all the rest on native weakmap
+        }return __callKey(method, "call", this, a, b);
+      });
+    });
+  }
+
+
+  /***/},
+/* 96 */
+/***/function (module, exports, __webpack_require__) {
+
+  // 9.4.2.3 ArraySpeciesCreate(originalArray, length)
+  var speciesConstructor = __webpack_require__(97);
+
+  __setKey(module, "exports", function (original, length) {
+    return new (speciesConstructor(original))(length);
+  });
+
+
+  /***/},
+/* 97 */
+/***/function (module, exports, __webpack_require__) {
+
+  var isObject = __webpack_require__(0);
+  var isArray = __webpack_require__(34);
+  var SPECIES = __webpack_require__(2)('species');
+
+  __setKey(module, "exports", function (original) {
+    var C;
+    if (isArray(original)) {
+      C = __getKey(original, "constructor");
+      // cross-realm fallback
+      if (typeof C == 'function' && (C === Array || isArray(__getKey(C, "prototype")))) C = undefined;
+      if (isObject(C)) {
+        C = __getKey(C, SPECIES);
+        if (C === null) C = undefined;
+      }
+    }return C === undefined ? Array : C;
+  });
+
+
+  /***/},
+/* 98 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  // 19.1.2.1 Object.assign(target, source, ...)
+  var getKeys = __webpack_require__(16);
+  var gOPS = __webpack_require__(24);
+  var pIE = __webpack_require__(22);
+  var toObject = __webpack_require__(11);
+  var IObject = __webpack_require__(29);
+  var $assign = Object.assign;
+
+  // should work with symbols and should have deterministic property order (V8 bug)
+  __setKey(module, "exports", !$assign || __webpack_require__(5)(function () {
+    var A = {};
+    var B = {};
+    // eslint-disable-next-line no-undef
+    var S = Symbol();
+    var K = 'abcdefghijklmnopqrst';
+    __setKey(A, S, 7);
+    __callKey(__callKey(K, "split", ''), "forEach", function (k) {__setKey(B, k, k);});
+    return __getKey($assign({}, A), S) != 7 || __callKey(Object.compatKeys($assign({}, B)), "join", '') != K;
+  }) ? function assign(target, source) {// eslint-disable-line no-unused-vars
+    var T = toObject(target);
+    var aLen = arguments.length;
+    var index = 1;
+    var getSymbols = __getKey(gOPS, "f");
+    var isEnum = __getKey(pIE, "f");
+    while (aLen > index) {
+      var S = IObject(arguments[index++]);
+      var keys = getSymbols ? getKeys(S).concat(getSymbols(S)) : getKeys(S);
+      var length = __getKey(keys, "length");
+      var j = 0;
+      var key;
+      while (length > j) if (__callKey(isEnum, "call", S, key = __getKey(keys, j++))) __setKey(T, key, __getKey(S, key));
+    }return T;
+  } : $assign);
+
+
+  /***/},
+/* 99 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  var weak = __webpack_require__(59);
+  var validate = __webpack_require__(18);
+  var WEAK_SET = 'WeakSet';
+
+  // 23.4 WeakSet Objects
+  __webpack_require__(25)(WEAK_SET, function (get) {
+    return function WeakSet() {return get(this, arguments.length > 0 ? arguments[0] : undefined);};
+  }, {
+    // 23.4.3.1 WeakSet.prototype.add(value)
+    add: function add(value) {
+      return __callKey(weak, "def", validate(this, WEAK_SET), value, true);
+    } },
+  weak, false, true);
+
+
+  /***/},
+/* 100 */
+/***/function (module, exports, __webpack_require__) {
+
+  "use strict";
+
+  // https://github.com/tc39/Array.prototype.includes
+  var $export = __webpack_require__(1);
+  var $includes = __webpack_require__(49)(true);
+
+  $export(__getKey($export, "P"), 'Array', {
+    includes: function includes(el /* , fromIndex = 0 */) {
+      return $includes(this, el, arguments.length > 1 ? arguments[1] : undefined);
+    } });
+
+
+  __webpack_require__(40)('includes');
+
+
+  /***/},
+/* 101 */
+/***/function (module, exports, __webpack_require__) {
+
+  // https://github.com/tc39/proposal-object-getownpropertydescriptors
+  var $export = __webpack_require__(1);
+  var ownKeys = __webpack_require__(102);
+  var toIObject = __webpack_require__(12);
+  var gOPD = __webpack_require__(37);
+  var createProperty = __webpack_require__(39);
+
+  $export(__getKey($export, "S"), 'Object', {
+    getOwnPropertyDescriptors: function getOwnPropertyDescriptors(object) {
+      var O = toIObject(object);
+      var getDesc = __getKey(gOPD, "f");
+      var keys = ownKeys(O);
+      var result = {};
+      var i = 0;
+      var key, desc;
+      while (__getKey(keys, "length") > i) {
+        desc = getDesc(O, key = __getKey(keys, i++));
+        if (desc !== undefined) createProperty(result, key, desc);
+      }
+      return result;
+    } });
+
+
+
+  /***/},
+/* 102 */
+/***/function (module, exports, __webpack_require__) {
+
+  // all object keys, includes non-enumerable and symbols
+  var gOPN = __webpack_require__(36);
+  var gOPS = __webpack_require__(24);
+  var anObject = __webpack_require__(7);
+  var Reflect = __getKey(__webpack_require__(3), "Reflect");
+  __setKey(module, "exports", Reflect && __getKey(Reflect, "ownKeys") || function ownKeys(it) {
+    var keys = __callKey(gOPN, "f", anObject(it));
+    var getSymbols = __getKey(gOPS, "f");
+    return getSymbols ? keys.concat(getSymbols(it)) : keys;
+  });
+
+
+  /***/},
+/* 103 */
+/***/function (module, exports, __webpack_require__) {
+
+  // https://github.com/tc39/proposal-object-values-entries
+  var $export = __webpack_require__(1);
+  var $values = __webpack_require__(60)(false);
+
+  $export(__getKey($export, "S"), 'Object', {
+    values: function values(it) {
+      return $values(it);
+    } });
+
+
+
+  /***/},
+/* 104 */
+/***/function (module, exports, __webpack_require__) {
+
+  // https://github.com/tc39/proposal-object-values-entries
+  var $export = __webpack_require__(1);
+  var $entries = __webpack_require__(60)(true);
+
+  $export(__getKey($export, "S"), 'Object', {
+    entries: function entries(it) {
+      return $entries(it);
+    } });
+
+
+
+  /***/}]
+/******/);
 
 /***/ }),
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; /* proxy-compat-disable */
+/**
+                                                                                                                                 * Copyright (C) 2017 salesforce.com, inc.
+                                                                                                                                 */
+function __extends(d, b) {
+  for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+  function __() {this.constructor = d;}
+  d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
 
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && __getKey(obj, 'constructor') === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-__setKey(module, 'exports', function (it) {
-  return (typeof it === 'undefined' ? 'undefined' : _typeof(it)) === 'object' ? it !== null : typeof it === 'function';
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var __iterableKey = window.Proxy.iterableKey;
-var global = __webpack_require__(4);
-var core = __webpack_require__(20);
-var hide = __webpack_require__(14);
-var redefine = __webpack_require__(15);
-var ctx = __webpack_require__(16);
-var PROTOTYPE = 'prototype';
-
-var $export = function $export(type, name, source) {
-  var IS_FORCED = type & __getKey($export, 'F');
-  var IS_GLOBAL = type & __getKey($export, 'G');
-  var IS_STATIC = type & __getKey($export, 'S');
-  var IS_PROTO = type & __getKey($export, 'P');
-  var IS_BIND = type & __getKey($export, 'B');
-  var target = IS_GLOBAL ? global : IS_STATIC ? __getKey(global, name) || __setKey(global, name, {}) : __getKey(__getKey(global, name) || {}, PROTOTYPE);
-  var exports = IS_GLOBAL ? core : __getKey(core, name) || __setKey(core, name, {});
-  var expProto = __getKey(exports, PROTOTYPE) || __setKey(exports, PROTOTYPE, {});
-  var key, own, out, exp;
-  if (IS_GLOBAL) source = name;
-  for (key in __iterableKey(source)) {
-    // contains in native
-    own = !IS_FORCED && target && __getKey(target, key) !== undefined;
-    // export native or passed
-    out = __getKey(own ? target : source, key);
-    // bind timers to global for call from export context
-    exp = IS_BIND && own ? ctx(out, global) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
-    // extend global
-    if (target) redefine(target, key, out, type & __getKey($export, 'U'));
-    // export
-    if (__getKey(exports, key) != out) hide(exports, key, exp);
-    if (IS_PROTO && __getKey(expProto, key) != out) __setKey(expProto, key, out);
+var ArrayConcat = Array.prototype.concat;
+var getOwnPropertyNames = Object.getOwnPropertyNames,_hasOwnProperty = Object.hasOwnProperty;
+function patchedGetOwnPropertyNames(replicaOrAny) {
+  if (isCompatProxy(replicaOrAny)) {
+    return replicaOrAny.ownKeys().filter(function (key) {return key.constructor !== Symbol;}); // TODO: only strings
   }
+  return getOwnPropertyNames(replicaOrAny);
+}
+// https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys
+// https://tc39.github.io/ecma262/#sec-ordinaryownpropertykeys
+function OwnPropertyKeys(O) {
+  return ArrayConcat.call(Object.getOwnPropertyNames(O), Object.getOwnPropertySymbols(O));
+}
+function patchedAssign(replicaOrAny) {
+  if (replicaOrAny == null) {
+    throw new TypeError('Cannot convert undefined or null to object');
+  }
+  var to = Object(replicaOrAny);
+  for (var index = 1; index < arguments.length; index++) {
+    var nextSource = arguments[index];
+    if (nextSource != null) {
+      var keys = OwnPropertyKeys(nextSource);
+      // tslint:disable-next-line:prefer-for-of
+      for (var i = 0; i < keys.length; i += 1) {
+        var nextKey = keys[i];
+        var descriptor = Object.getOwnPropertyDescriptor(nextSource, nextKey);
+        if (descriptor !== undefined && descriptor.enumerable === true) {
+          setKey(to, nextKey, getKey(nextSource, nextKey));
+        }
+      }
+    }
+  }
+  return to;
+}
+function compatHasOwnProperty(key) {
+  if (isCompatProxy(this)) {
+    return !!this.getOwnPropertyDescriptor(key);
+  }
+  return _hasOwnProperty.call(this, key);
+}
+
+// RFC4122 version 4 uuid
+var ProxySlot = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+  // tslint:disable-next-line:no-bitwise one-variable-per-declaration
+  var r = Math.random() * 16 | 0,v = c === 'x' ? r : r & 0x3 | 0x8;
+  return v.toString(16);
+});
+var ArraySlot = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+  // tslint:disable-next-line:no-bitwise one-variable-per-declaration
+  var r = Math.random() * 16 | 0,v = c === 'x' ? r : r & 0x3 | 0x8;
+  return v.toString(16);
+});
+var ProxyIdentifier = function ProxyCompat() {};
+var create = Object.create,defineProperty = Object.defineProperty,isExtensible = Object.isExtensible,getPrototypeOf = Object.getPrototypeOf,setPrototypeOf = Object.setPrototypeOf,getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,preventExtensions = Object.preventExtensions;
+var _a = Array.prototype,ArraySlice = _a.slice,ArrayUnshift = _a.unshift;
+var isArray = Array.isArray;
+// Proto chain check might be needed because of usage of a limited polyfill
+// https://github.com/es-shims/get-own-property-symbols
+// In this case, because this polyfill is assing all the stuff to Object.prototype to keep
+// all the other invariants of Symbols, we need to do some manual checks here for the slow patch.
+var isNotNativeSymbol;
+var inOperator = function inOperatorCompat(obj, key) {
+  if (isNotNativeSymbol === undefined) {
+    if (typeof Symbol === 'undefined') {
+      throw new Error('Symbol is not available. Make sure to apply symbol polyfill before calling inOperator');
+    }
+    isNotNativeSymbol = typeof Symbol() === 'object';
+  }
+  if (isNotNativeSymbol) {
+    var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+    if (key && key.constructor === Symbol) {
+      while (obj) {
+        if (getOwnPropertySymbols(obj).indexOf(key) !== -1) {
+          return true;
+        }
+        obj = getPrototypeOf(obj);
+      }
+      return false;
+    }
+    return key in obj;
+  }
+  return key in obj;
 };
-__setKey(global, 'core', core);
-// type bitmap
-__setKey($export, 'F', 1); // forced
-__setKey($export, 'G', 2); // global
-__setKey($export, 'S', 4); // static
-__setKey($export, 'P', 8); // proto
-__setKey($export, 'B', 16); // bind
-__setKey($export, 'W', 32); // wrap
-__setKey($export, 'U', 64); // safe
-__setKey($export, 'R', 128); // real proto method for `library`
-__setKey(module, 'exports', $export);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var store = __webpack_require__(28)('wks');
-var uid = __webpack_require__(22);
-var _Symbol = __getKey(__webpack_require__(4), 'Symbol');
-var USE_SYMBOL = typeof _Symbol == 'function';
-
-var $exports = __setKey(module, 'exports', function (name) {
-  return __getKey(store, name) || __setKey(store, name, USE_SYMBOL && __getKey(_Symbol, name) || (USE_SYMBOL ? _Symbol : uid)('Symbol.' + name));
-});
-
-__setKey($exports, 'store', store);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-var global = __setKey(module, 'exports', typeof window != 'undefined' && __getKey(window, 'Math') == Math ? window : typeof self != 'undefined' && __getKey(self, 'Math') == Math ? self
-// eslint-disable-next-line no-new-func
-: Function('return this')());
-if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-var hasOwnProperty = __getKey({}, "hasOwnProperty");
-__setKey(module, "exports", function (it, key) {
-  return __callKey(hasOwnProperty, "call", it, key);
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-__setKey(module, "exports", function (exec) {
-  try {
-    return !!exec();
-  } catch (e) {
+var defaultHandlerTraps = {
+  get: function (target, key) {
+    return target[key];
+  },
+  set: function (target, key, newValue) {
+    target[key] = newValue;
     return true;
-  }
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
+  },
+  apply: function (targetFn, thisArg, argumentsList) {
+    return targetFn.apply(thisArg, argumentsList);
+  },
+  construct: function (targetFn, argumentsList, newTarget) {
+    return new (targetFn.bind.apply(targetFn, [void 0].concat(argumentsList)))();
+  },
+  defineProperty: function (target, property, descriptor) {
+    defineProperty(target, property, descriptor);
+    return true;
+  },
+  deleteProperty: function (target, property) {
+    return delete target[property];
+  },
+  ownKeys: function (target) {
+    return OwnPropertyKeys(target);
+  },
+  has: function (target, propertyKey) {
+    return inOperator(target, propertyKey);
+  },
+  preventExtensions: function (target) {
+    preventExtensions(target);
+    return true;
+  },
+  getOwnPropertyDescriptor: getOwnPropertyDescriptor,
+  getPrototypeOf: getPrototypeOf,
+  isExtensible: isExtensible,
+  setPrototypeOf: setPrototypeOf };
 
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
+var lastRevokeFn;
+var proxyTrapFalsyErrors = {
+  set: function (target, key) {
+    throw new TypeError("'set' on proxy: trap returned falsish for property '" + key + "'");
+  },
+  deleteProperty: function (target, key) {
+    throw new TypeError("'deleteProperty' on proxy: trap returned falsish for property '" + key + "'");
+  },
+  setPrototypeOf: function (target, proto) {
+    throw new TypeError("'setPrototypeOf' on proxy: trap returned falsish");
+  },
+  preventExtensions: function (target, proto) {
+    throw new TypeError("'preventExtensions' on proxy: trap returned falsish");
+  },
+  defineProperty: function (target, key, descriptor) {
+    throw new TypeError("'defineProperty' on proxy: trap returned falsish for property '" + key + "'");
+  } };
 
-"use strict";
-
-
-var __setKey = window.Proxy.setKey;
-var __inKey = window.Proxy.inKey;
-var __getKey = window.Proxy.getKey;
-var anObject = __webpack_require__(8);
-var IE8_DOM_DEFINE = __webpack_require__(45);
-var toPrimitive = __webpack_require__(27);
-var dP = Object.defineProperty;
-
-__setKey(exports, 'f', __webpack_require__(10) ? Object.defineProperty : function defineProperty(O, P, Attributes) {
-  anObject(O);
-  P = toPrimitive(P, true);
-  anObject(Attributes);
-  if (IE8_DOM_DEFINE) try {
-    return dP(O, P, Attributes);
-  } catch (e) {/* empty */}
-  if (__inKey(Attributes, 'get') || __inKey(Attributes, 'set')) throw TypeError('Accessors not supported!');
-  if (__inKey(Attributes, 'value')) __setKey(O, P, __getKey(Attributes, 'value'));
-  return O;
-});
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var isObject = __webpack_require__(1);
-__setKey(module, 'exports', function (it) {
-  if (!isObject(it)) throw TypeError(it + ' is not an object!');
-  return it;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-// most Object methods by ES6 should accept primitives
-var $export = __webpack_require__(2);
-var core = __webpack_require__(20);
-var fails = __webpack_require__(6);
-__setKey(module, 'exports', function (KEY, exec) {
-  var fn = __getKey(__getKey(core, 'Object') || {}, KEY) || Object[KEY];
-  var exp = {};
-  __setKey(exp, KEY, exec(fn));
-  $export(__getKey($export, 'S') + __getKey($export, 'F') * fails(function () {
-    fn(1);
-  }), 'Object', exp);
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-// Thank's IE8 for his funny defineProperty
-__setKey(module, 'exports', !__webpack_require__(6)(function () {
-  return __getKey(Object.defineProperty({}, 'a', { get: function get() {
-      return 7;
-    } }), 'a') != 7;
-}));
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && __getKey(obj, 'constructor') === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var META = __webpack_require__(22)('meta');
-var isObject = __webpack_require__(1);
-var has = __webpack_require__(5);
-var setDesc = __getKey(__webpack_require__(7), 'f');
-var id = 0;
-var isExtensible = Object.isExtensible || function () {
-  return true;
-};
-var FREEZE = !__webpack_require__(6)(function () {
-  return isExtensible(Object.preventExtensions({}));
-});
-var setMeta = function setMeta(it) {
-  setDesc(it, META, { value: {
-      i: 'O' + ++id, // object ID
-      w: {} // weak collections IDs
+function proxifyProperty(proxy, key, descriptor) {
+  var enumerable = descriptor.enumerable,configurable = descriptor.configurable;
+  defineProperty(proxy, key, {
+    enumerable: enumerable,
+    configurable: configurable,
+    get: function () {
+      return proxy.get(key);
+    },
+    set: function (value) {
+      proxy.set(key, value);
     } });
-};
-var fastKey = function fastKey(it, create) {
-  // return primitive with prefix
-  if (!isObject(it)) return (typeof it === 'undefined' ? 'undefined' : _typeof(it)) == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
-  if (!has(it, META)) {
-    // can't set metadata to uncaught frozen object
-    if (!isExtensible(it)) return 'F';
-    // not necessary to add metadata
-    if (!create) return 'E';
-    // add missing metadata
-    setMeta(it);
-    // return object ID
-  }return __getKey(__getKey(it, META), 'i');
-};
-var getWeak = function getWeak(it, create) {
-  if (!has(it, META)) {
-    // can't set metadata to uncaught frozen object
-    if (!isExtensible(it)) return true;
-    // not necessary to add metadata
-    if (!create) return false;
-    // add missing metadata
-    setMeta(it);
-    // return hash weak collections IDs
-  }return __getKey(__getKey(it, META), 'w');
-};
-// add metadata on freeze-family methods calling
-var onFreeze = function onFreeze(it) {
-  if (FREEZE && __getKey(meta, 'NEED') && isExtensible(it) && !has(it, META)) setMeta(it);
-  return it;
-};
-var meta = __setKey(module, 'exports', {
-  KEY: META,
-  NEED: false,
-  fastKey: fastKey,
-  getWeak: getWeak,
-  onFreeze: onFreeze
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
 
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-// 7.1.13 ToObject(argument)
-var defined = __webpack_require__(49);
-__setKey(module, 'exports', function (it) {
-  return Object(defined(it));
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-// to indexed object, toObject with fallback for non-array-like ES3 strings
-var IObject = __webpack_require__(30);
-var defined = __webpack_require__(49);
-__setKey(module, 'exports', function (it) {
-  return IObject(defined(it));
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-var dP = __webpack_require__(7);
-var createDesc = __webpack_require__(21);
-__setKey(module, 'exports', __webpack_require__(10) ? function (object, key, value) {
-  return __callKey(dP, 'f', object, key, createDesc(1, value));
-} : function (object, key, value) {
-  __setKey(object, key, value);
-  return object;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __callKey = window.Proxy.callKey;
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var __deleteKey = window.Proxy.deleteKey;
-var global = __webpack_require__(4);
-var hide = __webpack_require__(14);
-var has = __webpack_require__(5);
-var SRC = __webpack_require__(22)('src');
-var TO_STRING = 'toString';
-var $toString = Function[TO_STRING];
-var TPL = __callKey('' + $toString, 'split', TO_STRING);
-
-__setKey(__webpack_require__(20), 'inspectSource', function (it) {
-  return __callKey($toString, 'call', it);
-});
-
-__setKey(module, 'exports', function (O, key, val, safe) {
-  var isFunction = typeof val == 'function';
-  if (isFunction) has(val, 'name') || hide(val, 'name', key);
-  if (__getKey(O, key) === val) return;
-  if (isFunction) has(val, SRC) || hide(val, SRC, __getKey(O, key) ? '' + __getKey(O, key) : __callKey(TPL, 'join', String(key)));
-  if (O === global) {
-    __setKey(O, key, val);
-  } else if (!safe) {
-    __deleteKey(O, key);
-    hide(O, key, val);
-  } else if (__getKey(O, key)) {
-    __setKey(O, key, val);
-  } else {
-    hide(O, key, val);
-  }
-  // add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative
-})(Function.prototype, TO_STRING, function toString() {
-  return typeof this == 'function' && __getKey(this, SRC) || __callKey($toString, 'call', this);
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-// optional / simple context binding
-var aFunction = __webpack_require__(64);
-__setKey(module, 'exports', function (fn, that, length) {
-  aFunction(fn);
-  if (that === undefined) return fn;
-  switch (length) {
-    case 1:
-      return function (a) {
-        return __callKey(fn, 'call', that, a);
-      };
-    case 2:
-      return function (a, b) {
-        return __callKey(fn, 'call', that, a, b);
-      };
-    case 3:
-      return function (a, b, c) {
-        return __callKey(fn, 'call', that, a, b, c);
-      };
-  }
-  return function () /* ...args */{
-    return __callKey(fn, 'apply', that, arguments);
-  };
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-// 19.1.2.14 / 15.2.3.14 Object.keys(O)
-var $keys = __webpack_require__(48);
-var enumBugKeys = __webpack_require__(34);
-
-__setKey(module, 'exports', Object.compatKeys || function keys(O) {
-  return $keys(O, enumBugKeys);
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-// 7.1.15 ToLength
-var toInteger = __webpack_require__(51);
-var min = Math.min;
-__setKey(module, 'exports', function (it) {
-  return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var isObject = __webpack_require__(1);
-__setKey(module, 'exports', function (it, TYPE) {
-  if (!isObject(it) || __getKey(it, '_t') !== TYPE) throw TypeError('Incompatible receiver, ' + TYPE + ' required!');
-  return it;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var core = __setKey(module, 'exports', { version: '2.5.1' });
-if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-__setKey(module, "exports", function (bitmap, value) {
-  return {
-    enumerable: !(bitmap & 1),
-    configurable: !(bitmap & 2),
-    writable: !(bitmap & 4),
-    value: value
-  };
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-var id = 0;
-var px = Math.random();
-__setKey(module, 'exports', function (key) {
-  return 'Symbol('.concat(key === undefined ? '' : key, ')_', __callKey(++id + px, 'toString', 36));
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-__setKey(exports, "f", __getKey({}, "propertyIsEnumerable"));
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var def = __getKey(__webpack_require__(7), 'f');
-var has = __webpack_require__(5);
-var TAG = __webpack_require__(3)('toStringTag');
-
-__setKey(module, 'exports', function (it, tag, stat) {
-  if (it && !has(it = stat ? it : __getKey(it, 'prototype'), TAG)) def(it, TAG, { configurable: true, value: tag });
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __setKey = window.Proxy.setKey;
-__setKey(exports, "f", Object.getOwnPropertySymbols);
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var __callKey = window.Proxy.callKey;
-var __deleteKey = window.Proxy.deleteKey;
-var global = __webpack_require__(4);
-var $export = __webpack_require__(2);
-var redefine = __webpack_require__(15);
-var redefineAll = __webpack_require__(42);
-var meta = __webpack_require__(11);
-var forOf = __webpack_require__(44);
-var anInstance = __webpack_require__(43);
-var isObject = __webpack_require__(1);
-var fails = __webpack_require__(6);
-var $iterDetect = __webpack_require__(57);
-var setToStringTag = __webpack_require__(24);
-var inheritIfRequired = __webpack_require__(93);
-
-__setKey(module, 'exports', function (NAME, wrapper, methods, common, IS_MAP, IS_WEAK) {
-  var Base = __getKey(global, NAME);
-  var C = Base;
-  var ADDER = IS_MAP ? 'set' : 'add';
-  var proto = C && __getKey(C, 'prototype');
-  var O = {};
-  var fixMethod = function fixMethod(KEY) {
-    var fn = __getKey(proto, KEY);
-    redefine(proto, KEY, KEY == 'delete' ? function (a) {
-      return IS_WEAK && !isObject(a) ? false : __callKey(fn, 'call', this, a === 0 ? 0 : a);
-    } : KEY == 'has' ? function has(a) {
-      return IS_WEAK && !isObject(a) ? false : __callKey(fn, 'call', this, a === 0 ? 0 : a);
-    } : KEY == 'get' ? function get(a) {
-      return IS_WEAK && !isObject(a) ? undefined : __callKey(fn, 'call', this, a === 0 ? 0 : a);
-    } : KEY == 'add' ? function add(a) {
-      __callKey(fn, 'call', this, a === 0 ? 0 : a);return this;
-    } : function set(a, b) {
-      __callKey(fn, 'call', this, a === 0 ? 0 : a, b);return this;
-    });
-  };
-  if (typeof C != 'function' || !(IS_WEAK || __getKey(proto, 'forEach') && !fails(function () {
-    __callKey(__callKey(new C(), 'entries'), 'next');
-  }))) {
-    // create collection constructor
-    C = __callKey(common, 'getConstructor', wrapper, NAME, IS_MAP, ADDER);
-    redefineAll(__getKey(C, 'prototype'), methods);
-    __setKey(meta, 'NEED', true);
-  } else {
-    var instance = new C();
-    // early implementations not supports chaining
-    var HASNT_CHAINING = __callKey(instance, ADDER, IS_WEAK ? {} : -0, 1) != instance;
-    // V8 ~  Chromium 40- weak-collections throws on primitives, but should return false
-    var THROWS_ON_PRIMITIVES = fails(function () {
-      __callKey(instance, 'has', 1);
-    });
-    // most early implementations doesn't supports iterables, most modern - not close it correctly
-    var ACCEPT_ITERABLES = $iterDetect(function (iter) {
-      new C(iter);
-    }); // eslint-disable-line no-new
-    // for early implementations -0 and +0 not the same
-    var BUGGY_ZERO = !IS_WEAK && fails(function () {
-      // V8 ~ Chromium 42- fails only with 5+ elements
-      var $instance = new C();
-      var index = 5;
-      while (index--) {
-        __callKey($instance, ADDER, index, index);
-      }return !__callKey($instance, 'has', -0);
-    });
-    if (!ACCEPT_ITERABLES) {
-      C = wrapper(function (target, iterable) {
-        anInstance(target, C, NAME);
-        var that = inheritIfRequired(new Base(), target, C);
-        if (iterable != undefined) forOf(iterable, IS_MAP, __getKey(that, ADDER), that);
-        return that;
-      });
-      __setKey(C, 'prototype', proto);
-      __setKey(proto, 'constructor', C);
+}
+var XProxy = /** @class */function () {
+  function XProxy(target, handler) {
+    var targetIsFunction = typeof target === 'function';
+    var targetIsArray = isArray(target);
+    if ((typeof target !== 'object' || target === null) && !targetIsFunction) {
+      throw new Error("Cannot create proxy with a non-object as target");
     }
-    if (THROWS_ON_PRIMITIVES || BUGGY_ZERO) {
-      fixMethod('delete');
-      fixMethod('has');
-      IS_MAP && fixMethod('get');
+    if (typeof handler !== 'object' || handler === null) {
+      throw new Error("new XProxy() expects the second argument to an object");
     }
-    if (BUGGY_ZERO || HASNT_CHAINING) fixMethod(ADDER);
-    // weak collections should not contains .clear method
-    if (IS_WEAK && __getKey(proto, 'clear')) __deleteKey(proto, 'clear');
-  }
-
-  setToStringTag(C, NAME);
-
-  __setKey(O, NAME, C);
-  $export(__getKey($export, 'G') + __getKey($export, 'W') + __getKey($export, 'F') * (C != Base), O);
-
-  if (!IS_WEAK) __callKey(common, 'setStrong', C, NAME, IS_MAP);
-
-  return C;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 27 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var __callKey = window.Proxy.callKey;
-// 7.1.1 ToPrimitive(input [, PreferredType])
-var isObject = __webpack_require__(1);
-// instead of the ES6 spec version, we didn't implement @@toPrimitive case
-// and the second argument - flag - preferred type is a string
-__setKey(module, 'exports', function (it, S) {
-  if (!isObject(it)) return it;
-  var fn, val;
-  if (S && typeof (fn = __getKey(it, 'toString')) == 'function' && !isObject(val = __callKey(fn, 'call', it))) return val;
-  if (typeof (fn = __getKey(it, 'valueOf')) == 'function' && !isObject(val = __callKey(fn, 'call', it))) return val;
-  if (!S && typeof (fn = __getKey(it, 'toString')) == 'function' && !isObject(val = __callKey(fn, 'call', it))) return val;
-  throw TypeError("Can't convert object to primitive value");
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var global = __webpack_require__(4);
-var SHARED = '__core-js_shared__';
-var store = __getKey(global, SHARED) || __setKey(global, SHARED, {});
-__setKey(module, 'exports', function (key) {
-  return __getKey(store, key) || __setKey(store, key, {});
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-__setKey(module, "exports", false);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-// fallback for non-array-like ES3 and non-enumerable old V8 strings
-var cof = __webpack_require__(31);
-// eslint-disable-next-line no-prototype-builtins
-__setKey(module, 'exports', __callKey(Object('z'), 'propertyIsEnumerable', 0) ? Object : function (it) {
-  return cof(it) == 'String' ? __callKey(it, 'split', '') : Object(it);
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-var toString = __getKey({}, "toString");
-
-__setKey(module, "exports", function (it) {
-  return __callKey(__callKey(toString, "call", it), "slice", 8, -1);
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var toInteger = __webpack_require__(51);
-var max = Math.max;
-var min = Math.min;
-__setKey(module, 'exports', function (index, length) {
-  index = toInteger(index);
-  return index < 0 ? max(index + length, 0) : min(index, length);
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var shared = __webpack_require__(28)('keys');
-var uid = __webpack_require__(22);
-__setKey(module, 'exports', function (key) {
-  return __getKey(shared, key) || __setKey(shared, key, uid(key));
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-// IE 8- don't enum bug keys
-__setKey(module, 'exports', __callKey('constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf', 'split', ','));
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 35 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-// 7.2.2 IsArray(argument)
-var cof = __webpack_require__(31);
-__setKey(module, 'exports', Array.isArray || function isArray(arg) {
-  return cof(arg) == 'Array';
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-var __deleteKey = window.Proxy.deleteKey;
-// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-var anObject = __webpack_require__(8);
-var dPs = __webpack_require__(67);
-var enumBugKeys = __webpack_require__(34);
-var IE_PROTO = __webpack_require__(33)('IE_PROTO');
-var Empty = function Empty() {/* empty */};
-var PROTOTYPE = 'prototype';
-
-// Create object with fake `null` prototype: use iframe Object with cleared prototype
-var _createDict = function createDict() {
-  // Thrash, waste and sodomy: IE GC bug
-  var iframe = __webpack_require__(46)('iframe');
-  var i = __getKey(enumBugKeys, 'length');
-  var lt = '<';
-  var gt = '>';
-  var iframeDocument;
-  __setKey(__getKey(iframe, 'style'), 'display', 'none');
-  __callKey(__webpack_require__(68), 'appendChild', iframe);
-  __setKey(iframe, 'src', 'javascript:'); // eslint-disable-line no-script-url
-  // createDict = iframe.contentWindow.Object;
-  // html.removeChild(iframe);
-  iframeDocument = __getKey(__getKey(iframe, 'contentWindow'), 'document');
-  __callKey(iframeDocument, 'open');
-  __callKey(iframeDocument, 'write', lt + 'script' + gt + 'document.F=Object' + lt + '/script' + gt);
-  __callKey(iframeDocument, 'close');
-  _createDict = __getKey(iframeDocument, 'F');
-  while (i--) {
-    __deleteKey(__getKey(_createDict, PROTOTYPE), __getKey(enumBugKeys, i));
-  }return _createDict();
-};
-
-__setKey(module, 'exports', Object.create || function create(O, Properties) {
-  var result;
-  if (O !== null) {
-    __setKey(Empty, PROTOTYPE, anObject(O));
-    result = new Empty();
-    __setKey(Empty, PROTOTYPE, null);
-    // add "__proto__" for Object.getPrototypeOf polyfill
-    __setKey(result, IE_PROTO, O);
-  } else result = _createDict();
-  return Properties === undefined ? result : dPs(result, Properties);
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __setKey = window.Proxy.setKey;
-// 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
-var $keys = __webpack_require__(48);
-var hiddenKeys = __webpack_require__(34).concat('length', 'prototype');
-
-__setKey(exports, 'f', Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
-  return $keys(O, hiddenKeys);
-});
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-var __getKey = window.Proxy.getKey;
-var pIE = __webpack_require__(23);
-var createDesc = __webpack_require__(21);
-var toIObject = __webpack_require__(13);
-var toPrimitive = __webpack_require__(27);
-var has = __webpack_require__(5);
-var IE8_DOM_DEFINE = __webpack_require__(45);
-var gOPD = Object.getOwnPropertyDescriptor;
-
-__setKey(exports, 'f', __webpack_require__(10) ? gOPD : function getOwnPropertyDescriptor(O, P) {
-  O = toIObject(O);
-  P = toPrimitive(P, true);
-  if (IE8_DOM_DEFINE) try {
-    return gOPD(O, P);
-  } catch (e) {/* empty */}
-  if (has(O, P)) return createDesc(!__callKey(__getKey(pIE, 'f'), 'call', O, P), __getKey(O, P));
-});
-
-/***/ }),
-/* 39 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-__setKey(module, "exports", {});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __inKey = window.Proxy.inKey;
-var __callKey = window.Proxy.callKey;
-var $defineProperty = __webpack_require__(7);
-var createDesc = __webpack_require__(21);
-
-__setKey(module, 'exports', function (object, index, value) {
-  if (__inKey(object, index)) __callKey($defineProperty, 'f', object, index, createDesc(0, value));else __setKey(object, index, value);
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-// 22.1.3.31 Array.prototype[@@unscopables]
-var UNSCOPABLES = __webpack_require__(3)('unscopables');
-var ArrayProto = Array.prototype;
-if (__getKey(ArrayProto, UNSCOPABLES) == undefined) __webpack_require__(14)(ArrayProto, UNSCOPABLES, {});
-__setKey(module, 'exports', function (key) {
-  __setKey(__getKey(ArrayProto, UNSCOPABLES), key, true);
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __iterableKey = window.Proxy.iterableKey;
-var __getKey = window.Proxy.getKey;
-var redefine = __webpack_require__(15);
-__setKey(module, 'exports', function (target, src, safe) {
-  for (var key in __iterableKey(src)) {
-    redefine(target, key, __getKey(src, key), safe);
-  }return target;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 43 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __instanceOfKey = window.Proxy.instanceOfKey;
-var __inKey = window.Proxy.inKey;
-__setKey(module, 'exports', function (it, Constructor, name, forbiddenField) {
-  if (!__instanceOfKey(it, Constructor) || forbiddenField !== undefined && __inKey(it, forbiddenField)) {
-    throw TypeError(name + ': incorrect invocation!');
-  }return it;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 44 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var __callKey = window.Proxy.callKey;
-var ctx = __webpack_require__(16);
-var call = __webpack_require__(54);
-var isArrayIter = __webpack_require__(55);
-var anObject = __webpack_require__(8);
-var toLength = __webpack_require__(18);
-var getIterFn = __webpack_require__(56);
-var BREAK = {};
-var RETURN = {};
-var exports = __setKey(module, 'exports', function (iterable, entries, fn, that, ITERATOR) {
-  var iterFn = ITERATOR ? function () {
-    return iterable;
-  } : getIterFn(iterable);
-  var f = ctx(fn, that, entries ? 2 : 1);
-  var index = 0;
-  var length, step, iterator, result;
-  if (typeof iterFn != 'function') throw TypeError(iterable + ' is not iterable!');
-  // fast case for arrays with default iterator
-  if (isArrayIter(iterFn)) for (length = toLength(__getKey(iterable, 'length')); length > index; index++) {
-    result = entries ? f(__getKey(anObject(step = __getKey(iterable, index)), 0), __getKey(step, 1)) : f(__getKey(iterable, index));
-    if (result === BREAK || result === RETURN) return result;
-  } else for (iterator = __callKey(iterFn, 'call', iterable); !__getKey(step = __callKey(iterator, 'next'), 'done');) {
-    result = call(iterator, f, __getKey(step, 'value'), entries);
-    if (result === BREAK || result === RETURN) return result;
-  }
-});
-__setKey(exports, 'BREAK', BREAK);
-__setKey(exports, 'RETURN', RETURN);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 45 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-__setKey(module, 'exports', !__webpack_require__(10) && !__webpack_require__(6)(function () {
-  return __getKey(Object.defineProperty(__webpack_require__(46)('div'), 'a', { get: function get() {
-      return 7;
-    } }), 'a') != 7;
-}));
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 46 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-var isObject = __webpack_require__(1);
-var document = __getKey(__webpack_require__(4), 'document');
-// typeof document.createElement is 'object' in old IE
-var is = isObject(document) && isObject(__getKey(document, 'createElement'));
-__setKey(module, 'exports', function (it) {
-  return is ? __callKey(document, 'createElement', it) : {};
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 47 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __setKey = window.Proxy.setKey;
-__setKey(exports, 'f', __webpack_require__(3));
-
-/***/ }),
-/* 48 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __iterableKey = window.Proxy.iterableKey;
-var __getKey = window.Proxy.getKey;
-var has = __webpack_require__(5);
-var toIObject = __webpack_require__(13);
-var arrayIndexOf = __webpack_require__(50)(false);
-var IE_PROTO = __webpack_require__(33)('IE_PROTO');
-
-__setKey(module, 'exports', function (object, names) {
-  var O = toIObject(object);
-  var i = 0;
-  var result = [];
-  var key;
-  for (key in __iterableKey(O)) {
-    if (key != IE_PROTO) has(O, key) && result.push(key);
-  } // Don't enum bug & hidden keys
-  while (__getKey(names, 'length') > i) {
-    if (has(O, key = __getKey(names, i++))) {
-      ~arrayIndexOf(result, key) || result.push(key);
-    }
-  }return result;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 49 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-// 7.2.1 RequireObjectCoercible(argument)
-__setKey(module, "exports", function (it) {
-  if (it == undefined) throw TypeError("Can't call method on  " + it);
-  return it;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 50 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var __inKey = window.Proxy.inKey;
-// false -> Array#indexOf
-// true  -> Array#includes
-var toIObject = __webpack_require__(13);
-var toLength = __webpack_require__(18);
-var toAbsoluteIndex = __webpack_require__(32);
-__setKey(module, 'exports', function (IS_INCLUDES) {
-  return function ($this, el, fromIndex) {
-    var O = toIObject($this);
-    var length = toLength(__getKey(O, 'length'));
-    var index = toAbsoluteIndex(fromIndex, length);
-    var value;
-    // Array#includes uses SameValueZero equality algorithm
-    // eslint-disable-next-line no-self-compare
-    if (IS_INCLUDES && el != el) while (length > index) {
-      value = __getKey(O, index++);
-      // eslint-disable-next-line no-self-compare
-      if (value != value) return true;
-      // Array#indexOf ignores holes, Array#includes - not
-    } else for (; length > index; index++) {
-      if (IS_INCLUDES || __inKey(O, index)) {
-        if (__getKey(O, index) === el) return IS_INCLUDES || index || 0;
-      }
-    }return !IS_INCLUDES && -1;
-  };
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 51 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-// 7.1.4 ToInteger
-var ceil = Math.ceil;
-var floor = Math.floor;
-__setKey(module, "exports", function (it) {
-  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 52 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __callKey = window.Proxy.callKey;
-var __setKey = window.Proxy.setKey;
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && __getKey(obj, 'constructor') === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
-var toIObject = __webpack_require__(13);
-var gOPN = __getKey(__webpack_require__(37), 'f');
-var toString = __getKey({}, 'toString');
-
-var windowNames = (typeof window === 'undefined' ? 'undefined' : _typeof(window)) == 'object' && window && Object.getOwnPropertyNames ? Object.getOwnPropertyNames(window) : [];
-
-var getWindowNames = function getWindowNames(it) {
-  try {
-    return gOPN(it);
-  } catch (e) {
-    return __callKey(windowNames, 'slice');
-  }
-};
-
-__setKey(__getKey(module, 'exports'), 'f', function getOwnPropertyNames(it) {
-  return windowNames && __callKey(toString, 'call', it) == '[object Window]' ? getWindowNames(it) : gOPN(toIObject(it));
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 53 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var __instanceOfKey = window.Proxy.instanceOfKey;
-// 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
-var has = __webpack_require__(5);
-var toObject = __webpack_require__(12);
-var IE_PROTO = __webpack_require__(33)('IE_PROTO');
-var ObjectProto = Object.prototype;
-
-__setKey(module, 'exports', Object.getPrototypeOf || function (O) {
-  O = toObject(O);
-  if (has(O, IE_PROTO)) return __getKey(O, IE_PROTO);
-  if (typeof __getKey(O, 'constructor') == 'function' && __instanceOfKey(O, __getKey(O, 'constructor'))) {
-    return __getKey(__getKey(O, 'constructor'), 'prototype');
-  }return __instanceOfKey(O, Object) ? ObjectProto : null;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 54 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var __callKey = window.Proxy.callKey;
-// call something on iterator step with safe closing on error
-var anObject = __webpack_require__(8);
-__setKey(module, 'exports', function (iterator, fn, value, entries) {
-  try {
-    return entries ? fn(__getKey(anObject(value), 0), __getKey(value, 1)) : fn(value);
-    // 7.4.6 IteratorClose(iterator, completion)
-  } catch (e) {
-    var ret = __getKey(iterator, 'return');
-    if (ret !== undefined) anObject(__callKey(ret, 'call', iterator));
-    throw e;
-  }
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 55 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-// check on default Array iterator
-var Iterators = __webpack_require__(39);
-var ITERATOR = __webpack_require__(3)('iterator');
-var ArrayProto = Array.prototype;
-
-__setKey(module, 'exports', function (it) {
-  return it !== undefined && (__getKey(Iterators, 'Array') === it || __getKey(ArrayProto, ITERATOR) === it);
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 56 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var classof = __webpack_require__(82);
-var ITERATOR = __webpack_require__(3)('iterator');
-var Iterators = __webpack_require__(39);
-__setKey(module, 'exports', __setKey(__webpack_require__(20), 'getIteratorMethod', function (it) {
-  if (it != undefined) return __getKey(it, ITERATOR) || __getKey(it, '@@iterator') || __getKey(Iterators, classof(it));
-}));
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 57 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __callKey = window.Proxy.callKey;
-var __setKey = window.Proxy.setKey;
-var ITERATOR = __webpack_require__(3)('iterator');
-var SAFE_CLOSING = false;
-
-try {
-  var riter = __callKey([7], ITERATOR);
-  __setKey(riter, 'return', function () {
-    SAFE_CLOSING = true;
-  });
-  // eslint-disable-next-line no-throw-literal
-  Array.from(riter, function () {
-    throw 2;
-  });
-} catch (e) {/* empty */}
-
-__setKey(module, 'exports', function (exec, skipClosing) {
-  if (!skipClosing && !SAFE_CLOSING) return false;
-  var safe = false;
-  try {
-    var arr = [7];
-    var iter = __callKey(arr, ITERATOR);
-    __setKey(iter, 'next', function () {
-      return { done: safe = true };
-    });
-    __setKey(arr, ITERATOR, function () {
-      return iter;
-    });
-    exec(arr);
-  } catch (e) {/* empty */}
-  return safe;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 58 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var __deleteKey = window.Proxy.deleteKey;
-var dP = __getKey(__webpack_require__(7), 'f');
-var create = __webpack_require__(36);
-var redefineAll = __webpack_require__(42);
-var ctx = __webpack_require__(16);
-var anInstance = __webpack_require__(43);
-var forOf = __webpack_require__(44);
-var $iterDefine = __webpack_require__(89);
-var step = __webpack_require__(91);
-var setSpecies = __webpack_require__(92);
-var DESCRIPTORS = __webpack_require__(10);
-var fastKey = __getKey(__webpack_require__(11), 'fastKey');
-var validate = __webpack_require__(19);
-var SIZE = DESCRIPTORS ? '_s' : 'size';
-
-var getEntry = function getEntry(that, key) {
-  // fast case
-  var index = fastKey(key);
-  var entry;
-  if (index !== 'F') return __getKey(__getKey(that, '_i'), index);
-  // frozen object case
-  for (entry = __getKey(that, '_f'); entry; entry = __getKey(entry, 'n')) {
-    if (__getKey(entry, 'k') == key) return entry;
-  }
-};
-
-__setKey(module, 'exports', {
-  getConstructor: function getConstructor(wrapper, NAME, IS_MAP, ADDER) {
-    var C = wrapper(function (that, iterable) {
-      anInstance(that, C, NAME, '_i');
-      __setKey(that, '_t', NAME); // collection type
-      __setKey(that, '_i', create(null)); // index
-      __setKey(that, '_f', undefined); // first entry
-      __setKey(that, '_l', undefined); // last entry
-      __setKey(that, SIZE, 0); // size
-      if (iterable != undefined) forOf(iterable, IS_MAP, __getKey(that, ADDER), that);
-    });
-    redefineAll(__getKey(C, 'prototype'), {
-      // 23.1.3.1 Map.prototype.clear()
-      // 23.2.3.2 Set.prototype.clear()
-      clear: function clear() {
-        for (var that = validate(this, NAME), data = __getKey(that, '_i'), entry = __getKey(that, '_f'); entry; entry = __getKey(entry, 'n')) {
-          __setKey(entry, 'r', true);
-          if (__getKey(entry, 'p')) __setKey(entry, 'p', __setKey(__getKey(entry, 'p'), 'n', undefined));
-          __deleteKey(data, __getKey(entry, 'i'));
+    // Construct revoke function, and set lastRevokeFn so that Proxy.revocable can steal it.
+    // The caller might get the wrong revoke function if a user replaces or wraps XProxy
+    // to call itself, but that seems unlikely especially when using the polyfill.
+    var throwRevoked = false;
+    lastRevokeFn = function () {
+      throwRevoked = true;
+    };
+    // Define proxy as Object, or Function (if either it's callable, or apply is set).
+    // tslint:disable-next-line:no-this-assignment
+    var proxy = this; // reusing the already created object, eventually the prototype will be resetted
+    if (targetIsFunction) {
+      proxy = function Proxy() {
+        var usingNew = this && this.constructor === proxy;
+        var args = ArraySlice.call(arguments);
+        if (usingNew) {
+          return proxy.construct(args, this);
+        } else
+        {
+          return proxy.apply(this, args);
         }
-        __setKey(that, '_f', __setKey(that, '_l', undefined));
-        __setKey(that, SIZE, 0);
-      },
-      // 23.1.3.3 Map.prototype.delete(key)
-      // 23.2.3.4 Set.prototype.delete(value)
-      'delete': function _delete(key) {
-        var that = validate(this, NAME);
-        var entry = getEntry(that, key);
-        if (entry) {
-          var next = __getKey(entry, 'n');
-          var prev = __getKey(entry, 'p');
-          __deleteKey(__getKey(that, '_i'), __getKey(entry, 'i'));
-          __setKey(entry, 'r', true);
-          if (prev) __setKey(prev, 'n', next);
-          if (next) __setKey(next, 'p', prev);
-          if (__getKey(that, '_f') == entry) __setKey(that, '_f', next);
-          if (__getKey(that, '_l') == entry) __setKey(that, '_l', prev);
-          __setKey(that, SIZE, __getKey(that, SIZE) - 1, __getKey(that, SIZE));
-        }return !!entry;
-      },
-      // 23.2.3.6 Set.prototype.forEach(callbackfn, thisArg = undefined)
-      // 23.1.3.5 Map.prototype.forEach(callbackfn, thisArg = undefined)
-      forEach: function forEach(callbackfn /* , that = undefined */) {
-        validate(this, NAME);
-        var f = ctx(callbackfn, arguments.length > 1 ? arguments[1] : undefined, 3);
-        var entry;
-        while (entry = entry ? __getKey(entry, 'n') : __getKey(this, '_f')) {
-          f(__getKey(entry, 'v'), __getKey(entry, 'k'), this);
-          // revert to the last existing entry
-          while (entry && __getKey(entry, 'r')) {
-            entry = __getKey(entry, 'p');
+      };
+    }
+    var _loop_1 = function (trapName) {
+      defineProperty(proxy, trapName, {
+        value: function () {
+          if (throwRevoked) {
+            throw new TypeError("Cannot perform '" + trapName + "' on a proxy that has been revoked");
           }
-        }
-      },
-      // 23.1.3.7 Map.prototype.has(key)
-      // 23.2.3.7 Set.prototype.has(value)
-      has: function has(key) {
-        return !!getEntry(validate(this, NAME), key);
-      }
-    });
-    if (DESCRIPTORS) dP(__getKey(C, 'prototype'), 'size', {
-      get: function get() {
-        return __getKey(validate(this, NAME), SIZE);
-      }
-    });
-    return C;
-  },
-  def: function def(that, key, value) {
-    var entry = getEntry(that, key);
-    var prev, index;
-    // change existing entry
-    if (entry) {
-      __setKey(entry, 'v', value);
-      // create new entry
-    } else {
-      __setKey(that, '_l', entry = {
-        i: index = fastKey(key, true), // <- index
-        k: key, // <- key
-        v: value, // <- value
-        p: prev = __getKey(that, '_l'), // <- previous entry
-        n: undefined, // <- next entry
-        r: false // <- removed
-      });
-      if (!__getKey(that, '_f')) __setKey(that, '_f', entry);
-      if (prev) __setKey(prev, 'n', entry);
-      __setKey(that, SIZE, __getKey(that, SIZE) + 1, __getKey(that, SIZE));
-      // add to index
-      if (index !== 'F') __setKey(__getKey(that, '_i'), index, entry);
-    }return that;
-  },
-  getEntry: getEntry,
-  setStrong: function setStrong(C, NAME, IS_MAP) {
-    // add .keys, .values, .entries, [@@iterator]
-    // 23.1.3.4, 23.1.3.8, 23.1.3.11, 23.1.3.12, 23.2.3.5, 23.2.3.8, 23.2.3.10, 23.2.3.11
-    $iterDefine(C, NAME, function (iterated, kind) {
-      __setKey(this, '_t', validate(iterated, NAME)); // target
-      __setKey(this, '_k', kind); // kind
-      __setKey(this, '_l', undefined); // previous
-    }, function () {
-      var that = this;
-      var kind = __getKey(that, '_k');
-      var entry = __getKey(that, '_l');
-      // revert to the last existing entry
-      while (entry && __getKey(entry, 'r')) {
-        entry = __getKey(entry, 'p');
-      } // get next entry
-      if (!__getKey(that, '_t') || !__setKey(that, '_l', entry = entry ? __getKey(entry, 'n') : __getKey(__getKey(that, '_t'), '_f'))) {
-        // or finish the iteration
-        __setKey(that, '_t', undefined);
-        return step(1);
-      }
-      // return step by kind
-      if (kind == 'keys') return step(0, __getKey(entry, 'k'));
-      if (kind == 'values') return step(0, __getKey(entry, 'v'));
-      return step(0, [__getKey(entry, 'k'), __getKey(entry, 'v')]);
-    }, IS_MAP ? 'entries' : 'values', !IS_MAP, true);
+          var args = ArraySlice.call(arguments);
+          ArrayUnshift.call(args, target);
+          var h = handler[trapName] ? handler : defaultHandlerTraps;
+          var value = h[trapName].apply(h, args);
+          if (proxyTrapFalsyErrors[trapName] && value === false) {
+            proxyTrapFalsyErrors[trapName].apply(proxyTrapFalsyErrors, args);
+          }
+          return value;
+        },
+        writable: false,
+        enumerable: false,
+        configurable: false });
 
-    // add [@@species], 23.1.2.2, 23.2.2.2
-    setSpecies(NAME);
-  }
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 59 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var __inKey = window.Proxy.inKey;
-// 0 -> Array#forEach
-// 1 -> Array#map
-// 2 -> Array#filter
-// 3 -> Array#some
-// 4 -> Array#every
-// 5 -> Array#find
-// 6 -> Array#findIndex
-var ctx = __webpack_require__(16);
-var IObject = __webpack_require__(30);
-var toObject = __webpack_require__(12);
-var toLength = __webpack_require__(18);
-var asc = __webpack_require__(97);
-__setKey(module, 'exports', function (TYPE, $create) {
-  var IS_MAP = TYPE == 1;
-  var IS_FILTER = TYPE == 2;
-  var IS_SOME = TYPE == 3;
-  var IS_EVERY = TYPE == 4;
-  var IS_FIND_INDEX = TYPE == 6;
-  var NO_HOLES = TYPE == 5 || IS_FIND_INDEX;
-  var create = $create || asc;
-  return function ($this, callbackfn, that) {
-    var O = toObject($this);
-    var self = IObject(O);
-    var f = ctx(callbackfn, that, 3);
-    var length = toLength(__getKey(self, 'length'));
-    var index = 0;
-    var result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined;
-    var val, res;
-    for (; length > index; index++) {
-      if (NO_HOLES || __inKey(self, index)) {
-        val = __getKey(self, index);
-        res = f(val, index, O);
-        if (TYPE) {
-          if (IS_MAP) __setKey(result, index, res); // map
-          else if (res) switch (TYPE) {
-              case 3:
-                return true; // some
-              case 5:
-                return val; // find
-              case 6:
-                return index; // findIndex
-              case 2:
-                result.push(val); // filter
-            } else if (IS_EVERY) return false; // every
-        }
-      }
-    }return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
-  };
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 60 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-var __deleteKey = window.Proxy.deleteKey;
-var redefineAll = __webpack_require__(42);
-var getWeak = __getKey(__webpack_require__(11), 'getWeak');
-var anObject = __webpack_require__(8);
-var isObject = __webpack_require__(1);
-var anInstance = __webpack_require__(43);
-var forOf = __webpack_require__(44);
-var createArrayMethod = __webpack_require__(59);
-var $has = __webpack_require__(5);
-var validate = __webpack_require__(19);
-var arrayFind = createArrayMethod(5);
-var arrayFindIndex = createArrayMethod(6);
-var id = 0;
-
-// fallback for uncaught frozen keys
-var uncaughtFrozenStore = function uncaughtFrozenStore(that) {
-  return __getKey(that, '_l') || __setKey(that, '_l', new UncaughtFrozenStore());
-};
-var UncaughtFrozenStore = function UncaughtFrozenStore() {
-  __setKey(this, 'a', []);
-};
-var findUncaughtFrozen = function findUncaughtFrozen(store, key) {
-  return arrayFind(__getKey(store, 'a'), function (it) {
-    return __getKey(it, 0) === key;
-  });
-};
-__setKey(UncaughtFrozenStore, 'prototype', {
-  get: function get(key) {
-    var entry = findUncaughtFrozen(this, key);
-    if (entry) return __getKey(entry, 1);
-  },
-  has: function has(key) {
-    return !!findUncaughtFrozen(this, key);
-  },
-  set: function set(key, value) {
-    var entry = findUncaughtFrozen(this, key);
-    if (entry) __setKey(entry, 1, value);else __getKey(this, 'a').push([key, value]);
-  },
-  'delete': function _delete(key) {
-    var index = arrayFindIndex(__getKey(this, 'a'), function (it) {
-      return __getKey(it, 0) === key;
-    });
-    if (~index) __callKey(__getKey(this, 'a'), 'splice', index, 1);
-    return !!~index;
-  }
-});
-
-__setKey(module, 'exports', {
-  getConstructor: function getConstructor(wrapper, NAME, IS_MAP, ADDER) {
-    var C = wrapper(function (that, iterable) {
-      anInstance(that, C, NAME, '_i');
-      __setKey(that, '_t', NAME); // collection type
-      __setKey(that, '_i', id++); // collection id
-      __setKey(that, '_l', undefined); // leak store for uncaught frozen objects
-      if (iterable != undefined) forOf(iterable, IS_MAP, __getKey(that, ADDER), that);
-    });
-    redefineAll(__getKey(C, 'prototype'), {
-      // 23.3.3.2 WeakMap.prototype.delete(key)
-      // 23.4.3.3 WeakSet.prototype.delete(value)
-      'delete': function _delete(key) {
-        if (!isObject(key)) return false;
-        var data = getWeak(key);
-        if (data === true) return __callKey(uncaughtFrozenStore(validate(this, NAME)), 'delete', key);
-        return data && $has(data, __getKey(this, '_i')) && __deleteKey(data, __getKey(this, '_i'));
-      },
-      // 23.3.3.4 WeakMap.prototype.has(key)
-      // 23.4.3.4 WeakSet.prototype.has(value)
-      has: function has(key) {
-        if (!isObject(key)) return false;
-        var data = getWeak(key);
-        if (data === true) return __callKey(uncaughtFrozenStore(validate(this, NAME)), 'has', key);
-        return data && $has(data, __getKey(this, '_i'));
-      }
-    });
-    return C;
-  },
-  def: function def(that, key, value) {
-    var data = getWeak(anObject(key), true);
-    if (data === true) __callKey(uncaughtFrozenStore(that), 'set', key, value);else __setKey(data, __getKey(that, '_i'), value);
-    return that;
-  },
-  ufstore: uncaughtFrozenStore
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 61 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-var getKeys = __webpack_require__(17);
-var toIObject = __webpack_require__(13);
-var isEnum = __getKey(__webpack_require__(23), 'f');
-__setKey(module, 'exports', function (isEntries) {
-  return function (it) {
-    var O = toIObject(it);
-    var keys = getKeys(O);
-    var length = __getKey(keys, 'length');
-    var i = 0;
-    var result = [];
-    var key;
-    while (length > i) {
-      if (__callKey(isEnum, 'call', O, key = __getKey(keys, i++))) {
-        result.push(isEntries ? [key, __getKey(O, key)] : __getKey(O, key));
-      }
-    }return result;
-  };
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 62 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(63);
-__webpack_require__(69);
-__webpack_require__(70);
-__webpack_require__(71);
-__webpack_require__(72);
-__webpack_require__(73);
-__webpack_require__(74);
-__webpack_require__(75);
-__webpack_require__(76);
-__webpack_require__(77);
-__webpack_require__(78);
-__webpack_require__(80);
-__webpack_require__(81);
-__webpack_require__(83);
-__webpack_require__(84);
-__webpack_require__(86);
-__webpack_require__(88);
-__webpack_require__(95);
-__webpack_require__(96);
-__webpack_require__(100);
-__webpack_require__(101);
-__webpack_require__(102);
-__webpack_require__(104);
-module.exports = __webpack_require__(105);
-
-
-/***/ }),
-/* 63 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-// ECMAScript 6 symbols shim
-
-var __getKey = window.Proxy.getKey;
-var __deleteKey = window.Proxy.deleteKey;
-var __setKey = window.Proxy.setKey;
-var __instanceOfKey = window.Proxy.instanceOfKey;
-var __callKey = window.Proxy.callKey;
-var __iterableKey = window.Proxy.iterableKey;
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && __getKey(obj, 'constructor') === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var global = __webpack_require__(4);
-var has = __webpack_require__(5);
-var DESCRIPTORS = __webpack_require__(10);
-var $export = __webpack_require__(2);
-var redefine = __webpack_require__(15);
-var META = __getKey(__webpack_require__(11), 'KEY');
-var $fails = __webpack_require__(6);
-var shared = __webpack_require__(28);
-var setToStringTag = __webpack_require__(24);
-var uid = __webpack_require__(22);
-var wks = __webpack_require__(3);
-var wksExt = __webpack_require__(47);
-var wksDefine = __webpack_require__(65);
-var enumKeys = __webpack_require__(66);
-var isArray = __webpack_require__(35);
-var anObject = __webpack_require__(8);
-var toIObject = __webpack_require__(13);
-var toPrimitive = __webpack_require__(27);
-var createDesc = __webpack_require__(21);
-var _create = __webpack_require__(36);
-var gOPNExt = __webpack_require__(52);
-var $GOPD = __webpack_require__(38);
-var $DP = __webpack_require__(7);
-var $keys = __webpack_require__(17);
-var gOPD = __getKey($GOPD, 'f');
-var dP = __getKey($DP, 'f');
-var gOPN = __getKey(gOPNExt, 'f');
-var $Symbol = __getKey(global, 'Symbol');
-var $JSON = __getKey(global, 'JSON');
-var _stringify = $JSON && __getKey($JSON, 'stringify');
-var PROTOTYPE = 'prototype';
-var HIDDEN = wks('_hidden');
-var TO_PRIMITIVE = wks('toPrimitive');
-var isEnum = __getKey({}, 'propertyIsEnumerable');
-var SymbolRegistry = shared('symbol-registry');
-var AllSymbols = shared('symbols');
-var OPSymbols = shared('op-symbols');
-var ObjectProto = Object[PROTOTYPE];
-var USE_NATIVE = typeof $Symbol == 'function';
-var QObject = __getKey(global, 'QObject');
-// Don't use setters in Qt Script, https://github.com/zloirock/core-js/issues/173
-var setter = !QObject || !__getKey(QObject, PROTOTYPE) || !__getKey(__getKey(QObject, PROTOTYPE), 'findChild');
-
-// fallback for old Android, https://code.google.com/p/v8/issues/detail?id=687
-var setSymbolDesc = DESCRIPTORS && $fails(function () {
-  return __getKey(_create(dP({}, 'a', {
-    get: function get() {
-      return __getKey(dP(this, 'a', { value: 7 }), 'a');
-    }
-  })), 'a') != 7;
-}) ? function (it, key, D) {
-  var protoDesc = gOPD(ObjectProto, key);
-  if (protoDesc) __deleteKey(ObjectProto, key);
-  dP(it, key, D);
-  if (protoDesc && it !== ObjectProto) dP(ObjectProto, key, protoDesc);
-} : dP;
-
-var wrap = function wrap(tag) {
-  var sym = __setKey(AllSymbols, tag, _create(__getKey($Symbol, PROTOTYPE)));
-  __setKey(sym, '_k', tag);
-  return sym;
-};
-
-var isSymbol = USE_NATIVE && _typeof(__getKey($Symbol, 'iterator')) == 'symbol' ? function (it) {
-  return (typeof it === 'undefined' ? 'undefined' : _typeof(it)) == 'symbol';
-} : function (it) {
-  return __instanceOfKey(it, $Symbol);
-};
-
-var $defineProperty = function defineProperty(it, key, D) {
-  if (it === ObjectProto) $defineProperty(OPSymbols, key, D);
-  anObject(it);
-  key = toPrimitive(key, true);
-  anObject(D);
-  if (has(AllSymbols, key)) {
-    if (!__getKey(D, 'enumerable')) {
-      if (!has(it, HIDDEN)) dP(it, HIDDEN, createDesc(1, {}));
-      __setKey(__getKey(it, HIDDEN), key, true);
-    } else {
-      if (has(it, HIDDEN) && __getKey(__getKey(it, HIDDEN), key)) __setKey(__getKey(it, HIDDEN), key, false);
-      D = _create(D, { enumerable: createDesc(0, false) });
-    }return setSymbolDesc(it, key, D);
-  }return dP(it, key, D);
-};
-var $defineProperties = function defineProperties(it, P) {
-  anObject(it);
-  var keys = enumKeys(P = toIObject(P));
-  var i = 0;
-  var l = __getKey(keys, 'length');
-  var key;
-  while (l > i) {
-    $defineProperty(it, key = __getKey(keys, i++), __getKey(P, key));
-  }return it;
-};
-var $create = function create(it, P) {
-  return P === undefined ? _create(it) : $defineProperties(_create(it), P);
-};
-var $propertyIsEnumerable = function propertyIsEnumerable(key) {
-  var E = __callKey(isEnum, 'call', this, key = toPrimitive(key, true));
-  if (this === ObjectProto && has(AllSymbols, key) && !has(OPSymbols, key)) return false;
-  return E || !has(this, key) || !has(AllSymbols, key) || has(this, HIDDEN) && __getKey(__getKey(this, HIDDEN), key) ? E : true;
-};
-var $getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key) {
-  it = toIObject(it);
-  key = toPrimitive(key, true);
-  if (it === ObjectProto && has(AllSymbols, key) && !has(OPSymbols, key)) return;
-  var D = gOPD(it, key);
-  if (D && has(AllSymbols, key) && !(has(it, HIDDEN) && __getKey(__getKey(it, HIDDEN), key))) __setKey(D, 'enumerable', true);
-  return D;
-};
-var $getOwnPropertyNames = function getOwnPropertyNames(it) {
-  var names = gOPN(toIObject(it));
-  var result = [];
-  var i = 0;
-  var key;
-  while (__getKey(names, 'length') > i) {
-    if (!has(AllSymbols, key = __getKey(names, i++)) && key != HIDDEN && key != META) result.push(key);
-  }return result;
-};
-var $getOwnPropertySymbols = function getOwnPropertySymbols(it) {
-  var IS_OP = it === ObjectProto;
-  var names = gOPN(IS_OP ? OPSymbols : toIObject(it));
-  var result = [];
-  var i = 0;
-  var key;
-  while (__getKey(names, 'length') > i) {
-    if (has(AllSymbols, key = __getKey(names, i++)) && (IS_OP ? has(ObjectProto, key) : true)) result.push(__getKey(AllSymbols, key));
-  }return result;
-};
-
-// 19.4.1.1 Symbol([description])
-if (!USE_NATIVE) {
-  $Symbol = function _Symbol() {
-    if (__instanceOfKey(this, $Symbol)) throw TypeError('Symbol is not a constructor!');
-    var tag = uid(arguments.length > 0 ? arguments[0] : undefined);
-    var $set = function $set(value) {
-      if (this === ObjectProto) __callKey($set, 'call', OPSymbols, value);
-      if (has(this, HIDDEN) && has(__getKey(this, HIDDEN), tag)) __setKey(__getKey(this, HIDDEN), tag, false);
-      setSymbolDesc(this, tag, createDesc(1, value));
     };
-    if (DESCRIPTORS && setter) setSymbolDesc(ObjectProto, tag, { configurable: true, set: $set });
-    return wrap(tag);
-  };
-  redefine(__getKey($Symbol, PROTOTYPE), 'toString', function toString() {
-    return __getKey(this, '_k');
-  });
+    // tslint:disable-next-line:forin
+    for (var trapName in defaultHandlerTraps) {
+      _loop_1(trapName);
+    }
+    var proxyDefaultHasInstance;
+    var SymbolHasInstance = Symbol.hasInstance;
+    var FunctionPrototypeSymbolHasInstance = Function.prototype[SymbolHasInstance];
+    defineProperty(proxy, SymbolHasInstance, {
+      get: function () {
+        var hasInstance = proxy.get(SymbolHasInstance);
+        // We do not want to deal with any Symbol.hasInstance here
+        // because we need to do special things to check prototypes.
+        // Symbol polyfill adds Symbol.hasInstance to the function prototype
+        // so if we have that here, we need to return our own.
+        // If the value we get from this function is different, that means
+        // user has supplied custom function so we need to respect that.
+        if (hasInstance === FunctionPrototypeSymbolHasInstance) {
+          return proxyDefaultHasInstance || (proxyDefaultHasInstance = function (inst) {
+            return defaultHasInstance(inst, proxy);
+          });
+        }
+        return hasInstance;
+      },
+      configurable: false,
+      enumerable: false });
 
-  __setKey($GOPD, 'f', $getOwnPropertyDescriptor);
-  __setKey($DP, 'f', $defineProperty);
-  __setKey(__webpack_require__(37), 'f', __setKey(gOPNExt, 'f', $getOwnPropertyNames));
-  __setKey(__webpack_require__(23), 'f', $propertyIsEnumerable);
-  __setKey(__webpack_require__(25), 'f', $getOwnPropertySymbols);
+    defineProperty(proxy, ProxySlot, {
+      value: ProxyIdentifier,
+      configurable: false,
+      enumerable: false,
+      writable: false });
 
-  if (DESCRIPTORS && !__webpack_require__(29)) {
-    redefine(ObjectProto, 'propertyIsEnumerable', $propertyIsEnumerable, true);
+    defineProperty(proxy, 'forIn', {
+      value: function () {
+        return proxy.ownKeys().reduce(function (o, key) {
+          o[key] = void 0;
+          return o;
+        }, create(null));
+      },
+      configurable: false,
+      enumerable: false,
+      writable: false });
+
+    var SymbolIterator = Symbol.iterator;
+    defineProperty(proxy, SymbolIterator, {
+      enumerable: false,
+      configurable: true,
+      get: function () {
+        return this.get(SymbolIterator);
+      },
+      set: function (value) {
+        this.set(SymbolIterator, value);
+      } });
+
+    if (targetIsArray) {
+      var trackedLength_1 = 0;
+      var adjustArrayIndex_1 = function (newLength) {
+        // removing old indexes from proxy when needed
+        while (trackedLength_1 > newLength) {
+          delete proxy[--trackedLength_1];
+        }
+        // add new indexes to proxy when needed
+        for (var i = trackedLength_1; i < newLength; i += 1) {
+          proxifyProperty(proxy, i, {
+            enumerable: true,
+            configurable: true });
+
+        }
+        trackedLength_1 = newLength;
+      };
+      defineProperty(proxy, ArraySlot, {
+        value: ProxyIdentifier,
+        writable: true,
+        enumerable: false,
+        configurable: false });
+
+      defineProperty(proxy, 'length', {
+        enumerable: false,
+        configurable: true,
+        get: function () {
+          var proxyLength = proxy.get('length');
+          // check if the trackedLength matches the length of the proxy
+          if (proxyLength !== trackedLength_1) {
+            adjustArrayIndex_1(proxyLength);
+          }
+          return proxyLength;
+        },
+        set: function (value) {
+          proxy.set('length', value);
+        } });
+
+      // building the initial index. this is observable by the proxy
+      // because we access the length property during the construction
+      // of the proxy, but it should be fine...
+      adjustArrayIndex_1(proxy.get('length'));
+    }
+    return proxy;
   }
+  // tslint:disable-next-line:member-ordering
+  XProxy.revocable = function (target, handler) {
+    var p = new XProxy(target, handler);
+    return {
+      proxy: p,
+      revoke: lastRevokeFn };
 
-  __setKey(wksExt, 'f', function (name) {
-    return wrap(wks(name));
-  });
+  };
+  XProxy.prototype.push = function () {
+    var push = this.get('push');
+    if (push === Array.prototype.push) {
+      push = compatPush;
+    }
+    return push.apply(this, arguments);
+  };
+  XProxy.prototype.concat = function () {
+    var concat = this.get('concat');
+    if (concat === Array.prototype.concat) {
+      concat = compatConcat;
+    }
+    return concat.apply(this, arguments);
+  };
+  XProxy.prototype.unshift = function () {
+    var unshift = this.get('unshift');
+    if (unshift === Array.prototype.unshift) {
+      unshift = compatUnshift;
+    }
+    return unshift.apply(this, arguments);
+  };
+  return XProxy;
+}();
+
+function defaultHasInstance(instance, Type) {
+  // We have to grab getPrototypeOf here
+  // because caching it at the module level is too early.
+  // We need our shimmed version.
+  var getPrototypeOf = Object.getPrototypeOf;
+  var instanceProto = getPrototypeOf(instance);
+  var TypeProto = getKey(Type, 'prototype');
+  while (instanceProto !== null) {
+    if (instanceProto === TypeProto) {
+      return true;
+    }
+    instanceProto = getPrototypeOf(instanceProto);
+  }
+  return false;
 }
-
-$export(__getKey($export, 'G') + __getKey($export, 'W') + __getKey($export, 'F') * !USE_NATIVE, { Symbol: $Symbol });
-
-for (var es6Symbols = __callKey(
-// 19.4.2.2, 19.4.2.3, 19.4.2.4, 19.4.2.6, 19.4.2.8, 19.4.2.9, 19.4.2.10, 19.4.2.11, 19.4.2.12, 19.4.2.13, 19.4.2.14
-'hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables', 'split', ','), j = 0; __getKey(es6Symbols, 'length') > j;) {
-  wks(__getKey(es6Symbols, j++));
-}for (var wellKnownSymbols = $keys(__getKey(wks, 'store')), k = 0; __getKey(wellKnownSymbols, 'length') > k;) {
-  wksDefine(__getKey(wellKnownSymbols, k++));
-}$export(__getKey($export, 'S') + __getKey($export, 'F') * !USE_NATIVE, 'Symbol', {
-  // 19.4.2.1 Symbol.for(key)
-  'for': function _for(key) {
-    return has(SymbolRegistry, key += '') ? __getKey(SymbolRegistry, key) : __setKey(SymbolRegistry, key, $Symbol(key));
-  },
-  // 19.4.2.5 Symbol.keyFor(sym)
-  keyFor: function keyFor(sym) {
-    if (!isSymbol(sym)) throw TypeError(sym + ' is not a symbol!');
-    for (var key in __iterableKey(SymbolRegistry)) {
-      if (__getKey(SymbolRegistry, key) === sym) return key;
-    }
-  },
-  useSetter: function useSetter() {
-    setter = true;
-  },
-  useSimple: function useSimple() {
-    setter = false;
-  }
-});
-
-$export(__getKey($export, 'S') + __getKey($export, 'F') * !USE_NATIVE, 'Object', {
-  // 19.1.2.2 Object.create(O [, Properties])
-  create: $create,
-  // 19.1.2.4 Object.defineProperty(O, P, Attributes)
-  defineProperty: $defineProperty,
-  // 19.1.2.3 Object.defineProperties(O, Properties)
-  defineProperties: $defineProperties,
-  // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
-  getOwnPropertyDescriptor: $getOwnPropertyDescriptor,
-  // 19.1.2.7 Object.getOwnPropertyNames(O)
-  getOwnPropertyNames: $getOwnPropertyNames,
-  // 19.1.2.8 Object.getOwnPropertySymbols(O)
-  getOwnPropertySymbols: $getOwnPropertySymbols
-});
-
-// 24.3.2 JSON.stringify(value [, replacer [, space]])
-$JSON && $export(__getKey($export, 'S') + __getKey($export, 'F') * (!USE_NATIVE || $fails(function () {
-  var S = $Symbol();
-  // MS Edge converts symbol values to JSON as {}
-  // WebKit converts symbol values to JSON as null
-  // V8 throws on boxed symbols
-  return _stringify([S]) != '[null]' || _stringify({ a: S }) != '{}' || _stringify(Object(S)) != '{}';
-})), 'JSON', {
-  stringify: function stringify(it) {
-    if (it === undefined || isSymbol(it)) return; // IE8 returns string on undefined
-    var args = [it];
-    var i = 1;
-    var replacer, $replacer;
-    while (arguments.length > i) {
-      args.push(arguments[i++]);
-    }replacer = __getKey(args, 1);
-    if (typeof replacer == 'function') $replacer = replacer;
-    if ($replacer || !isArray(replacer)) replacer = function replacer(key, value) {
-      if ($replacer) value = __callKey($replacer, 'call', this, key, value);
-      if (!isSymbol(value)) return value;
-    };
-    __setKey(args, 1, replacer);
-    return __callKey(_stringify, 'apply', $JSON, args);
-  }
-});
-
-// 19.4.3.4 Symbol.prototype[@@toPrimitive](hint)
-__getKey(__getKey($Symbol, PROTOTYPE), TO_PRIMITIVE) || __webpack_require__(14)(__getKey($Symbol, PROTOTYPE), TO_PRIMITIVE, __getKey(__getKey($Symbol, PROTOTYPE), 'valueOf'));
-// 19.4.3.5 Symbol.prototype[@@toStringTag]
-setToStringTag($Symbol, 'Symbol');
-// 20.2.1.9 Math[@@toStringTag]
-setToStringTag(Math, 'Math', true);
-// 24.3.3 JSON[@@toStringTag]
-setToStringTag(__getKey(global, 'JSON'), 'JSON', true);
-
-/***/ }),
-/* 64 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-__setKey(module, 'exports', function (it) {
-  if (typeof it != 'function') throw TypeError(it + ' is not a function!');
-  return it;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 65 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-var __inKey = window.Proxy.inKey;
-var global = __webpack_require__(4);
-var core = __webpack_require__(20);
-var LIBRARY = __webpack_require__(29);
-var wksExt = __webpack_require__(47);
-var defineProperty = __getKey(__webpack_require__(7), 'f');
-__setKey(module, 'exports', function (name) {
-  var $Symbol = __getKey(core, 'Symbol') || __setKey(core, 'Symbol', LIBRARY ? {} : __getKey(global, 'Symbol') || {});
-  if (__callKey(name, 'charAt', 0) != '_' && !__inKey($Symbol, name)) defineProperty($Symbol, name, { value: __callKey(wksExt, 'f', name) });
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 66 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var __callKey = window.Proxy.callKey;
-// all enumerable object keys, includes symbols
-var getKeys = __webpack_require__(17);
-var gOPS = __webpack_require__(25);
-var pIE = __webpack_require__(23);
-__setKey(module, 'exports', function (it) {
-  var result = getKeys(it);
-  var getSymbols = __getKey(gOPS, 'f');
-  if (getSymbols) {
-    var symbols = getSymbols(it);
-    var isEnum = __getKey(pIE, 'f');
-    var i = 0;
-    var key;
-    while (__getKey(symbols, 'length') > i) {
-      if (__callKey(isEnum, 'call', it, key = __getKey(symbols, i++))) result.push(key);
-    }
-  }return result;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 67 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var __callKey = window.Proxy.callKey;
-var dP = __webpack_require__(7);
-var anObject = __webpack_require__(8);
-var getKeys = __webpack_require__(17);
-
-__setKey(module, 'exports', __webpack_require__(10) ? Object.defineProperties : function defineProperties(O, Properties) {
-  anObject(O);
-  var keys = getKeys(Properties);
-  var length = __getKey(keys, 'length');
-  var i = 0;
-  var P;
-  while (length > i) {
-    __callKey(dP, 'f', O, P = __getKey(keys, i++), __getKey(Properties, P));
-  }return O;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 68 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var document = __getKey(__webpack_require__(4), 'document');
-__setKey(module, 'exports', document && __getKey(document, 'documentElement'));
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 69 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// 19.1.2.9 Object.getPrototypeOf(O)
-var toObject = __webpack_require__(12);
-var $getPrototypeOf = __webpack_require__(53);
-
-__webpack_require__(9)('getPrototypeOf', function () {
-  return function getPrototypeOf(it) {
-    return $getPrototypeOf(toObject(it));
-  };
-});
-
-/***/ }),
-/* 70 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// 19.1.2.14 Object.keys(O)
-var toObject = __webpack_require__(12);
-var $keys = __webpack_require__(17);
-
-__webpack_require__(9)('keys', function () {
-  return function keys(it) {
-    return $keys(toObject(it));
-  };
-});
-
-/***/ }),
-/* 71 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __getKey = window.Proxy.getKey;
-// 19.1.2.7 Object.getOwnPropertyNames(O)
-__webpack_require__(9)('getOwnPropertyNames', function () {
-  return __getKey(__webpack_require__(52), 'f');
-});
-
-/***/ }),
-/* 72 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __getKey = window.Proxy.getKey;
-// 19.1.2.5 Object.freeze(O)
-var isObject = __webpack_require__(1);
-var meta = __getKey(__webpack_require__(11), 'onFreeze');
-
-__webpack_require__(9)('freeze', function ($freeze) {
-  return function freeze(it) {
-    return $freeze && isObject(it) ? $freeze(meta(it)) : it;
-  };
-});
-
-/***/ }),
-/* 73 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __getKey = window.Proxy.getKey;
-// 19.1.2.17 Object.seal(O)
-var isObject = __webpack_require__(1);
-var meta = __getKey(__webpack_require__(11), 'onFreeze');
-
-__webpack_require__(9)('seal', function ($seal) {
-  return function seal(it) {
-    return $seal && isObject(it) ? $seal(meta(it)) : it;
-  };
-});
-
-/***/ }),
-/* 74 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __getKey = window.Proxy.getKey;
-// 19.1.2.15 Object.preventExtensions(O)
-var isObject = __webpack_require__(1);
-var meta = __getKey(__webpack_require__(11), 'onFreeze');
-
-__webpack_require__(9)('preventExtensions', function ($preventExtensions) {
-  return function preventExtensions(it) {
-    return $preventExtensions && isObject(it) ? $preventExtensions(meta(it)) : it;
-  };
-});
-
-/***/ }),
-/* 75 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// 19.1.2.12 Object.isFrozen(O)
-var isObject = __webpack_require__(1);
-
-__webpack_require__(9)('isFrozen', function ($isFrozen) {
-  return function isFrozen(it) {
-    return isObject(it) ? $isFrozen ? $isFrozen(it) : false : true;
-  };
-});
-
-/***/ }),
-/* 76 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// 19.1.2.13 Object.isSealed(O)
-var isObject = __webpack_require__(1);
-
-__webpack_require__(9)('isSealed', function ($isSealed) {
-  return function isSealed(it) {
-    return isObject(it) ? $isSealed ? $isSealed(it) : false : true;
-  };
-});
-
-/***/ }),
-/* 77 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// 19.1.2.11 Object.isExtensible(O)
-var isObject = __webpack_require__(1);
-
-__webpack_require__(9)('isExtensible', function ($isExtensible) {
-  return function isExtensible(it) {
-    return isObject(it) ? $isExtensible ? $isExtensible(it) : true : false;
-  };
-});
-
-/***/ }),
-/* 78 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __getKey = window.Proxy.getKey;
-// 19.1.3.10 Object.is(value1, value2)
-var $export = __webpack_require__(2);
-$export(__getKey($export, 'S'), 'Object', { is: __webpack_require__(79) });
-
-/***/ }),
-/* 79 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-// 7.2.9 SameValue(x, y)
-__setKey(module, "exports", Object.is || function is(x, y) {
-  // eslint-disable-next-line no-self-compare
-  return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 80 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __getKey = window.Proxy.getKey;
-// 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
-var $export = __webpack_require__(2);
-
-$export(__getKey($export, 'S'), 'Array', { isArray: __webpack_require__(35) });
-
-/***/ }),
-/* 81 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __getKey = window.Proxy.getKey;
-var __callKey = window.Proxy.callKey;
-var __setKey = window.Proxy.setKey;
-var ctx = __webpack_require__(16);
-var $export = __webpack_require__(2);
-var toObject = __webpack_require__(12);
-var call = __webpack_require__(54);
-var isArrayIter = __webpack_require__(55);
-var toLength = __webpack_require__(18);
-var createProperty = __webpack_require__(40);
-var getIterFn = __webpack_require__(56);
-
-$export(__getKey($export, 'S') + __getKey($export, 'F') * !__webpack_require__(57)(function (iter) {
-  Array.from(iter);
-}), 'Array', {
-  // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
-  from: function from(arrayLike /* , mapfn = undefined, thisArg = undefined */) {
-    var O = toObject(arrayLike);
-    var C = typeof this == 'function' ? this : Array;
-    var aLen = arguments.length;
-    var mapfn = aLen > 1 ? arguments[1] : undefined;
-    var mapping = mapfn !== undefined;
-    var index = 0;
-    var iterFn = getIterFn(O);
-    var length, result, step, iterator;
-    if (mapping) mapfn = ctx(mapfn, aLen > 2 ? arguments[2] : undefined, 2);
-    // if object isn't iterable or it's array with default iterator - use simple case
-    if (iterFn != undefined && !(C == Array && isArrayIter(iterFn))) {
-      for (iterator = __callKey(iterFn, 'call', O), result = new C(); !__getKey(step = __callKey(iterator, 'next'), 'done'); index++) {
-        createProperty(result, index, mapping ? call(iterator, mapfn, [__getKey(step, 'value'), index], true) : __getKey(step, 'value'));
-      }
-    } else {
-      length = toLength(__getKey(O, 'length'));
-      for (result = new C(length); length > index; index++) {
-        createProperty(result, index, mapping ? mapfn(__getKey(O, index), index) : __getKey(O, index));
-      }
-    }
-    __setKey(result, 'length', index);
-    return result;
-  }
-});
-
-/***/ }),
-/* 82 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-// getting tag from 19.1.3.6 Object.prototype.toString()
-var cof = __webpack_require__(31);
-var TAG = __webpack_require__(3)('toStringTag');
-// ES3 wrong here
-var ARG = cof(function () {
-  return arguments;
-}()) == 'Arguments';
-
-// fallback for IE11 Script Access Denied error
-var tryGet = function tryGet(it, key) {
+function isCompatProxy(replicaOrAny) {
   try {
-    return __getKey(it, key);
-  } catch (e) {/* empty */}
-};
-
-__setKey(module, 'exports', function (it) {
-  var O, T, B;
-  return it === undefined ? 'Undefined' : it === null ? 'Null'
-  // @@toStringTag case
-  : typeof (T = tryGet(O = Object(it), TAG)) == 'string' ? T
-  // builtinTag case
-  : ARG ? cof(O)
-  // ES3 arguments fallback
-  : (B = cof(O)) == 'Object' && typeof __getKey(O, 'callee') == 'function' ? 'Arguments' : B;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 83 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __getKey = window.Proxy.getKey;
-var __instanceOfKey = window.Proxy.instanceOfKey;
-var __callKey = window.Proxy.callKey;
-var __setKey = window.Proxy.setKey;
-var $export = __webpack_require__(2);
-var createProperty = __webpack_require__(40);
-
-// WebKit Array.of isn't generic
-$export(__getKey($export, 'S') + __getKey($export, 'F') * __webpack_require__(6)(function () {
-  function F() {/* empty */}
-  return !__instanceOfKey(__callKey(Array.of, 'call', F), F);
-}), 'Array', {
-  // 22.1.2.3 Array.of( ...items)
-  of: function of() /* ...args */{
-    var index = 0;
-    var aLen = arguments.length;
-    var result = new (typeof this == 'function' ? this : Array)(aLen);
-    while (aLen > index) {
-      createProperty(result, index, arguments[index++]);
-    }__setKey(result, 'length', aLen);
-    return result;
+    return replicaOrAny && replicaOrAny[ProxySlot] === ProxyIdentifier;
   }
-});
-
-/***/ }),
-/* 84 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __getKey = window.Proxy.getKey;
-// 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
-var $export = __webpack_require__(2);
-
-$export(__getKey($export, 'P'), 'Array', { copyWithin: __webpack_require__(85) });
-
-__webpack_require__(41)('copyWithin');
-
-/***/ }),
-/* 85 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {// 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
-
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var __inKey = window.Proxy.inKey;
-var __deleteKey = window.Proxy.deleteKey;
-var toObject = __webpack_require__(12);
-var toAbsoluteIndex = __webpack_require__(32);
-var toLength = __webpack_require__(18);
-
-__setKey(module, 'exports', __getKey([], 'copyWithin') || function copyWithin(target /* = 0 */, start /* = 0, end = @length */) {
-  var O = toObject(this);
-  var len = toLength(__getKey(O, 'length'));
-  var to = toAbsoluteIndex(target, len);
-  var from = toAbsoluteIndex(start, len);
-  var end = arguments.length > 2 ? arguments[2] : undefined;
-  var count = Math.min((end === undefined ? len : toAbsoluteIndex(end, len)) - from, len - to);
-  var inc = 1;
-  if (from < to && to < from + count) {
-    inc = -1;
-    from += count - 1;
-    to += count - 1;
+  catch (e) {
+    // some objects (iframe.contentWindow for example) throw an error trying
+    // to access random properties
+    return false;
   }
-  while (count-- > 0) {
-    if (__inKey(O, from)) __setKey(O, to, __getKey(O, from));else __deleteKey(O, to);
-    to += inc;
-    from += inc;
-  }return O;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 86 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __getKey = window.Proxy.getKey;
-// 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
-var $export = __webpack_require__(2);
-
-$export(__getKey($export, 'P'), 'Array', { fill: __webpack_require__(87) });
-
-__webpack_require__(41)('fill');
-
-/***/ }),
-/* 87 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {// 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
-
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var toObject = __webpack_require__(12);
-var toAbsoluteIndex = __webpack_require__(32);
-var toLength = __webpack_require__(18);
-__setKey(module, 'exports', function fill(value /* , start = 0, end = @length */) {
-  var O = toObject(this);
-  var length = toLength(__getKey(O, 'length'));
-  var aLen = arguments.length;
-  var index = toAbsoluteIndex(aLen > 1 ? arguments[1] : undefined, length);
-  var end = aLen > 2 ? arguments[2] : undefined;
-  var endPos = end === undefined ? length : toAbsoluteIndex(end, length);
-  while (endPos > index) {
-    __setKey(O, index++, value);
-  }return O;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 88 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-var __getKey = window.Proxy.getKey;
-var strong = __webpack_require__(58);
-var validate = __webpack_require__(19);
-var MAP = 'Map';
-
-// 23.1 Map Objects
-__setKey(module, 'exports', __webpack_require__(26)(MAP, function (get) {
-  return function Map() {
-    return get(this, arguments.length > 0 ? arguments[0] : undefined);
-  };
-}, {
-  // 23.1.3.6 Map.prototype.get(key)
-  get: function get(key) {
-    var entry = __callKey(strong, 'getEntry', validate(this, MAP), key);
-    return entry && __getKey(entry, 'v');
-  },
-  // 23.1.3.9 Map.prototype.set(key, value)
-  set: function set(key, value) {
-    return __callKey(strong, 'def', validate(this, MAP), key === 0 ? 0 : key, value);
-  }
-}, strong, true));
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 89 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __inKey = window.Proxy.inKey;
-var __callKey = window.Proxy.callKey;
-var __setKey = window.Proxy.setKey;
-var __iterableKey = window.Proxy.iterableKey;
-var LIBRARY = __webpack_require__(29);
-var $export = __webpack_require__(2);
-var redefine = __webpack_require__(15);
-var hide = __webpack_require__(14);
-var has = __webpack_require__(5);
-var Iterators = __webpack_require__(39);
-var $iterCreate = __webpack_require__(90);
-var setToStringTag = __webpack_require__(24);
-var getPrototypeOf = __webpack_require__(53);
-var ITERATOR = __webpack_require__(3)('iterator');
-var BUGGY = !(__getKey([], 'keys') && __inKey(__callKey([], 'keys'), 'next')); // Safari has buggy iterators w/o `next`
-var FF_ITERATOR = '@@iterator';
-var KEYS = 'keys';
-var VALUES = 'values';
-
-var returnThis = function returnThis() {
-  return this;
-};
-
-__setKey(module, 'exports', function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED) {
-  $iterCreate(Constructor, NAME, next);
-  var getMethod = function getMethod(kind) {
-    if (!BUGGY && __inKey(proto, kind)) return __getKey(proto, kind);
-    switch (kind) {
-      case KEYS:
-        return function keys() {
-          return new Constructor(this, kind);
-        };
-      case VALUES:
-        return function values() {
-          return new Constructor(this, kind);
-        };
-    }return function entries() {
-      return new Constructor(this, kind);
-    };
-  };
-  var TAG = NAME + ' Iterator';
-  var DEF_VALUES = DEFAULT == VALUES;
-  var VALUES_BUG = false;
-  var proto = __getKey(Base, 'prototype');
-  var $native = __getKey(proto, ITERATOR) || __getKey(proto, FF_ITERATOR) || DEFAULT && __getKey(proto, DEFAULT);
-  var $default = $native || getMethod(DEFAULT);
-  var $entries = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined;
-  var $anyNative = NAME == 'Array' ? __getKey(proto, 'entries') || $native : $native;
-  var methods, key, IteratorPrototype;
-  // Fix native
-  if ($anyNative) {
-    IteratorPrototype = getPrototypeOf(__callKey($anyNative, 'call', new Base()));
-    if (IteratorPrototype !== Object.prototype && __getKey(IteratorPrototype, 'next')) {
-      // Set @@toStringTag to native iterators
-      setToStringTag(IteratorPrototype, TAG, true);
-      // fix for some old engines
-      if (!LIBRARY && !has(IteratorPrototype, ITERATOR)) hide(IteratorPrototype, ITERATOR, returnThis);
-    }
-  }
-  // fix Array#{values, @@iterator}.name in V8 / FF
-  if (DEF_VALUES && $native && __getKey($native, 'name') !== VALUES) {
-    VALUES_BUG = true;
-    $default = function values() {
-      return __callKey($native, 'call', this);
-    };
-  }
-  // Define iterator
-  if ((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !__getKey(proto, ITERATOR))) {
-    hide(proto, ITERATOR, $default);
-  }
-  // Plug for library
-  __setKey(Iterators, NAME, $default);
-  __setKey(Iterators, TAG, returnThis);
-  if (DEFAULT) {
-    methods = {
-      values: DEF_VALUES ? $default : getMethod(VALUES),
-      keys: IS_SET ? $default : getMethod(KEYS),
-      entries: $entries
-    };
-    if (FORCED) for (key in __iterableKey(methods)) {
-      if (!__inKey(proto, key)) redefine(proto, key, __getKey(methods, key));
-    } else $export(__getKey($export, 'P') + __getKey($export, 'F') * (BUGGY || VALUES_BUG), NAME, methods);
-  }
-  return methods;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 90 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var create = __webpack_require__(36);
-var descriptor = __webpack_require__(21);
-var setToStringTag = __webpack_require__(24);
-var IteratorPrototype = {};
-
-// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-__webpack_require__(14)(IteratorPrototype, __webpack_require__(3)('iterator'), function () {
-  return this;
-});
-
-__setKey(module, 'exports', function (Constructor, NAME, next) {
-  __setKey(Constructor, 'prototype', create(IteratorPrototype, { next: descriptor(1, next) }));
-  setToStringTag(Constructor, NAME + ' Iterator');
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 91 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-__setKey(module, "exports", function (done, value) {
-  return { value: value, done: !!done };
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 92 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var __callKey = window.Proxy.callKey;
-var global = __webpack_require__(4);
-var dP = __webpack_require__(7);
-var DESCRIPTORS = __webpack_require__(10);
-var SPECIES = __webpack_require__(3)('species');
-
-__setKey(module, 'exports', function (KEY) {
-  var C = __getKey(global, KEY);
-  if (DESCRIPTORS && C && !__getKey(C, SPECIES)) __callKey(dP, 'f', C, SPECIES, {
-    configurable: true,
-    get: function get() {
-      return this;
-    }
-  });
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 93 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var isObject = __webpack_require__(1);
-var setPrototypeOf = __getKey(__webpack_require__(94), 'set');
-__setKey(module, 'exports', function (that, target, C) {
-  var S = __getKey(target, 'constructor');
-  var P;
-  if (S !== C && typeof S == 'function' && (P = __getKey(S, 'prototype')) !== __getKey(C, 'prototype') && isObject(P) && setPrototypeOf) {
-    setPrototypeOf(that, P);
-  }return that;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 94 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __inKey = window.Proxy.inKey;
-var __getKey = window.Proxy.getKey;
-var __callKey = window.Proxy.callKey;
-var __instanceOfKey = window.Proxy.instanceOfKey;
-// Works with __proto__ only. Old v8 can't work with null proto objects.
-/* eslint-disable no-proto */
-var isObject = __webpack_require__(1);
-var anObject = __webpack_require__(8);
-var check = function check(O, proto) {
-  anObject(O);
-  if (!isObject(proto) && proto !== null) throw TypeError(proto + ": can't set as prototype!");
-};
-__setKey(module, 'exports', {
-  set: Object.setPrototypeOf || (__inKey({}, '__proto__') ? // eslint-disable-line
-  function (test, buggy, set) {
-    try {
-      set = __webpack_require__(16)(Function.call, __getKey(__callKey(__webpack_require__(38), 'f', Object.prototype, '__proto__'), 'set'), 2);
-      set(test, []);
-      buggy = !__instanceOfKey(test, Array);
-    } catch (e) {
-      buggy = true;
-    }
-    return function setPrototypeOf(O, proto) {
-      check(O, proto);
-      if (buggy) __setKey(O, '__proto__', proto);else set(O, proto);
-      return O;
-    };
-  }({}, false) : undefined),
-  check: check
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 95 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-var strong = __webpack_require__(58);
-var validate = __webpack_require__(19);
-var SET = 'Set';
-
-// 23.2 Set Objects
-__setKey(module, 'exports', __webpack_require__(26)(SET, function (get) {
-  return function Set() {
-    return get(this, arguments.length > 0 ? arguments[0] : undefined);
-  };
-}, {
-  // 23.2.3.1 Set.prototype.add(value)
-  add: function add(value) {
-    return __callKey(strong, 'def', validate(this, SET), value = value === 0 ? 0 : value, value);
-  }
-}, strong));
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 96 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __callKey = window.Proxy.callKey;
-var __setKey = window.Proxy.setKey;
-var each = __webpack_require__(59)(0);
-var redefine = __webpack_require__(15);
-var meta = __webpack_require__(11);
-var assign = __webpack_require__(99);
-var weak = __webpack_require__(60);
-var isObject = __webpack_require__(1);
-var fails = __webpack_require__(6);
-var validate = __webpack_require__(19);
-var WEAK_MAP = 'WeakMap';
-var getWeak = __getKey(meta, 'getWeak');
-var isExtensible = Object.isExtensible;
-var uncaughtFrozenStore = __getKey(weak, 'ufstore');
-var tmp = {};
-var InternalMap;
-
-var wrapper = function wrapper(get) {
-  return function WeakMap() {
-    return get(this, arguments.length > 0 ? arguments[0] : undefined);
-  };
-};
-
-var methods = {
-  // 23.3.3.3 WeakMap.prototype.get(key)
-  get: function get(key) {
-    if (isObject(key)) {
-      var data = getWeak(key);
-      if (data === true) return __callKey(uncaughtFrozenStore(validate(this, WEAK_MAP)), 'get', key);
-      return data ? __getKey(data, __getKey(this, '_i')) : undefined;
-    }
-  },
-  // 23.3.3.5 WeakMap.prototype.set(key, value)
-  set: function set(key, value) {
-    return __callKey(weak, 'def', validate(this, WEAK_MAP), key, value);
-  }
-};
-
-// 23.3 WeakMap Objects
-var $WeakMap = __setKey(module, 'exports', __webpack_require__(26)(WEAK_MAP, wrapper, methods, weak, true, true));
-
-// IE11 WeakMap frozen keys fix
-if (fails(function () {
-  return __callKey(__callKey(new $WeakMap(), 'set', (Object.freeze || Object)(tmp), 7), 'get', tmp) != 7;
-})) {
-  InternalMap = __callKey(weak, 'getConstructor', wrapper, WEAK_MAP);
-  assign(__getKey(InternalMap, 'prototype'), methods);
-  __setKey(meta, 'NEED', true);
-  each(['delete', 'has', 'get', 'set'], function (key) {
-    var proto = __getKey($WeakMap, 'prototype');
-    var method = __getKey(proto, key);
-    redefine(proto, key, function (a, b) {
-      // store frozen objects on internal weakmap shim
-      if (isObject(a) && !isExtensible(a)) {
-        if (!__getKey(this, '_f')) __setKey(this, '_f', new InternalMap());
-        var result = __callKey(__getKey(this, '_f'), key, a, b);
-        return key == 'set' ? this : result;
-        // store all the rest on native weakmap
-      }return __callKey(method, 'call', this, a, b);
-    });
-  });
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
+var getKey = function (replicaOrAny, key) {
+  return isCompatProxy(replicaOrAny) ?
+  replicaOrAny.get(key) :
+  replicaOrAny[key];
+};
+var callKey = function (replicaOrAny, key, a1, a2, a3) {
+  var fn = getKey(replicaOrAny, key);
+  var l = arguments.length;
+  switch (l) {
+    case 2:return fn.call(replicaOrAny);
+    case 3:return fn.call(replicaOrAny, a1);
+    case 4:return fn.call(replicaOrAny, a1, a2);
+    case 5:return fn.call(replicaOrAny, a1, a2, a3);
+    default:
+      var args = [];
+      for (var i = 2; i < l; i++) {
+        args[i - 2] = arguments[i];
+      }
+      return fn.apply(replicaOrAny, args);}
 
-/***/ }),
-/* 97 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-// 9.4.2.3 ArraySpeciesCreate(originalArray, length)
-var speciesConstructor = __webpack_require__(98);
-
-__setKey(module, 'exports', function (original, length) {
-  return new (speciesConstructor(original))(length);
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 98 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var isObject = __webpack_require__(1);
-var isArray = __webpack_require__(35);
-var SPECIES = __webpack_require__(3)('species');
-
-__setKey(module, 'exports', function (original) {
-  var C;
-  if (isArray(original)) {
-    C = __getKey(original, 'constructor');
-    // cross-realm fallback
-    if (typeof C == 'function' && (C === Array || isArray(__getKey(C, 'prototype')))) C = undefined;
-    if (isObject(C)) {
-      C = __getKey(C, SPECIES);
-      if (C === null) C = undefined;
-    }
-  }return C === undefined ? Array : C;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 99 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-// 19.1.2.1 Object.assign(target, source, ...)
-
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-var __getKey = window.Proxy.getKey;
-var getKeys = __webpack_require__(17);
-var gOPS = __webpack_require__(25);
-var pIE = __webpack_require__(23);
-var toObject = __webpack_require__(12);
-var IObject = __webpack_require__(30);
-var $assign = Object.assign;
-
-// should work with symbols and should have deterministic property order (V8 bug)
-__setKey(module, 'exports', !$assign || __webpack_require__(6)(function () {
-  var A = {};
-  var B = {};
-  // eslint-disable-next-line no-undef
-  var S = Symbol();
-  var K = 'abcdefghijklmnopqrst';
-  __setKey(A, S, 7);
-  __callKey(__callKey(K, 'split', ''), 'forEach', function (k) {
-    __setKey(B, k, k);
-  });
-  return __getKey($assign({}, A), S) != 7 || __callKey(Object.compatKeys($assign({}, B)), 'join', '') != K;
-}) ? function assign(target, source) {
-  // eslint-disable-line no-unused-vars
-  var T = toObject(target);
-  var aLen = arguments.length;
-  var index = 1;
-  var getSymbols = __getKey(gOPS, 'f');
-  var isEnum = __getKey(pIE, 'f');
-  while (aLen > index) {
-    var S = IObject(arguments[index++]);
-    var keys = getSymbols ? getKeys(S).concat(getSymbols(S)) : getKeys(S);
-    var length = __getKey(keys, 'length');
-    var j = 0;
-    var key;
-    while (length > j) {
-      if (__callKey(isEnum, 'call', S, key = __getKey(keys, j++))) __setKey(T, key, __getKey(S, key));
-    }
-  }return T;
-} : $assign);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 100 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __callKey = window.Proxy.callKey;
-var weak = __webpack_require__(60);
-var validate = __webpack_require__(19);
-var WEAK_SET = 'WeakSet';
-
-// 23.4 WeakSet Objects
-__webpack_require__(26)(WEAK_SET, function (get) {
-  return function WeakSet() {
-    return get(this, arguments.length > 0 ? arguments[0] : undefined);
-  };
-}, {
-  // 23.4.3.1 WeakSet.prototype.add(value)
-  add: function add(value) {
-    return __callKey(weak, 'def', validate(this, WEAK_SET), value, true);
+};
+// tslint:disable-next-line:max-line-length
+var setKey = function (replicaOrAny, key, newValue, originalReturnValue) {
+  if (isCompatProxy(replicaOrAny)) {
+    replicaOrAny.set(key, newValue);
+  } else
+  {
+    replicaOrAny[key] = newValue;
   }
-}, weak, false, true);
-
-/***/ }),
-/* 101 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-// https://github.com/tc39/Array.prototype.includes
-
-var __getKey = window.Proxy.getKey;
-var $export = __webpack_require__(2);
-var $includes = __webpack_require__(50)(true);
-
-$export(__getKey($export, 'P'), 'Array', {
-  includes: function includes(el /* , fromIndex = 0 */) {
-    return $includes(this, el, arguments.length > 1 ? arguments[1] : undefined);
+  return arguments.length === 4 ? originalReturnValue : newValue;
+};
+var deleteKey = function (replicaOrAny, key) {
+  if (isCompatProxy(replicaOrAny)) {
+    return replicaOrAny.deleteProperty(key);
   }
-});
+  delete replicaOrAny[key];
+};
+var inKey = function (replicaOrAny, key) {
+  if (isCompatProxy(replicaOrAny)) {
+    return replicaOrAny.has(key);
+  }
+  return inOperator(replicaOrAny, key);
+};
+var iterableKey = function (replicaOrAny) {
+  if (isCompatProxy(replicaOrAny)) {
+    return replicaOrAny.forIn();
+  }
+  return replicaOrAny;
+};
+function instanceOfKey(instance, Type) {
+  var instanceIsCompatProxy = isCompatProxy(instance);
+  if (!isCompatProxy(Type) && !instanceIsCompatProxy) {
+    return instance instanceof Type;
+  }
+  // TODO: Once polyfills are transpiled to compat
+  // We can probably remove the below check
+  if (instanceIsCompatProxy) {
+    return defaultHasInstance(instance, Type);
+  }
+  return Type[Symbol.hasInstance](instance);
+}
 
-__webpack_require__(41)('includes');
+var _isArray = Array.isArray;
+var _a$1 = Array.prototype,ArraySlice$1 = _a$1.slice,ArrayShift = _a$1.shift,ArrayUnshift$1 = _a$1.unshift;
+// Patched Functions:
+function isArray$1(replicaOrAny) {
+  if (isCompatProxy(replicaOrAny)) {
+    return replicaOrAny[ArraySlot] === ProxyIdentifier;
+  }
+  return _isArray(replicaOrAny);
+}
+// http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.7
+function compatPush() {
+  var O = Object(this);
+  var n = O.length;
+  var items = ArraySlice$1.call(arguments);
+  while (items.length) {
+    var E = ArrayShift.call(items);
+    setKey(O, n, E);
+    n += 1;
+  }
+  O.length = n;
+  return O.length;
+}
+// http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.4
+function compatConcat() {
+  var O = Object(this);
+  var A = [];
+  var N = 0;
+  var items = ArraySlice$1.call(arguments);
+  ArrayUnshift$1.call(items, O);
+  while (items.length) {
+    var E = ArrayShift.call(items);
+    if (isArray$1(E)) {
+      var k = 0;
+      var length = E.length;
+      for (k; k < length; k += 1, N += 1) {
+        var subElement = getKey(E, k);
+        A[N] = subElement;
+      }
+    } else
+    {
+      A[N] = E;
+      N += 1;
+    }
+  }
+  return A;
+}
+// http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.13
+function compatUnshift() {
+  var O = Object(this);
+  var len = O.length;
+  var argCount = arguments.length;
+  var k = len;
+  while (k > 0) {
+    var from = k - 1;
+    var to = k + argCount - 1;
+    var fromPresent = compatHasOwnProperty.call(O, from);
+    if (fromPresent) {
+      var fromValue = O[from];
+      setKey(O, to, fromValue);
+    } else
+    {
+      deleteKey(O, to);
+    }
+    k -= 1;
+  }
+  var j = 0;
+  var items = ArraySlice$1.call(arguments);
+  while (items.length) {
+    var E = ArrayShift.call(items);
+    setKey(O, j, E);
+    j += 1;
+  }
+  O.length = len + argCount;
+  return O.length;
+}
 
-/***/ }),
-/* 102 */
-/***/ (function(module, exports, __webpack_require__) {
+function setPrototypeOf$1(obj, proto) {
+  obj.__proto__ = proto;
+  return obj;
+}
 
-"use strict";
-
-
-var __getKey = window.Proxy.getKey;
-// https://github.com/tc39/proposal-object-getownpropertydescriptors
-var $export = __webpack_require__(2);
-var ownKeys = __webpack_require__(103);
-var toIObject = __webpack_require__(13);
-var gOPD = __webpack_require__(38);
-var createProperty = __webpack_require__(40);
-
-$export(__getKey($export, 'S'), 'Object', {
-  getOwnPropertyDescriptors: function getOwnPropertyDescriptors(object) {
-    var O = toIObject(object);
-    var getDesc = __getKey(gOPD, 'f');
-    var keys = ownKeys(O);
-    var result = {};
-    var i = 0;
-    var key, desc;
-    while (__getKey(keys, 'length') > i) {
-      desc = getDesc(O, key = __getKey(keys, i++));
-      if (desc !== undefined) createProperty(result, key, desc);
+if (!Object.setPrototypeOf || !({ __proto__: [] } instanceof Array)) {
+  Object.setPrototypeOf = setPrototypeOf$1;
+}
+var _keys = Object.keys,_getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,_preventExtensions = Object.preventExtensions,_defineProperty = Object.defineProperty,_isExtensible = Object.isExtensible,_getPrototypeOf = Object.getPrototypeOf,_setPrototypeOf = Object.setPrototypeOf;
+function keys(replicaOrAny) {
+  if (isCompatProxy(replicaOrAny)) {
+    var all = replicaOrAny.forIn(); // get all enumerables and filter by own
+    var result = [];
+    // tslint:disable-next-line:forin
+    for (var prop in all) {
+      var desc = replicaOrAny.getOwnPropertyDescriptor(prop);
+      if (desc && desc.enumerable === true) {
+        result.push(prop);
+      }
     }
     return result;
   }
-});
-
-/***/ }),
-/* 103 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var __getKey = window.Proxy.getKey;
-var __setKey = window.Proxy.setKey;
-var __callKey = window.Proxy.callKey;
-// all object keys, includes non-enumerable and symbols
-var gOPN = __webpack_require__(37);
-var gOPS = __webpack_require__(25);
-var anObject = __webpack_require__(8);
-var Reflect = __getKey(__webpack_require__(4), 'Reflect');
-__setKey(module, 'exports', Reflect && __getKey(Reflect, 'ownKeys') || function ownKeys(it) {
-  var keys = __callKey(gOPN, 'f', anObject(it));
-  var getSymbols = __getKey(gOPS, 'f');
-  return getSymbols ? keys.concat(getSymbols(it)) : keys;
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 104 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __getKey = window.Proxy.getKey;
-// https://github.com/tc39/proposal-object-values-entries
-var $export = __webpack_require__(2);
-var $values = __webpack_require__(61)(false);
-
-$export(__getKey($export, 'S'), 'Object', {
-  values: function values(it) {
-    return $values(it);
+  return _keys(replicaOrAny);
+}
+function getPrototypeOf$1(replicaOrAny) {
+  if (isCompatProxy(replicaOrAny)) {
+    return replicaOrAny.getPrototypeOf();
   }
-});
-
-/***/ }),
-/* 105 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __getKey = window.Proxy.getKey;
-// https://github.com/tc39/proposal-object-values-entries
-var $export = __webpack_require__(2);
-var $entries = __webpack_require__(61)(true);
-
-$export(__getKey($export, 'S'), 'Object', {
-  entries: function entries(it) {
-    return $entries(it);
+  return _getPrototypeOf(replicaOrAny);
+}
+function setPrototypeOf$2(replicaOrAny, proto) {
+  if (isCompatProxy(replicaOrAny)) {
+    return replicaOrAny.setPrototypeOf(proto);
   }
-});
+  return _setPrototypeOf(replicaOrAny, proto);
+}
+function getOwnPropertyDescriptor$1(replicaOrAny, key) {
+  if (isCompatProxy(replicaOrAny)) {
+    return replicaOrAny.getOwnPropertyDescriptor(key);
+  }
+  return _getOwnPropertyDescriptor(replicaOrAny, key);
+}
+function preventExtensions$1(replicaOrAny) {
+  if (isCompatProxy(replicaOrAny)) {
+    return replicaOrAny.preventExtensions();
+  }
+  return _preventExtensions(replicaOrAny);
+}
+function isExtensible$1(replicaOrAny) {
+  if (isCompatProxy(replicaOrAny)) {
+    return replicaOrAny.isExtensible();
+  }
+  return _isExtensible(replicaOrAny);
+}
+function defineProperty$1(replicaOrAny, key, descriptor) {
+  if (isCompatProxy(replicaOrAny)) {
+    return replicaOrAny.defineProperty(key, descriptor);
+  }
+  return _defineProperty(replicaOrAny, key, descriptor);
+}
+// patches
+// [*] Object.prototype.hasOwnProperty should be patched as a general rule
+// [ ] Object.propertyIsEnumerable should be patched
+// [*] Array.isArray
+Object.prototype.hasOwnProperty = compatHasOwnProperty;
+Array.isArray = isArray$1;
+// trap `preventExtensions` can be covered by a patched version of:
+// [*] Object.preventExtensions()
+// [ ] Reflect.preventExtensions()
+// trap `getOwnPropertyDescriptor` can be covered by a patched version of:
+// [*] Object.getOwnPropertyDescriptor()
+// [ ] Reflect.getOwnPropertyDescriptor()
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/defineProperty
+// trap `defineProperty` can be covered by a patched version of:
+// [*] Object.defineProperty()
+// [ ] Reflect.defineProperty()
+// trap `deleteProperty` can be covered by the transpilation and the patched version of:
+// [ ] Reflect.deleteProperty()
+// trap `ownKeys` can be covered by a patched version of:
+// [*] Object.getOwnPropertyNames()
+// [ ] Object.getOwnPropertySymbols()
+// [*] Object.keys()
+// [ ] Reflect.ownKeys()
+Object.defineProperty = defineProperty$1;
+Object.preventExtensions = preventExtensions$1;
+Object.getOwnPropertyDescriptor = getOwnPropertyDescriptor$1;
+Object.getOwnPropertyNames = patchedGetOwnPropertyNames;
+Object.isExtensible = isExtensible$1;
+// trap `getPrototypeOf` can be covered by a patched version of:
+// [x] Object.setPrototypeOf()
+// [ ] Reflect.setPrototypeOf()
+// trap `getPrototypeOf` can be covered by a patched version of:
+// [x] Object.getPrototypeOf()
+// [ ] Reflect.getPrototypeOf()
+Object.setPrototypeOf = setPrototypeOf$2;
+Object.getPrototypeOf = getPrototypeOf$1;
+// Other necessary patches:
+// [*] Object.assign
+Object.assign = patchedAssign;
+// Object methods path
+Object.compatKeys = keys;
+// Array.prototype methods patches.
+Object.defineProperties(Array.prototype, {
+  compatUnshift: { value: compatUnshift, enumerable: false },
+  compatConcat: { value: compatConcat, enumerable: false },
+  compatPush: { value: compatPush, enumerable: false } });
+
+function overrideProxy() {
+  return Proxy.__COMPAT__;
+}
+function makeGlobal(obj) {
+  var global = function () {return this;}() || Function('return this')();
+  global.Proxy = obj;
+}
+// At this point Proxy can be the real Proxy (function) a noop-proxy (object with noop-keys) or undefined
+var FinalProxy = typeof Proxy !== 'undefined' ? Proxy : {};
+if (typeof FinalProxy !== 'function' || overrideProxy()) {
+  FinalProxy = /** @class */function (_super) {
+    __extends(Proxy, _super);
+    function Proxy() {
+      return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return Proxy;
+  }(XProxy);
+}
+FinalProxy.getKey = getKey;
+FinalProxy.callKey = callKey;
+FinalProxy.setKey = setKey;
+FinalProxy.deleteKey = deleteKey;
+FinalProxy.inKey = inKey;
+FinalProxy.iterableKey = iterableKey;
+FinalProxy.instanceOfKey = instanceOfKey;
+if (typeof Proxy === 'undefined') {
+  makeGlobal(FinalProxy);
+}
+var FinalProxy$1 = FinalProxy;var _default =
+
+FinalProxy$1;exports.default = _default;
 
 /***/ })
-/******/ ]);var __setKey = window.Proxy.setKey;
-var __getKey = window.Proxy.getKey;
-var __callKey = window.Proxy.callKey;
-var __instanceOfKey = window.Proxy.instanceOfKey;
-var __inKey = window.Proxy.inKey;
-var __iterableKey = window.Proxy.iterableKey;
-var __deleteKey = window.Proxy.deleteKey;
-(function (EngineHelpers) {
-  var babelHelpers = __setKey(EngineHelpers, "babelHelpers", {});
-  __setKey(babelHelpers, "typeof", typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && typeof Symbol === "function" && __getKey(obj, "constructor") === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+/******/ ]);
+
+this.Aura = this.Aura || {};
+this.Aura.compat = (function (exports) {
+'use strict';
+
+var __callKey = Proxy.callKey;
+var __setKey = Proxy.setKey;
+var __getKey = Proxy.getKey;
+var __inKey = Proxy.inKey;
+function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+  var desc = {};
+
+  __callKey(Object['ke' + 'ys'](descriptor), "forEach", function (key) {
+    __setKey(desc, key, __getKey(descriptor, key));
   });
 
-  __setKey(babelHelpers, "asyncIterator", function (iterable) {
-    if (typeof Symbol === "function") {
-      if (Symbol.asyncIterator) {
-        var method = __getKey(iterable, Symbol.asyncIterator);
-        if (method != null) return __callKey(method, "call", iterable);
-      }
+  __setKey(desc, "enumerable", !!__getKey(desc, "enumerable"));
 
-      if (Symbol.iterator) {
-        return __callKey(iterable, Symbol.iterator);
-      }
-    }
+  __setKey(desc, "configurable", !!__getKey(desc, "configurable"));
 
-    throw new TypeError("Object is not async iterable");
-  });
+  if (__inKey(desc, 'value') || __getKey(desc, "initializer")) {
+    __setKey(desc, "writable", true);
+  }
 
-  __setKey(babelHelpers, "asyncGenerator", function () {
-    function AwaitValue(value) {
-      __setKey(this, "value", value);
-    }
+  desc = __callKey(__callKey(__callKey(decorators, "slice"), "reverse"), "reduce", function (desc, decorator) {
+    return decorator(target, property, desc) || desc;
+  }, desc);
 
-    function AsyncGenerator(gen) {
-      var front, back;
+  if (context && __getKey(desc, "initializer") !== void 0) {
+    __setKey(desc, "value", __getKey(desc, "initializer") ? __callKey(__getKey(desc, "initializer"), "call", context) : void 0);
 
-      function send(key, arg) {
-        return new Promise(function (resolve, reject) {
-          var request = {
-            key: key,
-            arg: arg,
-            resolve: resolve,
-            reject: reject,
-            next: null
-          };
+    __setKey(desc, "initializer", undefined);
+  }
 
-          if (back) {
-            back = __setKey(back, "next", request);
-          } else {
-            front = back = request;
-            resume(key, arg);
-          }
-        });
-      }
+  if (__getKey(desc, "initializer") === void 0) {
+    Object['define' + 'Property'](target, property, desc);
+    desc = null;
+  }
 
-      function resume(key, arg) {
-        try {
-          var result = __callKey(gen, key, arg);
-          var value = __getKey(result, "value");
+  return desc;
+}
 
-          if (__instanceOfKey(value, AwaitValue)) {
-            __callKey(Promise.resolve(__getKey(value, "value")), "then", function (arg) {
-              resume("next", arg);
-            }, function (arg) {
-              resume("throw", arg);
-            });
-          } else {
-            settle(__getKey(result, "done") ? "return" : "normal", __getKey(result, "value"));
-          }
-        } catch (err) {
-          settle("throw", err);
-        }
-      }
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
 
-      function settle(type, value) {
-        switch (type) {
-          case "return":
-            __callKey(front, "resolve", {
-              value: value,
-              done: true
-            });
-            break;
+  return self;
+}
 
-          case "throw":
-            __callKey(front, "reject", value);
-            break;
+var __callKey$1 = Proxy.callKey;
+var __setKey$1 = Proxy.setKey;
+var __getKey$1 = Proxy.getKey;
+function _asyncGeneratorDelegate(inner, awaitWrap) {
+  var iter = {},
+      waiting = false;
 
-          default:
-            __callKey(front, "resolve", {
-              value: value,
-              done: false
-            });
-            break;
-        }
-
-        front = __getKey(front, "next");
-
-        if (front) {
-          resume(__getKey(front, "key"), __getKey(front, "arg"));
-        } else {
-          back = null;
-        }
-      }
-
-      __setKey(this, "_invoke", send);
-
-      if (typeof __getKey(gen, "return") !== "function") {
-        __setKey(this, "return", undefined);
-      }
-    }
-
-    if (typeof Symbol === "function" && Symbol.asyncIterator) {
-      __setKey(__getKey(AsyncGenerator, "prototype"), Symbol.asyncIterator, function () {
-        return this;
-      });
-    }
-
-    __setKey(__getKey(AsyncGenerator, "prototype"), "next", function (arg) {
-      return __callKey(this, "_invoke", "next", arg);
+  function pump(key, value) {
+    waiting = true;
+    value = new Promise(function (resolve) {
+      resolve(__callKey$1(inner, key, value));
     });
-
-    __setKey(__getKey(AsyncGenerator, "prototype"), "throw", function (arg) {
-      return __callKey(this, "_invoke", "throw", arg);
-    });
-
-    __setKey(__getKey(AsyncGenerator, "prototype"), "return", function (arg) {
-      return __callKey(this, "_invoke", "return", arg);
-    });
-
     return {
-      wrap: function (fn) {
-        return function () {
-          return new AsyncGenerator(__callKey(fn, "apply", this, arguments));
-        };
-      },
-      await: function (value) {
-        return new AwaitValue(value);
-      }
+      done: false,
+      value: awaitWrap(value)
     };
-  }());
+  }
 
-  __setKey(babelHelpers, "asyncGeneratorDelegate", function (inner, awaitWrap) {
-    var iter = {},
-        waiting = false;
+  if (typeof Symbol === "function" && Symbol.iterator) {
+    __setKey$1(iter, Symbol.iterator, function () {
+      return this;
+    });
+  }
 
-    function pump(key, value) {
-      waiting = true;
-      value = new Promise(function (resolve) {
-        resolve(__callKey(inner, key, value));
-      });
-      return {
-        done: false,
-        value: awaitWrap(value)
-      };
+  __setKey$1(iter, "next", function (value) {
+    if (waiting) {
+      waiting = false;
+      return value;
     }
 
-    ;
+    return pump("next", value);
+  });
 
-    if (typeof Symbol === "function" && Symbol.iterator) {
-      __setKey(iter, Symbol.iterator, function () {
-        return this;
-      });
-    }
-
-    __setKey(iter, "next", function (value) {
+  if (typeof __getKey$1(inner, "throw") === "function") {
+    __setKey$1(iter, "throw", function (value) {
       if (waiting) {
         waiting = false;
-        return value;
+        throw value;
       }
 
-      return pump("next", value);
+      return pump("throw", value);
     });
+  }
 
-    if (typeof __getKey(inner, "throw") === "function") {
-      __setKey(iter, "throw", function (value) {
-        if (waiting) {
-          waiting = false;
-          throw value;
+  if (typeof __getKey$1(inner, "return") === "function") {
+    __setKey$1(iter, "return", function (value) {
+      return pump("return", value);
+    });
+  }
+
+  return iter;
+}
+
+var __getKey$2 = Proxy.getKey;
+var __callKey$2 = Proxy.callKey;
+function _asyncIterator(iterable) {
+  if (typeof Symbol === "function") {
+    if (Symbol.asyncIterator) {
+      var method = __getKey$2(iterable, Symbol.asyncIterator);
+
+      if (method != null) return __callKey$2(method, "call", iterable);
+    }
+
+    if (Symbol.iterator) {
+      return __callKey$2(iterable, Symbol.iterator);
+    }
+  }
+
+  throw new TypeError("Object is not async iterable");
+}
+
+var __callKey$3 = Proxy.callKey;
+var __getKey$3 = Proxy.getKey;
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this,
+        args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = __callKey$3(fn, "apply", self, args);
+
+      function step(key, arg) {
+        try {
+          var info = __callKey$3(gen, key, arg);
+
+          var value = __getKey$3(info, "value");
+        } catch (error) {
+          reject(error);
+          return;
         }
 
-        return pump("throw", value);
-      });
-    }
-
-    if (typeof __getKey(inner, "return") === "function") {
-      __setKey(iter, "return", function (value) {
-        return pump("return", value);
-      });
-    }
-
-    return iter;
-  });
-
-  __setKey(babelHelpers, "asyncToGenerator", function (fn) {
-    return function () {
-      var gen = __callKey(fn, "apply", this, arguments);
-      return new Promise(function (resolve, reject) {
-        function step(key, arg) {
-          try {
-            var info = __callKey(gen, key, arg);
-            var value = __getKey(info, "value");
-          } catch (error) {
-            reject(error);
-            return;
-          }
-
-          if (__getKey(info, "done")) {
-            resolve(value);
-          } else {
-            return __callKey(Promise.resolve(value), "then", function (value) {
-              step("next", value);
-            }, function (err) {
-              step("throw", err);
-            });
-          }
+        if (__getKey$3(info, "done")) {
+          resolve(value);
+        } else {
+          __callKey$3(Promise.resolve(value), "then", _next, _throw);
         }
-
-        return step("next");
-      });
-    };
-  });
-
-  __setKey(babelHelpers, "classCallCheck", function (instance, Constructor) {
-    if (!__instanceOfKey(instance, Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  });
-
-  __setKey(babelHelpers, "createClass", function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < __getKey(props, "length"); i++) {
-        var descriptor = __getKey(props, i);
-        __setKey(descriptor, "enumerable", __getKey(descriptor, "enumerable") || false);
-        __setKey(descriptor, "configurable", true);
-        if (__inKey(descriptor, "value")) __setKey(descriptor, "writable", true);
-        Object.defineProperty(target, __getKey(descriptor, "key"), descriptor);
       }
-    }
 
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(__getKey(Constructor, "prototype"), protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }());
-
-  __setKey(babelHelpers, "defineEnumerableProperties", function (obj, descs) {
-    for (var key in __iterableKey(descs)) {
-      var desc = __getKey(descs, key);
-      __setKey(desc, "configurable", __setKey(desc, "enumerable", true));
-      if (__inKey(desc, "value")) __setKey(desc, "writable", true);
-      Object.defineProperty(obj, key, desc);
-    }
-
-    return obj;
-  });
-
-  __setKey(babelHelpers, "defaults", function (obj, defaults) {
-    var keys = Object.getOwnPropertyNames(defaults);
-
-    for (var i = 0; i < __getKey(keys, "length"); i++) {
-      var key = __getKey(keys, i);
-      var value = Object.getOwnPropertyDescriptor(defaults, key);
-
-      if (value && __getKey(value, "configurable") && __getKey(obj, key) === undefined) {
-        Object.defineProperty(obj, key, value);
+      function _next(value) {
+        step("next", value);
       }
+
+      function _throw(err) {
+        step("throw", err);
+      }
+
+      _next();
+    });
+  };
+}
+
+var __setKey$2 = Proxy.setKey;
+function _AwaitValue(value) {
+  __setKey$2(this, "wrapped", value);
+}
+
+function _awaitAsyncGenerator(value) {
+  return new _AwaitValue(value);
+}
+
+var __instanceOfKey = Proxy.instanceOfKey;
+function _classCallCheck(instance, Constructor) {
+  if (!__instanceOfKey(instance, Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _classNameTDZError(name) {
+  throw new Error("Class \"" + name + "\" cannot be referenced in computed property keys.");
+}
+
+var __getKey$4 = Proxy.getKey;
+var __setKey$3 = Proxy.setKey;
+var __inKey$1 = Proxy.inKey;
+
+function _defineProperties(target, props) {
+  for (var i = 0; i < __getKey$4(props, "length"); i++) {
+    var descriptor = __getKey$4(props, i);
+
+    __setKey$3(descriptor, "enumerable", __getKey$4(descriptor, "enumerable") || false);
+
+    __setKey$3(descriptor, "configurable", true);
+
+    if (__inKey$1(descriptor, "value")) __setKey$3(descriptor, "writable", true);
+    Object.defineProperty(target, __getKey$4(descriptor, "key"), descriptor);
+  }
+}
+
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(__getKey$4(Constructor, "prototype"), protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+
+var __getKey$5 = Proxy.getKey;
+function _defaults(obj, defaults) {
+  var keys = Object.getOwnPropertyNames(defaults);
+
+  for (var i = 0; i < __getKey$5(keys, "length"); i++) {
+    var key = __getKey$5(keys, i);
+
+    var value = Object.getOwnPropertyDescriptor(defaults, key);
+
+    if (value && __getKey$5(value, "configurable") && __getKey$5(obj, key) === undefined) {
+      Object.defineProperty(obj, key, value);
     }
+  }
 
-    return obj;
-  });
+  return obj;
+}
 
-  __setKey(babelHelpers, "defineProperty", function (obj, key, value) {
-    if (__inKey(obj, key)) {
-      Object.defineProperty(obj, key, {
-        value: value,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      });
-    } else {
-      __setKey(obj, key, value);
+var __iterableKey = Proxy.iterableKey;
+var __getKey$6 = Proxy.getKey;
+var __setKey$4 = Proxy.setKey;
+var __inKey$2 = Proxy.inKey;
+function _defineEnumerableProperties(obj, descs) {
+  for (var key in __iterableKey(descs)) {
+    var desc = __getKey$6(descs, key);
+
+    __setKey$4(desc, "configurable", __setKey$4(desc, "enumerable", true));
+
+    if (__inKey$2(desc, "value")) __setKey$4(desc, "writable", true);
+    Object.defineProperty(obj, key, desc);
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    var objectSymbols = Object.getOwnPropertySymbols(descs);
+
+    for (var i = 0; i < __getKey$6(objectSymbols, "length"); i++) {
+      var sym = __getKey$6(objectSymbols, i);
+
+      var desc = __getKey$6(descs, sym);
+
+      __setKey$4(desc, "configurable", __setKey$4(desc, "enumerable", true));
+
+      if (__inKey$2(desc, "value")) __setKey$4(desc, "writable", true);
+      Object.defineProperty(obj, sym, desc);
     }
+  }
 
-    return obj;
-  });
+  return obj;
+}
 
-  __setKey(babelHelpers, "extends", Object.assign || function (target) {
+var __inKey$3 = Proxy.inKey;
+var __setKey$5 = Proxy.setKey;
+function _defineProperty(obj, key, value) {
+  if (__inKey$3(obj, key)) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    __setKey$5(obj, key, value);
+  }
+
+  return obj;
+}
+
+var __iterableKey$1 = Proxy.iterableKey;
+var __callKey$4 = Proxy.callKey;
+var __getKey$7 = Proxy.getKey;
+var __setKey$6 = Proxy.setKey;
+function _extends() {
+  _extends = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
-      for (var key in __iterableKey(source)) {
-        if (__callKey(__getKey(Object.prototype, "hasOwnProperty"), "call", source, key)) {
-          __setKey(target, key, __getKey(source, key));
+      for (var key in __iterableKey$1(source)) {
+        if (__callKey$4(__getKey$7(Object.prototype, "hasOwnProperty"), "call", source, key)) {
+          __setKey$6(target, key, __getKey$7(source, key));
         }
       }
     }
 
     return target;
-  });
+  };
 
-  __setKey(babelHelpers, "get", function get(object, property, receiver) {
-    if (object === null) object = Function.prototype;
-    var desc = Object.getOwnPropertyDescriptor(object, property);
+  return __callKey$4(_extends, "apply", this, arguments);
+}
 
-    if (desc === undefined) {
-      var parent = Object.getPrototypeOf(object);
+var __inKey$4 = Proxy.inKey;
+var __getKey$8 = Proxy.getKey;
+var __callKey$5 = Proxy.callKey;
+function _get(object, property, receiver) {
+  if (object === null) object = Function.prototype;
+  var desc = Object.getOwnPropertyDescriptor(object, property);
 
-      if (parent === null) {
-        return undefined;
-      } else {
-        return get(parent, property, receiver);
-      }
-    } else if (__inKey(desc, "value")) {
-      return __getKey(desc, "value");
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
     } else {
-      var getter = __getKey(desc, "get");
-
-      if (getter === undefined) {
-        return undefined;
-      }
-
-      return __callKey(getter, "call", receiver);
+      return _get(parent, property, receiver);
     }
-  });
+  } else if (__inKey$4(desc, "value")) {
+    return __getKey$8(desc, "value");
+  } else {
+    var getter = __getKey$8(desc, "get");
 
-  __setKey(babelHelpers, "inherits", function (subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    if (getter === undefined) {
+      return undefined;
     }
 
-    __setKey(subClass, "prototype", Object.create(superClass && __getKey(superClass, "prototype"), {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    }));
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : __setKey(subClass, "__proto__", superClass);
-  });
+    return __callKey$5(getter, "call", receiver);
+  }
+}
 
-  __setKey(babelHelpers, "instanceof", function (left, right) {
-    if (right != null && typeof Symbol !== "undefined" && __getKey(right, Symbol.hasInstance)) {
-      return __callKey(right, Symbol.hasInstance, left);
-    } else {
-      return __instanceOfKey(left, right);
+var __setKey$7 = Proxy.setKey;
+var __getKey$9 = Proxy.getKey;
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+
+  __setKey$7(subClass, "prototype", Object.create(superClass && __getKey$9(superClass, "prototype"), {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
     }
+  }));
+
+  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : __setKey$7(subClass, "__proto__", superClass);
+}
+
+var __setKey$8 = Proxy.setKey;
+var __getKey$10 = Proxy.getKey;
+function _inheritsLoose(subClass, superClass) {
+  __setKey$8(subClass, "prototype", Object.create(__getKey$10(superClass, "prototype")));
+
+  __setKey$8(__getKey$10(subClass, "prototype"), "constructor", subClass);
+
+  __setKey$8(subClass, "__proto__", superClass);
+}
+
+var __getKey$11 = Proxy.getKey;
+var __callKey$6 = Proxy.callKey;
+function _initializerDefineProperty(target, property, descriptor, context) {
+  if (!descriptor) return;
+  Object.defineProperty(target, property, {
+    enumerable: __getKey$11(descriptor, "enumerable"),
+    configurable: __getKey$11(descriptor, "configurable"),
+    writable: __getKey$11(descriptor, "writable"),
+    value: __getKey$11(descriptor, "initializer") ? __callKey$6(__getKey$11(descriptor, "initializer"), "call", context) : void 0
   });
+}
 
-  __setKey(babelHelpers, "newArrowCheck", function (innerThis, boundThis) {
-    if (innerThis !== boundThis) {
-      throw new TypeError("Cannot instantiate an arrow function");
-    }
-  });
+function _initializerWarningHelper(descriptor, context) {
+  throw new Error('Decorating class property failed. Please ensure that ' + 'proposal-class-properties is enabled and set to use loose mode. ' + 'To use proposal-class-properties in spec mode with decorators, wait for ' + 'the next major version of decorators in stage 2.');
+}
 
-  __setKey(babelHelpers, "objectDestructuringEmpty", function (obj) {
-    if (obj == null) throw new TypeError("Cannot destructure undefined");
-  });
+var __getKey$12 = Proxy.getKey;
+var __callKey$7 = Proxy.callKey;
+var __instanceOfKey$1 = Proxy.instanceOfKey;
+function _instanceof(left, right) {
+  if (right != null && typeof Symbol !== "undefined" && __getKey$12(right, Symbol.hasInstance)) {
+    return __callKey$7(right, Symbol.hasInstance, left);
+  } else {
+    return __instanceOfKey$1(left, right);
+  }
+}
 
-  __setKey(babelHelpers, "objectWithoutProperties", function (obj, keys) {
-    var target = {};
+var __getKey$13 = Proxy.getKey;
+var __iterableKey$2 = Proxy.iterableKey;
+var __setKey$9 = Proxy.setKey;
+var REACT_ELEMENT_TYPE;
+function _createRawReactElement(type, props, key, children) {
+  if (!REACT_ELEMENT_TYPE) {
+    REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7;
+  }
 
-    for (var i in __iterableKey(obj)) {
-      if (__callKey(keys, "indexOf", i) >= 0) continue;
-      if (!__callKey(__getKey(Object.prototype, "hasOwnProperty"), "call", obj, i)) continue;
-      __setKey(target, i, __getKey(obj, i));
-    }
+  var defaultProps = type && __getKey$13(type, "defaultProps");
 
-    return target;
-  });
+  var childrenLength = arguments.length - 3;
 
-  __setKey(babelHelpers, "possibleConstructorReturn", function (self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  });
-
-  __setKey(babelHelpers, "set", function set(object, property, value, receiver) {
-    var desc = Object.getOwnPropertyDescriptor(object, property);
-
-    if (desc === undefined) {
-      var parent = Object.getPrototypeOf(object);
-
-      if (parent !== null) {
-        set(parent, property, value, receiver);
-      }
-    } else if (__inKey(desc, "value") && __getKey(desc, "writable")) {
-      __setKey(desc, "value", value);
-    } else {
-      var setter = __getKey(desc, "set");
-
-      if (setter !== undefined) {
-        __callKey(setter, "call", receiver, value);
-      }
-    }
-
-    return value;
-  });
-
-  __setKey(babelHelpers, "slicedToArray", function () {
-    function sliceIterator(arr, i) {
-      var _arr = [];
-      var _n = true;
-      var _d = false;
-      var _e = undefined;
-
-      try {
-        for (var _i = __callKey(arr, Symbol.iterator), _s; !(_n = __getKey(_s = __callKey(_i, "next"), "done")); _n = true) {
-          _arr.push(__getKey(_s, "value"));
-
-          if (i && __getKey(_arr, "length") === i) break;
-        }
-      } catch (err) {
-        _d = true;
-        _e = err;
-      } finally {
-        try {
-          if (!_n && __getKey(_i, "return")) __callKey(_i, "return");
-        } finally {
-          if (_d) throw _e;
-        }
-      }
-
-      return _arr;
-    }
-
-    return function (arr, i) {
-      if (Array.isArray(arr)) {
-        return arr;
-      } else if (__inKey(Object(arr), Symbol.iterator)) {
-        return sliceIterator(arr, i);
-      } else {
-        throw new TypeError("Invalid attempt to destructure non-iterable instance");
-      }
+  if (!props && childrenLength !== 0) {
+    props = {
+      children: void 0
     };
-  }());
+  }
 
-  __setKey(babelHelpers, "taggedTemplateLiteral", function (strings, raw) {
-    return Object.freeze(Object.defineProperties(strings, {
-      raw: {
-        value: Object.freeze(raw)
-      }
-    }));
-  });
-
-  __setKey(babelHelpers, "temporalRef", function (val, name, undef) {
-    if (val === undef) {
-      throw new ReferenceError(name + " is not defined - temporal dead zone");
-    } else {
-      return val;
-    }
-  });
-
-  __setKey(babelHelpers, "temporalUndefined", {});
-
-  __setKey(babelHelpers, "toArray", function (arr) {
-    return Array.isArray(arr) ? arr : Array.from(arr);
-  });
-
-  __setKey(babelHelpers, "toConsumableArray", function (arr) {
-    if (Array.isArray(arr)) {
-      for (var i = 0, arr2 = Array(__getKey(arr, "length")); i < __getKey(arr, "length"); i++) __setKey(arr2, i, __getKey(arr, i));
-
-      return arr2;
-    } else {
-      return Array.from(arr);
-    }
-  });
-
-  !function (global) {
-    "use strict";
-
-    var Op = Object.prototype;
-    var hasOwn = __getKey(Op, "hasOwnProperty");
-    var undefined;
-    var $Symbol = typeof Symbol === "function" ? Symbol : {};
-    var iteratorSymbol = __getKey($Symbol, "iterator") || "@@iterator";
-    var asyncIteratorSymbol = __getKey($Symbol, "asyncIterator") || "@@asyncIterator";
-    var toStringTagSymbol = __getKey($Symbol, "toStringTag") || "@@toStringTag";
-    var inModule = typeof module === "object";
-    var runtime = __getKey(global, "regeneratorRuntime");
-
-    if (runtime) {
-      if (inModule) {
-        __setKey(module, "exports", runtime);
-      }
-
-      return;
-    }
-
-    runtime = __setKey(global, "regeneratorRuntime", inModule ? __getKey(module, "exports") : {});
-
-    function wrap(innerFn, outerFn, self, tryLocsList) {
-      var protoGenerator = outerFn && __instanceOfKey(__getKey(outerFn, "prototype"), Generator) ? outerFn : Generator;
-      var generator = Object.create(__getKey(protoGenerator, "prototype"));
-      var context = new Context(tryLocsList || []);
-      __setKey(generator, "_invoke", makeInvokeMethod(innerFn, self, context));
-      return generator;
-    }
-
-    __setKey(runtime, "wrap", wrap);
-
-    function tryCatch(fn, obj, arg) {
-      try {
-        return {
-          type: "normal",
-          arg: __callKey(fn, "call", obj, arg)
-        };
-      } catch (err) {
-        return {
-          type: "throw",
-          arg: err
-        };
+  if (props && defaultProps) {
+    for (var propName in __iterableKey$2(defaultProps)) {
+      if (__getKey$13(props, propName) === void 0) {
+        __setKey$9(props, propName, __getKey$13(defaultProps, propName));
       }
     }
+  } else if (!props) {
+    props = defaultProps || {};
+  }
 
-    var GenStateSuspendedStart = "suspendedStart";
-    var GenStateSuspendedYield = "suspendedYield";
-    var GenStateExecuting = "executing";
-    var GenStateCompleted = "completed";
-    var ContinueSentinel = {};
+  if (childrenLength === 1) {
+    __setKey$9(props, "children", children);
+  } else if (childrenLength > 1) {
+    var childArray = new Array(childrenLength);
 
-    function Generator() {}
-
-    function GeneratorFunction() {}
-
-    function GeneratorFunctionPrototype() {}
-
-    var IteratorPrototype = {};
-
-    __setKey(IteratorPrototype, iteratorSymbol, function () {
-      return this;
-    });
-
-    var getProto = Object.getPrototypeOf;
-    var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
-
-    if (NativeIteratorPrototype && NativeIteratorPrototype !== Op && __callKey(hasOwn, "call", NativeIteratorPrototype, iteratorSymbol)) {
-      IteratorPrototype = NativeIteratorPrototype;
+    for (var i = 0; i < childrenLength; i++) {
+      __setKey$9(childArray, i, arguments[i + 3]);
     }
 
-    var Gp = __setKey(GeneratorFunctionPrototype, "prototype", __setKey(Generator, "prototype", Object.create(IteratorPrototype)));
-    __setKey(GeneratorFunction, "prototype", __setKey(Gp, "constructor", GeneratorFunctionPrototype));
-    __setKey(GeneratorFunctionPrototype, "constructor", GeneratorFunction);
-    __setKey(GeneratorFunctionPrototype, toStringTagSymbol, __setKey(GeneratorFunction, "displayName", "GeneratorFunction"));
+    __setKey$9(props, "children", childArray);
+  }
 
-    function defineIteratorMethods(prototype) {
-      __callKey(["next", "throw", "return"], "forEach", function (method) {
-        __setKey(prototype, method, function (arg) {
-          return __callKey(this, "_invoke", method, arg);
-        });
-      });
+  return {
+    $$typeof: REACT_ELEMENT_TYPE,
+    type: type,
+    key: key === undefined ? null : '' + key,
+    ref: null,
+    props: props,
+    _owner: null
+  };
+}
+
+function _newArrowCheck(innerThis, boundThis) {
+  if (innerThis !== boundThis) {
+    throw new TypeError("Cannot instantiate an arrow function");
+  }
+}
+
+function _objectDestructuringEmpty(obj) {
+  if (obj == null) throw new TypeError("Cannot destructure undefined");
+}
+
+var __getKey$14 = Proxy.getKey;
+var __callKey$8 = Proxy.callKey;
+var __setKey$10 = Proxy.setKey;
+function _objectWithoutProperties(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.compatKeys(source);
+  var key, i;
+
+  for (i = 0; i < __getKey$14(sourceKeys, "length"); i++) {
+    key = __getKey$14(sourceKeys, i);
+    if (__callKey$8(excluded, "indexOf", key) >= 0) continue;
+
+    __setKey$10(target, key, __getKey$14(source, key));
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+    for (i = 0; i < __getKey$14(sourceSymbolKeys, "length"); i++) {
+      key = __getKey$14(sourceSymbolKeys, i);
+      if (__callKey$8(excluded, "indexOf", key) >= 0) continue;
+      if (!__callKey$8(__getKey$14(Object.prototype, "propertyIsEnumerable"), "call", source, key)) continue;
+
+      __setKey$10(target, key, __getKey$14(source, key));
     }
+  }
 
-    __setKey(runtime, "isGeneratorFunction", function (genFun) {
-      var ctor = typeof genFun === "function" && __getKey(genFun, "constructor");
-      return ctor ? ctor === GeneratorFunction || (__getKey(ctor, "displayName") || __getKey(ctor, "name")) === "GeneratorFunction" : false;
-    });
+  return target;
+}
 
-    __setKey(runtime, "mark", function (genFun) {
-      if (Object.setPrototypeOf) {
-        Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
-      } else {
-        __setKey(genFun, "__proto__", GeneratorFunctionPrototype);
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
 
-        if (!__inKey(genFun, toStringTagSymbol)) {
-          __setKey(genFun, toStringTagSymbol, "GeneratorFunction");
-        }
-      }
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
 
-      __setKey(genFun, "prototype", Object.create(Gp));
-      return genFun;
-    });
+  return self;
+}
 
-    __setKey(runtime, "awrap", function (arg) {
-      return {
-        __await: arg
+function _readOnlyError(name) {
+  throw new Error("\"" + name + "\" is read-only");
+}
+
+var __inKey$5 = Proxy.inKey;
+var __getKey$15 = Proxy.getKey;
+var __setKey$11 = Proxy.setKey;
+var __callKey$9 = Proxy.callKey;
+function _set(object, property, value, receiver) {
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent !== null) {
+      _set(parent, property, value, receiver);
+    }
+  } else if (__inKey$5(desc, "value") && __getKey$15(desc, "writable")) {
+    __setKey$11(desc, "value", value);
+  } else {
+    var setter = __getKey$15(desc, "set");
+
+    if (setter !== undefined) {
+      __callKey$9(setter, "call", receiver, value);
+    }
+  }
+
+  return value;
+}
+
+var __callKey$10 = Proxy.callKey;
+function _skipFirstGeneratorNext(fn) {
+  return function () {
+    var it = __callKey$10(fn, "apply", this, arguments);
+
+    __callKey$10(it, "next");
+
+    return it;
+  };
+}
+
+var __callKey$11 = Proxy.callKey;
+var __getKey$16 = Proxy.getKey;
+var __inKey$6 = Proxy.inKey;
+
+function _sliceIterator(arr, i) {
+  var _arr = [];
+  var _n = true;
+  var _d = false;
+  var _e = undefined;
+
+  try {
+    for (var _i = __callKey$11(arr, Symbol.iterator), _s; !(_n = __getKey$16(_s = __callKey$11(_i, "next"), "done")); _n = true) {
+      _arr.push(__getKey$16(_s, "value"));
+
+      if (i && __getKey$16(_arr, "length") === i) break;
+    }
+  } catch (err) {
+    _d = true;
+    _e = err;
+  } finally {
+    try {
+      if (!_n && __getKey$16(_i, "return") != null) __callKey$11(_i, "return");
+    } finally {
+      if (_d) throw _e;
+    }
+  }
+
+  return _arr;
+}
+
+function _slicedToArray(arr, i) {
+  if (Array.isArray(arr)) {
+    return arr;
+  } else if (__inKey$6(Object(arr), Symbol.iterator)) {
+    return _sliceIterator(arr, i);
+  } else {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance");
+  }
+}
+
+function _taggedTemplateLiteral(strings, raw) {
+  return Object.freeze(Object.defineProperties(strings, {
+    raw: {
+      value: Object.freeze(raw)
+    }
+  }));
+}
+
+var undef = {};
+
+function _temporalRef(val, name) {
+  if (val === undef) {
+    throw new ReferenceError(name + " is not defined - temporal dead zone");
+  } else {
+    return val;
+  }
+}
+
+function _toArray(arr) {
+  return Array.isArray(arr) ? arr : Array.from(arr);
+}
+
+var __getKey$17 = Proxy.getKey;
+var __setKey$12 = Proxy.setKey;
+function _toConsumableArray(arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = new Array(__getKey$17(arr, "length")); i < __getKey$17(arr, "length"); i++) __setKey$12(arr2, i, __getKey$17(arr, i));
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+}
+
+function _toPropertyKey(key) {
+  if (typeof key === "symbol") {
+    return key;
+  } else {
+    return String(key);
+  }
+}
+
+var __getKey$18 = Proxy.getKey;
+function _typeof(obj) {
+  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+    _typeof = function (obj) {
+      return typeof obj;
+    };
+  } else {
+    _typeof = function (obj) {
+      return obj && typeof Symbol === "function" && __getKey$18(obj, "constructor") === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    };
+  }
+
+  return _typeof(obj);
+}
+
+var __setKey$13 = Proxy.setKey;
+var __callKey$12 = Proxy.callKey;
+var __getKey$19 = Proxy.getKey;
+var __instanceOfKey$2 = Proxy.instanceOfKey;
+function AsyncGenerator(gen) {
+  var front, back;
+
+  function send(key, arg) {
+    return new Promise(function (resolve, reject) {
+      var request = {
+        key: key,
+        arg: arg,
+        resolve: resolve,
+        reject: reject,
+        next: null
       };
-    });
 
-    function AsyncIterator(generator) {
-      function invoke(method, arg, resolve, reject) {
-        var record = tryCatch(__getKey(generator, method), generator, arg);
-
-        if (__getKey(record, "type") === "throw") {
-          reject(__getKey(record, "arg"));
-        } else {
-          var result = __getKey(record, "arg");
-          var value = __getKey(result, "value");
-
-          if (value && typeof value === "object" && __callKey(hasOwn, "call", value, "__await")) {
-            return __callKey(Promise.resolve(__getKey(value, "__await")), "then", function (value) {
-              invoke("next", value, resolve, reject);
-            }, function (err) {
-              invoke("throw", err, resolve, reject);
-            });
-          }
-
-          return __callKey(Promise.resolve(value), "then", function (unwrapped) {
-            __setKey(result, "value", unwrapped);
-            resolve(result);
-          }, reject);
-        }
+      if (back) {
+        back = __setKey$13(back, "next", request);
+      } else {
+        front = back = request;
+        resume(key, arg);
       }
+    });
+  }
 
-      var previousPromise;
+  function resume(key, arg) {
+    try {
+      var result = __callKey$12(gen, key, arg);
 
-      function enqueue(method, arg) {
-        function callInvokeWithMethodAndArg() {
-          return new Promise(function (resolve, reject) {
-            invoke(method, arg, resolve, reject);
+      var value = __getKey$19(result, "value");
+
+      var wrappedAwait = __instanceOfKey$2(value, _AwaitValue);
+
+      __callKey$12(Promise.resolve(wrappedAwait ? __getKey$19(value, "wrapped") : value), "then", function (arg) {
+        if (wrappedAwait) {
+          resume("next", arg);
+          return;
+        }
+
+        settle(__getKey$19(result, "done") ? "return" : "normal", arg);
+      }, function (err) {
+        resume("throw", err);
+      });
+    } catch (err) {
+      settle("throw", err);
+    }
+  }
+
+  function settle(type, value) {
+    switch (type) {
+      case "return":
+        __callKey$12(front, "resolve", {
+          value: value,
+          done: true
+        });
+
+        break;
+
+      case "throw":
+        __callKey$12(front, "reject", value);
+
+        break;
+
+      default:
+        __callKey$12(front, "resolve", {
+          value: value,
+          done: false
+        });
+
+        break;
+    }
+
+    front = __getKey$19(front, "next");
+
+    if (front) {
+      resume(__getKey$19(front, "key"), __getKey$19(front, "arg"));
+    } else {
+      back = null;
+    }
+  }
+
+  __setKey$13(this, "_invoke", send);
+
+  if (typeof __getKey$19(gen, "return") !== "function") {
+    __setKey$13(this, "return", undefined);
+  }
+}
+
+if (typeof Symbol === "function" && Symbol.asyncIterator) {
+  __setKey$13(__getKey$19(AsyncGenerator, "prototype"), Symbol.asyncIterator, function () {
+    return this;
+  });
+}
+
+__setKey$13(__getKey$19(AsyncGenerator, "prototype"), "next", function (arg) {
+  return __callKey$12(this, "_invoke", "next", arg);
+});
+
+__setKey$13(__getKey$19(AsyncGenerator, "prototype"), "throw", function (arg) {
+  return __callKey$12(this, "_invoke", "throw", arg);
+});
+
+__setKey$13(__getKey$19(AsyncGenerator, "prototype"), "return", function (arg) {
+  return __callKey$12(this, "_invoke", "return", arg);
+});
+
+var __callKey$13 = Proxy.callKey;
+function _wrapAsyncGenerator(fn) {
+  return function () {
+    return new AsyncGenerator(__callKey$13(fn, "apply", this, arguments));
+  };
+}
+
+var __getKey$20 = Proxy.getKey;
+var __setKey$14 = Proxy.setKey;
+var __callKey$14 = Proxy.callKey;
+
+var _gPO = Object.getPrototypeOf || function _gPO(o) {
+  return __getKey$20(o, "__proto__");
+};
+
+var _sPO = Object.setPrototypeOf || function _sPO(o, p) {
+  __setKey$14(o, "__proto__", p);
+
+  return o;
+};
+
+var _construct = typeof Reflect === "object" && __getKey$20(Reflect, "construct") || function _construct(Parent, args, Class) {
+  var Constructor,
+      a = [null];
+
+  __callKey$14(a.push, "apply", a, args);
+
+  Constructor = __callKey$14(__getKey$20(Parent, "bind"), "apply", Parent, a);
+  return _sPO(new Constructor(), __getKey$20(Class, "prototype"));
+};
+
+var _cache = typeof Map === "function" && new Map();
+
+function _wrapNativeSuper(Class) {
+  if (typeof Class !== "function") {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+
+  if (typeof _cache !== "undefined") {
+    if (__callKey$14(_cache, "has", Class)) return __callKey$14(_cache, "get", Class);
+
+    __callKey$14(_cache, "set", Class, Wrapper);
+  }
+
+  function Wrapper() {}
+
+  __setKey$14(Wrapper, "prototype", Object.create(__getKey$20(Class, "prototype"), {
+    constructor: {
+      value: Wrapper,
+      enumerable: false,
+      writeable: true,
+      configurable: true
+    }
+  }));
+
+  return _sPO(Wrapper, _sPO(function Super() {
+    return _construct(Class, arguments, __getKey$20(_gPO(this), "constructor"));
+  }, Class));
+}
+
+var __getKey$21 = Proxy.getKey;
+var __setKey$15 = Proxy.setKey;
+var __instanceOfKey$3 = Proxy.instanceOfKey;
+var __callKey$15 = Proxy.callKey;
+var __inKey$7 = Proxy.inKey;
+var __deleteKey = Proxy.deleteKey;
+var __iterableKey$3 = Proxy.iterableKey;
+const global = {};
+!function (global) {
+
+  var Op = Object.prototype;
+
+  var hasOwn = __getKey$21(Op, "hasOwnProperty");
+
+  var undefined;
+  var $Symbol = typeof Symbol === "function" ? Symbol : {};
+  var iteratorSymbol = __getKey$21($Symbol, "iterator") || "@@iterator";
+  var asyncIteratorSymbol = __getKey$21($Symbol, "asyncIterator") || "@@asyncIterator";
+  var toStringTagSymbol = __getKey$21($Symbol, "toStringTag") || "@@toStringTag";
+  var inModule = typeof module === "object";
+
+  var runtime = __getKey$21(global, "regeneratorRuntime");
+
+  if (runtime) {
+    if (inModule) {
+      __setKey$15(module, "exports", runtime);
+    }
+
+    return;
+  }
+
+  runtime = __setKey$15(global, "regeneratorRuntime", inModule ? __getKey$21(module, "exports") : {});
+
+  function wrap(innerFn, outerFn, self, tryLocsList) {
+    var protoGenerator = outerFn && __instanceOfKey$3(__getKey$21(outerFn, "prototype"), Generator) ? outerFn : Generator;
+    var generator = Object.create(__getKey$21(protoGenerator, "prototype"));
+    var context = new Context(tryLocsList || []);
+
+    __setKey$15(generator, "_invoke", makeInvokeMethod(innerFn, self, context));
+
+    return generator;
+  }
+
+  __setKey$15(runtime, "wrap", wrap);
+
+  function tryCatch(fn, obj, arg) {
+    try {
+      return {
+        type: "normal",
+        arg: __callKey$15(fn, "call", obj, arg)
+      };
+    } catch (err) {
+      return {
+        type: "throw",
+        arg: err
+      };
+    }
+  }
+
+  var GenStateSuspendedStart = "suspendedStart";
+  var GenStateSuspendedYield = "suspendedYield";
+  var GenStateExecuting = "executing";
+  var GenStateCompleted = "completed";
+  var ContinueSentinel = {};
+
+  function Generator() {}
+
+  function GeneratorFunction() {}
+
+  function GeneratorFunctionPrototype() {}
+
+  var IteratorPrototype = {};
+
+  __setKey$15(IteratorPrototype, iteratorSymbol, function () {
+    return this;
+  });
+
+  var getProto = Object.getPrototypeOf;
+  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
+
+  if (NativeIteratorPrototype && NativeIteratorPrototype !== Op && __callKey$15(hasOwn, "call", NativeIteratorPrototype, iteratorSymbol)) {
+    IteratorPrototype = NativeIteratorPrototype;
+  }
+
+  var Gp = __setKey$15(GeneratorFunctionPrototype, "prototype", __setKey$15(Generator, "prototype", Object.create(IteratorPrototype)));
+
+  __setKey$15(GeneratorFunction, "prototype", __setKey$15(Gp, "constructor", GeneratorFunctionPrototype));
+
+  __setKey$15(GeneratorFunctionPrototype, "constructor", GeneratorFunction);
+
+  __setKey$15(GeneratorFunctionPrototype, toStringTagSymbol, __setKey$15(GeneratorFunction, "displayName", "GeneratorFunction"));
+
+  function defineIteratorMethods(prototype) {
+    __callKey$15(["next", "throw", "return"], "forEach", function (method) {
+      __setKey$15(prototype, method, function (arg) {
+        return __callKey$15(this, "_invoke", method, arg);
+      });
+    });
+  }
+
+  __setKey$15(runtime, "isGeneratorFunction", function (genFun) {
+    var ctor = typeof genFun === "function" && __getKey$21(genFun, "constructor");
+
+    return ctor ? ctor === GeneratorFunction || (__getKey$21(ctor, "displayName") || __getKey$21(ctor, "name")) === "GeneratorFunction" : false;
+  });
+
+  __setKey$15(runtime, "mark", function (genFun) {
+    if (Object.setPrototypeOf) {
+      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
+    } else {
+      __setKey$15(genFun, "__proto__", GeneratorFunctionPrototype);
+
+      if (!__inKey$7(genFun, toStringTagSymbol)) {
+        __setKey$15(genFun, toStringTagSymbol, "GeneratorFunction");
+      }
+    }
+
+    __setKey$15(genFun, "prototype", Object.create(Gp));
+
+    return genFun;
+  });
+
+  __setKey$15(runtime, "awrap", function (arg) {
+    return {
+      __await: arg
+    };
+  });
+
+  function AsyncIterator(generator) {
+    function invoke(method, arg, resolve, reject) {
+      var record = tryCatch(__getKey$21(generator, method), generator, arg);
+
+      if (__getKey$21(record, "type") === "throw") {
+        reject(__getKey$21(record, "arg"));
+      } else {
+        var result = __getKey$21(record, "arg");
+
+        var value = __getKey$21(result, "value");
+
+        if (value && typeof value === "object" && __callKey$15(hasOwn, "call", value, "__await")) {
+          return __callKey$15(Promise.resolve(__getKey$21(value, "__await")), "then", function (value) {
+            invoke("next", value, resolve, reject);
+          }, function (err) {
+            invoke("throw", err, resolve, reject);
           });
         }
 
-        return previousPromise = previousPromise ? __callKey(previousPromise, "then", callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg();
-      }
+        return __callKey$15(Promise.resolve(value), "then", function (unwrapped) {
+          __setKey$15(result, "value", unwrapped);
 
-      __setKey(this, "_invoke", enqueue);
+          resolve(result);
+        }, reject);
+      }
     }
 
-    defineIteratorMethods(__getKey(AsyncIterator, "prototype"));
+    var previousPromise;
 
-    __setKey(__getKey(AsyncIterator, "prototype"), asyncIteratorSymbol, function () {
-      return this;
+    function enqueue(method, arg) {
+      function callInvokeWithMethodAndArg() {
+        return new Promise(function (resolve, reject) {
+          invoke(method, arg, resolve, reject);
+        });
+      }
+
+      return previousPromise = previousPromise ? __callKey$15(previousPromise, "then", callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg();
+    }
+
+    __setKey$15(this, "_invoke", enqueue);
+  }
+
+  defineIteratorMethods(__getKey$21(AsyncIterator, "prototype"));
+
+  __setKey$15(__getKey$21(AsyncIterator, "prototype"), asyncIteratorSymbol, function () {
+    return this;
+  });
+
+  __setKey$15(runtime, "AsyncIterator", AsyncIterator);
+
+  __setKey$15(runtime, "async", function (innerFn, outerFn, self, tryLocsList) {
+    var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList));
+    return __callKey$15(runtime, "isGeneratorFunction", outerFn) ? iter : __callKey$15(__callKey$15(iter, "next"), "then", function (result) {
+      return __getKey$21(result, "done") ? __getKey$21(result, "value") : __callKey$15(iter, "next");
     });
+  });
 
-    __setKey(runtime, "AsyncIterator", AsyncIterator);
+  function makeInvokeMethod(innerFn, self, context) {
+    var state = GenStateSuspendedStart;
+    return function invoke(method, arg) {
+      if (state === GenStateExecuting) {
+        throw new Error("Generator is already running");
+      }
 
-    __setKey(runtime, "async", function (innerFn, outerFn, self, tryLocsList) {
-      var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList));
-      return __callKey(runtime, "isGeneratorFunction", outerFn) ? iter : __callKey(__callKey(iter, "next"), "then", function (result) {
-        return __getKey(result, "done") ? __getKey(result, "value") : __callKey(iter, "next");
-      });
-    });
-
-    function makeInvokeMethod(innerFn, self, context) {
-      var state = GenStateSuspendedStart;
-      return function invoke(method, arg) {
-        if (state === GenStateExecuting) {
-          throw new Error("Generator is already running");
+      if (state === GenStateCompleted) {
+        if (method === "throw") {
+          throw arg;
         }
 
-        if (state === GenStateCompleted) {
-          if (method === "throw") {
-            throw arg;
-          }
+        return doneResult();
+      }
 
-          return doneResult();
+      __setKey$15(context, "method", method);
+
+      __setKey$15(context, "arg", arg);
+
+      while (true) {
+        var delegate = __getKey$21(context, "delegate");
+
+        if (delegate) {
+          var delegateResult = maybeInvokeDelegate(delegate, context);
+
+          if (delegateResult) {
+            if (delegateResult === ContinueSentinel) continue;
+            return delegateResult;
+          }
         }
 
-        __setKey(context, "method", method);
-        __setKey(context, "arg", arg);
-
-        while (true) {
-          var delegate = __getKey(context, "delegate");
-
-          if (delegate) {
-            var delegateResult = maybeInvokeDelegate(delegate, context);
-
-            if (delegateResult) {
-              if (delegateResult === ContinueSentinel) continue;
-              return delegateResult;
-            }
-          }
-
-          if (__getKey(context, "method") === "next") {
-            __setKey(context, "sent", __setKey(context, "_sent", __getKey(context, "arg")));
-          } else if (__getKey(context, "method") === "throw") {
-            if (state === GenStateSuspendedStart) {
-              state = GenStateCompleted;
-              throw __getKey(context, "arg");
-            }
-
-            __callKey(context, "dispatchException", __getKey(context, "arg"));
-          } else if (__getKey(context, "method") === "return") {
-            __callKey(context, "abrupt", "return", __getKey(context, "arg"));
-          }
-
-          state = GenStateExecuting;
-          var record = tryCatch(innerFn, self, context);
-
-          if (__getKey(record, "type") === "normal") {
-            state = __getKey(context, "done") ? GenStateCompleted : GenStateSuspendedYield;
-
-            if (__getKey(record, "arg") === ContinueSentinel) {
-              continue;
-            }
-
-            return {
-              value: __getKey(record, "arg"),
-              done: __getKey(context, "done")
-            };
-          } else if (__getKey(record, "type") === "throw") {
+        if (__getKey$21(context, "method") === "next") {
+          __setKey$15(context, "sent", __setKey$15(context, "_sent", __getKey$21(context, "arg")));
+        } else if (__getKey$21(context, "method") === "throw") {
+          if (state === GenStateSuspendedStart) {
             state = GenStateCompleted;
-            __setKey(context, "method", "throw");
-            __setKey(context, "arg", __getKey(record, "arg"));
-          }
-        }
-      };
-    }
-
-    function maybeInvokeDelegate(delegate, context) {
-      var method = __getKey(__getKey(delegate, "iterator"), __getKey(context, "method"));
-
-      if (method === undefined) {
-        __setKey(context, "delegate", null);
-
-        if (__getKey(context, "method") === "throw") {
-          if (__getKey(__getKey(delegate, "iterator"), "return")) {
-            __setKey(context, "method", "return");
-            __setKey(context, "arg", undefined);
-            maybeInvokeDelegate(delegate, context);
-
-            if (__getKey(context, "method") === "throw") {
-              return ContinueSentinel;
-            }
+            throw __getKey$21(context, "arg");
           }
 
-          __setKey(context, "method", "throw");
-          __setKey(context, "arg", new TypeError("The iterator does not provide a 'throw' method"));
+          __callKey$15(context, "dispatchException", __getKey$21(context, "arg"));
+        } else if (__getKey$21(context, "method") === "return") {
+          __callKey$15(context, "abrupt", "return", __getKey$21(context, "arg"));
         }
 
-        return ContinueSentinel;
-      }
+        state = GenStateExecuting;
+        var record = tryCatch(innerFn, self, context);
 
-      var record = tryCatch(method, __getKey(delegate, "iterator"), __getKey(context, "arg"));
+        if (__getKey$21(record, "type") === "normal") {
+          state = __getKey$21(context, "done") ? GenStateCompleted : GenStateSuspendedYield;
 
-      if (__getKey(record, "type") === "throw") {
-        __setKey(context, "method", "throw");
-        __setKey(context, "arg", __getKey(record, "arg"));
-        __setKey(context, "delegate", null);
-        return ContinueSentinel;
-      }
-
-      var info = __getKey(record, "arg");
-
-      if (!info) {
-        __setKey(context, "method", "throw");
-        __setKey(context, "arg", new TypeError("iterator result is not an object"));
-        __setKey(context, "delegate", null);
-        return ContinueSentinel;
-      }
-
-      if (__getKey(info, "done")) {
-        __setKey(context, __getKey(delegate, "resultName"), __getKey(info, "value"));
-        __setKey(context, "next", __getKey(delegate, "nextLoc"));
-
-        if (__getKey(context, "method") !== "return") {
-          __setKey(context, "method", "next");
-          __setKey(context, "arg", undefined);
-        }
-      } else {
-        return info;
-      }
-
-      __setKey(context, "delegate", null);
-      return ContinueSentinel;
-    }
-
-    defineIteratorMethods(Gp);
-    __setKey(Gp, toStringTagSymbol, "Generator");
-
-    __setKey(Gp, iteratorSymbol, function () {
-      return this;
-    });
-
-    __setKey(Gp, "toString", function () {
-      return "[object Generator]";
-    });
-
-    function pushTryEntry(locs) {
-      var entry = {
-        tryLoc: __getKey(locs, 0)
-      };
-
-      if (__inKey(locs, 1)) {
-        __setKey(entry, "catchLoc", __getKey(locs, 1));
-      }
-
-      if (__inKey(locs, 2)) {
-        __setKey(entry, "finallyLoc", __getKey(locs, 2));
-        __setKey(entry, "afterLoc", __getKey(locs, 3));
-      }
-
-      __getKey(this, "tryEntries").push(entry);
-    }
-
-    function resetTryEntry(entry) {
-      var record = __getKey(entry, "completion") || {};
-      __setKey(record, "type", "normal");
-      __deleteKey(record, "arg");
-      __setKey(entry, "completion", record);
-    }
-
-    function Context(tryLocsList) {
-      __setKey(this, "tryEntries", [{
-        tryLoc: "root"
-      }]);
-      __callKey(tryLocsList, "forEach", pushTryEntry, this);
-      __callKey(this, "reset", true);
-    }
-
-    __setKey(runtime, "keys", function (object) {
-      var keys = [];
-
-      for (var key in __iterableKey(object)) {
-        keys.push(key);
-      }
-
-      __callKey(keys, "reverse");
-      return function next() {
-        while (__getKey(keys, "length")) {
-          var key = __callKey(keys, "pop");
-
-          if (__inKey(object, key)) {
-            __setKey(next, "value", key);
-            __setKey(next, "done", false);
-            return next;
+          if (__getKey$21(record, "arg") === ContinueSentinel) {
+            continue;
           }
-        }
 
-        __setKey(next, "done", true);
-        return next;
-      };
-    });
-
-    function values(iterable) {
-      if (iterable) {
-        var iteratorMethod = __getKey(iterable, iteratorSymbol);
-
-        if (iteratorMethod) {
-          return __callKey(iteratorMethod, "call", iterable);
-        }
-
-        if (typeof __getKey(iterable, "next") === "function") {
-          return iterable;
-        }
-
-        if (!isNaN(__getKey(iterable, "length"))) {
-          var i = -1,
-              next = function next() {
-            while (++i < __getKey(iterable, "length")) {
-              if (__callKey(hasOwn, "call", iterable, i)) {
-                __setKey(next, "value", __getKey(iterable, i));
-                __setKey(next, "done", false);
-                return next;
-              }
-            }
-
-            __setKey(next, "value", undefined);
-            __setKey(next, "done", true);
-            return next;
+          return {
+            value: __getKey$21(record, "arg"),
+            done: __getKey$21(context, "done")
           };
+        } else if (__getKey$21(record, "type") === "throw") {
+          state = GenStateCompleted;
 
-          return __setKey(next, "next", next);
+          __setKey$15(context, "method", "throw");
+
+          __setKey$15(context, "arg", __getKey$21(record, "arg"));
         }
       }
+    };
+  }
 
-      return {
-        next: doneResult
-      };
-    }
+  function maybeInvokeDelegate(delegate, context) {
+    var method = __getKey$21(__getKey$21(delegate, "iterator"), __getKey$21(context, "method"));
 
-    __setKey(runtime, "values", values);
+    if (method === undefined) {
+      __setKey$15(context, "delegate", null);
 
-    function doneResult() {
-      return {
-        value: undefined,
-        done: true
-      };
-    }
+      if (__getKey$21(context, "method") === "throw") {
+        if (__getKey$21(__getKey$21(delegate, "iterator"), "return")) {
+          __setKey$15(context, "method", "return");
 
-    __setKey(Context, "prototype", {
-      constructor: Context,
-      reset: function (skipTempReset) {
-        __setKey(this, "prev", 0);
-        __setKey(this, "next", 0);
-        __setKey(this, "sent", __setKey(this, "_sent", undefined));
-        __setKey(this, "done", false);
-        __setKey(this, "delegate", null);
-        __setKey(this, "method", "next");
-        __setKey(this, "arg", undefined);
-        __callKey(__getKey(this, "tryEntries"), "forEach", resetTryEntry);
+          __setKey$15(context, "arg", undefined);
 
-        if (!skipTempReset) {
-          for (var name in __iterableKey(this)) {
-            if (__callKey(name, "charAt", 0) === "t" && __callKey(hasOwn, "call", this, name) && !isNaN(+__callKey(name, "slice", 1))) {
-              __setKey(this, name, undefined);
-            }
-          }
-        }
-      },
-      stop: function () {
-        __setKey(this, "done", true);
-        var rootEntry = __getKey(__getKey(this, "tryEntries"), 0);
-        var rootRecord = __getKey(rootEntry, "completion");
+          maybeInvokeDelegate(delegate, context);
 
-        if (__getKey(rootRecord, "type") === "throw") {
-          throw __getKey(rootRecord, "arg");
-        }
-
-        return __getKey(this, "rval");
-      },
-      dispatchException: function (exception) {
-        if (__getKey(this, "done")) {
-          throw exception;
-        }
-
-        var context = this;
-
-        function handle(loc, caught) {
-          __setKey(record, "type", "throw");
-          __setKey(record, "arg", exception);
-          __setKey(context, "next", loc);
-
-          if (caught) {
-            __setKey(context, "method", "next");
-            __setKey(context, "arg", undefined);
-          }
-
-          return !!caught;
-        }
-
-        for (var i = __getKey(__getKey(this, "tryEntries"), "length") - 1; i >= 0; --i) {
-          var entry = __getKey(__getKey(this, "tryEntries"), i);
-          var record = __getKey(entry, "completion");
-
-          if (__getKey(entry, "tryLoc") === "root") {
-            return handle("end");
-          }
-
-          if (__getKey(entry, "tryLoc") <= __getKey(this, "prev")) {
-            var hasCatch = __callKey(hasOwn, "call", entry, "catchLoc");
-            var hasFinally = __callKey(hasOwn, "call", entry, "finallyLoc");
-
-            if (hasCatch && hasFinally) {
-              if (__getKey(this, "prev") < __getKey(entry, "catchLoc")) {
-                return handle(__getKey(entry, "catchLoc"), true);
-              } else if (__getKey(this, "prev") < __getKey(entry, "finallyLoc")) {
-                return handle(__getKey(entry, "finallyLoc"));
-              }
-            } else if (hasCatch) {
-              if (__getKey(this, "prev") < __getKey(entry, "catchLoc")) {
-                return handle(__getKey(entry, "catchLoc"), true);
-              }
-            } else if (hasFinally) {
-              if (__getKey(this, "prev") < __getKey(entry, "finallyLoc")) {
-                return handle(__getKey(entry, "finallyLoc"));
-              }
-            } else {
-              throw new Error("try statement without catch or finally");
-            }
-          }
-        }
-      },
-      abrupt: function (type, arg) {
-        for (var i = __getKey(__getKey(this, "tryEntries"), "length") - 1; i >= 0; --i) {
-          var entry = __getKey(__getKey(this, "tryEntries"), i);
-
-          if (__getKey(entry, "tryLoc") <= __getKey(this, "prev") && __callKey(hasOwn, "call", entry, "finallyLoc") && __getKey(this, "prev") < __getKey(entry, "finallyLoc")) {
-            var finallyEntry = entry;
-            break;
-          }
-        }
-
-        if (finallyEntry && (type === "break" || type === "continue") && __getKey(finallyEntry, "tryLoc") <= arg && arg <= __getKey(finallyEntry, "finallyLoc")) {
-          finallyEntry = null;
-        }
-
-        var record = finallyEntry ? __getKey(finallyEntry, "completion") : {};
-        __setKey(record, "type", type);
-        __setKey(record, "arg", arg);
-
-        if (finallyEntry) {
-          __setKey(this, "method", "next");
-          __setKey(this, "next", __getKey(finallyEntry, "finallyLoc"));
-          return ContinueSentinel;
-        }
-
-        return __callKey(this, "complete", record);
-      },
-      complete: function (record, afterLoc) {
-        if (__getKey(record, "type") === "throw") {
-          throw __getKey(record, "arg");
-        }
-
-        if (__getKey(record, "type") === "break" || __getKey(record, "type") === "continue") {
-          __setKey(this, "next", __getKey(record, "arg"));
-        } else if (__getKey(record, "type") === "return") {
-          __setKey(this, "rval", __setKey(this, "arg", __getKey(record, "arg")));
-          __setKey(this, "method", "return");
-          __setKey(this, "next", "end");
-        } else if (__getKey(record, "type") === "normal" && afterLoc) {
-          __setKey(this, "next", afterLoc);
-        }
-
-        return ContinueSentinel;
-      },
-      finish: function (finallyLoc) {
-        for (var i = __getKey(__getKey(this, "tryEntries"), "length") - 1; i >= 0; --i) {
-          var entry = __getKey(__getKey(this, "tryEntries"), i);
-
-          if (__getKey(entry, "finallyLoc") === finallyLoc) {
-            __callKey(this, "complete", __getKey(entry, "completion"), __getKey(entry, "afterLoc"));
-            resetTryEntry(entry);
+          if (__getKey$21(context, "method") === "throw") {
             return ContinueSentinel;
           }
         }
-      },
-      "catch": function (tryLoc) {
-        for (var i = __getKey(__getKey(this, "tryEntries"), "length") - 1; i >= 0; --i) {
-          var entry = __getKey(__getKey(this, "tryEntries"), i);
 
-          if (__getKey(entry, "tryLoc") === tryLoc) {
-            var record = __getKey(entry, "completion");
+        __setKey$15(context, "method", "throw");
 
-            if (__getKey(record, "type") === "throw") {
-              var thrown = __getKey(record, "arg");
-              resetTryEntry(entry);
+        __setKey$15(context, "arg", new TypeError("The iterator does not provide a 'throw' method"));
+      }
+
+      return ContinueSentinel;
+    }
+
+    var record = tryCatch(method, __getKey$21(delegate, "iterator"), __getKey$21(context, "arg"));
+
+    if (__getKey$21(record, "type") === "throw") {
+      __setKey$15(context, "method", "throw");
+
+      __setKey$15(context, "arg", __getKey$21(record, "arg"));
+
+      __setKey$15(context, "delegate", null);
+
+      return ContinueSentinel;
+    }
+
+    var info = __getKey$21(record, "arg");
+
+    if (!info) {
+      __setKey$15(context, "method", "throw");
+
+      __setKey$15(context, "arg", new TypeError("iterator result is not an object"));
+
+      __setKey$15(context, "delegate", null);
+
+      return ContinueSentinel;
+    }
+
+    if (__getKey$21(info, "done")) {
+      __setKey$15(context, __getKey$21(delegate, "resultName"), __getKey$21(info, "value"));
+
+      __setKey$15(context, "next", __getKey$21(delegate, "nextLoc"));
+
+      if (__getKey$21(context, "method") !== "return") {
+        __setKey$15(context, "method", "next");
+
+        __setKey$15(context, "arg", undefined);
+      }
+    } else {
+      return info;
+    }
+
+    __setKey$15(context, "delegate", null);
+
+    return ContinueSentinel;
+  }
+
+  defineIteratorMethods(Gp);
+
+  __setKey$15(Gp, toStringTagSymbol, "Generator");
+
+  __setKey$15(Gp, iteratorSymbol, function () {
+    return this;
+  });
+
+  __setKey$15(Gp, "toString", function () {
+    return "[object Generator]";
+  });
+
+  function pushTryEntry(locs) {
+    var entry = {
+      tryLoc: __getKey$21(locs, 0)
+    };
+
+    if (__inKey$7(locs, 1)) {
+      __setKey$15(entry, "catchLoc", __getKey$21(locs, 1));
+    }
+
+    if (__inKey$7(locs, 2)) {
+      __setKey$15(entry, "finallyLoc", __getKey$21(locs, 2));
+
+      __setKey$15(entry, "afterLoc", __getKey$21(locs, 3));
+    }
+
+    __getKey$21(this, "tryEntries").push(entry);
+  }
+
+  function resetTryEntry(entry) {
+    var record = __getKey$21(entry, "completion") || {};
+
+    __setKey$15(record, "type", "normal");
+
+    __deleteKey(record, "arg");
+
+    __setKey$15(entry, "completion", record);
+  }
+
+  function Context(tryLocsList) {
+    __setKey$15(this, "tryEntries", [{
+      tryLoc: "root"
+    }]);
+
+    __callKey$15(tryLocsList, "forEach", pushTryEntry, this);
+
+    __callKey$15(this, "reset", true);
+  }
+
+  __setKey$15(runtime, "keys", function (object) {
+    var keys = [];
+
+    for (var key in __iterableKey$3(object)) {
+      keys.push(key);
+    }
+
+    __callKey$15(keys, "reverse");
+
+    return function next() {
+      while (__getKey$21(keys, "length")) {
+        var key = __callKey$15(keys, "pop");
+
+        if (__inKey$7(object, key)) {
+          __setKey$15(next, "value", key);
+
+          __setKey$15(next, "done", false);
+
+          return next;
+        }
+      }
+
+      __setKey$15(next, "done", true);
+
+      return next;
+    };
+  });
+
+  function values(iterable) {
+    if (iterable) {
+      var iteratorMethod = __getKey$21(iterable, iteratorSymbol);
+
+      if (iteratorMethod) {
+        return __callKey$15(iteratorMethod, "call", iterable);
+      }
+
+      if (typeof __getKey$21(iterable, "next") === "function") {
+        return iterable;
+      }
+
+      if (!isNaN(__getKey$21(iterable, "length"))) {
+        var i = -1,
+            next = function next() {
+          while (++i < __getKey$21(iterable, "length")) {
+            if (__callKey$15(hasOwn, "call", iterable, i)) {
+              __setKey$15(next, "value", __getKey$21(iterable, i));
+
+              __setKey$15(next, "done", false);
+
+              return next;
             }
+          }
 
-            return thrown;
+          __setKey$15(next, "value", undefined);
+
+          __setKey$15(next, "done", true);
+
+          return next;
+        };
+
+        return __setKey$15(next, "next", next);
+      }
+    }
+
+    return {
+      next: doneResult
+    };
+  }
+
+  __setKey$15(runtime, "values", values);
+
+  function doneResult() {
+    return {
+      value: undefined,
+      done: true
+    };
+  }
+
+  __setKey$15(Context, "prototype", {
+    constructor: Context,
+    reset: function (skipTempReset) {
+      __setKey$15(this, "prev", 0);
+
+      __setKey$15(this, "next", 0);
+
+      __setKey$15(this, "sent", __setKey$15(this, "_sent", undefined));
+
+      __setKey$15(this, "done", false);
+
+      __setKey$15(this, "delegate", null);
+
+      __setKey$15(this, "method", "next");
+
+      __setKey$15(this, "arg", undefined);
+
+      __callKey$15(__getKey$21(this, "tryEntries"), "forEach", resetTryEntry);
+
+      if (!skipTempReset) {
+        for (var name in __iterableKey$3(this)) {
+          if (__callKey$15(name, "charAt", 0) === "t" && __callKey$15(hasOwn, "call", this, name) && !isNaN(+__callKey$15(name, "slice", 1))) {
+            __setKey$15(this, name, undefined);
           }
         }
+      }
+    },
+    stop: function () {
+      __setKey$15(this, "done", true);
 
-        throw new Error("illegal catch attempt");
-      },
-      delegateYield: function (iterable, resultName, nextLoc) {
-        __setKey(this, "delegate", {
-          iterator: values(iterable),
-          resultName: resultName,
-          nextLoc: nextLoc
-        });
+      var rootEntry = __getKey$21(__getKey$21(this, "tryEntries"), 0);
 
-        if (__getKey(this, "method") === "next") {
-          __setKey(this, "arg", undefined);
+      var rootRecord = __getKey$21(rootEntry, "completion");
+
+      if (__getKey$21(rootRecord, "type") === "throw") {
+        throw __getKey$21(rootRecord, "arg");
+      }
+
+      return __getKey$21(this, "rval");
+    },
+    dispatchException: function (exception) {
+      if (__getKey$21(this, "done")) {
+        throw exception;
+      }
+
+      var context = this;
+
+      function handle(loc, caught) {
+        __setKey$15(record, "type", "throw");
+
+        __setKey$15(record, "arg", exception);
+
+        __setKey$15(context, "next", loc);
+
+        if (caught) {
+          __setKey$15(context, "method", "next");
+
+          __setKey$15(context, "arg", undefined);
         }
+
+        return !!caught;
+      }
+
+      for (var i = __getKey$21(__getKey$21(this, "tryEntries"), "length") - 1; i >= 0; --i) {
+        var entry = __getKey$21(__getKey$21(this, "tryEntries"), i);
+
+        var record = __getKey$21(entry, "completion");
+
+        if (__getKey$21(entry, "tryLoc") === "root") {
+          return handle("end");
+        }
+
+        if (__getKey$21(entry, "tryLoc") <= __getKey$21(this, "prev")) {
+          var hasCatch = __callKey$15(hasOwn, "call", entry, "catchLoc");
+
+          var hasFinally = __callKey$15(hasOwn, "call", entry, "finallyLoc");
+
+          if (hasCatch && hasFinally) {
+            if (__getKey$21(this, "prev") < __getKey$21(entry, "catchLoc")) {
+              return handle(__getKey$21(entry, "catchLoc"), true);
+            } else if (__getKey$21(this, "prev") < __getKey$21(entry, "finallyLoc")) {
+              return handle(__getKey$21(entry, "finallyLoc"));
+            }
+          } else if (hasCatch) {
+            if (__getKey$21(this, "prev") < __getKey$21(entry, "catchLoc")) {
+              return handle(__getKey$21(entry, "catchLoc"), true);
+            }
+          } else if (hasFinally) {
+            if (__getKey$21(this, "prev") < __getKey$21(entry, "finallyLoc")) {
+              return handle(__getKey$21(entry, "finallyLoc"));
+            }
+          } else {
+            throw new Error("try statement without catch or finally");
+          }
+        }
+      }
+    },
+    abrupt: function (type, arg) {
+      for (var i = __getKey$21(__getKey$21(this, "tryEntries"), "length") - 1; i >= 0; --i) {
+        var entry = __getKey$21(__getKey$21(this, "tryEntries"), i);
+
+        if (__getKey$21(entry, "tryLoc") <= __getKey$21(this, "prev") && __callKey$15(hasOwn, "call", entry, "finallyLoc") && __getKey$21(this, "prev") < __getKey$21(entry, "finallyLoc")) {
+          var finallyEntry = entry;
+          break;
+        }
+      }
+
+      if (finallyEntry && (type === "break" || type === "continue") && __getKey$21(finallyEntry, "tryLoc") <= arg && arg <= __getKey$21(finallyEntry, "finallyLoc")) {
+        finallyEntry = null;
+      }
+
+      var record = finallyEntry ? __getKey$21(finallyEntry, "completion") : {};
+
+      __setKey$15(record, "type", type);
+
+      __setKey$15(record, "arg", arg);
+
+      if (finallyEntry) {
+        __setKey$15(this, "method", "next");
+
+        __setKey$15(this, "next", __getKey$21(finallyEntry, "finallyLoc"));
 
         return ContinueSentinel;
       }
-    });
-  }(function () {
-    return this;
-  }() || Function("return this")());
-  __setKey(__getKey(EngineHelpers, "babelHelpers"), "regeneratorRuntime", __getKey(this, "regeneratorRuntime"));
-  __deleteKey(this, "regeneratorRuntime");
-})(__setKey(this, "EngineHelpers", __getKey(this, "EngineHelpers") || {}));
-/* proxy-compat */
- var __getKey = window.Proxy.getKey; var __setKey = window.Proxy.setKey; var __callKey = window.Proxy.callKey; var __iterableKey = window.Proxy.iterableKey; var __inKey = window.Proxy.inKey; var __deleteKey = window.Proxy.deleteKey; var __instanceOfKey = window.Proxy.instanceOfKey; var __compatPush = window.Proxy.compatPush; var __compatUnshift = window.Proxy.compatUnshift; var __compatConcat = window.Proxy.compatConcat;
+
+      return __callKey$15(this, "complete", record);
+    },
+    complete: function (record, afterLoc) {
+      if (__getKey$21(record, "type") === "throw") {
+        throw __getKey$21(record, "arg");
+      }
+
+      if (__getKey$21(record, "type") === "break" || __getKey$21(record, "type") === "continue") {
+        __setKey$15(this, "next", __getKey$21(record, "arg"));
+      } else if (__getKey$21(record, "type") === "return") {
+        __setKey$15(this, "rval", __setKey$15(this, "arg", __getKey$21(record, "arg")));
+
+        __setKey$15(this, "method", "return");
+
+        __setKey$15(this, "next", "end");
+      } else if (__getKey$21(record, "type") === "normal" && afterLoc) {
+        __setKey$15(this, "next", afterLoc);
+      }
+
+      return ContinueSentinel;
+    },
+    finish: function (finallyLoc) {
+      for (var i = __getKey$21(__getKey$21(this, "tryEntries"), "length") - 1; i >= 0; --i) {
+        var entry = __getKey$21(__getKey$21(this, "tryEntries"), i);
+
+        if (__getKey$21(entry, "finallyLoc") === finallyLoc) {
+          __callKey$15(this, "complete", __getKey$21(entry, "completion"), __getKey$21(entry, "afterLoc"));
+
+          resetTryEntry(entry);
+          return ContinueSentinel;
+        }
+      }
+    },
+    "catch": function (tryLoc) {
+      for (var i = __getKey$21(__getKey$21(this, "tryEntries"), "length") - 1; i >= 0; --i) {
+        var entry = __getKey$21(__getKey$21(this, "tryEntries"), i);
+
+        if (__getKey$21(entry, "tryLoc") === tryLoc) {
+          var record = __getKey$21(entry, "completion");
+
+          if (__getKey$21(record, "type") === "throw") {
+            var thrown = __getKey$21(record, "arg");
+
+            resetTryEntry(entry);
+          }
+
+          return thrown;
+        }
+      }
+
+      throw new Error("illegal catch attempt");
+    },
+    delegateYield: function (iterable, resultName, nextLoc) {
+      __setKey$15(this, "delegate", {
+        iterator: values(iterable),
+        resultName: resultName,
+        nextLoc: nextLoc
+      });
+
+      if (__getKey$21(this, "method") === "next") {
+        __setKey$15(this, "arg", undefined);
+      }
+
+      return ContinueSentinel;
+    }
+  });
+}(global);
+var regenerator = __getKey$21(global, "regeneratorRuntime");
+
+const babelHelpers = {
+  applyDecoratedDescriptor: _applyDecoratedDescriptor,
+  assertThisInitialized: _assertThisInitialized,
+  asyncGeneratorDelegate: _asyncGeneratorDelegate,
+  asyncIterator: _asyncIterator,
+  asyncToGenerator: _asyncToGenerator,
+  awaitAsyncGenerator: _awaitAsyncGenerator,
+  classCallCheck: _classCallCheck,
+  classNameTDZError: _classNameTDZError,
+  createClass: _createClass,
+  defaults: _defaults,
+  defineEnumerableProperties: _defineEnumerableProperties,
+  defineProperty: _defineProperty,
+  extends: _extends,
+  get: _get,
+  inherits: _inherits,
+  inheritsLoose: _inheritsLoose,
+  initializerDefineProperty: _initializerDefineProperty,
+  initializerWarningHelper: _initializerWarningHelper,
+  instanceof: _instanceof,
+  jsx: _createRawReactElement,
+  newArrowCheck: _newArrowCheck,
+  objectDestructuringEmpty: _objectDestructuringEmpty,
+  objectWithoutProperties: _objectWithoutProperties,
+  possibleConstructorReturn: _possibleConstructorReturn,
+  readOnlyError: _readOnlyError,
+  set: _set,
+  skipFirstGeneratorNext: _skipFirstGeneratorNext,
+  slicedToArray: _slicedToArray,
+  taggedTemplateLiteral: _taggedTemplateLiteral,
+  temporalRef: _temporalRef,
+  toArray: _toArray,
+  toConsumableArray: _toConsumableArray,
+  toPropertyKey: _toPropertyKey,
+  typeof: _typeof,
+  wrapAsyncGenerator: _wrapAsyncGenerator,
+  wrapNativeSuper: _wrapNativeSuper
+};
+
+exports.regenerator = regenerator;
+exports.babelHelpers = babelHelpers;
+
+return exports;
+
+}({}));

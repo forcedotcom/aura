@@ -1,0 +1,14 @@
+<aura:component render="client">
+    <aura:attribute name="myAriaDescribedBy" type="String" default="boom"/>
+    <aura:attribute name="myAriaLabelledBy" type="String" default="boom"/>
+    <aura:attribute name="myTabIndex" type="Integer" default="1"/>
+    <aura:attribute name="myReadOnly" type="Boolean" default="false"/>
+
+    <moduleTest:globalAttrsOverrideTests
+        ariaDescribedBy="{! v.myAriaDescribedBy }"
+        ariaLabelledby="{! v.myAriaLabelledBy }"
+        tabindex="{! v.myTabIndex }"
+        readonly="{! v.myReadOnly }"
+    />
+</aura:component>
+

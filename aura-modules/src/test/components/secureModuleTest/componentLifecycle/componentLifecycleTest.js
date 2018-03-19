@@ -41,16 +41,6 @@
         }
     },
 
-    testAttributeChangedCallbackHook: {
-        attributes: {
-            shouldTest_attributeChangedCallback_hook: true
-        },
-        test: function(cmp) {
-            cmp.set("v.title", "invoked!");
-            cmp.componentLifecycleTester("attributeChangedCallbackHookCalled");
-        }
-    },
-
     testRenderedCallbackHook: {
         attributes: {
             shouldTest_renderedCallback_hook: true /* Setting the attribute triggers in routine in the test module*/

@@ -45,6 +45,13 @@
         });
     },
     
+    submitErrorWithNoTokenToPrimingService: function (cmp) {
+        var primer = cmp.find('primer');
+        primer.submitErrorWithNoToken().then(function(errResult){
+            cmp.set('v.error', errResult);
+        });
+    },
+
     showErrorResult: function (cmp) {
         cmp.set('v.stringifiedError', JSON.stringify(cmp.get('v.error')));
     }

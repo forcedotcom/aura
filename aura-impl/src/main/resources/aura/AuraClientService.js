@@ -3422,7 +3422,22 @@ AuraClientService.prototype.reifyActions = function(rawResponses) {
                 }
             }, this);
         } else {
-            error = {"status": response["status"], "message": response["message"]};
+            // Send the new token in case of INVALID SESSION so that clients can implement their own retry logic.
+            var newToken;
+            if(response["status"] === AuraClientService.INVALID_SESSION_RETURN_STATUS) {
+                var event = response["event"];
+                var data = {};
+                if(event) {
+                    newToken = event["attributes"] &&
+                           event["attributes"]["values"] &&
+                           event["attributes"]["values"]["newToken"];
+
+                    if(this.isValidToken(newToken) && newToken !== this._token) {
+                        data["newToken"] = newToken;
+                    }
+                }
+            }
+            error = {"status": response["status"], "message": response["message"], "data": data};
         }
     }, this);
 

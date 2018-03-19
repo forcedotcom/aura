@@ -52,6 +52,7 @@
 
             <div style="margin: 10px;padding: 10px; border:1px solid red">
                 <ui:button press="{!c.submitErrorToPrimingService}" label="Test Aura Servlet error" />
+                <ui:button press="{!c.submitErrorWithNoTokenToPrimingService}" label="Test Aura Servlet error with no token" />
                 <ui:button press="{!c.showErrorResult}" label="Show Error Result" />
                 <p>Priming service should parse the Servlet's error payload <span>{!v.stringifiedError}</span></p>
             </div>

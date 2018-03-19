@@ -213,8 +213,23 @@ const ERROR_MOCK1_CONTENT =
   "exceptionEvent":true
 }/*ERROR*/`;
 
+const ERROR_NO_TOKEN_MOCK_CONTENT =
+`while(1);
+*/{
+  "event":{
+    "descriptor":"markup://aura:invalidSession",
+    "attributes":{
+      "values":{
+        "newToken": null
+      }
+    }
+  },
+  "exceptionEvent":true
+}/*ERROR*/`;
+
 const PRIMED_ACTIONS = [{status:200, responseText:LABEL_EXAMPLE_MOCK}]; // This will come from bridge
 const ERROR_RESULT =   [{status: ERROR_MOCK1_HTTP_STATUS_CODE, responseText: ERROR_MOCK1_CONTENT}];
+const ERROR_NO_TOKEN_RESULT =   [{status: ERROR_MOCK1_HTTP_STATUS_CODE, responseText: ERROR_NO_TOKEN_MOCK_CONTENT}];
 
 // Returns a promise for when the bridge return the actions from native land
 export async function getActionsFromBridge() {
@@ -227,6 +242,12 @@ export async function sendActionsToBridge() {
     return true;
 }
 
+// Sends the error response with a token
 export async function getErrorResponse() {
     return ERROR_RESULT;
+}
+
+// Sends the error response without a token
+export async function getErrorResponseWithNoToken() {
+    return ERROR_NO_TOKEN_RESULT;
 }

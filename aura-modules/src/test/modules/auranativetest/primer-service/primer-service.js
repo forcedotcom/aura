@@ -1,4 +1,4 @@
-import { getActionsFromBridge, sendActionsToBridge, getErrorResponse } from "./cordova-bridge";
+import { getActionsFromBridge, sendActionsToBridge, getErrorResponse, getErrorResponseWithNoToken } from "./cordova-bridge";
 
 let reifyApi;
 let prepareRequestApi;
@@ -29,6 +29,12 @@ export async function primeAuraActions(auraActions) {
 
 export async function submitError() {
     const mockError = await getErrorResponse();
+    const reifyResult = await reifyApi(mockError);
+    return reifyResult.error;
+}
+
+export async function submitErrorWithNoToken() {
+    const mockError = await getErrorResponseWithNoToken();
     const reifyResult = await reifyApi(mockError);
     return reifyResult.error;
 }

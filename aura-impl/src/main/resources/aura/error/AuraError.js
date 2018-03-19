@@ -155,13 +155,26 @@ Aura.Errors.GenerateErrorId = function(hashGen) {
 
 Aura.Errors.GenerateErrorIdHashGen = function(componentName, stackFrames) {
     var hashGen = componentName;
+    var fileUrl;
+    var functionName;
     for (var i = 0; i < stackFrames.length; i++) {
         var frame = stackFrames[i];
         // if non framework stackframe
         if (!frame.fileName || frame.fileName.match(/aura_[^\.]+\.js$/gi) === null) {
-            hashGen = hashGen + "$" + frame.functionName;
+            functionName = frame.functionName;
+            fileUrl = frame.fileName;
             break;
         }
+    }
+
+    // Use function name if known
+    if(functionName !== undefined) {
+        hashGen += "$" + functionName;
+    }
+
+    // If function name is not known, or was eval, also include filename
+    if((functionName === undefined || functionName === "eval()") && fileUrl !== undefined) {
+        hashGen += "$" + fileUrl.split("/").pop();
     }
 
     return hashGen;

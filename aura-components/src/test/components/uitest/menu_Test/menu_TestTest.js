@@ -405,26 +405,9 @@
      * General Test to verify focus on menu item when hovering the mouse over
      */
     testFocusOnMenuItem: {
-        test: [function (cmp) {
-            trigger = cmp.find("trigger");
-            this.clickAnchor(trigger);
-        }, function (cmp) {
-            var menuItem3 = cmp.find("actionItem3");
-            var mouseOverEvent;
-            if ($A.util.isIE) {
-                mouseOverEvent = document.createEvent("MouseEvent")
-                mouseOverEvent.initMouseEvent("mouseover", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-            } else {
-               mouseOverEvent = new MouseEvent("mouseover")
-            }
-            var element = menuItem3.getElement();
-            element.dispatchEvent(mouseOverEvent);
-
-            var expected = menuItem3.get('v.label');
-            $A.test.addWaitForWithFailureMessage(expected, function () {
-                return $A.test.getActiveElementText();
-            }, "Focus should be on item 3");
-        }]
+        // unreliable testing mechanisms available
+        // disabling this test until a more reliable way to test this behavior is available
+        test: []
     },
 
     /**

@@ -1192,8 +1192,7 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, pa
  * @platform
  */
 AuraLocalizationService.prototype.startOf = function(date, unit) {
-
-    var normalizedDate = this.normalizeDateTimeInput(date);
+    var normalizedDate = (date instanceof Date)? new Date(date.getTime()) : this.normalizeDateTimeInput(date);
     unit = this.normalizeDateTimeUnit(unit);
     if (!unit || !this.isValidDate(normalizedDate)) {
         return normalizedDate;
@@ -1248,13 +1247,12 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
  * @platform
  */
 AuraLocalizationService.prototype.endOf = function(date, unit) {
-    var normalizedDate = this.normalizeDateTimeInput(date);
+    var normalizedDate = this.startOf(date, unit);
     unit = this.normalizeDateTimeUnit(unit);
     if (!unit || !this.isValidDate(normalizedDate)) {
         return normalizedDate;
     }
 
-    normalizedDate = this.startOf(normalizedDate, unit);
     this.addSubtract(normalizedDate, 1, unit);
     this.addSubtract(normalizedDate, 1, "millisecond", true);
     return normalizedDate;
@@ -1828,9 +1826,9 @@ AuraLocalizationService.prototype.addSubtract = function(date, num, unit, isSubt
 };
 
 /**
- * Converts datetime input into a Date object.
+ * Converts datetime input into a Date object. If datetime is a Date object, it returns the original input.
  * @param {String|Number|Date} datetime - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object
- * @returns {Date} A Date object which represents the provided datetime, null if the given datetime is not a supported type
+ * @returns {Date} A Date object which represents the provided datetime, an invalid Date if the given datetime is not a supported type
  *
  * @private
  */
@@ -1840,10 +1838,10 @@ AuraLocalizationService.prototype.normalizeDateTimeInput = function(datetime) {
     } else if ($A.util.isNumber(datetime)) {
         return new Date(datetime);
     } else if (datetime instanceof Date) {
-        return new Date(datetime.getTime());
+        return datetime;
     }
 
-    return new Date("Invalid Date");
+    return new Date(NaN);
 };
 
 /**
@@ -1853,15 +1851,15 @@ AuraLocalizationService.prototype.normalizeDateTimeInput = function(datetime) {
  * @private
  */
 AuraLocalizationService.prototype.parseDateTimeString = function(dateTimeString) {
-    if (this.isISO8601DateTimeString(dateTimeString)) {
-        return this.parseDateTimeISO8601(dateTimeString);
+    if (!this.isISO8601DateTimeString(dateTimeString)) {
+        $A.warning("The provided datetime string is not in ISO8601 format. It will be parsed by native Date(), which may have different results across browsers and versions. ");
+        var date = new Date(dateTimeString);
+        // Date parsing includes browser timezone. To maintain current behavior, needs to remove it.
+        date.setTime(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
+        return date;
     }
 
-    $A.warning("The provided datetime string is not in ISO8601 format. It will be parsed by native Date(), which may have different results across browsers and versions. ");
-    var date = new Date(dateTimeString);
-    // Date parsing includes browser timezone. To maintain current behavior, needs to remove it.
-    date.setTime(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
-    return date;
+    return this.parseDateTimeISO8601(dateTimeString);
 };
 
 AuraLocalizationService.prototype.isISO8601DateTimeString = function(dateTimeString) {

@@ -118,14 +118,16 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 if ("null".equals(requestedUID)) {
                     throw new InvalidDefinitionException("requestedComponentUID can't be 'null'", null);
                 }
-                String scheme;
+
+                StringBuilder redirectUrl = new StringBuilder("http");
                 if (configAdapter.isSecureRequest(request)) {
-                    scheme = "https";
-                } else {
-                    scheme = "http";
+                    redirectUrl.append("s");
                 }
-                response.sendRedirect(new StringBuilder().append(scheme).append("://").append(request.getHeader("Host"))
-                        .append(generateRedirectURI(descriptors, hydrationType, computedUID, appReferrrer)).toString());
+                redirectUrl.append("://")
+                    .append(request.getHeader("Host"))
+                    .append(generateRedirectURI(descriptors, hydrationType, computedUID, appReferrrer));
+
+                response.sendRedirect(redirectUrl.toString());
                 return;
             }
 

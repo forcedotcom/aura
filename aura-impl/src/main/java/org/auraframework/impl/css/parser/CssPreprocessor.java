@@ -15,7 +15,7 @@
  */
 package org.auraframework.impl.css.parser;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -81,9 +81,36 @@ public final class CssPreprocessor {
         private String content;
         private String resourceName;
         private final boolean runtime;
-        private final Set<Plugin> plugins = new LinkedHashSet<>();
+        private final List<Plugin> plugins = new ArrayList<>();
         private StyleAdapter styleAdapter;
-
+        
+        private static Plugin prefixerPlugin;
+        private static Plugin autoRefinePlugin;
+        
+        /* double-check lock the prefixer plugin */ 
+        private Plugin getPrefixerPlugin() {
+            if (prefixerPlugin == null) {
+                synchronized (ParserConfiguration.class) {
+                    if (prefixerPlugin == null) {
+                        prefixerPlugin = Prefixer.defaultBrowserSupport().prune(true).rearrange(true);
+                    }
+                }
+            }
+            return prefixerPlugin;
+        }
+        
+        /* double-check lock the autoRefine plugin */
+        private Plugin getAutoRefinePlugin() {
+            if (autoRefinePlugin == null) {
+                synchronized (ParserConfiguration.class) {
+                    if (autoRefinePlugin == null) {
+                        autoRefinePlugin = AutoRefine.only(Match.AT_RULES);
+                    }
+                }
+            }
+            return autoRefinePlugin;
+        }
+        
         public ParserConfiguration(StyleAdapter styleAdapter) {
             this.runtime = false;
             this.styleAdapter = styleAdapter;
@@ -100,7 +127,7 @@ public final class CssPreprocessor {
 
             plugins.add(new UrlCacheBustingPlugin());
             plugins.add(new UnquotedIEFilterPlugin());
-            plugins.add(Prefixer.defaultBrowserSupport().prune(true).rearrange(true));
+            plugins.add(getPrefixerPlugin());
             plugins.add(PrefixCleaner.mismatchedPrefixedUnits());
             plugins.addAll(styleAdapter.getRuntimePlugins());
         }
@@ -129,7 +156,7 @@ public final class CssPreprocessor {
         public ParserConfiguration tokens(DefDescriptor<? extends BaseStyleDef> style, TokenValueProvider tvp) {
             if (runtime) {
                 plugins.add(new TokenFunctionPlugin(tvp));
-                plugins.add(AutoRefine.only(Match.AT_RULES));
+                plugins.add(getAutoRefinePlugin());
             } else {
                 plugins.add(new TokenFunctionPlugin(tvp));
                 if (styleAdapter.tokenPropertyValidation(style)) {

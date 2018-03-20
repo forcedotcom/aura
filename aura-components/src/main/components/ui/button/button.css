@@ -26,6 +26,7 @@
 }
 .THIS .label{
     display:block;
+    white-space: normal;
 }
 @if (IE7){
     .THIS .label{

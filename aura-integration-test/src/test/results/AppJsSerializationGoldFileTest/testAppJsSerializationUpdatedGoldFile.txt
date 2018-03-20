@@ -7035,7 +7035,7 @@ return {
                                     "value":{
                                       "class":{
                                         "exprType":"FUNCTION",
-                                        "code":"function(cmp, fn) { return fn.add(cmp.get(\"v.labelClass\"),\" label bBody truncate\"); }",
+                                        "code":"function(cmp, fn) { return fn.add(cmp.get(\"v.labelClass\"),\" label bBody\"); }",
                                         "args":[
                                           {
                                             "exprType":"PROPERTY",

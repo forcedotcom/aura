@@ -81,7 +81,7 @@
         </aura:if>
 
         <aura:if isTrue="{!v.labelDisplay &amp;&amp; !empty(v.label)}">
-            <span aura:id="span" class="{! v.labelClass + ' label bBody truncate' }" dir="{!v.labelDir}">
+            <span aura:id="span" class="{! v.labelClass + ' label bBody' }" dir="{!v.labelDir}">
                 {!v.label}
             </span>
             <aura:set attribute="else">

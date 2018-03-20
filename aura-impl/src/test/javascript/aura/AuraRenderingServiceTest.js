@@ -190,7 +190,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
                 collection.add("2:0");
                 actual = collection.get();
 
-                Assert.Type(expected, actual);                
+                Assert.Type(expected, actual);
             }
 
             [Fact]
@@ -204,7 +204,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
                 collection.add("3:0");
                 actual = collection.size();
 
-                Assert.Equal(expected, actual);  
+                Assert.Equal(expected, actual);
             }
         }
 
@@ -437,7 +437,8 @@ Test.Aura.AuraRenderingServiceTest = function(){
 
 
     [Fixture]
-    function Rerender(){
+    function rerender() {
+
         [Fact]
         function AssertRerenderCalled() {
             var target;
@@ -508,10 +509,55 @@ Test.Aura.AuraRenderingServiceTest = function(){
             var stubs = getStubs(mockComponent);
             Assert.Equal(0, stubs.afterRender.Calls.length);
         }
+
+        [Fact]
+        function ResetsAfterRenderStack() {
+            // Arrange
+            var targetService = new Aura.Services.AuraRenderingService();
+            var mockComponent = getFakeComponent(true, true, 'rendered');
+            targetService.afterRenderStack = [mockComponent];
+
+            var mockAuraInfo = getMockAuraInfo(true);
+
+            //Act
+            mockAuraInfo.mock(function() {
+                targetService.rerender([]);
+            });
+
+            Assert.Equal(0, targetService.afterRenderStack.length);
+        }
+
+        [Fact]
+        function ResetsAfterRenderStackWhenCmpAfterRenderThrowsError() {
+            // Arrange
+            var targetService = new Aura.Services.AuraRenderingService();
+            var mockComponent = {
+                isValid: function() {
+                    return true;
+                },
+                afterRender: function() {
+                    throw new Error("Error from component's afterRender");
+                },
+                getType: function() {}
+            };
+            targetService.afterRenderStack = [mockComponent];
+
+            var mockAuraInfo = getMockAuraInfo(true);
+
+            //Act
+            mockAuraInfo.mock(function() {
+                try {
+                    targetService.rerender([]);
+                } catch(e) { /* expect an error*/ }
+            });
+
+            Assert.Equal(0, targetService.afterRenderStack.length);
+        }
     }
 
     [Fixture]
-    function AfterRender(){
+    function afterRender() {
+
         [Fact]
         function WarnAndSkipOnNoComponent() {
             var expected = "AuraRenderingService.afterRender: 'cmp' must be a valid Component, found 'bad'.";

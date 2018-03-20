@@ -85,7 +85,7 @@
             this.waitForErrorMaskVisibleInIframe(iframe, function() {
                 var errorMsg = that.getErrorMessageFromIframe(iframe);
 
-                var originalErrorMsg = "Error from component afterrender";
+                var originalErrorMsg = "Error from component afterRender";
                 $A.test.assertTrue($A.test.contains(errorMsg, originalErrorMsg),
                         "Failed to find original error message. Expected message: " + originalErrorMsg + "; Actual: " + errorMsg);
 
@@ -133,7 +133,7 @@
             this.waitForErrorMaskVisibleInIframe(iframe, function() {
                 var errorMsg = that.getErrorMessageFromIframe(iframe);
 
-                var originalErrorMsg = "Error from component afterrender";
+                var originalErrorMsg = "Error from component afterRender";
                 $A.test.assertTrue($A.test.contains(errorMsg, originalErrorMsg),
                         "Failed to find original error message. Expected message: " + originalErrorMsg + "; Actual: " + errorMsg);
 

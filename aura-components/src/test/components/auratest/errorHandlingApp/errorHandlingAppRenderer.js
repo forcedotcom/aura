@@ -31,18 +31,20 @@
     },
 
     afterRender : function(component){
-        if(component.get("v.throwErrorFromAfterRender") === true) {
-            throw new Error("Error from app afterrender");
+        if (component.get("v.throwErrorFromAfterRender") === true) {
+            this.superAfterRender();
+            throw new Error("Error from app afterRender");
         } else {
-            return this.superAfterRender();
+            this.superAfterRender();
         }
     },
 
     unrender : function(component){
         if(component.get("v.throwErrorFromUnrender") === true) {
+            this.superUnrender();
             throw new Error("Error from app unrender");
         } else {
-            return this.superUnrender();
+            this.superUnrender();
         }
     }
 })

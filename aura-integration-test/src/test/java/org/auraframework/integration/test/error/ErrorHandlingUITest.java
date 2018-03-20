@@ -359,46 +359,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * Verify Aura default error handler can handle systemError event when an error is thrown from afterRender().
-     */
-    @Test
-    public void testDefaultHandleErrorFromAfterRenderWhenNoCustomHandler() throws Exception {
-        open("/auratest/errorHandlingApp.app?throwErrorFromAfterRender=true", Mode.PROD, false);
-
-        String actualMessage = findErrorMessage();
-        String expectedMsg = "Error from app afterrender";
-        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
-    }
-
-    /**
-     * Verify systemError event can be handled by Aura default error handler event when an error is thrown from
-     * afterRender() if a cmp/app contains custom error handler. When error is thrown from afterRender(), $A is not
-     * initialized, so the event has to be handled by default handler.
-     */
-    @Test
-    public void testDefaultHandleErrorFromAfterRenderWhenMarkEventHandled() throws Exception {
-        open("/auratest/errorHandlingApp.app?throwErrorFromAfterRender=true&handleSystemError=true", Mode.PROD, false);
-
-        String actualMessage = findErrorMessage();
-        String expectedMsg = "Error from app afterrender";
-        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
-    }
-
-    /**
-     * Verify Aura default error handler can handle systemError event when an error is thrown from rerender().
-     */
-    @Test
-    public void testDefaultHandleErrorThrownFromRerender() throws Exception {
-        open("/auratest/errorHandlingApp.app", Mode.PROD);
-
-        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromRerenderButton"));
-
-        String actualMessage = findErrorMessage();
-        String expectedMsg = "Error from app rerender";
-        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
-    }
-
-    /**
      * Verify custom error handler can handle systemError event when an error is thrown from render().
      */
     @Test

@@ -30,19 +30,21 @@
         }
     },
 
-    afterRender : function(component){
-        if(component.get("v.throwErrorFromAfterRender") === true) {
-            throw new Error("Error from component afterrender");
+    afterRender : function(component) {
+        if (component.get("v.throwErrorFromAfterRender") === true) {
+            this.superAfterRender();
+            throw new Error("Error from component afterRender");
         } else {
-            return this.superAfterRender();
+            this.superAfterRender();
         }
     },
 
     unrender : function(component){
         if(component.get("v.throwErrorFromUnrender") === true) {
+            this.superUnrender();
             throw new Error("Error from component unrender");
         } else {
-            return this.superUnrender();
+            this.superUnrender();
         }
     }
 })

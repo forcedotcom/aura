@@ -121,7 +121,7 @@ AuraRenderingService.prototype.render = function(components, parent) {
  */
 AuraRenderingService.prototype.rerender = function(components) {
     //#if {"modes" : ["STATS"]}
-    var startTime = (new Date()).getTime();
+    var startTime = Date.now();
     //#end
 
     var topVisit = false;
@@ -177,14 +177,17 @@ AuraRenderingService.prototype.rerender = function(components) {
     this.statsIndex["rerender"].push({
         'component' : components,
         'startTime' : startTime,
-        'endTime' : (new Date()).getTime()
+        'endTime' : Date.now()
     });
     //#end
 
     if (topVisit) {
         this.visited = undefined;
-        this.afterRender(this.afterRenderStack);
-        this.afterRenderStack.length=0;
+        try {
+            this.afterRender(this.afterRenderStack);
+        } finally {
+            this.afterRenderStack.length = 0;
+        }
         for(var r=0;r<components.length;r++){
             components[r].fire("render");
         }
@@ -204,7 +207,7 @@ AuraRenderingService.prototype.rerender = function(components) {
  */
 AuraRenderingService.prototype.afterRender = function(components) {
     //#if {"modes" : ["STATS"]}
-    var startTime = (new Date()).getTime();
+    var startTime = Date.now();
     //#end
 
     components = this.getArray(components);
@@ -241,7 +244,7 @@ AuraRenderingService.prototype.afterRender = function(components) {
     this.statsIndex["afterRender"].push({
         'component' : components,
         'startTime' : startTime,
-        'endTime' : (new Date()).getTime()
+        'endTime' : Date.now()
     });
     //#end
 };

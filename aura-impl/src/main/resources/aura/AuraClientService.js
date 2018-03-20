@@ -2586,6 +2586,7 @@ AuraClientService.prototype.processStorableActions = function() {
             undefined,
             function(error) {
                 // something is really wrong. no clear way to recover so at least report
+                $A.warning(undefined, error);
                 $A.logger.reportError(error);
             }
         );
@@ -3335,7 +3336,7 @@ AuraClientService.prototype.buildActionNameList = function(actions) {
         } else {
             pkg = controllerParts.join("-");
         }
-        
+
         var actionName = pkg + "." + controller + "." + controllerMethod;
 
         map[actionName] = map[actionName] ? map[actionName] + 1 : 1;
@@ -4565,8 +4566,8 @@ AuraClientService.prototype.getCurrentAccessGlobalId = function () {
 };
 
 /**
- * If set, an Authorization header will be set with the value of the given token for every request. 
- * 
+ * If set, an Authorization header will be set with the value of the given token for every request.
+ *
  * @param {String} token value to be set for every request
  * @export
  */

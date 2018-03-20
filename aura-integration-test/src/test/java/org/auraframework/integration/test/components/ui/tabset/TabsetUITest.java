@@ -122,19 +122,17 @@ public class TabsetUITest extends WebDriverTestCase {
      */
     private void closeTabAndVerify(String loc) {
         findDomElement(By.xpath(loc)).click();
-        
         // Subtracting total number of tabs that we expect by 1
-        NUMBER_OF_TABS = NUMBER_OF_TABS - 1;
+        NUMBER_OF_TABS--;
         
         WebDriverWait wait = new WebDriverWait(getDriver(), getAuraUITestingUtil().getTimeout());
+        wait.withMessage("Waiting for the tab to close");
         wait.until(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
                 return findDomElements(By.xpath("//ul/li")).size() == NUMBER_OF_TABS;
             }
         });
-
-        assertEquals("The number of tabs, after deleting a tab, do not match", findDomElements(By.xpath("//ul/li")).size(), NUMBER_OF_TABS);
     }
 
     /**
@@ -300,6 +298,7 @@ public class TabsetUITest extends WebDriverTestCase {
     /**
      * Test that will verify that when a tab closes, the active element is moved to either the correct element.
      */
+    @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD })
     @Test
     public void testFocusOnClose_MovesToAnotherElement() throws Exception {
         open(createURL("basic", "true"));
@@ -317,6 +316,7 @@ public class TabsetUITest extends WebDriverTestCase {
     /**
      * Test verifying that if an element that is not active is closed, then focus is not lost
      */
+    @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD })
     @Test
     public void testFocusOnClose_NonCurrentElementDoesntLoseFocus() throws Exception {
         open(createURL("basic", "true"));
@@ -330,6 +330,7 @@ public class TabsetUITest extends WebDriverTestCase {
     /**
      * Dynamically create a component, verify it and make sure that it still acts as a normal component
      */
+    @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD })
     @Test
     public void testFocusOnClose_DynamicTabGeneration() throws Exception {
         String tabName = "Dynamic";
@@ -345,6 +346,7 @@ public class TabsetUITest extends WebDriverTestCase {
     /**
      * Verifying that nestedTabs work the same as normal tabs
      */
+    @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD })
     @Test
     public void testNestedTabsDelete() throws Exception {
         open(createURL("nestedTabs", "false"));

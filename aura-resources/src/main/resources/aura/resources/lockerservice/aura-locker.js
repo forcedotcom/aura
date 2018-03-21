@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-03-14
- * Version: 0.3.24
+ * Generated: 2018-03-21
+ * Version: 0.3.26
  */
 
 (function (exports) {
@@ -1441,7 +1441,7 @@ function createFunctionEvaluator(sandbox) {
 function SecureScriptElement() {}
 
 // TODO: this should be removed once Locker has a proper configuration mechanism in place
-const TRUSTED_CORS_DOMAINS = /\.lightning\.(|.*\.)force\.com$/g;
+const TRUSTED_CORS_DOMAINS = /(\.lightning\.(.*\.)?force|\.salesforce)\.com$/;
 
 SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
   function getAttributeName(name) {

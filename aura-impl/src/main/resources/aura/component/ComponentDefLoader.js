@@ -38,7 +38,7 @@ ComponentDefLoader.MARKUP_param = "markup://";
 ComponentDefLoader.IE_URI_MAX_LENGTH = 1800;
 
 ComponentDefLoader.prototype.buildComponentUri = function(descriptor, uid) {
-    if (!descriptor || (typeof descriptor).toLowerCase() !== "string") {
+    if (!descriptor || typeof descriptor !== "string") {
         $A.reportError("Please provide a valid descriptor when building a component URI");
         return undefined;
     }
@@ -46,7 +46,7 @@ ComponentDefLoader.prototype.buildComponentUri = function(descriptor, uid) {
         uid = ComponentDefLoader.UID_default;
     }
     Aura["componentDefLoaderError"][uid] = [];
-    return ComponentDefLoader.BASE_PATH
+    return this.getBaseUrl()
          + ComponentDefLoader.UID_param + "=" + uid + "&"
          + ComponentDefLoader.DESCRIPTOR_param + "=" + descriptor + "&"
          + this.buildURIAppParam()
@@ -62,7 +62,7 @@ ComponentDefLoader.prototype.buildURIAppParam = function() {
 
 ComponentDefLoader.prototype.buildURIHydrationParam = function(hydration) {
     //This may be overkill
-    if (!hydration || !hydration.length || (typeof hydration).toLowerCase() !== "string") {
+    if (!hydration || !hydration.length || typeof hydration !== "string") {
         return "";
     }
 
@@ -119,7 +119,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     var descriptors = Object.keys(descriptorMap);
     var namespaceMap = this.buildBundleComponentNamespace(descriptors, descriptorMap);
 
-    var baseURI = ComponentDefLoader.BASE_PATH + this.buildURIAppParam();
+    var baseURI = this.getBaseUrl() + this.buildURIAppParam();
     var hydrationValue = this.getHydrationState();
     if (!hydrationValue.length) {
         baseURI += this.buildURIHydrationParam(hydrationValue);
@@ -326,12 +326,16 @@ ComponentDefLoader.prototype.loadComponentDefs = function(descriptorMap, callbac
     if (this.pending === null) {
         this.schedulePending();
     }
-    if (callback && (typeof callback).toLowerCase() === "function") {
+    if (callback && typeof callback === "function") {
         //DQ: Should we error here or just bypass this if callback is null?
         this.pending.callbacks.push(callback);
         //Can descriptor map be null? Im pretty sure the answer is 'no'
         Object.assign(this.pending.descriptorMap, descriptorMap);
     }
+};
+
+ComponentDefLoader.prototype.getBaseUrl = function() {
+    return ($A.getContext().getContextPath() || "") + ComponentDefLoader.BASE_PATH;
 };
 
 Aura.Component.ComponentDefLoader = ComponentDefLoader;

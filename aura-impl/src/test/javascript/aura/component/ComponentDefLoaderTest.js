@@ -67,7 +67,7 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
                 }
             },
             "getContext": function(){
-                return {"styleContext":{}};
+                return {"styleContext":{}, getContextPath: function(){return "";}};
             },
             "get": function(thing) {
                 return null;

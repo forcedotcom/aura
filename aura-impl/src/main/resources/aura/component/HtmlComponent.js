@@ -245,7 +245,7 @@ HtmlComponent.prototype["renderer"] = {
             helper.createHtmlAttribute(component, element, attribute, HTMLAttributes[attribute]);
         }
         
-        $A.util.setDataAttribute(element, $A.componentService.renderedBy, this.globalId);
+        $A.util.setDataAttribute(element, $A.componentService.renderedBy, component.globalId);
 
         helper.processJavascriptHref(element);
 

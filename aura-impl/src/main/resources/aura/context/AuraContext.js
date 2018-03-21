@@ -286,6 +286,14 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext, allowMissmatch
 };
 
 /**
+ * @param $Label mapping of additional labels to add
+ * @export
+ */
+Aura.Context.AuraContext.prototype.mergeLabels = function(labels) {
+    this.globalValueProviders.merge([labels]);
+};
+
+/**
  * FIXME: this should return a string, and it should probably not even be here.
  *
  * @return {number} the 'num' for this context

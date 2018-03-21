@@ -17,15 +17,9 @@ package org.auraframework.http;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
+
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,17 +32,24 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.http.RequestParam.StringParam;
+import org.auraframework.instance.AuraValueProviderType;
+import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.ServerService;
 import org.auraframework.service.ServerService.HYDRATION_TYPE;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
@@ -58,6 +59,8 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     private final static StringParam defDescriptorParam = new StringParam("_def", 0, false);
     private final static StringParam appDescriptorParam = new StringParam("aura.app", 0, false);
     private final static StringParam hydrationParam = new StringParam("_hydration", 0, false);
+    private final static StringParam localeParam = new StringParam("_l18n", 0, false);
+
     private final static List<Class> DESCRIPTOR_DEF_TYPES = Arrays.asList(ModuleDef.class, ComponentDef.class, EventDef.class, LibraryDef.class);
     
     private DefinitionService definitionService;
@@ -72,6 +75,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         String requestedUID = componentUIDParam.get(request);
         String appReferrrer = appDescriptorParam.get(request);
         String hydration = hydrationParam.get(request);
+        String locale = localeParam.get(request);
 
         List<String> requestedDescriptors = extractDescriptors(request);
 
@@ -79,6 +83,8 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
         StringBuilderWriter responseStringWriter = new StringBuilderWriter();
         
+        AuraContext context = contextService.getCurrentContext();
+
         try {
             if (requestedDescriptors.size() == 0) {
                 throw new InvalidDefinitionException("Descriptor required", null);
@@ -136,7 +142,20 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 hydrationType = HYDRATION_TYPE.one;
             }
 
+            // if locale provided, set the it on the context as a requested locale
+            if (StringUtils.isNotEmpty(locale)) {
+                context.setRequestedLocales(Arrays.asList(new Locale(locale)));
+            }
+
             serverService.writeDefinitions(descriptors.keySet(), responseStringWriter, false, 0, hydrationType, false);
+
+            try {
+                definitionService.populateGlobalValues(AuraValueProviderType.LABEL.getPrefix(),
+                        mapDescriptorToDefinition(descriptors.keySet()));
+            } catch (QuickFixException qfe) {
+                // this should not throw a QFE
+                loggingService.warn("attempting to populate labels for requested definitions: " + StringUtils.join(requestedDescriptors, ","), qfe);
+            }
 
             Set<DefDescriptor<?>> dependencies = new HashSet<>();
             descriptors.entrySet().stream().forEach((entry)->{
@@ -161,6 +180,25 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             }
             serverService.writeDefinitions(dependencies, responseStringWriter, false, 0, hydrationType, false);
 
+            if (dependencies.size() > 0) {
+                try {
+                    definitionService.populateGlobalValues(AuraValueProviderType.LABEL.getPrefix(),
+                            mapDescriptorToDefinition(dependencies));
+                } catch (QuickFixException qfe) {
+                    // this should not throw a QFE
+                    loggingService.warn("attempting to populate labels for requested definitions: " + StringUtils.join(requestedDescriptors, ","), qfe);
+                }
+            }
+
+            // write Labels
+            String labels = serializeLabels(context);
+            if (StringUtils.isNotEmpty(labels)) {
+                responseStringWriter.write("$A.getContext().mergeLabels(");
+                responseStringWriter.write(labels);
+                responseStringWriter.write(");");
+            }
+
+
             servletUtilAdapter.setLongCache(response);
         } catch (Exception e) {
             PrintWriter out = response.getWriter();
@@ -168,7 +206,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 requestedUID = requestedUID.replaceAll("[^a-zA-Z0-9-]+","");
             }
             out.append("Aura.componentDefLoaderError['").append(requestedUID).append("'].push(/*");
-            servletUtilAdapter.handleServletException(e, false, contextService.getCurrentContext(), request, response, true);
+            servletUtilAdapter.handleServletException(e, false, context, request, response, true);
             out.append(");\n");
             servletUtilAdapter.setNoCache(response);
             response.setStatus(HttpStatus.SC_OK);
@@ -176,6 +214,19 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             response.getWriter().print(responseStringWriter.toString());
             responseStringWriter.close();
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<DefDescriptor<?>, Definition> mapDescriptorToDefinition(Set<DefDescriptor<?>> descriptors) {
+        Map<DefDescriptor<?>, Definition> map = new HashMap<>();
+        for (DefDescriptor defDescriptor : descriptors) {
+            try {
+                map.put(defDescriptor, definitionService.getDefinition(defDescriptor));
+            } catch (QuickFixException e) {
+                // ignore
+            }
+        }
+        return map;
     }
 
     private List<String> extractDescriptors(HttpServletRequest request) {
@@ -256,6 +307,19 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         }
 
         return String.format("%s?%s=%s&%s=%s%s", URI_DEFINITIONS_PATH, componentUIDParam.name, computedUID, appDescriptorParam.name, appReferrrer, defsParameters.toString());
+    }
+
+    private String serializeLabels(AuraContext ctx) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        Json json = new JsonEncoder(sb, ctx.isDevMode());
+        GlobalValueProvider valueProvider = ctx.getGlobalProviders().get(AuraValueProviderType.LABEL.getPrefix());
+        if (valueProvider != null && !valueProvider.isEmpty()) {
+            json.writeMapBegin();
+            json.writeMapEntry("type", valueProvider.getValueProviderKey().getPrefix());
+            json.writeMapEntry("values", valueProvider.getData());
+            json.writeMapEnd();
+        }
+        return sb.toString();
     }
     
     @Inject

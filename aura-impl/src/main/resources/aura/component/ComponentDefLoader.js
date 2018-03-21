@@ -31,6 +31,7 @@ ComponentDefLoader.APP_param = "aura.app";
 ComponentDefLoader.HYDRATION_param = "_hydration";
 ComponentDefLoader.LOCKER_param = "_l";
 ComponentDefLoader.STYLE_param = "_style";
+ComponentDefLoader.LOCALE_param = "_l10n";
 ComponentDefLoader.UID_default = "LATEST";
 ComponentDefLoader.BASE_PATH = "/auraCmpDef?";
 ComponentDefLoader.MARKUP_param = "markup://";
@@ -51,7 +52,8 @@ ComponentDefLoader.prototype.buildComponentUri = function(descriptor, uid) {
          + this.buildURIAppParam()
          + this.buildURIHydrationParam(this.getHydrationState())
          + this.buildURILockerParam()
-         + this.buildURIStyleParam();
+         + this.buildURIStyleParam()
+         + this.buildURILocaleParam();
 };
 
 ComponentDefLoader.prototype.buildURIAppParam = function() {
@@ -74,6 +76,11 @@ ComponentDefLoader.prototype.buildURILockerParam = function() {
 ComponentDefLoader.prototype.buildURIStyleParam = function() {
     var cuid = $A.getContext().styleContext.cuid;
     return cuid ? "&" + ComponentDefLoader.STYLE_param + "=" + cuid : "";
+};
+
+ComponentDefLoader.prototype.buildURILocaleParam = function() {
+    var locale = $A.get("$Locale.langLocale");
+    return locale ? "&" + ComponentDefLoader.LOCALE_param + "=" + locale : "";
 };
 
 ComponentDefLoader.prototype.getHydrationState = function() {
@@ -120,6 +127,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
 
     baseURI += this.buildURILockerParam();
     baseURI += this.buildURIStyleParam();
+    baseURI += this.buildURILocaleParam();
 
     var uri = "";
     var uris = [];

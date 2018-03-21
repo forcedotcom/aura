@@ -68,6 +68,9 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
             },
             "getContext": function(){
                 return {"styleContext":{}};
+            },
+            "get": function(thing) {
+                return null;
             }
         },
         //Need to add a ref to itself to handle global defaults

@@ -70,20 +70,6 @@
         return { "counts": returnedCounts };
     },
 
-    // 
-    getFileSizes: function(cmp) {
-        var action = cmp.get("c.getApplicationScriptFileSizes");
-        action.setParam("definition", cmp.get("v.def"));
-        action.setParam("host", window.location.origin);
-
-        action.setCallback(this, function() {
-            var sizes = action.getReturnValue();
-            this.addMetrics(cmp, sizes);
-        });
-
-        $A.enqueueAction(action);
-    },
-
     addMetrics: function(cmp, newMetrics) {
         var metrics = cmp.get("v.metrics") || {};
         Object.assign(metrics, newMetrics);

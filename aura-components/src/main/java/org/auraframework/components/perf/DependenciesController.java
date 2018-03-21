@@ -105,39 +105,6 @@ public class DependenciesController implements Controller {
     }
 
     @AuraEnabled
-    public Map<String, String> getApplicationScriptFileSizes(@Key("definition")String definition, @Key("host")String host) {
-        final Map<String, String> fileSizes = new HashMap<String, String>();
-        final DecimalFormat formatter = new DecimalFormat("#,###");
-
-        DefDescriptor<?> descriptor = getDescriptor(definition);
-
-        @SuppressWarnings("unchecked")
-        AuraContext context = contextService.startContextNoGVP(Mode.PROD, Format.JS, Authentication.AUTHENTICATED, (DefDescriptor<? extends BaseComponentDef>) descriptor);
-
-        final String appJsUrl = host + servletUtilAdapter.getAppJsUrl(context, null);
-        final String appJsCoreUrl = host + servletUtilAdapter.getAppCoreJsUrl(context, null);
-
-        final String appJsContent = getUrlContent(appJsUrl);
-        final String appCoreJsContent = getUrlContent(appJsCoreUrl);
-
-        final Integer appJsSize = appJsContent.length();
-        final Integer appJsCoreSize = appCoreJsContent.length();
-
-        final Integer appJsCompressed = gzipString(appJsContent).length();
-        final Integer appJsCoreCompresed = gzipString(appCoreJsContent).length();
-
-
-        fileSizes.put("appjs", formatter.format(appJsSize));
-        fileSizes.put("appcorejs", formatter.format(appJsCoreSize));
-        fileSizes.put("appjs_compressed", formatter.format(appJsCompressed));
-        fileSizes.put("appcorejs_compressed", formatter.format(appJsCoreCompresed));
-        fileSizes.put("total", formatter.format(appJsSize + appJsCoreSize));
-        fileSizes.put("total_compressed", formatter.format(appJsCompressed + appJsCoreCompresed));
-
-        return fileSizes;
-    }
-
-    @AuraEnabled
     public Map<String, Node> createGraph(@Key("app")String app) throws Exception {
         DescriptorFilter matcher = new DescriptorFilter(app, DefType.APPLICATION);
         Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);

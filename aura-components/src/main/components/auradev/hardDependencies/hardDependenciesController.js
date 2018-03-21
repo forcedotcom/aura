@@ -18,7 +18,6 @@
         var def = cmp.get('v.def');
         if (def) {
             helper.getDependencies(cmp);
-            helper.getFileSizes(cmp);
         }
     }
 })// eslint-disable-line semi

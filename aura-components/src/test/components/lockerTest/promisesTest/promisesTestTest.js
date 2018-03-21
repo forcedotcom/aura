@@ -6,7 +6,7 @@
 
     // LockerService not supported on IE & Promise is not supported in IE 11 and below
     // TODO(W-3674741, W-4446969): FF and LockerService disabled for iOS browser in 212
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-SAFARI", "-IPHONE", "-IPAD"],
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
 
     setUp: function(cmp) {
         cmp.set("v.testUtils", $A.test);

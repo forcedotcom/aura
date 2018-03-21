@@ -124,18 +124,19 @@
 
     testArrayConstructor: {
         test: function(cmp) {
-            cmp.testSanitizeJSSrc();
+            cmp.testArrayConstructor();
         }
     },
 
-    // Temporarily disabled validation due to W-4532392
+    // TODO: [W-4532392] Enable when href sanitizer is turned back on. 
     _testSanitizeJSHref: {
         test: function(cmp) {
             cmp.testSanitizeJSHref();
         }
     },
 
-    testSanitizeJSSrc: {
+    // TODO: [W-4532392] Enable when src sanitizer is turned back on.
+    _testSanitizeJSSrc: {
         test: function(cmp) {
             cmp.testSanitizeJSSrc();
 

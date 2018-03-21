@@ -129,7 +129,7 @@
         document.body.appendChild(element);
 
         try {
-          element.setAttribute('href', 'javascript:console.log("stuff")');
+          element.setAttribute('href', 'javascript:console.log("stuff");');
         } catch (error) {
           errorMessage = error.message;
         }
@@ -139,9 +139,9 @@
 
     testSanitizeJSSrc: function(component) {
         var testUtils = component.get('v.testUtils');
-        var element = document.createElement('image');
+        var element = document.createElement('img');
         document.body.appendChild(element);
-        testUtils.expectAuraWarning('SecureElement: [object HTMLUnknownElement]{ key: {"namespace":"lockerTest"} } does not allow getting/setting the src attribute, ignoring!');
-        element.setAttribute('src', 'javascript:console.log("stuff")');
+        testUtils.expectAuraWarning('SecureElement: [object HTMLImageElement]{ key: {"namespace":"lockerTest"} } does not allow getting/setting the src attribute, ignoring!');
+        element.setAttribute('src', 'javascript:console.log("stuff");');
     }
 })

@@ -347,7 +347,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
 
     private void injectModuleServices (Json json, DefDescriptor<ApplicationDef> appDesc) throws QuickFixException, IOException {
         ApplicationDef appDef = definitionService.getDefinition(appDesc);
-        List<DefDescriptor<ModuleDef>> services = appDef.getModuleServices();
+        Set<DefDescriptor<ModuleDef>> services = appDef.getModuleServices();
         if (services != null && !services.isEmpty()) {
             json.writeMapEntry("services", services);
         }

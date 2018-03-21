@@ -71,7 +71,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private final String additionalAppCacheURLs;
     private final String bootstrapPublicCacheExpiration;
     private final List<DefDescriptor<TokensDef>> tokenOverrides;
-    private final List<DefDescriptor<ModuleDef>> moduleServices;
+    private final Set<DefDescriptor<ModuleDef>> moduleServices;
     private FlavorsDef flavorOverrides;
     private final DefDescriptor<FlavorsDef> externalFlavorOverrides;
 
@@ -101,7 +101,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         private List<DefDescriptor<TokensDef>> tokenOverrides;
         private FlavorsDef flavorOverrides;
         private DefDescriptor<FlavorsDef> externalFlavorOverrides;
-        private List <DefDescriptor<ModuleDef>> services;
+        private Set<DefDescriptor<ModuleDef>> services = Collections.emptySet();
 
         public Builder() {
             super(ApplicationDef.class);
@@ -119,13 +119,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         }
 
         @Override
-        public BaseComponentDefBuilder<ApplicationDef> setModuleServices(String services) {
-            if (this.services == null) {
-                this.services = new ArrayList<>();
-            }
-            for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(services)) {
-                this.services.add(Aura.getDefinitionService().getDefDescriptor(name, ModuleDef.class));
-            }
+        public BaseComponentDefBuilder<ApplicationDef> setModuleServices(Set<DefDescriptor<ModuleDef>> services) {
+            this.services = services;
             return this;
         }
 
@@ -426,7 +421,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
 
     @Override
-    public List<DefDescriptor<ModuleDef>> getModuleServices() throws QuickFixException{
+    public Set<DefDescriptor<ModuleDef>> getModuleServices() throws QuickFixException{
         return moduleServices;
     }
 }

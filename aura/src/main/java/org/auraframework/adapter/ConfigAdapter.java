@@ -233,4 +233,10 @@ public interface ConfigAdapter extends AuraAdapter {
     boolean uriAddressableDefsEnabled();
 
     boolean isSecureRequest(HttpServletRequest request);
+
+    /**
+     * Required module services.
+     * @return set of require module services
+     */
+    Set<String> getRequiredServices();
 }

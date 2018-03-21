@@ -26,6 +26,7 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -442,7 +443,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public boolean isFileMonitorEnabled() {
         String enableFileWatcher = System.getProperty("aura.enableFileMonitor");
         if (enableFileWatcher == null) {
-            return !isProduction();
+            return  !isProduction();
         }
         return Boolean.parseBoolean(enableFileWatcher);
     }
@@ -857,5 +858,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public boolean isSecureRequest(HttpServletRequest request) {
         return request.isSecure();
+    }
+
+    @Override
+    public Set<String> getRequiredServices() {
+        return Collections.emptySet();
     }
 }

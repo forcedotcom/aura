@@ -18,6 +18,9 @@ package org.auraframework.builder;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorsDef;
+import org.auraframework.def.module.ModuleDef;
+
+import java.util.Set;
 
 /**
  */
@@ -48,5 +51,5 @@ public interface ApplicationDefBuilder extends BaseComponentDefBuilder<Applicati
      *
      * @param services
      */
-    BaseComponentDefBuilder<ApplicationDef> setModuleServices(String services);
+    BaseComponentDefBuilder<ApplicationDef> setModuleServices(Set<DefDescriptor<ModuleDef>> services);
 }

@@ -17,6 +17,7 @@ package org.auraframework.def;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -40,7 +41,7 @@ public interface ApplicationDef extends BaseComponentDef {
 
     Map<String, String> getTokens();
 
-    List<DefDescriptor<ModuleDef>> getModuleServices() throws QuickFixException;
+    Set<DefDescriptor<ModuleDef>> getModuleServices() throws QuickFixException;
     
     /**
      * Gets the application-wide token overrides.

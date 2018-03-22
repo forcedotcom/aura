@@ -55,7 +55,6 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
         public Map<String, Throwable> errors;
 
-        @SuppressWarnings("unlikely-arg-type")
         public CompositeRuntimeException(String message, Map<String, Throwable> errors) {
             super(message, errors == null || errors.isEmpty() ? null : errors.entrySet().iterator().next().getValue());
             this.errors = errors;

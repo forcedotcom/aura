@@ -818,9 +818,13 @@ Test.Aura.AuraLocalizationServiceTest = function() {
                 return momentDate;
             };
 
-             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
+            targetService.moment.isMoment = function() {
+                return false;
+            };
+
+            var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value) {}
             });
@@ -852,11 +856,14 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             targetService.moment = function() {
                 return momentDate;
             };
+            targetService.moment.isMoment = function(){
+                return false;
+            };
 
             var expected = "format";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.dateFormat") return expected;
@@ -891,11 +898,14 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             targetService.moment = function() {
                 return momentDate;
             };
+            targetService.moment.isMoment = function(){
+                return false;
+            };
 
             var expected = "locale";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.langLocale") return expected;
@@ -935,10 +945,13 @@ Test.Aura.AuraLocalizationServiceTest = function() {
                     return momentDate;
                 }
             };
+            targetService.moment.isMoment = function(){
+                return false;
+            };
 
              var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value) {}
             });
@@ -972,11 +985,14 @@ Test.Aura.AuraLocalizationServiceTest = function() {
                     return momentDate;
                 }
             };
+            targetService.moment.isMoment = function() {
+                return false;
+            };
 
             var expected = "format";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.dateFormat") return expected;
@@ -1012,11 +1028,14 @@ Test.Aura.AuraLocalizationServiceTest = function() {
                     return momentDate;
                 }
             };
+            targetService.moment.isMoment = function() {
+                return false;
+            };
 
             var expected = "locale";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.langLocale") return expected;
@@ -1054,10 +1073,13 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             targetService.moment = function() {
                 return momentDate;
             };
+            targetService.moment.isMoment = function() {
+                return false;
+            };
 
              var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value) {}
             });
@@ -1089,11 +1111,14 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             targetService.moment = function() {
                 return momentDate;
             };
+            targetService.moment.isMoment = function() {
+                return false;
+            };
 
             var expected = "format";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.datetimeFormat") return expected;
@@ -1127,11 +1152,14 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             targetService.moment = function() {
                 return momentDate;
             };
+            targetService.moment.isMoment = function() {
+                return false;
+            };
 
             var expected = "locale";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.langLocale") return expected;
@@ -1171,10 +1199,13 @@ Test.Aura.AuraLocalizationServiceTest = function() {
                     return momentDate;
                 }
             };
+            targetService.moment.isMoment = function() {
+                return false;
+            };
 
              var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value) {}
             });
@@ -1208,11 +1239,14 @@ Test.Aura.AuraLocalizationServiceTest = function() {
                     return momentDate;
                 }
             };
+            targetService.moment.isMoment = function() {
+                return false;
+            };
 
             var expected = "format";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.datetimeFormat") return expected;
@@ -1248,11 +1282,14 @@ Test.Aura.AuraLocalizationServiceTest = function() {
                     return momentDate;
                 }
             };
+            targetService.moment.isMoment = function() {
+                return false;
+            };
 
             var expected = "locale";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.langLocale") return expected;
@@ -1290,10 +1327,13 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             targetService.moment = function() {
                 return momentDate;
             };
+            targetService.moment.isMoment = function() {
+                return false;
+            };
 
              var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value) {}
             });
@@ -1325,11 +1365,14 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             targetService.moment = function() {
                 return momentDate;
             };
+            targetService.moment.isMoment = function() {
+                return false;
+            };
 
             var expected = "format";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.timeFormat") return expected;
@@ -1363,11 +1406,14 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             targetService.moment = function() {
                 return momentDate;
             };
+            targetService.moment.isMoment = function() {
+                return false;
+            };
 
             var expected = "locale";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.langLocale") return expected;
@@ -1406,10 +1452,13 @@ Test.Aura.AuraLocalizationServiceTest = function() {
                     return momentDate;
                 }
             };
+            targetService.moment.isMoment = function() {
+                return false;
+            };
 
              var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value) {}
             });
@@ -1443,11 +1492,14 @@ Test.Aura.AuraLocalizationServiceTest = function() {
                     return momentDate;
                 }
             };
+            targetService.moment.isMoment = function() {
+                return false;
+            };
 
             var expected = "format";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.timeFormat") return expected;
@@ -1483,11 +1535,14 @@ Test.Aura.AuraLocalizationServiceTest = function() {
                     return momentDate;
                 }
             };
+            targetService.moment.isMoment = function() {
+                return false;
+            };
 
             var expected = "locale";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isUndefined: function(value) { return value === undefined; }
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.langLocale") return expected;
@@ -1878,8 +1933,8 @@ Test.Aura.AuraLocalizationServiceTest = function() {
 
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isBoolean: function(value) { return typeof value === "boolean" },
-                    isUndefined: function(value) { return value === undefined; }
+                    isBoolean: Aura.Utils.Util.prototype.isBoolean,
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){}
             });
@@ -1912,8 +1967,8 @@ Test.Aura.AuraLocalizationServiceTest = function() {
 
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isBoolean: function(value) { return typeof value === "boolean" },
-                    isUndefined: function(value) { return value === undefined; }
+                    isBoolean: Aura.Utils.Util.prototype.isBoolean,
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){}
             });
@@ -1950,8 +2005,8 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             var expected = "locale";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isBoolean: function(value) { return typeof value === "boolean" },
-                    isUndefined: function(value) { return value === undefined; }
+                    isBoolean: Aura.Utils.Util.prototype.isBoolean,
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.langLocale") return expected;
@@ -1990,8 +2045,8 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             var expected = "locale";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isBoolean: function(value) { return typeof value === "boolean" },
-                    isUndefined: function(value) { return value === undefined; }
+                    isBoolean: Aura.Utils.Util.prototype.isBoolean,
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.langLocale") return expected;
@@ -2045,8 +2100,8 @@ Test.Aura.AuraLocalizationServiceTest = function() {
 
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isBoolean: function(value) { return typeof value === "boolean" },
-                    isUndefined: function(value) { return value === undefined; }
+                    isBoolean: Aura.Utils.Util.prototype.isBoolean,
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value) {}
             });
@@ -2081,8 +2136,8 @@ Test.Aura.AuraLocalizationServiceTest = function() {
 
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isBoolean: function(value) { return typeof value === "boolean" },
-                    isUndefined: function(value) { return value === undefined; }
+                    isBoolean: Aura.Utils.Util.prototype.isBoolean,
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value) {}
             });
@@ -2121,8 +2176,8 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             var expected = "locale";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isBoolean: function(value) { return typeof value === "boolean" },
-                    isUndefined: function(value) { return value === undefined; }
+                    isBoolean: Aura.Utils.Util.prototype.isBoolean,
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.langLocale") return expected;
@@ -2163,8 +2218,8 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             var expected = "locale";
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 util: {
-                    isBoolean: function(value) { return typeof value === "boolean" },
-                    isUndefined: function(value) { return value === undefined; }
+                    isBoolean: Aura.Utils.Util.prototype.isBoolean,
+                    isUndefined: Aura.Utils.Util.prototype.isUndefined
                 },
                 get: function(value){
                     if(value === "$Locale.langLocale") return expected;

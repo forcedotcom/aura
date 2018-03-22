@@ -412,6 +412,11 @@ AuraLocalizationService.prototype.duration = function(num, unit) {
  * @platform
  */
 AuraLocalizationService.prototype.formatDate = function(date, formatString, locale) {
+    if (this.moment["isMoment"](date)) {
+        $A.deprecated("$A.localizationService.formatDate: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
+                null, "AuraLocalizationService.formatDate(moment)");
+    }
+
     var mDate = this.moment(date);
     if (!mDate || !mDate["isValid"]()) {
         throw { message: "Invalid date value" };
@@ -459,6 +464,11 @@ AuraLocalizationService.prototype.formatDate = function(date, formatString, loca
  * @platform
  */
 AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, locale) {
+    if (this.moment["isMoment"](date)) {
+        $A.deprecated("$A.localizationService.formatDateUTC: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
+                null, "AuraLocalizationService.formatDateUTC(moment)");
+    }
+
     var mDate = this.moment["utc"](date);
     if (!mDate || !mDate["isValid"]()) {
         throw { message: "Invalid date value" };
@@ -506,6 +516,11 @@ AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, l
  * @platform
  */
 AuraLocalizationService.prototype.formatDateTime = function(date, formatString, locale) {
+    if (this.moment["isMoment"](date)) {
+        $A.deprecated("$A.localizationService.formatDateTime: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
+                null, "AuraLocalizationService.formatDateTime(moment)");
+    }
+
     var mDate = this.moment(date);
     if (!mDate || !mDate["isValid"]()) {
         throw { message: "Invalid date time value" };
@@ -552,6 +567,11 @@ AuraLocalizationService.prototype.formatDateTime = function(date, formatString, 
  * @platform
  */
 AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatString, locale) {
+    if (this.moment["isMoment"](date)) {
+        $A.deprecated("$A.localizationService.formatDateTimeUTC: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
+                null, "AuraLocalizationService.formatDateTimeUTC(moment)");
+    }
+
     var mDate = this.moment["utc"](date);
     if (!mDate || !mDate["isValid"]()) {
         throw { message: "Invalid date time value" };
@@ -599,6 +619,11 @@ AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatStrin
  * @platform
  */
 AuraLocalizationService.prototype.formatTime = function(date, formatString, locale) {
+    if (this.moment["isMoment"](date)) {
+        $A.deprecated("$A.localizationService.formatTime: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
+                null, "AuraLocalizationService.formatTime(moment)");
+    }
+
     var mDate = this.moment(date);
     if (!mDate || !mDate["isValid"]()) {
         throw { message: "Invalid time value" };
@@ -649,6 +674,11 @@ AuraLocalizationService.prototype.formatTime = function(date, formatString, loca
  * @platform
  */
 AuraLocalizationService.prototype.formatTimeUTC = function(date, formatString, locale) {
+    if (this.moment["isMoment"](date)) {
+        $A.deprecated("$A.localizationService.formatTimeUTC: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
+                null, "AuraLocalizationService.formatTimeUTC(moment)");
+    }
+
     var mDate = this.moment["utc"](date);
     if (!mDate || !mDate["isValid"]()) {
         throw { message: "Invalid time value" };

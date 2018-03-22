@@ -61,7 +61,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     if (this.actionPublicCachingEnabled) {
         this.actionPublicCacheKey = config["apck"];
     }
-    this.uriAddressableDefsEnabled = !!config["uad"];
+    this.uriAddressableDefsEnabled = !!config[Json.ApplicationKey.URIADDRESSABLEDEFINITIONS];
     
     var that = this;
 
@@ -225,7 +225,7 @@ Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic, in
     if(this.useCompatSource) {
         contextToSend["c"] = 1;
     }
-    contextToSend["uad"] = !!this.uriAddressableDefsEnabled;
+    contextToSend[Json.ApplicationKey.URIADDRESSABLEDEFINITIONS] = !!this.uriAddressableDefsEnabled;
     return $A.util.json.encode(contextToSend);
 };
 

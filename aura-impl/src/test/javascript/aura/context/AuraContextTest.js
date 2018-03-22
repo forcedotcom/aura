@@ -87,16 +87,29 @@ Test.Aura.Context.AuraContextTest = function() {
                         }
                     };
                 }
+            },
+            "Json": {
+                "ApplicationKey": {
+                    "URIADDRESSABLEDEFINITIONS": "uad"
+                }
             }
         }));
-    }; 
+    };
+
+    var mockJson = function() {
+        return Mocks.GetMock(Object.Global(), 'Json', Stubs.GetObject({}, {
+            "ApplicationKey": {
+                "URIADDRESSABLEDEFINITIONS": "uad"
+            }
+        }));
+    };
 
     [Fixture]
     function EncodeForServer() {
 
         [Fact]
         function IncludesDefaultConfig() {
-            var mocks = [mock$A(), mockAura()], 
+            var mocks = [mock$A(), mockAura(), mockJson()],
                 config = {
                     mode: 'mode',
                     fwuid: 'fwuid',
@@ -121,7 +134,7 @@ Test.Aura.Context.AuraContextTest = function() {
 
         [Fact]
         function IncludesDynamic() {
-            var mocks = [mock$A(), mockAura()], 
+            var mocks = [mock$A(), mockAura(), mockJson()],
                 config = {
                     mode: 'mode',
                     fwuid: 'fwuid',
@@ -150,7 +163,7 @@ Test.Aura.Context.AuraContextTest = function() {
 
         [Fact]
         function IncludeCacheKeyForCacheableXHR() {
-            var mocks = [mock$A(), mockAura()], 
+            var mocks = [mock$A(), mockAura(), mockJson()],
                 config = {
                     mode: 'mode',
                     fwuid: 'fwuid',

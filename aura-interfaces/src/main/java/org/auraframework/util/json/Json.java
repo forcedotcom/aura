@@ -145,6 +145,7 @@ public interface Json {
         SUPERDEF("superDef","su"),
         TOKENS("tokens","tk"),
         TYPE("type","t"),
+        URIADDRESSABLEDEFINITIONS("uriAddressableDefs", "uad"),
         VALUE("v"/*"value"*/,"v"),
         VALUES("values","vv"),
         VALUEPROVIDER("valueProvider","vp");

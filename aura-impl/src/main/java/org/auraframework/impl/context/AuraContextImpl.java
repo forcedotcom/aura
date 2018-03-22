@@ -908,7 +908,7 @@ public class AuraContextImpl implements AuraContext {
                     }
                 }
                 if (enabled) {
-                    json.writeMapEntry("uad", 1);
+                    json.writeMapEntry(Json.ApplicationKey.URIADDRESSABLEDEFINITIONS, 1);
                 }
             }
             

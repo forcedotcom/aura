@@ -147,7 +147,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         json.writeMapEntry("fwuid", fwuid);
 
         if (uriEnabled) {
-            json.writeMapEntry("uad", 1);
+            json.writeMapEntry(Json.ApplicationKey.URIADDRESSABLEDEFINITIONS, 1);
         }
 
         // add contextual CSS information

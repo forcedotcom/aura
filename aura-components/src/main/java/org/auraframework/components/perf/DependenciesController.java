@@ -15,13 +15,8 @@
  */
 package org.auraframework.components.perf;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,15 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.zip.GZIPOutputStream;
-
 import javax.inject.Inject;
 
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -66,10 +54,6 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -94,15 +78,6 @@ public class DependenciesController implements Controller {
 
     @Inject
     ServletUtilAdapter servletUtilAdapter;
-
-    private final DefDescriptor<?> getDescriptor(String definition) {
-        final DescriptorFilter filter = new DescriptorFilter(definition, Lists.newArrayList(DefType.COMPONENT,DefType.APPLICATION));
-        final Set<DefDescriptor<?>> descriptors = definitionService.find(filter);
-        if (descriptors.size() != 1) {
-            return null;
-        }
-        return descriptors.iterator().next();
-    }
 
     @AuraEnabled
     public Map<String, Node> createGraph(@Key("app")String app) throws Exception {
@@ -603,58 +578,6 @@ public class DependenciesController implements Controller {
             }
         }
     }
-
-    // Request a url and return its content.
-    private final String getUrlContent(final String url) {
-
-        HttpResponse response;
-        try {
-            HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url);
-
-            // add request header
-            request.addHeader("User-Agent", HttpHeaders.USER_AGENT);
-
-            response = client.execute(request);
-
-            BufferedReader rd = new BufferedReader(
-                           new InputStreamReader(response.getEntity().getContent()));
-
-            StringBuffer result = new StringBuffer();
-            String line = "";
-            while ((line = rd.readLine()) != null) {
-                result.append(line);
-            }
-
-            return result.toString();
-        } catch(Exception ex) {
-            System.out.print(ex.getMessage());
-        }
-        return "";
-    }
-
-    // Compress a string using GZIP so we can measure its size after compression.
-    private final String gzipString(final String content) {
-        if(content == null || content.length() == 0) {
-            return content;
-        }
-
-
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream(content.length());
-            GZIPOutputStream zip = new GZIPOutputStream(out);
-
-            zip.write(content.getBytes());
-            zip.close();
-
-            return out.toString();
-        } catch(IOException ex) {
-
-        }
-
-        return "";
-    }
-
 
     private final static Set<String> namespaceBlackList = new HashSet<>(Arrays.asList("aura", "auradev"));
     private final static Set<DefType> defTypeWhitelist = new HashSet<>(Arrays.asList(

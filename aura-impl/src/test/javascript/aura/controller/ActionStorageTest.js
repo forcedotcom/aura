@@ -18,6 +18,7 @@ Function.RegisterNamespace("Test.Aura.Controller");
 [Fixture]
 Test.Aura.Controller.ActionStorageTest = function () {
     var Aura = { Controller: {} };
+    var ActionStorage_URI_DEFS_ENABLED_KEY = "_uri_defs_enabled";
 
     Mocks.GetMocks(Object.Global(), {
         "Aura": Aura,
@@ -481,7 +482,7 @@ Test.Aura.Controller.ActionStorageTest = function () {
         function CallsGetAllToPopulateFilter() {
             var target = new Aura.Controller.ActionStorage();
             target.isStoragePersistent = function() { return true; };
-            var mockGetAll =  Stubs.GetMethod();
+            var mockGetAll =  Stubs.GetMethod({"then":function(){}});
             target.getAll = mockGetAll;
 
             target.populateActionsFilter();

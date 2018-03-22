@@ -224,6 +224,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 map.put(defDescriptor, definitionService.getDefinition(defDescriptor));
             } catch (QuickFixException e) {
                 // ignore
+                loggingService.warn("attempting to look up definition failed for: " + defDescriptor.getQualifiedName(), e);
             }
         }
         return map;

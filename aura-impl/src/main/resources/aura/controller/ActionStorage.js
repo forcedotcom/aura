@@ -45,6 +45,8 @@ function ActionStorage() {
 
 ActionStorage.prototype.STORAGE_NAME = "actions";
 
+ActionStorage.prototype.URI_DEFS_ENABLED_KEY = "_uri_defs_enabled";
+
 /**
  * Enables or disables the persisted actions filter, required for multi-tab
  * environments that use storable actions.
@@ -83,8 +85,30 @@ ActionStorage.prototype.populateActionsFilter = function() {
         return Promise["resolve"]();
     }
 
+    var that = this;
     // if filter is enabled, getAll() populates all persisted actions to filter
-    return this.getAll();
+    return this.getAll().then(function(items){
+
+        var actionsStoredWithURIDefs = items[that.URI_DEFS_ENABLED_KEY];
+
+        // actions stored with uri defs enabled are backwards compatible with it disabled.
+        // actions stored with uri defs disabled are not compatible with uri defs enabled.
+        if ((!!$A.util.getURIDefsState()) && !actionsStoredWithURIDefs &&
+            (Object.keys(items).length > (actionsStoredWithURIDefs === undefined? 0: 1))) {
+            // it is enabled and it wasn't stored
+            $A.warning("Clearing actions db because uri addressable defs are now enabled and were previously disabled");
+            var hardRefresh = function() {
+                $A.clientService.hardRefresh();
+            };
+            that.clear().then(function(){
+                that.set(that.URI_DEFS_ENABLED_KEY, true).then(hardRefresh, hardRefresh);
+            });
+            return [];
+        } else {
+            that.set(that.URI_DEFS_ENABLED_KEY, !!$A.util.getURIDefsState());
+        }
+        return items;
+    });
 };
 
 /**
@@ -240,7 +264,6 @@ ActionStorage.prototype.getAll = function(actionKeys) {
             for (key in items) {
                 that.actionKeysFilter[key] = true;
             }
-
             return items;
         });
 };

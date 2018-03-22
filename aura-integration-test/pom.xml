@@ -131,7 +131,7 @@
     </dependencies>
     <properties>
         <chromedriver.download.root.url>http://chromedriver.storage.googleapis.com</chromedriver.download.root.url>
-        <chromedriver.version>2.34</chromedriver.version>
+        <chromedriver.version>2.37</chromedriver.version>
         <jetty.spawn>true</jetty.spawn>
         <jetty.resources>${basedir}/../aura/src/main/webapp</jetty.resources>
         <aura.build.id />

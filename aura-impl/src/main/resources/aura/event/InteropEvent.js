@@ -37,6 +37,13 @@ Aura.Event.InteropEvent = function (component, config) {
 
     var _config = config || {};
     var nativeEvent = _config['isEvent'] && _config['params'];
+
+    // [W-4712124] Non-bubbling native events whose API we need to
+    // expose are smuggled into the interop layer via the custom event.
+    if (nativeEvent && _config['exposeNativeAPI'] &&
+        nativeEvent['detail'] && nativeEvent['detail']['_originalEvent']) {
+        nativeEvent = nativeEvent['detail']['_originalEvent'];
+    }
     var event = nativeEvent || {};
 
     this._name = event.type || _config['name'] || '';

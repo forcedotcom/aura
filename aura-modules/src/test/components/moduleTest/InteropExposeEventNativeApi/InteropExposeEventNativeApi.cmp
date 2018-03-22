@@ -1,9 +1,10 @@
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="evt" type="Object" default=""/>
+    <aura:attribute name="focusEvt" type="Object" default=""/>
     <aura:attribute name="isLegacy" type="boolean" default="false"/>
 
     <aura:if isTrue="{!v.isLegacy}">
-        <moduleTest:interopLegacyEvent aura:id="legacy" onclick="{!c.handleClick}" />
+        <moduleTest:interopLegacyEvent aura:id="legacy" onclick="{!c.handleClick}" onfocus="{!c.handleFocus}" />
         <aura:set attribute="else">
             <moduleTest:interopEvent aura:id="cmptest" onremove="{!c.handleClick}" />
         </aura:set>

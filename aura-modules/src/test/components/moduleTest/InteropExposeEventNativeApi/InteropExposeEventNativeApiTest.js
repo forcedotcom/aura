@@ -36,4 +36,21 @@
             },
         ]
     },
+    testInteropExposeEventNativePropsOfNonBubbleEvents: {
+        browsers : [ 'GOOGLECHROME' ],
+        attributes: {
+            isLegacy: true
+        },
+        test: [
+            function (cmp) {
+                cmp.find('legacy').getElement().focus();
+            },
+            function (cmp) {
+                var receivedEvent = cmp.get('v.focusEvt');
+                $A.test.assertTruthy(receivedEvent.target, 'Interop should expose native event API (target)');
+                $A.test.assertEquals(receivedEvent.target.getAttribute('id'), 'trigger-click', 'The id of the target element should be trigger-click');
+                $A.test.assertTruthy(receivedEvent.currentTarget, 'Interop should expose native event API (currentTarget)');
+            }
+        ]
+    },
 })

@@ -47,13 +47,13 @@ ComponentDefLoader.prototype.buildComponentUri = function(descriptor, uid) {
     }
     Aura["componentDefLoaderError"][uid] = [];
     return this.getBaseUrl()
-         + ComponentDefLoader.UID_param + "=" + uid + "&"
-         + ComponentDefLoader.DESCRIPTOR_param + "=" + descriptor + "&"
          + this.buildURIAppParam()
          + this.buildURIHydrationParam(this.getHydrationState())
          + this.buildURILockerParam()
+         + this.buildURILocaleParam()
          + this.buildURIStyleParam()
-         + this.buildURILocaleParam();
+         + "&" + ComponentDefLoader.DESCRIPTOR_param + "=" + descriptor
+         + "&" + ComponentDefLoader.UID_param + "=" + uid;
 };
 
 ComponentDefLoader.prototype.buildURIAppParam = function() {
@@ -126,8 +126,8 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     }
 
     baseURI += this.buildURILockerParam();
-    baseURI += this.buildURIStyleParam();
     baseURI += this.buildURILocaleParam();
+    baseURI += this.buildURIStyleParam();
 
     var uri = "";
     var uris = [];

@@ -55,11 +55,13 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
     public final static String URI_DEFINITIONS_PATH = "/auraCmpDef";
 
-    private final static StringParam componentUIDParam = new StringParam("_uid", 0, false);
-    private final static StringParam defDescriptorParam = new StringParam("_def", 0, false);
     private final static StringParam appDescriptorParam = new StringParam("aura.app", 0, false);
     private final static StringParam hydrationParam = new StringParam("_hydration", 0, false);
-    private final static StringParam localeParam = new StringParam("_l18n", 0, false);
+    private final static StringParam lockerParam = new StringParam("_l", 0, false);
+    private final static StringParam localeParam = new StringParam("_l10n", 0, false);
+    private final static StringParam styleParam = new StringParam("_style", 0, false);
+    private final static StringParam defDescriptorParam = new StringParam("_def", 0, false);
+    private final static StringParam componentUIDParam = new StringParam("_uid", 0, false);
 
     private final static List<Class> DESCRIPTOR_DEF_TYPES = Arrays.asList(ModuleDef.class, ComponentDef.class, EventDef.class, LibraryDef.class);
     
@@ -98,8 +100,6 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             }
             String computedUID = allUIDs.toString();
 
-            DefDescriptor<ApplicationDef> appDescriptor = definitionService.getDefDescriptor(appReferrrer, ApplicationDef.class);
-
             // TODO remove hydration after performance anaylsis
             HYDRATION_TYPE hydrationType = null;
             if (StringUtils.isNotEmpty(hydration)) {
@@ -131,7 +131,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 }
                 redirectUrl.append("://")
                     .append(request.getHeader("Host"))
-                    .append(generateRedirectURI(descriptors, hydrationType, computedUID, appReferrrer));
+                    .append(generateRedirectURI(descriptors, hydrationType, computedUID, appReferrrer, locale, styleParam.get(request)));
 
                 response.sendRedirect(redirectUrl.toString());
                 return;
@@ -163,6 +163,8 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             });
 
             dependencies.removeAll(descriptors.keySet());
+
+            DefDescriptor<ApplicationDef> appDescriptor = definitionService.getDefDescriptor(appReferrrer, ApplicationDef.class);
 
             String appUID;
             try {
@@ -279,35 +281,54 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     }
 
     private String generateRedirectURI(Map<DefDescriptor<?>, String> descriptors, HYDRATION_TYPE hydrationType,
-                                       String computedUID, String appReferrrer) {
-        StringBuilder defsParameters = new StringBuilder();
+                                       String computedUID, String appReferrrer, String locale, String styleContext) {
+        StringBuilder redirectURI = new StringBuilder(URI_DEFINITIONS_PATH);
+
+        // note, keep parameters in alpha order and keep in sync with componentDefLoader.js to increase chances of cache hits
+        // with the exception of '_def', all definitions requested will be towards the end, followed by UID last, since it's calculated based on defs.
+        redirectURI.append("?");
+        // app param
+        redirectURI.append(appDescriptorParam.name).append("=").append(appReferrrer);
+
+        // TODO remove hydration after performance anaylsis
+        if (hydrationType != null) {
+            redirectURI.append("&").append(hydrationParam.name).append("=").append(hydrationType.toString());
+        }
+
+        redirectURI.append("&").append(lockerParam.name).append("=").append(configAdapter.isLockerServiceEnabled());
+
+        if (locale != null) {
+            redirectURI.append("&").append(localeParam.name).append("=").append(locale);
+        }
+
+        if (styleContext != null) {
+            redirectURI.append("&").append(styleParam.name).append("=").append(styleContext);
+        }
+
         if (descriptors.size() == 1) {
-            defsParameters.append("&").append(defDescriptorParam.name).append("=").append(descriptors.entrySet().iterator().next().getKey().getQualifiedName());
+            redirectURI.append("&").append(defDescriptorParam.name).append("=").append(descriptors.entrySet().iterator().next().getKey().getQualifiedName());
         } else {
             String previousNamespace = null;
             boolean firstName = true;
             for (DefDescriptor descriptor : descriptors.keySet()) {
                 if (!descriptor.getNamespace().equals(previousNamespace)) {
                     previousNamespace = descriptor.getNamespace();
-                    defsParameters.append("&").append(previousNamespace).append("=");
+                    redirectURI.append("&").append(previousNamespace).append("=");
                     firstName = true;
                 }
                 if (firstName) {
                     firstName = false;
                 } else {
-                    defsParameters.append(",");
+                    redirectURI.append(",");
                 }
-                defsParameters.append(descriptor.getName());
+                redirectURI.append(descriptor.getName());
             }
             computedUID = String.format("%d", computedUID.hashCode());
         }
 
-        // TODO remove hydration after performance anaylsis
-        if (hydrationType != null) {
-            defsParameters.append("&").append(hydrationParam.name).append("=").append(hydrationType.toString());
-        }
+        redirectURI.append("&").append(componentUIDParam.name).append("=").append(computedUID);
 
-        return String.format("%s?%s=%s&%s=%s%s", URI_DEFINITIONS_PATH, componentUIDParam.name, computedUID, appDescriptorParam.name, appReferrrer, defsParameters.toString());
+        return redirectURI.toString();
     }
 
     private String serializeLabels(AuraContext ctx) throws IOException {

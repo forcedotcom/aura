@@ -125,7 +125,7 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
         [Fact]
         function shouldReturnAValidURI() {
             var actual;
-            var expect = "/auraCmpDef?_uid=some_URI&_def=test_descriptor&aura.app=markup://test_type&_hydration=test_hydration_val&_l=true";
+            var expect = "/auraCmpDef?aura.app=markup://test_type&_hydration=test_hydration_val&_l=true&_def=test_descriptor&_uid=some_URI";
             mockAura(function () {
                 var defLoader = new Aura.Component.ComponentDefLoader();
                 actual = defLoader.buildComponentUri("test_descriptor", "some_URI");
@@ -136,7 +136,7 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
         [Fact]
         function shouldUseDefaultURIValueIfOneIsNotPassed() {
             var actual;
-            var expect = "/auraCmpDef?_uid=LATEST&_def=test_descriptor&aura.app=markup://test_type&_hydration=test_hydration_val&_l=true";
+            var expect = "/auraCmpDef?aura.app=markup://test_type&_hydration=test_hydration_val&_l=true&_def=test_descriptor&_uid=LATEST";
             mockAura(function () {
                 var defLoader = new Aura.Component.ComponentDefLoader();
                 actual = defLoader.buildComponentUri("test_descriptor");

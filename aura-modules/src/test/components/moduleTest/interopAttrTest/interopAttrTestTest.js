@@ -376,5 +376,21 @@
                 $A.test.assertTrue(validity.valid);
             }
         ]
+    },
+
+    testDynamicCreationNonExistentAttr: {
+        test: [
+           function(cmp) {
+               var createdCmp;
+               $A.createComponent("moduletest:simpleCmp", { nonExistent: "foo" }, function(newCmp) {
+                   createdCmp = newCmp;
+               });
+               $A.test.addWaitFor(true, function() { return createdCmp !== undefined; }, function() {
+                   $A.test.assertNotNull(createdCmp, "No component returned from $A.createComponent");
+                   var qualifiedName = createdCmp.getDef().getDescriptor().getQualifiedName();
+                   $A.test.assertEquals("markup://moduleTest:simpleCmp", qualifiedName, "Unexpected component returned from $A.createComponent");
+               });
+           }
+       ]
     }
 })

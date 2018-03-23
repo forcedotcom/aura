@@ -163,11 +163,13 @@ InteropComponent.prototype.setupAttributes = function(config) {
 
         // The mapping will have all public properties
         var isAttrInDefinition = !!this.attrNameToPropMap[attribute];
-
         var assertionMessage = '"' + attribute  + '" must either be a public property of ' + this.getName() + ' or a global HTML attribute';
+        if (isEvent || isAttrInDefinition || this.isHtmlGlobalAttr(attribute)) {
+            attributes[attribute] = valueConfig;
+        } else {
+            $A.warning(assertionMessage);
+        }
 
-        $A.assert(isEvent || isAttrInDefinition || this.isHtmlGlobalAttr(attribute), assertionMessage);
-        attributes[attribute] = valueConfig;
     }
 
     return attributes;

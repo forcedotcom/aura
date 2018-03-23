@@ -70,14 +70,15 @@
         },
         test: [
             function (cmp) {
-                var hasError = false;
-                try {
-                    $A.createComponent("moduleTest:mappedAttrTests", { format: 'some-value' }, function(newButton, status, errorMessage) {});
-                } catch (e) {
-                    hasError = true;
-                }
-
-                $A.test.assertEquals(true, hasError, 'it should not be able to set an invalid attribute (format, the valid its style)');
+                var createdCmp;
+                $A.createComponent("moduleTest:mappedAttrTests", { format: 'some-value', message: 'some-message' }, function(newCmp) {
+                    createdCmp = newCmp;
+                });
+                $A.test.addWaitFor(true, function() { return createdCmp !== undefined; }, function() {
+                    $A.test.assertEquals("some-message", createdCmp.attributes.message, "Did not set mapped attribute via $A.createComponent");
+                    $A.test.assertUndefined(createdCmp.attributes.format, 
+                            "Should not be able to set pre-mapped attribute (attempting to set format, which has been mapped to 'style')");
+                });
             }
         ]
     },

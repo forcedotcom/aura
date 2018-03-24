@@ -1,6 +1,4 @@
-/**
- * Copyright (C) 2017 salesforce.com, inc.
- */
+/* proxy-compat-disable */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -183,7 +181,7 @@ function assertValidForceTagName(Ctor) {
 }
 const usesNativeSymbols = typeof Symbol() === 'symbol';
 
-const { addEventListener, removeEventListener: removeEventListener$1, getAttribute, getAttributeNS, setAttribute, setAttributeNS, removeAttribute, removeAttributeNS, querySelector, querySelectorAll, } = Element.prototype;
+const { addEventListener, removeEventListener, getAttribute, getAttributeNS, setAttribute, setAttributeNS, removeAttribute, removeAttributeNS, querySelector, querySelectorAll, } = Element.prototype;
 // These properties get added to LWCElement.prototype publicProps automatically
 const defaultDefHTMLPropertyNames = ['dir', 'id', 'accessKey', 'title', 'lang', 'hidden', 'draggable', 'tabIndex'];
 // Few more exceptions that are using the attribute name to match the property in lowercase.
@@ -720,7 +718,7 @@ function removeComponentEventListener(vm, eventName, oldHandler) {
         const pos = handlers && ArrayIndexOf.call(handlers, oldHandler);
         if (handlers && pos > -1) {
             if (handlers.length === 1) {
-                removeEventListener$1.call(elm, eventName, vm.cmpListener);
+                removeEventListener.call(elm, eventName, vm.cmpListener);
                 cmpEvents[eventName] = undefined;
             }
             else {
@@ -1372,7 +1370,7 @@ var unwrap$1 = getKey$1 ?
     function (replicaOrAny) { return (replicaOrAny && getKey$1(replicaOrAny, TargetSlot$1)) || replicaOrAny; }
     : function (replicaOrAny) { return (replicaOrAny && replicaOrAny[TargetSlot$1]) || replicaOrAny; };
 function isObservable(value) {
-    if (!value) {
+    if (value == null) {
         return false;
     }
     if (isArray$1(value)) {
@@ -1755,16 +1753,21 @@ function observeMutation$1(membrane, obj, key) {
     membrane.propertyMemberAccess(obj, key);
 }
 var ReactiveMembrane = /** @class */ (function () {
-    function ReactiveMembrane(distrotion, eventMap) {
+    function ReactiveMembrane(distortion, eventMap) {
         this.objectGraph = new WeakMap();
-        this.distortion = distrotion;
+        this.distortion = distortion;
         this.propertyMemberChange = eventMap.propertyMemberChange;
         this.propertyMemberAccess = eventMap.propertyMemberAccess;
     }
     ReactiveMembrane.prototype.getProxy = function (value) {
         var distorted = invokeDistortion(this, value);
         if (isObservable(distorted)) {
-            return getReactiveState(this, distorted).reactive;
+            var o = getReactiveState(this, distorted);
+            if (o.readOnly === value) {
+                // TODO: add error code
+                throw new TypeError("Read only object is not observable.");
+            }
+            return o.reactive;
         }
         return distorted;
     };
@@ -1777,7 +1780,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.18.0 */
+/** version: 0.18.2 */
 
 function format(value) {
     return value;
@@ -2395,10 +2398,13 @@ function invokeComponentRenderMethod(vm) {
 }
 
 // stub function to prevent misuse of the @track decorator
-function track() {
+function track(obj) {
     {
-        assert.fail("@track may only be used as a decorator.");
+        if (arguments.length !== 1) {
+            assert.fail("@track can be used as a decorator or as a function with one argument to produce a trackable version of the provided value.");
+        }
     }
+    return membrane.getProxy(obj);
 }
 // TODO: how to allow symbols as property keys?
 function createTrackedPropertyDescriptor(proto, key, descriptor) {
@@ -4071,6 +4077,17 @@ function createElement$1(sel, options = {}) {
     return element;
 }
 
+// when used with exactly one argument, we assume it is a function invocation.
+function readonly(obj) {
+    {
+        // TODO: enable the usage of this function as @readonly decorator
+        if (arguments.length !== 1) {
+            assert.fail("@readonly cannot be used as a decorator just yet, use it as a function with one argument to produce a readonly version of the provided value.");
+        }
+    }
+    return membrane.getReadOnlyProxy(obj);
+}
+
 exports.createElement = createElement$1;
 exports.getComponentDef = getComponentDef;
 exports.Element = LWCElement;
@@ -4079,9 +4096,10 @@ exports.unwrap = unwrap$2;
 exports.dangerousObjectMutation = dangerousObjectMutation;
 exports.api = api$1;
 exports.track = track;
+exports.readonly = readonly;
 exports.wire = wire;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.18.0 */
+/** version: 0.18.2 */

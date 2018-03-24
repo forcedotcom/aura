@@ -1,6 +1,4 @@
-/**
- * Copyright (C) 2017 salesforce.com, inc.
- */
+/* proxy-compat-disable */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -54,7 +52,7 @@ function addCallbackToNextTick(callback) {
 }
 var usesNativeSymbols = typeof Symbol() === 'symbol';
 
-var _a$1 = Element.prototype, addEventListener = _a$1.addEventListener, removeEventListener$1 = _a$1.removeEventListener, getAttribute = _a$1.getAttribute, getAttributeNS = _a$1.getAttributeNS, setAttribute = _a$1.setAttribute, setAttributeNS = _a$1.setAttributeNS, removeAttribute = _a$1.removeAttribute, removeAttributeNS = _a$1.removeAttributeNS, querySelector = _a$1.querySelector, querySelectorAll = _a$1.querySelectorAll;
+var _a$1 = Element.prototype, addEventListener = _a$1.addEventListener, removeEventListener = _a$1.removeEventListener, getAttribute = _a$1.getAttribute, getAttributeNS = _a$1.getAttributeNS, setAttribute = _a$1.setAttribute, setAttributeNS = _a$1.setAttributeNS, removeAttribute = _a$1.removeAttribute, removeAttributeNS = _a$1.removeAttributeNS, querySelector = _a$1.querySelector, querySelectorAll = _a$1.querySelectorAll;
 // These properties get added to LWCElement.prototype publicProps automatically
 var defaultDefHTMLPropertyNames = ['dir', 'id', 'accessKey', 'title', 'lang', 'hidden', 'draggable', 'tabIndex'];
 // this regular expression is used to transform aria props into aria attributes because
@@ -382,7 +380,7 @@ function removeComponentEventListener(vm, eventName, oldHandler) {
         var pos = handlers && ArrayIndexOf.call(handlers, oldHandler);
         if (handlers && pos > -1) {
             if (handlers.length === 1) {
-                removeEventListener$1.call(elm, eventName, vm.cmpListener);
+                removeEventListener.call(elm, eventName, vm.cmpListener);
                 cmpEvents[eventName] = undefined;
             }
             else {
@@ -883,7 +881,7 @@ var unwrap$1 = getKey$1 ?
     function (replicaOrAny) { return (replicaOrAny && getKey$1(replicaOrAny, TargetSlot$1)) || replicaOrAny; }
     : function (replicaOrAny) { return (replicaOrAny && replicaOrAny[TargetSlot$1]) || replicaOrAny; };
 function isObservable(value) {
-    if (!value) {
+    if (value == null) {
         return false;
     }
     if (isArray$1(value)) {
@@ -1186,16 +1184,21 @@ function observeMutation$1(membrane, obj, key) {
     membrane.propertyMemberAccess(obj, key);
 }
 var ReactiveMembrane = /** @class */ (function () {
-    function ReactiveMembrane(distrotion, eventMap) {
+    function ReactiveMembrane(distortion, eventMap) {
         this.objectGraph = new WeakMap();
-        this.distortion = distrotion;
+        this.distortion = distortion;
         this.propertyMemberChange = eventMap.propertyMemberChange;
         this.propertyMemberAccess = eventMap.propertyMemberAccess;
     }
     ReactiveMembrane.prototype.getProxy = function (value) {
         var distorted = invokeDistortion(this, value);
         if (isObservable(distorted)) {
-            return getReactiveState(this, distorted).reactive;
+            var o = getReactiveState(this, distorted);
+            if (o.readOnly === value) {
+                // TODO: add error code
+                throw new TypeError("Read only object is not observable.");
+            }
+            return o.reactive;
         }
         return distorted;
     };
@@ -1208,7 +1211,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.18.0 */
+/** version: 0.18.2 */
 
 function format(value) {
     return value;
@@ -1676,7 +1679,8 @@ function invokeComponentRenderMethod(vm) {
 }
 
 // stub function to prevent misuse of the @track decorator
-function track() {
+function track(obj) {
+    return membrane.getProxy(obj);
 }
 // TODO: how to allow symbols as property keys?
 function createTrackedPropertyDescriptor(proto, key, descriptor) {
@@ -3017,6 +3021,11 @@ function createElement$1(sel, options) {
     return element;
 }
 
+// when used with exactly one argument, we assume it is a function invocation.
+function readonly(obj) {
+    return membrane.getReadOnlyProxy(obj);
+}
+
 exports.createElement = createElement$1;
 exports.getComponentDef = getComponentDef;
 exports.Element = LWCElement;
@@ -3025,9 +3034,10 @@ exports.unwrap = unwrap$2;
 exports.dangerousObjectMutation = dangerousObjectMutation;
 exports.api = api$1;
 exports.track = track;
+exports.readonly = readonly;
 exports.wire = wire;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.18.0 */
+/** version: 0.18.2 */

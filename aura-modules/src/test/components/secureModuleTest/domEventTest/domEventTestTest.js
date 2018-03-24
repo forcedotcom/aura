@@ -21,33 +21,36 @@
         }
     },
 
-    // W-4437423
-    testInitEventOnTemplateElement: {
+    // W-4437423, W-4837438
+    _testInitEventOnTemplateElement: {
         test: function(cmp) {
             cmp.domEventTester("testInitEventOnTemplateElement");
         }
     },
 
-    // W-4462187
+    // TODO: W-4462187
     _testEventView: {
         test: function(cmp) {
             cmp.domEventTester("testEventView");
         }
     },
 
-    testEventTargetOfHtmlElementHandler: {
+    // TODO: W-4837438
+    _testEventTargetOfHtmlElementHandler: {
         test: function(cmp) {
             cmp.domEventTester("testEventTargetOfHtmlElementHandler");
         }
     },
 
-    testInitEventOnElementOfChildModule: {
+    // TODO: W-4837438
+    _testInitEventOnElementOfChildModule: {
         test: function(cmp) {
             cmp.domEventTester("testInitEventOnElementOfChildModule");
         }
     },
 
-    testCustomEvent: {
+    // TODO: W-4837438
+    _testCustomEvent: {
         test: function(cmp) {
             cmp.domEventTester("testCustomEvent");
         }

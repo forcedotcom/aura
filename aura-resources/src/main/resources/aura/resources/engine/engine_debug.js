@@ -1,4 +1,6 @@
-/* proxy-compat-disable */
+/**
+ * Copyright (C) 2017 salesforce.com, inc.
+ */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -53,26 +55,6 @@ const attrNameToPropNameMap = create(null);
 const usesNativeSymbols = typeof Symbol() === 'symbol';
 
 const { addEventListener, removeEventListener: removeEventListener$1, getAttribute, getAttributeNS, setAttribute, setAttributeNS, removeAttribute, removeAttributeNS, querySelector, querySelectorAll, } = Element.prototype;
-const { DOCUMENT_POSITION_CONTAINED_BY } = Node;
-const { compareDocumentPosition: compareDocumentPosition$1, } = Node.prototype;
-// TODO: once we start using the real shadowDOM, we can rely on:
-// const { getRootNode } = Node.prototype;
-// for now, we need to provide a dummy implementation to provide retargeting
-function getRootNode(options) {
-    const composed = isUndefined(options) ? false : !!options.composed;
-    let node = this;
-    while (node !== document) {
-        if (!composed && !isUndefined(node[ViewModelReflection])) {
-            return node; // this is not quite the root (it is the host), but for us is sufficient
-        }
-        const parent = node.parentNode;
-        if (isNull(parent)) {
-            return node;
-        }
-        node = parent;
-    }
-    return node;
-}
 // These properties get added to LWCElement.prototype publicProps automatically
 const defaultDefHTMLPropertyNames = ['dir', 'id', 'accessKey', 'title', 'lang', 'hidden', 'draggable', 'tabIndex'];
 // this regular expression is used to transform aria props into aria attributes because
@@ -185,26 +167,6 @@ forEach.call(defaultDefHTMLPropertyNames, (propName) => {
 if (isUndefined(GlobalHTMLPropDescriptors.id)) {
     // In IE11, id property is on Element.prototype instead of HTMLElement
     GlobalHTMLPropDescriptors.id = getOwnPropertyDescriptor(Element.prototype, 'id');
-}
-// https://dom.spec.whatwg.org/#dom-event-composed
-// This is a very dummy, simple polyfill for composed
-if (!getOwnPropertyDescriptor(Event.prototype, 'composed')) {
-    defineProperties(Event.prototype, {
-        composed: {
-            value: true,
-            configurable: true,
-            enumerable: true,
-            writable: true,
-        },
-    });
-    const { CustomEvent: OriginalCustomEvent } = window;
-    window.CustomEvent = function CustomEvent(type, eventInitDict) {
-        const event = new OriginalCustomEvent(type, eventInitDict);
-        // support for composed on custom events
-        event.composed = !!(eventInitDict && eventInitDict.composed);
-        return event;
-    };
-    window.CustomEvent.prototype = OriginalCustomEvent.prototype;
 }
 
 const TopLevelContextSymbol = Symbol();
@@ -358,212 +320,107 @@ function pierce(vm, value) {
     return getReplica(membrane, value);
 }
 
-const TargetToReactiveRecordMap = new WeakMap();
-function notifyMutation(target, key) {
-    const reactiveRecord = TargetToReactiveRecordMap.get(target);
-    if (!isUndefined(reactiveRecord)) {
-        const value = reactiveRecord[key];
-        if (value) {
-            const len = value.length;
-            for (let i = 0; i < len; i += 1) {
-                const vm = value[i];
-                if (!vm.isDirty) {
-                    markComponentAsDirty(vm);
-                    scheduleRehydration(vm);
-                }
-            }
+let vmBeingConstructed = null;
+function isBeingConstructed(vm) {
+    return vmBeingConstructed === vm;
+}
+function createComponent(vm, Ctor) {
+    // create the component instance
+    const vmBeingConstructedInception = vmBeingConstructed;
+    vmBeingConstructed = vm;
+    const component = invokeComponentConstructor(vm, Ctor);
+    vmBeingConstructed = vmBeingConstructedInception;
+}
+function linkComponent(vm) {
+    // wiring service
+    const { def: { wire } } = vm;
+    if (wire) {
+        const { wiring } = Services;
+        if (wiring) {
+            invokeServiceHook(vm, wiring);
         }
     }
 }
-function observeMutation(target, key) {
-    if (isNull(vmBeingRendered)) {
-        return; // nothing to subscribe to
-    }
-    const vm = vmBeingRendered;
-    let reactiveRecord = TargetToReactiveRecordMap.get(target);
-    if (isUndefined(reactiveRecord)) {
-        const newRecord = create(null);
-        reactiveRecord = newRecord;
-        TargetToReactiveRecordMap.set(target, newRecord);
-    }
-    let value = reactiveRecord[key];
-    if (isUndefined(value)) {
-        value = [];
-        reactiveRecord[key] = value;
-    }
-    else if (value[0] === vm) {
-        return; // perf optimization considering that most subscriptions will come from the same vm
-    }
-    if (ArrayIndexOf.call(value, vm) === -1) {
-        ArrayPush.call(value, vm);
-        // we keep track of the sets that vm is listening from to be able to do some clean up later on
-        ArrayPush.call(vm.deps, value);
+function clearReactiveListeners(vm) {
+    const { deps } = vm;
+    const len = deps.length;
+    if (len) {
+        for (let i = 0; i < len; i += 1) {
+            const set = deps[i];
+            const pos = ArrayIndexOf.call(deps[i], vm);
+            ArraySplice.call(set, pos, 1);
+        }
+        deps.length = 0;
     }
 }
-
-function getHTMLPropDescriptor(propName, descriptor) {
-    const { get, set, enumerable, configurable } = descriptor;
-    if (!isFunction(get)) {
-        throw new TypeError();
-    }
-    if (!isFunction(set)) {
-        throw new TypeError();
-    }
-    return {
-        enumerable,
-        configurable,
-        get() {
-            const vm = this[ViewModelReflection];
-            if (isBeingConstructed(vm)) {
-                return;
-            }
-            observeMutation(this, propName);
-            return get.call(vm.elm);
-        },
-        set(newValue) {
-            const vm = this[ViewModelReflection];
-            if (newValue !== vm.cmpProps[propName]) {
-                vm.cmpProps[propName] = newValue;
-                if (vm.idx > 0) {
-                    // perf optimization to skip this step if not in the DOM
-                    notifyMutation(this, propName);
-                }
-            }
-            return set.call(vm.elm, newValue);
-        }
+function createComponentListener(vm) {
+    return function handler(event) {
+        handleComponentEvent(vm, event);
     };
 }
-const htmlElementDescriptors = ArrayReduce.call(getOwnPropertyNames(GlobalHTMLPropDescriptors), (seed, propName) => {
-    seed[propName] = getHTMLPropDescriptor(propName, GlobalHTMLPropDescriptors[propName]);
-    return seed;
-}, {});
-function getLinkedElement(cmp) {
-    return cmp[ViewModelReflection].elm;
-}
-function querySelectorAllFromComponent(cmp, selectors) {
-    const elm = getLinkedElement(cmp);
-    return elm.querySelectorAll(selectors);
-}
-// This should be as performant as possible, while any initialization should be done lazily
-class LWCElement {
-    constructor() {
-        if (isNull(vmBeingConstructed)) {
-            throw new ReferenceError();
-        }
-        const vm = vmBeingConstructed;
-        const { elm, def } = vm;
-        const component = this;
-        vm.component = component;
-        // TODO: eventually the render method should be a static property on the ctor instead
-        // catching render method to match other callbacks
-        vm.render = component.render;
-        // linking elm and its component with VM
-        component[ViewModelReflection] = elm[ViewModelReflection] = vm;
-        defineProperties(elm, def.descriptors);
+function addComponentEventListener(vm, eventName, newHandler) {
+    let { cmpEvents, cmpListener } = vm;
+    if (isUndefined(cmpEvents)) {
+        // this piece of code must be in sync with modules/component-events
+        vm.cmpEvents = cmpEvents = create(null);
+        vm.cmpListener = cmpListener = createComponentListener(vm);
     }
-    // HTML Element - The Good Parts
-    dispatchEvent(event) {
-        const elm = getLinkedElement(this);
-        const vm = getCustomElementVM(this);
-        // Pierce dispatchEvent so locker service has a chance to overwrite
-        pierce(vm, elm);
-        const dispatchEvent = piercingHook(vm.membrane, elm, 'dispatchEvent', elm.dispatchEvent);
-        return dispatchEvent.call(elm, event);
-    }
-    addEventListener(type, listener) {
-        const vm = getCustomElementVM(this);
-        addComponentEventListener(vm, type, listener);
-    }
-    removeEventListener(type, listener) {
-        const vm = getCustomElementVM(this);
-        removeComponentEventListener(vm, type, listener);
-    }
-    setAttributeNS(ns, attrName, value) {
-        // use cached setAttributeNS, because elm.setAttribute throws
-        // when not called in template
-        return setAttributeNS.call(getLinkedElement(this), ns, attrName, value);
-    }
-    removeAttributeNS(ns, attrName) {
-        // use cached removeAttributeNS, because elm.setAttribute throws
-        // when not called in template
-        return removeAttributeNS.call(getLinkedElement(this), ns, attrName);
-    }
-    removeAttribute(attrName) {
-        const vm = getCustomElementVM(this);
-        // use cached removeAttribute, because elm.setAttribute throws
-        // when not called in template
-        removeAttribute.call(vm.elm, attrName);
-        attemptAriaAttributeFallback(vm, attrName);
-    }
-    setAttribute(attrName, value) {
-        const vm = getCustomElementVM(this);
-        // marking the set is needed for the AOM polyfill
-        vm.hostAttrs[attrName] = 1;
-        // use cached setAttribute, because elm.setAttribute throws
-        // when not called in template
-        return setAttribute.call(getLinkedElement(this), attrName, value);
-    }
-    getAttributeNS(ns, attrName) {
-        return getAttributeNS.call(getLinkedElement(this), ns, attrName);
-    }
-    getAttribute(attrName) {
-        return getAttribute.apply(getLinkedElement(this), ArraySlice.call(arguments));
-    }
-    getBoundingClientRect() {
-        const elm = getLinkedElement(this);
-        return elm.getBoundingClientRect();
-    }
-    querySelector(selectors) {
-        const vm = getCustomElementVM(this);
-        const nodeList = querySelectorAllFromComponent(this, selectors);
-        for (let i = 0, len = nodeList.length; i < len; i += 1) {
-            if (wasNodePassedIntoVM(vm, nodeList[i])) {
-                // TODO: locker service might need to return a membrane proxy
-                return pierce(vm, nodeList[i]);
-            }
-        }
-        return null;
-    }
-    querySelectorAll(selectors) {
-        const vm = getCustomElementVM(this);
-        const nodeList = querySelectorAllFromComponent(this, selectors);
-        // TODO: locker service might need to do something here
-        const filteredNodes = ArrayFilter.call(nodeList, (node) => wasNodePassedIntoVM(vm, node));
-        return pierce(vm, filteredNodes);
-    }
-    get tagName() {
-        const elm = getLinkedElement(this);
-        return elm.tagName + ''; // avoiding side-channeling
-    }
-    get classList() {
-        return getLinkedElement(this).classList;
-    }
-    get root() {
-        const vm = getCustomElementVM(this);
-        let { cmpRoot } = vm;
-        // lazy creation of the ShadowRoot Object the first time it is accessed.
-        if (isUndefined(cmpRoot)) {
-            cmpRoot = new Root(vm);
-            vm.cmpRoot = cmpRoot;
-        }
-        return cmpRoot;
-    }
-    toString() {
-        const vm = getCustomElementVM(this);
+    if (isUndefined(cmpEvents[eventName])) {
+        cmpEvents[eventName] = [];
         const { elm } = vm;
-        const { tagName } = elm;
-        const is = getAttribute.call(elm, 'is');
-        return `<${tagName.toLowerCase()}${is ? ' is="${is}' : ''}>`;
+        addEventListener.call(elm, eventName, cmpListener, false);
+    }
+    ArrayPush.call(cmpEvents[eventName], newHandler);
+}
+function removeComponentEventListener(vm, eventName, oldHandler) {
+    const { cmpEvents, elm } = vm;
+    if (cmpEvents) {
+        const handlers = cmpEvents[eventName];
+        const pos = handlers && ArrayIndexOf.call(handlers, oldHandler);
+        if (handlers && pos > -1) {
+            if (handlers.length === 1) {
+                removeEventListener$1.call(elm, eventName, vm.cmpListener);
+                cmpEvents[eventName] = undefined;
+            }
+            else {
+                ArraySplice.call(cmpEvents[eventName], pos, 1);
+            }
+            return;
+        }
     }
 }
-defineProperties(LWCElement.prototype, htmlElementDescriptors);
-freeze(LWCElement);
-seal(LWCElement.prototype);
-function getCustomElementVM(elmOrCmp) {
-    return elmOrCmp[ViewModelReflection];
+function handleComponentEvent(vm, event) {
+    const { cmpEvents = EmptyObject } = vm;
+    const { type, stopImmediatePropagation } = event;
+    const handlers = cmpEvents[type];
+    if (isArray(handlers)) {
+        let uninterrupted = true;
+        event.stopImmediatePropagation = function () {
+            uninterrupted = false;
+            stopImmediatePropagation.call(event);
+        };
+        const e = pierce(vm, event);
+        for (let i = 0, len = handlers.length; uninterrupted && i < len; i += 1) {
+            invokeComponentCallback(vm, handlers[i], [e]);
+        }
+        // restoring original methods
+        event.stopImmediatePropagation = stopImmediatePropagation;
+    }
+}
+function renderComponent(vm) {
+    clearReactiveListeners(vm);
+    const vnodes = invokeComponentRenderMethod(vm);
+    vm.isDirty = false;
+    return vnodes;
+}
+function markComponentAsDirty(vm) {
+    vm.isDirty = true;
+}
+function getCustomElementComponent(elmOrRoot) {
+    return elmOrRoot[ViewModelReflection].component;
 }
 
-function getLinkedElement$1(root) {
+function getLinkedElement(root) {
     return getCustomElementVM(root).elm;
 }
 function createAccessibilityDescriptorForShadowRoot(propName, attrName, defaultValue) {
@@ -597,14 +454,14 @@ const RootDescriptors = create(null);
 forEach.call(getOwnPropertyNames(GlobalAOMProperties), (propName) => RootDescriptors[propName] = createAccessibilityDescriptorForShadowRoot(propName, getAriaAttributeName(propName), GlobalAOMProperties[propName]));
 function shadowRootQuerySelector(shadowRoot, selector) {
     const vm = getCustomElementVM(shadowRoot);
-    const elm = getLinkedElement$1(shadowRoot);
+    const elm = getLinkedElement(shadowRoot);
     pierce(vm, elm);
     const piercedQuerySelector = piercingHook(vm.membrane, elm, 'querySelector', elm.querySelector);
     return piercedQuerySelector.call(elm, selector);
 }
 function shadowRootQuerySelectorAll(shadowRoot, selector) {
     const vm = getCustomElementVM(shadowRoot);
-    const elm = getLinkedElement$1(shadowRoot);
+    const elm = getLinkedElement(shadowRoot);
     pierce(vm, elm);
     const piercedQuerySelectorAll = piercingHook(vm.membrane, elm, 'querySelectorAll', elm.querySelectorAll);
     return piercedQuerySelectorAll.call(elm, selector);
@@ -707,9 +564,6 @@ function wrapIframeWindow(win) {
         },
     };
 }
-function isChildOfRoot(root, node) {
-    return !!(compareDocumentPosition$1.call(root, node) & DOCUMENT_POSITION_CONTAINED_BY);
-}
 // Registering a service to enforce the shadowDOM semantics via the Raptor membrane implementation
 register({
     piercing(component, data, def, context, target, key, value, callback) {
@@ -743,565 +597,213 @@ register({
                 // prevent access to the original Host element
                 return callback(component);
             }
-            if (target instanceof Event) {
-                switch (key) {
-                    case 'currentTarget':
-                        return callback(value === elm ? vm.component : pierce(vm, value));
-                    case 'target':
-                        const { currentTarget } = target;
-                        if (currentTarget === elm) {
-                            return callback(vm.component);
-                        }
-                        else if (isChildOfRoot(elm, currentTarget)) {
-                            let root = value; // initial root is always the original target
-                            do {
-                                value = root;
-                                root = getRootNode.call(value);
-                            } while (!isChildOfRoot(root, currentTarget));
-                            return callback(pierce(vm, value));
-                        }
+        }
+    }
+});
+
+const TargetToReactiveRecordMap = new WeakMap();
+function notifyMutation(target, key) {
+    const reactiveRecord = TargetToReactiveRecordMap.get(target);
+    if (!isUndefined(reactiveRecord)) {
+        const value = reactiveRecord[key];
+        if (value) {
+            const len = value.length;
+            for (let i = 0; i < len; i += 1) {
+                const vm = value[i];
+                if (!vm.isDirty) {
+                    markComponentAsDirty(vm);
+                    scheduleRehydration(vm);
                 }
             }
         }
     }
-});
-
-let vmBeingConstructed = null;
-function isBeingConstructed(vm) {
-    return vmBeingConstructed === vm;
 }
-function createComponent(vm, Ctor) {
-    // create the component instance
-    const vmBeingConstructedInception = vmBeingConstructed;
-    vmBeingConstructed = vm;
-    const component = invokeComponentConstructor(vm, Ctor);
-    vmBeingConstructed = vmBeingConstructedInception;
-}
-function linkComponent(vm) {
-    // wiring service
-    const { def: { wire } } = vm;
-    if (wire) {
-        const { wiring } = Services;
-        if (wiring) {
-            invokeServiceHook(vm, wiring);
-        }
-    }
-}
-function clearReactiveListeners(vm) {
-    const { deps } = vm;
-    const len = deps.length;
-    if (len) {
-        for (let i = 0; i < len; i += 1) {
-            const set = deps[i];
-            const pos = ArrayIndexOf.call(deps[i], vm);
-            ArraySplice.call(set, pos, 1);
-        }
-        deps.length = 0;
-    }
-}
-function createComponentListener(vm) {
-    return function handler(event) {
-        handleComponentEvent(vm, event);
-    };
-}
-function addComponentEventListener(vm, eventName, newHandler) {
-    let { cmpEvents, cmpListener } = vm;
-    if (isUndefined(cmpEvents)) {
-        // this piece of code must be in sync with modules/component-events
-        vm.cmpEvents = cmpEvents = create(null);
-        vm.cmpListener = cmpListener = createComponentListener(vm);
-    }
-    if (isUndefined(cmpEvents[eventName])) {
-        cmpEvents[eventName] = [];
-        const { elm } = vm;
-        addEventListener.call(elm, eventName, cmpListener, false);
-    }
-    ArrayPush.call(cmpEvents[eventName], newHandler);
-}
-function removeComponentEventListener(vm, eventName, oldHandler) {
-    const { cmpEvents, elm } = vm;
-    if (cmpEvents) {
-        const handlers = cmpEvents[eventName];
-        const pos = handlers && ArrayIndexOf.call(handlers, oldHandler);
-        if (handlers && pos > -1) {
-            if (handlers.length === 1) {
-                removeEventListener$1.call(elm, eventName, vm.cmpListener);
-                cmpEvents[eventName] = undefined;
-            }
-            else {
-                ArraySplice.call(cmpEvents[eventName], pos, 1);
-            }
-            return;
-        }
-    }
-}
-function isValidEvent(event) {
-    // TODO: this is only needed if ShadowDOM is not used
-    if (event.composed === true) {
-        return true;
-    }
-    // if the closest root contains the currentTarget, the event is valid
-    return isChildOfRoot(getRootNode.call(event.target), event.currentTarget);
-}
-function handleComponentEvent(vm, event) {
-    if (!isValidEvent(event)) {
-        return;
-    }
-    const { cmpEvents = EmptyObject } = vm;
-    const { type, stopImmediatePropagation } = event;
-    const handlers = cmpEvents[type];
-    if (isArray(handlers)) {
-        let uninterrupted = true;
-        event.stopImmediatePropagation = function () {
-            uninterrupted = false;
-            stopImmediatePropagation.call(event);
-        };
-        const e = pierce(vm, event);
-        for (let i = 0, len = handlers.length; uninterrupted && i < len; i += 1) {
-            invokeComponentCallback(vm, handlers[i], [e]);
-        }
-        // restoring original methods
-        event.stopImmediatePropagation = stopImmediatePropagation;
-    }
-}
-function renderComponent(vm) {
-    clearReactiveListeners(vm);
-    const vnodes = invokeComponentRenderMethod(vm);
-    vm.isDirty = false;
-    return vnodes;
-}
-function markComponentAsDirty(vm) {
-    vm.isDirty = true;
-}
-function getCustomElementComponent(elmOrRoot) {
-    return elmOrRoot[ViewModelReflection].component;
-}
-
-const CHAR_S = 115;
-const CHAR_V = 118;
-const CHAR_G = 103;
-const NamespaceAttributeForSVG = 'http://www.w3.org/2000/svg';
-const SymbolIterator = Symbol.iterator;
-const { ELEMENT_NODE, TEXT_NODE, COMMENT_NODE } = Node;
-const classNameToClassMap = create(null);
-function getMapFromClassName(className) {
-    if (className === undefined) {
-        return;
-    }
-    let map = classNameToClassMap[className];
-    if (map) {
-        return map;
-    }
-    map = {};
-    let start = 0;
-    let o;
-    const len = className.length;
-    for (o = 0; o < len; o++) {
-        if (StringCharCodeAt.call(className, o) === SPACE_CHAR) {
-            if (o > start) {
-                map[StringSlice.call(className, start, o)] = true;
-            }
-            start = o + 1;
-        }
-    }
-    if (o > start) {
-        map[StringSlice.call(className, start, o)] = true;
-    }
-    classNameToClassMap[className] = map;
-    return map;
-}
-// insert is called after postpatch, which is used somewhere else (via a module)
-// to mark the vm as inserted, that means we cannot use postpatch as the main channel
-// to rehydrate when dirty, because sometimes the element is not inserted just yet,
-// which breaks some invariants. For that reason, we have the following for any
-// Custom Element that is inserted via a template.
-const hook = {
-    postpatch(oldVNode, vnode) {
-        const vm = getCustomElementVM(vnode.elm);
-        vm.cmpSlots = vnode.data.slotset;
-        // TODO: hot-slots names are those slots used during the last rendering cycle, and only if
-        // one of those is changed, the vm should be marked as dirty.
-        // TODO: Issue #133
-        if (vm.cmpSlots !== oldVNode.data.slotset && !vm.isDirty) {
-            markComponentAsDirty(vm);
-        }
-        renderVM(vm);
-    },
-    insert(vnode) {
-        const vm = getCustomElementVM(vnode.elm);
-        appendVM(vm);
-        renderVM(vm);
-    },
-    create(oldVNode, vnode) {
-        createVM(vnode.sel, vnode.elm, vnode.data.slotset);
-    },
-    remove(vnode, removeCallback) {
-        removeVM(getCustomElementVM(vnode.elm));
-        removeCallback();
-    }
-};
-function isVElement(vnode) {
-    return vnode.nt === ELEMENT_NODE;
-}
-function addNS(vnode) {
-    const { data, children, sel } = vnode;
-    // TODO: review why `sel` equal `foreignObject` should get this `ns`
-    data.ns = NamespaceAttributeForSVG;
-    if (isArray(children) && sel !== 'foreignObject') {
-        for (let j = 0, n = children.length; j < n; ++j) {
-            const childNode = children[j];
-            if (childNode != null && isVElement(childNode)) {
-                addNS(childNode);
-            }
-        }
-    }
-}
-function getCurrentOwnerId() {
-    return isNull(vmBeingRendered) ? 0 : vmBeingRendered.uid;
-}
-function getCurrentTplToken() {
-    // For root elements and other special cases the vm is not set.
+function observeMutation(target, key) {
     if (isNull(vmBeingRendered)) {
-        return;
-    }
-    return vmBeingRendered.context.tplToken;
-}
-function normalizeStyleString(value) {
-    if (value == null || value === false) {
-        return;
-    }
-    if (isString(value)) {
-        return value;
-    }
-    return value + '';
-}
-// [h]tml node
-function h(sel, data, children) {
-    const { classMap, className, style, styleMap, key } = data;
-    data.class = classMap || getMapFromClassName(normalizeStyleString(className));
-    data.style = styleMap || normalizeStyleString(style);
-    data.token = getCurrentTplToken();
-    data.uid = getCurrentOwnerId();
-    let text, elm; // tslint:disable-line
-    const vnode = {
-        nt: ELEMENT_NODE,
-        tag: sel,
-        sel,
-        data,
-        children,
-        text,
-        elm,
-        key,
-    };
-    if (sel.length === 3 && StringCharCodeAt.call(sel, 0) === CHAR_S && StringCharCodeAt.call(sel, 1) === CHAR_V && StringCharCodeAt.call(sel, 2) === CHAR_G) {
-        addNS(vnode);
-    }
-    return vnode;
-}
-// [c]ustom element node
-function c(sel, Ctor, data) {
-    // The compiler produce AMD modules that do not support circular dependencies
-    // We need to create an indirection to circumvent those cases.
-    // We could potentially move this check to the definition
-    if (Ctor.__circular__) {
-        Ctor = Ctor();
-    }
-    const { key, slotset, styleMap, style, on, className, classMap, props } = data;
-    let { attrs } = data;
-    // hack to allow component authors to force the usage of the "is" attribute in their components
-    const { forceTagName } = Ctor;
-    let tag = sel, text, elm; // tslint:disable-line
-    if (!isUndefined(attrs) && !isUndefined(attrs.is)) {
-        tag = sel;
-        sel = attrs.is;
-    }
-    else if (!isUndefined(forceTagName)) {
-        tag = forceTagName;
-        attrs = assign({}, attrs);
-        attrs.is = sel;
-    }
-    registerComponent(sel, Ctor);
-    data = { hook, key, slotset, attrs, on, props };
-    data.class = classMap || getMapFromClassName(normalizeStyleString(className));
-    data.style = styleMap || normalizeStyleString(style);
-    data.token = getCurrentTplToken();
-    data.uid = getCurrentOwnerId();
-    const vnode = {
-        nt: ELEMENT_NODE,
-        tag,
-        sel,
-        data,
-        children: EmptyArray,
-        text,
-        elm,
-        key,
-    };
-    return vnode;
-}
-// [i]terable node
-function i(iterable, factory) {
-    const list = [];
-    if (isUndefined(iterable) || iterable === null) {
-        return list;
-    }
-    const iterator = iterable[SymbolIterator]();
-    let next = iterator.next();
-    let j = 0;
-    let { value, done: last } = next;
-    while (last === false) {
-        // implementing a look-back-approach because we need to know if the element is the last
-        next = iterator.next();
-        last = next.done;
-        // template factory logic based on the previous collected value
-        const vnode = factory(value, j, j === 0, last);
-        if (isArray(vnode)) {
-            ArrayPush.apply(list, vnode);
-        }
-        else {
-            ArrayPush.call(list, vnode);
-        }
-        // preparing next value
-        j += 1;
-        value = next.value;
-    }
-    return list;
-}
-/**
- * [f]lattening
- */
-function f(items) {
-    const len = items.length;
-    const flattened = [];
-    for (let j = 0; j < len; j += 1) {
-        const item = items[j];
-        if (isArray(item)) {
-            ArrayPush.apply(flattened, item);
-        }
-        else {
-            ArrayPush.call(flattened, item);
-        }
-    }
-    return flattened;
-}
-// [t]ext node
-function t(text) {
-    let sel, data = {}, children, key, elm; // tslint:disable-line
-    return {
-        nt: TEXT_NODE,
-        sel,
-        data,
-        children,
-        text,
-        elm,
-        key,
-    };
-}
-function p(text) {
-    let sel = '!', data = {}, children, key, elm; // tslint:disable-line
-    return {
-        nt: COMMENT_NODE,
-        sel,
-        data,
-        children,
-        text,
-        elm,
-        key,
-    };
-}
-// [d]ynamic value to produce a text vnode
-function d(value) {
-    if (value === undefined || value === null) {
-        return null;
-    }
-    return t(value);
-}
-// [b]ind function
-function b(fn) {
-    if (isNull(vmBeingRendered)) {
-        throw new Error();
+        return; // nothing to subscribe to
     }
     const vm = vmBeingRendered;
-    return function handler(event) {
-        if (!isValidEvent(event)) {
-            return;
+    let reactiveRecord = TargetToReactiveRecordMap.get(target);
+    if (isUndefined(reactiveRecord)) {
+        const newRecord = create(null);
+        reactiveRecord = newRecord;
+        TargetToReactiveRecordMap.set(target, newRecord);
+    }
+    let value = reactiveRecord[key];
+    if (isUndefined(value)) {
+        value = [];
+        reactiveRecord[key] = value;
+    }
+    else if (value[0] === vm) {
+        return; // perf optimization considering that most subscriptions will come from the same vm
+    }
+    if (ArrayIndexOf.call(value, vm) === -1) {
+        ArrayPush.call(value, vm);
+        // we keep track of the sets that vm is listening from to be able to do some clean up later on
+        ArrayPush.call(vm.deps, value);
+    }
+}
+
+function getHTMLPropDescriptor(propName, descriptor) {
+    const { get, set, enumerable, configurable } = descriptor;
+    if (!isFunction(get)) {
+        throw new TypeError();
+    }
+    if (!isFunction(set)) {
+        throw new TypeError();
+    }
+    return {
+        enumerable,
+        configurable,
+        get() {
+            const vm = this[ViewModelReflection];
+            if (isBeingConstructed(vm)) {
+                return;
+            }
+            observeMutation(this, propName);
+            return get.call(vm.elm);
+        },
+        set(newValue) {
+            const vm = this[ViewModelReflection];
+            if (newValue !== vm.cmpProps[propName]) {
+                vm.cmpProps[propName] = newValue;
+                if (vm.idx > 0) {
+                    // perf optimization to skip this step if not in the DOM
+                    notifyMutation(this, propName);
+                }
+            }
+            return set.call(vm.elm, newValue);
         }
-        const e = pierce(vm, event);
-        invokeComponentCallback(vm, fn, [e]);
     };
 }
-// [k]ey function
-function k(compilerKey, obj) {
-    switch (typeof obj) {
-        case 'number':
-        // TODO: when obj is a numeric key, we might be able to use some
-        // other strategy to combine two numbers into a new unique number
-        case 'string':
-            return compilerKey + ':' + obj;
-        case 'object':
-
+const htmlElementDescriptors = ArrayReduce.call(getOwnPropertyNames(GlobalHTMLPropDescriptors), (seed, propName) => {
+    seed[propName] = getHTMLPropDescriptor(propName, GlobalHTMLPropDescriptors[propName]);
+    return seed;
+}, {});
+function getLinkedElement$1(cmp) {
+    return cmp[ViewModelReflection].elm;
+}
+function querySelectorAllFromComponent(cmp, selectors) {
+    const elm = getLinkedElement$1(cmp);
+    return elm.querySelectorAll(selectors);
+}
+// This should be as performant as possible, while any initialization should be done lazily
+class LWCElement {
+    constructor() {
+        if (isNull(vmBeingConstructed)) {
+            throw new ReferenceError();
+        }
+        const vm = vmBeingConstructed;
+        const { elm, def } = vm;
+        const component = this;
+        vm.component = component;
+        // TODO: eventually the render method should be a static property on the ctor instead
+        // catching render method to match other callbacks
+        vm.render = component.render;
+        // linking elm and its component with VM
+        component[ViewModelReflection] = elm[ViewModelReflection] = vm;
+        defineProperties(elm, def.descriptors);
+    }
+    // HTML Element - The Good Parts
+    dispatchEvent(event) {
+        const elm = getLinkedElement$1(this);
+        const vm = getCustomElementVM(this);
+        // Pierce dispatchEvent so locker service has a chance to overwrite
+        pierce(vm, elm);
+        const dispatchEvent = piercingHook(vm.membrane, elm, 'dispatchEvent', elm.dispatchEvent);
+        return dispatchEvent.call(elm, event);
+    }
+    addEventListener(type, listener) {
+        const vm = getCustomElementVM(this);
+        addComponentEventListener(vm, type, listener);
+    }
+    removeEventListener(type, listener) {
+        const vm = getCustomElementVM(this);
+        removeComponentEventListener(vm, type, listener);
+    }
+    setAttributeNS(ns, attrName, value) {
+        // use cached setAttributeNS, because elm.setAttribute throws
+        // when not called in template
+        return setAttributeNS.call(getLinkedElement$1(this), ns, attrName, value);
+    }
+    removeAttributeNS(ns, attrName) {
+        // use cached removeAttributeNS, because elm.setAttribute throws
+        // when not called in template
+        return removeAttributeNS.call(getLinkedElement$1(this), ns, attrName);
+    }
+    removeAttribute(attrName) {
+        const vm = getCustomElementVM(this);
+        // use cached removeAttribute, because elm.setAttribute throws
+        // when not called in template
+        removeAttribute.call(vm.elm, attrName);
+        attemptAriaAttributeFallback(vm, attrName);
+    }
+    setAttribute(attrName, value) {
+        const vm = getCustomElementVM(this);
+        // marking the set is needed for the AOM polyfill
+        vm.hostAttrs[attrName] = 1;
+        // use cached setAttribute, because elm.setAttribute throws
+        // when not called in template
+        return setAttribute.call(getLinkedElement$1(this), attrName, value);
+    }
+    getAttributeNS(ns, attrName) {
+        return getAttributeNS.call(getLinkedElement$1(this), ns, attrName);
+    }
+    getAttribute(attrName) {
+        return getAttribute.apply(getLinkedElement$1(this), ArraySlice.call(arguments));
+    }
+    getBoundingClientRect() {
+        const elm = getLinkedElement$1(this);
+        return elm.getBoundingClientRect();
+    }
+    querySelector(selectors) {
+        const vm = getCustomElementVM(this);
+        const nodeList = querySelectorAllFromComponent(this, selectors);
+        for (let i = 0, len = nodeList.length; i < len; i += 1) {
+            if (wasNodePassedIntoVM(vm, nodeList[i])) {
+                // TODO: locker service might need to return a membrane proxy
+                return pierce(vm, nodeList[i]);
+            }
+        }
+        return null;
+    }
+    querySelectorAll(selectors) {
+        const vm = getCustomElementVM(this);
+        const nodeList = querySelectorAllFromComponent(this, selectors);
+        // TODO: locker service might need to do something here
+        const filteredNodes = ArrayFilter.call(nodeList, (node) => wasNodePassedIntoVM(vm, node));
+        return pierce(vm, filteredNodes);
+    }
+    get tagName() {
+        const elm = getLinkedElement$1(this);
+        return elm.tagName + ''; // avoiding side-channeling
+    }
+    get classList() {
+        return getLinkedElement$1(this).classList;
+    }
+    get root() {
+        const vm = getCustomElementVM(this);
+        let { cmpRoot } = vm;
+        // lazy creation of the ShadowRoot Object the first time it is accessed.
+        if (isUndefined(cmpRoot)) {
+            cmpRoot = new Root(vm);
+            vm.cmpRoot = cmpRoot;
+        }
+        return cmpRoot;
+    }
+    toString() {
+        const vm = getCustomElementVM(this);
+        const { elm } = vm;
+        const { tagName } = elm;
+        const is = getAttribute.call(elm, 'is');
+        return `<${tagName.toLowerCase()}${is ? ' is="${is}' : ''}>`;
     }
 }
-
-
-var api = Object.freeze({
-	h: h,
-	c: c,
-	i: i,
-	f: f,
-	t: t,
-	p: p,
-	d: d,
-	b: b,
-	k: k
-});
-
-const EmptySlots = create(null);
-function getSlotsetValue(slotset, slotName) {
-    // TODO: mark slotName as reactive
-    return slotset && slotset[slotName];
-}
-const slotsetProxyHandler = {
-    get: (slotset, key) => getSlotsetValue(slotset, key),
-    set: () => {
-        return false;
-    },
-    deleteProperty: () => {
-        return false;
-    },
-};
-{
-    assign(slotsetProxyHandler, {
-        apply(target, thisArg, argArray) {
-            throw new Error(`invalid call invocation from slotset`);
-        },
-        construct(target, argArray, newTarget) {
-            throw new Error(`invalid construction invocation from slotset`);
-        },
-    });
-}
-function applyTokenToHost(vm, html) {
-    const { context } = vm;
-    const oldToken = context.tplToken;
-    const newToken = html.token;
-    if (oldToken !== newToken) {
-        const host = vm.elm;
-        // Remove the token currently applied to the host element if different than the one associated
-        // with the current template
-        if (!isUndefined(oldToken)) {
-            host.removeAttribute(oldToken);
-        }
-        // If the template has a token apply the token to the host element
-        if (!isUndefined(newToken)) {
-            host.setAttribute(newToken, '');
-        }
-    }
-}
-function evaluateTemplate(vm, html) {
-    // TODO: add identity to the html functions
-    const { component, context, cmpSlots = EmptySlots, cmpTemplate } = vm;
-    // reset the cache memoizer for template when needed
-    if (html !== cmpTemplate) {
-        if (!isUndefined(cmpTemplate)) {
-            resetShadowRoot(vm);
-        }
-        applyTokenToHost(vm, html);
-        vm.cmpTemplate = html;
-        context.tplCache = create(null);
-        context.tplToken = html.token;
-    }
-    const { proxy: slotset, revoke: slotsetRevoke } = Proxy.revocable(cmpSlots, slotsetProxyHandler);
-    const vnodes = html.call(undefined, api, component, slotset, context.tplCache);
-    slotsetRevoke();
-    return vnodes;
-}
-
-// Even if all the browser the engine supports implements the UserTiming API, we need to guard the measure APIs.
-// JSDom (used in Jest) for example doesn't implement the UserTiming APIs
-const isUserTimingSupported = typeof performance !== 'undefined' &&
-    typeof performance.mark === 'function' &&
-    typeof performance.clearMarks === 'function' &&
-    typeof performance.measure === 'function' &&
-    typeof performance.clearMeasures === 'function';
-
-let vmBeingRendered = null;
-function invokeComponentCallback(vm, fn, args) {
-    const { context, component } = vm;
-    const ctx = currentContext;
-    establishContext(context);
-    let result;
-    let error;
-    try {
-        // TODO: membrane proxy for all args that are objects
-        result = fn.apply(component, args);
-    }
-    catch (e) {
-        error = Object(e);
-    }
-    finally {
-        establishContext(ctx);
-        if (error) {
-            error.wcStack = getComponentStack(vm);
-            // rethrowing the original error annotated after restoring the context
-            throw error; // tslint:disable-line
-        }
-    }
-    return result;
-}
-function invokeComponentConstructor(vm, Ctor) {
-    const { context } = vm;
-    const ctx = currentContext;
-    establishContext(context);
-    let component;
-    let error;
-    try {
-        component = new Ctor();
-    }
-    catch (e) {
-        error = Object(e);
-    }
-    finally {
-        establishContext(ctx);
-        if (error) {
-            error.wcStack = getComponentStack(vm);
-            // rethrowing the original error annotated after restoring the context
-            throw error; // tslint:disable-line
-        }
-    }
-    return component;
-}
-function invokeComponentRenderMethod(vm) {
-    const { render } = vm;
-    if (isUndefined(render)) {
-        return [];
-    }
-    const { component, context } = vm;
-    const ctx = currentContext;
-    establishContext(context);
-    const vmBeingRenderedInception = vmBeingRendered;
-    vmBeingRendered = vm;
-    let result;
-    let error;
-    try {
-        const html = render.call(component);
-        if (isFunction(html)) {
-            result = evaluateTemplate(vm, html);
-        }
-        else if (!isUndefined(html)) {
-        }
-    }
-    catch (e) {
-        error = Object(e);
-    }
-    finally {
-        establishContext(ctx);
-        vmBeingRendered = vmBeingRenderedInception;
-        if (error) {
-            error.wcStack = getComponentStack(vm);
-            // rethrowing the original error annotated after restoring the context
-            throw error; // tslint:disable-line
-        }
-    }
-    return result || [];
+defineProperties(LWCElement.prototype, htmlElementDescriptors);
+freeze(LWCElement);
+seal(LWCElement.prototype);
+function getCustomElementVM(elmOrCmp) {
+    return elmOrCmp[ViewModelReflection];
 }
 
 /**
@@ -1322,7 +824,7 @@ var unwrap$1 = getKey$1 ?
     function (replicaOrAny) { return (replicaOrAny && getKey$1(replicaOrAny, TargetSlot$1)) || replicaOrAny; }
     : function (replicaOrAny) { return (replicaOrAny && replicaOrAny[TargetSlot$1]) || replicaOrAny; };
 function isObservable(value) {
-    if (value == null) {
+    if (!value) {
         return false;
     }
     if (isArray$1(value)) {
@@ -1625,21 +1127,16 @@ function observeMutation$1(membrane, obj, key) {
     membrane.propertyMemberAccess(obj, key);
 }
 var ReactiveMembrane = /** @class */ (function () {
-    function ReactiveMembrane(distortion, eventMap) {
+    function ReactiveMembrane(distrotion, eventMap) {
         this.objectGraph = new WeakMap();
-        this.distortion = distortion;
+        this.distortion = distrotion;
         this.propertyMemberChange = eventMap.propertyMemberChange;
         this.propertyMemberAccess = eventMap.propertyMemberAccess;
     }
     ReactiveMembrane.prototype.getProxy = function (value) {
         var distorted = invokeDistortion(this, value);
         if (isObservable(distorted)) {
-            var o = getReactiveState(this, distorted);
-            if (o.readOnly === value) {
-                // TODO: add error code
-                throw new TypeError("Read only object is not observable.");
-            }
-            return o.reactive;
+            return getReactiveState(this, distorted).reactive;
         }
         return distorted;
     };
@@ -1652,7 +1149,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.18.1 */
+/** version: 0.18.0 */
 
 function format(value) {
     return value;
@@ -1681,9 +1178,445 @@ function dangerousObjectMutation(obj) {
     return membrane.getProxy(unwrap$2(obj));
 }
 
+const CHAR_S = 115;
+const CHAR_V = 118;
+const CHAR_G = 103;
+const NamespaceAttributeForSVG = 'http://www.w3.org/2000/svg';
+const SymbolIterator = Symbol.iterator;
+const { ELEMENT_NODE, TEXT_NODE, COMMENT_NODE } = Node;
+const classNameToClassMap = create(null);
+function getMapFromClassName(className) {
+    if (className === undefined) {
+        return;
+    }
+    let map = classNameToClassMap[className];
+    if (map) {
+        return map;
+    }
+    map = {};
+    let start = 0;
+    let o;
+    const len = className.length;
+    for (o = 0; o < len; o++) {
+        if (StringCharCodeAt.call(className, o) === SPACE_CHAR) {
+            if (o > start) {
+                map[StringSlice.call(className, start, o)] = true;
+            }
+            start = o + 1;
+        }
+    }
+    if (o > start) {
+        map[StringSlice.call(className, start, o)] = true;
+    }
+    classNameToClassMap[className] = map;
+    return map;
+}
+// insert is called after postpatch, which is used somewhere else (via a module)
+// to mark the vm as inserted, that means we cannot use postpatch as the main channel
+// to rehydrate when dirty, because sometimes the element is not inserted just yet,
+// which breaks some invariants. For that reason, we have the following for any
+// Custom Element that is inserted via a template.
+const hook = {
+    postpatch(oldVNode, vnode) {
+        const vm = getCustomElementVM(vnode.elm);
+        vm.cmpSlots = vnode.data.slotset;
+        // TODO: hot-slots names are those slots used during the last rendering cycle, and only if
+        // one of those is changed, the vm should be marked as dirty.
+        // TODO: Issue #133
+        if (vm.cmpSlots !== oldVNode.data.slotset && !vm.isDirty) {
+            markComponentAsDirty(vm);
+        }
+        renderVM(vm);
+    },
+    insert(vnode) {
+        const vm = getCustomElementVM(vnode.elm);
+        appendVM(vm);
+        renderVM(vm);
+    },
+    create(oldVNode, vnode) {
+        createVM(vnode.sel, vnode.elm, vnode.data.slotset);
+    },
+    remove(vnode, removeCallback) {
+        removeVM(getCustomElementVM(vnode.elm));
+        removeCallback();
+    }
+};
+function isVElement(vnode) {
+    return vnode.nt === ELEMENT_NODE;
+}
+function addNS(vnode) {
+    const { data, children, sel } = vnode;
+    // TODO: review why `sel` equal `foreignObject` should get this `ns`
+    data.ns = NamespaceAttributeForSVG;
+    if (isArray(children) && sel !== 'foreignObject') {
+        for (let j = 0, n = children.length; j < n; ++j) {
+            const childNode = children[j];
+            if (childNode != null && isVElement(childNode)) {
+                addNS(childNode);
+            }
+        }
+    }
+}
+function getCurrentOwnerId() {
+    return isNull(vmBeingRendered) ? 0 : vmBeingRendered.uid;
+}
+function getCurrentTplToken() {
+    // For root elements and other special cases the vm is not set.
+    if (isNull(vmBeingRendered)) {
+        return;
+    }
+    return vmBeingRendered.context.tplToken;
+}
+function normalizeStyleString(value) {
+    if (value == null || value === false) {
+        return;
+    }
+    if (isString(value)) {
+        return value;
+    }
+    return value + '';
+}
+// [h]tml node
+function h(sel, data, children) {
+    const { classMap, className, style, styleMap, key } = data;
+    data.class = classMap || getMapFromClassName(normalizeStyleString(className));
+    data.style = styleMap || normalizeStyleString(style);
+    data.token = getCurrentTplToken();
+    data.uid = getCurrentOwnerId();
+    let text, elm; // tslint:disable-line
+    const vnode = {
+        nt: ELEMENT_NODE,
+        tag: sel,
+        sel,
+        data,
+        children,
+        text,
+        elm,
+        key,
+    };
+    if (sel.length === 3 && StringCharCodeAt.call(sel, 0) === CHAR_S && StringCharCodeAt.call(sel, 1) === CHAR_V && StringCharCodeAt.call(sel, 2) === CHAR_G) {
+        addNS(vnode);
+    }
+    return vnode;
+}
+// [c]ustom element node
+function c(sel, Ctor, data) {
+    // The compiler produce AMD modules that do not support circular dependencies
+    // We need to create an indirection to circumvent those cases.
+    // We could potentially move this check to the definition
+    if (Ctor.__circular__) {
+        Ctor = Ctor();
+    }
+    const { key, slotset, styleMap, style, on, className, classMap, props } = data;
+    let { attrs } = data;
+    // hack to allow component authors to force the usage of the "is" attribute in their components
+    const { forceTagName } = Ctor;
+    let tag = sel, text, elm; // tslint:disable-line
+    if (!isUndefined(attrs) && !isUndefined(attrs.is)) {
+        tag = sel;
+        sel = attrs.is;
+    }
+    else if (!isUndefined(forceTagName)) {
+        tag = forceTagName;
+        attrs = assign({}, attrs);
+        attrs.is = sel;
+    }
+    registerComponent(sel, Ctor);
+    data = { hook, key, slotset, attrs, on, props };
+    data.class = classMap || getMapFromClassName(normalizeStyleString(className));
+    data.style = styleMap || normalizeStyleString(style);
+    data.token = getCurrentTplToken();
+    data.uid = getCurrentOwnerId();
+    const vnode = {
+        nt: ELEMENT_NODE,
+        tag,
+        sel,
+        data,
+        children: EmptyArray,
+        text,
+        elm,
+        key,
+    };
+    return vnode;
+}
+// [i]terable node
+function i(iterable, factory) {
+    const list = [];
+    if (isUndefined(iterable) || iterable === null) {
+        return list;
+    }
+    const iterator = iterable[SymbolIterator]();
+    let next = iterator.next();
+    let j = 0;
+    let { value, done: last } = next;
+    while (last === false) {
+        // implementing a look-back-approach because we need to know if the element is the last
+        next = iterator.next();
+        last = next.done;
+        // template factory logic based on the previous collected value
+        const vnode = factory(value, j, j === 0, last);
+        if (isArray(vnode)) {
+            ArrayPush.apply(list, vnode);
+        }
+        else {
+            ArrayPush.call(list, vnode);
+        }
+        // preparing next value
+        j += 1;
+        value = next.value;
+    }
+    return list;
+}
+/**
+ * [f]lattening
+ */
+function f(items) {
+    const len = items.length;
+    const flattened = [];
+    for (let j = 0; j < len; j += 1) {
+        const item = items[j];
+        if (isArray(item)) {
+            ArrayPush.apply(flattened, item);
+        }
+        else {
+            ArrayPush.call(flattened, item);
+        }
+    }
+    return flattened;
+}
+// [t]ext node
+function t(text) {
+    let sel, data = {}, children, key, elm; // tslint:disable-line
+    return {
+        nt: TEXT_NODE,
+        sel,
+        data,
+        children,
+        text,
+        elm,
+        key,
+    };
+}
+function p(text) {
+    let sel = '!', data = {}, children, key, elm; // tslint:disable-line
+    return {
+        nt: COMMENT_NODE,
+        sel,
+        data,
+        children,
+        text,
+        elm,
+        key,
+    };
+}
+// [d]ynamic value to produce a text vnode
+function d(value) {
+    if (value === undefined || value === null) {
+        return null;
+    }
+    return t(value);
+}
+// [b]ind function
+function b(fn) {
+    if (isNull(vmBeingRendered)) {
+        throw new Error();
+    }
+    const vm = vmBeingRendered;
+    return function handler(event) {
+        // TODO: only if the event is `composed` it can be dispatched
+        invokeComponentCallback(vm, fn, [event]);
+    };
+}
+const objToKeyMap = new WeakMap();
+let globalKey = 0;
+// [k]ind function
+function k(compilerKey, obj) {
+    switch (typeof obj) {
+        case 'number':
+        // TODO: when obj is a numeric key, we might be able to use some
+        // other strategy to combine two numbers into a new unique number
+        case 'string':
+            return compilerKey + ':' + obj;
+        case 'object':
+            if (isNull(obj)) {
+                return;
+            }
+            // Slow path. We get here when element is inside iterator
+            // but no key is specified.
+            const unwrapped = unwrap$2(obj);
+            let objKey = objToKeyMap.get(unwrapped);
+            if (isUndefined(objKey)) {
+                objKey = globalKey++;
+                objToKeyMap.set(unwrapped, objKey);
+            }
+            return compilerKey + ':' + objKey;
+    }
+}
+
+
+var api = Object.freeze({
+	h: h,
+	c: c,
+	i: i,
+	f: f,
+	t: t,
+	p: p,
+	d: d,
+	b: b,
+	k: k
+});
+
+const EmptySlots = create(null);
+function getSlotsetValue(slotset, slotName) {
+    // TODO: mark slotName as reactive
+    return slotset && slotset[slotName];
+}
+const slotsetProxyHandler = {
+    get: (slotset, key) => getSlotsetValue(slotset, key),
+    set: () => {
+        return false;
+    },
+    deleteProperty: () => {
+        return false;
+    },
+};
+{
+    assign(slotsetProxyHandler, {
+        apply(target, thisArg, argArray) {
+            throw new Error(`invalid call invocation from slotset`);
+        },
+        construct(target, argArray, newTarget) {
+            throw new Error(`invalid construction invocation from slotset`);
+        },
+    });
+}
+function applyTokenToHost(vm, html) {
+    const { context } = vm;
+    const oldToken = context.tplToken;
+    const newToken = html.token;
+    if (oldToken !== newToken) {
+        const host = vm.elm;
+        // Remove the token currently applied to the host element if different than the one associated
+        // with the current template
+        if (!isUndefined(oldToken)) {
+            host.removeAttribute(oldToken);
+        }
+        // If the template has a token apply the token to the host element
+        if (!isUndefined(newToken)) {
+            host.setAttribute(newToken, '');
+        }
+    }
+}
+function evaluateTemplate(vm, html) {
+    // TODO: add identity to the html functions
+    const { component, context, cmpSlots = EmptySlots, cmpTemplate } = vm;
+    // reset the cache memoizer for template when needed
+    if (html !== cmpTemplate) {
+        if (!isUndefined(cmpTemplate)) {
+            resetShadowRoot(vm);
+        }
+        applyTokenToHost(vm, html);
+        vm.cmpTemplate = html;
+        context.tplCache = create(null);
+        context.tplToken = html.token;
+    }
+    const { proxy: slotset, revoke: slotsetRevoke } = Proxy.revocable(cmpSlots, slotsetProxyHandler);
+    const vnodes = html.call(undefined, api, component, slotset, context.tplCache);
+    slotsetRevoke();
+    return vnodes;
+}
+
+// Even if all the browser the engine supports implements the UserTiming API, we need to guard the measure APIs.
+// JSDom (used in Jest) for example doesn't implement the UserTiming APIs
+const isUserTimingSupported = typeof performance !== 'undefined' &&
+    typeof performance.mark === 'function' &&
+    typeof performance.clearMarks === 'function' &&
+    typeof performance.measure === 'function' &&
+    typeof performance.clearMeasures === 'function';
+
+let vmBeingRendered = null;
+function invokeComponentCallback(vm, fn, args) {
+    const { context, component } = vm;
+    const ctx = currentContext;
+    establishContext(context);
+    let result;
+    let error;
+    try {
+        // TODO: membrane proxy for all args that are objects
+        result = fn.apply(component, args);
+    }
+    catch (e) {
+        error = Object(e);
+    }
+    finally {
+        establishContext(ctx);
+        if (error) {
+            error.wcStack = getComponentStack(vm);
+            // rethrowing the original error annotated after restoring the context
+            throw error; // tslint:disable-line
+        }
+    }
+    return result;
+}
+function invokeComponentConstructor(vm, Ctor) {
+    const { context } = vm;
+    const ctx = currentContext;
+    establishContext(context);
+    let component;
+    let error;
+    try {
+        component = new Ctor();
+    }
+    catch (e) {
+        error = Object(e);
+    }
+    finally {
+        establishContext(ctx);
+        if (error) {
+            error.wcStack = getComponentStack(vm);
+            // rethrowing the original error annotated after restoring the context
+            throw error; // tslint:disable-line
+        }
+    }
+    return component;
+}
+function invokeComponentRenderMethod(vm) {
+    const { render } = vm;
+    if (isUndefined(render)) {
+        return [];
+    }
+    const { component, context } = vm;
+    const ctx = currentContext;
+    establishContext(context);
+    const vmBeingRenderedInception = vmBeingRendered;
+    vmBeingRendered = vm;
+    let result;
+    let error;
+    try {
+        const html = render.call(component);
+        if (isFunction(html)) {
+            result = evaluateTemplate(vm, html);
+        }
+        else if (!isUndefined(html)) {
+        }
+    }
+    catch (e) {
+        error = Object(e);
+    }
+    finally {
+        establishContext(ctx);
+        vmBeingRendered = vmBeingRenderedInception;
+        if (error) {
+            error.wcStack = getComponentStack(vm);
+            // rethrowing the original error annotated after restoring the context
+            throw error; // tslint:disable-line
+        }
+    }
+    return result || [];
+}
+
 // stub function to prevent misuse of the @track decorator
-function track(obj) {
-    return membrane.getProxy(obj);
+function track() {
 }
 // TODO: how to allow symbols as property keys?
 function createTrackedPropertyDescriptor(proto, key, descriptor) {
@@ -3010,11 +2943,6 @@ function createElement$1(sel, options = {}) {
     return element;
 }
 
-// when used with exactly one argument, we assume it is a function invocation.
-function readonly(obj) {
-    return membrane.getReadOnlyProxy(obj);
-}
-
 exports.createElement = createElement$1;
 exports.getComponentDef = getComponentDef;
 exports.Element = LWCElement;
@@ -3023,10 +2951,9 @@ exports.unwrap = unwrap$2;
 exports.dangerousObjectMutation = dangerousObjectMutation;
 exports.api = api$1;
 exports.track = track;
-exports.readonly = readonly;
 exports.wire = wire;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.18.1 */
+/** version: 0.18.0 */

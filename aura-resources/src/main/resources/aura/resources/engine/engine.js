@@ -183,7 +183,7 @@ function assertValidForceTagName(Ctor) {
 }
 const usesNativeSymbols = typeof Symbol() === 'symbol';
 
-const { addEventListener, removeEventListener: removeEventListener$1, getAttribute, getAttributeNS, setAttribute, setAttributeNS, removeAttribute, removeAttributeNS, querySelector, querySelectorAll, } = Element.prototype;
+const { addEventListener, removeEventListener, getAttribute, getAttributeNS, setAttribute, setAttributeNS, removeAttribute, removeAttributeNS, querySelector, querySelectorAll, } = Element.prototype;
 // These properties get added to LWCElement.prototype publicProps automatically
 const defaultDefHTMLPropertyNames = ['dir', 'id', 'accessKey', 'title', 'lang', 'hidden', 'draggable', 'tabIndex'];
 // Few more exceptions that are using the attribute name to match the property in lowercase.
@@ -720,7 +720,7 @@ function removeComponentEventListener(vm, eventName, oldHandler) {
         const pos = handlers && ArrayIndexOf.call(handlers, oldHandler);
         if (handlers && pos > -1) {
             if (handlers.length === 1) {
-                removeEventListener$1.call(elm, eventName, vm.cmpListener);
+                removeEventListener.call(elm, eventName, vm.cmpListener);
                 cmpEvents[eventName] = undefined;
             }
             else {
@@ -1777,7 +1777,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.18.0 */
+/** version: 0.18.0-1 */
 
 function format(value) {
     return value;
@@ -4084,4 +4084,4 @@ exports.wire = wire;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.18.0 */
+/** version: 0.18.0-1 */

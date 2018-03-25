@@ -54,7 +54,7 @@ function addCallbackToNextTick(callback) {
 }
 var usesNativeSymbols = typeof Symbol() === 'symbol';
 
-var _a$1 = Element.prototype, addEventListener = _a$1.addEventListener, removeEventListener$1 = _a$1.removeEventListener, getAttribute = _a$1.getAttribute, getAttributeNS = _a$1.getAttributeNS, setAttribute = _a$1.setAttribute, setAttributeNS = _a$1.setAttributeNS, removeAttribute = _a$1.removeAttribute, removeAttributeNS = _a$1.removeAttributeNS, querySelector = _a$1.querySelector, querySelectorAll = _a$1.querySelectorAll;
+var _a$1 = Element.prototype, addEventListener = _a$1.addEventListener, removeEventListener = _a$1.removeEventListener, getAttribute = _a$1.getAttribute, getAttributeNS = _a$1.getAttributeNS, setAttribute = _a$1.setAttribute, setAttributeNS = _a$1.setAttributeNS, removeAttribute = _a$1.removeAttribute, removeAttributeNS = _a$1.removeAttributeNS, querySelector = _a$1.querySelector, querySelectorAll = _a$1.querySelectorAll;
 // These properties get added to LWCElement.prototype publicProps automatically
 var defaultDefHTMLPropertyNames = ['dir', 'id', 'accessKey', 'title', 'lang', 'hidden', 'draggable', 'tabIndex'];
 // this regular expression is used to transform aria props into aria attributes because
@@ -382,7 +382,7 @@ function removeComponentEventListener(vm, eventName, oldHandler) {
         var pos = handlers && ArrayIndexOf.call(handlers, oldHandler);
         if (handlers && pos > -1) {
             if (handlers.length === 1) {
-                removeEventListener$1.call(elm, eventName, vm.cmpListener);
+                removeEventListener.call(elm, eventName, vm.cmpListener);
                 cmpEvents[eventName] = undefined;
             }
             else {
@@ -1208,7 +1208,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.18.0 */
+/** version: 0.18.0-1 */
 
 function format(value) {
     return value;
@@ -3030,4 +3030,4 @@ exports.wire = wire;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.18.0 */
+/** version: 0.18.0-1 */

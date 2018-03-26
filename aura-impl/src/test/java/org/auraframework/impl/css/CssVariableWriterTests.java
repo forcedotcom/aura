@@ -107,7 +107,7 @@ public class CssVariableWriterTests {
         target.write(sb);
 
         String expected = ":root{ \n" +
-                          "--token3: value3;\n" +
+                          "--lwc-token3: value3;\n" +
                           " } \n";
         String actual = sb.toString();
 

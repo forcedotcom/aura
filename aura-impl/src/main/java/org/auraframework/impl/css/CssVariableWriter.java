@@ -41,6 +41,7 @@ public class CssVariableWriter {
     private ContextService contextService;
     private static Pattern validName = Pattern.compile("^([a-z_]|-[a-z_-])[a-z\\d_-]*", Pattern.CASE_INSENSITIVE);
     private static Pattern invalidValue = Pattern.compile("[\\{\\}]|\\/\\/|\\/\\*");
+    private static String variableDeclaration = "--lwc-%s: %s;\n";
 
     public CssVariableWriter(DefinitionService definitionService, ContextService contextService){
         this.definitionService = definitionService;
@@ -64,7 +65,7 @@ public class CssVariableWriter {
                         Optional<Object> value = tokens.getToken(name);
 
                         if (isValidValue(value)) {
-                            cssVariables.append(String.format("--%s: %s;\n", name, value.get()));
+                            cssVariables.append(String.format(variableDeclaration, name, value.get()));
                         }
                     }
                 }

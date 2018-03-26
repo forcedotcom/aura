@@ -704,6 +704,20 @@ public class ServerServiceImpl implements ServerService {
         return writer.toString();
     }
 
+    private String serializeStyleContext(AuraContext context) throws IOException{
+        if (context.getStyleContext() == null){
+            context.setStyleContext();
+        }
+        JsonSerializationContext serializationContext = context.getJsonSerializationContext();
+        StringWriter writer = new StringWriter();
+        JsonEncoder json = JsonEncoder.createJsonStream(writer, serializationContext);
+        json.writeValue(context.getStyleContext());
+        writer.flush();
+        writer.close();
+
+        return writer.toString();
+    }
+
     private String writeError(Throwable t, AuraContext context) throws IOException {
         JsonSerializationContext serializationContext = context.getJsonSerializationContext();
         StringWriter writer = new StringWriter();
@@ -751,6 +765,11 @@ public class ServerServiceImpl implements ServerService {
             }
         } else {
             serializedContext = context.serialize(AuraContext.EncodingStyle.Full);
+        }
+
+        if (configAdapter.uriAddressableDefsEnabled()){
+            String styleContext = serializeStyleContext(context);
+            attributes.put("styleContext", styleContext);
         }
 
         templateUtil.writePreloadLinkTags(servletUtilAdapter.getCssPreloadUrls(context), sb);

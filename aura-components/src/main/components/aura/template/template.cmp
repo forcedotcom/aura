@@ -39,6 +39,7 @@
     <aura:attribute name="autoInitializeSync"       type="String" default="false" />
     <aura:attribute name="appBootstrap"             type="String" description="Inline bootstrap application config"/>
     <aura:attribute name="bootstrapInlineJs"        type="String" description="Allow inlineJS execution within the context of bootsttrap script"/>
+    <aura:attribute name="styleContext"             type="String" default="null" description="uid that identifies tokendef uids for the app"/>
 
     <aura:attribute name="prefetchTags"             type="String" description="Prefetch resources tags"/>
 
@@ -122,7 +123,9 @@
     window.Aura.bootstrap.execInlineJs = time();
 
     window.Aura.inlineJsLoaded = true;
+
     var auraConfig = {!v.auraInit};
+    auraConfig.context.styleContext = {!v.styleContext};
 
     function auraPreInitBlock () {
         {!v.auraPreInitBlock}

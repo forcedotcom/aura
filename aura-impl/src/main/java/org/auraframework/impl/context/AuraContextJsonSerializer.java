@@ -150,12 +150,6 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             json.writeMapEntry(Json.ApplicationKey.URIADDRESSABLEDEFINITIONS, 1);
         }
 
-        // add contextual CSS information
-        if (ctx.getStyleContext() == null) {
-            ctx.setStyleContext();
-        }
-        json.writeMapEntry("styleContext", ctx.getStyleContext());
-
         //
         // Now comes the tricky part, we have to serialize all of the definitions that are
         // required on the client side, and, of all types. This way, we won't have to handle

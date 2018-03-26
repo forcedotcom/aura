@@ -194,10 +194,11 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
         DefinitionService definitionService = Aura.getDefinitionService();
         ComponentDef cmp = definitionService.getDefinition(getParentDescriptor().getQualifiedName(),ComponentDef.class);
         AttributeDef attr = cmp.getAttributeDef(getName());
-        TypeDef attrType = attr.getTypeDef();
         if (attr == null || !attr.getName().equals(getName())) {
         	throw new InvalidDefinitionException("The design file contains attribute '"+getName()+"' but the component doesn't.", getLocation());
         }
+
+        TypeDef attrType = attr.getTypeDef();
         if(!isInInternalNamespace && getDataSource() != null){
             if(!VALID_DATASOURCE_ATTRIBUTE_TYPES.contains(attrType.getDescriptor().getDescriptorName().toLowerCase())){
                 throw new InvalidDefinitionException("Only String attributes may have a datasource in the design file.", getLocation());

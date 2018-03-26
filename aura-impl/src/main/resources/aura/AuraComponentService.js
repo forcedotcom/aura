@@ -1926,6 +1926,9 @@ AuraComponentService.prototype.createComponentPrivAsync = function (config, call
         this.componentDefLoader.loadComponentDef(descriptor, null, $A.getCallback(function(err) {
             if (infiniteLoopProtection) {
                 err = "infinite loop error on fetching component definition for: " + descriptor;
+                $A.deprecated(err,
+                    "New definition needs to be created on the server",
+                    "infiniteLoopProtection:" + descriptor);
             }
             if (err) {
                 callback(null, "ERROR", err.message?err.message:err);

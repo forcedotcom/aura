@@ -673,4 +673,121 @@ Test.Aura.AuraComponentServiceTest = function(){
             );
         }
     }
+
+    [Fixture]
+    function loadComponentDefs() {
+
+        [Fact]
+        function removesAlreadyCachedDefs() {
+            var actual;
+            var expected = {
+                "markup://one": {},
+                "markup://two": {},
+                "markup://four": {},
+                "markup://five": {},
+            };
+
+            mockOnLoadUtil(function() {
+                $A.util["isObject"] = function(){
+                    return true;
+                };
+
+                var descriptorMap = {
+                    "markup://one": {},
+                    "markup://two": {},
+                    "markup://three": {},
+                    "markup://four": {},
+                    "markup://five": {},
+                };
+
+                var targetService = new Aura.Services.AuraComponentService();
+
+                targetService.hasCacheableDefinitionOfAnyType = function(desc) {
+                    if(desc === "markup://three") {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+
+                targetService.componentDefLoader = {
+                    loadComponentDefs: function(desc, cb) {
+                        actual = desc;
+                    }
+                };
+
+                targetService.loadComponentDefs(descriptorMap, function() {});
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function willNotLoadDefsIfDefMapIsNotAnObject() {
+            var actual;
+            var expected = false;
+
+            mockOnLoadUtil(function() {
+                $A.util["isObject"] = function(){
+                    return false;
+                };
+
+                var descriptorMap = null;
+
+                var targetService = new Aura.Services.AuraComponentService();
+
+                targetService.componentDefLoader = {
+                    //Should never enter this code path
+                    loadComponentDefs: function() {
+                        actual = true;
+                    }
+                };
+
+                targetService.loadComponentDefs(descriptorMap, function() {
+                    actual = false;
+                });
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function willNotLoadDefsIfDefMapIsEmpty() {
+            var actual;
+            var expected = false;
+
+            mockOnLoadUtil(function() {
+                $A.util["isObject"] = function(){
+                    return true;
+                };
+
+                var descriptorMap = {
+                    "markup://one": {},
+                    "markup://two": {},
+                    "markup://three": {},
+                    "markup://four": {},
+                    "markup://five": {},
+                };
+
+                var targetService = new Aura.Services.AuraComponentService();
+
+                targetService.hasCacheableDefinitionOfAnyType = function(desc) {
+                    return true;
+                }
+
+                targetService.componentDefLoader = {
+                    //Should never enter this code path
+                    loadComponentDefs: function() {
+                        actual = true;
+                    }
+                };
+
+                targetService.loadComponentDefs(descriptorMap, function() {
+                    actual = false;
+                });
+            });
+
+            Assert.Equal(expected, actual);
+        }
+    }
 }

@@ -29,7 +29,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.css.StyleContext;
-import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -896,18 +895,13 @@ public class AuraContextImpl implements AuraContext {
             }
 
             if (configAdapter.uriAddressableDefsEnabled()) {
-                boolean enabled = true;
-                Optional<? extends Definition> appDef = getLocalDef(appDesc);
-                if (appDef != null && appDef.isPresent() && appDef.get() instanceof ApplicationDef) {
-                    Set<DefDescriptor<InterfaceDef>> interfaces = ((ApplicationDef)appDef.get()).getInterfaces();
-                    if (interfaces != null && interfaces.size() > 0) {
-                        DefDescriptor<InterfaceDef> uriAddressableDisabled = definitionService.getDefDescriptor("aura:uriDefinitionsDisabled", InterfaceDef.class);
-                        if (interfaces.contains(uriAddressableDisabled)) {
-                            enabled = false;
-                        }
-                    }
+                boolean uriEnabled = true;
+                try {
+                    uriEnabled = !definitionService.hasInterface(appDesc, definitionService.getDefDescriptor("aura:uriDefinitionsDisabled", InterfaceDef.class));
+                } catch (QuickFixException qfe) {
+                    // ignore
                 }
-                if (enabled) {
+                if (uriEnabled) {
                     json.writeMapEntry(Json.ApplicationKey.URIADDRESSABLEDEFINITIONS, 1);
                 }
             }

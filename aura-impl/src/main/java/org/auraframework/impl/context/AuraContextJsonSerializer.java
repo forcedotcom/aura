@@ -113,16 +113,14 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
                 json.writeMapEntry("cmp", String.format("%s:%s", appDesc.getNamespace(), appDesc.getName()));
             }
 
-            try {
-                Set<DefDescriptor<InterfaceDef>> interfaces = definitionService.getDefinition(appDesc).getInterfaces();
-                if (interfaces != null && interfaces.size() > 0) {
-                    DefDescriptor<InterfaceDef> uriAddressableDisabled = definitionService.getDefDescriptor("aura:uriDefinitionsDisabled", InterfaceDef.class);
-                    if (interfaces.contains(uriAddressableDisabled)) {
+            if (uriEnabled) {
+                try {
+                    if (definitionService.hasInterface(appDesc, definitionService.getDefDescriptor("aura:uriDefinitionsDisabled", InterfaceDef.class))) {
                         uriEnabled = false;
                     }
+                } catch (QuickFixException qfe) {
+                    // ignore
                 }
-            } catch (QuickFixException qfe) {
-                // ignore
             }
         }
 

@@ -28,6 +28,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.ClientOutOfSyncException;
@@ -305,6 +306,14 @@ public interface DefinitionService extends AuraService {
     boolean hasAccess(DefDescriptor<?> referencingDescriptor, DefDescriptor<?> accessDescriptor) throws QuickFixException;
 
     <D extends Definition> boolean hasAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException;
+
+    /**
+     * @param descriptor
+     * @param interfaceDef
+     * @return true if the definition or it's parent (extends) definitions contain the interface
+     * @throws QuickFixException
+     */
+    boolean hasInterface(DefDescriptor<? extends BaseComponentDef> descriptor, DefDescriptor<InterfaceDef> interfaceDef) throws QuickFixException;
 
     /**
      * make sure all of our registries are built.

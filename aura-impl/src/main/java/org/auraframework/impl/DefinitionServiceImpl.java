@@ -43,6 +43,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DefDescriptor.DescriptorKey;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
@@ -958,6 +959,25 @@ public class DefinitionServiceImpl implements DefinitionService {
         return accessChecker.checkAccess(referencingDescriptor, def,
                 contextService.getCurrentContext().getAccessCheckCache());
         
+    }
+
+    @Override
+    public boolean hasInterface(DefDescriptor<? extends BaseComponentDef> descriptor, DefDescriptor<InterfaceDef> interfaceDef) throws QuickFixException {
+        BaseComponentDef def = getDefinition(descriptor);
+        Set<DefDescriptor<InterfaceDef>> interfaces = def.getInterfaces();
+        DefDescriptor<? extends BaseComponentDef> parent = def.getExtendsDescriptor();
+        while (interfaces != null && interfaces.size() > 0 || (parent != null)) {
+            if (interfaces.contains(interfaceDef)) {
+                return true;
+            }
+            if (parent == null) {
+                break;
+            }
+            def = getDefinition(parent);
+            interfaces = def.getInterfaces();
+            parent = def.getExtendsDescriptor();
+        }
+        return false;
     }
 
     // FIXME: These should move to caching service.

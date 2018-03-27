@@ -45,20 +45,18 @@
         var div = document.getElementById("title");
 
         // 'get' on unsupported property works but 'set' throws an error
-        testUtils.assertUndefined(div.shadowRoot);
-        testUtils.expectAuraWarning('SecureElement does not allow access to shadowRoot');
-        div.shadowRoot = "foo";
-        testUtils.assertUndefined(div.shadowRoot);
+        testUtils.assertUndefined(div.align);
+        testUtils.expectAuraWarning('SecureElement does not allow access to align');
+        div.align = "foo";
+        testUtils.assertUndefined(div.align);
     },
 
     testInOperation: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var div = document.getElementById("title");
-
         // simple 'in' usage for properties that exist or do not
         testUtils.assertTrue("textContent" in div);
         testUtils.assertFalse("foobar" in div);
-        testUtils.assertTrue("shadowRoot" in div); // part of the HTMLDivElement prototype but blocked by Locker
 
         // now try on expandos
         div.foo = "expando!";
@@ -105,7 +103,11 @@
             delete div.expando;
             testUtils.fail("Expected error trying to delete non-configurable property");
         } catch (e) {
-            testUtils.assertEquals("Cannot delete property 'expando' of [object Object]", e.message);
+            if ($A.get("$Browser.isFIREFOX")) {
+                testUtils.assertEquals("property \"expando\" is non-configurable and can't be deleted", e.message);
+            } else {
+                testUtils.assertEquals("Cannot delete property 'expando' of [object Object]", e.message);
+            }
         }
     },
 

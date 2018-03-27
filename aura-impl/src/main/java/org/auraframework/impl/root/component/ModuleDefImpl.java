@@ -217,10 +217,11 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
      */
     private boolean isAuraDependency(String dependency) {
         return dependency != null &&
-                ("aura-instrumentation".equals(dependency) ||
-                        "aura-storage".equals(dependency) ||
-                dependency.startsWith("proxy-compat") ||
-                dependency.startsWith("@"));
+                ("wire-service".equals(dependency) ||
+                 "aura-instrumentation".equals(dependency) ||
+                 "aura-storage".equals(dependency) ||
+                 dependency.startsWith("proxy-compat") ||
+                 dependency.startsWith("@"));
     }
 
     @Override

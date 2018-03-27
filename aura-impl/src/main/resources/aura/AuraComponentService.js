@@ -22,7 +22,13 @@
  */
 function AuraComponentService() {
     // Def registries
-    this.moduleEngine           = window["Engine"];
+    this.moduleEngine           = Aura["Engine"];
+    this.wireService            = Aura["WireService"];
+
+    // remove globals
+    delete Aura["Engine"];
+    delete Aura["WireService"];
+
     // Will hold a reference to a wrapped engine, will be used for custom modules(LockerService)
     this.wrappedEngine          = undefined;
     this.moduleDefRegistry      = {};
@@ -88,12 +94,12 @@ AuraComponentService.prototype.initCoreModules = function () {
     var ProxyObject = window["Proxy"] || {};
 
     this.addModule("markup://engine", "engine", [], null, this.moduleEngine);
+    this.addModule("markup://wire-service", "wire-service", [], null, this.wireService);
     this.addModule("markup://assert", "assert", [], null, Aura.ExportsAssert);
     this.addModule("markup://logger", "logger", [], null, Aura.ExportsLogger);
     this.addModule("markup://aura", "aura", [], null, Aura.ExportsModule);
     this.addModule("markup://aura-storage", "aura-storage", [], null, Aura.ExportsStorage);
     this.addModule("markup://aura-instrumentation", "aura-instrumentation", [], null, Aura.ExportsMetricsService);
-
 
     // Register proxy-compat helpers
     var proxyPrefix = "proxy-compat/";
@@ -113,7 +119,6 @@ AuraComponentService.prototype.initCoreModules = function () {
         // Regenerator (for transpiling async stuff)
         this.addModule("markup://babel-compat/regeneratorRuntime", "babel-compat/regenerator", [], null, compat["regenerator"]);
     }
-
 };
 
 /**

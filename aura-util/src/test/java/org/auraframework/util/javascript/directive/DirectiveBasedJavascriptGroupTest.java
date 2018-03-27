@@ -105,12 +105,12 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
      */
     @Test
     public void testJavascriptGenerationProduction() throws Exception {
-    	doTestJavascriptGeneration(JavascriptGeneratorMode.PRODUCTION);
+        doTestJavascriptGeneration(JavascriptGeneratorMode.PRODUCTION);
     }
 
     @Test
     public void testJavascriptGenerationDevelopment() throws Exception {
-    	doTestJavascriptGeneration(JavascriptGeneratorMode.DEVELOPMENT);
+        doTestJavascriptGeneration(JavascriptGeneratorMode.DEVELOPMENT);
     }
 
     private void doTestJavascriptGeneration(JavascriptGeneratorMode mode) throws Exception {
@@ -122,11 +122,14 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
 
         jg = Mockito.spy(jg);
 
-        String mockEngineCompat = "var mock='engine compat';console.log(mock);";
+        String mockEngineCompat = "var mock='engine compat';console.log(mock);\n";
+        String mockWireCompat = "var mock='wire compat';console.log(mock);\n";
 
         // mock out getSource for engine to test compat
         Mockito.when(jg.getSource("aura/resources/engine/engine_compat.js")).thenReturn(mockEngineCompat);
         Mockito.when(jg.getSource("aura/resources/engine/engine_compat.min.js")).thenReturn(mockEngineCompat);
+        Mockito.when(jg.getSource("aura/resources/wire/wire_compat.js")).thenReturn(mockWireCompat);
+        Mockito.when(jg.getSource("aura/resources/wire/wire_compat.min.js")).thenReturn(mockWireCompat);
         Mockito.when(jg.getSource("aura/resources/compat-helpers/compat.js")).thenReturn("");
         Mockito.when(jg.getSource("aura/resources/compat-helpers/compat.min.js")).thenReturn("");
 

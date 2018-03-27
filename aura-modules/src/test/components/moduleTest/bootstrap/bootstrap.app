@@ -19,7 +19,7 @@
     template="moduleTest:bootstrapTemplate"
     access="global"
     useAppcache="false"
-    services="schemas:importSchemaService">
+    services="schemas:importSchemaService,wire:registerWireService">
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:attribute name="branch" type="Boolean" default="true" access="GLOBAL" />

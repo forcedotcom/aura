@@ -284,6 +284,14 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         String engineCompatMinSource = null;
         String engineProdDebugSource = null;
         String engineCompatProdDebugSource = null;
+        // Wire
+        String wireSource = null;
+        String wireMinSource = null;
+        String wireCompatSource = null;
+        String wireCompatMinSource = null;
+        String wireProdDebugSource = null;
+        String wireCompatProdDebugSource = null;
+        // Compat Helper
         String compatHelpersSource = null;
         String compatHelpersMinSource = null;
 
@@ -297,32 +305,67 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
             engineProdDebugSource = getSource("aura/resources/engine/engine_debug.js");
             engineCompatProdDebugSource = getSource("aura/resources/engine/engine_compat_debug.js");
 
+            wireSource = getSource("aura/resources/wire/wire.js");
+            wireMinSource = getSource("aura/resources/wire/wire.min.js");
+
+            wireCompatSource = getSource("aura/resources/wire/wire_compat.js");
+            wireCompatMinSource = getSource("aura/resources/wire/wire_compat.min.js");
+
+            wireProdDebugSource = getSource("aura/resources/wire/wire_debug.js");
+            wireCompatProdDebugSource = getSource("aura/resources/wire/wire_compat_debug.js");
+
             compatHelpersSource = getSource("aura/resources/compat-helpers/compat.js");
             compatHelpersMinSource = getSource("aura/resources/compat-helpers/compat.min.js");
         }  catch (MalformedURLException e) {}
 
-        if (engineSource != null) {
-            this.engine = engineSource;
+        String iifeBegin = "(function getModuleGlobals(window){\n";
+        String iifeEnd = "}).call(Aura, window);\n";
+        if (engineSource != null && wireSource != null) {
+            this.engine = iifeBegin
+                    + engineSource
+                    + wireSource
+                    + iifeEnd;
         }
 
-        if (engineMinSource != null) {
-            this.engineMin = engineMinSource;
+        if (engineMinSource != null && wireMinSource != null) {
+            this.engineMin = iifeBegin
+                    + engineMinSource
+                    + wireMinSource
+                    + iifeEnd;
         }
 
-        if (compatHelpersSource != null && engineCompatSource != null) {
-            this.engineCompat = compatHelpersSource + "\n" + engineCompatSource;
+        if (compatHelpersSource != null && engineCompatSource != null && wireCompatSource != null) {
+            this.engineCompat = compatHelpersSource
+                    + "\n"
+                    + iifeBegin
+                    + engineCompatSource
+                    + wireCompatSource
+                    + iifeEnd;
         }
 
-        if (compatHelpersMinSource != null && engineCompatMinSource != null) {
-            this.engineCompatMin = compatHelpersMinSource + "\n" + engineCompatMinSource;
+        if (compatHelpersMinSource != null && engineCompatMinSource != null && wireCompatMinSource != null) {
+            this.engineCompatMin = compatHelpersMinSource
+                    + "\n"
+                    + iifeBegin
+                    + engineCompatMinSource
+                    + wireCompatMinSource
+                    + iifeEnd;
         }
 
-        if (engineProdDebugSource != null) {
-            this.engineProdDebug = engineProdDebugSource;
+        if (engineProdDebugSource != null && wireProdDebugSource != null) {
+            this.engineProdDebug = iifeBegin
+                    + engineProdDebugSource
+                    + wireProdDebugSource
+                    + iifeEnd;
         }
 
-        if (compatHelpersSource != null && engineCompatProdDebugSource != null) {
-            this.engineCompatProdDebug = compatHelpersSource + "\n" + engineCompatProdDebugSource;
+        if (compatHelpersSource != null && engineCompatProdDebugSource != null && wireCompatProdDebugSource != null) {
+            this.engineCompatProdDebug = compatHelpersSource
+                    + "\n"
+                    + iifeBegin
+                    + engineCompatProdDebugSource
+                    + wireCompatProdDebugSource
+                    + iifeEnd;
         }
     }
 

@@ -894,16 +894,15 @@ public class AuraContextImpl implements AuraContext {
                 json.writeMapEntry("fc", 1);
             }
 
-            if (configAdapter.uriAddressableDefsEnabled()) {
-                boolean uriEnabled = true;
-                try {
-                    uriEnabled = !definitionService.hasInterface(appDesc, definitionService.getDefDescriptor("aura:uriDefinitionsDisabled", InterfaceDef.class));
-                } catch (QuickFixException qfe) {
-                    // ignore
-                }
-                if (uriEnabled) {
-                    json.writeMapEntry(Json.ApplicationKey.URIADDRESSABLEDEFINITIONS, 1);
-                }
+            boolean uriAddressableExplicitlyDisabled = false;
+            try {
+                uriAddressableExplicitlyDisabled = definitionService.hasInterface(appDesc, definitionService.getDefDescriptor("aura:uriDefinitionsDisabled", InterfaceDef.class));
+            } catch (QuickFixException qfe) {
+                // ignore
+            }
+
+            if (configAdapter.uriAddressableDefsEnabled() || uriAddressableExplicitlyDisabled) {
+                json.writeMapEntry(Json.ApplicationKey.URIADDRESSABLEDEFINITIONS, uriAddressableExplicitlyDisabled? 0: 1);
             }
             
             json.writeMapEnd();

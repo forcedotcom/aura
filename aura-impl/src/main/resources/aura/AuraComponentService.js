@@ -1915,7 +1915,7 @@ AuraComponentService.prototype.createComponentPrivAsync = function (config, call
     // If we have the definition already, go ahead
     // If we don't have the def and uri-addressable defs is enabled and should use the action.
     // Otherwise use component def loader to bypass the action call
-    if (def || $A.util.getURIDefsState() == null || !$A.util.getURIDefsState().createCmp) {
+    if (def || $A.getContext().getURIDefsState() == null || !$A.getContext().getURIDefsState().createCmp) {
         if (def && !def.hasRemoteDependencies()) {
             this.createComponentPriv(config, callback);
             return;

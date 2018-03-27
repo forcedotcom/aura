@@ -1575,9 +1575,9 @@ Aura.Utils.Util.prototype.apply = function(/* Object|Function */ baseObject, /* 
                 if(deepCopy&&value!=undefined) {//eslint-disable-line eqeqeq
                     var branchValue = null;
                     if (this.isArray(value)) {
-                    	branchValue = baseObject[property] || [];
+                        branchValue = baseObject[property] || [];
                     } else if (this.isPlainObject(value)) {
-                    	branchValue = baseObject[property] || {};
+                        branchValue = baseObject[property] || {};
                     }
                     if (branchValue) {
                         baseObject[property] = this.apply(branchValue, value, forceCopy, deepCopy);
@@ -2490,9 +2490,9 @@ Aura.Utils.Util.prototype.setText = function(node, text) {
  * @export
  */
 Aura.Utils.Util.prototype.postMessage = function(targetWindow, argsArray){
-	if(targetWindow && targetWindow["postMessage"]){
-		targetWindow["postMessage"].apply(targetWindow, argsArray);
-	}
+    if(targetWindow && targetWindow["postMessage"]){
+        targetWindow["postMessage"].apply(targetWindow, argsArray);
+    }
 };
 
 /**
@@ -2531,43 +2531,6 @@ Aura.Utils.Util.prototype.hasSourceURL = function() {
     }
 
     return this.sourceURLsupported;
-};
-
-/**
- * config flags for using uri based definitions
- * @returns {Object} uri defs state object
- * @private
- */
-Aura.Utils.Util.prototype.getURIDefsState = function() {
-    if (this.uriDefsState === undefined) {
-        var state = window.location.search.split("uriDefsState=");
-        if (state.length >= 2 && state[1].length > 0) {
-            this.uriDefsState = JSON.parse(decodeURIComponent(state[1].split("&")[0]));
-        } else if ($A.getContext().isURIAddressableDefsEnabled()) {
-            this.uriDefsState = {};
-        } else {
-            this.uriDefsState = null;
-            return this.uriDefsState;
-        }
-
-        if (this.uriDefsState["createCmp"] === undefined) {
-            this.uriDefsState.createCmp = true;
-        } else {
-            this.uriDefsState.createCmp = this.uriDefsState["createCmp"];
-        }
-        if (this.uriDefsState["hydration"] === undefined) {
-            this.uriDefsState.hydration = "one";
-        } else {
-            this.uriDefsState.hydration = this.uriDefsState["hydration"];
-        }
-        if (this.uriDefsState["bundleRequests"] === undefined) {
-            this.uriDefsState.bundleRequests = true;
-        } else {
-            this.uriDefsState.bundleRequests = this.uriDefsState["bundleRequests"];
-        }
-    }
-
-    return this.uriDefsState;
 };
 
 /**

@@ -61,7 +61,10 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     if (this.actionPublicCachingEnabled) {
         this.actionPublicCacheKey = config["apck"];
     }
-    this.uriAddressableDefsEnabled = !!config[Json.ApplicationKey.URIADDRESSABLEDEFINITIONS];
+    this.uriAddressableDefsEnabled = config[Json.ApplicationKey.URIADDRESSABLEDEFINITIONS];
+    if (this.uriAddressableDefsEnabled === undefined) {
+        this.uriAddressableDefsEnabled = !!this.getURIDefsStateFromQuery();
+    }
     
     var that = this;
 
@@ -657,4 +660,62 @@ Aura.Context.AuraContext.prototype.isURIAddressableDefsEnabled = function() {
  */
 Aura.Context.AuraContext.prototype.isCompat = function() {
     return this.useCompatSource;
+};
+
+/**
+ * should only be used in AuraContext.
+ * @private
+ */
+Aura.Context.AuraContext.prototype.__setDefaultURIDefsState = function(state) {
+    var newState = {};
+    if (state["createCmp"] === undefined) {
+        newState.createCmp = true;
+    } else {
+        newState.createCmp = state["createCmp"];
+    }
+    if (state["hydration"] === undefined) {
+        newState.hydration = "one";
+    } else {
+        newState.hydration = state["hydration"];
+    }
+    if (state["bundleRequests"] === undefined) {
+        newState.bundleRequests = true;
+    } else {
+        newState.bundleRequests = state["bundleRequests"];
+    }
+    return newState;
+};
+
+/**
+ * @private
+ */
+Aura.Context.AuraContext.prototype.getURIDefsStateFromQuery = function() {
+    var uriDefsState = null;
+    var state = window.location.search.split("uriDefsState=");
+    if (state.length >= 2) {
+        var value = state[1].split("&")[0];
+        if (value.length > 0) {
+            uriDefsState = JSON.parse(decodeURIComponent(value));
+        }
+    }
+    return uriDefsState;
+};
+
+/**
+ * @private
+ */
+Aura.Context.AuraContext.prototype.getURIDefsState = function() {
+    if (this.uriDefsState === undefined) {
+        if (!this.uriAddressableDefsEnabled) {
+            this.uriDefsState = null;
+            return this.uriDefsState;
+        }
+        this.uriDefsState = this.getURIDefsStateFromQuery();
+        if (this.uriAddressableDefsEnabled && this.uriDefsState === null) {
+            this.uriDefsState = {};
+        }
+        this.uriDefsState = this.__setDefaultURIDefsState(this.uriDefsState);
+    }
+
+    return this.uriDefsState;
 };

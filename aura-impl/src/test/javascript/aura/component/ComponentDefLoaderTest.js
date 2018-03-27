@@ -41,11 +41,6 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
                 "getHashCode": function() {
                     return 555555;
                 },
-                "getURIDefsState": function() {
-                    return {
-                        "hydration": "test_hydration_val"
-                    }
-                },
                 "isArray": typeof Array.isArray === "function" ? Array.isArray : function(arg) {
                   return Object.prototype.toString.call(arg) === '[object Array]';
                 },
@@ -67,7 +62,13 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
                 }
             },
             "getContext": function(){
-                return {"styleContext":{}, getContextPath: function(){return "";}};
+                return {
+                    "styleContext":{},
+                    "getContextPath": function(){return "";},
+                    "getURIDefsState": function() {
+                        return { "hydration": "test_hydration_val" };
+                    }
+               };
             },
             "get": function(thing) {
                 return null;
@@ -285,9 +286,6 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
                         util: {
                             "getHashCode": function() {
                                 return 555555;
-                            },
-                            "getURIDefsState": function() {
-                                return null
                             }
                         },
                         "reportError": reportError,
@@ -297,6 +295,9 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
                                     return "test_type";
                                 } 
                             }
+                        },
+                        "getContext": function() {
+                            return {"getURIDefsState": function() { return null; }}
                         }
                     },
                     //Need to add a ref to itself to handle global defaults
@@ -326,11 +327,6 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
                         util: {
                             "getHashCode": function() {
                                 return 555555;
-                            },
-                            "getURIDefsState": function() {
-                                return {
-                                    "hydration": null
-                                }
                             }
                         },
                         "reportError": reportError,
@@ -340,6 +336,9 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
                                     return "test_type";
                                 } 
                             }
+                        },
+                        "getContext": function() {
+                            return {"getURIDefsState": function() { return null; }}
                         }
                     },
                     //Need to add a ref to itself to handle global defaults

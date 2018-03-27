@@ -935,7 +935,7 @@ Action.prototype.finishAction = function(context) {
 
                 try {
                     if (cb) {
-                        if (this.defDependencies && $A.util.getURIDefsState()) {
+                        if (this.defDependencies && $A.getContext().uriAddressableDefsEnabled) {
                             var that = this;
                             var previousClearComponents = clearComponents;
                             clearComponents = false;

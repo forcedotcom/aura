@@ -99,12 +99,12 @@ Test.Aura.AuraComponentServiceTest = function(){
                     },
                     isFunction:function(obj){
                         return !!obj && Object.prototype.toString.apply(obj) === '[object Function]';
-                    },
-                    getURIDefsState: function() {
-                        return {createCmp:true};
                     }
                 },
                 clientService: {
+                },
+                getContext: function(){
+                	    return {getURIDefsState: function() {return {createCmp:true};}};
                 }
             },
             "Json": {

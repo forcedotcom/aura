@@ -90,18 +90,19 @@ ActionStorage.prototype.populateActionsFilter = function() {
     return this.getAll().then(function(items){
 
         var actionsStoredWithURIDefs = items[that.URI_DEFS_ENABLED_KEY];
-
+        var uriEnabled = $A.getContext().uriAddressableDefsEnabled;
+        
         // actions stored with uri defs enabled are backwards compatible with it disabled.
         // actions stored with uri defs disabled are not compatible with uri defs enabled.
-        if ((!!$A.util.getURIDefsState() !== !!actionsStoredWithURIDefs) &&
+        if ((uriEnabled !== !!actionsStoredWithURIDefs) &&
             (Object.keys(items).length > (actionsStoredWithURIDefs === undefined? 0: 1))) {
 
             $A.warning("Clearing actions db because uri addressable defs state was toggled");
             return that.clear().then(function(){
-                return that.set(that.URI_DEFS_ENABLED_KEY, !!$A.util.getURIDefsState()).then(function(){ return []; });
+                return that.set(that.URI_DEFS_ENABLED_KEY, uriEnabled).then(function(){ return []; });
             });
         } else if (actionsStoredWithURIDefs === undefined){
-            that.set(that.URI_DEFS_ENABLED_KEY, !!$A.util.getURIDefsState());
+            that.set(that.URI_DEFS_ENABLED_KEY, uriEnabled);
         }
         return items;
     });

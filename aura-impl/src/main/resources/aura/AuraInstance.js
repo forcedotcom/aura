@@ -433,7 +433,7 @@ AuraInstance.prototype.initAsync = function(config) {
             return;
         }
 
-        if ($A.util.getURIDefsState()) {
+        if (context.uriAddressableDefsEnabled) {
             Aura.Component.ComponentDefStorage.prototype.useDefStore = false;
         }
 
@@ -533,7 +533,7 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
         // creating context.
         $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
             $A.context = context;
-            if ($A.util.getURIDefsState()) {
+            if (context.uriAddressableDefsEnabled) {
                 Aura.Component.ComponentDefStorage.prototype.useDefStore = false;
             }
             $A.clientService.initDefs();

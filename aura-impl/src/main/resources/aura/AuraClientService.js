@@ -2447,8 +2447,7 @@ AuraClientService.prototype.allDefsExistOnClient = function(actionItem, response
     }
     var deps = response["defDependencies"];
     if ($A.util.isObject(deps)) {
-        var uriDefsEnabled = $A.util.getURIDefsState();
-        if (uriDefsEnabled) {
+        if ($A.getContext().uriAddressableDefsEnabled) {
             for (var dep in deps) {
                 // TODO check on this, type safety in JS is no bueno
                 if ($A.util.isObject(deps[dep])) {

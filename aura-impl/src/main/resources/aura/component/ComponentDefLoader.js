@@ -84,7 +84,7 @@ ComponentDefLoader.prototype.buildURILocaleParam = function() {
 };
 
 ComponentDefLoader.prototype.getHydrationState = function() {
-    var defState = $A.util.getURIDefsState();
+    var defState = $A.getContext().getURIDefsState();
     if (defState && defState.hydration) {
         return defState.hydration;
     }
@@ -200,7 +200,7 @@ ComponentDefLoader.prototype.buildURIString = function(uri, uid, descriptors) {
 
 ComponentDefLoader.prototype.getScriptPromises = function(descriptorMap) {
     var scriptPromises = [];
-    var defState = $A.util.getURIDefsState();
+    var defState = $A.getContext().getURIDefsState();
     if (defState !== null && defState.bundleRequests) {
         scriptPromises.push(this.setScriptTag(this.buildBundleComponentUri(descriptorMap)));
     } else {

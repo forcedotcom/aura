@@ -44,7 +44,11 @@ public class CSPReporterServlet extends HttpServlet {
     // (or find a way to do it programmatically.)
     public static final String URL = "/_/csp";
 
+    public static final String PATH = "/_/ContentDomainCSP";
+    public static final String PATH_NO_AUTH = "/_/ContentDomainCSPNoAuth";
     public static final String JSON_NAME = "csp-report";
+    public static final String TYPE = "type";
+    public static final String REPORT_TYPE = "lightning";
 
     public static final String BLOCKED_URI = "blocked-uri";
     public static final String COLUMN_NUMBER = "column-number";

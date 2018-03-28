@@ -27,6 +27,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.http.CSP.PolicyBuilder;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 
@@ -75,12 +77,13 @@ public class AuraCSPFilter implements Filter {
     public void destroy() {}
 
     protected String getPolicy(String url) {
+        ConfigAdapter configAdapter = Aura.getConfigAdapter();
         PolicyBuilder p = new PolicyBuilder();
         p.connect_src(CSP.SELF)
             .default_src(CSP.SELF)
             .img_src(CSP.ALL)
             .font_src(CSP.ALL)
-            .report_uri(CSPReporterServlet.URL);
+            .report_uri(configAdapter.getCSPReportUri());
 
         // note that chrome-extensions can cause violations, and we don't generally care.
         if (doesUrlAllowInline(url)) {

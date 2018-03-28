@@ -39,6 +39,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.DefaultContentSecurityPolicy;
@@ -49,6 +50,7 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.expression.PropertyReference;
+import org.auraframework.http.CSPReporterServlet;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.util.AuraImplFiles;
@@ -691,7 +693,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             }
         }
 
-        return new DefaultContentSecurityPolicy(allowInline, cspInliningService);
+        return new DefaultContentSecurityPolicy(allowInline, cspInliningService, this);
     }
 
     public void setContextService(ContextService service) {
@@ -864,4 +866,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public Set<String> getRequiredServices() {
         return Collections.emptySet();
     }
+
+    @Override
+    public String getCSPReportUri(){ return CSPReporterServlet.URL; }
 }

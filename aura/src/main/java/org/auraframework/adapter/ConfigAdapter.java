@@ -239,4 +239,10 @@ public interface ConfigAdapter extends AuraAdapter {
      * @return set of require module services
      */
     Set<String> getRequiredServices();
+
+    /**
+     * CSP Report Uri.
+     * @return the report-uri for CSP directives
+     */
+    String getCSPReportUri();
 }

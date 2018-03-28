@@ -42,12 +42,14 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
 
     private boolean nonCspInlineEnabled;
 
+    private ConfigAdapter configAdapter;
+
     /**
      * Returns the content security report URL.
      */
     @Override
     public String getReportUrl() {
-        return CSPReporterServlet.URL;
+        return configAdapter.getCSPReportUri();
     }
 
     /**
@@ -58,7 +60,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
      */
     @Deprecated
     public DefaultContentSecurityPolicy(boolean inline) {
-        this(inline, Aura.getCspInliningService());
+        this(inline, Aura.getCspInliningService(), Aura.getConfigAdapter());
     }
 
     /**
@@ -66,10 +68,12 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
      *
      * @param inline whether to allow inline script and style. It's better not to, but legacy is what legacy is.
      * @param scriptService inline csp service
+     * @param auraConfigAdapter static reference to config adapter
      */
-    public DefaultContentSecurityPolicy(boolean inline, CSPInliningService scriptService) {
+    public DefaultContentSecurityPolicy(boolean inline, CSPInliningService scriptService, ConfigAdapter auraConfigAdapter) {
         nonCspInlineEnabled = inline;
         cspInliningService = scriptService;
+        configAdapter = auraConfigAdapter;
     }
 
     /**

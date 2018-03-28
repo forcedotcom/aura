@@ -963,7 +963,13 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     @Override
     public boolean hasInterface(DefDescriptor<? extends BaseComponentDef> descriptor, DefDescriptor<InterfaceDef> interfaceDef) throws QuickFixException {
+        if (descriptor == null) {
+            return false;
+        }
         BaseComponentDef def = getDefinition(descriptor);
+        if (def == null) {
+            return false;
+        }
         Set<DefDescriptor<InterfaceDef>> interfaces = def.getInterfaces();
         DefDescriptor<? extends BaseComponentDef> parent = def.getExtendsDescriptor();
         while (interfaces != null && interfaces.size() > 0 || (parent != null)) {
@@ -974,6 +980,9 @@ public class DefinitionServiceImpl implements DefinitionService {
                 break;
             }
             def = getDefinition(parent);
+            if (def == null) {
+                return false;
+            }
             interfaces = def.getInterfaces();
             parent = def.getExtendsDescriptor();
         }

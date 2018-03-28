@@ -15,8 +15,8 @@
  */
 ({
     testInitialValue: {
-        attributes : {value: "2016-01-22T01:00:00.000Z", timezone: 'America/Toronto'},
-        test: function(cmp){
+        attributes : {value: "2016-01-22T01:00:00.000Z", timezone: "America/New_York"},
+        test: function(cmp) {
             $A.test.addWaitForWithFailureMessage(true, function() {
                 var inputDateStr = cmp.find("inputDateTimeHtml").getElement().value;
                 return $A.test.contains(inputDateStr, "2016-01-21T20:00");
@@ -25,37 +25,39 @@
     },
 
     testInitialValueThenClear: {
-        attributes : {value: "2016-01-22T01:00:00.000Z", timezone: 'America/Toronto'},
-        test: [function(cmp){
-            $A.test.addWaitForWithFailureMessage(true, function() {
-                var inputDateStr = cmp.find("inputDateTimeHtml").getElement().value;
-                return $A.test.contains(inputDateStr, "2016-01-21T20:00");
-            }, "Initial value for input was not set properly");
-        }, function (cmp) {
-            cmp.set("v.value", "");
-        }, function(cmp) {
-            $A.test.addWaitForWithFailureMessage(true, function() {
-                var inputDateStr = cmp.find("inputDateTimeHtml").getElement().value;
-                return $A.util.isEmpty(inputDateStr);
-            }, "Dates are not the same and they should be");
-        }]
+        attributes : {value: "2016-01-22T01:00:00.000Z", timezone: "America/New_York"},
+        test: [
+            function(cmp){
+                $A.test.addWaitForWithFailureMessage(true, function() {
+                    var inputDateStr = cmp.find("inputDateTimeHtml").getElement().value;
+                    return $A.test.contains(inputDateStr, "2016-01-21T20:00");
+                }, "Initial value for input was not set properly");
+            }, function (cmp) {
+                cmp.set("v.value", "");
+                $A.test.addWaitForWithFailureMessage(true, function() {
+                    var inputDateStr = cmp.find("inputDateTimeHtml").getElement().value;
+                    return $A.util.isEmpty(inputDateStr);
+                }, "Dates are not the same and they should be");
+            }
+        ]
     },
 
     testStartWithNoValue: {
-        attributes: {value: "", timezone: 'America/Toronto'},
-        test: [function (cmp) {
-            $A.test.addWaitForWithFailureMessage(true, function () {
-                var inputDateStr = cmp.find("inputDateTimeHtml").getElement().value;
-                return $A.util.isEmpty(inputDateStr);
-            }, "Initial value for input was not set properly");
-        }, function (cmp) {
-            cmp.set("v.value", "2016-01-22T01:00:00.000Z");
-        }, function (cmp) {
-            $A.test.addWaitForWithFailureMessage(true, function () {
-                var inputDateStr = cmp.find("inputDateTimeHtml").getElement().value;
-                return $A.test.contains(inputDateStr, "2016-01-21T20:00");
-            }, "Date/Time value is not what it should be");
-        }]
+        attributes: {value: "", timezone: "America/New_York"},
+        test: [
+            function (cmp) {
+                $A.test.addWaitForWithFailureMessage(true, function () {
+                    var inputDateStr = cmp.find("inputDateTimeHtml").getElement().value;
+                    return $A.util.isEmpty(inputDateStr);
+                }, "Initial value for input was not set properly");
+            }, function (cmp) {
+                cmp.set("v.value", "2016-01-22T01:00:00.000Z");
+                $A.test.addWaitForWithFailureMessage(true, function () {
+                    var inputDateStr = cmp.find("inputDateTimeHtml").getElement().value;
+                    return $A.test.contains(inputDateStr, "2016-01-21T20:00");
+                }, "Date/Time value is not what it should be");
+            }
+        ]
     },
 
     testEmptyValue: {

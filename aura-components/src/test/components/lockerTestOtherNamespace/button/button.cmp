@@ -1,0 +1,6 @@
+<aura:component implements="aura:requireLocker">
+    <aura:attribute name="clickText" type="String"/>
+    <span>
+        <button aura:id="xNSButton" id="xNSButton" data-testmarker="xNSButton">Click Text {!v.clickText}</button>
+    </span>
+</aura:component>

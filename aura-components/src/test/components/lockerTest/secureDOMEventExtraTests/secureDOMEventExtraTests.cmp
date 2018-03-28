@@ -1,0 +1,16 @@
+<aura:component implements="aura:requireLocker">
+    <aura:attribute name="handlerCalled" type="Boolean" default="false"/>
+    <aura:attribute name="eventTarget" type="String" default=""/>
+    <aura:attribute name="listData" type="String[]" default="First, Second, Third" />
+
+    <ul onclick="{!c.onClickHandler}" class="crossNamespaceButton">
+        <aura:iteration items="{!v.listData}" var="data" indexVar="index">
+            <li data-testmarker="childLi">
+                <!-- Include a cross namespace component which has the button. The button is inaccessible from this component  -->
+                <lockerTestOtherNamespace:button clickText="{!data}"/> <br/>
+                <!-- A button included in markup and accessible from this component-->
+                <button aura:id="button" id="inlineButton" data-testmarker="inlineButton">Click inline button</button>
+            </li>
+        </aura:iteration>
+    </ul>
+</aura:component>

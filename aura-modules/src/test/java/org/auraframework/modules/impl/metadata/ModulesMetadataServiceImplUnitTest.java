@@ -20,7 +20,6 @@ import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.root.component.ModuleDefImpl;
 import org.auraframework.impl.source.file.FileSource;
 import org.auraframework.modules.impl.metadata.xml.ApiVersionElementHandler;
-import org.auraframework.modules.impl.metadata.xml.DescriptionElementHandler;
 import org.auraframework.modules.impl.metadata.xml.ExposeElementHandler;
 import org.auraframework.modules.impl.metadata.xml.MinApiVersionElementHandler;
 import org.auraframework.modules.impl.metadata.xml.ModuleMetadataXMLHandler;
@@ -49,14 +48,13 @@ public class ModulesMetadataServiceImplUnitTest {
                     "  <isExposed>   true</isExposed>" +
                     "  <apiVersion>  42.0</apiVersion>" +
                     "  <minApiVersion>  41.0</minApiVersion>" +
-                    " <requireLocker>true</requireLocker>  \n" +
-                    " <support>gA</support>  \n" +
-                    "    <description> My cool test component that does cool things.   </description>\n" +
-                    "<tags>" +
-                    " <tag>random__tag  </tag>" +
-                    "  <tag>  bob__tag  </tag> " +
-                    "   <tag>  home__tag</tag>\n" +
-                    "</tags>" +
+                    "  <requireLocker>true</requireLocker>  \n" +
+                    "  <support>gA</support>  \n" +
+                    "  <tags>" +
+                    "      <tag>random__tag  </tag>" +
+                    "      <tag>  bob__tag  </tag> " +
+                    "      <tag>  home__tag</tag>\n" +
+                    "  </tags>" +
                 "</LightningComponentBundle>";
 
         FileSource xmlSource = mock(FileSource.class);
@@ -82,7 +80,6 @@ public class ModulesMetadataServiceImplUnitTest {
         assertEquals("should have 3 tags", 3, moduleDef.getTags().size());
         assertTrue("should contain home__tag", moduleDef.getTags().contains("home__tag"));
         assertEquals("should be SupportLevel GA", SupportLevel.GA, moduleDef.getSupport());
-        assertTrue("should have description", !moduleDef.getDescription().isEmpty());
     }
 
     @Test
@@ -266,7 +263,6 @@ public class ModulesMetadataServiceImplUnitTest {
         xmlHandlers.add(new MinApiVersionElementHandler());
         xmlHandlers.add(new RequireLockerElementHandler());
         xmlHandlers.add(new SupportElementHandler());
-        xmlHandlers.add(new DescriptionElementHandler());
 		return xmlHandlers;
 	}
 

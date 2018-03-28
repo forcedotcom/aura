@@ -30,6 +30,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDesignDef;
+import org.auraframework.def.module.impl.ModuleDesignDefImpl;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.PlatformDefImpl;
@@ -288,6 +289,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private Boolean requireLocker = false;
         private ModuleDesignDef moduleDesignDef = null;
         private Set<String> validTags = Collections.emptySet();
+        private ModuleDesignDefImpl.Builder designBuilder;
 
         public Builder() {
             super(ModuleDef.class);
@@ -339,8 +341,18 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
             return this.tags;
         }
 
+        public ModuleDesignDefImpl.Builder getDesignBuilder() {
+            if (this.designBuilder == null) {
+                this.designBuilder = new ModuleDesignDefImpl.Builder();
+            }
+            return this.designBuilder;
+        }
+
         @Override
         public ModuleDef build() throws QuickFixException {
+            if (designBuilder != null) {
+                setModuleDesignDef(designBuilder.build());
+            }
             return new ModuleDefImpl(this);
         }
     }

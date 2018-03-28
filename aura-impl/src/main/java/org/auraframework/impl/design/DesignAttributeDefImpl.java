@@ -195,9 +195,8 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
         ComponentDef cmp = definitionService.getDefinition(getParentDescriptor().getQualifiedName(),ComponentDef.class);
         AttributeDef attr = cmp.getAttributeDef(getName());
         if (attr == null || !attr.getName().equals(getName())) {
-        	throw new InvalidDefinitionException("The design file contains attribute '"+getName()+"' but the component doesn't.", getLocation());
+            throw new InvalidDefinitionException("The design file contains attribute '"+getName()+"' but the component doesn't.", getLocation());
         }
-
         TypeDef attrType = attr.getTypeDef();
         if(!isInInternalNamespace && getDataSource() != null){
             if(!VALID_DATASOURCE_ATTRIBUTE_TYPES.contains(attrType.getDescriptor().getDescriptorName().toLowerCase())){

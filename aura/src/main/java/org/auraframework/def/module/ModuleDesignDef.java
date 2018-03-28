@@ -15,28 +15,38 @@
  */
 package org.auraframework.def.module;
 
-import java.util.Map;
+import java.io.Serializable;
 
 /**
  * ModuleDesignDef is java representation of the  
- * design configuration specified in <tagConfigs> </tagConfigs> tags 
- * in -meta.xml file of raptor component bundle.
+ * design configuration specified in -meta.xml
+ * in a LWC component bundle.
  */
-public interface ModuleDesignDef extends DesignElementDef {
+public interface ModuleDesignDef extends Serializable {
 
     /**
-     * Returns all the design configurations in the -meta.xml
-     * @return Map of configuration with tagName/elementName as the key and ModuleDesignConfig {@link ModuleDesignConfig} as the value.
-     * The map can be empty when no configurations are available. 
-     * @link 
+     * Returns the component masterLabel within <masterLabel></masterLabel>in the -meta.xml
+     * @return masterLabel
      */
-    public Map<String, ModuleDesignConfig> getConfigs();
+    public String getLabel();
+
+    /**
+     * Returns the component description within <description></description>in the -meta.xml
+     * @return description
+     */
+    public String getDescription();
+
+    /**
+     * Returns all the design configurations with in <tagConfigs></tagConfigs>in the -meta.xml
+     * @return TagConfigs {@link TagConfigs}
+     */
+    public TagConfigs getConfigs();
 
     /**
      * Gets design configuration for given tag specified in <tagConfig> </tagConfig>
      * @param tagName String - represents a tag , ex - lightning__recordHome
-     * @return config for the given tag if present , null otherwise.
+     * @return {@link TagConfig}  for the given tag if present , null otherwise.
      */
-    public ModuleDesignConfig getConfig(String tagName);
+    public TagConfig getConfig(String tagName);
 
 }

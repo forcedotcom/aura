@@ -18,6 +18,7 @@ package org.auraframework.modules.impl.metadata;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.module.impl.ModuleDesignDefImpl;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.factory.XMLParserBase;
 import org.auraframework.impl.root.component.ModuleDefImpl.Builder;

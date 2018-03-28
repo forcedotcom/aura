@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-03-21
- * Version: 0.3.26
+ * Generated: 2018-03-27
+ * Version: 0.3.28
  */
 
 (function (exports) {
@@ -26,6 +26,7 @@ const FUNCTION = { type: 'function' };
 const FUNCTION_TRUST_RETURN_VALUE = { type: 'function', trustReturnValue: true };
 const EVENT = { type: '@event' };
 const SKIP_OPAQUE = { skipOpaque: true };
+const SKIP_OPAQUE_ASCENDING = { skipOpaque: true, propertyName: 'parentNode' };
 const FUNCTION_RAW_ARGS = { type: 'function', rawArguments: true };
 
 const CTOR = { type: '@ctor' };
@@ -1441,7 +1442,7 @@ function createFunctionEvaluator(sandbox) {
 function SecureScriptElement() {}
 
 // TODO: this should be removed once Locker has a proper configuration mechanism in place
-const TRUSTED_CORS_DOMAINS = /(\.lightning\.(.*\.)?force|\.salesforce)\.com$/;
+const TRUSTED_DOMAINS = /\.(force|salesforce)\.com$/;
 
 SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
   function getAttributeName(name) {
@@ -1641,10 +1642,7 @@ SecureScriptElement.run = function(st) {
   // TODO: this should be revisited once Locker has a proper configuration mechanism
   const normalized = document.createElement('a');
   normalized.href = scriptUrl;
-  if (
-    window.location.hostname !== normalized.hostname &&
-    normalized.hostname.match(TRUSTED_CORS_DOMAINS)
-  ) {
+  if (normalized.hostname.match(TRUSTED_DOMAINS)) {
     xhr.withCredentials = true;
   }
 
@@ -2140,8 +2138,10 @@ const lsProxyFormatter = {
  * Under console, select "Enable custom formatters"
  * For more information, https://docs.google.com/document/d/1FTascZXT9cxfetuPRT2eXPQKXui4nWFivUnS_335T3U/preview
  */
-window.devtoolsFormatters = window.devtoolsFormatters || [];
-window.devtoolsFormatters.push(lsProxyFormatter);
+if (typeof window !== 'undefined') {
+  window.devtoolsFormatters = window.devtoolsFormatters || [];
+  window.devtoolsFormatters.push(lsProxyFormatter);
+}
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -3630,13 +3630,13 @@ function SecureElement(el, key) {
       tagNameSpecificConfig['innerText'] = {
         get: function() {
           /*
-                     * innerText changes it's return value based on style and whether the element is live in
-                     * the DOM or not. This implementation does not account for that and simply returns the
-                     * innerText of the cloned node. This may cause subtle differences, such as missing newlines,
-                     * from the original implementation.
-                     *
-                     * https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#Differences_from_innerText
-                     */
+           * innerText changes it's return value based on style and whether the element is live in
+           * the DOM or not. This implementation does not account for that and simply returns the
+           * innerText of the cloned node. This may cause subtle differences, such as missing newlines,
+           * from the original implementation.
+           *
+           * https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#Differences_from_innerText
+           */
           const rawEl = SecureObject.getRaw(this);
           const filtered = cloneFiltered(rawEl, o);
           const ret = filtered.innerText;
@@ -3826,6 +3826,15 @@ function SecureElement(el, key) {
     prototypes.set(tagName, prototypeInfo);
   }
 
+  /*
+   * Additional checks for <object> and <embed> tag, restrict access to browser navigation and
+   * browser interaction APIs
+   * https://help.adobe.com/en_US/ActionScript/3.0_ProgrammingAS3/WS1EFE2EDA-026D-4d14-864E-79DFD56F87C6.html#WS5b3ccc516d4fbf351e63e3d118a9b90204-7c5b
+   */
+  if (tagName === 'OBJECT' || tagName === 'EMBED') {
+    el.setAttribute('allowNetworking', 'internal');
+  }
+
   o = Object.create(prototypeInfo.prototype);
 
   if (prototypeInfo.expandoCapturingHandler) {
@@ -3848,8 +3857,11 @@ SecureElement.isValidAttributeName = function(raw, name, prototype, caseInsensit
     return false;
   }
 
+  const lcName = name.toLowerCase();
+  const tagName = raw.tagName && raw.tagName.toUpperCase();
+
   // Reason: [W-4210397] Locker does not allow setting custom HTTP headers.
-  if (raw.tagName === 'META' && name.toLowerCase() === 'http-equiv') {
+  if (tagName === 'META' && lcName === 'http-equiv') {
     return false;
   }
 
@@ -3862,8 +3874,11 @@ SecureElement.isValidAttributeName = function(raw, name, prototype, caseInsensit
     return true;
   }
 
-  // Allow SVG elements free reign
   if (raw instanceof SVGElement) {
+    // Reason: [W-4552994] Window access via svg use element
+    if (tagName === 'USE' && ['href', 'xlink:href'].includes(lcName)) {
+      return false;
+    }
     return true;
   }
 
@@ -3873,12 +3888,12 @@ SecureElement.isValidAttributeName = function(raw, name, prototype, caseInsensit
 
   // Special case Label element's 'for' attribute. It called 'htmlFor' on prototype but
   // needs to be addressable as 'for' via accessors like .attributes/getAttribute()/setAtribute()
-  if (raw.tagName === 'LABEL' && name.toLowerCase() === 'for') {
+  if (tagName === 'LABEL' && lcName === 'for') {
     return true;
   }
 
   // Special case Meta element's custom 'property' attribute. It used by the Open Graph protocol.
-  if (raw.tagName === 'META' && name.toLowerCase() === 'property') {
+  if (tagName === 'META' && lcName === 'property') {
     return true;
   }
 
@@ -4379,7 +4394,6 @@ function evaluate(src, key, sourceURL) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 function SecureDOMEvent(event, key) {
   assert$1.invariant(event, 'Wrapping an undefined event is prohibited.');
   let o = getFromCache(event, key);
@@ -4398,7 +4412,7 @@ function SecureDOMEvent(event, key) {
   const DOMEventSecureDescriptors = {
     // Events properties that are DOM Elements were compiled from
     // https://developer.mozilla.org/en-US/docs/Web/Events
-    target: SecureObject.createFilteredProperty(o, event, 'target'),
+    target: SecureObject.createFilteredProperty(o, event, 'target', SKIP_OPAQUE_ASCENDING),
     currentTarget: SecureObject.createFilteredProperty(o, event, 'currentTarget'),
 
     initEvent: SecureObject.createFilteredMethod(o, event, 'initEvent'),
@@ -5441,10 +5455,10 @@ const KEY_TO_NAMED_NODE_MAP_HANLDER = typeof Map !== 'undefined' ? new Map() : u
 function getFilteredNamedNodeMap(raw, key, prototype, caseInsensitiveAttributes) {
   const filtered = {};
 
-  for (let n = 0; n < raw.length; n++) {
+  for (let n = 0, i = 0; n < raw.length; n++) {
     const value = raw[n];
     if (SecureElement.isValidAttributeName(raw, value.name, prototype, caseInsensitiveAttributes)) {
-      filtered[n] = value;
+      filtered[i++] = value;
     }
   }
 
@@ -5745,14 +5759,16 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
   descriptor.get = function() {
     let value = raw[propertyName];
 
-    // Continue from the current object until we find an acessible object.
+    // Continue from the current object until we find an accessible object.
     if (options && options.skipOpaque === true) {
+      // skipping opaque elements and traversing up the dom tree, eg: event.target
+      const accesorProperty = options.propertyName || propertyName;
       while (value) {
         const hasAccess$$1 = hasAccess(st, value);
         if (hasAccess$$1 || SecureElement.isSharedElement(value)) {
           break;
         }
-        value = value[propertyName];
+        value = value[accesorProperty];
       }
     }
 
@@ -6999,7 +7015,7 @@ function SecureMutationObserver(key) {
     return filtered;
   }
 
-  // Create a new closure constructor for new XHMLHttpRequest() syntax support that captures the key
+  // Create a new closure constructor for new MutationObserver() syntax support that captures the key
   return function(callback) {
     const o = Object.create(null);
 
@@ -7516,7 +7532,7 @@ const metadata$$1 = {
       DOMError: FUNCTION,
       DOMException: FUNCTION,
       DOMImplementation: FUNCTION,
-      DOMParser: RAW,
+      // DOMParser: RAW, W-4844851
       DOMStringList: FUNCTION,
       DOMStringMap: FUNCTION,
       DOMTokenList: FUNCTION,
@@ -8067,14 +8083,6 @@ function SecureWindow(sandbox, key) {
         return o;
       }
     },
-    localStorage: {
-      enumerable: true,
-      value: SecureStorage(win.localStorage, 'LOCAL', key)
-    },
-    sessionStorage: {
-      enumerable: true,
-      value: SecureStorage(win.sessionStorage, 'SESSION', key)
-    },
     MutationObserver: {
       enumerable: true,
       value: SecureMutationObserver(key)
@@ -8160,6 +8168,19 @@ function SecureWindow(sandbox, key) {
       }
     })
   );
+
+  if ('localStorage' in win) {
+    Object.defineProperty(o, 'localStorage', {
+      enumerable: true,
+      value: SecureStorage(win.localStorage, 'LOCAL', key)
+    });
+  }
+  if ('sessionStorage' in win) {
+    Object.defineProperty(o, 'sessionStorage', {
+      enumerable: true,
+      value: SecureStorage(win.sessionStorage, 'SESSION', key)
+    });
+  }
 
   if ('FormData' in win) {
     let formDataValueOverride;
@@ -9250,6 +9271,9 @@ function windowAddPropertiesHook(st, raw, key) {
       }
     });
     SecureObject.addUnfilteredPropertyIfSupported(st, raw, 'MediaStream');
+    // DOMParser and document.implementation is not currently supported in Locker due to W-4437359
+    // enable only for RTC namespace until a better solution arises.
+    SecureObject.addUnfilteredPropertyIfSupported(st, raw, 'DOMParser');
   }
 }
 

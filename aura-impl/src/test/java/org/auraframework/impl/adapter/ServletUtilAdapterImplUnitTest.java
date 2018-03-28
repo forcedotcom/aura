@@ -660,6 +660,19 @@ public class ServletUtilAdapterImplUnitTest {
     }
 
     @Test
+    public void testSetLongCachePrivate() throws Exception {
+        ServletUtilAdapterImpl servletUtilAdapter = new ServletUtilAdapterImpl();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        servletUtilAdapter.setLongCachePrivate(response);
+
+        String expectedVary = Arrays.asList("Accept-Encoding").toString();
+        Assert.assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
+        String expectedCacheControl = "[" + String.join(",", Arrays.asList("max-age=3888000", "private", "immutable")) + "]";
+        Assert.assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
+    }
+
+    @Test
     public void testSetShortCache() throws Exception {
         ServletUtilAdapterImpl servletUtilAdapter = new ServletUtilAdapterImpl();
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -669,6 +682,19 @@ public class ServletUtilAdapterImplUnitTest {
         String expectedVary = Arrays.asList("Accept-Encoding").toString();
         Assert.assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
         String expectedCacheControl = "[" + String.join(",", Arrays.asList("max-age=86400", "public")) + "]";
+        Assert.assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
+    }
+
+    @Test
+    public void testSetShortCachePrivate() throws Exception {
+        ServletUtilAdapterImpl servletUtilAdapter = new ServletUtilAdapterImpl();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        servletUtilAdapter.setShortCachePrivate(response);
+
+        String expectedVary = Arrays.asList("Accept-Encoding").toString();
+        Assert.assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
+        String expectedCacheControl = "[" + String.join(",", Arrays.asList("max-age=86400", "private")) + "]";
         Assert.assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
     }
 

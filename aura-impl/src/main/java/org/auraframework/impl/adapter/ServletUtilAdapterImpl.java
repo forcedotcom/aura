@@ -738,6 +738,19 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     /**
+     * Set a long cache timeout and proxy cache setting.
+     *
+     * This sets headers like the setLongCache method.  But it also setting proxy the proxy cache definition for the request.
+     *
+     * @param response the HTTP response to which we will add headers.
+     * @param cacheAtProxy if true, response will be cached by the proxy
+     */
+    @Override
+    public void setLongCachePrivate(HttpServletResponse response) {
+        setCacheTimeoutPriv(response, LONG_EXPIRE, true, "private");
+    }
+
+    /**
      * Set a 'short' cache timeout.
      *
      * This sets several headers to try to ensure that the page will be cached for a shortish length of time. Of note is
@@ -748,6 +761,19 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     @Override
     public void setShortCache(HttpServletResponse response) {
         this.setCacheTimeout(response, SHORT_EXPIRE, false);
+    }
+
+    /**
+     * Set a 'short' cache timeout and proxy cache setting.
+     *
+     * This sets headers like the setShortCache method. But it also setting proxy the proxy cache definition for the request.
+     *
+     * @param response the HTTP response to which we will add headers.
+     * @param cacheAtProxy if true, response will be cached by the proxy
+     */
+    @Override
+    public void setShortCachePrivate(HttpServletResponse response) {
+        setCacheTimeoutPriv(response, SHORT_EXPIRE, false, "private");
     }
 
     /**
@@ -762,8 +788,12 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     @Override
     public void setCacheTimeout(HttpServletResponse response, long expiration, boolean immutable) {
+        setCacheTimeoutPriv(response, expiration, immutable, "public");
+    }
+
+    private void setCacheTimeoutPriv(HttpServletResponse response, long expiration, boolean immutable, String proxyCacheSetting) {
         response.setHeader(HttpHeaders.VARY, "Accept-Encoding");
-        String cacheHeader = String.format("max-age=%s,public", expiration / 1000);
+        String cacheHeader = String.format("max-age=%s,%s", expiration / 1000, proxyCacheSetting);
         if (immutable) {
             cacheHeader += ",immutable";
         }

@@ -201,7 +201,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             }
 
 
-            servletUtilAdapter.setLongCache(response);
+            servletUtilAdapter.setLongCachePrivate(response);
         } catch (Exception e) {
             PrintWriter out = response.getWriter();
             if (requestedUID!=null) {

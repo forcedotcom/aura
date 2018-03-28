@@ -219,15 +219,25 @@ public interface ServletUtilAdapter extends AuraAdapter {
     void setShortCache(HttpServletResponse response);
 
     /**
+     * Set a page to be cached for a 'short' period and define if request will be cached on the proxy.
+     */
+    void setShortCachePrivate(HttpServletResponse response);
+
+    /**
      * Set a page to cache for a 'long' time.
      */
     void setLongCache(HttpServletResponse response);
 
     /**
+     * Set a page to cache for a 'long' time and define if request will be cached on the proxy.
+     */
+    void setLongCachePrivate(HttpServletResponse response);
+
+    /**
      * Set cache timeout for a resource in milliseconds.
      */
     void setCacheTimeout(HttpServletResponse response, long expiration, boolean immutable);
-
+    
     /**
      * are we in production mode?
      */

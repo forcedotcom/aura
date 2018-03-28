@@ -318,7 +318,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
             compatHelpersMinSource = getSource("aura/resources/compat-helpers/compat.min.js");
         }  catch (MalformedURLException e) {}
 
-        String iifeBegin = "(function getModuleGlobals(window){\n";
+        String iifeBegin = "\"undefined\"===typeof Aura&&(Aura={});(function getModuleGlobals(window){\n";
         String iifeEnd = "}).call(Aura, window);\n";
         if (engineSource != null && wireSource != null) {
             this.engine = iifeBegin

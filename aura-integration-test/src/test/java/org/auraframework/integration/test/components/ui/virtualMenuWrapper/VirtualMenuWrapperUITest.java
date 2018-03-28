@@ -55,7 +55,7 @@ public class VirtualMenuWrapperUITest extends WebDriverTestCase {
     public void testFocusAfterEnterOpenMenu() throws Exception {
         open(TEST_CMP);
         String menuSel = MENU_WITH_TRIGGER_LABEL_SEL;
-        String focusSel = menuSel + " " + MENU_ITEM_SEL;
+        String focusSel = menuSel + " a";
         testTriggerAndFocus(menuSel, focusSel, trigger -> trigger.sendKeys(Keys.ENTER));
     }
     
@@ -63,7 +63,7 @@ public class VirtualMenuWrapperUITest extends WebDriverTestCase {
     public void testFocusAfterClickOpenMenu() throws Exception {
         open(TEST_CMP);
         String menuSel = MENU_WITH_TRIGGER_LABEL_SEL;
-        String focusSel = menuSel + " " + MENU_ITEM_SEL;
+        String focusSel = menuSel + " a";
         testTriggerAndFocus(menuSel, focusSel, trigger -> trigger.click());
     }
 

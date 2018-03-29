@@ -569,7 +569,7 @@ InteropComponent.prototype.afterRender = function () {
     // check assumes that we can safely swap when we have a parent element.
     // It's not clear that this check is necessary as there were no comments
     // talking about any specific scenarios. Leaving it in to be safe.
-    if (element.parentElement) {
+    if (element && element.parentElement) {
         this.swapInteropElement(element, this._customElement);
         return;
     }
@@ -578,7 +578,16 @@ InteropComponent.prototype.afterRender = function () {
     if (owner) {
         var handleValueRenderOnce = function () {
             owner.removeEventHandler('markup://aura:valueRender', handleValueRenderOnce);
-            this.swapInteropElement(element, this._customElement);
+            var el = this.elements[0];
+            if (el && el.parentElement) {
+                this.swapInteropElement(el, this._customElement);
+            } else {
+                $A.warning(
+                    'Unexpected situation encountered where the interop component ' +
+                    this.getGlobalId() +
+                    ' never swapped in its custom element due to it missing its parentElement.'
+                );
+            }
         }.bind(this);
         owner.addEventHandler('markup://aura:valueRender', handleValueRenderOnce, 'default');
     }

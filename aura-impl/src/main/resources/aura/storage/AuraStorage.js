@@ -328,7 +328,7 @@ AuraStorage.prototype.get = function(key, includeExpired) {
  * @export
  */
 AuraStorage.prototype.inFlightOperations = function() {
-    return this.operationsInFlight;
+    return this.operationsInFlight + this.queue.length;
 };
 
 

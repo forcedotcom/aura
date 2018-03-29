@@ -49,19 +49,6 @@
         content.set("v.body", newBody, ignoreChanges);
     },
 
-    isIframeReloaded: function() {
-        // Some tests are aware that we are sub-optimal: facet reordering causes a reload of all
-        // iframes because the reinsertion of DOM elements will create a reload. Both IE7/IE8 had
-        // the right behavior, and this will probably be fixed in FF soon, so we expect different
-        // results on diffewrent browsers. The specs are ambiguous:
-        //
-        // "When an iframe element is inserted into a document that has a browsing context, the user
-        // agent must create a nested browsing context, and then process the iframe attributes for the "first time".
-        // https://html.spec.whatwg.org/multipage/embedded-content.html#the-iframe-element
-
-        return ! $A.get("$Browser.isIE8");
-    },
-
     /**
      * Check that all iFrames are done loading.
      */
@@ -86,7 +73,6 @@
                 $A.test.assertEquals(values.length, nodes.length, message + ": invalid component count");
 
                 for (var n = 0; n < nodes.length; n++) {
-
                     //
                     // If a number is provided for a row, we assume render=1, rerender=onload=1, unrender=0, onload=1
                     // which is the normal case.
@@ -116,7 +102,7 @@
         test: [
             function(component) {
                 this.createComponents(component, 4, function(body, newCmps) {
-                	return body.concat(newCmps);
+                    return body.concat(newCmps);
                 });
             },
             function(component) {
@@ -309,7 +295,7 @@
                 });
             },
             function(component) {
-                var expected = this.isIframeReloaded() ? ["41202","21202","31202","11202"] : ["41101","21101","31101","11101"];
+                var expected = ["41202","21202","31202","11202"];
                 this.assertComponents(component, expected, "Swapped 1st and 4rd components");
             }
         ]
@@ -328,7 +314,7 @@
                 });
             },
             function(component) {
-                var expected = this.isIframeReloaded() ? ["11202","31202","21202","41202"] : ["11101","31101","21101","41101"];
+                var expected = ["11202","31202","21202","41202"];
                 this.assertComponents(component, expected, "Swapped 2nd and 3rd components");
             }
         ]
@@ -347,7 +333,7 @@
                 });
             },
             function(component) {
-                var expected = this.isIframeReloaded() ? ["21202","11202","31202","41202"] : ["21101","11101","31101","41101"];
+                var expected = ["21202","11202","31202","41202"];
                 this.assertComponents(component, expected, "Swapped 1st and 2nd components");
             }
         ]
@@ -366,7 +352,7 @@
                 });
             },
             function(component) {
-                var expected = this.isIframeReloaded() ? ["11202","21202","41202","31202"] : ["11101","21101","41101","31101"];
+                var expected = ["11202","21202","41202","31202"];
                 this.assertComponents(component, expected, "Swapped 3rd and 4th components");
             }
         ]

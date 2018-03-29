@@ -231,17 +231,22 @@ ComponentDefLoader.prototype.retrievePending = function(pending) {
             that.loading--;
         }
     }, function(e){
-        try {
-            for (var j = 0, p_length = pending.callbacks.length; j < p_length; j++) {
-                // TODO: all callbacks get the error if only one errors?
+        for (var j = 0, p_length = pending.callbacks.length; j < p_length; j++) {
+            try {
+                // all callbacks get the error if only one errors, we aren't tracking which def was for which callback
                 pending.callbacks[j](e);
+            } catch (callbackError) {
+                var errorMessage = callbackError.message ? callbackError.message : "Error in callback provided to component creation.";
+                if (e && e.message) {
+                    errorMessage +=  "\nAdditional exception on component load: " + e.message;
+                }
+                $A.reportError(errorMessage, callbackError);
             }
-        } finally {
-            that.loading--;
         }
+        that.loading--;
         if (pending.callbacks.length === 0) {
             // there was no callbacks, the error should still be surfaced
-            $A.reportError(e);
+            $A.reportError("Error loading component definitions", e);
         }
     });
 };

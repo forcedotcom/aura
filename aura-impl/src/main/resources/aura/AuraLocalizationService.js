@@ -205,9 +205,7 @@ AuraLocalizationService.prototype.getDefaultCurrencyFormat = function() {
  * @platform
  */
 AuraLocalizationService.prototype.displayDuration = function(duration, withSuffix) {
-    $A.deprecated("$A.localizationService.displayDuration(): The String from this method are no longer supported. This method will be removed in an upcoming release.",
-                null, "AuraLocalizationService.displayDuration");
-
+    // TODO: figure out if it is possible to support this by using labels
     if (duration.getMomentDuration) {
         duration = duration.getMomentDuration();
     }

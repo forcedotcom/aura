@@ -222,14 +222,16 @@ ComponentDefLoader.prototype.retrievePending = function(pending) {
     var that = this;
 
     Promise.all(scriptPromises).then(function(){
-        try {
-            for (var j = 0, p_length = pending.callbacks.length; j < p_length; j++) {
-                var scope = {idx:j, total:p_length, remaining:p_length-j-1};
+        for (var j = 0, p_length = pending.callbacks.length; j < p_length; j++) {
+            var scope = {idx:j, total:p_length, remaining:p_length-j-1};
+            try {
                 pending.callbacks[j].call(scope);
+            } catch (e) {
+                var errorMessage = e.message ? e.message : "Error in callback provided to component creation.";
+                $A.reportError(errorMessage, e);
             }
-        } finally {
-            that.loading--;
         }
+        that.loading--;
     }, function(e){
         for (var j = 0, p_length = pending.callbacks.length; j < p_length; j++) {
             try {

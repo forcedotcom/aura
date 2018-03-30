@@ -48,7 +48,9 @@ Aura.Event.InteropEvent = function (component, config) {
 
     this._name = event.type || _config['name'] || '';
     this._source = component;
-    this._params = _config['isEvent'] ? event.detail || {} : _config['params'] || {};
+    this._params = _config['isEvent']
+        ? this.buildEventParams($A.componentService.moduleEngine['unwrap'](event.detail) || {})
+        : _config['params'] || {};
 
     // The following three attributes are initialized to fulfill the locker
     // duck test for native event objects
@@ -73,6 +75,25 @@ Aura.Event.InteropEvent = function (component, config) {
             this.exposeNativeEventAPI(this, nativeEvent);
         }
     }
+};
+
+/**
+ * Needed to unwrap Proxies that might come as part of the event.details and wont work on Compat mode.
+ * @private
+ * @param eventDetails
+ */
+Aura.Event.InteropEvent.prototype.buildEventParams = function (eventDetails) {
+    var unwrap = $A.componentService.moduleEngine['unwrap'];
+    var evtDetails = {};
+    var objKeys = Object.keys(eventDetails);
+    var key;
+
+    for (var i = 0, n = objKeys.length; i < n; i++) {
+        key = objKeys[i];
+        evtDetails[key] = unwrap(eventDetails[key]);
+    }
+
+    return evtDetails;
 };
 
 /**

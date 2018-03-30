@@ -25,4 +25,10 @@
         event.preventDefault();
         event.stopPropagation();
     },
+    handleEventWithDetails : function (cmp, event) {
+        cmp.set('v.value', event.getParam('v'));
+    },
+	handleEventWithDetailsAsProxy: function (cmp, event) {
+		cmp.set('v.value', event.getParams());
+	},
 })

@@ -1,6 +1,8 @@
 import { Element, api, track } from "engine";
 
 export default class InteropEvent extends Element {
+    @api value;
+    @api detailsAsProxy;
     @api removeCallback;
     @api clickHandler;
     @track removePrevented = '';
@@ -27,4 +29,17 @@ export default class InteropEvent extends Element {
     handleClickWithCallback(evt) {
         this.clickHandler({ domEvent: evt });
     }
+
+	handleDispatchEventWithDetailsClick() {
+        const evtName = this.detailsAsProxy ? 'eventtwithdetailsasproxy' : 'eventtwithdetails';
+        const detail = this.detailsAsProxy ? this.value :  { v: this.value, };
+
+        const evt = new CustomEvent(evtName, {
+            composed: false,
+            bubbles: false,
+            detail,
+		});
+
+		this.dispatchEvent(evt);
+	}
 }

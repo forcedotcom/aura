@@ -2,6 +2,7 @@
     <aura:attribute name="method" type="String" default=""/>
     <aura:attribute name="methodCallError" type="String" default=""/>
     <aura:attribute name="ids" type="Object" default=""/>
+    <aura:attribute name="value" type="Object" default=""/>
     <aura:attribute name="evtName" type="String" default=""/>
     <aura:attribute name="errorAction" type="Integer" default="0"/>
 
@@ -25,5 +26,14 @@
                              onremove="{!c.handleRemoveCustomEvent}"
                              removeCallback="{!c.handleRemoveCallback}"
                              clickHandler="{!c.handleRemoveCallback}"
+    />
+    <moduleTest:interopEvent aura:id="eventWithDetails"
+                             value="{!v.value}"
+                             oneventtwithdetails="{!c.handleEventWithDetails}"
+    />
+    <moduleTest:interopEvent aura:id="eventWithDetailsAsProxy"
+                             value="{!v.value}"
+                             detailsAsProxy="true"
+                             oneventtwithdetailsasproxy="{!c.handleEventWithDetailsAsProxy}"
     />
 </aura:component>

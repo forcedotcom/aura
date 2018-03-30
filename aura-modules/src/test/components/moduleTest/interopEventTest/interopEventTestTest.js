@@ -3,7 +3,8 @@
         removeBtn : '#remove-btn',
         removeWithCallbackBtn : '#remove-with-callback-btn',
         onClickWithCallbackBtn : '#onclick-with-callback-btn',
-        removePrevented : '#remove-prevented'
+        removePrevented : '#remove-prevented',
+        evtWithDetails : '#onclick-dispatch-evt-with-details-btn'
     },
     assertMethodThrowError: function (cmp, method) {
         var interopCmp = cmp.find('errorTest');
@@ -126,4 +127,50 @@
             },
         ]
     },
+	testUnwrapEventDetailFromRaptorComponent: {
+        // this is specifically for ie11
+		test: [
+			function (cmp) {
+		        cmp._valueObject = {
+		            prop1: 'value1',
+		            prop2: 'value2',
+
+                }
+                cmp.set('v.value', cmp._valueObject);
+				var interopCmp = cmp.find('eventWithDetails');
+				var triggerEvtBtn = interopCmp.getElement().querySelector(this.selector.evtWithDetails);
+
+				triggerEvtBtn.click();
+			},
+			function (cmp) {
+		        var value = cmp._valueObject;
+		        var valueFromEvent = cmp.get('v.value');
+				$A.test.assertEquals(value.prop1, valueFromEvent.prop1, 'it should be able to read correct values from the event.details.');
+				$A.test.assertEquals(value.prop2, valueFromEvent.prop2, 'it should be able to read correct values from the event.details');
+			},
+		]
+	},
+	testUnwrapEventDetailAsProxyFromRaptorComponent: {
+		// this is specifically for ie11
+		test: [
+			function (cmp) {
+				cmp._valueObject = {
+					prop1: 'value1',
+					prop2: 'value2',
+
+				}
+				cmp.set('v.value', cmp._valueObject);
+				var interopCmp = cmp.find('eventWithDetailsAsProxy');
+				var triggerEvtBtn = interopCmp.getElement().querySelector(this.selector.evtWithDetails);
+
+				triggerEvtBtn.click();
+			},
+			function (cmp) {
+				var value = cmp._valueObject;
+				var valueFromEvent = cmp.get('v.value');
+				$A.test.assertEquals(value.prop1, valueFromEvent.prop1, 'it should be able to read correct values from the event.details.');
+				$A.test.assertEquals(value.prop2, valueFromEvent.prop2, 'it should be able to read correct values from the event.details');
+			},
+		]
+	},
 })

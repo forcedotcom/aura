@@ -810,6 +810,10 @@ AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timeZo
     $A.assert(date instanceof Date, "AuraLocalizationService.getDateStringBasedOnTimezone(): 'date' must be a Date object.");
     $A.assert(typeof callback === "function", "AuraLocalizationService.getDateStringBasedOnTimezone(): 'callback' must be a function.");
 
+    if (!this.isValidDate(date)) {
+        return callback("Invalid Date");
+    }
+
     var tz = timeZone ? timeZone : $A.get("$Locale.timezone");
     callback(this.formatDateWithTimeZone(date, tz));
 };
@@ -1454,7 +1458,7 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
         timezone = $A.get("$Locale.timezone");
     }
 
-    if (timezone === "GMT" || timezone === "UTC") {
+    if (timezone === "GMT" || timezone === "UTC" || !this.isValidDate(date)) {
         callback(date);
         return;
     }
@@ -1485,7 +1489,7 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
         timezone = $A.get("$Locale.timezone");
     }
 
-    if (timezone === "GMT" || timezone === "UTC") {
+    if (timezone === "GMT" || timezone === "UTC" || !this.isValidDate(date)) {
         callback(date);
         return;
     }

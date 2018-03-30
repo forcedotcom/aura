@@ -1063,10 +1063,12 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
  };
 
 AuraComponentService.prototype.hasCacheableDefinitionOfAnyType = function(descriptor) {
-    return this.hasModuleDefinition(descriptor) ||
-        this.getComponentDef(descriptor) ||
-        this.hasLibrary(descriptor) ||
-        $A.eventService.getEventDef(descriptor);
+    var desc = this.getDescriptorFromConfig(descriptor);
+    return  !!this.hasModuleDefinition(desc) ||
+            !!this.componentDefRegistry[desc] ||
+            (this.savedComponentConfigs[desc] && Object.keys(this.savedComponentConfigs[desc]).length > 1) ||
+            !!this.hasLibrary(desc) ||
+            !!$A.eventService.getEventDef(desc);
 };
 
 AuraComponentService.prototype.loadComponentDefs = function(descriptorMap, callback) {

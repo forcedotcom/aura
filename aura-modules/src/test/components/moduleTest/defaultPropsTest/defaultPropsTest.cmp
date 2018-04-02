@@ -1,4 +1,4 @@
 <aura:component render="client">
-    <aura:attribute name="disabled" type="Boolean"/>
+    <aura:attribute name="disabled" type="Boolean" />
     <moduleTest:button label="Hello" disabled="{! v.disabled }"/>
 </aura:component>

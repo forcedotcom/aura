@@ -1,6 +1,4 @@
-/**
- * Copyright (C) 2017 salesforce.com, inc.
- */
+/* proxy-compat-disable */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -20,9 +18,6 @@ function isNull(obj) {
 function isTrue(obj) {
     return obj === true;
 }
-function isFalse(obj) {
-    return obj === false;
-}
 function isFunction(obj) {
     return typeof obj === 'function';
 }
@@ -31,6 +26,9 @@ function isObject(obj) {
 }
 function isString(obj) {
     return typeof obj === 'string';
+}
+function isNumber(obj) {
+    return typeof obj === 'number';
 }
 const OtS = {}.toString;
 function toString(obj) {
@@ -132,14 +130,15 @@ function addCallbackToNextTick(callback) {
     ArrayPush.call(nextTickCallbackQueue, callback);
 }
 const CAMEL_REGEX = /-([a-z])/g;
-const attrNameToPropNameMap = create(null);
+/**
+ * This method maps between attribute names
+ * and the corresponding property name.
+ */
 function getPropNameFromAttrName(attrName) {
-    let propName = attrNameToPropNameMap[attrName];
-    if (isUndefined(propName)) {
-        propName = StringReplace.call(attrName, CAMEL_REGEX, (g) => g[1].toUpperCase());
-        attrNameToPropNameMap[attrName] = propName;
+    if (!hasOwnProperty.call(AttrNameToPropNameMap, attrName)) {
+        AttrNameToPropNameMap[attrName] = StringReplace.call(attrName, CAMEL_REGEX, (g) => g[1].toUpperCase());
     }
-    return propName;
+    return AttrNameToPropNameMap[attrName];
 }
 const CAPS_REGEX = /[A-Z]/g;
 /**
@@ -147,20 +146,10 @@ const CAPS_REGEX = /[A-Z]/g;
  * and the corresponding attribute name.
  */
 function getAttrNameFromPropName(propName) {
-    // these are exceptions to the rule that cannot be inferred via `CAPS_REGEX`,
-    switch (propName) {
-        case 'className':
-            return 'class';
-        case 'htmlFor':
-            return 'for';
-        default:
-            // Few more exceptions where the attribute name matches the property in lowercase.
-            if (ArrayIndexOf.call(HTMLPropertyNamesWithLowercasedReflectiveAttributes, propName) >= 0) {
-                propName.toLocaleLowerCase();
-            }
+    if (!hasOwnProperty.call(PropNameToAttrNameMap, propName)) {
+        PropNameToAttrNameMap[propName] = StringReplace.call(propName, CAPS_REGEX, (match) => '-' + match.toLowerCase());
     }
-    // otherwise we do the regular canonical transformation.
-    return StringReplace.call(propName, CAPS_REGEX, (match) => '-' + match.toLowerCase());
+    return PropNameToAttrNameMap[propName];
 }
 // According to the WC spec (https://dom.spec.whatwg.org/#dom-element-attachshadow), certain elements
 // are not allowed to attached a shadow dom, and therefore, we need to prevent setting forceTagName to
@@ -207,19 +196,20 @@ const HTMLPropertyNamesWithLowercasedReflectiveAttributes = [
 // this regular expression is used to transform aria props into aria attributes because
 // that doesn't follow the regular transformation process. e.g.: `aria-labeledby` <=> `ariaLabelBy`
 const ARIA_REGEX = /^aria/;
-function getAriaAttributeName(propName) {
-    return StringToLowerCase.call(StringReplace.call(propName, ARIA_REGEX, 'aria-'));
-}
 function attemptAriaAttributeFallback(vm, attrName) {
     {
         assert.vm(vm);
     }
-    if (hasOwnProperty.call(AOMAttrNameToPropNameMap, attrName)) {
-        vm.hostAttrs[attrName] = undefined; // marking the set is needed for the AOM polyfill
-        const propName = AOMAttrNameToPropNameMap[attrName];
-        const shadowValue = vm.cmpRoot[propName];
-        if (shadowValue !== null) {
-            setAttribute.call(vm.elm, attrName, shadowValue);
+    // if the map is known (because all AOM attributes are known)
+    if (hasOwnProperty.call(AttrNameToPropNameMap, attrName)) {
+        const propName = AttrNameToPropNameMap[attrName];
+        // and if the corresponding prop is an actual AOM property
+        if (hasOwnProperty.call(GlobalAOMProperties, propName)) {
+            vm.hostAttrs[attrName] = undefined; // marking the set is needed for the AOM polyfill
+            const shadowValue = vm.cmpRoot[propName];
+            if (shadowValue !== null) {
+                setAttribute.call(vm.elm, attrName, shadowValue);
+            }
         }
     }
 }
@@ -227,7 +217,7 @@ function attemptAriaAttributeFallback(vm, attrName) {
 // respective default value.
 // https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques
 const GlobalAOMProperties = {
-    ariaAutocomplete: null,
+    ariaAutoComplete: null,
     ariaChecked: null,
     ariaCurrent: null,
     ariaDisabled: null,
@@ -237,11 +227,11 @@ const GlobalAOMProperties = {
     ariaInvalid: null,
     ariaLabel: null,
     ariaLevel: null,
-    ariaMultiline: null,
+    ariaMultiLine: null,
     ariaMultiSelectable: null,
     ariaOrientation: null,
     ariaPressed: null,
-    ariaReadonly: null,
+    ariaReadOnly: null,
     ariaRequired: null,
     ariaSelected: null,
     ariaSort: null,
@@ -253,8 +243,6 @@ const GlobalAOMProperties = {
     ariaRelevant: null,
     ariaAtomic: null,
     ariaBusy: null,
-    ariaDropEffect: null,
-    ariaDragged: null,
     ariaActiveDescendant: null,
     ariaControls: null,
     ariaDescribedBy: null,
@@ -263,152 +251,165 @@ const GlobalAOMProperties = {
     ariaOwns: null,
     ariaPosInSet: null,
     ariaSetSize: null,
+    ariaColCount: null,
+    ariaColIndex: null,
+    ariaDetails: null,
+    ariaErrorMessage: null,
+    ariaKeyShortcuts: null,
+    ariaModal: null,
+    ariaPlaceholder: null,
+    ariaRoleDescription: null,
+    ariaRowCount: null,
+    ariaRowIndex: null,
+    ariaRowSpan: null,
     role: null,
 };
 const OffsetPropertiesError = 'This property will round the value to an integer, and it is considered an anti-pattern. Instead, you can use \`this.getBoundingClientRect()\` to obtain `left`, `top`, `right`, `bottom`, `x`, `y`, `width`, and `height` fractional values describing the overall border-box in pixels.';
 // Global HTML Attributes & Properties
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes
 // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement
-const GlobalHTMLProperties = {
-    id: {
-        attribute: 'id',
-        reflective: true,
-    },
-    accessKey: {
-        attribute: 'accesskey',
-        reflective: true,
-    },
-    accessKeyLabel: {
-        readOnly: true,
-    },
-    className: {
-        attribute: 'class',
-        error: `Using property "className" is an anti-pattern because of slow runtime behavior and conflicting with classes provided by the owner element. Instead use property "classList".`,
-    },
-    contentEditable: {
-        attribute: 'contenteditable',
-        reflective: true,
-    },
-    isContentEditable: {
-        readOnly: true,
-    },
-    contextMenu: {
-        attribute: 'contextmenu',
-    },
-    dataset: {
-        readOnly: true,
-        error: 'Using property "dataset" is an anti-pattern. Components should not rely on dataset to implement its internal logic, nor use that as a communication channel.',
-    },
-    dir: {
-        attribute: 'dir',
-        reflective: true,
-    },
-    draggable: {
-        attribute: 'draggable',
-        experimental: true,
-        reflective: true,
-    },
-    dropzone: {
-        attribute: 'dropzone',
-        readOnly: true,
-        experimental: true,
-    },
-    hidden: {
-        attribute: 'hidden',
-        reflective: true,
-    },
-    itemScope: {
-        attribute: 'itemscope',
-        experimental: true,
-    },
-    itemType: {
-        attribute: 'itemtype',
-        readOnly: true,
-        experimental: true,
-    },
-    itemId: {
-        attribute: 'itemid',
-        experimental: true,
-    },
-    itemRef: {
-        attribute: 'itemref',
-        readOnly: true,
-        experimental: true,
-    },
-    itemProp: {
-        attribute: 'itemprop',
-        readOnly: true,
-        experimental: true,
-    },
-    itemValue: {
-        experimental: true,
-    },
-    lang: {
-        attribute: 'lang',
-        reflective: true,
-    },
-    offsetHeight: {
-        readOnly: true,
-        error: OffsetPropertiesError,
-    },
-    offsetLeft: {
-        readOnly: true,
-        error: OffsetPropertiesError,
-    },
-    offsetParent: {
-        readOnly: true,
-    },
-    offsetTop: {
-        readOnly: true,
-        error: OffsetPropertiesError,
-    },
-    offsetWidth: {
-        readOnly: true,
-        error: OffsetPropertiesError,
-    },
-    properties: {
-        readOnly: true,
-        experimental: true,
-    },
-    spellcheck: {
-        experimental: true,
-        reflective: true,
-    },
-    style: {
-        attribute: 'style',
-        error: `Using property or attribute "style" is an anti-pattern. Instead use property "classList".`,
-    },
-    tabIndex: {
-        attribute: 'tabindex',
-        reflective: true,
-    },
-    title: {
-        attribute: 'title',
-        reflective: true,
-    },
-    translate: {
-        experimental: true,
-    },
-    // additional global attributes that are not present in the link above.
-    role: {
-        attribute: 'role',
-    },
-    slot: {
-        attribute: 'slot',
-        experimental: true,
-        error: `Using property or attribute "slot" is an anti-pattern.`
-    }
-};
+function getGlobalHTMLPropertiesInfo() {
+    return {
+        id: {
+            attribute: 'id',
+            reflective: true,
+        },
+        accessKey: {
+            attribute: 'accesskey',
+            reflective: true,
+        },
+        accessKeyLabel: {
+            readOnly: true,
+        },
+        className: {
+            attribute: 'class',
+            error: `Using property "className" is an anti-pattern because of slow runtime behavior and conflicting with classes provided by the owner element. Instead use property "classList".`,
+        },
+        contentEditable: {
+            attribute: 'contenteditable',
+            reflective: true,
+        },
+        isContentEditable: {
+            readOnly: true,
+        },
+        contextMenu: {
+            attribute: 'contextmenu',
+        },
+        dataset: {
+            readOnly: true,
+            error: 'Using property "dataset" is an anti-pattern. Components should not rely on dataset to implement its internal logic, nor use that as a communication channel.',
+        },
+        dir: {
+            attribute: 'dir',
+            reflective: true,
+        },
+        draggable: {
+            attribute: 'draggable',
+            experimental: true,
+            reflective: true,
+        },
+        dropzone: {
+            attribute: 'dropzone',
+            readOnly: true,
+            experimental: true,
+        },
+        hidden: {
+            attribute: 'hidden',
+            reflective: true,
+        },
+        itemScope: {
+            attribute: 'itemscope',
+            experimental: true,
+        },
+        itemType: {
+            attribute: 'itemtype',
+            readOnly: true,
+            experimental: true,
+        },
+        itemId: {
+            attribute: 'itemid',
+            experimental: true,
+        },
+        itemRef: {
+            attribute: 'itemref',
+            readOnly: true,
+            experimental: true,
+        },
+        itemProp: {
+            attribute: 'itemprop',
+            readOnly: true,
+            experimental: true,
+        },
+        itemValue: {
+            experimental: true,
+        },
+        lang: {
+            attribute: 'lang',
+            reflective: true,
+        },
+        offsetHeight: {
+            readOnly: true,
+            error: OffsetPropertiesError,
+        },
+        offsetLeft: {
+            readOnly: true,
+            error: OffsetPropertiesError,
+        },
+        offsetParent: {
+            readOnly: true,
+        },
+        offsetTop: {
+            readOnly: true,
+            error: OffsetPropertiesError,
+        },
+        offsetWidth: {
+            readOnly: true,
+            error: OffsetPropertiesError,
+        },
+        properties: {
+            readOnly: true,
+            experimental: true,
+        },
+        spellcheck: {
+            experimental: true,
+            reflective: true,
+        },
+        style: {
+            attribute: 'style',
+            error: `Using property or attribute "style" is an anti-pattern. Instead use property "classList".`,
+        },
+        tabIndex: {
+            attribute: 'tabindex',
+            reflective: true,
+        },
+        title: {
+            attribute: 'title',
+            reflective: true,
+        },
+        translate: {
+            experimental: true,
+        },
+        // additional global attributes that are not present in the link above.
+        role: {
+            attribute: 'role',
+        },
+        slot: {
+            attribute: 'slot',
+            experimental: true,
+            error: `Using property or attribute "slot" is an anti-pattern.`
+        }
+    };
+}
 // TODO: complete this list with Element properties
 // https://developer.mozilla.org/en-US/docs/Web/API/Element
 // TODO: complete this list with Node properties
 // https://developer.mozilla.org/en-US/docs/Web/API/Node
-const AOMAttrNameToPropNameMap = create(null);
 const GlobalHTMLPropDescriptors = create(null);
+const AttrNameToPropNameMap = create(null);
+const PropNameToAttrNameMap = create(null);
 // Synthetic creation of all AOM property descriptors
 forEach.call(getOwnPropertyNames(GlobalAOMProperties), (propName) => {
-    const attrName = getAriaAttributeName(propName);
-    AOMAttrNameToPropNameMap[attrName] = propName;
+    const attrName = StringToLowerCase.call(StringReplace.call(propName, ARIA_REGEX, 'aria-'));
     function get() {
         const vm = this[ViewModelReflection];
         if (!hasOwnProperty.call(vm.cmpProps, propName)) {
@@ -441,16 +442,27 @@ forEach.call(getOwnPropertyNames(GlobalAOMProperties), (propName) => {
         configurable: true,
         enumerable: true,
     };
+    AttrNameToPropNameMap[attrName] = propName;
+    PropNameToAttrNameMap[propName] = attrName;
 });
 forEach.call(defaultDefHTMLPropertyNames, (propName) => {
     const descriptor = getOwnPropertyDescriptor(HTMLElement.prototype, propName);
     if (!isUndefined(descriptor)) {
         GlobalHTMLPropDescriptors[propName] = descriptor;
+        const attrName = StringToLowerCase.call(propName);
+        AttrNameToPropNameMap[attrName] = propName;
+        PropNameToAttrNameMap[propName] = attrName;
     }
+});
+forEach.call(HTMLPropertyNamesWithLowercasedReflectiveAttributes, (propName) => {
+    const attrName = StringToLowerCase.call(propName);
+    AttrNameToPropNameMap[attrName] = propName;
+    PropNameToAttrNameMap[propName] = attrName;
 });
 if (isUndefined(GlobalHTMLPropDescriptors.id)) {
     // In IE11, id property is on Element.prototype instead of HTMLElement
     GlobalHTMLPropDescriptors.id = getOwnPropertyDescriptor(Element.prototype, 'id');
+    AttrNameToPropNameMap.id = PropNameToAttrNameMap.id = 'id';
 }
 
 const TopLevelContextSymbol = Symbol();
@@ -488,30 +500,556 @@ function invokeServiceHook(vm, cbs) {
     }
 }
 
-const TargetSlot = Symbol();
+/**
+ * Copyright (C) 2017 salesforce.com, inc.
+ */
+var isArray$1 = Array.isArray;
+var getPrototypeOf$1 = Object.getPrototypeOf, ObjectCreate = Object.create, ObjectDefineProperty = Object.defineProperty, ObjectDefineProperties = Object.defineProperties;
+var _a = Array.prototype, ArrayPush$1 = _a.push, ArrayConcat$1 = _a.concat;
+var ObjectDotPrototype = Object.prototype;
+var OtS$1 = {}.toString;
+function toString$1(obj) {
+    if (obj && obj.toString) {
+        return obj.toString();
+    }
+    else if (typeof obj === 'object') {
+        return OtS$1.call(obj);
+    }
+    else {
+        return obj + '';
+    }
+}
+function isUndefined$1(obj) {
+    return obj === undefined;
+}
+var TargetSlot = Symbol();
+// TODO: we are using a funky and leaky abstraction here to try to identify if
+// the proxy is a compat proxy, and define the unwrap method accordingly.
+// @ts-ignore
+var getKey = Proxy.getKey;
+var unwrap = getKey ?
+    function (replicaOrAny) { return (replicaOrAny && getKey(replicaOrAny, TargetSlot)) || replicaOrAny; }
+    : function (replicaOrAny) { return (replicaOrAny && replicaOrAny[TargetSlot]) || replicaOrAny; };
+function isObservable(value) {
+    if (value == null) {
+        return false;
+    }
+    if (isArray$1(value)) {
+        return true;
+    }
+    var proto = getPrototypeOf$1(value);
+    return (proto === ObjectDotPrototype || proto === null || getPrototypeOf$1(proto) === null);
+}
+function isObject$1(obj) {
+    return typeof obj === 'object';
+}
+
+var isArray$1$1 = Array.isArray;
+var getPrototypeOf$1$1 = Object.getPrototypeOf, isExtensible$1 = Object.isExtensible, getOwnPropertyDescriptor$1 = Object.getOwnPropertyDescriptor, getOwnPropertyNames$1 = Object.getOwnPropertyNames, getOwnPropertySymbols$1 = Object.getOwnPropertySymbols, defineProperty$1 = Object.defineProperty, preventExtensions$1 = Object.preventExtensions;
+var ArrayConcat$1$1 = Array.prototype.concat;
+// Unwrap property descriptors
+// We only need to unwrap if value is specified
+function unwrapDescriptor(descriptor) {
+    if ('value' in descriptor) {
+        descriptor.value = unwrap(descriptor.value);
+    }
+    return descriptor;
+}
+function wrapDescriptor(membrane, descriptor) {
+    if ('value' in descriptor) {
+        descriptor.value = isObservable(descriptor.value) ? membrane.getProxy(descriptor.value) : descriptor.value;
+    }
+    return descriptor;
+}
+function lockShadowTarget(membrane, shadowTarget, originalTarget) {
+    var targetKeys = ArrayConcat$1$1.call(getOwnPropertyNames$1(originalTarget), getOwnPropertySymbols$1(originalTarget));
+    targetKeys.forEach(function (key) {
+        var descriptor = getOwnPropertyDescriptor$1(originalTarget, key);
+        // We do not need to wrap the descriptor if not configurable
+        // Because we can deal with wrapping it when user goes through
+        // Get own property descriptor. There is also a chance that this descriptor
+        // could change sometime in the future, so we can defer wrapping
+        // until we need to
+        if (!descriptor.configurable) {
+            descriptor = wrapDescriptor(membrane, descriptor);
+        }
+        defineProperty$1(shadowTarget, key, descriptor);
+    });
+    preventExtensions$1(shadowTarget);
+}
+var ReactiveProxyHandler = /** @class */ (function () {
+    function ReactiveProxyHandler(membrane, value) {
+        this.originalTarget = value;
+        this.membrane = membrane;
+    }
+    ReactiveProxyHandler.prototype.get = function (shadowTarget, key) {
+        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
+        if (key === TargetSlot) {
+            return originalTarget;
+        }
+        var value = originalTarget[key];
+        observeMutation(membrane, originalTarget, key);
+        return membrane.getProxy(value);
+    };
+    ReactiveProxyHandler.prototype.set = function (shadowTarget, key, value) {
+        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
+        var oldValue = originalTarget[key];
+        if (oldValue !== value) {
+            originalTarget[key] = value;
+            notifyMutation(membrane, originalTarget, key);
+        }
+        else if (key === 'length' && isArray$1$1(originalTarget)) {
+            // fix for issue #236: push will add the new index, and by the time length
+            // is updated, the internal length is already equal to the new length value
+            // therefore, the oldValue is equal to the value. This is the forking logic
+            // to support this use case.
+            notifyMutation(membrane, originalTarget, key);
+        }
+        return true;
+    };
+    ReactiveProxyHandler.prototype.deleteProperty = function (shadowTarget, key) {
+        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
+        delete originalTarget[key];
+        notifyMutation(membrane, originalTarget, key);
+        return true;
+    };
+    ReactiveProxyHandler.prototype.apply = function (shadowTarget, thisArg, argArray) {
+        /* No op */
+    };
+    ReactiveProxyHandler.prototype.construct = function (target, argArray, newTarget) {
+        /* No op */
+    };
+    ReactiveProxyHandler.prototype.has = function (shadowTarget, key) {
+        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
+        observeMutation(membrane, originalTarget, key);
+        return key in originalTarget;
+    };
+    ReactiveProxyHandler.prototype.ownKeys = function (shadowTarget) {
+        var originalTarget = this.originalTarget;
+        return ArrayConcat$1$1.call(getOwnPropertyNames$1(originalTarget), getOwnPropertySymbols$1(originalTarget));
+    };
+    ReactiveProxyHandler.prototype.isExtensible = function (shadowTarget) {
+        var shadowIsExtensible = isExtensible$1(shadowTarget);
+        if (!shadowIsExtensible) {
+            return shadowIsExtensible;
+        }
+        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
+        var targetIsExtensible = isExtensible$1(originalTarget);
+        if (!targetIsExtensible) {
+            lockShadowTarget(membrane, shadowTarget, originalTarget);
+        }
+        return targetIsExtensible;
+    };
+    ReactiveProxyHandler.prototype.setPrototypeOf = function (shadowTarget, prototype) {
+        {
+            throw new Error("Invalid setPrototypeOf invocation for reactive proxy " + toString$1(this.originalTarget) + ". Prototype of reactive objects cannot be changed.");
+        }
+    };
+    ReactiveProxyHandler.prototype.getPrototypeOf = function (shadowTarget) {
+        var originalTarget = this.originalTarget;
+        return getPrototypeOf$1$1(originalTarget);
+    };
+    ReactiveProxyHandler.prototype.getOwnPropertyDescriptor = function (shadowTarget, key) {
+        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
+        // keys looked up via hasOwnProperty need to be reactive
+        observeMutation(membrane, originalTarget, key);
+        var desc = getOwnPropertyDescriptor$1(originalTarget, key);
+        if (isUndefined$1(desc)) {
+            return desc;
+        }
+        var shadowDescriptor = getOwnPropertyDescriptor$1(shadowTarget, key);
+        if (!desc.configurable && !shadowDescriptor) {
+            // If descriptor from original target is not configurable,
+            // We must copy the wrapped descriptor over to the shadow target.
+            // Otherwise, proxy will throw an invariant error.
+            // This is our last chance to lock the value.
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/getOwnPropertyDescriptor#Invariants
+            desc = wrapDescriptor(membrane, desc);
+            defineProperty$1(shadowTarget, key, desc);
+        }
+        return shadowDescriptor || desc;
+    };
+    ReactiveProxyHandler.prototype.preventExtensions = function (shadowTarget) {
+        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
+        lockShadowTarget(membrane, shadowTarget, originalTarget);
+        preventExtensions$1(originalTarget);
+        return true;
+    };
+    ReactiveProxyHandler.prototype.defineProperty = function (shadowTarget, key, descriptor) {
+        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
+        var configurable = descriptor.configurable;
+        // We have to check for value in descriptor
+        // because Object.freeze(proxy) calls this method
+        // with only { configurable: false, writeable: false }
+        // Additionally, method will only be called with writeable:false
+        // if the descriptor has a value, as opposed to getter/setter
+        // So we can just check if writable is present and then see if
+        // value is present. This eliminates getter and setter descriptors
+        if ('writable' in descriptor && !('value' in descriptor)) {
+            var originalDescriptor = getOwnPropertyDescriptor$1(originalTarget, key);
+            descriptor.value = originalDescriptor.value;
+        }
+        defineProperty$1(originalTarget, key, unwrapDescriptor(descriptor));
+        if (configurable === false) {
+            defineProperty$1(shadowTarget, key, wrapDescriptor(membrane, descriptor));
+        }
+        notifyMutation(membrane, originalTarget, key);
+        return true;
+    };
+    return ReactiveProxyHandler;
+}());
+
+var getOwnPropertyDescriptor$1$1 = Object.getOwnPropertyDescriptor, getOwnPropertyNames$1$1 = Object.getOwnPropertyNames, getOwnPropertySymbols$1$1 = Object.getOwnPropertySymbols, defineProperty$1$1 = Object.defineProperty;
+var ArrayConcat$2 = Array.prototype.concat;
+function wrapDescriptor$1(membrane, descriptor) {
+    if ('value' in descriptor) {
+        descriptor.value = isObservable(descriptor.value) ? membrane.getReadOnlyProxy(descriptor.value) : descriptor.value;
+    }
+    return descriptor;
+}
+var ReadOnlyHandler = /** @class */ (function () {
+    function ReadOnlyHandler(membrane, value) {
+        this.originalTarget = value;
+        this.membrane = membrane;
+    }
+    ReadOnlyHandler.prototype.get = function (shadowTarget, key) {
+        var _a = this, membrane = _a.membrane, originalTarget = _a.originalTarget;
+        if (key === TargetSlot) {
+            return originalTarget;
+        }
+        var value = originalTarget[key];
+        observeMutation(membrane, originalTarget, key);
+        return membrane.getReadOnlyProxy(value);
+    };
+    ReadOnlyHandler.prototype.set = function (shadowTarget, key, value) {
+        {
+            var originalTarget = this.originalTarget;
+            throw new Error("Invalid mutation: Cannot set \"" + key + "\" on \"" + originalTarget + "\". \"" + originalTarget + "\" is read-only.");
+        }
+        return false;
+    };
+    ReadOnlyHandler.prototype.deleteProperty = function (shadowTarget, key) {
+        {
+            var originalTarget = this.originalTarget;
+            throw new Error("Invalid mutation: Cannot delete \"" + key + "\" on \"" + originalTarget + "\". \"" + originalTarget + "\" is read-only.");
+        }
+        return false;
+    };
+    ReadOnlyHandler.prototype.apply = function (shadowTarget, thisArg, argArray) {
+        /* No op */
+    };
+    ReadOnlyHandler.prototype.construct = function (target, argArray, newTarget) {
+        /* No op */
+    };
+    ReadOnlyHandler.prototype.has = function (shadowTarget, key) {
+        var _a = this, membrane = _a.membrane, originalTarget = _a.originalTarget;
+        observeMutation(membrane, originalTarget, key);
+        return key in originalTarget;
+    };
+    ReadOnlyHandler.prototype.ownKeys = function (shadowTarget) {
+        var originalTarget = this.originalTarget;
+        return ArrayConcat$2.call(getOwnPropertyNames$1$1(originalTarget), getOwnPropertySymbols$1$1(originalTarget));
+    };
+    ReadOnlyHandler.prototype.setPrototypeOf = function (shadowTarget, prototype) {
+        {
+            var originalTarget = this.originalTarget;
+            throw new Error("Invalid prototype mutation: Cannot set prototype on \"" + originalTarget + "\". \"" + originalTarget + "\" prototype is read-only.");
+        }
+    };
+    ReadOnlyHandler.prototype.getOwnPropertyDescriptor = function (shadowTarget, key) {
+        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
+        // keys looked up via hasOwnProperty need to be reactive
+        observeMutation(membrane, originalTarget, key);
+        var desc = getOwnPropertyDescriptor$1$1(originalTarget, key);
+        if (isUndefined$1(desc)) {
+            return desc;
+        }
+        var shadowDescriptor = getOwnPropertyDescriptor$1$1(shadowTarget, key);
+        if (!desc.configurable && !shadowDescriptor) {
+            // If descriptor from original target is not configurable,
+            // We must copy the wrapped descriptor over to the shadow target.
+            // Otherwise, proxy will throw an invariant error.
+            // This is our last chance to lock the value.
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/getOwnPropertyDescriptor#Invariants
+            desc = wrapDescriptor$1(membrane, desc);
+            defineProperty$1$1(shadowTarget, key, desc);
+        }
+        return shadowDescriptor || desc;
+    };
+    ReadOnlyHandler.prototype.preventExtensions = function (shadowTarget) {
+        {
+            var originalTarget = this.originalTarget;
+            throw new Error("Invalid mutation: Cannot preventExtensions on " + originalTarget + "\". \"" + originalTarget + " is read-only.");
+        }
+        return false;
+    };
+    ReadOnlyHandler.prototype.defineProperty = function (shadowTarget, key, descriptor) {
+        {
+            var originalTarget = this.originalTarget;
+            throw new Error("Invalid mutation: Cannot defineProperty \"" + key + "\" on \"" + originalTarget + "\". \"" + originalTarget + "\" is read-only.");
+        }
+        return false;
+    };
+    return ReadOnlyHandler;
+}());
+
+var create$1 = Object.create, getPrototypeOf$2 = Object.getPrototypeOf, getOwnPropertyNames$2 = Object.getOwnPropertyNames, getOwnPropertySymbols$2 = Object.getOwnPropertySymbols;
+var isArray$2 = Array.isArray;
+function getTarget(item) {
+    return item && item[TargetSlot];
+}
+function extract(objectOrArray) {
+    if (isArray$2(objectOrArray)) {
+        return objectOrArray.map(function (item) {
+            var original = getTarget(item);
+            if (original) {
+                return extract(original);
+            }
+            return item;
+        });
+    }
+    var obj = create$1(getPrototypeOf$2(objectOrArray));
+    var names = getOwnPropertyNames$2(objectOrArray);
+    return ArrayConcat$1.call(names, getOwnPropertySymbols$2(objectOrArray))
+        .reduce(function (seed, key) {
+        var item = objectOrArray[key];
+        var original = getTarget(item);
+        if (original) {
+            seed[key] = extract(original);
+        }
+        else {
+            seed[key] = item;
+        }
+        return seed;
+    }, obj);
+}
+var formatter = {
+    header: function (plainOrProxy) {
+        var originalTarget = plainOrProxy[TargetSlot];
+        if (!originalTarget) {
+            return null;
+        }
+        var obj = extract(plainOrProxy);
+        return ['object', { object: obj }];
+    },
+    hasBody: function () {
+        return false;
+    },
+    body: function () {
+        return null;
+    }
+};
+function init() {
+    // Custom Formatter for Dev Tools
+    // To enable this, open Chrome Dev Tools
+    // Go to Settings,
+    // Under console, select "Enable custom formatters"
+    // For more information, https://docs.google.com/document/d/1FTascZXT9cxfetuPRT2eXPQKXui4nWFivUnS_335T3U/preview
+    var devWindow = window;
+    var devtoolsFormatters = devWindow.devtoolsFormatters || [];
+    ArrayPush$1.call(devtoolsFormatters, formatter);
+    devWindow.devtoolsFormatters = devtoolsFormatters;
+}
+
+{
+    init();
+}
+function invokeDistortion(membrane, value) {
+    return membrane.distortion(value);
+}
+function createShadowTarget(value) {
+    var shadowTarget = undefined;
+    if (isArray$1(value)) {
+        shadowTarget = [];
+    }
+    else if (isObject$1(value)) {
+        shadowTarget = {};
+    }
+    return shadowTarget;
+}
+function getReactiveState(membrane, value) {
+    var objectGraph = membrane.objectGraph;
+    value = unwrap(value);
+    var reactiveState = objectGraph.get(value);
+    if (reactiveState) {
+        return reactiveState;
+    }
+    reactiveState = ObjectDefineProperties(ObjectCreate(null), {
+        shadowTarget: {
+            get: function () {
+                var shadowTarget = createShadowTarget(value);
+                ObjectDefineProperty(this, 'shadowTarget', { value: shadowTarget });
+                return shadowTarget;
+            },
+            configurable: true,
+        },
+        reactive: {
+            get: function () {
+                var shadowTarget = this.shadowTarget;
+                var reactiveHandler = new ReactiveProxyHandler(membrane, value);
+                var proxy = new Proxy(shadowTarget, reactiveHandler);
+                ObjectDefineProperty(this, 'reactive', { value: proxy });
+                return proxy;
+            },
+            configurable: true,
+        },
+        readOnly: {
+            get: function () {
+                var shadowTarget = this.shadowTarget;
+                var readOnlyHandler = new ReadOnlyHandler(membrane, value);
+                var proxy = new Proxy(shadowTarget, readOnlyHandler);
+                ObjectDefineProperty(this, 'readOnly', { value: proxy });
+                return proxy;
+            },
+            configurable: true,
+        }
+    });
+    objectGraph.set(value, reactiveState);
+    return reactiveState;
+}
+function notifyMutation(membrane, obj, key) {
+    membrane.propertyMemberChange(obj, key);
+}
+function observeMutation(membrane, obj, key) {
+    membrane.propertyMemberAccess(obj, key);
+}
+var ReactiveMembrane = /** @class */ (function () {
+    function ReactiveMembrane(distortion, eventMap) {
+        this.objectGraph = new WeakMap();
+        this.distortion = distortion;
+        this.propertyMemberChange = eventMap.propertyMemberChange;
+        this.propertyMemberAccess = eventMap.propertyMemberAccess;
+    }
+    ReactiveMembrane.prototype.getProxy = function (value) {
+        var distorted = invokeDistortion(this, value);
+        if (isObservable(distorted)) {
+            var o = getReactiveState(this, distorted);
+            // when trying to extract the writable version of a readonly
+            // we return the readonly.
+            return o.readOnly === value ? value : o.reactive;
+        }
+        return distorted;
+    };
+    ReactiveMembrane.prototype.getReadOnlyProxy = function (value) {
+        var distorted = invokeDistortion(this, value);
+        if (isObservable(distorted)) {
+            return getReactiveState(this, distorted).readOnly;
+        }
+        return distorted;
+    };
+    return ReactiveMembrane;
+}());
+/** version: 0.19.0-0 */
+
+const TargetToReactiveRecordMap = new WeakMap();
+function notifyMutation$1(target, key) {
+    {
+        assert.invariant(!isRendering, `Mutating property ${toString(key)} of ${toString(target)} is not allowed during the rendering life-cycle of ${vmBeingRendered}.`);
+    }
+    const reactiveRecord = TargetToReactiveRecordMap.get(target);
+    if (!isUndefined(reactiveRecord)) {
+        const value = reactiveRecord[key];
+        if (value) {
+            const len = value.length;
+            for (let i = 0; i < len; i += 1) {
+                const vm = value[i];
+                {
+                    assert.vm(vm);
+                }
+                if (!vm.isDirty) {
+                    markComponentAsDirty(vm);
+                    scheduleRehydration(vm);
+                }
+            }
+        }
+    }
+}
+function observeMutation$1(target, key) {
+    if (isNull(vmBeingRendered)) {
+        return; // nothing to subscribe to
+    }
+    const vm = vmBeingRendered;
+    let reactiveRecord = TargetToReactiveRecordMap.get(target);
+    if (isUndefined(reactiveRecord)) {
+        const newRecord = create(null);
+        reactiveRecord = newRecord;
+        TargetToReactiveRecordMap.set(target, newRecord);
+    }
+    let value = reactiveRecord[key];
+    if (isUndefined(value)) {
+        value = [];
+        reactiveRecord[key] = value;
+    }
+    else if (value[0] === vm) {
+        return; // perf optimization considering that most subscriptions will come from the same vm
+    }
+    if (ArrayIndexOf.call(value, vm) === -1) {
+        ArrayPush.call(value, vm);
+        // we keep track of the sets that vm is listening from to be able to do some clean up later on
+        ArrayPush.call(vm.deps, value);
+    }
+}
+
+function format(value) {
+    {
+        // For now, if we determine that value is a piercing membrane
+        // we want to throw a big error.
+        if (replicaUnwrap(value) !== value) {
+            throw new ReferenceError(`Invalid attempt to get access to a piercing membrane ${toString(value)} via a reactive membrane.`);
+        }
+    }
+    return value;
+}
+const reactiveMembrane = new ReactiveMembrane(format, {
+    propertyMemberChange: notifyMutation$1,
+    propertyMemberAccess: observeMutation$1,
+});
+// TODO: REMOVE THIS https://github.com/salesforce/lwc/issues/129
+function dangerousObjectMutation(obj) {
+    {
+        assert.logWarning(`Dangerously Mutating Object ${toString(obj)}. This object was passed to you from a parent component, and should not be mutated here. This will be removed in the near future.`);
+    }
+    return reactiveMembrane.getProxy(unwrap$1(obj));
+}
+const TargetSlot$1 = Symbol();
 const MembraneSlot = Symbol();
 function isReplicable(value) {
     const type = typeof value;
     return value && (type === 'object' || type === 'function');
 }
-function getReplica(membrane, value) {
+// TODO: we are using a funky and leaky abstraction here to try to identify if
+// the proxy is a compat proxy, and define the unwrap method accordingly.
+// @ts-ignore
+const { getKey: ProxyGetKey } = Proxy;
+const getKey$1 = ProxyGetKey ? ProxyGetKey : (o, key) => o[key];
+function replicaUnwrap(value) {
+    // observable membrane goes first because it is in the critical path
+    return (value && getKey$1(value, TargetSlot$1)) || value;
+}
+function getReplica(piercingMembrane, value) {
     if (isNull(value)) {
         return value;
     }
-    value = unwrap(value);
-    if (!isReplicable(value)) {
-        return value;
+    const replicaRawValue = replicaUnwrap(value);
+    if (!isReplicable(replicaRawValue)) {
+        return replicaRawValue;
+    }
+    const reactiveRawValue = unwrap(replicaRawValue);
+    if (replicaRawValue !== reactiveRawValue) {
+        // user is accessing a reactive membrane via a piercing membrane
+        // in which case we return a readonly version of the reactive one
+        return reactiveMembrane.getReadOnlyProxy(reactiveRawValue);
     }
     {
-        assert.isTrue(membrane instanceof Membrane, `getReplica() first argument must be a membrane.`);
+        assert.isTrue(piercingMembrane instanceof Membrane, `getReplica() first argument must be a membrane.`);
     }
-    const { cells } = membrane;
-    const r = cells.get(value);
+    const { cells } = piercingMembrane;
+    const r = cells.get(replicaRawValue);
     if (r) {
         return r;
     }
-    const replica = new Proxy(value, membrane);
-    cells.set(value, replica);
+    const replica = new Proxy(replicaRawValue, piercingMembrane);
+    cells.set(replicaRawValue, replica);
     return replica;
 }
 class Membrane {
@@ -520,7 +1058,7 @@ class Membrane {
         this.cells = new WeakMap();
     }
     get(target, key) {
-        if (key === TargetSlot) {
+        if (key === TargetSlot$1) {
             return target;
         }
         else if (key === MembraneSlot) {
@@ -532,34 +1070,41 @@ class Membrane {
         return this.handler.set(this, target, key, newValue);
     }
     deleteProperty(target, key) {
-        if (key === TargetSlot) {
+        if (key === TargetSlot$1) {
             return false;
         }
         return this.handler.deleteProperty(this, target, key);
     }
     apply(target, thisArg, argumentsList) {
-        thisArg = unwrap(thisArg);
-        argumentsList = unwrap(argumentsList);
+        thisArg = unwrap$1(thisArg);
+        argumentsList = unwrap$1(argumentsList);
         if (isArray(argumentsList)) {
-            argumentsList = ArrayMap.call(argumentsList, unwrap);
+            argumentsList = ArrayMap.call(argumentsList, unwrap$1);
         }
         return this.handler.apply(this, target, thisArg, argumentsList);
     }
     construct(target, argumentsList, newTarget) {
-        argumentsList = unwrap(argumentsList);
+        argumentsList = unwrap$1(argumentsList);
         if (isArray(argumentsList)) {
-            argumentsList = ArrayMap.call(argumentsList, unwrap);
+            argumentsList = ArrayMap.call(argumentsList, unwrap$1);
         }
         return this.handler.construct(this, target, argumentsList, newTarget);
     }
 }
-// TODO: we are using a funky and leaky abstraction here to try to identify if
-// the proxy is a compat proxy, and define the unwrap method accordingly.
-// @ts-ignore
-const { getKey } = Proxy;
-const unwrap = getKey ?
-    (replicaOrAny) => (replicaOrAny && getKey(replicaOrAny, TargetSlot)) || replicaOrAny
-    : (replicaOrAny) => (replicaOrAny && replicaOrAny[TargetSlot]) || replicaOrAny;
+// Universal unwrap mechanism that works for any type of membrane
+function unwrap$1(value) {
+    // observable membrane goes first because it is in the critical path
+    let unwrapped = unwrap(value);
+    if (unwrapped !== value) {
+        return unwrapped;
+    }
+    // piercing membrane is not that important, it goes second
+    unwrapped = replicaUnwrap(value);
+    if (unwrapped !== value) {
+        return unwrapped;
+    }
+    return value;
+}
 
 function piercingHook(membrane, target, key, value) {
     const { vm } = membrane.handler;
@@ -816,9 +1361,9 @@ function createAccessibilityDescriptorForShadowRoot(propName, attrName, defaultV
     };
 }
 const RootDescriptors = create(null);
-// This routine will be a descriptor map for all AOM properties to be added
+// This routine will build a descriptor map for all AOM properties to be added
 // to ShadowRoot prototype to polyfill AOM capabilities.
-forEach.call(getOwnPropertyNames(GlobalAOMProperties), (propName) => RootDescriptors[propName] = createAccessibilityDescriptorForShadowRoot(propName, getAriaAttributeName(propName), GlobalAOMProperties[propName]));
+forEach.call(getOwnPropertyNames(GlobalAOMProperties), (propName) => RootDescriptors[propName] = createAccessibilityDescriptorForShadowRoot(propName, getAttrNameFromPropName(propName), GlobalAOMProperties[propName]));
 function shadowRootQuerySelector(shadowRoot, selector) {
     const vm = getCustomElementVM(shadowRoot);
     {
@@ -907,7 +1452,7 @@ function isIframeContentWindow(key, value) {
 }
 function wrapIframeWindow(win) {
     return {
-        [TargetSlot]: win,
+        [TargetSlot$1]: win,
         postMessage() {
             return win.postMessage.apply(win, arguments);
         },
@@ -989,55 +1534,6 @@ register({
     }
 });
 
-const TargetToReactiveRecordMap = new WeakMap();
-function notifyMutation(target, key) {
-    {
-        assert.invariant(!isRendering, `Mutating property ${toString(key)} of ${toString(target)} is not allowed during the rendering life-cycle of ${vmBeingRendered}.`);
-    }
-    const reactiveRecord = TargetToReactiveRecordMap.get(target);
-    if (!isUndefined(reactiveRecord)) {
-        const value = reactiveRecord[key];
-        if (value) {
-            const len = value.length;
-            for (let i = 0; i < len; i += 1) {
-                const vm = value[i];
-                {
-                    assert.vm(vm);
-                }
-                if (!vm.isDirty) {
-                    markComponentAsDirty(vm);
-                    scheduleRehydration(vm);
-                }
-            }
-        }
-    }
-}
-function observeMutation(target, key) {
-    if (isNull(vmBeingRendered)) {
-        return; // nothing to subscribe to
-    }
-    const vm = vmBeingRendered;
-    let reactiveRecord = TargetToReactiveRecordMap.get(target);
-    if (isUndefined(reactiveRecord)) {
-        const newRecord = create(null);
-        reactiveRecord = newRecord;
-        TargetToReactiveRecordMap.set(target, newRecord);
-    }
-    let value = reactiveRecord[key];
-    if (isUndefined(value)) {
-        value = [];
-        reactiveRecord[key] = value;
-    }
-    else if (value[0] === vm) {
-        return; // perf optimization considering that most subscriptions will come from the same vm
-    }
-    if (ArrayIndexOf.call(value, vm) === -1) {
-        ArrayPush.call(value, vm);
-        // we keep track of the sets that vm is listening from to be able to do some clean up later on
-        ArrayPush.call(vm.deps, value);
-    }
-}
-
 function getHTMLPropDescriptor(propName, descriptor) {
     const { get, set, enumerable, configurable } = descriptor;
     if (!isFunction(get)) {
@@ -1066,7 +1562,7 @@ function getHTMLPropDescriptor(propName, descriptor) {
                 }
                 return;
             }
-            observeMutation(this, propName);
+            observeMutation$1(this, propName);
             return get.call(vm.elm);
         },
         set(newValue) {
@@ -1081,7 +1577,7 @@ function getHTMLPropDescriptor(propName, descriptor) {
                 vm.cmpProps[propName] = newValue;
                 if (vm.idx > 0) {
                     // perf optimization to skip this step if not in the DOM
-                    notifyMutation(this, propName);
+                    notifyMutation$1(this, propName);
                 }
             }
             return set.call(vm.elm, newValue);
@@ -1125,6 +1621,9 @@ class LWCElement {
         const elm = getLinkedElement$1(this);
         const vm = getCustomElementVM(this);
         {
+            if (arguments.length === 0) {
+                throw new Error(`Failed to execute 'dispatchEvent' on ${this}: 1 argument required, but only 0 present.`);
+            }
             const { type: evtName, composed, bubbles } = event;
             assert.isFalse(isBeingConstructed(vm), `this.dispatchEvent() should not be called during the construction of the custom element for ${this} because no one is listening for the event "${evtName}" just yet.`);
             if (bubbles && ('composed' in event && !composed)) {
@@ -1204,8 +1703,9 @@ class LWCElement {
             assert.vm(vm);
             if (isString(attrName)) {
                 const propName = getPropNameFromAttrName(attrName);
-                if (GlobalHTMLProperties[propName] && GlobalHTMLProperties[propName].attribute) {
-                    const { error, experimental } = GlobalHTMLProperties[propName];
+                const info = getGlobalHTMLPropertiesInfo();
+                if (info[propName] && info[propName].attribute) {
+                    const { error, experimental } = info[propName];
                     if (error) {
                         assert.logError(error);
                     }
@@ -1298,14 +1798,15 @@ class LWCElement {
 defineProperties(LWCElement.prototype, htmlElementDescriptors);
 // Global HTML Attributes
 {
-    forEach.call(getOwnPropertyNames(GlobalHTMLProperties), (propName) => {
+    const info = getGlobalHTMLPropertiesInfo();
+    forEach.call(getOwnPropertyNames(info), (propName) => {
         if (propName in LWCElement.prototype) {
             return; // no need to redefine something that we are already exposing
         }
         defineProperty(LWCElement.prototype, propName, {
             get() {
                 const vm = getCustomElementVM(this);
-                const { error, attribute, readOnly, experimental } = GlobalHTMLProperties[propName];
+                const { error, attribute, readOnly, experimental } = info[propName];
                 const msg = [];
                 msg.push(`Accessing the global HTML property "${propName}" in ${vm} is disabled.`);
                 if (error) {
@@ -1339,474 +1840,6 @@ function getCustomElementVM(elmOrCmp) {
         assert.vm(elmOrCmp[ViewModelReflection]);
     }
     return elmOrCmp[ViewModelReflection];
-}
-
-/**
- * Copyright (C) 2017 salesforce.com, inc.
- */
-var isArray$1 = Array.isArray;
-var getPrototypeOf$1 = Object.getPrototypeOf, ObjectCreate = Object.create, ObjectDefineProperty = Object.defineProperty, ObjectDefineProperties = Object.defineProperties;
-var _a = Array.prototype, ArrayPush$1 = _a.push, ArrayConcat$1 = _a.concat;
-var ObjectDotPrototype = Object.prototype;
-var OtS$1 = {}.toString;
-function toString$1(obj) {
-    if (obj && obj.toString) {
-        return obj.toString();
-    }
-    else if (typeof obj === 'object') {
-        return OtS$1.call(obj);
-    }
-    else {
-        return obj + '';
-    }
-}
-function isUndefined$1(obj) {
-    return obj === undefined;
-}
-var TargetSlot$1 = Symbol();
-// TODO: we are using a funky and leaky abstraction here to try to identify if
-// the proxy is a compat proxy, and define the unwrap method accordingly.
-// @ts-ignore
-var getKey$1 = Proxy.getKey;
-var unwrap$1 = getKey$1 ?
-    function (replicaOrAny) { return (replicaOrAny && getKey$1(replicaOrAny, TargetSlot$1)) || replicaOrAny; }
-    : function (replicaOrAny) { return (replicaOrAny && replicaOrAny[TargetSlot$1]) || replicaOrAny; };
-function isObservable(value) {
-    if (!value) {
-        return false;
-    }
-    if (isArray$1(value)) {
-        return true;
-    }
-    var proto = getPrototypeOf$1(value);
-    return (proto === ObjectDotPrototype || proto === null || getPrototypeOf$1(proto) === null);
-}
-function isObject$1(obj) {
-    return typeof obj === 'object';
-}
-
-var isArray$1$1 = Array.isArray;
-var getPrototypeOf$1$1 = Object.getPrototypeOf, isExtensible$1 = Object.isExtensible, getOwnPropertyDescriptor$1 = Object.getOwnPropertyDescriptor, getOwnPropertyNames$1 = Object.getOwnPropertyNames, getOwnPropertySymbols$1 = Object.getOwnPropertySymbols, defineProperty$1 = Object.defineProperty, preventExtensions$1 = Object.preventExtensions;
-var ArrayConcat$1$1 = Array.prototype.concat;
-// Unwrap property descriptors
-// We only need to unwrap if value is specified
-function unwrapDescriptor(descriptor) {
-    if ('value' in descriptor) {
-        descriptor.value = unwrap$1(descriptor.value);
-    }
-    return descriptor;
-}
-function wrapDescriptor(membrane, descriptor) {
-    if ('value' in descriptor) {
-        descriptor.value = isObservable(descriptor.value) ? membrane.getProxy(descriptor.value) : descriptor.value;
-    }
-    return descriptor;
-}
-function lockShadowTarget(membrane, shadowTarget, originalTarget) {
-    var targetKeys = ArrayConcat$1$1.call(getOwnPropertyNames$1(originalTarget), getOwnPropertySymbols$1(originalTarget));
-    targetKeys.forEach(function (key) {
-        var descriptor = getOwnPropertyDescriptor$1(originalTarget, key);
-        // We do not need to wrap the descriptor if not configurable
-        // Because we can deal with wrapping it when user goes through
-        // Get own property descriptor. There is also a chance that this descriptor
-        // could change sometime in the future, so we can defer wrapping
-        // until we need to
-        if (!descriptor.configurable) {
-            descriptor = wrapDescriptor(membrane, descriptor);
-        }
-        defineProperty$1(shadowTarget, key, descriptor);
-    });
-    preventExtensions$1(shadowTarget);
-}
-var ReactiveProxyHandler = /** @class */ (function () {
-    function ReactiveProxyHandler(membrane, value) {
-        this.originalTarget = value;
-        this.membrane = membrane;
-    }
-    ReactiveProxyHandler.prototype.get = function (shadowTarget, key) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        if (key === TargetSlot$1) {
-            return originalTarget;
-        }
-        var value = originalTarget[key];
-        observeMutation$1(membrane, originalTarget, key);
-        return membrane.getProxy(value);
-    };
-    ReactiveProxyHandler.prototype.set = function (shadowTarget, key, value) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        var oldValue = originalTarget[key];
-        if (oldValue !== value) {
-            originalTarget[key] = value;
-            notifyMutation$1(membrane, originalTarget, key);
-        }
-        else if (key === 'length' && isArray$1$1(originalTarget)) {
-            // fix for issue #236: push will add the new index, and by the time length
-            // is updated, the internal length is already equal to the new length value
-            // therefore, the oldValue is equal to the value. This is the forking logic
-            // to support this use case.
-            notifyMutation$1(membrane, originalTarget, key);
-        }
-        return true;
-    };
-    ReactiveProxyHandler.prototype.deleteProperty = function (shadowTarget, key) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        delete originalTarget[key];
-        notifyMutation$1(membrane, originalTarget, key);
-        return true;
-    };
-    ReactiveProxyHandler.prototype.apply = function (shadowTarget, thisArg, argArray) {
-        /* No op */
-    };
-    ReactiveProxyHandler.prototype.construct = function (target, argArray, newTarget) {
-        /* No op */
-    };
-    ReactiveProxyHandler.prototype.has = function (shadowTarget, key) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        observeMutation$1(membrane, originalTarget, key);
-        return key in originalTarget;
-    };
-    ReactiveProxyHandler.prototype.ownKeys = function (shadowTarget) {
-        var originalTarget = this.originalTarget;
-        return ArrayConcat$1$1.call(getOwnPropertyNames$1(originalTarget), getOwnPropertySymbols$1(originalTarget));
-    };
-    ReactiveProxyHandler.prototype.isExtensible = function (shadowTarget) {
-        var shadowIsExtensible = isExtensible$1(shadowTarget);
-        if (!shadowIsExtensible) {
-            return shadowIsExtensible;
-        }
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        var targetIsExtensible = isExtensible$1(originalTarget);
-        if (!targetIsExtensible) {
-            lockShadowTarget(membrane, shadowTarget, originalTarget);
-        }
-        return targetIsExtensible;
-    };
-    ReactiveProxyHandler.prototype.setPrototypeOf = function (shadowTarget, prototype) {
-        {
-            throw new Error("Invalid setPrototypeOf invocation for reactive proxy " + toString$1(this.originalTarget) + ". Prototype of reactive objects cannot be changed.");
-        }
-    };
-    ReactiveProxyHandler.prototype.getPrototypeOf = function (shadowTarget) {
-        var originalTarget = this.originalTarget;
-        return getPrototypeOf$1$1(originalTarget);
-    };
-    ReactiveProxyHandler.prototype.getOwnPropertyDescriptor = function (shadowTarget, key) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        // keys looked up via hasOwnProperty need to be reactive
-        observeMutation$1(membrane, originalTarget, key);
-        var desc = getOwnPropertyDescriptor$1(originalTarget, key);
-        if (isUndefined$1(desc)) {
-            return desc;
-        }
-        var shadowDescriptor = getOwnPropertyDescriptor$1(shadowTarget, key);
-        if (!desc.configurable && !shadowDescriptor) {
-            // If descriptor from original target is not configurable,
-            // We must copy the wrapped descriptor over to the shadow target.
-            // Otherwise, proxy will throw an invariant error.
-            // This is our last chance to lock the value.
-            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/getOwnPropertyDescriptor#Invariants
-            desc = wrapDescriptor(membrane, desc);
-            defineProperty$1(shadowTarget, key, desc);
-        }
-        return shadowDescriptor || desc;
-    };
-    ReactiveProxyHandler.prototype.preventExtensions = function (shadowTarget) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        lockShadowTarget(membrane, shadowTarget, originalTarget);
-        preventExtensions$1(originalTarget);
-        return true;
-    };
-    ReactiveProxyHandler.prototype.defineProperty = function (shadowTarget, key, descriptor) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        var configurable = descriptor.configurable;
-        // We have to check for value in descriptor
-        // because Object.freeze(proxy) calls this method
-        // with only { configurable: false, writeable: false }
-        // Additionally, method will only be called with writeable:false
-        // if the descriptor has a value, as opposed to getter/setter
-        // So we can just check if writable is present and then see if
-        // value is present. This eliminates getter and setter descriptors
-        if ('writable' in descriptor && !('value' in descriptor)) {
-            var originalDescriptor = getOwnPropertyDescriptor$1(originalTarget, key);
-            descriptor.value = originalDescriptor.value;
-        }
-        defineProperty$1(originalTarget, key, unwrapDescriptor(descriptor));
-        if (configurable === false) {
-            defineProperty$1(shadowTarget, key, wrapDescriptor(membrane, descriptor));
-        }
-        notifyMutation$1(membrane, originalTarget, key);
-        return true;
-    };
-    return ReactiveProxyHandler;
-}());
-
-var getOwnPropertyDescriptor$1$1 = Object.getOwnPropertyDescriptor, getOwnPropertyNames$1$1 = Object.getOwnPropertyNames, getOwnPropertySymbols$1$1 = Object.getOwnPropertySymbols, defineProperty$1$1 = Object.defineProperty;
-var ArrayConcat$2 = Array.prototype.concat;
-function wrapDescriptor$1(membrane, descriptor) {
-    if ('value' in descriptor) {
-        descriptor.value = isObservable(descriptor.value) ? membrane.getReadOnlyProxy(descriptor.value) : descriptor.value;
-    }
-    return descriptor;
-}
-var ReadOnlyHandler = /** @class */ (function () {
-    function ReadOnlyHandler(membrane, value) {
-        this.originalTarget = value;
-        this.membrane = membrane;
-    }
-    ReadOnlyHandler.prototype.get = function (shadowTarget, key) {
-        var _a = this, membrane = _a.membrane, originalTarget = _a.originalTarget;
-        if (key === TargetSlot$1) {
-            return originalTarget;
-        }
-        var value = originalTarget[key];
-        observeMutation$1(membrane, originalTarget, key);
-        return membrane.getReadOnlyProxy(value);
-    };
-    ReadOnlyHandler.prototype.set = function (shadowTarget, key, value) {
-        {
-            var originalTarget = this.originalTarget;
-            throw new Error("Invalid mutation: Cannot set \"" + key + "\" on \"" + originalTarget + "\". \"" + originalTarget + "\" is read-only.");
-        }
-        return false;
-    };
-    ReadOnlyHandler.prototype.deleteProperty = function (shadowTarget, key) {
-        {
-            var originalTarget = this.originalTarget;
-            throw new Error("Invalid mutation: Cannot delete \"" + key + "\" on \"" + originalTarget + "\". \"" + originalTarget + "\" is read-only.");
-        }
-        return false;
-    };
-    ReadOnlyHandler.prototype.apply = function (shadowTarget, thisArg, argArray) {
-        /* No op */
-    };
-    ReadOnlyHandler.prototype.construct = function (target, argArray, newTarget) {
-        /* No op */
-    };
-    ReadOnlyHandler.prototype.has = function (shadowTarget, key) {
-        var _a = this, membrane = _a.membrane, originalTarget = _a.originalTarget;
-        observeMutation$1(membrane, originalTarget, key);
-        return key in originalTarget;
-    };
-    ReadOnlyHandler.prototype.ownKeys = function (shadowTarget) {
-        var originalTarget = this.originalTarget;
-        return ArrayConcat$2.call(getOwnPropertyNames$1$1(originalTarget), getOwnPropertySymbols$1$1(originalTarget));
-    };
-    ReadOnlyHandler.prototype.setPrototypeOf = function (shadowTarget, prototype) {
-        {
-            var originalTarget = this.originalTarget;
-            throw new Error("Invalid prototype mutation: Cannot set prototype on \"" + originalTarget + "\". \"" + originalTarget + "\" prototype is read-only.");
-        }
-    };
-    ReadOnlyHandler.prototype.getOwnPropertyDescriptor = function (shadowTarget, key) {
-        var _a = this, originalTarget = _a.originalTarget, membrane = _a.membrane;
-        // keys looked up via hasOwnProperty need to be reactive
-        observeMutation$1(membrane, originalTarget, key);
-        var desc = getOwnPropertyDescriptor$1$1(originalTarget, key);
-        if (isUndefined$1(desc)) {
-            return desc;
-        }
-        var shadowDescriptor = getOwnPropertyDescriptor$1$1(shadowTarget, key);
-        if (!desc.configurable && !shadowDescriptor) {
-            // If descriptor from original target is not configurable,
-            // We must copy the wrapped descriptor over to the shadow target.
-            // Otherwise, proxy will throw an invariant error.
-            // This is our last chance to lock the value.
-            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/getOwnPropertyDescriptor#Invariants
-            desc = wrapDescriptor$1(membrane, desc);
-            defineProperty$1$1(shadowTarget, key, desc);
-        }
-        return shadowDescriptor || desc;
-    };
-    ReadOnlyHandler.prototype.preventExtensions = function (shadowTarget) {
-        {
-            var originalTarget = this.originalTarget;
-            throw new Error("Invalid mutation: Cannot preventExtensions on " + originalTarget + "\". \"" + originalTarget + " is read-only.");
-        }
-        return false;
-    };
-    ReadOnlyHandler.prototype.defineProperty = function (shadowTarget, key, descriptor) {
-        {
-            var originalTarget = this.originalTarget;
-            throw new Error("Invalid mutation: Cannot defineProperty \"" + key + "\" on \"" + originalTarget + "\". \"" + originalTarget + "\" is read-only.");
-        }
-        return false;
-    };
-    return ReadOnlyHandler;
-}());
-
-var create$1 = Object.create, getPrototypeOf$2 = Object.getPrototypeOf, getOwnPropertyNames$2 = Object.getOwnPropertyNames, getOwnPropertySymbols$2 = Object.getOwnPropertySymbols;
-var isArray$2 = Array.isArray;
-function getTarget(item) {
-    return item && item[TargetSlot$1];
-}
-function extract(objectOrArray) {
-    if (isArray$2(objectOrArray)) {
-        return objectOrArray.map(function (item) {
-            var original = getTarget(item);
-            if (original) {
-                return extract(original);
-            }
-            return item;
-        });
-    }
-    var obj = create$1(getPrototypeOf$2(objectOrArray));
-    var names = getOwnPropertyNames$2(objectOrArray);
-    return ArrayConcat$1.call(names, getOwnPropertySymbols$2(objectOrArray))
-        .reduce(function (seed, key) {
-        var item = objectOrArray[key];
-        var original = getTarget(item);
-        if (original) {
-            seed[key] = extract(original);
-        }
-        else {
-            seed[key] = item;
-        }
-        return seed;
-    }, obj);
-}
-var formatter = {
-    header: function (plainOrProxy) {
-        var originalTarget = plainOrProxy[TargetSlot$1];
-        if (!originalTarget) {
-            return null;
-        }
-        var obj = extract(plainOrProxy);
-        return ['object', { object: obj }];
-    },
-    hasBody: function () {
-        return false;
-    },
-    body: function () {
-        return null;
-    }
-};
-function init() {
-    // Custom Formatter for Dev Tools
-    // To enable this, open Chrome Dev Tools
-    // Go to Settings,
-    // Under console, select "Enable custom formatters"
-    // For more information, https://docs.google.com/document/d/1FTascZXT9cxfetuPRT2eXPQKXui4nWFivUnS_335T3U/preview
-    var devWindow = window;
-    var devtoolsFormatters = devWindow.devtoolsFormatters || [];
-    ArrayPush$1.call(devtoolsFormatters, formatter);
-    devWindow.devtoolsFormatters = devtoolsFormatters;
-}
-
-{
-    init();
-}
-function invokeDistortion(membrane, value) {
-    return membrane.distortion(value);
-}
-function createShadowTarget(value) {
-    var shadowTarget = undefined;
-    if (isArray$1(value)) {
-        shadowTarget = [];
-    }
-    else if (isObject$1(value)) {
-        shadowTarget = {};
-    }
-    return shadowTarget;
-}
-function getReactiveState(membrane, value) {
-    var objectGraph = membrane.objectGraph;
-    value = unwrap$1(value);
-    var reactiveState = objectGraph.get(value);
-    if (reactiveState) {
-        return reactiveState;
-    }
-    reactiveState = ObjectDefineProperties(ObjectCreate(null), {
-        shadowTarget: {
-            get: function () {
-                var shadowTarget = createShadowTarget(value);
-                ObjectDefineProperty(this, 'shadowTarget', { value: shadowTarget });
-                return shadowTarget;
-            },
-            configurable: true,
-        },
-        reactive: {
-            get: function () {
-                var shadowTarget = this.shadowTarget;
-                var reactiveHandler = new ReactiveProxyHandler(membrane, value);
-                var proxy = new Proxy(shadowTarget, reactiveHandler);
-                ObjectDefineProperty(this, 'reactive', { value: proxy });
-                return proxy;
-            },
-            configurable: true,
-        },
-        readOnly: {
-            get: function () {
-                var shadowTarget = this.shadowTarget;
-                var readOnlyHandler = new ReadOnlyHandler(membrane, value);
-                var proxy = new Proxy(shadowTarget, readOnlyHandler);
-                ObjectDefineProperty(this, 'readOnly', { value: proxy });
-                return proxy;
-            },
-            configurable: true,
-        }
-    });
-    objectGraph.set(value, reactiveState);
-    return reactiveState;
-}
-function notifyMutation$1(membrane, obj, key) {
-    membrane.propertyMemberChange(obj, key);
-}
-function observeMutation$1(membrane, obj, key) {
-    membrane.propertyMemberAccess(obj, key);
-}
-var ReactiveMembrane = /** @class */ (function () {
-    function ReactiveMembrane(distrotion, eventMap) {
-        this.objectGraph = new WeakMap();
-        this.distortion = distrotion;
-        this.propertyMemberChange = eventMap.propertyMemberChange;
-        this.propertyMemberAccess = eventMap.propertyMemberAccess;
-    }
-    ReactiveMembrane.prototype.getProxy = function (value) {
-        var distorted = invokeDistortion(this, value);
-        if (isObservable(distorted)) {
-            return getReactiveState(this, distorted).reactive;
-        }
-        return distorted;
-    };
-    ReactiveMembrane.prototype.getReadOnlyProxy = function (value) {
-        var distorted = invokeDistortion(this, value);
-        if (isObservable(distorted)) {
-            return getReactiveState(this, distorted).readOnly;
-        }
-        return distorted;
-    };
-    return ReactiveMembrane;
-}());
-/** version: 0.18.0-1 */
-
-function format(value) {
-    return value;
-}
-const membrane = new ReactiveMembrane(format, {
-    propertyMemberChange: notifyMutation,
-    propertyMemberAccess: observeMutation,
-});
-const unwrapMethods = [
-    unwrap,
-    unwrap$1
-];
-const { length: unwrapLength } = unwrapMethods;
-function unwrap$2(value) {
-    for (let i = 0; i < unwrapLength; i += 1) {
-        const current = unwrapMethods[i];
-        const unwrapped = current(value);
-        if (unwrapped !== value) {
-            return unwrapped;
-        }
-    }
-    return value;
-}
-// TODO: REMOVE THIS https://github.com/salesforce/lwc/issues/129
-function dangerousObjectMutation(obj) {
-    {
-        assert.logWarning(`Dangerously Mutating Object ${obj}. This object was passed to you from a parent component, and should not be mutated here. This will be removed in the near future.`);
-    }
-    return membrane.getProxy(unwrap$2(obj));
 }
 
 const CHAR_S = 115;
@@ -2024,6 +2057,10 @@ function i(iterable, factory) {
     let next = iterator.next();
     let j = 0;
     let { value, done: last } = next;
+    let keyMap;
+    {
+        keyMap = create(null);
+    }
     while (last === false) {
         // implementing a look-back-approach because we need to know if the element is the last
         next = iterator.next();
@@ -2039,9 +2076,18 @@ function i(iterable, factory) {
         {
             const vnodes = isArray(vnode) ? vnode : [vnode];
             forEach.call(vnodes, (childVnode) => {
-                if (!isNull(childVnode) && isObject(childVnode) && !isUndefined(childVnode.sel) && StringIndexOf.call(childVnode.sel, '-') > 0 && isUndefined(childVnode.key)) {
-                    // TODO - it'd be nice to log the owner component rather than the iteration children
-                    assert.logWarning(`Missing "key" attribute in iteration with child "<${childVnode.sel}>", index ${i}. Instead set a unique "key" attribute value on all iteration children so internal state can be preserved during rehydration.`);
+                if (!isNull(childVnode) && isObject(childVnode) && !isUndefined(childVnode.sel)) {
+                    const { key } = childVnode;
+                    if (isString(key) || isNumber(key)) {
+                        if (keyMap[key] === 1) {
+                            assert.logWarning(`Invalid "key" attribute in iteration with child "<${childVnode.sel}>". Key with value "${childVnode.key}" appears more than once in iteration. Key values must be unique numbers or strings.`);
+                        }
+                        keyMap[key] = 1;
+                    }
+                    else {
+                        // TODO - it'd be nice to log the owner component rather than the iteration children
+                        assert.logWarning(`Missing "key" attribute in iteration with child "<${childVnode.sel}>", index ${i}. Instead set a unique "key" attribute value on all iteration children so internal state can be preserved during rehydration.`);
+                    }
                 }
             });
         }
@@ -2114,9 +2160,7 @@ function b(fn) {
         invokeComponentCallback(vm, fn, [event]);
     };
 }
-const objToKeyMap = new WeakMap();
-let globalKey = 0;
-// [k]ind function
+// [k]ey function
 function k(compilerKey, obj) {
     switch (typeof obj) {
         case 'number':
@@ -2125,18 +2169,9 @@ function k(compilerKey, obj) {
         case 'string':
             return compilerKey + ':' + obj;
         case 'object':
-            if (isNull(obj)) {
-                return;
+            {
+                assert.fail(`Invalid key value "${obj}" in ${vmBeingRendered}. Key must be a string or number.`);
             }
-            // Slow path. We get here when element is inside iterator
-            // but no key is specified.
-            const unwrapped = unwrap$2(obj);
-            let objKey = objToKeyMap.get(unwrapped);
-            if (isUndefined(objKey)) {
-                objKey = globalKey++;
-                objToKeyMap.set(unwrapped, objKey);
-            }
-            return compilerKey + ':' + objKey;
     }
 }
 
@@ -2395,10 +2430,13 @@ function invokeComponentRenderMethod(vm) {
 }
 
 // stub function to prevent misuse of the @track decorator
-function track() {
+function track(obj) {
     {
-        assert.fail("@track may only be used as a decorator.");
+        if (arguments.length !== 1) {
+            assert.fail("@track can be used as a decorator or as a function with one argument to produce a trackable version of the provided value.");
+        }
     }
+    return reactiveMembrane.getProxy(obj);
 }
 // TODO: how to allow symbols as property keys?
 function createTrackedPropertyDescriptor(proto, key, descriptor) {
@@ -2408,7 +2446,7 @@ function createTrackedPropertyDescriptor(proto, key, descriptor) {
             {
                 assert.vm(vm);
             }
-            observeMutation(this, key);
+            observeMutation$1(this, key);
             return vm.cmpTrack[key];
         },
         set(newValue) {
@@ -2417,7 +2455,7 @@ function createTrackedPropertyDescriptor(proto, key, descriptor) {
                 assert.vm(vm);
                 assert.invariant(!isRendering, `${vmBeingRendered}.render() method has side effects on the state of ${vm}.${key}`);
             }
-            const reactiveOrAnyValue = membrane.getProxy(newValue);
+            const reactiveOrAnyValue = reactiveMembrane.getProxy(newValue);
             if (reactiveOrAnyValue !== vm.cmpTrack[key]) {
                 {
                     // reactiveMembrane.getProxy(newValue) will return a different value (proxy)
@@ -2430,7 +2468,7 @@ function createTrackedPropertyDescriptor(proto, key, descriptor) {
                 vm.cmpTrack[key] = reactiveOrAnyValue;
                 if (vm.idx > 0) {
                     // perf optimization to skip this step if not in the DOM
-                    notifyMutation(this, key);
+                    notifyMutation$1(this, key);
                 }
             }
         },
@@ -2477,7 +2515,7 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
                 }
                 return;
             }
-            observeMutation(this, key);
+            observeMutation$1(this, key);
             return vm.cmpProps[key];
         },
         set(newValue) {
@@ -2491,7 +2529,7 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
                 {
                     // reactiveMembrane.getProxy(newValue) will return a different value (proxy)
                     // Then newValue if newValue is observable (plain object or array)
-                    const isObservable = membrane.getProxy(newValue) !== newValue;
+                    const isObservable = reactiveMembrane.getProxy(newValue) !== newValue;
                     if (!isObservable && !isNull(newValue) && isObject(newValue)) {
                         assert.logWarning(`Assigning a non-reactive value ${newValue} to member property ${key} of ${vm} is not common because mutations on that value cannot be observed.`);
                     }
@@ -2500,11 +2538,11 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
             if (vmBeingUpdated === vm) {
                 // not need to wrap or check the value since that is happening somewhere else
                 vmBeingUpdated = null; // releasing the lock
-                vm.cmpProps[key] = membrane.getReadOnlyProxy(newValue);
+                vm.cmpProps[key] = reactiveMembrane.getReadOnlyProxy(newValue);
                 // avoid notification of observability while constructing the instance
                 if (vm.idx > 0) {
                     // perf optimization to skip this step if not in the DOM
-                    notifyMutation(this, key);
+                    notifyMutation$1(this, key);
                 }
             }
             else {
@@ -2543,7 +2581,7 @@ function createPublicAccessorDescriptor(proto, key, descriptor) {
                 {
                     // reactiveMembrane.getProxy(newValue) will return a different value (proxy)
                     // Then newValue if newValue is observable (plain object or array)
-                    const isObservable = membrane.getProxy(newValue) !== newValue;
+                    const isObservable = reactiveMembrane.getProxy(newValue) !== newValue;
                     if (!isObservable && !isNull(newValue) && isObject(newValue)) {
                         assert.logWarning(`Assigning a non-reactive value ${newValue} to member property ${key} of ${vm} is not common because mutations on that value cannot be observed.`);
                     }
@@ -2553,7 +2591,7 @@ function createPublicAccessorDescriptor(proto, key, descriptor) {
                 // not need to wrap or check the value since that is happening somewhere else
                 vmBeingUpdated = null; // releasing the lock
                 if (set) {
-                    set.call(this, membrane.getReadOnlyProxy(newValue));
+                    set.call(this, reactiveMembrane.getReadOnlyProxy(newValue));
                 }
                 else {
                     assert.fail(`Invalid attempt to set a new value for property ${key} of ${vm} that does not has a setter decorated with @api.`);
@@ -2581,7 +2619,11 @@ const CtorToDefMap = new WeakMap();
 const COMPUTED_GETTER_MASK = 1;
 const COMPUTED_SETTER_MASK = 2;
 function propertiesReducer(seed, propName) {
-    seed[propName] = { config: 3 };
+    seed[propName] = {
+        config: 3,
+        type: 'any',
+        attr: getAttrNameFromPropName(propName),
+    };
     return seed;
 }
 const reducedDefaultHTMLPropertyNames = ArrayReduce.call(defaultDefHTMLPropertyNames, propertiesReducer, create(null));
@@ -2862,8 +2904,9 @@ function getPublicPropertiesHash(target) {
         return EmptyObject;
     }
     return getOwnPropertyNames(props).reduce((propsHash, propName) => {
+        const attrName = getAttrNameFromPropName(propName);
         {
-            const globalHTMLProperty = GlobalHTMLProperties[propName];
+            const globalHTMLProperty = getGlobalHTMLPropertiesInfo()[propName];
             if (globalHTMLProperty && globalHTMLProperty.attribute && globalHTMLProperty.reflective === false) {
                 const { error, attribute, experimental } = globalHTMLProperty;
                 const msg = [];
@@ -2881,7 +2924,11 @@ function getPublicPropertiesHash(target) {
                 console.error(msg.join('\n')); // tslint:disable-line
             }
         }
-        propsHash[propName] = assign({ config: 0, type: 'any' }, props[propName]);
+        propsHash[propName] = assign({
+            config: 0,
+            type: 'any',
+            attr: attrName,
+        }, props[propName]);
         return propsHash;
     }, create(null));
 }
@@ -3365,10 +3412,11 @@ function updateAttrs(oldVnode, vnode) {
         assert.invariant(isUndefined(oldAttrs) || keys(oldAttrs).join(',') === keys(attrs).join(','), `vnode.data.attrs cannot change shape.`);
     }
     const elm = vnode.elm;
-    const { setAttribute, removeAttribute } = elm;
     let key;
     oldAttrs = isUndefined(oldAttrs) ? EmptyObject : oldAttrs;
     // update modified attributes, add new attributes
+    // this routine is only useful for data-* attributes in all kind of elements
+    // and aria-* in standard elements (custom elements will use props for these)
     for (key in attrs) {
         const cur = attrs[key];
         const old = oldAttrs[key];
@@ -3376,24 +3424,19 @@ function updateAttrs(oldVnode, vnode) {
             {
                 prepareForAttributeMutationFromTemplate(elm, key);
             }
-            if (isTrue(cur)) {
-                setAttribute.call(elm, key, "");
+            if (StringCharCodeAt.call(key, 3) === ColonCharCode) {
+                // Assume xml namespace
+                elm.setAttributeNS(xmlNS, key, cur);
             }
-            else if (isFalse(cur)) {
-                removeAttribute.call(elm, key);
+            else if (StringCharCodeAt.call(key, 5) === ColonCharCode) {
+                // Assume xlink namespace
+                elm.setAttributeNS(xlinkNS, key, cur);
+            }
+            else if (isNull(cur)) {
+                elm.removeAttribute(key);
             }
             else {
-                if (StringCharCodeAt.call(key, 3) === ColonCharCode) {
-                    // Assume xml namespace
-                    elm.setAttributeNS.call(elm, xmlNS, key, cur);
-                }
-                else if (StringCharCodeAt.call(key, 5) === ColonCharCode) {
-                    // Assume xlink namespace
-                    elm.setAttributeNS.call(elm, xlinkNS, key, cur);
-                }
-                else {
-                    setAttribute.call(elm, key, cur);
-                }
+                elm.setAttribute(key, cur);
             }
         }
     }
@@ -4071,17 +4114,29 @@ function createElement$1(sel, options = {}) {
     return element;
 }
 
+// when used with exactly one argument, we assume it is a function invocation.
+function readonly(obj) {
+    {
+        // TODO: enable the usage of this function as @readonly decorator
+        if (arguments.length !== 1) {
+            assert.fail("@readonly cannot be used as a decorator just yet, use it as a function with one argument to produce a readonly version of the provided value.");
+        }
+    }
+    return reactiveMembrane.getReadOnlyProxy(obj);
+}
+
 exports.createElement = createElement$1;
 exports.getComponentDef = getComponentDef;
 exports.Element = LWCElement;
 exports.register = register;
-exports.unwrap = unwrap$2;
+exports.unwrap = unwrap$1;
 exports.dangerousObjectMutation = dangerousObjectMutation;
 exports.api = api$1;
 exports.track = track;
+exports.readonly = readonly;
 exports.wire = wire;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.18.0-1 */
+/** version: 0.19.0-0 */

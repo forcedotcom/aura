@@ -80,17 +80,17 @@ function updatedFuture(cmp, configContext) {
     // configContext.mutated must be set prior to invoking this function
     const mutated = configContext.mutated;
     delete configContext.mutated;
-    for (const prop of mutated) {
+    mutated.forEach(prop => {
         const value = cmp[prop];
         if (configContext.values[prop] === value) {
-            continue;
+            return;
         }
         configContext.values[prop] = value;
         const listeners = configContext.listeners[prop];
         for (let i = 0, len = listeners.length; i < len; i++) {
             uniqueListeners.add(listeners[i]);
         }
-    }
+    });
     invokeConfigListeners(uniqueListeners, configContext.values);
 }
 /**
@@ -209,8 +209,9 @@ class WireEventTarget {
             case CONFIG:
                 const params = this._wireDef.params;
                 const statics = this._wireDef.static;
+                const paramsKeys = Object.keys(params);
                 // no dynamic params, only static, so fire config once
-                if (!params) {
+                if (paramsKeys.length === 0) {
                     const config = statics || {};
                     listener.call(undefined, config);
                     return;
@@ -221,7 +222,7 @@ class WireEventTarget {
                     params
                 };
                 const configContext = this._context[CONTEXT_ID][CONTEXT_UPDATED];
-                Object.keys(params).forEach(param => {
+                paramsKeys.forEach(param => {
                     const prop = params[param];
                     let configListenerMetadatas = configContext.listeners[prop];
                     if (!configListenerMetadatas) {
@@ -381,4 +382,4 @@ exports.ValueChangedEvent = ValueChangedEvent;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.18.1 */
+/** version: 0.19.0-0 */

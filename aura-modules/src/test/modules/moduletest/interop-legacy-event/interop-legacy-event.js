@@ -2,11 +2,12 @@ import { Element, api, unwrap } from "engine";
 
 export default class InteropLegacyEvent extends Element {
     @api
-    focus() {
-        this.root.querySelector('#trigger-click').focus();
+    triggerEvent() {
+        // a bug in Chrome prevents us from using focus() here. Fixed in Chome 67.
+        this.root.querySelector('#trigger-click').click();
     }
 
-    handleButtonFocus(event) {
+    handleButtonClick(event) {
         let detail = {};
 
         if (this.getAttribute('data-aura-rendered-by')) {

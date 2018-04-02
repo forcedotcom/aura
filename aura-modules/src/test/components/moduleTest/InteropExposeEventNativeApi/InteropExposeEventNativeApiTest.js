@@ -43,7 +43,7 @@
         },
         test: [
             function (cmp) {
-                cmp.find('legacy').getElement().focus();
+                cmp.find('legacy').getElement().triggerEvent();
             },
             function (cmp) {
                 var receivedEvent = cmp.get('v.focusEvt');

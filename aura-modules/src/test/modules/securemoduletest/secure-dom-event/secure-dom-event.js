@@ -2,7 +2,7 @@ import { Element, track, api } from 'engine';
 import * as testUtil from 'securemoduletest-test-util';
 
 export default class SecureDOMEventClazz extends Element {
-    @track _event = null;
+    _event = null;
     @track accounts = [{ id: 1, Name: "account1" }];
     @track boolVar = true;
 
@@ -109,15 +109,15 @@ export default class SecureDOMEventClazz extends Element {
     @api
     testCustomEvent() {
         let listenerCalled = false;
-        this.addEventListener("customEvent", event => {
+        this.addEventListener("customevent", event => {
             const eventData = event.detail.welcome;
             testUtil.assertEquals("Hello", eventData[0], "Expected data to be equal to 'Hello'");
             testUtil.assertEquals("World!", eventData[1], "Expected data to be equal to 'World!'");
             listenerCalled = true;
         });
 
-        const testData = {detail: {welcome: ["Hello", "World!"]}};
-        const customEvt = new CustomEvent("customEvent", testData);
+        const testData = {composed: true, detail: {welcome: ["Hello", "World!"]}};
+        const customEvt = new CustomEvent("customevent", testData);
         this.dispatchEvent(customEvt);
 
         testUtil.assertEquals(true, listenerCalled, "Expected custom event to be dispatched.");

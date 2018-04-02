@@ -3,7 +3,7 @@
     <button id="buttonInMarkup" onclick={handleClick}>Button in markup</button>
 
     <template for:each={accounts} for:item="account">
-        <button onclick={handleClick} id="buttonInIteration">Button inside for:each</button>
+        <button key={account.id} onclick={handleClick} id="buttonInIteration">Button inside for:each</button>
     </template>
 
     <p if:true={boolVar}>
@@ -12,7 +12,7 @@
 
 
     <template for:each={accounts} for:item="account">
-        <p if:true={boolVar}>
+        <p key={account.id} if:true={boolVar}>
             <button onclick={handleClick} id="buttonInNestedIteration">Button inside aura:iteration and aura:if</button>
         </p>
     </template>

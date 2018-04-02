@@ -84,7 +84,7 @@
             function updateProps(cmp) {
                 var list = cmp.find('list');
 
-                cmp.set('v.items', [{ label: 'item1' }, { label: 'item2' }]);
+                cmp.set('v.items', [{ label: 'item1', id: 1 }, { label: 'item2', id: 2 }]);
 
                 $A.test.assertEquals(
                     list.get('v.items').length,
@@ -137,7 +137,7 @@
             function updateProps(cmp) {
                 var list = cmp.find('list-without-items');
 
-                list.set('v.items', [{ label: 'item1' }, { label: 'item2' }]);
+                list.set('v.items', [{ label: 'item1', id: 1 }, { label: 'item2', id: 2 }]);
 
                 $A.test.assertEquals(
                     2,

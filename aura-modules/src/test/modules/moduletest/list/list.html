@@ -1,8 +1,8 @@
 <template>
     <ul>
         <template for:each={items} for:item="item" for:index="index">
-            <li key={index}>{item.label}</li>
-            <moduletest-list key={index} items={item.items}></moduletest-list>
+            <li key={item.id}>{item.label}</li>
+            <moduletest-list key={item.id} items={item.items}></moduletest-list>
         </template>
     </ul>
 </template>

@@ -252,34 +252,36 @@ if ("document" in self) {
     }());
 
     }
-window.CustomEvent = function CustomEvent(type, eventInitDict) {
-	if (!type) {
-		throw Error('TypeError: Failed to construct "CustomEvent": An event name must be provided.');
-	}
+if (typeof CustomEvent !== 'function') {
+    window.CustomEvent = function CustomEvent(type, eventInitDict) {
+        if (!type) {
+            throw Error('TypeError: Failed to construct "CustomEvent": An event name must be provided.');
+        }
 
-	var event;
-	eventInitDict = eventInitDict || {bubbles: false, cancelable: false, detail: null};
+        var event;
+        eventInitDict = eventInitDict || {bubbles: false, cancelable: false, detail: null};
 
-	if ('createEvent' in document) {
-		try {
-			event = document.createEvent('CustomEvent');
-			event.initCustomEvent(type, eventInitDict.bubbles, eventInitDict.cancelable, eventInitDict.detail);
-		} catch (error) {
-			// for browsers which don't support CustomEvent at all, we use a regular event instead
-			event = document.createEvent('Event');
-			event.initEvent(type, eventInitDict.bubbles, eventInitDict.cancelable);
-			event.detail = eventInitDict.detail;
-		}
-	} else {
+        if ('createEvent' in document) {
+            try {
+                event = document.createEvent('CustomEvent');
+                event.initCustomEvent(type, eventInitDict.bubbles, eventInitDict.cancelable, eventInitDict.detail);
+            } catch (error) {
+                // for browsers which don't support CustomEvent at all, we use a regular event instead
+                event = document.createEvent('Event');
+                event.initEvent(type, eventInitDict.bubbles, eventInitDict.cancelable);
+                event.detail = eventInitDict.detail;
+            }
+        } else {
 
-		// IE8
-		event = new Event(type, eventInitDict);
-		event.detail = eventInitDict && eventInitDict.detail || null;
-	}
-	return event;
-};
+            // IE8
+            event = new Event(type, eventInitDict);
+            event.detail = eventInitDict && eventInitDict.detail || null;
+        }
+        return event;
+    };
 
-CustomEvent.prototype = Event.prototype;
+    CustomEvent.prototype = Event.prototype;
+}
 (function () {
 	var unlistenableWindowEvents = {
 		click: 1,
@@ -3508,7 +3510,7 @@ module.exports = function (hint) {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_proxy_compat__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_proxy_compat__);
-var __getKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.getKey;var __setKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.setKey;var __callKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.callKey;var __iterableKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.iterableKey;var __inKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.inKey;var __deleteKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.deleteKey;var __instanceOfKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.instanceOfKey; /******/(function (modules) {// webpackBootstrap
+var __getKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.getKey;var __setKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.setKey;var __callKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.callKey;var __iterableKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.iterableKey;var __inKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.inKey;var __deleteKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.deleteKey;var __concat = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.concat;var __instanceOfKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.instanceOfKey; /******/(function (modules) {// webpackBootstrap
   /******/ // The module cache
   /******/var installedModules = {};
   /******/
@@ -3966,7 +3968,7 @@ var __getKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.getKey;var _
   var id = 0;
   var px = Math.random();
   __setKey(module, "exports", function (key) {
-    return 'Symbol('.concat(key === undefined ? '' : key, ')_', __callKey(++id + px, "toString", 36));
+    return __concat('Symbol(', key === undefined ? '' : key, ')_', __callKey(++id + px, "toString", 36));
   });
 
 
@@ -4247,7 +4249,7 @@ var __getKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.getKey;var _
 
   // 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
   var $keys = __webpack_require__(47);
-  var hiddenKeys = __webpack_require__(33).concat('length', 'prototype');
+  var hiddenKeys = __concat(__webpack_require__(33), 'length', 'prototype');
 
   __setKey(exports, "f", Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
     return $keys(O, hiddenKeys);
@@ -5931,7 +5933,7 @@ var __getKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.getKey;var _
     var isEnum = __getKey(pIE, "f");
     while (aLen > index) {
       var S = IObject(arguments[index++]);
-      var keys = getSymbols ? getKeys(S).concat(getSymbols(S)) : getKeys(S);
+      var keys = getSymbols ? __concat(getKeys(S), getSymbols(S)) : getKeys(S);
       var length = __getKey(keys, "length");
       var j = 0;
       var key;
@@ -6020,7 +6022,7 @@ var __getKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.getKey;var _
   __setKey(module, "exports", Reflect && __getKey(Reflect, "ownKeys") || function ownKeys(it) {
     var keys = __callKey(gOPN, "f", anObject(it));
     var getSymbols = __getKey(gOPS, "f");
-    return getSymbols ? keys.concat(getSymbols(it)) : keys;
+    return getSymbols ? __concat(keys, getSymbols(it)) : keys;
   });
 
 
@@ -6388,11 +6390,11 @@ var XProxy = /** @class */function () {
     return push.apply(this, arguments);
   };
   XProxy.prototype.concat = function () {
-    var concat = this.get('concat');
-    if (concat === Array.prototype.concat) {
-      concat = compatConcat;
+    var concat$$1 = this.get('concat');
+    if (concat$$1 === Array.prototype.concat) {
+      concat$$1 = compatConcat;
     }
-    return concat.apply(this, arguments);
+    return concat$$1.apply(this, arguments);
   };
   XProxy.prototype.unshift = function () {
     var unshift = this.get('unshift');
@@ -6490,6 +6492,18 @@ function instanceOfKey(instance, Type) {
   }
   return Type[Symbol.hasInstance](instance);
 }
+function concat(replicaOrAny) {
+  var fn = getKey(replicaOrAny, 'concat');
+  if (fn === Array.prototype.concat) {
+    fn = compatConcat;
+  }
+  var args = [];
+  var l = arguments.length;
+  for (var i = 1; i < l; i++) {
+    args[i - 1] = arguments[i];
+  }
+  return fn.apply(replicaOrAny, args);
+}
 
 var _isArray = Array.isArray;
 var _a$1 = Array.prototype,ArraySlice$1 = _a$1.slice,ArrayShift = _a$1.shift,ArrayUnshift$1 = _a$1.unshift;
@@ -6575,10 +6589,10 @@ function setPrototypeOf$1(obj, proto) {
 if (!Object.setPrototypeOf || !({ __proto__: [] } instanceof Array)) {
   Object.setPrototypeOf = setPrototypeOf$1;
 }
-var _keys = Object.keys,_getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,_preventExtensions = Object.preventExtensions,_defineProperty = Object.defineProperty,_isExtensible = Object.isExtensible,_getPrototypeOf = Object.getPrototypeOf,_setPrototypeOf = Object.setPrototypeOf;
+var _keys = Object.keys,_values = Object.values,_entries = Object.entries,_getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,_preventExtensions = Object.preventExtensions,_defineProperty = Object.defineProperty,_isExtensible = Object.isExtensible,_getPrototypeOf = Object.getPrototypeOf,_setPrototypeOf = Object.setPrototypeOf;
 function keys(replicaOrAny) {
   if (isCompatProxy(replicaOrAny)) {
-    var all = replicaOrAny.forIn(); // get all enumerables and filter by own
+    var all = replicaOrAny.forIn();
     var result = [];
     // tslint:disable-next-line:forin
     for (var prop in all) {
@@ -6588,8 +6602,47 @@ function keys(replicaOrAny) {
       }
     }
     return result;
+  } else
+  {
+    return _keys(replicaOrAny);
   }
-  return _keys(replicaOrAny);
+}
+function values(replicaOrAny) {
+  if (isCompatProxy(replicaOrAny)) {
+    var all = replicaOrAny.forIn();
+    var result = [];
+    // tslint:disable-next-line:forin
+    for (var prop in all) {
+      var desc = replicaOrAny.getOwnPropertyDescriptor(prop);
+      if (desc && desc.enumerable === true) {
+        result.push(getKey(replicaOrAny, prop));
+      }
+    }
+    return result;
+  } else
+  {
+    return _values(replicaOrAny);
+  }
+}
+function entries(replicaOrAny) {
+  if (isCompatProxy(replicaOrAny)) {
+    var all = replicaOrAny.forIn();
+    var result = [];
+    // tslint:disable-next-line:forin
+    for (var prop in all) {
+      var desc = replicaOrAny.getOwnPropertyDescriptor(prop);
+      if (desc && desc.enumerable === true) {
+        result.push([
+        prop,
+        getKey(replicaOrAny, prop)]);
+
+      }
+    }
+    return result;
+  } else
+  {
+    return _entries(replicaOrAny);
+  }
 }
 function getPrototypeOf$1(replicaOrAny) {
   if (isCompatProxy(replicaOrAny)) {
@@ -6668,6 +6721,8 @@ Object.getPrototypeOf = getPrototypeOf$1;
 Object.assign = patchedAssign;
 // Object methods path
 Object.compatKeys = keys;
+Object.compatValues = values;
+Object.compatEntries = entries;
 // Array.prototype methods patches.
 Object.defineProperties(Array.prototype, {
   compatUnshift: { value: compatUnshift, enumerable: false },
@@ -6699,6 +6754,7 @@ FinalProxy.deleteKey = deleteKey;
 FinalProxy.inKey = inKey;
 FinalProxy.iterableKey = iterableKey;
 FinalProxy.instanceOfKey = instanceOfKey;
+FinalProxy.concat = concat;
 if (typeof Proxy === 'undefined') {
   makeGlobal(FinalProxy);
 }
@@ -8183,4 +8239,4 @@ exports.babelHelpers = babelHelpers;
 return exports;
 
 }({}));
-/** version: 0.17.32 */
+/** version: 0.17.35 */

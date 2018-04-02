@@ -40,11 +40,11 @@ var DISCONNECT = "disconnect"; // wire event target life cycle config changed ho
 
 var CONFIG = "config";
 
-function _instanceof$$1(left, right) {
+function _instanceof(left, right) {
   if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) {
     return right[Symbol.hasInstance](left);
   } else {
-    return _instanceof$$1(left, right);
+    return left instanceof right;
   }
 }
 
@@ -99,13 +99,11 @@ function updatedFuture(cmp, configContext) {
 
   var mutated = configContext.mutated;
   delete configContext.mutated;
-
-  for (var _i = 0, mutated_1 = mutated; _i < mutated_1.length; _i++) {
-    var prop = mutated_1[_i];
+  mutated.forEach(function (prop) {
     var value = cmp[prop];
 
     if (configContext.values[prop] === value) {
-      continue;
+      return;
     }
 
     configContext.values[prop] = value;
@@ -114,8 +112,7 @@ function updatedFuture(cmp, configContext) {
     for (var i = 0, len = listeners.length; i < len; i++) {
       uniqueListeners.add(listeners[i]);
     }
-  }
-
+  });
   invokeConfigListeners(uniqueListeners, configContext.values);
 }
 /**
@@ -259,9 +256,10 @@ function () {
 
       case CONFIG:
         var params_1 = this._wireDef.params;
-        var statics = this._wireDef.static; // no dynamic params, only static, so fire config once
+        var statics = this._wireDef.static;
+        var paramsKeys = Object.keys(params_1); // no dynamic params, only static, so fire config once
 
-        if (!params_1) {
+        if (paramsKeys.length === 0) {
           var config = statics || {};
           listener.call(undefined, config);
           return;
@@ -273,7 +271,7 @@ function () {
           params: params_1
         };
         var configContext_1 = this._context[CONTEXT_ID][CONTEXT_UPDATED];
-        Object.keys(params_1).forEach(function (param) {
+        paramsKeys.forEach(function (param) {
           var prop = params_1[param];
           var configListenerMetadatas = configContext_1.listeners[prop];
 
@@ -327,7 +325,7 @@ function () {
   };
 
   WireEventTarget.prototype.dispatchEvent = function (evt) {
-    if (_instanceof$$1(evt, ValueChangedEvent)) {
+    if (_instanceof(evt, ValueChangedEvent)) {
       var value = evt.value;
 
       if (this._wireDef.method) {
@@ -463,4 +461,4 @@ exports.ValueChangedEvent = ValueChangedEvent;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.18.1 */
+/** version: 0.19.0-0 */

@@ -34,7 +34,24 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
             "Component": {
                 "ComponentDefLoader": _componentDefLoader
             },
-            "componentDefLoaderError": {}
+            "componentDefLoaderError": {},
+            "System": {
+                "DefDescriptor": function(desc){
+                    this.prefix = "markup";
+                    if (desc.indexOf("://") != -1) {
+                        var pieces = desc.split("://");
+                        this.prefix = pieces[0];
+                        desc = pieces[1];
+                    }
+                    var parts = desc.split(":");
+                    this.getName = function() {
+                        return parts[1];
+                    };
+                    this.getNamespace = function() {
+                        return parts[0];
+                    };
+                }
+            }
         },
         "$A": {
             util: {
@@ -46,6 +63,9 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
                 },
                 "isString": function(obj){
                     return typeof obj === 'string';
+                },
+                "isUndefinedOrNull": function(obj) {
+                    return obj === undefined || obj === null;
                 }
             },
             "reportError": reportError,
@@ -72,10 +92,19 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
             },
             "get": function(thing) {
                 return null;
+            },
+            "componentService": {
+                "hasCacheableDefinitionOfAnyType": function() { return false; }
             }
         },
         //Need to add a ref to itself to handle global defaults
-        "ComponentDefLoader": _componentDefLoader
+        "ComponentDefLoader": _componentDefLoader,
+        "document": {
+            "cookie": "sample cookie values"
+        },
+        "window": {
+            "navigator": {"userAgent": "sample user agent string"}
+        }
     };
 
     var mockAura = Mocks.GetMocks(Object.Global(), defaultMock);
@@ -86,7 +115,7 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
         [Fact]
         function defaultVariablesDefined() {
             var actual;
-            var expect = "_uid,_def,aura.app,_hydration,_l,LATEST,/auraCmpDef?,markup://,1800";
+            var expect = "_uid,_def,aura.app,_hydration,_l,LATEST,/auraCmpDef?,markup://";
             mockAura(function () {
                 var defLoader = Aura.Component.ComponentDefLoader;
                 actual = [
@@ -97,8 +126,7 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
                     defLoader.LOCKER_param,
                     defLoader.UID_default,
                     defLoader.BASE_PATH,
-                    defLoader.MARKUP_param,
-                    defLoader.IE_URI_MAX_LENGTH
+                    defLoader.MARKUP_param
                 ];
             });
 
@@ -385,6 +413,51 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
 
     [Fixture]
     function buildBundleComponentUri() {
+
+        [Fact]
+        function shouldBuildOneBundleURI() {
+            var actual;
+            var expect = 1;
+            mockAura(function () {
+                var defLoader = new Aura.Component.ComponentDefLoader();
+                var descriptorMap = {"test:thing": "someUid"};
+                actual = defLoader.buildBundleComponentUri(descriptorMap).length;
+            });
+
+            Assert.Equal(expect, actual);
+        }
+
+        [Fact]
+        function shouldBuildBundleURI() {
+            var actual;
+            var expect = '/auraCmpDef?aura.app=markup://test_type&_l=true&test=thing&_uid=someUid';
+            mockAura(function () {
+                var defLoader = new Aura.Component.ComponentDefLoader();
+                var descriptorMap = {"test:thing": "someUid"};
+                actual = defLoader.buildBundleComponentUri(descriptorMap)[0];
+            });
+
+            Assert.Equal(expect, actual);
+        }
+
+        [Fact]
+        function shouldSplitTooLongRequestIntoTwoURIs(){
+            var actual;
+            var expect = 2;
+            mockAura(function () {
+                var defLoader = new Aura.Component.ComponentDefLoader();
+                var descriptorMap = {};
+                // generate enough descriptors to exceed 16k limit
+                for (var namespace=0; namespace < 5; namespace++) {
+                    for (var name=0; name < 500; name++) {
+                        descriptorMap["namespace" + namespace + ":name" + name] = namespace + "uid" + name;
+                    }
+                }
+                actual = defLoader.buildBundleComponentUri(descriptorMap).length;
+            });
+
+            Assert.Equal(expect, actual);
+        }
         
     }
 

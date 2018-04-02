@@ -35,7 +35,6 @@ ComponentDefLoader.LOCALE_param = "_l10n";
 ComponentDefLoader.UID_default = "LATEST";
 ComponentDefLoader.BASE_PATH = "/auraCmpDef?";
 ComponentDefLoader.MARKUP_param = "markup://";
-ComponentDefLoader.IE_URI_MAX_LENGTH = 1800;
 
 ComponentDefLoader.prototype.buildComponentUri = function(descriptor, uid) {
     if (!descriptor || typeof descriptor !== "string") {
@@ -99,7 +98,7 @@ ComponentDefLoader.prototype.buildBundleComponentNamespace = function(descriptor
         return {};
     }
     var namespaceMap = {};
-    for (var i=0, length=descriptors.length; i<length; i++) {
+    for (var i=0; i < descriptors.length; i++) {
         if ($A.componentService.hasCacheableDefinitionOfAnyType(descriptors[i])) {
             continue;
         }
@@ -138,15 +137,27 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
         return undefined;
     }
 
+    var maxLength;
+    if ($A.util.isIE) {
+        // URI length for IE needs to be below 2000 characters.
+        maxLength = 1800;
+    } else {
+        // Commonly, app servers are configured with a request header size of 16k
+        //   this includes URL and any additional Headers, like Cookies
+        //   initially buffering for standard headers Accept*, Host, Referrer, Connection.
+        // This information can vary, reducing the size further to help ensure we stay under the limit
+        maxLength = 15000 - document.cookie.length - window.navigator.userAgent.length;
+    }
+
     for (var i=0, length=namespaces.length; i<length; i++) {
         var names = Object.keys(namespaceMap[namespaces[i]]).sort();
         var additionalURI = "&" + namespaces[i] + "=" + names.join(",");
-        if ($A.util.isIE && (additionalURI.length + uri.length > ComponentDefLoader.IE_URI_MAX_LENGTH)) {
-            if (additionalURI.length > ComponentDefLoader.IE_URI_MAX_LENGTH) {
+        if (additionalURI.length + uri.length > maxLength) {
+            if (additionalURI.length > maxLength) {
                 additionalURI = "&" + namespaces[i] + "=";
                 for (var name_idx=0; name_idx < names.length; name_idx++) {
                     var name = names[name_idx];
-                    if (additionalURI.length + name.length + uri.length > ComponentDefLoader.IE_URI_MAX_LENGTH) {
+                    if (additionalURI.length + name.length + uri.length > maxLength) {
                         uris.push([uri, uid]);
                         uid = $A.util.isString(namespaceMap[namespaces[i]][name]) ?  namespaceMap[namespaces[i]][name] : "";
                         uri =  "&" + namespaces[i] + "=" + name;

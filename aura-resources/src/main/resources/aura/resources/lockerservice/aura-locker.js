@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-03-29
- * Version: 0.3.29
+ * Generated: 2018-03-30
+ * Version: 0.3.30
  */
 
 (function (exports) {
@@ -1779,6 +1779,44 @@ function isValidURLScheme(url) {
   const normalized = document.createElement('a');
   normalized.href = url;
   return normalized.protocol === 'https:' || normalized.protocol === 'http:';
+}
+
+/**
+ * Displays a popup asking if the user wants to exit the current domain.
+ * Returns a boolean of the result of that popup.
+ * @return {Boolean}
+ */
+function confirmNavigationAwayFromCurrentDomain() {
+  let currentLocation = `${window.location.protocol}//${window.location.hostname}`;
+  currentLocation += window.location.port.length ? `:${window.location.port}` : '';
+
+  // eslint-disable-next-line
+  if (confirm(`You are exiting ${currentLocation}. Continue?`)) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Determines if a link points to a third-party domain.
+ * @param {Object} currentDomain
+ * @param {Object} newDomain
+ * @return {Boolean}
+ */
+function isSameLocation(currentDomain, newDomain) {
+  if (currentDomain.protocol !== newDomain.protocol) {
+    return false;
+  }
+
+  if (currentDomain.hostname !== newDomain.hostname) {
+    return false;
+  }
+
+  if (currentDomain.port !== newDomain.port) {
+    return false;
+  }
+
+  return true;
 }
 
 /*
@@ -6795,6 +6833,11 @@ function SecureLocation(loc, key) {
         dummy.href = href;
 
         if (dummy.protocol === 'http:' || dummy.protocol === 'https:') {
+          if (!isSameLocation(window.location, dummy)) {
+            if (!confirmNavigationAwayFromCurrentDomain()) {
+              throw new error('User opted not to exit the current domain');
+            }
+          }
           return href;
         }
 

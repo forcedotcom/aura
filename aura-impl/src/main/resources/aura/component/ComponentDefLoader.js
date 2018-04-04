@@ -120,7 +120,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
 
     var baseURI = this.getBaseUrl() + this.buildURIAppParam();
     var hydrationValue = this.getHydrationState();
-    if (!hydrationValue.length) {
+    if (hydrationValue && hydrationValue.length > 0) {
         baseURI += this.buildURIHydrationParam(hydrationValue);
     }
 
@@ -158,14 +158,15 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
                 for (var name_idx=0; name_idx < names.length; name_idx++) {
                     var name = names[name_idx];
                     if (additionalURI.length + name.length + uri.length > maxLength) {
+                        uri += additionalURI;
                         uris.push([uri, uid]);
                         uid = $A.util.isString(namespaceMap[namespaces[i]][name]) ?  namespaceMap[namespaces[i]][name] : "";
-                        uri =  "&" + namespaces[i] + "=" + name;
-                        additionalURI = uri;
+                        additionalURI =  "&" + namespaces[i] + "=" + name;
+                        uri = "";
                     } else {
                         additionalURI += (name_idx>0?",":"") + name;
                         var additional_def_uid = namespaceMap[namespaces[i]][name];
-                        if ($A.util.isString(def_uid)) {
+                        if ($A.util.isString(additional_def_uid)) {
                             uid += additional_def_uid;
                         }
                     }

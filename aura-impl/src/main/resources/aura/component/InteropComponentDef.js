@@ -90,7 +90,7 @@ InteropComponentDef.prototype.HTML_ATTRS_TO_DOM_PROPS = {
     'for': 'htmlFor',
 
     // Aria
-    'aria-autocomplete': 'ariaAutocomplete',
+    'aria-autocomplete': 'ariaAutoComplete',
     'aria-checked': 'ariaChecked',
     'aria-current': 'ariaCurrent',
     'aria-disabled': 'ariaDisabled',
@@ -100,11 +100,11 @@ InteropComponentDef.prototype.HTML_ATTRS_TO_DOM_PROPS = {
     'aria-invalid': 'ariaInvalid',
     'aria-label': 'ariaLabel',
     'aria-level': 'ariaLevel',
-    'aria-multiline': 'ariaMultiline',
+    'aria-multiline': 'ariaMultiLine',
     'aria-multiselectable': 'ariaMultiSelectable',
     'aria-orientation': 'ariaOrientation',
     'aria-pressed': 'ariaPressed',
-    'aria-readonly': 'ariaReadonly',
+    'aria-readonly': 'ariaReadOnly',
     'aria-required': 'ariaRequired',
     'aria-selected': 'ariaSelected',
     'aria-sort': 'ariaSort',
@@ -116,8 +116,6 @@ InteropComponentDef.prototype.HTML_ATTRS_TO_DOM_PROPS = {
     'aria-relevant': 'ariaRelevant',
     'aria-atomic': 'ariaAtomic',
     'aria-busy': 'ariaBusy',
-    'aria-dropeffect': 'ariaDropEffect',
-    'aria-dragged': 'ariaDragged',
     'aria-activedescendant': 'ariaActiveDescendant',
     'aria-controls': 'ariaControls',
     'aria-describedby': 'ariaDescribedBy',
@@ -125,7 +123,19 @@ InteropComponentDef.prototype.HTML_ATTRS_TO_DOM_PROPS = {
     'aria-labelledby': 'ariaLabelledBy',
     'aria-owns': 'ariaOwns',
     'aria-posinset': 'ariaPosInSet',
-    'aria-setsize': 'ariaSetSize'
+    'aria-setsize': 'ariaSetSize',
+
+    'aria-colcount': 'ariaColCount',
+    'aria-colindex': 'ariaColIndex',
+    'aria-details': 'ariaDetails',
+    'aria-errormessage': 'ariaErrorMessage',
+    'aria-keyshortcuts': 'ariaKeyShortcuts',
+    'aria-modal': 'ariaModal',
+    'aria-placeholder': 'ariaPlaceholder',
+    'aria-roledescription': 'ariaRoleDescription',
+    'aria-rowcount': 'ariaRowCount',
+    'aria-rowindex': 'ariaRowIndex',
+    'aria-rowspan': 'ariaRowSpan'
 };
 
 // Invert the (attr => prop) map to (prop => attr) while filtering out

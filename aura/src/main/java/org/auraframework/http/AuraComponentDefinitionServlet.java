@@ -82,7 +82,8 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         List<String> requestedDescriptors = extractDescriptors(request);
 
         response.setContentType("text/javascript");
-
+        response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
+        
         StringBuilderWriter responseStringWriter = new StringBuilderWriter();
         
         AuraContext context = contextService.getCurrentContext();

@@ -484,18 +484,20 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
             
             return returnFocusElement;
         },
-
+        
         /**
          * returns the vendor prefix
          * @private
          */
-        getPrefix : function () {
+        getPrefix: function () {
             if (!this._prefix) {
-                var styles = window.getComputedStyle(document.documentElement, ''),
-                    pre = (Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['', 'o']))[1],
-                    up = $A.util.isIE;
+                var styles = window.getComputedStyle(document.documentElement, '');
 
-                this._prefix = up ? pre.toUpperCase() : pre;
+                // Firefox getComputedStyle could return null.
+                if (styles) {
+                    var pre = (Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['', 'o']))[1];
+                    this._prefix = $A.util.isIE ? pre.toUpperCase() : pre;     
+                }
             }
             return this._prefix;
         },

@@ -6074,8 +6074,10 @@ function __extends(d, b) {
   d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 }
 
-var ArrayConcat = Array.prototype.concat;
-var getOwnPropertyNames = Object.getOwnPropertyNames,_hasOwnProperty = Object.hasOwnProperty;
+var _a = Object,getOwnPropertyNames = _a.getOwnPropertyNames,create = _a.create,keys = _a.keys,getOwnPropertyDescriptor = _a.getOwnPropertyDescriptor,preventExtensions = _a.preventExtensions,defineProperty = _a.defineProperty,hasOwnProperty = _a.hasOwnProperty,isExtensible = _a.isExtensible,getPrototypeOf = _a.getPrototypeOf,setPrototypeOf = _a.setPrototypeOf;
+var _b = Array.prototype,ArraySlice = _b.slice,ArrayShift = _b.shift,ArrayUnshift = _b.unshift,ArrayConcat = _b.concat;
+var isArray = Array.isArray;
+
 function patchedGetOwnPropertyNames(replicaOrAny) {
   if (isCompatProxy(replicaOrAny)) {
     return replicaOrAny.ownKeys().filter(function (key) {return key.constructor !== Symbol;}); // TODO: only strings
@@ -6095,10 +6097,10 @@ function patchedAssign(replicaOrAny) {
   for (var index = 1; index < arguments.length; index++) {
     var nextSource = arguments[index];
     if (nextSource != null) {
-      var keys = OwnPropertyKeys(nextSource);
+      var objectKeys = OwnPropertyKeys(nextSource);
       // tslint:disable-next-line:prefer-for-of
-      for (var i = 0; i < keys.length; i += 1) {
-        var nextKey = keys[i];
+      for (var i = 0; i < objectKeys.length; i += 1) {
+        var nextKey = objectKeys[i];
         var descriptor = Object.getOwnPropertyDescriptor(nextSource, nextKey);
         if (descriptor !== undefined && descriptor.enumerable === true) {
           setKey(to, nextKey, getKey(nextSource, nextKey));
@@ -6112,7 +6114,65 @@ function compatHasOwnProperty(key) {
   if (isCompatProxy(this)) {
     return !!this.getOwnPropertyDescriptor(key);
   }
-  return _hasOwnProperty.call(this, key);
+  return hasOwnProperty.call(this, key);
+}
+function keys$1(replicaOrAny) {
+  if (isCompatProxy(replicaOrAny)) {
+    var all = replicaOrAny.forIn();
+    var result = [];
+    // tslint:disable-next-line:forin
+    for (var prop in all) {
+      var desc = replicaOrAny.getOwnPropertyDescriptor(prop);
+      if (desc && desc.enumerable === true) {
+        result.push(prop);
+      }
+    }
+    return result;
+  } else
+  {
+    return keys(replicaOrAny);
+  }
+}
+function values(replicaOrAny) {
+  if (isCompatProxy(replicaOrAny)) {
+    var all = replicaOrAny.forIn();
+    var result = [];
+    // tslint:disable-next-line:forin
+    for (var prop in all) {
+      var desc = replicaOrAny.getOwnPropertyDescriptor(prop);
+      if (desc && desc.enumerable === true) {
+        result.push(getKey(replicaOrAny, prop));
+      }
+    }
+    return result;
+  } else
+  {
+    // Calling `Object.values` instead of dereferencing the method during the module evaluation
+    // since `Object.values` gets polyfilled at the module evaluation.
+    return Object.values(replicaOrAny);
+  }
+}
+function entries(replicaOrAny) {
+  if (isCompatProxy(replicaOrAny)) {
+    var all = replicaOrAny.forIn();
+    var result = [];
+    // tslint:disable-next-line:forin
+    for (var prop in all) {
+      var desc = replicaOrAny.getOwnPropertyDescriptor(prop);
+      if (desc && desc.enumerable === true) {
+        result.push([
+        prop,
+        getKey(replicaOrAny, prop)]);
+
+      }
+    }
+    return result;
+  } else
+  {
+    // Calling `Object.entries` instead of dereferencing the method during the module evaluation
+    // since `Object.entries` gets polyfilled at the module evaluation.
+    return Object.entries(replicaOrAny);
+  }
 }
 
 // RFC4122 version 4 uuid
@@ -6127,9 +6187,6 @@ var ArraySlot = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function
   return v.toString(16);
 });
 var ProxyIdentifier = function ProxyCompat() {};
-var create = Object.create,defineProperty = Object.defineProperty,isExtensible = Object.isExtensible,getPrototypeOf = Object.getPrototypeOf,setPrototypeOf = Object.setPrototypeOf,getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,preventExtensions = Object.preventExtensions;
-var _a = Array.prototype,ArraySlice = _a.slice,ArrayUnshift = _a.unshift;
-var isArray = Array.isArray;
 // Proto chain check might be needed because of usage of a limited polyfill
 // https://github.com/es-shims/get-own-property-symbols
 // In this case, because this polyfill is assing all the stuff to Object.prototype to keep
@@ -6403,6 +6460,33 @@ var XProxy = /** @class */function () {
     }
     return unshift.apply(this, arguments);
   };
+  XProxy.prototype.toJSON = function () {
+    if (this[ArraySlot] === ProxyIdentifier) {
+      var unwrappedArray = [];
+      var length = this.get('length');
+      for (var i = 0; i < length; i++) {
+        unwrappedArray[i] = this.get(i);
+      }
+      return unwrappedArray;
+    } else
+    {
+      var toJSON = this.get('toJSON');
+      if (toJSON !== undefined && typeof toJSON === 'function') {
+        return toJSON.apply(this, arguments);
+      }
+      var keys$$1 = this.ownKeys();
+      var unwrappedObject = {};
+      // tslint:disable-next-line:prefer-for-of
+      for (var i = 0; i < keys$$1.length; i++) {
+        var key = keys$$1[i];
+        var enumerable = this.getOwnPropertyDescriptor(key).enumerable;
+        if (enumerable) {
+          unwrappedObject[key] = this.get(key);
+        }
+      }
+      return unwrappedObject;
+    }
+  };
   return XProxy;
 }();
 
@@ -6505,20 +6589,18 @@ function concat(replicaOrAny) {
   return fn.apply(replicaOrAny, args);
 }
 
-var _isArray = Array.isArray;
-var _a$1 = Array.prototype,ArraySlice$1 = _a$1.slice,ArrayShift = _a$1.shift,ArrayUnshift$1 = _a$1.unshift;
 // Patched Functions:
 function isArray$1(replicaOrAny) {
   if (isCompatProxy(replicaOrAny)) {
     return replicaOrAny[ArraySlot] === ProxyIdentifier;
   }
-  return _isArray(replicaOrAny);
+  return isArray(replicaOrAny);
 }
 // http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.7
 function compatPush() {
   var O = Object(this);
   var n = O.length;
-  var items = ArraySlice$1.call(arguments);
+  var items = ArraySlice.call(arguments);
   while (items.length) {
     var E = ArrayShift.call(items);
     setKey(O, n, E);
@@ -6532,8 +6614,8 @@ function compatConcat() {
   var O = Object(this);
   var A = [];
   var N = 0;
-  var items = ArraySlice$1.call(arguments);
-  ArrayUnshift$1.call(items, O);
+  var items = ArraySlice.call(arguments);
+  ArrayUnshift.call(items, O);
   while (items.length) {
     var E = ArrayShift.call(items);
     if (isArray$1(E)) {
@@ -6571,7 +6653,7 @@ function compatUnshift() {
     k -= 1;
   }
   var j = 0;
-  var items = ArraySlice$1.call(arguments);
+  var items = ArraySlice.call(arguments);
   while (items.length) {
     var E = ArrayShift.call(items);
     setKey(O, j, E);
@@ -6589,96 +6671,41 @@ function setPrototypeOf$1(obj, proto) {
 if (!Object.setPrototypeOf || !({ __proto__: [] } instanceof Array)) {
   Object.setPrototypeOf = setPrototypeOf$1;
 }
-var _keys = Object.keys,_values = Object.values,_entries = Object.entries,_getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,_preventExtensions = Object.preventExtensions,_defineProperty = Object.defineProperty,_isExtensible = Object.isExtensible,_getPrototypeOf = Object.getPrototypeOf,_setPrototypeOf = Object.setPrototypeOf;
-function keys(replicaOrAny) {
-  if (isCompatProxy(replicaOrAny)) {
-    var all = replicaOrAny.forIn();
-    var result = [];
-    // tslint:disable-next-line:forin
-    for (var prop in all) {
-      var desc = replicaOrAny.getOwnPropertyDescriptor(prop);
-      if (desc && desc.enumerable === true) {
-        result.push(prop);
-      }
-    }
-    return result;
-  } else
-  {
-    return _keys(replicaOrAny);
-  }
-}
-function values(replicaOrAny) {
-  if (isCompatProxy(replicaOrAny)) {
-    var all = replicaOrAny.forIn();
-    var result = [];
-    // tslint:disable-next-line:forin
-    for (var prop in all) {
-      var desc = replicaOrAny.getOwnPropertyDescriptor(prop);
-      if (desc && desc.enumerable === true) {
-        result.push(getKey(replicaOrAny, prop));
-      }
-    }
-    return result;
-  } else
-  {
-    return _values(replicaOrAny);
-  }
-}
-function entries(replicaOrAny) {
-  if (isCompatProxy(replicaOrAny)) {
-    var all = replicaOrAny.forIn();
-    var result = [];
-    // tslint:disable-next-line:forin
-    for (var prop in all) {
-      var desc = replicaOrAny.getOwnPropertyDescriptor(prop);
-      if (desc && desc.enumerable === true) {
-        result.push([
-        prop,
-        getKey(replicaOrAny, prop)]);
-
-      }
-    }
-    return result;
-  } else
-  {
-    return _entries(replicaOrAny);
-  }
-}
 function getPrototypeOf$1(replicaOrAny) {
   if (isCompatProxy(replicaOrAny)) {
     return replicaOrAny.getPrototypeOf();
   }
-  return _getPrototypeOf(replicaOrAny);
+  return getPrototypeOf(replicaOrAny);
 }
 function setPrototypeOf$2(replicaOrAny, proto) {
   if (isCompatProxy(replicaOrAny)) {
     return replicaOrAny.setPrototypeOf(proto);
   }
-  return _setPrototypeOf(replicaOrAny, proto);
+  return setPrototypeOf(replicaOrAny, proto);
 }
 function getOwnPropertyDescriptor$1(replicaOrAny, key) {
   if (isCompatProxy(replicaOrAny)) {
     return replicaOrAny.getOwnPropertyDescriptor(key);
   }
-  return _getOwnPropertyDescriptor(replicaOrAny, key);
+  return getOwnPropertyDescriptor(replicaOrAny, key);
 }
 function preventExtensions$1(replicaOrAny) {
   if (isCompatProxy(replicaOrAny)) {
     return replicaOrAny.preventExtensions();
   }
-  return _preventExtensions(replicaOrAny);
+  return preventExtensions(replicaOrAny);
 }
 function isExtensible$1(replicaOrAny) {
   if (isCompatProxy(replicaOrAny)) {
     return replicaOrAny.isExtensible();
   }
-  return _isExtensible(replicaOrAny);
+  return isExtensible(replicaOrAny);
 }
 function defineProperty$1(replicaOrAny, key, descriptor) {
   if (isCompatProxy(replicaOrAny)) {
     return replicaOrAny.defineProperty(key, descriptor);
   }
-  return _defineProperty(replicaOrAny, key, descriptor);
+  return defineProperty(replicaOrAny, key, descriptor);
 }
 // patches
 // [*] Object.prototype.hasOwnProperty should be patched as a general rule
@@ -6720,15 +6747,13 @@ Object.getPrototypeOf = getPrototypeOf$1;
 // [*] Object.assign
 Object.assign = patchedAssign;
 // Object methods path
-Object.compatKeys = keys;
+Object.compatKeys = keys$1;
 Object.compatValues = values;
 Object.compatEntries = entries;
 // Array.prototype methods patches.
-Object.defineProperties(Array.prototype, {
-  compatUnshift: { value: compatUnshift, enumerable: false },
-  compatConcat: { value: compatConcat, enumerable: false },
-  compatPush: { value: compatPush, enumerable: false } });
-
+Array.prototype.compatUnshift = compatUnshift;
+Array.prototype.compatConcat = compatConcat;
+Array.prototype.compatPush = compatPush;
 function overrideProxy() {
   return Proxy.__COMPAT__;
 }
@@ -8239,4 +8264,4 @@ exports.babelHelpers = babelHelpers;
 return exports;
 
 }({}));
-/** version: 0.17.35 */
+/** version: 0.17.39 */

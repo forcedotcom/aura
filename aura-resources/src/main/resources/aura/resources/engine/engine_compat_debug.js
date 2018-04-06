@@ -5,9 +5,71 @@
 	(factory((global.Engine = {})));
 }(this, (function (exports) { 'use strict';
 
-var freeze = Object.freeze, seal = Object.seal, create = Object.create, assign = Object.assign, defineProperty = Object.defineProperty, getPrototypeOf = Object.getPrototypeOf, getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor, getOwnPropertyNames = Object.getOwnPropertyNames, defineProperties = Object.defineProperties, hasOwnProperty = Object.hasOwnProperty;
+function detect() {
+    // Don't apply polyfill when ProxyCompat is enabled.
+    if ('getKey' in Proxy) {
+        return false;
+    }
+    var proxy = new Proxy([3, 4], {});
+    var res = [1, 2].concat(proxy);
+    return res.length !== 4;
+}
+
+var isConcatSpreadable = Symbol.isConcatSpreadable;
 var isArray = Array.isArray;
-var _a = Array.prototype, ArrayFilter = _a.filter, ArraySlice = _a.slice, ArraySplice = _a.splice, ArrayUnshift = _a.unshift, ArrayIndexOf = _a.indexOf, ArrayPush = _a.push, ArrayMap = _a.map, forEach = _a.forEach, ArrayReduce = _a.reduce;
+var _a = Array.prototype, ArraySlice = _a.slice, ArrayUnshift = _a.unshift, ArrayShift = _a.shift;
+function isObject(O) {
+    return typeof O === 'object' ? O !== null : typeof O === 'function';
+}
+// https://www.ecma-international.org/ecma-262/6.0/#sec-isconcatspreadable
+function isSpreadable(O) {
+    if (!isObject(O)) {
+        return false;
+    }
+    var spreadable = O[isConcatSpreadable];
+    return spreadable !== undefined ? Boolean(spreadable) : isArray(O);
+}
+// https://www.ecma-international.org/ecma-262/6.0/#sec-array.prototype.concat
+function ArrayConcatPolyfill() {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+    }
+    var O = Object(this);
+    var A = [];
+    var N = 0;
+    var items = ArraySlice.call(arguments);
+    ArrayUnshift.call(items, O);
+    while (items.length) {
+        var E = ArrayShift.call(items);
+        if (isSpreadable(E)) {
+            var k = 0;
+            var length = E.length;
+            for (k; k < length; k += 1, N += 1) {
+                if (k in E) {
+                    var subElement = E[k];
+                    A[N] = subElement;
+                }
+            }
+        }
+        else {
+            A[N] = E;
+            N += 1;
+        }
+    }
+    return A;
+}
+function apply() {
+    Array.prototype.concat = ArrayConcatPolyfill;
+}
+
+if (detect()) {
+    apply();
+}
+
+var freeze = Object.freeze, seal = Object.seal, create = Object.create, assign = Object.assign, defineProperty = Object.defineProperty, getPrototypeOf = Object.getPrototypeOf, getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor, getOwnPropertyNames = Object.getOwnPropertyNames, defineProperties = Object.defineProperties, hasOwnProperty = Object.hasOwnProperty;
+var isArray$1 = Array.isArray;
+var _a$1 = Array.prototype, ArrayFilter = _a$1.filter, ArraySlice$1 = _a$1.slice, ArraySplice = _a$1.splice, ArrayUnshift$1 = _a$1.unshift, ArrayIndexOf = _a$1.indexOf, ArrayPush = _a$1.push, ArrayMap = _a$1.map, forEach = _a$1.forEach, ArrayReduce = _a$1.reduce;
 var _b = String.prototype, StringReplace = _b.replace, StringToLowerCase = _b.toLowerCase, StringCharCodeAt = _b.charCodeAt, StringSlice = _b.slice;
 function isUndefined(obj) {
     return obj === undefined;
@@ -60,7 +122,7 @@ function getAttrNameFromPropName(propName) {
 }
 var usesNativeSymbols = typeof Symbol() === 'symbol';
 
-var _a$1 = Element.prototype, addEventListener = _a$1.addEventListener, removeEventListener = _a$1.removeEventListener, getAttribute = _a$1.getAttribute, getAttributeNS = _a$1.getAttributeNS, setAttribute = _a$1.setAttribute, setAttributeNS = _a$1.setAttributeNS, removeAttribute = _a$1.removeAttribute, removeAttributeNS = _a$1.removeAttributeNS, querySelector = _a$1.querySelector, querySelectorAll = _a$1.querySelectorAll;
+var _a$2 = Element.prototype, addEventListener = _a$2.addEventListener, removeEventListener = _a$2.removeEventListener, getAttribute = _a$2.getAttribute, getAttributeNS = _a$2.getAttributeNS, setAttribute = _a$2.setAttribute, setAttributeNS = _a$2.setAttributeNS, removeAttribute = _a$2.removeAttribute, removeAttributeNS = _a$2.removeAttributeNS, querySelector = _a$2.querySelector, querySelectorAll = _a$2.querySelectorAll;
 // These properties get added to LWCElement.prototype publicProps automatically
 var defaultDefHTMLPropertyNames = ['dir', 'id', 'accessKey', 'title', 'lang', 'hidden', 'draggable', 'tabIndex'];
 // Few more exceptions that are using the attribute name to match the property in lowercase.
@@ -245,7 +307,7 @@ function invokeServiceHook(vm, cbs) {
 /**
  * Copyright (C) 2017 salesforce.com, inc.
  */
-var isArray$1 = Array.isArray;
+var isArray$2 = Array.isArray;
 var getPrototypeOf$1 = Object.getPrototypeOf, ObjectCreate = Object.create, ObjectDefineProperty = Object.defineProperty, ObjectDefineProperties = Object.defineProperties;
 var ObjectDotPrototype = Object.prototype;
 function isUndefined$1(obj) {
@@ -263,13 +325,13 @@ function isObservable(value) {
     if (value == null) {
         return false;
     }
-    if (isArray$1(value)) {
+    if (isArray$2(value)) {
         return true;
     }
     var proto = getPrototypeOf$1(value);
     return (proto === ObjectDotPrototype || proto === null || getPrototypeOf$1(proto) === null);
 }
-function isObject$1(obj) {
+function isObject$2(obj) {
     return typeof obj === 'object';
 }
 
@@ -508,10 +570,10 @@ function invokeDistortion(membrane, value) {
 }
 function createShadowTarget(value) {
     var shadowTarget = undefined;
-    if (isArray$1(value)) {
+    if (isArray$2(value)) {
         shadowTarget = [];
     }
-    else if (isObject$1(value)) {
+    else if (isObject$2(value)) {
         shadowTarget = {};
     }
     return shadowTarget;
@@ -588,7 +650,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.19.0-0 */
+/** version: 0.19.1 */
 
 var TargetToReactiveRecordMap = new WeakMap();
 function notifyMutation$1(target, key) {
@@ -708,14 +770,14 @@ var Membrane = /** @class */ (function () {
     Membrane.prototype.apply = function (target, thisArg, argumentsList) {
         thisArg = unwrap$1(thisArg);
         argumentsList = unwrap$1(argumentsList);
-        if (isArray(argumentsList)) {
+        if (isArray$1(argumentsList)) {
             argumentsList = ArrayMap.call(argumentsList, unwrap$1);
         }
         return this.handler.apply(this, target, thisArg, argumentsList);
     };
     Membrane.prototype.construct = function (target, argumentsList, newTarget) {
         argumentsList = unwrap$1(argumentsList);
-        if (isArray(argumentsList)) {
+        if (isArray$1(argumentsList)) {
             argumentsList = ArrayMap.call(argumentsList, unwrap$1);
         }
         return this.handler.construct(this, target, argumentsList, newTarget);
@@ -866,7 +928,7 @@ function handleComponentEvent(vm, event) {
     var _a = vm.cmpEvents, cmpEvents = _a === void 0 ? EmptyObject : _a;
     var type = event.type, stopImmediatePropagation = event.stopImmediatePropagation;
     var handlers = cmpEvents[type];
-    if (isArray(handlers)) {
+    if (isArray$1(handlers)) {
         var uninterrupted_1 = true;
         event.stopImmediatePropagation = function () {
             uninterrupted_1 = false;
@@ -1220,7 +1282,7 @@ var LWCElement = /** @class */ (function () {
     LWCElement.prototype.getAttribute = function (attrName) {
         // logging errors for experimental and special attributes
         
-        return getAttribute.apply(getLinkedElement$1(this), ArraySlice.call(arguments));
+        return getAttribute.apply(getLinkedElement$1(this), ArraySlice$1.call(arguments));
     };
     LWCElement.prototype.getBoundingClientRect = function () {
         var elm = getLinkedElement$1(this);
@@ -1351,9 +1413,8 @@ var hook = {
     create: function (oldVNode, vnode) {
         createVM(vnode.sel, vnode.elm, vnode.data.slotset);
     },
-    remove: function (vnode, removeCallback) {
+    destroy: function (vnode) {
         removeVM(getCustomElementVM(vnode.elm));
-        removeCallback();
     }
 };
 function isVElement(vnode) {
@@ -1363,7 +1424,7 @@ function addNS(vnode) {
     var data = vnode.data, children = vnode.children, sel = vnode.sel;
     // TODO: review why `sel` equal `foreignObject` should get this `ns`
     data.ns = NamespaceAttributeForSVG;
-    if (isArray(children) && sel !== 'foreignObject') {
+    if (isArray$1(children) && sel !== 'foreignObject') {
         for (var j = 0, n = children.length; j < n; ++j) {
             var childNode = children[j];
             if (childNode != null && isVElement(childNode)) {
@@ -1470,7 +1531,7 @@ function i(iterable, factory) {
         last = next.done;
         // template factory logic based on the previous collected value
         var vnode = factory(value, j, j === 0, last);
-        if (isArray(vnode)) {
+        if (isArray$1(vnode)) {
             ArrayPush.apply(list, vnode);
         }
         else {
@@ -1491,7 +1552,7 @@ function f(items) {
     var flattened = [];
     for (var j = 0; j < len; j += 1) {
         var item = items[j];
-        if (isArray(item)) {
+        if (isArray$1(item)) {
             ArrayPush.apply(flattened, item);
         }
         else {
@@ -1931,31 +1992,31 @@ function createSetter(key) {
 function createMethodCaller(key) {
     return function () {
         var component = getCustomElementComponent(this);
-        return component[key].apply(component, ArraySlice.call(arguments));
+        return component[key].apply(component, ArraySlice$1.call(arguments));
     };
 }
 function getAttributePatched(attrName) {
     
-    return getAttribute.apply(this, ArraySlice.call(arguments));
+    return getAttribute.apply(this, ArraySlice$1.call(arguments));
 }
 function setAttributePatched(attrName, newValue) {
     var vm = getCustomElementVM(this);
     // marking the set is needed for the AOM polyfill
     vm.hostAttrs[attrName] = 1; // marking the set is needed for the AOM polyfill
-    setAttribute.apply(this, ArraySlice.call(arguments));
+    setAttribute.apply(this, ArraySlice$1.call(arguments));
 }
 function setAttributeNSPatched(attrNameSpace, attrName, newValue) {
     var vm = getCustomElementVM(this);
-    setAttributeNS.apply(this, ArraySlice.call(arguments));
+    setAttributeNS.apply(this, ArraySlice$1.call(arguments));
 }
 function removeAttributePatched(attrName) {
     var vm = getCustomElementVM(this);
-    removeAttribute.apply(this, ArraySlice.call(arguments));
+    removeAttribute.apply(this, ArraySlice$1.call(arguments));
     attemptAriaAttributeFallback(vm, attrName);
 }
 function removeAttributeNSPatched(attrNameSpace, attrName) {
     var vm = getCustomElementVM(this);
-    removeAttributeNS.apply(this, ArraySlice.call(arguments));
+    removeAttributeNS.apply(this, ArraySlice$1.call(arguments));
 }
 function createDescriptorMap(publicProps, publicMethodsConfig) {
     // replacing mutators and accessors on the element itself to catch any mutation
@@ -2228,7 +2289,6 @@ function init$1(modules, api, compareFn) {
             // text nodes do not have logic associated to them
             if (isVNode(ch)) {
                 if (!isTextVNode(ch)) {
-                    invokeDestroyHook(ch);
                     listeners = cbs.remove.length + 1;
                     rm = createRmCb(ch.elm, listeners);
                     for (i_1 = 0; i_1 < cbs.remove.length; ++i_1) {
@@ -2240,6 +2300,7 @@ function init$1(modules, api, compareFn) {
                     else {
                         rm();
                     }
+                    invokeDestroyHook(ch);
                 }
                 else {
                     api.removeChild(parentElm, ch.elm);
@@ -2680,7 +2741,7 @@ var uidModule = {
 };
 
 var createElement = document.createElement, createElementNS = document.createElementNS, createTextNode = document.createTextNode, createComment = document.createComment, createDocumentFragment = document.createDocumentFragment;
-var _a$3 = Node.prototype, insertBefore = _a$3.insertBefore, removeChild = _a$3.removeChild, appendChild = _a$3.appendChild;
+var _a$4 = Node.prototype, insertBefore = _a$4.insertBefore, removeChild = _a$4.removeChild, appendChild = _a$4.appendChild;
 function parentNode(node) {
     return node.parentNode;
 }
@@ -2896,7 +2957,7 @@ function flushRehydrationQueue() {
                     if (rehydrateQueue.length === 0) {
                         addCallbackToNextTick(flushRehydrationQueue);
                     }
-                    ArrayUnshift.apply(rehydrateQueue, ArraySlice.call(vms, i + 1));
+                    ArrayUnshift$1.apply(rehydrateQueue, ArraySlice$1.call(vms, i + 1));
                 }
                 // rethrowing the original error will break the current tick, but since the next tick is
                 // already scheduled, it should continue patching the rest.
@@ -2987,7 +3048,7 @@ function getComponentStack(vm) {
     return wcStack.reverse().join('\n\t');
 }
 
-var _a$4 = Node.prototype, removeChild$1 = _a$4.removeChild, appendChild$1 = _a$4.appendChild, insertBefore$1 = _a$4.insertBefore, replaceChild = _a$4.replaceChild;
+var _a$5 = Node.prototype, removeChild$1 = _a$5.removeChild, appendChild$1 = _a$5.appendChild, insertBefore$1 = _a$5.insertBefore, replaceChild = _a$5.replaceChild;
 var ConnectingSlot = Symbol();
 var DisconnectingSlot = Symbol();
 function callNodeSlot(node, slot) {
@@ -3085,4 +3146,4 @@ exports.wire = wire;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.19.0-0 */
+/** version: 0.19.1 */

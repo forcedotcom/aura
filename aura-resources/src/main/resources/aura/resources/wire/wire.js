@@ -384,4 +384,4 @@ exports.ValueChangedEvent = ValueChangedEvent;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.19.0-0 */
+/** version: 0.19.1 */

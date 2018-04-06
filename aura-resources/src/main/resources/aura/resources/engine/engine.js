@@ -5,9 +5,67 @@
 	(factory((global.Engine = {})));
 }(this, (function (exports) { 'use strict';
 
-const { freeze, seal, keys, create, assign, defineProperty, getPrototypeOf, setPrototypeOf, getOwnPropertyDescriptor, getOwnPropertyNames, defineProperties, getOwnPropertySymbols, hasOwnProperty, preventExtensions, isExtensible, } = Object;
+function detect() {
+    // Don't apply polyfill when ProxyCompat is enabled.
+    if ('getKey' in Proxy) {
+        return false;
+    }
+    const proxy = new Proxy([3, 4], {});
+    const res = [1, 2].concat(proxy);
+    return res.length !== 4;
+}
+
+const { isConcatSpreadable } = Symbol;
 const { isArray } = Array;
-const { concat: ArrayConcat, filter: ArrayFilter, slice: ArraySlice, splice: ArraySplice, unshift: ArrayUnshift, indexOf: ArrayIndexOf, push: ArrayPush, map: ArrayMap, forEach, reduce: ArrayReduce, } = Array.prototype;
+const { slice: ArraySlice, unshift: ArrayUnshift, shift: ArrayShift } = Array.prototype;
+function isObject(O) {
+    return typeof O === 'object' ? O !== null : typeof O === 'function';
+}
+// https://www.ecma-international.org/ecma-262/6.0/#sec-isconcatspreadable
+function isSpreadable(O) {
+    if (!isObject(O)) {
+        return false;
+    }
+    const spreadable = O[isConcatSpreadable];
+    return spreadable !== undefined ? Boolean(spreadable) : isArray(O);
+}
+// https://www.ecma-international.org/ecma-262/6.0/#sec-array.prototype.concat
+function ArrayConcatPolyfill(...args) {
+    const O = Object(this);
+    const A = [];
+    let N = 0;
+    const items = ArraySlice.call(arguments);
+    ArrayUnshift.call(items, O);
+    while (items.length) {
+        const E = ArrayShift.call(items);
+        if (isSpreadable(E)) {
+            let k = 0;
+            const length = E.length;
+            for (k; k < length; k += 1, N += 1) {
+                if (k in E) {
+                    const subElement = E[k];
+                    A[N] = subElement;
+                }
+            }
+        }
+        else {
+            A[N] = E;
+            N += 1;
+        }
+    }
+    return A;
+}
+function apply() {
+    Array.prototype.concat = ArrayConcatPolyfill;
+}
+
+if (detect()) {
+    apply();
+}
+
+const { freeze, seal, keys, create, assign, defineProperty, getPrototypeOf, setPrototypeOf, getOwnPropertyDescriptor, getOwnPropertyNames, defineProperties, getOwnPropertySymbols, hasOwnProperty, preventExtensions, isExtensible, } = Object;
+const { isArray: isArray$1 } = Array;
+const { concat: ArrayConcat, filter: ArrayFilter, slice: ArraySlice$1, splice: ArraySplice, unshift: ArrayUnshift$1, indexOf: ArrayIndexOf, push: ArrayPush, map: ArrayMap, forEach, reduce: ArrayReduce, } = Array.prototype;
 const { replace: StringReplace, toLowerCase: StringToLowerCase, indexOf: StringIndexOf, charCodeAt: StringCharCodeAt, slice: StringSlice, split: StringSplit, } = String.prototype;
 function isUndefined(obj) {
     return obj === undefined;
@@ -21,7 +79,7 @@ function isTrue(obj) {
 function isFunction(obj) {
     return typeof obj === 'function';
 }
-function isObject(obj) {
+function isObject$1(obj) {
     return typeof obj === 'object';
 }
 function isString(obj) {
@@ -476,7 +534,7 @@ const Services = create(null);
 const hooks = ['wiring', 'rendered', 'connected', 'disconnected', 'piercing'];
 function register(service) {
     {
-        assert.isTrue(isObject(service), `Invalid service declaration, ${service}: service must be an object`);
+        assert.isTrue(isObject$1(service), `Invalid service declaration, ${service}: service must be an object`);
     }
     for (let i = 0; i < hooks.length; ++i) {
         const hookName = hooks[i];
@@ -492,7 +550,7 @@ function register(service) {
 function invokeServiceHook(vm, cbs) {
     {
         assert.vm(vm);
-        assert.isTrue(isArray(cbs) && cbs.length > 0, `Optimize invokeServiceHook() to be invoked only when needed`);
+        assert.isTrue(isArray$1(cbs) && cbs.length > 0, `Optimize invokeServiceHook() to be invoked only when needed`);
     }
     const { component, data, def, context } = vm;
     for (let i = 0, len = cbs.length; i < len; ++i) {
@@ -503,7 +561,7 @@ function invokeServiceHook(vm, cbs) {
 /**
  * Copyright (C) 2017 salesforce.com, inc.
  */
-var isArray$1 = Array.isArray;
+var isArray$2 = Array.isArray;
 var getPrototypeOf$1 = Object.getPrototypeOf, ObjectCreate = Object.create, ObjectDefineProperty = Object.defineProperty, ObjectDefineProperties = Object.defineProperties;
 var _a = Array.prototype, ArrayPush$1 = _a.push, ArrayConcat$1 = _a.concat;
 var ObjectDotPrototype = Object.prototype;
@@ -534,13 +592,13 @@ function isObservable(value) {
     if (value == null) {
         return false;
     }
-    if (isArray$1(value)) {
+    if (isArray$2(value)) {
         return true;
     }
     var proto = getPrototypeOf$1(value);
     return (proto === ObjectDotPrototype || proto === null || getPrototypeOf$1(proto) === null);
 }
-function isObject$1(obj) {
+function isObject$2(obj) {
     return typeof obj === 'object';
 }
 
@@ -794,12 +852,12 @@ var ReadOnlyHandler = /** @class */ (function () {
 }());
 
 var create$1 = Object.create, getPrototypeOf$2 = Object.getPrototypeOf, getOwnPropertyNames$2 = Object.getOwnPropertyNames, getOwnPropertySymbols$2 = Object.getOwnPropertySymbols;
-var isArray$2 = Array.isArray;
+var isArray$2$1 = Array.isArray;
 function getTarget(item) {
     return item && item[TargetSlot];
 }
 function extract(objectOrArray) {
-    if (isArray$2(objectOrArray)) {
+    if (isArray$2$1(objectOrArray)) {
         return objectOrArray.map(function (item) {
             var original = getTarget(item);
             if (original) {
@@ -859,10 +917,10 @@ function invokeDistortion(membrane, value) {
 }
 function createShadowTarget(value) {
     var shadowTarget = undefined;
-    if (isArray$1(value)) {
+    if (isArray$2(value)) {
         shadowTarget = [];
     }
-    else if (isObject$1(value)) {
+    else if (isObject$2(value)) {
         shadowTarget = {};
     }
     return shadowTarget;
@@ -939,7 +997,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.19.0-0 */
+/** version: 0.19.1 */
 
 const TargetToReactiveRecordMap = new WeakMap();
 function notifyMutation$1(target, key) {
@@ -1078,14 +1136,14 @@ class Membrane {
     apply(target, thisArg, argumentsList) {
         thisArg = unwrap$1(thisArg);
         argumentsList = unwrap$1(argumentsList);
-        if (isArray(argumentsList)) {
+        if (isArray$1(argumentsList)) {
             argumentsList = ArrayMap.call(argumentsList, unwrap$1);
         }
         return this.handler.apply(this, target, thisArg, argumentsList);
     }
     construct(target, argumentsList, newTarget) {
         argumentsList = unwrap$1(argumentsList);
-        if (isArray(argumentsList)) {
+        if (isArray$1(argumentsList)) {
             argumentsList = ArrayMap.call(argumentsList, unwrap$1);
         }
         return this.handler.construct(this, target, argumentsList, newTarget);
@@ -1290,7 +1348,7 @@ function handleComponentEvent(vm, event) {
     const { cmpEvents = EmptyObject } = vm;
     const { type, stopImmediatePropagation } = event;
     const handlers = cmpEvents[type];
-    if (isArray(handlers)) {
+    if (isArray$1(handlers)) {
         let uninterrupted = true;
         event.stopImmediatePropagation = function () {
             uninterrupted = false;
@@ -1313,7 +1371,7 @@ function renderComponent(vm) {
     const vnodes = invokeComponentRenderMethod(vm);
     vm.isDirty = false;
     {
-        assert.invariant(isArray(vnodes), `${vm}.render() should always return an array of vnodes instead of ${vnodes}`);
+        assert.invariant(isArray$1(vnodes), `${vm}.render() should always return an array of vnodes instead of ${vnodes}`);
     }
     return vnodes;
 }
@@ -1571,7 +1629,7 @@ function getHTMLPropDescriptor(propName, descriptor) {
                 assert.vm(vm);
                 assert.invariant(!isRendering, `${vmBeingRendered}.render() method has side effects on the state of ${vm}.${propName}`);
                 assert.isFalse(isBeingConstructed(vm), `Failed to construct '${this}': The result must not have attributes.`);
-                assert.invariant(!isObject(newValue) || isNull(newValue), `Invalid value "${newValue}" for "${propName}" of ${vm}. Value cannot be an object, must be a primitive value.`);
+                assert.invariant(!isObject$1(newValue) || isNull(newValue), `Invalid value "${newValue}" for "${propName}" of ${vm}. Value cannot be an object, must be a primitive value.`);
             }
             if (newValue !== vm.cmpProps[propName]) {
                 vm.cmpProps[propName] = newValue;
@@ -1715,7 +1773,7 @@ class LWCElement {
                 }
             }
         }
-        return getAttribute.apply(getLinkedElement$1(this), ArraySlice.call(arguments));
+        return getAttribute.apply(getLinkedElement$1(this), ArraySlice$1.call(arguments));
     }
     getBoundingClientRect() {
         const elm = getLinkedElement$1(this);
@@ -1904,9 +1962,8 @@ const hook = {
     create(oldVNode, vnode) {
         createVM(vnode.sel, vnode.elm, vnode.data.slotset);
     },
-    remove(vnode, removeCallback) {
+    destroy(vnode) {
         removeVM(getCustomElementVM(vnode.elm));
-        removeCallback();
     }
 };
 function isVElement(vnode) {
@@ -1916,7 +1973,7 @@ function addNS(vnode) {
     const { data, children, sel } = vnode;
     // TODO: review why `sel` equal `foreignObject` should get this `ns`
     data.ns = NamespaceAttributeForSVG;
-    if (isArray(children) && sel !== 'foreignObject') {
+    if (isArray$1(children) && sel !== 'foreignObject') {
         for (let j = 0, n = children.length; j < n; ++j) {
             const childNode = children[j];
             if (childNode != null && isVElement(childNode)) {
@@ -1948,8 +2005,8 @@ function normalizeStyleString(value) {
 function h(sel, data, children) {
     {
         assert.isTrue(isString(sel), `h() 1st argument sel must be a string.`);
-        assert.isTrue(isObject(data), `h() 2nd argument data must be an object.`);
-        assert.isTrue(isArray(children), `h() 3rd argument children must be an array.`);
+        assert.isTrue(isObject$1(data), `h() 2nd argument data must be an object.`);
+        assert.isTrue(isArray$1(children), `h() 3rd argument children must be an array.`);
         assert.isTrue(('key' in data) || !!data.key, ` <${sel}> "key" attribute is invalid or missing for ${vmBeingRendered}. Key inside iterator is either undefined or null.`);
         // checking reserved internal data properties
         assert.invariant(data.class === undefined, `vnode.data.class should be undefined when calling h().`);
@@ -1996,7 +2053,7 @@ function c(sel, Ctor, data) {
     {
         assert.isTrue(isString(sel), `c() 1st argument sel must be a string.`);
         assert.isTrue(isFunction(Ctor), `c() 2nd argument Ctor must be a function.`);
-        assert.isTrue(isObject(data), `c() 3nd argument data must be an object.`);
+        assert.isTrue(isObject$1(data), `c() 3nd argument data must be an object.`);
         // checking reserved internal data properties
         assert.invariant(data.class === undefined, `vnode.data.class should be undefined when calling c().`);
         assert.isTrue(arguments.length < 4, `Compiler Issue: Custom elements expect up to 3 arguments, received ${arguments.length} instead.`);
@@ -2067,16 +2124,16 @@ function i(iterable, factory) {
         last = next.done;
         // template factory logic based on the previous collected value
         const vnode = factory(value, j, j === 0, last);
-        if (isArray(vnode)) {
+        if (isArray$1(vnode)) {
             ArrayPush.apply(list, vnode);
         }
         else {
             ArrayPush.call(list, vnode);
         }
         {
-            const vnodes = isArray(vnode) ? vnode : [vnode];
+            const vnodes = isArray$1(vnode) ? vnode : [vnode];
             forEach.call(vnodes, (childVnode) => {
-                if (!isNull(childVnode) && isObject(childVnode) && !isUndefined(childVnode.sel)) {
+                if (!isNull(childVnode) && isObject$1(childVnode) && !isUndefined(childVnode.sel)) {
                     const { key } = childVnode;
                     if (isString(key) || isNumber(key)) {
                         if (keyMap[key] === 1) {
@@ -2102,13 +2159,13 @@ function i(iterable, factory) {
  */
 function f(items) {
     {
-        assert.isTrue(isArray(items), 'flattening api can only work with arrays.');
+        assert.isTrue(isArray$1(items), 'flattening api can only work with arrays.');
     }
     const len = items.length;
     const flattened = [];
     for (let j = 0; j < len; j += 1) {
         const item = items[j];
-        if (isArray(item)) {
+        if (isArray$1(item)) {
             ArrayPush.apply(flattened, item);
         }
         else {
@@ -2191,7 +2248,7 @@ var api = Object.freeze({
 const EmptySlots = create(null);
 function getSlotsetValue(slotset, slotName) {
     {
-        assert.isTrue(isObject(slotset), `Invalid slotset value ${toString(slotset)}`);
+        assert.isTrue(isObject$1(slotset), `Invalid slotset value ${toString(slotset)}`);
     }
     // TODO: mark slotName as reactive
     return slotset && slotset[slotName];
@@ -2216,7 +2273,7 @@ function validateSlots(vm, html) {
         const { cmpSlots = EmptySlots } = vm;
         const { slots = EmptyArray } = html;
         for (const slotName in cmpSlots) {
-            assert.isTrue(isArray(cmpSlots[slotName]), `Slots can only be set to an array, instead received ${toString(cmpSlots[slotName])} for slot ${slotName} in ${vm}.`);
+            assert.isTrue(isArray$1(cmpSlots[slotName]), `Slots can only be set to an array, instead received ${toString(cmpSlots[slotName])} for slot ${slotName} in ${vm}.`);
             if (ArrayIndexOf.call(slots, slotName) === -1) {
                 // TODO: this should never really happen because the compiler should always validate
                 assert.logWarning(`Ignoring unknown provided slot name "${slotName}" in ${vm}. This is probably a typo on the slot attribute.`);
@@ -2289,12 +2346,12 @@ function evaluateTemplate(vm, html) {
         }
     }
     {
-        assert.isTrue(isObject(context.tplCache), `vm.context.tplCache must be an object associated to ${cmpTemplate}.`);
+        assert.isTrue(isObject$1(context.tplCache), `vm.context.tplCache must be an object associated to ${cmpTemplate}.`);
     }
     const { proxy: slotset, revoke: slotsetRevoke } = Proxy.revocable(cmpSlots, slotsetProxyHandler);
     const vnodes = html.call(undefined, api, component, slotset, context.tplCache);
     {
-        assert.invariant(isArray(vnodes), `Compiler should produce html functions that always return an array.`);
+        assert.invariant(isArray$1(vnodes), `Compiler should produce html functions that always return an array.`);
     }
     slotsetRevoke();
     return vnodes;
@@ -2461,7 +2518,7 @@ function createTrackedPropertyDescriptor(proto, key, descriptor) {
                     // reactiveMembrane.getProxy(newValue) will return a different value (proxy)
                     // Then newValue if newValue is observable (plain object or array)
                     const isObservable = reactiveOrAnyValue !== newValue;
-                    if (!isObservable && newValue !== null && (isObject(newValue) || isArray(newValue))) {
+                    if (!isObservable && newValue !== null && (isObject$1(newValue) || isArray$1(newValue))) {
                         assert.logWarning(`Property "${key}" of ${vm} is set to a non-trackable object, which means changes into that object cannot be observed.`);
                     }
                 }
@@ -2530,7 +2587,7 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
                     // reactiveMembrane.getProxy(newValue) will return a different value (proxy)
                     // Then newValue if newValue is observable (plain object or array)
                     const isObservable = reactiveMembrane.getProxy(newValue) !== newValue;
-                    if (!isObservable && !isNull(newValue) && isObject(newValue)) {
+                    if (!isObservable && !isNull(newValue) && isObject$1(newValue)) {
                         assert.logWarning(`Assigning a non-reactive value ${newValue} to member property ${key} of ${vm} is not common because mutations on that value cannot be observed.`);
                     }
                 }
@@ -2582,7 +2639,7 @@ function createPublicAccessorDescriptor(proto, key, descriptor) {
                     // reactiveMembrane.getProxy(newValue) will return a different value (proxy)
                     // Then newValue if newValue is observable (plain object or array)
                     const isObservable = reactiveMembrane.getProxy(newValue) !== newValue;
-                    if (!isObservable && !isNull(newValue) && isObject(newValue)) {
+                    if (!isObservable && !isNull(newValue) && isObject$1(newValue)) {
                         assert.logWarning(`Assigning a non-reactive value ${newValue} to member property ${key} of ${vm} is not common because mutations on that value cannot be observed.`);
                     }
                 }
@@ -2666,10 +2723,10 @@ function createComponentDef(Ctor) {
                 const mustHaveGetter = COMPUTED_GETTER_MASK & config;
                 const mustHaveSetter = COMPUTED_SETTER_MASK & config;
                 if (mustHaveGetter) {
-                    assert.isTrue(isObject(descriptor) && isFunction(descriptor.get), `Missing getter for property ${propName} decorated with @api in ${name}`);
+                    assert.isTrue(isObject$1(descriptor) && isFunction(descriptor.get), `Missing getter for property ${propName} decorated with @api in ${name}`);
                 }
                 if (mustHaveSetter) {
-                    assert.isTrue(isObject(descriptor) && isFunction(descriptor.set), `Missing setter for property ${propName} decorated with @api in ${name}`);
+                    assert.isTrue(isObject$1(descriptor) && isFunction(descriptor.set), `Missing setter for property ${propName} decorated with @api in ${name}`);
                     assert.isTrue(mustHaveGetter, `Missing getter for property ${propName} decorated with @api in ${name}. You cannot have a setter without the corresponding getter.`);
                 }
             }
@@ -2765,7 +2822,7 @@ function createSetter(key) {
 function createMethodCaller(key) {
     return function () {
         const component = getCustomElementComponent(this);
-        return component[key].apply(component, ArraySlice.call(arguments));
+        return component[key].apply(component, ArraySlice$1.call(arguments));
     };
 }
 function getAttributePatched(attrName) {
@@ -2773,7 +2830,7 @@ function getAttributePatched(attrName) {
         const vm = getCustomElementVM(this);
         assertPublicAttributeCollision(vm, attrName);
     }
-    return getAttribute.apply(this, ArraySlice.call(arguments));
+    return getAttribute.apply(this, ArraySlice$1.call(arguments));
 }
 function setAttributePatched(attrName, newValue) {
     const vm = getCustomElementVM(this);
@@ -2783,7 +2840,7 @@ function setAttributePatched(attrName, newValue) {
         assertTemplateMutationViolation(vm, attrName);
         assertPublicAttributeCollision(vm, attrName);
     }
-    setAttribute.apply(this, ArraySlice.call(arguments));
+    setAttribute.apply(this, ArraySlice$1.call(arguments));
 }
 function setAttributeNSPatched(attrNameSpace, attrName, newValue) {
     const vm = getCustomElementVM(this);
@@ -2791,7 +2848,7 @@ function setAttributeNSPatched(attrNameSpace, attrName, newValue) {
         assertTemplateMutationViolation(vm, attrName);
         assertPublicAttributeCollision(vm, attrName);
     }
-    setAttributeNS.apply(this, ArraySlice.call(arguments));
+    setAttributeNS.apply(this, ArraySlice$1.call(arguments));
 }
 function removeAttributePatched(attrName) {
     const vm = getCustomElementVM(this);
@@ -2800,7 +2857,7 @@ function removeAttributePatched(attrName) {
         assertTemplateMutationViolation(vm, attrName);
         assertPublicAttributeCollision(vm, attrName);
     }
-    removeAttribute.apply(this, ArraySlice.call(arguments));
+    removeAttribute.apply(this, ArraySlice$1.call(arguments));
     attemptAriaAttributeFallback(vm, attrName);
 }
 function removeAttributeNSPatched(attrNameSpace, attrName) {
@@ -2809,7 +2866,7 @@ function removeAttributeNSPatched(attrNameSpace, attrName) {
         assertTemplateMutationViolation(vm, attrName);
         assertPublicAttributeCollision(vm, attrName);
     }
-    removeAttributeNS.apply(this, ArraySlice.call(arguments));
+    removeAttributeNS.apply(this, ArraySlice$1.call(arguments));
 }
 function assertPublicAttributeCollision(vm, attrName) {
     const propName = isString(attrName) ? getPropNameFromAttrName(attrName.toLocaleLowerCase()) : null;
@@ -3141,7 +3198,6 @@ function init$1(modules, api, compareFn) {
             // text nodes do not have logic associated to them
             if (isVNode(ch)) {
                 if (!isTextVNode(ch)) {
-                    invokeDestroyHook(ch);
                     listeners = cbs.remove.length + 1;
                     rm = createRmCb(ch.elm, listeners);
                     for (i = 0; i < cbs.remove.length; ++i) {
@@ -3153,6 +3209,7 @@ function init$1(modules, api, compareFn) {
                     else {
                         rm();
                     }
+                    invokeDestroyHook(ch);
                 }
                 else {
                     api.removeChild(parentElm, ch.elm);
@@ -3908,7 +3965,7 @@ function flushRehydrationQueue() {
                     if (rehydrateQueue.length === 0) {
                         addCallbackToNextTick(flushRehydrationQueue);
                     }
-                    ArrayUnshift.apply(rehydrateQueue, ArraySlice.call(vms, i + 1));
+                    ArrayUnshift$1.apply(rehydrateQueue, ArraySlice$1.call(vms, i + 1));
                 }
                 // rethrowing the original error will break the current tick, but since the next tick is
                 // already scheduled, it should continue patching the rest.
@@ -4139,4 +4196,4 @@ exports.wire = wire;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.19.0-0 */
+/** version: 0.19.1 */

@@ -5,9 +5,67 @@
 	(factory((global.Engine = {})));
 }(this, (function (exports) { 'use strict';
 
-const { freeze, seal, keys, create, assign, defineProperty, getPrototypeOf, setPrototypeOf, getOwnPropertyDescriptor, getOwnPropertyNames, defineProperties, getOwnPropertySymbols, hasOwnProperty, preventExtensions, isExtensible, } = Object;
+function detect() {
+    // Don't apply polyfill when ProxyCompat is enabled.
+    if ('getKey' in Proxy) {
+        return false;
+    }
+    const proxy = new Proxy([3, 4], {});
+    const res = [1, 2].concat(proxy);
+    return res.length !== 4;
+}
+
+const { isConcatSpreadable } = Symbol;
 const { isArray } = Array;
-const { concat: ArrayConcat, filter: ArrayFilter, slice: ArraySlice, splice: ArraySplice, unshift: ArrayUnshift, indexOf: ArrayIndexOf, push: ArrayPush, map: ArrayMap, forEach, reduce: ArrayReduce, } = Array.prototype;
+const { slice: ArraySlice, unshift: ArrayUnshift, shift: ArrayShift } = Array.prototype;
+function isObject(O) {
+    return typeof O === 'object' ? O !== null : typeof O === 'function';
+}
+// https://www.ecma-international.org/ecma-262/6.0/#sec-isconcatspreadable
+function isSpreadable(O) {
+    if (!isObject(O)) {
+        return false;
+    }
+    const spreadable = O[isConcatSpreadable];
+    return spreadable !== undefined ? Boolean(spreadable) : isArray(O);
+}
+// https://www.ecma-international.org/ecma-262/6.0/#sec-array.prototype.concat
+function ArrayConcatPolyfill(...args) {
+    const O = Object(this);
+    const A = [];
+    let N = 0;
+    const items = ArraySlice.call(arguments);
+    ArrayUnshift.call(items, O);
+    while (items.length) {
+        const E = ArrayShift.call(items);
+        if (isSpreadable(E)) {
+            let k = 0;
+            const length = E.length;
+            for (k; k < length; k += 1, N += 1) {
+                if (k in E) {
+                    const subElement = E[k];
+                    A[N] = subElement;
+                }
+            }
+        }
+        else {
+            A[N] = E;
+            N += 1;
+        }
+    }
+    return A;
+}
+function apply() {
+    Array.prototype.concat = ArrayConcatPolyfill;
+}
+
+if (detect()) {
+    apply();
+}
+
+const { freeze, seal, keys, create, assign, defineProperty, getPrototypeOf, setPrototypeOf, getOwnPropertyDescriptor, getOwnPropertyNames, defineProperties, getOwnPropertySymbols, hasOwnProperty, preventExtensions, isExtensible, } = Object;
+const { isArray: isArray$1 } = Array;
+const { concat: ArrayConcat, filter: ArrayFilter, slice: ArraySlice$1, splice: ArraySplice, unshift: ArrayUnshift$1, indexOf: ArrayIndexOf, push: ArrayPush, map: ArrayMap, forEach, reduce: ArrayReduce, } = Array.prototype;
 const { replace: StringReplace, toLowerCase: StringToLowerCase, indexOf: StringIndexOf, charCodeAt: StringCharCodeAt, slice: StringSlice, split: StringSplit, } = String.prototype;
 function isUndefined(obj) {
     return obj === undefined;
@@ -244,7 +302,7 @@ function invokeServiceHook(vm, cbs) {
 /**
  * Copyright (C) 2017 salesforce.com, inc.
  */
-var isArray$1 = Array.isArray;
+var isArray$2 = Array.isArray;
 var getPrototypeOf$1 = Object.getPrototypeOf, ObjectCreate = Object.create, ObjectDefineProperty = Object.defineProperty, ObjectDefineProperties = Object.defineProperties;
 var ObjectDotPrototype = Object.prototype;
 function isUndefined$1(obj) {
@@ -262,13 +320,13 @@ function isObservable(value) {
     if (value == null) {
         return false;
     }
-    if (isArray$1(value)) {
+    if (isArray$2(value)) {
         return true;
     }
     var proto = getPrototypeOf$1(value);
     return (proto === ObjectDotPrototype || proto === null || getPrototypeOf$1(proto) === null);
 }
-function isObject$1(obj) {
+function isObject$2(obj) {
     return typeof obj === 'object';
 }
 
@@ -507,10 +565,10 @@ function invokeDistortion(membrane, value) {
 }
 function createShadowTarget(value) {
     var shadowTarget = undefined;
-    if (isArray$1(value)) {
+    if (isArray$2(value)) {
         shadowTarget = [];
     }
-    else if (isObject$1(value)) {
+    else if (isObject$2(value)) {
         shadowTarget = {};
     }
     return shadowTarget;
@@ -587,7 +645,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.19.0-0 */
+/** version: 0.19.1 */
 
 const TargetToReactiveRecordMap = new WeakMap();
 function notifyMutation$1(target, key) {
@@ -707,14 +765,14 @@ class Membrane {
     apply(target, thisArg, argumentsList) {
         thisArg = unwrap$1(thisArg);
         argumentsList = unwrap$1(argumentsList);
-        if (isArray(argumentsList)) {
+        if (isArray$1(argumentsList)) {
             argumentsList = ArrayMap.call(argumentsList, unwrap$1);
         }
         return this.handler.apply(this, target, thisArg, argumentsList);
     }
     construct(target, argumentsList, newTarget) {
         argumentsList = unwrap$1(argumentsList);
-        if (isArray(argumentsList)) {
+        if (isArray$1(argumentsList)) {
             argumentsList = ArrayMap.call(argumentsList, unwrap$1);
         }
         return this.handler.construct(this, target, argumentsList, newTarget);
@@ -861,7 +919,7 @@ function handleComponentEvent(vm, event) {
     const { cmpEvents = EmptyObject } = vm;
     const { type, stopImmediatePropagation } = event;
     const handlers = cmpEvents[type];
-    if (isArray(handlers)) {
+    if (isArray$1(handlers)) {
         let uninterrupted = true;
         event.stopImmediatePropagation = function () {
             uninterrupted = false;
@@ -1175,7 +1233,7 @@ class LWCElement {
         return getAttributeNS.call(getLinkedElement$1(this), ns, attrName);
     }
     getAttribute(attrName) {
-        return getAttribute.apply(getLinkedElement$1(this), ArraySlice.call(arguments));
+        return getAttribute.apply(getLinkedElement$1(this), ArraySlice$1.call(arguments));
     }
     getBoundingClientRect() {
         const elm = getLinkedElement$1(this);
@@ -1289,9 +1347,8 @@ const hook = {
     create(oldVNode, vnode) {
         createVM(vnode.sel, vnode.elm, vnode.data.slotset);
     },
-    remove(vnode, removeCallback) {
+    destroy(vnode) {
         removeVM(getCustomElementVM(vnode.elm));
-        removeCallback();
     }
 };
 function isVElement(vnode) {
@@ -1301,7 +1358,7 @@ function addNS(vnode) {
     const { data, children, sel } = vnode;
     // TODO: review why `sel` equal `foreignObject` should get this `ns`
     data.ns = NamespaceAttributeForSVG;
-    if (isArray(children) && sel !== 'foreignObject') {
+    if (isArray$1(children) && sel !== 'foreignObject') {
         for (let j = 0, n = children.length; j < n; ++j) {
             const childNode = children[j];
             if (childNode != null && isVElement(childNode)) {
@@ -1408,7 +1465,7 @@ function i(iterable, factory) {
         last = next.done;
         // template factory logic based on the previous collected value
         const vnode = factory(value, j, j === 0, last);
-        if (isArray(vnode)) {
+        if (isArray$1(vnode)) {
             ArrayPush.apply(list, vnode);
         }
         else {
@@ -1428,7 +1485,7 @@ function f(items) {
     const flattened = [];
     for (let j = 0; j < len; j += 1) {
         const item = items[j];
-        if (isArray(item)) {
+        if (isArray$1(item)) {
             ArrayPush.apply(flattened, item);
         }
         else {
@@ -1857,30 +1914,30 @@ function createSetter(key) {
 function createMethodCaller(key) {
     return function () {
         const component = getCustomElementComponent(this);
-        return component[key].apply(component, ArraySlice.call(arguments));
+        return component[key].apply(component, ArraySlice$1.call(arguments));
     };
 }
 function getAttributePatched(attrName) {
-    return getAttribute.apply(this, ArraySlice.call(arguments));
+    return getAttribute.apply(this, ArraySlice$1.call(arguments));
 }
 function setAttributePatched(attrName, newValue) {
     const vm = getCustomElementVM(this);
     // marking the set is needed for the AOM polyfill
     vm.hostAttrs[attrName] = 1; // marking the set is needed for the AOM polyfill
-    setAttribute.apply(this, ArraySlice.call(arguments));
+    setAttribute.apply(this, ArraySlice$1.call(arguments));
 }
 function setAttributeNSPatched(attrNameSpace, attrName, newValue) {
     const vm = getCustomElementVM(this);
-    setAttributeNS.apply(this, ArraySlice.call(arguments));
+    setAttributeNS.apply(this, ArraySlice$1.call(arguments));
 }
 function removeAttributePatched(attrName) {
     const vm = getCustomElementVM(this);
-    removeAttribute.apply(this, ArraySlice.call(arguments));
+    removeAttribute.apply(this, ArraySlice$1.call(arguments));
     attemptAriaAttributeFallback(vm, attrName);
 }
 function removeAttributeNSPatched(attrNameSpace, attrName) {
     const vm = getCustomElementVM(this);
-    removeAttributeNS.apply(this, ArraySlice.call(arguments));
+    removeAttributeNS.apply(this, ArraySlice$1.call(arguments));
 }
 function createDescriptorMap(publicProps, publicMethodsConfig) {
     // replacing mutators and accessors on the element itself to catch any mutation
@@ -2152,7 +2209,6 @@ function init$1(modules, api, compareFn) {
             // text nodes do not have logic associated to them
             if (isVNode(ch)) {
                 if (!isTextVNode(ch)) {
-                    invokeDestroyHook(ch);
                     listeners = cbs.remove.length + 1;
                     rm = createRmCb(ch.elm, listeners);
                     for (i = 0; i < cbs.remove.length; ++i) {
@@ -2164,6 +2220,7 @@ function init$1(modules, api, compareFn) {
                     else {
                         rm();
                     }
+                    invokeDestroyHook(ch);
                 }
                 else {
                     api.removeChild(parentElm, ch.elm);
@@ -2820,7 +2877,7 @@ function flushRehydrationQueue() {
                     if (rehydrateQueue.length === 0) {
                         addCallbackToNextTick(flushRehydrationQueue);
                     }
-                    ArrayUnshift.apply(rehydrateQueue, ArraySlice.call(vms, i + 1));
+                    ArrayUnshift$1.apply(rehydrateQueue, ArraySlice$1.call(vms, i + 1));
                 }
                 // rethrowing the original error will break the current tick, but since the next tick is
                 // already scheduled, it should continue patching the rest.
@@ -3008,4 +3065,4 @@ exports.wire = wire;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.19.0-0 */
+/** version: 0.19.1 */

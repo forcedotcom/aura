@@ -100,7 +100,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
             return;
         }
         resource.setContentType(response);
-        servletUtilAdapter.setCSPHeaders(context.getApplicationDescriptor(), request, response);
 
         resource.write(request, response, context);
     }

@@ -383,7 +383,11 @@ public class AuraServlet extends AuraBaseServlet {
                 assertAccess(def);
             }
         } catch (Throwable t) {
-            servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
+            try {
+                servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
+            } catch (Throwable t2){
+                //if csp headers fail on this exception path ignore the error as it will mask the handled exception
+            }
             servletUtilAdapter.handleServletException(t, false, context, request, response, false);
             return;
         }
@@ -410,7 +414,11 @@ public class AuraServlet extends AuraBaseServlet {
             writer.append(out.toString());
 
         } catch (Throwable e) {
-            servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
+            try {
+                servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
+            } catch (Throwable t2){
+                //if csp headers fail on this exception path ignore the error as it will mask the handled exception
+            }
             servletUtilAdapter.handleServletException(e, false, context, request, response, true);
         } finally {
             loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION_AURA);

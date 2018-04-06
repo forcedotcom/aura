@@ -38,9 +38,9 @@
             if (innerLabel) {
                 var innerLabelElement = innerLabel.getElement();
                 if (innerLabelElement && innerLabelElement.offsetWidth < innerLabelElement.scrollWidth) {
-                    component.getElement().title = label;
+                    component.getElement().setAttribute("title", label);
                 } else {
-                    component.getElement().title = undefined;
+                    component.getElement().removeAttribute("title");
                 }
             }
         }

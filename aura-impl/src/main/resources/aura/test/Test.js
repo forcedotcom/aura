@@ -469,6 +469,14 @@ TestInstance.prototype.setServerReachable = function(reachable) {
 };
 
 /**
+ * @param xhrExclusivity boolean for xhr's to be run exclusively (one at a time)
+ * @export
+ */
+TestInstance.prototype.setXHRExclusivity = function(xhrExclusivity) {
+    $A.clientService.setXHRExclusivity(xhrExclusivity);
+};
+
+/**
  * Invoke a callback after the provided condition evaluates to truthy, checking on the condition every specified
  * interval. Truthy values can refer to a non-empty String, a non-zero number, a non-empty array, an object, or an
  * expression evaluating to true.

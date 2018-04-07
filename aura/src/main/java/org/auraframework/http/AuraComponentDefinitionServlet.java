@@ -134,6 +134,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                     .append(request.getHeader("Host"))
                     .append(generateRedirectURI(descriptors, hydrationType, computedUID, appReferrrer, locale, styleParam.get(request)));
 
+                servletUtilAdapter.setNoCache(response);
                 response.sendRedirect(redirectUrl.toString());
                 return;
             }

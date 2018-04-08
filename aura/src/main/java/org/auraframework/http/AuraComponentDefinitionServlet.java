@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -96,6 +98,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             Map<DefDescriptor<?>, String> descriptors = mapDescriptorsToDefDesriptorAndUid(requestedDescriptors);
 
             StringBuilder allUIDs = new StringBuilder();
+
             for (Entry defDesc : descriptors.entrySet()) {
                 allUIDs.append(defDesc.getValue());
             }
@@ -163,11 +166,9 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             descriptors.entrySet().stream().forEach((entry)->{
                 dependencies.addAll(definitionService.getDependencies(entry.getValue()));
             });
-
             dependencies.removeAll(descriptors.keySet());
 
             DefDescriptor<ApplicationDef> appDescriptor = definitionService.getDefDescriptor(appReferrrer, ApplicationDef.class);
-
             String appUID;
             try {
                 appUID = definitionService.getUid(null, appDescriptor);
@@ -176,7 +177,6 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 // if neither exist, let the error bubble up
                 appUID = definitionService.getUid(null, definitionService.getDefDescriptor(appReferrrer, ComponentDef.class));
             }
-
             dependencies.removeAll(definitionService.getDependencies(appUID));
 
             if (hydrationType == HYDRATION_TYPE.one) {
@@ -202,8 +202,12 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 responseStringWriter.write(");");
             }
 
+            if(containsOnlyRestrictedDefs(context, requestedDescriptors)) {
+                servletUtilAdapter.setLongCache(response);
+            } else {
+                servletUtilAdapter.setLongCachePrivate(response);
+            }
 
-            servletUtilAdapter.setLongCachePrivate(response);
         } catch (Exception e) {
             PrintWriter out = response.getWriter();
             if (requestedUID!=null) {
@@ -218,6 +222,20 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             response.getWriter().print(responseStringWriter.toString());
             responseStringWriter.close();
         }
+    }
+
+    private Boolean containsOnlyRestrictedDefs(AuraContext context, List<String> requestedDescriptors) {
+        if(requestedDescriptors.isEmpty()) {
+            return false;
+        }
+
+        for (String desc : requestedDescriptors) {
+            if(!context.getRestrictedNamespaces().contains(desc)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     @SuppressWarnings("unchecked")

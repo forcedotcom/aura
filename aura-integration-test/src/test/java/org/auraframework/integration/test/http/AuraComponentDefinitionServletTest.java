@@ -18,6 +18,8 @@ package org.auraframework.integration.test.http;
 import static org.junit.Assert.assertTrue;
 
 import java.io.PrintWriter;
+import java.util.Set;
+import java.util.HashSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +30,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.http.AuraComponentDefinitionServlet;
 import org.auraframework.service.ContextService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.ServerService;
@@ -52,6 +55,9 @@ public class AuraComponentDefinitionServletTest {
     
     @Mock
     private ContextService contextService;
+
+    @Mock
+    private AuraContext auraContextService;
     
     @Mock
     private ConfigAdapter configAdapter;
@@ -118,5 +124,82 @@ public class AuraComponentDefinitionServletTest {
         // Assert
         Mockito.verify(response).sendRedirect("https://example.host/auraCmpDef?aura.app=myApp&_hydration=one&_l=false&_l10n=de&_style=styling&_def=def:qualifiedName&_uid=DIFFERENT_UID");
     }
-    
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testContainsOnlyRestrictedDefsIsTrue() throws Exception {
+        // Arrange
+        //private Boolean containsOnlyRestrictedDefs = true;
+        setMockRequestParameters("myApp", "one", "true", "de", "styling", "def", "UID");
+        DefDescriptor<Definition> defDescriptorMock = Mockito.mock(DefDescriptor.class);
+        Mockito.when(defDescriptorMock.getNamespace()).thenReturn("namespace");
+        Mockito.when(defDescriptorMock.getName()).thenReturn("name");
+        Mockito.when(defDescriptorMock.getQualifiedName()).thenReturn("def:qualifiedName");
+        Mockito.when(definitionService.getDefDescriptor(Matchers.eq("def"), Matchers.any())).thenReturn(defDescriptorMock);
+        Mockito.when(definitionService.getUid(null, defDescriptorMock)).thenReturn("UID");
+        Mockito.when(configAdapter.isSecureRequest(request)).thenReturn(true);
+        Mockito.when(response.getWriter()).thenReturn(Mockito.mock(PrintWriter.class));
+        Mockito.when(request.getHeader("Host")).thenReturn("example.host");
+        Set<String> restrictedNamespaces = new HashSet<String>();
+        restrictedNamespaces.add("def");
+        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContextService);
+        Mockito.when(contextService.getCurrentContext().getRestrictedNamespaces()).thenReturn(restrictedNamespaces);
+
+        // Act
+        AuraPrivateAccessor.invoke(auraComponentDefinitionServlet, "doGet", request, response);
+
+        // Assert
+        Mockito.verify(servletUtilAdapter, Mockito.times(1)).setLongCache(response);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testContainsOnlyRestrictedDefsIsFalse() throws Exception {
+        // Arrange
+        setMockRequestParameters("myApp", "one", "true", "de", "styling", "def", "UID");
+        DefDescriptor<Definition> defDescriptorMock = Mockito.mock(DefDescriptor.class);
+        Mockito.when(defDescriptorMock.getNamespace()).thenReturn("namespace");
+        Mockito.when(defDescriptorMock.getName()).thenReturn("name");
+        Mockito.when(defDescriptorMock.getQualifiedName()).thenReturn("def:qualifiedName");
+        Mockito.when(definitionService.getDefDescriptor(Matchers.eq("def"), Matchers.any())).thenReturn(defDescriptorMock);
+        Mockito.when(definitionService.getUid(null, defDescriptorMock)).thenReturn("UID");
+        Mockito.when(configAdapter.isSecureRequest(request)).thenReturn(true);
+        Mockito.when(response.getWriter()).thenReturn(Mockito.mock(PrintWriter.class));
+        Mockito.when(request.getHeader("Host")).thenReturn("example.host");
+        Set<String> restrictedNamespaces = new HashSet<String>();
+        restrictedNamespaces.add("fed");
+        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContextService);
+        Mockito.when(contextService.getCurrentContext().getRestrictedNamespaces()).thenReturn(restrictedNamespaces);
+
+        // Act
+        AuraPrivateAccessor.invoke(auraComponentDefinitionServlet, "doGet", request, response);
+
+        // Assert
+        Mockito.verify(servletUtilAdapter, Mockito.times(1)).setLongCachePrivate(response);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testContainsNoRestrictedDefs() throws Exception {
+        // Arrange
+        setMockRequestParameters("myApp", "one", "true", "de", "styling", "def", "UID");
+        DefDescriptor<Definition> defDescriptorMock = Mockito.mock(DefDescriptor.class);
+        Mockito.when(defDescriptorMock.getNamespace()).thenReturn("namespace");
+        Mockito.when(defDescriptorMock.getName()).thenReturn("name");
+        Mockito.when(defDescriptorMock.getQualifiedName()).thenReturn("def:qualifiedName");
+        Mockito.when(definitionService.getDefDescriptor(Matchers.eq("def"), Matchers.any())).thenReturn(defDescriptorMock);
+        Mockito.when(definitionService.getUid(null, defDescriptorMock)).thenReturn("UID");
+        Mockito.when(configAdapter.isSecureRequest(request)).thenReturn(true);
+        Mockito.when(response.getWriter()).thenReturn(Mockito.mock(PrintWriter.class));
+        Mockito.when(request.getHeader("Host")).thenReturn("example.host");
+        Set<String> restrictedNamespaces = new HashSet<String>();
+        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContextService);
+        Mockito.when(contextService.getCurrentContext().getRestrictedNamespaces()).thenReturn(restrictedNamespaces);
+
+        // Act
+        AuraPrivateAccessor.invoke(auraComponentDefinitionServlet, "doGet", request, response);
+
+        // Assert
+        Mockito.verify(servletUtilAdapter, Mockito.times(1)).setLongCachePrivate(response);
+    }
 }

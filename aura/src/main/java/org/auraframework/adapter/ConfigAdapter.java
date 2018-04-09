@@ -188,6 +188,12 @@ public interface ConfigAdapter extends AuraAdapter {
     boolean isBootstrapInliningEnabled();
 
     /**
+     * If false then models will not be included in the application instance used when bootstrapping
+     * @return
+     */
+    boolean isBootstrapModelExclusionEnabled();
+
+    /**
      * @return max number of parallel XHRs used to execute server actions, must be 2 or more
      */
     int getMaxParallelXHRCount();

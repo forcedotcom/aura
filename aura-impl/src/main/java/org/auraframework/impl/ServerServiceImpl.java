@@ -18,7 +18,9 @@ package org.auraframework.impl;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.adapter.StyleAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponentApplicationInitializer;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.cache.Cache;
 import org.auraframework.css.StyleContext;
@@ -51,10 +54,12 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.http.BootstrapUtil;
 import org.auraframework.http.ManifestUtil;
+import org.auraframework.impl.cache.ApplicationInitializerCache;
 import org.auraframework.impl.css.CssVariableWriter;
 import org.auraframework.impl.css.StyleDefWriter;
 import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.instance.Action;
+import org.auraframework.instance.ApplicationInitializer;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.Event;
@@ -121,6 +126,12 @@ public class ServerServiceImpl implements ServerService {
 
     @Inject
     protected CSPInliningService cspInliningService;
+
+    @Inject
+    java.util.Optional<List<ApplicationInitializer>> initializers;
+
+    @Inject
+    private ApplicationInitializerCache applicationInitializerCache;
 
     private ManifestUtil manifestUtil;
 
@@ -694,7 +705,9 @@ public class ServerServiceImpl implements ServerService {
         json.writeMapEntry("inlined", true);
         json.writeMapKey("data");
         json.writeMapBegin();
-        json.writeMapEntry("app", appInstance);
+
+        bootstrapUtil.serializeApplication(appInstance, context, json);
+
         json.writeMapEnd();
         json.writeMapEnd();
         writer.write(bootstrapUtil.getAppendScript());
@@ -733,6 +746,38 @@ public class ServerServiceImpl implements ServerService {
         return writer.toString();
     }
 
+    private String serializeInitializers(AuraContext context) throws IOException {
+        JsonSerializationContext serializationContext = context.getJsonSerializationContext();
+        StringWriter writer = new StringWriter();
+        JsonEncoder json = JsonEncoder.createJsonStream(writer, serializationContext);
+        json.writeMapBegin();
+
+        Map<String, ApplicationInitializer> appInitializers = applicationInitializerCache.get(context.getApplicationDescriptor().getDescriptorName(), () -> {
+            Map<String, ApplicationInitializer> result = new HashMap<>();
+            if (initializers.isPresent()) {
+                for (ApplicationInitializer initializer : initializers.get()) {
+                    ServiceComponentApplicationInitializer annotation = initializer.getClass().getAnnotation(ServiceComponentApplicationInitializer.class);
+                    if (Arrays.stream(annotation.applications()).anyMatch(context.getApplicationDescriptor().getDescriptorName()::equals)) {
+                        result.put(annotation.name(), initializer);
+                    }
+                }
+            }
+
+            return result;
+        });
+
+        for (Map.Entry<String, ApplicationInitializer> entry : appInitializers.entrySet()) {
+            json.writeMapEntry(entry.getKey(), entry.getValue().provideConfiguration());
+        }
+
+        json.writeMapEnd();
+        writer.flush();
+        writer.close();
+
+        return writer.toString();
+
+    }
+
     @Override
     public <T extends BaseComponentDef> Component writeTemplate(AuraContext context,
             T value, Map<String, Object> componentAttributes, Appendable out)
@@ -749,7 +794,10 @@ public class ServerServiceImpl implements ServerService {
             // ensure app dependencies are excluded from context serialization
             try {
                 DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
-                Instance<?> appInstance = instanceService.getInstance(app, componentAttributes);
+                Instance<?> appInstance = null;
+                if (!configAdapter.isBootstrapModelExclusionEnabled()) {
+                    appInstance = instanceService.getInstance(app, componentAttributes);
+                }
                 context.addPreloadedDefinitions(definitionService.getDependencies(definitionService.getUid(null, app)));
 
                 serializedContext = serializeInlineContext(context);
@@ -831,6 +879,9 @@ public class ServerServiceImpl implements ServerService {
 
             auraInit.put("MaxParallelXHRCount", configAdapter.getMaxParallelXHRCount());
             auraInit.put("XHRExclusivity", configAdapter.getXHRExclusivity());
+            if (configAdapter.isBootstrapModelExclusionEnabled()) {
+                auraInit.put("initializers", new Literal(serializeInitializers(context)));
+            }
 
             auraInit.put("context", new Literal(serializedContext));
             attributes.put("auraInit", JsonEncoder.serialize(auraInit));

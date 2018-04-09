@@ -720,6 +720,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
+    public boolean isBootstrapModelExclusionEnabled() {
+        return false;
+    }
+
+    @Override
     public boolean requireLocker(RootDefinition def) {
         boolean requireLocker = !isInternalNamespace(def.getDescriptor().getNamespace());
         if (!requireLocker) {

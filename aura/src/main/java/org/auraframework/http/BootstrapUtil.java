@@ -17,21 +17,29 @@ package org.auraframework.http;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.auraframework.annotations.Annotations;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.expression.PropertyReference;
+import org.auraframework.instance.ApplicationInitializer;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.Instance;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.CompositeValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.util.json.JsonSerializationContext;
 
 import javax.inject.Inject;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-
 
 /**
  * Shared bootstrap logic used for both the bootstrap resource and bootstrap inlining
@@ -85,4 +93,18 @@ public class BootstrapUtil {
             throw new CompositeValidationException("Unable to load values for "+root, errors);
         }
     }
+
+    public void serializeApplication(Instance<?> appInstance, AuraContext context, JsonEncoder json) throws IOException {
+        if (appInstance != null) {
+            json.writeMapEntry("app", appInstance);
+        } else {
+            json.writeMapKey("app");
+            json.writeMapBegin();
+            json.writeMapKey("componentDef");
+            json.writeMapBegin();
+            json.writeMapEntry("descriptor", context.getApplicationDescriptor().getQualifiedName());
+            json.writeMapEnd();
+            json.writeMapEnd();
+        }
+     }
 }

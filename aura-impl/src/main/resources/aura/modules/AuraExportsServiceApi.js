@@ -58,5 +58,10 @@ Aura.ServiceApi = {
     },
     "getFormFactor": function() {
         return $A.get('$Browser.formFactor');
+    },
+    "getInitializer": function(name) {
+        if ($A.initializers) {
+            return $A.initializers[name];
+        }
     }
 };

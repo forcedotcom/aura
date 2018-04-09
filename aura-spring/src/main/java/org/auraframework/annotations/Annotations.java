@@ -125,4 +125,14 @@ public interface Annotations {
     @interface ServiceComponentRenderer {
     }
 
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Component
+    @Lazy
+    @Scope(BeanDefinition.SCOPE_SINGLETON)
+    @interface ServiceComponentApplicationInitializer {
+        String name();
+
+        String[] applications();
+    }
 }

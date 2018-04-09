@@ -31,6 +31,7 @@ function AuraInstance () {
     this.globalValueProviders = {};
     this.deprecationUsages    = {};
     this.displayErrors        = true;
+    this.initializers         = {};
 
     this.logger               = new Aura.Utils.Logger();
 
@@ -419,6 +420,7 @@ AuraInstance.prototype.initAsync = function(config) {
     this.clientService.setNamespacePrivileges(config["ns"]);
     this.clientService.setQueueSize(config["MaxParallelXHRCount"]);
     this.clientService.setXHRExclusivity(config["XHRExclusivity"]);
+    this.initializers = config["initializers"];
 
     // Context is created async because of the GVPs go though async storage checks
     $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
@@ -524,6 +526,7 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
     this.clientService.setNamespacePrivileges(config["ns"]);
     this.clientService.setQueueSize(config["MaxParallelXHRCount"]);
     this.clientService.setXHRExclusivity(config["XHRExclusivity"]);
+    this.initializers = config["initializers"];
     this.beforeInitHooks();
 
     $A.executeExternalLibraries();

@@ -90,7 +90,10 @@ public class Bootstrap extends AuraResourceImpl {
             }
 
             setCacheHeaders(response, app);
-            Instance<?> appInstance = instanceService.getInstance(app, getComponentAttributes(request));
+            Instance<?> appInstance = null;
+            if (!configAdapter.isBootstrapModelExclusionEnabled()) {
+                instanceService.getInstance(app, getComponentAttributes(request));
+            }
             definitionService.updateLoaded(app);
             loadLabels(context);
 
@@ -102,7 +105,9 @@ public class Bootstrap extends AuraResourceImpl {
             json.writeMapBegin();
             json.writeMapKey("data");
             json.writeMapBegin();
-            json.writeMapEntry("app", appInstance);
+
+            bootstrapUtil.serializeApplication(appInstance, context, json);
+
             context.getInstanceStack().serializeAsPart(json);
             json.writeMapEnd();
             json.writeMapEntry("md5", out.getMD5());

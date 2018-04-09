@@ -214,12 +214,15 @@ ComponentDefLoader.prototype.getScriptPromises = function(descriptorMap) {
     var scriptPromises = [];
     var defState = $A.getContext().getURIDefsState();
     if (defState !== null && defState.bundleRequests) {
-        scriptPromises.push(this.setScriptTag(this.buildBundleComponentUri(descriptorMap)));
+        var URIs = this.buildBundleComponentUri(descriptorMap);
+        for (var idx=0; idx < URIs.length; idx++) {
+            scriptPromises.push(this.generateScriptTag(URIs[idx]));
+        }
     } else {
         var descriptors = Object.keys(descriptorMap);
         for (var i=0, length=descriptors.length; i<length; i++) {
             if (!$A.componentService.hasCacheableDefinitionOfAnyType(descriptors[i])) {
-                scriptPromises.push(this.setScriptTag(this.buildComponentUri(descriptors[i], descriptorMap[descriptors[i]])));
+                scriptPromises.push(this.generateScriptTag(this.buildComponentUri(descriptors[i], descriptorMap[descriptors[i]])));
             }
         }
     }
@@ -234,8 +237,8 @@ ComponentDefLoader.prototype.retrievePending = function(pending) {
     var that = this;
 
     Promise.all(scriptPromises).then(function(){
-        for (var j = 0, p_length = pending.callbacks.length; j < p_length; j++) {
-            var scope = {idx:j, total:p_length, remaining:p_length-j-1};
+        for (var j = 0; j < pending.callbacks.length; j++) {
+            var scope = {idx:j, total:pending.callbacks.length, remaining:pending.callbacks.length-j-1};
             try {
                 pending.callbacks[j].call(scope);
             } catch (e) {
@@ -285,39 +288,29 @@ ComponentDefLoader.prototype.onerror = function(uri, reject){
     }, reject);
 };
 
-ComponentDefLoader.prototype.setScriptTag = function(uri) {
+ComponentDefLoader.prototype.generateScriptTag = function(uri) {
     if (!uri) {
         return Promise["resolve"]();
     }
 
     var that = this;
     return new Promise(function(resolve, reject) {
-        if($A.util.isArray(uri)) {
-            for(var i=0, uri_len=uri.length; i<uri_len; i++) {
-                that.generateScriptTag(that, uri[i], resolve, reject);
-            }
-        } else {
-            that.generateScriptTag(that, uri, resolve, reject);
-        }
+        var script = document.createElement("script");
+        script["type"] = "text/javascript";
+        script["src"] = $A.clientService._host + uri;
+        script["onload"] = function () {
+            that.checkForError(uri, resolve, reject);
+            script["onload"] = script["onerror"] = undefined;
+            document.body.removeChild(script);
+        };
+        script["onerror"] = function(){
+            that.onerror(uri, reject);
+            script["onload"] = script["onerror"] = undefined;
+            document.body.removeChild(script);
+        };
+        script["nonce"] = $A.getContext().scriptNonce;
+        document.body.appendChild(script);
     });
-};
-
-ComponentDefLoader.prototype.generateScriptTag = function(scope, uri, resolve, reject) {
-    var script = document.createElement("script");
-    script["type"] = "text/javascript";
-    script["src"] = $A.clientService._host + uri;
-    script["onload"] = function () {
-        scope.checkForError(uri, resolve, reject);
-        script["onload"] = script["onerror"] = undefined;
-        document.body.removeChild(script);
-    };
-    script["onerror"] = function(){
-        scope.onerror(uri, reject);
-        script["onload"] = script["onerror"] = undefined;
-        document.body.removeChild(script);
-    };
-    script["nonce"] = $A.getContext().scriptNonce;
-    document.body.appendChild(script);
 };
 
 ComponentDefLoader.prototype.schedulePending = function() {

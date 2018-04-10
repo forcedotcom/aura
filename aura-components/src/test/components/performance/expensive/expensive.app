@@ -18,13 +18,13 @@
 <aura:application access="GLOBAL">
     <h1>A very expensive app to load</h1>
     <p>
-        This app is expensive because it creates a TON of components. Primarily those components are the building blocks of an application, divs, inputs, etc. 
+        This app is expensive because it creates a TON of components. Primarily those components are the building blocks of an application, divs, inputs, etc.
         The idea is to get a feel for the performance of the primary components of Aura and figure out how to optimize the heck out of them.
     </p>
-    <br/>    
+    <br/>
     <b>Time to load and render the expensive app</b>
     <div aura:id="load"></div>
-    
+
     <br/>
     <b>Total amount of components on the page</b>
     <div aura:id="count"></div>
@@ -39,15 +39,24 @@
     <div aura:id="render">n/a</div>
 
     <br/><br/>
+    <b>Time to Rerender</b>
+    <div aura:id="rerender">n/a</div>
+
+    <br/><br/>
     <b>Time for Raw Operation</b>
     <div aura:id="raw">n/a</div>
 
     <br/><br/>
 
+    <aura:method name="doRender" action="c.onRender"/>
+    <aura:method name="doRerender" action="c.onRerender"/>
+    <aura:method name="doUnrender" action="c.onUnrender"/>
+
     <ui:inputCheckbox aura:id="record" label="Record Profiles" /><br/>
-    <ui:button press="{!c.onRender}" label="Render"/>    
-    <ui:button press="{!c.onUnrender}" label="Unrender"/>    
-    <ui:button press="{!c.onRaw}" label="Raw"/>    
+    <ui:button aura:id="renderButton" press="{!c.onRender}" label="Render"/>
+    <ui:button aura:id="rerenderButton" press="{!c.onRerender}" label="Rerender" disabled="true"/>
+    <ui:button aura:id="unrenderButton" press="{!c.onUnrender}" label="Unrender" disabled="true"/>
+    <ui:button press="{!c.onRaw}" label="Raw"/>
 
 
     <br/>

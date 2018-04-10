@@ -31,12 +31,36 @@
             helper.profileEnd(cmp, "Render");
 
             var render = cmp.find("render").getElement();
-            render.innerHTML = end - start + "ms";
+            var duration = (end - start).toFixed(2);
+            render.innerHTML = duration + "ms";
+
+            cmp.find("rerenderButton").set("v.disabled", false);
+            cmp.find("unrenderButton").set("v.disabled", false);
+
         });
     },
 
+    onRerender: function(cmp, event, helper) {
+        var output = cmp.find("appendTo");
+
+        var body = output.get("v.body");
+
+        helper.profile(cmp, "Rerender");
+        var start = performance.now();
+        $A.rerender(body);
+        var end = performance.now();
+        helper.profileEnd(cmp, "Rerender");
+
+        var rerender = cmp.find("rerender").getElement();
+        var duration = (end - start).toFixed(2);
+        rerender.innerHTML = duration + "ms";
+        if (helper.isProfilingEnabled(cmp)) {
+            $A.log("Rerendering Time: " + duration);
+        }
+    },
+
     onUnrender: function(cmp, event, helper) {
-        
+
         helper.profile(cmp, "Unrender");
         var start = performance.now();
         $A.unrender(cmp.find("appendTo").get("v.body"));
@@ -44,7 +68,8 @@
         helper.profileEnd(cmp, "Unrender");
 
         var unrender = cmp.find("unrender").getElement();
-        unrender.innerHTML = (end - start) + "ms";
+        var duration = (end - start).toFixed(2);
+        unrender.innerHTML = duration + "ms";
     },
 
     updateCount: function(component, event, helper) {

@@ -134,7 +134,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     var uid = "";
     var namespaces = Object.keys(namespaceMap).sort();
     if (namespaces.length === 0) {
-        return undefined;
+        return uris;
     }
 
     var maxLength;

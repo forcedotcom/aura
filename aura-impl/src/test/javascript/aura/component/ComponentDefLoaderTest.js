@@ -415,6 +415,19 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
     function buildBundleComponentUri() {
 
         [Fact]
+        function shouldReturnEmptyArrayWithNoDescriptors() {
+            var actual;
+            var expect = [];
+            mockAura(function () {
+                var defLoader = new Aura.Component.ComponentDefLoader();
+                var descriptorMap = {};
+                actual = defLoader.buildBundleComponentUri(descriptorMap);
+            });
+
+            Assert.Equal(expect, actual);
+        }
+
+        [Fact]
         function shouldBuildOneBundleURI() {
             var actual;
             var expect = 1;

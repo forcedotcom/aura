@@ -208,7 +208,7 @@
             return null;
         }
         itemsSection.iters = iterCmp.get("v.body");
-
+        
         // original index points to the currently highlighted item or -1 if we're not in item list
         // highlightedIndex is used to determine the next item to highlight during traversal
         itemsSection.originalIndex = itemsSection.highlightedIndex = this.findHighlightedOptionIndex(itemsSection.iters);
@@ -328,7 +328,11 @@
                     } else if (!itemList[this.highlightedIndex].get("v.visible")) {
                         resultSection = this.incrementedTo();
                     }
+                // no visible items found, so the count is off, in this case we skip to the footer if present
+                } else if (itemList[this.highlightedIndex] && !itemList[this.highlightedIndex].get("v.visible") && this.traversalCount === itemList.length) {
+                    return this.next.incrementedTo();
                 }
+                
                 return resultSection;
             },
 

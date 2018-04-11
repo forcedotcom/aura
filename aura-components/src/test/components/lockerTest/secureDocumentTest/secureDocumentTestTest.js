@@ -178,7 +178,8 @@
         }
     },
 
-    testBlockStyleTag: {
+    // TODO: [W-4871355] Change when secure <style> tag filter is added.
+    _testBlockStyleTag: {
         test: function(cmp) {
             cmp.testBlockStyleTag();
         }

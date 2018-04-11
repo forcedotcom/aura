@@ -227,39 +227,39 @@
      * Attempts to use location.assign() to modify the current URL.
      * This should be permitted and whitelisted by locker since the URL is valid.
      */
-     testLocationAssign: function(component, event, helper) {
-         var testUtils = component.get('v.testUtils');
-         document.location.assign('#success');
-         testUtils.assertEquals('#success', document.location.hash, 'Failed to assign a new hash using location.assign()');
-     },
+    testLocationAssign: function(component, event, helper) {
+        var testUtils = component.get('v.testUtils');
+        document.location.assign('#success');
+        testUtils.assertEquals('#success', document.location.hash, 'Failed to assign a new hash using location.assign()');
+    },
 
-     testBlockStyleTag: function(cmp) {
-        var testUtils = cmp.get("v.testUtils");
-        var assertMessage = "";
+    testBlockStyleTag: function(cmp) {
+       var testUtils = cmp.get("v.testUtils");
+       var assertMessage = "";
 
-        try {
-            var el = document.createElement("style");
-        } catch (error) {        
-            assertMessage = error.message;            
-        }
+       try {
+           var el = document.createElement("style");
+       } catch (error) {        
+           assertMessage = error.message;            
+       }
 
-        testUtils.assertEquals(
-            assertMessage, 
-            "Creation of style tags is not allowed", 
-            "document.createElement should prevent style tags"
-        );
-        assertMessage = "";
+       testUtils.assertEquals(
+           assertMessage, 
+           "Creation of style tags is not allowed", 
+           "document.createElement should prevent style tags"
+       );
+       assertMessage = "";
 
-        try {
-            var el = document.createElementNS("http://www.w3.org/2000/svg", "style");
-        } catch (error) {
-            assertMessage = error.message;
-        }
+       try {
+           var el = document.createElementNS("http://www.w3.org/2000/svg", "style");
+       } catch (error) {
+           assertMessage = error.message;
+       }
 
-        testUtils.assertEquals(
-            assertMessage, 
-            "Creation of style tags is not allowed", 
-            "document.createElementNS should prevent style tags"
-        );
-     }
+       testUtils.assertEquals(
+           assertMessage, 
+           "Creation of style tags is not allowed", 
+           "document.createElementNS should prevent style tags"
+       );
+    }
 })

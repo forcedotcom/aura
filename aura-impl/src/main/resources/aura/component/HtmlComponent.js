@@ -746,18 +746,16 @@ HtmlComponent.prototype["helper"] = {
                 element.setAttribute("href", "javascript:void(0);");
             }
 
-            if ($A.lockerService.isEnabled()) {
-                element.addEventListener("click", this.inlineJavasciptCSPViolationPreventer);
-            }
+            element.addEventListener("click", this.inlineJavasciptCSPViolationPreventer);
       }
     },
 
     inlineJavasciptCSPViolationPreventer: function(event) {
         // Check for javascript: inline javascript
-        
+
         /*eslint-disable no-script-url*/
         var hrefTarget = this.href;
-        if (hrefTarget && /javascript:\s*void\(/.test(hrefTarget.toLowerCase())) {
+        if (hrefTarget && /^\s*javascript:\s*void\((\s*|0|null|'.*')\)/.test(hrefTarget.toLowerCase())) {
             event.preventDefault();
         }
     }

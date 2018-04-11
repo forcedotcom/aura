@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-04-09
- * Version: 0.4.2
+ * Generated: 2018-04-11
+ * Version: 0.4.3
  */
 
 (function (exports) {
@@ -6643,8 +6643,11 @@ const metadata$5 = {
   }
 };
 
-function isForbiddenTag(el) {
-  return el.constructor === HTMLStyleElement || el.constructor === SVGStyleElement;
+function isStyleTag(el) {
+  return (
+    (typeof HTMLStyleElement !== 'undefined' && el instanceof HTMLStyleElement) ||
+    (typeof SVGStyleElement !== 'undefined' && el instanceof SVGStyleElement)
+  );
 }
 
 function SecureDocument(doc, key) {
@@ -6672,9 +6675,10 @@ function SecureDocument(doc, key) {
     },
     createElement: {
       value: function(tag) {
-        const el = doc.createElement(tag);
-        if (isForbiddenTag(el)) {
-          throw new Error(`Creation of ${tag} tags is not allowed`);
+        let el = doc.createElement(tag);
+        if (isStyleTag(el)) {
+          el = doc.createElement('style-disabled');
+          warn('Creation of style tags is not allowed! Created style-disabled tag instead.');
         }
         setKey(el, key);
         return SecureElement(el, key);
@@ -6682,9 +6686,10 @@ function SecureDocument(doc, key) {
     },
     createElementNS: {
       value: function(namespace, tag) {
-        const el = doc.createElementNS(namespace, tag);
-        if (isForbiddenTag(el)) {
-          throw new Error(`Creation of ${tag} tags is not allowed`);
+        let el = doc.createElementNS(namespace, tag);
+        if (isStyleTag(el)) {
+          el = doc.createElementNS(namespace, 'style-disabled');
+          warn('Creation of style tags is not allowed! Created style-disabled tag instead.');
         }
         setKey(el, key);
         return SecureElement(el, key);

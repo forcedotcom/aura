@@ -92,7 +92,7 @@ public class Bootstrap extends AuraResourceImpl {
             setCacheHeaders(response, app);
             Instance<?> appInstance = null;
             if (!configAdapter.isBootstrapModelExclusionEnabled()) {
-                instanceService.getInstance(app, getComponentAttributes(request));
+                appInstance = instanceService.getInstance(app, getComponentAttributes(request));
             }
             definitionService.updateLoaded(app);
             loadLabels(context);

@@ -178,10 +178,15 @@
         }
     },
 
-    // TODO: [W-4871355] Change when secure <style> tag filter is added.
-    _testBlockStyleTag: {
+    testCreateHTMLStyleTag: {
         test: function(cmp) {
-            cmp.testBlockStyleTag();
+            cmp.testCreateHTMLStyleTag();
+        }
+    },
+
+    testCreateSVGStyleTag: {
+        test: function(cmp) {
+            cmp.testCreateSVGStyleTag();
         }
     }
 })

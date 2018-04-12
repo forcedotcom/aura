@@ -252,36 +252,64 @@ if ("document" in self) {
     }());
 
     }
-if (typeof CustomEvent !== 'function') {
-    window.CustomEvent = function CustomEvent(type, eventInitDict) {
-        if (!type) {
-            throw Error('TypeError: Failed to construct "CustomEvent": An event name must be provided.');
-        }
+(function() {
+    "use strict";
 
-        var event;
-        eventInitDict = eventInitDict || {bubbles: false, cancelable: false, detail: null};
+    var create = Object.create;
+    var defineProperty = Object.defineProperty;
 
-        if ('createEvent' in document) {
-            try {
-                event = document.createEvent('CustomEvent');
-                event.initCustomEvent(type, eventInitDict.bubbles, eventInitDict.cancelable, eventInitDict.detail);
-            } catch (error) {
-                // for browsers which don't support CustomEvent at all, we use a regular event instead
-                event = document.createEvent('Event');
-                event.initEvent(type, eventInitDict.bubbles, eventInitDict.cancelable);
-                event.detail = eventInitDict.detail;
-            }
-        } else {
-
-            // IE8
-            event = new Event(type, eventInitDict);
-            event.detail = eventInitDict && eventInitDict.detail || null;
-        }
-        return event;
+    var defaultPreventedDescriptor = {
+        get: function () { return true; }
     };
 
-    CustomEvent.prototype = Event.prototype;
-}
+    var preventDefault = function () {
+        if (this.defaultPrevented === true || this.cancelable !== true) {
+            return;
+        }
+
+        defineProperty(this, "defaultPrevented", defaultPreventedDescriptor);
+    }
+
+    if (typeof CustomEvent !== 'function') {
+        window.CustomEvent = function CustomEvent(type, eventInitDict) {
+            if (!type) {
+                throw Error('TypeError: Failed to construct "CustomEvent": An event name must be provided.');
+            }
+
+            var event;
+            eventInitDict = eventInitDict || { bubbles: false, cancelable: false, detail: null };
+
+            if ('createEvent' in document) {
+                try {
+                    event = document.createEvent('CustomEvent');
+                    event.initCustomEvent(type, eventInitDict.bubbles, eventInitDict.cancelable, eventInitDict.detail);
+                } catch (error) {
+                    // for browsers which don't support CustomEvent at all, we use a regular event instead
+                    event = document.createEvent('Event');
+                    event.initEvent(type, eventInitDict.bubbles, eventInitDict.cancelable);
+                    event.detail = eventInitDict.detail;
+                }
+            } else {
+
+                // IE8
+                event = new Event(type, eventInitDict);
+                event.detail = eventInitDict && eventInitDict.detail || null;
+            }
+
+            // We attach the preventDefault to the instance instead of the prototype:
+            //  - We don't want to mutate the Event.prototype.
+            //  - Adding an indirection (adding a new level of inheritance) would slow down all the access to the Event properties.
+            event.preventDefault = preventDefault;
+
+            // Warning we can't add anything to the CustomEvent prototype because we are returning an event, instead of the this object.
+            return event;
+        };
+
+        // We also assign Event.prototype to CustomEvent.prototype to ensure that consumer can use the following form
+        // CustomEvent.prototype.[method]
+        CustomEvent.prototype = Event.prototype;
+    }
+}());
 (function () {
 	var unlistenableWindowEvents = {
 		click: 1,
@@ -6751,9 +6779,13 @@ Object.compatKeys = keys$1;
 Object.compatValues = values;
 Object.compatEntries = entries;
 // Array.prototype methods patches.
-Array.prototype.compatUnshift = compatUnshift;
-Array.prototype.compatConcat = compatConcat;
-Array.prototype.compatPush = compatPush;
+// We need to ensure that those new methods are not-enumerable to avoid leaking
+// when using for ... in without guarding via Object.hasOwnProperty
+Object.defineProperties(Array.prototype, {
+  compatUnshift: { value: compatUnshift, enumerable: false },
+  compatConcat: { value: compatConcat, enumerable: false },
+  compatPush: { value: compatPush, enumerable: false } });
+
 function overrideProxy() {
   return Proxy.__COMPAT__;
 }

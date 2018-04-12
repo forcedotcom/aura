@@ -29,6 +29,7 @@ import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.component.BaseComponentDefTest;
 import org.auraframework.service.CompilerService;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
@@ -375,5 +376,45 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
                     nextLevelDef.getDescriptor().getName()));
         assertTrue("Component containing abstract components with serverside providers have server dependecies.",
                 topLevelDef.hasLocalDependencies());
+    }
+
+    @Test
+    public void testLinkTagsCannotHaveImportAttribute() throws Exception {
+        // Arrange
+        String cmpWithImport =
+                "<aura:component><link rel='import' href='ohnoes'/></aura:component>";
+        DefDescriptor<ComponentDef> descriptor = addSourceAutoCleanup(ComponentDef.class, cmpWithImport);
+        Throwable exception = null;
+
+        // Act
+        try {
+            definitionService.getDefinition(descriptor);
+        } catch (Throwable t) {
+            exception = t;
+        }
+
+        //assert
+        assertNotNull("An exception was not raised when an import was added to a link", exception);
+        assertExceptionMessageContains(exception, InvalidDefinitionException.class, "import attribute is not allowed in link tags");
+    }
+
+    @Test
+    public void testAuraHtmlTagsOfLinkCannotHaveImportAttribute() throws Exception {
+        // Arrange
+        String cmpWithImport =
+                "<aura:component><aura:html tag='link' rel='import' href='ohnoes'/></aura:component>";
+        DefDescriptor<ComponentDef> descriptor = addSourceAutoCleanup(ComponentDef.class, cmpWithImport);
+        Throwable exception = null;
+
+        // Act
+        try {
+            definitionService.getDefinition(descriptor);
+        } catch (Throwable t) {
+            exception = t;
+        }
+
+        //assert
+        assertNotNull("An exception was not raised when an import was added to a link", exception);
+        assertExceptionMessageContains(exception, InvalidDefinitionException.class, "import attribute is not allowed in link tags");
     }
 }

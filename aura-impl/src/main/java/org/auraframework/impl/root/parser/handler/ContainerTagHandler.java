@@ -45,9 +45,13 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public abstract class ContainerTagHandler<T extends Definition> extends XMLHandler<T>
         implements ExpressionContainerHandler {
     public static final String SCRIPT_TAG = "script";
+    public static final String LINK_TAG = "link";
     public static final String AURA_HTML_TAG = "aura:html";
     public static final String ATTRIBUTE_ACCESS = "access";
     public static final String ATTRIBUTE_TAG = "tag";
+    public static final String ATTRIBUTE_REL = "rel";
+    public static final String ATTRIBUTE_REL_IMPORT = "import";
+
     protected final boolean isInInternalNamespace;
     protected DefDescriptor<T> defDescriptor;
 
@@ -152,6 +156,11 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
             boolean isScript = SCRIPT_TAG.equals(lowerTag) || (AURA_HTML_TAG.equals(lowerTag) && SCRIPT_TAG.equalsIgnoreCase(getAttributeValue(ATTRIBUTE_TAG)));
             if (!parentHandler.getAllowsScript() && isScript) {
                 throw new AuraRuntimeException("script tags only allowed in templates", getLocation());
+            }
+            if ((LINK_TAG.equals(lowerTag) || (AURA_HTML_TAG.equals(lowerTag) &&
+                                               LINK_TAG.equalsIgnoreCase(getAttributeValue(ATTRIBUTE_TAG))))
+                  && ATTRIBUTE_REL_IMPORT.equals(getAttributeValue(ATTRIBUTE_REL))){
+                throw new AuraRuntimeException("import attribute is not allowed in link tags", getLocation());
             }
             return new HTMLComponentDefRefHandler<>(parentHandler, tag, xmlReader, source, isInInternalNamespace,
                     definitionService, configAdapter, definitionParserAdapter);

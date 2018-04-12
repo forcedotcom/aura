@@ -42,10 +42,9 @@ function AuraRenderingService() {
 /**
  * Renders a component by calling its renderer.
  *
- * @param {Component}
- *            components The component or component array to be rendered
- * @param {Component}
- *            parent Optional. The component's parent
+ * @param {Component} components - A component or a component array to be rendered.
+ * @param {Component} parent - Optional. The components' parent.
+ *
  * @memberOf AuraRenderingService
  * @public
  * @export
@@ -56,8 +55,8 @@ AuraRenderingService.prototype.render = function(components, parent) {
     //#end
 
     components = this.getArray(components);
-    var elements = [];
 
+    var elements = [];
     for (var i=0; i < components.length; i++){
         var cmp = components[i];
 
@@ -73,23 +72,25 @@ AuraRenderingService.prototype.render = function(components, parent) {
             }
         }
 
-        if (cmp.isValid()) {
-            $A.clientService.setCurrentAccess(cmp);
-            try {
-                var renderedElements = cmp["render"]();
-                renderedElements = this.finishRender(cmp, renderedElements);
-                elements = elements.concat(renderedElements);
-            } catch (e) {
-                if (e instanceof $A.auraError && e["component"]) {
-                    throw e;
-                } else {
-                    var ae = new $A.auraError("render threw an error in '" + cmp.getType() + "'", e);
-                    $A.lastKnownError = ae;
-                    throw ae;
-                }
-            } finally {
-                $A.clientService.releaseCurrentAccess();
+        if (!cmp.isValid()) {
+            continue;
+        }
+
+        $A.clientService.setCurrentAccess(cmp);
+        try {
+            var renderedElements = cmp["render"]();
+            renderedElements = this.finishRender(cmp, renderedElements);
+            // component's render could return non-array
+            Array.prototype.push.apply(elements, this.getArray(renderedElements));
+        } catch (e) {
+            if (!(e instanceof $A.auraError) || !e["component"]) {
+                var auraError = new $A.auraError("render threw an error in '" + cmp.getType() + "'", e);
+                $A.lastKnownError = auraError;
+                throw auraError;
             }
+            throw e;
+        } finally {
+            $A.clientService.releaseCurrentAccess();
         }
     }
 
@@ -113,8 +114,9 @@ AuraRenderingService.prototype.render = function(components, parent) {
  * superRerender() from your customized function to chain the
  * rerendering to the components in the body attribute.
  *
- * @param {Component}
- *            components The component or component array to be rerendered
+ * @param {Component} components - The component or component array to be rerendered
+ * @returns {Array} An array of rerendered elements
+ *
  * @memberOf AuraRenderingService
  * @public
  * @export
@@ -137,41 +139,42 @@ AuraRenderingService.prototype.rerender = function(components) {
     for (var i = 0; i < components.length; i++) {
         var cmp = components[i];
         var id = cmp.getGlobalId();
-        if (cmp.isValid()) {
-            var renderedElements = [];
-            var addExistingElements = visited[id];
-            if (!visited[id]) {
-                if (!cmp.isRendered()) {
-                    throw new $A.auraError("Aura.RenderingService.rerender: attempt to rerender component that has not been rendered.", null, $A.severity.QUIET);
-                }
-                var rerenderedElements = undefined;
-                $A.clientService.setCurrentAccess(cmp);
-                try {
-                    rerenderedElements = cmp["rerender"]();
-                } catch (e) {
-                    if (e instanceof $A.auraError && e["component"]) {
-                        throw e;
-                    } else {
-                        var ae = new $A.auraError("rerender threw an error in '" + cmp.getType() + "'", e);
-                        $A.lastKnownError = ae;
-                        throw ae;
-                    }
-                } finally {
-                    $A.clientService.releaseCurrentAccess();
-                    if(rerenderedElements!=undefined){//eslint-disable-line eqeqeq
-                        renderedElements=renderedElements.concat(rerenderedElements);
-                    }else{
-                        addExistingElements=true;
-                    }
-                }
-                visited[id] = true;
-            }
-            if(addExistingElements){
-                renderedElements=renderedElements.concat(this.getElements(cmp));
-            }
-            elements=elements.concat(renderedElements);
+        if (!cmp.isValid()) {
+            this.cleanComponent(id);
+            continue;
         }
-        this.cleanComponent(id);
+
+        var rerenderedElements = undefined;
+        if (!visited[id]) {
+            if (!cmp.isRendered()) {
+                throw new $A.auraError("AuraRenderingService.rerender: attempt to rerender component that has not been rendered.", null, $A.severity.QUIET);
+            }
+
+            $A.clientService.setCurrentAccess(cmp);
+            try {
+                rerenderedElements = cmp["rerender"]();
+            } catch (e) {
+                if (!(e instanceof $A.auraError) || !e["component"]) {
+                    var auraError = new $A.auraError("rerender threw an error in '" + cmp.getType() + "'", e);
+                    $A.lastKnownError = auraError;
+                    throw auraError;
+                }
+                throw e;
+            } finally {
+                this.cleanComponent(id);
+                visited[id] = true;
+                $A.clientService.releaseCurrentAccess();
+            }
+        }
+
+        // cmp has been visited or component's rerender returns undefined
+        if (rerenderedElements === undefined) {
+            Array.prototype.push.apply(elements, this.getElements(cmp));
+        } else {
+            // component's rerender could return single element
+            Array.prototype.push.apply(elements, this.getArray(rerenderedElements));
+        }
+
     }
     //#if {"modes" : ["STATS"]}
     this.statsIndex["rerender"].push({
@@ -188,7 +191,7 @@ AuraRenderingService.prototype.rerender = function(components) {
         } finally {
             this.afterRenderStack.length = 0;
         }
-        for(var r=0;r<components.length;r++){
+        for (var r = 0; r < components.length; r++) {
             components[r].fire("render");
         }
     }
@@ -223,17 +226,12 @@ AuraRenderingService.prototype.afterRender = function(components) {
                 cmp["afterRender"]();
                 cmp.fire("render");
             } catch (e) {
-                // The after render routine threw an error, so we should
-                //  (a) log the error
-                if (e instanceof $A.auraError && e["component"]) {
-                    throw e;
-                } else {
-                    var ae = new $A.auraError("afterRender threw an error in '" + cmp.getType() + "'", e);
-                    $A.lastKnownError = ae;
-                    throw ae;
+                if (!(e instanceof $A.auraError) || !e["component"]) {
+                    var auraError = new $A.auraError("afterRender threw an error in '" + cmp.getType() + "'", e);
+                    $A.lastKnownError = auraError;
+                    throw auraError;
                 }
-                //  (b) mark the component as possibly broken.
-                //  FIXME: keep track of component stability
+                throw e;
             } finally {
                 $A.clientService.releaseCurrentAccess(cmp);
             }
@@ -275,7 +273,7 @@ AuraRenderingService.prototype.unrender = function(components) {
     var cmp;
     var container;
     var beforeUnrenderElements;
-    for (var i = 0,length=components.length; i < length; i++){
+    for (var i = 0; i < components.length; i++){
         cmp = components[i];
         if ($A.util.isComponent(cmp) && cmp.destroyed!==1 && cmp.isRendered()) {
             cmp.setUnrendering(true);
@@ -299,13 +297,12 @@ AuraRenderingService.prototype.unrender = function(components) {
             try {
                 cmp["unrender"]();
             } catch (e) {
-                if (e instanceof $A.auraError && e["component"]) {
-                    throw e;
-                } else {
-                    var ae = new $A.auraError("unrender threw an error in '" + cmp.getType() + "'", e);
-                    $A.lastKnownError = ae;
-                    throw ae;
+                if (!(e instanceof $A.auraError) || !e["component"]) {
+                    var auraError = new $A.auraError("unrender threw an error in '" + cmp.getType() + "'", e);
+                    $A.lastKnownError = auraError;
+                    throw auraError;
                 }
+                throw e;
             } finally {
                 $A.clientService.releaseCurrentAccess(cmp);
 
@@ -336,7 +333,9 @@ AuraRenderingService.prototype.unrender = function(components) {
                 if (cmp.destroyed!==1) {
                     cmp.setRendered(false);
                     if (visited) {
-                        visited[cmp.getGlobalId()] = true;
+                        var id = cmp.getGlobalId();
+                        visited[id] = true;
+                        this.cleanComponent(id);
                     }
                     cmp.setUnrendering(false);
                 }
@@ -389,44 +388,47 @@ AuraRenderingService.prototype.replaceElementOnContainers = function(component, 
 };
 
 /**
- * @private
- * @memberOf AuraRenderingService
  *
- * @param {Component} component the component for which we are storing the facet.
- * @param {Component|Array} facet the component or array of components to store.
+ * @param {Component} component - The component which owns the facet.
+ * @param {Component|Array} facet - The component or the component array to store.
+ * @private
  */
 AuraRenderingService.prototype.storeFacetInfo = function(component, facet) {
     if (!$A.util.isComponent(component)) {
-        throw new $A.auraError("AuraRenderingService.storeFacetInfo: 'component' must be a valid Component. Found '" + component + "'.",
-                null, $A.severity.QUIET);
+        throw new $A.auraError("AuraRenderingService.storeFacetInfo: 'component' must be a valid Component. Found '" +
+                component + "'.", null, $A.severity.QUIET);
     }
     if ($A.util.isComponent(facet)) {
-        facet=[facet];
-    }
-    if (!$A.util.isArray(facet)) {
-        $A.warning("AuraRenderingService.storeFacetInfo: 'facet' must be a Component or an Array. Found '" + facet + "' in '" + component.getType() + "'.");
+        facet = [facet];
+    } else if (!$A.util.isArray(facet)) {
+        $A.warning("AuraRenderingService.storeFacetInfo: 'facet' must be a Component or an Array. Found '" +
+                facet + "' in '" + component.getType() + "'.");
         facet = [];
     }
     component._facetInfo = facet.slice(0);
 };
 
 /**
+ *
+ * @param {Component} component - The component which owns the facet.
+ * @param {Component|Array} facet - The component or the component array to update.
+ * @returns {Object} The updated facet configs
  * @private
- * @memberOf AuraRenderingService
  */
 AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) {
-    if(!$A.util.isComponent(component)) {
-        throw new $A.auraError("AuraRenderingService.getUpdatedFacetInfo: 'component' must be a valid Component. Found '" + component + "'.",
-                null, $A.severity.QUIET);
+    if (!$A.util.isComponent(component)) {
+        throw new $A.auraError("AuraRenderingService.getUpdatedFacetInfo: 'component' must be a valid Component. Found '" +
+                component + "'.", null, $A.severity.QUIET);
     }
-    if($A.util.isComponent(facet)){
-        facet=[facet];
-    }
-    if(!$A.util.isArray(facet)){
-        $A.warning("AuraRenderingService.getUpdatedFacetInfo: 'facet' must be a Component or an Array. Found '" + facet + "' in '" + component.getType() + "'.");
+    if ($A.util.isComponent(facet)) {
+        facet = [facet];
+    } else if (!$A.util.isArray(facet)) {
+        $A.warning("AuraRenderingService.getUpdatedFacetInfo: 'facet' must be a Component or an Array. Found '" +
+                facet + "' in '" + component.getType() + "'.");
         facet = [];
     }
-    var updatedFacet={
+
+    var updatedFacet = {
         components:[],
         facetInfo:[],
         useFragment:false,
@@ -440,7 +442,8 @@ AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) 
             var child = facet[i];
             // Guard against non-component facets, as these will cause troubles later.
             if (!$A.util.isComponent(child)) {
-                $A.warning("AuraRenderingService.getUpdatedFacetInfo: all values to be rendered in an expression must be components. Found '" + child + "' in '" + component.getType() + "'.");
+                $A.warning("AuraRenderingService.getUpdatedFacetInfo: all values to be rendered in an expression must be components. Found '" +
+                        child + "' in '" + component.getType() + "'.");
                 continue;
             }
 
@@ -555,12 +558,12 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
 
     var components = updatedFacet.components;
     for (var i = 0; i < components.length; i++) {
-        var info=components[i];
-        var renderedElements=null;
+        var info = components[i];
         if (!info.component.isValid() && info.action !== 'unrender') {
             continue;
         }
 
+        var renderedElements = null;
         switch (info.action) {
             case "render":
                 var containerId = component.globalId;
@@ -570,10 +573,10 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
 
                 renderedElements = this.render(info.component);
                 if (updatedFacet.useFragment) {
-                    ret = ret.concat(renderedElements);
+                    Array.prototype.push.apply(ret, renderedElements);
                     calculatedPosition += renderedElements.length;
                 } else if (renderedElements.length) {
-                    ret = ret.concat(renderedElements);
+                    Array.prototype.push.apply(ret, renderedElements);
                     if (!target) {
                         $A.warning("Rendering Error: The element for the following component was removed from the DOM outside of the Aura lifecycle. " +
                                 "We cannot render any further updates to it or its children.\nComponent: " + $A.clientService.getAccessStackHierarchy() +
@@ -596,7 +599,7 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
                 }
                 info.component.disassociateElements();
                 this.associateElements(info.component, renderedElements);
-                ret = ret.concat(renderedElements);
+                Array.prototype.push.apply(ret, renderedElements);
                 calculatedPosition += renderedElements.length;
                 break;
             case "unrender":
@@ -919,15 +922,15 @@ AuraRenderingService.prototype.unrenderFacet = function(cmp,facet) {
         cmp._facetInfo = null;
     }
 
-    if(facet) {
+    if (facet) {
         this.unrender(facet);
     }
 
     var elements = this.getAllElements(cmp);
-    var element;
-    if(elements) {
+    if (elements) {
+        var element;
         var globalId = cmp.getGlobalId();
-        for(var c=elements.length-1;c>=0;c--) {
+        for (var c = elements.length-1; c >= 0; c--) {
             element = elements[c];
             this.removeMarkerReference(element, globalId);
             this.removeElement(element, cmp);
@@ -967,12 +970,12 @@ AuraRenderingService.prototype.setMarker = function(cmp, newMarker) {
     // Html and Text Markers are special parts of the framework.
     // They always have a 1 to 1 mapping from component to element|textnode, and will never
     // use a comment marker. So no need to add overhead of tracking markers just for these component types.
-    var type = cmp.getType();
-    if (type !== "aura:html") {
-        $A.renderingService.addMarkerReference(newMarker, concrete.getGlobalId());
+    var globalId = concrete.getGlobalId();
+    if (cmp.getType() !== "aura:html") {
+        $A.renderingService.addMarkerReference(newMarker, globalId);
     }
     if (oldMarker) {
-        $A.renderingService.removeMarkerReference(oldMarker, concrete.getGlobalId());
+        $A.renderingService.removeMarkerReference(oldMarker, globalId);
     }
 
     // Clear it out!
@@ -1005,12 +1008,12 @@ AuraRenderingService.prototype.addDirtyValue = function(expression, cmp) {
 };
 
 /**
- * Does a component have a dirty value?.
- *
- * Only used by component to figure out if it is dirty... Maybe we should move this to component?
+ * Check if a component has any dirty value in dirty component set.
+ * It's used in an exported method, Component.isDirty().
+ * TODO: this method should be private.
  *
  * @protected
- * @param cmp the component to check.
+ * @param {Component} cmp - The component to check.
  */
 AuraRenderingService.prototype.hasDirtyValue = function(cmp){
    return this.dirtyComponents.hasOwnProperty(cmp.getGlobalId());
@@ -1043,9 +1046,9 @@ AuraRenderingService.prototype.rerenderDirty = function(stackName) {
         var maxiterations = 1000;
 
         // #if {"modes" : ["PTEST","STATS"]}
-        var allRerendered = [],
-            startTime,
-            cmpsWithWhy = {
+        var allRerendered = [];
+        var startTime;
+        var cmpsWithWhy = {
             "stackName" : stackName,
             "components" : {}
         };
@@ -1101,7 +1104,7 @@ AuraRenderingService.prototype.rerenderDirty = function(stackName) {
             }
 
             // #if {"modes" : ["STATS"]}
-            startTime = startTime || (new Date()).getTime();
+            startTime = startTime || Date.now();
             // #end
 
             if (dirty.length) {
@@ -1116,7 +1119,7 @@ AuraRenderingService.prototype.rerenderDirty = function(stackName) {
 
         // #if {"modes" : ["PTEST","STATS"]}
         if (allRerendered.length) {
-            cmpsWithWhy["renderingTime"] = (new Date()).getTime() - startTime;
+            cmpsWithWhy["renderingTime"] = Date.now() - startTime;
             this.statsIndex["rerenderDirty"].push(cmpsWithWhy);
         }
         // #end
@@ -1125,6 +1128,9 @@ AuraRenderingService.prototype.rerenderDirty = function(stackName) {
 };
 
 /**
+ * This method is not used by framework anymore, but it's exposed via Component.markClean().
+ * TODO: Clean up the references and remove the both methods.
+ *
  * @deprecated
  * @protected
  */
@@ -1158,7 +1164,11 @@ AuraRenderingService.prototype.statsIndex = {
     "unrender": []
 };
 //#end
-//
+
+/**
+ * Remove component's concrete global id from dirty components set
+ * @private
+ */
 AuraRenderingService.prototype.cleanComponent = function(id) {
     delete this.dirtyComponents[id];
 };

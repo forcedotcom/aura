@@ -30,6 +30,7 @@ function ActionDef(config) {
     this.paramDefs = {};
     this.background = false;
     this.caboose = false;
+    this.actionGroup;
     this.publicCachingEnabled = false;
     this.publicCachingExpiration = -1;
 
@@ -47,6 +48,9 @@ function ActionDef(config) {
         }
         if (config[Json.ApplicationKey.CABOOSE]) {
             this.caboose = true;
+        }
+        if (config[Json.ApplicationKey.ACTIONGROUP]) {
+            this.actionGroup = config[Json.ApplicationKey.ACTIONGROUP];
         }
         if (config[Json.ApplicationKey.PUBLICCACHINGENABLED]) {
             this.publicCachingEnabled = true;
@@ -134,6 +138,15 @@ ActionDef.prototype.isCaboose = function() {
 };
 
 /**
+ * Returns the action group name if one exists, or undefined if the default should be used
+ * @protected
+ * @returns {!String}
+ */
+ActionDef.prototype.getActionGroup = function() {
+    return this.actionGroup;
+};
+
+/**
  * Returns true if the action is defined to enable public caching (i.e. @PublicCachingEnabled on the java class)
  * @protected
  * @returns {Boolean}
@@ -151,6 +164,15 @@ ActionDef.prototype.isPublicCachingEnabled = function() {
 ActionDef.prototype.getPublicCachingExpiration = function() {
     return this.publicCachingExpiration;
 };
+
+/**
+ * Returns the action group name if one exists, or undefined if the default should be used
+ * @protected
+ * @returns {!String}
+ */
+ActionDef.prototype.getActionGroup = function() {
+   return this.actionGroup;
+ };
 
 /**
  * Returns a new Action instance.

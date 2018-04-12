@@ -15,8 +15,9 @@
  */
 package org.auraframework.docs;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
+import java.util.Map;
+
+import javax.inject.Inject;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -27,12 +28,13 @@ import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
+import org.auraframework.system.Annotations.ActionGroup;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import javax.inject.Inject;
-import java.util.Map;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 
 @ServiceComponent
 public class DocsController implements Controller {
@@ -47,6 +49,7 @@ public class DocsController implements Controller {
     private ConfigAdapter configAdapter;
 
     @AuraEnabled
+    @ActionGroup(value = "docs")
     public Component getTopic(@Key("topic") String topic) throws QuickFixException {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("topic", topic);
@@ -54,6 +57,7 @@ public class DocsController implements Controller {
     }
 
     @AuraEnabled
+    @ActionGroup(value = "docs")
     public Component getDemo(@Key("demo") String demo) throws QuickFixException {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("demo", demo);
@@ -61,6 +65,7 @@ public class DocsController implements Controller {
     }
 
     @AuraEnabled
+    @ActionGroup(value = "docs")
     public Component getReference(@Key("topic") String topic, @Key("descriptor") String descriptor,
                                   @Key("defType") String defType) throws QuickFixException {
 

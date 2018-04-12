@@ -26,6 +26,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.docs.ApiContentsModel;
 import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.system.Annotations.ActionGroup;
 import org.auraframework.system.Annotations.AuraEnabled;
 
 @ServiceComponent
@@ -40,6 +41,7 @@ public class LockerApiController implements Controller {
      * @throws Exception
      */
     @AuraEnabled
+    @ActionGroup("locker-service")
     public Map<String, List<String>> getPlatformApis() throws Exception {
         Map<String, List<String>> ret = new HashMap<>();
 

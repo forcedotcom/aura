@@ -39,6 +39,7 @@ import org.auraframework.impl.java.type.JavaTypeDef;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.ActionGroup;
 import org.auraframework.system.Annotations.BackgroundAction;
 import org.auraframework.system.Annotations.CabooseAction;
 import org.auraframework.system.Annotations.Key;
@@ -147,6 +148,10 @@ public class JavaControllerDefFactory implements DefinitionFactory<JavaSourceImp
         actionBuilder.setBackground(method.isAnnotationPresent(BackgroundAction.class));
         actionBuilder.setCaboose(method.isAnnotationPresent(CabooseAction.class));
 
+        ActionGroup actionGrouAnnotation = method.getAnnotation(ActionGroup.class);
+        String actionGroup = (actionGrouAnnotation != null && actionGrouAnnotation.value() != null && !(actionGrouAnnotation.value().isEmpty())) ? actionGrouAnnotation.value() : null;
+        actionBuilder.setActionGroup(actionGroup);
+        
         PublicCachingEnabled publicCachingAnnotation = method.getAnnotation(PublicCachingEnabled.class);
         actionBuilder.setPublicCachingEnabled(publicCachingAnnotation != null);
         actionBuilder.setPublicCachingExpiration(publicCachingAnnotation == null ? 

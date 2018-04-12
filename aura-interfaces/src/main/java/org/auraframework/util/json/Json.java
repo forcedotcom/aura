@@ -76,6 +76,7 @@ public interface Json {
         ABSTRACT("isAbstract","ab"),
         ACCESS("xs" /*"access"*/,"xs"),
         ACTION("action","x"),
+        ACTIONGROUP("actionGroup","ag"),
         ACTIONS("action","xx"),
         ACTIONDEFS("actionDefs","ac"),
         ACTIONTYPE("actionType","at"),

@@ -56,6 +56,12 @@ public interface Annotations {
     }
 
     @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    @interface ActionGroup {
+        String value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.PARAMETER)
     @interface Key {
         String value();

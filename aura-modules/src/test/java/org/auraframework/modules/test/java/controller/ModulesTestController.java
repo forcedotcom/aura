@@ -24,6 +24,7 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.system.Annotations.ActionGroup;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -34,6 +35,7 @@ public class ModulesTestController implements Controller {
     DefinitionService definitionService;
 
     @AuraEnabled
+    @ActionGroup(value = "modules")
     public List<String> getModuleAttributes(@Key("module") String moduleDescriptor) throws QuickFixException {
         List<String> ret = new ArrayList<String>();
         ModuleDef module = definitionService.getDefinition(moduleDescriptor, ModuleDef.class);

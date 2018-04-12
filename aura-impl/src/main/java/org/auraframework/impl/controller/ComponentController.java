@@ -42,6 +42,7 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.LoggingService;
+import org.auraframework.system.Annotations.ActionGroup;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.CabooseAction;
 import org.auraframework.system.Annotations.Key;
@@ -70,6 +71,7 @@ public class ComponentController implements GlobalController {
     }
 
     @AuraEnabled
+    @ActionGroup(value = "aura")
     public Boolean loadLabels() throws QuickFixException {
         AuraContext ctx = contextService.getCurrentContext();
         Map<DefDescriptor<? extends Definition>, Definition> defMap;
@@ -106,6 +108,7 @@ public class ComponentController implements GlobalController {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @AuraEnabled
+    @ActionGroup(value = "aura")
     public Instance getComponent(@Key(value = "name", loggable = true) String name,
                                  @Key("attributes") Map<String, Object> attributes,
                                  @Key(value = "chainLoadLabels", loggable = true) Boolean loadLabels) throws QuickFixException {
@@ -118,6 +121,7 @@ public class ComponentController implements GlobalController {
     }
 
     @AuraEnabled
+    @ActionGroup(value = "aura")
     public Application getApplication(@Key(value = "name", loggable = true) String name,
                                       @Key("attributes") Map<String, Object> attributes,
                                       @Key(value = "chainLoadLabels", loggable = true) Boolean loadLabels) throws QuickFixException {
@@ -140,6 +144,7 @@ public class ComponentController implements GlobalController {
      * @param level - Error reporting level
      */
     @AuraEnabled
+    @ActionGroup(value = "aura")
     public void reportFailedAction(
             @Key(value = "failedAction") String desc,
             @Key("failedId") String id,
@@ -180,12 +185,14 @@ public class ComponentController implements GlobalController {
     }
 
     @AuraEnabled
+    @ActionGroup(value = "aura")
     public ComponentDef getComponentDef(@Key(value = "name", loggable = true) String name) throws QuickFixException {
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(name, ComponentDef.class);
         return definitionService.getDefinition(desc);
     }
 
     @AuraEnabled
+    @ActionGroup(value = "aura")
     public List<RootDefinition> getDefinitions(@Key(value = "names", loggable = true) List<String> names) throws QuickFixException {
         if (names == null) {
             return Collections.emptyList();
@@ -202,6 +209,7 @@ public class ComponentController implements GlobalController {
     }
 
     @AuraEnabled
+    @ActionGroup(value = "aura")
     public EventDef getEventDef(@Key(value = "name", loggable = true) String name) throws QuickFixException {
         final String descriptorName = name.replace("e.", "");
         DefDescriptor<EventDef> desc = definitionService.getDefDescriptor(descriptorName, EventDef.class);
@@ -209,6 +217,7 @@ public class ComponentController implements GlobalController {
     }
 
     @AuraEnabled
+    @ActionGroup(value = "aura")
     public ApplicationDef getApplicationDef(@Key(value = "name", loggable = true) String name) throws QuickFixException {
         DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(name, ApplicationDef.class);
         return definitionService.getDefinition(desc);
@@ -216,6 +225,7 @@ public class ComponentController implements GlobalController {
 
     @SuppressWarnings("rawtypes")
     @AuraEnabled
+    @ActionGroup(value = "aura")
     public List<Instance> getComponents(@Key("components") List<Map<String, Object>> components)
             throws QuickFixException {
         List<Instance> ret = Lists.newArrayList();
@@ -231,6 +241,7 @@ public class ComponentController implements GlobalController {
 
     @CabooseAction
     @AuraEnabled
+    @ActionGroup(value = "aura")
     public void reportDeprecationUsages(@Key("usages") Map<String, List<String>> usages) {
         if (usages != null) {
             this.loggingService.logDeprecationUsages(usages);

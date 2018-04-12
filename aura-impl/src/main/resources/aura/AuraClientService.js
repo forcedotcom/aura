@@ -3041,10 +3041,12 @@ AuraClientService.prototype.getAndClearDupes = function(key) {
 AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     options = options || { background: false };
     var actionsToSend = [];
+    var actionDefs = [];
     var that = this;
     var action;
     var context = $A.getContext();
     var i;
+    var actionDef;
 
     for (i = 0; i < actions.length; i++) {
         action = actions[i];
@@ -3060,6 +3062,8 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
             continue;
         }
         actionsToSend.push(action.prepareToSend());
+        actionDef = action.getDef();
+        actionDefs.push(actionDef);
     }
 
     if (actionsToSend.length === 0) {
@@ -3104,7 +3108,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
         // or the action name list and we want the query string in the URL
         url = this._host + "/aura?" + qs;
     } else {
-        url = this._host + "/aura?r=" + marker + "&" + this.buildActionNameList(actionsToSend);
+        url = this._host + "/aura?r=" + marker + "&" + this.buildActionNameList(actionsToSend, actionDefs);
     }
 
     auraXHR.background = options.background;
@@ -3312,7 +3316,7 @@ AuraClientService.prototype.buildParams = function(map) {
  * @returns {String}          The encoded query string.
  * @private
  */
-AuraClientService.prototype.buildActionNameList = function(actions) {
+AuraClientService.prototype.buildActionNameList = function(actions, actionDefs) {
     var i, map = {};
 
     for (i = 0; i < actions.length; i++) {
@@ -3332,6 +3336,8 @@ AuraClientService.prototype.buildActionNameList = function(actions) {
             } else {
                 pkg = "other";
             }
+        } else if (actionDefs && actionDefs[i] && actionDefs[i].getActionGroup()) {
+            pkg = actionDefs[i].getActionGroup();
         } else {
             pkg = controllerParts.join("-");
         }

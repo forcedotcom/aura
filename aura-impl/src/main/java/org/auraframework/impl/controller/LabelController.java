@@ -25,6 +25,7 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.ContextService;
+import org.auraframework.system.Annotations.ActionGroup;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -37,6 +38,7 @@ public class LabelController implements GlobalController {
     private ContextService contextService;
 
     @AuraEnabled
+    @ActionGroup(value = "aura")
     public String getLabel(@Key("section") String section, @Key("name") String name) throws QuickFixException {
         GlobalValueProvider labelProvider = contextService.getCurrentContext().getGlobalProviders()
                 .get(LABEL.getPrefix());

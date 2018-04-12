@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
@@ -52,6 +53,7 @@ import org.auraframework.http.resource.AppJs;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.system.Annotations.ActionGroup;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.ClientOutOfSyncException;
@@ -80,6 +82,7 @@ public class DependenciesController implements Controller {
     ServletUtilAdapter servletUtilAdapter;
 
     @AuraEnabled
+    @ActionGroup(value = "dependencies-app")
     public Map<String, Node> createGraph(@Key("app")String app) throws Exception {
         DescriptorFilter matcher = new DescriptorFilter(app, DefType.APPLICATION);
         Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);
@@ -98,6 +101,7 @@ public class DependenciesController implements Controller {
     }
 
     @AuraEnabled
+    @ActionGroup(value = "dependencies-app")
     public Map<String, Map<String, String>> getClientLibraryDependencies(@Key("app")String app) throws Exception {
         Map<String, Map<String, String>> result = new HashMap<>();
         Map<String, List<String>> consumers = new HashMap<>();
@@ -141,6 +145,7 @@ public class DependenciesController implements Controller {
     }
 
     @AuraEnabled
+    @ActionGroup(value = "dependencies-app")
     public Set<String> getAllDescriptors() {
         // Note: DescriptorFilter with all DefTypes does not seem to work, so doing all separate
         DescriptorFilter matcher = new DescriptorFilter("markup://*:*", DefType.COMPONENT);
@@ -161,6 +166,7 @@ public class DependenciesController implements Controller {
     }
 
     @AuraEnabled
+    @ActionGroup(value = "dependencies-app")
     public Map<String, Object> getDependencies(@Key("component")String component) {
         DefDescriptor<?> descriptor;
         SortedSet<DefDescriptor<?>> sorted;
@@ -224,6 +230,7 @@ public class DependenciesController implements Controller {
      */
     @SuppressWarnings("unchecked")
     @AuraEnabled
+    @ActionGroup(value = "dependencies-app")
     public Map<String, Object> getDependenciesWithHashCodes(@Key("component")String component) {
         DefDescriptor<?> descriptor = null;
         SortedSet<DefDescriptor<?>> sorted;
@@ -328,6 +335,7 @@ public class DependenciesController implements Controller {
      */
     @SuppressWarnings("unchecked")
     @AuraEnabled
+    @ActionGroup(value = "dependencies-app")
     public Map<String, Object> getDependencyMetrics(@Key("component") String component) {
         DefDescriptor<?> descriptor = null;
         Map<String, Object> dependencies = Maps.newHashMap();
@@ -390,6 +398,7 @@ public class DependenciesController implements Controller {
 
 
     @AuraEnabled
+    @ActionGroup(value = "dependencies-app")
     public Boolean writeAllDependencies(@Key("file")String file) {
         Set<String> descriptors = getAllDescriptors();
         Map<String, Object> dependencies = Maps.newHashMap();

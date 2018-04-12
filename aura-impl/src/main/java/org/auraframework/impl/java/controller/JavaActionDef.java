@@ -41,6 +41,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
     private final Method method;
     private final boolean background;
     private final boolean caboose;
+    private String actionGroup;
     private final boolean publicCachingEnabled;
     private final int publicCachingExpiration;
 
@@ -53,6 +54,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         this.method = builder.method;
         this.background = builder.background;
         this.caboose = builder.caboose;
+        this.actionGroup = builder.actionGroup;
         this.publicCachingEnabled = builder.publicCachingEnabled;
         this.publicCachingExpiration = builder.publicCachingExpiration;
     }
@@ -91,11 +93,15 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
     }
     
     public boolean isBackground() {
-    	return background;
+        return background;
     }
 
     public boolean isCaboose() {
-    	return caboose;
+        return caboose;
+    }
+    
+    public String getActionGroup() {
+        return this.actionGroup;
     }
 
     public boolean isPublicCachingEnabled() {
@@ -115,6 +121,10 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         json.writeMapEntry(Json.ApplicationKey.RETURNTYPE, getReturnType());
         json.writeMapEntry(Json.ApplicationKey.BACKGROUND, isBackground());
         json.writeMapEntry(Json.ApplicationKey.CABOOSE, isCaboose());
+        String ag = getActionGroup();
+        if (ag != null) {
+            json.writeMapEntry(Json.ApplicationKey.ACTIONGROUP, ag);
+        }
         json.writeMapEntry(Json.ApplicationKey.PARAMS, params);
         if (isPublicCachingEnabled()) {
             json.writeMapEntry(Json.ApplicationKey.PUBLICCACHINGENABLED, true);
@@ -145,6 +155,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         private Method method;
         private boolean background = false;
         private boolean caboose = false;
+        private String actionGroup;
         private boolean publicCachingEnabled = false;
         private int publicCachingExpiration = -1;
 
@@ -199,6 +210,10 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
 
         public void setCaboose(boolean caboose) {
             this.caboose = caboose;
+        }
+        
+        public void setActionGroup(String actionGroup) {
+            this.actionGroup = actionGroup;
         }
 
         public void setPublicCachingEnabled(boolean publicCachingEnabled) {

@@ -31,6 +31,7 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.ds.servicecomponent.GlobalController;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.StyleService;
+import org.auraframework.system.Annotations.ActionGroup;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -70,6 +71,7 @@ public final class StyleController implements GlobalController {
      *         returned.
      */
     @AuraEnabled
+    @ActionGroup(value = "aura")
     public String applyTokens(@Key("descriptors") List<String> tokens, @Key("extraStyles") List<String> extraStyles) throws QuickFixException {
         checkNotNull(tokens, "The 'tokens' argument cannot be null");
 

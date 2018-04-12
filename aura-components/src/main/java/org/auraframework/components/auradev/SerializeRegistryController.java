@@ -15,18 +15,20 @@
  */
 package org.auraframework.components.auradev;
 
+import java.io.IOException;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.system.Annotations.ActionGroup;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.throwable.AuraException;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.RegistryJsonSerializer;
 
-import java.io.IOException;
-
 @ServiceComponent
 public class SerializeRegistryController implements Controller {
     @AuraEnabled
+    @ActionGroup(value = "auradev")
     public String serializeComponentRegistryToJson() throws AuraException {
         try {
             return RegistryJsonSerializer.serializeToFile();

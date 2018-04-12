@@ -14387,6 +14387,7 @@ return {
         "rt":"java://org.auraframework.instance.Component",
         "b":false,
         "ca":false,
+        "ag":"docs",
         "pa":[
           {
             "name":"demo",
@@ -14401,6 +14402,7 @@ return {
         "rt":"java://org.auraframework.instance.Component",
         "b":false,
         "ca":false,
+        "ag":"docs",
         "pa":[
           {
             "name":"topic",
@@ -14423,6 +14425,7 @@ return {
         "rt":"java://org.auraframework.instance.Component",
         "b":false,
         "ca":false,
+        "ag":"docs",
         "pa":[
           {
             "name":"topic",
@@ -15310,6 +15313,7 @@ $A.componentService.initControllerDefs([
         "rt":"java://org.auraframework.instance.Application",
         "b":false,
         "ca":false,
+        "ag":"aura",
         "pa":[
           {
             "name":"name",
@@ -15332,6 +15336,7 @@ $A.componentService.initControllerDefs([
         "rt":"java://org.auraframework.def.ApplicationDef",
         "b":false,
         "ca":false,
+        "ag":"aura",
         "pa":[
           {
             "name":"name",
@@ -15346,6 +15351,7 @@ $A.componentService.initControllerDefs([
         "rt":"java://org.auraframework.instance.Instance",
         "b":false,
         "ca":false,
+        "ag":"aura",
         "pa":[
           {
             "name":"name",
@@ -15368,6 +15374,7 @@ $A.componentService.initControllerDefs([
         "rt":"java://org.auraframework.def.ComponentDef",
         "b":false,
         "ca":false,
+        "ag":"aura",
         "pa":[
           {
             "name":"name",
@@ -15382,6 +15389,7 @@ $A.componentService.initControllerDefs([
         "rt":"java://java.util.List",
         "b":false,
         "ca":false,
+        "ag":"aura",
         "pa":[
           {
             "name":"components",
@@ -15396,6 +15404,7 @@ $A.componentService.initControllerDefs([
         "rt":"java://java.util.List",
         "b":false,
         "ca":false,
+        "ag":"aura",
         "pa":[
           {
             "name":"names",
@@ -15410,6 +15419,7 @@ $A.componentService.initControllerDefs([
         "rt":"java://org.auraframework.def.EventDef",
         "b":false,
         "ca":false,
+        "ag":"aura",
         "pa":[
           {
             "name":"name",
@@ -15424,6 +15434,7 @@ $A.componentService.initControllerDefs([
         "rt":"java://java.lang.Boolean",
         "b":false,
         "ca":false,
+        "ag":"aura",
         "pa":[
 
         ]
@@ -15435,6 +15446,7 @@ $A.componentService.initControllerDefs([
         "rt":"java://void",
         "b":false,
         "ca":true,
+        "ag":"aura",
         "pa":[
           {
             "name":"usages",
@@ -15449,6 +15461,7 @@ $A.componentService.initControllerDefs([
         "rt":"java://void",
         "b":false,
         "ca":false,
+        "ag":"aura",
         "pa":[
           {
             "name":"failedAction",
@@ -15492,6 +15505,7 @@ $A.componentService.initControllerDefs([
         "rt":"java://java.lang.String",
         "b":false,
         "ca":false,
+        "ag":"aura",
         "pa":[
           {
             "name":"section",
@@ -15515,6 +15529,7 @@ $A.componentService.initControllerDefs([
         "rt":"java://java.lang.String",
         "b":false,
         "ca":false,
+        "ag":"aura",
         "pa":[
           {
             "name":"descriptors",

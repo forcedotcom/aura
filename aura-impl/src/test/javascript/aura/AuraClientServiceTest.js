@@ -2468,7 +2468,8 @@ Test.Aura.AuraClientServiceTest = function() {
             isChained: function() { return false; },
             prepareToSend: function() {},
             markException: function() {},
-            finishAction: function () {}
+            finishAction: function () {},
+            getDef: function() { return undefined; }
         }];
 
         function setOverrides(target) {

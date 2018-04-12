@@ -40,9 +40,9 @@
 		classList.push('transition-start');
 
 		cmp.set('v.classList', classList.join(' '));
-		this.position(cmp);
+		var isValidPosition = this.position(cmp);
 		requestAnimationFrame($A.getCallback(function() {
-			if(!cmp.isValid()) {
+			if(!cmp.isValid() || isValidPosition === false) {
 				return;
 			}
 
@@ -63,13 +63,18 @@
 	position: function(component) {
 		var FLIP_THRESHOLD = 50;
 		var node = component.find('tooltip').getElement();
-		var direction = component.get('v.direction');
 		var ttbodyNode = component.find('tooltipbody').getElement();
 		var ttWrapper = component.find('tooltipwrapper').getElement();
+		var target = $A.getComponent(component.get('v.target')).getElement();
+
+		if (!component.isValid() || !node || !ttbodyNode || !ttWrapper || !target) {
+			return false;
+		}
+
+		var direction = component.get('v.direction');
 		var classList = component.get('v.classList');
 
 		var pointer = node.querySelector('.pointer');
-		var target = $A.getComponent(component.get('v.target')).getElement();
 
 		var allowFlips = $A.util.getBooleanValue(component.get('v.allowFlips'));
 		var boundingRect = target.getBoundingClientRect();

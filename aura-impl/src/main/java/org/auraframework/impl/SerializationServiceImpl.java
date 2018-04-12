@@ -19,6 +19,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.ExecutionError;
+
 import org.auraframework.adapter.FormatAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.util.AuraUtil;
@@ -152,6 +154,12 @@ public class SerializationServiceImpl implements SerializationService {
 
         try {
             ret = (FormatAdapter<T>) formatAdapterCache.get(new IndexKey(format, type));
+        } catch (ExecutionError ex) {
+            AuraContext context = contextService.getCurrentContext();
+            String message = String.format(ex.getMessage() + "  Application descriptor: %s  Loading Application Descriptor: %s",
+                    context.getApplicationDescriptor(),
+                    context.getLoadingApplicationDescriptor());
+            throw new AuraRuntimeException(message, ex);
         } catch (ExecutionException ee) {
             // FIXME: EXCEPTIONINFO
             throw new AuraRuntimeException(ee);

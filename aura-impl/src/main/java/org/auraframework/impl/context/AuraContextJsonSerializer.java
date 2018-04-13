@@ -313,6 +313,10 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         if (configAdapter.isStrictCSPEnforced()) {
             json.writeMapEntry("csp", 1);
         }
+
+        if (configAdapter.isFrozenRealmEnabled()) {
+            json.writeMapEntry("fr", 1);
+        }
         
         Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
         if (!moduleNamespaceAliases.isEmpty()) {

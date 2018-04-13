@@ -182,6 +182,12 @@ public interface ConfigAdapter extends AuraAdapter {
     boolean isStrictCSPEnforced();
 
     /**
+     * Is frozen realm policy enabled: freezing object properties.
+     * @return
+     */
+    boolean isFrozenRealmEnabled();
+
+    /**
      * If true bootstrap.js will not be served but rather it's contents rendered inline (or inline.js as a fallback)
      * @return
      */

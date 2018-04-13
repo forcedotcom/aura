@@ -107,6 +107,7 @@ function LockerService() {
         context = context || {};
         var isEnabled = !!context["ls"];
         var isStrictCSP = !!context["csp"];
+        var isFrozenRealm = !!context["fr"];
 
         if (isEnabled && !!window["AuraLocker"]) {
             var types = {
@@ -123,6 +124,7 @@ function LockerService() {
                 "getPublicMethodNames": getPublicMethodNames,
                 "requireLocker": requireLocker,
                 "isStrictCSP": isStrictCSP,
+                "isFrozenRealm": isFrozenRealm,
                 "warn": warn,
                 "error": $A.auraError,
                 "registerEngineServices": registerEngineServices

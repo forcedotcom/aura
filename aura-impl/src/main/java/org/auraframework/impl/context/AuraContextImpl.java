@@ -875,6 +875,10 @@ public class AuraContextImpl implements AuraContext {
                 json.writeMapEntry("csp", 1);
             }
 
+            if (configAdapter.isFrozenRealmEnabled()) {
+                json.writeMapEntry("fr", 1);
+            }
+
             if (nonce != null && style == EncodingStyle.Full){
                 json.writeMapEntry("scriptNonce", nonce);
             }

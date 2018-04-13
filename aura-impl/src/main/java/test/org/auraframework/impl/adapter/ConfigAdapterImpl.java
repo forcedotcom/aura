@@ -715,6 +715,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
+    public boolean isFrozenRealmEnabled() {
+        return false;
+    }
+
+    @Override
     public boolean isBootstrapInliningEnabled() {
         return true;
     }

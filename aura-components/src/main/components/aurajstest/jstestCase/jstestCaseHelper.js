@@ -28,6 +28,14 @@
         }
     },
 
+    unloadTestContent: function (cmp) {
+    	if (cmp._testLoaded) {
+            var content = cmp.find("content").getElement();
+            content.removeChild(content.firstChild);
+            delete cmp._testLoaded;
+    	}
+    },
+    
     runTest : function (cmp) {
         var frame = cmp.find("content").getElement().firstChild;
         var win = frame.contentWindow ? frame.contentWindow : frame.contentDocument.window;
@@ -74,10 +82,14 @@
             cmp.find("results").getElement().innerHTML = msg;
         } else {
             cmp.set("v.status", "pass");
+            if (!cmp.get("v.keepContentAfterRun")) {
+            	this.unloadTestContent(cmp);
+            }
         }
 
         cmp.set("v.runTime", " in " + (new Date().getTime() - cmp._startTime) + "ms");
-
+        
+        cmp.set("v.keepContentAfterRun", true);
         cmp.get("e.done").fire();
     }
 })// eslint-disable-line semi

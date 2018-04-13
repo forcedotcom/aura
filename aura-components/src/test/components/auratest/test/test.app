@@ -17,14 +17,13 @@
 -->
 <aura:application access="UNAUTHENTICATED" support="GA" description="Execute specified jstest on a dynamically created instance of the target component.">
     <aura:attribute name="descriptor" access="GLOBAL" type="String" description="The target component to test."/>
-    <aura:attribute name="testName" access="GLOBAL" type="String" description="The test to execute."/>
+    <aura:attribute name="test" access="GLOBAL" type="String" description="The test to execute."/>
     <aura:attribute name="timeout" access="GLOBAL" type="Integer" default="30" description="The maximum number of seconds to wait for the test to complete."/>
-
     <aura:attribute name="target" type="Aura.Component" />
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-
-    <script src="{!'/aura?aura.tag=' + v.descriptor + '&amp;aura.format=JS&amp;aura.testTimeout=' + v.timeout + '&amp;aura.jstestrun=' + v.testName}"/>
+    
+    <script src="{#'/l/%7b&quot;app&quot;%3a&quot;auratest%3atest&quot;%7d/test.js?test=' + v.test + '&amp;bundle=' + v.descriptor + '&amp;timeout=' + v.timeout}"/>
 
     {!v.target}
 </aura:application>

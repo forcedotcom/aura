@@ -35,8 +35,6 @@ import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.test.TestContext;
-import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -52,12 +50,11 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
 
     public static interface AuraContextJsonSerializerProvider {
         AuraContextJsonSerializer createAuraContextJsonSerializer(ConfigAdapter configAdapter,
-                TestContextAdapter testContextAdapter, DefinitionService definitionService);
+                DefinitionService definitionService);
     }
 
     public static final String DELETED = "deleted";
 
-    protected final TestContextAdapter testContextAdapter;
     protected final ConfigAdapter configAdapter;
     private final DefinitionService definitionService;
     private static final Set<DefType> SERIALIZEABLE_DEF_TYPES = Sets.immutableEnumSet(
@@ -67,10 +64,8 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             DefType.LIBRARY,
             DefType.MODULE);
 
-    public AuraContextJsonSerializer(ConfigAdapter configAdapter, TestContextAdapter testContextAdapter,
-            DefinitionService definitionService) {
+    public AuraContextJsonSerializer(ConfigAdapter configAdapter, DefinitionService definitionService) {
         this.configAdapter = configAdapter;
-        this.testContextAdapter = testContextAdapter;
         this.definitionService = definitionService;
     }
 
@@ -133,13 +128,6 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         String currentPathPrefix = ctx.getPathPrefix();
         if (currentPathPrefix != null) {
             json.writeMapEntry("pathPrefix", currentPathPrefix);
-        }
-
-        if (testContextAdapter != null) {
-            TestContext testContext = testContextAdapter.getTestContext();
-            if (testContext != null) {
-                json.writeMapEntry("test", testContext.getName());
-            }
         }
 
         json.writeMapEntry("fwuid", fwuid);

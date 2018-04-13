@@ -15,11 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:application>
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
     <!--This component is the twin of modules/securemoduletest/bootstrap and its is not lockerized-->
     I am not lockerized.
 
     <aura:method name="testCmpLockerStateNotAffectedByEquivalentModule"/>
-</aura:component>
+</aura:application>

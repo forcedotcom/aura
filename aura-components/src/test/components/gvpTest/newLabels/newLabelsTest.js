@@ -1,21 +1,21 @@
 ({
     testLabelAsAttribute: {
         test : function(cmp) {
-            $A.test.assertEquals("Today", cmp.find('LabelAsAttribute').get('v.class'));
+            $A.test.addWaitFor("Today", function(){ return cmp.find('LabelAsAttribute').get('v.class') });
         }
     },
 
     testLabelAsExpressionComponent: {
         test : function(cmp) {
-            $A.test.assertEquals("Today + Overdue", $A.test.getTextByComponent(cmp.find('LabelAsExpressionComponent')));
+            $A.test.addWaitFor("Today + Overdue", function(){ return $A.test.getTextByComponent(cmp.find('LabelAsExpressionComponent')) });
         }
     },
 
     testInnerLabelsLoaded: {
         test: function(cmp) {
-            $A.test.assertEquals("Tomorrow", $A.test.getTextByComponent(cmp.find("innerCmp")),
+            $A.test.addWaitForWithFailureMessage("Tomorrow", function(){ return $A.test.getTextByComponent(cmp.find("innerCmp")) },
                     "Label on inner component not properly displayed");
-            $A.test.assertEquals("Tomorrow", $A.get("$Label.Related_Lists.task_mode_tomorrow"));
+            $A.test.addWaitFor("Tomorrow", function(){ return $A.get("$Label.Related_Lists.task_mode_tomorrow") });
         }
     },
 

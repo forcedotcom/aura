@@ -16,20 +16,21 @@
 
 -->
 <aura:application access="GLOBAL" controller="java://org.auraframework.components.aurajstest.JSTestController">
-    <aura:attribute name="descriptor" type="String" default="ui:button"/>
-    <aura:attribute name="defType" type="String" default="COMPONENT"/>
+    <aura:attribute name="descriptor" type="String" default=""/>
     <aura:attribute name="test" type="String"/>
-    
+    <aura:attribute name="keepContentAfterRun" type="Boolean" default="true"
+        description="Setting to false will delete the content frame used to execute the test after the test has finished executing." />
+
     <aura:attribute name="index" type="Integer" default="0"/>
     <aura:attribute name="testCases" type="List" default="" access="PRIVATE"/>
     <aura:attribute name="testSuiteCode" type="String" access="PRIVATE"/>
-    
+
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    
+
     <aura:if isTrue="{!v.testCases.length}">
         <ui:tabset aura:id="tabs" class="jstestTabset">
             <aura:iteration items="{!v.testCases}" var="case">
-                <aurajstest:jstestCase aura:id="test" name="{!case.name}" url="{!case.url}" done="{!c.testDone}"/>
+                <aurajstest:jstestCase aura:id="test" name="{#case.name}" bundle="{#case.bundle}" url="{#case.url}" done="{!c.testDone}" keepContentAfterRun="{#v.keepContentAfterRun}"/>
             </aura:iteration>
         </ui:tabset>
     </aura:if>

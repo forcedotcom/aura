@@ -16,7 +16,7 @@
 ({
     testSelectInIteration : {
         attributes :{
-            multi:"false"
+            multi:false
         }, test : function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectIteration");
             this.selectOptionAndVerify(inputSelectCmp, "Montreal");
@@ -28,7 +28,7 @@
 
     testMultiSelectInIteration : {
         attributes :{
-            multi:"true"
+            multi:true
         }, test : function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectIteration");
             this.selectMultipleOptionsAndVerify(inputSelectCmp, ["Montreal", "Toronto", "Quebec"]);
@@ -45,8 +45,8 @@
 
     testSelectInIf : {
         attributes :{
-            multi:"false",
-            condition:"true"
+            multi:false,
+            condition:true
         }, test : function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectCondition");
             this.selectOptionAndVerify(inputSelectCmp, "Toronto");
@@ -57,8 +57,8 @@
 
     testMultiSelectInIf : {
         attributes :{
-            multi:"true",
-            condition:"true"
+            multi:true,
+            condition:true
         }, test : function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectCondition");
             this.selectMultipleOptionsAndVerify(inputSelectCmp, [ "Toronto", "Quebec"]);
@@ -71,8 +71,8 @@
 
     testSelectInElse : {
         attributes :{
-            multi:"false",
-            condition:"false"
+            multi:false,
+            condition:false
         }, test : function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectCondition");
             this.selectOptionAndVerify(inputSelectCmp, "Montreal");
@@ -83,8 +83,8 @@
 
     testMultiSelectInElse : {
         attributes :{
-            multi:"true",
-            condition:"false"
+            multi:true,
+            condition:false
         }, test : function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectCondition");
             this.selectMultipleOptionsAndVerify(inputSelectCmp, [ "Montreal", "Quebec"]);
@@ -97,8 +97,8 @@
 
     testSelectInRenderIf : {
         attributes :{
-            multi:"false",
-            condition:"true"
+            multi:false,
+            condition:true
         }, test : function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectRenderIf");
             this.selectOptionAndVerify(inputSelectCmp, "Toronto");
@@ -109,8 +109,8 @@
 
     testMultiSelectInRenderIf : {
         attributes :{
-            multi:"true",
-            condition:"true"
+            multi:true,
+            condition:true
         }, test : function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectRenderIf");
             this.selectMultipleOptionsAndVerify(inputSelectCmp, [ "Toronto", "Quebec"]);
@@ -123,7 +123,7 @@
 
     testSelectInOptionGroup : {
         attributes :{
-            multi:"false"
+            multi:false
         }, test : function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectOptionGroup");
             this.selectOptionAndVerify(inputSelectCmp, "Quebec");
@@ -133,7 +133,7 @@
 
     testMultiSelectInOptionGroup : {
         attributes :{
-            multi:"true"
+            multi:true
         }, test : function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectOptionGroup");
             this.selectMultipleOptionsAndVerify(inputSelectCmp, ["Ottawa", "Toronto", "Quebec"]);
@@ -146,7 +146,7 @@
 
     testSelectRenderIfInIteration : {
         attributes :{
-            multi:"false"
+            multi:false
         }, test : function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectRenderIfCondition");
             this.selectOptionAndVerify(inputSelectCmp, "Ottawa");
@@ -158,7 +158,7 @@
 
     testMultiSelectRenderIfInIteration : {
         attributes :{
-            multi:"true"
+            multi:true
         }, test : function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectRenderIfCondition");
             this.selectMultipleOptionsAndVerify(inputSelectCmp, ["Ottawa", "Vancouver", "Toronto"]);
@@ -172,7 +172,7 @@
 
     testSelectWhenNestedOptions : {
         attributes :{
-            multi:"false"
+            multi:false
         }, test : function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectNested");
             this.selectOptionAndVerify(inputSelectCmp, "Quebec");
@@ -185,7 +185,7 @@
 
     testMultiSelectWhenNestedOptions : {
         attributes :{
-            multi:"true"
+            multi:true
         }, test : function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectNested");
             this.selectMultipleOptionsAndVerify(inputSelectCmp, ["Ottawa", "Vancouver", "Quebec"]);
@@ -199,7 +199,7 @@
 
     testSelectWithIterationOptionsChanged : {
         attributes :{
-            multi:"false"
+            multi:false
         }, test: function(cmp) {
             var inputSelectCmp = cmp.find("InputSelectIterationChanged"),
                 context = this;

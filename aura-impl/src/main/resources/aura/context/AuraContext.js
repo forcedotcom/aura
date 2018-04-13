@@ -50,7 +50,6 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.componentConfigs = {};
     this.app = config["app"];
     this.cmp = config["cmp"];
-    this.test = config["test"];
     this.contextPath = config["contextPath"] || "";
     this.allowedGlobals = config["allowedGlobals"];
     this.globals = config["globals"];
@@ -211,9 +210,6 @@ Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic, in
         contextToSend["app"] = this.app;
     } else {
         contextToSend["cmp"] = this.cmp;
-    }
-    if (this.test) {
-        contextToSend["test"] = this.test;
     }
     if (includeDynamic) {
         contextToSend["loaded"] = this.loaded;

@@ -32,7 +32,7 @@
      * Truncating with ellipsis to 0 length will give unmodified string.
      */
     testTruncateZeroAttributeValue: {
-        attributes : {value: 'truncate me', truncate: '0'},
+        attributes : {value: 'truncate me', truncate: 0},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('truncate me', text, "value not truncated as expected");
@@ -43,7 +43,7 @@
      * Truncating without ellipsis to 0 length will give unmodified string.
      */
     testTruncateZeroAttributeValueWithoutEllipsis: {
-        attributes : {value: 'truncate me', truncate: '0', ellipsis: 'false'},
+        attributes : {value: 'truncate me', truncate: 0, ellipsis: false},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('truncate me', text, "value not truncated as expected");
@@ -54,7 +54,7 @@
      * Truncating with ellipsis 1 length will give 1 character and ellipsis.
      */
     testTruncateOneAttributeValue: {
-        attributes : {value: 'truncate me', truncate: '1'},
+        attributes : {value: 'truncate me', truncate: 1},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('t...', text, "value not truncated as expected");
@@ -65,7 +65,7 @@
      * Truncating without ellipsis to 1 length will give 1 character.
      */
     testTruncateOneAttributeValueWithoutEllipsis: {
-        attributes : {value: 'truncate me', truncate: '1', ellipsis: 'false'},
+        attributes : {value: 'truncate me', truncate: 1, ellipsis: false},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('t', text, "value not truncated as expected");
@@ -76,7 +76,7 @@
      * Truncating with ellipsis to 3 length will give 1 character and ellipsis.
      */
     testTruncateThreeAttributeValue: {
-        attributes : {value: 'truncate me', truncate: '3'},
+        attributes : {value: 'truncate me', truncate: 3},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('t...', text, "value not truncated as expected");
@@ -87,7 +87,7 @@
      * Truncating without ellipsis to 3 length will give 3 characters.
      */
     testTruncateThreeAttributeValueWithoutEllipsis: {
-        attributes : {value: 'truncate me', truncate: '3', ellipsis: 'false'},
+        attributes : {value: 'truncate me', truncate: 3, ellipsis: false},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('tru', text, "value not truncated as expected");
@@ -98,7 +98,7 @@
      * Truncating with ellipsis to 4 length will give 1 character and ellipsis.
      */
     testTruncateFourAttributeValue: {
-        attributes : {value: 'truncate me', truncate: '4'},
+        attributes : {value: 'truncate me', truncate: 4},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('t...', text, "value not truncated as expected");
@@ -109,7 +109,7 @@
      * Truncating without ellipsis to 4 length will give 4 characters.
      */
     testTruncateFourAttributeValueWithoutEllipsis: {
-        attributes : {value: 'truncate me', truncate: '4', ellipsis: 'false'},
+        attributes : {value: 'truncate me', truncate: 4, ellipsis: false},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('trun', text, "value not truncated as expected");
@@ -120,7 +120,7 @@
      * Truncating with ellipsis to value length will give value back without ellipsis.
      */
     testTruncateExactAttributeValue: {
-        attributes : {value: 'truncate me', truncate: '11'},
+        attributes : {value: 'truncate me', truncate: 11},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('truncate me', text, "value shouldn't need truncating");
@@ -131,7 +131,7 @@
      * Truncating without ellipsis to value length will give value back without ellipsis.
      */
     testTruncateExactAttributeValueWithoutEllipsis: {
-        attributes : {value: 'truncate me', truncate: '11', ellipsis: 'false'},
+        attributes : {value: 'truncate me', truncate: 11, ellipsis: false},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('truncate me', text, "value shouldn't need truncating");
@@ -142,7 +142,7 @@
      * Truncating with ellipsis to  >value length, but <(value length + ellipsis length), will give value back without ellipsis.
      */
     testTruncateEnoughAttributeValue: {
-        attributes : {value: 'truncate me', truncate: '13'},
+        attributes : {value: 'truncate me', truncate: 13},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('truncate me', text, "value shouldn't need truncating");
@@ -153,7 +153,7 @@
      * Truncating with ellipsis to (value length + ellipsis length), will give value back without ellipsis.
      */
     testTruncateMoreThanEnoughAttributeValue: {
-        attributes : {value: 'truncate me', truncate: '14'},
+        attributes : {value: 'truncate me', truncate: 14},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('truncate me', text, "value shouldn't need truncating");
@@ -164,7 +164,7 @@
      * Truncating with negative value will be ignored.
      */
     testTruncateNegativeAttributeValue: {
-        attributes : {value: 'truncate me', truncate: '-1'},
+        attributes : {value: 'truncate me', truncate: -1},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('truncate me', text, "negative truncate value not ignored");
@@ -175,7 +175,7 @@
      * Truncating by word with ellipsis will truncate before the last word.
      */
     testTruncateByWordWithEllipsis: {
-        attributes : {value: 'this word fits', truncate: '13', ellipsis: 'true', truncateByWord: 'true'},
+        attributes : {value: 'this word fits', truncate: 13, ellipsis: true, truncateByWord: true},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('this word...', text, "value wasn't truncated");
@@ -186,7 +186,7 @@
      * Truncating by word with ellipsis where the length of the value (not counting the ellipsis) fits will not truncate the last word.
      */
     testTruncateByWordWithEllipsisExact: {
-        attributes : {value: 'this word fits', truncate: '14', ellipsis: 'true', truncateByWord: 'true'},
+        attributes : {value: 'this word fits', truncate: 14, ellipsis: true, truncateByWord: true},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('this word fits', text, "value shouldn't need truncating");
@@ -197,7 +197,7 @@
      * Truncating by word without ellipsis will truncate midway through the last word.
      */
     testTruncateByWordWithoutEllipsis: {
-        attributes : {value: 'this word fits', truncate: '13', ellipsis: 'false', truncateByWord: 'true'},
+        attributes : {value: 'this word fits', truncate: 13, ellipsis: false, truncateByWord: true},
         test: function(component){
             var text = $A.test.getText(component.find("content").getElement());
             $A.test.assertEquals('this word', text, "value wasn't truncated");

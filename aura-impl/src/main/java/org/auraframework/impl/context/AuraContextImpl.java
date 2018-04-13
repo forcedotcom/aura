@@ -52,8 +52,6 @@ import org.auraframework.system.Client;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.RegistrySet;
-import org.auraframework.test.TestContext;
-import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.SystemErrorException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
@@ -140,7 +138,6 @@ public class AuraContextImpl implements AuraContext {
 
     private final DefinitionService definitionService;
     private final ConfigAdapter configAdapter;
-    private final TestContextAdapter testContextAdapter;
 
     private boolean isSystem = false;
 
@@ -164,8 +161,7 @@ public class AuraContextImpl implements AuraContext {
     public AuraContextImpl(Mode mode, RegistrySet registries, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
             Map<String, GlobalValueProvider> globalProviders,
-            ConfigAdapter configAdapter, DefinitionService definitionService,
-            TestContextAdapter testContextAdapter) {
+            ConfigAdapter configAdapter, DefinitionService definitionService) {
         this.mode = mode;
         this.registries = registries;
         this.defaultPrefixes = defaultPrefixes;
@@ -175,7 +171,6 @@ public class AuraContextImpl implements AuraContext {
         this.globalProviders = globalProviders;
         this.configAdapter = configAdapter;
         this.definitionService = definitionService;
-        this.testContextAdapter = testContextAdapter;
         this.globalValues = new HashMap<>();
         this.localStore = new AuraLocalStoreImpl();
         this.clientClassesLoaded = new HashMap<>();
@@ -858,13 +853,6 @@ public class AuraContextImpl implements AuraContext {
 
             if (currentPathPrefix != null) {
                 json.writeMapEntry("pathPrefix", currentPathPrefix);
-            }
-
-            if (testContextAdapter != null) {
-                TestContext testContext = testContextAdapter.getTestContext();
-                if (testContext != null) {
-                    json.writeMapEntry("test", testContext.getName());
-                }
             }
 
             if (configAdapter.isLockerServiceEnabled()) {

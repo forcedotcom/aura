@@ -263,8 +263,8 @@
         // TODO(W-2537764): IE < 10 gives Access Denied error when trying to send XHRs after setServerReachable(false)
         browsers: ["-IE8", "-IE9"],
         test: function(cmp) {
-            var expected="INCOMPLETE";
-            var expectedList="SUCCESS,SUCCESS,INCOMPLETE,";
+            var expected="ERROR";
+            var expectedList="SUCCESS,SUCCESS,ERROR,";
             var actual;
             var actualList;
             var actionComplete = false;

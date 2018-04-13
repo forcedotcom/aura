@@ -145,7 +145,7 @@
     testEmptyStringValue: {
         attributes : {value : ""},
         test : function(component){
-            $A.test.assertUndefined(component.get("v.value"), "value does not equal expected");
+            $A.test.assertEquals("", component.get("v.value"), "value does not equal expected");
         }
     },
 

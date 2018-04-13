@@ -34,10 +34,8 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.RegistrySet;
-import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.JsonSerializationContext;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  */
@@ -49,9 +47,6 @@ public class ContextAdapterImpl implements ContextAdapter {
     @Inject
     private DefinitionService definitionService;
     
-    @Autowired(required=false)
-    private TestContextAdapter testContextAdapter;
-
     private static ThreadLocal<AuraContext> currentContext = new ThreadLocal<>();
     
     private static ThreadLocal<AuraContext> systemContext = new ThreadLocal<>();
@@ -65,7 +60,7 @@ public class ContextAdapterImpl implements ContextAdapter {
                                  Map<String, GlobalValueProvider> globalProviders,
                                  DefDescriptor<? extends BaseComponentDef> appDesc) {
         AuraContext context = new AuraContextImpl(mode, registries, defaultPrefixes, format, access, jsonContext,
-                globalProviders, configAdapter, definitionService, testContextAdapter);
+                globalProviders, configAdapter, definitionService);
         currentContext.set(context);
         context.setApplicationDescriptor(appDesc);
         

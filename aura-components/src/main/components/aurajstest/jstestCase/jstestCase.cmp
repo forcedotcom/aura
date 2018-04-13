@@ -17,8 +17,11 @@
 -->
 <aura:component extends="ui:tab">
     <aura:attribute name="name" type="String"/>
+    <aura:attribute name="bundle" type="String"/>
     <aura:attribute name="url" type="String"/>
     <aura:attribute name="runTime" type="String"/>
+    <aura:attribute name="keepContentAfterRun" type="Boolean" default="true"
+        description="Setting to false will delete the content frame used to execute the test after the test has finished executing." />
 
 	<!-- PRIVATE ATTRIBUTE(S) -->
     <aura:attribute name="status" type="String" default="" serializeTo="NONE"/>
@@ -38,12 +41,13 @@
     <aura:set attribute="body">
         <section class="results">
             <aura:if isTrue="{!v.status == 'pass' || v.status == 'fail'}">
-                <h1>{! v.status == 'pass' ? 'Passed ' : 'Failed '}<sub>{!v.name}{!v.runTime}</sub></h1>
+                <h1>{! v.status == 'pass' ? 'Passed ' : 'Failed '}<sub>{#v.name}({#v.bundle}){!v.runTime}</sub></h1>
                 <div class="action">
-                    <a onclick="{!c.rerun}">Re-run</a>&nbsp;
+                    <a onclick="{!c.rerun}">Re-run</a>
+                    &nbsp;
                     <a href="{!v.individualUrl}" target="_">Run in a new tab</a>
                 </div>
-                <aura:set attribute="else"><h1>Running Test <sub>{!v.name}</sub></h1></aura:set>
+                <aura:set attribute="else"><h1>Running Test <sub>{#v.name}({#v.bundle})</sub></h1></aura:set>
             </aura:if>
             <div aura:id="results" class="results"></div>
         </section>

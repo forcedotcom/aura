@@ -2419,4 +2419,14 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
         );
 };
 
+/**
+ * Returns the number of batches fetching components from the server
+ *
+ * @return {Number} Number of component batch loads in progress
+ * @export
+ */
+AuraComponentService.prototype.inFlightComponents = function() {
+    return this.componentDefLoader.loading;
+};
+
 Aura.Services.AuraComponentService = AuraComponentService;

@@ -270,7 +270,17 @@ Aura.OverrideMap = function OverrideMap() {
             function(orig) {
                 $A.componentService.indexComponent = orig;
             }
-        )
+        ), 
+
+        "ComponentDefLoader.loadingComplete" : new Aura.Utils.Override(null, 
+                                        Aura.Component.ComponentDefLoader.prototype.loadingComplete, true /*isProto*/,
+            function(bound) {
+                Aura.Component.ComponentDefLoader.prototype.loadingComplete = bound;
+            },
+            function(orig) {
+                Aura.Component.ComponentDefLoader.prototype.loadingComplete = orig;
+            }
+        ) 
 
     };
 };

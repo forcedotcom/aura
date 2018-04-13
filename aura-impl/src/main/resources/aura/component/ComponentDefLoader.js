@@ -265,7 +265,14 @@ ComponentDefLoader.prototype.retrievePending = function(pending) {
             // there was no callbacks, the error should still be surfaced
             $A.reportError("Error loading component definitions", e);
         }
-    });
+    }).then(this.loadingComplete, this.loadingComplete);
+};
+
+// Exists only so that instrumentation can hook into script tag load completes
+// Called when all the script tags have finished loading. Hook defined in Aura_exports override map
+// ComponentDefLoader.loadingComplete
+ComponentDefLoader.prototype.loadingComplete = function() {
+    // no-op empty function
 };
 
 ComponentDefLoader.prototype.checkForError = function (uri, resolve, reject) {

@@ -174,16 +174,6 @@
             "defaultView should return the SecureWindow: " + actual);
     },
 
-    testDocumentImplementationHTMLDocumentCreation: function(cmp) {
-        var testUtils = cmp.get("v.testUtils");
-
-        var body = document.implementation.createHTMLDocument("").body;
-        body.innerHTML = "<form></form><form></form>";
-        var actual = body.childNodes.length;
-
-        testUtils.assertEquals(2, actual, "Expected created HTML document body to have 2 nodes after modifying innerHTML");
-    },
-
     testDocumentElementHasNonZeroPropertyValues: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var documentElement = document.documentElement;

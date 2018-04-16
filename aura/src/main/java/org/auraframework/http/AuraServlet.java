@@ -309,6 +309,11 @@ public class AuraServlet extends AuraBaseServlet {
 
         // check if the GET request is for a publicly cacheable action, and if so, handle it
         if (isActionGetRequest(request)) {
+            //We do not support a request method of "HEAD" for actions
+            if("HEAD".equals(request.getMethod())) {
+                servletUtilAdapter.send405(servletContext, request, response);
+                return;
+            }
             handleActionRequest(request, response, true);
             return;
         }
@@ -330,6 +335,12 @@ public class AuraServlet extends AuraBaseServlet {
             servletUtilAdapter.send404(servletContext, request, response);
             return;
         }
+
+        if(context.getFormat() == Format.JSON) {
+            servletUtilAdapter.send405(servletContext, request, response);
+            return;
+        }
+
         String nocache = nocacheParam.get(request);
         if (nocache != null && !nocache.isEmpty()) {
             handleNoCacheRedirect(nocache, request, response);

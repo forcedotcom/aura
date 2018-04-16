@@ -208,6 +208,30 @@ public class ServletUtilAdapterImplUnitTest {
     }
 
     @Test
+    public void testSend405() throws Exception {
+        ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        ContextService contextService = Mockito.mock(ContextService.class);
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+
+        sua.setContextService(contextService);
+
+        Mockito.when(response.getWriter()).thenReturn(pw);
+
+        sua.send405(null, null, response);
+
+        Mockito.verify(response, Mockito.times(1)).setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        Mockito.verify(response, Mockito.times(1)).getWriter();
+        Mockito.verify(contextService, Mockito.times(1)).endContext();
+        Mockito.verifyNoMoreInteractions(response);
+        Mockito.verifyNoMoreInteractions(contextService);
+
+        String output = sw.getBuffer().toString();
+        Assert.assertTrue("Output should start with '405 Method Not Allowed'", output.startsWith("405 Method Not Allowed"));
+    }
+
+    @Test
     public void testGetScriptsSafeNoIgnore() throws Exception {
         ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
         AuraContext context = Mockito.mock(AuraContext.class);

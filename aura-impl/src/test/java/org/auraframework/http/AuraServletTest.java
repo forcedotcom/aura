@@ -572,6 +572,51 @@ public class AuraServletTest extends UnitTestCase {
         assertSingleHeader(response, HttpHeaders.LOCATION, "/");
         Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
+
+    @Test
+    public void testDoGet_ContextJSON() throws Exception {
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.isValidDefType(Matchers.any(), Matchers.any())).thenReturn(false); // trigger 405
+
+        MockHttpServletRequest request = getBaseAuraRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        servlet.doGet(request, response);
+
+        // def type check occurs after nocache processing
+        Mockito.verify(servletUtilAdapter).send405(Matchers.any(), Matchers.eq(request), Matchers.eq(response));
+    }
+
+    @Test
+    public void testDoGet_auraActionWhenRequestMethodHEAD() throws Exception {
+        // Arrange
+        startContext();
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setMethod("HEAD");
+        request.setScheme("http");
+        request.setServerName("server");
+        request.setServerPort(9090);
+        request.setRequestURI("/aura");
+        request.addParameter("aura.tag", "aura:text");
+        request.setParameter("aura.token", "token");
+        request.setParameter("aura.isAction", "true");
+        request.setParameter("message", "someMessage");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        Message message = new Message(Arrays.asList(getAction("someAction")));
+        Mockito.doReturn(message).when(servlet).readMessage(Matchers.any());
+
+        Mockito.when(configAdapter.isActionPublicCachingEnabled()).thenReturn(false);
+
+        // Act
+        servlet.doGet(request, response);
+
+        // def type check occurs after nocache processing
+        Mockito.verify(servletUtilAdapter).send405(Matchers.any(), Matchers.eq(request), Matchers.eq(response));
+    }
     
     @Test
     public void testDoPostRunsMessage() throws Exception {

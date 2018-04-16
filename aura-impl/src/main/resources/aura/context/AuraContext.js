@@ -64,6 +64,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     if (this.uriAddressableDefsEnabled === undefined) {
         this.uriAddressableDefsEnabled = !!this.getURIDefsStateFromQuery();
     }
+    this.cdnHost = config[Json.ApplicationKey.CDN_HOST];
     
     var that = this;
 

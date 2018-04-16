@@ -897,6 +897,10 @@ public class AuraContextImpl implements AuraContext {
                 json.writeMapEntry(Json.ApplicationKey.URIADDRESSABLEDEFINITIONS, uriAddressableExplicitlyDisabled? 0: 1);
             }
             
+            if (configAdapter.cdnEnabled()) {
+                json.writeMapEntry(Json.ApplicationKey.CDN_HOST, configAdapter.getCDNDomain());
+            }
+
             json.writeMapEnd();
         } catch (IOException ioe) {
             // This can't possibly happen.

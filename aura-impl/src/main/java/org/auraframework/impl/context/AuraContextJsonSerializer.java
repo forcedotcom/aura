@@ -155,30 +155,32 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             List<Definition> moduleDefs = Lists.newArrayList();
             
             if (uriEnabled && !ctx.isPreloading()) {
-                json.writeMapKey("descriptorUids");
-                json.writeMapBegin();
+                if (!defMap.isEmpty()) {
+                    json.writeMapKey("descriptorUids");
+                    json.writeMapBegin();
 
-                for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
-                    Definition def = entry.getValue();
+                    for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
+                        Definition def = entry.getValue();
 
-                    if (def != null && SERIALIZEABLE_DEF_TYPES.contains(entry.getKey().getDefType())) {
-                        if (def.isDynamicallyGenerated()) {
-                            DefType dt = entry.getKey().getDefType();
-                            if (DefType.COMPONENT.equals(dt) || DefType.APPLICATION.equals(dt)) {
-                                componentDefs.add(def);
-                            } else if (DefType.MODULE.equals(dt)) {
-                                moduleDefs.add(def);
+                        if (def != null && SERIALIZEABLE_DEF_TYPES.contains(entry.getKey().getDefType())) {
+                            if (def.isDynamicallyGenerated()) {
+                                DefType dt = entry.getKey().getDefType();
+                                if (DefType.COMPONENT.equals(dt) || DefType.APPLICATION.equals(dt)) {
+                                    componentDefs.add(def);
+                                } else if (DefType.MODULE.equals(dt)) {
+                                    moduleDefs.add(def);
+                                }
+                                continue;
                             }
-                            continue;
-                        }
-                        try {
-                            json.writeMapEntry(def.getDescriptor(), definitionService.getUid(null, def.getDescriptor()));
-                        } catch (Exception ex) {
-                            //TODO: error handling, surface the exception
+                            try {
+                                json.writeMapEntry(def.getDescriptor(), definitionService.getUid(null, def.getDescriptor()));
+                            } catch (Exception ex) {
+                                //TODO: error handling, surface the exception
+                            }
                         }
                     }
+                    json.writeMapEnd();
                 }
-                json.writeMapEnd();
                 
                 if (componentDefs.size() > 0) {
                     writeDefs(json, "componentDefs", componentDefs);
@@ -243,9 +245,14 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         // Step 2: serialize the server set and subtract the server set from the client set.
         Map<String, String> loadedStrings = new HashMap<>();
         for (Map.Entry<DefDescriptor<?>, String> entry : ctx.getLoaded().entrySet()) {
-            loadedStrings.put(String.format("%s@%s", entry.getKey().getDefType().toString(),
-                    entry.getKey().getQualifiedName()), entry.getValue());
+            if (!uriEnabled || appDesc.equals(entry.getKey())) {
+                // uri defs disabled or
+                // if uri defs enabled we want to send the application in loaded still
+                loadedStrings.put(String.format("%s@%s", entry.getKey().getDefType().toString(),
+                        entry.getKey().getQualifiedName()), entry.getValue());
+            }
             currentLoaded.remove(entry.getKey());
+
         }
 
         // Step 3: serialize remaining not found client definitions, now unused.
@@ -253,7 +260,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             loadedStrings.put(String.format("%s@%s", deleted.getDefType().toString(),
                     deleted.getQualifiedName()), DELETED);
         }
-        if ((!uriEnabled || ctx.isPreloading()) && loadedStrings.size() > 0) {
+        if (loadedStrings.size() > 0) {
             json.writeMapKey("loaded");
             json.writeMap(loadedStrings);
         }
@@ -306,6 +313,10 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             json.writeMapEntry("fr", 1);
         }
         
+        if (configAdapter.cdnEnabled()) {
+            json.writeMapEntry(Json.ApplicationKey.CDN_HOST, configAdapter.getCDNDomain());
+        }
+
         Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
         if (!moduleNamespaceAliases.isEmpty()) {
             json.writeMapEntry("mna", moduleNamespaceAliases);

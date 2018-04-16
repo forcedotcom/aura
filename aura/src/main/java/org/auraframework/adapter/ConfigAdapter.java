@@ -211,6 +211,8 @@ public interface ConfigAdapter extends AuraAdapter {
 
     boolean cdnEnabled();
 
+    String getCDNDomain();
+
     /**
      * Module namespace aliases
      *

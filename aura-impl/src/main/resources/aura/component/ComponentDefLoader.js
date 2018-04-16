@@ -130,6 +130,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
 
     var uri = "";
     var uris = [];
+    var onlyRestrictedNamespaces = true;
 
     var uid = "";
     var namespaces = Object.keys(namespaceMap).sort();
@@ -149,7 +150,11 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
         maxLength = 15000 - document.cookie.length - window.navigator.userAgent.length;
     }
 
-    for (var i=0, length=namespaces.length; i<length; i++) {
+    for (var i=0; i<namespaces.length; i++) {
+        var isRestrictedNamespace = !!($A.clientService.isInternalNamespace(namespaces[i]) || $A.clientService.isPrivilegedNamespace(namespaces[i]));
+        if (!isRestrictedNamespace) {
+            onlyRestrictedNamespaces = false;
+        }
         var names = Object.keys(namespaceMap[namespaces[i]]).sort();
         var additionalURI = "&" + namespaces[i] + "=" + names.join(",");
         if (additionalURI.length + uri.length > maxLength) {
@@ -159,10 +164,11 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
                     var name = names[name_idx];
                     if (additionalURI.length + name.length + uri.length > maxLength) {
                         uri += additionalURI;
-                        uris.push([uri, uid]);
+                        uris.push([uri, uid, onlyRestrictedNamespaces]);
                         uid = $A.util.isString(namespaceMap[namespaces[i]][name]) ?  namespaceMap[namespaces[i]][name] : "";
                         additionalURI =  "&" + namespaces[i] + "=" + name;
                         uri = "";
+                        onlyRestrictedNamespaces = isRestrictedNamespace;
                     } else {
                         additionalURI += (name_idx>0?",":"") + name;
                         var additional_def_uid = namespaceMap[namespaces[i]][name];
@@ -174,9 +180,10 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
                 uri = additionalURI;
                 names.length = 0;
             } else {
-                uris.push([uri, uid]);
+                uris.push([uri, uid, onlyRestrictedNamespaces]);
                 uid = "";
                 uri = additionalURI;
+                onlyRestrictedNamespaces = isRestrictedNamespace;
             }
         } else {
             uri += additionalURI;
@@ -189,13 +196,17 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
         }
     }
 
-    uris.push([uri, uid]);
+    uris.push([uri, uid, onlyRestrictedNamespaces]);
 
     var processedURI = [];
     for(var def=0; def<uris.length; def++) {
         var finalURI = this.buildURIString(uris[def][0], uris[def][1], descriptors);
         Aura["componentDefLoaderError"][finalURI.uid] = [];
-        processedURI.push(baseURI + finalURI.uriString);
+        var host = $A.clientService._host;
+        if (uris[def][2]) {
+            host = $A.getContext().cdnHost || host;
+        }
+        processedURI.push(host + baseURI + finalURI.uriString);
     }
     return processedURI;
 };
@@ -304,7 +315,7 @@ ComponentDefLoader.prototype.generateScriptTag = function(uri) {
     return new Promise(function(resolve, reject) {
         var script = document.createElement("script");
         script["type"] = "text/javascript";
-        script["src"] = $A.clientService._host + uri;
+        script["src"] = uri;
         script["onload"] = function () {
             that.checkForError(uri, resolve, reject);
             script["onload"] = script["onerror"] = undefined;

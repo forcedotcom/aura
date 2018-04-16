@@ -39,7 +39,6 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.DefaultContentSecurityPolicy;
@@ -817,6 +816,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public boolean cdnEnabled() {
         return false;
+    }
+
+    @Override
+    public String getCDNDomain() {
+        return null;
     }
     
     @Override

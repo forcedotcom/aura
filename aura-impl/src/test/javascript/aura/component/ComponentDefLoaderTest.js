@@ -68,6 +68,11 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
                     return obj === undefined || obj === null;
                 }
             },
+            clientService: {
+                isInternalNamespace: function(){return false},
+                isPrivilegedNamespace: function(){return false},
+                _host: ""
+            },
             "reportError": reportError,
             "getRoot": function() {
                 return {
@@ -83,6 +88,7 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
             },
             "getContext": function(){
                 return {
+                    "cdnHost": "cdnHost",
                     "styleContext":{},
                     "getContextPath": function(){return "";},
                     "getURIDefsState": function() {

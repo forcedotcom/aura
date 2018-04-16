@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-04-11
- * Version: 0.4.3
+ * Generated: 2018-04-16
+ * Version: 0.4.5
  */
 
 (function (exports) {
@@ -1665,7 +1665,7 @@ SecureScriptElement.run = function(st) {
  * limitations under the License.
  */
 
-let warn = window.console.warn;
+let warn = typeof console !== 'undefined' ? console.warn : function() {}; // eslint-disable-line no-console
 let error = Error;
 
 function registerReportAPI(api) {
@@ -2196,6 +2196,8 @@ if (typeof window !== 'undefined') {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+const REGEX_CONTAINS_IMPORT = /import/i;
 
 // Remove when SecureElement is refactored to use sandbox
 let shouldFreeze;
@@ -3724,7 +3726,7 @@ function SecureElement(el, key) {
         },
         set: function(value) {
           value = String(value);
-          if (value.toLowerCase() === 'import') {
+          if (REGEX_CONTAINS_IMPORT.test(value)) {
             warn(
               "SecureLinkElement does not allow setting 'rel' property to 'import' value."
             );
@@ -3870,7 +3872,7 @@ function SecureElement(el, key) {
    * https://help.adobe.com/en_US/ActionScript/3.0_ProgrammingAS3/WS1EFE2EDA-026D-4d14-864E-79DFD56F87C6.html#WS5b3ccc516d4fbf351e63e3d118a9b90204-7c5b
    */
   if (tagName === 'OBJECT' || tagName === 'EMBED') {
-    el.setAttribute('allowNetworking', 'internal');
+    el.setAttribute('allowNetworking', 'none');
   }
 
   o = Object.create(prototypeInfo.prototype);
@@ -6515,7 +6517,7 @@ const metadata$5 = {
       head: DEFAULT,
       hidden: DEFAULT,
       images: DEFAULT,
-      implementation: DEFAULT,
+      // implementation: DEFAULT, //W-4844856
       importNode: FUNCTION,
       inputEncoding: DEFAULT,
       lastElementChild: DEFAULT,
@@ -6760,15 +6762,6 @@ function SecureDocument(doc, key) {
       doc.cookie = newCookie;
     }
   });
-
-  ['implementation'].forEach(
-    // These are direct passthrough's and should never be wrapped in a SecureObject
-    name =>
-      Object.defineProperty(o, name, {
-        enumerable: true,
-        value: doc[name]
-      })
-  );
 
   SecureObject.addPrototypeMethodsAndProperties(metadata$5, o, doc, key);
 
@@ -7393,6 +7386,8 @@ const WHITELISTED_MIME_TYPES = [
 
 const HTML_MIME_TYPES = ['text/html', 'image/svg+xml', 'text/xml'];
 
+const REGEX_VALID_MIME_TYPE = /^[a-z]+\/[a-z+-]+$/;
+
 function sanitizeHTMLParts(arr) {
   const out = [];
   let i = 0;
@@ -7409,6 +7404,12 @@ function sanitizeHTMLParts(arr) {
 }
 
 function isWhitelistedMIMEType(type = '') {
+  // avoid MIME types which try to escape using special characters
+  // Reason: W-4896359
+  if (!REGEX_VALID_MIME_TYPE.test(type)) {
+    return false;
+  }
+
   for (let i = 0; i < WHITELISTED_MIME_TYPES.length; i++) {
     if (type.startsWith(WHITELISTED_MIME_TYPES[i], 0)) {
       return true;
@@ -7461,7 +7462,10 @@ function SecureBlob(blobParts = [], opts) {
   // prevent property getters hijacking
   opts = Object.assign({}, opts);
 
-  if (typeof opts.type === 'undefined') {
+  // prevent shapeshifting attacks on type property
+  opts.type = String(opts.type).toLowerCase();
+
+  if (opts.type === 'undefined') {
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types
     opts.type = 'application/octet-stream';
   }
@@ -9438,9 +9442,7 @@ function initialize(types, api) {
   }
 
   init({
-    // TODO: disabled until W-4733987 is resolved
-    // shouldFreeze: api.isStrictCSP,
-    shouldFreeze: false,
+    shouldFreeze: api.isFrozenRealm,
     unsafeGlobal: window,
     unsafeEval: window.eval,
     unsafeFunction: window.Function

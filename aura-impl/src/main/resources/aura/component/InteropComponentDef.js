@@ -70,7 +70,7 @@ InteropComponentDef.prototype.setupPropAttrMap = function (interopMap, props) {
     }
 };
 
-// Mapping taken from https://github.com/salesforce/lwc/blob/1ee756b5038c463d7b9fa0d7eace23fcd6acf0c3/packages/lwc-template-compiler/src/parser/constants.ts#L52-L109
+// Mapping taken from https://github.com/salesforce/lwc/blob/5fd64c2b760d07e1e1f95cdf89d61ff6d9cf6af0/packages/lwc-template-compiler/src/parser/constants.ts#L52-L124
 InteropComponentDef.prototype.HTML_ATTRS_TO_DOM_PROPS = {
     'accesskey': 'accessKey',
     'readonly': 'readOnly',
@@ -89,53 +89,54 @@ InteropComponentDef.prototype.HTML_ATTRS_TO_DOM_PROPS = {
     'usemap': 'useMap',
     'for': 'htmlFor',
 
-    // Aria
+    'aria-activedescendant': 'ariaActiveDescendant',
+    'aria-atomic': 'ariaAtomic',
     'aria-autocomplete': 'ariaAutoComplete',
+    'aria-busy': 'ariaBusy',
     'aria-checked': 'ariaChecked',
+    'aria-colcount': 'ariaColCount',
+    'aria-colindex': 'ariaColIndex',
+    'aria-colspan': 'ariaColSpan',
+    'aria-controls': 'ariaControls',
     'aria-current': 'ariaCurrent',
+    'aria-describedby': 'ariaDescribedBy',
+    'aria-details': 'ariaDetails',
     'aria-disabled': 'ariaDisabled',
+//  'aria-dropeffect': 'ariaDropEffect', /* Deprecated in ARIA 1.1 */
+    'aria-errormessage': 'ariaErrorMessage',
     'aria-expanded': 'ariaExpanded',
-    'aria-haspopup': 'ariaHasPopUp',
+    'aria-flowto': 'ariaFlowTo',
+//  'aria-grabbed': 'ariaGrabbed', /* Deprecated in ARIA 1.1 */
+    'aria-haspopup': 'ariaHasPopup',
     'aria-hidden': 'ariaHidden',
     'aria-invalid': 'ariaInvalid',
+    'aria-keyshortcuts': 'ariaKeyShortcuts',
     'aria-label': 'ariaLabel',
+    'aria-labelledby': 'ariaLabelledBy',
     'aria-level': 'ariaLevel',
+    'aria-live': 'ariaLive',
+    'aria-modal': 'ariaModal',
     'aria-multiline': 'ariaMultiLine',
     'aria-multiselectable': 'ariaMultiSelectable',
     'aria-orientation': 'ariaOrientation',
+    'aria-owns': 'ariaOwns',
+    'aria-placeholder': 'ariaPlaceholder',
+    'aria-posinset': 'ariaPosInSet',
     'aria-pressed': 'ariaPressed',
     'aria-readonly': 'ariaReadOnly',
+    'aria-relevant': 'ariaRelevant',
     'aria-required': 'ariaRequired',
+    'aria-roledescription': 'ariaRoleDescription',
+    'aria-rowcount': 'ariaRowCount',
+    'aria-rowindex': 'ariaRowIndex',
+    'aria-rowspan': 'ariaRowSpan',
     'aria-selected': 'ariaSelected',
+    'aria-setsize': 'ariaSetSize',
     'aria-sort': 'ariaSort',
     'aria-valuemax': 'ariaValueMax',
     'aria-valuemin': 'ariaValueMin',
     'aria-valuenow': 'ariaValueNow',
-    'aria-valuetext': 'ariaValueText',
-    'aria-live': 'ariaLive',
-    'aria-relevant': 'ariaRelevant',
-    'aria-atomic': 'ariaAtomic',
-    'aria-busy': 'ariaBusy',
-    'aria-activedescendant': 'ariaActiveDescendant',
-    'aria-controls': 'ariaControls',
-    'aria-describedby': 'ariaDescribedBy',
-    'aria-flowto': 'ariaFlowTo',
-    'aria-labelledby': 'ariaLabelledBy',
-    'aria-owns': 'ariaOwns',
-    'aria-posinset': 'ariaPosInSet',
-    'aria-setsize': 'ariaSetSize',
-
-    'aria-colcount': 'ariaColCount',
-    'aria-colindex': 'ariaColIndex',
-    'aria-details': 'ariaDetails',
-    'aria-errormessage': 'ariaErrorMessage',
-    'aria-keyshortcuts': 'ariaKeyShortcuts',
-    'aria-modal': 'ariaModal',
-    'aria-placeholder': 'ariaPlaceholder',
-    'aria-roledescription': 'ariaRoleDescription',
-    'aria-rowcount': 'ariaRowCount',
-    'aria-rowindex': 'ariaRowIndex',
-    'aria-rowspan': 'ariaRowSpan'
+    'aria-valuetext': 'ariaValueText'
 };
 
 // Invert the (attr => prop) map to (prop => attr) while filtering out

@@ -221,13 +221,14 @@ public interface ConfigAdapter extends AuraAdapter {
     Map<String, String> getModuleNamespaceAliases();
 
     /**
-     * Checks whether module namespace is allowed to be used in components
+     * Checks whether module is allowed to be used in components
      * that are not internal
      *
-     * @param namespace namespace to check
-     * @return whether module namespace is allowed by non internal components
+     * @param namespace module namespace to check
+     * @param name      module name to check
+     * @return whether module is allowed by non internal components
      */
-    boolean isAllowedModuleNamespace(String namespace);
+    boolean isAllowedModule(String namespace, String name);
 
     /**
      * @return if public caching of actions is enabled

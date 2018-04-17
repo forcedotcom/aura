@@ -209,6 +209,7 @@ public class AccessChecker {
     private String computeModuleAccess(DefDescriptor<?> referencingDescriptor, ModuleDef def) {
         DefDescriptor<?> desc = def.getDescriptor();
         String targetNamespace = desc.getNamespace();
+        String targetName = desc.getName();
         DefinitionAccess access = def.getAccess();
 
         String aliasedTarget = configAdapter.getModuleNamespaceAliases().get(targetNamespace);
@@ -232,13 +233,13 @@ public class AccessChecker {
                     // referencing is internal namespace
                     return null;
                 }
-                if (!isReferencingInternal && configAdapter.isAllowedModuleNamespace(targetNamespace) && def.getMinVersion() != null) {
+                if (!isReferencingInternal && configAdapter.isAllowedModule(targetNamespace, targetName) && def.getMinVersion() != null) {
                     // not internal namespace && namespace allowed to be used externally && module has minVersion
                     return null;
                 }
             }
             from = " from " + referencingNamespace + ":" + referencingDescriptor.getName();
         }
-        return "Access to MODULE " + targetNamespace + ":" + desc.getName() + " is not allowed" + from;
+        return "Access to MODULE " + targetNamespace + ":" + targetName + " is not allowed" + from;
     }
 }

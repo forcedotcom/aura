@@ -841,7 +841,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
-    public boolean isAllowedModuleNamespace(String namespace) {
+    public boolean isAllowedModule(String namespace, String name) {
         return true;
     }
 

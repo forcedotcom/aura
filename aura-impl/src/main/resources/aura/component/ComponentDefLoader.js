@@ -365,7 +365,7 @@ ComponentDefLoader.prototype.loadComponentDefs = function(descriptorMap, callbac
 };
 
 ComponentDefLoader.prototype.getBaseUrl = function() {
-    return ($A.getContext().getContextPath() || "") + ComponentDefLoader.BASE_PATH;
+    return ComponentDefLoader.BASE_PATH;
 };
 
 Aura.Component.ComponentDefLoader = ComponentDefLoader;

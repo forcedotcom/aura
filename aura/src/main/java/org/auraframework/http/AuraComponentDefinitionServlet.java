@@ -47,7 +47,6 @@ import org.auraframework.service.LoggingService;
 import org.auraframework.service.ServerService;
 import org.auraframework.service.ServerService.HYDRATION_TYPE;
 import org.auraframework.system.AuraContext;
-import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -275,7 +274,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<DefDescriptor<?>, String> mapDescriptorsToDefDesriptorAndUid(List<String> requestedDescriptors) throws ClientOutOfSyncException, QuickFixException {
+    private Map<DefDescriptor<?>, String> mapDescriptorsToDefDesriptorAndUid(List<String> requestedDescriptors) {
         Map<DefDescriptor<?>, String> descriptors = new TreeMap<>(
                 Comparator.comparing((DefDescriptor defDescriptor)->{return defDescriptor.getNamespace();})
                         .thenComparing((DefDescriptor defDescriptor)->{return defDescriptor.getName();}));
@@ -290,7 +289,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                     descriptors.put(defDescriptor, uid);
                     found = true;
                     break;
-                } catch (DefinitionNotFoundException e) {
+                } catch (Exception e) {
                 }
             }
             if (!found) {

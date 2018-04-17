@@ -197,7 +197,7 @@ public class ComponentJSUITest extends TestSuite {
                 return String.format("%s?aura.jstestrun=%s&aura.testReset=true&aura.testTimeout=%s",
                         suite.getUrl(defType), caseDef.getName(), getAuraUITestingUtil().getTimeout());
             } else {
-                return String.format("%s&test=%s&aura.testReset=true&aura.testTimeout=%s", suite.getUrl(defType),
+                return String.format("%s&testName=%s&aura.testReset=true&aura.testTimeout=%s", suite.getUrl(defType),
                         caseDef.getName(), getAuraUITestingUtil().getTimeout());
             }
         }

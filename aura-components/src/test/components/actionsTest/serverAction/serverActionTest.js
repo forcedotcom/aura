@@ -35,7 +35,7 @@
                 var cb_handle;
                 var modifyResponse = function (oldResponse) {
                     var response = oldResponse["response"];
-                    if (response.indexOf("recordObjCounter") >= 0) {
+                    if (response.indexOf("testModifyResponseFromServer") >= 0 && response.indexOf("recordObjCounter") >= 0) {
                         var newResponse = {};
                         //copy everything from oldResponse
                         var responseText = oldResponse["responseText"];

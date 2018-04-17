@@ -34,11 +34,11 @@
                 for (var i=0; i < tests.length; i++) {
                     var test = tests[i];
                     if ( defType === "APPLICATION" ) {
-                        test["url"] = ($A.getContext().getContextPath() || "") + "/" + descriptor.replace(":","/") + ".app?aura.jstestrun=" + test["name"] +
+                        test["url"] = "/" + descriptor.replace(":","/") + ".app?aura.jstestrun=" + test["name"] +
                             "&aura.mode=" + mode +
                             "&aura.testReset=true";
                     } else {
-                        test["url"] = ($A.getContext().getContextPath() || "") + "/auratest/test.app?testName=" + test["name"] +
+                        test["url"] = "/auratest/test.app?testName=" + test["name"] +
                             "&descriptor=" + descriptor +
                             "&aura.mode=" + mode +
                             "&aura.testReset=true";

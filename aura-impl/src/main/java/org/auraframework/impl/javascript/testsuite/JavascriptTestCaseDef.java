@@ -21,6 +21,7 @@ import test.org.auraframework.impl.javascript.JavascriptMockActionHandler;
 import test.org.auraframework.impl.javascript.JavascriptMockProviderHandler;
 
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -170,9 +171,8 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
     }
 
     private List<Definition> parseMocks() throws QuickFixException {
-        @SuppressWarnings("unchecked")
-        DefDescriptor<? extends BaseComponentDef> compDesc = (DefDescriptor<? extends BaseComponentDef>)DefDescriptorImpl
-                .getAssociateDescriptor(suiteDescriptor, this.defType.getPrimaryInterface(),
+        DefDescriptor<? extends BaseComponentDef> compDesc = DefDescriptorImpl
+                .getAssociateDescriptor(suiteDescriptor, ComponentDef.class,
                         DefDescriptor.MARKUP_PREFIX);
         List<Definition> building = Lists.newArrayList();
         if (mocks != null && !mocks.isEmpty()) {

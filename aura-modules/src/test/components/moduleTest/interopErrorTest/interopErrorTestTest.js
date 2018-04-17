@@ -13,7 +13,7 @@
                 $A.test.assertEquals(expectedComponent, actualComponent);
 
                 var actualComponentStack = cmp['_auraError']['componentStack'];
-                var expectedComponentStack = '[auratest:test] > [moduleTest:interopErrorTest]';
+                var expectedComponentStack = '[moduleTest:interopErrorTest]';
                 $A.test.assertEquals(expectedComponentStack, actualComponentStack);
             }
         ]

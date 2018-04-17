@@ -140,7 +140,7 @@ public class JsonSerializerAdapterImpl implements JsonSerializerAdapter {
 
     private AuraContextJsonSerializer getAuraContextJsonSerializer(ConfigAdapter configAdapter, TestContextAdapter testContextAdapter, DefinitionService definitionService) {
         if (auraContextJsonSerializer == null) {
-            auraContextJsonSerializer = new AuraContextJsonSerializer(configAdapter, definitionService);
+            auraContextJsonSerializer = new AuraContextJsonSerializer(configAdapter, testContextAdapter, definitionService);
         }
         return auraContextJsonSerializer;
     }

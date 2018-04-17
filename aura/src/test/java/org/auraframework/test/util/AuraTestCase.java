@@ -68,6 +68,9 @@ public abstract class AuraTestCase extends UnitTestCase {
     public void setUp() throws Exception {
         super.setUp();
         endContextIfEstablished();
+        if (testContextAdapter != null) {
+            testContextAdapter.getTestContext(getQualifiedName());
+        }
     }
 
     @Override

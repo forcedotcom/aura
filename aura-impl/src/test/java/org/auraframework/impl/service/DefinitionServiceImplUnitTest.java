@@ -115,7 +115,8 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
                 null /* jsonContext */,
                 gvps /* globalProviders */,
                 configAdapter,
-                service);
+                service,
+                null /* testContextAdapter */);
         Mockito.when(contextService.getCurrentContext()).thenReturn(context);
         return context;
     }
@@ -702,7 +703,8 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
                 null /* jsonContext */,
                 null /* globalProviders */,
                 configAdapter,
-                definitionService);
+                definitionService,
+                null /* testContextAdapter */);
         AuraContext mockedContext = Mockito.spy(context);
         Mockito.when(mockedContext.getLocalDependencyEntry("testUID")).thenReturn(de);
         Mockito.when(contextService.getCurrentContext()).thenReturn(mockedContext);     
@@ -733,7 +735,8 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
                 null /* jsonContext */,
                 null /* globalProviders */,
                 configAdapter,
-                definitionService);
+                definitionService,
+                null /* testContextAdapter */);
         AuraContext mockedContext = Mockito.spy(context);
         Mockito.when(mockedContext.getLocalDependencyEntry("testUID")).thenReturn(de);
         Mockito.when(contextService.getCurrentContext()).thenReturn(mockedContext);     
@@ -791,7 +794,8 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
                 null /* jsonContext */,
                 null /* globalProviders */,
                 configAdapter,
-                definitionService);
+                definitionService,
+                null /* testContextAdapter */);
         AuraContext mockedContext = Mockito.spy(context);
         Mockito.when(mockedContext.getLocalDependencyEntry("testUID")).thenReturn(de);
         Mockito.when(contextService.getCurrentContext()).thenReturn(mockedContext);       

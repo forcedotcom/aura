@@ -120,7 +120,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         String lockerConfig = isLockerServiceEnabled + isStrictCSPEnforced;
         
         String expectedSubPath = AuraTextUtil.urlencode(String.format(
-                "{\"mode\":\"UTEST\",\"app\":\"%s\",\"pathPrefix\":\"\"%s,\"uad\":1}",
+                "{\"mode\":\"UTEST\",\"app\":\"%s\",\"pathPrefix\":\"\",\"test\":\"org.auraframework.integration.test.adapter.format.html.ApplicationDefHTMLFormatAdapterTest.testWriteManifest\"%s,\"uad\":1}",
                 desc.getDescriptorName(), lockerConfig));
         String expectedAttribute = " manifest=\"/l/" + expectedSubPath + "/app.manifest";
         

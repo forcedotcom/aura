@@ -17,7 +17,7 @@
 -->
 <aura:component description="file">
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    <aura:attribute name="wrapperText" default="Inner Text Set from locatorWrapper" type="String"/>
+    <aura:attribute name="wrapperText" default="Inner Text Set from locatorWrapper" access="PRIVATE" type="String"/>
     <aura:attribute name="parentKeyAppend" default=" abc" type="String"/>
     <aura:attribute name="alwaysTrue" type="Boolean" default="true"/>
     

@@ -83,9 +83,8 @@
      * Helper Functions
      ****************************************************************/
     assertProviderType: function(cmp, expProvidedCmp) {
-        var target = cmp.find("target");
-        var type = target.get("v.type");
-        var actProvidedCmp = target.getDef().getDescriptor().getQualifiedName().replace("markup://", "");
+        var type = cmp.get("v.type");
+        var actProvidedCmp = cmp.getDef().getDescriptor().getQualifiedName().replace("markup://", "");
         $A.test.assertEquals(expProvidedCmp, actProvidedCmp,
                 "With type='"+type+"', "+"expected provided cmp should be "+expProvidedCmp);
     }

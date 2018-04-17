@@ -15,13 +15,12 @@
             $A.createComponent(
                 "gvpTest:newLabels", {},
                 function(newCmp){
-                    cmp.find("container").set("v.body", [newCmp]);
-                    
                     // Component should be sent back from server with necessary labels
-                    $A.test.addWaitForWithFailureMessage("Today", function(){ return $A.get("$Label.Related_Lists.task_mode_today") },
+                    $A.test.assertEquals("Today", $A.get("$Label.Related_Lists.task_mode_today"),
                         "Failed to add Labels from dynamically created components");
-                    $A.test.addWaitForWithFailureMessage("Today + Overdue", function(){ return $A.get("$Label.Related_Lists.task_mode_today_overdue") },
+                    $A.test.assertEquals("Today + Overdue", $A.get("$Label.Related_Lists.task_mode_today_overdue"),
                         "Failed to add all labels from dynamically created components");
+                    cmp.find("container").set("v.body", [newCmp]);
                 }
             );
 
@@ -43,11 +42,10 @@
             $A.createComponent(
                 "gvpTest:newLabels", {},
                 function(newCmp) {
-                    cmp.find("container").set("v.body", [newCmp]);
-                    
                     // Component should be sent back from server with necessary labels
-                    $A.test.addWaitForWithFailureMessage("Tomorrow", function(){ return $A.get("$Label.Related_Lists.task_mode_tomorrow") },
+                    $A.test.assertEquals("Tomorrow", $A.get("$Label.Related_Lists.task_mode_tomorrow"),
                         "Failed to add labels from inner cmp on dynamically created component");
+                    cmp.find("container").set("v.body", [newCmp]);
                 }
             );
 
@@ -133,10 +131,15 @@
                 $A.test.assertEquals("SUCCESS", state);
             });
 
-            // since the label is loaded to client when creating component,
-            // the label should be directly returned.
-            $A.test.addWaitForWithFailureMessage("Today + Overdue", function(){ return $A.get("$Label.Related_Lists.task_mode_today_overdue") },
-                    "The label doesn't exist in client LabelValueProvider.");
+            $A.test.addWaitFor(false, $A.test.isActionPending,
+                function() {
+                    // since the label is loaded to client when creating component,
+                    // the label should be directly returned.
+                    var actualLabel = $A.get("$Label.Related_Lists.task_mode_today_overdue");
+                    $A.test.assertEquals("Today + Overdue", actualLabel,
+                            "The label doesn't exist in client LabelValueProvider.");
+                }
+            );
         }
     }
 })

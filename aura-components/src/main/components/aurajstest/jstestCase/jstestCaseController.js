@@ -23,21 +23,21 @@
         } else {
             cmp.set("v.title", testName);
         }
-        cmp.set("v.individualUrl", $A.getContext().getContextPath()
-            + "/aurajstest/jstest.app?test=" + cmp.get("v.name")
-            + "&descriptor=" + cmp.get("v.bundle")
-            + "&aura.mode=AUTOJSTESTDEBUG&aura.testReset=true");
+        cmp.set("v.individualUrl", window.location.pathname + "?test="
+            + testName + "&aura.mode=JSTESTDEBUG&aura.testReset=true");
     },
 
     runTest : function(cmp, evt, helper){
         helper.runTest(cmp);
     },
 
-    rerun : function(cmp, evt, helper){
-        helper.unloadTestContent(cmp);
-        helper.loadTest(cmp);
+    rerun : function(cmp){
+        var frame = cmp.find("content").getElement().firstChild;
+        cmp.find("results").getElement().innerHTML = "";
+        var win = frame.contentWindow?frame.contentWindow:frame.contentDocument.window;
+        win.location.reload(true);
     },
-
+    
     onActivate: function(cmp, evt, helper) {
         helper.loadTest(cmp);
     }

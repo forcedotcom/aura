@@ -121,7 +121,7 @@ public class AuraTestFilterUnitTest {
         Mockito.doReturn(new PrintWriter(writer)).when(response).getWriter();
         
         Mockito.doReturn("testContextKey").when(request).getParameter("aura.test");
-        Mockito.doReturn(testContext).when(testContextAdapter).getTestContext(Matchers.any());
+        Mockito.doReturn(testContext).when(testContextAdapter).getTestContext("testContextKey");
         
         Mockito.doReturn(true).when(contextService).isEstablished();
         Mockito.doReturn(context).when(contextService).getCurrentContext();
@@ -167,7 +167,7 @@ public class AuraTestFilterUnitTest {
         String responseString = writer.toString();
         Assert.assertEquals(true, responseString.startsWith(renderedTargetComponent));
         responseString = responseString.substring(renderedTargetComponent.length());
-        Assert.assertEquals(true, responseString.contains("<script src='/l/{\"app\":\"auratest:test\"}/test.js?test=someTest&bundle=namespace:name&timeout=30&aura.nonce="));
+        Assert.assertEquals(true, responseString.contains("<script src='/aura?aura.tag=namespace%3Aname&aura.deftype=APPLICATION&aura.mode=AUTOJSTEST&aura.format=JS&aura.access=AUTHENTICATED&aura.jstestrun=someTest"));
     }
 
     @Test
@@ -219,7 +219,7 @@ public class AuraTestFilterUnitTest {
         Mockito.doReturn(new PrintWriter(writer)).when(response).getWriter();
         
         Mockito.doReturn("testContextKey").when(request).getParameter("aura.test");
-        Mockito.doReturn(testContext).when(testContextAdapter).getTestContext(Matchers.any());
+        Mockito.doReturn(testContext).when(testContextAdapter).getTestContext("testContextKey");
         
         Mockito.doReturn(true).when(contextService).isEstablished();
         Mockito.doReturn(context).when(contextService).getCurrentContext();

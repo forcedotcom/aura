@@ -341,13 +341,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
-    public void send405(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-        response.getWriter().println("405 Method Not Allowed");
-        this.contextService.endContext();
-    }
-
-    @Override
     public List<String> getScripts(AuraContext context, boolean safeInlineJs, boolean ignoreNonCacheableScripts, Map<String,Object> attributes)
             throws QuickFixException {
         List<String> ret = Lists.newArrayList();

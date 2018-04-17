@@ -90,12 +90,6 @@ public interface ServletUtilAdapter extends AuraAdapter {
     void send404(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
 
     /**
-     * Send a 405 page to the client.
-     */
-    void send405(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
-
-
-    /**
      * Get the full set of scripts for the current context.
      *
      * @param context the aura context to use.

@@ -37,10 +37,11 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
      * Returns the current activeElement, if document's activeElement can be accessed.
      * @returns {Element | null}
      */
-    function getActiveElement() {
+    function getActiveElement(cmp) {
         // Edge/IE11 throws an Unspecified Error for document.activeElement when accessed from an iframe.
         try {
-            return document.activeElement;
+            // IE11 use lastActive if it's specified.
+            return (cmp && cmp.lastActive) || document.activeElement;
         } catch(e) {
             return null;
         }
@@ -68,7 +69,7 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
         if (!component || !component.isValid()) {
             return false;
         }
-        var active = getActiveElement();
+        var active = getActiveElement(component);
         var i, el, els;
         if (active) {
             els = component.getElements();

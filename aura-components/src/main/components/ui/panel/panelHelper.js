@@ -276,6 +276,11 @@
             onFinish: function() {
                 if(cmp.isValid()) {
                     if(cmp.positioned) {
+                        // IE11, after set display to none, focus return to body
+                        // To allow stackUtil can check whether panel has focus.
+                        if ($A.get("$Browser.isIE11")) {
+                            cmp.lastActive = document.activeElement;
+                        }
                         panelEl.style.display = 'none';
                     }
                     var keyHandler = self._getKeyHandler(cmp);

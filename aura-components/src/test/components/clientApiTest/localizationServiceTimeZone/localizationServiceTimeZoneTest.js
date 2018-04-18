@@ -70,6 +70,40 @@
                         "Incorrect time from WallTimeToUTC when given time is during DST ends");
             });
         }
+    },
+
+    testSupportedTimeZone: {
+        // Intl API throws error if it doesn't support the time zone. In localization service, we catch the error and warn.
+        failOnWarning: true,
+        test: function() {
+            // https://help.salesforce.com/articleView?id=admin_supported_timezone.htm&type=5
+            var timeZones = [
+                "Africa/Algiers", "Africa/Cairo", "Africa/Casablanca", "Africa/Johannesburg", "Africa/Nairobi",
+                "America/Adak", "America/Anchorage", "America/Argentina/Buenos_Aires", "America/Bogota", "America/Caracas",
+                "America/Chicago", "America/Denver", "America/El_Salvador", "America/Halifax", "America/Indiana/Indianapolis",
+                "America/Lima", "America/Los_Angeles", "America/Mazatlan", "America/Mexico_City", "America/New_York",
+                "America/Panama", "America/Phoenix", "America/Puerto_Rico", "America/Santiago", "America/Sao_Paulo",
+                "America/Scoresbysund", "America/St_Johns", "America/Tijuana", "Asia/Baghdad", "Asia/Baku", "Asia/Bangkok",
+                "Asia/Beirut", "Asia/Colombo", "Asia/Dhaka", "Asia/Dubai", "Asia/Ho_Chi_Minh", "Asia/Hong_Kong", "Asia/Jakarta",
+                "Asia/Jerusalem", "Asia/Kabul", "Asia/Kamchatka", "Asia/Karachi", "Asia/Kathmandu", "Asia/Kolkata",
+                "Asia/Kuala_Lumpur", "Asia/Kuwait", "Asia/Manila", "Asia/Rangoon", "Asia/Riyadh", "Asia/Seoul", "Asia/Shanghai",
+                "Asia/Singapore", "Asia/Taipei", "Asia/Tashkent", "Asia/Tbilisi", "Asia/Tehran", "Asia/Tokyo", "Asia/Yekaterinburg",
+                "Asia/Yerevan", "Atlantic/Azores", "Atlantic/Bermuda", "Atlantic/Cape_Verde", "Atlantic/South_Georgia",
+                "Australia/Adelaide", "Australia/Brisbane", "Australia/Darwin", "Australia/Lord_Howe", "Australia/Perth",
+                "Australia/Sydney", "Europe/Amsterdam", "Europe/Athens", "Europe/Berlin", "Europe/Brussels", "Europe/Bucharest",
+                "Europe/Dublin", "Europe/Helsinki", "Europe/Istanbul", "Europe/Lisbon", "Europe/London", "Europe/Minsk", "Europe/Moscow",
+                "Europe/Paris", "Europe/Prague", "Europe/Rome", "GMT", "Pacific/Auckland", "Pacific/Chatham", "Pacific/Enderbury",
+                "Pacific/Fiji", "Pacific/Gambier", "Pacific/Guadalcanal", "Pacific/Honolulu", "Pacific/Kiritimati", "Pacific/Marquesas",
+                "Pacific/Niue", "Pacific/Norfolk", "Pacific/Pago_Pago", "Pacific/Pitcairn", "Pacific/Tongatapu"
+            ];
+
+            timeZones.forEach(function(timeZone) {
+                // WallTimeToUTC is currently sync method
+                $A.localizationService.WallTimeToUTC(new Date(), timeZone, function(utc) {
+                    $A.test.assertFalse(isNaN(utc.getTime()), "Failed to convert datetime for time zone: " + timeZone);
+                });
+            });
+        }
     }
 
 })

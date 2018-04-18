@@ -64,6 +64,9 @@ function lib() { //eslint-disable-line no-unused-vars
 
     function modifyZindex(el, increment) {
         var stackingCtxEl = getStackingCtx(el);
+        if (!stackingCtxEl) {
+            return;
+        }
         var siblings;
         var siblingsMaxMinZindex = increment ? 0 : -1;
         var elAncestor = el;

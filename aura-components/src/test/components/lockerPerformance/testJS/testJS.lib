@@ -1,0 +1,8 @@
+<aura:library>
+    <aura:include name="wrapObjectTest" export="wrapObjectTest"/>
+    <aura:include name="unwrapObjectTest" export="unwrapObjectTest"/>
+    <aura:include name="loopX10ObjectTest" export="loopX10ObjectTest"/>
+    <aura:include name="loopX10ArrayTest" export="loopX10ArrayTest"/>
+    <aura:include name="evalTest" export="evalTest"/>
+    <aura:include name="invokeEvalCodeTest" export="invokeEvalCodeTest"/>
+</aura:library>

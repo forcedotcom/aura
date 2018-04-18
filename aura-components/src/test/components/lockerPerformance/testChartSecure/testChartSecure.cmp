@@ -1,0 +1,7 @@
+<aura:component access="global" implements="aura:requireLocker">
+
+  <aura:attribute name="data" type="Object[]"/>
+  <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+  <canvas aura:id="canvas"/>
+
+</aura:component>

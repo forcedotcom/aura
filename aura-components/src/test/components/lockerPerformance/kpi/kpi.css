@@ -1,0 +1,28 @@
+/* Palette: dk-blue 1B619B blue ACCBE0 lt-blue D3E0EA beige F8F2E5 grey 9A9A9B orange D75A20 */
+.THIS {
+    color: #1B619B;
+    margin: 1em;
+    font-size: 1em;
+    font-family: sans-serif;
+}
+.THIS h1 {
+    padding-bottom: 0;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+.THIS em {
+    margin-top: 0.33em;
+    color: #D75A20;
+    font-style: italic;
+}
+.THIS a {
+    color: #D75A20;
+    font-family: monospace;
+}
+.THIS button {
+    padding: 0.2em 0.5em;
+    background-color: #D75A20;
+    color: #FFFFFF;
+    font-family: monospace;
+}
+

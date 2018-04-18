@@ -1,0 +1,4 @@
+<aura:library>
+    <aura:include name="fakeSameSpeedTest" export="fakeSameSpeedTest"/>
+    <aura:include name="fake10xSlowerTest" export="fake10xSlowerTest"/>
+</aura:library>

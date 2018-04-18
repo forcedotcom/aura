@@ -1,0 +1,10 @@
+<aura:component access="global" implements="aura:requireLocker">
+
+  <aura:attribute name="headers" type="String[]"/>
+  <aura:attribute name="content" type="Object[]"/>
+
+  <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+  <div aura:id="container"/>
+
+</aura:component>

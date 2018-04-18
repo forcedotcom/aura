@@ -1,0 +1,4 @@
+<aura:library>
+    <aura:include name="createAuraTableComponentTest" export="createAuraTableComponentTest"/>
+    <aura:include name="renderAuraTableComponentTest" export="renderAuraTableComponentTest"/>
+</aura:library>

@@ -1,0 +1,8 @@
+<aura:library>
+    <!-- patch and minimize the source files with the utilities provided -->
+    <!-- see minify.sh (no parameter required) -->
+    <aura:include name="lodash" export="_"/>
+    <aura:include name="benchmark" export="Benchmark"
+        imports="lodash"
+        aliases="_"/>
+</aura:library>

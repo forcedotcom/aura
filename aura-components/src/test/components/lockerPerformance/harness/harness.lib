@@ -1,0 +1,37 @@
+<aura:library>
+    <aura:include name="constants" export="constants"/>
+
+    <aura:include name="api" export="api"
+        imports="constants"
+        aliases="constants"/>
+
+    <aura:include name="createTestPlan" export="createTestPlan"
+        imports="constants"
+        aliases="constants"/>
+
+    <aura:include name="createSuite" export="createSuite"
+        imports="lockerPerformance:vendor:benchmark"
+        aliases="Benchmark"/>
+
+    <aura:include name="updateMetrics" export="updateMetrics"
+        imports="lockerPerformance:vendor:lodash"
+        aliases="_"/>
+
+    <aura:include name="runBenchmark" export="runBenchmark"
+      imports="constants, api, createSuite"
+      aliases="constants, api, createSuite"/>
+
+    <aura:include name="createTable" export="createTable"
+        imports="lockerPerformance:vendor:lodash"
+        aliases="_"/>
+
+    <aura:include name="runTests" export="runTests"
+        imports="createTable, updateMetrics, runBenchmark"
+        aliases="createTable, updateMetrics, runBenchmark"/>
+
+    <aura:include name="download" export="download"/>
+
+    <aura:include name="saveTests" export="saveTests"
+        imports="download"
+        aliases="download"/>
+</aura:library>

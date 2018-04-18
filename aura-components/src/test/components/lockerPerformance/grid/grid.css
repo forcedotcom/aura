@@ -1,0 +1,44 @@
+.THIS table {
+    margin-top: 1em;
+    border-collapse: collapse;
+}
+.THIS tr:nth-child(even) {
+    background: #D3E0EA;
+}
+
+.THIS th {
+    min-width: 15em;
+    text-align: center;
+    font-weight: bold;
+}
+.THIS th:first-child,
+.THIS th:nth-child(2) {
+    min-width: 5em;
+    text-align: left;
+}
+
+.THIS td {
+    padding: 0.5em 1em;
+    border: 1px solid #9A9A9B;
+    text-align: center;
+    white-space: pre-line;
+}
+.THIS td:first-child,
+.THIS td:nth-child(2) {
+    text-align: left;
+}
+
+.THIS.grid-options {
+    margin-top: 1em;
+}
+
+.THIS.grid-options button,
+.THIS.grid-options select {
+    margin: 0.3em;
+}
+.THIS.grid-options p {
+    display: inline;
+}
+@media (max-width:500px){
+    .THIS .grid-options p {display: block;}
+}

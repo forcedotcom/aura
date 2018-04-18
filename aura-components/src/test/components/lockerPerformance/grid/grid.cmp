@@ -1,0 +1,47 @@
+<aura:component>
+
+    <aura:import library="lockerPerformance:harness" property="harness"/>
+
+    <aura:attribute name="groups" type="String[]"/>
+    <aura:attribute name="plan" type="Object[]"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <aura:if isTrue="{!!empty(v.plan)}">
+      <div class="grid-options">
+          <p>Tests to run:</p>
+
+          <select aura:id="group" onchange="{!c.selectGroup}">
+            <option value="ALL">
+                ALL
+            </option>
+            <aura:iteration items="{!v.groups}" var="group">
+              <option value="{!group}">
+                {!group}
+              </option>
+            </aura:iteration>
+          </select>
+
+          <select aura:id="name" onchange="{!c.selectName}">
+            <option value="ALL">
+                ALL
+            </option>
+            <aura:iteration items="{!v.plan}" var="test">
+              <option value="{!test.name}">
+                {!test.name}
+              </option>
+            </aura:iteration>
+          </select>
+
+          <button aura:id="run" onclick="{!c.run}">
+              Run
+          </button>
+          <button aura:id="save" onclick="{!c.save}">
+              Save
+          </button>
+      </div>
+
+      <div aura:id="grid"/>
+    </aura:if>
+
+</aura:component>

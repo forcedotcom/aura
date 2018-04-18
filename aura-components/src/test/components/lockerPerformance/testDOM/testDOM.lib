@@ -1,0 +1,6 @@
+<aura:library>
+    <aura:include name="createElementTest" export="createElementTest"/>
+    <aura:include name="innerHTMLTest" export="innerHTMLTest"/>
+    <aura:include name="createDOMTableComponentTest" export="createDOMTableComponentTest"/>
+    <aura:include name="renderDOMTableComponentTest" export="renderDOMTableComponentTest"/>
+</aura:library>

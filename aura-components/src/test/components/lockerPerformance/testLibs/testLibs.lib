@@ -1,0 +1,6 @@
+<aura:library>
+    <aura:include name="createJQueryTableComponentTest" export="createJQueryTableComponentTest"/>
+    <aura:include name="renderJQueryTableComponentTest" export="renderJQueryTableComponentTest"/>
+    <aura:include name="createChartComponentTest" export="createChartComponentTest"/>
+    <aura:include name="renderChartComponentTest" export="renderChartComponentTest"/>
+</aura:library>

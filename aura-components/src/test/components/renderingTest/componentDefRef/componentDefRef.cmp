@@ -16,10 +16,6 @@
 
 -->
 <aura:component>
-    <aura:attribute name="cmpDefRefs" type="Aura.ComponentDefRef[]">
-        <ui:button label="hi"/>
-    </aura:attribute>
-
     <aura:attribute name="cmpDefRefsOnFacet" type="Aura.ComponentDefRef[]" >
         <ui:button label="button" class="button"/>
     </aura:attribute>

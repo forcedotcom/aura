@@ -198,14 +198,14 @@ Logger.prototype.isExternalError = function(e) {
     }
 
     var errorframes = this.generateStackFrames(e);
-    for (var i = 0, len = errorframes.length; i < len; i++) {
+    for (var i = 0; i < errorframes.length; i++) {
         var fileName = errorframes[i].fileName;
         if (!fileName) {
             continue;
         }
 
-        // if the error is raised from chrome extension code
-        if (i === 0 && fileName.indexOf("chrome-extension://") > -1) {
+        // if the caller is from chrome extension code
+        if (fileName.indexOf("chrome-extension://") > -1) {
             return true;
         }
 

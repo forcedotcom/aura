@@ -15,18 +15,6 @@
  */
 package org.auraframework.http;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -52,6 +40,26 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
+
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Stream;
 
 public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
@@ -202,10 +210,10 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 responseStringWriter.write(");");
             }
 
-            if(containsOnlyRestrictedDefs(context, requestedDescriptors)) {
-                servletUtilAdapter.setLongCache(response);
-            } else {
+            if(containsRestrictedDefs(context, descriptors)) {
                 servletUtilAdapter.setLongCachePrivate(response);
+            } else {
+                servletUtilAdapter.setLongCache(response);
             }
 
         } catch (Exception e) {
@@ -224,18 +232,14 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         }
     }
 
-    private Boolean containsOnlyRestrictedDefs(AuraContext context, List<String> requestedDescriptors) {
-        if(requestedDescriptors.isEmpty()) {
-            return false;
-        }
+    @SuppressWarnings("unchecked")
+    private Boolean containsRestrictedDefs(AuraContext context, Map<DefDescriptor<?>, String> requestedDescriptors) {
 
-        for (String desc : requestedDescriptors) {
-            if(!context.getRestrictedNamespaces().contains(desc)) {
-                return false;
-            }
-        }
-        
-        return true;
+        Set<String> restrictedNamespaces = context.getRestrictedNamespaces();
+        Stream<String> nameSpaces = requestedDescriptors.entrySet().stream().map(e -> e.getKey().getNamespace());
+        boolean hasRestrictedName = nameSpaces.anyMatch(restrictedNamespaces::contains);
+
+        return hasRestrictedName;
     }
 
     @SuppressWarnings("unchecked")

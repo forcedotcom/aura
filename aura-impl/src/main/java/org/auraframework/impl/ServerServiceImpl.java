@@ -848,6 +848,8 @@ public class ServerServiceImpl implements ServerService {
             attributes.put("bodyClass", "");
             attributes.put("defaultBodyClass", "");
             attributes.put("autoInitialize", "false");
+            attributes.put("auraInit", "{context:{}}");
+
         } else {
             if (manifestUtil.isManifestEnabled()) {
                 attributes.put("manifest", servletUtilAdapter.getManifestUrl(context, componentAttributes));

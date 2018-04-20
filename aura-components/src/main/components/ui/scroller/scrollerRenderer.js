@@ -17,6 +17,7 @@
     afterRender : function(component, helper) {
         this.superAfterRender();
         helper.initAfterRender(component);
+        helper.applyDeviceStyles(component);
     },
 
     rerender : function(component, helper) {

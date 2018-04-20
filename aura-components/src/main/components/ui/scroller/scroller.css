@@ -40,7 +40,6 @@
 .THIS.native {
     overflow: auto;
     -webkit-overflow-scrolling: touch;
-    -ms-overflow-style: none;
 }
 
 .THIS.native > .scroller > .pullToRefresh,

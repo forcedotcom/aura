@@ -477,10 +477,9 @@ AuraInstance.prototype.initAsync = function(config) {
 
         if (!$A.clientService.gvpsFromStorage) {
             $A.log("Aura.initAsync: GVP not loaded from storage so not loading defs or actions either");
-            $A.clientService.loadTokenFromStorage().then(ensureCssLoaded).then(initializeApp).then(undefined, reportError);
+            ensureCssLoaded().then(initializeApp).then(undefined, reportError);
         } else {
             Promise["all"]([
-                $A.clientService.loadTokenFromStorage(),
                 $A.clientService.loadBootstrapFromStorage(),
                 $A.componentService.restoreDefsFromStorage(context),
                 $A.clientService.populateActionsFilter(),

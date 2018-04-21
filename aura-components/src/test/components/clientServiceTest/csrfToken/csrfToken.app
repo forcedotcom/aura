@@ -22,8 +22,7 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
-    <div>Token: <span class="output">{!v.token}</span></div>
     <div>Value: <span class="value">{!v.value}</span></div>
-    
+
     <ui:button class="trigger" label="get value" press="{!c.getValue}"/>
 </aura:application>

@@ -1558,95 +1558,6 @@ AuraClientService.prototype.setConnected = function(isConnected) {
 };
 
 /**
- * Saves the CSRF token to the Actions storage. Does not block nor report success or failure.
- *
- * This storage operate uses the adapter directly instead of AuraStorage because the specific
- * token key is used in mobile (hybrid) devices to obtain the token without the isolation and
- * even before Aura initialization.
- *
- * @returns {Promise} Promise that resolves with the current CSRF token value.
- */
-AuraClientService.prototype.saveTokenToStorage = function() {
-    // update the persisted CSRF token so it's accessible when the app is launched while offline.
-    // fire-and-forget style, matching action response persistence.
-    var storage = $A.storageService.getStorage(this.getActionStorageName());
-    if (storage && storage.isPersistent() && $A.util.isString(this._token) && !$A.util.isEmpty(this._token) ) {
-        var token = this._token;
-
-        // satisfy the adapter API shape requirements; see AuraStorage.setItems().
-        var now = new Date().getTime();
-        var tuple = [
-             AuraClientService.TOKEN_KEY,
-             {
-                 "value": { "token": this._token },
-                 "expires": now + 15768000000, // 1/2 year
-                 "created": now
-             },
-             $A.util.estimateSize(AuraClientService.TOKEN_KEY) + $A.util.estimateSize(this._token)
-         ];
-
-        // saves token when storage's adapter is ready
-        return storage.enqueue(function(resolve) {
-            storage.adapter.setItems([tuple]).then(
-                function() {
-                    $A.log("AuraClientService.saveTokenToStorage(): token persisted");
-                    resolve(token);
-                },
-                function(err) {
-                    $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err);
-                    resolve(token);
-                }
-            );
-        });
-    }
-
-    return Promise["resolve"](this._token);
-};
-
-/**
- * Loads the CSRF token from Actions storage.
- *
- * @return {Promise} Resolves with the token from storage, or undefined
- *         otherwise. Rejects if there is an error.
- */
-AuraClientService.prototype.loadTokenFromStorage = function() {
-    var self = this;
-    var storage = $A.storageService.getStorage(this.getActionStorageName());
-    if (storage && storage.isPersistent()) {
-        // loads token when storage's adapter is ready
-        return storage.enqueue(function(resolve, reject) {
-            storage.adapter.getItems([AuraClientService.TOKEN_KEY])
-                .then(
-                    function(items) {
-                        if (items[AuraClientService.TOKEN_KEY]) {
-                            var token = items[AuraClientService.TOKEN_KEY]["value"]["token"];
-                            if ($A.util.isString(token) && !$A.util.isEmpty(token)) {
-                                self.setToken(token);
-                                $A.log("AuraClientService.loadTokenFromStorage(): token loaded");
-                                resolve(token);
-                            } else {
-                                resolve(undefined);
-                            }
-                        } else {
-                            $A.log("AuraClientService.loadTokenFromStorage(): no token found");
-                            resolve(undefined);
-                        }
-                    }
-                ).then(
-                    undefined,
-                    function(err) {
-                        $A.warning("AuraClientService.loadTokenFromStorage(): failed to load token: " + err);
-                        reject(err);
-                    }
-                );
-        });
-    }
-
-    $A.log("AuraClientService.loadTokenFromStorage(): no Action storage");
-    return Promise["resolve"]();
-};
-
-/**
  * Init host is used to set the host name for communications.
  *
  * It should only be called once during the application life cycle, since it
@@ -1966,7 +1877,7 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
     if (bootstrap.source === "network") {
         if (boot["token"]) {
             $A.log("AuraClientService.runAfterBootstrapReady(): Received updated token from bootstrap");
-            this.setToken(boot["token"], true);
+            this.setToken(boot["token"]);
         }
         if (this.tokenSharing && this._token) {
             $A.log("AuraClientService.runAfterBootstrapReady(): Broadcasting token received during bootstrap");
@@ -2011,7 +1922,7 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
                     Aura["bootstrapUpgrade"] = this.appBootstrap["md5"] !== Aura["appBootstrap"]["md5"];
                     if (Aura["appBootstrap"]["token"]) {
                         $A.log("AuraClientService.runAfterBootstrapReady(): Received updated token after cached bootstrap");
-                        this.setToken(Aura["appBootstrap"]["token"], true);
+                        this.setToken(Aura["appBootstrap"]["token"]);
                     }
                     this.checkBootstrapUIDs(Aura["appBootstrap"]);
                     this.checkBootstrapUpgrade();
@@ -3515,7 +3426,7 @@ AuraClientService.prototype.retryActions = function(auraXHR, event) {
                    event["attributes"]["values"] &&
                    event["attributes"]["values"]["newToken"];
     if (this.isValidToken(newToken) && newToken !== this._token) {
-        this.setToken(newToken, true, true);
+        this.setToken(newToken, true);
 
         $A.log("[AuraClientService.retryActions]: New token received, attempting to retry failed actions");
         for (var name in auraXHR.actions) {
@@ -3640,7 +3551,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
     var action, actionResponses, response, dupes;
     var token = responseMessage["token"];
     if (token) {
-        this.setToken(token, true);
+        this.setToken(token);
     }
     var context=$A.getContext();
     var priorAccess=this.currentAccess;
@@ -3825,13 +3736,9 @@ AuraClientService.prototype.parseAndFireEvent = function(evtObj) {
  * @memberOf AuraClientService
  * @private
  */
-AuraClientService.prototype.setToken = function(newToken, saveToStorage, broadcast) {
+AuraClientService.prototype.setToken = function(newToken, broadcast) {
     var oldToken = this._token;
     this._token = newToken;
-
-    if (saveToStorage) {
-       this.saveTokenToStorage();
-    }
 
     if (broadcast && this.tokenSharing && (!oldToken || (newToken !== oldToken))) {
         this.broadcastToken(newToken);
@@ -3880,7 +3787,7 @@ AuraClientService.prototype.setupTokenListener = function() {
  * @export
  */
 AuraClientService.prototype.resetToken = function(newToken) {
-    this.setToken(newToken, true);
+    this.setToken(newToken);
 };
 
 
@@ -4421,7 +4328,7 @@ AuraClientService.prototype.invalidSession = function(newToken) {
     // fails then we must go to the server for bootstrap.js to get a new token.
     if (this.isValidToken(newToken) && newToken !== this._token) {
         $A.log("[AuraClientService.invalidSession]: New Token provided, replacing existing token.");
-        this.setToken(newToken, true, true);
+        this.setToken(newToken, true);
     } else {
         // refresh (to get a new session id) and force bootstrap.js to the server
         // (to get a new csrf token).

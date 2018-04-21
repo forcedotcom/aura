@@ -64,7 +64,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
         inlineMockRule.setIsRelevent(true);
         inlineMockRule.setMode(UNSUPPORTED);
 
-        String target = "/clientServiceTest/csrfTokenStorage.app";
+        String target = "/clientServiceTest/csrfToken.app";
 
         AtomicLong counter = new AtomicLong();
         String expectedBase = "expectedTestToken";
@@ -84,23 +84,16 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
     @FreshBrowserInstance
     @ThreadHostileTest("ConfigAdapter modified, can't tolerate other tests.")
     @Test
-    public void testCsrfTokenLoadedFromStorageOnInit() throws Exception {
-        String target = "/clientServiceTest/csrfTokenStorage.app";
+    public void testCsrfTokenLoadedManuallyOnInit() throws Exception {
+        String target = "/clientServiceTest/csrfToken.app";
         getMockConfigAdapter().setCSRFToken("initialToken");
 
         open(target);
 
-        // Manually set the token in storage. To reduce flappiness, verify that
-        // it got stored before reloading.
+        // Manually set the token
         String expectedToken = "updatedToken";
         getAuraUITestingUtil().getEval("$A.clientService.resetToken('" + expectedToken + "')");
-        String storedToken = getStoredToken();
-        assertEquals(expectedToken, storedToken);
 
-        open(target);
-        
-        waitForText(By.className("output"), expectedToken);
-        
         String actual = getTokenReceivedAtServer();
         assertEquals(expectedToken, actual);
     }
@@ -109,7 +102,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
     @ThreadHostileTest("ConfigAdapter modified, can't tolerate other tests.")
     @Test
     public void testCsrfTokenSavedFromInvalidSessionException() throws Exception {
-        String target = "/clientServiceTest/csrfTokenStorage.app";
+        String target = "/clientServiceTest/csrfToken.app";
         open(target);
 
         String expectedToken = "errorToken";
@@ -126,9 +119,6 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
             }
         });
         assertEquals("Stored token not as received at server", expectedToken, actual);
-
-        String storedToken = getStoredToken();
-        assertEquals("Stored token not as expected", expectedToken, storedToken);
     }
 
     @FreshBrowserInstance
@@ -136,7 +126,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
     @Test
     public void testInvalidSessionExceptionReloadsPage() throws Exception {
         // This test will NOT return a token as part of the invalidSession response, which should cause a reload
-        String target = "/clientServiceTest/csrfTokenStorage.app";
+        String target = "/clientServiceTest/csrfToken.app";
         open(target);
 
         WebDriver driver = getDriver();
@@ -167,7 +157,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
     @Test
     public void testInvalidSessionExceptionDoesNotReloadPage() throws Exception {
         // This test will return a valid token as part of the invalidSession response, which should NOT cause a reload
-        String target = "/clientServiceTest/csrfTokenStorage.app";
+        String target = "/clientServiceTest/csrfToken.app";
         open(target);
 
         WebDriver driver = getDriver();
@@ -197,7 +187,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
     public void testNewTokenFromBootstrapSharedAcrossWindows() throws Exception {
         String updatedToken = "updatedTokenBootstrap";
         getMockConfigAdapter().setCSRFToken("initialToken");
-        String target = "/clientServiceTest/csrfTokenStorage.app";
+        String target = "/clientServiceTest/csrfToken.app";
         open(target);
         WebDriver driver = getDriver();
 
@@ -272,20 +262,6 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
             WebElement trigger = getDriver().findElement(By.className("trigger"));
             trigger.click();
          }, null);
-    }
-
-    private String getStoredToken() {
-        String script =
-            "var callback = arguments[arguments.length - 1];" +
-            "var key = '$AuraClientService.token$';" +
-            "$A.storageService.getStorage('actions').adapter.getItems([key]).then(" +
-            "  function(items){ callback(items[key] ? items[key].value.token : null) }," +
-            "  function(){ callback('Error retrieving from storage') }" +
-            ")";
-        getDriver().manage().timeouts().setScriptTimeout(1, TimeUnit.SECONDS);
-        return (String) getAuraUITestingUtil().waitUntil((WebDriver driver) ->  
-            ((JavascriptExecutor) driver).executeAsyncScript(script)
-        );
     }
 
     private void waitForText(By locator, String expected) {

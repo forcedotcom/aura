@@ -69,7 +69,7 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
 
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
-        this.mockDefs = parseMocks();
+        this.mockDefs = parseMocks(validationContext);
     }
 
     @Override
@@ -155,22 +155,7 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
         return this.currentBrowser;
     }
 
-    private static Definition parseMock(DefDescriptor<? extends BaseComponentDef> compDesc,
-            Map<String, Object> map) throws QuickFixException {
-        DefType mockType = DefType.valueOf((String) map.get("type"));
-        switch (mockType) {
-        case MODEL:
-            return new JavascriptMockModelHandler(compDesc, map).getDefinition();
-        case ACTION:
-            return new JavascriptMockActionHandler(compDesc, map).getDefinition();
-        case PROVIDER:
-            return new JavascriptMockProviderHandler(compDesc, map).getDefinition();
-        default:
-            return null;
-        }
-    }
-
-    private List<Definition> parseMocks() throws QuickFixException {
+    private List<Definition> parseMocks(ReferenceValidationContext validationContext) throws QuickFixException {
         DefDescriptor<? extends BaseComponentDef> compDesc = DefDescriptorImpl
                 .getAssociateDescriptor(suiteDescriptor, ComponentDef.class,
                         DefDescriptor.MARKUP_PREFIX);
@@ -178,7 +163,22 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
         if (mocks != null && !mocks.isEmpty()) {
             for (Object mock : mocks) {
                 @SuppressWarnings("unchecked")
-                Definition mockDef = parseMock(compDesc, (Map<String, Object>) mock);
+                Map<String,Object> mockMap = (Map<String, Object>) mock;
+                DefType mockType = DefType.valueOf((String) mockMap.get("type"));
+                Definition mockDef = null;
+                switch (mockType) {
+                case MODEL:
+                    mockDef = new JavascriptMockModelHandler(compDesc, mockMap, validationContext).getDefinition();
+                    break;
+                case ACTION:
+                    mockDef = new JavascriptMockActionHandler(compDesc, mockMap, validationContext).getDefinition();
+                    break;
+                case PROVIDER:
+                    mockDef = new JavascriptMockProviderHandler(compDesc, mockMap, validationContext).getDefinition();
+                    break;
+                default:
+                    return null;
+                }
                 if (mockDef != null) {
                     mockDef.validateDefinition();
                     building.add(mockDef);

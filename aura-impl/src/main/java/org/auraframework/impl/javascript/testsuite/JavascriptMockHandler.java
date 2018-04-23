@@ -25,6 +25,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Location;
 import org.auraframework.test.mock.Answer;
@@ -35,6 +36,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
@@ -48,11 +50,15 @@ import com.google.common.collect.Lists;
 public abstract class JavascriptMockHandler<D extends Definition> {
     private final Map<String, Object> sourceMap;
     private final DefDescriptor<? extends BaseComponentDef> compDesc;
+    protected final ReferenceValidationContext validationContext;
+    protected final BaseComponentDef target;
 
     protected JavascriptMockHandler(DefDescriptor<? extends BaseComponentDef> targetDescriptor,
-            Map<String, Object> map) {
+            Map<String, Object> map, ReferenceValidationContext validationContext) {
         this.sourceMap = map;
         this.compDesc = targetDescriptor;
+        this.validationContext = validationContext;
+        this.target = validationContext.getAccessibleDefinition(targetDescriptor);
     }
 
     protected DefDescriptor<? extends BaseComponentDef> getTargetDescriptor() {
@@ -88,10 +94,19 @@ public abstract class JavascriptMockHandler<D extends Definition> {
     protected D getBaseDefinition(String descStr, Class<D> defClass)
             throws DefinitionNotFoundException, QuickFixException {
         if (descStr != null) {
-            DefinitionService definitionService = Aura.getDefinitionService();
-            D def = definitionService.getDefinition(descStr, defClass);
-            def = DelegatingHandler.getSourceDelegate(def);
-            return def;
+            for (Map.Entry<DefDescriptor<?>,Definition> entry : target.getBundledDefs().entrySet()) {
+                DefDescriptor<?> desc = entry.getKey();
+                if (defClass.isAssignableFrom(desc.getDefType().getPrimaryInterface())
+                        && (desc.getDescriptorName().equals(descStr) || desc.getQualifiedName().equals(descStr))) {
+                    @SuppressWarnings("unchecked")
+                    D def = (D) entry.getValue();
+                    def = DelegatingHandler.getSourceDelegate(def);
+                    return def;
+                }
+            }
+            // Whoops.
+            throw new AuraRuntimeException("Could not find definition for '" +descStr+ "' of type "+defClass+" on "+
+                getTargetDescriptor() /*, Location */);
         }
         D ret = getDefaultBaseDefinition();
         if (ret == null) {
@@ -102,13 +117,6 @@ public abstract class JavascriptMockHandler<D extends Definition> {
     }
 
     protected abstract D getDefaultBaseDefinition() throws QuickFixException;
-
-    protected <T extends Definition> DefDescriptor<T> getDescriptor(String descStr, Class<T> defClass) {
-        if (descStr != null) {
-            return Aura.getDefinitionService().getDefDescriptor(descStr, defClass);
-        }
-        return null;
-    }
 
     /**
      * Read a single or list of Stubs
@@ -143,13 +151,12 @@ public abstract class JavascriptMockHandler<D extends Definition> {
      * @return a Stub object
      * @throws QuickFixException
      */
-    protected Stub<?> getStub(Object object) throws QuickFixException {
+    protected <T> Stub<T> getStub(Object object) throws QuickFixException {
         if (object instanceof Map) {
             Invocation invocation = getInvocation(((Map<?, ?>) object).get("method"));
-            @SuppressWarnings("rawtypes")
-            Class retType = invocation.getReturnType();
             @SuppressWarnings("unchecked")
-            List<Answer<Object>> answers = getAnswers(((Map<?, ?>) object).get("answers"), retType);
+            Class<T> retType = (Class<T>)invocation.getReturnType();
+            List<Answer<T>> answers = getAnswers(((Map<?, ?>) object).get("answers"), retType);
             return new Stub<>(invocation, answers);
         }
         return null;

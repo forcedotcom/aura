@@ -40,6 +40,7 @@ import org.auraframework.test.mock.Stub;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.validation.ReferenceValidationContext;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -133,8 +134,8 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
     private ActionDef actionDef;
 
     public JavascriptMockActionHandler(DefDescriptor<? extends BaseComponentDef> targetDescriptor,
-            Map<String, Object> map) {
-        super(targetDescriptor, map);
+            Map<String, Object> map, ReferenceValidationContext validationContext) {
+        super(targetDescriptor, map, validationContext);
     }
 
     @Override

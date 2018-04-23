@@ -19,6 +19,7 @@ import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDef;
@@ -38,6 +39,7 @@ import org.auraframework.test.mock.Invocation;
 import org.auraframework.test.mock.Stub;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.validation.ReferenceValidationContext;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,7 +50,7 @@ import org.springframework.context.annotation.Configuration;
 public class JavascriptMockProviderHandler extends JavascriptMockHandler<ProviderDef> {
     
 	
-	@Configuration
+    @Configuration
     public static class ConfigureMockProviderInstanceBuilder {
         @Bean(autowire = Autowire.BY_TYPE)
         public InstanceBuilder<ProviderInstance, ?> mockProviderInstanceBuilder() {
@@ -72,8 +74,8 @@ public class JavascriptMockProviderHandler extends JavascriptMockHandler<Provide
     }
 
     public JavascriptMockProviderHandler(DefDescriptor<? extends BaseComponentDef> targetDescriptor,
-            Map<String, Object> map) {
-        super(targetDescriptor, map);
+            Map<String, Object> map, ReferenceValidationContext validationContext) {
+        super(targetDescriptor, map, validationContext);
     }
 
     @Override
@@ -100,10 +102,12 @@ public class JavascriptMockProviderHandler extends JavascriptMockHandler<Provide
             if (configProvider != null && !configProvider.isEmpty()) {
                 config = null;
             } else {// Else determine the mock component to provide
+                String descStr = (String) ((Map<?, ?>) object).get("descriptor");
                 config = new ComponentConfig();
-                DefDescriptor<ComponentDef> cdd = getDescriptor((String) ((Map<?, ?>) object).get("descriptor"),
+                if (descStr != null) {
+                    // FIXME:
+                    DefDescriptor<ComponentDef> cdd = Aura.getDefinitionService().getDefDescriptor(descStr,
                         ComponentDef.class);
-                if (cdd != null) {
                     config.setDescriptor(cdd);
                 }
                 Map<String, Object> attributes = (Map<String, Object>) ((Map<?, ?>) object).get("attributes");

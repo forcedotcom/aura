@@ -31,7 +31,6 @@ import org.auraframework.test.mock.MockModel;
 import org.auraframework.test.mock.Stub;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.collect.Maps;
 
@@ -42,8 +41,8 @@ public class JavascriptMockModelHandler extends JavascriptMockHandler<ModelDef> 
     private DefDescriptor<ModelDef> modelDefDescriptor = null;
 
     public JavascriptMockModelHandler(DefDescriptor<? extends BaseComponentDef> targetDescriptor,
-            Map<String, Object> map, ReferenceValidationContext validationContext) {
-        super(targetDescriptor, map, validationContext);
+            Map<String, Object> map) {
+        super(targetDescriptor, map);
     }
 
     @Override

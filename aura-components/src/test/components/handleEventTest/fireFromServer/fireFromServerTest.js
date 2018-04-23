@@ -48,7 +48,7 @@
             $A.run(function() {
                 var action = cmp.get('c.attachMultipleEvents');
                 action.runDeprecated();
-                $A.test.addWaitFor(false, $A.test.isActionPending,
+                $A.test.addWaitFor("New Component", function(){ return $A.util.trim($A.test.getText(cmp.find("response").getElement())) },
                     function() {
                         if (action.getState() === "ERROR") {
                             $A.test.fail("Failed to run server action and attach multiple client events.");
@@ -57,9 +57,6 @@
                         $A.test.assertEquals("Go Raiders!Go 49ers!",
                                 $A.test.getText(cmp.find("events").getElement()),
                                 "Failed to attach multiple events at server");
-                        //Verify the response of action itself
-                        $A.test.assertEquals("New Component", 
-                                $A.util.trim($A.test.getText(cmp.find("response").getElement())));
                     });
             });
 		}

@@ -456,9 +456,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             facet.validateReferences(validationContext);
         }
 
-        DefinitionService definitionService = Aura.getDefinitionService();
         if (templateDefDescriptor != null) {
-            BaseComponentDef template = definitionService.getDefinition(templateDefDescriptor);
+            BaseComponentDef template = validationContext.getAccessibleDefinition(templateDefDescriptor);
             if (!template.isTemplate()) {
                 throw new InvalidDefinitionException(String.format(
                         "Template %s must be marked as a template", templateDefDescriptor), getLocation());
@@ -470,7 +469,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         if (extendsDescriptor != null) {
-            T parentDef = definitionService.getDefinition(extendsDescriptor);
+            T parentDef = validationContext.getAccessibleDefinition(extendsDescriptor);
 
             // This should never happen.
             if (parentDef == null) {
@@ -507,7 +506,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             SupportLevel support = getSupport();
             DefDescriptor<T> extDesc = extendsDescriptor;
             while (extDesc != null) {
-                T extDef = definitionService.getDefinition(extDesc);
+                T extDef = validationContext.getAccessibleDefinition(extDesc);
                 if (support.ordinal() > extDef.getSupport().ordinal()) {
                     throw new InvalidDefinitionException(
                             String.format("%s cannot widen the support level to %s from %s's level of %s",
@@ -557,23 +556,23 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             }
         }
         if (styleDefDescriptor != null) {
-            styleDef = styleDefDescriptor.getDef();
+            styleDef = validationContext.getAccessibleDefinition(styleDefDescriptor);
         }
         if (classCode == null) {
             if (externalModelDescriptor != null) {
-                clientModelDef = externalModelDescriptor.getDef();
+                clientModelDef = validationContext.getAccessibleDefinition(externalModelDescriptor);
             }
             if (externalRendererDescriptor != null) {
-                clientRendererDef = externalRendererDescriptor.getDef();
+                clientRendererDef = validationContext.getAccessibleDefinition(externalRendererDescriptor);
             }
             if (externalControllerDescriptor != null) {
-                clientControllerDef = externalControllerDescriptor.getDef();
+                clientControllerDef = validationContext.getAccessibleDefinition(externalControllerDescriptor);
             }
             if (externalHelperDescriptor != null) {
-                clientHelperDef = externalHelperDescriptor.getDef();
+                clientHelperDef = validationContext.getAccessibleDefinition(externalHelperDescriptor);
             }
             if (externalProviderDescriptor != null) {
-                clientProviderDef = externalProviderDescriptor.getDef();
+                clientProviderDef = validationContext.getAccessibleDefinition(externalProviderDescriptor);
             }
             buildClass();
         }
@@ -1320,7 +1319,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         if (clientModelDef != null) {
-        	ret.add(clientModelDef.getDescriptor());
+            ret.add(clientModelDef.getDescriptor());
         }
 
         if (extendsDescriptor != null) {

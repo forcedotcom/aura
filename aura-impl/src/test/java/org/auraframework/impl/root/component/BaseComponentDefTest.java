@@ -1959,20 +1959,19 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     @Test
     public void testValidateReferencesWithNonExtensibleParent() throws Exception {
         DefDescriptor<T> parentDesc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "", ""));
-        BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null,
-                null, parentDesc, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
-        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
+        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "extends='"+parentDesc.getDescriptorName()+"'", ""));
+        InvalidDefinitionException expected = null;
         try {
-            bcd.validateReferences(validationContext);
-            fail("Should have thrown AuraException because the parent isn't extensible.");
+            definitionService.getDefinition(desc);
         } catch (InvalidDefinitionException e) {
-            checkExceptionFull(
-                    e,
-                    InvalidDefinitionException.class,
-                    String.format("%s cannot extend non-extensible component %s", bcd.getDescriptor()
-                            .getQualifiedName(), parentDesc.getQualifiedName()));
+            expected = e;
         }
+        assertNotNull("Should have failed on non extensible item", expected);
+        checkExceptionFull(
+                expected,
+                InvalidDefinitionException.class,
+                String.format("%s cannot extend non-extensible component %s", desc.getQualifiedName(),
+                        parentDesc.getQualifiedName()));
     }
 
     /**

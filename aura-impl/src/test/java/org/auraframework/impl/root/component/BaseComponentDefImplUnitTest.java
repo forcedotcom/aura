@@ -30,6 +30,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventHandlerDef;
@@ -130,7 +131,9 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         this.extendsDescriptor = null;
         this.modelDefDescriptor = null;
         setupTemplate(true);
-        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
+        Map<DefDescriptor<?>,Definition> defmap = Maps.newHashMap();
+        defmap.put(this.templateDefDescriptor, this.templateDef);
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(defmap);
         buildDefinition().validateReferences(validationContext);
     }
     
@@ -199,7 +202,9 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         this.modelDefDescriptor = null;
         setupTemplate(false);
         Throwable expected = null;
-        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
+        Map<DefDescriptor<?>,Definition> defmap = Maps.newHashMap();
+        defmap.put(this.templateDefDescriptor, this.templateDef);
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(defmap);
         try {
             buildDefinition().validateReferences(validationContext);
         } catch (QuickFixException qfe) {

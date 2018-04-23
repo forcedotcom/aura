@@ -38,6 +38,7 @@ import org.auraframework.service.LoggingService;
  * Entry point for accessing Aura services
  */
 @ServiceComponent
+@Deprecated
 public class Aura implements AuraDeprecated {
     private static IntegrationService integrationService;
     private static StyleAdapter styleAdapter;
@@ -114,6 +115,7 @@ public class Aura implements AuraDeprecated {
      * Do not use!!! Use injection.
      */
     // Used by: Lots
+    @Deprecated
     public static ContextService getContextService() {
         return contextService;
     }
@@ -122,6 +124,7 @@ public class Aura implements AuraDeprecated {
      * Get the Definition Service: for loading, finding or interacting with a {@link Definition}
      */
     // Used by: Lots
+    @Deprecated
     public static DefinitionService getDefinitionService() {
         return definitionService;
     }
@@ -130,6 +133,7 @@ public class Aura implements AuraDeprecated {
      * Get the Logging Service: Provides Aura with a top-level Logging handler from the host environments
      */
     // Used by: ApexAuraComponent, BaseComponentImpl, SFDCAuraContextFilter, CoreLightningComponentFacadeImpl, JavaModel, ServiceComponentModel, RecordValueProvider, and more...
+    @Deprecated
     public static LoggingService getLoggingService() {
         return loggingService;
     }
@@ -147,6 +151,7 @@ public class Aura implements AuraDeprecated {
      * Get the Config Adapter: Provides Aura with configuration from the host environment
      */
     // Used by: Everybody
+    @Deprecated
     public static ConfigAdapter getConfigAdapter() {
         return configAdapter;
     }
@@ -155,6 +160,7 @@ public class Aura implements AuraDeprecated {
      * Get the Style Adapter: Used to provide CSS/Style specific functionality.
      */
     // Used by StyleContextImpl, Tokens, FlavoredStyleParser, StyleParser, ParserConfiguration, AbstractStyleDef
+    @Deprecated
     public static StyleAdapter getStyleAdapter() {
         return styleAdapter;
     }
@@ -163,11 +169,13 @@ public class Aura implements AuraDeprecated {
      * Gets the Integration Service: Service that makes integrating into other containers easy.
      */
     // Used in AuraElement, AuraServicesImpl (not used after that), ImportWizardAuraIntegrationServlet, and AuraIntegrationHolder
+    @Deprecated
     public static IntegrationService getIntegrationService() {
         return integrationService;
     }
 
     // Used in BaseComponentImpl and JavaTypeDef
+    @Deprecated
     public static ConverterService getConverterService() {
         return converterService;
     }

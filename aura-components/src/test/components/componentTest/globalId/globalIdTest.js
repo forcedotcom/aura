@@ -24,7 +24,7 @@
 
             var expected = action.getId();
             $A.test.addWaitFor(true, function () {
-                    return $A.test.areActionsComplete([action]);
+                    return $A.test.areActionsComplete([action]) && targetComponent && !!targetComponent.getGlobalId();
                 },
                 function verifyActionIdExistsInGlobalId() {
                     var globalId = targetComponent.getGlobalId();
@@ -58,7 +58,7 @@
 
             var expected = action.getId();
             $A.test.addWaitFor(true, function () {
-                    return $A.test.areActionsComplete([action]);
+                    return $A.test.areActionsComplete([action]) && targetComponents.length > 0 && !!targetComponents[0].getGlobalId();
                 },
                 function verifyActionIdExistsInGlobalId() {
                     var targetComponent = targetComponents[0];
@@ -103,7 +103,7 @@
 
                 var expected = secondAction.getId();
                 $A.test.addWaitFor(true, function () {
-                        return $A.test.areActionsComplete([secondAction]);
+                        return $A.test.areActionsComplete([secondAction]) && targetComponent && !!targetComponent.getGlobalId();
                     },
                     function () {
                         var globalId = targetComponent.getGlobalId();
@@ -126,7 +126,9 @@
                 $A.enqueueAction(targetAction);
 
                 var expected = cmp._expectedActionId;
-                $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([targetAction]); },
+                $A.test.addWaitFor(true, function(){ 
+                        return $A.test.areActionsComplete([targetAction]) && targetComponent && !!targetComponent.getGlobalId();
+                    },
                     function verifyActionIdExistsInGlobalId() {
                         var globalId = targetComponent.getGlobalId();
                         var actual = globalId.split(":")[1];
@@ -151,7 +153,7 @@
             $A.enqueueAction(action);
 
             var expected = action.getId();
-            $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action]); },
+            $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action]) && !!globalId },
                 function verifyGlobalIdOnServer() {
                     var actual = globalId.split(":")[1];
                     $A.test.assertEquals(expected, actual,

@@ -1076,7 +1076,9 @@ AuraClientService.prototype.dumpCachesAndReload = function(force, metricsPayload
     if (this.reloadPointPassed || force) {
         if (this.shouldPreventReload()) {
             var err = new AuraError("We can't load the page. Please click Refresh.");
-            var extraMessage = "Bootstrap state: " + JSON.stringify(this.getBootstrapState());
+            var extraMessage = "Bootstrap state: " + JSON.stringify(this.getBootstrapState()) +
+                               "\nMetrics payload: " + JSON.stringify(metricsPayload);
+            err["reported"] = true;
             this.showErrorDialogWithReload(err, extraMessage);
         } else {
             this.reloadFunction();

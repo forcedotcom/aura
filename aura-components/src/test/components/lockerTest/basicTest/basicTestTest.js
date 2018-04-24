@@ -124,8 +124,7 @@
     testAttemptToEvalToWindow: {
         // This exploit not covered in IE11
         test: function(cmp) {
-            //Taking into account if its a manual run (which runs inside an iframe) or an auto run
-            cmp.testEvalBlocking(window !== window.parent);
+            cmp.testAttemptToEvalToWindow(window !== window.parent);
 
             // DCHASMAN TOOD Port these to cmp.testEvalBlocking()
 

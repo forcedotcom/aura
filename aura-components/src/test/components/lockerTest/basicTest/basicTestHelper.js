@@ -6,11 +6,11 @@
     testCanAccessDocumentHeadFromHelper: function(testUtils) {
     	this.verifySharedSecureElement(testUtils, "head");
     },
-    
+
     testAuraLockerInHelper: function(testUtils) {
         testUtils.assertStartsWith("SecureAura", $A.toString(), "Expected $A in helper to be a SecureAura");
     },
-    
+
     testDocumentLockerInHelper: function(testUtils) {
         testUtils.assertStartsWith("SecureDocument", document.toString(), "Expected document in helper"
                 + " to be a SecureDocument");
@@ -58,14 +58,6 @@
         }
     },
 
-    doTestEvalForUndefined : function(cmp, testCase, testUtils) {
-        testUtils.assertStartsWith("Global window via " + testCase.toString() + ": undefined", this.testExpression(testCase));
-    },
-
-    doTestEvalForSecureWindow : function(cmp, testCase, testUtils) {
-        testUtils.assertStartsWith("Global window via " + testCase.toString() + ": SecureWindow", this.testExpression(testCase));
-    },
-
     doTestEvalForSecureIFrameContentWindow: function(cmp, testCase, testUtils) {
         testUtils.assertStartsWith("Global window via " + testCase.toString() + ": SecureIFrameContentWindow", this.testExpression(testCase));
     },
@@ -74,11 +66,11 @@
         var result = testCase();
         return "Global window via " + testCase.toString() + ": " + result;
     },
-    
+
     verifySharedSecureElement: function(testUtils, property) {
         var el = document[property];
         testUtils.assertStartsWith("SecureElement", el.toString(), "Expected document.body in helper to be a SecureElement");
-        
+
         try {
         	el.innerHTML = "<div>Should throw an Aura exception</div>";
         	testUtils.fail("Should not be able to set innerHTML property on shared SecureElement: " + property);

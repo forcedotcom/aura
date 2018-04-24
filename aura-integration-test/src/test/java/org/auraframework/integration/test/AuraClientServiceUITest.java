@@ -263,8 +263,4 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
             trigger.click();
          }, null);
     }
-
-    private void waitForText(By locator, String expected) {
-        getAuraUITestingUtil().waitForElementText(locator, expected, true);
-    }
 }

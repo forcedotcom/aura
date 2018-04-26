@@ -157,7 +157,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
             // if locale provided, set the it on the context as a requested locale
             if (StringUtils.isNotEmpty(locale)) {
-                context.setRequestedLocales(Arrays.asList(new Locale(locale)));
+                setLocale(new Locale(locale));
             }
 
             serverService.writeDefinitions(descriptors.keySet(), responseStringWriter, false, 0, hydrationType, false);
@@ -232,7 +232,10 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    protected void setLocale(Locale locale) {
+        contextService.getCurrentContext().setRequestedLocales(Arrays.asList(locale));
+    }
+
     private Boolean containsRestrictedDefs(AuraContext context, Map<DefDescriptor<?>, String> requestedDescriptors) {
 
         Set<String> restrictedNamespaces = context.getRestrictedNamespaces();

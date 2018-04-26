@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-04-16
- * Version: 0.4.5
+ * Generated: 2018-04-26
+ * Version: 0.4.7
  */
 
 (function (exports) {
@@ -962,8 +962,6 @@ function getIntrinsics(realmRec) {
     AsyncGeneratorPrototype,
     // %AsyncIteratorPrototype%
     AsyncIteratorPrototype,
-    // %Atomics%
-    Atomics: _.Atomics,
     // %Boolean%
     Boolean: _.Boolean,
     // %BooleanPrototype%
@@ -6517,7 +6515,7 @@ const metadata$5 = {
       head: DEFAULT,
       hidden: DEFAULT,
       images: DEFAULT,
-      // implementation: DEFAULT, //W-4844856
+      implementation: DEFAULT,
       importNode: FUNCTION,
       inputEncoding: DEFAULT,
       lastElementChild: DEFAULT,
@@ -6762,6 +6760,15 @@ function SecureDocument(doc, key) {
       doc.cookie = newCookie;
     }
   });
+
+  ['implementation'].forEach(
+    // These are direct passthrough's and should never be wrapped in a SecureObject
+    name =>
+      Object.defineProperty(o, name, {
+        enumerable: true,
+        value: doc[name]
+      })
+  );
 
   SecureObject.addPrototypeMethodsAndProperties(metadata$5, o, doc, key);
 
@@ -7375,7 +7382,8 @@ function SecureURL(raw) {
 const HTML_MAX_BUF_SIZE = 32768;
 
 const WHITELISTED_MIME_TYPES = [
-  'application/',
+  'application/octet-stream',
+  'application/json',
   'video/',
   'audio/',
   'image/',

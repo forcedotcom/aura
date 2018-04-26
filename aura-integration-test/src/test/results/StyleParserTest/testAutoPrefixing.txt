@@ -1,9 +1,5 @@
-.testTestStyleNamespacePrefixing {-webkit-transform:rotateY(10deg); -ms-transform:rotateY(10deg); transform:rotateY(10deg)}
-.testTestStyleNamespacePrefixing {background:-webkit-linear-gradient(red, yellow); background:linear-gradient(red, yellow)}
-@-webkit-keyframes test {
-  from {top:0%}
-  to {top:100%}
-}
+.testTestStyleNamespacePrefixing {transform:rotateY(10deg)}
+.testTestStyleNamespacePrefixing {background:linear-gradient(red, yellow)}
 @keyframes test {
   from {top:0%}
   to {top:100%}

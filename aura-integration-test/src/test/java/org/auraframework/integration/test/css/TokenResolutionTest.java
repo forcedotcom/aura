@@ -252,7 +252,6 @@ public class TokenResolutionTest extends StyleTestCase {
                 "-moz-user-select:none; " +
                 "-ms-user-select:none; " +
                 "user-select:none; " +
-                "background:-webkit-linear-gradient(red, yellow); " +
                 "background:linear-gradient(red, yellow)" +
                 "}";
 

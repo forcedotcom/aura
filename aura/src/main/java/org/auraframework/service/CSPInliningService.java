@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * CSPInliningService controls how to annotate and process an script block with an inline body to apply CSP-2 security
  */
-public interface CSPInliningService extends AuraService {
+public interface CSPInliningService {
     enum InlineScriptMode{
         UNSUPPORTED(""),
         HASH("'sha256-%s'"),

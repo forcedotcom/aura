@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.context;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +48,7 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.InstanceStack;
+import org.auraframework.service.CSPInliningService.InlineScriptMode;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraLocalStore;
@@ -69,9 +73,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 public class AuraContextImpl implements AuraContext {
     // JBUCH: TEMPORARY FLAG FOR 202 CRUC. REMOVE IN 204.
@@ -1030,5 +1031,23 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public void setUriDefsEnabled(Boolean uriDefsEnabled) {
         this.uriDefsEnabled = uriDefsEnabled;
+    }
+
+    private InlineScriptMode inlineScriptMode;
+
+    /**
+     * Set the current mode for inline scripts.
+     */
+    @Override
+    public void setInlineScriptMode(InlineScriptMode mode) {
+        this.inlineScriptMode = mode;
+    }
+
+    /**
+     * Get the current mode for inline scripts.
+     */
+    @Override
+    public InlineScriptMode getInlineScriptMode() {
+        return inlineScriptMode;
     }
 }

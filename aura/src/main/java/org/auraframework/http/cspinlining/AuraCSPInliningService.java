@@ -122,10 +122,15 @@ public class AuraCSPInliningService implements CSPInliningService {
 
     @Override
     public InlineScriptMode getInlineMode() {
+        AuraContext context = contextService.getCurrentContext();
+        if (context.getInlineScriptMode() != null) {
+            return context.getInlineScriptMode();
+        }
         CSPInliningCriteria criteria = new CSPInliningCriteria(contextService.getCurrentContext());
         List<CSPInliningRule> rules = MoreObjects.firstNonNull(this.rules, ImmutableList.<CSPInliningRule>of());
 
         rules.stream().filter(r -> r.isRelevant(criteria)).forEach(r -> r.process(criteria));
+        context.setInlineScriptMode(criteria.getMode());
 
         return criteria.getMode();
     }

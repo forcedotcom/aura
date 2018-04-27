@@ -39,6 +39,7 @@ import org.auraframework.instance.InstanceStack;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
+import org.auraframework.service.CSPInliningService.InlineScriptMode;
 
 import com.google.common.base.Optional;
 import org.auraframework.util.json.Json;
@@ -818,4 +819,14 @@ public interface AuraContext {
      */
     void setUriDefsEnabled(Boolean uriDefsEnabled);
     Boolean getUriDefsEnabled();
+
+    /**
+     * Set the current mode for inline scripts.
+     */
+    public void setInlineScriptMode(InlineScriptMode mode);
+
+    /**
+     * Get the current mode for inline scripts.
+     */
+    public InlineScriptMode getInlineScriptMode();
 }

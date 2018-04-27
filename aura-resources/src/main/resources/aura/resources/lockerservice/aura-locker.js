@@ -15,11 +15,88 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-04-26
- * Version: 0.4.7
+ * Version: 0.4.8
  */
 
 (function (exports) {
 'use strict';
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Declare shorthand functions. Sharing these declarations accross modules
+// improves both consitency and minification. Unused declarations are dropped
+// by the tree shaking process.
+
+const { isArray } = Array;
+
+const {
+  assign,
+  create: create$1,
+  defineProperties,
+  freeze,
+  getOwnPropertyDescriptor,
+  getOwnPropertyDescriptors,
+  getOwnPropertyNames,
+  isFrozen,
+  seal
+} = Object;
+
+const {
+  defineProperty,
+  deleteProperty,
+  getPrototypeOf,
+  has,
+  ownKeys,
+  setPrototypeOf
+} = Reflect;
+
+
+const objectToString = Object.prototype.toString;
+const objectHasOwnProperty = Object.prototype.hasOwnProperty;
+
+/**
+ * Converts ArrayBuffer to UTF-8 String
+ * @param {ArrayBuffer} buf
+ */
+function ab2str(buf) {
+  if (typeof TextDecoder !== 'undefined') {
+    const dec = new TextDecoder('utf-8');
+    return dec.decode(buf);
+  }
+
+  let str = '';
+  const abLen = buf.byteLength;
+  let offset = 0;
+  const CHUNK_SIZE = 2 ** 16;
+
+  do {
+    const len = Math.min(CHUNK_SIZE, abLen - offset);
+    const part = new Uint8Array(buf.slice(offset, offset + len));
+    str += String.fromCharCode.apply(null, part);
+    offset += len;
+  } while (offset < abLen);
+  return str;
+}
+
+/**
+ * Converts String to ArrayBuffer
+ * https://github.com/dfcreative/string-to-arraybuffer/blob/master/index.js
+ * @param {String} str
+ */
 
 const DEFAULT = {};
 const FUNCTION = { type: 'function' };
@@ -94,6 +171,7 @@ const domPurifyConfig = {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 let substituteMapForWeakMap = false;
 
 if (typeof WeakMap !== 'undefined' && typeof Proxy !== 'undefined') {
@@ -270,7 +348,7 @@ function unwrap$1(from, st) {
   const key = keychain.get(from);
   let ref;
 
-  if (Array.isArray(st)) {
+  if (isArray(st)) {
     // Only getRef on "secure" arrays
     if (secureToRaw.get(st)) {
       // Secure array - reconcile modifications to the filtered clone with the actual array
@@ -433,7 +511,7 @@ function SecureCanvasRenderingContext2D(ctx, key) {
   if (o) {
     return o;
   }
-  o = Object.create(null, {
+  o = create$1(null, {
     toString: {
       value: function() {
         return `SecureCanvasRenderingContext2D: ${ctx}{ key: ${JSON.stringify(key)} }`;
@@ -448,320 +526,6 @@ function SecureCanvasRenderingContext2D(ctx, key) {
   registerProxy(o);
 
   return o;
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-// Declare shorthand functions. Sharing these declarations accross modules
-// improves both consitency and minification. Unused declarations are dropped
-// by the tree shaking process.
-
-
-
-const {
-  assign,
-  create: create$1,
-  defineProperties,
-  freeze,
-  getOwnPropertyDescriptor,
-  getOwnPropertyDescriptors,
-  getOwnPropertyNames,
-  isFrozen,
-  seal
-} = Object;
-
-const {
-  defineProperty,
-  deleteProperty,
-  getPrototypeOf,
-  has,
-  ownKeys,
-  setPrototypeOf
-} = Reflect;
-
-
-const objectToString = Object.prototype.toString;
-const objectHasOwnProperty = Object.prototype.hasOwnProperty;
-
-/**
- * Converts ArrayBuffer to UTF-8 String
- * @param {ArrayBuffer} buf
- */
-function ab2str(buf) {
-  if (typeof TextDecoder !== 'undefined') {
-    const dec = new TextDecoder('utf-8');
-    return dec.decode(buf);
-  }
-
-  let str = '';
-  const abLen = buf.byteLength;
-  let offset = 0;
-  const CHUNK_SIZE = 2 ** 16;
-
-  do {
-    const len = Math.min(CHUNK_SIZE, abLen - offset);
-    const part = new Uint8Array(buf.slice(offset, offset + len));
-    str += String.fromCharCode.apply(null, part);
-    offset += len;
-  } while (offset < abLen);
-  return str;
-}
-
-/**
- * Converts String to ArrayBuffer
- * https://github.com/dfcreative/string-to-arraybuffer/blob/master/index.js
- * @param {String} str
- */
-
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-// Adapted from SES/Caja
-// Copyright (C) 2011 Google Inc.
-// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
-// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
-
-function repairAccessors(realmRec) {
-  const { unsafeGlobal } = realmRec;
-
-  // W-2961201 Prevent execution in the global context.
-
-  // Fixing properties of Object to comply with strict mode
-  // and ES2016 semantics, we do this by redefining them while in 'use strict'
-  // https://tc39.github.io/ecma262/#sec-object.prototype.__defineGetter__
-  defineProperties(unsafeGlobal.Object.prototype, {
-    __defineGetter__: {
-      value: function(prop, func) {
-        return defineProperty(this, prop, {
-          get: func,
-          enumerable: true,
-          configurable: true
-        });
-      }
-    },
-    __defineSetter__: {
-      value: function(prop, func) {
-        return defineProperty(this, prop, {
-          set: func,
-          enumerable: true,
-          configurable: true
-        });
-      }
-    },
-    __lookupGetter__: {
-      value: function(prop) {
-        let base = this;
-        let desc;
-        while (base && !(desc = getOwnPropertyDescriptor(base, prop))) {
-          base = getPrototypeOf(base);
-        }
-        return desc && desc.get;
-      }
-    },
-    __lookupSetter__: {
-      value: function(prop) {
-        let base = this;
-        let desc;
-        while (base && !(desc = getOwnPropertyDescriptor(base, prop))) {
-          base = getPrototypeOf(base);
-        }
-        return desc && desc.set;
-      }
-    }
-  });
-}
-
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-// Adapted from SES/Caja
-// Copyright (C) 2011 Google Inc.
-// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
-// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
-
-/**
- * The process to repair constructors:
- * 1. Obtain the prototype from an instance
- * 2. Create a substitute noop constructor
- * 3. Replace its prototype property with the original prototype
- * 4. Replace its prototype property's constructor with itself
- * 5. Replace its [[Prototype]] slot with the noop constructor of Function
- */
-function repairFunction(realmRec, functionName, functionDecl) {
-  const { unsafeGlobal, unsafeEval, unsafeFunction } = realmRec;
-
-  const FunctionInstance = unsafeEval(`(${functionDecl}(){})`);
-  const FunctionPrototype = getPrototypeOf(FunctionInstance);
-
-  const RealmFunction = unsafeFunction('return function(){}');
-
-  defineProperties(RealmFunction, {
-    name: {
-      value: functionName
-    },
-    prototype: {
-      value: FunctionPrototype
-    }
-  });
-  defineProperty(FunctionPrototype, 'constructor', { value: RealmFunction });
-
-  // Prevent loop in case of Function.
-  if (RealmFunction !== unsafeGlobal.Function.prototype.constructor) {
-    setPrototypeOf(RealmFunction, unsafeGlobal.Function.prototype.constructor);
-  }
-}
-
-/**
- * This block replaces the original Function constructor, and the original
- * %GeneratorFunction% %AsyncFunction% and %AsyncGeneratorFunction%, with
- * safe replacements that preserve SES confinement. After this block is done,
- * the originals should no longer be reachable.
- */
-function repairFunctions(realmRec) {
-  const { unsafeGlobal } = realmRec;
-  const hasAsyncIteration = typeof unsafeGlobal.Symbol.asyncIterator !== 'undefined';
-
-  // Here, the order of operation is important: Function needs to be
-  // repaired first since the other constructors need it.
-  repairFunction(realmRec, 'Function', 'function');
-  repairFunction(realmRec, 'GeneratorFunction', 'function*');
-  repairFunction(realmRec, 'AsyncFunction', 'async function');
-  if (hasAsyncIteration) {
-    repairFunction(realmRec, 'AsyncGeneratorFunction', 'async function*');
-  }
-}
-
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/**
- * For a special set of properties (defined below), it ensures that the
- * effect of freezing does not suppress the ability to override these
- * properties on derived objects by simple assignment.
- *
- * Because of lack of sufficient foresight at the time, ES5 unfortunately
- * specified that a simple assignment to a non-existent property must fail if
- * it would override a non-writable data property of the same name. (In
- * retrospect, this was a mistake, but it is now too late and we must live
- * with the consequences.) As a result, simply freezing an object to make it
- * tamper proof has the unfortunate side effect of breaking previously correct
- * code that is considered to have followed JS best practices, if this
- * previous code used assignment to override.
- *
- * To work around this mistake, deepFreeze(), prior to freezing, replaces
- * selected configurable own data properties with accessor properties which
- * simulate what we should have specified -- that assignments to derived
- * objects succeed if otherwise possible.
- */
-
-function tamperProof(obj, prop) {
-  const desc = getOwnPropertyDescriptor(obj, prop);
-  if ('value' in desc && desc.configurable) {
-    const value = desc.value;
-
-    // eslint-disable-next-line no-inner-declarations
-    function getter() {
-      return value;
-    }
-
-    // eslint-disable-next-line no-inner-declarations
-    function setter(newValue) {
-      if (obj === this) {
-        throw new TypeError(
-          `Cannot assign to read only property '${prop}' of object '${obj.name}'`
-        );
-      }
-      if (objectHasOwnProperty.call(this, prop)) {
-        this[prop] = newValue;
-      } else {
-        defineProperty(this, prop, {
-          value: newValue,
-          writable: true,
-          enumerable: desc.enumerable,
-          configurable: desc.configurable
-        });
-      }
-    }
-
-    defineProperty(obj, prop, {
-      get: getter,
-      set: setter,
-      enumerable: desc.enumerable,
-      configurable: desc.configurable
-    });
-  }
-}
-
-/**
- * These properties are subject to the override mistake.
- * We "repair" these data properties to getters
- * and setters.
- */
-function repairDataProperties(realmRec) {
-  const { unsafeGlobal: _ } = realmRec;
-
-  // Intentionally avoid loops and data structures.
-  tamperProof(_.Object.prototype, 'toString');
-  tamperProof(_.Error.prototype, 'message');
-  tamperProof(_.EvalError.prototype, 'message');
-  tamperProof(_.RangeError.prototype, 'message');
-  tamperProof(_.ReferenceError.prototype, 'message');
-  tamperProof(_.SyntaxError.prototype, 'message');
-  tamperProof(_.TypeError.prototype, 'message');
-  tamperProof(_.URIError.prototype, 'message');
 }
 
 /*
@@ -837,7 +601,6 @@ function deepFreeze(node) {
       }
     });
     freeze(obj);
-    frozenSet.add(obj);
   }
 
   // Process the freezingSet.
@@ -851,6 +614,14 @@ function deepFreeze(node) {
 
   enqueue(node);
   dequeue();
+
+  // "Committing" the changes upon exit guards against exceptions aborting
+  // the deep freeze process, which could leave the system in a state
+  // where unfrozen objects are never frozen when no longer discoverable by
+  // subsequent invocations of deep-freeze because all object owning a reference
+  // to them are frozen.
+
+  freezingSet.forEach(frozenSet.add, frozenSet);
 }
 
 /*
@@ -1835,7 +1606,7 @@ function isSameLocation(currentDomain, newDomain) {
 
 const SecureIFrameElement = {
   addMethodsAndProperties: function(prototype) {
-    Object.defineProperties(prototype, {
+    defineProperties(prototype, {
       // Standard HTMLElement methods
       // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
       blur: SecureObject.createFilteredMethodStateless('blur', prototype),
@@ -1874,11 +1645,7 @@ const SecureIFrameElement = {
     // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
     // Note: Ignoring 'contentDocument', 'sandbox' and 'srcdoc' from the list above.
     ['height', 'width', 'name'].forEach(name =>
-      Object.defineProperty(
-        prototype,
-        name,
-        SecureObject.createFilteredPropertyStateless(name, prototype)
-      )
+      defineProperty(prototype, name, SecureObject.createFilteredPropertyStateless(name, prototype))
     );
   },
 
@@ -1888,7 +1655,7 @@ const SecureIFrameElement = {
     if (sicw) {
       return sicw;
     }
-    sicw = Object.create(null, {
+    sicw = create$1(null, {
       toString: {
         value: function() {
           return `SecureIFrameContentWindow: ${w}{ key: ${JSON.stringify(key)} }`;
@@ -1896,7 +1663,7 @@ const SecureIFrameElement = {
       }
     });
 
-    Object.defineProperties(sicw, {
+    defineProperties(sicw, {
       postMessage: SecureObject.createFilteredMethod(sicw, w, 'postMessage', { rawArguments: true })
     });
 
@@ -2051,7 +1818,7 @@ function createAddEventListenerDescriptor(st, el, key) {
 }
 
 function addEventTargetMethods(st, raw, key) {
-  Object.defineProperties(st, {
+  defineProperties(st, {
     addEventListener: createAddEventListenerDescriptor(st, raw, key),
     dispatchEvent: SecureObject.createFilteredMethod(st, raw, 'dispatchEvent', {
       rawArguments: true
@@ -3555,11 +3322,11 @@ function SecureElement(el, key) {
       },
 
       getOwnPropertyDescriptor: function(target, property) {
-        let desc = Object.getOwnPropertyDescriptor(target, property);
+        let desc = getOwnPropertyDescriptor(target, property);
         if (!desc) {
           const raw = getRef(target, key);
           const data = getData(raw, key);
-          desc = data ? Object.getOwnPropertyDescriptor(data, property) : undefined;
+          desc = data ? getOwnPropertyDescriptor(data, property) : undefined;
         }
         return desc;
       },
@@ -3600,9 +3367,9 @@ function SecureElement(el, key) {
     // See inputValueTracking.js
     // https://github.com/facebook/react/blob/master/packages/react-dom/src/client/inputValueTracking.js
     ['checked', 'value'].forEach(prop => {
-      const descriptor = Object.getOwnPropertyDescriptor(el.constructor.prototype, prop);
+      const descriptor = getOwnPropertyDescriptor(el.constructor.prototype, prop);
       if (descriptor) {
-        Object.defineProperty(prototype.constructor.prototype, prop, {
+        defineProperty(prototype.constructor.prototype, prop, {
           configurable: descriptor.configurable,
           enumerable: true,
           get: function() {
@@ -3619,7 +3386,7 @@ function SecureElement(el, key) {
 
     SecureElement.addStandardMethodAndPropertyOverrides(prototype, caseInsensitiveAttributes, key);
 
-    Object.defineProperties(prototype, {
+    defineProperties(prototype, {
       toString: {
         value: function() {
           const e = SecureObject.getRaw(this);
@@ -3628,7 +3395,7 @@ function SecureElement(el, key) {
       }
     });
 
-    const prototypicalInstance = Object.create(prototype);
+    const prototypicalInstance = create$1(prototype);
     setRef(prototypicalInstance, el, key);
 
     if (tagName === 'IFRAME') {
@@ -3846,7 +3613,7 @@ function SecureElement(el, key) {
       SecureScriptElement.setOverrides(tagNameSpecificConfig, prototype);
     }
 
-    Object.defineProperties(prototype, tagNameSpecificConfig);
+    defineProperties(prototype, tagNameSpecificConfig);
 
     // Build case insensitive index for attribute validation
     Object.keys(prototype).forEach(k => {
@@ -3873,7 +3640,7 @@ function SecureElement(el, key) {
     el.setAttribute('allowNetworking', 'none');
   }
 
-  o = Object.create(prototypeInfo.prototype);
+  o = create$1(prototypeInfo.prototype);
 
   if (prototypeInfo.expandoCapturingHandler) {
     setRef(o, el, key);
@@ -3943,7 +3710,7 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(
   caseInsensitiveAttributes,
   key
 ) {
-  Object.defineProperties(prototype, {
+  defineProperties(prototype, {
     appendChild: {
       writable: true,
       value: function(child) {
@@ -4275,13 +4042,7 @@ function sanitize(realmRec) {
     return;
   }
 
-  repairAccessors(realmRec);
-
   if (realmRec.shouldFreeze) {
-    repairFunctions(realmRec);
-    repairDataProperties(realmRec);
-    freezeIntrinsics(realmRec);
-
     // Temporary until SecureWindow is refactored
     const { prototypes: { Window } } = metadata$$1;
     const names = [];
@@ -4362,6 +4123,254 @@ function getSandbox(key, realmRec) {
 }
 
 /*
+ * Copyright (C) 2017 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Adapted from SES/Caja
+// Copyright (C) 2011 Google Inc.
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
+
+function repairAccessors(realmRec) {
+  const { unsafeGlobal } = realmRec;
+
+  // W-2961201 Prevent execution in the global context.
+
+  // Fixing properties of Object to comply with strict mode
+  // and ES2016 semantics, we do this by redefining them while in 'use strict'
+  // https://tc39.github.io/ecma262/#sec-object.prototype.__defineGetter__
+  defineProperties(unsafeGlobal.Object.prototype, {
+    __defineGetter__: {
+      value: function(prop, func) {
+        return defineProperty(this, prop, {
+          get: func,
+          enumerable: true,
+          configurable: true
+        });
+      }
+    },
+    __defineSetter__: {
+      value: function(prop, func) {
+        return defineProperty(this, prop, {
+          set: func,
+          enumerable: true,
+          configurable: true
+        });
+      }
+    },
+    __lookupGetter__: {
+      value: function(prop) {
+        let base = this;
+        let desc;
+        while (base && !(desc = getOwnPropertyDescriptor(base, prop))) {
+          base = getPrototypeOf(base);
+        }
+        return desc && desc.get;
+      }
+    },
+    __lookupSetter__: {
+      value: function(prop) {
+        let base = this;
+        let desc;
+        while (base && !(desc = getOwnPropertyDescriptor(base, prop))) {
+          base = getPrototypeOf(base);
+        }
+        return desc && desc.set;
+      }
+    }
+  });
+}
+
+/*
+ * Copyright (C) 2017 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Adapted from SES/Caja
+// Copyright (C) 2011 Google Inc.
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
+
+/**
+ * The process to repair constructors:
+ * 1. Obtain the prototype from an instance
+ * 2. Create a substitute noop constructor
+ * 3. Replace its prototype property with the original prototype
+ * 4. Replace its prototype property's constructor with itself
+ * 5. Replace its [[Prototype]] slot with the noop constructor of Function
+ */
+function repairFunction(realmRec, functionName, functionDecl) {
+  const { unsafeGlobal, unsafeEval, unsafeFunction } = realmRec;
+
+  const FunctionInstance = unsafeEval(`(${functionDecl}(){})`);
+  const FunctionPrototype = getPrototypeOf(FunctionInstance);
+
+  const RealmFunction = unsafeFunction('return function(){}');
+
+  defineProperties(RealmFunction, {
+    name: {
+      value: functionName
+    },
+    prototype: {
+      value: FunctionPrototype
+    }
+  });
+  defineProperty(FunctionPrototype, 'constructor', { value: RealmFunction });
+
+  // Prevent loop in case of Function.
+  if (RealmFunction !== unsafeGlobal.Function.prototype.constructor) {
+    setPrototypeOf(RealmFunction, unsafeGlobal.Function.prototype.constructor);
+  }
+}
+
+/**
+ * This block replaces the original Function constructor, and the original
+ * %GeneratorFunction% %AsyncFunction% and %AsyncGeneratorFunction%, with
+ * safe replacements that preserve SES confinement. After this block is done,
+ * the originals should no longer be reachable.
+ */
+function repairFunctions(realmRec) {
+  const { unsafeGlobal } = realmRec;
+  const hasAsyncIteration = typeof unsafeGlobal.Symbol.asyncIterator !== 'undefined';
+
+  // Here, the order of operation is important: Function needs to be
+  // repaired first since the other constructors need it.
+  repairFunction(realmRec, 'Function', 'function');
+  repairFunction(realmRec, 'GeneratorFunction', 'function*');
+  repairFunction(realmRec, 'AsyncFunction', 'async function');
+  if (hasAsyncIteration) {
+    repairFunction(realmRec, 'AsyncGeneratorFunction', 'async function*');
+  }
+}
+
+/*
+ * Copyright (C) 2017 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * For a special set of properties (defined below), it ensures that the
+ * effect of freezing does not suppress the ability to override these
+ * properties on derived objects by simple assignment.
+ *
+ * Because of lack of sufficient foresight at the time, ES5 unfortunately
+ * specified that a simple assignment to a non-existent property must fail if
+ * it would override a non-writable data property of the same name. (In
+ * retrospect, this was a mistake, but it is now too late and we must live
+ * with the consequences.) As a result, simply freezing an object to make it
+ * tamper proof has the unfortunate side effect of breaking previously correct
+ * code that is considered to have followed JS best practices, if this
+ * previous code used assignment to override.
+ *
+ * To work around this mistake, deepFreeze(), prior to freezing, needs to replace
+ * selected configurable own data properties with accessor properties which
+ * simulate what we should have specified -- that assignments to derived
+ * objects succeed if otherwise possible.
+ */
+
+function tamperProof(obj, prop) {
+  const desc = getOwnPropertyDescriptor(obj, prop);
+  if ('value' in desc && desc.configurable) {
+    const value = desc.value;
+
+    // eslint-disable-next-line no-inner-declarations
+    function getter() {
+      return value;
+    }
+
+    // Re-attach the data propery value to the object tree to make
+    // it discoverable by the deep-freeze traversal algorithm.
+    getter.value = value;
+
+    // eslint-disable-next-line no-inner-declarations
+    function setter(newValue) {
+      if (obj === this) {
+        const name = obj.constructor.name;
+        throw new TypeError(`Cannot assign to read only property '${prop}' of object '${name}'`);
+      }
+      if (objectHasOwnProperty.call(this, prop)) {
+        this[prop] = newValue;
+      } else {
+        defineProperty(this, prop, {
+          value: newValue,
+          writable: true,
+          enumerable: desc.enumerable,
+          configurable: desc.configurable
+        });
+      }
+    }
+
+    defineProperty(obj, prop, {
+      get: getter,
+      set: setter,
+      enumerable: desc.enumerable,
+      configurable: desc.configurable
+    });
+  }
+}
+
+/**
+ * These properties are subject to the override mistake.
+ */
+function repairDataProperties(realmRec) {
+  const { unsafeGlobal: _ } = realmRec;
+
+  const objPrototype = _.Object.prototype;
+  [
+    'constructor',
+    'hasOwnProperty',
+    'isPrototypeOf',
+    'propertyIsEnumerable',
+    'toString',
+    'toLocaleString',
+    'valueOf'
+  ].forEach(prop => tamperProof(objPrototype, prop));
+
+  // Intentionally avoid loops and data structures.
+  tamperProof(_.Error.prototype, 'message');
+  tamperProof(_.EvalError.prototype, 'message');
+  tamperProof(_.RangeError.prototype, 'message');
+  tamperProof(_.ReferenceError.prototype, 'message');
+  tamperProof(_.SyntaxError.prototype, 'message');
+  tamperProof(_.TypeError.prototype, 'message');
+  tamperProof(_.URIError.prototype, 'message');
+}
+
+/*
  * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
@@ -4377,7 +4386,13 @@ function getSandbox(key, realmRec) {
  * limitations under the License.
  */
 const realmRec = {};
+let isInitialized = false;
+
 function init(options) {
+  if (isInitialized) {
+    return;
+  }
+
   // The frozen/unfrozen status of the Locker is set at creation.
   // Keep options.isFrozen until playground is updated.
   realmRec.shouldFreeze = options.shouldFreeze || options.isFrozen;
@@ -4393,6 +4408,15 @@ function init(options) {
 
   // None of these values can change after initialization.
   freeze(realmRec);
+
+  repairAccessors(realmRec);
+  if (realmRec.shouldFreeze) {
+    repairFunctions(realmRec);
+    repairDataProperties(realmRec);
+    freezeIntrinsics(realmRec);
+  }
+
+  isInitialized = true;
 }
 
 function getEnv$1(key) {
@@ -4432,6 +4456,7 @@ function evaluate(src, key, sourceURL) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 function SecureDOMEvent(event, key) {
   assert$1.invariant(event, 'Wrapping an undefined event is prohibited.');
   let o = getFromCache(event, key);
@@ -4439,7 +4464,7 @@ function SecureDOMEvent(event, key) {
     return o;
   }
 
-  o = Object.create(null, {
+  o = create$1(null, {
     toString: {
       value: function() {
         return `SecureDOMEvent: ${event}{ key: ${JSON.stringify(key)} }`;
@@ -4492,7 +4517,7 @@ function SecureDOMEvent(event, key) {
     // and accessing the nodeType property triggers an exception, then the source is a content window,
     // wrap the source in a SecureIFrameContentWindow
     if (xorigin) {
-      Object.defineProperty(o, 'source', {
+      defineProperty(o, 'source', {
         enumerable: true,
         value: SecureIFrameElement.SecureIFrameContentWindow(eventSource, key)
       });
@@ -4505,7 +4530,7 @@ function SecureDOMEvent(event, key) {
     if (!(name in o)) {
       // every DOM event has a different shape, we apply filters when possible,
       // and bypass when no secure filter is found.
-      Object.defineProperty(
+      defineProperty(
         o,
         name,
         DOMEventSecureDescriptors[name] || SecureObject.createFilteredProperty(o, event, name)
@@ -4553,7 +4578,7 @@ SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
         // Create a stub object with all the properties
         return keys.reduce(
           (o, p) =>
-            Object.defineProperty(o, p, {
+            defineProperty(o, p, {
               // all props in a touch object are readonly by spec:
               // https://developer.mozilla.org/en-US/docs/Web/API/Touch
               get: function() {
@@ -4601,7 +4626,7 @@ function SecureObject(thing, key) {
     return o;
   }
 
-  o = Object.create(null, {
+  o = create$1(null, {
     toString: {
       value: function() {
         return `SecureObject: ${thing}{ key: ${JSON.stringify(key)} }`;
@@ -4613,14 +4638,14 @@ function SecureObject(thing, key) {
   addToCache(thing, o, key);
   registerProxy(o);
 
-  return Object.seal(o);
+  return seal(o);
 }
 
 const defaultSecureObjectKey = {
   defaultSecureObjectKey: true
 };
 
-SecureObject.getRaw = function(so) {
+SecureObject.getRaw = function getRaw(so) {
   const raw = getRef(so, getKey(so));
 
   if (!raw) {
@@ -4729,7 +4754,7 @@ SecureObject.filterEverything = function(st, raw, options) {
     }
 
     const isNodeList = raw && (raw instanceof NodeList || raw instanceof HTMLCollection);
-    if (Array.isArray(raw)) {
+    if (isArray(raw)) {
       if (!belongsToLocker) {
         if (!rawKey) {
           // Array that was created in this locker or system mode but not yet keyed - key it now
@@ -4836,7 +4861,7 @@ SecureObject.filterArguments = function(st, args, options) {
     const value = args[n];
     if (value) {
       if (rawArguments && typeof value === 'object') {
-        args[n] = Array.isArray(value) ? getRawArray(value) : getRaw(value);
+        args[n] = isArray(value) ? getRawArray(value) : getRaw(value);
       } else {
         args[n] = SecureObject.filterEverything(st, value, options);
       }
@@ -4908,7 +4933,7 @@ const filteringProxyHandler = (function() {
 
   FilteringProxyHandler.prototype['defineProperty'] = function(target, property, descriptor) {
     const raw = getRef(target, getKey(target));
-    Object.defineProperty(raw, property, descriptor);
+    defineProperty(raw, property, descriptor);
     return true;
   };
 
@@ -4926,14 +4951,14 @@ const filteringProxyHandler = (function() {
 
   FilteringProxyHandler.prototype['getOwnPropertyDescriptor'] = function(target, property) {
     // If the property is non-writable and non-configurable, there is nothing to do.
-    const targetDescriptor = Object.getOwnPropertyDescriptor(target, property);
+    const targetDescriptor = getOwnPropertyDescriptor(target, property);
     if (targetDescriptor && !targetDescriptor.configurable && !targetDescriptor.writable) {
       return targetDescriptor;
     }
 
     // Always get the descriptor of the raw object.
     const raw = getRef(target, getKey(target));
-    const rawDescriptor = Object.getOwnPropertyDescriptor(raw, property);
+    const rawDescriptor = getOwnPropertyDescriptor(raw, property);
     if (rawDescriptor) {
       // Always filter the descriptor value.
       if (rawDescriptor.hasOwnProperty('value')) {
@@ -4942,17 +4967,17 @@ const filteringProxyHandler = (function() {
 
       // Always remove from the surrogate (and redefine if necessary).
       if (targetDescriptor) {
-        Reflect.deleteProperty(target, property);
+        deleteProperty(target, property);
       }
 
       // Use the surrogate to preserve invariants.
       // Only non-configurable properties are verified against the target.
       if (!rawDescriptor.configurable) {
-        Object.defineProperty(target, property, rawDescriptor);
+        defineProperty(target, property, rawDescriptor);
       }
     } else if (targetDescriptor) {
       // Update the surrogate when the property is no longer on raw.
-      Reflect.deleteProperty(target, property);
+      deleteProperty(target, property);
     }
 
     return rawDescriptor;
@@ -4968,12 +4993,12 @@ const filteringProxyHandler = (function() {
     return Object.preventExtensions(raw);
   };
 
-  return Object.freeze(new FilteringProxyHandler());
+  return freeze(new FilteringProxyHandler());
 })();
 
 SecureObject.createFilteringProxy = function(raw, key) {
   // Use a direct proxy on raw to a proxy on {} to avoid the Proxy invariants for non-writable, non-configurable properties
-  const surrogate = Object.create(Object.getPrototypeOf(raw));
+  const surrogate = create$1(Object.getPrototypeOf(raw));
   setRef(surrogate, raw, key);
 
   const rawKey = getKey(raw);
@@ -5096,14 +5121,14 @@ function getArrayLikeThingProxyHandler(key) {
 
     KEY_TO_ARRAY_LIKE_THING_HANDLER.set(key, handler);
 
-    Object.freeze(handler);
+    freeze(handler);
   }
 
   return handler;
 }
 
 SecureObject.createProxyForArrayLikeObjects = function(raw, key) {
-  const surrogate = Object.create(Object.getPrototypeOf(raw));
+  const surrogate = create$1(Object.getPrototypeOf(raw));
   setRef(surrogate, raw, key);
 
   const proxy = new Proxy(surrogate, getArrayLikeThingProxyHandler(key));
@@ -5177,16 +5202,16 @@ function getArrayProxyHandler(key) {
         const raw = target;
         const filtered = getFilteredArray(handler, raw, key);
         if (property === 'length') {
-          return Object.getOwnPropertyDescriptor(filtered, property);
+          return getOwnPropertyDescriptor(filtered, property);
         }
         if (property in filtered) {
-          return Object.getOwnPropertyDescriptor(raw, filtered[property]['rawIndex']);
+          return getOwnPropertyDescriptor(raw, filtered[property]['rawIndex']);
         }
         return undefined;
       },
       defineProperty: function(target, property, descriptor) {
         const raw = target;
-        Object.defineProperty(raw, property, descriptor);
+        defineProperty(raw, property, descriptor);
         return true;
       },
       get: function(target, property) {
@@ -5433,7 +5458,7 @@ function getArrayProxyHandler(key) {
       ownKeys: function(target) {
         const raw = target;
         const filtered = getFilteredArray(handler, raw, key);
-        return Object.getOwnPropertyNames(filtered);
+        return getOwnPropertyNames(filtered);
       },
       deleteProperty: function(target, property) {
         const raw = target;
@@ -5468,14 +5493,14 @@ function getArrayProxyHandler(key) {
 
     KEY_TO_ARRAY_HANLDER.set(key, handler);
 
-    Object.freeze(handler);
+    freeze(handler);
   }
 
   return handler;
 }
 
 SecureObject.createProxyForArrayObjects = function(raw, key) {
-  if (!Array.isArray(raw)) {
+  if (!isArray(raw)) {
     warn('Illegal usage of SecureObject.createProxyForArrayObjects');
     return SecureObject.createFilteringProxy(raw, key);
   }
@@ -5704,14 +5729,14 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
 
     KEY_TO_NAMED_NODE_MAP_HANLDER.set(key, handler);
 
-    Object.freeze(handler);
+    freeze(handler);
   }
 
   return handler;
 }
 
 SecureObject.createProxyForNamedNodeMap = function(raw, key, prototype, caseInsensitiveAttributes) {
-  const surrogate = Object.create(Object.getPrototypeOf(raw));
+  const surrogate = create$1(Object.getPrototypeOf(raw));
   setRef(surrogate, raw, key);
 
   const proxy = new Proxy(
@@ -5900,7 +5925,7 @@ SecureObject.addIfSupported = function(behavior, st, element, name, options) {
 
   const prop = behavior(st, element, name, options);
   if (prop) {
-    Object.defineProperty(st, name, prop);
+    defineProperty(st, name, prop);
   }
 };
 
@@ -6156,7 +6181,7 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, k
       if (item.type === 'function') {
         SecureObject.addMethodIfSupported(so, raw, name, options);
       } else if (item.type === '@raw') {
-        Object.defineProperty(so, name, {
+        defineProperty(so, name, {
           // Does not currently secure proxy the actual class
           get: function() {
             return valueOverride || raw[name];
@@ -6166,7 +6191,7 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, k
           }
         });
       } else if (item.type === '@ctor') {
-        Object.defineProperty(so, name, {
+        defineProperty(so, name, {
           get: function() {
             return (
               valueOverride ||
@@ -6197,7 +6222,7 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, k
           }
         });
       } else if (item.type === '@event') {
-        Object.defineProperty(so, name, {
+        defineProperty(so, name, {
           get: function() {
             return SecureObject.filterEverything(so, raw[name]);
           },
@@ -6214,7 +6239,7 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, k
         // Properties
         const descriptor = SecureObject.createFilteredProperty(so, raw, name, options);
         if (descriptor) {
-          Object.defineProperty(so, name, descriptor);
+          defineProperty(so, name, descriptor);
         }
       }
     }
@@ -6419,7 +6444,7 @@ SecureObject.addUnfilteredPropertyIfSupported = function(st, raw, name) {
       value: raw[name],
       writable: true
     };
-    Object.defineProperty(st, name, config);
+    defineProperty(st, name, config);
   }
 };
 
@@ -6658,9 +6683,9 @@ function SecureDocument(doc, key) {
 
   // create prototype to allow instanceof checks against document
   const prototype = function() {};
-  Object.freeze(prototype);
+  freeze(prototype);
 
-  o = Object.create(prototype, {
+  o = create$1(prototype, {
     toString: {
       value: function() {
         return `SecureDocument: ${doc}{ key: ${JSON.stringify(key)} }`;
@@ -6737,7 +6762,7 @@ function SecureDocument(doc, key) {
     return `LSKey[${key['namespace']}]`;
   }
 
-  Object.defineProperty(o, 'cookie', {
+  defineProperty(o, 'cookie', {
     get: function() {
       const fullCookie = doc.cookie;
       const entries = fullCookie.split(';');
@@ -6801,7 +6826,7 @@ function SecureLocation(loc, key) {
     return o;
   }
 
-  o = Object.create(null, {
+  o = create$1(null, {
     toString: {
       value: function() {
         return loc.href;
@@ -6886,7 +6911,7 @@ function SecureNavigator(navigator, key) {
     return o;
   }
 
-  o = Object.create(null, {
+  o = create$1(null, {
     toString: {
       value: function() {
         return `SecureNavigator: ${navigator}{ key: ${JSON.stringify(key)} }`;
@@ -6939,7 +6964,7 @@ function SecureXMLHttpRequest(key) {
   return function() {
     const xhr = new XMLHttpRequest();
 
-    const o = Object.create(null, {
+    const o = create$1(null, {
       toString: {
         value: function() {
           return `SecureXMLHttpRequest: ${xhr} { key: ${JSON.stringify(key)} }`;
@@ -6978,7 +7003,7 @@ function SecureXMLHttpRequest(key) {
       'onloadend',
       'onreadystatechange'
     ].forEach(name =>
-      Object.defineProperty(o, name, {
+      defineProperty(o, name, {
         set: function(callback) {
           xhr[name] = function(e) {
             callback.call(o, e && SecureDOMEvent(e, key));
@@ -6987,7 +7012,7 @@ function SecureXMLHttpRequest(key) {
       })
     );
 
-    Object.defineProperties(o, {
+    defineProperties(o, {
       abort: SecureObject.createFilteredMethod(o, xhr, 'abort'),
 
       addEventListener: createAddEventListenerDescriptor(o, xhr, key),
@@ -7030,7 +7055,7 @@ function SecureXMLHttpRequest(key) {
 
     setRef(o, xhr, key);
 
-    return Object.freeze(o);
+    return freeze(o);
   };
 }
 
@@ -7065,7 +7090,7 @@ function SecureMutationObserver(key) {
 
   // Create a new closure constructor for new MutationObserver() syntax support that captures the key
   return function(callback) {
-    const o = Object.create(null);
+    const o = create$1(null);
 
     const observer = new MutationObserver(records => {
       const filtered = filterRecords(o, records);
@@ -7074,7 +7099,7 @@ function SecureMutationObserver(key) {
       }
     });
 
-    Object.defineProperties(o, {
+    defineProperties(o, {
       toString: {
         value: function() {
           return `SecureMutationObserver: ${observer} { key: ${JSON.stringify(key)} }`;
@@ -7094,7 +7119,7 @@ function SecureMutationObserver(key) {
 
     setRef(o, observer, key);
 
-    return Object.freeze(o);
+    return freeze(o);
   };
 }
 
@@ -7119,7 +7144,7 @@ function SecureNotification(key) {
   return function(title, options) {
     const notification = new Notification(title, options);
 
-    const o = Object.create(null, {
+    const o = create$1(null, {
       toString: {
         value: function() {
           return `SecureNotification: ${notification} { key: ${JSON.stringify(key)} }`;
@@ -7151,7 +7176,7 @@ function SecureNotification(key) {
 
     // Event handlers
     ['onclick', 'onerror'].forEach(name =>
-      Object.defineProperty(o, name, {
+      defineProperty(o, name, {
         set: function(callback) {
           notification[name] = function(e) {
             callback.call(o, e && SecureDOMEvent(e, key));
@@ -7160,7 +7185,7 @@ function SecureNotification(key) {
       })
     );
 
-    Object.defineProperties(o, {
+    defineProperties(o, {
       close: SecureObject.createFilteredMethod(o, notification, 'close')
     });
 
@@ -7168,7 +7193,7 @@ function SecureNotification(key) {
 
     setRef(o, notification, key);
 
-    return Object.freeze(o);
+    return freeze(o);
   };
 }
 
@@ -7240,7 +7265,7 @@ function SecureStorage(storage, type, key) {
     }
   }
 
-  o = Object.create(null, {
+  o = create$1(null, {
     toString: {
       value: function() {
         return `SecureStorage: ${type} { key: ${JSON.stringify(key)} }`;
@@ -7333,8 +7358,9 @@ function SecureStorage(storage, type, key) {
 // https://developer.microsoft.com/en-us/microsoft-edge/platform/status/urlapi/
 
 // Only FireFox implements the correct behavior.
+
 function SecureURL(raw) {
-  const SecureURLMethods = Object.create(null, {
+  const SecureURLMethods = create$1(null, {
     createObjectURL: {
       value: function(object) {
         if (Object.prototype.toString.call(object) === '[object Blob]') {
@@ -7357,9 +7383,9 @@ function SecureURL(raw) {
   return new Proxy(raw, {
     get: function(target, name) {
       // Give priority to the overritten methods.
-      let desc = Object.getOwnPropertyDescriptor(SecureURLMethods, name);
+      let desc = getOwnPropertyDescriptor(SecureURLMethods, name);
       if (desc === undefined) {
-        desc = Object.getOwnPropertyDescriptor(target, name);
+        desc = getOwnPropertyDescriptor(target, name);
       }
       if (desc === undefined || desc.value === undefined) {
         return undefined;
@@ -7468,7 +7494,7 @@ function SecureBlob(blobParts = [], opts) {
   blobParts = [].concat(blobParts);
 
   // prevent property getters hijacking
-  opts = Object.assign({}, opts);
+  opts = assign({}, opts);
 
   // prevent shapeshifting attacks on type property
   opts.type = String(opts.type).toLowerCase();
@@ -8125,14 +8151,14 @@ function SecureWindow(sandbox, key) {
   }
 
   // Create prototype to allow basic object operations like hasOwnProperty etc
-  const props = Object.getOwnPropertyDescriptors(Object.prototype);
+  const props = getOwnPropertyDescriptors(Object.prototype);
   // Do not treat window like a plain object, $A.util.isPlainObject() returns true if we leave the constructor intact.
   delete props.constructor;
-  const emptyProto = Object.create(null, props);
+  const emptyProto = create$1(null, props);
 
-  Object.freeze(emptyProto);
+  freeze(emptyProto);
 
-  o = Object.create(emptyProto, {
+  o = create$1(emptyProto, {
     document: {
       enumerable: true,
       value: SecureDocument(win.document, key)
@@ -8230,13 +8256,13 @@ function SecureWindow(sandbox, key) {
   );
 
   if ('localStorage' in win) {
-    Object.defineProperty(o, 'localStorage', {
+    defineProperty(o, 'localStorage', {
       enumerable: true,
       value: SecureStorage(win.localStorage, 'LOCAL', key)
     });
   }
   if ('sessionStorage' in win) {
-    Object.defineProperty(o, 'sessionStorage', {
+    defineProperty(o, 'sessionStorage', {
       enumerable: true,
       value: SecureStorage(win.sessionStorage, 'SESSION', key)
     });
@@ -8244,7 +8270,7 @@ function SecureWindow(sandbox, key) {
 
   if ('FormData' in win) {
     let formDataValueOverride;
-    Object.defineProperty(o, 'FormData', {
+    defineProperty(o, 'FormData', {
       get: function() {
         return (
           formDataValueOverride ||
@@ -8277,14 +8303,14 @@ function SecureWindow(sandbox, key) {
 
   if ('Notification' in win) {
     let notificationValueOverride;
-    Object.defineProperty(o, 'Notification', {
+    defineProperty(o, 'Notification', {
       get: function() {
         if (notificationValueOverride) {
           return notificationValueOverride;
         }
         const notification = SecureNotification(key);
         if ('requestPermission' in win['Notification']) {
-          Object.defineProperty(notification, 'requestPermission', {
+          defineProperty(notification, 'requestPermission', {
             enumerable: true,
             value: function(callback) {
               return Notification['requestPermission'](callback);
@@ -8292,7 +8318,7 @@ function SecureWindow(sandbox, key) {
           });
         }
         if ('permission' in win['Notification']) {
-          Object.defineProperty(notification, 'permission', {
+          defineProperty(notification, 'permission', {
             enumerable: true,
             value: Notification['permission']
           });
@@ -8306,7 +8332,7 @@ function SecureWindow(sandbox, key) {
   }
 
   if ('Blob' in win) {
-    Object.defineProperty(o, 'Blob', {
+    defineProperty(o, 'Blob', {
       enumerable: true,
       value: SecureBlob
     });
@@ -8314,7 +8340,7 @@ function SecureWindow(sandbox, key) {
 
   if ('File' in win) {
     let valueOverride;
-    Object.defineProperty(o, 'File', {
+    defineProperty(o, 'File', {
       get: function() {
         return (
           valueOverride ||
@@ -8369,7 +8395,7 @@ function SecureWindow(sandbox, key) {
     // These are direct passthrough's and should never be wrapped in a SecureObject
     // They are non-writable to make them compatible with the evaluator.
     name =>
-      Object.defineProperty(o, name, {
+      defineProperty(o, name, {
         enumerable: true,
         value: win[name]
       })
@@ -8407,7 +8433,7 @@ function SecureWindow(sandbox, key) {
 function SecureRTCPeerConnection(raw, key) {
   const SecureConstructor = function(configuration) {
     const rtc = new raw(configuration);
-    const o = Object.create(null, {
+    const o = create$1(null, {
       toString: {
         value: function() {
           return `SecureRTCPeerConnection: ${rtc}{ key: ${JSON.stringify(key)} }`;
@@ -8421,7 +8447,7 @@ function SecureRTCPeerConnection(raw, key) {
     const originalRemoveEventListener = rtc['removeEventListener'];
     const options = { rawArguments: true };
     // Override the event target functions to handled wrapped arguments
-    Object.defineProperties(rtc, {
+    defineProperties(rtc, {
       addEventListener: {
         writable: true,
         value: function(event, callback, useCapture) {
@@ -8486,7 +8512,7 @@ function SecureRTCPeerConnection(raw, key) {
  */
 
 function SecureEngine(engine) {
-  const o = Object.create(null, {
+  const o = create$1(null, {
     Element: {
       enumerable: true,
       value: engine['Element']
@@ -8497,7 +8523,7 @@ function SecureEngine(engine) {
       }
     }
   });
-  Object.freeze(o);
+  freeze(o);
   return o;
 }
 
@@ -8533,7 +8559,7 @@ function SecureAura(AuraInstance, key) {
     for (const property in members) {
       value = members[property];
       if (value !== undefined && value !== null) {
-        if (Array.isArray(value) || isPlainObject(value)) {
+        if (isArray(value) || isPlainObject(value)) {
           const branchValue = baseObject[property];
           baseObject[property] = deepUnfilterArgs(branchValue, value);
           continue;
@@ -8547,9 +8573,9 @@ function SecureAura(AuraInstance, key) {
     return baseObject;
   }
 
-  const su = Object.create(null);
-  const sls = Object.create(null);
-  o = Object.create(null, {
+  const su = create$1(null);
+  const sls = create$1(null);
+  o = create$1(null, {
     util: {
       writable: true,
       enumerable: true,
@@ -8597,7 +8623,7 @@ function SecureAura(AuraInstance, key) {
       writable: true,
       value: function(components, callback) {
         let filteredComponents = [];
-        if (Array.isArray(components)) {
+        if (isArray(components)) {
           for (let i = 0; i < components.length; i++) {
             const filteredComponent = [];
             filteredComponent[0] = components[i][0];
@@ -8620,7 +8646,7 @@ function SecureAura(AuraInstance, key) {
 
   // SecureAura methods and properties
   ['enqueueAction'].forEach(name =>
-    Object.defineProperty(
+    defineProperty(
       o,
       name,
       SecureObject.createFilteredMethod(o, AuraInstance, name, { rawArguments: true })
@@ -8628,23 +8654,19 @@ function SecureAura(AuraInstance, key) {
   );
 
   ['get', 'getComponent', 'getReference', 'getRoot', 'log', 'reportError', 'warning'].forEach(
-    name => Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name))
+    name => defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name))
   );
 
   setRef(o, AuraInstance, key);
-  Object.seal(o);
+  seal(o);
 
   // SecureUtil: creating a proxy for $A.util
   ['getBooleanValue', 'isArray', 'isObject', 'isUndefined', 'isUndefinedOrNull'].forEach(name =>
-    Object.defineProperty(
-      su,
-      name,
-      SecureObject.createFilteredMethod(su, AuraInstance['util'], name)
-    )
+    defineProperty(su, name, SecureObject.createFilteredMethod(su, AuraInstance['util'], name))
   );
   // These methods in Util deal with raw objects like components, so mark them as such
   ['addClass', 'hasClass', 'removeClass', 'toggleClass', 'isEmpty'].forEach(name =>
-    Object.defineProperty(
+    defineProperty(
       su,
       name,
       SecureObject.createFilteredMethod(su, AuraInstance['util'], name, { rawArguments: true })
@@ -8652,7 +8674,7 @@ function SecureAura(AuraInstance, key) {
   );
 
   setRef(su, AuraInstance['util'], key);
-  Object.seal(su);
+  seal(su);
 
   // SecureLocalizationService: creating a proxy for $A.localizationService
   [
@@ -8705,7 +8727,7 @@ function SecureAura(AuraInstance, key) {
     'UTCToWallTime',
     'WallTimeToUTC'
   ].forEach(name =>
-    Object.defineProperty(
+    defineProperty(
       sls,
       name,
       SecureObject.createFilteredMethod(sls, AuraInstance['localizationService'], name)
@@ -8713,7 +8735,7 @@ function SecureAura(AuraInstance, key) {
   );
 
   setRef(sls, AuraInstance['localizationService'], key);
-  Object.seal(sls);
+  seal(sls);
 
   addToCache(AuraInstance, o, key);
   registerProxy(o);
@@ -8743,7 +8765,7 @@ function SecureAuraAction(action, key) {
     return o;
   }
 
-  o = Object.create(null, {
+  o = create$1(null, {
     toString: {
       value: function() {
         return `SecureAction: ${action}{ key: ${JSON.stringify(key)} }`;
@@ -8751,7 +8773,7 @@ function SecureAuraAction(action, key) {
     }
   });
 
-  Object.defineProperties(o, {
+  defineProperties(o, {
     getName: SecureObject.createFilteredMethod(o, action, 'getName'),
     setCallback: SecureObject.createFilteredMethod(o, action, 'setCallback', { defaultKey: key }),
     setParams: SecureObject.createFilteredMethod(o, action, 'setParams', { defaultKey: key }),
@@ -8774,7 +8796,7 @@ function SecureAuraAction(action, key) {
   addToCache(action, o, key);
   registerProxy(o);
 
-  return Object.seal(o);
+  return seal(o);
 }
 
 /*
@@ -8808,7 +8830,7 @@ function SecureAuraEvent(event, key) {
     let value;
     for (const property in members) {
       value = members[property];
-      if (Array.isArray(value)) {
+      if (isArray(value)) {
         value = deepUnfilterMethodArguments([], value);
       } else if (isPlainObject(value)) {
         value = deepUnfilterMethodArguments({}, value);
@@ -8831,7 +8853,7 @@ function SecureAuraEvent(event, key) {
     return baseObject;
   }
 
-  o = Object.create(null, {
+  o = create$1(null, {
     toString: {
       value: function() {
         return `SecureAuraEvent: ${event}{ key: ${JSON.stringify(key)} }`;
@@ -8870,15 +8892,13 @@ function SecureAuraEvent(event, key) {
     'stopPropagation',
     'getType',
     'getEventType'
-  ].forEach(name =>
-    Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name))
-  );
+  ].forEach(name => defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name)));
 
   setRef(o, event, key);
   addToCache(event, o, key);
   registerProxy(o);
 
-  return Object.seal(o);
+  return seal(o);
 }
 
 /*
@@ -8930,7 +8950,7 @@ function SecureAuraComponent(component, key) {
   }
 
   // special methods that require some extra work
-  o = Object.create(null, {
+  o = create$1(null, {
     get: {
       writable: true,
       enumerable: true,
@@ -8970,7 +8990,7 @@ function SecureAuraComponent(component, key) {
     }
   });
 
-  Object.defineProperties(o, {
+  defineProperties(o, {
     // these four super* methods are exposed as a temporary solution until we figure how to re-arrange the render flow
     superRender: SecureObject.createFilteredMethod(o, component, 'superRender'),
     superAfterRender: SecureObject.createFilteredMethod(o, component, 'superAfterRender'),
@@ -9046,14 +9066,14 @@ function SecureAuraComponentRef(component, key) {
     return o;
   }
 
-  o = Object.create(null, {
+  o = create$1(null, {
     toString: {
       value: function() {
         return `SecureComponentRef: ${component}{ key: ${JSON.stringify(key)} }`;
       }
     }
   });
-  Object.defineProperties(o, {
+  defineProperties(o, {
     addValueHandler: SecureObject.createFilteredMethod(o, component, 'addValueHandler'),
     addValueProvider: SecureObject.createFilteredMethod(o, component, 'addValueProvider'),
     destroy: SecureObject.createFilteredMethod(o, component, 'destroy'),
@@ -9094,7 +9114,7 @@ function SecureAuraComponentRef(component, key) {
     let value;
     for (const property in members) {
       value = members[property];
-      if (Array.isArray(value)) {
+      if (isArray(value)) {
         value = deepUnfilterMethodArguments([], value);
       } else if (isPlainObject(value)) {
         value = deepUnfilterMethodArguments({}, value);
@@ -9144,7 +9164,7 @@ function SecureAuraComponentRef(component, key) {
   addToCache(component, o, key);
   registerProxy(o);
 
-  return Object.seal(o);
+  return seal(o);
 }
 
 /*
@@ -9169,7 +9189,7 @@ function SecureAuraPropertyReferenceValue(prv, key) {
     return o;
   }
 
-  o = Object.create(null, {
+  o = create$1(null, {
     toString: {
       value: function() {
         return `SecurePropertyReferenceValue: ${prv} { key: ${JSON.stringify(key)} }`;
@@ -9181,7 +9201,7 @@ function SecureAuraPropertyReferenceValue(prv, key) {
   addToCache(prv, o, key);
   registerProxy(o);
 
-  return Object.seal(o);
+  return seal(o);
 }
 
 /*

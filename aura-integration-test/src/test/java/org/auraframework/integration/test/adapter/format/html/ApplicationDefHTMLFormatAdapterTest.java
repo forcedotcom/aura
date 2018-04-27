@@ -117,7 +117,8 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         String isLockerServiceEnabled =  configAdapter.isLockerServiceEnabled() ? ",\"ls\":1" : "";
         String isStrictCSPEnforced = configAdapter.isStrictCSPEnforced() ? ",\"csp\":1" : "";
-        String lockerConfig = isLockerServiceEnabled + isStrictCSPEnforced;
+        String isFrozenRealmEnabled = configAdapter.isFrozenRealmEnabled() ? ",\"fr\":1" : "";
+        String lockerConfig = isLockerServiceEnabled + isStrictCSPEnforced + isFrozenRealmEnabled;
         
         String expectedSubPath = AuraTextUtil.urlencode(String.format(
                 "{\"mode\":\"UTEST\",\"app\":\"%s\",\"pathPrefix\":\"\",\"test\":\"org.auraframework.integration.test.adapter.format.html.ApplicationDefHTMLFormatAdapterTest.testWriteManifest\"%s,\"uad\":1}",

@@ -28,7 +28,8 @@
             $A.test.assertEquals("{\"1\":\"salesforce.com\",\"2\":{\"a\":\"AA\"}}", $A.util.json.encode(map), "Json encode methods failed to serialize a javascript object");
         }
     },
-    testArrayWithToJSON : {
+    // Disabled because modifying prototype will be prevented by freezing.
+    _testArrayWithToJSON : {
         test : function(cmp) {
             var tojson = function() {};
             Array.prototype.toJSON = tojson;

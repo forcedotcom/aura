@@ -102,12 +102,15 @@
                 }
             }
 
-            delete resizer._pendingUpdates[id];
+            // clean pending updates for given component.
+            if (resizer._pendingUpdates) {                
+                delete resizer._pendingUpdates[id];
 
-            // Check to see if all components have called in and we're ready to
-            // actually perform the resizer() call
-            if (Object.keys(resizer._pendingUpdates || {}).length > 0) {
-                return;
+                // Check to see if all components have called in and we're ready to
+                // actually perform the resizer() call
+                if (Object.keys(resizer._pendingUpdates).length > 0) {
+                    return;
+                }
             }
 
             resizer._resizing = false;

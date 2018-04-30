@@ -8075,12 +8075,15 @@ return {
                 }
             }
 
-            delete resizer._pendingUpdates[id];
+            
+            if (resizer._pendingUpdates) {                
+                delete resizer._pendingUpdates[id];
 
-            
-            
-            if (Object.keys(resizer._pendingUpdates || {}).length > 0) {
-                return;
+                
+                
+                if (Object.keys(resizer._pendingUpdates).length > 0) {
+                    return;
+                }
             }
 
             resizer._resizing = false;

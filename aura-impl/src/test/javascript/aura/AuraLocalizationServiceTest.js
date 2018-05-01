@@ -2236,8 +2236,6 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         }
     }
 
-
-
     [Fixture]
     function parseDateTimeISO8601() {
 
@@ -2339,23 +2337,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         }
 
         [Fact]
-        function CallsToISOStringOnDateIfExits() {
-            // Arrange
-            var targetService = new Aura.Services.AuraLocalizationService();
-            var date = new Date();
-            date.toISOString = Stubs.GetMethod();
-
-            // Act
-            mockUtil(function() {
-                targetService.toISOString(date);
-            });
-
-            // Assert
-            Assert.Equal(1, date.toISOString.Calls.length);
-        }
-
-        [Fact]
-        function ReturnsISOStringForDateWithToISOString(){
+        function ReturnsISOString() {
             // Arrange
             var targetService = new Aura.Services.AuraLocalizationService();
             var expected = "2004-11-09T12:30:59.123Z";
@@ -2371,23 +2353,6 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [Fact]
-        function ReturnsISOStringForDateWithoutToISOString(){
-            // Arrange
-            var targetService = new Aura.Services.AuraLocalizationService();
-            var expected = "2004-11-09T12:30:59.123Z";
-            var date = new Date(Date.UTC(2004,10,09,12,30,59,123));
-            date.toISOString = undefined;
-            var actual;
-
-            // Act
-            mockUtil(function() {
-                actual = targetService.toISOString(date);
-            });
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
     }
 
     [Fixture]
@@ -2566,7 +2531,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
     }
 
     [Fixture]
-    function WallTimeToUTC(){
+    function WallTimeToUTC() {
 
         [Fact]
         function CallbackWithOriginalDateWhenZoneIsGMT() {
@@ -3509,115 +3474,4 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         }
     }
 
-    [Fixture]
-    function pad(){
-
-        [Fact]
-        function pad0(){
-            // Arrange
-            var expected = '00';
-            var actual;
-
-            // Act
-            actual = targetService.pad(0);
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function pad1(){
-            // Arrange
-            var expected = '01';
-            var actual;
-
-            // Act
-            actual = targetService.pad(1);
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function pad9(){
-            // Arrange
-            var expected = '09';
-            var actual;
-
-            // Act
-            actual = targetService.pad(9);
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function pad10(){
-            // Arrange
-            var expected = '10';
-            var actual;
-
-            // Act
-            actual = targetService.pad(10);
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-    }
-
-    [Fixture]
-    function doublePad(){
-
-        [Fact]
-        function pad0(){
-            // Arrange
-            var expected = '000';
-            var actual;
-
-            // Act
-            actual = targetService.doublePad(0);
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function pad1(){
-            // Arrange
-            var expected = '001';
-            var actual;
-
-            // Act
-            actual = targetService.doublePad(1);
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function pad9(){
-            // Arrange
-            var expected = '099';
-            var actual;
-
-            // Act
-            actual = targetService.doublePad(99);
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function pad10(){
-            // Arrange
-            var expected = '100';
-            var actual;
-
-            // Act
-            actual = targetService.doublePad(100);
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-    }
 }

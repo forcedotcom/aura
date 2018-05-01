@@ -812,8 +812,14 @@ AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timeZo
         return callback("Invalid Date");
     }
 
-    var tz = timeZone ? timeZone : $A.get("$Locale.timezone");
-    callback(this.formatDateWithTimeZone(date, tz));
+    if (!timeZone) {
+        timeZone = $A.get("$Locale.timezone");
+    }
+
+    var dateTimeString = this.formatDateWithTimeZone(date, timeZone);
+    var match = this.EN_US_DATETIME_PATTERN.exec(dateTimeString);
+
+    callback(match[3] + "-" + match[1] + "-" + match[2]);
 };
 
 /**
@@ -1032,7 +1038,7 @@ AuraLocalizationService.prototype.isBefore = function(date1, date2, unit) {
  * @return {Boolean} Returns true if date1 is the same as date2, or false otherwise.
  * @memberOf AuraLocalizationService
  * @example
- * var date = new date();
+ * var date = new Date();
  * var day = $A.localizationService.endOf(date, 'day');
  * // Returns false
  * $A.localizationService.isSame(date, day, 'hour');
@@ -1255,7 +1261,7 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
     if (unit === "week") {
         var firstDayOfWeek = $A.get("$Locale.firstDayOfWeek");
         var weekday = (normalizedDate.getDay() + 7 - firstDayOfWeek) % 7;
-        var offset = weekday * 24 * 60 * 60 * 1000;
+        var offset = weekday * 864e5; // 24 * 60 * 60 * 1000
 
         normalizedDate.setTime(normalizedDate.getTime() - offset);
     }
@@ -1291,7 +1297,7 @@ AuraLocalizationService.prototype.endOf = function(date, unit) {
 };
 
 /**
- * Most modern browsers support this method on Date object. But that is not the case for IE8 and older.
+ * Get a date time string in simplified extended ISO format.
  * @param {Date} date - a Date object
  * @return {String} An ISO8601 string to represent passed in Date object.
  * @memberOf AuraLocalizationService
@@ -1307,21 +1313,8 @@ AuraLocalizationService.prototype.endOf = function(date, unit) {
 AuraLocalizationService.prototype.toISOString = function(date) {
     $A.deprecated("$A.localizationService.toISOString(): The method is no longer supported by framework, and will be removed in an upcoming release.",
             "Use native method Date.toISOString() instead", "AuraLocalizationService.toISOString");
-    if (date instanceof Date) {
-        if (date.toISOString) {
-            return date.toISOString();
-        } else {
-            return date.getUTCFullYear() + '-'
-                 + this.pad(date.getUTCMonth() + 1) + '-'
-                 + this.pad(date.getUTCDate()) + 'T'
-                 + this.pad(date.getUTCHours()) + ':'
-                 + this.pad(date.getUTCMinutes()) + ':'
-                 + this.pad(date.getUTCSeconds()) + '.'
-                 + this.doublePad(date.getUTCMilliseconds()) + 'Z';
-        }
-    } else {
-        return date;
-    }
+
+    return this.isValidDate(date)? date.toISOString() : date;
 };
 
 /**
@@ -1452,17 +1445,23 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
     $A.assert(date instanceof Date, "AuraLocalizationService.UTCToWallTime(): 'date' must be a Date object.");
     $A.assert(typeof callback === "function", "AuraLocalizationService.UTCToWallTime(): 'callback' must be a function.");
 
-    if (!timezone) {
-        timezone = $A.get("$Locale.timezone");
-    }
-
-    if (timezone === "GMT" || timezone === "UTC" || !this.isValidDate(date)) {
+    timezone = this.normalizeTimeZone(timezone);
+    if (timezone === "UTC" || !this.isValidDate(date)) {
         callback(date);
         return;
     }
 
-    var offset = this.getTimeZoneOffsetByDate(date, timezone);
-    callback(new Date(date.getTime() + offset));
+    var data = this.createDateTimeData(date, "UTC");
+
+    var convertedData = this.setDataToZone(data, timezone);
+    var dateTime = convertedData["config"];
+
+    var ts = Date.UTC(dateTime["year"], dateTime["month"]-1, dateTime["day"], dateTime["hour"], dateTime["minute"]);
+    var wallTimeDate = new Date(ts);
+    wallTimeDate.setSeconds(date.getSeconds());
+    wallTimeDate.setMilliseconds(date.getMilliseconds());
+
+    callback(wallTimeDate);
 };
 
 /**
@@ -1483,17 +1482,23 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
     $A.assert(date instanceof Date, "AuraLocalizationService.WallTimeToUTC(): 'date' must be a Date object.");
     $A.assert(typeof callback === "function", "AuraLocalizationService.WallTimeToUTC(): callback must be a function.");
 
-    if (!timezone) {
-        timezone = $A.get("$Locale.timezone");
-    }
-
-    if (timezone === "GMT" || timezone === "UTC" || !this.isValidDate(date)) {
+    timezone = this.normalizeTimeZone(timezone);
+    if (timezone === "UTC" || !this.isValidDate(date)) {
         callback(date);
         return;
     }
 
-    var offset = this.getTimeZoneOffsetByDate(date, timezone);
-    callback(new Date(date.getTime() - offset));
+    var data = this.createDateTimeData(date, timezone);
+
+    var convertedData = this.setDataToZone(data, "UTC");
+    var dateTime = convertedData["config"];
+
+    var ts = Date.UTC(dateTime["year"], dateTime["month"]-1, dateTime["day"], dateTime["hour"], dateTime["minute"]);
+    var utcDate = new Date(ts);
+    utcDate.setSeconds(date.getSeconds());
+    utcDate.setMilliseconds(date.getMilliseconds());
+
+    callback(utcDate);
 };
 
 /**---------- Private functions ----------*/
@@ -1536,6 +1541,137 @@ AuraLocalizationService.prototype.init = function() {
     this.setupDateTimeUnitAlias();
 };
 
+AuraLocalizationService.prototype.normalizeTimeZone = function(timeZone) {
+
+    if (timeZone) {
+        if (timeZone === "GMT" || timeZone === "UTC") {
+            return "UTC";
+        }
+
+        var timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
+        if (timeZoneFormat !== null) {
+            return timeZone;
+        } else {
+            $A.warning("Unsupported time zone: " + timeZone + ". Fallback to default time zone.");
+        }
+    }
+
+    // If timeZone is falsy or unsupported
+    timeZone = $A.get("$Locale.timezone");
+    if (timeZone === "GMT" || timeZone === "UTC") {
+        return "UTC";
+    }
+
+    timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
+    if (timeZoneFormat !== null) {
+        return timeZone;
+    }
+
+    // If the time zone in label is not supported, then fallback to UTC
+    var message = "Unsupported time zone value in GVP: " + timeZone;
+    $A.warning(message);
+    // Sending Gack to server if the time zone in GVP is not supported by browsers
+    $A.logger.reportError(new $A.auraError(message));
+
+    return "UTC";
+};
+
+AuraLocalizationService.prototype.createDateTimeData = function(date, timeZone) {
+    var config = {
+        "year": date.getUTCFullYear(),
+        "month": date.getUTCMonth() + 1,
+        "day": date.getUTCDate(),
+        "hour": date.getUTCHours(),
+        "minute": date.getUTCMinutes()
+        // Currently we only use the config for time zone conversion,
+        // second and millisecond are not needed.
+    };
+    var zoneInfo = this.getZoneInfo(config, timeZone);
+
+    return {
+        "config": config,
+        "offset": zoneInfo[1],
+        "timestamp": zoneInfo[0],
+        "timeZone": timeZone
+    };
+};
+
+/**
+ * Convert datatime data created by createDateTimeData() to different time zone.
+ *
+ * @returns {Object} datetime data for the given zone
+ *
+ * @private
+ */
+AuraLocalizationService.prototype.setDataToZone = function(data, timeZone) {
+    var timestamp = data["timestamp"];
+    var offset = this.zoneOffset(timestamp, timeZone);
+    timestamp += offset * 6e4; // 60 * 1000
+
+    var date = new Date(timestamp);
+    var config = {
+        "year": date.getUTCFullYear(),
+        "month": date.getUTCMonth() + 1,
+        "day": date.getUTCDate(),
+        "hour": date.getUTCHours(),
+        "minute": date.getUTCMinutes()
+        // Currently we only use the config for time zone conversion,
+        // so second and millisecond are not needed.
+    };
+
+    return {
+        "timestamp": timestamp,
+        "config": config,
+        "timeZone": timeZone,
+        "offset": offset
+    };
+};
+
+/**
+ * @returns {Array} a tuple which contains timestamp and offset
+ */
+AuraLocalizationService.prototype.getZoneInfo = function(config, timeZone) {
+    var nowOffset = this.zoneOffset(Date.now(), timeZone);
+
+    var localTs = Date.UTC(config["year"], config["month"]-1, config["day"], config["hour"], config["minute"]);
+    // First attempt: the time zone offset during current time.
+    var utcGuess = localTs - nowOffset * 6e4; // 60 * 1000
+    var guessOffset = this.zoneOffset(utcGuess, timeZone);
+
+    if (nowOffset === guessOffset) {
+        return [utcGuess, guessOffset];
+    }
+
+    // Second attempt: if the offsets are different, remove the delta from ts.
+    utcGuess -= (guessOffset - nowOffset) * 6e4; // 60 * 1000
+
+    var guessOffset2 = this.zoneOffset(utcGuess, timeZone);
+    if (guessOffset === guessOffset2) {
+        return [utcGuess, guessOffset];
+    }
+
+    // Finally: if the offsets are still different, we have to make the decision.
+    return [localTs - Math.min(guessOffset, guessOffset2) * 6e4, Math.max(guessOffset, guessOffset2)];
+};
+
+/**
+ * Get the time zone offset during the given timestamp.
+ *
+ * @returns {Number} offset in second
+ */
+AuraLocalizationService.prototype.zoneOffset = function(timestamp, timeZone) {
+   if (timeZone === "UTC") {
+       return 0;
+   }
+
+   var dateTimeString = this.formatDateWithTimeZone(new Date(timestamp), timeZone);
+   var zoneTs = this.parseEnUSDateTimeString(dateTimeString);
+
+   // converts to seconds
+   timestamp -= timestamp % 1000;
+   return (zoneTs - timestamp) / (6e4); // 60 * 1000
+};
+
 /**
  * Formats a Date object to the ISO8601 date string.
  *
@@ -1544,57 +1680,7 @@ AuraLocalizationService.prototype.init = function() {
  */
 AuraLocalizationService.prototype.formatDateWithTimeZone = function(date, timeZone) {
     var timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
-    if (timeZoneFormat === null) {
-        $A.warning("Unsupported time zone: " + timeZone + ". Fallback to default time zone.");
-
-        timeZone = $A.get("$Locale.timezone");
-        timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
-        // if the time zone in label is not supported, then fallback to UTC
-        if (timeZoneFormat === null) {
-            var message = "Unsupported time zone value in GVP: " + timeZone;
-            $A.warning(message);
-            // sending Gack to server if the time zone in GVP is not supported by browsers
-            $A.logger.reportError(new $A.auraError(message));
-            // fallback to UTC
-            timeZoneFormat = this.createDateTimeFormatByTimeZone("UTC");
-        }
-    }
-
-    var dateTimeString = timeZoneFormat["format"](date);
-    // IE11 adds LTR / RTL mark in the formatted date time string
-    var match = this.EN_US_DATETIME_PATTERN.exec(dateTimeString.replace(/[\u200E\u200F]/g,''));
-
-    return match[3] + "-" + match[1] + "-" + match[2];
-};
-
-/**
- * Get the time zone offset in millisecond at the given datetime
- *
- * @private
- */
-AuraLocalizationService.prototype.getTimeZoneOffsetByDate = function(date, timeZone) {
-    var utcFormat = this.createDateTimeFormatByTimeZone("UTC");
-    var timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
-    if (timeZoneFormat === null) {
-        $A.warning("Unsupported time zone: " + timeZone + ". Fallback to default time zone.");
-
-        timeZone = $A.get("$Locale.timezone");
-        timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
-        // if the time zone in label is not supported, then fallback to UTC
-        if (timeZoneFormat === null) {
-            var message = "Unsupported time zone value in GVP: " + timeZone;
-            $A.warning(message);
-            // sending Gack to server if the time zone in GVP is not supported by browsers
-            $A.logger.reportError(new $A.auraError(message));
-            return 0;
-        }
-    }
-
-    var timeZoneString = timeZoneFormat["format"](date);
-    var utcString = utcFormat["format"](date);
-
-    var offset = this.parseEnUSDateTimeString(timeZoneString) - this.parseEnUSDateTimeString(utcString);
-    return offset;
+    return this.formatDateTimeToString(timeZoneFormat, date);
 };
 
 /**
@@ -1606,14 +1692,18 @@ AuraLocalizationService.prototype.getTimeZoneOffsetByDate = function(date, timeZ
  * @private
  */
 AuraLocalizationService.prototype.parseEnUSDateTimeString = function(dateTimeString) {
-    // IE11 adds LTR / RTL mark in the formatted date time string
-    var match = this.EN_US_DATETIME_PATTERN.exec(dateTimeString.replace(/[\u200E\u200F]/g,''));
+    var match = this.EN_US_DATETIME_PATTERN.exec(dateTimeString);
     if (match === null) {
         return null;
     }
 
     // month param is between 0 and 11
     return Date.UTC(match[3], match[1] - 1, match[2], match[4], match[5]);
+};
+
+AuraLocalizationService.prototype.formatDateTimeToString = function(dateTimeFormat, date) {
+    // IE11 adds LTR / RTL mark in the formatted date time string
+    return dateTimeFormat["format"](date).replace(/[\u200E\u200F]/g,'');
 };
 
 AuraLocalizationService.prototype.createDateTimeFormatByTimeZone = function(timeZone) {
@@ -1887,7 +1977,7 @@ AuraLocalizationService.prototype.parseDateTimeString = function(dateTimeString)
         $A.warning("The provided datetime string is not in ISO8601 format. It will be parsed by native Date(), which may have different results across browsers and versions. ");
         var date = new Date(dateTimeString);
         // Date parsing includes browser timezone. To maintain current behavior, needs to remove it.
-        date.setTime(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
+        date.setTime(date.getTime() + date.getTimezoneOffset() * 6e4); // 60 * 1000
         return date;
     }
 
@@ -1923,22 +2013,6 @@ AuraLocalizationService.prototype.setupDateTimeUnitAlias = function() {
 
 AuraLocalizationService.prototype.isValidDate = function(date) {
     return (date instanceof Date) && !isNaN(date.getTime());
-};
-
-/**
- * Append zero in front if necessary to standardize a number with two digits. For example, "9" becomes "09".
- * @private
- */
-AuraLocalizationService.prototype.pad = function(n) {
-    return n < 10 ? '0' + n : n;
-};
-
-/**
- * Append zero in front if necessary to standardize a number with three digits. For example, "99" becomes "099".
- * @private
- */
-AuraLocalizationService.prototype.doublePad = function(n) {
-    return n < 10 ? '00' + n : n  < 100 ? '0' + n : n;
 };
 
 Aura.Services.AuraLocalizationService = AuraLocalizationService;

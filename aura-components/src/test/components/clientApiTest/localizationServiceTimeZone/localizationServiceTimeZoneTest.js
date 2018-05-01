@@ -26,25 +26,26 @@
      * This is an edge case but important. Since date object includes browser's timezone offset,
      * the test is verify DST is applied for given timezone vs for browser's timezone.
      *
-     * In the case, for zone "America/New_York", 2:00:00 am clocks were turned backward 1 hour to
-     * 1:00:00 am on Nov 3, 2013.
+     * In the case, for zone "America/New_York", 02:00 am clocks were turned backward 1 hour to
+     * 01:00 am on Nov 3, 2013.
      */
     testUTCToWallTimeWithTimeDuringDSTChange: {
         test: function() {
-            var dateInDST = $A.localizationService.parseDateTimeISO8601("2013-11-03T05:01:00.000Z");
-            var dateOutOfDST = $A.localizationService.parseDateTimeISO8601("2013-11-03T06:01:00.000Z");
-            var format = "MMM d, yyyy h:mm:ss a";
-            var expected = "Nov 3, 2013 1:01:00 AM";
-
-            $A.localizationService.UTCToWallTime(dateInDST, "America/New_York", function(walltime) {
-                var actual = $A.localizationService.formatDateTimeUTC(walltime, format);
-                $A.test.assertEquals(expected, actual,
+            // 2013-11-03T04:30:30
+            var dateInDaylightTime = new Date(Date.UTC(2013, 10, 3, 4, 30, 30));
+            $A.localizationService.UTCToWallTime(dateInDaylightTime, "America/New_York", function(walltime) {
+                var actual = walltime.toISOString();
+                // UTC-4
+                $A.test.assertEquals("2013-11-03T00:30:30.000Z", actual,
                         "Incorrect time from UTCToWallTime when given time is right before DST ends");
             });
 
-            $A.localizationService.UTCToWallTime(dateOutOfDST, "America/New_York", function(walltime) {
-                var actual = $A.localizationService.formatDateTimeUTC(walltime, format);
-                $A.test.assertEquals(expected, actual,
+            // 2013-11-03T07:30:30
+            var dateInStandardTime = new Date(Date.UTC(2013, 10, 3, 7, 30, 30));
+            $A.localizationService.UTCToWallTime(dateInStandardTime, "America/New_York", function(walltime) {
+                var actual = walltime.toISOString();
+                // UTC-5
+                $A.test.assertEquals("2013-11-03T02:30:30.000Z", actual,
                         "Incorrect time from UTCToWallTime when given time is right after DST ends");
             });
         }
@@ -55,19 +56,27 @@
      * This is an edge case but important. Since date object includes browser's timezone offset,
      * the test is verify DST is applied for given timezone vs for browser's timezone.
      *
-     * In the case, for zone "Europe/Berlin", 3:00:00 am clocks were turned backward 1 hour to
-     * 2:00:00 am am on Oct 27, 2013.
+     * In the case, for zone "Europe/Berlin", 03:00 am clocks were turned backward 1 hour to
+     * 02:00 am on Oct 27, 2013.
      */
     testWallTimeToUTCWithTimeDuringDSTChange: {
         test: function() {
-            var format = "MMM d, yyyy h:mm:ss a";
-            var date = $A.localizationService.parseDateTime("Oct 27, 2013 02:30:00 AM", format);
-            var expected = "Oct 27, 2013 1:30:00 AM";
+            // 2013-10-27T01:30:30
+            var dateInDaylightTime = new Date(Date.UTC(2013, 9, 27, 1, 30, 30));
+            $A.localizationService.WallTimeToUTC(dateInDaylightTime, "Europe/Berlin", function(utc) {
+                // UTC+2
+                var actual = utc.toISOString();
+                $A.test.assertEquals("2013-10-26T23:30:30.000Z", actual,
+                        "Incorrect time from WallTimeToUTC when given time is right before DST ends");
+            });
 
-            $A.localizationService.WallTimeToUTC(date, "Europe/Berlin", function(utc) {
-                var actual = $A.localizationService.formatDateTime(utc, format);
-                $A.test.assertEquals(expected, actual,
-                        "Incorrect time from WallTimeToUTC when given time is during DST ends");
+            // 2013-10-27T02:30:30
+            var dateInStandardTime = new Date(Date.UTC(2013, 9, 27, 3, 30, 30));
+            $A.localizationService.WallTimeToUTC(dateInStandardTime, "Europe/Berlin", function(utc) {
+                // UTC+1
+                var actual = utc.toISOString();
+                $A.test.assertEquals("2013-10-27T02:30:30.000Z", actual,
+                        "Incorrect time from WallTimeToUTC when given time is right after DST ends");
             });
         }
     },

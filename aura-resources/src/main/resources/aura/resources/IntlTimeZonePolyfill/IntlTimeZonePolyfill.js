@@ -683,7 +683,7 @@ function polyfill(globalSpace) {
           "Asia/Kuala_Lumpur||3ci,2c,0,3cj,1b,0,3ck,24,1,3cl,24,0,3cm,1p,0,3cn,1t,0,3co,1p,0,0,19,0",
           "Asia/Manila||3d1,19,0,3d2,1t,1,3d3,19,0,3d4,1t,0,3d5,19,0,3d6,1t,1,3d7,19,0,3d8,1t,1,0,19,0",
           "Asia/Rangoon||3dd,2f,0,3de,1r,0,3df,1t,0,0,1r,0",
-          "Asia/Riyadh||2km,1j,0,0,3,0",
+          "Asia/Kuwait,Asia/Riyadh||2km,1j,0,0,3,0",
           "Asia/Seoul||3dm,2g,0,3db,2e,0,3dc,1t,0,3dn,1t,0,3do,1t,0,3dp,2e,0,3dq,25,1,3dr,2e,0,3ds,25,1,3dt,2e,0,3du,25,1,3dv,2e,0,3e0,25,1,3e1,2e,0,3e2,25,1,3e3,2e,0,3e4,25,1,3e5,2e,0,3e6,1t,0,3e7,1d,1,3e8,1t,0,3e9,1d,1,0,1t,0",
           "Asia/Shanghai||30k,19,0,30l,1t,1,30m,19,0,30n,1t,1,30o,19,0,30p,1t,1,30q,19,0,30r,1t,1,30s,19,0,30t,1t,1,30u,19,0,30v,1t,1,310,19,0,311,1t,1,312,19,0,313,1t,1,0,19,0",
           "Asia/Singapore||3ci,2c,0,3cj,1b,0,3ck,24,1,3cl,24,0,3cm,1p,0,3cn,1t,0,3ea,1p,0,3co,1p,0,0,19,0",

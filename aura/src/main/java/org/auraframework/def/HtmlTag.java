@@ -105,6 +105,7 @@ public enum HtmlTag {
     pre,
     progress,
     q,
+    rowspan,
     rp,
     rt,
     ruby,

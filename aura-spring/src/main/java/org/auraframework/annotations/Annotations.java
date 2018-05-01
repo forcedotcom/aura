@@ -87,6 +87,7 @@ public interface Annotations {
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
     @Model
+    @Deprecated
     @interface ServiceComponentModelInstance {
     }
 
@@ -102,6 +103,7 @@ public interface Annotations {
     @Component
     @Lazy
     @Scope(BeanDefinition.SCOPE_SINGLETON)
+    @Deprecated
     @interface ServiceComponentModelFactory {
     }
 
@@ -112,6 +114,7 @@ public interface Annotations {
     @Component
     @Lazy
     @Scope(BeanDefinition.SCOPE_SINGLETON)
+    @Deprecated
     @interface ServiceComponentProvider {
     }
 

@@ -85,6 +85,7 @@
 <pre> : allowed
 <progress> : allowed
 <q> : allowed
+<rowspan> : allowed
 <rp> : allowed
 <rt> : allowed
 <ruby> : allowed

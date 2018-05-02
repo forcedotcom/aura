@@ -41,7 +41,9 @@ Test.Aura.Component.ActionValueProviderTest = function() {
                 "auraError" : function(msg) {
                     return {
                         message: msg,
-                        setComponent: function(){}
+                        setComponent: function(cmp) {
+                            this.component = cmp;
+                        }
                     };
                 },
                 "util" : {
@@ -52,32 +54,29 @@ Test.Aura.Component.ActionValueProviderTest = function() {
     }
 
     [Fixture]
-    function Get() {
+    function get() {
+
         [Fact]
         function ThrowsWhenNoActionDef() {
-            var key = "test";
-            var expected = "Unknown controller action '"+key+"'";
-            var actual;
+            var expected = "expectedComponent";
 
             var mockComponent = {
-                "getDef" : function() {
-                    return {
-                        "getDescriptor" : function() {
-                            return "test";
-                        }
-                    };
+                "getType" : function() {
+                    return expected;
                 }
             };
 
+            var actual;
             getAuraMock(function () {
                 var avp = new Aura.Component.ActionValueProvider(mockComponent, null);
                 try {
-                    avp.get(key);
+                    avp.get("notExists");
                 } catch (e) {
-                    actual = e.message;
-                    Assert.Equal(expected, actual);
+                    actual = e["component"];
                 }
             });
+
+            Assert.Equal(expected, actual);
         }
     }
 }

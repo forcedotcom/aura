@@ -3663,7 +3663,7 @@ AuraClientService.prototype.buildStorableServerAction = function(response) {
         // Create a client side action instance to go with the server created action response
         //
         var descriptor = response["action"];
-        var actionDef = $A.services.component.getActionDef(descriptor);
+        var actionDef = $A.componentService.getActionDef(descriptor);
         if (!actionDef) {
             // No action.
             throw new $A.auraError("Missing action definition for "+descriptor);

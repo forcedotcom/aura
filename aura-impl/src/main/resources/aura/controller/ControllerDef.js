@@ -49,27 +49,18 @@ ControllerDef.prototype.hasActionDef = function(key){
 
 /**
  * Gets the Action Definition.
- * @param {String} key The data key to look up on the element.
- * @returns {Object}
- * @export
+ * @param {String} key - A action name which is defined on the controller.
+ * @returns {ActionDef} an action definition, undefined if the definition does not exist.
  */
-ControllerDef.prototype.getActionDef = function(key){
+ControllerDef.prototype.getActionDef = function(key) {
     var action = this.actionDefs[key];
-    if (!action) {
-        var ae = new $A.auraError("Unable to find '"+key+"' on '"+this.descriptor+"'.", null, $A.severity.QUIET);
-        // ControllerDef config descriptor uses compound:// so that it can find the right thing,
-        // but error reporting only cares about the component name so replacing it with markup:// here.
-        ae.setComponent(this.descriptor.replace("compound://", "markup://").replace(".", ":"));
-        throw ae;
-    }
     return action;
 };
 
 /**
- * Gets the value of the Controller Definition based on the given key.
- * @param {String} key The data key to look up on the element.
- * @returns {Object} A new Action Definition instance
- * @export
+ * Gets a new Action instance based on the given key.
+ * @param {String} key - A action name which is defined on the controller.
+ * @returns {Action} A new Action instance
  */
 ControllerDef.prototype.get = function(key){
     return this.getActionDef(key).newInstance();

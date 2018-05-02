@@ -82,26 +82,26 @@
                 testUtils.assertStartsWith("SecureComponent", comp.toString(), "Component passed to value provider should be SecureComponent");
             }
         }
-        cmp.addValueProvider('foo', vp); 
+        cmp.addValueProvider('foo', vp);
         cmp.get('foo.x');
     },
-    
+
     testAuraMethod: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         cmp.sayHello();
         testUtils.assertEquals("Hello from sayHello()", cmp.find("message").textContent);
     },
-    
+
     testCyclicObject: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-        
+
         var cyclicObject = {};
         cyclicObject.parent = cyclicObject;
-                
+
         cmp.set("v.cyclicObject", cyclicObject);
-                
+
         cmp.get("v.cyclicObject");
-    },  
+    },
 
     testGet_AttributeValue: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
@@ -143,7 +143,7 @@
             cmp.get('c.unknownAction');
             testUtils.fail("Expected error when executing SecureComponent.get('c.unknownAction')");
         } catch (e) {
-            testUtils.assertEquals("Unable to find 'unknownAction' on 'compound://lockerTest.secureComponentTest'.", e.message);
+            testUtils.assertEquals("Unable to find action 'unknownAction' on the controller of lockerTest:secureComponentTest", e.message);
         }
     },
 

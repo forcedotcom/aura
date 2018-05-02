@@ -79,7 +79,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     private LoggingService loggingService;
     private ServerService serverService;
     private ContextService contextService;
-    private ConfigAdapter configAdapter;
+    protected ConfigAdapter configAdapter;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -137,13 +137,8 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                     throw new InvalidDefinitionException("requestedComponentUID can't be 'null'", null);
                 }
 
-                StringBuilder redirectUrl = new StringBuilder("http");
-                if (configAdapter.isSecureRequest(request)) {
-                    redirectUrl.append("s");
-                }
-                redirectUrl.append("://")
-                    .append(request.getHeader("Host"))
-                    .append(generateRedirectURI(descriptors, hydrationType, computedUID, appReferrrer, locale, styleParam.get(request)));
+                StringBuilder redirectUrl = getHost(request);
+                redirectUrl.append(generateRedirectURI(descriptors, hydrationType, computedUID, appReferrrer, locale, styleParam.get(request)));
 
                 servletUtilAdapter.setNoCache(response);
                 response.sendRedirect(redirectUrl.toString());
@@ -234,6 +229,16 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
     protected void setLocale(Locale locale) {
         contextService.getCurrentContext().setRequestedLocales(Arrays.asList(locale));
+    }
+
+    protected StringBuilder getHost(HttpServletRequest request) {
+        StringBuilder sb = new StringBuilder("http");
+        if (configAdapter.isSecureRequest(request)) {
+            sb.append("s");
+        }
+        sb.append("://");
+        sb.append(request.getHeader("Host"));
+        return sb;
     }
 
     private Boolean containsRestrictedDefs(AuraContext context, Map<DefDescriptor<?>, String> requestedDescriptors) {

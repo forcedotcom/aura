@@ -211,6 +211,9 @@ public interface ConfigAdapter extends AuraAdapter {
 
     boolean cdnEnabled();
 
+    /**
+     * @return URL with scheme and host, no trailing slash.
+     */
     String getCDNDomain();
 
     /**

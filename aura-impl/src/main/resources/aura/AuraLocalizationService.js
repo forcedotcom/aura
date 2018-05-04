@@ -1495,8 +1495,7 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
 
     var ts = Date.UTC(dateTime["year"], dateTime["month"]-1, dateTime["day"], dateTime["hour"], dateTime["minute"]);
     var utcDate = new Date(ts);
-    utcDate.setSeconds(date.getSeconds());
-    utcDate.setMilliseconds(date.getMilliseconds());
+    utcDate.setUTCSeconds(date.getSeconds(), date.getMilliseconds());
 
     callback(utcDate);
 };
@@ -1651,26 +1650,28 @@ AuraLocalizationService.prototype.getZoneInfo = function(config, timeZone) {
     }
 
     // Finally: if the offsets are still different, we have to make the decision.
-    return [localTs - Math.min(guessOffset, guessOffset2) * 6e4, Math.max(guessOffset, guessOffset2)];
+    return [localTs - Math.max(guessOffset, guessOffset2) * 6e4, Math.max(guessOffset, guessOffset2)];
 };
 
 /**
  * Get the time zone offset during the given timestamp.
  *
- * @returns {Number} offset in second
+ * @returns {Number} offset in minute
  */
 AuraLocalizationService.prototype.zoneOffset = function(timestamp, timeZone) {
-   if (timeZone === "UTC") {
-       return 0;
-   }
+    if (timeZone === "UTC") {
+        return 0;
+    }
 
-   var dateTimeString = this.formatDateWithTimeZone(new Date(timestamp), timeZone);
-   var zoneTs = this.parseEnUSDateTimeString(dateTimeString);
+    // clean up second and millisecond from timestamp
+    var date = new Date(timestamp);
+    date.setSeconds(0, 0);
+    var dateTimeString = this.formatDateWithTimeZone(date, timeZone);
+    var zoneTs = this.parseEnUSDateTimeString(dateTimeString);
 
-   // converts to seconds
-   timestamp -= timestamp % 1000;
-   return (zoneTs - timestamp) / (6e4); // 60 * 1000
-};
+    // converts to minutes
+    return (zoneTs - date.getTime()) / (6e4); // 60 * 1000
+  };
 
 /**
  * Formats a Date object to the ISO8601 date string.

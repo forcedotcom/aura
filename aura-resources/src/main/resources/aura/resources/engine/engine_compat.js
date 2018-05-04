@@ -1001,7 +1001,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.19.4 */
+/** version: 0.19.5 */
 
 var TargetToReactiveRecordMap = new WeakMap();
 function notifyMutation$1(target, key) {
@@ -4251,4 +4251,4 @@ exports.wire = wire;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.19.4 */
+/** version: 0.19.5 */

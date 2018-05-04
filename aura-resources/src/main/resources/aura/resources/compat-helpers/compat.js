@@ -3705,7 +3705,7 @@ var __getKey = __WEBPACK_IMPORTED_MODULE_0_proxy_compat___default.a.getKey;var _
 /* 4 */
 /***/function (module, exports) {
 
-  var hasOwnProperty = __getKey({}, "hasOwnProperty");
+  var hasOwnProperty = __getKey({}, "compatHasOwnProperty");
   __setKey(module, "exports", function (it, key) {
     return __callKey(hasOwnProperty, "call", it, key);
   });
@@ -8294,4 +8294,4 @@ exports.babelHelpers = babelHelpers;
 return exports;
 
 }({}));
-/** version: 0.17.42 */
+/** version: 0.17.43 */

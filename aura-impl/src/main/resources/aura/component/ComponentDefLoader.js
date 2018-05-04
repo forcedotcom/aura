@@ -45,7 +45,13 @@ ComponentDefLoader.prototype.buildComponentUri = function(descriptor, uid) {
         uid = ComponentDefLoader.UID_default;
     }
     Aura["componentDefLoaderError"][uid] = [];
-    return this.getBaseUrl()
+
+    var host = $A.clientService._host;
+    var namespace = new Aura.System.DefDescriptor(descriptor).getNamespace();
+    if (!($A.clientService.isInternalNamespace(namespace) || $A.clientService.isPrivilegedNamespace(namespace))) {
+        host = $A.getContext().cdnHost || host;
+    }
+    return host + ComponentDefLoader.BASE_PATH
          + this.buildURIAppParam()
          + this.buildURIHydrationParam(this.getHydrationState())
          + this.buildURILockerParam()
@@ -118,7 +124,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     var descriptors = Object.keys(descriptorMap);
     var namespaceMap = this.buildBundleComponentNamespace(descriptors, descriptorMap);
 
-    var baseURI = this.getBaseUrl() + this.buildURIAppParam();
+    var baseURI = ComponentDefLoader.BASE_PATH + this.buildURIAppParam();
     var hydrationValue = this.getHydrationState();
     if (hydrationValue && hydrationValue.length > 0) {
         baseURI += this.buildURIHydrationParam(hydrationValue);
@@ -130,7 +136,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
 
     var uri = "";
     var uris = [];
-    var onlyRestrictedNamespaces = true;
+    var hasRestrictedNamespaces = false;
 
     var uid = "";
     var namespaces = Object.keys(namespaceMap).sort();
@@ -151,9 +157,9 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     }
 
     for (var i=0; i<namespaces.length; i++) {
-        var isRestrictedNamespace = !!($A.clientService.isInternalNamespace(namespaces[i]) || $A.clientService.isPrivilegedNamespace(namespaces[i]));
-        if (!isRestrictedNamespace) {
-            onlyRestrictedNamespaces = false;
+        var isRestrictedNamespace = !($A.clientService.isInternalNamespace(namespaces[i]) || $A.clientService.isPrivilegedNamespace(namespaces[i]));
+        if (isRestrictedNamespace) {
+            hasRestrictedNamespaces = true;
         }
         var names = Object.keys(namespaceMap[namespaces[i]]).sort();
         var additionalURI = "&" + namespaces[i] + "=" + names.join(",");
@@ -164,11 +170,11 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
                     var name = names[name_idx];
                     if (additionalURI.length + name.length + uri.length > maxLength) {
                         uri += additionalURI;
-                        uris.push([uri, uid, onlyRestrictedNamespaces]);
+                        uris.push([uri, uid, hasRestrictedNamespaces]);
                         uid = $A.util.isString(namespaceMap[namespaces[i]][name]) ?  namespaceMap[namespaces[i]][name] : "";
                         additionalURI =  "&" + namespaces[i] + "=" + name;
                         uri = "";
-                        onlyRestrictedNamespaces = isRestrictedNamespace;
+                        hasRestrictedNamespaces = isRestrictedNamespace;
                     } else {
                         additionalURI += (name_idx>0?",":"") + name;
                         var additional_def_uid = namespaceMap[namespaces[i]][name];
@@ -180,10 +186,10 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
                 uri = additionalURI;
                 names.length = 0;
             } else {
-                uris.push([uri, uid, onlyRestrictedNamespaces]);
+                uris.push([uri, uid, hasRestrictedNamespaces]);
                 uid = "";
                 uri = additionalURI;
-                onlyRestrictedNamespaces = isRestrictedNamespace;
+                hasRestrictedNamespaces = isRestrictedNamespace;
             }
         } else {
             uri += additionalURI;
@@ -196,14 +202,14 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
         }
     }
 
-    uris.push([uri, uid, onlyRestrictedNamespaces]);
+    uris.push([uri, uid, hasRestrictedNamespaces]);
 
     var processedURI = [];
     for(var def=0; def<uris.length; def++) {
         var finalURI = this.buildURIString(uris[def][0], uris[def][1], descriptors);
         Aura["componentDefLoaderError"][finalURI.uid] = [];
         var host = $A.clientService._host;
-        if (uris[def][2]) {
+        if (!uris[def][2]) {
             host = $A.getContext().cdnHost || host;
         }
         processedURI.push(host + baseURI + finalURI.uriString);
@@ -362,10 +368,6 @@ ComponentDefLoader.prototype.loadComponentDefs = function(descriptorMap, callbac
         //Can descriptor map be null? Im pretty sure the answer is 'no'
         Object.assign(this.pending.descriptorMap, descriptorMap);
     }
-};
-
-ComponentDefLoader.prototype.getBaseUrl = function() {
-    return ComponentDefLoader.BASE_PATH;
 };
 
 Aura.Component.ComponentDefLoader = ComponentDefLoader;

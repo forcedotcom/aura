@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-04-26
- * Version: 0.4.8
+ * Generated: 2018-05-04
+ * Version: 0.4.9
  */
 
 (function (exports) {
@@ -4302,8 +4302,7 @@ function repairFunctions(realmRec) {
  * objects succeed if otherwise possible.
  */
 
-function tamperProof(obj, prop) {
-  const desc = getOwnPropertyDescriptor(obj, prop);
+function tamperProof(obj, prop, desc) {
   if ('value' in desc && desc.configurable) {
     const value = desc.value;
 
@@ -4343,31 +4342,36 @@ function tamperProof(obj, prop) {
   }
 }
 
+function tamperProofAll(obj) {
+  const descs = getOwnPropertyDescriptors(obj);
+  for (const prop in descs) {
+    const desc = descs[prop];
+    tamperProof(obj, prop, desc);
+  }
+}
+
+function tamperProofProp(obj, prop) {
+  const desc = getOwnPropertyDescriptor(obj, prop);
+  tamperProof(obj, prop, desc);
+}
+
 /**
  * These properties are subject to the override mistake.
  */
 function repairDataProperties(realmRec) {
-  const { unsafeGlobal: _ } = realmRec;
+  const { unsafeGlobal: g } = realmRec;
 
-  const objPrototype = _.Object.prototype;
-  [
-    'constructor',
-    'hasOwnProperty',
-    'isPrototypeOf',
-    'propertyIsEnumerable',
-    'toString',
-    'toLocaleString',
-    'valueOf'
-  ].forEach(prop => tamperProof(objPrototype, prop));
+  ['Object', 'Array', 'Function'].forEach(name => {
+    tamperProofAll(g[name].prototype);
+  });
 
-  // Intentionally avoid loops and data structures.
-  tamperProof(_.Error.prototype, 'message');
-  tamperProof(_.EvalError.prototype, 'message');
-  tamperProof(_.RangeError.prototype, 'message');
-  tamperProof(_.ReferenceError.prototype, 'message');
-  tamperProof(_.SyntaxError.prototype, 'message');
-  tamperProof(_.TypeError.prototype, 'message');
-  tamperProof(_.URIError.prototype, 'message');
+  tamperProofProp(g.Error.prototype, 'message');
+  tamperProofProp(g.EvalError.prototype, 'message');
+  tamperProofProp(g.RangeError.prototype, 'message');
+  tamperProofProp(g.ReferenceError.prototype, 'message');
+  tamperProofProp(g.SyntaxError.prototype, 'message');
+  tamperProofProp(g.TypeError.prototype, 'message');
+  tamperProofProp(g.URIError.prototype, 'message');
 }
 
 /*
@@ -6983,7 +6987,12 @@ function SecureXMLHttpRequest(key) {
       'responseURL',
       'timeout',
       'withCredentials',
-      'upload'
+      'upload',
+      'UNSENT',
+      'OPENED',
+      'HEADERS_RECEIVED',
+      'LOADING',
+      'DONE'
     ].forEach(name => SecureObject.addPropertyIfSupported(o, xhr, name));
 
     SecureObject.addPropertyIfSupported(o, xhr, 'responseXML', {
@@ -7618,7 +7627,7 @@ const metadata$$1 = {
       DOMError: FUNCTION,
       DOMException: FUNCTION,
       DOMImplementation: FUNCTION,
-      // DOMParser: RAW, W-4844851
+      DOMParser: RAW, // W-4954203
       DOMStringList: FUNCTION,
       DOMStringMap: FUNCTION,
       DOMTokenList: FUNCTION,

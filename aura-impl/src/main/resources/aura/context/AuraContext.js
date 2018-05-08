@@ -656,6 +656,13 @@ Aura.Context.AuraContext.prototype.isURIAddressableDefsEnabled = function() {
 };
 
 /**
+ * @return {boolean} if CDN is enabled
+ */
+Aura.Context.AuraContext.prototype.isCDNEnabled = function() {
+    return !$A.util.isUndefinedOrNull(this.cdnHost);
+};
+
+/**
  * Whether compat source is needed.
  * @returns {Boolean} whether compat is enabled
  */

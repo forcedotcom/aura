@@ -61,7 +61,10 @@ Test.Aura.Context.AuraContextTest = function() {
                         return value;
                     }
                 },
-                getURIDefsState: function(){}
+                getURIDefsState: function(){},
+                isUndefinedOrNull: function (val) {
+                    return val === undefined || val === null;
+                }
             }, 
             services: {
                 component: {
@@ -99,7 +102,8 @@ Test.Aura.Context.AuraContextTest = function() {
     var mockJson = function() {
         return Mocks.GetMock(Object.Global(), 'Json', Stubs.GetObject({}, {
             "ApplicationKey": {
-                "URIADDRESSABLEDEFINITIONS": "uad"
+                "URIADDRESSABLEDEFINITIONS": "uad",
+                "CDN_HOST": "cdn"
             }
         }));
     };
@@ -279,6 +283,64 @@ Test.Aura.Context.AuraContextTest = function() {
 
                 Assert.Equal(expected, actual);
             }
+        }
+    }
+
+    [Fixture]
+    function isCDNEnabled() {
+
+        var cdnMock = function(delegate) {
+            withMocks([mock$A(), mockAura(), mockJson(),
+            Mocks.GetMocks(Object.Global(), {
+                document:{createDocumentFragment:function() {}},
+                Json:function() {},
+                Aura: Aura,
+                window: {
+                    location: {
+                        search: ''
+                    }
+                }
+            })], delegate
+            );
+        };
+
+        [Fact]
+        function cdnHostIsNull() {
+            var actual;
+            var expected = false;
+
+            cdnMock(function(){
+                var targetContext = new Aura.Context.AuraContext({"cdn": null});
+                actual = targetContext.isCDNEnabled();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function cdnHostIsUndefined() {
+            var actual;
+            var expected = false;
+
+            cdnMock(function(){
+                var targetContext = new Aura.Context.AuraContext({"cdn": undefined});
+                actual = targetContext.isCDNEnabled();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function cdnHostIsNotNullOrUndefined() {
+            var actual;
+            var expected = true;
+
+            cdnMock(function(){
+                var targetContext = new Aura.Context.AuraContext({"cdn": "some-host"});
+                actual = targetContext.isCDNEnabled();
+            });
+
+            Assert.Equal(expected, actual);
         }
     }
 }

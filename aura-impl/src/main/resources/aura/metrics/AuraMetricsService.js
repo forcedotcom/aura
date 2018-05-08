@@ -886,6 +886,7 @@ Aura.Services.MetricsService.prototype.skipBootstrapLogging = function () {
 Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
     var bootstrap = this.bootstrap;
     var pageStartTime = this.getPageStartTime();
+    var context = $A.getContext();
 
     for (var m in Aura["bootstrap"]) {
         bootstrap[m] = parseInt(Aura["bootstrap"][m], 10);
@@ -893,7 +894,8 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
 
     // allow non-numerics
     bootstrap["visibilityStateStart"] = Aura["bootstrap"]["visibilityStateStart"];
-    bootstrap["mode"] = $A.getContext().getMode();
+    bootstrap["cdnEnabled"] = context.isCDNEnabled();
+    bootstrap["mode"] = context.getMode();
 
     bootstrap["pageStartTime"] = pageStartTime;
 

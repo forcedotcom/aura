@@ -21,13 +21,18 @@ import java.util.Map;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDefRef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.ModuleDefRefImpl.Builder;
+import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.system.Location;
+import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
+import org.mockito.Mockito;
 
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 /**
@@ -36,15 +41,24 @@ import com.google.gson.Gson;
 public class ModuleDefRefImplTest extends AuraImplTestCase {
 
     @SuppressWarnings("unchecked")
-	@Test
+    @Test
     public void testModuleDefRefSerialization() throws Exception {
         Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = new HashMap<>();
         String attributeName = "testAttribute";
         String attributeValue = "WoW";
         attributes.put(definitionService.getDefDescriptor(attributeName, AttributeDef.class),
                 vendor.makeAttributeDefRef(attributeName, attributeValue, null));
-        ModuleDefRef moduleDefRef = createModuleDefRef(definitionService.getDefDescriptor("test:module", ModuleDef.class),
-                attributes, null);
+        DefDescriptor<ModuleDef> reference = definitionService.getDefDescriptor("test:Module", ModuleDef.class);
+        DefDescriptor<ModuleDef> properRef = definitionService.getDefDescriptor("test:module", ModuleDef.class);
+        ModuleDef refDef = Mockito.mock(ModuleDef.class);
+        Mockito.doReturn(properRef).when(refDef).getDescriptor();
+        ModuleDefRef moduleDefRef = createModuleDefRef(reference, attributes, null);
+        Map<DefDescriptor<?>, Definition> map = Maps.newHashMap();
+        map.put(reference, refDef);
+        ReferenceValidationContext context = new ReferenceValidationContextImpl(map);
+
+        moduleDefRef.validateReferences(context);
+
         String json = toJson(moduleDefRef);
 
         Map<String, Object> result = new Gson().fromJson(json, Map.class);

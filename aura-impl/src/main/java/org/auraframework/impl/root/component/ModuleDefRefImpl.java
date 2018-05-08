@@ -43,6 +43,7 @@ import com.google.common.collect.Lists;
 public class ModuleDefRefImpl extends DefinitionReferenceImpl<ModuleDef> implements ModuleDefRef {
 
     private static final long serialVersionUID = 2121381558446216947L;
+    private transient DefDescriptor<?> reference;
 
     protected ModuleDefRefImpl(Builder builder) {
         super(builder);
@@ -54,7 +55,7 @@ public class ModuleDefRefImpl extends DefinitionReferenceImpl<ModuleDef> impleme
         json.writeMapKey("componentDef");
 
         json.writeMapBegin();
-        json.writeMapEntry("descriptor", descriptor);
+        json.writeMapEntry("descriptor", reference);
         json.writeMapEntry("type", "module");
         json.writeMapEnd();
 
@@ -85,10 +86,12 @@ public class ModuleDefRefImpl extends DefinitionReferenceImpl<ModuleDef> impleme
 
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
-        ModuleDef def = descriptor.getDef();
+        ModuleDef def = validationContext.getAccessibleDefinition(descriptor);
         if (def == null) {
+            // not possible
             throw new DefinitionNotFoundException(descriptor);
         }
+        this.reference = def.getDescriptor();
     }
 
     @Override

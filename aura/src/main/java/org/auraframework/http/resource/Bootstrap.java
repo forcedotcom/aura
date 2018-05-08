@@ -61,6 +61,7 @@ public class Bootstrap extends AuraResourceImpl {
         Integer cacheExpiration = null;
         if (appDesc.getDefType() == DefType.APPLICATION) {
             // only app has bootstrap cache capability
+            definitionService.updateLoaded(appDesc);
             ApplicationDef appDef = (ApplicationDef) definitionService.getDefinition(appDesc);
             cacheExpiration = appDef.getBootstrapPublicCacheExpiration();
         }
@@ -88,7 +89,6 @@ public class Bootstrap extends AuraResourceImpl {
             if (!configAdapter.validateBootstrap(jwtToken)) {
                 throw new AuraJWTError("Invalid jwt parameter");
             }
-
             setCacheHeaders(response, app);
             Instance<?> appInstance = null;
             if (!configAdapter.isBootstrapModelExclusionEnabled()) {

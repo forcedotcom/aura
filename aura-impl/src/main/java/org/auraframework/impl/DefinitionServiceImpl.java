@@ -831,6 +831,8 @@ public class DefinitionServiceImpl implements DefinitionService {
                 if (de == null) {
                     return null;
                 }
+            } else if (de.dependencyMap != null) {
+                loadDE(de);
             }
         } finally {
             rLock.unlock();

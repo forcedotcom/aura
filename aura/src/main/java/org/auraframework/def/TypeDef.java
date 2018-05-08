@@ -53,6 +53,4 @@ public interface TypeDef extends Definition {
     Object getExternalType(String prefix) throws QuickFixException;
 
     Object initialize(Object config, BaseComponent<?, ?> valueProvider) throws QuickFixException;
-
-    void appendDependencies(Object instance, Set<DefDescriptor<?>> deps);
 }

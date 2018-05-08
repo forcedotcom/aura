@@ -356,10 +356,9 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     @Test
     public void testAppendDependenciesWithNone() throws Exception {
-        Set<DefDescriptor<?>> dependencies = new HashSet<>();
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", null, null, null, null,
                 null, null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
-        bcd.appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies = bcd.getDependencySet();
 
         assertFalse(dependencies.isEmpty());
         assertEquals(1, dependencies.size());
@@ -410,8 +409,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                         StyleDef.class);
         addSourceAutoCleanup(styleDesc, ".THIS {}");
 
-        Set<DefDescriptor<?>> dependencies = new HashSet<>();
-        definitionService.getDefinition(cmpDesc).appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDefinition(cmpDesc).getDependencySet();
 
         Set<DefDescriptor<?>> expected = Sets.newHashSet(parentDesc, childDesc, intfDesc, eventDesc, styleDesc);
         if (!dependencies.containsAll(expected)) {
@@ -467,8 +465,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                         StyleDef.class);
         addSourceAutoCleanup(styleDesc, ".THIS {}");
 
-        Set<DefDescriptor<?>> dependencies = new HashSet<>();
-        definitionService.getDefinition(cmpDesc).appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDefinition(cmpDesc).getDependencySet();
 
         Set<DefDescriptor<?>> expected = Sets.newHashSet(parentDesc, childDesc, intfDesc, providerDesc, modelDesc,
                 controllerDesc, eventDesc, styleDesc, rendererDesc);
@@ -537,8 +534,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                         StyleDef.class);
         addSourceAutoCleanup(styleDesc, ".THIS {}");
 
-        Set<DefDescriptor<?>> dependencies = new HashSet<>();
-        definitionService.getDefinition(cmpDesc).appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDefinition(cmpDesc).getDependencySet();
 
         Set<DefDescriptor<?>> expected = Sets.newHashSet(parentDesc, childDesc, intfDesc, eventDesc, styleDesc,
                 providerDesc, modelDesc, controllerDesc, rendererDesc, helperDesc);

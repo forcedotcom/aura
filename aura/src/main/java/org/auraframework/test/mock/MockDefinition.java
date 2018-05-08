@@ -32,6 +32,8 @@ import org.auraframework.util.json.Serialization.ReferenceScope;
 import org.auraframework.util.json.Serialization.ReferenceType;
 import org.auraframework.validation.ReferenceValidationContext;
 
+import com.google.common.collect.Sets;
+
 /**
  * A simple Definition.
  */
@@ -86,6 +88,14 @@ public abstract class MockDefinition<D extends Definition> implements Definition
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies){
     }
+
+    @Override
+    public Set<DefDescriptor<?>> getDependencySet() {
+        Set<DefDescriptor<?>> dependencies = Sets.newLinkedHashSet();
+        appendDependencies(dependencies);
+        return dependencies;
+    }
+
 
     @Override
     public void validateDefinition() throws QuickFixException {

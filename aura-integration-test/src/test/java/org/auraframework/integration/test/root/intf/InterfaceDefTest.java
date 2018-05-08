@@ -64,8 +64,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
                 "java://org.auraframework.impl.java.provider.TestComponentDescriptorProvider", ProviderDef.class));
         expected.add(vendor.makeInterfaceDefDescriptor("aura:testinterfaceparent"));
         expected.add(eventDescriptor);
-        Set<DefDescriptor<?>> dependencies = new HashSet<>();
-        def.appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies = def.getDependencySet();
         assertEquals("dependencies are incorrect", expected, dependencies);
     }
 

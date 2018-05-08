@@ -94,12 +94,10 @@ public class DependencyDefImplTest extends AuraImplTestCase {
     public void testAppendDependenciesNoneFound() throws Exception {
         DependencyDef testDependencyDef;
         ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
-        Set<DefDescriptor<?>> deps = new HashSet<>();
         // Try to get dependency that doesn't exist, verify exception thrown
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
                 "markup://aura:iDontExist*", "COMPONENT", vendor.makeLocation("f1", 5, 5, 0));
-        deps.clear();
-        testDependencyDef.appendDependencies(deps);
+        Set<DefDescriptor<?>> deps = testDependencyDef.getDependencySet();
         testDependencyDef.validateReferences(validationContext);
         assertEquals(0, deps.size());
     }
@@ -115,25 +113,22 @@ public class DependencyDefImplTest extends AuraImplTestCase {
     @Test
     public void testAppendDependencies() throws Exception {
         DependencyDef testDependencyDef;
-        Set<DefDescriptor<?>> deps = new HashSet<>();
 
         // Check for a couple dependencies present in a namespace
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"), "aura", "INTERFACE",
                 vendor.makeLocation("f1", 5, 5, 0));
-        testDependencyDef.appendDependencies(deps);
+        Set<DefDescriptor<?>> deps = testDependencyDef.getDependencySet();
         assertTrue("Dependency not found", containsDependency(deps, "markup://aura:rootComponent"));
 
         // Check dependency that exists but is wrong type
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
                 "aura", "PROVIDER", vendor.makeLocation("f1", 5, 5, 0));
-        deps.clear();
-        testDependencyDef.appendDependencies(deps);
+        deps = testDependencyDef.getDependencySet();
 
         // Get dependency of specific component
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
                 "markup://aura:component", "COMPONENT", vendor.makeLocation("f1", 5, 5, 0));
-        deps.clear();
-        testDependencyDef.appendDependencies(deps);
+        deps = testDependencyDef.getDependencySet();
         assertTrue("Failed to find dependency when searching using format <type>://<namespace>:<name>",
                 containsDependency(deps, "markup://aura:component"));
     }
@@ -143,11 +138,9 @@ public class DependencyDefImplTest extends AuraImplTestCase {
         // Valid resource name but wrong type
         ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         DependencyDef testDependencyDef;
-        Set<DefDescriptor<?>> deps = new HashSet<>();
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
                 "markup://aura:applicatio*", "COMPONENT", vendor.makeLocation("f1", 5, 5, 0));
-        deps.clear();
-        testDependencyDef.appendDependencies(deps);
+        Set<DefDescriptor<?>> deps = testDependencyDef.getDependencySet();
         testDependencyDef.validateReferences(validationContext);
         assertEquals(0, deps.size());
 
@@ -158,11 +151,9 @@ public class DependencyDefImplTest extends AuraImplTestCase {
         // Valid resource name but disallowed type
         ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         DependencyDef testDependencyDef;
-        Set<DefDescriptor<?>> deps = new HashSet<>();
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
                 "markup://aura:application", "APPLICATION", vendor.makeLocation("f1", 5, 5, 0));
-        deps.clear();
-        testDependencyDef.appendDependencies(deps);
+        Set<DefDescriptor<?>> deps = testDependencyDef.getDependencySet();
         testDependencyDef.validateReferences(validationContext);
         assertEquals(0, deps.size());
     }

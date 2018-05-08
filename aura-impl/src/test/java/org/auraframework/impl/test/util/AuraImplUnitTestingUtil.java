@@ -84,6 +84,7 @@ import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * Utility to easily get aura objects.
@@ -188,6 +189,11 @@ public class AuraImplUnitTestingUtil {
             }
 
             @Override
+            public Set<DefDescriptor<?>> getDependencySet() {
+                return Sets.newHashSet();
+            }
+
+            @Override
             public DefDescriptor<TypeDef> getDescriptor() {
                 return definitionService.getDefDescriptor("String", TypeDef.class);
             }
@@ -263,10 +269,6 @@ public class AuraImplUnitTestingUtil {
             @Override
             public <D extends Definition> D getSubDefinition( SubDefDescriptor<D, ?> descriptor) {
                 return null;
-            }
-
-            @Override
-            public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
             }
 
             @Override

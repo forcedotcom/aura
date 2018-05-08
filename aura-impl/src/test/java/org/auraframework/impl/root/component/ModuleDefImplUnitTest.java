@@ -85,9 +85,8 @@ public class ModuleDefImplUnitTest {
         dependencies.add("namespace-component-name");
         moduleDefBuilder.setModuleDependencies(dependencies);
 
-        Set<DefDescriptor<?>> results = Sets.newHashSet();
         ModuleDef moduleDef = moduleDefBuilder.build();
-        moduleDef.appendDependencies(results);
+        Set<DefDescriptor<?>> results = moduleDef.getDependencySet();
 
         assertEquals("should not be more than 1 module dependency", 1, results.size());
         assertTrue("module dependency not found", results.contains(moduleDefDescriptor));

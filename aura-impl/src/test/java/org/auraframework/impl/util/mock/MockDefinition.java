@@ -16,6 +16,7 @@
 package org.auraframework.impl.util.mock;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
@@ -86,6 +87,13 @@ public class MockDefinition implements Definition {
         if (localDeps != null) {
             dependencies.addAll(localDeps);
         }
+    }
+
+    @Override
+    public Set<DefDescriptor<?>> getDependencySet() {
+        Set<DefDescriptor<?>> dependencies = Sets.newLinkedHashSet();
+        appendDependencies(dependencies);
+        return dependencies;
     }
 
     @Override

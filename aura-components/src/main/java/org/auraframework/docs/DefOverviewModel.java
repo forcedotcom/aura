@@ -66,9 +66,7 @@ public class DefOverviewModel implements ModelInstance {
         
         Map<DefType, List<DefModel>> depsMap = Maps.newEnumMap(DefType.class);
 
-        Set<DefDescriptor<?>> deps = Sets.newHashSet();
-
-        def.appendDependencies(deps);
+        Set<DefDescriptor<?>> deps = def.getDependencySet();
 
         for (DefDescriptor<?> dep : deps) {
             DefType type = dep.getDefType();

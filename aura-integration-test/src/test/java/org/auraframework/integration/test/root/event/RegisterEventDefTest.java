@@ -86,9 +86,9 @@ public class RegisterEventDefTest extends AuraImplTestCase {
 
     @Test
     public void testAppendDependencies() {
-        Set<DefDescriptor<?>> descriptors = new HashSet<>();
-        vendor.makeRegisterEventDef(null, vendor.makeEventDefDescriptor("aura:testevent"), true,
-                vendor.makeLocation("filename1", 5, 5, 0)).appendDependencies(descriptors);
+        Set<DefDescriptor<?>> descriptors = 
+            vendor.makeRegisterEventDef(null, vendor.makeEventDefDescriptor("aura:testevent"), true,
+                    vendor.makeLocation("filename1", 5, 5, 0)).getDependencySet();
         assertTrue(descriptors.contains(vendor.makeEventDefDescriptor("aura:testevent")));
     }
 

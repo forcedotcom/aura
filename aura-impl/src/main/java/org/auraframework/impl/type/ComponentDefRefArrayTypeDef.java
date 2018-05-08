@@ -90,13 +90,4 @@ public class ComponentDefRefArrayTypeDef extends DefinitionImpl<TypeDef> impleme
         }
         return config;
     }
-
-    @Override
-    public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
-        @SuppressWarnings("unchecked")
-        List<ComponentDefRef> value = (List<ComponentDefRef>) instance;
-        for (ComponentDefRef componentDefRef : value) {
-            componentDefRef.appendDependencies(deps);
-        }
-    }
 }

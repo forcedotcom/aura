@@ -235,6 +235,13 @@ public class AuraLinkerTest {
         public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> descriptor) {
             return null;
         }
+
+        @Override
+        public Set<DefDescriptor<?>> getDependencySet() {
+            Set<DefDescriptor<?>> deps = Sets.newLinkedHashSet();
+            appendDependencies(deps);
+            return deps;
+        }
     }
 
     private static class TreePopulator {

@@ -82,9 +82,4 @@ public class ActionTypeDef extends DefinitionImpl<TypeDef> implements TypeDef {
             return new ActionTypeDef(this);
         }
     }
-
-    @Override
-    public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
-    }
-
 }

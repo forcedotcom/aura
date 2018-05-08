@@ -71,8 +71,7 @@ public class TokensImportImplTest extends StyleTestCase {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens());
         TokensImportDef def = source(String.format("<aura:import name='%s'/>", desc.getDescriptorName()));
 
-        Set<DefDescriptor<?>> deps = Sets.newHashSet();
-        def.appendDependencies(deps);
+        Set<DefDescriptor<?>> deps = def.getDependencySet();
         assertTrue(deps.contains(desc));
     }
 }

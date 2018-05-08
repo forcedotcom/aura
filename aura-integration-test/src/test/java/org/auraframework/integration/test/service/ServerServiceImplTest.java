@@ -104,6 +104,11 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         }
 
         @Override
+        public Set<DefDescriptor<?>> getDependencySet() {
+            return Sets.newHashSet();
+        }
+
+        @Override
         public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         }
 

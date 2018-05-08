@@ -120,11 +120,6 @@ public class JavaTypeDef extends DefinitionImpl<TypeDef> implements TypeDef {
         return config;
     }
 
-    @Override
-    public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
-
-    }
-
     /**
      * Get the underlying class for a type, or null if the type is a variable
      * type. Code in part from Ian Roberton's June 23, 2007 blog post :

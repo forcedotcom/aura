@@ -15,12 +15,16 @@
  */
 package org.auraframework.def;
 
+import java.util.Set;
+
 /**
  * A dependency for a component/application.
  */
 public interface DependencyDef extends Definition {
     @Override
     DefDescriptor<DependencyDef> getDescriptor();
+
+    void appendDependencies(Set<DefDescriptor<?>> dependencies, BaseComponentDef referenceDescriptor);
 
     /**
      * @return The dependency.

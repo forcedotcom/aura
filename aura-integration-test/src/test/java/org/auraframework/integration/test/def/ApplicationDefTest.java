@@ -138,8 +138,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         String src = String.format("<aura:application tokens=\"%s\"/>", tokens.getDescriptorName());
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
 
-        Set<DefDescriptor<?>> deps = Sets.newHashSet();
-        definitionService.getDefinition(desc).appendDependencies(deps);
+        Set<DefDescriptor<?>> deps = definitionService.getDefinition(desc).getDependencySet();
         assertTrue(deps.contains(tokens));
     }
 

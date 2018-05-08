@@ -181,6 +181,11 @@ public class DefRefDelegate implements DefinitionReference {
     }
 
     @Override
+    public Set<DefDescriptor<?>> getDependencySet() {
+        return select().getDependencySet();
+    }
+
+    @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         select().validateReferences(validationContext);
     }

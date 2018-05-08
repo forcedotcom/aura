@@ -1946,9 +1946,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         // If we've gotten this far, let's spider dependencies.
         if (ret) {
-            Set<DefDescriptor<?>> deps = Sets.newLinkedHashSet();
-
-            appendDependencies(deps);
+            Set<DefDescriptor<?>> deps = getDependencySet();
             for (DefDescriptor<?> dep : deps) {
                 if (!already.contains(dep)) {
                     already.add(dep);

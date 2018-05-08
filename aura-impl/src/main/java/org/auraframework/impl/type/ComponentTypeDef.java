@@ -91,15 +91,4 @@ public class ComponentTypeDef extends DefinitionImpl<TypeDef> implements TypeDef
             throw new AuraRuntimeException(e);
         }
     }
-
-    /**
-     * Expects instance to be a ComponentDefRef
-     * 
-     * @throws QuickFixException
-     */
-    @Override
-    public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
-        ((ComponentDefRef) instance).appendDependencies(deps);
-    }
-
 }

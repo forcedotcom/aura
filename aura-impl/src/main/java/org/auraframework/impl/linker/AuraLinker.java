@@ -331,8 +331,7 @@ public class AuraLinker {
                     }
                 }
 
-                Set<DefDescriptor<?>> newDeps = Sets.newLinkedHashSet();
-                linkingDef.def.appendDependencies(newDeps);
+                Set<DefDescriptor<?>> newDeps = linkingDef.def.getDependencySet();
 
                 for (DefDescriptor<?> dep : newDeps) {
                     getHelper(dep, stack, linkingDef.def);

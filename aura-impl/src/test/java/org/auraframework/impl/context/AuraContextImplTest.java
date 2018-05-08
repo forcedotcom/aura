@@ -272,6 +272,11 @@ public class AuraContextImplTest extends AuraImplTestCase {
         public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> descriptor) {
             return null;
         }
+
+        @Override
+        public Set<DefDescriptor<?>> getDependencySet() {
+            return Sets.newHashSet();
+        }
     }
 
     @Test

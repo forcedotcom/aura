@@ -63,8 +63,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         DefDescriptor<FlavoredStyleDef> flavor = addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc),
                 ".THIS--test{}");
 
-        Set<DefDescriptor<?>> dependencies = new HashSet<>();
-        definitionService.getDefinition(desc).appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDefinition(desc).getDependencySet();
         assertTrue(dependencies.contains(flavor));
     }
 

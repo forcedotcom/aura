@@ -70,15 +70,15 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
 
     @Test
     public void testAppendDependencies() throws Exception {
-        Set<DefDescriptor<?>> dependencies = new HashSet<>();
-        testComponentDefRef.appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies;
+
+        dependencies = testComponentDefRef.getDependencySet();
         assertEquals(1, dependencies.size());
         assertTrue(dependencies.contains(vendor.makeComponentDefDescriptor("test:text")));
 
-        dependencies = new HashSet<>();
-        vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("test:text"),
+        dependencies = vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("test:text"),
                 new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>(),
-                vendor.makeLocation("fakefilename", 10, 10, 0)).appendDependencies(dependencies);
+                vendor.makeLocation("fakefilename", 10, 10, 0)).getDependencySet();
         assertEquals(1, dependencies.size());
 
         List<ComponentDefRef> children = new ArrayList<>();
@@ -95,8 +95,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         testComponentDefRef = vendor.makeComponentDefRef(
                 definitionService.getDefDescriptor("test:text", ComponentDef.class), attributes,
                 vendor.makeLocation("filename", 5, 5, 0));
-        dependencies = new HashSet<>();
-        testComponentDefRef.appendDependencies(dependencies);
+        dependencies = testComponentDefRef.getDependencySet();
         assertEquals(1, dependencies.size());
         assertTrue(dependencies.contains(definitionService.getDefDescriptor("test:text", ComponentDef.class)));
         // assertTrue(dependencies.contains(vendor.makeComponentDefDescriptor("aura:text")));

@@ -26,7 +26,7 @@ public interface ReferenceValidationContext extends ErrorAccumulator {
      * Get a definition that is accessible to this validation.
      *
      * This should be used to get any definition that is needed by definition during
-     * validation. If the definition is not in the set, it was not included in appendDependencies
+     * validation. If the definition is not in the set, it was not included in getDependencySet
      * which is a bug in the code.
      *
      * @param descriptor the descriptor for the definition that we want.

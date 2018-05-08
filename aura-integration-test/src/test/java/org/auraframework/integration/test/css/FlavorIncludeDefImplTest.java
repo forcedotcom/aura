@@ -69,8 +69,7 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
     @Test
     public void testAppendsDependencies() throws Exception {
         FlavorIncludeDef fi = source("<aura:include source='flavorTestAlt:flavorIncludeDefTestFlavors'/>");
-        Set<DefDescriptor<?>> dependencies = new HashSet<>();
-        fi.appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies = fi.getDependencySet();
 
         DefDescriptor<ComponentDef> sample1 = definitionService.getDefDescriptor("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<ComponentDef> sample2 = definitionService.getDefDescriptor("flavorTest:x_landmark", ComponentDef.class);

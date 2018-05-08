@@ -425,8 +425,7 @@ public class DependenciesController implements Controller {
     }
 
     private ArrayList<Map<String, String>> getDependenciesData(Definition definition) throws DefinitionNotFoundException, QuickFixException {
-        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        definition.appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies = definition.getDependencySet();
         ArrayList<Map<String, String>> dependenciesData = Lists.newArrayList();
 
         for (DefDescriptor<?> dependency : dependencies) {
@@ -565,8 +564,7 @@ public class DependenciesController implements Controller {
             return;
         }
 
-        Set<DefDescriptor<?>> hardDependencies = new HashSet<>();
-        def.appendDependencies(hardDependencies);
+        Set<DefDescriptor<?>> hardDependencies = def.getDependencySet();
 
         //TODO: figure out if we can add the serialized def size as well
         current.setOwnSize(getCodeSize(def));

@@ -125,20 +125,4 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
         }
         return components;
     }
-
-    /**
-     * Expects instance to be a List<ComponentDefRef>
-     *
-     * @throws QuickFixException
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
-
-        List<ComponentDefRef> value = (List<ComponentDefRef>) instance;
-
-        for (ComponentDefRef componentDefRef : value) {
-            componentDefRef.appendDependencies(deps);
-        }
-    }
 }

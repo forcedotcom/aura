@@ -16,6 +16,7 @@
 
 package org.auraframework.impl.system;
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.auraframework.builder.ElementBuilder;
@@ -30,6 +31,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 import org.auraframework.validation.ReferenceValidationContext;
 
+import com.google.common.collect.Sets;
+
 /**
  * Base implementation for an element.
  */
@@ -42,6 +45,7 @@ public abstract class BaseXmlElementImpl implements BaseXmlElement {
     protected final String fullyQualifiedName;
 
     protected transient final QuickFixException parseError;
+    private transient Set<DefDescriptor<?>> dependencySet;
     protected final String ownHash;
     protected final DefinitionAccess access;
     private boolean valid;
@@ -102,6 +106,16 @@ public abstract class BaseXmlElementImpl implements BaseXmlElement {
      */
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+    }
+
+    @Override
+    public Set<DefDescriptor<?>> getDependencySet() {
+        if (this.dependencySet == null) {
+            Set<DefDescriptor<?>> newDeps = Sets.newLinkedHashSet();
+            this.appendDependencies(newDeps);
+            this.dependencySet = Collections.unmodifiableSet(newDeps);
+        }
+        return this.dependencySet;
     }
 
     /**

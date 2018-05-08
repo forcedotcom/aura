@@ -392,7 +392,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         Mockito.verify(definition1, Mockito.times(1)).validateDefinition();
         Mockito.verify(definition1, Mockito.times(0)).validateReferences(Matchers.any());
         Mockito.verify(definition1, Mockito.times(0)).markValid();
-        Mockito.verify(definition1, Mockito.times(0)).appendDependencies(Matchers.any());
+        Mockito.verify(definition1, Mockito.times(0)).getDependencySet();
     }
 
     @Test
@@ -419,7 +419,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         Mockito.verify(definition1, Mockito.times(1)).validateDefinition();
         Mockito.verify(definition1, Mockito.times(0)).validateReferences(Matchers.any());
         Mockito.verify(definition1, Mockito.times(0)).markValid();
-        Mockito.verify(definition1, Mockito.times(0)).appendDependencies(Matchers.any());
+        Mockito.verify(definition1, Mockito.times(0)).getDependencySet();
     }
 
     @Test
@@ -436,7 +436,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         Mockito.verify(definition1, Mockito.times(0)).validateDefinition();
         Mockito.verify(definition1, Mockito.times(0)).validateReferences(Matchers.any());
         Mockito.verify(definition1, Mockito.times(0)).markValid();
-        Mockito.verify(definition1, Mockito.times(0)).appendDependencies(Matchers.any());
+        Mockito.verify(definition1, Mockito.times(0)).getDependencySet();
     }
 
 //<D extends Definition> boolean exists(DefDescriptor<D> descriptor);

@@ -57,8 +57,7 @@ public class StyleDefImplTest extends StyleTestCase {
         DefDescriptor<TokensDef> nsDefault = addNsTokens(tokens().token("color", "red"));
         DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: token(color) }");
 
-        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        definitionService.getDefinition(style).appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDefinition(style).getDependencySet();
         assertTrue(dependencies.contains(nsDefault));
     }
 

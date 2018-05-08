@@ -561,9 +561,7 @@ public class TokensDefImplTest extends StyleTestCase {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> child = addSeparateTokens(tokens().parent(parent));
 
-        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-
-        definitionService.getDefinition(child).appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDefinition(child).getDependencySet();
         assertTrue(dependencies.contains(parent));
     }
 
@@ -574,8 +572,7 @@ public class TokensDefImplTest extends StyleTestCase {
 
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().imported(import1).imported(import2));
 
-        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        definitionService.getDefinition(desc).appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDefinition(desc).getDependencySet();
         assertTrue(dependencies.contains(import1));
         assertTrue(dependencies.contains(import2));
     }
@@ -595,8 +592,7 @@ public class TokensDefImplTest extends StyleTestCase {
     public void testAddsProviderToDeps() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF));
 
-        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        definitionService.getDefinition(desc).appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDefinition(desc).getDependencySet();
 
         DefDescriptor<TokenDescriptorProviderDef> def = definitionService.getDefDescriptor(TestTokenDescriptorProvider.REF,
                 TokenDescriptorProviderDef.class);
@@ -676,8 +672,7 @@ public class TokensDefImplTest extends StyleTestCase {
     public void testAddsMapProviderToDeps() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().mapProvider(TestTokenMapProvider.REF));
 
-        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        definitionService.getDefinition(desc).appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDefinition(desc).getDependencySet();
 
         DefDescriptor<TokenMapProviderDef> def = definitionService.getDefDescriptor(TestTokenMapProvider.REF,
                 TokenMapProviderDef.class);

@@ -66,22 +66,20 @@ public class DefDependenciesModel implements ModelInstance {
 
         Map<DefType, List<DefModel>> depsMap = Maps.newEnumMap(DefType.class);
 
-        Set<DefDescriptor<?>> deps = Sets.newHashSet();
-
-        def.appendDependencies(deps);
+        Set<DefDescriptor<?>> deps = def.getDependencySet();
 
         for (DefDescriptor<?> dep : deps) {
-        	if (hasAccess(definitionService.getDefinition(dep))) {
-	            DefType type = dep.getDefType();
-	
-	            List<DefModel> depsList = depsMap.get(type);
-	            if (depsList == null) {
-	                depsList = Lists.newArrayList();
-	                depsMap.put(type, depsList);
-	            }
-	            
-	            depsList.add(new DefModel(dep));
-        	}
+            if (hasAccess(definitionService.getDefinition(dep))) {
+                DefType type = dep.getDefType();
+    
+                List<DefModel> depsList = depsMap.get(type);
+                if (depsList == null) {
+                    depsList = Lists.newArrayList();
+                    depsMap.put(type, depsList);
+                }
+                
+                depsList.add(new DefModel(dep));
+            }
         }
 
         for (Entry<DefType, List<DefModel>> entry : depsMap.entrySet()) {

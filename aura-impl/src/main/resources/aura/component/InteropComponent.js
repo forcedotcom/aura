@@ -133,7 +133,7 @@ InteropComponent.prototype.setupAttributes = function(config) {
                 var isPTV = valueProvider instanceof PassthroughValue;
                 $A.assert(isPTV || provider === 'c' || provider === 'v', 'Provider type not supported');
 
-                var valueDescriptor = value['descriptor'];
+                var valueDescriptor = value['descriptor'] || attribute;
                 var startsWithOn = valueDescriptor && valueDescriptor.indexOf('on') === 0;
                 var hasNativeAPIExposed = startsWithOn && this.hasNativeAPIExposed(valueDescriptor.substr(2));
                 // For "v" add change handler, for "v.[Aura.Action attribute]" and "c" add bridging

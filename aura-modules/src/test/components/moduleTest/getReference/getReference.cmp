@@ -1,0 +1,8 @@
+<aura:component>
+    <aura:attribute name="created" type="Aura.Component"/>
+    <aura:attribute name="actionCalled" type="Boolean" default="false"/>
+
+    <aura:method name="createInteropWithGetReference" action="{!c.createInteropWithGetReference}"/>
+
+    {!v.created}
+</aura:component>

@@ -1680,8 +1680,23 @@ AuraLocalizationService.prototype.zoneOffset = function(timestamp, timeZone) {
  * @private
  */
 AuraLocalizationService.prototype.formatDateWithTimeZone = function(date, timeZone) {
-    var timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
-    return this.formatDateTimeToString(timeZoneFormat, date);
+
+    if (this.formatErrorFromIntl) {
+        return this.formatDateTime(date, "MM/dd/yyyy, hh:mm");
+    }
+
+    try {
+        var timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
+        return this.formatDateTimeToString(timeZoneFormat, date);
+    } catch(e) {
+        // The error should never happen here. The callers validate the arguments.
+        // This is only for IE11 profiler. Intl API time zone polyfill gets messed up
+        // when start profiling on IE11. If the following code gets executed, we assume
+        // that Intl does not work correctly.
+        $A.warning("Intl API throws an unexpected error.", e);
+        this.formatErrorFromIntl = true;
+        return this.formatDateTime(date, "MM/dd/yyyy, hh:mm");
+    }
 };
 
 /**

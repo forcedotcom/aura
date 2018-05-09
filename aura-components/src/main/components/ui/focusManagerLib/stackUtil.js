@@ -119,7 +119,6 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
         return selector.join(" > ");
     }
 
-
     /**
      * Pushes the given element or activeElement and its Selector into the stack.
      * @param {Element} [element] - Element to which the focus should return.

@@ -30,7 +30,7 @@ function lib() { //eslint-disable-line no-unused-vars
         }
 
         var result = false;
-        var style = window.getComputedStyle(el);
+        var style = window.getComputedStyle(el) || el.style;
         if (style.visibility === 'hidden' || style.display === 'none') {
             result = true;
         } else if (el.parentNode) {

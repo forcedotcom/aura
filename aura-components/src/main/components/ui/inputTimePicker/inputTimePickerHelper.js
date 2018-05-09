@@ -91,7 +91,7 @@
 
         // if overflow is auto overflow-y is also auto,
         // however in firefox the opposite is not true
-        var overflow = getComputedStyle(elem)['overflow-y'];
+        var overflow = (getComputedStyle(elem) || elem.style)['overflow-y'];
 
         if (overflow === 'auto') {
             this._scrollableParent = elem;

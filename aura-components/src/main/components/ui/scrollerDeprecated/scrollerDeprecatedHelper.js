@@ -91,7 +91,8 @@
 		return parseInt(str, 10) || 0; // always use radix 10, return 0 if falsey
 	},
 	heightOffsetHelper : function(component){
-		var el_info = getComputedStyle(component.getElement());
+		var el = component.getElement();
+		var el_info = getComputedStyle(el) || el.style;
 		// use these dimensions to calculate a height offset:
 		var dims = [
 			'height'     ,
@@ -463,7 +464,8 @@
 				} else {
 					// Check for rubber banding because cached wrapper
 					// dimensions and actual wrapper dimensions do not match
-					var wrapperStyle = getComputedStyle(c.getElement(), null);
+					var el = c.getElement();
+					var wrapperStyle = getComputedStyle(el, null) || el.style;
 					validate(c._scroller.wrapperH === Math.round(wrapperStyle.height.replace("px", "")),
 							'Rubberbanding detected: actual wrapper height does not match cached height', c, errors);
 					validate(c._scroller.wrapperW === Math.round(wrapperStyle.width.replace("px", "")), 'Rubberbanding detected: actual wrapper width does not match cached width',
@@ -471,7 +473,8 @@
 
 					// Check for rubber banding because cached content
 					// dimensions and actual content dimensions do not match
-					var contentStyle = getComputedStyle(c.find('scrollContent').getElement(), null);
+					el = c.find('scrollContent').getElement();
+					var contentStyle = getComputedStyle(el, null) || el.style;
 					validate(c._scroller.scrollerH + c._scroller.options.topOffset === Math.round(contentStyle.height.replace("px", "")),
 							'Rubberbanding detected: actual content height does not match cached height', c, errors);
 					validate(c._scroller.scrollerW === Math.round(contentStyle.width.replace("px", "")),
@@ -922,15 +925,16 @@
 					}
 
 					if (that.options.momentum) {
+						var computedStyle = getComputedStyle(that.scroller, null) || that.scroller.style;							
 						if (that.options.useTransform) {
 							// Very lame general purpose alternative to
 							// CSSMatrix
-							matrix = getComputedStyle(that.scroller, null)[transform].replace(/[^0-9\-.,]/g, '').split(',');
+							matrix = computedStyle[transform].replace(/[^0-9\-.,]/g, '').split(',');
 							x = +(matrix[12] || matrix[4]);
 							y = +(matrix[13] || matrix[5]);
 						} else {
-							x = +getComputedStyle(that.scroller, null).left.replace(/[^0-9-]/g, '');
-							y = +getComputedStyle(that.scroller, null).top.replace(/[^0-9-]/g, '');
+							x = +computedStyle.left.replace(/[^0-9-]/g, '');
+							y = +computedStyle.top.replace(/[^0-9-]/g, '');
 						}
 
 						if (x !== that.x || y !== that.y) {

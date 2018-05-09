@@ -30,7 +30,7 @@ function lib() { //eslint-disable-line no-unused-vars
             // getComputedStyle throws an exception
             // if elem is not an element
             // (can happen during unrender)
-            var computedStyle = getComputedStyle(elem);
+            var computedStyle = getComputedStyle(elem) || elem.style;
         } catch (e) {
             return null;
         }

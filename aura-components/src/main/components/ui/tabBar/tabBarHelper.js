@@ -337,7 +337,7 @@
         var dataAttr = "original-width";
         var width = $A.util.getDataAttribute(el, dataAttr);
         if ($A.util.isUndefinedOrNull(width)) {
-            var style = window.getComputedStyle(el, '');
+            var style = window.getComputedStyle(el, '') || el.style;
             width = parseFloat(style["marginLeft"]) + parseFloat(style["marginRight"]) + el.offsetWidth;
             $A.util.setDataAttribute(el, "original-width", width);
         } else {

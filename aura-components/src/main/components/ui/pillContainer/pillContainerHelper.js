@@ -269,7 +269,7 @@
             elmMargin = parseInt(element.currentStyle.marginTop, 10) + parseInt(element.currentStyle.marginBottom, 10);
         }
         else {
-            var computedStyle = getComputedStyle(element, null);
+            var computedStyle = getComputedStyle(element, null) || element.style;
             elmHeight = parseInt(computedStyle.height);
             elmMargin = parseInt(computedStyle.marginTop) + parseInt(computedStyle.marginBottom);
         }

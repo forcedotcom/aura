@@ -5,7 +5,7 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
       return null
     }
     try {
-      var computedStyle = getComputedStyle(elem)
+      var computedStyle = getComputedStyle(elem) || elem.style
     }catch(e) {
       return null
     }
@@ -3101,7 +3101,7 @@ return {
 
         
         
-        var overflow = getComputedStyle(elem)['overflow-y'];
+        var overflow = (getComputedStyle(elem) || elem.style)['overflow-y'];
 
         if (overflow === 'auto') {
             this._scrollableParent = elem;
@@ -10141,7 +10141,7 @@ return {
         var dataAttr = "original-width";
         var width = $A.util.getDataAttribute(el, dataAttr);
         if ($A.util.isUndefinedOrNull(width)) {
-            var style = window.getComputedStyle(el, '');
+            var style = window.getComputedStyle(el, '') || el.style;
             width = parseFloat(style["marginLeft"]) + parseFloat(style["marginRight"]) + el.offsetWidth;
             $A.util.setDataAttribute(el, "original-width", width);
         } else {

@@ -32,7 +32,8 @@ module.exports = function (grunt) {
             components: {
                 options: {
                     configFile: 'aura-components/src/main/components/.eslintrc',
-                    outputFile: 'aura-components/target/eslint-output'
+                    outputFile: 'aura-components/target/eslint-output',
+                    rulePaths: ['aura-components/src/rules']
                 },
                 src: [
                     'aura-components/src/main/components/aura',

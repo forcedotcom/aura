@@ -490,8 +490,8 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
          * @private
          */
         getPrefix: function () {
-            if (!this._prefix) {
-                var styles = window.getComputedStyle(document.documentElement, '');
+            if (!this._prefix) {                
+                var styles = window.getComputedStyle(document.documentElement, ''); // eslint-disable-line check-return-value-for-nullable-call
 
                 // Firefox getComputedStyle could return null.
                 if (styles) {
@@ -517,7 +517,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
          */
         isVisible: function(el) {
             while (el && el.style) {
-                var computedStyle = window.getComputedStyle(el);
+                var computedStyle = window.getComputedStyle(el) || el.style;
                 if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden') {
                     return false;
                 }

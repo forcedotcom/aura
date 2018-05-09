@@ -587,7 +587,7 @@
         // Check all parent elements for scrollability
         while (el !== document.body) {
             // Get some style properties
-            var style = window.getComputedStyle(el);
+            var style = window.getComputedStyle(el) || el.style;
 
             if (!style) {
                 // If we've encountered an element we can't compute the style for, get out
@@ -635,7 +635,8 @@
 
         document.documentElement.appendChild(testDiv);
         testDiv.style.WebkitOverflowScrolling = 'touch';
-        scrollSupport = 'getComputedStyle' in window && window.getComputedStyle(testDiv)['-webkit-overflow-scrolling'] === 'touch';
+        var computedStyle = window.getComputedStyle(testDiv) || testDiv.style;
+        scrollSupport = computedStyle['-webkit-overflow-scrolling'] === 'touch';
         document.documentElement.removeChild(testDiv);
         return scrollSupport;
     }

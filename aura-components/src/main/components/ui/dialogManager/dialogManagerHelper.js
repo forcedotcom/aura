@@ -141,7 +141,9 @@
     getKeydownHandler : function(dialog, isModal, firstFocusable, event) {
 
         if (!event) { event = window.event; }
-
+        if(!dialog || !dialog.isValid()) {
+            return;
+        }
         var closeButton  = dialog.find("closeButton").getElement(),
             shiftPressed = event.shiftKey,
             currentFocus = document.activeElement,
@@ -188,7 +190,9 @@
     getClickHandler : function(dialog, clickOutToClose, event) {
 
         if (!event) { event = window.event; }
-
+        if(!dialog || !dialog.isValid()) {
+            return;
+        }
         var target        = event.target || event.srcElement,
             container     = dialog.find("outer").getElement(),
             clickedInside = $A.util.contains(container, target),
@@ -288,7 +292,9 @@
      * @return {void}
      */
     toggleDisplay : function(show, dialog, autoFocus, isModal, config) {
-
+        if(!dialog || !dialog.isValid()) {
+            return;
+        }
         var mask         = isModal ? dialog.find("mask").getElement() : null,
             outer        = dialog.find("outer").getElement(), // outer dialog wrapper
             inner        = dialog.find("content").getElement(), // inner content wrapper (i.e., the part that is scrollable)

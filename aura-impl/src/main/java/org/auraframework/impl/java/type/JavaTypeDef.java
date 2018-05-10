@@ -21,16 +21,12 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.ConverterService;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
@@ -62,15 +58,6 @@ public class JavaTypeDef extends DefinitionImpl<TypeDef> implements TypeDef {
         return tempParamName;
     }
 
-    private boolean hasCollectionConverters() {
-        if (!descriptor.isParameterized() || simpleParamName == null) {
-            return false;
-        }
-
-        return Aura.getConverterService().hasConverter(ArrayList.class, clazz, simpleParamName);
-
-    }
-
     @Override
     public void serialize(Json json) throws IOException {
         json.writeString(getName());
@@ -78,16 +65,13 @@ public class JavaTypeDef extends DefinitionImpl<TypeDef> implements TypeDef {
 
     /**
      * @return The Java class wrapped by this Aura TypeDef
-     * @throws QuickFixException
+     *
+     * @param prefix unused
      */
     @Override
-    public Object getExternalType(String prefix) throws QuickFixException {
-        prefix = prefix.toLowerCase();
-        if (!prefix.equals("java")) {
-            TypeDef typeDef = DefDescriptorImpl.getAssociateDescriptor(descriptor, TypeDef.class, prefix).getDef();
-            if (typeDef != null) {
-                return typeDef.getExternalType(prefix);
-            }
+    public Object getExternalType(String prefix) {
+        if (!"java".equalsIgnoreCase(prefix)) {
+            throw new UnsupportedOperationException("We only support java wrappers");
         }
         return clazz;
     }
@@ -100,7 +84,8 @@ public class JavaTypeDef extends DefinitionImpl<TypeDef> implements TypeDef {
     @Override
     public Object valueOf(Object value) {
         ConverterService converterService = Aura.getConverterService();
-        if (hasCollectionConverters()) {
+        if (descriptor.isParameterized() && simpleParamName != null
+                && converterService.hasConverter(ArrayList.class, clazz, simpleParamName)) {
             return converterService.convert(value, clazz, simpleParamName, false);
         }
         return converterService.convert(value, clazz, null, false, true);

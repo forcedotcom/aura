@@ -17,6 +17,7 @@
 -->
 <aura:component extensible="true" implements="ui:visible" description="Represents a date picker, which can be used in input components such as ui:inputDate and ui:inputDateTime.">
     <aura:import library="ui:panelPositioningLib" property="lib" />
+    <aura:import library="ui:dateTimeLib" property="dateTimeLib"/>
 
     <!-- These are only needed to support windows phone with IE11 -->
     <aura:attribute name="hasTime" type="Boolean" default="false" description="Indicate if the parent datePicker component supports time picker."/>

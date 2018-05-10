@@ -30,15 +30,15 @@ import org.auraframework.util.AuraLocale;
 public interface LocalizationAdapter extends AuraAdapter {
 
     /**
-     * Returns the specified label. 
-     * @param section 
-     *      The section in the label definition file where the label is defined. 
-     *      This assumes your label name has two parts (section.name). 
+     * Returns the specified label.
+     * @param section
+     *      The section in the label definition file where the label is defined.
+     *      This assumes your label name has two parts (section.name).
      *      This parameter can be <code>null</code> depending on your label system implementation.
      * @param name
      *      The label name.
      * @param params
-     *      A list of parameter values for substitution on the server. 
+     *      A list of parameter values for substitution on the server.
      *      This parameter can be <code>null</code> if parameter substitution is done on the client.
      * @return
      */
@@ -47,8 +47,8 @@ public interface LocalizationAdapter extends AuraAdapter {
     /**
      * Indicates whether the specified label is defined or not.
      * @param section
-     *      The section in the label definition file where the label is defined. 
-     *      This assumes your label name has two parts (section.name). 
+     *      The section in the label definition file where the label is defined.
+     *      This assumes your label name has two parts (section.name).
      *      This parameter can be <code>null</code> depending on your label system implementation.
      * @param name
      *      The label name.
@@ -58,7 +58,7 @@ public interface LocalizationAdapter extends AuraAdapter {
 
     /**
      * Gets a default AuraLocale instance for this context.
-     * 
+     *
      * @return a AuraLocale
      */
     AuraLocale getAuraLocale();
@@ -66,9 +66,9 @@ public interface LocalizationAdapter extends AuraAdapter {
     /**
      * Gets an instance of AuraLocale based on the given defaultLocale for this
      * context.
-     * 
+     *
      * @param defaultLocal a Locale
-     * 
+     *
      * @return a AuraLocale based on the defaultLocale value
      */
     AuraLocale getAuraLocale(Locale defaultLocal);
@@ -76,7 +76,7 @@ public interface LocalizationAdapter extends AuraAdapter {
     /**
      * Gets an instance of AuraLocale based on the given parameters for this
      * context.
-     * 
+     *
      * @param defaultLocale a Locale
      * @param timeZone a TimeZone
      * @return a AuraLocale based on the defaultLocale and timeZone values
@@ -88,7 +88,7 @@ public interface LocalizationAdapter extends AuraAdapter {
      * context. Locales can be specified for each type of localization. If null
      * is given for any argument, an appropriate default value may be calculated
      * and used as needed.
-     * 
+     *
      * @param defaultLocale a Locale to use by default. If null is given a
      *            default may be assumed.
      * @param currencyLocale a Locale to use for currency amounts if different
@@ -101,7 +101,7 @@ public interface LocalizationAdapter extends AuraAdapter {
      *            different than the default
      * @param systemLocale the Locale to use as the system default
      * @param timeZone a TimeZone to use
-     * 
+     *
      * @return a AuraLocale based on the given values
      */
     AuraLocale getAuraLocale(Locale defaultLocale, Locale currencyLocale, Locale dateLocale, Locale languageLocale,
@@ -110,8 +110,16 @@ public interface LocalizationAdapter extends AuraAdapter {
     /**
      * Sets requested locales that must be considered when creating default
      * AuraLocale.
-     * 
+     *
      * @param requestedLocales
      */
     void setRequestedLocales(List<Locale> requestedLocales);
+
+
+    /**
+     * Returns whether the the current locale requires to display Japanese imperial year
+     * @see <a href="https://en.wikipedia.org/wiki/List_of_Japanese_era_names">List of Japanese era</a>
+     * @return {@code true} to display imperial year, {@code false} otherwise
+     */
+    Boolean showJapaneseImperialYear();
 }

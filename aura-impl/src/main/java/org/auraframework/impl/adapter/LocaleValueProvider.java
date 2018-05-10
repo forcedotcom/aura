@@ -15,8 +15,14 @@
  */
 package org.auraframework.impl.adapter;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
+import java.io.IOException;
+import java.text.DateFormatSymbols;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.DefDescriptor;
@@ -33,14 +39,9 @@ import org.auraframework.util.AuraLocale;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
-import java.io.IOException;
-import java.text.DateFormatSymbols;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+
 
 public class LocaleValueProvider implements GlobalValueProvider {
     public static String USER_LOCALE_LANGUAGE = "userLocaleLang";
@@ -73,6 +74,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
     public static String ZERO_DIGIT = "zero";
 
     public static String IS_EASTERN_NAME_STYLE = "isEasternNameStyle";
+    public static String SHOW_JAPANESE_IMPERIAL_YEAR = "showJapaneseImperialYear";
     public static String DIR = "dir";
 
     private final Map<String, Object> data;
@@ -109,6 +111,9 @@ public class LocaleValueProvider implements GlobalValueProvider {
         builder.put(TIME_ZONE, timezoneId);
 
         builder.put(IS_EASTERN_NAME_STYLE, auraLocale.isEasternNameStyle());
+        if ("ja".equals(userLocale.getLanguage())) {
+            builder.put(SHOW_JAPANESE_IMPERIAL_YEAR, localizationAdapter.showJapaneseImperialYear());
+        }
 
         // FORMAT PATTERNS
 
@@ -127,7 +132,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
         builder.put(CURRENCY_FORMAT, localizationService.getCurrencyFormatPattern());
         builder.put(CURRENCY_CODE, localizationService.getCurrencyCode());
         builder.put(CURRENCY, localizationService.getCurrencySymbol());
-        
+
         String dir = "ltr";
         switch (lang.getLanguage()) {
         case "he":  case "ji":  case "ar":  case "iw":  case "yi":  case "fa":  case "ur":

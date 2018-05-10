@@ -27,7 +27,37 @@ function lib() { //eslint-disable-line no-unused-vars
         var localDate = new Date(date);
         $A.localizationService.WallTimeToUTC(localDate, timezone, callback);
     };
+    
+    var getImperialYearLabel = function(data, useKey) {
+        return useKey ? data.key : data.label;
+    };
 
+    // Japanese imperial year
+    var imperialYear = [
+        // note: the order matters. see implementation of getImperialYear 
+        {key: "H", year: 1989, label: "平成"}, // Heisei:  1/8/1989
+        {key: "S", year: 1926, label: "昭和"}, // Showa:  12/25/1926
+        {key: "T", year: 1912, label: "大正"}, // Taisho:  7/30/1912
+        {key: "M", year: 1868, label: "明治"}  // Meiji:   1/1/1868
+    ];
+
+    var getImperialYear = function(year) {
+        var langLocale = $A.get("$Locale.langLocale");
+        var useShortName = langLocale !== "ja";
+        for (var i = 0; i < imperialYear.length; i++) {
+            if (year >= imperialYear[i].year) {
+                var ret = getImperialYearLabel(imperialYear[i], useShortName) + (year - imperialYear[i].year + 1);
+                if (year === imperialYear[i].year && i < imperialYear.length - 1) {
+                    // transition year -- display both
+                    var prev = imperialYear[i + 1];
+                    ret += '/' +  getImperialYearLabel(prev, useShortName) + (year - prev.year + 1);
+                }
+                return ret;
+            }
+        }
+        return null;
+    };
+     
     return {
         /*
          * Get the formatted display value of a date string based on timezone
@@ -120,6 +150,11 @@ function lib() { //eslint-disable-line no-unused-vars
             };
 
             convertFromTimezone(date, config.timezone, $A.getCallback(isoValue));
+        },
+        
+        formatYear: function(year) {
+            var jpYear = $A.get("$Locale.showJapaneseImperialYear") && getImperialYear(year);
+            return year + (jpYear ? " (" + jpYear + ")" : "");
         }
     };
 }

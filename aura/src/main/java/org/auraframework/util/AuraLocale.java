@@ -31,7 +31,7 @@ public interface AuraLocale extends Serializable {
 
     /**
      * A convenience method that returns the same value as getDefaultLocale().
-     * 
+     *
      * @return a non-null Locale object for the current context
      */
     public Locale getLocale();
@@ -39,7 +39,7 @@ public interface AuraLocale extends Serializable {
     /**
      * Returns the current Locale, which can be used for any localization
      * purpose. This is typically per user or per request.
-     * 
+     *
      * @return a non-null Locale object for the current context
      */
     public Locale getDefaultLocale();
@@ -47,7 +47,7 @@ public interface AuraLocale extends Serializable {
     /**
      * Returns the default locale for the system. This is typically per app or
      * per server.
-     * 
+     *
      * @return the system default locale
      */
     public Locale getSystemLocale();
@@ -56,7 +56,7 @@ public interface AuraLocale extends Serializable {
      * Returns the language Locale, which may differ from the default, for
      * example, if used to generate labels in a UI and translated resource
      * bundles for the user's default Locale are not available.
-     * 
+     *
      * @return a Locale to use for String lookups
      */
     public Locale getLanguageLocale();
@@ -66,7 +66,7 @@ public interface AuraLocale extends Serializable {
      * default, for example, if used to generate a calendar component with date
      * selection and the component has only been localized into a certain list
      * of languages.
-     * 
+     *
      * @return a Locale to use for Date, Time, and Calendar related lookups
      */
     public Locale getDateLocale();
@@ -74,7 +74,7 @@ public interface AuraLocale extends Serializable {
     /**
      * Returns a Locale to use when parsing and formatting numbers, including
      * percentages.
-     * 
+     *
      * @return a Locale to use for numbers
      */
     public Locale getNumberLocale();
@@ -83,7 +83,7 @@ public interface AuraLocale extends Serializable {
      * Returns a Locale to use when parsing and formatting currency amounts, if
      * that currency amount does not have a specified currency type (unusual),
      * and if the default Locale is not appropriate.
-     * 
+     *
      * @return a Locale to use for default currency amounts
      */
     public Locale getCurrencyLocale();
@@ -92,23 +92,22 @@ public interface AuraLocale extends Serializable {
      * Returns a TimeZone definition for use when displaying times to a user, so
      * they can view times in their local reference time, rather than in
      * UTC/GMT.
-     * 
+     *
      * @return a non-null TimeZone
      */
     public TimeZone getTimeZone();
 
     /**
      * Returns a Calendar based on the Locale and TimeZone of this instance.
-     * 
+     *
      * @return a Calendar
      */
     public Calendar getCalendar();
-    
+
     /**
      * Returns if a name is in eastern style: true - name is in eastern style: last first[ middle][ suffix]
-     * 
+     *
      * @return a Boolean
      */
     public Boolean isEasternNameStyle();
-
 }

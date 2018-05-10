@@ -47,7 +47,7 @@
         }));
 
     },
-    
+
     goToPrevMonth: function (component) {
         this.changeCalendar(component, -1, 0);
     },
@@ -213,7 +213,8 @@
             if (selectElem) {
                 selectElem.setAttribute("id", yearTitleCmp.getGlobalId());
                 for (var i = minY; i <= maxY; i++) {
-                    selectElem.options[selectElem.options.length] = new Option(i + "", i + "");
+                    var displayText = this.dateTimeLib.dateTimeService.formatYear(i);
+                    selectElem.options[selectElem.options.length] = new Option(displayText, i + "");
                 }
             }
             component._yearListInitialized = true;

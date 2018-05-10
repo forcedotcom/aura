@@ -181,4 +181,8 @@ public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLoc
         return section + "." + name;
     }
 
+    @Override
+    public Boolean showJapaneseImperialYear() {
+        return false;
+    }
 }

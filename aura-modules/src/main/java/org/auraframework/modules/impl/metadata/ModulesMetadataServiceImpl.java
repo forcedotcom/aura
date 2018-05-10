@@ -18,7 +18,6 @@ package org.auraframework.modules.impl.metadata;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.def.module.impl.ModuleDesignDefImpl;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.factory.XMLParserBase;
 import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
@@ -51,6 +50,14 @@ public class ModulesMetadataServiceImpl implements ModulesMetadataService {
     private Map<String, ModuleMetadataXMLHandler> elementHandlers = new HashMap<>();
 
     protected static final Gson GSON = new Gson();
+
+    private static final XMLInputFactory XML_INPUT_FACTORY;
+    static {
+        XML_INPUT_FACTORY = XMLInputFactory.newInstance();
+        // protect xxe
+        XML_INPUT_FACTORY.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        XML_INPUT_FACTORY.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+    }
 
     /**
      * Process lightning.json metadata
@@ -101,8 +108,7 @@ public class ModulesMetadataServiceImpl implements ModulesMetadataService {
         XMLStreamReader reader = null;
         String rootElement = "LightningComponentBundle";
         try (StringReader sr = new StringReader(source.getContents())) {
-            XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-            reader = inputFactory.createXMLStreamReader(sr);
+            reader = XML_INPUT_FACTORY.createXMLStreamReader(sr);
             while (reader.hasNext()) {
                 int eventType = reader.next();
                 switch (eventType) {

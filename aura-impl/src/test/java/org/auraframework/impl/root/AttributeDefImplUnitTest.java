@@ -21,14 +21,11 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.root.AttributeDefImpl.Builder;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
-import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.validation.ReferenceValidationContext;
@@ -37,7 +34,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDefImpl, AttributeDef, AttributeDef, Builder> {
@@ -199,41 +195,29 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
     @Test
     public void testValidateReferencesDefaultValue() throws Exception {
         TypeDef typeDef = Mockito.mock(TypeDef.class);
-        Mockito.doReturn(typeDef).when(this.typeDefDescriptor).getDef();
+        ReferenceValidationContext rvc = Mockito.mock(ReferenceValidationContext.class);
+        Mockito.doReturn(typeDef).when(rvc).getAccessibleDefinition(this.typeDefDescriptor);
         AttributeDef attributeDef = buildDefinition();
         Mockito.verifyZeroInteractions(this.defaultValue);
-        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
-        attributeDef.validateReferences(validationContext);
+        attributeDef.validateReferences(rvc);
         Mockito.verify(this.defaultValue).parseValue(typeDef);
-        Mockito.verify(this.defaultValue).validateReferences(validationContext);
+        Mockito.verify(this.defaultValue).validateReferences(rvc);
     }
 
     @Test
-    public void testValidateReferencesReferenceThrowsClassNotFound() throws Exception {
-        Throwable t = new AuraRuntimeException(new ClassNotFoundException());
-        Mockito.doThrow(t).when(this.typeDefDescriptor).getDef();
-        Mockito.doReturn(DefType.ATTRIBUTE).when(this.typeDefDescriptor).getDefType();
-        Mockito.doReturn("something").when(this.typeDefDescriptor).getQualifiedName();
-        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
-        try {
-            buildDefinition().validateReferences(validationContext);
-            fail("Expected a DefinitionNotFoundException if class not found for a reference");
-        } catch (Exception e) {
-            assertExceptionMessage(e, DefinitionNotFoundException.class, "No ATTRIBUTE named something found");
-        }
-    }
-
-    @Test
-    public void testValidateReferencesReferenceThrowsOtherException() throws Exception {
+    public void testValidateReferencesParseThrowsException() throws Exception {
+        TypeDef typeDef = Mockito.mock(TypeDef.class);
         Throwable expected = new AuraRuntimeException("");
-        Mockito.doThrow(expected).when(this.typeDefDescriptor).getDef();
-        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
+        Throwable actual = null;
+        ReferenceValidationContext rvc = Mockito.mock(ReferenceValidationContext.class);
+        Mockito.doReturn(typeDef).when(rvc).getAccessibleDefinition(this.typeDefDescriptor);
+        Mockito.doThrow(expected).when(this.defaultValue).parseValue(typeDef);
         try {
-            buildDefinition().validateReferences(validationContext);
-            fail("Expected an exception for failed reference validation");
-        } catch (Exception actual) {
-            assertEquals(expected, actual);
+            buildDefinition().validateReferences(rvc);
+        } catch (Exception e) {
+            actual = e;
         }
+        assertEquals(expected, actual);
     }
 
     @Override

@@ -23,8 +23,6 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.system.Location;
-import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -74,18 +72,20 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     }
 
     /**
-     * @return The ValueDef that defines type information about Values for instances of this AttributeDef
+     * @return The TypeDef that defines type information about Values for instances of this AttributeDef
      * @throws QuickFixException
+     * @deprecated use #getTypeDesc()
      */
     @Override
+    @Deprecated
     public TypeDef getTypeDef() throws QuickFixException {
         if (typeDefDescriptor == null) {
             return null;
         }
-
         return typeDefDescriptor.getDef();
     }
 
+    @Override
     public DefDescriptor<TypeDef> getTypeDesc() {
         return typeDefDescriptor;
     }
@@ -186,19 +186,14 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         super.validateReferences(validationContext);
-        try {
-            TypeDef typeDef = typeDefDescriptor.getDef();
-            if (defaultValue != null) {
-                defaultValue.parseValue(typeDef);
-                defaultValue.validateReferences(validationContext);
+        TypeDef typeDef = validationContext.getAccessibleDefinition(typeDefDescriptor);
+        if (defaultValue != null) {
+            // FIXME(goliver): It is possible that we should repackage exceptions from
+            // parseValue, but let's not try to be clever right now. This code goes via
+            // a rather circuitious path that we should probably clean up.
+            defaultValue.parseValue(typeDef);
 
-            }
-        } catch (AuraRuntimeException e) {
-            if (e.getCause() instanceof ClassNotFoundException) {
-                throw new DefinitionNotFoundException(typeDefDescriptor, getLocation());
-            } else {
-                throw e; // Don't try to be clever about unknown bad things!
-            }
+            defaultValue.validateReferences(validationContext);
         }
     }
 

@@ -18,6 +18,7 @@ package org.auraframework.def;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
+ * FIXME(goliver)-SHALOM: This should not be a definition.
  */
 public interface AttributeDef extends Definition, ParentedDef {
     @Override
@@ -33,7 +34,22 @@ public interface AttributeDef extends Definition, ParentedDef {
      */
     AttributeDefRef getDefaultValue();
 
+    /**
+     * Get the type def for this attribute.
+     *
+     * @deprecated use #getTypeDesc
+     */
+    @Deprecated
     TypeDef getTypeDef() throws QuickFixException;
+
+    /**
+     * Get the descriptor for the type of this attribute.
+     *
+     * If you need the def, you should use definition service.
+     *
+     * @return the descriptor.
+     */
+    DefDescriptor<TypeDef> getTypeDesc();
 
     boolean isRequired();
 

@@ -8,14 +8,14 @@ function resolveAfter1Sec(x) {
     });
 }
 
-async function test(number) {
+async function testFun(number) {
     const t = await resolveAfter1Sec(number);
     return t;
 }
 
 export default class Async extends Element {
     connectedCallback() {
-        test(7).then((n) => {
+        testFun(7).then((n) => {
             console.log('YAY!', n); // eslint-disable-line no-console
         });
     }

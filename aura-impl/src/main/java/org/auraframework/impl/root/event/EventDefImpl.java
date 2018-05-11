@@ -25,7 +25,6 @@ import java.util.Set;
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
 import org.auraframework.def.RegisterEventDef;
@@ -52,6 +51,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
 
     private final EventType eventType;
     private final DefDescriptor<EventDef> extendsDescriptor;
+    private transient DefDescriptor<EventDef> extendsDescriptorCanonical;
     private final int hashCode;
     private static final DefDescriptor<EventDef> PROTO_COMPONENT_EVENT = new DefDescriptorImpl<>("markup", "aura",
             "componentEvent", EventDef.class);
@@ -99,19 +99,19 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
                 json.writeMapEnd();
 
             } else {
+                if (extendsDescriptorCanonical == null) {
+                    extendsDescriptorCanonical = extendsDescriptor;
+                }
 
                 serializationContext.setSerializing(true);
                 json.writeMapBegin();
                 json.writeMapEntry(Json.ApplicationKey.DESCRIPTOR, getDescriptor());
                 json.writeMapEntry(Json.ApplicationKey.TYPE, eventType);
                 json.writeValue(getAccess());
-                if (extendsDescriptor != null) {
-                    // Write out superDef if it's not a componentEvent or applicationEvent as those can be easily inferred
-                    Definition superDef = Aura.getDefinitionService().getDefinition(extendsDescriptor);
-                    if (superDef != null && !superDef.getDescriptor().getQualifiedName().equals("markup://aura:componentEvent") &&
-                                            !superDef.getDescriptor().getQualifiedName().equals("markup://aura:applicationEvent")) {
-                        json.writeMapEntry(Json.ApplicationKey.SUPERDEF, superDef);
-                    }
+                if (extendsDescriptorCanonical != null
+                        && !extendsDescriptorCanonical.equals(PROTO_COMPONENT_EVENT)
+                        && !extendsDescriptorCanonical.equals(PROTO_APPLICATION_EVENT)) {
+                    json.writeMapEntry(Json.ApplicationKey.SUPERDEF, extendsDescriptorCanonical);
                 }
                 Map<DefDescriptor<AttributeDef>, AttributeDef> attrDefs = getAttributeDefs();
                 if (attrDefs.size() > 0) {
@@ -153,7 +153,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         if (extendsDescriptor != null) {
-            EventDef extended = Aura.getDefinitionService().getDefinition(extendsDescriptor);
+            EventDef extended = validationContext.getAccessibleDefinition(extendsDescriptor);
             if (extended == null) {
                 throw new InvalidDefinitionException(String.format("Event %s cannot extend %s", getDescriptor(),
                         getExtendsDescriptor()), getLocation());
@@ -163,6 +163,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
                 throw new InvalidDefinitionException(String.format("Event %s cannot extend %s", getDescriptor(),
                         getExtendsDescriptor()), getLocation());
             }
+            extendsDescriptorCanonical = extended.getDescriptor();
             // need to resolve duplicated attributes from supers
         }
 

@@ -18,14 +18,12 @@ package org.auraframework.impl.root.event;
 import java.io.IOException;
 import java.util.Set;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -40,6 +38,7 @@ public final class RegisterEventDefImpl extends DefinitionImpl<RegisterEventDef>
     private final int hashCode;
     private final DefDescriptor<? extends RootDefinition> parentDescriptor;
     private final DefDescriptor<EventDef> reference;
+    private transient DefDescriptor<EventDef> referenceCanonical;
 
     protected RegisterEventDefImpl(Builder builder) {
         super(builder);
@@ -77,16 +76,15 @@ public final class RegisterEventDefImpl extends DefinitionImpl<RegisterEventDef>
 
     @Override
     public void serialize(Json json) throws IOException {
-        try {
-            EventDef eventDef = Aura.getDefinitionService().getDefinition(reference);
-            json.writeMapBegin();
-            json.writeMapEntry(Json.ApplicationKey.EVENTDEF, eventDef.getDescriptor());
-            json.writeMapEntry(Json.ApplicationKey.NAME, descriptor.getName());
-            json.writeValue(getAccess());
-            json.writeMapEnd();
-        } catch (QuickFixException e) {
-            throw new AuraUnhandledException("unhandled exception", e);
+        if (referenceCanonical == null) {
+            // someone serialized without validating. Shame!
+            referenceCanonical = reference;
         }
+        json.writeMapBegin();
+        json.writeMapEntry(Json.ApplicationKey.EVENTDEF, referenceCanonical);
+        json.writeMapEntry(Json.ApplicationKey.NAME, descriptor.getName());
+        json.writeValue(getAccess());
+        json.writeMapEnd();
     }
 
     @Override
@@ -112,13 +110,14 @@ public final class RegisterEventDefImpl extends DefinitionImpl<RegisterEventDef>
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         super.validateReferences(validationContext);
         
-        EventDef event = Aura.getDefinitionService().getDefinition(reference);
+        EventDef event = validationContext.getAccessibleDefinition(reference);
         if (event == null) {
             throw new InvalidDefinitionException("Cannot register event of type " + reference, getLocation());
         }
         if (!event.getEventType().canBeFired()) {
             throw new InvalidDefinitionException("Cannot fire event of type: " + reference, getLocation());
     	}
+        referenceCanonical = event.getDescriptor();
     }
 
     @Override

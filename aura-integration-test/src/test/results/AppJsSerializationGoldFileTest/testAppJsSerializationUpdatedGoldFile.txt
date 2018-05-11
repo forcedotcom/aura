@@ -14785,9 +14785,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://aura:valueChange",
     "t":"VALUE",
     "xs":"G",
-    "su":{
-      "descriptor":"markup://aura:valueEvent"
-    },
+    "su":"markup://aura:valueEvent",
     "a":{
       "expression":["expression","aura://String","G",false],
       "oldValue":["oldValue","aura://Object","G",false,null],
@@ -14799,9 +14797,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://aura:valueDestroy",
     "t":"VALUE",
     "xs":"G",
-    "su":{
-      "descriptor":"markup://aura:valueEvent"
-    },
+    "su":"markup://aura:valueEvent",
     "a":{
       "value":["value","aura://Object","G",false,null]
     }
@@ -14810,9 +14806,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://aura:valueInit",
     "t":"VALUE",
     "xs":"G",
-    "su":{
-      "descriptor":"markup://aura:valueEvent"
-    },
+    "su":"markup://aura:valueEvent",
     "a":{
       "value":["value","aura://Object","G",false,null]
     }
@@ -14821,9 +14815,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://aura:valueRender",
     "t":"VALUE",
     "xs":"G",
-    "su":{
-      "descriptor":"markup://aura:valueEvent"
-    },
+    "su":"markup://aura:valueEvent",
     "a":{
       "value":["value","aura://Object","G",false,null]
     }
@@ -14845,9 +14837,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:baseMouseEvent",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseDOMEvent"
-    },
+    "su":"markup://ui:baseDOMEvent",
     "a":{
       "domEvent":["domEvent","aura://Object","I",false,null],
       "button":["button","aura://Integer","I",false]
@@ -14857,9 +14847,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:baseKeyboardEvent",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseDOMEvent"
-    },
+    "su":"markup://ui:baseDOMEvent",
     "a":{
       "ctrlKey":["ctrlKey","aura://Boolean","I",false],
       "domEvent":["domEvent","aura://Object","I",false,null],
@@ -14871,9 +14859,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:click",
     "t":"COMPONENT",
     "xs":"PP",
-    "su":{
-      "descriptor":"markup://ui:baseMouseEvent"
-    },
+    "su":"markup://ui:baseMouseEvent",
     "a":{
       "domEvent":["domEvent","aura://Object","I",false,null],
       "button":["button","aura://Integer","I",false]
@@ -14883,9 +14869,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:dblclick",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseMouseEvent"
-    },
+    "su":"markup://ui:baseMouseEvent",
     "a":{
       "domEvent":["domEvent","aura://Object","I",false,null],
       "button":["button","aura://Integer","I",false]
@@ -14895,9 +14879,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:mousedown",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseMouseEvent"
-    },
+    "su":"markup://ui:baseMouseEvent",
     "a":{
       "domEvent":["domEvent","aura://Object","I",false,null],
       "button":["button","aura://Integer","I",false]
@@ -14907,9 +14889,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:mousemove",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseMouseEvent"
-    },
+    "su":"markup://ui:baseMouseEvent",
     "a":{
       "domEvent":["domEvent","aura://Object","I",false,null],
       "button":["button","aura://Integer","I",false]
@@ -14919,9 +14899,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:mouseout",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseMouseEvent"
-    },
+    "su":"markup://ui:baseMouseEvent",
     "a":{
       "domEvent":["domEvent","aura://Object","I",false,null],
       "button":["button","aura://Integer","I",false]
@@ -14931,9 +14909,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:mouseover",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseMouseEvent"
-    },
+    "su":"markup://ui:baseMouseEvent",
     "a":{
       "domEvent":["domEvent","aura://Object","I",false,null],
       "button":["button","aura://Integer","I",false]
@@ -14943,9 +14919,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:mouseup",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseMouseEvent"
-    },
+    "su":"markup://ui:baseMouseEvent",
     "a":{
       "domEvent":["domEvent","aura://Object","I",false,null],
       "button":["button","aura://Integer","I",false]
@@ -14955,9 +14929,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:blur",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseDOMEvent"
-    },
+    "su":"markup://ui:baseDOMEvent",
     "a":{
       "domEvent":["domEvent","aura://Object","I",false,null]
     }
@@ -14974,9 +14946,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:focus",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseDOMEvent"
-    },
+    "su":"markup://ui:baseDOMEvent",
     "a":{
       "domEvent":["domEvent","aura://Object","I",false,null]
     }
@@ -14985,9 +14955,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:keydown",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseKeyboardEvent"
-    },
+    "su":"markup://ui:baseKeyboardEvent",
     "a":{
       "ctrlKey":["ctrlKey","aura://Boolean","I",false],
       "domEvent":["domEvent","aura://Object","I",false,null],
@@ -14999,9 +14967,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:keypress",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseKeyboardEvent"
-    },
+    "su":"markup://ui:baseKeyboardEvent",
     "a":{
       "ctrlKey":["ctrlKey","aura://Boolean","I",false],
       "domEvent":["domEvent","aura://Object","I",false,null],
@@ -15013,9 +14979,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:keyup",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseKeyboardEvent"
-    },
+    "su":"markup://ui:baseKeyboardEvent",
     "a":{
       "ctrlKey":["ctrlKey","aura://Boolean","I",false],
       "domEvent":["domEvent","aura://Object","I",false,null],
@@ -15027,9 +14991,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:select",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseDOMEvent"
-    },
+    "su":"markup://ui:baseDOMEvent",
     "a":{
       "domEvent":["domEvent","aura://Object","I",false,null]
     }
@@ -15097,9 +15059,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:refresh",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:command"
-    },
+    "su":"markup://ui:command",
     "a":{
       "parameters":["parameters","aura://Object","I",false,null]
     }
@@ -15160,9 +15120,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:onTabHover",
     "t":"COMPONENT",
     "xs":"PP",
-    "su":{
-      "descriptor":"markup://ui:baseMouseEvent"
-    },
+    "su":"markup://ui:baseMouseEvent",
     "a":{
       "tabComponent":["tabComponent","aura://Aura.Component","PP",false,null],
       "domEvent":["domEvent","aura://Object","I",false,null],
@@ -15178,9 +15136,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://ui:press",
     "t":"COMPONENT",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://ui:baseDOMEvent"
-    },
+    "su":"markup://ui:baseDOMEvent",
     "a":{
       "domEvent":["domEvent","aura://Object","I",false,null]
     }
@@ -15248,9 +15204,7 @@ $A.componentService.initEventDefs([
     "descriptor":"markup://auradocs:locationChange",
     "t":"APPLICATION",
     "xs":"I",
-    "su":{
-      "descriptor":"markup://aura:locationChange"
-    },
+    "su":"markup://aura:locationChange",
     "a":{
       "demo":["demo","aura://String","I",false],
       "querystring":["querystring","aura://String","G",false],

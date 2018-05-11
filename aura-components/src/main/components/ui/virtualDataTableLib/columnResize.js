@@ -49,7 +49,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
     };
 
     ColumnResizer.prototype = {
-        DIVIDER_RELAYOUT_DELAY: 150,
+        DIVIDER_RELAYOUT_DELAY: 17,
         _setDividerHeight: function(indicator) {
             // Since window.innerHeight and getBoundingClientRect call will trigger relayout,
             // and divider is not visible when init the VDT, so we can delay the _setDividerHeight.

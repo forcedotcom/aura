@@ -44,7 +44,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
 
     ColumnResizer.prototype = {
 
-    	DIVIDER_RELAYOUT_DELAY: 150,
+    	DIVIDER_RELAYOUT_DELAY: 17,
         _setDividerHeight: function(indicator) {
             var that = this;
             return new Promise($A.getCallback(function(resolve) {

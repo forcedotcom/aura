@@ -231,6 +231,38 @@ function assertValidForceTagName(Ctor) {
 const usesNativeSymbols = typeof Symbol() === 'symbol';
 
 const { addEventListener, removeEventListener, getAttribute, getAttributeNS, setAttribute, setAttributeNS, removeAttribute, removeAttributeNS, querySelector, querySelectorAll, } = Element.prototype;
+const { DOCUMENT_POSITION_CONTAINED_BY } = Node;
+const { compareDocumentPosition: compareDocumentPosition$1, } = Node.prototype;
+function findShadowRoot(node) {
+    let root = node;
+    while (isUndefined(root[ViewModelReflection])) {
+        root = root.parentNode;
+    }
+    return root;
+}
+function findComposedRootNode(node) {
+    while (node !== document) {
+        const parent = node.parentNode;
+        if (isNull(parent)) {
+            return node;
+        }
+        node = parent;
+    }
+    return node;
+}
+// TODO: once we start using the real shadowDOM, we can rely on:
+// const { getRootNode } = Node.prototype;
+// for now, we need to provide a dummy implementation to provide retargeting
+function getRootNode(options) {
+    const composed = isUndefined(options) ? false : !!options.composed;
+    if (!composed) {
+        return findShadowRoot(this.parentNode); // this is not quite the root (it is the host), but for us is sufficient
+    }
+    return findComposedRootNode(this);
+}
+function isChildNode(root, node) {
+    return !!(compareDocumentPosition$1.call(root, node) & DOCUMENT_POSITION_CONTAINED_BY);
+}
 // These properties get added to LWCElement.prototype publicProps automatically
 const defaultDefHTMLPropertyNames = ['dir', 'id', 'accessKey', 'title', 'lang', 'hidden', 'draggable', 'tabIndex'];
 // Few more exceptions that are using the attribute name to match the property in lowercase.
@@ -522,6 +554,27 @@ if (isUndefined(GlobalHTMLPropDescriptors.id)) {
     GlobalHTMLPropDescriptors.id = getOwnPropertyDescriptor(Element.prototype, 'id');
     AttrNameToPropNameMap.id = PropNameToAttrNameMap.id = 'id';
 }
+// https://dom.spec.whatwg.org/#dom-event-composed
+// This is a very dummy, simple polyfill for composed
+if (!getOwnPropertyDescriptor(Event.prototype, 'composed')) {
+    defineProperties(Event.prototype, {
+        composed: {
+            value: true,
+            configurable: true,
+            enumerable: true,
+            writable: true,
+        },
+    });
+    const { CustomEvent: OriginalCustomEvent } = window;
+    window.CustomEvent = function PatchedCustomEvent(type, eventInitDict) {
+        const event = new OriginalCustomEvent(type, eventInitDict);
+        // support for composed on custom events
+        event.composed = !!(eventInitDict && eventInitDict.composed);
+        return event;
+    };
+    window.CustomEvent.prototype = OriginalCustomEvent.prototype;
+}
+const CustomEvent = window.CustomEvent;
 
 const TopLevelContextSymbol = Symbol();
 let currentContext = {};
@@ -556,6 +609,87 @@ function invokeServiceHook(vm, cbs) {
     for (let i = 0, len = cbs.length; i < len; ++i) {
         cbs[i].call(undefined, component, data, def, context);
     }
+}
+
+function createComponent(vm, Ctor) {
+    {
+        assert.vm(vm);
+    }
+    // create the component instance
+    const component = invokeComponentConstructor(vm, Ctor);
+    {
+        assert.isTrue(vm.component === component, `Invalid construction for ${vm}, maybe you are missing the call to super() on classes extending Element.`);
+        const { track } = getComponentDef(Ctor);
+        if ('state' in component && (!track || !track.state)) {
+            assert.logWarning(`Non-trackable component state detected in ${component}. Updates to state property will not be reactive. To make state reactive, add @track decorator.`);
+        }
+    }
+}
+function linkComponent(vm) {
+    {
+        assert.vm(vm);
+    }
+    // wiring service
+    const { def: { wire } } = vm;
+    if (wire) {
+        const { wiring } = Services;
+        if (wiring) {
+            invokeServiceHook(vm, wiring);
+        }
+    }
+}
+function clearReactiveListeners(vm) {
+    {
+        assert.vm(vm);
+    }
+    const { deps } = vm;
+    const len = deps.length;
+    if (len) {
+        for (let i = 0; i < len; i += 1) {
+            const set = deps[i];
+            const pos = ArrayIndexOf.call(deps[i], vm);
+            {
+                assert.invariant(pos > -1, `when clearing up deps, the vm must be part of the collection.`);
+            }
+            ArraySplice.call(set, pos, 1);
+        }
+        deps.length = 0;
+    }
+}
+function isValidEvent(event) {
+    // TODO: this is only needed if ShadowDOM is not used
+    if (event.composed === true) {
+        return true;
+    }
+    // if the closest root contains the currentTarget, the event is valid
+    return isChildNode(getRootNode.call(event.target), event.currentTarget);
+}
+function renderComponent(vm) {
+    {
+        assert.vm(vm);
+        assert.invariant(vm.isDirty, `${vm} is not dirty.`);
+    }
+    clearReactiveListeners(vm);
+    const vnodes = invokeComponentRenderMethod(vm);
+    vm.isDirty = false;
+    {
+        assert.invariant(isArray$1(vnodes), `${vm}.render() should always return an array of vnodes instead of ${vnodes}`);
+    }
+    return vnodes;
+}
+function markComponentAsDirty(vm) {
+    {
+        assert.vm(vm);
+        assert.isFalse(vm.isDirty, `markComponentAsDirty() for ${vm} should not be called when the component is already dirty.`);
+        assert.isFalse(isRendering, `markComponentAsDirty() for ${vm} cannot be called during rendering of ${vmBeingRendered}.`);
+    }
+    vm.isDirty = true;
+}
+function getCustomElementComponent(elmOrRoot) {
+    {
+        assert.vm(elmOrRoot[ViewModelReflection]);
+    }
+    return elmOrRoot[ViewModelReflection].component;
 }
 
 /**
@@ -997,7 +1131,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.19.5 */
+/** version: 0.20.1 */
 
 const TargetToReactiveRecordMap = new WeakMap();
 function notifyMutation$1(target, key) {
@@ -1165,13 +1299,8 @@ function unwrap$1(value) {
 }
 
 function piercingHook(membrane, target, key, value) {
-    const { vm } = membrane.handler;
-    {
-        assert.vm(vm);
-    }
     const { piercing } = Services;
     if (piercing) {
-        const { component, data, def, context } = vm;
         let result = value;
         let next = true;
         const callback = (newValue) => {
@@ -1179,215 +1308,228 @@ function piercingHook(membrane, target, key, value) {
             result = newValue;
         };
         for (let i = 0, len = piercing.length; next && i < len; ++i) {
-            piercing[i].call(undefined, component, data, def, context, target, key, value, callback);
+            piercing[i].call(undefined, target, key, value, callback);
         }
         return result === value ? getReplica(membrane, result) : result;
     }
 }
-class PiercingMembraneHandler {
-    constructor(vm) {
-        {
-            assert.vm(vm);
-        }
-        this.vm = vm;
-    }
-    get(membrane, target, key) {
-        if (key === OwnerKey) {
-            return undefined;
-        }
-        const value = target[key];
-        return piercingHook(membrane, target, key, value);
-    }
-    set(membrane, target, key, newValue) {
-        target[key] = newValue;
-        return true;
-    }
-    deleteProperty(membrane, target, key) {
-        delete target[key];
-        return true;
-    }
-    apply(membrane, targetFn, thisArg, argumentsList) {
-        return getReplica(membrane, targetFn.apply(thisArg, argumentsList));
-    }
-    construct(membrane, targetFn, argumentsList, newTarget) {
-        {
-            assert.isTrue(newTarget, `construct handler expects a 3rd argument with a newly created object that will be ignored in favor of the wrapped constructor.`);
-        }
-        return getReplica(membrane, new targetFn(...argumentsList));
-    }
+let piercingMembrane;
+function createPiercingMembrane() {
+    return new Membrane({
+        get(membrane, target, key) {
+            if (key === OwnerKey) {
+                return undefined;
+            }
+            const value = target[key];
+            return piercingHook(membrane, target, key, value);
+        },
+        set(membrane, target, key, newValue) {
+            target[key] = newValue;
+            return true;
+        },
+        deleteProperty(membrane, target, key) {
+            delete target[key];
+            return true;
+        },
+        apply(membrane, targetFn, thisArg, argumentsList) {
+            return getReplica(membrane, targetFn.apply(thisArg, argumentsList));
+        },
+        construct(membrane, targetFn, argumentsList, newTarget) {
+            {
+                assert.isTrue(newTarget, `construct handler expects a 3rd argument with a newly created object that will be ignored in favor of the wrapped constructor.`);
+            }
+            return getReplica(membrane, new targetFn(...argumentsList));
+        },
+    });
 }
-function pierce(vm, value) {
-    {
-        assert.vm(vm);
+function pierce(value) {
+    if (isUndefined(piercingMembrane)) {
+        piercingMembrane = createPiercingMembrane();
     }
-    let { membrane } = vm;
-    if (!membrane) {
-        const handler = new PiercingMembraneHandler(vm);
-        membrane = new Membrane(handler);
-        vm.membrane = membrane;
+    return getReplica(piercingMembrane, value);
+}
+// TODO: this is only really needed by locker, eventually we can remove this
+function pierceProperty(target, key) {
+    if (isUndefined(piercingMembrane)) {
+        piercingMembrane = createPiercingMembrane();
     }
-    return getReplica(membrane, value);
+    return piercingHook(piercingMembrane, target, key, target[key]);
 }
 
-let vmBeingConstructed = null;
-function isBeingConstructed(vm) {
+const rootEventListenerMap = new WeakMap();
+function getWrappedRootListener(vm, listener) {
     {
         assert.vm(vm);
     }
-    return vmBeingConstructed === vm;
-}
-function createComponent(vm, Ctor) {
-    {
-        assert.vm(vm);
+    if (!isFunction(listener)) {
+        throw new TypeError(); // avoiding problems with non-valid listeners
     }
-    // create the component instance
-    const vmBeingConstructedInception = vmBeingConstructed;
-    vmBeingConstructed = vm;
-    const component = invokeComponentConstructor(vm, Ctor);
-    vmBeingConstructed = vmBeingConstructedInception;
-    {
-        assert.isTrue(vm.component === component, `Invalid construction for ${vm}, maybe you are missing the call to super() on classes extending Element.`);
-        const { track } = getComponentDef(Ctor);
-        if ('state' in component && (!track || !track.state)) {
-            assert.logWarning(`Non-trackable component state detected in ${component}. Updates to state property will not be reactive. To make state reactive, add @track decorator.`);
-        }
-    }
-}
-function linkComponent(vm) {
-    {
-        assert.vm(vm);
-    }
-    // wiring service
-    const { def: { wire } } = vm;
-    if (wire) {
-        const { wiring } = Services;
-        if (wiring) {
-            invokeServiceHook(vm, wiring);
-        }
-    }
-}
-function clearReactiveListeners(vm) {
-    {
-        assert.vm(vm);
-    }
-    const { deps } = vm;
-    const len = deps.length;
-    if (len) {
-        for (let i = 0; i < len; i += 1) {
-            const set = deps[i];
-            const pos = ArrayIndexOf.call(deps[i], vm);
-            {
-                assert.invariant(pos > -1, `when clearing up deps, the vm must be part of the collection.`);
+    let wrappedListener = rootEventListenerMap.get(listener);
+    if (isUndefined(wrappedListener)) {
+        wrappedListener = function (event) {
+            // * if the event is dispatched directly on the host, it is not observable from root
+            // * if the event is dispatched in an element that does not belongs to the shadow and it is not composed,
+            //   it is not observable from the root
+            const { composed, target, currentTarget } = event;
+            if (
+            // it is composed and was not dispatched onto the custom element directly
+            (composed === true && target !== currentTarget) ||
+                // it is coming from an slotted element
+                isChildNode(getRootNode.call(target, event), currentTarget) ||
+                // it is not composed and its is coming from from shadow
+                (composed === false && getRootNode.call(event.target) === currentTarget)) {
+                const e = pierce(event);
+                invokeEventListener(vm, EventListenerContext.ROOT_LISTENER, listener, e);
             }
-            ArraySplice.call(set, pos, 1);
+        };
+        wrappedListener.placement = EventListenerContext.ROOT_LISTENER;
+        {
+            wrappedListener.original = listener; // for logging purposes
         }
-        deps.length = 0;
+        rootEventListenerMap.set(listener, wrappedListener);
     }
+    return wrappedListener;
 }
-function createComponentListener(vm) {
-    return function handler(event) {
-        handleComponentEvent(vm, event);
+const cmpEventListenerMap = new WeakMap();
+function getWrappedComponentsListener(vm, listener) {
+    {
+        assert.vm(vm);
+    }
+    if (!isFunction(listener)) {
+        throw new TypeError(); // avoiding problems with non-valid listeners
+    }
+    let wrappedListener = cmpEventListenerMap.get(listener);
+    if (isUndefined(wrappedListener)) {
+        wrappedListener = function (event) {
+            const { composed, target, currentTarget } = event;
+            if (
+            // it is composed, and we should always get it
+            composed === true ||
+                // it is dispatched onto the custom element directly
+                target === currentTarget ||
+                // it is coming from an slotted element
+                isChildNode(getRootNode.call(target, event), currentTarget)) {
+                const e = pierce(event);
+                invokeEventListener(vm, EventListenerContext.COMPONENT_LISTENER, listener, e);
+            }
+        };
+        wrappedListener.placement = EventListenerContext.COMPONENT_LISTENER;
+        {
+            wrappedListener.original = listener; // for logging purposes
+        }
+        cmpEventListenerMap.set(listener, wrappedListener);
+    }
+    return wrappedListener;
+}
+function createElementEventListener(vm) {
+    {
+        assert.vm(vm);
+    }
+    return function (evt) {
+        let interrupted = false;
+        const { type, stopImmediatePropagation } = evt;
+        const { cmpEvents } = vm;
+        const listeners = cmpEvents[type]; // it must have listeners at this point
+        const len = listeners.length;
+        evt.stopImmediatePropagation = function () {
+            interrupted = true;
+            stopImmediatePropagation.call(this);
+        };
+        for (let i = 0; i < len; i += 1) {
+            if (listeners[i].placement === EventListenerContext.ROOT_LISTENER) {
+                // all handlers on the custom element should be called with undefined 'this'
+                listeners[i].call(undefined, evt);
+                if (interrupted) {
+                    return;
+                }
+            }
+        }
+        for (let i = 0; i < len; i += 1) {
+            if (listeners[i].placement === EventListenerContext.COMPONENT_LISTENER) {
+                // all handlers on the custom element should be called with undefined 'this'
+                listeners[i].call(undefined, evt);
+                if (interrupted) {
+                    return;
+                }
+            }
+        }
     };
 }
-function addComponentEventListener(vm, eventName, newHandler) {
+function attachDOMListener(vm, type, wrappedListener) {
     {
         assert.vm(vm);
-        assert.invariant(!isRendering, `${vmBeingRendered}.render() method has side effects on the state of ${vm} by adding a new event listener for "${eventName}".`);
     }
-    let { cmpEvents, cmpListener } = vm;
+    let { cmpListener, cmpEvents } = vm;
+    if (isUndefined(cmpListener)) {
+        cmpListener = vm.cmpListener = createElementEventListener(vm);
+    }
     if (isUndefined(cmpEvents)) {
-        // this piece of code must be in sync with modules/component-events
-        vm.cmpEvents = cmpEvents = create(null);
-        vm.cmpListener = cmpListener = createComponentListener(vm);
+        cmpEvents = vm.cmpEvents = create(null);
     }
-    if (isUndefined(cmpEvents[eventName])) {
-        cmpEvents[eventName] = [];
-        const { elm } = vm;
-        addEventListener.call(elm, eventName, cmpListener, false);
+    let cmpEventHandlers = cmpEvents[type];
+    if (isUndefined(cmpEventHandlers)) {
+        cmpEventHandlers = cmpEvents[type] = [];
     }
-    {
-        if (cmpEvents[eventName] && ArrayIndexOf.call(cmpEvents[eventName], newHandler) !== -1) {
-            assert.logWarning(`${vm} has duplicate listeners for event "${eventName}". Instead add the event listener in the connectedCallback() hook.`);
+    // only add to DOM if there is no other listener on the same placement yet
+    if (cmpEventHandlers.length === 0) {
+        addEventListener.call(vm.elm, type, cmpListener);
+    }
+    else {
+        if (ArrayIndexOf.call(cmpEventHandlers, wrappedListener) !== -1) {
+            assert.logWarning(`${vm} has duplicate listener ${wrappedListener.original} for event "${type}". Instead add the event listener in the connectedCallback() hook.`);
         }
     }
-    ArrayPush.call(cmpEvents[eventName], newHandler);
+    ArrayPush.call(cmpEventHandlers, wrappedListener);
 }
-function removeComponentEventListener(vm, eventName, oldHandler) {
+function detachDOMListener(vm, type, wrappedListener) {
     {
         assert.vm(vm);
-        assert.invariant(!isRendering, `${vmBeingRendered}.render() method has side effects on the state of ${vm} by removing an event listener for "${eventName}".`);
     }
-    const { cmpEvents, elm } = vm;
-    if (cmpEvents) {
-        const handlers = cmpEvents[eventName];
-        const pos = handlers && ArrayIndexOf.call(handlers, oldHandler);
-        if (handlers && pos > -1) {
-            if (handlers.length === 1) {
-                removeEventListener.call(elm, eventName, vm.cmpListener);
-                cmpEvents[eventName] = undefined;
-            }
-            else {
-                ArraySplice.call(cmpEvents[eventName], pos, 1);
-            }
-            return;
+    const { cmpEvents } = vm;
+    let p;
+    let listeners;
+    if (!isUndefined(cmpEvents) && !isUndefined(listeners = cmpEvents[type]) && (p = ArrayIndexOf.call(listeners, wrappedListener)) !== -1) {
+        ArraySplice.call(listeners, p, 1);
+        // only remove from DOM if there is no other listener on the same placement
+        if (listeners.length === 0) {
+            removeEventListener.call(vm.elm, type, vm.cmpListener);
         }
     }
-    {
-        assert.logWarning(`Did not find event listener ${oldHandler} for event "${eventName}" on ${vm}. Instead only remove an event listener once.`);
+    else {
+        assert.logError(`Did not find event listener ${wrappedListener.original} for event "${type}" on ${vm}. This is probably a typo or a life cycle mismatch. Make sure that you add the right event listeners in the connectedCallback() hook and remove them in the disconnectedCallback() hook.`);
     }
 }
-function handleComponentEvent(vm, event) {
+function addCmpEventListener(vm, type, listener, options) {
     {
         assert.vm(vm);
-        assert.invariant(event instanceof Event, `dispatchComponentEvent() must receive an event instead of ${event}`);
-        const eventType = event.type;
-        const cmpEvt = vm.cmpEvents;
-        const cmpEventsType = cmpEvt && cmpEvt[eventType];
-        assert.invariant(vm.cmpEvents && !isUndefined(cmpEventsType) && cmpEventsType.length, `handleComponentEvent() should only be invoked if there is at least one listener in queue for ${event.type} on ${vm}.`);
+        assert.invariant(!isRendering, `${vmBeingRendered}.render() method has side effects on the state of ${vm} by adding an event listener for "${type}".`);
+        assert.invariant(isFunction(listener), `Invalid second argument for this.template.addEventListener() in ${vm} for event "${type}". Expected an EventListener but received ${listener}.`);
     }
-    const { cmpEvents = EmptyObject } = vm;
-    const { type, stopImmediatePropagation } = event;
-    const handlers = cmpEvents[type];
-    if (isArray$1(handlers)) {
-        let uninterrupted = true;
-        event.stopImmediatePropagation = function () {
-            uninterrupted = false;
-            stopImmediatePropagation.call(event);
-        };
-        const e = pierce(vm, event);
-        for (let i = 0, len = handlers.length; uninterrupted && i < len; i += 1) {
-            invokeComponentCallback(vm, handlers[i], [e]);
-        }
-        // restoring original methods
-        event.stopImmediatePropagation = stopImmediatePropagation;
-    }
+    const wrappedListener = getWrappedComponentsListener(vm, listener);
+    attachDOMListener(vm, type, wrappedListener);
 }
-function renderComponent(vm) {
+function addRootEventListener(vm, type, listener, options) {
     {
         assert.vm(vm);
-        assert.invariant(vm.isDirty, `${vm} is not dirty.`);
+        assert.invariant(!isRendering, `${vmBeingRendered}.render() method has side effects on the state of ${vm} by adding an event listener for "${type}".`);
+        assert.invariant(isFunction(listener), `Invalid second argument for this.template.addEventListener() in ${vm} for event "${type}". Expected an EventListener but received ${listener}.`);
     }
-    clearReactiveListeners(vm);
-    const vnodes = invokeComponentRenderMethod(vm);
-    vm.isDirty = false;
-    {
-        assert.invariant(isArray$1(vnodes), `${vm}.render() should always return an array of vnodes instead of ${vnodes}`);
-    }
-    return vnodes;
+    const wrappedListener = getWrappedRootListener(vm, listener);
+    attachDOMListener(vm, type, wrappedListener);
 }
-function markComponentAsDirty(vm) {
+function removeCmpEventListener(vm, type, listener, options) {
     {
         assert.vm(vm);
-        assert.isFalse(vm.isDirty, `markComponentAsDirty() for ${vm} should not be called when the component is already dirty.`);
-        assert.isFalse(isRendering, `markComponentAsDirty() for ${vm} cannot be called during rendering of ${vmBeingRendered}.`);
     }
-    vm.isDirty = true;
+    const wrappedListener = getWrappedComponentsListener(vm, listener);
+    detachDOMListener(vm, type, wrappedListener);
 }
-function getCustomElementComponent(elmOrRoot) {
+function removeRootEventListener(vm, type, listener, options) {
     {
-        assert.vm(elmOrRoot[ViewModelReflection]);
+        assert.vm(vm);
     }
-    return elmOrRoot[ViewModelReflection].component;
+    const wrappedListener = getWrappedRootListener(vm, listener);
+    detachDOMListener(vm, type, wrappedListener);
 }
 
 function getLinkedElement(root) {
@@ -1425,22 +1567,18 @@ forEach.call(getOwnPropertyNames(GlobalAOMProperties), (propName) => RootDescrip
 function shadowRootQuerySelector(shadowRoot, selector) {
     const vm = getCustomElementVM(shadowRoot);
     {
-        assert.isFalse(isBeingConstructed(vm), `this.root.querySelector() cannot be called during the construction of the custom element for ${vm} because no content has been rendered yet.`);
+        assert.isFalse(isBeingConstructed(vm), `this.template.querySelector() cannot be called during the construction of the custom element for ${vm} because no content has been rendered yet.`);
     }
     const elm = getLinkedElement(shadowRoot);
-    pierce(vm, elm);
-    const piercedQuerySelector = piercingHook(vm.membrane, elm, 'querySelector', elm.querySelector);
-    return piercedQuerySelector.call(elm, selector);
+    return getFirstMatch(vm, elm, selector);
 }
 function shadowRootQuerySelectorAll(shadowRoot, selector) {
     const vm = getCustomElementVM(shadowRoot);
     {
-        assert.isFalse(isBeingConstructed(vm), `this.root.querySelectorAll() cannot be called during the construction of the custom element for ${vm} because no content has been rendered yet.`);
+        assert.isFalse(isBeingConstructed(vm), `this.template.querySelectorAll() cannot be called during the construction of the custom element for ${vm} because no content has been rendered yet.`);
     }
     const elm = getLinkedElement(shadowRoot);
-    pierce(vm, elm);
-    const piercedQuerySelectorAll = piercingHook(vm.membrane, elm, 'querySelectorAll', elm.querySelectorAll);
-    return piercedQuerySelectorAll.call(elm, selector);
+    return getAllMatches(vm, elm, selector);
 }
 class Root {
     constructor(vm) {
@@ -1466,7 +1604,7 @@ class Root {
         {
             const component = getCustomElementComponent(this);
             if (isNull(node) && component.querySelector(selector)) {
-                assert.logWarning(`this.root.querySelector() can only return elements from the template declaration of ${component}. It seems that you are looking for elements that were passed via slots, in which case you should use this.querySelector() instead.`);
+                assert.logWarning(`this.template.querySelector() can only return elements from the template declaration of ${component}. It seems that you are looking for elements that were passed via slots, in which case you should use this.querySelector() instead.`);
             }
         }
         return node;
@@ -1476,10 +1614,18 @@ class Root {
         {
             const component = getCustomElementComponent(this);
             if (nodeList.length === 0 && component.querySelectorAll(selector).length) {
-                assert.logWarning(`this.root.querySelectorAll() can only return elements from template declaration of ${component}. It seems that you are looking for elements that were passed via slots, in which case you should use this.querySelectorAll() instead.`);
+                assert.logWarning(`this.template.querySelectorAll() can only return elements from template declaration of ${component}. It seems that you are looking for elements that were passed via slots, in which case you should use this.querySelectorAll() instead.`);
             }
         }
         return nodeList;
+    }
+    addEventListener(type, listener, options) {
+        const vm = getCustomElementVM(this);
+        addRootEventListener(vm, type, listener, options);
+    }
+    removeEventListener(type, listener, options) {
+        const vm = getCustomElementVM(this);
+        removeRootEventListener(vm, type, listener, options);
     }
     toString() {
         const component = getCustomElementComponent(this);
@@ -1492,7 +1638,7 @@ function getFirstMatch(vm, elm, selector) {
     // search for all, and find the first node that is owned by the VM in question.
     for (let i = 0, len = nodeList.length; i < len; i += 1) {
         if (isNodeOwnedByVM(vm, nodeList[i])) {
-            return pierce(vm, nodeList[i]);
+            return pierce(nodeList[i]);
         }
     }
     return null;
@@ -1500,7 +1646,27 @@ function getFirstMatch(vm, elm, selector) {
 function getAllMatches(vm, elm, selector) {
     const nodeList = querySelectorAll.call(elm, selector);
     const filteredNodes = ArrayFilter.call(nodeList, (node) => isNodeOwnedByVM(vm, node));
-    return pierce(vm, filteredNodes);
+    return pierce(filteredNodes);
+}
+function getElementOwnerVM(elm) {
+    if (!(elm instanceof Node)) {
+        return;
+    }
+    let node = elm;
+    let ownerKey;
+    // search for the first element with owner identity (just in case of manually inserted elements)
+    while (!isNull(node) && isUndefined((ownerKey = node[OwnerKey]))) {
+        node = node.parentNode;
+    }
+    if (isUndefined(ownerKey) || isNull(node)) {
+        return;
+    }
+    let vm;
+    // search for a custom element with a VM that owns the first element with owner identity attached to it
+    while (!isNull(node) && (isUndefined(vm = node[ViewModelReflection]) || vm.uid !== ownerKey)) {
+        node = node.parentNode;
+    }
+    return isNull(node) ? undefined : vm;
 }
 function isParentNodeKeyword(key) {
     return (key === 'parentNode' || key === 'parentElement');
@@ -1557,36 +1723,61 @@ function wrapIframeWindow(win) {
 }
 // Registering a service to enforce the shadowDOM semantics via the Raptor membrane implementation
 register({
-    piercing(component, data, def, context, target, key, value, callback) {
-        const vm = component[ViewModelReflection];
-        const { elm } = vm;
+    piercing(target, key, value, callback) {
         if (value) {
             if (isIframeContentWindow(key, value)) {
                 callback(wrapIframeWindow(value));
             }
             if (value === querySelector) {
-                // TODO: it is possible that they invoke the querySelector() function via call or apply to set a new context, what should
-                // we do in that case? Right now this is essentially a bound function, but the original is not.
-                return callback((selector) => getFirstMatch(vm, target, selector));
+                return callback((selector) => {
+                    const vm = getElementOwnerVM(target);
+                    return isUndefined(vm) ? null : getFirstMatch(vm, target, selector);
+                });
             }
             if (value === querySelectorAll) {
-                // TODO: it is possible that they invoke the querySelectorAll() function via call or apply to set a new context, what should
-                // we do in that case? Right now this is essentially a bound function, but the original is not.
-                return callback((selector) => getAllMatches(vm, target, selector));
+                return callback((selector) => {
+                    const vm = getElementOwnerVM(target);
+                    return isUndefined(vm) ? [] : getAllMatches(vm, target, selector);
+                });
             }
             if (isParentNodeKeyword(key)) {
-                if (value === elm) {
+                const vm = getElementOwnerVM(target);
+                if (!isUndefined(vm) && value === vm.elm) {
                     // walking up via parent chain might end up in the shadow root element
-                    return callback(component.root);
+                    return callback(vm.component.root);
                 }
-                else if (target[OwnerKey] !== value[OwnerKey]) {
+                else if (target instanceof Element && value instanceof Element && target[OwnerKey] !== value[OwnerKey]) {
                     // cutting out access to something outside of the shadow of the current target (usually slots)
-                    return callback();
+                    return callback(); // TODO: this should probably be `null`
                 }
             }
-            if (value === elm) {
-                // prevent access to the original Host element
-                return callback(component);
+            if (target instanceof Event) {
+                const event = target;
+                switch (key) {
+                    case 'currentTarget':
+                        // intentionally return the host element pierced here otherwise the general role below
+                        // will kick in and return the cmp, which is not the intent.
+                        return callback(pierce(value));
+                    case 'target':
+                        const { currentTarget } = event;
+                        // Executing event listener on component, target is always currentTarget
+                        if (componentEventListenerType === EventListenerContext.COMPONENT_LISTENER) {
+                            return callback(pierce(currentTarget));
+                        }
+                        // Event is coming from an slotted element
+                        if (isChildNode(getRootNode.call(value, event), currentTarget)) {
+                            return;
+                        }
+                        // target is owned by the VM
+                        const vm = currentTarget ? getElementOwnerVM(currentTarget) : undefined;
+                        if (!isUndefined(vm)) {
+                            let node = value;
+                            while (!isNull(node) && vm.uid !== node[OwnerKey]) {
+                                node = node.parentNode;
+                            }
+                            return callback(pierce(node));
+                        }
+                }
             }
         }
     }
@@ -1682,6 +1873,9 @@ class LWCElement {
             if (arguments.length === 0) {
                 throw new Error(`Failed to execute 'dispatchEvent' on ${this}: 1 argument required, but only 0 present.`);
             }
+            if (!(event instanceof CustomEvent) && !(event instanceof Event)) {
+                throw new Error(`Failed to execute 'dispatchEvent' on ${this}: parameter 1 is not of type 'Event'.`);
+            }
             const { type: evtName, composed, bubbles } = event;
             assert.isFalse(isBeingConstructed(vm), `this.dispatchEvent() should not be called during the construction of the custom element for ${this} because no one is listening for the event "${evtName}" just yet.`);
             if (bubbles && ('composed' in event && !composed)) {
@@ -1695,11 +1889,10 @@ class LWCElement {
             }
         }
         // Pierce dispatchEvent so locker service has a chance to overwrite
-        pierce(vm, elm);
-        const dispatchEvent = piercingHook(vm.membrane, elm, 'dispatchEvent', elm.dispatchEvent);
+        const dispatchEvent = pierceProperty(elm, 'dispatchEvent');
         return dispatchEvent.call(elm, event);
     }
-    addEventListener(type, listener) {
+    addEventListener(type, listener, options) {
         const vm = getCustomElementVM(this);
         {
             assert.vm(vm);
@@ -1708,17 +1901,11 @@ class LWCElement {
                 assert.logWarning(`this.addEventListener() on ${vm} does not support more than 2 arguments. Options to make the listener passive, once or capture are not allowed at the top level of the component's fragment.`);
             }
         }
-        addComponentEventListener(vm, type, listener);
+        addCmpEventListener(vm, type, listener, options);
     }
-    removeEventListener(type, listener) {
+    removeEventListener(type, listener, options) {
         const vm = getCustomElementVM(this);
-        {
-            assert.vm(vm);
-            if (arguments.length > 2) {
-                assert.logWarning(`this.removeEventListener() on ${vm} does not support more than 2 arguments. Options to make the listener passive or capture are not allowed at the top level of the component's fragment.`);
-            }
-        }
-        removeComponentEventListener(vm, type, listener);
+        removeCmpEventListener(vm, type, listener, options);
     }
     setAttributeNS(ns, attrName, value) {
         {
@@ -1792,12 +1979,12 @@ class LWCElement {
         for (let i = 0, len = nodeList.length; i < len; i += 1) {
             if (wasNodePassedIntoVM(vm, nodeList[i])) {
                 // TODO: locker service might need to return a membrane proxy
-                return pierce(vm, nodeList[i]);
+                return pierce(nodeList[i]);
             }
         }
         {
-            if (shadowRootQuerySelector(this.root, selectors)) {
-                assert.logWarning(`this.querySelector() can only return elements that were passed into ${vm.component} via slots. It seems that you are looking for elements from your template declaration, in which case you should use this.root.querySelector() instead.`);
+            if (shadowRootQuerySelector(this.template, selectors)) {
+                assert.logWarning(`this.querySelector() can only return elements that were passed into ${vm.component} via slots. It seems that you are looking for elements from your template declaration, in which case you should use this.template.querySelector() instead.`);
             }
         }
         return null;
@@ -1811,11 +1998,11 @@ class LWCElement {
         // TODO: locker service might need to do something here
         const filteredNodes = ArrayFilter.call(nodeList, (node) => wasNodePassedIntoVM(vm, node));
         {
-            if (filteredNodes.length === 0 && shadowRootQuerySelectorAll(this.root, selectors).length) {
-                assert.logWarning(`this.querySelectorAll() can only return elements that were passed into ${vm.component} via slots. It seems that you are looking for elements from your template declaration, in which case you should use this.root.querySelectorAll() instead.`);
+            if (filteredNodes.length === 0 && shadowRootQuerySelectorAll(this.template, selectors).length) {
+                assert.logWarning(`this.querySelectorAll() can only return elements that were passed into ${vm.component} via slots. It seems that you are looking for elements from your template declaration, in which case you should use this.template.querySelectorAll() instead.`);
             }
         }
-        return pierce(vm, filteredNodes);
+        return pierce(filteredNodes);
     }
     get tagName() {
         const elm = getLinkedElement$1(this);
@@ -1829,7 +2016,7 @@ class LWCElement {
         }
         return getLinkedElement$1(this).classList;
     }
-    get root() {
+    get template() {
         const vm = getCustomElementVM(this);
         {
             assert.vm(vm);
@@ -1841,6 +2028,13 @@ class LWCElement {
             vm.cmpRoot = cmpRoot;
         }
         return cmpRoot;
+    }
+    get root() {
+        {
+            const vm = getCustomElementVM(this);
+            assert.logWarning(`"this.template" access in ${vm.component} has been deprecated and will be removed. Use "this.template" instead.`);
+        }
+        return this.template;
     }
     toString() {
         const vm = getCustomElementVM(this);
@@ -1887,6 +2081,8 @@ defineProperties(LWCElement.prototype, htmlElementDescriptors);
                 console.log(msg.join('\n')); // tslint:disable-line
                 return; // explicit undefined
             },
+            // a setter is required here to avoid TypeError's when an attribute is set in a template but only the above getter is defined
+            set() { },
             enumerable: false,
         });
     });
@@ -2115,6 +2311,7 @@ function i(iterable, factory) {
     let j = 0;
     let { value, done: last } = next;
     let keyMap;
+    let iterationError;
     {
         keyMap = create(null);
     }
@@ -2136,14 +2333,13 @@ function i(iterable, factory) {
                 if (!isNull(childVnode) && isObject$1(childVnode) && !isUndefined(childVnode.sel)) {
                     const { key } = childVnode;
                     if (isString(key) || isNumber(key)) {
-                        if (keyMap[key] === 1) {
-                            assert.logWarning(`Invalid "key" attribute in iteration with child "<${childVnode.sel}>". Key with value "${childVnode.key}" appears more than once in iteration. Key values must be unique numbers or strings.`);
+                        if (keyMap[key] === 1 && isUndefined(iterationError)) {
+                            iterationError = `Duplicated "key" attribute value for "<${childVnode.sel}>" in ${vmBeingRendered} for item number ${j}. Key with value "${childVnode.key}" appears more than once in iteration. Key values must be unique numbers or strings.`;
                         }
                         keyMap[key] = 1;
                     }
-                    else {
-                        // TODO - it'd be nice to log the owner component rather than the iteration children
-                        assert.logWarning(`Missing "key" attribute in iteration with child "<${childVnode.sel}>", index ${i}. Instead set a unique "key" attribute value on all iteration children so internal state can be preserved during rehydration.`);
+                    else if (isUndefined(iterationError)) {
+                        iterationError = `Invalid "key" attribute value in "<${childVnode.sel}>" in ${vmBeingRendered} for item number ${j}. Instead set a unique "key" attribute value on all iteration children so internal state can be preserved during rehydration.`;
                     }
                 }
             });
@@ -2151,6 +2347,11 @@ function i(iterable, factory) {
         // preparing next value
         j += 1;
         value = next.value;
+    }
+    {
+        if (!isUndefined(iterationError)) {
+            assert.logError(iterationError);
+        }
     }
     return list;
 }
@@ -2213,8 +2414,11 @@ function b(fn) {
     }
     const vm = vmBeingRendered;
     return function handler(event) {
-        // TODO: only if the event is `composed` it can be dispatched
-        invokeComponentCallback(vm, fn, [event]);
+        if (!isValidEvent(event)) {
+            return;
+        }
+        const e = pierce(event);
+        invokeComponentCallback(vm, fn, [e]);
     };
 }
 // [k]ey function
@@ -2388,6 +2592,13 @@ function endMeasure(vm, phase) {
 
 let isRendering = false;
 let vmBeingRendered = null;
+let vmBeingConstructed = null;
+function isBeingConstructed(vm) {
+    {
+        assert.vm(vm);
+    }
+    return vmBeingConstructed === vm;
+}
 function invokeComponentCallback(vm, fn, args) {
     const { context, component } = vm;
     const ctx = currentContext;
@@ -2415,6 +2626,8 @@ function invokeComponentConstructor(vm, Ctor) {
     const { context } = vm;
     const ctx = currentContext;
     establishContext(context);
+    const vmBeingConstructedInception = vmBeingConstructed;
+    vmBeingConstructed = vm;
     {
         startMeasure(vm, 'constructor');
     }
@@ -2431,6 +2644,7 @@ function invokeComponentConstructor(vm, Ctor) {
             endMeasure(vm, 'constructor');
         }
         establishContext(ctx);
+        vmBeingConstructed = vmBeingConstructedInception;
         if (error) {
             error.wcStack = getComponentStack(vm);
             // rethrowing the original error annotated after restoring the context
@@ -2484,6 +2698,35 @@ function invokeComponentRenderMethod(vm) {
         }
     }
     return result || [];
+}
+var EventListenerContext;
+(function (EventListenerContext) {
+    EventListenerContext[EventListenerContext["COMPONENT_LISTENER"] = 1] = "COMPONENT_LISTENER";
+    EventListenerContext[EventListenerContext["ROOT_LISTENER"] = 2] = "ROOT_LISTENER";
+})(EventListenerContext || (EventListenerContext = {}));
+let componentEventListenerType = null;
+function invokeEventListener(vm, listenerContext, fn, event) {
+    const { context } = vm;
+    const ctx = currentContext;
+    establishContext(context);
+    let error;
+    const componentEventListenerTypeInception = componentEventListenerType;
+    componentEventListenerType = listenerContext;
+    try {
+        fn.call(undefined, event);
+    }
+    catch (e) {
+        error = Object(e);
+    }
+    finally {
+        establishContext(ctx);
+        componentEventListenerType = componentEventListenerTypeInception;
+        if (error) {
+            error.wcStack = getComponentStack(vm);
+            // rethrowing the original error annotated after restoring the context
+            throw error; // tslint:disable-line
+        }
+    }
 }
 
 // stub function to prevent misuse of the @track decorator
@@ -3712,7 +3955,9 @@ const htmlDomApi = {
         insertBefore.call(parent, newNode, referenceNode);
     },
     removeChild(node, child) {
-        removeChild.call(node, child);
+        if (!isNull(node)) {
+            removeChild.call(node, child);
+        }
     },
     appendChild(node, child) {
         appendChild.call(node, child);
@@ -4009,9 +4254,6 @@ function resetShadowRoot(vm) {
         patchChildren(elm, oldCh, EmptyArray);
     }
     catch (e) {
-        {
-            assert.logError("Swallow Error: Failed to reset component's shadow with an empty list of children: " + e);
-        }
         // in the event of patch failure force offender removal
         vm.elm.innerHTML = "";
     }
@@ -4196,4 +4438,4 @@ exports.wire = wire;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.19.5 */
+/** version: 0.20.1 */

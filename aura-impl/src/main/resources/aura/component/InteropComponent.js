@@ -220,7 +220,8 @@ InteropComponent.prototype.setupMethods = function () {
                 return $A.warning('Methods are not available until the component is rendered');
             }
             var elmt = this.getElement();
-            return elmt[m].apply(elmt, arguments);
+            var rv = elmt[m].apply(elmt, arguments);
+            return $A.componentService.moduleEngine['unwrap'](rv);
         };
     });
 };

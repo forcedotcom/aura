@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-05-04
- * Version: 0.4.9
+ * Generated: 2018-05-08
+ * Version: 0.4.10
  */
 
 (function (exports) {
@@ -9259,30 +9259,16 @@ function registerAuraTypes(types) {
  * limitations under the License.
  */
 const service = {
-  piercing: (component, data, def, context, target, key, value, callback) => {
+  piercing: (target, key, value, callback) => {
     if (value === EventTarget.prototype.dispatchEvent && SecureObject.isDOMElementOrNode(target)) {
-      /**
-       * See if target represents a lockerized module
-       * Else look up the key by the class.
-       * If found, get the SecureWindow for that key
-       */
-      let lsKey = getKey(target);
-      if (!lsKey) {
-        const Ctor = component.constructor;
-        lsKey = getKey(Ctor);
-        /**
-         * For elements not created by interop component, this is the first chance we have
-         * had to trust the element. Propagate the key from Ctor to the element
-         */
+      callback(event => {
+        // If the event is a wrapped event, unwrap it and dispatch the event
+        const lsKey = getKey(event);
         if (lsKey) {
-          trust$1(Ctor, target);
+          event = getRef(event, lsKey);
         }
-      }
-      if (lsKey) {
-        // Create a SecureElement for the custom element
-        const secureTarget = SecureElement(target, lsKey);
-        callback(event => secureTarget.dispatchEvent(event));
-      }
+        target.dispatchEvent(event);
+      });
     }
   }
 };

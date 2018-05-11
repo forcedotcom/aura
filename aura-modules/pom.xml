@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>aura-modules</artifactId>
-   
+
     <properties>
         <aura.home>${basedir}/..</aura.home>
         <module.dir>modules_aura_modules</module.dir>

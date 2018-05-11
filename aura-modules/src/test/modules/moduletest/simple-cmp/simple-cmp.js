@@ -77,4 +77,11 @@ export default class Simple extends Element {
     get valueText() {
         return this._nullValueTest;
     }
+
+    @track _proxyValue;
+    @api
+    proxyTest (value) {
+        this._proxyValue = value;
+        return this._proxyValue;
+    }
 }

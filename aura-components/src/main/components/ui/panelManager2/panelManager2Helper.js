@@ -209,6 +209,7 @@
     * @private
     */
     destroyPanel: function (cmp, config, doActivateNext) {
+        config = config || {};
         var stack             = this.PANELS_STACK,
             shouldReturnFocus = config.shouldReturnFocus,
             panelParam        = config.panelInstance,

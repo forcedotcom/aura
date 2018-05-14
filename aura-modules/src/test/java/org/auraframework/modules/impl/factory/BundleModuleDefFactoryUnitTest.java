@@ -199,30 +199,73 @@ public class BundleModuleDefFactoryUnitTest {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         FileSource<ModuleDef> jsFileSource = mock(FileSource.class);
-        when(jsFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","name-Space","module-cmp","moduleCmp.js"));
+        when(jsFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","nameSpace","module-cmp","moduleCmp.js"));
         when(jsFileSource.getContents()).thenReturn("javascript code here");
 
         FileSource<ModuleDef> htmlFileSource = mock(FileSource.class);
-        when(htmlFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","name-Space","module-cmp","moduleCmp.html"));
+        when(htmlFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","nameSpace","module-cmp","moduleCmp.html"));
         when(htmlFileSource.getContents()).thenReturn("template code here");
 
-        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "name-Space", "modulecmp", ModuleDef.class);
-        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "name-Space", "modulecmp-moduleCmp", ModuleDef.class, module);
+        FileSource<ModuleDef> jsonFileSource = mock(FileSource.class);
+        when(jsonFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","nameSpace","module-cmp","lightning.json"));
+        when(jsonFileSource.getContents()).thenReturn("{ description: 'hello there', expose: 'true', minVersion: '12.3' }");
+
+        String xml =
+                "<LightningComponentBundle>\n" +
+                    "<isExposed>true</isExposed>\n" +
+                    "<minApiVersion>12.3</minApiVersion>\n" +
+                    "<requireLocker>true</requireLocker>\n" +
+                    "<tags>\n" +
+                    "   <tag>random__tag</tag>\n" +
+                    "   <tag>bob__tag</tag>\n" +
+                    "   <tag>home__tag</tag>\n" +
+                    "</tags>\n" +
+                "</LightningComponentBundle>";
+        FileSource<ModuleDef> xmlMetadataFileSource = mock(FileSource.class);
+        when(xmlMetadataFileSource.getSystemId()).thenReturn(String.join(File.separator,"User","me","project","src","main","modules","nameSpace","module-cmp","module-cmp.js-meta.xml"));
+        when(xmlMetadataFileSource.getContents()).thenReturn(xml);
+
+        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "modulecmp", ModuleDef.class);
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "modulecmp-moduleCmp", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> json = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, "nameSpace", "moduleCmp-" + ModuleDef.META_FILE_BASENAME, ModuleDef.class, module);
+        DefDescriptor<ModuleDef> xmlMetadata = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, "nameSpace", "moduleCmp-" + ModuleDef.META_XML_NAME, ModuleDef.class, module);
 
         Map<DefDescriptor<?>, Source<?>> mockBundledParts = Maps.newHashMap();
         mockBundledParts.put(module, jsFileSource);
         mockBundledParts.put(template, htmlFileSource);
+        // TODO: remove json metadata
+        mockBundledParts.put(json, jsonFileSource);
+        mockBundledParts.put(xmlMetadata, xmlMetadataFileSource);
 
         when(mockBundleSource.getBundledParts()).thenReturn(mockBundledParts);
 
+        String mockCompiled = "define()";
+        Map<CodeType, String> codeMap = new EnumMap<>(CodeType.class);
+        codeMap.put(CodeType.DEV, mockCompiled);
+        codeMap.put(CodeType.PROD, mockCompiled);
+        codeMap.put(CodeType.COMPAT, mockCompiled);
+        codeMap.put(CodeType.PROD_COMPAT, mockCompiled);
+
+        ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
+        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet("prop1", "prop2", "prop3"), Sets.newHashSet());
+        when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
+
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
-        moduleDefFactory.setModulesMetadataService(new ModulesMetadataServiceImpl());
+        moduleDefFactory.setModulesCompilerService(mockCompiler);
+
+        List<ModuleMetadataXMLHandler> xmlHandlers = new ArrayList<>();
+        xmlHandlers.add(new TagsElementHandler());
+        xmlHandlers.add(new ExposeElementHandler());
+        xmlHandlers.add(new MinApiVersionElementHandler());
+        xmlHandlers.add(new RequireLockerElementHandler());
+        ModulesMetadataServiceImpl modulesMetadataService = new ModulesMetadataServiceImpl();
+        modulesMetadataService.setModuleXMLHandlers(xmlHandlers);
+        moduleDefFactory.setModulesMetadataService(modulesMetadataService);
 
         try {
             moduleDefFactory.getDefinition(module, mockBundleSource);
-            fail("Should have thrown InvalidDefinitionException due to bad naming convention for modules");
         } catch (InvalidDefinitionException ide) {
-            assertTrue("Incorrect exception message", ide.getMessage().startsWith("Use lowercase for module folder names."));
+            fail("Should not have thrown InvalidDefinitionException due to usage of uppercase in module folder name");
         }
     }
 

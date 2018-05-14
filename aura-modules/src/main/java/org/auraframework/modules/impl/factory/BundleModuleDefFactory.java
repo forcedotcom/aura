@@ -104,11 +104,6 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
         Location location = new Location(baseClassSource);
 
-        // ensure module folders adhere to web component (custom element) naming conventions.
-        if (CharMatcher.javaUpperCase().matchesAnyOf(namespace)) {
-            throw new InvalidDefinitionException("Use lowercase for module folder names. Not " + namespace, location);
-        }
-
         if (namespace.contains("-")) {
             throw new InvalidDefinitionException("Namespace cannot have a hyphen. Not " + namespace, location);
         }

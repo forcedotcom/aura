@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-05-08
- * Version: 0.4.10
+ * Generated: 2018-05-11
+ * Version: 0.4.11
  */
 
 (function (exports) {
@@ -5767,7 +5767,7 @@ SecureObject.createFilteredMethod = function(st, raw, methodName, options) {
     writable: true,
     value: function() {
       const filteredArgs = SecureObject.filterArguments(st, arguments, options);
-      let fnReturnedValue = raw[methodName].apply(raw, filteredArgs);
+      let fnReturnedValue = raw[methodName](...filteredArgs);
 
       if (options && options.afterCallback) {
         fnReturnedValue = options.afterCallback(fnReturnedValue);

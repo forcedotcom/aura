@@ -79,6 +79,9 @@ function isTrue(obj) {
 function isFunction(obj) {
     return typeof obj === 'function';
 }
+function isObject$1(obj) {
+    return typeof obj === 'object';
+}
 function isString(obj) {
     return typeof obj === 'string';
 }
@@ -260,7 +263,7 @@ forEach.call(getOwnPropertyNames(GlobalAOMProperties), (propName) => {
         const vm = this[ViewModelReflection];
         const value = vm.cmpProps[propName] = isNull(newValue) ? null : newValue + ''; // storing the normalized new value
         if (isNull(value)) {
-            newValue = vm.component.root[propName];
+            newValue = vm.rootProps[propName];
             vm.hostAttrs[attrName] = undefined;
         }
         else {
@@ -324,6 +327,29 @@ if (!getOwnPropertyDescriptor(Event.prototype, 'composed')) {
 }
 const CustomEvent = window.CustomEvent;
 
+function decorate(Ctor, decorators) {
+    // intentionally comparing decorators with null and undefined
+    if (!isFunction(Ctor) || decorators == null) {
+        throw new TypeError();
+    }
+    const props = getOwnPropertyNames(decorators);
+    // intentionally allowing decoration of classes only for now
+    const target = Ctor.prototype;
+    for (let i = 0, len = props.length; i < len; i += 1) {
+        const propName = props[i];
+        const decorator = decorators[propName];
+        if (!isFunction(decorator)) {
+            throw new TypeError();
+        }
+        const originalDescriptor = getOwnPropertyDescriptor(target, propName);
+        const descriptor = decorator(Ctor, propName, originalDescriptor);
+        if (!isUndefined(descriptor)) {
+            defineProperty(target, propName, descriptor);
+        }
+    }
+    return Ctor; // chaining
+}
+
 const TopLevelContextSymbol = Symbol();
 let currentContext = {};
 currentContext[TopLevelContextSymbol] = true;
@@ -354,7 +380,7 @@ function invokeServiceHook(vm, cbs) {
 
 function createComponent(vm, Ctor) {
     // create the component instance
-    const component = invokeComponentConstructor(vm, Ctor);
+    invokeComponentConstructor(vm, Ctor);
 }
 function linkComponent(vm) {
     // wiring service
@@ -745,7 +771,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.20.1 */
+/** version: 0.20.3 */
 
 const TargetToReactiveRecordMap = new WeakMap();
 function notifyMutation$1(target, key) {
@@ -1355,22 +1381,29 @@ function querySelectorAllFromComponent(cmp, selectors) {
     return elm.querySelectorAll(selectors);
 }
 // This should be as performant as possible, while any initialization should be done lazily
-class LWCElement {
-    constructor() {
-        if (isNull(vmBeingConstructed)) {
-            throw new ReferenceError();
-        }
-        const vm = vmBeingConstructed;
-        const { elm, def } = vm;
-        const component = this;
-        vm.component = component;
-        // TODO: eventually the render method should be a static property on the ctor instead
-        // catching render method to match other callbacks
-        vm.render = component.render;
-        // linking elm and its component with VM
-        component[ViewModelReflection] = elm[ViewModelReflection] = vm;
-        defineProperties(elm, def.descriptors);
+function LWCElement() {
+    if (isNull(vmBeingConstructed)) {
+        throw new ReferenceError();
     }
+    const vm = vmBeingConstructed;
+    const { elm, def } = vm;
+    const component = this;
+    vm.component = component;
+    // interaction hooks
+    // We are intentionally hiding this argument from the formal API of LWCElement because
+    // we don't want folks to know about it just yet.
+    if (arguments.length === 1) {
+        const { callHook, setHook, getHook } = arguments[0];
+        vm.callHook = callHook;
+        vm.setHook = setHook;
+        vm.getHook = getHook;
+    }
+    // linking elm and its component with VM
+    component[ViewModelReflection] = elm[ViewModelReflection] = vm;
+    defineProperties(elm, def.descriptors);
+}
+LWCElement.prototype = {
+    constructor: LWCElement,
     // HTML Element - The Good Parts
     dispatchEvent(event) {
         const elm = getLinkedElement$1(this);
@@ -1378,32 +1411,32 @@ class LWCElement {
         // Pierce dispatchEvent so locker service has a chance to overwrite
         const dispatchEvent = pierceProperty(elm, 'dispatchEvent');
         return dispatchEvent.call(elm, event);
-    }
+    },
     addEventListener(type, listener, options) {
         const vm = getCustomElementVM(this);
         addCmpEventListener(vm, type, listener, options);
-    }
+    },
     removeEventListener(type, listener, options) {
         const vm = getCustomElementVM(this);
         removeCmpEventListener(vm, type, listener, options);
-    }
+    },
     setAttributeNS(ns, attrName, value) {
         // use cached setAttributeNS, because elm.setAttribute throws
         // when not called in template
         return setAttributeNS.call(getLinkedElement$1(this), ns, attrName, value);
-    }
+    },
     removeAttributeNS(ns, attrName) {
         // use cached removeAttributeNS, because elm.setAttribute throws
         // when not called in template
         return removeAttributeNS.call(getLinkedElement$1(this), ns, attrName);
-    }
+    },
     removeAttribute(attrName) {
         const vm = getCustomElementVM(this);
         // use cached removeAttribute, because elm.setAttribute throws
         // when not called in template
         removeAttribute.call(vm.elm, attrName);
         attemptAriaAttributeFallback(vm, attrName);
-    }
+    },
     setAttribute(attrName, value) {
         const vm = getCustomElementVM(this);
         // marking the set is needed for the AOM polyfill
@@ -1411,17 +1444,17 @@ class LWCElement {
         // use cached setAttribute, because elm.setAttribute throws
         // when not called in template
         return setAttribute.call(getLinkedElement$1(this), attrName, value);
-    }
+    },
     getAttributeNS(ns, attrName) {
         return getAttributeNS.call(getLinkedElement$1(this), ns, attrName);
-    }
+    },
     getAttribute(attrName) {
         return getAttribute.apply(getLinkedElement$1(this), ArraySlice$1.call(arguments));
-    }
+    },
     getBoundingClientRect() {
         const elm = getLinkedElement$1(this);
         return elm.getBoundingClientRect();
-    }
+    },
     querySelector(selectors) {
         const vm = getCustomElementVM(this);
         const nodeList = querySelectorAllFromComponent(this, selectors);
@@ -1432,21 +1465,21 @@ class LWCElement {
             }
         }
         return null;
-    }
+    },
     querySelectorAll(selectors) {
         const vm = getCustomElementVM(this);
         const nodeList = querySelectorAllFromComponent(this, selectors);
         // TODO: locker service might need to do something here
         const filteredNodes = ArrayFilter.call(nodeList, (node) => wasNodePassedIntoVM(vm, node));
         return pierce(filteredNodes);
-    }
+    },
     get tagName() {
         const elm = getLinkedElement$1(this);
         return elm.tagName + ''; // avoiding side-channeling
-    }
+    },
     get classList() {
         return getLinkedElement$1(this).classList;
-    }
+    },
     get template() {
         const vm = getCustomElementVM(this);
         let { cmpRoot } = vm;
@@ -1456,18 +1489,18 @@ class LWCElement {
             vm.cmpRoot = cmpRoot;
         }
         return cmpRoot;
-    }
+    },
     get root() {
         return this.template;
-    }
+    },
     toString() {
         const vm = getCustomElementVM(this);
         const { elm } = vm;
         const { tagName } = elm;
         const is = getAttribute.call(elm, 'is');
         return `<${tagName.toLowerCase()}${is ? ' is="${is}' : ''}>`;
-    }
-}
+    },
+};
 defineProperties(LWCElement.prototype, htmlElementDescriptors);
 freeze(LWCElement);
 seal(LWCElement.prototype);
@@ -1600,7 +1633,7 @@ function c(sel, Ctor, data) {
     // The compiler produce AMD modules that do not support circular dependencies
     // We need to create an indirection to circumvent those cases.
     // We could potentially move this check to the definition
-    if (Ctor.__circular__) {
+    if (hasOwnProperty.call(Ctor, '__circular__')) {
         Ctor = Ctor();
     }
     const { key, slotset, styleMap, style, on, className, classMap, props } = data;
@@ -1826,14 +1859,13 @@ function isBeingConstructed(vm) {
     return vmBeingConstructed === vm;
 }
 function invokeComponentCallback(vm, fn, args) {
-    const { context, component } = vm;
+    const { context, component, callHook } = vm;
     const ctx = currentContext;
     establishContext(context);
     let result;
     let error;
     try {
-        // TODO: membrane proxy for all args that are objects
-        result = fn.apply(component, args);
+        result = callHook(component, fn, args);
     }
     catch (e) {
         error = Object(e);
@@ -1854,10 +1886,9 @@ function invokeComponentConstructor(vm, Ctor) {
     establishContext(context);
     const vmBeingConstructedInception = vmBeingConstructed;
     vmBeingConstructed = vm;
-    let component;
     let error;
     try {
-        component = new Ctor();
+        new Ctor(); // tslint:disable-line
     }
     catch (e) {
         error = Object(e);
@@ -1871,10 +1902,9 @@ function invokeComponentConstructor(vm, Ctor) {
             throw error; // tslint:disable-line
         }
     }
-    return component;
 }
 function invokeComponentRenderMethod(vm) {
-    const { render } = vm;
+    const { def: { render }, callHook } = vm;
     if (isUndefined(render)) {
         return [];
     }
@@ -1886,7 +1916,7 @@ function invokeComponentRenderMethod(vm) {
     let result;
     let error;
     try {
-        const html = render.call(component);
+        const html = callHook(component, render);
         if (isFunction(html)) {
             result = evaluateTemplate(vm, html);
         }
@@ -1914,14 +1944,14 @@ var EventListenerContext;
 })(EventListenerContext || (EventListenerContext = {}));
 let componentEventListenerType = null;
 function invokeEventListener(vm, listenerContext, fn, event) {
-    const { context } = vm;
+    const { context, callHook } = vm;
     const ctx = currentContext;
     establishContext(context);
     let error;
     const componentEventListenerTypeInception = componentEventListenerType;
     componentEventListenerType = listenerContext;
     try {
-        fn.call(undefined, event);
+        callHook(undefined, fn, [event]);
     }
     catch (e) {
         error = Object(e);
@@ -1937,13 +1967,14 @@ function invokeEventListener(vm, listenerContext, fn, event) {
     }
 }
 
-// stub function to prevent misuse of the @track decorator
-function track(obj) {
-    return reactiveMembrane.getProxy(obj);
+function track(target, prop, descriptor) {
+    if (arguments.length === 1) {
+        return reactiveMembrane.getProxy(target);
+    }
+    return createTrackedPropertyDescriptor(target, prop, isUndefined(descriptor) ? true : descriptor.enumerable === true);
 }
-// TODO: how to allow symbols as property keys?
-function createTrackedPropertyDescriptor(proto, key, descriptor) {
-    defineProperty(proto, key, {
+function createTrackedPropertyDescriptor(Ctor, key, enumerable) {
+    return {
         get() {
             const vm = getCustomElementVM(this);
             observeMutation$1(this, key);
@@ -1960,29 +1991,47 @@ function createTrackedPropertyDescriptor(proto, key, descriptor) {
                 }
             }
         },
-        enumerable: isUndefined(descriptor) ? true : descriptor.enumerable,
-        configurable: false,
-    });
+        enumerable,
+        configurable: true,
+    };
 }
 
-// stub function to prevent misuse of the @wire decorator
-function wire() {
+function wireDecorator(target, prop, descriptor) {
+    // TODO: eventually this decorator should have its own logic
+    return createTrackedPropertyDescriptor(target, prop, isObject$1(descriptor) ? descriptor.enumerable === true : true);
 }
-// TODO: how to allow symbols as property keys?
-function createWiredPropertyDescriptor(proto, key, descriptor) {
-    createTrackedPropertyDescriptor(proto, key, descriptor);
+// @wire is a factory that when invoked, returns the wire decorator
+function wire(adapter, config) {
+    const len = arguments.length;
+    if (len > 0 && len < 3) {
+        return wireDecorator;
+    }
+    else {
+        throw new TypeError();
+    }
 }
 
-// stub function to prevent misuse of the @api decorator
-function api$1() {
+const COMPUTED_GETTER_MASK = 1;
+const COMPUTED_SETTER_MASK = 2;
+function api$1(target, propName, descriptor) {
+    const meta = target.publicProps;
+    // publicProps must be an own property, otherwise the meta is inherited.
+    const config = (!isUndefined(meta) && hasOwnProperty.call(target, 'publicProps') && hasOwnProperty.call(meta, propName)) ? meta[propName].config : 0;
+    // initializing getters and setters for each public prop on the target prototype
+    if (COMPUTED_SETTER_MASK & config || COMPUTED_GETTER_MASK & config) {
+        // if it is configured as an accessor it must have a descriptor
+        return createPublicAccessorDescriptor(target, propName, descriptor);
+    }
+    else {
+        return createPublicPropertyDescriptor(target, propName, descriptor);
+    }
 }
 let vmBeingUpdated = null;
 function prepareForPropUpdate(vm) {
     vmBeingUpdated = vm;
 }
-// TODO: how to allow symbols as property keys?
 function createPublicPropertyDescriptor(proto, key, descriptor) {
-    defineProperty(proto, key, {
+    return {
         get() {
             const vm = getCustomElementVM(this);
             if (isBeingConstructed(vm)) {
@@ -2009,14 +2058,14 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
             else {}
         },
         enumerable: isUndefined(descriptor) ? true : descriptor.enumerable,
-    });
+    };
 }
-function createPublicAccessorDescriptor(proto, key, descriptor) {
+function createPublicAccessorDescriptor(Ctor, key, descriptor) {
     const { get, set, enumerable } = descriptor;
     if (!isFunction(get)) {
         throw new TypeError();
     }
-    defineProperty(proto, key, {
+    return {
         get() {
             return get.call(this);
         },
@@ -2036,7 +2085,7 @@ function createPublicAccessorDescriptor(proto, key, descriptor) {
             else {}
         },
         enumerable,
-    });
+    };
 }
 
 /**
@@ -2048,8 +2097,6 @@ function createPublicAccessorDescriptor(proto, key, descriptor) {
  * shape of a component. It is also used internally to apply extra optimizations.
  */
 const CtorToDefMap = new WeakMap();
-const COMPUTED_GETTER_MASK = 1;
-const COMPUTED_SETTER_MASK = 2;
 function propertiesReducer(seed, propName) {
     seed[propName] = {
         config: 3,
@@ -2060,6 +2107,16 @@ function propertiesReducer(seed, propName) {
 }
 const reducedDefaultHTMLPropertyNames = ArrayReduce.call(defaultDefHTMLPropertyNames, propertiesReducer, create(null));
 const HTML_PROPS = ArrayReduce.call(getOwnPropertyNames(GlobalAOMProperties), propertiesReducer, reducedDefaultHTMLPropertyNames);
+function getCtorProto(Ctor) {
+    let proto = getPrototypeOf(Ctor);
+    // The compiler produce AMD modules that do not support circular dependencies
+    // We need to create an indirection to circumvent those cases.
+    // We could potentially move this check to the definition
+    if (hasOwnProperty.call(proto, '__circular__')) {
+        proto = proto();
+    }
+    return proto;
+}
 function createComponentDef(Ctor) {
     const name = Ctor.name;
     let props = getPublicPropertiesHash(Ctor);
@@ -2067,39 +2124,31 @@ function createComponentDef(Ctor) {
     let wire$$1 = getWireHash(Ctor);
     const track$$1 = getTrackHash(Ctor);
     const proto = Ctor.prototype;
-    for (const propName in props) {
-        const propDef = props[propName];
-        // initializing getters and setters for each public prop on the target prototype
-        const descriptor = getOwnPropertyDescriptor(proto, propName);
-        const { config } = propDef;
-        if (COMPUTED_SETTER_MASK & config || COMPUTED_GETTER_MASK & config) {
-            // if it is configured as an accessor it must have a descriptor
-            createPublicAccessorDescriptor(proto, propName, descriptor);
+    const decoratorMap = create(null);
+    // TODO: eventually, the compiler should do this work
+    {
+        for (const propName in props) {
+            decoratorMap[propName] = api$1;
         }
-        else {
-            createPublicPropertyDescriptor(proto, propName, descriptor);
-        }
-    }
-    if (wire$$1) {
-        for (const propName in wire$$1) {
-            if (wire$$1[propName].method) {
-                // for decorated methods we need to do nothing
-                continue;
+        if (wire$$1) {
+            for (const propName in wire$$1) {
+                const wireDef = wire$$1[propName];
+                if (wireDef.method) {
+                    // for decorated methods we need to do nothing
+                    continue;
+                }
+                decoratorMap[propName] = wire(wireDef.adapter, wireDef.params);
             }
-            const descriptor = getOwnPropertyDescriptor(proto, propName);
-            // initializing getters and setters for each public prop on the target prototype
-            createWiredPropertyDescriptor(proto, propName, descriptor);
         }
-    }
-    if (track$$1) {
-        for (const propName in track$$1) {
-            const descriptor = getOwnPropertyDescriptor(proto, propName);
-            // initializing getters and setters for each public prop on the target prototype
-            createTrackedPropertyDescriptor(proto, propName, descriptor);
+        if (track$$1) {
+            for (const propName in track$$1) {
+                decoratorMap[propName] = track;
+            }
         }
+        decorate(Ctor, decoratorMap);
     }
-    let { connectedCallback, disconnectedCallback, renderedCallback, errorCallback, } = proto;
-    const superProto = getPrototypeOf(Ctor);
+    let { connectedCallback, disconnectedCallback, renderedCallback, errorCallback, render, } = proto;
+    const superProto = getCtorProto(Ctor);
     const superDef = superProto !== LWCElement ? getComponentDef(superProto) : null;
     if (!isNull(superDef)) {
         props = assign(create(null), superDef.props, props);
@@ -2109,9 +2158,10 @@ function createComponentDef(Ctor) {
         disconnectedCallback = disconnectedCallback || superDef.disconnectedCallback;
         renderedCallback = renderedCallback || superDef.renderedCallback;
         errorCallback = errorCallback || superDef.errorCallback;
+        render = render || superDef.render;
     }
     props = assign(create(null), HTML_PROPS, props);
-    const descriptors = createDescriptorMap(props, methods);
+    const descriptors = createCustomElementDescriptorMap(props, methods);
     const def = {
         name,
         wire: wire$$1,
@@ -2123,23 +2173,29 @@ function createComponentDef(Ctor) {
         disconnectedCallback,
         renderedCallback,
         errorCallback,
+        render,
     };
     return def;
 }
 function createGetter(key) {
     return function () {
-        return getCustomElementComponent(this)[key];
+        const vm = getCustomElementVM(this);
+        const { getHook } = vm;
+        return getHook(vm.component, key);
     };
 }
 function createSetter(key) {
     return function (newValue) {
-        getCustomElementComponent(this)[key] = newValue;
+        const vm = getCustomElementVM(this);
+        const { setHook } = vm;
+        setHook(vm.component, key, newValue);
     };
 }
-function createMethodCaller(key) {
+function createMethodCaller(method) {
     return function () {
-        const component = getCustomElementComponent(this);
-        return component[key].apply(component, ArraySlice$1.call(arguments));
+        const vm = getCustomElementVM(this);
+        const { callHook } = vm;
+        return callHook(vm.component, method, ArraySlice$1.call(arguments));
     };
 }
 function getAttributePatched(attrName) {
@@ -2164,7 +2220,7 @@ function removeAttributeNSPatched(attrNameSpace, attrName) {
     const vm = getCustomElementVM(this);
     removeAttributeNS.apply(this, ArraySlice$1.call(arguments));
 }
-function createDescriptorMap(publicProps, publicMethodsConfig) {
+function createCustomElementDescriptorMap(publicProps, publicMethodsConfig) {
     // replacing mutators and accessors on the element itself to catch any mutation
     const descriptors = {
         getAttribute: {
@@ -2198,7 +2254,7 @@ function createDescriptorMap(publicProps, publicMethodsConfig) {
     // expose public methods as props on the Element
     for (const key in publicMethodsConfig) {
         descriptors[key] = {
-            value: createMethodCaller(key),
+            value: createMethodCaller(publicMethodsConfig[key]),
             configurable: true,
         };
     }
@@ -2241,7 +2297,7 @@ function getPublicMethodsHash(target) {
         return EmptyObject;
     }
     return publicMethods.reduce((methodsHash, methodName) => {
-        methodsHash[methodName] = 1;
+        methodsHash[methodName] = target.prototype[methodName];
         return methodsHash;
     }, create(null));
 }
@@ -2943,6 +2999,15 @@ const patchChildren = patchVNode.children;
 
 let idx = 0;
 let uid$1 = 0;
+function callHook(cmp, fn, args) {
+    return fn.apply(cmp, args);
+}
+function setHook(cmp, prop, newValue) {
+    cmp[prop] = newValue;
+}
+function getHook(cmp, prop) {
+    return cmp[prop];
+}
 const OwnerKey = usesNativeSymbols ? Symbol('key') : '$$OwnerKey$$';
 function addInsertionIndex(vm) {
     vm.idx = ++idx;
@@ -3019,6 +3084,9 @@ function createVM(tagName, elm, cmpSlots) {
         cmpListener: undefined,
         cmpTemplate: undefined,
         cmpRoot: undefined,
+        callHook,
+        setHook,
+        getHook,
         component: undefined,
         children: EmptyArray,
         hostAttrs: create(null),
@@ -3288,8 +3356,9 @@ exports.api = api$1;
 exports.track = track;
 exports.readonly = readonly;
 exports.wire = wire;
+exports.decorate = decorate;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.20.1 */
+/** version: 0.20.3 */

@@ -516,7 +516,7 @@ forEach.call(getOwnPropertyNames(GlobalAOMProperties), function (propName) {
         var vm = this[ViewModelReflection];
         var value = vm.cmpProps[propName] = isNull(newValue) ? null : newValue + ''; // storing the normalized new value
         if (isNull(value)) {
-            newValue = vm.component.root[propName];
+            newValue = vm.rootProps[propName];
             vm.hostAttrs[attrName] = undefined;
         }
         else {
@@ -580,6 +580,29 @@ if (!getOwnPropertyDescriptor(Event.prototype, 'composed')) {
 }
 var CustomEvent = window.CustomEvent;
 
+function decorate(Ctor, decorators) {
+    // intentionally comparing decorators with null and undefined
+    if (!isFunction(Ctor) || decorators == null) {
+        throw new TypeError();
+    }
+    var props = getOwnPropertyNames(decorators);
+    // intentionally allowing decoration of classes only for now
+    var target = Ctor.prototype;
+    for (var i = 0, len = props.length; i < len; i += 1) {
+        var propName = props[i];
+        var decorator = decorators[propName];
+        if (!isFunction(decorator)) {
+            throw new TypeError();
+        }
+        var originalDescriptor = getOwnPropertyDescriptor(target, propName);
+        var descriptor = decorator(Ctor, propName, originalDescriptor);
+        if (!isUndefined(descriptor)) {
+            defineProperty(target, propName, descriptor);
+        }
+    }
+    return Ctor; // chaining
+}
+
 var TopLevelContextSymbol = Symbol();
 var currentContext = {};
 currentContext[TopLevelContextSymbol] = true;
@@ -620,12 +643,12 @@ function createComponent(vm, Ctor) {
         assert.vm(vm);
     }
     // create the component instance
-    var component = invokeComponentConstructor(vm, Ctor);
+    invokeComponentConstructor(vm, Ctor);
     {
-        assert.isTrue(vm.component === component, "Invalid construction for " + vm + ", maybe you are missing the call to super() on classes extending Element.");
+        assert.isTrue(isObject$1(vm.component), "Invalid construction for " + vm + ", maybe you are missing the call to super() on classes extending Element.");
         var track = getComponentDef(Ctor).track;
-        if ('state' in component && (!track || !track.state)) {
-            assert.logWarning("Non-trackable component state detected in " + component + ". Updates to state property will not be reactive. To make state reactive, add @track decorator.");
+        if ('state' in vm.component && (!track || !track.state)) {
+            assert.logWarning("Non-trackable component state detected in " + vm.component + ". Updates to state property will not be reactive. To make state reactive, add @track decorator.");
         }
     }
 }
@@ -1135,7 +1158,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.20.1 */
+/** version: 0.20.3 */
 
 var TargetToReactiveRecordMap = new WeakMap();
 function notifyMutation$1(target, key) {
@@ -1619,6 +1642,7 @@ var Root = /** @class */ (function () {
     Root.prototype.querySelector = function (selector) {
         var node = shadowRootQuerySelector(this, selector);
         {
+            // TODO: this invocation into component is invalid, and should be eventually removed
             var component = getCustomElementComponent(this);
             if (isNull(node) && component.querySelector(selector)) {
                 assert.logWarning("this.template.querySelector() can only return elements from the template declaration of " + component + ". It seems that you are looking for elements that were passed via slots, in which case you should use this.querySelector() instead.");
@@ -1629,6 +1653,7 @@ var Root = /** @class */ (function () {
     Root.prototype.querySelectorAll = function (selector) {
         var nodeList = shadowRootQuerySelectorAll(this, selector);
         {
+            // TODO: this invocation into component is invalid, and should be eventually removed
             var component = getCustomElementComponent(this);
             if (nodeList.length === 0 && component.querySelectorAll(selector).length) {
                 assert.logWarning("this.template.querySelectorAll() can only return elements from template declaration of " + component + ". It seems that you are looking for elements that were passed via slots, in which case you should use this.querySelectorAll() instead.");
@@ -1885,28 +1910,35 @@ function querySelectorAllFromComponent(cmp, selectors) {
     return elm.querySelectorAll(selectors);
 }
 // This should be as performant as possible, while any initialization should be done lazily
-var LWCElement = /** @class */ (function () {
-    function LWCElement() {
-        if (isNull(vmBeingConstructed)) {
-            throw new ReferenceError();
-        }
-        {
-            assert.vm(vmBeingConstructed);
-            assert.invariant(vmBeingConstructed.elm instanceof HTMLElement, "Component creation requires a DOM element to be associated to " + vmBeingConstructed + ".");
-        }
-        var vm = vmBeingConstructed;
-        var elm = vm.elm, def = vm.def;
-        var component = this;
-        vm.component = component;
-        // TODO: eventually the render method should be a static property on the ctor instead
-        // catching render method to match other callbacks
-        vm.render = component.render;
-        // linking elm and its component with VM
-        component[ViewModelReflection] = elm[ViewModelReflection] = vm;
-        defineProperties(elm, def.descriptors);
+function LWCElement() {
+    if (isNull(vmBeingConstructed)) {
+        throw new ReferenceError();
     }
+    {
+        assert.vm(vmBeingConstructed);
+        assert.invariant(vmBeingConstructed.elm instanceof HTMLElement, "Component creation requires a DOM element to be associated to " + vmBeingConstructed + ".");
+    }
+    var vm = vmBeingConstructed;
+    var elm = vm.elm, def = vm.def;
+    var component = this;
+    vm.component = component;
+    // interaction hooks
+    // We are intentionally hiding this argument from the formal API of LWCElement because
+    // we don't want folks to know about it just yet.
+    if (arguments.length === 1) {
+        var _a = arguments[0], callHook = _a.callHook, setHook = _a.setHook, getHook = _a.getHook;
+        vm.callHook = callHook;
+        vm.setHook = setHook;
+        vm.getHook = getHook;
+    }
+    // linking elm and its component with VM
+    component[ViewModelReflection] = elm[ViewModelReflection] = vm;
+    defineProperties(elm, def.descriptors);
+}
+LWCElement.prototype = {
+    constructor: LWCElement,
     // HTML Element - The Good Parts
-    LWCElement.prototype.dispatchEvent = function (event) {
+    dispatchEvent: function (event) {
         var elm = getLinkedElement$1(this);
         var vm = getCustomElementVM(this);
         {
@@ -1931,8 +1963,8 @@ var LWCElement = /** @class */ (function () {
         // Pierce dispatchEvent so locker service has a chance to overwrite
         var dispatchEvent = pierceProperty(elm, 'dispatchEvent');
         return dispatchEvent.call(elm, event);
-    };
-    LWCElement.prototype.addEventListener = function (type, listener, options) {
+    },
+    addEventListener: function (type, listener, options) {
         var vm = getCustomElementVM(this);
         {
             assert.vm(vm);
@@ -1942,32 +1974,32 @@ var LWCElement = /** @class */ (function () {
             }
         }
         addCmpEventListener(vm, type, listener, options);
-    };
-    LWCElement.prototype.removeEventListener = function (type, listener, options) {
+    },
+    removeEventListener: function (type, listener, options) {
         var vm = getCustomElementVM(this);
         removeCmpEventListener(vm, type, listener, options);
-    };
-    LWCElement.prototype.setAttributeNS = function (ns, attrName, value) {
+    },
+    setAttributeNS: function (ns, attrName, value) {
         {
             assert.isFalse(isBeingConstructed(this[ViewModelReflection]), "Failed to construct '" + this + "': The result must not have attributes.");
         }
         // use cached setAttributeNS, because elm.setAttribute throws
         // when not called in template
         return setAttributeNS.call(getLinkedElement$1(this), ns, attrName, value);
-    };
-    LWCElement.prototype.removeAttributeNS = function (ns, attrName) {
+    },
+    removeAttributeNS: function (ns, attrName) {
         // use cached removeAttributeNS, because elm.setAttribute throws
         // when not called in template
         return removeAttributeNS.call(getLinkedElement$1(this), ns, attrName);
-    };
-    LWCElement.prototype.removeAttribute = function (attrName) {
+    },
+    removeAttribute: function (attrName) {
         var vm = getCustomElementVM(this);
         // use cached removeAttribute, because elm.setAttribute throws
         // when not called in template
         removeAttribute.call(vm.elm, attrName);
         attemptAriaAttributeFallback(vm, attrName);
-    };
-    LWCElement.prototype.setAttribute = function (attrName, value) {
+    },
+    setAttribute: function (attrName, value) {
         var vm = getCustomElementVM(this);
         {
             assert.isFalse(isBeingConstructed(vm), "Failed to construct '" + this + "': The result must not have attributes.");
@@ -1977,11 +2009,11 @@ var LWCElement = /** @class */ (function () {
         // use cached setAttribute, because elm.setAttribute throws
         // when not called in template
         return setAttribute.call(getLinkedElement$1(this), attrName, value);
-    };
-    LWCElement.prototype.getAttributeNS = function (ns, attrName) {
+    },
+    getAttributeNS: function (ns, attrName) {
         return getAttributeNS.call(getLinkedElement$1(this), ns, attrName);
-    };
-    LWCElement.prototype.getAttribute = function (attrName) {
+    },
+    getAttribute: function (attrName) {
         // logging errors for experimental and special attributes
         {
             var vm = this[ViewModelReflection];
@@ -2001,16 +2033,16 @@ var LWCElement = /** @class */ (function () {
             }
         }
         return getAttribute.apply(getLinkedElement$1(this), ArraySlice$1.call(arguments));
-    };
-    LWCElement.prototype.getBoundingClientRect = function () {
+    },
+    getBoundingClientRect: function () {
         var elm = getLinkedElement$1(this);
         {
             var vm = getCustomElementVM(this);
             assert.isFalse(isBeingConstructed(vm), "this.getBoundingClientRect() should not be called during the construction of the custom element for " + this + " because the element is not yet in the DOM, instead, you can use it in one of the available life-cycle hooks.");
         }
         return elm.getBoundingClientRect();
-    };
-    LWCElement.prototype.querySelector = function (selectors) {
+    },
+    querySelector: function (selectors) {
         var vm = getCustomElementVM(this);
         {
             assert.isFalse(isBeingConstructed(vm), "this.querySelector() cannot be called during the construction of the custom element for " + this + " because no children has been added to this element yet.");
@@ -2028,8 +2060,8 @@ var LWCElement = /** @class */ (function () {
             }
         }
         return null;
-    };
-    LWCElement.prototype.querySelectorAll = function (selectors) {
+    },
+    querySelectorAll: function (selectors) {
         var vm = getCustomElementVM(this);
         {
             assert.isFalse(isBeingConstructed(vm), "this.querySelectorAll() cannot be called during the construction of the custom element for " + this + " because no children has been added to this element yet.");
@@ -2043,56 +2075,40 @@ var LWCElement = /** @class */ (function () {
             }
         }
         return pierce(filteredNodes);
-    };
-    Object.defineProperty(LWCElement.prototype, "tagName", {
-        get: function () {
-            var elm = getLinkedElement$1(this);
-            return elm.tagName + ''; // avoiding side-channeling
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(LWCElement.prototype, "classList", {
-        get: function () {
-            {
-                var vm = getCustomElementVM(this);
-                // TODO: this still fails in dev but works in production, eventually, we should just throw in all modes
-                assert.isFalse(isBeingConstructed(vm), "Failed to construct " + vm + ": The result must not have attributes. Adding or tampering with classname in constructor is not allowed in a web component, use connectedCallback() instead.");
-            }
-            return getLinkedElement$1(this).classList;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(LWCElement.prototype, "template", {
-        get: function () {
+    },
+    get tagName() {
+        var elm = getLinkedElement$1(this);
+        return elm.tagName + ''; // avoiding side-channeling
+    },
+    get classList() {
+        {
             var vm = getCustomElementVM(this);
-            {
-                assert.vm(vm);
-            }
-            var cmpRoot = vm.cmpRoot;
-            // lazy creation of the ShadowRoot Object the first time it is accessed.
-            if (isUndefined(cmpRoot)) {
-                cmpRoot = new Root(vm);
-                vm.cmpRoot = cmpRoot;
-            }
-            return cmpRoot;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(LWCElement.prototype, "root", {
-        get: function () {
-            {
-                var vm = getCustomElementVM(this);
-                assert.logWarning("\"this.template\" access in " + vm.component + " has been deprecated and will be removed. Use \"this.template\" instead.");
-            }
-            return this.template;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    LWCElement.prototype.toString = function () {
+            // TODO: this still fails in dev but works in production, eventually, we should just throw in all modes
+            assert.isFalse(isBeingConstructed(vm), "Failed to construct " + vm + ": The result must not have attributes. Adding or tampering with classname in constructor is not allowed in a web component, use connectedCallback() instead.");
+        }
+        return getLinkedElement$1(this).classList;
+    },
+    get template() {
+        var vm = getCustomElementVM(this);
+        {
+            assert.vm(vm);
+        }
+        var cmpRoot = vm.cmpRoot;
+        // lazy creation of the ShadowRoot Object the first time it is accessed.
+        if (isUndefined(cmpRoot)) {
+            cmpRoot = new Root(vm);
+            vm.cmpRoot = cmpRoot;
+        }
+        return cmpRoot;
+    },
+    get root() {
+        {
+            var vm = getCustomElementVM(this);
+            assert.logWarning("\"this.template\" access in " + vm.component + " has been deprecated and will be removed. Use \"this.template\" instead.");
+        }
+        return this.template;
+    },
+    toString: function () {
         var vm = getCustomElementVM(this);
         {
             assert.vm(vm);
@@ -2101,9 +2117,8 @@ var LWCElement = /** @class */ (function () {
         var tagName = elm.tagName;
         var is = getAttribute.call(elm, 'is');
         return "<" + tagName.toLowerCase() + (is ? ' is="${is}' : '') + ">";
-    };
-    return LWCElement;
-}());
+    },
+};
 defineProperties(LWCElement.prototype, htmlElementDescriptors);
 // Global HTML Attributes
 {
@@ -2300,7 +2315,7 @@ function c(sel, Ctor, data) {
     // The compiler produce AMD modules that do not support circular dependencies
     // We need to create an indirection to circumvent those cases.
     // We could potentially move this check to the definition
-    if (Ctor.__circular__) {
+    if (hasOwnProperty.call(Ctor, '__circular__')) {
         Ctor = Ctor();
     }
     {
@@ -2657,14 +2672,13 @@ function isBeingConstructed(vm) {
     return vmBeingConstructed === vm;
 }
 function invokeComponentCallback(vm, fn, args) {
-    var context = vm.context, component = vm.component;
+    var context = vm.context, component = vm.component, callHook = vm.callHook;
     var ctx = currentContext;
     establishContext(context);
     var result;
     var error;
     try {
-        // TODO: membrane proxy for all args that are objects
-        result = fn.apply(component, args);
+        result = callHook(component, fn, args);
     }
     catch (e) {
         error = Object(e);
@@ -2688,10 +2702,9 @@ function invokeComponentConstructor(vm, Ctor) {
     {
         startMeasure(vm, 'constructor');
     }
-    var component;
     var error;
     try {
-        component = new Ctor();
+        new Ctor(); // tslint:disable-line
     }
     catch (e) {
         error = Object(e);
@@ -2708,10 +2721,9 @@ function invokeComponentConstructor(vm, Ctor) {
             throw error; // tslint:disable-line
         }
     }
-    return component;
 }
 function invokeComponentRenderMethod(vm) {
-    var render = vm.render;
+    var render = vm.def.render, callHook = vm.callHook;
     if (isUndefined(render)) {
         return [];
     }
@@ -2728,7 +2740,7 @@ function invokeComponentRenderMethod(vm) {
         startMeasure(vm, 'render');
     }
     try {
-        var html = render.call(component);
+        var html = callHook(component, render);
         if (isFunction(html)) {
             result = evaluateTemplate(vm, html);
         }
@@ -2763,14 +2775,14 @@ var EventListenerContext;
 })(EventListenerContext || (EventListenerContext = {}));
 var componentEventListenerType = null;
 function invokeEventListener(vm, listenerContext, fn, event) {
-    var context = vm.context;
+    var context = vm.context, callHook = vm.callHook;
     var ctx = currentContext;
     establishContext(context);
     var error;
     var componentEventListenerTypeInception = componentEventListenerType;
     componentEventListenerType = listenerContext;
     try {
-        fn.call(undefined, event);
+        callHook(undefined, fn, [event]);
     }
     catch (e) {
         error = Object(e);
@@ -2786,18 +2798,25 @@ function invokeEventListener(vm, listenerContext, fn, event) {
     }
 }
 
-// stub function to prevent misuse of the @track decorator
-function track(obj) {
+function track(target, prop, descriptor) {
+    if (arguments.length === 1) {
+        return reactiveMembrane.getProxy(target);
+    }
     {
-        if (arguments.length !== 1) {
-            assert.fail("@track can be used as a decorator or as a function with one argument to produce a trackable version of the provided value.");
+        if (arguments.length !== 3) {
+            assert.fail("@track decorator can only be used with one argument to return a trackable object, or as a decorator function.");
+        }
+        if (!isUndefined(descriptor)) {
+            var get = descriptor.get, set = descriptor.set, configurable = descriptor.configurable, writable = descriptor.writable;
+            assert.isTrue(!get && !set, "Compiler Error: A @track decorator can only be applied to a public field.");
+            assert.isTrue(configurable !== false, "Compiler Error: A @track decorator can only be applied to a configurable property.");
+            assert.isTrue(writable !== false, "Compiler Error: A @track decorator can only be applied to a writable property.");
         }
     }
-    return reactiveMembrane.getProxy(obj);
+    return createTrackedPropertyDescriptor(target, prop, isUndefined(descriptor) ? true : descriptor.enumerable === true);
 }
-// TODO: how to allow symbols as property keys?
-function createTrackedPropertyDescriptor(proto, key, descriptor) {
-    defineProperty(proto, key, {
+function createTrackedPropertyDescriptor(Ctor, key, enumerable) {
+    return {
         get: function () {
             var vm = getCustomElementVM(this);
             {
@@ -2829,26 +2848,67 @@ function createTrackedPropertyDescriptor(proto, key, descriptor) {
                 }
             }
         },
-        enumerable: isUndefined(descriptor) ? true : descriptor.enumerable,
-        configurable: false,
-    });
+        enumerable: enumerable,
+        configurable: true,
+    };
 }
 
-// stub function to prevent misuse of the @wire decorator
-function wire() {
+function wireDecorator(target, prop, descriptor) {
     {
-        assert.fail("@wire may only be used as a decorator.");
+        if (!isUndefined(descriptor)) {
+            var get = descriptor.get, set = descriptor.set, configurable = descriptor.configurable, writable = descriptor.writable;
+            assert.isTrue(!get && !set, "Compiler Error: A @wire decorator can only be applied to a public field.");
+            assert.isTrue(configurable !== false, "Compiler Error: A @wire decorator can only be applied to a configurable property.");
+            assert.isTrue(writable !== false, "Compiler Error: A @wire decorator can only be applied to a writable property.");
+        }
+    }
+    // TODO: eventually this decorator should have its own logic
+    return createTrackedPropertyDescriptor(target, prop, isObject$1(descriptor) ? descriptor.enumerable === true : true);
+}
+// @wire is a factory that when invoked, returns the wire decorator
+function wire(adapter, config) {
+    var len = arguments.length;
+    if (len > 0 && len < 3) {
+        return wireDecorator;
+    }
+    else {
+        {
+            assert.fail("@wire(adapter, config?) may only be used as a decorator.");
+        }
+        throw new TypeError();
     }
 }
-// TODO: how to allow symbols as property keys?
-function createWiredPropertyDescriptor(proto, key, descriptor) {
-    createTrackedPropertyDescriptor(proto, key, descriptor);
-}
 
-// stub function to prevent misuse of the @api decorator
-function api$1() {
+var COMPUTED_GETTER_MASK = 1;
+var COMPUTED_SETTER_MASK = 2;
+function api$1(target, propName, descriptor) {
     {
-        assert.fail("@api may only be used as a decorator.");
+        if (arguments.length !== 3) {
+            assert.fail("@api decorator can only be used as a decorator function.");
+        }
+    }
+    var meta = target.publicProps;
+    // publicProps must be an own property, otherwise the meta is inherited.
+    var config = (!isUndefined(meta) && hasOwnProperty.call(target, 'publicProps') && hasOwnProperty.call(meta, propName)) ? meta[propName].config : 0;
+    // initializing getters and setters for each public prop on the target prototype
+    if (COMPUTED_SETTER_MASK & config || COMPUTED_GETTER_MASK & config) {
+        {
+            assert.invariant(!descriptor || (isFunction(descriptor.get) || isFunction(descriptor.set)), "Invalid property " + propName + " definition in " + target + ", it cannot be a prototype definition if it is a public property. Instead use the constructor to define it.");
+            var mustHaveGetter = COMPUTED_GETTER_MASK & config;
+            var mustHaveSetter = COMPUTED_SETTER_MASK & config;
+            if (mustHaveGetter) {
+                assert.isTrue(isObject$1(descriptor) && isFunction(descriptor.get), "Missing getter for property " + propName + " decorated with @api in " + target);
+            }
+            if (mustHaveSetter) {
+                assert.isTrue(isObject$1(descriptor) && isFunction(descriptor.set), "Missing setter for property " + propName + " decorated with @api in " + target);
+                assert.isTrue(mustHaveGetter, "Missing getter for property " + propName + " decorated with @api in " + target + ". You cannot have a setter without the corresponding getter.");
+            }
+        }
+        // if it is configured as an accessor it must have a descriptor
+        return createPublicAccessorDescriptor(target, propName, descriptor);
+    }
+    else {
+        return createPublicPropertyDescriptor(target, propName, descriptor);
     }
 }
 var vmBeingUpdated = null;
@@ -2858,9 +2918,8 @@ function prepareForPropUpdate(vm) {
     }
     vmBeingUpdated = vm;
 }
-// TODO: how to allow symbols as property keys?
 function createPublicPropertyDescriptor(proto, key, descriptor) {
-    defineProperty(proto, key, {
+    return {
         get: function () {
             var vm = getCustomElementVM(this);
             {
@@ -2909,17 +2968,17 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
             }
         },
         enumerable: isUndefined(descriptor) ? true : descriptor.enumerable,
-    });
+    };
 }
-function createPublicAccessorDescriptor(proto, key, descriptor) {
+function createPublicAccessorDescriptor(Ctor, key, descriptor) {
     var get = descriptor.get, set = descriptor.set, enumerable = descriptor.enumerable;
     if (!isFunction(get)) {
         {
-            assert.fail("Invalid attempt to create public property descriptor " + key + " in " + proto + ". It is missing the getter declaration with @api get " + key + "() {} syntax.");
+            assert.fail("Invalid attempt to create public property descriptor " + key + " in " + Ctor + ". It is missing the getter declaration with @api get " + key + "() {} syntax.");
         }
         throw new TypeError();
     }
-    defineProperty(proto, key, {
+    return {
         get: function () {
             {
                 var vm = getCustomElementVM(this);
@@ -2961,7 +3020,7 @@ function createPublicAccessorDescriptor(proto, key, descriptor) {
             }
         },
         enumerable: enumerable,
-    });
+    };
 }
 
 /**
@@ -2973,8 +3032,6 @@ function createPublicAccessorDescriptor(proto, key, descriptor) {
  * shape of a component. It is also used internally to apply extra optimizations.
  */
 var CtorToDefMap = new WeakMap();
-var COMPUTED_GETTER_MASK = 1;
-var COMPUTED_SETTER_MASK = 2;
 function propertiesReducer(seed, propName) {
     seed[propName] = {
         config: 3,
@@ -2985,12 +3042,22 @@ function propertiesReducer(seed, propName) {
 }
 var reducedDefaultHTMLPropertyNames = ArrayReduce.call(defaultDefHTMLPropertyNames, propertiesReducer, create(null));
 var HTML_PROPS = ArrayReduce.call(getOwnPropertyNames(GlobalAOMProperties), propertiesReducer, reducedDefaultHTMLPropertyNames);
+function getCtorProto(Ctor) {
+    var proto = getPrototypeOf(Ctor);
+    // The compiler produce AMD modules that do not support circular dependencies
+    // We need to create an indirection to circumvent those cases.
+    // We could potentially move this check to the definition
+    if (hasOwnProperty.call(proto, '__circular__')) {
+        proto = proto();
+    }
+    return proto;
+}
 function isElementComponent(Ctor, protoSet) {
     protoSet = protoSet || [];
     if (!Ctor || ArrayIndexOf.call(protoSet, Ctor) >= 0) {
         return false; // null, undefined, or circular prototype definition
     }
-    var proto = getPrototypeOf(Ctor);
+    var proto = getCtorProto(Ctor);
     if (proto === LWCElement) {
         return true;
     }
@@ -3012,65 +3079,31 @@ function createComponentDef(Ctor) {
     var wire$$1 = getWireHash(Ctor);
     var track$$1 = getTrackHash(Ctor);
     var proto = Ctor.prototype;
-    for (var propName in props) {
-        var propDef = props[propName];
-        // initializing getters and setters for each public prop on the target prototype
-        var descriptor = getOwnPropertyDescriptor(proto, propName);
-        var config = propDef.config;
-        if (COMPUTED_SETTER_MASK & config || COMPUTED_GETTER_MASK & config) {
-            {
-                assert.invariant(!descriptor || (isFunction(descriptor.get) || isFunction(descriptor.set)), "Invalid " + name + ".prototype." + propName + " definition, it cannot be a prototype definition if it is a public property. Instead use the constructor to define it.");
-                var mustHaveGetter = COMPUTED_GETTER_MASK & config;
-                var mustHaveSetter = COMPUTED_SETTER_MASK & config;
-                if (mustHaveGetter) {
-                    assert.isTrue(isObject$1(descriptor) && isFunction(descriptor.get), "Missing getter for property " + propName + " decorated with @api in " + name);
+    var decoratorMap = create(null);
+    // TODO: eventually, the compiler should do this work
+    {
+        for (var propName in props) {
+            decoratorMap[propName] = api$1;
+        }
+        if (wire$$1) {
+            for (var propName in wire$$1) {
+                var wireDef = wire$$1[propName];
+                if (wireDef.method) {
+                    // for decorated methods we need to do nothing
+                    continue;
                 }
-                if (mustHaveSetter) {
-                    assert.isTrue(isObject$1(descriptor) && isFunction(descriptor.set), "Missing setter for property " + propName + " decorated with @api in " + name);
-                    assert.isTrue(mustHaveGetter, "Missing getter for property " + propName + " decorated with @api in " + name + ". You cannot have a setter without the corresponding getter.");
-                }
+                decoratorMap[propName] = wire(wireDef.adapter, wireDef.params);
             }
-            // if it is configured as an accessor it must have a descriptor
-            createPublicAccessorDescriptor(proto, propName, descriptor);
         }
-        else {
-            createPublicPropertyDescriptor(proto, propName, descriptor);
+        if (track$$1) {
+            for (var propName in track$$1) {
+                decoratorMap[propName] = track;
+            }
         }
+        decorate(Ctor, decoratorMap);
     }
-    if (wire$$1) {
-        for (var propName in wire$$1) {
-            if (wire$$1[propName].method) {
-                // for decorated methods we need to do nothing
-                continue;
-            }
-            var descriptor = getOwnPropertyDescriptor(proto, propName);
-            // TODO: maybe these conditions should be always applied.
-            {
-                var _a = descriptor || EmptyObject, get = _a.get, set = _a.set, configurable = _a.configurable, writable = _a.writable;
-                assert.isTrue(!get && !set, "Compiler Error: A decorator can only be applied to a public field.");
-                assert.isTrue(configurable !== false, "Compiler Error: A decorator can only be applied to a configurable property.");
-                assert.isTrue(writable !== false, "Compiler Error: A decorator can only be applied to a writable property.");
-            }
-            // initializing getters and setters for each public prop on the target prototype
-            createWiredPropertyDescriptor(proto, propName, descriptor);
-        }
-    }
-    if (track$$1) {
-        for (var propName in track$$1) {
-            var descriptor = getOwnPropertyDescriptor(proto, propName);
-            // TODO: maybe these conditions should be always applied.
-            {
-                var _b = descriptor || EmptyObject, get = _b.get, set = _b.set, configurable = _b.configurable, writable = _b.writable;
-                assert.isTrue(!get && !set, "Compiler Error: A decorator can only be applied to a public field.");
-                assert.isTrue(configurable !== false, "Compiler Error: A decorator can only be applied to a configurable property.");
-                assert.isTrue(writable !== false, "Compiler Error: A decorator can only be applied to a writable property.");
-            }
-            // initializing getters and setters for each public prop on the target prototype
-            createTrackedPropertyDescriptor(proto, propName, descriptor);
-        }
-    }
-    var connectedCallback = proto.connectedCallback, disconnectedCallback = proto.disconnectedCallback, renderedCallback = proto.renderedCallback, errorCallback = proto.errorCallback;
-    var superProto = getPrototypeOf(Ctor);
+    var connectedCallback = proto.connectedCallback, disconnectedCallback = proto.disconnectedCallback, renderedCallback = proto.renderedCallback, errorCallback = proto.errorCallback, render = proto.render;
+    var superProto = getCtorProto(Ctor);
     var superDef = superProto !== LWCElement ? getComponentDef(superProto) : null;
     if (!isNull(superDef)) {
         props = assign(create(null), superDef.props, props);
@@ -3080,9 +3113,10 @@ function createComponentDef(Ctor) {
         disconnectedCallback = disconnectedCallback || superDef.disconnectedCallback;
         renderedCallback = renderedCallback || superDef.renderedCallback;
         errorCallback = errorCallback || superDef.errorCallback;
+        render = render || superDef.render;
     }
     props = assign(create(null), HTML_PROPS, props);
-    var descriptors = createDescriptorMap(props, methods);
+    var descriptors = createCustomElementDescriptorMap(props, methods);
     var def = {
         name: name,
         wire: wire$$1,
@@ -3094,6 +3128,7 @@ function createComponentDef(Ctor) {
         disconnectedCallback: disconnectedCallback,
         renderedCallback: renderedCallback,
         errorCallback: errorCallback,
+        render: render,
     };
     {
         freeze(Ctor.prototype);
@@ -3111,18 +3146,23 @@ function createComponentDef(Ctor) {
 }
 function createGetter(key) {
     return function () {
-        return getCustomElementComponent(this)[key];
+        var vm = getCustomElementVM(this);
+        var getHook = vm.getHook;
+        return getHook(vm.component, key);
     };
 }
 function createSetter(key) {
     return function (newValue) {
-        getCustomElementComponent(this)[key] = newValue;
+        var vm = getCustomElementVM(this);
+        var setHook = vm.setHook;
+        setHook(vm.component, key, newValue);
     };
 }
-function createMethodCaller(key) {
+function createMethodCaller(method) {
     return function () {
-        var component = getCustomElementComponent(this);
-        return component[key].apply(component, ArraySlice$1.call(arguments));
+        var vm = getCustomElementVM(this);
+        var callHook = vm.callHook;
+        return callHook(vm.component, method, ArraySlice$1.call(arguments));
     };
 }
 function getAttributePatched(attrName) {
@@ -3199,7 +3239,7 @@ function prepareForAttributeMutationFromTemplate(elm, key) {
         controlledAttributeName = key;
     }
 }
-function createDescriptorMap(publicProps, publicMethodsConfig) {
+function createCustomElementDescriptorMap(publicProps, publicMethodsConfig) {
     // replacing mutators and accessors on the element itself to catch any mutation
     var descriptors = {
         getAttribute: {
@@ -3233,7 +3273,7 @@ function createDescriptorMap(publicProps, publicMethodsConfig) {
     // expose public methods as props on the Element
     for (var key in publicMethodsConfig) {
         descriptors[key] = {
-            value: createMethodCaller(key),
+            value: createMethodCaller(publicMethodsConfig[key]),
             configurable: true,
         };
     }
@@ -3295,11 +3335,10 @@ function getPublicMethodsHash(target) {
         return EmptyObject;
     }
     return publicMethods.reduce(function (methodsHash, methodName) {
-        methodsHash[methodName] = 1;
         {
             assert.isTrue(isFunction(target.prototype[methodName]), "Component \"" + target.name + "\" should have a method `" + methodName + "` instead of " + target.prototype[methodName] + ".");
-            freeze(target.prototype[methodName]);
         }
+        methodsHash[methodName] = target.prototype[methodName];
         return methodsHash;
     }, create(null));
 }
@@ -4039,6 +4078,15 @@ var patchChildren = patchVNode.children;
 
 var idx = 0;
 var uid$1 = 0;
+function callHook(cmp, fn, args) {
+    return fn.apply(cmp, args);
+}
+function setHook(cmp, prop, newValue) {
+    cmp[prop] = newValue;
+}
+function getHook(cmp, prop) {
+    return cmp[prop];
+}
 var OwnerKey = usesNativeSymbols ? Symbol('key') : '$$OwnerKey$$';
 function addInsertionIndex(vm) {
     {
@@ -4147,6 +4195,9 @@ function createVM(tagName, elm, cmpSlots) {
         cmpListener: undefined,
         cmpTemplate: undefined,
         cmpRoot: undefined,
+        callHook: callHook,
+        setHook: setHook,
+        getHook: getHook,
         component: undefined,
         children: EmptyArray,
         hostAttrs: create(null),
@@ -4492,8 +4543,9 @@ exports.api = api$1;
 exports.track = track;
 exports.readonly = readonly;
 exports.wire = wire;
+exports.decorate = decorate;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.20.1 */
+/** version: 0.20.3 */

@@ -51,41 +51,23 @@ public class DefRefDelegate implements DefinitionReference {
     private static final long serialVersionUID = 781643093362675129L;
 
     private DefinitionReference componentDefRef;
-    private DefinitionReference moduleDefRef = null;
-    private transient Boolean switchable = null;
+    private transient DefinitionReference actualReference = null;
 
     public DefRefDelegate(ComponentDefRef componentDefRef) throws DefinitionNotFoundException {
         this.componentDefRef = componentDefRef;
     }
 
-    private void processReferences() throws DefinitionNotFoundException {
-        this.switchable = false;
-
+    private void processReferences() {
         DefinitionService definitionService = Aura.getDefinitionService();
         DefDescriptor<ModuleDef> moduleDefDescriptor = definitionService.getDefDescriptor(this.componentDefRef.getDescriptor(),
                 DefDescriptor.MARKUP_PREFIX, ModuleDef.class);
 
         boolean moduleExists = definitionService.exists(moduleDefDescriptor);
-        boolean componentExists = definitionService.exists(this.componentDefRef.getDescriptor());
-
-        if (!componentExists && !moduleExists) {
-            throw new DefinitionNotFoundException(this.componentDefRef.getDescriptor());
-        }
 
         if (moduleExists) {
-            this.moduleDefRef = createModuleDefRef(moduleDefDescriptor);
+            this.actualReference = createModuleDefRef(moduleDefDescriptor);
         } else {
-            this.moduleDefRef = this.componentDefRef;
-        }
-
-        if (!componentExists) {
-            // This allows NON existence of aura component of same name
-            // Remove to REQUIRE existence of aura component version
-            this.componentDefRef = this.moduleDefRef;
-        }
-
-        if (componentExists && moduleExists) {
-            this.switchable = true;
+            this.actualReference = this.componentDefRef;
         }
     }
 
@@ -251,24 +233,25 @@ public class DefRefDelegate implements DefinitionReference {
      * @return definition reference dependent on module enablement
      */
     public DefinitionReference select() {
-        if (this.switchable == null) {
-            try {
-                // build time compilation requires runtime operation since namespace and existing descriptor lookup
-                // is limited to the current maven module during build time
-                processReferences();
-            } catch (DefinitionNotFoundException dnfe) {
-                this.switchable = false;
+        if (this.actualReference == null) {
+            synchronized(this) {
+                if (this.actualReference == null) {
+                    // build time compilation requires runtime operation since namespace and existing descriptor lookup
+                    // is limited to the current maven module during build time
+                    processReferences();
+                }
             }
         }
-
-        if (this.switchable) {
-            return this.moduleDefRef;
-        }
-        return this.componentDefRef;
+        return this.actualReference;
     }
 
     @Override
     public Collection<PropertyReference> getPropertyReferences() {
         return select().getPropertyReferences();
+    }
+
+    @Override
+    public String toString() {
+        return "DefRefDelegate: " + this.actualReference;
     }
 }

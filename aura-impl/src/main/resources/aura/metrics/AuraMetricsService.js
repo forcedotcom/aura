@@ -997,6 +997,14 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
                 }
             }, this);
         }
+        var navigator = window["navigator"];
+        var conn = navigator && navigator["connection"];
+        if (conn && !bootstrap["connection"]) {
+            bootstrap["connection"] = {
+                "rtt": conn["rtt"],
+                "downlink": conn["downlink"]
+            };
+        }
     }
 
     return bootstrap;

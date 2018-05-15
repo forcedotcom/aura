@@ -106,6 +106,11 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     }
 
     @Override
+    public String getCustomElementName() {
+        return this.customElementName;
+    }
+
+    @Override
     public void serialize(Json json) throws IOException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         boolean compat = context.useCompatSource();

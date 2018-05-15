@@ -62,4 +62,10 @@ public interface ModuleDef extends PlatformDef {
      * @return
      */
     ModuleDesignDef getModuleDesignDef();
+
+    /**
+     * For Modules, you reference them in other modules using a custom-element-name syntax vs
+     * the standard prefix:name syntax. This will return that custom-element-name value.
+     */
+    String getCustomElementName();
 }

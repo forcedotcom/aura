@@ -487,6 +487,7 @@
         test : function(cmp) {
             $A.test.expectAuraWarning("unused configs");
             var action = $A.get("c.aura://ComponentController.getComponent");
+            var actionComplete = false;
             action.setParams({
                 "name" : "markup://loadLevelTest:serverComponent"
             });
@@ -494,12 +495,13 @@
                 if (a.getState() === "SUCCESS") {
                     // Here is where the config should normally be consumed
                 }
+                actionComplete = true;
             });
             $A.run(function(){
                 $A.enqueueAction(action);
             });
 
-            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
+            $A.test.addWaitFor(true, function(){return actionComplete}, function(){
                 // This test will fail if we don't get the warning specificed by the $A.test.expectAuraWarning()
                 // call above. This wait is just to ensure the Action code finishes.
             });

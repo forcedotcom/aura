@@ -94,6 +94,13 @@
         }
     },
 
+    testMultipleQueryParams: {
+        attributes : {textValue: 'visit www.salesforce.com/sfdc?attributes=1234&amp;foo=bar for more details'},
+        test: function(cmp){
+            this.assertLinksPresent(cmp, "href=\"http://www.salesforce.com/sfdc?attributes=1234&amp;foo=bar\"");
+        }
+    },
+
     testMailLink:{
         attributes : {textValue: 'contact dude@aura.com for more details'},
         test: function(cmp){

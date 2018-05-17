@@ -44,6 +44,6 @@ public interface TagConfig extends DesignElementDef {
      * @param defClass designElement class type
      * @return list of design elements of the class type
      */
-    <T extends DesignElementDef> List<T> getDesignElement(Class<T> defClass);
+    <T extends DesignElementDef> List<T> getDesignElement(Class<? extends DesignElementDef> defClass);
 
 }

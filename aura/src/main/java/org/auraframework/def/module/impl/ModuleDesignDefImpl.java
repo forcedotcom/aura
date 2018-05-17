@@ -38,7 +38,7 @@ public class ModuleDesignDefImpl implements ModuleDesignDef {
     }
 
     @Override
-    public TagConfigs configs() {
+    public TagConfigs getConfigs() {
        return tagConfigs;
     }
 
@@ -81,17 +81,18 @@ public class ModuleDesignDefImpl implements ModuleDesignDef {
             return this;
         }
         
-        public Builder setTagConfigs(TagConfigs tagConfigs) {
+        public Builder setDesignInfo(TagConfigs tagConfigs) {
             this.tagConfigs = tagConfigs;
             return this;
-        }
-
-        public TagConfigs getTagConfigs() {
-            return this.tagConfigs;
         }
 
         public ModuleDesignDefImpl build() throws QuickFixException {
             return new ModuleDesignDefImpl(this);
         }
     }
+
+	@Override
+	public TagConfig getConfig(String tagName) {
+		return tagConfigs.getConfig(tagName);
+	}
 }

@@ -29,12 +29,12 @@ public interface TagConfigs extends DesignElementDef {
      * The map can be empty when no configurations are available.
      * @return Map
      */
-    public Map<String, TagConfig> all();
+    public Map<String, TagConfig> getConfigs();
 
 	/**
     * Gets design configuration for given tag specified in <tagConfig> </tagConfig>
     * @param tagName String - represents a tag , ex - lightning__recordHome
     * @return config for the given tag if present , null otherwise.
     */
-    public TagConfig get(String tagName);
+    public TagConfig getConfig(String tagName);
 }

@@ -34,6 +34,7 @@ function InteropComponent(config) {
     this.shouldAutoDestroy = true;
     this.localIndex = {};
     this.valueProviders = {};
+    this.handlers = {};
     this.localId = config['localId'];
     this.attributeValueProvider = config['attributes']['valueProvider'];
     this.owner = $A.clientService.getCurrentAccessGlobalId();
@@ -396,6 +397,7 @@ InteropComponent.prototype.set = function (key, value) {
     var normalizedKey  = $A.expressionService.normalize(key);
     var path = normalizedKey.split('.');
     var provider = path.shift();
+    var oldValue;
 
     $A.assert(provider === 'v', 'This component does not allow mutations on controller actions');
     $A.assert(path.length === 1, 'This component does not allow set on nested properties');
@@ -410,11 +412,20 @@ InteropComponent.prototype.set = function (key, value) {
         );
         attrValue.value.set(value);
     } else if (attrValue && attrValue.getExpression) { // PRV
+        oldValue = attrValue.evaluate();
         attrValue.set(value);
+
     } else { // set in case attribute was not explicitly set in markup
+        oldValue = this.attributes[expr];
         this.attributes[expr] = value;
         this.attributeChange(expr, value);
     }
+
+    var changed = $A.util.isArray(value) || $A.util.isObject(value) || oldValue !== value;
+    if (changed) {
+        this.fireChangeEvent(key, oldValue, value);
+    }
+
 };
 
 InteropComponent.prototype.attachOnChangeToElement = function (element) {
@@ -677,24 +688,6 @@ InteropComponent.prototype.getSuperest = function(){
 InteropComponent.prototype.implementsDirectly = function(){
     this.raiseInvalidInteropApi('implementsDirectly', arguments);
 };
-
-/**
- * @public
- * @export
- */
-InteropComponent.prototype.addHandler = function(){
-    this.raiseInvalidInteropApi('addHandler', arguments);
-};
-
-/**
- * @public
- * @export
- */
-InteropComponent.prototype.addValueHandler = function(){
-    this.raiseInvalidInteropApi('addValueHandler', arguments);
-};
-
-InteropComponent.prototype.removeValueHandler = function() {};
 
 /**
  * @protected

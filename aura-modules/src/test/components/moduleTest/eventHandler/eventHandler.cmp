@@ -1,5 +1,12 @@
 <aura:component render="client">
     <aura:attribute name="somethingName" type="String"/>
-    <moduleTest:eventHandlerTests onsomething="{! c.handleSomething }"
-                                  onchange="{! c.handleChange }"/>
+    <aura:attribute name="testValue" type="String" default="original"/>
+    <aura:attribute name="handlerCalled" type="Boolean" default="false"/>
+
+    <moduleTest:eventHandlerTests
+    	aura:id="targetCmp"
+    	value="{!v.testValue}"
+    	onsomething="{! c.handleSomething }"
+		onchange="{! c.handleChange }"
+	/>
 </aura:component>

@@ -1,8 +1,7 @@
 ({
-  init: function(cmp, event, helper) {
-      helper.init();
+  init: function(cmp) {
 
-      var rows = 10;
+      var rows = 100;
       var months = [
         "January",
         "February",

@@ -1,0 +1,22 @@
+<template>
+
+  <table>
+    <thead>
+      <tr>
+        <template for:each={headers} for:item="header">
+          <th key={header.id}>{header.value}</th>
+        </template>
+      </tr>
+    </thead>
+    <tbody>
+      <template for:each={content} for:item="row">
+        <tr key={row.id}>
+          <template for:each={row.value} for:item="col">
+            <td key={col.id}>{col.value}</td>
+          </template>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+</template>

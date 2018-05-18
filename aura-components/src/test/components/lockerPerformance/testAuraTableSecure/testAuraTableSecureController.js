@@ -1,9 +1,8 @@
 ({
   init: function(cmp) {
-    var headers = cmp.get("v.headers");
-    var content = cmp.get("v.content");
-    if ($A.util.isEmpty(headers) || $A.util.isEmpty(content)) {
-      headers = [
+
+      var rows = 10;
+      var months = [
         "January",
         "February",
         "March",
@@ -17,17 +16,21 @@
         "November",
         "December"
       ];
-      var n = 10;
-      content = Array.apply(null, { length: n }).map(function(x, i) {
-        return Array.apply(null, { length: headers.length }).map(function(
-          y,
-          j
-        ) {
-          return 12 * i + j + 1;
-        });
-      });
+
+      var headers = months;
+
+      var content = [];
+      for (var i = 0; i < rows; i++) {
+        var row = [];
+        for (var j = 0; j < months.length; j++) {
+          var col = 12 * i + j + 1;
+          row.push(col);
+        }
+        content.push(row);
+      }
+
       cmp.set("v.headers", headers);
       cmp.set("v.content", content);
     }
   }
-});
+})

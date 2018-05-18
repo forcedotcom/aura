@@ -1,0 +1,11 @@
+<aura:component access="global">
+
+  <aura:attribute name="row" type="Object[]"/>
+
+  <tr>
+    <aura:iteration items="{!v.row}" var="col">
+      <td>{!col}</td>
+    </aura:iteration>
+  </tr>
+
+</aura:component>

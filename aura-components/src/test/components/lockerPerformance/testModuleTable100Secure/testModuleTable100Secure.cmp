@@ -1,0 +1,3 @@
+<aura:component access="global">
+    <moduleTest:testModuleTable100Secure/>
+</aura:component>

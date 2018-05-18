@@ -1,4 +1,4 @@
-// Measure the cost of creating Aura components.
+// Measure the cost of creating components.
 /* exported createAuraTableComponentTest */
 
 function createAuraTableComponentTest(count, validate) {

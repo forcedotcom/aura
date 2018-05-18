@@ -1,0 +1,23 @@
+<aura:component access="global" implements="aura:requireLocker">
+
+  <aura:attribute name="headers" type="String[]"/>
+  <aura:attribute name="content" type="Object[]"/>
+
+  <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+  <table>
+    <thead>
+      <tr>
+        <aura:iteration items="{!v.headers}" var="header">
+          <th>{!header}</th>
+        </aura:iteration>
+      </tr>
+    </thead>
+    <tbody>
+      <aura:iteration items="{!v.content}" var="row">
+        <lockerPerformance:testAuraTableRowSecure row="{!row}"/>
+      </aura:iteration>
+    </tbody>
+  </table>
+
+</aura:component>

@@ -94,6 +94,7 @@ public class ModuleImpl implements Module {
         instanceStack.pushInstance(this, descriptor);
         this.globalId = getNextGlobalId(context);
 
+        // if there is an aura equivalent to this module, ensures exposed attributes in both are equivalent
         DefDescriptor<ComponentDef> compDesc = definitionService.getDefDescriptor(descriptor,
                 DefDescriptor.MARKUP_PREFIX, ComponentDef.class);
         if (compDesc.exists()) {

@@ -28,6 +28,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.instance.Instance;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -97,7 +98,7 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
             return config;
         }
 
-        List<BaseComponent<?, ?>> components = new ArrayList<>();
+        List<Instance> components = new ArrayList<>();
         List<?> list = (List<?>) config;
         AuraContext context = Aura.getContextService().getCurrentContext();
         InstanceService instanceService = Aura.getInstanceService();
@@ -109,14 +110,10 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
                     components.add((BaseComponent<?, ?>) defRef);
                 } else if (defRef instanceof DefinitionReference) {
                     DefinitionReference dr = (DefinitionReference) defRef;
-                    if (dr.type() == DefType.COMPONENT) {
-                        context.getInstanceStack().setAttributeIndex(idx);
-                        //components.add(((ComponentDefRef) defRef).newInstance(valueProvider));
-                        components.add((BaseComponent<?, ?>) instanceService.getInstance((ComponentDefRef) dr.get(), valueProvider));
-                        context.getInstanceStack().clearAttributeIndex(idx);
-                        idx += 1;
-                    }
-                    // TODO ModuleDefRef
+                    context.getInstanceStack().setAttributeIndex(idx);
+                    components.add(instanceService.getInstance(dr.get(), valueProvider));
+                    context.getInstanceStack().clearAttributeIndex(idx);
+                    idx += 1;
                 } else {
                     throw new InvalidDefinitionException(String.format("Expected Component, received %s", defRef
                             .getClass().getName()), getLocation());

@@ -15,15 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <!-- These attributes are not used in the test but must match what the module version of this component exposes -->
-    <aura:attribute name="literal" type="String"/>
-    <aura:attribute name="bound" type="String"/>
-    <aura:attribute name="unbound" type="String"/>
-    <aura:attribute name="expression" type="String"/>
-    <aura:attribute name="nested" type="String"/>
-    <aura:attribute name="testRenderer" type="Boolean"/>
+<aura:component description="Component that is also present as a module">
+    <aura:attribute name="text" type="String"/>
 
-    <!--This component is the twin of securemoduletest/simple-cmp and its is not lockerized-->
-    I am not lockerized.
+    <div>[moduletest:fromServerWithAuraEquivalent] {text}</div>
 </aura:component>

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-05-11
- * Version: 0.4.11
+ * Generated: 2018-05-18
+ * Version: 0.4.12
  */
 
 (function (exports) {
@@ -4361,7 +4361,7 @@ function tamperProofProp(obj, prop) {
 function repairDataProperties(realmRec) {
   const { unsafeGlobal: g } = realmRec;
 
-  ['Object', 'Array', 'Function'].forEach(name => {
+  ['Object', 'Array', 'Function', 'Promise'].forEach(name => {
     tamperProofAll(g[name].prototype);
   });
 

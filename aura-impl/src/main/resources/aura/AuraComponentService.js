@@ -416,10 +416,11 @@ AuraComponentService.prototype.createInternalConfig = function (config) {
     $A.assert(descriptor.indexOf("markup://") === 0, "Descriptor needs to be of the format markup://ns:name");
 
     return {
-        "componentDef" : this.createDescriptorConfig(config["descriptor"]),
-        "localId"      : config["localId"] || config["aura:id"],
-        "flavor"       : config["flavor"],
-        "attributes"   : {
+        "componentDef"     : this.createDescriptorConfig(config["descriptor"]),
+        "localId"          : config["localId"] || config["aura:id"],
+        "flavor"           : config["flavor"],
+        "skipCreationPath" : config["skipCreationPath"],
+        "attributes"       : {
             "values"        : config["attributes"],
             "valueProvider" : config["valueProvider"]
         }

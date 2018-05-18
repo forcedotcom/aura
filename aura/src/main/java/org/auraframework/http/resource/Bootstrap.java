@@ -89,12 +89,12 @@ public class Bootstrap extends AuraResourceImpl {
             if (!configAdapter.validateBootstrap(jwtToken)) {
                 throw new AuraJWTError("Invalid jwt parameter");
             }
+            definitionService.updateLoaded(app);
             setCacheHeaders(response, app);
             Instance<?> appInstance = null;
             if (!configAdapter.isBootstrapModelExclusionEnabled()) {
                 appInstance = instanceService.getInstance(app, getComponentAttributes(request));
             }
-            definitionService.updateLoaded(app);
             loadLabels(context);
 
             JsonSerializationContext serializationContext = context.getJsonSerializationContext();

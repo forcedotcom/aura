@@ -2257,8 +2257,10 @@ AuraClientService.prototype.postProcess = function() {
             this.process();
         } catch (e) {
             throw (e instanceof $A.auraError) ? e : new $A.auraError("AuraClientService.postProcess: error in processing", e);
+        } finally {
+            this.auraStack.pop();
         }
-        this.auraStack.pop();
+ 
     }
 };
 

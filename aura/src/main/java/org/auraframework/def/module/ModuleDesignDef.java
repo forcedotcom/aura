@@ -40,13 +40,5 @@ public interface ModuleDesignDef extends Serializable {
      * Returns all the design configurations with in <tagConfigs></tagConfigs>in the -meta.xml
      * @return TagConfigs {@link TagConfigs}
      */
-    public TagConfigs getConfigs();
-
-    /**
-     * Gets design configuration for given tag specified in <tagConfig> </tagConfig>
-     * @param tagName String - represents a tag , ex - lightning__recordHome
-     * @return {@link TagConfig}  for the given tag if present , null otherwise.
-     */
-    public TagConfig getConfig(String tagName);
-
+    public TagConfigs configs();
 }

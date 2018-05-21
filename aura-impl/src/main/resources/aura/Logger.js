@@ -158,7 +158,7 @@ Logger.prototype.reportError = function(e, action, level, foreground) {
     }
 
     if (!e["component"] || !e["stacktraceIdGen"]) {
-        var component = e.findComponentFromStackTrace();
+        var component = e["component"] || e.findComponentFromStackTrace();
         e.setComponent(component);
     }
 

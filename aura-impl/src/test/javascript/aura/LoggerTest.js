@@ -640,14 +640,30 @@ Test.Aura.LoggerTest = function() {
         }
 
         [Fact]
-        function SetsComponentForErrorWithoutStacktraceIdGen() {
+        function SetsComponentFromStackTraceForErrorWithoutIdGenAndComponent() {
             var target = new Aura.Utils.Logger();
             var expected = "component";
             var actual;
 
             var error = new Error("Test Error");
-            error.component = "old-component";
             error.findComponentFromStackTrace = function() { return expected; };
+            error.setComponent = function(cmp) { actual = cmp; };
+
+            mockAura(function() {
+                target.reportError(error);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function SetsComponentInErrorForErrorWithoutStacktraceIdGen() {
+            var target = new Aura.Utils.Logger();
+            var expected = "component";
+            var actual;
+
+            var error = new Error("Test Error");
+            error["component"] = expected;
             error.setComponent = function(cmp) { actual = cmp; };
 
             mockAura(function() {

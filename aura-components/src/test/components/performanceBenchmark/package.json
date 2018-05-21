@@ -1,0 +1,20 @@
+{
+    "name": "performance-benchmark",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+      "start": "best",
+      "test": "echo 'No unit test in this package'",
+      "perf": "yarn perf:clean; yarn perf:prepare; best",
+      "perf:clean": "rm -rf __benchmarks_results__; rm -f public/libs/js/aura*",
+      "perf:prepare": "node scripts/prepare_run.js",
+      "perf:open": "open __benchmarks_results__/aura-framework-benchmark/*/artifacts/*.html"
+    },
+    "devDependencies": {
+      "@best/frontend": "0.5.1",
+      "@best/runner-headless": "0.5.1",
+      "@best/runner-remote": "0.5.1",
+      "best-cli": "0.5.1"
+    },
+    "dependencies": {}
+  }

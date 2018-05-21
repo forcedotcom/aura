@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>{{benchmarkName}}</title>
+    <script src="{{publicFolder}}/libs/js/aura_dev_compat.js"></script>
+    <script src="{{publicFolder}}/libs/js/app.js"></script>
+  </head>
+
+  <body>
+    <div id="main"></div>
+    <script src="{{publicFolder}}/libs/js/inline.js"></script>
+    <script>window.BEST_CONFIG = { benchmarkName: "{{benchmarkName}}" }</script>
+    <script src="{{benchmarkJS}}" type="text/javascript"></script>
+  </body>
+</html>

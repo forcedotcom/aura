@@ -674,7 +674,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * Checks to see if the specified column has a handle attached
          */
         hasHandle : function(column) {
-            return column ? (column.querySelector(HANDLE_CLASS) !== null) : false;
+            return column ? (column.querySelector('.' + HANDLE_CLASS) !== null) : false;
         },
 
         /**

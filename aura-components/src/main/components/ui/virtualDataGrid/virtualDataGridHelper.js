@@ -615,7 +615,7 @@
      * rerender the resizer handles natively. 
      */
     hasResizerHandles : function(cmp) {
-    	var handles = cmp.getElement().querySelectorAll(".handle").length;
+    	var handles = cmp.getElement().querySelectorAll("thead .handle").length;
     	var headers = cmp.get("v.headerColumns").length;
     	return handles === headers;
     },

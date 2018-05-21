@@ -633,7 +633,7 @@
      */
     hasResizerHandles : function(cmp) {
         // TODO: Use getHandles from the resizer instead of grabbing the elements ourselves
-        var handles = cmp.getElement().querySelectorAll(".slds-resizable").length;
+        var handles = cmp.getElement().querySelectorAll("thead .slds-resizable").length;
         var headers = cmp.get("v.headerColumns").length;
         return handles === headers;
     },

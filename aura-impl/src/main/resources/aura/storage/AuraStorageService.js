@@ -18,7 +18,7 @@
  * @constructor
  * @export
  */
-function AuraStorageService(){
+function AuraStorageService() {
     this.storages = {};
     this.adapters = {};
     this.version = "";
@@ -87,19 +87,33 @@ AuraStorageService.prototype.initStorage = function(config) {
     $A.assert($A.util.isString(config["name"]) && config["name"], "name must be a non-empty string");
     $A.assert(!this.storages[config["name"]], "Storage named '" + config["name"] + "' already exists");
 
+    
+    // There's a boundary condition where expiration could be between Number.MAX_VALUE/1000 and Number.MAX_VALUE.
+    // AuraStorage.js config takes the expiration and multiplies by 1000.
+    // See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_VALUE
+    var expiration = 10, MAX_EXPIRATOIN = Number.MAX_VALUE / 1000;
+    if ($A.util.isFiniteNumber(config["expiration"]) && config["expiration"] > 0) {
+        expiration = config["expiration"];
+
+        // if it's an extremely large number, divide by 1000 to represent as seconds instead of ms.
+        if (expiration > MAX_EXPIRATOIN) {
+            expiration = MAX_EXPIRATOIN;
+        }
+    }
+
     // default values come from <auraStorage:init/>
     var validatedConfig = {
         "name": config["name"],
         "persistent": !!config["persistent"],
         "secure": !!config["secure"],
         "maxSize": $A.util.isFiniteNumber(config["maxSize"]) && config["maxSize"] > 0 ? config["maxSize"] : 1000 * 1024,
-        "expiration": $A.util.isFiniteNumber(config["expiration"]) && config["expiration"] > 0 ? config["expiration"] : 10,
+        "expiration": expiration,
         "debugLogging": !!config["debugLogging"],
         "clearOnInit": $A.util.isBoolean(config["clearOnInit"]) ? config["clearOnInit"] : true,
-         // falsey values, like <auraStorage:init/>'s default empty string, are treated as not specified
+        // falsey values, like <auraStorage:init/>'s default empty string, are treated as not specified
         "version": config["version"] ? "" + config["version"] : this.version,
         "isolationKey": this.isolationKey,
-        "autoRefreshInterval":  $A.util.isFiniteNumber(config["autoRefreshInterval"]) && config["autoRefreshInterval"] >= 0 ? config["autoRefreshInterval"] : 30,
+        "autoRefreshInterval": $A.util.isFiniteNumber(config["autoRefreshInterval"]) && config["autoRefreshInterval"] >= 0 ? config["autoRefreshInterval"] : 30,
         "partitionName": this.partitionName
     };
 

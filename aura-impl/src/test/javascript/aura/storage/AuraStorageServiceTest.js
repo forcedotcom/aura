@@ -295,8 +295,37 @@ Test.Aura.Storage.AuraStorageServiceTest = function() {
         }
 
         [Fact]
+        function InfiniteExpirationDefaults10() {
+            mockA(function() {
+                targetService.initStorage({name:"name", expiration:Number.POSITIVE_INFINITY});
+            });
+
+            Assert.Equal(10, configPassedToAuraStorage.expiration);
+        }
+
+        [Fact]
         function ExpirationRespectsArgument() {
             var expected = 25;
+            mockA(function() {
+                targetService.initStorage({name:"name",expiration:expected});
+            });
+
+            Assert.Equal(expected, configPassedToAuraStorage.expiration);
+        }
+
+        [Fact]
+        function NumberMaxExpirationUsesMaxExpirationValue() {
+            var expected = Number.MAX_VALUE / 1000;
+            mockA(function() {
+                targetService.initStorage({name:"name",expiration:Number.MAX_VALUE});
+            });
+
+            Assert.Equal(expected, configPassedToAuraStorage.expiration);
+        }
+
+        [Fact]
+        function MaxExpirationUsesMaxExpirationValue() {
+            var expected = Number.MAX_VALUE / 1000;
             mockA(function() {
                 targetService.initStorage({name:"name",expiration:expected});
             });

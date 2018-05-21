@@ -26,12 +26,165 @@
  * @constructor
  * @export
  */
-Aura.Utils.Duration = function Duration(momentDuration) {
-    this.duration = momentDuration;
+Aura.Utils.Duration = function Duration(num, unit, moment) {
+    // still needed for relative time strings
+    this.momentDuration = moment["duration"](num, unit);
+    this.isValid = true;
+
+    if (typeof num !== "number") {
+        this.isValid = false;
+        return;
+    }
+
+    unit = unit? $A.localizationService.normalizeDateTimeUnit(unit) : "millisecond";
+
+    var milliseconds, days, months;
+    switch(unit) {
+        // Time
+        case "millisecond": milliseconds = num; break;
+        case "second": milliseconds = num * 1e3; break;
+        case "minute": milliseconds = num * 6e4; break; // 60 * 1000
+        case "hour": milliseconds = num * 36e5; break; // 60 * 60 * 1000
+
+        // days -> month, days -> years
+        case "day": days = num; break;
+        case "week": days = num * 7; break;
+
+        // year -> days, month -> days
+        case "month": months = num; break;
+        case "year": months = num * 12;
+    }
+
+    // If unit is not supported, set as 0
+    this.duration = {
+        "millisecond": milliseconds || 0,
+        "day": days || 0,
+        "month": months || 0
+    };
+
+    this.data = undefined;
 };
 
-Aura.Utils.Duration.prototype.getMomentDuration = function() {
-    return this.duration;
+/**
+ * Displays the time length of the duration.
+ *
+ * @param {Boolean} withSuffix - If true, returns value with the suffix
+ */
+Aura.Utils.Duration.prototype.displayDuration = function(withSuffix) {
+    // TODO: figure out if it is possible to support this by using labels
+    return this.momentDuration["humanize"](withSuffix);
+};
+
+/**
+ * Displays a length of time in given unit.
+ *
+ * @param {String} unit - A datetime unit. The default is millisecond. Options: year, month, week, day, hour, minute, second, millisecond
+ */
+Aura.Utils.Duration.prototype.asUnit = function(unit) {
+    if (!this.isValid) {
+        return NaN;
+    }
+
+    unit = unit? $A.localizationService.normalizeDateTimeUnit(unit) : "millisecond";
+
+    var days;
+    var milliseconds = this.duration["millisecond"];
+    if (unit === "month" || unit === "year") {
+        days = this.duration["day"] +  (milliseconds / 864e5); // 24 * 60 * 60 * 1000
+        var months = this.duration["month"] + this.daysToMonths(days);
+        return unit === "month" ? months : months / 12;
+    } else {
+        days = this.duration["day"];
+        if (this.duration["month"]) {
+            days += Math.round(this.monthsToDays(this.duration["month"]));
+        }
+
+        switch (unit) {
+            case "week": return (days / 7) + (milliseconds / 6048e5);   // 24 * 60 * 60 * 1000 * 7
+            case "day": return days + (milliseconds / 864e5);           // 24 * 60 * 60 * 1000
+            case "hour": return (days * 24) + (milliseconds / 36e5);    // 60 * 60 * 1000
+            case "minute": return (days * 1440) + (milliseconds / 6e4);
+            case "second": return (days * 86400) + (milliseconds / 1000);
+            case "millisecond": return Math.floor(days * 864e5) + milliseconds;
+
+            // if unit is not supported
+            default: return NaN;
+        }
+    }
+};
+
+/**
+ * Gets the number of time in given unit in the duration.
+ *
+ * @param {String} unit - A datetime unit. The default is millisecond. Options: year, month, day, hour, minute, second, millisecond
+ */
+Aura.Utils.Duration.prototype.getUnit = function(unit) {
+    if (!this.isValid) {
+        return NaN;
+    }
+
+    // if data has never been populated
+    if (this.data === undefined) {
+        this.data = {};
+
+        var milliseconds = this.duration["millisecond"];
+        this.data["millisecond"] = milliseconds % 1000;
+
+        var seconds = this.absFloor(milliseconds / 1000);
+        this.data["second"] = seconds % 60;
+
+        var minutes = this.absFloor(seconds / 60);
+        this.data["minute"] = minutes % 60;
+
+        var hours = this.absFloor(minutes / 60);
+        this.data["hour"] = hours % 24;
+
+        var days = this.absFloor(hours / 24);
+        days += this.duration["day"];
+
+        var months = this.absFloor(this.daysToMonths(days)) + this.duration["month"];
+        this.data["day"] = days - this.absCeil(this.monthsToDays(months));
+
+        this.data["month"] = months % 12;
+        this.data["year"] = this.absFloor(months / 12);
+    }
+
+    unit = unit? $A.localizationService.normalizeDateTimeUnit(unit) : "millisecond";
+
+    var num = this.data[unit];
+    return num === undefined? NaN : num;
+};
+
+/**
+ * Converts days to months.
+ *
+ * @param {Number} days - the number of days
+ * @returns {Number} The number of months
+ *
+ * @private
+ */
+Aura.Utils.Duration.prototype.daysToMonths = function(days) {
+    return days * 4800 / 146097;
+};
+
+/**
+ * Converts months to days.
+ *
+ * @param {Number} months - the number of months
+ * @returns {Number} The number of days
+ *
+ * @private
+ */
+Aura.Utils.Duration.prototype.monthsToDays = function(months) {
+    return months * 146097 / 4800;
+};
+
+Aura.Utils.Duration.prototype.absCeil = function(number) {
+    return number < 0? Math.floor(number) : Math.ceil(number);
+};
+
+Aura.Utils.Duration.prototype.absFloor = function(number) {
+    return number < 0?  Math.ceil(number) || 0 : Math.floor(number);
 };
 
 /**
@@ -42,7 +195,7 @@ Aura.Utils.Duration.prototype.getMomentDuration = function() {
 Aura.Utils.Duration.prototype.clone = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             null, "Duration.clone");
-    return this.duration["clone"]();
+    return this.momentDuration["clone"]();
 };
 
 /**
@@ -53,7 +206,7 @@ Aura.Utils.Duration.prototype.clone = function() {
 Aura.Utils.Duration.prototype.humanize = function(withSuffix) {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             null, "Duration.humanize");
-    return this.duration["humanize"](withSuffix);
+    return this.momentDuration["humanize"](withSuffix);
 };
 
 /**
@@ -64,7 +217,7 @@ Aura.Utils.Duration.prototype.humanize = function(withSuffix) {
 Aura.Utils.Duration.prototype.milliseconds = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationService.getMillisecondsInDuration()'", "Duration.milliseconds");
-    return this.duration["milliseconds"]();
+    return this.momentDuration["milliseconds"]();
 };
 
 /**
@@ -75,7 +228,7 @@ Aura.Utils.Duration.prototype.milliseconds = function() {
 Aura.Utils.Duration.prototype.asMilliseconds = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationService.displayDurationInMilliseconds()'", "Duration.asMilliseconds");
-    return this.duration["asMilliseconds"]();
+    return this.momentDuration["asMilliseconds"]();
 };
 
 /**
@@ -86,7 +239,7 @@ Aura.Utils.Duration.prototype.asMilliseconds = function() {
 Aura.Utils.Duration.prototype.seconds = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationSerivce.displayDurationInSeconds()'", "Duration.seconds");
-    return this.duration["seconds"]();
+    return this.momentDuration["seconds"]();
 };
 
 /**
@@ -97,7 +250,7 @@ Aura.Utils.Duration.prototype.seconds = function() {
 Aura.Utils.Duration.prototype.asSeconds = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationService.displayDurationInSeconds()'", "Duration.asSeconds");
-    return this.duration["asSeconds"]();
+    return this.momentDuration["asSeconds"]();
 };
 
 /**
@@ -108,7 +261,7 @@ Aura.Utils.Duration.prototype.asSeconds = function() {
 Aura.Utils.Duration.prototype.minutes = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationService.getMinutesInDuration()", "Duration.minutes");
-    return this.duration["minutes"]();
+    return this.momentDuration["minutes"]();
 };
 
 /**
@@ -119,7 +272,7 @@ Aura.Utils.Duration.prototype.minutes = function() {
 Aura.Utils.Duration.prototype.asMinutes = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationService.displayDurationInMinutes()'", "Duration.asMinutes");
-    return this.duration["asMinutes"]();
+    return this.momentDuration["asMinutes"]();
 };
 
 /**
@@ -130,7 +283,7 @@ Aura.Utils.Duration.prototype.asMinutes = function() {
 Aura.Utils.Duration.prototype.hours = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationService.getHoursInDuration()'", "Duration.hours");
-    return this.duration["hours"]();
+    return this.momentDuration["hours"]();
 };
 
 /**
@@ -141,7 +294,7 @@ Aura.Utils.Duration.prototype.hours = function() {
 Aura.Utils.Duration.prototype.asHours = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationService.displayDurationInHours()'", "Duration.asHours");
-    return this.duration["asHours"]();
+    return this.momentDuration["asHours"]();
 };
 
 /**
@@ -152,7 +305,7 @@ Aura.Utils.Duration.prototype.asHours = function() {
 Aura.Utils.Duration.prototype.days = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationService.getDaysInDuration()'", "Duration.days");
-    return this.duration["days"]();
+    return this.momentDuration["days"]();
 };
 
 /**
@@ -163,7 +316,7 @@ Aura.Utils.Duration.prototype.days = function() {
 Aura.Utils.Duration.prototype.asDays = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationService.displayDurationInDays()'", "Duration.asDays");
-    return this.duration["asDays"]();
+    return this.momentDuration["asDays"]();
 };
 
 /**
@@ -174,7 +327,7 @@ Aura.Utils.Duration.prototype.asDays = function() {
 Aura.Utils.Duration.prototype.weeks = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             null, "Duration.weeks");
-    return this.duration["weeks"]();
+    return this.momentDuration["weeks"]();
 };
 
 /**
@@ -185,7 +338,7 @@ Aura.Utils.Duration.prototype.weeks = function() {
 Aura.Utils.Duration.prototype.asWeeks = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             null, "Duration.asWeeks");
-    return this.duration["asWeeks"]();
+    return this.momentDuration["asWeeks"]();
 };
 
 /**
@@ -196,7 +349,7 @@ Aura.Utils.Duration.prototype.asWeeks = function() {
 Aura.Utils.Duration.prototype.months = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationService.getMonthsInDuration()'", "Duration.months");
-    return this.duration["months"]();
+    return this.momentDuration["months"]();
 };
 
 /**
@@ -207,7 +360,7 @@ Aura.Utils.Duration.prototype.months = function() {
 Aura.Utils.Duration.prototype.asMonths = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationService.displayDurationInMonths()'", "Duration.asMonths");
-    return this.duration["asMonths"]();
+    return this.momentDuration["asMonths"]();
 };
 
 /**
@@ -218,7 +371,7 @@ Aura.Utils.Duration.prototype.asMonths = function() {
 Aura.Utils.Duration.prototype.years = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationService.getYearsInDuration()'", "Duration.years");
-    return this.duration["years"]();
+    return this.momentDuration["years"]();
 };
 
 /**
@@ -229,7 +382,7 @@ Aura.Utils.Duration.prototype.years = function() {
 Aura.Utils.Duration.prototype.asYears = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationService.displayDurationInYears()'", "Duration.asYears");
-    return this.duration["asYears"]();
+    return this.momentDuration["asYears"]();
 };
 
 /**
@@ -240,7 +393,7 @@ Aura.Utils.Duration.prototype.asYears = function() {
 Aura.Utils.Duration.prototype.add = function(number, unit) {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             null, "Duration.add");
-    return this.duration["add"](number, unit);
+    return this.momentDuration["add"](number, unit);
 };
 
 /**
@@ -251,7 +404,7 @@ Aura.Utils.Duration.prototype.add = function(number, unit) {
 Aura.Utils.Duration.prototype.subtract = function(number, unit) {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             null, "Duration.subtract");
-    return this.duration["subtract"](number, unit);
+    return this.momentDuration["subtract"](number, unit);
 };
 
 /**
@@ -262,7 +415,7 @@ Aura.Utils.Duration.prototype.subtract = function(number, unit) {
 Aura.Utils.Duration.prototype.as = function(unit) {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             null, "Duration.as");
-    return this.duration["as"](unit);
+    return this.momentDuration["as"](unit);
 };
 
 /**
@@ -273,7 +426,7 @@ Aura.Utils.Duration.prototype.as = function(unit) {
 Aura.Utils.Duration.prototype.get = function(unit) {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             null, "Duration.get");
-    return this.duration["get"](unit);
+    return this.momentDuration["get"](unit);
 };
 
 /**
@@ -284,7 +437,7 @@ Aura.Utils.Duration.prototype.get = function(unit) {
 Aura.Utils.Duration.prototype.toJSON = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             null, "Duration.toJSON");
-    return this.duration["toJSON"]();
+    return this.momentDuration["toJSON"]();
 };
 
 /**
@@ -295,7 +448,7 @@ Aura.Utils.Duration.prototype.toJSON = function() {
 Aura.Utils.Duration.prototype.toISOString = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             null, "Duration.toISOString");
-    return this.duration["toISOString"]();
+    return this.momentDuration["toISOString"]();
 };
 
 /**
@@ -306,5 +459,5 @@ Aura.Utils.Duration.prototype.toISOString = function() {
 Aura.Utils.Duration.prototype.locale = function(locale) {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             null, "Duration.locale");
-    return this.duration["locale"](locale);
+    return this.momentDuration["locale"](locale);
 };

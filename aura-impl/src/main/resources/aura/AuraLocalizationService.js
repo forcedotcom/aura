@@ -205,12 +205,14 @@ AuraLocalizationService.prototype.getDefaultCurrencyFormat = function() {
  * @platform
  */
 AuraLocalizationService.prototype.displayDuration = function(duration, withSuffix) {
-    // TODO: figure out if it is possible to support this by using labels
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
+    if (this.moment["isDuration"](duration)) {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInDays");
+
+        return duration["humanize"](withSuffix);
     }
 
-    return duration["humanize"](withSuffix);
+    return duration.displayDuration(withSuffix);
 };
 
 /**
@@ -227,13 +229,14 @@ AuraLocalizationService.prototype.displayDuration = function(duration, withSuffi
  * @platform
  */
 AuraLocalizationService.prototype.displayDurationInDays = function(duration) {
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
-    } else {
+    if (this.moment["isDuration"](duration)) {
         $A.deprecated("moment Duration object will not be supported in upcoming release.",
                 "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInDays");
+
+        return duration["asDays"]();
     }
-    return duration["asDays"]();
+
+    return duration.asUnit("day");
 };
 
 /**
@@ -250,13 +253,14 @@ AuraLocalizationService.prototype.displayDurationInDays = function(duration) {
  * @platform
  */
 AuraLocalizationService.prototype.displayDurationInHours = function(duration) {
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
-    } else {
+    if (this.moment["isDuration"](duration)) {
         $A.deprecated("moment Duration object will not be supported in upcoming release.",
                 "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInHours");
+
+        return duration["asHours"]();
     }
-    return duration["asHours"]();
+
+    return duration.asUnit("hour");
 };
 
 /**
@@ -273,13 +277,14 @@ AuraLocalizationService.prototype.displayDurationInHours = function(duration) {
  * @platform
  */
 AuraLocalizationService.prototype.displayDurationInMilliseconds = function(duration) {
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
-    } else {
+    if (this.moment["isDuration"](duration)) {
         $A.deprecated("moment Duration object will not be supported in upcoming release.",
                 "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInMilliseconds");
+
+        return duration["asMilliseconds"]();
     }
-    return duration["asMilliseconds"]();
+
+    return duration.asUnit("millisecond");
 };
 
 /**
@@ -296,13 +301,14 @@ AuraLocalizationService.prototype.displayDurationInMilliseconds = function(durat
  * @platform
  */
 AuraLocalizationService.prototype.displayDurationInMinutes = function(duration) {
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
-    } else {
+    if (this.moment["isDuration"](duration)) {
         $A.deprecated("moment Duration object will not be supported in upcoming release.",
                 "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInMinutes");
+
+        return duration["asMinutes"]();
     }
-    return duration["asMinutes"]();
+
+    return duration.asUnit("minute");
 };
 
 /**
@@ -319,13 +325,14 @@ AuraLocalizationService.prototype.displayDurationInMinutes = function(duration) 
  * @platform
  */
 AuraLocalizationService.prototype.displayDurationInMonths = function(duration) {
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
-    } else {
+    if (this.moment["isDuration"](duration)) {
         $A.deprecated("moment Duration object will not be supported in upcoming release.",
                 "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInMonths");
+
+        return duration["asMonths"]();
     }
-    return duration["asMonths"]();
+
+    return duration.asUnit("month");
 };
 
 /**
@@ -342,13 +349,14 @@ AuraLocalizationService.prototype.displayDurationInMonths = function(duration) {
  * @platform
  */
 AuraLocalizationService.prototype.displayDurationInSeconds = function(duration) {
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
-    } else {
+    if (this.moment["isDuration"](duration)) {
         $A.deprecated("moment Duration object will not be supported in upcoming release.",
                 "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInSeconds");
+
+        return duration["asSeconds"]();
     }
-    return duration["asSeconds"]();
+
+    return duration.asUnit("second");
 };
 
 /**
@@ -365,13 +373,14 @@ AuraLocalizationService.prototype.displayDurationInSeconds = function(duration) 
  * @platform
  */
 AuraLocalizationService.prototype.displayDurationInYears = function(duration) {
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
-    } else {
+    if (this.moment["isDuration"](duration)) {
         $A.deprecated("moment Duration object will not be supported in upcoming release.",
                 "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInYears");
+
+        return duration["asYears"]();
     }
-    return duration["asYears"]();
+
+    return duration.asUnit("year");
 };
 
 /**
@@ -387,8 +396,7 @@ AuraLocalizationService.prototype.displayDurationInYears = function(duration) {
  * @platform
  */
 AuraLocalizationService.prototype.duration = function(num, unit) {
-    var duration = this.moment["duration"](num, unit);
-    return new Aura.Utils.Duration(duration);
+    return new Aura.Utils.Duration(num, unit, this.moment);
 };
 
 /**
@@ -722,13 +730,14 @@ AuraLocalizationService.prototype.formatTimeUTC = function(date, formatString, l
  * @platform
  */
 AuraLocalizationService.prototype.getDaysInDuration = function(duration) {
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
-    } else {
+    if (this.moment["isDuration"](duration)) {
         $A.deprecated("moment Duration object will not be supported in upcoming release.",
                 "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getDaysInDuration");
+
+        return duration["days"]();
     }
-    return duration["days"]();
+
+    return duration.getUnit("day");
 };
 
 /**
@@ -745,13 +754,130 @@ AuraLocalizationService.prototype.getDaysInDuration = function(duration) {
  * @platform
  */
 AuraLocalizationService.prototype.getHoursInDuration = function(duration) {
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
-    } else {
+    if (this.moment["isDuration"](duration)) {
         $A.deprecated("moment Duration object will not be supported in upcoming release.",
                 "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getHoursInDuration");
+
+        return duration["hours"]();
     }
-    return duration["hours"]();
+
+    return duration.getUnit("hour");
+};
+
+/**
+ * Gets the number of milliseconds in a duration.
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
+ * @return {Number} The number of milliseconds in duration.
+ * @memberOf AuraLocalizationService
+ * @public
+ * @export
+ * @platform
+ */
+AuraLocalizationService.prototype.getMillisecondsInDuration = function(duration) {
+    if (this.moment["isDuration"](duration)) {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getMillisecondsInDuration");
+
+        return duration["milliseconds"]();
+    }
+
+    return duration.getUnit("millisecond");
+};
+
+/**
+ * Gets the number of minutes in a duration.
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
+ * @return {Number} The number of minutes in duration.
+ * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(60, 'second');
+ * // Returns 1, the number of minutes in the given duration
+ * $A.localizationService.getMinutesInDuration(dur);
+ * @public
+ * @export
+ * @platform
+ */
+AuraLocalizationService.prototype.getMinutesInDuration = function(duration) {
+    if (this.moment["isDuration"](duration)) {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getMillisecondsInDuration");
+
+        return duration["minutes"]();
+    }
+
+    return duration.getUnit("minute");
+};
+
+/**
+ * Gets the number of months in a duration.
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
+ * @return {Number} The number of months in duration.
+ * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(70, 'day');
+ * // Returns 2, the number of months in the given duration
+ * $A.localizationService.getMonthsInDuration(dur);
+ * @public
+ * @export
+ * @platform
+ */
+AuraLocalizationService.prototype.getMonthsInDuration = function(duration) {
+    if (this.moment["isDuration"](duration)) {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getMonthsInDuration");
+
+        return duration["months"]();
+    }
+
+    return duration.getUnit("month");
+};
+
+/**
+ * Gets the number of seconds in a duration.
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
+ * @return {Number} The number of seconds in duration.
+ * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(3000, 'millisecond');
+ * // Returns 3
+ * $A.localizationService.getSecondsInDuration(dur);
+ * @public
+ * @export
+ * @platform
+ */
+AuraLocalizationService.prototype.getSecondsInDuration = function(duration) {
+    if (this.moment["isDuration"](duration)) {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getSecondsInDuration");
+
+        return duration["seconds"]();
+    }
+
+    return duration.getUnit("second");
+};
+
+/**
+ * Gets the number of years in a duration.
+ * @param {Duration} duration - The duration object returned by $A.localizationService.duration
+ * @return {Number} The number of years in duration.
+ * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(24, 'month');
+ * // Returns 2
+ * $A.localizationService.getYearsInDuration(dur);
+ * @public
+ * @export
+ * @platform
+ */
+AuraLocalizationService.prototype.getYearsInDuration = function(duration) {
+    if (this.moment["isDuration"](duration)) {
+        $A.deprecated("moment Duration object will not be supported in upcoming release.",
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getYearsInDuration");
+
+        return duration["years"]();
+    }
+
+    return duration.getUnit("year");
 };
 
 /**
@@ -820,117 +946,6 @@ AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timeZo
     var match = this.EN_US_DATETIME_PATTERN.exec(dateTimeString);
 
     callback(match[3] + "-" + match[1] + "-" + match[2]);
-};
-
-/**
- * Gets the number of milliseconds in a duration.
- * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The number of milliseconds in duration.
- * @memberOf AuraLocalizationService
- * @public
- * @export
- * @platform
- */
-AuraLocalizationService.prototype.getMillisecondsInDuration = function(duration) {
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
-    } else {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getMillisecondsInDuration");
-    }
-    return duration["milliseconds"]();
-};
-
-/**
- * Gets the number of minutes in a duration.
- * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The number of minutes in duration.
- * @memberOf AuraLocalizationService
- * @example
- * var dur = $A.localizationService.duration(60, 'second');
- * // Returns 1, the number of minutes in the given duration
- * $A.localizationService.getMinutesInDuration(dur);
- * @public
- * @export
- * @platform
- */
-AuraLocalizationService.prototype.getMinutesInDuration = function(duration) {
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
-    } else {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getMinutesInDuration");
-    }
-    return duration["minutes"]();
-};
-
-/**
- * Gets the number of months in a duration.
- * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The number of months in duration.
- * @memberOf AuraLocalizationService
- * @example
- * var dur = $A.localizationService.duration(70, 'day');
- * // Returns 2, the number of months in the given duration
- * $A.localizationService.getMonthsInDuration(dur);
- * @public
- * @export
- * @platform
- */
-AuraLocalizationService.prototype.getMonthsInDuration = function(duration) {
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
-    } else {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getMonthsInDuration");
-    }
-    return duration["months"]();
-};
-
-/**
- * Gets the number of seconds in a duration.
- * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The number of seconds in duration.
- * @memberOf AuraLocalizationService
- * @example
- * var dur = $A.localizationService.duration(3000, 'millisecond');
- * // Returns 3
- * $A.localizationService.getSecondsInDuration(dur);
- * @public
- * @export
- * @platform
- */
-AuraLocalizationService.prototype.getSecondsInDuration = function(duration) {
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
-    } else {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getSecondsInDuration");
-    }
-    return duration["seconds"]();
-};
-
-/**
- * Gets the number of years in a duration.
- * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The number of years in duration.
- * @memberOf AuraLocalizationService
- * @example
- * var dur = $A.localizationService.duration(24, 'month');
- * // Returns 2
- * $A.localizationService.getYearsInDuration(dur);
- * @public
- * @export
- * @platform
- */
-AuraLocalizationService.prototype.getYearsInDuration = function(duration) {
-    if (duration.getMomentDuration) {
-        duration = duration.getMomentDuration();
-    } else {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getYearsInDuration");
-    }
-    return duration["years"]();
 };
 
 /**

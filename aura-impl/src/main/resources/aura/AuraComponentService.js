@@ -2020,7 +2020,13 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
         } else if (cmp !== null) {
             return cmp;
         }
-        throw new Error('Definition does not exist on the client for descriptor:'+descriptor);
+        // We are potentially in an inconsistent state. This occurs when a dependency definition is no longer in cache,
+        // yet the original parent definition does exist.
+        // clearing indexeddb
+        // component def storage clear will also clear actions
+        this.componentDefStorage.clear();
+        throw new Error('Definition does not exist on the client for descriptor:' + descriptor +
+            '. Client side caches have been cleared. Please reload the page.');
     } finally {
         if (createMark) {
             this.trackingCreate = false;

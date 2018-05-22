@@ -17,11 +17,13 @@ function tmpl($api, $cmp, $slotset, $ctx) {
 }
 
 if (style) {
-   const tagName = 'modules-moduletest';
-   const token = 'modules-moduletest_moduletest';
+    tmpl.token = 'modules-moduletest_moduletest';
 
-   tmpl.token = token;
-   tmpl.style = style(tagName, token);
+    const style$$1 = document.createElement('style');
+    style$$1.type = 'text/css';
+    style$$1.dataset.token = 'modules-moduletest_moduletest';
+    style$$1.textContent = style('modules-moduletest', 'modules-moduletest_moduletest');
+    document.head.appendChild(style$$1);
 }
 
 class Test extends engine.Element {

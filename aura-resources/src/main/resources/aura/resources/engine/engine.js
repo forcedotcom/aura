@@ -1154,7 +1154,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.20.3 */
+/** version: 0.20.4 */
 
 const TargetToReactiveRecordMap = new WeakMap();
 function notifyMutation$1(target, key) {
@@ -1746,6 +1746,7 @@ function wrapIframeWindow(win) {
         },
     };
 }
+const GET_ROOT_NODE_CONFIG_FALSE = { composed: false };
 // Registering a service to enforce the shadowDOM semantics via the Raptor membrane implementation
 register({
     piercing(target, key, value, callback) {
@@ -1769,7 +1770,7 @@ register({
                 const vm = getElementOwnerVM(target);
                 if (!isUndefined(vm) && value === vm.elm) {
                     // walking up via parent chain might end up in the shadow root element
-                    return callback(vm.component.root);
+                    return callback(vm.component.template);
                 }
                 else if (target instanceof Element && value instanceof Element && target[OwnerKey] !== value[OwnerKey]) {
                     // cutting out access to something outside of the shadow of the current target (usually slots)
@@ -1790,7 +1791,7 @@ register({
                             return callback(pierce(currentTarget));
                         }
                         // Event is coming from an slotted element
-                        if (isChildNode(getRootNode.call(value, event), currentTarget)) {
+                        if (isChildNode(getRootNode.call(value, GET_ROOT_NODE_CONFIG_FALSE), currentTarget)) {
                             return;
                         }
                         // target is owned by the VM
@@ -2064,7 +2065,7 @@ LWCElement.prototype = {
     get root() {
         {
             const vm = getCustomElementVM(this);
-            assert.logWarning(`"this.template" access in ${vm.component} has been deprecated and will be removed. Use "this.template" instead.`);
+            assert.logWarning(`"this.root" access in ${vm.component} has been deprecated and will be removed. Use "this.template" instead.`);
         }
         return this.template;
     },
@@ -4507,4 +4508,4 @@ exports.decorate = decorate;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.20.3 */
+/** version: 0.20.4 */

@@ -46,9 +46,6 @@ function AuraComponentService() {
     this.moduleNameToDescriptorLookup = {};
     this.descriptorCasingMap    = {};
 
-    // holds a temporary list of collected styles
-    this.moduleStyleBuffer = [];
-
     // holds ComponentDef configs to be created
     this.savedComponentConfigs = {};
 
@@ -873,26 +870,10 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
 
     Ctor = Ctor || exportns;
     entry.ns = Ctor;
-    this.collectModuleStyles(Ctor);
+
     // Propagate the key from definition to Ctor, will be used to used by locker's piercing hook to look up keys on component instances
     $A.lockerService.trust(entry.definition, Ctor);
     return Ctor;
-};
-
-AuraComponentService.prototype.collectModuleStyles = function (Ctor) {
-    if (Ctor.style) {
-        this.moduleStyleBuffer.push(Ctor.style);
-        Ctor.style = undefined;
-    }
-};
-
-
-AuraComponentService.prototype.flushModuleStyles = function () {
-    var styles = this.moduleStyleBuffer;
-    if (styles.length) {
-        this.moduleStyleBuffer = [];
-        $A.util.style.apply(styles.join('\n'));
-    }
 };
 
 AuraComponentService.prototype.createInteropComponentDef = function (descriptor) {
@@ -910,7 +891,7 @@ AuraComponentService.prototype.createInteropComponentDef = function (descriptor)
     });
 
     this.componentDefRegistry[descriptor] = interOpCmpDef;
-    this.flushModuleStyles();
+
     return interOpCmpDef;
 };
 

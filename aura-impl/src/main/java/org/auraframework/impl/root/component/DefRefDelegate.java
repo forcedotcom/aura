@@ -51,7 +51,7 @@ public class DefRefDelegate implements DefinitionReference {
     private static final long serialVersionUID = 781643093362675129L;
 
     private DefinitionReference componentDefRef;
-    private transient DefinitionReference actualReference = null;
+    private transient volatile DefinitionReference actualReference = null;
 
     public DefRefDelegate(ComponentDefRef componentDefRef) throws DefinitionNotFoundException {
         this.componentDefRef = componentDefRef;

@@ -22,18 +22,14 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDefRef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDefRef;
-import org.auraframework.impl.root.AttributeSetImpl;
 import org.auraframework.instance.Action;
-import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.Module;
 import org.auraframework.service.ContextService;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -51,16 +47,12 @@ public class ModuleImpl implements Module {
     private final String path;
     private final String localId;
     private final ContextService contextService;
-    private final AttributeSet attributeSet;
 
     private Map<String, Object> attributes = Maps.newHashMap();
 
     public ModuleImpl(DefDescriptor<ModuleDef> descriptor, Map<String, Object> attributes) throws QuickFixException {
         this(descriptor, null, null);
         this.attributes = attributes;
-        if (this.attributeSet != null) {
-            this.attributeSet.set(attributes);
-        }
         this.contextService.getCurrentContext().getInstanceStack().popInstance(this);
     }
 
@@ -72,9 +64,6 @@ public class ModuleImpl implements Module {
     public ModuleImpl(DefDescriptor<ModuleDef> descriptor, Collection<AttributeDefRef> attributeDefRefs,
                       BaseComponent<?, ?> attributeValueProvider, String localId) throws QuickFixException {
         this(descriptor, attributeValueProvider, localId);
-        if (this.attributeSet != null) {
-            this.attributeSet.set(attributeDefRefs);
-        }
         this.contextService.getCurrentContext().getInstanceStack().popInstance(this);
     }
 
@@ -82,7 +71,6 @@ public class ModuleImpl implements Module {
                       String localId) throws QuickFixException {
         // services
         this.contextService = Aura.getContextService();
-        DefinitionService definitionService = Aura.getDefinitionService();
 
         this.descriptor = descriptor;
         this.localId = localId;
@@ -93,15 +81,6 @@ public class ModuleImpl implements Module {
         this.path = instanceStack.getPath();
         instanceStack.pushInstance(this, descriptor);
         this.globalId = getNextGlobalId(context);
-
-        // if there is an aura equivalent to this module, ensures exposed attributes in both are equivalent
-        DefDescriptor<ComponentDef> compDesc = definitionService.getDefDescriptor(descriptor,
-                DefDescriptor.MARKUP_PREFIX, ComponentDef.class);
-        if (compDesc.exists()) {
-            this.attributeSet = new AttributeSetImpl(compDesc, attributeValueProvider, this, true);
-        } else {
-            this.attributeSet = null;
-        }
     }
 
     // TODO: duplicate code
@@ -163,9 +142,7 @@ public class ModuleImpl implements Module {
 
         json.writeMapEntry("creationPath", getPath());
 
-        if (this.attributeSet != null && !this.attributeSet.isEmpty()) {
-            json.writeMapEntry("attributes", attributeSet);
-        } else if (!attributes.isEmpty()) {
+        if (!attributes.isEmpty()) {
             json.writeMapKey("attributes");
 
             json.writeMapBegin();

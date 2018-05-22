@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-05-18
- * Version: 0.4.12
+ * Generated: 2018-05-21
+ * Version: 0.4.13
  */
 
 (function (exports) {
@@ -1211,7 +1211,7 @@ function createFunctionEvaluator(sandbox) {
 function SecureScriptElement() {}
 
 // TODO: this should be removed once Locker has a proper configuration mechanism in place
-const TRUSTED_DOMAINS = /\.(force|salesforce)\.com$/;
+const TRUSTED_DOMAINS = /\.(force|salesforce|visualforce)\.com$/;
 
 SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
   function getAttributeName(name) {
@@ -4361,7 +4361,7 @@ function tamperProofProp(obj, prop) {
 function repairDataProperties(realmRec) {
   const { unsafeGlobal: g } = realmRec;
 
-  ['Object', 'Array', 'Function', 'Promise'].forEach(name => {
+  ['Object', 'Array', 'Function'].forEach(name => {
     tamperProofAll(g[name].prototype);
   });
 

@@ -3623,8 +3623,10 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             if (!action) {
                 throw new $A.auraError("Unable to find an action for "+response["id"]+": "+response);
             } else {
+                var defDependencies;
                 if (Object.keys(allDefsInContextResponse).length > 0) {
-                    action.defDependencies = allDefsInContextResponse;
+                    defDependencies = allDefsInContextResponse;
+                    action.defDependencies = defDependencies;
                 }
 
                 actionsToPersist.push(action);
@@ -3633,6 +3635,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
                 this.singleAction(action, response);
                 if (dupes) {
                     for (var i = 0; i < dupes.length; i++) {
+                        dupes[i].defDependencies = defDependencies;
                         this.singleAction(dupes[i], response);
                     }
                 }

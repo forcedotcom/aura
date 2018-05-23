@@ -123,32 +123,48 @@ const usesNativeSymbols = typeof Symbol() === 'symbol';
 const { addEventListener, removeEventListener, getAttribute, getAttributeNS, setAttribute, setAttributeNS, removeAttribute, removeAttributeNS, querySelector, querySelectorAll, } = Element.prototype;
 const { DOCUMENT_POSITION_CONTAINED_BY } = Node;
 const { compareDocumentPosition: compareDocumentPosition$1, } = Node.prototype;
+/**
+ * Returns the context shadow included root.
+ */
 function findShadowRoot(node) {
-    let root = node;
-    while (isUndefined(root[ViewModelReflection])) {
-        root = root.parentNode;
+    // We need to ensure that the parent element is present before accessing it.
+    if (isNull(node.parentNode)) {
+        return node;
     }
-    return root;
-}
-function findComposedRootNode(node) {
-    while (node !== document) {
-        const parent = node.parentNode;
-        if (isNull(parent)) {
-            return node;
-        }
-        node = parent;
+    // In the case of LWC, the root and the host element are the same things. Therefor,
+    // when calling findShadowRoot on the a host element we want to return the parent host
+    // element and not the current host element.
+    node = node.parentNode;
+    while (!isNull(node.parentNode) &&
+        isUndefined(node[ViewModelReflection])) {
+        node = node.parentNode;
     }
     return node;
 }
-// TODO: once we start using the real shadowDOM, we can rely on:
-// const { getRootNode } = Node.prototype;
-// for now, we need to provide a dummy implementation to provide retargeting
+/**
+ * Returns the context root beyond the shadow root.
+ *
+ * It doesn't returns actually the root but the host. This approximation is sufficiant
+ * in our case.
+ */
+function findComposedRootNode(node) {
+    while (!isNull(node.parentNode)) {
+        node = node.parentNode;
+    }
+    return node;
+}
+/**
+ * Dummy implementation of the Node.prototype.getRootNode.
+ * Spec: https://dom.spec.whatwg.org/#dom-node-getrootnode
+ *
+ * TODO: Once we start using the real shadowDOM, this method should be replaced by:
+ * const { getRootNode } = Node.prototype;
+ */
 function getRootNode(options) {
     const composed = isUndefined(options) ? false : !!options.composed;
-    if (!composed) {
-        return findShadowRoot(this.parentNode); // this is not quite the root (it is the host), but for us is sufficient
-    }
-    return findComposedRootNode(this);
+    return isTrue(composed) ?
+        findComposedRootNode(this) :
+        findShadowRoot(this);
 }
 function isChildNode(root, node) {
     return !!(compareDocumentPosition$1.call(root, node) & DOCUMENT_POSITION_CONTAINED_BY);
@@ -771,7 +787,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.20.4 */
+/** version: 0.20.5 */
 
 const TargetToReactiveRecordMap = new WeakMap();
 function notifyMutation$1(target, key) {
@@ -1314,19 +1330,43 @@ register({
                         // will kick in and return the cmp, which is not the intent.
                         return callback(pierce(value));
                     case 'target':
+                        // For event listener attached:
+                        // * on the component => `target` must always equal to `currentTarget`
+                        // * on the root => `target` is retargeted
+                        // * on an element inside template => `target` is retargeted
+                        // * on the root component of the component tree via addEventListener
+                        //      => don't do any retargeting
+                        //
+                        // Slotted events should not be handled, since those are part of the light DOM.
                         const { currentTarget } = event;
                         // Executing event listener on component, target is always currentTarget
                         if (componentEventListenerType === EventListenerContext.COMPONENT_LISTENER) {
                             return callback(pierce(currentTarget));
                         }
-                        // Event is coming from an slotted element
+                        // Handle events is coming from an slotted elements.
+                        // TODO: Add more information why we need to handle the light DOM events here.
                         if (isChildNode(getRootNode.call(value, GET_ROOT_NODE_CONFIG_FALSE), currentTarget)) {
                             return;
                         }
-                        // target is owned by the VM
-                        const vm = currentTarget ? getElementOwnerVM(currentTarget) : undefined;
+                        let vm;
+                        if (componentEventListenerType === EventListenerContext.ROOT_LISTENER) {
+                            // If we are in an event listener attached on the shadow root, then we do not want to look
+                            // for the currentTarget owner VM because the currentTarget owner VM would be the VM which
+                            // rendered the component (parent component).
+                            //
+                            // Instead, we want to get the custom element's VM because that VM owns the shadow root itself.
+                            vm = getCustomElementVM(currentTarget);
+                        }
+                        else if (!isUndefined(currentTarget)) {
+                            // TODO: When does currentTarget can be undefined
+                            vm = getElementOwnerVM(currentTarget);
+                        }
+                        // Handle case when VM is not present for example when attaching an event listener
+                        // on the root component of the component tree.
                         if (!isUndefined(vm)) {
                             let node = value;
+                            // Let's climb up the node tree starting from the original event target
+                            // up until finding the first node being rendered by the current VM.
                             while (!isNull(node) && vm.uid !== node[OwnerKey]) {
                                 node = node.parentNode;
                             }
@@ -3362,4 +3402,4 @@ exports.decorate = decorate;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.20.4 */
+/** version: 0.20.5 */

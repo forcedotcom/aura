@@ -18,6 +18,9 @@ package org.auraframework.http;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 
@@ -181,7 +184,11 @@ public class CSP {
         }
 
         public PolicyBuilder report_uri(String... uris) {
-            directives.put(Directive.REPORT_URI, Lists.newArrayList(uris));
+         // If the Report URI is empty or null, don't add report-uri directive at all
+            List<String> reportURIs = Lists.newArrayList(uris).stream().filter(StringUtils::isNotBlank).collect(Collectors.toList());
+            if (reportURIs.size() > 0) {
+                directives.put(Directive.REPORT_URI, reportURIs);
+            }
             return this;
         }
 

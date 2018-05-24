@@ -51,13 +51,7 @@ public class ModulesMetadataServiceImpl implements ModulesMetadataService {
 
     protected static final Gson GSON = new Gson();
 
-    private static final XMLInputFactory XML_INPUT_FACTORY;
-    static {
-        XML_INPUT_FACTORY = XMLInputFactory.newInstance();
-        // protect xxe
-        XML_INPUT_FACTORY.setProperty(XMLInputFactory.SUPPORT_DTD, false);
-        XML_INPUT_FACTORY.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-    }
+    private volatile static XMLInputFactory XML_INPUT_FACTORY = null;
 
     /**
      * Process lightning.json metadata
@@ -108,7 +102,7 @@ public class ModulesMetadataServiceImpl implements ModulesMetadataService {
         XMLStreamReader reader = null;
         String rootElement = "LightningComponentBundle";
         try (StringReader sr = new StringReader(source.getContents())) {
-            reader = XML_INPUT_FACTORY.createXMLStreamReader(sr);
+            reader = getXmlInputFactory().createXMLStreamReader(sr);
             while (reader.hasNext()) {
                 int eventType = reader.next();
                 switch (eventType) {
@@ -151,6 +145,21 @@ public class ModulesMetadataServiceImpl implements ModulesMetadataService {
         for (ModuleMetadataXMLHandler handler : handlers) {
             this.elementHandlers.put(handler.handledElement(), handler);
         }
+    }
+
+    private static XMLInputFactory getXmlInputFactory() {
+        if (XML_INPUT_FACTORY == null) {
+            synchronized (ModulesMetadataServiceImpl.class) {
+                if (XML_INPUT_FACTORY == null) {
+                    XMLInputFactory factoryToSetUp = XMLInputFactory.newFactory();
+                    // protect xxe
+                    factoryToSetUp.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+                    factoryToSetUp.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+                    XML_INPUT_FACTORY = factoryToSetUp;
+                }
+            }
+        }
+        return XML_INPUT_FACTORY;
     }
 
 }

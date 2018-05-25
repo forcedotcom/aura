@@ -38,12 +38,12 @@ import org.auraframework.validation.ReferenceValidationContext;
  */
 public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> implements ComponentDef {
 
-    private static final long serialVersionUID = -8833271874946123511L;
+    private static final long serialVersionUID = 1L;
     
     private final boolean dynamicallyGenerated;
 
     protected ComponentDefImpl(Builder builder) {
-        super(builder);
+        super(builder, null);
         dynamicallyGenerated = builder.dynamicallyGenerated;
     }
 

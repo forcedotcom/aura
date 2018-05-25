@@ -19,11 +19,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.Aura;
 import org.auraframework.builder.PlatformDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.PlatformDef;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableMap;
@@ -54,8 +54,13 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
     public abstract Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException;
 
     @Override
+    public Map<DefDescriptor<AttributeDef>, AttributeDef> getDeclaredAttributeDefs() {
+        return attributeDefs;
+    }
+
+    @Override
     public AttributeDef getAttributeDef(String name) throws QuickFixException {
-        return getAttributeDefs().get(Aura.getDefinitionService().getDefDescriptor(name, AttributeDef.class));
+        return getAttributeDefs().get(new DefDescriptorImpl<>(null, null, name, AttributeDef.class));
     }
 
     /**

@@ -16,7 +16,6 @@
 package org.auraframework.impl.util.mock;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
@@ -142,10 +141,6 @@ public class MockDefinition implements Definition {
 
     public void setOwnHash(String ownHash) {
         this.ownHash = ownHash;
-    }
-
-    @Override
-    public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
     }
 
     @Override

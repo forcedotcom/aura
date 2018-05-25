@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.root.event;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.auraframework.def.ComponentDef;

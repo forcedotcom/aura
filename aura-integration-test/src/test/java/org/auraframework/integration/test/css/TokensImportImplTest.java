@@ -28,16 +28,10 @@ import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.factory.XMLParserBase;
 import org.auraframework.impl.root.parser.handler.TokensImportDefHandler;
 import org.auraframework.impl.source.StringSource;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser.Format;
 import org.junit.Test;
 
-import com.google.common.collect.Sets;
-
 public class TokensImportImplTest extends StyleTestCase {
-    @Inject
-    DefinitionService definitionService;
-
     @Inject
     private DefinitionParserAdapter definitionParserAdapter;
     

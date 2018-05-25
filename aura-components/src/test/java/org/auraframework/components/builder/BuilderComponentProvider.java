@@ -41,9 +41,6 @@ public class BuilderComponentProvider implements ComponentConfigProvider {
     private DefinitionService definitionService;
 
     @Inject
-    private ContextService contextService;
-
-    @Inject
     private BuilderService builderService;
 
     public static AtomicInteger counter = new AtomicInteger(1);
@@ -65,7 +62,7 @@ public class BuilderComponentProvider implements ComponentConfigProvider {
         List<ComponentDefRef> body = Lists.newArrayList();
         body.add(contents.build());
         builder.setFacet("body", body);
-        contextService.getCurrentContext().addDynamicDef(builder.build());
+        definitionService.addDynamicDef(builder.build());
         ComponentConfig cc = new ComponentConfig();
         cc.setDescriptor(newDesc);
         return cc;

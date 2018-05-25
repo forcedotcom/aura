@@ -21,7 +21,6 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
@@ -36,14 +35,11 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
- * <p>
  * Service for loading, finding or interacting with a {@link Definition}.
- * </p>
- * <p>
- * Instances of all AuraServices should be retrieved from {@link Aura}
- * </p>
+ *
+ * This service should be injected.
  */
-public interface DefinitionService extends AuraService {
+public interface DefinitionService {
 
     /**
      * <p>
@@ -95,6 +91,16 @@ public interface DefinitionService extends AuraService {
     DefDescriptor<?> getDefDescriptor(String prefix, String namespace, String name, DefType defType);
 
     /**
+     * Add a dynamically generated def.
+     *
+     * This method will process the def as needed and make sure it gets added to the context.
+     *
+     * @param def The definition to add.
+     * @throws QuickFixException if there is a problem during flattening.
+     */
+    <D extends Definition> void addDynamicDef(@Nonnull D def) throws QuickFixException;
+
+    /**
      * Get the Definition associated with the descriptor passed in, compiling if
      * necessary.
      *
@@ -104,7 +110,7 @@ public interface DefinitionService extends AuraService {
      * @throws QuickFixException
      */
     <T extends Definition> T getDefinition(DefDescriptor<T> descriptor) throws DefinitionNotFoundException,
-    QuickFixException;
+            QuickFixException;
 
     /**
      * Creates a {@link DefDescriptor} from the qualified name passed in,
@@ -131,7 +137,9 @@ public interface DefinitionService extends AuraService {
      * @param descriptor the descriptor to find.
      * @return the corresponding definition, or null if it doesn't exist.
      * @throws QuickFixException if there is a compile time error.
+     * @deprecated use #getDefinition(DefDescriptor) instead
      */
+    @Deprecated
     <D extends Definition> D getUnlinkedDefinition(DefDescriptor<D> descriptor) throws QuickFixException;
 
     /**

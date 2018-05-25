@@ -13495,9 +13495,7 @@ return {
     "markup://aura:rootComponent"
   ],
   "ab":true,
-  "lc":{
-    "descriptor":"markup://aura:locationChange"
-  },
+  "lc":"markup://aura:locationChange",
   "css":true
 };*/}));
 $A.componentService.addComponent("markup://auradocs:nav", (function (){/*$A.componentService.addComponentClass("markup://auradocs:nav",function() {
@@ -14645,9 +14643,7 @@ return {
       ]
     }
   ],
-  "lc":{
-    "descriptor":"markup://auradocs:locationChange"
-  },
+  "lc":"markup://auradocs:locationChange",
   "css":true
 };*/}));
 $A.componentService.initEventDefs([
@@ -14849,10 +14845,10 @@ $A.componentService.initEventDefs([
     "xs":"I",
     "su":"markup://ui:baseDOMEvent",
     "a":{
-      "ctrlKey":["ctrlKey","aura://Boolean","I",false],
       "domEvent":["domEvent","aura://Object","I",false,null],
-      "shiftKey":["shiftKey","aura://Boolean","I",false],
-      "keyCode":["keyCode","aura://Integer","I",false]
+      "ctrlKey":["ctrlKey","aura://Boolean","I",false],
+      "keyCode":["keyCode","aura://Integer","I",false],
+      "shiftKey":["shiftKey","aura://Boolean","I",false]
     }
   },
   {
@@ -14957,10 +14953,10 @@ $A.componentService.initEventDefs([
     "xs":"I",
     "su":"markup://ui:baseKeyboardEvent",
     "a":{
-      "ctrlKey":["ctrlKey","aura://Boolean","I",false],
       "domEvent":["domEvent","aura://Object","I",false,null],
-      "shiftKey":["shiftKey","aura://Boolean","I",false],
-      "keyCode":["keyCode","aura://Integer","I",false]
+      "ctrlKey":["ctrlKey","aura://Boolean","I",false],
+      "keyCode":["keyCode","aura://Integer","I",false],
+      "shiftKey":["shiftKey","aura://Boolean","I",false]
     }
   },
   {
@@ -14969,10 +14965,10 @@ $A.componentService.initEventDefs([
     "xs":"I",
     "su":"markup://ui:baseKeyboardEvent",
     "a":{
-      "ctrlKey":["ctrlKey","aura://Boolean","I",false],
       "domEvent":["domEvent","aura://Object","I",false,null],
-      "shiftKey":["shiftKey","aura://Boolean","I",false],
-      "keyCode":["keyCode","aura://Integer","I",false]
+      "ctrlKey":["ctrlKey","aura://Boolean","I",false],
+      "keyCode":["keyCode","aura://Integer","I",false],
+      "shiftKey":["shiftKey","aura://Boolean","I",false]
     }
   },
   {
@@ -14981,10 +14977,10 @@ $A.componentService.initEventDefs([
     "xs":"I",
     "su":"markup://ui:baseKeyboardEvent",
     "a":{
-      "ctrlKey":["ctrlKey","aura://Boolean","I",false],
       "domEvent":["domEvent","aura://Object","I",false,null],
-      "shiftKey":["shiftKey","aura://Boolean","I",false],
-      "keyCode":["keyCode","aura://Integer","I",false]
+      "ctrlKey":["ctrlKey","aura://Boolean","I",false],
+      "keyCode":["keyCode","aura://Integer","I",false],
+      "shiftKey":["shiftKey","aura://Boolean","I",false]
     }
   },
   {
@@ -15122,9 +15118,9 @@ $A.componentService.initEventDefs([
     "xs":"PP",
     "su":"markup://ui:baseMouseEvent",
     "a":{
-      "tabComponent":["tabComponent","aura://Aura.Component","PP",false,null],
       "domEvent":["domEvent","aura://Object","I",false,null],
-      "button":["button","aura://Integer","I",false]
+      "button":["button","aura://Integer","I",false],
+      "tabComponent":["tabComponent","aura://Aura.Component","PP",false,null]
     }
   },
   {
@@ -15206,13 +15202,13 @@ $A.componentService.initEventDefs([
     "xs":"I",
     "su":"markup://aura:locationChange",
     "a":{
-      "demo":["demo","aura://String","I",false],
-      "querystring":["querystring","aura://String","G",false],
-      "topic":["topic","aura://String","I",false],
-      "defType":["defType","aura://String","I",false],
-      "descriptor":["descriptor","aura://String","I",false],
       "token":["token","aura://String","G",false],
-      "searchTerm":["searchTerm","aura://String","I",false]
+      "querystring":["querystring","aura://String","G",false],
+      "defType":["defType","aura://String","I",false],
+      "topic":["topic","aura://String","I",false],
+      "demo":["demo","aura://String","I",false],
+      "searchTerm":["searchTerm","aura://String","I",false],
+      "descriptor":["descriptor","aura://String","I",false]
     }
   },
   {

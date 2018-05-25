@@ -213,11 +213,6 @@ public class DefRefDelegate implements DefinitionReference {
     }
 
     @Override
-    public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
-        select().appendSupers(supers);
-    }
-
-    @Override
     public DefDescriptor<? extends Definition> getDescriptor() {
         return select().getDescriptor();
     }

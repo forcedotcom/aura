@@ -34,6 +34,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DescriptorKey;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.PlatformDef;
 import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraLocalStore;
@@ -42,6 +43,7 @@ import org.auraframework.system.Location;
 import org.auraframework.system.RegistrySet;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.validation.ReferenceValidationContext;
 
@@ -135,6 +137,33 @@ public class AuraLinker {
     @CheckForNull
     public <D extends Definition> D linkDefinition(@Nonnull DefDescriptor<D> descriptor) throws QuickFixException {
         return linkDefinition(descriptor, false);
+    }
+
+    /**
+     * Flatten a definition in place (traverse inheritance tree).
+     *
+     * After the definition is 'flattened', it is usable for serialization, and all 'combined' fields should be
+     * available.
+     *
+     * @param definition the definition to roll up. This is generally a dynamically generated one.
+     */
+    public <D extends Definition> void flattenHierarchy(D definition) throws QuickFixException {
+        if (!(definition instanceof PlatformDef)) {
+            return;
+        }
+        Set<DefDescriptor<?>> inheritanceStack = Sets.newLinkedHashSet();
+        PlatformDef pd = (PlatformDef)definition;
+        inheritanceStack.add(definition.getDescriptor());
+        @SuppressWarnings("unchecked")
+        LinkingDefinition<D> ld = getLinkingDef((DefDescriptor<D>)definition.getDescriptor());
+        ld.def = definition;
+        ld.built = true;
+
+        Set<DefDescriptor<?>> superDeps = pd.getSupers();
+        for (DefDescriptor<?> superDesc : superDeps) {
+            inheritanceHelper(superDesc, inheritanceStack, definition); 
+        }
+        finishFlatten();
     }
 
     /**
@@ -279,6 +308,34 @@ public class AuraLinker {
         } while (compiling.size() < linked.size());
     }
 
+    private <D extends Definition> void inheritanceHelper(@Nonnull DefDescriptor<D> descriptor,
+            @Nonnull Set<DefDescriptor<?>> stack, @CheckForNull Definition parent) throws QuickFixException {
+        loggingService.incrementNum(LoggingService.DEF_VISIT_COUNT);
+        if (stack.contains(descriptor)) {
+            if (stack.size() == 1) {
+                throw new InvalidDefinitionException(String.format("%s cannot extend itself", descriptor),
+                            new Location(descriptor.toString(), 0L));
+            } else {
+                throw new InvalidDefinitionException(String.format("Loop in inheritance at %s in %s", descriptor,
+                            stack.toString()), new Location(descriptor.toString(), 0L));
+            }
+        }
+        LinkingDefinition<D> linkingDef = getLinkingDef(descriptor);
+        if (linkingDef.def != null) {
+            return;
+        }
+        fillDefinitionOrThrow(linkingDef, parent, stack);
+        if (linkingDef.def instanceof PlatformDef) {
+            stack.add(descriptor);
+            PlatformDef pd = (PlatformDef)linkingDef.def;
+            Set<DefDescriptor<?>> superDeps = pd.getSupers();
+            for (DefDescriptor<?> dep : superDeps) {
+                inheritanceHelper(dep, stack, linkingDef.def);
+            }
+            stack.remove(descriptor);
+        }
+    }
+
     /**
      * A private helper routine to make the compiler code more sane.
      *
@@ -311,23 +368,23 @@ public class AuraLinker {
                 // We need to walk the whole tree, which is unfortunate perf-wise.
                 //
                 if (linkingDef.def == null) {
-                    if (!fillLinkingDefinition(linkingDef)) {
-                        // No def. Blow up.
-                        Location l = null;
-                        if (parent != null) {
-                            l = parent.getLocation();
-                        }
-                        stack.remove(descriptor);
-                        String stackInfo = null;
-                        if (stack.size() > 0) {
-                            stackInfo = stack.toString();
-                        }
-                        throw new DefinitionNotFoundException(descriptor, l, stackInfo);
-                    }
+                    fillDefinitionOrThrow(linkingDef, parent, stack);
                     // get client libs
                     if (clientLibs != null && linkingDef.def instanceof BaseComponentDef) {
                         BaseComponentDef baseComponent = (BaseComponentDef) linkingDef.def;
                         baseComponent.addClientLibs(clientLibs);
+                    }
+                }
+
+                if (linkingDef.def instanceof PlatformDef) {
+                    PlatformDef pd = (PlatformDef)linkingDef.def;
+                    Set<DefDescriptor<?>> superDeps = pd.getSupers();
+                    if (superDeps.size() > 0) {
+                        Set<DefDescriptor<?>> inheritanceStack = Sets.newLinkedHashSet();
+                        inheritanceStack.add(descriptor);
+                        for (DefDescriptor<?> dep : superDeps) {
+                            inheritanceHelper(dep, inheritanceStack, linkingDef.def);
+                        }
                     }
                 }
 
@@ -349,10 +406,36 @@ public class AuraLinker {
         }
     }
 
+    private void flatteningRecurse(LinkingDefinition<?> linkingDef, ReferenceValidationContext context) throws QuickFixException {
+        if (!(linkingDef.def instanceof PlatformDef)) {
+            linkingDef.rolledup = true;
+            return;
+        }
+        PlatformDef pd = (PlatformDef)linkingDef.def;
+        Set<DefDescriptor<?>> supers = pd.getSupers();
+        for (DefDescriptor<?> superDesc : supers) {
+            LinkingDefinition<?> superDef = getLinkingDef(superDesc);
+            if (linkingDef.built && !linkingDef.rolledup) {
+                flatteningRecurse(superDef, context);
+            }
+        }
+        pd.flattenHierarchy(context);
+        linkingDef.rolledup = true;
+    }
+
+    private void finishFlatten() throws QuickFixException {
+        final Map<DefDescriptor<? extends Definition>,Definition> accessible = Maps.newHashMap();
+        linked.values().stream().forEach(linkingDef -> accessible.put(linkingDef.descriptor, linkingDef.def));
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(accessible);
+        for (LinkingDefinition<?> linkingDef : linked.values()) {
+            if (linkingDef.built && !linkingDef.rolledup) {
+                flatteningRecurse(linkingDef, validationContext);
+            }
+        }
+    }
 
     /**
      * finish up the validation of a set of compiling defs.
-     *
      */
     private void finishValidation() throws QuickFixException {
         int iteration = 0;
@@ -369,8 +452,8 @@ public class AuraLinker {
         // The ability to nest is nearly gone, meaning that this will get much simpler.
         //
         do {
+            finishFlatten();
             compiling = Lists.newArrayList(linked.values());
-
             Map<DefDescriptor<? extends Definition>,Definition> accessible = Maps.newHashMap();
             linked.values().stream().forEach(linkingDef -> accessible.put(linkingDef.descriptor, linkingDef.def));
             ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(accessible);
@@ -407,6 +490,24 @@ public class AuraLinker {
                 throw new AuraRuntimeException("Missing def for " + linkingDef.descriptor + " during validation of "
                         + topLevel);
             }
+        }
+    }
+
+
+    private void fillDefinitionOrThrow(LinkingDefinition<?> linking, Definition parent, Set<DefDescriptor<?>> stack) 
+            throws QuickFixException {
+        if (!fillLinkingDefinition(linking)) {
+            // No def. Blow up.
+            Location l = null;
+            if (parent != null) {
+                l = parent.getLocation();
+            }
+            stack.remove(linking.descriptor);
+            String stackInfo = null;
+            if (stack.size() > 0) {
+                stackInfo = stack.toString();
+            }
+            throw new DefinitionNotFoundException(linking.descriptor, l, stackInfo);
         }
     }
 

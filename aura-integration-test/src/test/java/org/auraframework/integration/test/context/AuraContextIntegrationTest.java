@@ -340,7 +340,7 @@ public class AuraContextIntegrationTest extends AuraImplTestCase {
                 AttributeDef.SerializeToType.BOTH, null, new DefinitionAccessImpl(AuraContext.Access.PUBLIC)));
         EventDefImpl eventDef = vendor.makeEventDef(eventDesc, EventType.COMPONENT, atts, null, null, AuraContext.Access.INTERNAL);
 
-        context.addDynamicDef(eventDef);
+        definitionService.addDynamicDef(eventDef);
         String res = JsonEncoder.serialize(context, context.getJsonSerializationContext());
         assertTrue(res.contains("markup://fake:event"));
     }

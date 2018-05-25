@@ -72,7 +72,7 @@ BaseComponent<D, I> {
 
     protected final DefDescriptor<D> originalDescriptor;
     protected DefDescriptor<D> descriptor;
-    protected DefDescriptor<? extends RootDefinition> intfDescriptor;
+    protected DefDescriptor<? extends BaseComponentDef> intfDescriptor;
     private final String globalId;
     private final String path;
     protected String localId;

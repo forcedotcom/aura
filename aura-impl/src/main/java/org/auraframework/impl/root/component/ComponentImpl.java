@@ -17,6 +17,7 @@ package org.auraframework.impl.root.component;
 
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -84,9 +85,9 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
             BaseComponent<?, ?> oldComponent = context.setCurrentComponent(new ProtoComponentImpl(descriptor,
                     getGlobalId(), attributeSet));
             try {
-                RootDefinition root = intfDescriptor.getDef();
+                BaseComponentDef root = intfDescriptor.getDef();
                 ProviderDef providerDef = root.getLocalProviderDef();
-                if (providerDef == null && root.getProviderDef() == null) {
+                if (providerDef == null && root.getRemoteProviderDef() == null) {
                     // In this case, we have no provider anywhere. This should have been
                     // caught at compile time.
                     throw new InvalidDefinitionException(String.format("%s cannot be instantiated directly.",
@@ -98,7 +99,7 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
                     ComponentConfig config = provider.provide();
                     //ComponentConfig config = providerDef.provide(intfDescriptor);
                     if (config != null) {
-                        ProviderDef remoteProviderDef = root.getProviderDef();
+                        ProviderDef remoteProviderDef = root.getRemoteProviderDef();
                         if (remoteProviderDef == null || remoteProviderDef.isLocal() || config.getShouldSerializeToClient()) {
                             hasLocalDependencies = true;
                         }

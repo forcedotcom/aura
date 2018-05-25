@@ -17,7 +17,6 @@ package org.auraframework.impl.factory;
 
 import javax.inject.Inject;
 
-import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -50,10 +49,6 @@ public class InterfaceDefFactoryTest extends AuraImplTestCase {
                 )));
         InterfaceDef def = factory.getDefinition(bundleSource.getDescriptor(), bundleSource);
         assertNotNull(def);
-        assertEquals(1, def.getAttributeDefs().size());
-        assertTrue(def.getAttributeDefs().containsKey(definitionService.getDefDescriptor("mystring", AttributeDef.class)));
-        assertEquals(1, def.getRegisterEventDefs().size());
-        assertNotNull(def.getRegisterEventDefs().get("click"));
     }
 
     /**
@@ -69,8 +64,8 @@ public class InterfaceDefFactoryTest extends AuraImplTestCase {
                 "<aura:interface extends='aura:testinterfaceparent'></aura:interface>"
                 )));
         InterfaceDef def = factory.getDefinition(bundleSource.getDescriptor(), bundleSource);
-        assertEquals(1, def.getExtendsDescriptors().size());
-        assertEquals("testinterfaceparent", def.getExtendsDescriptors().iterator().next().getName());
+        assertEquals(1, def.getDeclaredExtendsDescriptors().size());
+        assertEquals("testinterfaceparent", def.getDeclaredExtendsDescriptors().iterator().next().getName());
     }
 
     /**

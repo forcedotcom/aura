@@ -31,11 +31,6 @@ public interface RootDefinition extends PlatformDef, Versionable {
     DefDescriptor<? extends RootDefinition> getDescriptor();
 
     /**
-     * @return just the attributes declared on this definition
-     */
-    Map<DefDescriptor<AttributeDef>, AttributeDef> getDeclaredAttributeDefs();
-
-    /**
      * @return all the required versions for this component
      * @throws QuickFixException
      */
@@ -48,24 +43,33 @@ public interface RootDefinition extends PlatformDef, Versionable {
     RequiredVersionDef getRequiredVersion(String namespace);
 
     /**
-     * This is used to validate by the compiler to validate EventDefRefs.
+     * Get the full set of registered event defs (including inherited)
      * 
      * @return all the events this component can fire, including those inherited
      * @throws QuickFixException
      */
-    Map<String, RegisterEventDef> getRegisterEventDefs() throws org.auraframework.throwable.quickfix.QuickFixException;
-
+    Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException;
+    
+    /**
+     * Check to see if this definition is an instance of another.
+     *
+     * This does a recursive check for instances, and will not work until after the definition has been
+     * 'rolled-up' so that we can effectively do the check.
+     *
+     * @param other the other definition to check.
+     * @return true if the definition is an instance of the other definition.
+     * @throws QuickFixException never - this should be removed.
+     */
     boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException;
 
     DefDescriptor<? extends ProviderDef> getProviderDescriptor() throws QuickFixException;
 
     ProviderDef getProviderDef() throws QuickFixException;
 
+    ProviderDef getLocalProviderDef() throws QuickFixException;
+
     @Deprecated
     List<DefDescriptor<?>> getBundle();
 
-    ProviderDef getLocalProviderDef() throws QuickFixException;
-
     DocumentationDef getDocumentationDef() throws QuickFixException;
-
 }

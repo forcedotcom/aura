@@ -45,6 +45,7 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.RootDefinitionTest;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.validation.ReferenceValidationContextImpl;
@@ -79,6 +80,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public BaseComponentDefTest(Class<T> defClass, String tag) {
         super(defClass, tag);
     }
+
+    protected abstract BaseComponentDefImpl.Builder<T> getBuilder();
 
     @Test
     public void testHashCode() throws Exception {
@@ -185,6 +188,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertTrue("The BaseComponentDefs should have been equal", bcd1.equals(bcd2));
     }
 
+    @SuppressWarnings("unlikely-arg-type")
     @Test
     public void testEqualsWithDifferentObjects() throws Exception {
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
@@ -235,9 +239,11 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     @Test
     public void testSerializeWithAttributes() throws Exception {
-        Map<DefDescriptor<AttributeDef>, AttributeDef> testAttributeDefs = ImmutableMap.of(
-                definitionService.getDefDescriptor("testAttributeDescriptorName", AttributeDef.class),
-                (AttributeDef) vendor.makeAttributeDefWithNulls(
+        BaseComponentDefImpl.Builder<T> builder = getBuilder();
+        builder.setDescriptor(new DefDescriptorImpl<>("markup", "string", "nothere", getDefClass()));
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.INTERNAL));
+        builder.addAttributeDef(new DefDescriptorImpl<>(null, null, "testAttributeDescriptorName", AttributeDef.class),
+                vendor.makeAttributeDefWithNulls(
                         "testAttributeDescriptorName",
                         null,
                         vendor.getTypeDefDescriptor(),
@@ -245,25 +251,30 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                                 vendor.makeLocation("filename1", 5, 5, 0)),
                         false, null,
                         vendor.makeLocation("filename1", 5, 5, 0)));
-        serializeAndGoldFile(vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                "aura:test", testAttributeDefs, null, null, vendor.makeLocation("filename1", 5, 5, 0), null,
-                null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL));
+        T def = builder.build();
+        definitionService.addDynamicDef(def);
+        serializeAndGoldFile(def);
     }
 
     @Test
     public void testSerializeBasic() throws Exception {
-        serializeAndGoldFile(vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                "aura:test", null, null, null, vendor.makeLocation("filename2", 10, 10, 0), null,
-                null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL));
+        BaseComponentDefImpl.Builder<T> builder = getBuilder();
+        builder.setDescriptor(new DefDescriptorImpl<>("markup", "string", "nothere", getDefClass()));
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.INTERNAL));
+        T def = builder.build();
+        definitionService.addDynamicDef(def);
+        serializeAndGoldFile(def);
     }
 
     @Test
     @UnAdaptableTest("Checks for running this test in core are different so will not be in Locker")
     public void testSerializeInLocker() throws Exception {
         // Using a non-internal namespace will put the component in the Locker
-        serializeAndGoldFile(vendor.makeBaseComponentDefWithNulls(getDefClass(),
+            T def = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "nonInternal:component", null, null, null, vendor.makeLocation("filename3", 10, 10, 0), null,
-                null, null, null, null, null, null, false, false, AuraContext.Access.PUBLIC));
+                null, null, null, null, null, null, false, false, AuraContext.Access.PUBLIC);
+            definitionService.addDynamicDef(def);
+            serializeAndGoldFile(def);
     }
 
     /**
@@ -276,9 +287,10 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<RendererDef> renderer = definitionService.getDefDescriptor(
                 "js://aura.html", RendererDef.class);
         rendererList.add(renderer);
-        Object cmpDef = vendor.makeBaseComponentDefWithNulls(getDefClass(),
+        T cmpDef = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "aura:if", null, null, null, null, null, null, null, null,
                 rendererList, null, null, false, false, AuraContext.Access.INTERNAL);
+        definitionService.addDynamicDef(cmpDef);
 
         Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
         Map<?, ?> rendererDef = (Map<?, ?>) json.get("rendererDef");
@@ -297,10 +309,10 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<HelperDef> helper = definitionService.getDefDescriptor(
                 "js://aura.label", HelperDef.class);
         helperList.add(helper);
-        Object cmpDef = vendor.makeBaseComponentDefWithNulls(getDefClass(),
+        T cmpDef = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "aura:if", null, null, null, null, null, null, null, null,
                 null, helperList, null, false, false, AuraContext.Access.INTERNAL);
-
+        definitionService.addDynamicDef(cmpDef);
         Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
         Map<?, ?> helperDef = (Map<?, ?>) json.get("helperDef");
 
@@ -310,11 +322,12 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     @Test
     public void testComponentClassSerialized() throws Exception {
-        Object cmpDef = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                "aura:text", null, null, null, null, null, null, null, null,
-                null, null, null, false, false, AuraContext.Access.INTERNAL);
-
-        Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
+        BaseComponentDefImpl.Builder<T> builder = getBuilder();
+        builder.setDescriptor(new DefDescriptorImpl<>("markup", "string", "nothere", getDefClass()));
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.INTERNAL));
+        T def = builder.build();
+        definitionService.addDynamicDef(def);
+        Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(def));
         String componentClass = (String) json.get(Json.ApplicationKey.COMPONENTCLASS.toString());
 
         assertNotNull(componentClass);
@@ -329,6 +342,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "aura:test", null, null, null, null, null, null, extendsDescriptor, interfaces, null, null, null,
                 false, false, AuraContext.Access.INTERNAL);
+        definitionService.addDynamicDef(bcd);
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = bcd.getAttributeDefs();
         //assertEquals(4  , attributes.size());
         assertTrue("mystring should be an attribute",
@@ -348,6 +362,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "aura:test", null, null, null, null, null, null, extendsDescriptor, interfaces, null, null, null,
                 false, false, AuraContext.Access.INTERNAL);
+        definitionService.addDynamicDef(bcd);
         Map<String, RegisterEventDef> registeredED = bcd.getRegisterEventDefs();
         assertEquals(2, registeredED.size());
         assertNotNull(registeredED.containsKey("parentEvent"));
@@ -692,62 +707,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             fail("Should not be able to load component with invalid provider");
         } catch (QuickFixException e) {
             checkExceptionStart(e, DefinitionNotFoundException.class, "No PROVIDER named java://oops found");
-        }
-    }
-
-    /**
-     * getModelDefDescriptors returns empty list if there are no models. Test method for
-     * {@link BaseComponentDef#getModelDefDescriptors()}.
-     */
-    @Test
-    public void testGetModelDefDescriptorsWithoutModels() throws QuickFixException {
-        List<DefDescriptor<ModelDef>> dds = define(baseTag, "", "").getModelDefDescriptors();
-        assertNotNull(dds);
-        assertTrue(dds.isEmpty());
-    }
-
-    /**
-     * Test method for {@link BaseComponentDef#getModelDefDescriptors()}.
-     */
-    @Test
-    public void testGetModelDefDescriptors() throws QuickFixException {
-        DefDescriptor<T> grandParentDesc = addSourceAutoCleanup(getDefClass(), String.format(baseTag,
-                "extensible='true'", ""));
-        DefDescriptor<ModelDef> grandParentModelDesc = DefDescriptorImpl.getAssociateDescriptor(grandParentDesc,
-                ModelDef.class,
-                DefDescriptor.JAVASCRIPT_PREFIX);
-        addSourceAutoCleanup(grandParentModelDesc, "{obj:{}}");
-
-        DefDescriptor<T> parentDesc = addSourceAutoCleanup(
-                getDefClass(),
-                String.format(
-                        baseTag,
-                        String.format("extends='%s' extensible='true' model='js://test.jsModel'",
-                                grandParentDesc.getDescriptorName()),
-                        ""));
-
-        DefDescriptor<T> compDesc = addSourceAutoCleanup(getDefClass(), String.format(
-                baseTag,
-                String.format("extends='%s' model='java://org.auraframework.components.test.java.model.TestModel'",
-                        parentDesc.getDescriptorName()),
-                ""));
-
-        List<DefDescriptor<ModelDef>> dds = definitionService.getDefinition(compDesc).getModelDefDescriptors();
-        assertNotNull(dds);
-
-        List<String> names = Lists.transform(dds, new Function<DefDescriptor<?>, String>() {
-            @Override
-            public String apply(DefDescriptor<?> input) {
-                return input.getQualifiedName();
-            }
-        });
-        Set<String> expected = ImmutableSet.of("java://org.auraframework.components.test.java.model.TestModel",
-                "js://test.jsModel", grandParentModelDesc.getQualifiedName());
-        if (!names.containsAll(expected)) {
-            fail("Missing expected models. Expected: " + expected + ", Actual: " + names);
-        }
-        if (!expected.containsAll(names)) {
-            fail("Unexpected models. Expected: " + expected + ", Actual: " + names);
         }
     }
 
@@ -1529,7 +1488,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<T> extendsSelf = addSourceAutoCleanup(getDefClass(), "");
         getAuraTestingUtil().updateSource(extendsSelf, String.format(baseTag,
                     "extensible='true' extends='" + extendsSelf.getDescriptorName() + "'", ""));
-        DefType defType = DefType.getDefType(this.getDefClass());
         try {
             definitionService.getDefinition(extendsSelf);
             fail(defType + " should not be able to extend itself.");
@@ -1546,7 +1504,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<T> extendsCmp = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "extends='" + nonExtensible.getDescriptorName() + "'", ""));
 
-        DefType defType = DefType.getDefType(this.getDefClass());
         try {
             definitionService.getDefinition(extendsCmp);
             fail(defType + " should not be able to extend a non-extensible component");
@@ -1565,7 +1522,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<T> cmp = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "extends='aura:iDontExist'", ""));
 
-        DefType defType = DefType.getDefType(this.getDefClass());
         try {
             definitionService.getDefinition(cmp);
             fail(defType + " should throw Exception when extending non-existent component");
@@ -1584,7 +1540,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<T> cmp = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "extends=''", ""));
 
-        DefType defType = DefType.getDefType(this.getDefClass());
         try {
             definitionService.getDefinition(cmp);
             fail(defType + " should throw Exception when extends is empty");
@@ -1792,7 +1747,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 String.format(baseTag, "", "<aura:registerEvent name='dupeAttrEvent' type='test:parentEvent'/>"
                         + "<aura:attribute name='dupeAttrEvent' type='String'/>"));
 
-        DefType defType = DefType.getDefType(this.getDefClass());
         try {
             definitionService.getDefinition(dd);
             fail(defType + " should not be able to have attribute and event with same name");
@@ -1971,15 +1925,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Verify getHelper returns null when no HelperDef
-     */
-    @Test
-    public void testGetHelperDefDefault() throws Exception {
-        HelperDef helperDef = define(baseTag, "", "").getHelperDef();
-        assertNull(helperDef);
-    }
-
-    /**
      * Verify getHelper returns HelperDef when component has auto-wired helper
      */
     @Test
@@ -1988,7 +1933,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<HelperDef> expectedHelperDescriptor = DefDescriptorImpl.getAssociateDescriptor(cmpDescriptor,
                 HelperDef.class, DefDescriptor.JAVASCRIPT_PREFIX);
         addSourceAutoCleanup(expectedHelperDescriptor, "({help:function(){}})");
-        HelperDef helperDef = definitionService.getDefinition(cmpDescriptor).getHelperDef();
+        HelperDef helperDef = definitionService.getDefinition(cmpDescriptor).getRemoteHelperDef();
 
         assertNotNull(helperDef);
         DefDescriptor<HelperDef> actualHelperDescriptor = helperDef.getDescriptor();
@@ -2003,7 +1948,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         String helperJS = "({})";
         DefDescriptor<HelperDef> expectedHelperDescriptor = addSourceAutoCleanup(HelperDef.class, helperJS);
         String helperAttribute = String.format("helper='%s'", expectedHelperDescriptor.getQualifiedName());
-        HelperDef helperDef = define(baseTag, helperAttribute, "").getHelperDef();
+        HelperDef helperDef = define(baseTag, helperAttribute, "").getRemoteHelperDef();
 
         assertNotNull(helperDef);
         DefDescriptor<HelperDef> actualHelperDescriptor = helperDef.getDescriptor();
@@ -2024,7 +1969,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 HelperDef.class, DefDescriptor.JAVASCRIPT_PREFIX);
         addSourceAutoCleanup(autoWiredHelperDescriptor, "({help:function(){}})");
 
-        HelperDef helperDef = definitionService.getDefinition(cmpDescriptor).getHelperDef();
+        HelperDef helperDef = definitionService.getDefinition(cmpDescriptor).getRemoteHelperDef();
         assertNotNull(helperDef);
         assertEquals(explicitHelperDescriptor, helperDef.getDescriptor());
     }

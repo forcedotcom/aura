@@ -61,7 +61,7 @@ import com.google.common.collect.Sets;
  */
 public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implements TokensDef {
 
-    private static final long serialVersionUID = -6632330906775767056L;
+    private static final long serialVersionUID = 1L;
 
     private final Map<String, TokenDef> tokens;
     private final List<DefDescriptor<TokensDef>> imports;
@@ -450,7 +450,7 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
     }
 
     @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
+    public Map<String, RegisterEventDef> getRegisterEventDefs() {
         return Collections.emptyMap();
     }
 

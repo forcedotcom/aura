@@ -152,10 +152,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         }
 
         @Override
-        public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
-        }
-
-        @Override
         public void serialize(Json json) throws IOException {
         }
 

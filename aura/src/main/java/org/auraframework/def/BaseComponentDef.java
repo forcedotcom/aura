@@ -28,7 +28,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * Common base for ComponentDef and ApplicationDef
  */
 public interface BaseComponentDef extends RootDefinition {
-
     /**
      * Get the component descriptor.
      */
@@ -92,14 +91,21 @@ public interface BaseComponentDef extends RootDefinition {
      * @return all library requirements on this component, including those inherited
      * @throws QuickFixException
      */
-    List<LibraryDefRef> getImports() throws QuickFixException;
+    List<LibraryDefRef> getImports();
 
     /**
      * @return All the locators defined in this component def
      */
     Map<String, LocatorDef> getLocators();
 
-    List<DefDescriptor<ModelDef>> getModelDefDescriptors() throws QuickFixException;
+    /**
+     * Get the descriptors for this component's models.
+     *
+     * @return the set of descriptors for models that this component declares, and might use.
+     * @deprecated Models are deprecated, and this method is not very useful in any case.
+     */
+    @Deprecated
+    List<DefDescriptor<ModelDef>> getModelDefDescriptors();
 
     List<DefDescriptor<ControllerDef>> getControllerDefDescriptors() throws QuickFixException;
 
@@ -107,17 +113,12 @@ public interface BaseComponentDef extends RootDefinition {
 
     ControllerDef getControllerDef() throws QuickFixException;
 
-    HelperDef getHelperDef() throws QuickFixException;
-
     /**
      * Get the code for the client side for this component.
      *
      * @param minify should it be the minified version or not.
      */
     String getCode(boolean minify);
-
-    @Override
-    ProviderDef getProviderDef() throws QuickFixException;
 
     ControllerDef getLocalControllerDef() throws QuickFixException;
 
@@ -149,7 +150,26 @@ public interface BaseComponentDef extends RootDefinition {
 
     RenderType getRender();
 
+    /**
+     * Get the full set of interfaces directly implemented by this component.
+     *
+     * This set is the somewhat confusing set of interfaces that is either directly implemented
+     * by this component, or is extended by one of those interfaces. It does not include interfaces
+     * that are implemented by a super component of this component.
+     *
+     * @return the set of interfaces.
+     */
     Set<DefDescriptor<InterfaceDef>> getInterfaces();
+
+    /**
+     * Get the full set of definitions extended by this component.
+     *
+     * This is the set of all things that this component extends/implements. So all interfaces
+     * implemented by this component, one of its super components or one of the interfaces therein
+     *
+     * @return the full set of extended components/implemented interfaces.
+     */
+    Set<DefDescriptor<?>> getAllExtensions();
 
     boolean hasLocalDependencies() throws QuickFixException;
 
@@ -208,6 +228,7 @@ public interface BaseComponentDef extends RootDefinition {
     //
     ControllerDef getRemoteControllerDef();
     HelperDef getRemoteHelperDef();
+
     ProviderDef getRemoteProviderDef();
     RendererDef getRemoteRendererDef();
     StyleDef getStyleDef();

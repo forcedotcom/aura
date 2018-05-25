@@ -15,13 +15,12 @@
  */
 package org.auraframework.impl.css;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.salesforce.omakase.plugin.Plugin;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.css.FlavorOverrideLocator;
-import org.auraframework.css.TokenCache;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseStyleDef;
@@ -29,16 +28,13 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.FlavorsDef;
-import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.parser.plugin.FlavorOverridePlugin;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import com.google.common.collect.ImmutableList;
+import com.salesforce.omakase.plugin.Plugin;
 
 
 public class StyleDefWriter {

@@ -260,10 +260,6 @@ public class AuraContextImplTest extends AuraImplTestCase {
         }
 
         @Override
-        public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
-        }
-
-        @Override
         public DefDescriptor<? extends Definition> getDescriptor() {
             return descriptor;
         }

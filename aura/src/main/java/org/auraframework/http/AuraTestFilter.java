@@ -429,7 +429,7 @@ public class AuraTestFilter {
                 if (doReset && def instanceof Resettable) {
                     ((Resettable) def).reset();
                 }
-                context.addDynamicDef(def);
+                definitionService.addDynamicDef(def);
             } catch (Throwable t) {
                 loggingService.error("AuraTestFilter.loadTestMocks(): Failed to add mock " + def, t);
                 error = true;

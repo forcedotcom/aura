@@ -17,12 +17,10 @@ package org.auraframework.impl.root.intf;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
@@ -38,7 +36,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.validation.ReferenceValidationContext;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * The definition of an interface. Holds all information about a given type of
@@ -47,17 +48,29 @@ import com.google.common.collect.Lists;
  */
 public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implements InterfaceDef {
 
-    private static final long serialVersionUID = -4629444607020775922L;
+    private static final long serialVersionUID = 1L;
 
     private final Set<DefDescriptor<InterfaceDef>> extendsDescriptors;
+    private final Set<DefDescriptor<?>> supers;
     private final Map<String, RegisterEventDef> events;
     private final Map<DefDescriptor<MethodDef>, MethodDef> methodDefs;
     private final int hashCode;
 
+    private transient volatile Set<DefDescriptor<InterfaceDef>> allInterfaces;
+    private transient volatile Map<String, RegisterEventDef> allEvents;
+    private transient volatile Map<DefDescriptor<MethodDef>, MethodDef> allMethodDefs;
+    private transient volatile Map<DefDescriptor<AttributeDef>, AttributeDef> allAttrs;
+
     protected InterfaceDefImpl(Builder builder) {
         super(builder);
 
-        this.extendsDescriptors = AuraUtil.immutableSet(builder.extendsDescriptors);
+        if (builder.extendsDescriptors == null) {
+            this.extendsDescriptors = ImmutableSet.of();
+        } else {
+            this.extendsDescriptors = Collections.unmodifiableSet(builder.extendsDescriptors);
+        }
+        // FIXME: Java is really stupid here. It allows this, but not a direct assignment.
+        this.supers = Collections.unmodifiableSet(this.extendsDescriptors);
         this.events = AuraUtil.immutableMap(builder.events);
         this.methodDefs = AuraUtil.immutableMap(builder.methods);
         this.hashCode = AuraUtil.hashCode(super.hashCode(), extendsDescriptors, events);
@@ -97,7 +110,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
         super.validateReferences(validationContext);
 
         for (DefDescriptor<InterfaceDef> extended : extendsDescriptors) {
-            InterfaceDef def = Aura.getDefinitionService().getDefinition(extended);
+            InterfaceDef def = validationContext.getAccessibleDefinition(extended);
             if (def == null) {
                 throw new DefinitionNotFoundException(extended, getLocation());
             }
@@ -116,6 +129,31 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
         for (AttributeDef att : this.attributeDefs.values()) {
             att.validateReferences(validationContext);
         }
+    }
+
+    @Override
+    public void flattenHierarchy(ReferenceValidationContext validationContext) throws QuickFixException {
+        Set<DefDescriptor<InterfaceDef>> ifcs = Sets.newLinkedHashSet();
+        Map<String, RegisterEventDef> evts = Maps.newLinkedHashMap();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = Maps.newLinkedHashMap();
+        Map<DefDescriptor<MethodDef>, MethodDef> meths = Maps.newLinkedHashMap();
+
+        for (DefDescriptor<InterfaceDef> extendsDescriptor : extendsDescriptors) {
+            InterfaceDef extendsDef = validationContext.getAccessibleDefinition(extendsDescriptor);
+            evts.putAll(extendsDef.getRegisterEventDefs());
+            meths.putAll(extendsDef.getMethodDefs());
+            attrs.putAll(extendsDef.getAttributeDefs());
+            ifcs.addAll(extendsDef.getExtendsDescriptors());
+            ifcs.add(extendsDef.getDescriptor());
+        }
+        evts.putAll(events);
+        meths.putAll(this.methodDefs);
+        attrs.putAll(this.attributeDefs);
+
+        this.allMethodDefs = Collections.unmodifiableMap(meths);
+        this.allEvents = Collections.unmodifiableMap(evts);
+        this.allAttrs = Collections.unmodifiableMap(attrs);
+        this.allInterfaces = Collections.unmodifiableSet(ifcs);
     }
 
     /**
@@ -138,19 +176,13 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
     }
 
     @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
-        Map<String, RegisterEventDef> ret = new LinkedHashMap<>();
-        for (DefDescriptor<InterfaceDef> extendsDescriptor : extendsDescriptors) {
-            InterfaceDef extendsDef = extendsDescriptor.getDef();
-            ret.putAll(extendsDef.getRegisterEventDefs());
-            ret.putAll(events);
-        }
+    public Set<DefDescriptor<?>> getSupers() {
+        return supers;
+    }
 
-        if (ret.isEmpty()) {
-            return events;
-        } else {
-            return Collections.unmodifiableMap(ret);
-        }
+    @Override
+    public Map<String, RegisterEventDef> getRegisterEventDefs() {
+        return this.allEvents;
     }
 
     /**
@@ -159,14 +191,8 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
      * @throws QuickFixException
      */
     @Override
-    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
-
-        Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = new LinkedHashMap<>();
-        for (DefDescriptor<InterfaceDef> extendsDescriptor : extendsDescriptors) {
-            attributeDefs.putAll(Aura.getDefinitionService().getDefinition(extendsDescriptor).getAttributeDefs());
-        }
-        attributeDefs.putAll(this.attributeDefs);
-        return Collections.unmodifiableMap(attributeDefs);
+    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() {
+        return this.allAttrs;
     }
 
     /**
@@ -176,12 +202,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
      */
     @Override
     public Map<DefDescriptor<MethodDef>, MethodDef> getMethodDefs() throws QuickFixException {
-        Map<DefDescriptor<MethodDef>, MethodDef> methodDefs = new LinkedHashMap<>();
-        for (DefDescriptor<InterfaceDef> extendsDescriptor : extendsDescriptors) {
-            methodDefs.putAll(Aura.getDefinitionService().getDefinition(extendsDescriptor).getMethodDefs());
-        }
-        methodDefs.putAll(this.methodDefs);
-        return Collections.unmodifiableMap(methodDefs);
+        return allMethodDefs;
     }
 
 
@@ -192,6 +213,11 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
 
     @Override
     public Set<DefDescriptor<InterfaceDef>> getExtendsDescriptors() {
+        return allInterfaces;
+    }
+
+    @Override
+    public Set<DefDescriptor<InterfaceDef>> getDeclaredExtendsDescriptors() {
         return extendsDescriptors;
     }
 
@@ -246,21 +272,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
 
     @Override
     public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
-        switch (other.getDefType()) {
-        case INTERFACE:
-            if (descriptor.equals(other)) {
-                return true;
-            }
-
-            for (DefDescriptor<InterfaceDef> intf : extendsDescriptors) {
-                if (intf.equals(other) || intf.getDef().isInstanceOf(other)) {
-                    return true;
-                }
-            }
-            return false;
-        default:
-            return false;
-        }
+        return descriptor.equals(other) || allInterfaces.contains(other);
     }
 
     @Override
@@ -268,5 +280,4 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
         List<DefDescriptor<?>> ret = Lists.newArrayList();
         return ret;
     }
-
 }

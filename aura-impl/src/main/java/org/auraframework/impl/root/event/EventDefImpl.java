@@ -17,12 +17,10 @@ package org.auraframework.impl.root.event;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
@@ -40,25 +38,32 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.validation.ReferenceValidationContext;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * The definition of an event, basically just defines shape, i.e. attributes
  */
 public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventDef {
 
-    private static final long serialVersionUID = -5328742464932470661L;
-
-    private final EventType eventType;
-    private final DefDescriptor<EventDef> extendsDescriptor;
-    private transient DefDescriptor<EventDef> extendsDescriptorCanonical;
-    private final int hashCode;
+    private static final long serialVersionUID = 1L;
     private static final DefDescriptor<EventDef> PROTO_COMPONENT_EVENT = new DefDescriptorImpl<>("markup", "aura",
             "componentEvent", EventDef.class);
     private static final DefDescriptor<EventDef> PROTO_APPLICATION_EVENT = new DefDescriptorImpl<>("markup", "aura",
             "applicationEvent", EventDef.class);
     private static final DefDescriptor<EventDef> PROTO_VALUE_EVENT = new DefDescriptorImpl<>("markup", "aura",
             "valueEvent", EventDef.class);
+
+    private final EventType eventType;
+    private final DefDescriptor<EventDef> extendsDescriptor;
+    private final Set<DefDescriptor<?>> supers;
+    private final int hashCode;
+
+    private transient volatile DefDescriptor<EventDef> extendsDescriptorCanonical;
+    private transient volatile Map<DefDescriptor<AttributeDef>, AttributeDef> calculatedAttributeDefs;
+    private transient volatile Set<DefDescriptor<EventDef>> calculatedExtensions;
 
     protected EventDefImpl(Builder builder) {
         super(builder);
@@ -73,6 +78,11 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
             this.extendsDescriptor = PROTO_VALUE_EVENT;
         } else {
             this.extendsDescriptor = null;
+        }
+        if (this.extendsDescriptor == null) {
+            this.supers = ImmutableSet.of();
+        } else {
+            this.supers = new ImmutableSet.Builder<DefDescriptor<?>>().add(this.extendsDescriptor).build();
         }
         this.hashCode = AuraUtil.hashCode(super.hashCode(), extendsDescriptor, eventType);
     }
@@ -112,7 +122,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
                         && !extendsDescriptorCanonical.equals(PROTO_COMPONENT_EVENT)
                         && !extendsDescriptorCanonical.equals(PROTO_APPLICATION_EVENT)) {
                     json.writeMapEntry(Json.ApplicationKey.SUPERDEF, extendsDescriptorCanonical);
-                }
+                    }
                 Map<DefDescriptor<AttributeDef>, AttributeDef> attrDefs = getAttributeDefs();
                 if (attrDefs.size() > 0) {
                     json.writeMapEntry(Json.ApplicationKey.ATTRIBUTES, attrDefs);
@@ -127,14 +137,6 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
         } catch (QuickFixException e) {
             throw new AuraUnhandledException("unhandled exception", e);
         }
-    }
-
-    private EventDef getSuperDef() throws QuickFixException {
-        EventDef ret = null;
-        if (getExtendsDescriptor() != null) {
-            ret = Aura.getDefinitionService().getDefinition(extendsDescriptor);
-        }
-        return ret;
     }
 
     @Override
@@ -163,12 +165,37 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
                 throw new InvalidDefinitionException(String.format("Event %s cannot extend %s", getDescriptor(),
                         getExtendsDescriptor()), getLocation());
             }
-            extendsDescriptorCanonical = extended.getDescriptor();
             // need to resolve duplicated attributes from supers
         }
 
         for (AttributeDef att : this.attributeDefs.values()) {
             att.validateReferences(validationContext);
+        }
+    }
+
+    @Override
+    public void flattenHierarchy(ReferenceValidationContext validationContext) throws QuickFixException {
+        if (extendsDescriptor != null) {
+            EventDef extended = validationContext.getAccessibleDefinition(extendsDescriptor);
+            extendsDescriptorCanonical = extended.getDescriptor();
+
+            Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = Maps.newLinkedHashMap();
+            attrs.putAll(extended.getAttributeDefs());
+            // FIXME(goliver): check overlaps
+            attrs.putAll(attributeDefs);
+            this.calculatedAttributeDefs = Collections.unmodifiableMap(attrs);
+
+            Set<DefDescriptor<EventDef>> extensions = Sets.newHashSet();
+            DefDescriptor<EventDef> zuper = extended.getDescriptor();
+            while (zuper != null) {
+                EventDef zuperDef = validationContext.getAccessibleDefinition(zuper);
+                extensions.add(zuper);
+                zuper = zuperDef.getExtendsDescriptor();
+            }
+            this.calculatedExtensions = Collections.unmodifiableSet(extensions);
+        } else {
+            this.calculatedAttributeDefs = attributeDefs;
+            this.calculatedExtensions = Collections.emptySet();
         }
     }
 
@@ -181,18 +208,13 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
     }
 
     @Override
-    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
-        Map<DefDescriptor<AttributeDef>, AttributeDef> map = new HashMap<>();
-        if (extendsDescriptor != null) {
-            map.putAll(getSuperDef().getAttributeDefs());
-        }
+    public Set<DefDescriptor<?>> getSupers() {
+        return supers;
+    }
 
-        if (map.isEmpty()) {
-            return attributeDefs;
-        } else {
-            map.putAll(attributeDefs);
-            return Collections.unmodifiableMap(map);
-        }
+    @Override
+    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
+        return calculatedAttributeDefs;
     }
 
     @Override
@@ -250,19 +272,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
      */
     @Override
     public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) {
-        if (other.equals(descriptor)) {
-            return true;
-        }
-        EventDef zuper = null;
-        try {
-            zuper = getSuperDef();
-            if (zuper != null) {
-                return zuper.isInstanceOf(other);
-            }
-        } catch (QuickFixException e) {
-            throw new AuraUnhandledException("Unable to find super-class", e);
-        }
-        return false;
+        return other.equals(descriptor) || calculatedExtensions.contains(other);
     }
 
     @Override

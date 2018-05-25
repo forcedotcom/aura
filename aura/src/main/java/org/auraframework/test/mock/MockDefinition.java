@@ -172,8 +172,4 @@ public abstract class MockDefinition<D extends Definition> implements Definition
     public DefinitionAccess getAccess() {
         return new MockDefinitionAccess();
     }
-
-    @Override
-    public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
-    }
 }

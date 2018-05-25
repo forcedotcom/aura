@@ -25,10 +25,12 @@ import java.util.Set;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.cache.Cache;
+import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
+import org.auraframework.def.PlatformDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.impl.util.mock.MockDefDescriptor;
@@ -132,7 +134,7 @@ public class AuraLinkerTest {
     private static SecureRandom random = new SecureRandom();
 
     @SuppressWarnings("serial")
-    private static class TestDef implements Definition {
+    private static class TestDef implements PlatformDef {
         private final DefDescriptor<ComponentDef> descriptor;
         private final String ownHash;
         private ArrayList<DefDescriptor<?>> parents = Lists.newArrayList();
@@ -222,12 +224,12 @@ public class AuraLinkerTest {
         }
 
         @Override
-        public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
-            supers.addAll(parents);
+        public Set<DefDescriptor<?>> getSupers() {
+            return Sets.newHashSet(parents);
         }
 
         @Override
-        public DefDescriptor<? extends Definition> getDescriptor() {
+        public DefDescriptor<? extends PlatformDef> getDescriptor() {
             return descriptor;
         }
 
@@ -241,6 +243,41 @@ public class AuraLinkerTest {
             Set<DefDescriptor<?>> deps = Sets.newLinkedHashSet();
             appendDependencies(deps);
             return deps;
+        }
+
+        @Override
+        public Map<DefDescriptor<?>, Definition> getBundledDefs() {
+            return Maps.newHashMap();
+        }
+
+        @Override
+        public <X extends Definition> X getBundledDefinition(DefDescriptor<X> descriptor) {
+            return null;
+        }
+
+        @Override
+        public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
+            return null;
+        }
+
+        @Override
+        public Map<DefDescriptor<AttributeDef>, AttributeDef> getDeclaredAttributeDefs() {
+            return null;
+        }
+
+        @Override
+        public AttributeDef getAttributeDef(String name) throws QuickFixException {
+            return null;
+        }
+
+        @Override
+        public Double getMinVersion() {
+            return null;
+        }
+
+        @Override
+        public SupportLevel getSupport() {
+            return null;
         }
     }
 

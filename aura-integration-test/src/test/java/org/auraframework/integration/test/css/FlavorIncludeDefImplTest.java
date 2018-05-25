@@ -15,7 +15,8 @@
  */
 package org.auraframework.integration.test.css;
 
-import com.google.common.collect.Table;
+import java.util.Set;
+
 import org.auraframework.css.FlavorOverrideLocation;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -24,20 +25,13 @@ import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.util.Flavors;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
-import javax.inject.Inject;
-import java.util.HashSet;
-import java.util.Set;
+import com.google.common.collect.Table;
 
 public class FlavorIncludeDefImplTest extends StyleTestCase {
-
-    @Inject
-    DefinitionService definitionService;
-
     /* util */
     private FlavorIncludeDef source(String flavorIncludeSource) throws QuickFixException {
         String fmt = String.format("<aura:flavors>%s</aura:flavors>", flavorIncludeSource);

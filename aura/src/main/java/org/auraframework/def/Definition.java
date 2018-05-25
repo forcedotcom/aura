@@ -16,16 +16,16 @@
 
 package org.auraframework.def;
 
+import java.util.Collection;
+import java.util.Set;
+
+import javax.annotation.CheckForNull;
+
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
 import org.auraframework.validation.ReferenceValidationContext;
-
-import java.util.Collection;
-import java.util.Set;
-
-import javax.annotation.CheckForNull;
 
 /**
  * Define something.

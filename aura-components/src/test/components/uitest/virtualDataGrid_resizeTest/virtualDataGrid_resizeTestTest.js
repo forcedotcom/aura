@@ -51,23 +51,35 @@
 	
 	testProgrammaticResizing : {
 		test : [function(cmp) {
-			var initialSize = this.WIDTHS.initialWidths[0];
+			var initialWidths = this.WIDTHS.initialWidths;
 
 			// Let's wait for the grid does the initial resize
 			$A.test.addWaitForWithFailureMessage(true, function(){
 				var columns = cmp.find('grid').getElement().querySelectorAll('th');
-				return columns[0].clientWidth === initialSize;
+				var correctWidths = true, i = 0;
+
+				while (correctWidths && i < columns.length) {
+					correctWidths = columns[i].clientWidth === initialWidths[i];
+					i++;
+				}
+
+				return correctWidths;
 			}, 'Columns width did not change for the initialResize (initialWidths)');
 		}, function(cmp) {
-			cmp.find("grid").resizeColumns(this.WIDTHS.smallerWidths);
-		}, function(cmp) {
-			var grid = cmp.find("grid");
-			var columns = grid.getElement().querySelectorAll('th');
-			
-			for (var i=0; i<columns.length; i++) {
-				$A.test.assertEquals(columns[i].clientWidth, this.WIDTHS.smallerWidths[i], "Column " + i + " has an incorrect width.");
-			}
-			
+			var expectedWidths = this.WIDTHS.smallerWidths;
+			cmp.find("grid").resizeColumns(expectedWidths);
+
+			$A.test.addWaitForWithFailureMessage(true, function(){
+				var columns = cmp.find('grid').getElement().querySelectorAll('th');
+				var correctWidths = true, i = 0;
+
+				while (correctWidths && i < columns.length) {
+					correctWidths = columns[i].clientWidth === expectedWidths[i];
+					i++;
+				}
+
+				return correctWidths;
+			}, 'Columns width did not change to the correct width (smallerWidths) when calling resizeColumns');
 		}]
 	},
 	

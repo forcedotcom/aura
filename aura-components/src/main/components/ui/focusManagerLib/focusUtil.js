@@ -39,6 +39,14 @@ function lib() { //eslint-disable-line no-unused-vars
         return result;
     }
 
+    function isTRofIE11(el) {
+        // On IE11, TR tabIndex is 0, instead Chrome/FF is -1.
+        // https://gus.lightning.force.com/lightning/r/0D5B000000dg5sTKAQ/view
+        return $A.get("$Browser.isIE11") && 
+                el.tagName === "TR" && 
+                (!el.tabIndex || el.tabIndex <= 0);
+    }
+    
     /**
      * Returns true if the given element "el" can accept focus via tab
      * @param {Element} el
@@ -49,6 +57,7 @@ function lib() { //eslint-disable-line no-unused-vars
             (el.tagName === 'INPUT' && el.type === 'hidden') ||
             (el.tagName === 'A' && !el.href && !el.tabIndex) ||
             el.disabled ||
+            isTRofIE11(el) ||
             isElementHidden(el)) {
             return false;
         }

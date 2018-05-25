@@ -69,7 +69,7 @@
     <aura:handler name="change" value="{!v.name}" action="{!c.updateNameRef}" description="Handles a change to the name attribute by updating the wiring between the component and the name attribute."/>
     
     <th scope="{!v.scope}" class="{! v.class + ' ' + (v.disabled ? 'disabled' : v.direction) + (v.sortable ? ' slds-is-sortable ' : '') + (v.resizable ? ' slds-is-resizable' : '')}" title="{!v.title}"
-                           style="{! (v.width gt 0) ? 'width:' + v.width + 'px' : ''}">
+                           style="{! (v.width gt 0) ? 'width:' + v.width + 'px' : ''}" aria-label="{! v.label }">
         <div aura:id="wrapper" class="slds-cell-fixed" style="{! (v.width gt 0) ? 'width:' + v.width + 'px' : ''}">
         {!v.preBody}
         <aura:if isTrue="{! v.body.length == 0 }">

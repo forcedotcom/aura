@@ -57,7 +57,7 @@
 	<aura:handler name="change" value="{!v.name}" action="{!c.updateNameRef}" description="Handles a change to the name attribute by updating the wiring between the component and the name attribute."/>
 	
 	<th scope="{!v.scope}" class="{! v.class + ' ' + (v.disabled ? 'disabled' : v.direction) }" title="{!v.title}"
-						   style="{! (v.width gt 0) ? 'width:' + v.width + 'px' : ''}">
+						   style="{! (v.width gt 0) ? 'width:' + v.width + 'px' : ''}" aria-label="{! v.label }">
         {!v.preBody}
         <aura:if isTrue="{! v.body.length == 0 }">
             <!-- Conditionally insert link for column sorting. -->

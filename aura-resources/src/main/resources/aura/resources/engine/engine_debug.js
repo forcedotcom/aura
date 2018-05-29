@@ -787,7 +787,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.20.5 */
+/** version: 0.20.6 */
 
 const TargetToReactiveRecordMap = new WeakMap();
 function notifyMutation$1(target, key) {
@@ -2067,10 +2067,6 @@ function api$1(target, propName, descriptor) {
         return createPublicPropertyDescriptor(target, propName, descriptor);
     }
 }
-let vmBeingUpdated = null;
-function prepareForPropUpdate(vm) {
-    vmBeingUpdated = vm;
-}
 function createPublicPropertyDescriptor(proto, key, descriptor) {
     return {
         get() {
@@ -2084,19 +2080,14 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
         set(newValue) {
             const vm = getCustomElementVM(this);
             if (isTrue(vm.isRoot) || isBeingConstructed(vm)) {
-                vmBeingUpdated = vm;
             }
-            if (vmBeingUpdated === vm) {
-                // not need to wrap or check the value since that is happening somewhere else
-                vmBeingUpdated = null; // releasing the lock
-                vm.cmpProps[key] = reactiveMembrane.getReadOnlyProxy(newValue);
-                // avoid notification of observability while constructing the instance
-                if (vm.idx > 0) {
-                    // perf optimization to skip this step if not in the DOM
-                    notifyMutation$1(this, key);
-                }
+            // not need to wrap or check the value since that is happening somewhere else
+            vm.cmpProps[key] = reactiveMembrane.getReadOnlyProxy(newValue);
+            // avoid notification of observability while constructing the instance
+            if (vm.idx > 0) {
+                // perf optimization to skip this step if not in the DOM
+                notifyMutation$1(this, key);
             }
-            else {}
         },
         enumerable: isUndefined(descriptor) ? true : descriptor.enumerable,
     };
@@ -2113,15 +2104,10 @@ function createPublicAccessorDescriptor(Ctor, key, descriptor) {
         set(newValue) {
             const vm = getCustomElementVM(this);
             if (vm.isRoot || isBeingConstructed(vm)) {
-                vmBeingUpdated = vm;
             }
-            if (vmBeingUpdated === vm) {
-                // not need to wrap or check the value since that is happening somewhere else
-                vmBeingUpdated = null; // releasing the lock
-                if (set) {
-                    set.call(this, reactiveMembrane.getReadOnlyProxy(newValue));
-                }
-                else {}
+            // not need to wrap or check the value since that is happening somewhere else
+            if (set) {
+                set.call(this, reactiveMembrane.getReadOnlyProxy(newValue));
             }
             else {}
         },
@@ -2759,9 +2745,6 @@ function update(oldVnode, vnode) {
         cur = props[key];
         old = oldProps[key];
         if (old !== cur && (key in elm) && (key !== 'value' || elm[key] !== cur)) {
-            if (!isUndefined(vm)) {
-                prepareForPropUpdate(vm); // this is just in case the vnode is actually a custom element
-            }
             // touching the dom if the prop really changes.
             elm[key] = cur;
         }
@@ -3402,4 +3385,4 @@ exports.decorate = decorate;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.20.5 */
+/** version: 0.20.6 */

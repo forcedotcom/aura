@@ -1170,7 +1170,7 @@ var ReactiveMembrane = /** @class */ (function () {
     };
     return ReactiveMembrane;
 }());
-/** version: 0.20.5 */
+/** version: 0.20.6 */
 
 const TargetToReactiveRecordMap = new WeakMap();
 function notifyMutation$1(target, key) {
@@ -2952,20 +2952,20 @@ function createPublicPropertyDescriptor(proto, key, descriptor) {
                     }
                 }
             }
-            if (vmBeingUpdated === vm) {
-                // not need to wrap or check the value since that is happening somewhere else
-                vmBeingUpdated = null; // releasing the lock
-                vm.cmpProps[key] = reactiveMembrane.getReadOnlyProxy(newValue);
-                // avoid notification of observability while constructing the instance
-                if (vm.idx > 0) {
-                    // perf optimization to skip this step if not in the DOM
-                    notifyMutation$1(this, key);
+            {
+                if (vmBeingUpdated !== vm) {
+                    // logic for setting new properties of the element directly from the DOM
+                    // is only recommended for root elements created via createElement()
+                    assert.logWarning(`If property ${key} decorated with @api in ${vm} is used in the template, the value ${toString(newValue)} set manually may be overridden by the template, consider binding the property only in the template.`);
                 }
             }
-            else {
-                // logic for setting new properties of the element directly from the DOM
-                // will only be allowed for root elements created via createElement()
-                assert.logError(`Invalid attempt to set property ${key} from ${vm} to ${newValue}. This property was decorated with @api, and can only be changed via the template.`);
+            vmBeingUpdated = null; // releasing the lock
+            // not need to wrap or check the value since that is happening somewhere else
+            vm.cmpProps[key] = reactiveMembrane.getReadOnlyProxy(newValue);
+            // avoid notification of observability while constructing the instance
+            if (vm.idx > 0) {
+                // perf optimization to skip this step if not in the DOM
+                notifyMutation$1(this, key);
             }
         },
         enumerable: isUndefined(descriptor) ? true : descriptor.enumerable,
@@ -3004,20 +3004,20 @@ function createPublicAccessorDescriptor(Ctor, key, descriptor) {
                     }
                 }
             }
-            if (vmBeingUpdated === vm) {
-                // not need to wrap or check the value since that is happening somewhere else
-                vmBeingUpdated = null; // releasing the lock
-                if (set) {
-                    set.call(this, reactiveMembrane.getReadOnlyProxy(newValue));
-                }
-                else {
-                    assert.fail(`Invalid attempt to set a new value for property ${key} of ${vm} that does not has a setter decorated with @api.`);
+            {
+                if (vmBeingUpdated !== vm) {
+                    // logic for setting new properties of the element directly from the DOM
+                    // is only recommended for root elements created via createElement()
+                    assert.logWarning(`If property ${key} decorated with @api in ${vm} is used in the template, the value ${toString(newValue)} set manually may be overridden by the template, consider binding the property only in the template.`);
                 }
             }
+            vmBeingUpdated = null; // releasing the lock
+            // not need to wrap or check the value since that is happening somewhere else
+            if (set) {
+                set.call(this, reactiveMembrane.getReadOnlyProxy(newValue));
+            }
             else {
-                // logic for setting new properties of the element directly from the DOM
-                // will only be allowed for root elements created via createElement()
-                assert.fail(`Invalid attempt to set property ${key} from ${vm} to ${newValue}. This property was decorated with @api, and can only be changed via the template.`);
+                assert.fail(`Invalid attempt to set a new value for property ${key} of ${vm} that does not has a setter decorated with @api.`);
             }
         },
         enumerable,
@@ -4548,4 +4548,4 @@ exports.decorate = decorate;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.20.5 */
+/** version: 0.20.6 */

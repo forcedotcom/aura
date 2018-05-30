@@ -29,6 +29,7 @@ import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDefRef;
 import org.auraframework.impl.root.DefinitionReferenceImpl;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -43,7 +44,7 @@ import com.google.common.collect.Lists;
 public class ModuleDefRefImpl extends DefinitionReferenceImpl<ModuleDef> implements ModuleDefRef {
 
     private static final long serialVersionUID = 2121381558446216947L;
-    private transient DefDescriptor<?> reference;
+    private transient volatile DefDescriptor<ModuleDef> reference;
 
     protected ModuleDefRefImpl(Builder builder) {
         super(builder);
@@ -51,24 +52,39 @@ public class ModuleDefRefImpl extends DefinitionReferenceImpl<ModuleDef> impleme
 
     @Override
     public void serialize(Json json) throws IOException {
+
+        if (this.reference == null) {
+            synchronized (this) {
+                if (this.reference == null) {
+                    try {
+                        // get correct cased descriptor from definition
+                        ModuleDef def = this.descriptor.getDef();
+                        this.reference = def.getDescriptor();
+                    } catch (QuickFixException e) {
+                        throw new AuraRuntimeException(e);
+                    }
+                }
+            }
+        }
+
         json.writeMapBegin();
         json.writeMapKey("componentDef");
 
         json.writeMapBegin();
-        json.writeMapEntry("descriptor", reference);
+        json.writeMapEntry("descriptor", this.reference);
         json.writeMapEntry("type", "module");
         json.writeMapEnd();
 
-        json.writeMapEntry("localId", localId);
+        json.writeMapEntry("localId", this.localId);
 
-        if (!attributeValues.isEmpty()) {
+        if (!this.attributeValues.isEmpty()) {
             json.writeMapKey("attributes");
 
             json.writeMapBegin();
             json.writeMapKey("values");
 
             json.writeMapBegin();
-            for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : attributeValues.entrySet()) {
+            for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : this.attributeValues.entrySet()) {
                 json.writeMapEntry(entry.getKey(), entry.getValue());
             }
             json.writeMapEnd();
@@ -78,7 +94,7 @@ public class ModuleDefRefImpl extends DefinitionReferenceImpl<ModuleDef> impleme
 
         json.writeMapEnd();
     }
-    
+
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
@@ -86,10 +102,10 @@ public class ModuleDefRefImpl extends DefinitionReferenceImpl<ModuleDef> impleme
 
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
-        ModuleDef def = validationContext.getAccessibleDefinition(descriptor);
+        ModuleDef def = validationContext.getAccessibleDefinition(this.descriptor);
         if (def == null) {
             // not possible
-            throw new DefinitionNotFoundException(descriptor);
+            throw new DefinitionNotFoundException(this.descriptor);
         }
         this.reference = def.getDescriptor();
     }
@@ -98,7 +114,7 @@ public class ModuleDefRefImpl extends DefinitionReferenceImpl<ModuleDef> impleme
     public boolean equals(Object obj) {
         if (obj instanceof ModuleDefRefImpl) {
             ModuleDefRefImpl other = (ModuleDefRefImpl) obj;
-            return descriptor.equals(other.getDescriptor()) && location.equals(other.getLocation());
+            return this.descriptor.equals(other.getDescriptor()) && this.location.equals(other.getLocation());
         }
         return false;
     }

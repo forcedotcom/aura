@@ -42,7 +42,7 @@ import org.auraframework.validation.ReferenceValidationContext;
 
 public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements LibraryDef {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 8578929121184211088L;
 
     private final int hashCode;
     private final List<IncludeDefRef> includes;

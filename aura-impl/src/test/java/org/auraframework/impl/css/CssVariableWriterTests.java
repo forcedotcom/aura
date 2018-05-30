@@ -15,15 +15,8 @@
  */
 package org.auraframework.impl.css;
 
-import static junit.framework.TestCase.assertEquals;
-
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import org.auraframework.css.StyleContext;
 import org.auraframework.css.TokenCache;
@@ -37,8 +30,15 @@ import org.auraframework.system.AuraContext;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static junit.framework.TestCase.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class CssVariableWriterTests {
 

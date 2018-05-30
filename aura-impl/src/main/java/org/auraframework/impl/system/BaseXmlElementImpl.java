@@ -120,6 +120,14 @@ public abstract class BaseXmlElementImpl implements BaseXmlElement {
 
     /**
      * @throws QuickFixException
+     * @see Definition#appendSupers(java.util.Set)
+     */
+    @Override
+    public void appendSupers(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+    }
+
+    /**
+     * @throws QuickFixException
      * @see Definition#validateDefinition()
      */
     @Override

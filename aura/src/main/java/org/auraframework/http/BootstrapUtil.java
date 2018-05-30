@@ -15,15 +15,12 @@
  */
 package org.auraframework.http;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.auraframework.annotations.Annotations;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.expression.PropertyReference;
+import org.auraframework.instance.ApplicationInitializer;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.Instance;
@@ -33,9 +30,16 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.CompositeValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.util.json.JsonSerializationContext;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Shared bootstrap logic used for both the bootstrap resource and bootstrap inlining

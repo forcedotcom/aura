@@ -73,7 +73,7 @@ public class ComponentDefRefImpl extends DefinitionReferenceImpl<ComponentDef> i
 
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
-        ComponentDef def = validationContext.getAccessibleDefinition(descriptor);
+        ComponentDef def = descriptor.getDef();
         if (def == null) {
             throw new DefinitionNotFoundException(descriptor);
         }
@@ -103,7 +103,7 @@ public class ComponentDefRefImpl extends DefinitionReferenceImpl<ComponentDef> i
      * @param validationContext the validation context.
      */
     private void validateAttributesValues(ReferenceValidationContext validationContext) throws QuickFixException {
-        ComponentDef def = validationContext.getAccessibleDefinition(descriptor);
+        ComponentDef def = descriptor.getDef();
         Map<DefDescriptor<AttributeDef>, AttributeDef> atts = def.getAttributeDefs();
         Map<String, RegisterEventDef> registeredEvents = def.getRegisterEventDefs();
         DefinitionService definitionService = Aura.getDefinitionService();

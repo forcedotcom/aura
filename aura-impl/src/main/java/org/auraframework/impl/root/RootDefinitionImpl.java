@@ -78,6 +78,11 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Platf
     }
 
     @Override
+    public Map<DefDescriptor<AttributeDef>, AttributeDef> getDeclaredAttributeDefs() {
+        return attributeDefs;
+    }
+
+    @Override
     public abstract Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs();
 
     @Override

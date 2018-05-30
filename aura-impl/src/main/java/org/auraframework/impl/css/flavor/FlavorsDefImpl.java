@@ -47,7 +47,7 @@ import com.google.common.collect.Sets;
 
 public class FlavorsDefImpl extends RootDefinitionImpl<FlavorsDef> implements FlavorsDef {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 8656338421965511637L;
 
     private final List<FlavorIncludeDef> flavorIncludeDefs;
     private final List<FlavorDefaultDef> flavorDefaultDefs;
@@ -145,8 +145,8 @@ public class FlavorsDefImpl extends RootDefinitionImpl<FlavorsDef> implements Fl
     }
 
     @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs() {
-        return null;
+    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
+        throw new UnsupportedOperationException("FlavorsDef cannot contain RegisterEventDefs.");
     }
 
     @Override

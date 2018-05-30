@@ -16,6 +16,7 @@
 package org.auraframework.integration.test.root.event;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -123,7 +124,6 @@ public class EventDefTest extends AuraImplTestCase {
         vendor.insertAttributeDef(atts, desc, "testInt", "Integer", true,
                 AttributeDef.SerializeToType.BOTH, null, AuraContext.Access.PUBLIC);
         EventDefImpl def = vendor.makeEventDefWithNulls(desc, EventType.COMPONENT, atts, null, null);
-        definitionService.addDynamicDef(def);
         serializeAndGoldFile(def);
     }
 
@@ -137,7 +137,7 @@ public class EventDefTest extends AuraImplTestCase {
                 AttributeDef.SerializeToType.BOTH, null, AuraContext.Access.PUBLIC);
         EventDefImpl def = vendor.makeEventDefWithNulls(desc, EventType.COMPONENT, atts, null, null);
 
-        Map<DefDescriptor<AttributeDef>, AttributeDef> returnedAttributes = def.getDeclaredAttributeDefs();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> returnedAttributes = def.getAttributeDefs();
         assertEquals(atts, returnedAttributes);
     }
 
@@ -145,7 +145,6 @@ public class EventDefTest extends AuraImplTestCase {
     public void testGetAttributeDefsWithParent() throws Exception {
         DefDescriptor<EventDef> edd = vendor.makeEventDefDescriptor("test:parentEvent");
         EventDefImpl ed = vendor.makeEventDef(null, edd);
-        definitionService.addDynamicDef(ed);
         Map<DefDescriptor<AttributeDef>, AttributeDef> atts = ed.getAttributeDefs();
         assertEquals(3, atts.size());
         assertTrue(atts.containsKey(vendor.getAttributeDescriptor()));

@@ -96,6 +96,8 @@ import com.google.common.collect.Sets;
  */
 @ServiceComponent
 public class DefinitionServiceImpl implements DefinitionService {
+    private static final long serialVersionUID = -2488984746420077688L;
+
     protected ContextService contextService;
 
     private CachingService cachingService;
@@ -970,7 +972,23 @@ public class DefinitionServiceImpl implements DefinitionService {
         if (def == null) {
             return false;
         }
-        return def.isInstanceOf(interfaceDef);
+        Set<DefDescriptor<InterfaceDef>> interfaces = def.getInterfaces();
+        DefDescriptor<? extends BaseComponentDef> parent = def.getExtendsDescriptor();
+        while (interfaces != null && interfaces.size() > 0 || (parent != null)) {
+            if (interfaces.contains(interfaceDef)) {
+                return true;
+            }
+            if (parent == null) {
+                break;
+            }
+            def = getDefinition(parent);
+            if (def == null) {
+                return false;
+            }
+            interfaces = def.getInterfaces();
+            parent = def.getExtendsDescriptor();
+        }
+        return false;
     }
 
     // FIXME: These should move to caching service.
@@ -1284,24 +1302,5 @@ public class DefinitionServiceImpl implements DefinitionService {
         if (errors.size() > 0) {
             throw new CompositeValidationException("Unable to load values for "+root, errors);
         }
-    }
-
-    private <T extends Definition> T flattenHierarchy(T def) throws QuickFixException {
-        AuraContext context = contextService.getCurrentContext();
-        Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache = cachingService.getDefsCache();
-        AuraLinker linker = new AuraLinker(def.getDescriptor(), defsCache,
-                cachingService.getDefDescriptorByNameCache(),
-                loggingService, configAdapter, accessChecker, context.getAuraLocalStore(),
-                context.getAccessCheckCache(), context.getRegistries());
-        linker.flattenHierarchy(def);
-        return def;
-    }
-
-    @Override
-    public <D extends Definition> void addDynamicDef(D def) throws QuickFixException {
-        AuraContext context = contextService.getCurrentContext();
-
-        flattenHierarchy(def);
-        context.addDynamicDef(def);
     }
 }

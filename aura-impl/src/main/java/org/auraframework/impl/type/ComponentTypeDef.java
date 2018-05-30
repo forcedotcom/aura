@@ -15,10 +15,9 @@
  */
 package org.auraframework.impl.type;
 
-import java.io.IOException;
-
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -31,6 +30,9 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
  */

@@ -27,7 +27,6 @@ import org.auraframework.def.DefinitionReference.Load;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.root.component.ComponentDefRefImpl.Builder;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
-import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -40,11 +39,11 @@ public class ComponentDefRefImplUnitTest extends
     protected Load load;
 
     @Override
-    protected void setupValidateReferences(ReferenceValidationContext mock) throws Exception {
-        super.setupValidateReferences(mock);
+    protected void setupValidateReferences() throws Exception {
+        super.setupValidateReferences();
         ComponentDef def = Mockito.mock(ComponentDef.class);
         Mockito.doReturn(false).when(def).isAbstract();
-        Mockito.doReturn(def).when(mock).getAccessibleDefinition(this.descriptor);
+        Mockito.doReturn(def).when(this.descriptor).getDef();
     }
 
     @Override

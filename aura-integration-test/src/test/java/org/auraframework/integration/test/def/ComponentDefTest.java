@@ -15,7 +15,10 @@
  */
 package org.auraframework.integration.test.def;
 
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -24,20 +27,19 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.component.BaseComponentDefTest;
-import org.auraframework.impl.root.component.ComponentDefImpl;
+import org.auraframework.service.CompilerService;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
 public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
+    @Inject
+    protected CompilerService compilerService;
+
     public ComponentDefTest() {
         super(ComponentDef.class, "aura:component");
-    }
-
-    @Override
-    protected ComponentDefImpl.Builder getBuilder() {
-        return new ComponentDefImpl.Builder();
     }
 
     /**
@@ -332,6 +334,11 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
                 ComponentDef.class);
         ComponentDef def = definitionService.getDefinition(childDescriptor);
         assertEquals(parentDescriptor, def.getExtendsDescriptor());
+        assertEquals(2, def.getModelDefDescriptors().size());
+        assertEquals("java://org.auraframework.components.test.java.controller.TestController", def.getControllerDefDescriptors()
+                .get(0).getQualifiedName());
+        assertEquals("java://org.auraframework.components.test.java.model.TestModel", def.getModelDef().getDescriptor()
+                .getQualifiedName());
     }
 
     /**

@@ -196,6 +196,8 @@ public interface AuraContext {
     void setScriptNonce(String nonce);
 
     /**
+     * TODO: should have serialization contexts for any format, this shouldn't be tied to json
+     *
      * @return the json serialization context to use
      */
     JsonSerializationContext getJsonSerializationContext();

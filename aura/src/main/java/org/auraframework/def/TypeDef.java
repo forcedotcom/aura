@@ -15,6 +15,8 @@
  */
 package org.auraframework.def;
 
+import java.util.Set;
+
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.throwable.quickfix.QuickFixException;
 

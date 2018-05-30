@@ -17,10 +17,8 @@
  */
 package org.auraframework.impl.type;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.DefinitionAccessImpl;
@@ -31,6 +29,10 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 /**
  * typedef that allows for defrefs to be passed around without being automatically instantiated

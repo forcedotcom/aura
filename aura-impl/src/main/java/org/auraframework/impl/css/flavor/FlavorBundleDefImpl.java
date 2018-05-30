@@ -31,14 +31,14 @@ import org.auraframework.util.json.Json;
 
 public class FlavorBundleDefImpl extends RootDefinitionImpl<FlavorBundleDef> implements FlavorBundleDef {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7895713566349526564L;
 
     protected FlavorBundleDefImpl(Builder builder) {
         super(builder);
     }
 
     @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs() {
+    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
         return null;
     }
 

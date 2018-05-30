@@ -1,8 +1,8 @@
 {
   "xs":"I",
-  "descriptor":"markup://string:nothere",
+  "descriptor":"markup://aura:test",
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]]
   ],
-  "cc":"$A.componentService.addComponentClass(\"markup://string:nothere\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"string$nothere\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\n});\n"
+  "cc":"$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\n});\n"
 }

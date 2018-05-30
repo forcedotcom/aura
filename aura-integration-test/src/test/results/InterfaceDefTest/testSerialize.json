@@ -1,7 +1,7 @@
 {
-  "descriptor":"markup://string:interfacegoldfile",
+  "descriptor":"markup://aura:testinterfacechild",
   "attributes":{
-    "foo":["foo","aura://String","I",false]
+    "fakeAttribute":["fakeAttribute","java://fakeAttribute","p",false,null]
   },
   "isAbstract":true
 }

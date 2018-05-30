@@ -1,10 +1,12 @@
 {
   "xs":"I",
-  "descriptor":"markup://string:nothere",
+  "descriptor":"markup://aura:test",
   "su":"markup://aura:application",
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]]
   ],
-  "lc":"markup://aura:locationChange",
-  "cc":"$A.componentService.addComponentClass(\"markup://string:nothere\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"string$nothere\",\n    \"extends\":\"markup://aura:application\"\n  }\n};\n});\n"
+  "cc":"$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:application\"\n  }\n};\n});\n",
+  "lc":{
+    "descriptor":"markup://aura:locationChange"
+  }
 }

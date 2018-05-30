@@ -17,12 +17,15 @@ package org.auraframework.integration.test.def;
 
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
-import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.component.BaseComponentDefTest;
+import org.auraframework.service.CompilerService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -30,14 +33,17 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.google.common.collect.Sets;
+
 public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
+    @Inject
+    DefinitionService definitionService;
+
+    @Inject
+    protected CompilerService compilerService;
+
     public ApplicationDefTest() {
         super(ApplicationDef.class, "aura:application");
-    }
-
-    @Override
-    protected ApplicationDefImpl.Builder getBuilder() {
-        return new ApplicationDefImpl.Builder();
     }
 
     /**

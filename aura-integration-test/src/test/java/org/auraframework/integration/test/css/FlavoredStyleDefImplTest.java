@@ -33,6 +33,7 @@ import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Unit tests for {@link FlavoredStyleDef}.

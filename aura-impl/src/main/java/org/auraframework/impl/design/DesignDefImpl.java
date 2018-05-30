@@ -56,7 +56,7 @@ import com.google.common.collect.Multimap;
 
 public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements DesignDef {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -8856144193410487528L;
 
     private final Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> attributeDesignDefs;
     private final DesignTemplateDef template;
@@ -121,8 +121,8 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     }
 
     @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs() {
-        return null;
+    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
+        throw new UnsupportedOperationException("DesignDef cannot contain RegisterEventDefs.");
     }
 
     @Override

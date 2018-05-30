@@ -29,9 +29,7 @@ public interface InterfaceDef extends RootDefinition {
     @Override
     Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException;
 
-    Set<DefDescriptor<InterfaceDef>> getExtendsDescriptors();
-    
-    Set<DefDescriptor<InterfaceDef>> getDeclaredExtendsDescriptors();
+    Set<DefDescriptor<org.auraframework.def.InterfaceDef>> getExtendsDescriptors();
 
     Map<DefDescriptor<MethodDef>, MethodDef> getMethodDefs() throws QuickFixException;
 }

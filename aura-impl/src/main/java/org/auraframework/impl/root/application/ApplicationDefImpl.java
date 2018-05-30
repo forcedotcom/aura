@@ -56,7 +56,6 @@ import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * The definition of an Application. Holds all information about a given type of application. ApplicationDefs are
@@ -64,7 +63,7 @@ import com.google.common.collect.Sets;
  */
 public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> implements ApplicationDef {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 3967927701473071621L;
 
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
     private final List<DefDescriptor<ComponentDef>> trackedDependencies;
@@ -76,16 +75,11 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private FlavorsDef flavorOverrides;
     private final DefDescriptor<FlavorsDef> externalFlavorOverrides;
 
-    private transient DefDescriptor<EventDef> locationChangeEventCanonical;
-
     public static final DefDescriptor<ApplicationDef> PROTOTYPE_APPLICATION = new DefDescriptorImpl<>(
             "markup", "aura", "application", ApplicationDef.class);
-    public static final DefDescriptor<EventDef> PROTOTYPE_LOCATION_CHANGE = new DefDescriptorImpl<>(
-            "markup", "aura", "locationChange", EventDef.class);
 
     protected ApplicationDefImpl(Builder builder) {
-        super(builder, (builder.locationChangeEventDescriptor==null?null
-                :Sets.newHashSet(builder.locationChangeEventDescriptor)));
+        super(builder);
 
         this.locationChangeEventDescriptor = builder.locationChangeEventDescriptor;
         this.trackedDependencies = AuraUtil.immutableList(builder.trackedDependency);
@@ -168,7 +162,15 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
      */
     @Override
     public DefDescriptor<EventDef> getLocationChangeEventDescriptor() throws QuickFixException {
-        return locationChangeEventCanonical;
+        if (locationChangeEventDescriptor == null) {
+            ApplicationDef superDef = getSuperDef();
+            if (superDef != null) {
+                return superDef.getLocationChangeEventDescriptor();
+            }
+            return null;
+        } else {
+            return locationChangeEventDescriptor;
+        }
     }
 
     @Override
@@ -229,8 +231,9 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
     @Override
     protected void serializeFields(Json json) throws IOException, QuickFixException {
-        if (locationChangeEventCanonical != null) {
-            json.writeMapEntry(Json.ApplicationKey.LOCATIONCHANGEEVENTDEF, locationChangeEventCanonical);
+        DefDescriptor<EventDef> locationChangeEventDescriptor = getLocationChangeEventDescriptor();
+        if (locationChangeEventDescriptor != null) {
+            json.writeMapEntry(Json.ApplicationKey.LOCATIONCHANGEEVENTDEF, locationChangeEventDescriptor.getDef());
         }
         Map<String,String> tokens = getTokens();
         if (tokens != null && !tokens.isEmpty()) {
@@ -368,34 +371,19 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         
         return expiration;
     }
-    
-    @Override
-    public void flattenHierarchy(ReferenceValidationContext validationContext) throws QuickFixException {
-        super.flattenHierarchy(validationContext);
-        DefDescriptor<EventDef> tmpLocationChangeEventDescriptor = this.locationChangeEventDescriptor;
-        DefDescriptor<ApplicationDef> nextSuper = this.getExtendsDescriptor();
-        if (tmpLocationChangeEventDescriptor == null && nextSuper != null) {
-            ApplicationDef zuper = validationContext.getAccessibleDefinition(nextSuper);
-            tmpLocationChangeEventDescriptor = zuper.getLocationChangeEventDescriptor();
-        }
-        if (tmpLocationChangeEventDescriptor != null) {
-            EventDef locationChangeDef = validationContext.getAccessibleDefinition(tmpLocationChangeEventDescriptor);
-            if (!locationChangeDef.isInstanceOf(PROTOTYPE_LOCATION_CHANGE)) {
-                throw new InvalidDefinitionException(String.format("%s must extend aura:locationChange",
-                        locationChangeDef.getDescriptor()), getLocation());
-            }
-            this.locationChangeEventCanonical = locationChangeDef.getDescriptor();
-        } else {
-            this.locationChangeEventCanonical = null;
-        }
-    }
 
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         super.validateReferences(validationContext);
 
+        EventDef locationChangeDef = getLocationChangeEventDescriptor().getDef();
+        if (!locationChangeDef.isInstanceOf(Aura.getDefinitionService().getDefDescriptor("aura:locationChange",
+                EventDef.class))) {
+            throw new InvalidDefinitionException(String.format("%s must extend aura:locationChange",
+                    locationChangeDef.getDescriptor()), getLocation());
+        }
         if (externalFlavorOverrides != null && flavorOverrides == null) {
-            flavorOverrides = validationContext.getAccessibleDefinition(externalFlavorOverrides);
+            flavorOverrides = externalFlavorOverrides.getDef();
         }
     }
 

@@ -15,12 +15,9 @@
  */
 package org.auraframework.impl.type;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.TypeDef;
@@ -38,6 +35,11 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  */

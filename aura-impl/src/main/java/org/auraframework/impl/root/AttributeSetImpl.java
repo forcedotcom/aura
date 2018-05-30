@@ -74,12 +74,20 @@ public class AttributeSetImpl implements AttributeSet {
     private final Map<DefDescriptor<EventHandlerDef>, EventHandler> events = Maps.newHashMap();
     private final BaseComponent<?, ?> valueProvider;
     private final Instance<?> parent;
+    private final boolean useUnlinkedDefinition;
 
     public AttributeSetImpl(DefDescriptor<? extends RootDefinition> componentDefDescriptor,
             BaseComponent<?, ?> valueProvider, Instance<?> parent) throws QuickFixException {
+        this(componentDefDescriptor, valueProvider, parent, false);
+    }
+
+    public AttributeSetImpl(DefDescriptor<? extends RootDefinition> componentDefDescriptor,
+                            BaseComponent<?, ?> valueProvider, Instance<?> parent, boolean useUnlinkedDefinition)
+            throws QuickFixException {
         this.rootDefDescriptor = componentDefDescriptor;
         this.valueProvider = valueProvider;
         this.parent = parent;
+        this.useUnlinkedDefinition = useUnlinkedDefinition;
 
         setDefaults();
     }
@@ -313,7 +321,13 @@ public class AttributeSetImpl implements AttributeSet {
      */
     private RootDefinition getRootDefinition() throws QuickFixException {
         DefinitionService definitionService = Aura.getDefinitionService();
-        return definitionService.getDefinition(rootDefDescriptor);
+        if (this.useUnlinkedDefinition) {
+            // when serializing module instances, we normalize attributes with the component,
+            // but the def should be stored in context cache as it will be serialized to the client
+            return definitionService.getUnlinkedDefinition(rootDefDescriptor);
+        } else {
+            return definitionService.getDefinition(rootDefDescriptor);
+        }
     }
 
     @Override

@@ -216,9 +216,9 @@ extends AuraTestCase {
         }
 
         testAuraContext = contextService.startContext(Mode.PROD, Format.JS, Authentication.AUTHENTICATED);
-        ReferenceValidationContext validationContext = Mockito.mock(ReferenceValidationContext.class);
 
-        setupValidateReferences(validationContext);
+        setupValidateReferences();
+        ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         buildDefinition().validateReferences(validationContext);
     }
 
@@ -229,7 +229,7 @@ extends AuraTestCase {
         }
     }
 
-    protected void setupValidateReferences(ReferenceValidationContext mock) throws Exception {
+    protected void setupValidateReferences() throws Exception {
     }
 
     /**
@@ -262,6 +262,7 @@ extends AuraTestCase {
         return builder.build();
     }
 
-    protected void setupValidateDefinitions() throws Exception {
-    }
+	protected void setupValidateDefinitions() throws Exception {
+		
+	}
 }

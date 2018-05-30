@@ -52,11 +52,6 @@ public class LinkingDefinition<T extends Definition> {
     public boolean built = false;
 
     /**
-     * Have we completed roll-up.
-     */
-    public boolean rolledup = false;
-
-    /**
      * The 'level' of this def in the compile tree.
      */
     public int level = 0;

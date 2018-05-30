@@ -15,20 +15,28 @@
  */
 package org.auraframework.integration.test.root.application;
 
-import org.auraframework.def.*;
+import javax.inject.Inject;
+
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefinitionAccess;
+import org.auraframework.def.EventDef;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl.Builder;
 import org.auraframework.impl.root.component.BaseComponentDefImplUnitTest;
-import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.validation.ReferenceValidationContext;
+import org.auraframework.service.DefinitionService;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 public class ApplicationDefImplUnitTest extends
         BaseComponentDefImplUnitTest<ApplicationDefImpl, ApplicationDef, Builder> {
 
-    DefDescriptor<EventDef> locationChangeEventDescriptor = Mockito.spy(new DefDescriptorImpl<>(
-                "markup", "test", "LCED", EventDef.class));
-    DefDescriptor<EventDef> root_lced = new DefDescriptorImpl<>("markup", "aura", "locationChange", EventDef.class);
+	@Inject
+    DefinitionService definitionService;
+
+    @Mock
+    DefDescriptor<EventDef> locationChangeEventDescriptor;
+    DefinitionAccess access;
     Boolean isAppcacheEnabled;
     String additionalAppCacheURLs;
 
@@ -52,10 +60,12 @@ public class ApplicationDefImplUnitTest extends
     }
 
     @Override
-    protected void setupValidateReferences(ReferenceValidationContext mock) throws Exception {
-        super.setupValidateReferences(mock);
+    protected void setupValidateReferences() throws Exception {
+        super.setupValidateReferences();
+        DefDescriptor<EventDef> superDesc = definitionService.getDefDescriptor("aura:locationChange",
+                EventDef.class);
         EventDef locationChangeEventDef = Mockito.mock(EventDef.class);
-        Mockito.doReturn(true).when(locationChangeEventDef).isInstanceOf(root_lced);
-        Mockito.doReturn(locationChangeEventDef).when(mock).getAccessibleDefinition(this.locationChangeEventDescriptor);
+        Mockito.doReturn(true).when(locationChangeEventDef).isInstanceOf(superDesc);
+        Mockito.doReturn(locationChangeEventDef).when(this.locationChangeEventDescriptor).getDef();
     }
 }

@@ -185,6 +185,10 @@ public class AuraLocalStoreImplTest {
         }
 
         @Override
+        public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
+        }
+
+        @Override
         public DefDescriptor<? extends Definition> getDescriptor() {
             return descriptor;
         }

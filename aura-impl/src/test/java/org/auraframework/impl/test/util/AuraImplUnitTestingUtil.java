@@ -290,6 +290,10 @@ public class AuraImplUnitTestingUtil {
             public DefinitionAccess getAccess() {
                 return null;
             }
+
+            @Override
+            public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
+            }
         };
     }
 

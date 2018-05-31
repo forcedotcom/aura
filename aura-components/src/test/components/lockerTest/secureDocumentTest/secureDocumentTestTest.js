@@ -170,17 +170,5 @@
         test: function(component) {
             component.testLocationAssign();
         }
-    },
-
-    testCreateHTMLStyleTag: {
-        test: function(cmp) {
-            cmp.testCreateHTMLStyleTag();
-        }
-    },
-
-    testCreateSVGStyleTag: {
-        test: function(cmp) {
-            cmp.testCreateSVGStyleTag();
-        }
     }
 })

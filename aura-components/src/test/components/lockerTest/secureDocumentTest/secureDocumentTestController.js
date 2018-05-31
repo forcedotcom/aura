@@ -221,23 +221,5 @@
         var testUtils = component.get('v.testUtils');
         document.location.assign('#success');
         testUtils.assertEquals('#success', document.location.hash, 'Failed to assign a new hash using location.assign()');
-    },
-
-    testCreateHTMLStyleTag: function(cmp) {
-       var testUtils = cmp.get("v.testUtils");
-       testUtils.expectAuraWarning('Creation of style tags is not allowed! Created style-disabled tag instead.');
-           
-       var el = document.createElement("style");
-       testUtils.assertTrue(el instanceof HTMLElement, "Expected element to be an HTMLElement instance.");
-       testUtils.assertFalse(el instanceof HTMLStyleElement, "Expected element to NOT be an HTMLStyleElement instance.");
-    },
-
-    testCreateSVGStyleTag: function(cmp) {
-       var testUtils = cmp.get("v.testUtils");
-       testUtils.expectAuraWarning('Creation of style tags is not allowed! Created style-disabled tag instead.');
-           
-       var el = document.createElementNS("http://www.w3.org/2000/svg", "style");
-       testUtils.assertTrue(el instanceof SVGElement, "Expected element to be an SVGElement instance.");
-       testUtils.assertFalse(el instanceof SVGStyleElement, "Expected element to NOT be an SVGStyleElement instance.");
     }
 })

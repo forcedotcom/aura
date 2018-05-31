@@ -10,11 +10,10 @@ const AURA_SOURCE_DIR = "../../../../../../aura-resources/target/src-gen/main/re
 const aura_mode = getAuraMode();
 
 var source = path.resolve(path.join(__dirname, AURA_SOURCE_DIR, `aura_${aura_mode}.js`));
-var target = path.resolve(path.join(__dirname, '..', 'public', 'libs', 'js', `aura_${aura_mode}.js`));
+var target = path.resolve(path.join(__dirname, '..', 'public', 'libs', 'js', `aura.js`));
 
 copyFile(source, target, function(resp){
     //TODO: Need better error handling here.
-    console.warn("resp", resp);
 });
 
 //Have to do crazy arg stripping because yarn does not support passing args to Node scripts (sad times).
@@ -58,4 +57,4 @@ function copyFile(source, target, cb) {
       }
       cb(resp);
     }
-  }
+}

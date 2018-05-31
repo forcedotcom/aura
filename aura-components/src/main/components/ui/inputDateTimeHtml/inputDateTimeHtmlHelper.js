@@ -52,7 +52,9 @@
             component._considerLocalDateTime = $A.util.isEmpty(component.get("v.value"));
         }
 
-        if (component._considerLocalDateTime) {
+        if (!value) {
+            this.setValue(component, value);
+        } else if (component._considerLocalDateTime) {
             // When v.value is empty and the new value is 2017-04-12T01:00, we use parseDateTime method that will parse
             // it in local time. When toISOString is called, it will take into account the timezone offset and return a
             // UTC ISO string corresponding to that local time.
@@ -67,7 +69,11 @@
     },
 
     setValue: function (component, value) {
-        component.set("v.value", value.toISOString());
+        if (value instanceof Date) {
+            value = value.toISOString();
+        }
+
+        component.set("v.value", value);
         component._ignoreChange = true;
     }
 });

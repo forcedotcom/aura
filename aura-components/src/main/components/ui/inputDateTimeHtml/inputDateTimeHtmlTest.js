@@ -60,6 +60,28 @@
         ]
     },
 
+    testSetToEmptyValue: {
+        attributes: {value: "2016-01-22T01:00:00.000Z", timezone: "America/New_York"},
+        test: [
+            function (cmp) {
+                $A.test.addWaitForWithFailureMessage(true, function () {
+                    var inputDateStr = cmp.find("inputDateTimeHtml").getElement().value;
+                    return $A.test.contains(inputDateStr, "2016-01-21T20:00");
+                }, "Initial value for input was not set properly");
+            }, function (cmp) {
+                cmp.set("v.value", "");
+                var targetElement = cmp.find("inputDateTimeHtml").getElement();
+                $A.test.addWaitForWithFailureMessage(false, function () {
+                        return $A.test.contains(targetElement.value, "2016-01-21T20:00");
+                    },
+                    "Datetime value has not been rerendered",
+                    function() {
+                        $A.util.isEmpty(targetElement.value);
+                    });
+            }
+        ]
+    },
+
     testEmptyValue: {
         test: function(cmp){
             var inputDateStr = cmp.find("inputDateTimeHtml").getElement().value;

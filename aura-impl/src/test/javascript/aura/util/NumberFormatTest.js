@@ -104,8 +104,6 @@ Test.Aura.Util.NumberFormatTest=function() {
 
         [Fact]
         function formatSmallPositive() {
-            // Test for bug W-2545700
-            // This failed.
             var format = "0.###";
             var symbols = {"decimalSeparator": ".",
                            "groupingSeparator": ",",

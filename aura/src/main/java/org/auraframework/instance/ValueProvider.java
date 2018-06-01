@@ -22,9 +22,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 public interface ValueProvider {
 
-    // TypeDef getType(Expression key);
-
     Object getValue(PropertyReference key) throws QuickFixException;
 
-    // void validate(Expression key);
 }

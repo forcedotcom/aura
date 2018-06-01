@@ -1199,9 +1199,9 @@ AuraInstance.prototype.run = function(func, name) {
     if (name === undefined) {
         name = "$A.run()";
     }
-    var nested = $A.services.client.inAuraLoop();
+    var nested = $A.clientService.inAuraLoop();
 
-    $A.services.client.pushStack(name);
+    $A.clientService.pushStack(name);
     try {
         return func();
     } catch (e) {
@@ -1212,7 +1212,7 @@ AuraInstance.prototype.run = function(func, name) {
             throw (e instanceof $A.auraError) ? e : new $A.auraError("Uncaught error in "+name, e);
         }
     } finally {
-        $A.services.client.popStack(name);
+        $A.clientService.popStack(name);
     }
 
     return undefined;

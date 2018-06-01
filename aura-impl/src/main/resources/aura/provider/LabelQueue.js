@@ -20,7 +20,10 @@
  * @constructor
  */
 function LabelQueue() {
-    this.reset();
+    this.components = [];
+    this.callbacks = [];
+    this.returnValues = [];
+    this.requested = false;
 }
 
 /**
@@ -64,37 +67,13 @@ LabelQueue.prototype.getCallbacks = function() {
 };
 
 /**
- * Add callback
+ * Add callback, if callback is a function
  * @param {Function} callback
  */
 LabelQueue.prototype.addCallback = function(callback) {
-    this.callbacks.push(callback);
+    if ($A.util.isFunction(callback)) {
+        this.callbacks.push(callback);
+    }
 };
-
-/**
- * Set requested flag
- */
-LabelQueue.prototype.setRequested = function() {
-    this.requested = true;
-};
-
-/**
- * Checks whether requested
- * @return {Boolean}
- */
-LabelQueue.prototype.isRequested = function() {
-    return this.requested;
-};
-
-/**
- * Resets / Initializes queue variables
- */
-LabelQueue.prototype.reset = function() {
-    this.components = [];
-    this.callbacks = [];
-    this.returnValues = [];
-    this.requested = false;
-};
-
 
 Aura.Provider.LabelQueue = LabelQueue;

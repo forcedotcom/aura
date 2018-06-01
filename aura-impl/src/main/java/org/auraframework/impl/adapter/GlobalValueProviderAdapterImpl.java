@@ -49,7 +49,7 @@ public class GlobalValueProviderAdapterImpl implements GlobalValueProviderAdapte
 
     @Inject
     private LocalizationService localizationService;
-    
+
     @Override
     public List<GlobalValueProvider> createValueProviders() {
         List<GlobalValueProvider> l = new LinkedList<>();
@@ -62,10 +62,10 @@ public class GlobalValueProviderAdapterImpl implements GlobalValueProviderAdapte
 
         // $Browser
         l.add(new BrowserValueProvider(contextService));
-        
+
         // $Global
         l.add(new ContextValueProvider(contextService));
-        
+
         return l;
     }
 

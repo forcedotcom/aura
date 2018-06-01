@@ -32,7 +32,7 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.BootstrapUtil;
-import org.auraframework.instance.*;
+import org.auraframework.instance.Instance;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.AuraJWTError;
@@ -72,10 +72,6 @@ public class Bootstrap extends AuraResourceImpl {
         }
     }
 
-    protected void loadLabels(AuraContext context) throws QuickFixException {
-        bootstrapUtil.loadLabels(context);
-    }
-
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context)
             throws IOException {
@@ -95,7 +91,7 @@ public class Bootstrap extends AuraResourceImpl {
             if (!configAdapter.isBootstrapModelExclusionEnabled()) {
                 appInstance = instanceService.getInstance(app, getComponentAttributes(request));
             }
-            loadLabels(context);
+            bootstrapUtil.loadLabelsToContext(context, this.definitionService);
 
             JsonSerializationContext serializationContext = context.getJsonSerializationContext();
 

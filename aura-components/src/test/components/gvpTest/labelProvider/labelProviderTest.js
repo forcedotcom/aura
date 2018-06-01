@@ -49,33 +49,6 @@
         }
     },
 
-    testGVPCallback: {
-        test: [
-            function (cmp) {
-
-                $A.get("$Label.Related_Lists.task_mode_today", cmp, function (res) {
-                    $A.test.assertEquals("Today", res, "Failed: Wrong label value in callback");
-                });
-            },
-
-            function (cmp) {
-
-                var tmt = $A.get("$Label.Related_Lists.task_mode_today", function (res) {
-
-                    $A.test.assertEquals("Today", res, "Failed: Wrong label value in callback");
-                });
-
-                $A.test.addWaitFor(
-                    false,
-                    $A.test.isActionPending,
-                    function () {
-                        $A.test.assertEquals("Today", $A.get("$Label.Related_Lists.task_mode_today"), "Label should already be context so it should be the return value");
-                    }
-                );
-            }
-        ]
-    },
-
     testPartialLabelExpressions: {
         test: [
             //Wait for all labels to be fetched and GVP to be ready
@@ -118,50 +91,54 @@
         test: [
             //Fetch a new label from server
             function (cmp) {
+                var completed = false;
+                var actual;
+
                 var label = "$Label.Related_Lists.FooBar";
-                $A.get(label,
-                    function (value) {
-                        cmp._callBack = true;
-                        cmp._label = value;
+                $A.get(label, function (value) {
+                        completed = true;
+                        actual = value;
                     });
-                $A.test.addWaitForWithFailureMessage(
-                    true,
-                    function () {
-                        return cmp._callBack;
+
+                $A.test.addWaitForWithFailureMessage(true, function () {
+                        return completed;
                     },
                     "Failed to run call back after fetching label from server",
                     function () {
                         $A.test.assertTrue(
-                            cmp._label === null ||
-                            cmp._label.indexOf(label + " does not exist") !== -1,
-                            "$Label.Related_Lists.FooBar should have error value: " + cmp._label
+                            actual === null ||
+                            actual.indexOf(label + " does not exist") > -1,
+                            "$Label.Related_Lists.FooBar should have error value: " + actual
                         );
                     });
             },
             //Fetch existing GVPs at client
             function (cmp) {
+                var actual;
+
                 var label = "$Label.Related_Lists.FooBar";
-                cmp._callBack = false;
-                $A.get(label,
-                    function (value) {
-                        cmp._callBack = true;
-                        cmp._label = value;
+                $A.get(label, function (value) {
+                        actual = value;
                     });
+
                 //No need to wait for unlike previous case, call backs are immediate as value is available at client
-                $A.test.assertTrue(cmp._callBack);
                 $A.test.assertTrue(
-                    cmp._label === null ||
-                    cmp._label.indexOf(label + " does not exist") !== -1,
-                    "$Label.Related_Lists.FooBar should have error value: " + cmp._label
+                    actual === null ||
+                    actual.indexOf(label + " does not exist") > -1,
+                    "$Label.Related_Lists.FooBar should have error value: " + actual
                 );
             }
         ]
     },
 
-    testGetWithNonFunctionCallback: {
+    testGetWithoutCallbackUpatesLabel: {
         test : function (cmp) {
-            $A.test.addWaitFor("Today + Overdue", function(){return $A.get("$Label.Related_Lists.task_mode_today_overdue","Mary Poppins")});
-            $A.test.addWaitFor("Today + Overdue", function(){return $A.get("$Label.Related_Lists.task_mode_today_overdue","undefined")});
+            // The label does not exist on client and will request it from server
+            $A.get("$Label.Related_Lists.task_mode_today_overdue");
+
+            $A.test.addWaitFor("Today + Overdue", function() {
+                return $A.get("$Label.Related_Lists.task_mode_today_overdue");
+            });
         }
     },
 

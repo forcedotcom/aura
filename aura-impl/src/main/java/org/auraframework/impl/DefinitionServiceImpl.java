@@ -18,6 +18,8 @@ package org.auraframework.impl;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1288,19 +1290,27 @@ public class DefinitionServiceImpl implements DefinitionService {
     @Override
     public void populateGlobalValues(String root, Map<DefDescriptor<? extends Definition>, Definition> defs)
             throws QuickFixException {
-        GlobalValueProvider provider = contextService.getCurrentContext().getGlobalProviders().get(root);
-        Map<Throwable, Collection<Location>> errors = Maps.newLinkedHashMap();
         UsageMap<PropertyReference> refs = getReferenceUsageMap(root, defs);
+
+        Map<Throwable, Collection<Location>> errors = new LinkedHashMap<>();
+        AuraContext context = contextService.getCurrentContext();
+        GlobalValueProvider provider = context.getGlobalProviders().get(root);
+
+        Set<PropertyReference> validRefs = new HashSet<>();
         for (Map.Entry<PropertyReference, Set<Location>> entry: refs.entrySet()) {
             try {
-                provider.validate(entry.getKey());
-                provider.getValue(entry.getKey());
-            } catch (InvalidExpressionException iee) {
-                errors.put(iee, entry.getValue());
+                PropertyReference ref = entry.getKey();
+                provider.validate(ref);
+                validRefs.add(ref);
+            } catch (InvalidExpressionException e) {
+                errors.put(e, entry.getValue());
             }
         }
-        if (errors.size() > 0) {
-            throw new CompositeValidationException("Unable to load values for "+root, errors);
+
+        provider.loadValues(validRefs);
+
+        if (!errors.isEmpty()) {
+            throw new CompositeValidationException("Unable to load values for " + root, errors);
         }
     }
 }

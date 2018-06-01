@@ -159,11 +159,11 @@ public class ServerServiceImpl implements ServerService {
 
     @Override
     public void run(Message message, AuraContext context, Writer out, Map<?,?> extras) throws IOException {
-        loggingService.startTimer(LoggingService.TIMER_AURA_RUN);
-
         if (message == null) {
             return;
         }
+        loggingService.startTimer(LoggingService.TIMER_AURA_RUN);
+
         List<Action> actions = message.getActions();
         JsonSerializationContext serializationContext = context.getJsonSerializationContext();
         JsonEncoder json = JsonEncoder.createJsonStream(out, serializationContext);
@@ -399,7 +399,7 @@ public class ServerServiceImpl implements ServerService {
             throws IOException, QuickFixException {
         writeDefinitions(dependencies, out, hasParts, partIndex, hydrationType, true);
     }
-    
+
     @Override
     public void writeDefinitions(final Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex, HYDRATION_TYPE hydrationType, boolean preloading)
             throws IOException, QuickFixException {
@@ -522,7 +522,7 @@ public class ServerServiceImpl implements ServerService {
 
         writeDefinitionStringToBuilder(ModuleDef.class, dependencies, null, context, sb, "$A.componentService.initModuleDefs(", serverSideDescriptor);
 
-        for (DefDescriptor dependency : dependencies) {
+        for (DefDescriptor<? extends Definition> dependency : dependencies) {
             String name = dependency.getQualifiedName();
             if (!serverSideDescriptor.contains(name)) {
                 java.util.Optional<String> match = serverSideDescriptor.stream().filter((d)->name.equalsIgnoreCase(d)).findFirst();
@@ -651,10 +651,10 @@ public class ServerServiceImpl implements ServerService {
                     return cache.get(getKey(de, descriptor, key), loader);
                 } catch (ExecutionException e) {
                     // Don't interfere if the callable caused these exceptions.
-                    Throwables.propagateIfInstanceOf(e.getCause(), IOException.class);
-                    Throwables.propagateIfInstanceOf(e.getCause(), QuickFixException.class);
-                    // Propagates as-is if RuntimeException, or wraps with a RuntimeException.
-                    Throwables.propagate(e);
+                    Throwables.throwIfInstanceOf(e.getCause(), IOException.class);
+                    Throwables.throwIfInstanceOf(e.getCause(), QuickFixException.class);
+                    // Wraps with a RuntimeException for others exceptions.
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -664,13 +664,13 @@ public class ServerServiceImpl implements ServerService {
             return loader.call();
         } catch (Exception e) {
             // Don't interfere if the call caused these exceptions.
-            Throwables.propagateIfInstanceOf(e, IOException.class);
-            Throwables.propagateIfInstanceOf(e, QuickFixException.class);
-            // Propagates as-is if RuntimeException, or wraps with a RuntimeException.
-            Throwables.propagate(e);
+            Throwables.throwIfInstanceOf(e, IOException.class);
+            Throwables.throwIfInstanceOf(e, QuickFixException.class);
+            // Re-throw as-is if it's a RuntimeException.
+            Throwables.throwIfUnchecked(e);
+            // Wraps with a RuntimeException for others exceptions.
+            throw new RuntimeException(e);
         }
-
-        return null;
     }
 
     private String getKey(DependencyEntry de, DefDescriptor<?> descriptor, String key) {
@@ -681,7 +681,7 @@ public class ServerServiceImpl implements ServerService {
 
     private String serializeInlineContext(AuraContext context) throws QuickFixException, IOException {
         // ensure all labels are loaded in context before serializing GVPs
-        bootstrapUtil.loadLabels(context);
+        bootstrapUtil.loadLabelsToContext(context, this.definitionService);
 
         JsonSerializationContext serializationContext = context.getJsonSerializationContext();
         StringWriter writer = new StringWriter();

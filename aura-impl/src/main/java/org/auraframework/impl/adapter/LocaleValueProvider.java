@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.DefDescriptor;
@@ -34,14 +35,12 @@ import org.auraframework.instance.ValueProviderType;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
-
 
 public class LocaleValueProvider implements GlobalValueProvider {
     public static String USER_LOCALE_LANGUAGE = "userLocaleLang";
@@ -97,13 +96,9 @@ public class LocaleValueProvider implements GlobalValueProvider {
         builder.put(VARIANT, lang.getVariant());
         builder.put(LANGUAGE_LOCALE, lang.toString());
 
-        try {
-            builder.put(MONTH_NAME, this.getNameOfMonths(auraLocale));
-            builder.put(WEEKDAY_NAME, this.getNameOfWeekdays(auraLocale));
-            builder.put(TODAY_LABEL, this.getLabelForToday(localizationAdapter));
-        } catch (QuickFixException qfe) {
-            // Ignore
-        }
+        builder.put(MONTH_NAME, this.getNameOfMonths(auraLocale));
+        builder.put(WEEKDAY_NAME, this.getNameOfWeekdays(auraLocale));
+        builder.put(TODAY_LABEL, this.getLabelForToday(localizationAdapter));
 
         builder.put(FIRST_DAY_OF_WEEK, Calendar.getInstance(auraLocale.getTimeZone(), userLocale).getFirstDayOfWeek());
 
@@ -116,7 +111,6 @@ public class LocaleValueProvider implements GlobalValueProvider {
         }
 
         // FORMAT PATTERNS
-
         builder.put(DATE_FORMAT, localizationService.getDateFormatPattern());
         builder.put(DATETIME_FORMAT, localizationService.getDateTimeFormatPattern());
         builder.put(TIME_FORMAT, localizationService.getTimeFormatPattern());
@@ -140,7 +134,6 @@ public class LocaleValueProvider implements GlobalValueProvider {
         default:
         }
         builder.put(DIR, dir);
-
 
         data = builder.build();
     }
@@ -173,17 +166,11 @@ public class LocaleValueProvider implements GlobalValueProvider {
     }
 
     @Override
-    public boolean refSupport() {
-        // $Locale has no serialization references.
-        return false;
-    }
-
-    @Override
     public Map<String, ?> getData() {
         return data;
     }
 
-    private List<LocalizedLabel> getNameOfMonths(AuraLocale locale) throws QuickFixException {
+    private List<LocalizedLabel> getNameOfMonths(AuraLocale locale) {
         Locale lang = locale.getLanguageLocale();
         Calendar cal = Calendar.getInstance(lang);
         Map<String, Integer> shortNames = cal.getDisplayNames(Calendar.MONTH, Calendar.SHORT_STANDALONE, lang);
@@ -210,7 +197,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
         return monthList;
     }
 
-    private String getLabelForToday(LocalizationAdapter localizationAdapter) throws QuickFixException {
+    private String getLabelForToday(LocalizationAdapter localizationAdapter) {
         String today = localizationAdapter.getLabel("Related_Lists", "task_mode_today");
         if (today == null) {
             return "Today";
@@ -218,7 +205,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
         return today;
     }
 
-    private List<LocalizedLabel> getNameOfWeekdays(AuraLocale locale) throws QuickFixException {
+    private List<LocalizedLabel> getNameOfWeekdays(AuraLocale locale) {
         DateFormatSymbols weekdaySymbols = DateFormatSymbols.getInstance(locale.getLanguageLocale());
         String[] weekdays = weekdaySymbols.getWeekdays();
         String[] shortWeekdays = weekdaySymbols.getShortWeekdays();
@@ -257,5 +244,10 @@ public class LocaleValueProvider implements GlobalValueProvider {
             json.writeValue(this.getShortName());
             json.writeMapEnd();
         }
+    }
+
+    @Override
+    public void loadValues(Set<PropertyReference> keys) {
+        // do nothing
     }
 }

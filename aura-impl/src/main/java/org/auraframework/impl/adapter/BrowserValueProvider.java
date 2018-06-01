@@ -16,6 +16,7 @@
 package org.auraframework.impl.adapter;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
@@ -120,18 +121,17 @@ public class BrowserValueProvider implements GlobalValueProvider {
     }
 
     @Override
-    public boolean refSupport() {
-        // $Browser has no serialization references.
-        return false;
-    }
-
-    @Override
     public Map<String, ?> getData() {
         if (browserDetails == null) {
             browserDetails = AuraUtil.immutableMap(parse());
         }
 
         return browserDetails;
+    }
+
+    @Override
+    public void loadValues(Set<PropertyReference> keys) {
+        // do nothing
     }
 
 }

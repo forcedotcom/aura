@@ -81,4 +81,12 @@ public class UsageMap<T> {
     public Set<Map.Entry<T, Set<Location>>> entrySet() {
         return Collections.unmodifiableSet(map.entrySet());
     }
+
+    /**
+     * Get a set of the keys contained in this map.
+     * @return an immutable set of keys.
+     */
+    public Set<T> keySet() {
+        return Collections.unmodifiableSet(this.map.keySet());
+    }
 }

@@ -32,7 +32,7 @@
  * @constructor
  * @export
  */
-function GlobalValueProviders (gvp, initCallback) {
+function GlobalValueProviders(gvp, initCallback) {
     this.valueProviders = {
         "$Browser" : new Aura.Provider.ObjectValueProvider(gvp["$Browser"]),
         "$Label": new Aura.Provider.LabelValueProvider(gvp["$Label"]),

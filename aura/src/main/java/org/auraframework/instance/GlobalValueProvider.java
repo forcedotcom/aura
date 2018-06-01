@@ -16,6 +16,7 @@
 package org.auraframework.instance;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
@@ -52,13 +53,16 @@ public interface GlobalValueProvider extends ValueProvider {
     boolean isEmpty();
 
     /**
-     * @deprecated refSupport no longer supported
-     */
-    @Deprecated
-    boolean refSupport();
-
-    /**
      * @return map of data to be serialized to client
      */
     Map<String, ?> getData();
+
+    /**
+     * Loading values to provider.
+     * If the values for the global value provider need to be fetched from another layer, this method should be implemented
+     * to load the values into the provider in batch, and consume the data via getDate() or getValue().
+     * 
+     * @param keys - the keys to specify what values to be loaded into the provider.
+     */
+    void loadValues(Set<PropertyReference> keys);
 }

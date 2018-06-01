@@ -17,6 +17,7 @@ package org.auraframework.http.resource;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +30,8 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.BootstrapUtil;
+import org.auraframework.instance.AuraValueProviderType;
+import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -79,9 +82,6 @@ public class BootstrapUnitTest {
                 return Maps.newHashMap();
             }
 
-            @Override
-            protected void loadLabels(AuraContext context) {
-            }
         };
 
         bootstrap.setBootstrapUtil(new BootstrapUtil());
@@ -116,10 +116,13 @@ public class BootstrapUnitTest {
         bootstrap.setDefinitionService(definitionService);
 
         AuraContext context = Mockito.mock(AuraContext.class);
+        Map<String, GlobalValueProvider> globalValueProviders = new HashMap<>();
+        globalValueProviders.put(AuraValueProviderType.LABEL.getPrefix(), Mockito.mock(GlobalValueProvider.class));
         InstanceStack instanceStack = Mockito.mock(InstanceStack.class);
         Mockito.doReturn(appDescriptor).when(context).getApplicationDescriptor();
         Mockito.doReturn(new DefaultJsonSerializationContext(true, true)).when(context).getJsonSerializationContext();
         Mockito.doReturn(instanceStack).when(context).getInstanceStack();
+        Mockito.doReturn(globalValueProviders).when(context).getGlobalProviders();
 
         ContextService contextService = Mockito.mock(ContextService.class);
         Mockito.doReturn(context).when(contextService).getCurrentContext();
@@ -140,10 +143,6 @@ public class BootstrapUnitTest {
             @Override
             protected Map<String, Object> getComponentAttributes(HttpServletRequest request) {
                 return Maps.newHashMap();
-            }
-
-            @Override
-            protected void loadLabels(AuraContext context) {
             }
         };
 
@@ -193,10 +192,6 @@ public class BootstrapUnitTest {
             @Override
             protected Map<String, Object> getComponentAttributes(HttpServletRequest request) {
                 return Maps.newHashMap();
-            }
-
-            @Override
-            protected void loadLabels(AuraContext context) {
             }
         };
 

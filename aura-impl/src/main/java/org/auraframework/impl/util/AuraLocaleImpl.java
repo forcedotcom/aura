@@ -80,7 +80,7 @@ public class AuraLocaleImpl implements AuraLocale, Serializable {
     public AuraLocaleImpl(Locale defaultLocale, TimeZone timeZone) {
         this(defaultLocale, null, null, null, null, null, timeZone, false);
     }
-    
+
     /**
      * Creates an instance with the given values without nameStyle.
      * @param defaultLocale the Locale to use unless otherwise overridden
@@ -94,7 +94,7 @@ public class AuraLocaleImpl implements AuraLocale, Serializable {
      */
     public AuraLocaleImpl(Locale defaultLocale, Locale currencyLocale, Locale dateLocale, Locale languageLocale,
             Locale numberLocale, Locale systemLocale, TimeZone timeZone) {
-    	this(defaultLocale, currencyLocale, dateLocale, languageLocale, numberLocale, systemLocale, timeZone, false);
+        this(defaultLocale, currencyLocale, dateLocale, languageLocale, numberLocale, systemLocale, timeZone, false);
     }
 
     /**
@@ -114,14 +114,12 @@ public class AuraLocaleImpl implements AuraLocale, Serializable {
     public AuraLocaleImpl(Locale defaultLocale, Locale currencyLocale, Locale dateLocale, Locale languageLocale,
             Locale numberLocale, Locale systemLocale, TimeZone timeZone, Boolean isEasternNameStyle) {
 
-        this.defaultLocale = (defaultLocale != null) ? defaultLocale : (Locale.getDefault() != null) ? Locale
-                .getDefault() : Locale.ENGLISH;
+        this.defaultLocale = (defaultLocale != null) ? defaultLocale : (Locale.getDefault() != null) ? Locale.getDefault() : Locale.ENGLISH;
         this.currencyLocale = (currencyLocale != null) ? currencyLocale : this.defaultLocale;
         this.dateLocale = (dateLocale != null) ? dateLocale : this.defaultLocale;
         this.languageLocale = (languageLocale != null) ? languageLocale : this.defaultLocale;
         this.numberLocale = (numberLocale != null) ? numberLocale : this.defaultLocale;
-        this.systemLocale = (systemLocale != null) ? systemLocale : (Locale.getDefault() != null) ? Locale.getDefault()
-                : Locale.ENGLISH;
+        this.systemLocale = (systemLocale != null) ? systemLocale : (Locale.getDefault() != null) ? Locale.getDefault() : Locale.ENGLISH;
 
         if (timeZone == null) {
             try {
@@ -182,7 +180,7 @@ public class AuraLocaleImpl implements AuraLocale, Serializable {
     public Calendar getCalendar() {
         return Calendar.getInstance(getTimeZone(), getDateLocale());
     }
-    
+
     @Override
     public Boolean isEasternNameStyle() {
         return this.isEasternNameStyle;

@@ -18,9 +18,8 @@
  */
 package org.auraframework.adapter;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.util.AuraLocale;
 
@@ -45,6 +44,14 @@ public interface LocalizationAdapter extends AuraAdapter {
     String getLabel(String section, String name, Object... params);
 
     /**
+     * Get labels to which the specified keys are mapped.
+     * 
+     * @param keys - a map of label keys, mapping from section to a set of names.
+     * @return a map of labels, mapping from section to name-value pairs.
+     */
+    Map<String, Map<String, String>> getLabels(Map<String, Set<String>> keys);
+
+    /**
      * Indicates whether the specified label is defined or not.
      * @param section
      *      The section in the label definition file where the label is defined.
@@ -64,62 +71,10 @@ public interface LocalizationAdapter extends AuraAdapter {
     AuraLocale getAuraLocale();
 
     /**
-     * Gets an instance of AuraLocale based on the given defaultLocale for this
-     * context.
-     *
-     * @param defaultLocal a Locale
-     *
-     * @return a AuraLocale based on the defaultLocale value
-     */
-    AuraLocale getAuraLocale(Locale defaultLocal);
-
-    /**
-     * Gets an instance of AuraLocale based on the given parameters for this
-     * context.
-     *
-     * @param defaultLocale a Locale
-     * @param timeZone a TimeZone
-     * @return a AuraLocale based on the defaultLocale and timeZone values
-     */
-    AuraLocale getAuraLocale(Locale defaultLocale, TimeZone timeZone);
-
-    /**
-     * Gets an instance of AuraLocale based on the given parameters for this
-     * context. Locales can be specified for each type of localization. If null
-     * is given for any argument, an appropriate default value may be calculated
-     * and used as needed.
-     *
-     * @param defaultLocale a Locale to use by default. If null is given a
-     *            default may be assumed.
-     * @param currencyLocale a Locale to use for currency amounts if different
-     *            than the default
-     * @param dateLocale a Locale to use for dates and times if different than
-     *            the default
-     * @param languageLocale a Locale to use for Strings if different than the
-     *            default
-     * @param numberLocale a Locale to use for numbers including percentages, if
-     *            different than the default
-     * @param systemLocale the Locale to use as the system default
-     * @param timeZone a TimeZone to use
-     *
-     * @return a AuraLocale based on the given values
-     */
-    AuraLocale getAuraLocale(Locale defaultLocale, Locale currencyLocale, Locale dateLocale, Locale languageLocale,
-            Locale numberLocale, Locale systemLocale, TimeZone timeZone);
-
-    /**
-     * Sets requested locales that must be considered when creating default
-     * AuraLocale.
-     *
-     * @param requestedLocales
-     */
-    void setRequestedLocales(List<Locale> requestedLocales);
-
-
-    /**
      * Returns whether the the current locale requires to display Japanese imperial year
      * @see <a href="https://en.wikipedia.org/wiki/List_of_Japanese_era_names">List of Japanese era</a>
      * @return {@code true} to display imperial year, {@code false} otherwise
      */
     Boolean showJapaneseImperialYear();
+
 }

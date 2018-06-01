@@ -1,1 +1,0 @@
-{"mode":"PROD","test":"org.auraframework.integration.test.context.AuraContextImplTest.testSerializeGlobalValueProviderWithoutRefSupport","fwuid":"#FAKEUID#","globalValueProviders":[{"type":"$NONE","values":{"data":"identity"}}],"enableAccessChecks":true,"lockerEnabled":true}

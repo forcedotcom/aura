@@ -74,7 +74,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     private final static StringParam componentUIDParam = new StringParam("_uid", 0, false);
 
     private final static List<Class> DESCRIPTOR_DEF_TYPES = Arrays.asList(ModuleDef.class, ComponentDef.class, EventDef.class, LibraryDef.class);
-    
+
     private DefinitionService definitionService;
     private LoggingService loggingService;
     private ServerService serverService;
@@ -93,9 +93,9 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
         response.setContentType("text/javascript");
         response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
-        
+
         StringBuilderWriter responseStringWriter = new StringBuilderWriter();
-        
+
         AuraContext context = contextService.getCurrentContext();
 
         try {
@@ -187,10 +187,10 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             }
             serverService.writeDefinitions(dependencies, responseStringWriter, false, 0, hydrationType, false);
 
-            if (dependencies.size() > 0) {
+            if (!dependencies.isEmpty()) {
                 try {
-                    definitionService.populateGlobalValues(AuraValueProviderType.LABEL.getPrefix(),
-                            mapDescriptorToDefinition(dependencies));
+                    String providerPrefix = AuraValueProviderType.LABEL.getPrefix();
+                    definitionService.populateGlobalValues(providerPrefix, mapDescriptorToDefinition(dependencies));
                 } catch (QuickFixException qfe) {
                     // this should not throw a QFE
                     loggingService.warn("attempting to populate labels for requested definitions: " + StringUtils.join(requestedDescriptors, ","), qfe);

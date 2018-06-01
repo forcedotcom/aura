@@ -33,55 +33,52 @@ function LabelValueProvider(values) {
  * @private
  */
 LabelValueProvider.prototype.requestServerLabel = function(section, name, callback) {
-    var lvp = this,
-        queue = this.getQueue(section, name),
-        placeholder = $A.getContext().getMode() === "PROD" ? "" : "[" + section + "." + name + "]";
+    var queue = this.getQueue(section, name);
 
-    if ($A.util.isFunction(callback)) {
-        queue.addCallback(callback);
-    }
+    var placeholder = "";
+    //#if {"excludeModes" : ["PRODUCTION"]}
+    placeholder = "[" + section + "." + name + "]";
+    //#end
 
-    if (!queue.isRequested()) {
+    queue.addCallback(callback);
 
+    if (!queue.requested) {
         var action = $A.get("c.aura://LabelController.getLabel");
-
         action.setParams({
             "name": name,
             "section": section
         });
 
-        action.setCallback(this, function(a) {
+        action.setCallback(this, function(result) {
             var returnValue = placeholder;
-            if(a.getState() === "SUCCESS") {
-                returnValue = a.getReturnValue();
-                if(!this.values[section]){
-                    this.values[section]={};
+            if (result.getState() === "SUCCESS") {
+                returnValue = result.getReturnValue();
+                var labels = this.values[section];
+                if (!labels) {
+                    this.values[section] = labels = {};
                 }
-                this.values[section][name] = returnValue;
-                //JBUCH: HACK. FIX IN PRV REWRITE
-                $A.expressionService.updateGlobalReference(["$Label",section,name].join('.'),null,returnValue);
-            } else {
-                $A.log("Error getting label: " + section + "." +name);
-            }
+                labels[name] = returnValue;
 
+                //JBUCH: HACK. FIX IN PRV REWRITE
+                $A.expressionService.updateGlobalReference("$Label." + section + "." + name, null, returnValue);
+            } else {
+                $A.warning("Error getting label: $Label." + section + "." + name + ". Caused by: " + JSON.stringify(result.getError()));
+            }
 
             var callbacks = queue.getCallbacks();
             for (var i = 0; i < callbacks.length; i++) {
                 callbacks[i].call(null, returnValue);
             }
 
-            lvp.removeQueue(section, name);
+            this.removeQueue(section, name);
         });
 
         $A.enqueueAction(action);
 
-        $A.run(function() {}, "LabelValueProvider.requestServerLabel");
-
-        queue.setRequested();
+        queue.requested = true;
     }
 
     return placeholder;
-
 };
 
 /**
@@ -141,24 +138,20 @@ LabelValueProvider.prototype.merge = function(values) {
  * @return {String}
  */
 LabelValueProvider.prototype.get = function(expression, callback) {
-    var value;
-    var path=expression.split('.');
-
-    if(path.length === 2) {
-        var section=path[0];
-        var name=path[1];
-        value = this.values[section]&&this.values[section][name];
-        if(value === undefined) {
-            // request from server if no value found in existing gvps
-            value = this.requestServerLabel(section, name, callback);
-        } else {
-            if( $A.util.isFunction(callback) ) {
-                callback.call(null, value);
-            }
-
-        }
-    } else {
+    var path = expression.split('.');
+    if (path.length !== 2) {
         $A.log("$Label requests must have both section and name");
+        return null;
+    }
+
+    var section = path[0];
+    var name = path[1];
+    var value = this.values[section] && this.values[section][name];
+    if (value === undefined) {
+        // request from server if no value found in existing gvps
+        value = this.requestServerLabel(section, name, callback);
+    } else if ($A.util.isFunction(callback)) {
+        callback.call(null, value);
     }
 
     return value;

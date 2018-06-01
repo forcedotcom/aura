@@ -16,6 +16,7 @@
 package org.auraframework.impl.adapter;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
@@ -77,12 +78,6 @@ public class ContextValueProvider implements GlobalValueProvider {
     }
 
     @Override
-    public boolean refSupport() {
-        // $Global may have serialization references.
-        return true;
-    }
-
-    @Override
     public Map<String, ?> getData() {
         AuraContext context = contextService.getCurrentContext();
 
@@ -98,6 +93,11 @@ public class ContextValueProvider implements GlobalValueProvider {
         };
 
         return Maps.filterValues(context.getGlobals(), isNonNullFilter);
+    }
+
+    @Override
+    public void loadValues(Set<PropertyReference> keys) {
+        // do nothing
     }
 
 }

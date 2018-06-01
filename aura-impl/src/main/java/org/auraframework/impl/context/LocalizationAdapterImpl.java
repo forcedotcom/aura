@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -39,14 +39,12 @@ public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLoc
     @Inject
     private ContextService contextService;
 
-    private List<Locale> requestedLocales;
-
     /**
      * Temporary workaround for localized labels
      */
-    private static Map<String, Map<String, String>> labels = new HashMap<>();
+    private final static Map<String, Map<String, String>> labels = new HashMap<>();
 
-    private final static Map<String, String> testLabels = new HashMap<>();
+    private final Map<String, String> testLabels = new HashMap<>();
 
     // THIS SHOULD DIE.
     static {
@@ -64,6 +62,7 @@ public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLoc
         todayLabels.put("zh_TW", "今天");
         labels.put("task_mode_today", todayLabels);
 
+        // TODO: Only used in Tests, No Use in OSS & core. Remove or move to test labels.
         todayLabels = new HashMap<>();
         todayLabels.put("ar", "اليوم + المتأخرة");
         todayLabels.put("cs", "Dnes + splatnosti");
@@ -81,30 +80,47 @@ public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLoc
         Map<String, String> tomorrowLabels = new HashMap<>();
         tomorrowLabels.put("en_US", "Tomorrow");
         labels.put("task_mode_tomorrow", tomorrowLabels);
-
-        Map<String, String> formatLabels = new HashMap<>();
-        formatLabels.put("en_US", "Format {0}");
-        labels.put("format_one", formatLabels);
-
-        formatLabels = new HashMap<>();
-        formatLabels.put("en_US", "Format {0} {1}");
-        labels.put("format_two", formatLabels);
-
-        formatLabels = new HashMap<>();
-        formatLabels.put("en_US", "Format {0} {1} {2}");
-        labels.put("format_three", formatLabels);
     }
 
     @Override
     public String getLabel(String section, String name, Object... params) {
+        // In OSS, there's no section (namespace) for label
         Map<String, String> label = labels.get(name);
         if (label == null) {
-            if(testLabels.containsKey(getLabelKey(section, name))) {
-                return testLabels.get(getLabelKey(section, name));
-            }
-            return null;
+            return this.getTestLabel(section, name);
         }
-        return label.get(this.getAuraLocale().getLanguageLocale().toString());
+
+        String userLangLocale = this.getAuraLocale().getLanguageLocale().toString();
+        return label.get(userLangLocale);
+    }
+
+    @Override
+    public Map<String, Map<String, String>> getLabels(Map<String, Set<String>> keys) {
+        Map<String, Map<String, String>> result = new HashMap<>();
+
+        String userLangLocale = this.getAuraLocale().getLanguageLocale().toString();
+        for (Map.Entry<String, Set<String>> entry : keys.entrySet()) {
+            String section = entry.getKey();
+            Map<String, String> pairs = new HashMap<>();
+            result.put(section, pairs);
+
+            Set<String> names = entry.getValue();
+            for (String name : names) {
+                String value;
+                Map<String, String> localizedLabels = labels.get(name);
+                if (localizedLabels == null) {
+                    value = this.getTestLabel(section, name);
+                } else {
+                    value = localizedLabels.get(userLangLocale);
+                }
+
+                if (value != null) {
+                    pairs.put(name, value);
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override
@@ -119,21 +135,14 @@ public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLoc
      */
     @Override
     public AuraLocale getAuraLocale() {
-        //
         // use requested locales from context
-        // check for nulls - this happens when AuraContextFilter has not been
-        // run
+        // check for nulls - this happens when AuraContextFilter has not been run
         AuraContext context = contextService.getCurrentContext();
         if (context != null) {
             List<Locale> locales = context.getRequestedLocales();
-            if (locales != null && locales.size() > 0) {
+            if (locales != null && !locales.isEmpty()) {
                 return new AuraLocaleImpl(locales.get(0));
             }
-        }
-
-        // use any explicitly set requested locales if available
-        if (requestedLocales != null && !requestedLocales.isEmpty()) {
-            return new AuraLocaleImpl(requestedLocales.get(0));
         }
 
         // none available create a default locale
@@ -141,43 +150,21 @@ public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLoc
     }
 
     @Override
-    public AuraLocale getAuraLocale(Locale defaultLocale) {
-        return new AuraLocaleImpl(defaultLocale);
-    }
-
-    @Override
-    public AuraLocale getAuraLocale(Locale defaultLocale, TimeZone timeZone) {
-        return new AuraLocaleImpl(defaultLocale, timeZone);
-    }
-
-    @Override
-    public AuraLocale getAuraLocale(Locale defaultLocale, Locale currencyLocale, Locale dateLocale,
-            Locale languageLocale, Locale numberLocale, Locale systemLocale, TimeZone timeZone) {
-        return new AuraLocaleImpl(defaultLocale, currencyLocale, dateLocale, languageLocale, numberLocale,
-                systemLocale, timeZone);
-    }
-
-    @Override
-    public void setRequestedLocales(List<Locale> requestedLocales) {
-        this.requestedLocales = requestedLocales;
-    }
-
-   @Override
     public void setTestLabel(String section, String name, String value) {
-        testLabels.put(getLabelKey(section, name), value);
+        testLabels.put(getTestLabelKey(section, name), value);
     }
 
     @Override
     public String getTestLabel(String section, String name) {
-        return testLabels.get(getLabelKey(section, name));
+        return testLabels.get(getTestLabelKey(section, name));
     }
 
     @Override
     public String removeTestLabel(String section, String name) {
-        return testLabels.remove(getLabelKey(section, name));
+        return testLabels.remove(getTestLabelKey(section, name));
     }
 
-    private String getLabelKey(String section, String name) {
+    private String getTestLabelKey(String section, String name) {
         return section + "." + name;
     }
 

@@ -74,10 +74,9 @@ public class ComponentController implements GlobalController {
     @ActionGroup(value = "aura")
     public Boolean loadLabels() throws QuickFixException {
         AuraContext ctx = contextService.getCurrentContext();
-        Map<DefDescriptor<? extends Definition>, Definition> defMap;
 
         definitionService.getDefinition(ctx.getApplicationDescriptor());
-        defMap = ctx.filterLocalDefs(null);
+        Map<DefDescriptor<? extends Definition>, Definition> defMap = ctx.filterLocalDefs(null);
         definitionService.populateGlobalValues(AuraValueProviderType.LABEL.getPrefix(), defMap);
         return Boolean.TRUE;
     }

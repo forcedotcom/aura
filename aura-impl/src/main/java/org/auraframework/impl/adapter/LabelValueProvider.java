@@ -15,7 +15,12 @@
  */
 package org.auraframework.impl.adapter;
 
-import com.google.common.collect.Maps;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
@@ -27,25 +32,21 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.util.AuraTextUtil;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Value provider for $Label
  */
 public class LabelValueProvider implements GlobalValueProvider {
 
-    // MapValueProvider...
     private final Map<String, Map<String, String>> labels;
 
     private final LocalizationAdapter localizationAdapter;
     private final DefinitionService definitionService;
 
     public LabelValueProvider(LocalizationAdapter localizationAdapter, DefinitionService definitionService) {
-        this.labels = Maps.newHashMap();
         this.localizationAdapter = localizationAdapter;
         this.definitionService = definitionService;
+
+        this.labels = new HashMap<>();
     }
 
     @Override
@@ -53,16 +54,16 @@ public class LabelValueProvider implements GlobalValueProvider {
         List<String> parts = expr.getList();
         String section = parts.get(0);
         String param = parts.get(1);
-        Map<String, String> m = labels.get(section);
+        Map<String, String> m = this.labels.get(section);
         if (m == null) {
             m = new HashMap<>();
-            labels.put(section, m);
+            this.labels.put(section, m);
         }
+
         String ret = m.get(param);
         if (ret == null) {
             String label = localizationAdapter.getLabel(section, param);
-            // people escape stuff like &copy; in the labels, aura doesn't need
-            // that.
+            // people escape stuff like &copy; in the labels, aura doesn't need that.
             ret = AuraTextUtil.unescapeOutput(label, false);
             m.put(param, ret);
         }
@@ -98,14 +99,75 @@ public class LabelValueProvider implements GlobalValueProvider {
     }
 
     @Override
-    public boolean refSupport() {
-        // $Label has no serialization references.
-        return false;
+    public Map<String, ?> getData() {
+        return labels;
     }
 
     @Override
-    public Map<String, ?> getData() {
-        return labels;
+    public void loadValues(Set<PropertyReference> keys) {
+        if (keys == null) {
+            return;
+        }
+
+        Map<String, Set<String>> uncachedLabels = new HashMap<>();
+        for (PropertyReference key : keys) {
+            if (key.size() != 2) {
+                continue;
+            }
+
+            List<String> parts = key.getList();
+            String section = parts.get(0);
+            String name = parts.get(1);
+
+            // If section doesn't exist in cache, adding key to uncached labels and continue
+            Map<String, String> labels = this.labels.get(section);
+            if (labels == null) {
+                labels = new HashMap<>();
+                this.addLabelKeyToMap(uncachedLabels, section, name);
+                continue;
+            }
+
+            if (!labels.containsKey(name)) {
+                this.addLabelKeyToMap(uncachedLabels, section, name);
+            }
+        }
+
+        if (uncachedLabels.isEmpty()) {
+            return;
+        }
+
+        Map<String, Map<String, String>> labels = this.localizationAdapter.getLabels(uncachedLabels);
+
+        for (Map.Entry<String, Map<String, String>> entry : labels.entrySet()) {
+            String section = entry.getKey();
+            for (Map.Entry<String, String> nameToValue : entry.getValue().entrySet()) {
+                String name = nameToValue.getKey();
+                String label = nameToValue.getValue();
+                // people escape stuff like &copy; in the labels, aura doesn't need that.
+                label = AuraTextUtil.unescapeOutput(label, false);
+
+                this.addLabelToMap(this.labels, section, name, label);
+            }
+        }
+
+    }
+
+    private void addLabelKeyToMap(Map<String, Set<String>> map, String section, String name) {
+        Set<String> names = map.get(section);
+        if (names == null) {
+            names = new HashSet<>();
+            map.put(section, names);
+        }
+        names.add(name);
+    }
+
+    private void addLabelToMap(Map<String, Map<String, String>> map, String section, String name, String label) {
+        Map<String, String> labels = map.get(section);
+        if (labels == null) {
+            labels = new HashMap<>();
+            map.put(section, labels);
+        }
+        labels.put(name, label);
     }
 
 }

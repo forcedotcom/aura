@@ -15,9 +15,9 @@
  */
 package org.auraframework.http;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import org.auraframework.annotations.Annotations;
+import java.io.IOException;
+import java.util.Set;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.ApplicationInitializer;
@@ -26,28 +26,21 @@ import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.Instance;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.Location;
-import org.auraframework.throwable.quickfix.CompositeValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
-import javax.inject.Inject;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Shared bootstrap logic used for both the bootstrap resource and bootstrap inlining
  */
 @ServiceComponent
 public class BootstrapUtil {
-    @Inject
-    DefinitionService definitionService;
 
     // note: these code blocks must stay in sync with fallback.bootstrap.js
     private final static String PREPEND_JS = "window.Aura || (window.Aura = {});\n" +
@@ -74,24 +67,12 @@ public class BootstrapUtil {
         return APPEND_JS;
     }
 
-    public void loadLabels(AuraContext context) throws QuickFixException {
+    public void loadLabelsToContext(AuraContext context, DefinitionService definitionService) throws QuickFixException {
         String uid = definitionService.getUid(null, context.getApplicationDescriptor());
         String root = AuraValueProviderType.LABEL.getPrefix();
-        GlobalValueProvider provider = context.getGlobalProviders().get(root);
-        Map<Throwable, Collection<Location>> errors = Maps.newLinkedHashMap();
+        GlobalValueProvider labelValueProvider = context.getGlobalProviders().get(root);
         Set<PropertyReference> labels = definitionService.getGlobalReferences(uid, root);
-        if (labels != null) {
-            for (PropertyReference label : labels) {
-                try {
-                    provider.getValue(label);
-                } catch (Throwable t) {
-                    errors.put(t, Sets.newHashSet(new Location(label.toString(), 0)));
-                }
-            }
-        }
-        if (errors.size() > 0) {
-            throw new CompositeValidationException("Unable to load values for "+root, errors);
-        }
+        labelValueProvider.loadValues(labels);
     }
 
     public void serializeApplication(Instance<?> appInstance, AuraContext context, JsonEncoder json) throws IOException {

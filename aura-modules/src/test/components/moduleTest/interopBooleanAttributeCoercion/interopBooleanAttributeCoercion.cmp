@@ -5,55 +5,62 @@
     <div>
         <moduleTest:interopBooleanAttribute
             aura:id="string-false"
-            foo="false"
+            booleanAttribute="false"
         />
         <moduleTest:interopBooleanAttribute
             aura:id="string-true"
-            foo="true"
+            booleanAttribute="true"
         />
         <moduleTest:interopBooleanAttribute
             aura:id="expression-string-false"
-            foo="{! join('', 'false') }"
+            booleanAttribute="{! join('', 'false') }"
         />
         <moduleTest:interopBooleanAttribute
             aura:id="expression-string-true"
-            foo="{! join('', 'true') }"
+            booleanAttribute="{! join('', 'true') }"
         />
         <moduleTest:interopBooleanAttribute
             aura:id="unbound-expression-string-false"
-            foo="{# join('', 'false') }"
+            booleanAttribute="{# join('', 'false') }"
         />
         <moduleTest:interopBooleanAttribute
             aura:id="unbound-expression-string-true"
-            foo="{# join('', 'true') }"
+            booleanAttribute="{# join('', 'true') }"
         />
         <moduleTest:interopBooleanAttribute
             aura:id="unbound-attribute-expression-string-true"
-            foo="{# v.trueAttribute }"
+            booleanAttribute="{# v.trueAttribute }"
         />
         <moduleTest:interopBooleanAttribute
             aura:id="unbound-attribute-expression-string-false"
-            foo="{# v.falseAttribute }"
+            booleanAttribute="{# v.falseAttribute }"
         />
 
-        <!-- The next four components are for future tests that are currently commented out
         <moduleTest:interopBooleanAttribute
             aura:id="string-random"
-            foo="amazing-robot-restaurant"
+            booleanAttribute="amazing-robot-restaurant"
         />
         <moduleTest:interopBooleanAttribute
             aura:id="string-empty"
-            foo=""
+            booleanAttribute=""
         />
         <moduleTest:interopBooleanAttribute
             aura:id="string-null"
-            foo="null"
+            booleanAttribute="null"
         />
         <moduleTest:interopBooleanAttribute
             aura:id="string-undefined"
-            foo="undefined"
+            booleanAttribute="undefined"
         />
-        -->
+
+        <moduleTest:interopBooleanAttribute
+            aura:id="non-boolean-attribute-string-false"
+            nonBooleanAttribute="false"
+        />
+        <moduleTest:interopBooleanAttribute
+            aura:id="non-boolean-attribute-string-true"
+            nonBooleanAttribute="true"
+        />
     </div>
 
     <!-- These are here for sanity-testing how Aura actually coerces boolean attributes -->
@@ -66,10 +73,11 @@
     <moduleTest:auraBooleanAttributeBaseline aura:id="sanity-unbound-attribute-expression-string-false" booleanAttribute="{# v.falseAttribute }" />
     <moduleTest:auraBooleanAttributeBaseline aura:id="sanity-unbound-attribute-expression-string-true"  booleanAttribute="{# v.trueAttribute }" />
 
-    <!-- The next four components are for future tests that are currently commented out
-    <moduleTest:auraBooleanAttributeBaseline aura:id="sanity-string-random"           booleanAttribute="amazing-robot-restaurant" />
-    <moduleTest:auraBooleanAttributeBaseline aura:id="sanity-string-empty"            booleanAttribute="" />
-    <moduleTest:auraBooleanAttributeBaseline aura:id="sanity-string-null"             booleanAttribute="null" />
-    <moduleTest:auraBooleanAttributeBaseline aura:id="sanity-string-undefined"        booleanAttribute="undefined" />
-    -->
+    <moduleTest:auraBooleanAttributeBaseline aura:id="sanity-string-random"     booleanAttribute="amazing-robot-restaurant" />
+    <moduleTest:auraBooleanAttributeBaseline aura:id="sanity-string-empty"      booleanAttribute="" />
+    <moduleTest:auraBooleanAttributeBaseline aura:id="sanity-string-null"       booleanAttribute="null" />
+    <moduleTest:auraBooleanAttributeBaseline aura:id="sanity-string-undefined"  booleanAttribute="undefined" />
+
+    <moduleTest:auraBooleanAttributeBaseline aura:id="sanity-non-boolean-attribute-string-false"    stringAttribute="false" />
+    <moduleTest:auraBooleanAttributeBaseline aura:id="sanity-non-boolean-attribute-string-true"     stringAttribute="true" />
 </aura:component>

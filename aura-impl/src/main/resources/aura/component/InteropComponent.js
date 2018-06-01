@@ -118,24 +118,16 @@ InteropComponent.prototype.setupAttributes = function(config) {
             valueConfig = value["value"];
         }
 
-        var isPrimitiveString = typeof valueConfig === 'string';
+        // We need to know whether a value was initially passed as a hardcoded
+        // primitive string in order to support Aura's type coercion for boolean
+        // attributes. This map is used later when we set property values on
+        // the custom element.
+        this.isPrimitiveString = this.isPrimitiveString || {};
+        this.isPrimitiveString[attribute] = typeof valueConfig === 'string';
+
         var valueProvider = config['valueProvider'];
 
         valueConfig = valueFactory.create(valueConfig, valueProvider || this);
-
-        // The actual behavior of Aura when assigning string values to
-        // attributes with the boolean type, is to coerce 'true' to `true` and
-        // all other strings to `false`. We cannot exactly emulate that behavior
-        // until LWC gains attribute type support. Until then, the following
-        // workaround will have to do.
-        if (isPrimitiveString) {
-            if (valueConfig === 'true') {
-                valueConfig = true;
-            }
-            if (valueConfig === 'false') {
-                valueConfig = false;
-            }
-        }
 
         // Check typeof PRV | FCV
         if ($A.util.isExpression(valueConfig)) {
@@ -494,7 +486,19 @@ InteropComponent.prototype.setupInteropInstance = function () {
         } else if (!propName && this.isHtmlGlobalAttr(attrName)) { // first check we are not overriding this attrName
             this.setGlobalAttribute(element, attrName, value);
         } else {
-            if (!cmp.isReadOnlyProperty(propName)) { // Don't throw when they set value on the template to some read only prop
+            if (!cmp.isReadOnlyProperty(propName)) {
+                // When assigning hardcoded string values to boolean attributes,
+                // Aura coerces 'true' to `true` and all other strings to
+                // `false`. We cannot exactly emulate that behavior until LWC
+                // gains attribute type support. Until then, we will use the
+                // following workaround where we assume a boolean attribute if
+                // the corresponding prop returns false. This is ok for now
+                // because all LGC components follow this convention for boolean
+                // attributes.
+                if (this.isPrimitiveString[propName] && element[propName] === false) {
+                    value = value === 'true';
+                }
+
                 if (value !== undefined) {
                     element[propName] = value;
                 }

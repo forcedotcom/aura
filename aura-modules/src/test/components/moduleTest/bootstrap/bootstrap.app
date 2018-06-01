@@ -44,6 +44,7 @@
             <moduleTest:testCss></moduleTest:testCss>
             <moduleTest:schemaTest></moduleTest:schemaTest>
             <moduleTest:schemaLabel></moduleTest:schemaLabel>
+            <moduleTest:nested aura:id="nested"></moduleTest:nested>
         </div>
 
         <section style="margin: 10px; border: 1px solid # ">

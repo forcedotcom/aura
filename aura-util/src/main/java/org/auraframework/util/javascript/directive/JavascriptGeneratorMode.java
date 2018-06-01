@@ -100,6 +100,10 @@ public enum JavascriptGeneratorMode {
         return jsWriter == null ? JavascriptWriter.WITHOUT_CLOSURE : jsWriter;
     }
 
+    public boolean isTestingMode() {
+        return this == STATS || this == TESTING || this == TESTINGDEBUG || this == AUTOTESTING || this == AUTOTESTINGDEBUG || this == PTEST;
+    }
+
     /**
      * @return the suffix used for the file to be generated
      */

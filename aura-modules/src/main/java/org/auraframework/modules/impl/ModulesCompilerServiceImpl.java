@@ -25,6 +25,7 @@ import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.tools.node.api.NodeLambdaFactory;
+import org.lwc.bundle.BundleType;
 
 @ServiceComponent
 public class ModulesCompilerServiceImpl implements ModulesCompilerService {
@@ -47,11 +48,18 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
 
     @Override
     public final ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
+        return this.compile(entry, sources, BundleType.internal);
+    }
+
+    @Override
+    public final ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType) throws Exception {
         // need to create compiler lazily to avoid the core modularity enforcer
         compiler = getCompiler();
         long startNanos = System.nanoTime();
-        ModulesCompilerData data = compiler.compile(entry, sources);
+        ModulesCompilerData data = compiler.compile(entry, sources, bundleType);
         long elapsedMillis = (System.nanoTime() - startNanos) / 1000000;
+        
+        // TODO: keep the log bc it is consumed in splunk.
         loggingService.info("[node-tool] ModulesCompilerServiceImpl: entry=" + entry + ", elapsedMs=" + elapsedMillis
                 + ", nodeServiceType=" + nodeServiceFactory);
         return data;

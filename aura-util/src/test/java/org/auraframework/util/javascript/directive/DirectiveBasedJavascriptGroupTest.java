@@ -126,12 +126,12 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
         String mockWireCompat = "var mock='wire compat';console.log(mock);\n";
 
         // mock out getSource for engine to test compat
-        Mockito.when(jg.getSource("aura/resources/engine/engine_compat.js")).thenReturn(mockEngineCompat);
-        Mockito.when(jg.getSource("aura/resources/engine/engine_compat.min.js")).thenReturn(mockEngineCompat);
-        Mockito.when(jg.getSource("aura/resources/wire/wire_compat.js")).thenReturn(mockWireCompat);
-        Mockito.when(jg.getSource("aura/resources/wire/wire_compat.min.js")).thenReturn(mockWireCompat);
-        Mockito.when(jg.getSource("aura/resources/compat-helpers/compat.js")).thenReturn("");
-        Mockito.when(jg.getSource("aura/resources/compat-helpers/compat.min.js")).thenReturn("");
+        Mockito.when(jg.getSource("lwc/engine/es5/engine.js")).thenReturn(mockEngineCompat);
+        Mockito.when(jg.getSource("lwc/engine/es5/engine.min.js")).thenReturn(mockEngineCompat);
+        Mockito.when(jg.getSource("lwc/wire-service/es5/wire.js")).thenReturn(mockWireCompat);
+        Mockito.when(jg.getSource("lwc/wire-service/es5/wire.min.js")).thenReturn(mockWireCompat);
+        Mockito.when(jg.getSource("lwc/proxy-compat/compat.js")).thenReturn("");
+        Mockito.when(jg.getSource("lwc/proxy-compat/compat.min.js")).thenReturn("");
 
         File dir = getResourceFile("/testdata/javascript/generated/");
 

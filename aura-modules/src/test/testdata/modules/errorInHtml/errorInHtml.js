@@ -1,4 +1,4 @@
-import { Element } from "engine";
+import { Element, api } from "engine";
 export default class Bar extends Element {
-    @api min = D5;
+    @api min = "D5";
 }

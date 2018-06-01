@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,6 +49,8 @@ import org.auraframework.util.json.Json.ApplicationKey;
 import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.collect.Sets;
+import org.lwc.CompilerReport;
+import org.lwc.reference.Reference;
 
 /**
  * ModuleDef holds compiled code and serializes for client
@@ -63,7 +66,8 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     private Map<CodeType, String> codes;
     private final Set<PropertyReference> labelReferences;
     private Double minVersion;
-    private String externalReferences;
+    private List<Reference> sourceReferences;
+    private List<Reference> metadataReferences;
     private Boolean requireLocker;
     private ModuleDesignDef moduleDesignDef;
     private Set<String> validTags;
@@ -76,10 +80,11 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         this.customElementName = builder.customElementName;
         this.labelReferences = builder.labelReferences;
         this.minVersion = builder.minVersion;
-        this.externalReferences = builder.externalReferences;
         this.requireLocker = builder.requireLocker;
         this.moduleDesignDef = builder.moduleDesignDef;
         this.validTags = builder.validTags;
+        this.sourceReferences = builder.sourceReferences;
+        this.metadataReferences = builder.metadataReferences;
     }
 
     @Override
@@ -93,8 +98,13 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     }
 
     @Override
-    public String getExternalReferences() {
-        return externalReferences;
+    public List<Reference> getSourceReferences() {
+        return this.sourceReferences;
+    }
+
+    @Override
+    public List<Reference> getMetadataReferences() {
+        return this.metadataReferences;
     }
 
     @Override
@@ -290,7 +300,8 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private Set<String> moduleDependencies;
         private String customElementName;
         private Set<PropertyReference> labelReferences = new HashSet<>();
-        private String externalReferences;
+        private List<Reference> sourceReferences = Collections.emptyList();
+        private List<Reference> metadataReferences = Collections.emptyList();
         private Boolean requireLocker = false;
         private ModuleDesignDef moduleDesignDef = null;
         private Set<String> validTags = Collections.emptySet();
@@ -351,6 +362,14 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
                 this.designBuilder = new ModuleDesignDefImpl.Builder();
             }
             return this.designBuilder;
+        }
+
+        public void setMetadataReferences(List<Reference> references) {
+            this.metadataReferences = references;
+        }
+
+        public void setSourceReferences(List<Reference> sourceReferences) {
+            this.sourceReferences = sourceReferences;
         }
 
         @Override

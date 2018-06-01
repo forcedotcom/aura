@@ -58,6 +58,8 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.lwc.CompilerReport;
+import org.lwc.metadata.ReportMetadata;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -125,8 +127,11 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.COMPAT, mockCompiled);
         codeMap.put(CodeType.PROD_COMPAT, mockCompiled);
 
+
+        CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class));
+
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
-        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet("prop1", "prop2", "prop3"), Sets.newHashSet());
+        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet("prop1", "prop2", "prop3"), Sets.newHashSet(), mockReport);
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
@@ -246,8 +251,10 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.COMPAT, mockCompiled);
         codeMap.put(CodeType.PROD_COMPAT, mockCompiled);
 
+        CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class));
+
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
-        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet("prop1", "prop2", "prop3"), Sets.newHashSet());
+        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet("prop1", "prop2", "prop3"), Sets.newHashSet(), mockReport);
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
@@ -371,7 +378,9 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.PROD_COMPAT, mockCompiled);
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
-        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet());
+
+        CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class));
+        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), mockReport);
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();

@@ -58,6 +58,7 @@
         <node.version>v4.2.1</node.version>
         <npm.version>2.14.7</npm.version>
         <eslint.extra.arg>--no-color</eslint.extra.arg>
+        <lwc.version>0.22.0-RC6</lwc.version>
     </properties>
     <repositories>
         <repository>
@@ -160,6 +161,11 @@
     </dependencies>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.lwc</groupId>
+                <artifactId>lwc</artifactId>
+                <version>${lwc.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura</artifactId>
@@ -461,11 +467,6 @@
                 <groupId>com.github.tntim96</groupId>
                 <artifactId>jscover-report-maven-plugin</artifactId>
                 <version>1.0.16</version>
-            </dependency>
-            <dependency>
-                <groupId>org.auraframework</groupId>
-                <artifactId>node-tool</artifactId>
-                <version>0.2.2</version>
             </dependency>
             <dependency>
                 <groupId>org.polyfillservice</groupId>

@@ -18,6 +18,7 @@ package org.auraframework.service;
 import java.util.Map;
 
 import org.auraframework.modules.ModulesCompilerData;
+import org.lwc.bundle.BundleType;
 
 /**
  * Service to compile modules into their runtime representation.
@@ -25,4 +26,5 @@ import org.auraframework.modules.ModulesCompilerData;
 public interface ModulesCompilerService {
 
     ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception;
+    ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType) throws Exception;
 }

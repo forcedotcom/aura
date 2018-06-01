@@ -46,7 +46,7 @@ import com.google.common.io.Resources;
 @ServiceComponent
 public class InlineJs extends AuraResourceImpl {
 
-    private static final String DOWNGRADE_JS_RESOURCE_PATH = "aura/resources/compat-helpers/downgrade.js";
+    private static final String DOWNGRADE_JS_RESOURCE_PATH = "lwc/proxy-compat/downgrade.js";
 
     private RenderingService renderingService;
     private List<InlineJSAppender> inlineJsAppenders;

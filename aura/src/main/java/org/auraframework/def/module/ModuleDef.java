@@ -17,6 +17,9 @@ package org.auraframework.def.module;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.PlatformDef;
+import org.lwc.reference.Reference;
+
+import java.util.List;
 
 /**
  * Module Definition
@@ -47,9 +50,16 @@ public interface ModuleDef extends PlatformDef {
     String getPath();
 
     /**
-     * @return serialized JSONObject with references to custom metadata
+     * Source references
+     * @return list of source references
      */
-    String getExternalReferences();
+    List<Reference> getSourceReferences();
+
+    /**
+     * Metadata references
+     * @return list of metadata references
+     */
+    List<Reference> getMetadataReferences();
 
     /**
      * Does the module require to be lockerized

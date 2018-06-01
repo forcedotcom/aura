@@ -149,6 +149,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setLabels(compilerData.labels);
         builder.setOwnHash(calculateOwnHash(descriptor, codes));
         builder.setValidTags(this.validTags);
+        builder.setSourceReferences(compilerData.compilerReport.metadata.references);
 
         Set<String> publicProperties = compilerData.publicProperties;
         for (String attribute : publicProperties) {

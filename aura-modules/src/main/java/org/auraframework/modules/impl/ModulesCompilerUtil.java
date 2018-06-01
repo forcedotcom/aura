@@ -19,21 +19,31 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.Optional;
+
 
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.modules.ModulesCompilerData.WireAdapter;
 import org.auraframework.modules.ModulesCompilerData.WireDecoration;
+import org.lwc.CompilerReport;
+import org.lwc.OutputConfig;
+import org.lwc.bundle.BundleResult;
+import org.lwc.decorator.Decorator;
+import org.lwc.decorator.DecoratorTarget;
+import org.lwc.decorator.DecoratorTargetAdapter;
+import org.lwc.metadata.ReportMetadata;
+import org.lwc.reference.Reference;
 import org.auraframework.tools.node.api.NodeBundle;
 import org.auraframework.tools.node.api.NodeLambdaFactory;
 import org.auraframework.tools.node.impl.NodeBundleBuilder;
@@ -46,12 +56,12 @@ import org.json.JSONObject;
 
 public final class ModulesCompilerUtil {
 
-    static final String COMPILER_JS_PATH = pathToLocalTempFile("modules/compiler.js");
     static final String COMPILER_HANDLER = "src/lwc/invokeCompile.js";
     static final String LABEL_SCHEMA = "@label/";
 
     private static NodeBundle COMPILER_BUNDLE;
 
+    // TODO: CLEAN UP AND REMOVE
     public static synchronized NodeBundle getCompilerBundle(NodeLambdaFactory consumingFactory) throws Exception {
         return (COMPILER_BUNDLE != null)? COMPILER_BUNDLE : (COMPILER_BUNDLE = createCompilerBundle(consumingFactory));
     }
@@ -79,10 +89,6 @@ public final class ModulesCompilerUtil {
         return builder.build(createNodeEnvZip);
     }
 
-    public static String pathToLocalTempFile(String classpathResource) {
-        return pathToLocalTempFile(ModulesCompilerUtil.class.getClassLoader(), classpathResource);
-    }
-
     public static String pathToLocalTempFile(ClassLoader classLoader, String classpathResource) {
         try {
             InputStream input = classLoader.getResourceAsStream(classpathResource);
@@ -97,72 +103,58 @@ public final class ModulesCompilerUtil {
         }
     }
 
-    static File createTempScriptFile(String script, String name) throws IOException {
-        // create script in current dir for require to find the modules
-        File file = createTempFile(name);
-        try (PrintWriter writer = new PrintWriter(file, "UTF-8")) {
-            writer.print(script);
-        }
-        return file;
-    }
+   public static JSONObject generateCompilerInput(String entry, Map<String, String> sources) throws JSONException {
+       JSONObject options = new JSONObject();
+       options.put("format", "amd");
+       options.put("mode", "all");
+       options.put("mapNamespaceFromPath", true);
 
-    static File createTempFile(String name) throws IOException {
-        File file = File.createTempFile(name, ".js.tmp", new File("."));
-        file.deleteOnExit();
-        return file;
-    }
+       // add entries for all files in the bundle
+       JSONObject sourcesObject = new JSONObject();
+       for (Entry<String, String> sourceEntry : sources.entrySet()) {
+           String name = sourceEntry.getKey();
+           String source = sourceEntry.getValue();
+           sourcesObject.put(name, source);
+       }
+       options.put("sources", sourcesObject);
 
-    public static JSONObject generateCompilerInput(String entry, Map<String, String> sources) throws JSONException {
-        JSONObject options = new JSONObject();
-        options.put("format", "amd");
-        options.put("mode", "all");
-        options.put("mapNamespaceFromPath", true);
+       JSONObject input = new JSONObject();
+       input.put("entry", entry);
+       input.put("options", options);
 
-        // add entries for all files in the bundle
-        JSONObject sourcesObject = new JSONObject();
-        for (Entry<String, String> sourceEntry : sources.entrySet()) {
-            String name = sourceEntry.getKey();
-            String source = sourceEntry.getValue();
-            sourcesObject.put(name, source);
-        }
-        options.put("sources", sourcesObject);
+       return input;
+   }
 
-        JSONObject input = new JSONObject();
-        input.put("entry", entry);
-        input.put("options", options);
+   static String[] convertJsonArrayToStringArray(JSONArray input) {
+       if (input == null) {
+           return null;
+       }
 
-        return input;
-    }
+       String[] ret = new String[input.length()];
+       for (int i = 0; i < input.length(); i++) {
+           try {
+               ret[i] = input.getString(i);
+           } catch(JSONException e) {
+               return null;
+           }
+       }
 
-    static String[] convertJsonArrayToStringArray(JSONArray input) {
-        if (input == null) {
-            return null;
-        }
+       return ret;
+   }
 
-        String[] ret = new String[input.length()];
-        for (int i = 0; i < input.length(); i++) {
-            try {
-                ret[i] = input.getString(i);
-            } catch(JSONException e) {
-                return null;
-            }
-        }
-
-        return ret;
-    }
-
-    static Set<String> parsePublicProperties(JSONArray input) {
-        if (input == null) {
+    static Set<String> parsePublicProperties(List<DecoratorTarget> targets) {
+        if (targets == null) {
             return Collections.emptySet();
         }
 
         Set<String> ret = new HashSet<>();
-        for (int i = 0; i < input.length(); i++) {
-            JSONObject publicDecoration = input.getJSONObject(i);
+
+        for (DecoratorTarget publicDecoration : targets) {
+
             if (publicDecoration != null) {
                 try {
-                    if (publicDecoration.getString("type").equals("property")) {
-                        ret.add(publicDecoration.getString("name"));
+                    if (publicDecoration.type.name().equals("property")) {
+                        ret.add(publicDecoration.name);
                     }
                 } catch (JSONException e){
                     // ignore
@@ -173,36 +165,40 @@ public final class ModulesCompilerUtil {
         return ret;
     }
 
-    static Set<WireDecoration> parseWireDecorations(JSONArray input) {
-        if (input == null) {
+    static Set<WireDecoration> parseWireDecorations(List<DecoratorTarget> targets) {
+        if (targets == null) {
             return Collections.emptySet();
         }
 
         Set<WireDecoration> wireDecorations = new HashSet<>();
-        for (int i = 0; i < input.length(); i++) {
+        for (DecoratorTarget wo : targets) {
             try {
-                JSONObject wo = input.getJSONObject(i);
-                JSONObject adapter = wo.getJSONObject("adapter");
-                JSONObject paramsObject = wo.getJSONObject("params");
+
+                DecoratorTargetAdapter adapter = wo.adapter;
+
+                Map<String, String> paramsObject = wo.params;
+
+
                 Map<String, String> paramsMap = new HashMap<>();
                 if (paramsObject != null) {
-                    Iterator<?> keys = paramsObject.keys();
-                    while (keys.hasNext()) {
-                        String key = (String)keys.next();
-                        String paramValue = paramsObject.getString(key);
+                    Set<String> keys = paramsObject.keySet();
+
+                    for(String key : keys) {
+                        String paramValue = paramsObject.get(key);
                         if (paramValue != null) {
                             paramsMap.put(key, paramValue);
                         }
                     }
                 }
 
-                JSONObject staticFields = wo.getJSONObject("static");
+                Map<String, String[]> staticDescription = wo.staticDescription;
+
                 Map<String, String[]> staticFieldsMap = new HashMap<>();
-                if (staticFields != null) {
-                    Iterator<?> keys = staticFields.keys();
+                if (staticDescription != null) {
+                    Iterator<?> keys = staticDescription.keySet().iterator();
                     while (keys.hasNext()) {
                         String key = (String)keys.next();
-                        String[] staticFieldsValues = convertJsonArrayToStringArray(staticFields.getJSONArray(key));
+                        String[] staticFieldsValues = staticDescription.get(key);
                         if (staticFieldsValues != null) {
                             staticFieldsMap.put(key, staticFieldsValues);
                         }
@@ -210,13 +206,13 @@ public final class ModulesCompilerUtil {
                 }
 
                 wireDecorations.add(
-                    new WireDecoration(
-                            wo.getString("type"),
-                            wo.getString("name"),
-                            new WireAdapter(adapter.getString("name"), adapter.getString("reference")),
-                            paramsMap,
-                            staticFieldsMap)
-                    );
+                        new WireDecoration(
+                                wo.type.name(),
+                                wo.name,
+                                new WireAdapter(adapter.name, adapter.reference),
+                                paramsMap,
+                                staticFieldsMap)
+                );
             } catch (JSONException e) {
                 // ignore
             }
@@ -224,47 +220,66 @@ public final class ModulesCompilerUtil {
 
         return wireDecorations;
     }
+
     
-    public static ModulesCompilerData parseCompilerOutput(JSONObject result) {
-        JSONObject dev = result.getJSONObject("dev");
-        JSONObject prod = result.getJSONObject("prod");
-        JSONObject compat = result.getJSONObject("compat");
-        JSONObject prodCompat = result.getJSONObject("prod_compat");
 
-        String devCode = dev.getString("code");
-        String prodCode = prod.getString("code");
-        String compatCode = compat.getString("code");
-        String prodCompatCode = prodCompat.getString("code");
 
+    // this is open-source to platform compiler output conversion
+    public static ModulesCompilerData parsePlatformCompilerOutput(CompilerReport report) {
+        // TODO: figure out better strategy to pass diagnostics, perhpas add diagnostics to ModulesCompilerData
+        // TODO: alternative it to detect failure and throw with a list of diagnostics
+
+        // loop over config objects and create bundles
         Map<CodeType, String> codeMap = new EnumMap<>(CodeType.class);
-        codeMap.put(CodeType.DEV, devCode);
-        codeMap.put(CodeType.PROD, prodCode);
-        codeMap.put(CodeType.COMPAT, compatCode);
-        codeMap.put(CodeType.PROD_COMPAT, prodCompatCode);
 
-        JSONObject metadata = prodCompat.getJSONObject("metadata");
-        JSONArray bundleReferences = metadata.getJSONArray("references");
+        //JSONObject metadata = report.getJSONObject("metadata");
+        ReportMetadata metadata = report.metadata;
+
+        List<Reference> references = metadata.references;
+
+        List<BundleResult> results = report.results;
+
+        for (BundleResult bundle : results) {
+            OutputConfig config = bundle.outputConfig;
+            String code = bundle.code;
+
+            if (isDev(config)) {
+                codeMap.put(CodeType.DEV, code);
+            } else if (isProd(config)) {
+                codeMap.put(CodeType.PROD, code);
+            } else if (isCompat(config)) {
+                codeMap.put(CodeType.COMPAT, code);
+            } else if (isProdCompat(config)) {
+                codeMap.put(CodeType.PROD_COMPAT, code);
+            } else {
+                // this should never happen
+                //throw new Exception("Unable to map bundle config to a mode: " + config);
+                return null;
+            }
+        }
 
         Set<String> bundleDependencies = new HashSet<>();
         Set<String> bundleLabels = new HashSet<>();
 
-        for (int i = 0; i < bundleReferences.length(); i++) {
-            JSONObject reference = bundleReferences.getJSONObject(i);
-            String dep = reference.getString("name");
-            String type = reference.getString("type");
-            if (type.equals("module") && dep.startsWith(LABEL_SCHEMA)) {
-                bundleLabels.add(dep.substring(LABEL_SCHEMA.length()));
+        for (Reference reference : references) {
+            String dep = reference.id;
+            String type = reference.type.name();
+
+            if (type.equals("label")) {
+                bundleLabels.add(dep);
             }
             bundleDependencies.add(dep);
         }
 
-        JSONArray bundleDecorators = metadata.getJSONArray("decorators");
+        List<Decorator> decorators = metadata.decorators;
         Set<String> publicProperties = Collections.emptySet();
         Set<WireDecoration> wireDecorations = Collections.emptySet();
-        for (int i = 0; i < bundleDecorators.length(); i++) {
-            JSONObject decorator = bundleDecorators.getJSONObject(i);
-            String type = decorator.getString("type");
-            JSONArray decorations = decorator.getJSONArray("targets");
+
+        // TODO: convert to use Java classes
+        for (Decorator decorator : decorators) {
+            String type = decorator.type.name();
+            List<DecoratorTarget> decorations = decorator.targets;
+
             if (type.equals("api")) {
                 publicProperties = parsePublicProperties(decorations);
             } else if (type.equals("wire")) {
@@ -272,6 +287,59 @@ public final class ModulesCompilerUtil {
             }
         }
 
-        return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels, publicProperties, wireDecorations);
+        return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels, publicProperties, wireDecorations, report);
     }
+
+    public static boolean isDev(OutputConfig config) {
+        return config.minify == false
+                && config.compat == false
+                && config.env.get("NODE_ENV").equals("development");
+    }
+
+    public static boolean isProd(OutputConfig config) {
+        return config.minify == true
+                && config.compat == false
+                && config.env.get("NODE_ENV").equals("production");
+    }
+
+    public static boolean isCompat(OutputConfig config) {
+        return config.minify == false
+                && config.compat == true
+                && config.env.get("NODE_ENV").equals("development");
+    }
+
+    public static boolean isProdCompat(OutputConfig config) {
+        return config.minify == true
+                && config.compat == true
+                && config.env.get("NODE_ENV").equals("production");
+    }
+
+    public static OutputConfig createDevOutputConfig() {
+        return new OutputConfig(false, false, null, null);
+
+    }
+    public static OutputConfig createProdOutputConfig() {
+        Map<String, String> env = new HashMap<>();
+        env.put("NODE_ENV", "production");
+
+        return new OutputConfig(false, true, env, null);
+    }
+    public static OutputConfig createProdCompatOutputConfig() {
+        Map<String, String> env = new HashMap<>();
+        env.put("NODE_ENV", "production");
+
+        Map<String, Object> proxyMap = new HashMap<>();
+        proxyMap.put("independent", "proxy-compat");
+        Optional<Map<String, Object>> proxyConfig = Optional.of(proxyMap);
+
+        return new OutputConfig(true, true, env, proxyConfig);
+    }
+    public static OutputConfig createCompatOutputConfig() {
+        Map<String, Object> proxyMap = new HashMap<>();
+        proxyMap.put("independent", "proxy-compat");
+        Optional<Map<String, Object>> proxyConfig = Optional.of(proxyMap);
+
+        return new OutputConfig(true, false, null, proxyConfig);
+    }
+
 }

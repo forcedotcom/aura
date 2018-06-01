@@ -296,26 +296,26 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         String compatHelpersMinSource = null;
 
         try {
-            engineSource = getSource("aura/resources/engine/engine.js");
-            engineMinSource = getSource("aura/resources/engine/engine.min.js");
+            engineSource = getSource("lwc/engine/es2017/engine.js");
+            engineMinSource = getSource("lwc/engine/es2017/engine.min.js");
 
-            engineCompatSource = getSource("aura/resources/engine/engine_compat.js");
-            engineCompatMinSource = getSource("aura/resources/engine/engine_compat.min.js");
+            engineCompatSource = getSource("lwc/engine/es5/engine.js");
+            engineCompatMinSource = getSource("lwc/engine/es5/engine.min.js");
 
-            engineProdDebugSource = getSource("aura/resources/engine/engine_debug.js");
-            engineCompatProdDebugSource = getSource("aura/resources/engine/engine_compat_debug.js");
+            engineProdDebugSource = getSource("lwc/engine/es2017/engine_debug.js");
+            engineCompatProdDebugSource = getSource("lwc/engine/es5/engine_debug.js");
 
-            wireSource = getSource("aura/resources/wire/wire.js");
-            wireMinSource = getSource("aura/resources/wire/wire.min.js");
+            wireSource = getSource("lwc/wire-service/es2017/wire.js");
+            wireMinSource = getSource("lwc/wire-service/es2017/wire.min.js");
 
-            wireCompatSource = getSource("aura/resources/wire/wire_compat.js");
-            wireCompatMinSource = getSource("aura/resources/wire/wire_compat.min.js");
+            wireCompatSource = getSource("lwc/wire-service/es5/wire.js");
+            wireCompatMinSource = getSource("lwc/wire-service/es5/wire.min.js");
 
-            wireProdDebugSource = getSource("aura/resources/wire/wire_debug.js");
-            wireCompatProdDebugSource = getSource("aura/resources/wire/wire_compat_debug.js");
+            wireProdDebugSource = getSource("lwc/wire-service/es2017/wire_debug.js");
+            wireCompatProdDebugSource = getSource("lwc/wire-service/es2017/wire_debug.js");
 
-            compatHelpersSource = getSource("aura/resources/compat-helpers/compat.js");
-            compatHelpersMinSource = getSource("aura/resources/compat-helpers/compat.min.js");
+            compatHelpersSource = getSource("lwc/proxy-compat/compat.js");
+            compatHelpersMinSource = getSource("lwc/proxy-compat/compat.min.js");
         }  catch (MalformedURLException e) {}
 
         String iifeBegin = "\"undefined\"===typeof Aura&&(Aura={});(function getModuleGlobals(window){\n";
@@ -434,9 +434,12 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                         writer = new FileWriter(output);
 
                         if (mode != JavascriptGeneratorMode.DOC) {
+                            if (mode.isTestingMode()) {
+                                writer.append("typeof process === 'undefined' ? (process = { env: { NODE_ENV: 'test' } }) : process.env ? process.env.NODE_ENV = 'test' : process.env = { NODE_ENV: 'test' } ").append("\n");
+                            }
                             // jsdoc errors when parsing engine.js
                             String eng = minified ?
-                                    (isCompat ? engineCompatMin : engineMin) :
+                                    (isCompat ? engineCompatMin : mode == JavascriptGeneratorMode.AUTOTESTING ? engine : engineMin) :
                                     (isCompat ? ( isProdDebug ? engineCompatProdDebug : engineCompat) : ( isProdDebug ? engineProdDebug : engine));
                             writer.append(eng).append("\n");
 

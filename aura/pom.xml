@@ -10,6 +10,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.lwc</groupId>
+            <artifactId>lwc</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura-interfaces</artifactId>
         </dependency>
@@ -92,10 +96,6 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>node-tool</artifactId>
         </dependency>
     </dependencies>
     <properties>

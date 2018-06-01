@@ -118,24 +118,17 @@ InteropComponent.prototype.setupAttributes = function(config) {
             valueConfig = value["value"];
         }
 
+        var isPrimitiveString = typeof valueConfig === 'string';
         var valueProvider = config['valueProvider'];
 
         valueConfig = valueFactory.create(valueConfig, valueProvider || this);
 
-        var isExpression = $A.util.isExpression(valueConfig);
-
-        /*
-        This is just a close approximation and does not exactly emulate the
-        behavior of Aura because we don't yet have attribute type metadata in
-        LWC. Some notes for if/when we need to work on this again:
-        1) For type=boolean attributes, Aura coerces strings into booleans.
-        2) Aura only does the coercion initially. Coercion does not happen
-           after the initial set().
-        3) Aura only coerces to the boolean value `true` for the string "true".
-           It coerces all other string values to the boolean value `false`. See
-           the commented tests in interopBooleanAttributeCoercion.
-        */
-        if (!isExpression) {
+        // The actual behavior of Aura when assigning string values to
+        // attributes with the boolean type, is to coerce 'true' to `true` and
+        // all other strings to `false`. We cannot exactly emulate that behavior
+        // until LWC gains attribute type support. Until then, the following
+        // workaround will have to do.
+        if (isPrimitiveString) {
             if (valueConfig === 'true') {
                 valueConfig = true;
             }
@@ -145,7 +138,7 @@ InteropComponent.prototype.setupAttributes = function(config) {
         }
 
         // Check typeof PRV | FCV
-        if (isExpression) {
+        if ($A.util.isExpression(valueConfig)) {
             // GVP
             if (valueConfig.getIsGlobal && valueConfig.getIsGlobal()) {
                 valueConfig = valueConfig.evaluate();

@@ -9,7 +9,7 @@
             },
             function(cmp) {
                 var expected = false;
-                var actual = cmp.getElement().querySelector('.string-false').foo;
+                var actual = cmp.find('string-false').getElement().foo;
                 var message = '[DOM Assertion] Hardcoded string attribute value "false" should be coerced to boolean false';
                 $A.test.assertEquals(expected, actual, message);
             },
@@ -32,7 +32,7 @@
             },
             function(cmp) {
                 var expected = true;
-                var actual = cmp.getElement().querySelector('.string-true').foo;
+                var actual = cmp.find('string-true').getElement().foo;
                 var message = '[DOM Assertion] Hardcoded string attribute value "true" should be coerced to boolean true';
                 $A.test.assertEquals(expected, actual, message);
             },
@@ -55,7 +55,7 @@
             },
             function(cmp) {
                 var expected = 'false';
-                var actual = cmp.getElement().querySelector('.expression-string-false').foo;
+                var actual = cmp.find('expression-string-false').getElement().foo;
                 var message = '[DOM Assertion] An expression evaluating to string attribute value "false" should not be coerced to boolean false';
                 $A.test.assertEquals(expected, actual, message);
             },
@@ -78,7 +78,7 @@
             },
             function(cmp) {
                 var expected = 'true';
-                var actual = cmp.getElement().querySelector('.expression-string-true').foo;
+                var actual = cmp.find('expression-string-true').getElement().foo;
                 var message = '[DOM Assertion] An expression evaluating to string attribute value "true" should not be coerced to boolean true';
                 $A.test.assertEquals(expected, actual, message);
             },
@@ -86,6 +86,98 @@
                 var expected = cmp.find('sanity-expression-string-true').get('v.booleanAttribute');
                 var actual = cmp.find('expression-string-true').get('v.foo');
                 var message = '[Sanity Check] Interop coerces expressions evaluating to the "true" string in the same way that Aura does.';
+                $A.test.assertEquals(expected, actual, message);
+            }
+        ]
+    },
+
+    testUnboundExpressionStringFalse: {
+        test: [
+            function(cmp) {
+                var expected = 'false';
+                var actual = cmp.find('unbound-expression-string-false').get('v.foo');
+                var message = '[Aura Attribute Assertion] An unbound expression evaluating to string attribute value "false" should not be coerced to boolean false';
+                $A.test.assertEquals(expected, actual, message);
+            },
+            function(cmp) {
+                var expected = 'false';
+                var actual = cmp.find('unbound-expression-string-false').getElement().foo;
+                var message = '[DOM Assertion] An unbound expression evaluating to string attribute value "false" should not be coerced to boolean false';
+                $A.test.assertEquals(expected, actual, message);
+            },
+            function(cmp) {
+                var expected = cmp.find('sanity-unbound-expression-string-false').get('v.booleanAttribute');
+                var actual = cmp.find('unbound-expression-string-false').get('v.foo');
+                var message = '[Sanity Check] Interop coerces unbound expressions evaluating to the "false" string in the same way that Aura does.';
+                $A.test.assertEquals(expected, actual, message);
+            }
+        ]
+    },
+
+    testUnboundExpressionStringTrue: {
+        test: [
+            function(cmp) {
+                var expected = 'true';
+                var actual = cmp.find('unbound-expression-string-true').get('v.foo');
+                var message = '[Aura Attribute Assertion] An unbound expression evaluating to string attribute value "true" should not be coerced to boolean true';
+                $A.test.assertEquals(expected, actual, message);
+            },
+            function(cmp) {
+                var expected = 'true';
+                var actual = cmp.find('unbound-expression-string-true').getElement().foo;
+                var message = '[DOM Assertion] An unbound expression evaluating to string attribute value "true" should not be coerced to boolean true';
+                $A.test.assertEquals(expected, actual, message);
+            },
+            function(cmp) {
+                var expected = cmp.find('sanity-unbound-expression-string-true').get('v.booleanAttribute');
+                var actual = cmp.find('unbound-expression-string-true').get('v.foo');
+                var message = '[Sanity Check] Interop coerces unbound expressions evaluating to the "true" string in the same way that Aura does.';
+                $A.test.assertEquals(expected, actual, message);
+            }
+        ]
+    },
+
+    testUnboundAttributeExpressionStringFalse: {
+        test: [
+            function(cmp) {
+                var expected = 'false';
+                var actual = cmp.find('unbound-attribute-expression-string-false').get('v.foo');
+                var message = '[Aura Attribute Assertion] An unbound expression evaluating to string attribute value "false" should not be coerced to boolean false';
+                $A.test.assertEquals(expected, actual, message);
+            },
+            function(cmp) {
+                var expected = 'false';
+                var actual = cmp.find('unbound-attribute-expression-string-false').getElement().foo;
+                var message = '[DOM Assertion] An unbound expression evaluating to string attribute value "false" should not be coerced to boolean false';
+                $A.test.assertEquals(expected, actual, message);
+            },
+            function(cmp) {
+                var expected = cmp.find('sanity-unbound-attribute-expression-string-false').get('v.booleanAttribute');
+                var actual = cmp.find('unbound-attribute-expression-string-false').get('v.foo');
+                var message = '[Sanity Check] Interop coerces unbound expressions evaluating to the "false" string in the same way that Aura does.';
+                $A.test.assertEquals(expected, actual, message);
+            }
+        ]
+    },
+
+    testUnboundAttributeExpressionStringTrue: {
+        test: [
+            function(cmp) {
+                var expected = 'true';
+                var actual = cmp.find('unbound-attribute-expression-string-true').get('v.foo');
+                var message = '[Aura Attribute Assertion] An unbound expression evaluating to string attribute value "true" should not be coerced to boolean true';
+                $A.test.assertEquals(expected, actual, message);
+            },
+            function(cmp) {
+                var expected = 'true';
+                var actual = cmp.find('unbound-attribute-expression-string-true').getElement().foo;
+                var message = '[DOM Assertion] An unbound expression evaluating to string attribute value "true" should not be coerced to boolean true';
+                $A.test.assertEquals(expected, actual, message);
+            },
+            function(cmp) {
+                var expected = cmp.find('sanity-unbound-attribute-expression-string-true').get('v.booleanAttribute');
+                var actual = cmp.find('unbound-attribute-expression-string-true').get('v.foo');
+                var message = '[Sanity Check] Interop coerces unbound expressions evaluating to the "true" string in the same way that Aura does.';
                 $A.test.assertEquals(expected, actual, message);
             }
         ]
@@ -108,7 +200,7 @@
             },
             function(cmp) {
                 var expected = false;
-                var actual = cmp.getElement().querySelector('.string-random').foo;
+                var actual = cmp.find('string-random').getElement().foo;
                 var message = '[DOM Assertion] Hardcoded random string attribute value (ie, not "true" and not "false") should be coerced to boolean false';
                 $A.test.assertEquals(expected, actual, message);
             },
@@ -131,7 +223,7 @@
             },
             function(cmp) {
                 var expected = false;
-                var actual = cmp.getElement().querySelector('.string-empty').foo;
+                var actual = cmp.find('string-empty').getElement().foo;
                 var message = '[DOM Assertion] Hardcoded empty string attribute value should be coerced to boolean false';
                 $A.test.assertEquals(expected, actual, message);
             },
@@ -154,7 +246,7 @@
             },
             function(cmp) {
                 var expected = false;
-                var actual = cmp.getElement().querySelector('.string-null').foo;
+                var actual = cmp.find('string-null').getElement().foo;
                 var message = '[DOM Assertion] Hardcoded "null" string attribute value should be coerced to boolean false';
                 $A.test.assertEquals(expected, actual, message);
             },
@@ -177,7 +269,7 @@
             },
             function(cmp) {
                 var expected = false;
-                var actual = cmp.getElement().querySelector('.string-undefined').foo;
+                var actual = cmp.find('string-undefined').getElement().foo;
                 var message = '[DOM Assertion] Hardcoded "undefined" string attribute value should be coerced to boolean false';
                 $A.test.assertEquals(expected, actual, message);
             },

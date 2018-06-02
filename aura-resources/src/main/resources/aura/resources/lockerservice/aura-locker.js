@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-06-01
- * Version: 0.4.15
+ * Version: 0.4.16
  */
 
 (function (exports) {
@@ -665,20 +665,38 @@ function getIntrinsics(realmRec) {
   const AsyncFunction = AsyncFunctionInstance.constructor;
   const AsyncFunctionPrototype = AsyncFunction.prototype;
 
-  const GeneratorFunctionInstance = _.eval('(function*(){})');
-  const GeneratorFunction = GeneratorFunctionInstance.constructor;
-  const Generator = GeneratorFunction.prototype;
-  const GeneratorPrototype = Generator.prototype;
+  // Ensure parsing doesn't fail on platforms that don't support Generator Functions.
+  let GeneratorFunctionInstance;
+  try {
+    GeneratorFunctionInstance = _.eval('(function*(){})');
+  } catch (e) {
+    if (!(e instanceof SyntaxError)) {
+      // Re-throw
+      throw e;
+    }
+  }
+  const GeneratorFunction = GeneratorFunctionInstance && GeneratorFunctionInstance.constructor;
+  const Generator = GeneratorFunctionInstance && GeneratorFunction.prototype;
+  const GeneratorPrototype = GeneratorFunctionInstance && Generator.prototype;
 
-  const hasAsyncIteration = typeof _.Symbol.asyncIterator !== 'undefined';
+  // Ensure parsing doesn't fail on platforms that don't support Async Generator Functions.
+  let AsyncGeneratorFunctionInstance;
+  try {
+    AsyncGeneratorFunctionInstance = _.eval('(async function*(){})');
+  } catch (e) {
+    if (!(e instanceof SyntaxError)) {
+      // Re-throw
+      throw e;
+    }
+  }
+  const AsyncGeneratorFunction =
+    AsyncGeneratorFunctionInstance && AsyncGeneratorFunctionInstance.constructor;
+  const AsyncGenerator = AsyncGeneratorFunctionInstance && AsyncGeneratorFunction.prototype;
+  const AsyncGeneratorPrototype = AsyncGeneratorFunctionInstance && AsyncGenerator.prototype;
 
-  const AsyncGeneratorFunctionInstance = hasAsyncIteration && _.eval('(async function*(){})');
-  const AsyncGeneratorFunction = hasAsyncIteration && AsyncGeneratorFunctionInstance.constructor;
-  const AsyncGenerator = hasAsyncIteration && AsyncGeneratorFunction.prototype;
-  const AsyncGeneratorPrototype = hasAsyncIteration && AsyncGenerator.prototype;
-
-  const AsyncFromSyncIteratorPrototype = hasAsyncIteration && undefined; // TODO
-  const AsyncIteratorPrototype = hasAsyncIteration && getPrototypeOf(AsyncGeneratorPrototype);
+  // const AsyncFromSyncIteratorPrototype = undefined // not reacheable
+  const AsyncIteratorPrototype =
+    AsyncGeneratorFunctionInstance && getPrototypeOf(AsyncGeneratorPrototype);
 
   const MapIteratorObject = new _.Map()[SymbolIterator]();
   const MapIteratorPrototype = getPrototypeOf(MapIteratorObject);
@@ -720,7 +738,7 @@ function getIntrinsics(realmRec) {
     // %ArrayProto_values%
     ArrayProto_values: _.Array.prototype.values,
     // %AsyncFromSyncIteratorPrototype%
-    AsyncFromSyncIteratorPrototype,
+    // AsyncFromSyncIteratorPrototype, // Not reacheable
     // %AsyncFunction%
     AsyncFunction,
     // %AsyncFunctionPrototype%
@@ -4221,7 +4239,17 @@ function repairAccessors(realmRec) {
 function repairFunction(realmRec, functionName, functionDecl) {
   const { unsafeGlobal, unsafeEval, unsafeFunction } = realmRec;
 
-  const FunctionInstance = unsafeEval(`(${functionDecl}(){})`);
+  let FunctionInstance;
+  try {
+    FunctionInstance = unsafeEval(`(${functionDecl}(){})`);
+  } catch (e) {
+    if (!(e instanceof SyntaxError)) {
+      // Re-throw
+      throw e;
+    }
+    // Prevent failure on platforms where generators are not supported.
+    return;
+  }
   const FunctionPrototype = getPrototypeOf(FunctionInstance);
 
   const RealmFunction = unsafeFunction('return function(){}');
@@ -4249,17 +4277,12 @@ function repairFunction(realmRec, functionName, functionDecl) {
  * the originals should no longer be reachable.
  */
 function repairFunctions(realmRec) {
-  const { unsafeGlobal } = realmRec;
-  const hasAsyncIteration = typeof unsafeGlobal.Symbol.asyncIterator !== 'undefined';
-
   // Here, the order of operation is important: Function needs to be
   // repaired first since the other constructors need it.
   repairFunction(realmRec, 'Function', 'function');
   repairFunction(realmRec, 'GeneratorFunction', 'function*');
   repairFunction(realmRec, 'AsyncFunction', 'async function');
-  if (hasAsyncIteration) {
-    repairFunction(realmRec, 'AsyncGeneratorFunction', 'async function*');
-  }
+  repairFunction(realmRec, 'AsyncGeneratorFunction', 'async function*');
 }
 
 /*

@@ -184,6 +184,20 @@
         ]
     },
 
+    testNoReferrerAttribute: {
+        attributes : {
+            textValue: 'visit salesforce.com for more details'
+        },
+        test: [
+            function(cmp) {
+                var link = cmp.find("richTextComp").getElement().querySelector("a");
+                var rel = link && link.getAttribute("rel");
+                $A.test.assertNotNull(rel);
+                $A.test.assertEquals(rel, "noreferrer noopener");
+            }
+        ]
+    },
+
     assertLinksPresent: function(cmp, hrefText, checkValue) {
         $A.test.addWaitForWithFailureMessage(true,
             function() {

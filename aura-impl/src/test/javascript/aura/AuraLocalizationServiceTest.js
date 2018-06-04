@@ -2431,7 +2431,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         function UsesUserTimezoneIfTimeZoneIsFalsy() {
             // Arrange
             var targetService = new Aura.Services.AuraLocalizationService();
-            var mockGet = Stubs.GetMethod("$Locale.timezone", "UTC");
+            var mockGet = Stubs.GetMethod("UTC");
             var actual;
 
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
@@ -2453,7 +2453,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         function UsesUserTimeZoneIfTimeZoneIsUnsupported() {
             // Arrange
             var targetService = new Aura.Services.AuraLocalizationService();
-            var mockGet = Stubs.GetMethod("$Locale.timezone", "America/Los_Angeles");
+            var mockGet = Stubs.GetMethod("America/Los_Angeles");
 
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 assert: function () {},
@@ -3093,7 +3093,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
     }
 
     [Fixture]
-    function normalizeToMomentLocale(){
+    function normalizeToMomentLocale() {
 
         [Fact]
         function ReturnsArgValueForFalsy() {
@@ -3525,4 +3525,145 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         }
     }
 
+    [Fixture]
+    function normalizeTimeZone() {
+
+        [Fact]
+        function ReturnsUTCForGMT() {
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+
+            // Act
+            var actual = targetService.normalizeTimeZone("GMT");
+
+            // Assert
+            Assert.Equal("UTC", actual);
+        }
+
+        [Fact]
+        function UsesTimeZoneFromGVPForFalsy() {
+            // Arrange
+            var expected = "expectedTimeZone";
+            var targetService = new Aura.Services.AuraLocalizationService();
+            targetService.createDateTimeFormatByTimeZone = function(timeZone) {
+                if (expected === timeZone) {
+                    return {};
+                }
+            };
+
+            var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
+                get: function(key) {
+                    if (key === "$Locale.timezone") {
+                        return expected;
+                    }
+                }
+            });
+
+            // Act
+            var actual;
+            mockUtil(function() {
+                actual = targetService.normalizeTimeZone(undefined);
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function UsesValueFromCacheIfExisted() {
+            // Arrange
+            var expected = "expectedTimeZone";
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var timeZone = "timeZone";
+            targetService.timeZoneMap[timeZone] = expected;
+
+            // Act
+            var actual = targetService.normalizeTimeZone(timeZone);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnSameValueIfTimeZoneIsSupported() {
+            // Arrange
+            var expected = "expectedTimeZone";
+            var targetService = new Aura.Services.AuraLocalizationService();
+            targetService.createDateTimeFormatByTimeZone = function(timeZone) {
+                if (expected === timeZone) {
+                    return {};
+                }
+            };
+
+            // Act
+            var actual = targetService.normalizeTimeZone(expected);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function FallbackToTimeZoneFromGVPIfUnsupported() {
+            // Arrange
+            var expected = "expectedTimeZone";
+            var targetService = new Aura.Services.AuraLocalizationService();
+            targetService.createDateTimeFormatByTimeZone = function(timeZone) {
+                if (expected === timeZone) {
+                    return {};
+                }
+                return null;
+            };
+
+            var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
+                get: function(key) {
+                    if (key === "$Locale.timezone") {
+                        return expected;
+                    }
+                },
+                warning: function() {}
+            });
+
+            // Act
+            var actual;
+            mockUtil(function() {
+                actual = targetService.normalizeTimeZone("unsupported");
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function CachesTimeZoneFromGVPIfTimeZoneIsFalsy() {
+            // Arrange
+            var timeZone = "TimeZone";
+            var targetService = new Aura.Services.AuraLocalizationService();
+            targetService.createDateTimeFormatByTimeZone = function() {
+                return null;
+            };
+
+            var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
+                get: function(key) {
+                    if (key === "$Locale.timezone") {
+                        return timeZone;
+                    }
+                },
+                logger: {
+                    reportError: function() {}
+                },
+                auraError: function() {},
+                warning: function() {}
+            });
+
+            // Act
+            var actual;
+            mockUtil(function() {
+                targetService.normalizeTimeZone(undefined);
+                actual = targetService.timeZoneMap[timeZone];
+            });
+
+            // Assert
+            Assert.Equal("UTC", actual);
+        }
+    }
 }

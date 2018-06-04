@@ -938,9 +938,7 @@ AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timeZo
         return callback("Invalid Date");
     }
 
-    if (!timeZone) {
-        timeZone = $A.get("$Locale.timezone");
-    }
+    timeZone = this.normalizeTimeZone(timeZone);
 
     var dateTimeString = this.formatDateWithTimeZone(date, timeZone);
     var match = this.EN_US_DATETIME_PATTERN.exec(dateTimeString);
@@ -1556,37 +1554,51 @@ AuraLocalizationService.prototype.init = function() {
 };
 
 AuraLocalizationService.prototype.normalizeTimeZone = function(timeZone) {
-
-    if (timeZone) {
-        if (timeZone === "GMT" || timeZone === "UTC") {
-            return "UTC";
-        }
-
-        var timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
-        if (timeZoneFormat !== null) {
-            return timeZone;
-        } else {
-            $A.warning("Unsupported time zone: " + timeZone + ". Fallback to default time zone.");
-        }
+    var normalizedTimeZone = timeZone;
+    if (!timeZone) {
+        normalizedTimeZone = $A.get("$Locale.timezone");
     }
 
-    // If timeZone is falsy or unsupported
-    timeZone = $A.get("$Locale.timezone");
-    if (timeZone === "GMT" || timeZone === "UTC") {
+    if (normalizedTimeZone === "GMT" || normalizedTimeZone === "UTC") {
         return "UTC";
     }
 
-    timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
+    if (this.timeZoneMap.hasOwnProperty(normalizedTimeZone)) {
+        return this.timeZoneMap[normalizedTimeZone];
+    }
+
+    var timeZoneFormat = this.createDateTimeFormatByTimeZone(normalizedTimeZone);
     if (timeZoneFormat !== null) {
-        return timeZone;
+        return normalizedTimeZone;
+    }
+
+    // If timeZone is falsy, the time zone at this point is from $Locale
+    if (timeZone) {
+        normalizedTimeZone = $A.get("$Locale.timezone");
+        $A.warning("Unsupported time zone: " + timeZone + ". Fallback to default time zone: " + normalizedTimeZone);
+
+        if (normalizedTimeZone === "GMT" || normalizedTimeZone === "UTC") {
+            this.timeZoneMap[timeZone] = "UTC";
+            return "UTC";
+        }
+
+        timeZoneFormat = this.createDateTimeFormatByTimeZone(normalizedTimeZone);
+        if (timeZoneFormat !== null) {
+            this.timeZoneMap[timeZone] = normalizedTimeZone;
+            return normalizedTimeZone;
+        }
+    } else {
+        // If timeZone is falsy, we cache the value from $Locale
+        timeZone = normalizedTimeZone;
     }
 
     // If the time zone in label is not supported, then fallback to UTC
-    var message = "Unsupported time zone value in GVP: " + timeZone;
+    var message = "Unsupported time zone value in GVP: " + normalizedTimeZone;
     $A.warning(message);
     // Sending Gack to server if the time zone in GVP is not supported by browsers
-    $A.logger.reportError(new $A.auraError(message));
+    $A.logger.reportError(new $A.auraError(message), undefined, "WARNING");
 
+    this.timeZoneMap[timeZone] = "UTC";
     return "UTC";
 };
 
@@ -1689,7 +1701,7 @@ AuraLocalizationService.prototype.zoneOffset = function(timestamp, timeZone) {
   };
 
 /**
- * Formats a Date object to the ISO8601 date string.
+ * Formats a Date object to the en-US date string.
  *
  * This method assumes the browser supports Intl API with time zone data.
  * @private
@@ -1743,15 +1755,10 @@ AuraLocalizationService.prototype.createDateTimeFormatByTimeZone = function(time
         return timeZoneFormat;
     }
 
-    var supportedTimeZone = timeZone;
-    if (this.timeZoneMap.hasOwnProperty(timeZone)) {
-        supportedTimeZone = this.timeZoneMap[timeZone];
-    }
-
     try {
         // we rely en-US format to parse the datetime string
         timeZoneFormat = Intl["DateTimeFormat"]("en-US", {
-            "timeZone": supportedTimeZone,
+            "timeZone": timeZone,
             "hour12": false, // 24-hour time is needed for parsing the datetime string
             "year": "numeric",
             "month": "2-digit",

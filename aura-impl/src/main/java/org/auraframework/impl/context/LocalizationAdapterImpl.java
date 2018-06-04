@@ -172,4 +172,15 @@ public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLoc
     public Boolean showJapaneseImperialYear() {
         return false;
     }
+
+    @Override
+    public String getTextDirection() {
+        String dir = "ltr";
+        switch (getAuraLocale().getLanguageLocale().getLanguage()) {
+        case "he":  case "ji":  case "ar":  case "iw":  case "yi":  case "fa":  case "ur":
+            dir = "rtl";
+        default:
+        }
+        return dir;
+    }
 }

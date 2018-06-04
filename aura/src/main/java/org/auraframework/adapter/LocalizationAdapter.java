@@ -77,4 +77,10 @@ public interface LocalizationAdapter extends AuraAdapter {
      */
     Boolean showJapaneseImperialYear();
 
+    /**
+     * @return the text direction to show for the current locale.  
+     * This is overridable based on the preference of the user to allow psuedo-localization of RTL
+     */
+    String getTextDirection();
+
 }

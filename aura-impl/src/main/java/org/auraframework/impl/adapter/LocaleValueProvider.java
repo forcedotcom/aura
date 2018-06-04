@@ -127,13 +127,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
         builder.put(CURRENCY_CODE, localizationService.getCurrencyCode());
         builder.put(CURRENCY, localizationService.getCurrencySymbol());
 
-        String dir = "ltr";
-        switch (lang.getLanguage()) {
-        case "he":  case "ji":  case "ar":  case "iw":  case "yi":  case "fa":  case "ur":
-            dir = "rtl";
-        default:
-        }
-        builder.put(DIR, dir);
+        builder.put(DIR, localizationAdapter.getTextDirection());
 
         data = builder.build();
     }

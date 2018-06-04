@@ -139,11 +139,13 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
      * For a given component that has focus it pops the element, xPath.
      * @param {Component} component - Component from which this method is called.
      */
-    function popFocus(component) {
-        if (!hasFocus(component)) {
+    function popFocus(component, forcePop) {
+        // hasFocus() works as expected if it's modal. For panel, such as closeOnClickOut,
+        // focus is already changed, so hasFocus will always return false.
+        if (!forcePop && !hasFocus(component)) {
             return null;
-        } 
-        
+        }
+
         var el = pop();
         while (el && (!document.body.contains(el.domElement) || focusUtil.isElementHidden(el.domElement))) {
             if(el.selector) {

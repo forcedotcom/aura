@@ -251,7 +251,9 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
             if(useTransition) {
             	useTransition = this.validateAnimationName(animName);
             }
-            //need to notify panel manager to de-activate other panels;
+
+            // Notify panel manager to de-activate other panels
+            // and push returnFocusElement into STACK (stackUtil).
             cmp.getEvent('notify').setParams({
                     action: 'beforeShow',
                     typeOf: 'ui:panel',

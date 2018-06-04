@@ -185,7 +185,7 @@
         }
     },
 
-    show: function (cmp, callback) {
+    show: function (cmp, callback) {        
         var autoFocus = cmp.get('v.autoFocus');
         var panelEl = cmp.getElement();
         var referenceEl = this._getReferenceElement(cmp);
@@ -236,7 +236,7 @@
                 callback && callback();
             }
         };
-
+        
         if (referenceEl) {
             panelEl.style.opacity = '0';
             panelEl.style.display = 'block';
@@ -267,6 +267,14 @@
     },
 
     hide: function (cmp, callback) {
+        if (!cmp._closing) {
+            // panel.show() will trigger "beforeShow" event, which always push returnFocusElement to STACK(stackUtil).
+            // so panel.hide() should force to pop it when hide panel, since in panel hide/close case, hasFocus always return false,
+            // which cause panel's returnFocusElement isn't removed from STACK.
+            // TODO: https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07B00000052wXQIAY/view
+            this.focusLib.stackUtil.popFocus(cmp, true);
+        }        
+        
         var panelEl = cmp.getElement();
         panelEl.style.opacity = 0;
         var self = this;
@@ -306,10 +314,8 @@
         if (!cmp.isValid()) {
             return;
         }
-
-
         var self = this;
-
+        cmp._closing = true;
         cmp.getConcreteComponent().hide(function () {
             if (!cmp.isValid()) {
                 return;

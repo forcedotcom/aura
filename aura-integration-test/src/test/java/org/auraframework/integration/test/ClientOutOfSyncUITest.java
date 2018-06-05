@@ -67,7 +67,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                         baseComponentTag,
                         "controller='java://org.auraframework.components.test.java.controller.JavaTestController' "
                                 + attrs,
-                        "<button class='button' onclick='{!c.post}'>post</button>" + body));
+                        "<br/><br/><br/><button class='button' onclick='{!c.post}'>post</button>" + body));
         DefDescriptor<?> controllerDesc = definitionService
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
                         ControllerDef.class);

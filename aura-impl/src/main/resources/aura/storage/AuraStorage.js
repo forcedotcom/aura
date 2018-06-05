@@ -237,7 +237,6 @@ AuraStorage.prototype.executeQueue = function() {
 
     if (this.ready) {
         this.log(this.LOG_LEVEL.INFO, "executeQueue(): adapter completed initialization. Processing " + queue.length + " operations.");
-        this.logError({"operation":"initialize", "error":"success"});
     } else {
         var message = "executeQueue(): adapter failed initialization, entering permanent error state. All future operations will fail. Failing " + queue.length + " enqueued operations.";
         this.log(this.LOG_LEVEL.WARNING, message);

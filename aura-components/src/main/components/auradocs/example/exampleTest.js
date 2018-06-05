@@ -27,24 +27,9 @@
             // Verify
             function(cmp) {
                 var img = cmp.getElement().querySelector("img");
-
+                
                 $A.test.assertFalse(img.hasAttribute("onerror"), "onerror attribute was present on the inserted img element");
-            },
-
-            /**
-             * Test inline event handlers are not even part of the element when inserted.
-             */
-            // Set
-            function(cmp){
-                cmp.set("v.description", "<iframe src='about:blank' onload='window.testXSSRawHtml=2'/>");
-            },
-            // Verify
-            function(cmp) {
-                var iframe = cmp.getElement().querySelector("iframe");
-
-                $A.test.assertFalse(iframe.hasAttribute("onload"), "onload attribute was present on the inserted iframe element");
             }
-
         ]
     }
 

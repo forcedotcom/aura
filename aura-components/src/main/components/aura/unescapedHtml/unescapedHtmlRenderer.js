@@ -15,7 +15,9 @@
  */
 ({
     render : function(cmp){
-        var elements=$A.util.createElementsFromMarkup(cmp.get("v.value"));
+        var value = cmp.get("v.value");
+        value = $A.util.sanitizeDOM(value, {FORBID_TAGS: ['style', 'meta','script']});
+        var elements=$A.util.createElementsFromMarkup(value);
         if(!elements.length){
             elements=$A.renderingService.renderFacet(cmp,elements);
         }

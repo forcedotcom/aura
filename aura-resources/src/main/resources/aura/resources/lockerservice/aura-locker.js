@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-06-01
- * Version: 0.4.16
+ * Generated: 2018-06-05
+ * Version: 0.4.18
  */
 
 (function (exports) {
@@ -543,102 +543,6 @@ function SecureCanvasRenderingContext2D(ctx, key) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-// Adapted from SES/Caja
-// Copyright (C) 2011 Google Inc.
-// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
-// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
-
-// Mitigate proxy-related security issues
-// https://github.com/tc39/ecma262/issues/272
-
-// Objects that are deeply frozen
-const frozenSet = new WeakSet();
-
-/**
- * "deepFreeze()" acts like "Object.freeze()", except that:
- *
- * To deepFreeze an object is to freeze it and all objects transitively
- * reachable from it via transitive reflective property and prototype
- * traversal.
- */
-function deepFreeze(node) {
-  if (frozenSet.has(node)) {
-    return;
-  }
-
-  // Objects that we're attempting to freeze.
-  const freezingSet = new Set();
-
-  // If val is something we should be freezing but aren't yet,
-  // add it to freezingSet.
-  function enqueue(val) {
-    if (Object(val) !== val) {
-      // ignore primitives
-      return;
-    }
-    const type = typeof val;
-    if (type !== 'object' && type !== 'function') {
-      // future proof: break until someone figures out what it should do
-      throw new TypeError(`Unexpected typeof: ${type}`);
-    }
-    if (frozenSet.has(val) || freezingSet.has(val)) {
-      // Ignore if already frozen or freezing
-      return;
-    }
-    freezingSet.add(val);
-  }
-
-  function doFreeze(obj) {
-    const descs = getOwnPropertyDescriptors(obj);
-    ownKeys(descs).forEach(name => {
-      const desc = descs[name];
-      if ('value' in desc) {
-        enqueue(desc.value);
-      } else {
-        enqueue(desc.get);
-        enqueue(desc.set);
-      }
-    });
-    freeze(obj);
-  }
-
-  // Process the freezingSet.
-  function dequeue() {
-    // New values added before forEach() has finished will be visited.
-    freezingSet.forEach(obj => {
-      doFreeze(obj);
-      enqueue(getPrototypeOf(obj));
-    });
-  }
-
-  enqueue(node);
-  dequeue();
-
-  // "Committing" the changes upon exit guards against exceptions aborting
-  // the deep freeze process, which could leave the system in a state
-  // where unfrozen objects are never frozen when no longer discoverable by
-  // subsequent invocations of deep-freeze because all object owning a reference
-  // to them are frozen.
-
-  freezingSet.forEach(frozenSet.add, frozenSet);
-}
-
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 /**
  * Get all intrinsics:
  *
@@ -945,6 +849,102 @@ function getIntrinsics(realmRec) {
 
     // TODO: other special cases
   };
+}
+
+/*
+ * Copyright (C) 2017 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Adapted from SES/Caja
+// Copyright (C) 2011 Google Inc.
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
+// https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
+
+// Mitigate proxy-related security issues
+// https://github.com/tc39/ecma262/issues/272
+
+// Objects that are deeply frozen
+const frozenSet = new WeakSet();
+
+/**
+ * "deepFreeze()" acts like "Object.freeze()", except that:
+ *
+ * To deepFreeze an object is to freeze it and all objects transitively
+ * reachable from it via transitive reflective property and prototype
+ * traversal.
+ */
+function deepFreeze(node) {
+  if (frozenSet.has(node)) {
+    return;
+  }
+
+  // Objects that we're attempting to freeze.
+  const freezingSet = new Set();
+
+  // If val is something we should be freezing but aren't yet,
+  // add it to freezingSet.
+  function enqueue(val) {
+    if (Object(val) !== val) {
+      // ignore primitives
+      return;
+    }
+    const type = typeof val;
+    if (type !== 'object' && type !== 'function') {
+      // future proof: break until someone figures out what it should do
+      throw new TypeError(`Unexpected typeof: ${type}`);
+    }
+    if (frozenSet.has(val) || freezingSet.has(val)) {
+      // Ignore if already frozen or freezing
+      return;
+    }
+    freezingSet.add(val);
+  }
+
+  function doFreeze(obj) {
+    const descs = getOwnPropertyDescriptors(obj);
+    ownKeys(descs).forEach(name => {
+      const desc = descs[name];
+      if ('value' in desc) {
+        enqueue(desc.value);
+      } else {
+        enqueue(desc.get);
+        enqueue(desc.set);
+      }
+    });
+    freeze(obj);
+  }
+
+  // Process the freezingSet.
+  function dequeue() {
+    // New values added before forEach() has finished will be visited.
+    freezingSet.forEach(obj => {
+      doFreeze(obj);
+      enqueue(getPrototypeOf(obj));
+    });
+  }
+
+  enqueue(node);
+  dequeue();
+
+  // "Committing" the changes upon exit guards against exceptions aborting
+  // the deep freeze process, which could leave the system in a state
+  // where unfrozen objects are never frozen when no longer discoverable by
+  // subsequent invocations of deep-freeze because all object owning a reference
+  // to them are frozen.
+
+  freezingSet.forEach(frozenSet.add, frozenSet);
 }
 
 /*
@@ -4041,7 +4041,7 @@ SecureElement.secureQuerySelector = function(el, key, selector) {
 const sanitized = new WeakSet();
 
 function freezeIntrinsics(realmRec) {
-  const intrinsics = getIntrinsics(realmRec);
+  const { intrinsics } = realmRec;
   deepFreeze(intrinsics);
 }
 
@@ -4378,19 +4378,45 @@ function tamperProofProp(obj, prop) {
  * These properties are subject to the override mistake.
  */
 function repairDataProperties(realmRec) {
-  const { unsafeGlobal: g } = realmRec;
+  const { intrinsics: i } = realmRec;
 
-  ['Object', 'Array', 'Function'].forEach(name => {
-    tamperProofAll(g[name].prototype);
+  [
+    i.ArrayIteratorPrototype,
+    i.DataViewPrototype,
+
+    i.ObjectPrototype,
+    i.FunctionPrototype,
+
+    i.ArrayPrototype,
+    i.BooleanPrototype,
+    i.DatePrototype,
+    i.NumberPrototype,
+    i.StringPrototype,
+
+    i.PromisePrototype,
+
+    i.TypedArray,
+    i.Int8ArrayPrototype,
+    i.Int16ArrayPrototype,
+    i.Int32ArrayPrototype,
+    i.Uint8Array,
+    i.Uint16Array,
+    i.Uint32Array
+  ].forEach(proto => {
+    tamperProofAll(proto);
   });
 
-  tamperProofProp(g.Error.prototype, 'message');
-  tamperProofProp(g.EvalError.prototype, 'message');
-  tamperProofProp(g.RangeError.prototype, 'message');
-  tamperProofProp(g.ReferenceError.prototype, 'message');
-  tamperProofProp(g.SyntaxError.prototype, 'message');
-  tamperProofProp(g.TypeError.prototype, 'message');
-  tamperProofProp(g.URIError.prototype, 'message');
+  [
+    i.ErrorPrototype,
+    i.EvalErrorPrototype,
+    i.RangeErrorPrototype,
+    i.ReferenceErrorPrototype,
+    i.SyntaxErrorPrototype,
+    i.TypeErrorPrototype,
+    i.URIErrorPrototype
+  ].forEach(proto => {
+    tamperProofProp(proto, 'message');
+  });
 }
 
 /*
@@ -4428,6 +4454,7 @@ function init(options) {
   realmRec.unsafeGlobal = options.unsafeGlobal;
   realmRec.unsafeEval = options.unsafeGlobal.eval;
   realmRec.unsafeFunction = options.unsafeGlobal.Function;
+  realmRec.intrinsics = getIntrinsics(realmRec);
 
   // None of these values can change after initialization.
   freeze(realmRec);

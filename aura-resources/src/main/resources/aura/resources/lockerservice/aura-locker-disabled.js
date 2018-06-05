@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-06-05
- * Version: 0.4.18
+ * Version: 0.4.19
  */
 
 (function (exports) {
@@ -118,8 +118,12 @@ function wrapComponentEvent(component, event) {
   return event;
 }
 
-function wrapEngine(engine) {
+function wrapEngine(engine, key) {
   return engine;
+}
+
+function wrapLib(lib, key, requireLocker) {
+  return lib;
 }
 
 exports.create = create;
@@ -139,5 +143,6 @@ exports.unwrap = unwrap;
 exports.wrapComponent = wrapComponent;
 exports.wrapComponentEvent = wrapComponentEvent;
 exports.wrapEngine = wrapEngine;
+exports.wrapLib = wrapLib;
 
 }((this.AuraLockerDisabled = this.AuraLockerDisabled || {})));

@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-06-05
- * Version: 0.4.18
+ * Version: 0.4.19
  */
 
 (function (exports) {
@@ -43,6 +43,7 @@
 
 const { isArray } = Array;
 
+
 const {
   assign,
   create: create$1,
@@ -52,6 +53,7 @@ const {
   getOwnPropertyDescriptors,
   getOwnPropertyNames,
   isFrozen,
+  keys,
   seal
 } = Object;
 
@@ -97,6 +99,26 @@ function ab2str(buf) {
  * https://github.com/dfcreative/string-to-arraybuffer/blob/master/index.js
  * @param {String} str
  */
+
+
+function isObject(obj) {
+  return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
+}
+
+/**
+ * Return a prototype which looks like an Object
+ * Create prototype to allow basic object operations like hasOwnProperty etc
+ */
+function getObjectLikeProto() {
+  const props = getOwnPropertyDescriptors(Object.prototype);
+  // Do not want to leak access to the raw Object constructor
+  delete props.constructor;
+  // To keep it configurable in any extensions of this prototype
+  // Note: This does no affect the original Object.prototype
+  props.toString.configurable = true;
+  const emptyProto = create$1(null, props);
+  return emptyProto;
+}
 
 const DEFAULT = {};
 const FUNCTION = { type: 'function' };
@@ -1980,6 +2002,31 @@ if (typeof window !== 'undefined') {
  * limitations under the License.
  */
 
+function isCustomElement(el) {
+  return el.tagName && el.tagName.indexOf('-') > 0;
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+let customElementHook;
+function registerCustomElementHook(hook) {
+  customElementHook = hook;
+}
+
 const REGEX_CONTAINS_IMPORT = /import/i;
 
 // Remove when SecureElement is refactored to use sandbox
@@ -3269,7 +3316,9 @@ function SecureElement(el, key) {
 
     const expandoCapturingHandler = {
       get: function(target, property) {
-        if (property in basePrototype) {
+        // Deyan: TODO W-4808252, is this fine? custom element
+        if (property in basePrototype || property in target) {
+          // if (property in basePrototype) {
           return property in target ? target[property] : undefined;
         }
 
@@ -3332,11 +3381,11 @@ function SecureElement(el, key) {
       ownKeys: function(target) {
         const raw = getRef(target, key);
         const data = getData(raw, key);
-        let keys = Object.keys(raw);
+        let keys$$1 = Object.keys(raw);
         if (data) {
-          keys = keys.concat(Object.keys(data));
+          keys$$1 = keys$$1.concat(Object.keys(data));
         }
-        return keys;
+        return keys$$1;
       },
 
       getOwnPropertyDescriptor: function(target, property) {
@@ -3629,6 +3678,11 @@ function SecureElement(el, key) {
 
     if (tagName === 'SCRIPT') {
       SecureScriptElement.setOverrides(tagNameSpecificConfig, prototype);
+    }
+
+    // Custom Element with properties
+    if (isCustomElement(el) && customElementHook) {
+      customElementHook(el, prototype, tagNameSpecificConfig, key);
     }
 
     defineProperties(prototype, tagNameSpecificConfig);
@@ -4615,18 +4669,18 @@ SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
         // we do not want to pre-process them all, just create the getters
         // and process the accessor on the spot. e.g.:
         // https://developer.mozilla.org/en-US/docs/Web/Events/touchstart
-        let keys = [];
+        let keys$$1 = [];
         let touchShape = touch;
         // Walk up the prototype chain and gather all properties
         do {
-          keys = keys.concat(Object.keys(touchShape));
+          keys$$1 = keys$$1.concat(Object.keys(touchShape));
         } while (
           (touchShape = Object.getPrototypeOf(touchShape)) &&
           touchShape !== Object.prototype
         );
 
         // Create a stub object with all the properties
-        return keys.reduce(
+        return keys$$1.reduce(
           (o, p) =>
             defineProperty(o, p, {
               // all props in a touch object are readonly by spec:
@@ -6496,6 +6550,38 @@ SecureObject.addUnfilteredPropertyIfSupported = function(st, raw, name) {
     };
     defineProperty(st, name, config);
   }
+};
+
+/**
+ * Traverse all entries in the baseObject to unwrap any secure wrappers and wrap any functions as
+ * SecureFunction. This ensures any non-Lockerized handlers of the event do not choke on the secure
+ * wrappers, but any callbacks back into the original Locker have their arguments properly filtered.
+ */
+SecureObject.deepUnfilterMethodArguments = function(st, baseObject, members) {
+  let value;
+  for (const property in members) {
+    value = members[property];
+    if (isArray(value)) {
+      value = SecureObject.deepUnfilterMethodArguments(st, [], value);
+    } else if (isPlainObject(value)) {
+      value = SecureObject.deepUnfilterMethodArguments(st, {}, value);
+    } else if (typeof value !== 'function') {
+      if (value) {
+        const key = getKey(value);
+        if (key) {
+          value = getRef(value, key) || value;
+        }
+      }
+      // If value is a plain object, we need to deep unfilter
+      if (isPlainObject(value)) {
+        value = SecureObject.deepUnfilterMethodArguments(st, {}, value);
+      }
+    } else {
+      value = SecureObject.filterEverything(st, value, { defaultKey: getKey(st) });
+    }
+    baseObject[property] = value;
+  }
+  return baseObject;
 };
 
 SecureObject.FunctionPrototypeBind = Function.prototype.bind;
@@ -8550,21 +8636,482 @@ function SecureRTCPeerConnection(raw, key) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const metadata$7 = {
+  prototypes: {
+    ShadowRoot: {
+      mode: READ_ONLY_PROPERTY,
+      delegatesFocus: READ_ONLY_PROPERTY,
+      host: READ_ONLY_PROPERTY
+    },
+    ARIA: {
+      ariaAutoComplete: DEFAULT,
+      ariaChecked: DEFAULT,
+      ariaCurrent: DEFAULT,
+      ariaDisabled: DEFAULT,
+      ariaExpanded: DEFAULT,
+      ariaHasPopUp: DEFAULT,
+      ariaHidden: DEFAULT,
+      ariaInvalid: DEFAULT,
+      ariaLabel: DEFAULT,
+      ariaLevel: DEFAULT,
+      ariaMultiLine: DEFAULT,
+      ariaMultiSelectable: DEFAULT,
+      ariaOrientation: DEFAULT,
+      ariaPressed: DEFAULT,
+      ariaReadOnly: DEFAULT,
+      ariaRequired: DEFAULT,
+      ariaSelected: DEFAULT,
+      ariaSort: DEFAULT,
+      ariaValueMax: DEFAULT,
+      ariaValueMin: DEFAULT,
+      ariaValueNow: DEFAULT,
+      ariaValueText: DEFAULT,
+      ariaLive: DEFAULT,
+      ariaRelevant: DEFAULT,
+      ariaAtomic: DEFAULT,
+      ariaBusy: DEFAULT,
+      ariaActiveDescendant: DEFAULT,
+      ariaControls: DEFAULT,
+      ariaDescribedBy: DEFAULT,
+      ariaFlowTo: DEFAULT,
+      ariaLabelledBy: DEFAULT,
+      ariaOwns: DEFAULT,
+      ariaPosInSet: DEFAULT,
+      ariaSetSize: DEFAULT,
+      ariaColCount: DEFAULT,
+      ariaColIndex: DEFAULT,
+      ariaDetails: DEFAULT,
+      ariaErrorMessage: DEFAULT,
+      ariaKeyShortcuts: DEFAULT,
+      ariaModal: DEFAULT,
+      ariaPlaceholder: DEFAULT,
+      ariaRoleDescription: DEFAULT,
+      ariaRowCount: DEFAULT,
+      ariaRowIndex: DEFAULT,
+      ariaRowSpan: DEFAULT,
+      role: DEFAULT
+    }
+  }
+};
 
-function SecureEngine(engine) {
-  const o = create$1(null, {
+// 1 wrapped template per key, 1 per key to isolate the prototype
+const WRAPPED_TEMPLATE_BY_KEY = new Map();
+
+function getWrappedTemplatePrototype() {
+  const wrappedTemplatePrototype = create$1(getObjectLikeProto(), {
+    toString: {
+      value: function() {
+        const template = SecureObject.getRaw(this);
+        return `SecureTemplate: ${template}{ key: ${JSON.stringify(getKey(this))} }`;
+      }
+    },
+    querySelector: {
+      value: function(selector) {
+        const template = SecureObject.getRaw(this);
+        const node = template.querySelector(selector);
+        // TODO: JF/RJ - revisit this after DOM Access is finalized
+        // Trust element with the wrapped template's key
+        if (node) {
+          trust$1(this, node);
+        }
+        return SecureObject.filterEverything(this, node);
+      }
+    },
+    querySelectorAll: {
+      value: function(selector) {
+        const template = SecureObject.getRaw(this);
+        const rawNodeList = template.querySelectorAll(selector);
+        if (rawNodeList) {
+          // TODO: JF/RJ - revisit this after DOM Access is finalized
+          // Trust the result given by lwc.
+          rawNodeList.forEach(node => trust$1(this, node));
+        }
+        return SecureObject.filterEverything(this, rawNodeList);
+      }
+    }
+  });
+
+  // define addEventListener and removeEventListener. dispatchEvent is not supported on template
+  defineProperties(wrappedTemplatePrototype, {
+    addEventListener: createAddEventListenerDescriptorStateless(),
+    // TODO: RJ - This is a copy/paste of pieces of SecureEventTarget.addEventTargetMethodsStateless
+    // It should be refactored into a reusable function. Separate PR for that to minimize change
+    removeEventListener: {
+      writable: true,
+      value: function(type, listener, options) {
+        const raw = SecureObject.getRaw(this);
+        const sCallback = getFromCache(listener, getKey(this));
+        raw.removeEventListener(type, sCallback, options);
+      }
+    }
+  });
+
+  // When the native ShadowRoot is used by LWC, then switch this over to SecureObject.addPrototypeMethodsAndPropertiesStateless
+  const prototypes = metadata$7['prototypes'];
+  const supportedInterfaces = ['ShadowRoot', 'ARIA'];
+  supportedInterfaces.forEach(name => {
+    const prototype = prototypes[name];
+    for (const property in prototype) {
+      if (!wrappedTemplatePrototype.hasOwnProperty(property)) {
+        defineProperty(
+          wrappedTemplatePrototype,
+          property,
+          SecureObject.createFilteredPropertyStateless(
+            property,
+            wrappedTemplatePrototype,
+            prototype[property]
+          )
+        );
+      }
+    }
+  });
+
+  freeze(wrappedTemplatePrototype);
+  return wrappedTemplatePrototype;
+}
+
+function SecureTemplate(template, key) {
+  assert$1.invariant(isObject(key), 'Cannot invoke SecureTemplate wrapper with a valid key');
+  assert$1.invariant(isObject(template), 'Expected template to be an object');
+
+  let o = getFromCache(template, key);
+  if (o) {
+    return o;
+  }
+
+  assert$1.invariant(WRAPPED_TEMPLATE_BY_KEY, 'Expected to recive a map for caching prototypes');
+  let wrappedTemplatePrototype = WRAPPED_TEMPLATE_BY_KEY.get(key);
+
+  if (!wrappedTemplatePrototype) {
+    wrappedTemplatePrototype = getWrappedTemplatePrototype();
+    WRAPPED_TEMPLATE_BY_KEY.set(key, wrappedTemplatePrototype);
+  }
+
+  o = create$1(wrappedTemplatePrototype);
+
+  setRef(o, template, key);
+  addToCache(template, o, key);
+  registerProxy(o);
+
+  return o;
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the 'License');
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an 'AS IS' BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * this should return a secure value
+ * @param {*} cmp component instance who is accessing the value
+ * @param {*} rawValue unwrapped value
+ */
+function getFilteredValue(cmp, rawValue) {
+  return SecureObject.filterEverything(cmp, rawValue);
+}
+
+/**
+ * this should return an unwrapped value
+ * @param {*} cmp component
+ * @param {*} filteredValue wrapped value
+ */
+function getUnwrappedValue(cmp, filteredValue) {
+  if (filteredValue) {
+    if (isArray(filteredValue)) {
+      return SecureObject.deepUnfilterMethodArguments(cmp, [], filteredValue);
+    } else if (isObject(filteredValue)) {
+      return SecureObject.deepUnfilterMethodArguments(cmp, {}, filteredValue);
+    } else if (getKey(filteredValue)) {
+      return unwrap$1(cmp, filteredValue);
+    }
+  }
+  return filteredValue;
+}
+
+// Hooks to be used by engine
+function generateInstanceHooks(st) {
+  return {
+    callHook: function(cmp, fn, args) {
+      if (isArray(args)) {
+        args = args.map(rawValue => getFilteredValue(st, rawValue));
+      }
+      const filteredResult = fn.apply(st, args);
+      return getUnwrappedValue(st, filteredResult);
+    },
+    setHook: function(cmp, prop, rawValue) {
+      st[prop] = getFilteredValue(st, rawValue);
+    },
+    getHook: function(cmp, prop) {
+      return getUnwrappedValue(st, st[prop]);
+    }
+  };
+}
+// End of hooks
+
+let lwcElementProtoPropNames;
+
+function SecureLWCElementFactory(LWCElement, key) {
+  let o = getFromCache(LWCElement, key);
+  if (o) {
+    return o;
+  }
+  o = SecureLWCElementFactory.getWrappedLWCElement(LWCElement, key);
+
+  setRef(o, LWCElement, key);
+  addToCache(LWCElement, o, key);
+  freeze(o);
+  return o;
+}
+
+SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
+  function getWrappedDescriptor(rawDescriptor) {
+    const { value, get, set, enumerable, configurable, writable } = rawDescriptor;
+    function wrappedMethod() {
+      const args = SecureObject.filterArguments(this, arguments, { rawArguments: true });
+      const rawResult = value.apply(this, args);
+      return getFilteredValue(this, rawResult);
+    }
+    if (rawDescriptor.hasOwnProperty('value')) {
+      // Wrap if value is a function
+      if (typeof value === 'function') {
+        return {
+          value: wrappedMethod,
+          enumerable,
+          writable,
+          configurable
+        };
+      }
+      // else return a getter descriptor for static values
+      return {
+        get() {
+          return getFilteredValue(this, value);
+        },
+        writable,
+        enumerable,
+        configurable
+      };
+    }
+    // getter and setter
+    return {
+      get() {
+        return getFilteredValue(this, get.call(this));
+      },
+      set(filteredValue) {
+        if (set) {
+          set.call(this, getUnwrappedValue(this, filteredValue));
+        }
+      },
+      enumerable,
+      configurable
+    };
+  }
+
+  function SecureLWCElement() {
+    if (this instanceof SecureLWCElement) {
+      LWCElement.prototype.constructor.call(this, generateInstanceHooks(this));
+
+      /**
+       *  `this` represents the user mode instance. No need to wrap this object or protect it
+       * `pseudoInstance` is used as an instance we are trying to protect.
+       * If this instance ever crosses from one locker to another, a filtering proxy will be placed
+       * around this and there is no risk of leaking.
+       */
+      const pseudoInstance = create$1(null, {
+        toString: {
+          value: function() {
+            return LWCElement.prototype.toString.call(this);
+          }
+        }
+      });
+      freeze(pseudoInstance);
+      setRef(this, pseudoInstance, lockerKey);
+      registerProxy(this);
+    } else {
+      // TODO: Caridy - This trick leaks Element into sandboxes, we will figure a better way.
+      return LWCElement;
+    }
+  }
+
+  // eslint-disable-next-line no-underscore-dangle
+  SecureLWCElement.__circular__ = true;
+  const SecureElementPrototype = (SecureLWCElement.prototype = getObjectLikeProto());
+  const ElementPrototype = LWCElement.prototype;
+
+  // Special properties
+  defineProperties(SecureElementPrototype, {
+    toString: {
+      value: function() {
+        return `SecureLWCElement ${ElementPrototype.toString.call(this)}{ key: ${JSON.stringify(
+          lockerKey
+        )} }`;
+      }
+    },
+    template: {
+      enumerable: true,
+      get: function() {
+        const { get } = getOwnPropertyDescriptor(ElementPrototype, 'template');
+        const rawValue = get.call(this);
+        return SecureTemplate(rawValue, lockerKey);
+      }
+    },
+    querySelector: {
+      enumerable: true,
+      value: function(selector) {
+        const { value } = getOwnPropertyDescriptor(ElementPrototype, 'querySelector');
+        const node = value.call(this, selector);
+        // TODO: JF/RJ - revisit this after DOM Access is finalized
+        // Trust element with the component instance's key
+        if (node) {
+          trust$1(this, node);
+        }
+        return getFilteredValue(this, node);
+      }
+    },
+    querySelectorAll: {
+      enumerable: true,
+      value: function(selector) {
+        const { value } = getOwnPropertyDescriptor(ElementPrototype, 'querySelector');
+        const rawNodeList = value.call(this, selector);
+        if (rawNodeList) {
+          // TODO: JF/RJ - revisit this after DOM Access is finalized
+          // Trust elements with the component instance's key
+          rawNodeList.forEach(node => trust$1(this, node));
+        }
+        return getFilteredValue(this, rawNodeList);
+      }
+    }
+  });
+
+  // Fetch the properties on LWCElement.prototype and cache them
+  if (!lwcElementProtoPropNames) {
+    lwcElementProtoPropNames = getOwnPropertyNames(ElementPrototype);
+    lwcElementProtoPropNames.splice(lwcElementProtoPropNames.indexOf('constructor'), 1);
+  }
+
+  // Remaining properties
+  // TOOD: RJ/JF Revisit whether we should whitelist instead of all properties
+  lwcElementProtoPropNames.forEach(propName => {
+    if (!SecureElementPrototype.hasOwnProperty(propName)) {
+      const originalDescriptor = getOwnPropertyDescriptor(ElementPrototype, propName);
+      const wrappedDescriptor = getWrappedDescriptor(originalDescriptor);
+      defineProperty(SecureElementPrototype, propName, wrappedDescriptor);
+    }
+  });
+  freeze(SecureLWCElement);
+  freeze(SecureElementPrototype);
+
+  return SecureLWCElement;
+};
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the 'License');
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an 'AS IS' BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+function SecureEngine(engine, key) {
+  let o = getFromCache(engine, key);
+  if (o) {
+    return o;
+  }
+
+  o = create$1(null, {
     Element: {
       enumerable: true,
-      value: engine['Element']
+      value: SecureLWCElementFactory(engine['Element'], key)
     },
     toString: {
       value: function() {
-        return 'SecureEngine';
+        return `SecureEngine: ${engine}{ key: ${JSON.stringify(key)} }`;
       }
     }
   });
   freeze(o);
+
+  setRef(o, engine, key);
+  addToCache(engine, o, key);
+
   return o;
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Create a wrapped library
+ * @param {Object} lib Library being imported
+ * @param {Object} key Locker key of the module importing the library
+ * @param {Boolean} requireLocker Should the library being imported be lockeried
+ */
+function SecureLib(lib, key, requireLocker) {
+  let o = getFromCache(lib, key);
+  if (o) {
+    return o;
+  }
+
+  assert$1.invariant(isPlainObject(lib), 'Expect lib to be a plain object');
+  o = create$1(null, {
+    toString: {
+      value: function() {
+        return `SecureLib: ${lib}{ key: ${JSON.stringify(key)} }`;
+      }
+    }
+  });
+
+  const methodOptions = {
+    defaultKey: key,
+    unfilterEverything: !requireLocker
+      ? function(args) {
+          return SecureObject.deepUnfilterMethodArguments(o, [], args);
+        }
+      : undefined
+  };
+
+  keys(lib).forEach(property => {
+    if (typeof lib[property] === 'function') {
+      SecureObject.addMethodIfSupported(o, lib, property, methodOptions);
+    } else {
+      SecureObject.addPropertyIfSupported(o, lib, property);
+    }
+  });
+
+  setRef(o, lib, key);
+  addToCache(lib, o, key);
+  registerProxy(o);
+
+  return seal(o);
 }
 
 /*
@@ -9289,25 +9836,48 @@ function registerAuraTypes(types) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const service = {
-  piercing: (target, key, value, callback) => {
-    if (value === EventTarget.prototype.dispatchEvent && SecureObject.isDOMElementOrNode(target)) {
-      callback(event => {
-        // If the event is a wrapped event, unwrap it and dispatch the event
-        const lsKey = getKey(event);
-        if (lsKey) {
-          event = getRef(event, lsKey);
-        }
-        target.dispatchEvent(event);
-      });
+/**
+ * Add additional properties for custom elements
+ * @param {*} el DOM element
+ * @param {*} prototype Represents the psuedo protototype that will be used to create wrapped element
+ * @param {*} tagNameSpecificConfig Temporary holder of tag specific config
+ * @param {*} key locker key
+ */
+function customElementHook$1(el, prototype, tagNameSpecificConfig, key) {
+  assert$1.invariant(isCustomElement(el), 'Cannot call custom element hook on a non custom element');
+  const methodOptions = {
+    defaultKey: key,
+    unfilterEverything: function(args) {
+      const st = this;
+      return SecureObject.deepUnfilterMethodArguments(st, [], args);
     }
-  }
-};
-
-function registerEngineAPI(api) {
-  if (api && api.registerEngineServices) {
-    api.registerEngineServices(service);
-  }
+  };
+  getOwnPropertyNames(el).forEach(prop => {
+    const originalDescriptor = getOwnPropertyDescriptor(el, prop);
+    if (
+      !getOwnPropertyDescriptor(prototype, prop) &&
+      !getOwnPropertyDescriptor(tagNameSpecificConfig, prop)
+    ) {
+      // Wrap functions with a filtered method
+      if (
+        originalDescriptor.hasOwnProperty('value') &&
+        typeof originalDescriptor.value === 'function'
+      ) {
+        tagNameSpecificConfig[prop] = SecureObject.createFilteredMethodStateless(
+          prop,
+          prototype,
+          methodOptions
+        );
+      } else {
+        // Everything else has a wrapped getter/setter
+        tagNameSpecificConfig[prop] = SecureObject.createFilteredPropertyStateless(
+          prop,
+          prototype,
+          methodOptions
+        );
+      }
+    }
+  });
 }
 
 /*
@@ -9505,12 +10075,11 @@ function initialize(types, api) {
   registerAuraTypes(types);
   registerAuraAPI(api);
   registerReportAPI(api);
-  registerEngineAPI(api);
   registerFilterTypeHook(filterTypeHook);
   registerIsUnfilteredTypeHook(isUnfilteredTypeHook);
   registerAddPropertiesHook$$1(windowAddPropertiesHook);
   registerAddPropertiesHook$1(navigatorAddPropertiesHook);
-
+  registerCustomElementHook(customElementHook$1);
   isLockerInitialized = true;
 }
 
@@ -9563,13 +10132,17 @@ function wrapComponentEvent(component, event) {
   return event instanceof AuraEvent ? SecureAuraEvent(event, key) : SecureDOMEvent(event, key);
 }
 
-function wrapEngine(engine) {
-  let secureEngine = engineToSecureEngine.get(engine);
+function wrapEngine(engine, key) {
+  let secureEngine = engineToSecureEngine.get(key);
   if (!secureEngine) {
-    secureEngine = SecureEngine(engine);
-    engineToSecureEngine.set(engine, secureEngine);
+    secureEngine = SecureEngine(engine, key);
+    engineToSecureEngine.set(key, secureEngine);
   }
   return secureEngine;
+}
+
+function wrapLib(lib, key, requireLocker$$1) {
+  return SecureLib(lib, key, requireLocker$$1);
 }
 
 exports.create = create$$1;
@@ -9589,5 +10162,6 @@ exports.unwrap = unwrap$$1;
 exports.wrapComponent = wrapComponent;
 exports.wrapComponentEvent = wrapComponentEvent;
 exports.wrapEngine = wrapEngine;
+exports.wrapLib = wrapLib;
 
 }((this.AuraLocker = this.AuraLocker || {})));

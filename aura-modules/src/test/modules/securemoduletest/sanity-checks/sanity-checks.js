@@ -62,7 +62,7 @@ export default class SanityChecks extends Element {
         div.className = "fancypants";
         contentEl.appendChild(div);
 
-        div = this.root.querySelector("#content");
+        div = this.template.querySelector("#content");
         const appendedDiv = div.childNodes[0];
         testUtil.assertEquals("myId", appendedDiv.id);
         testUtil.assertEquals("fancypants", appendedDiv.className);
@@ -75,7 +75,7 @@ export default class SanityChecks extends Element {
         // Public method invoked on internal library
         helper.testContextInModuleInternalLib();
         // Public method invoked on facet
-        const simpleCmp = this.root.querySelector("#securemoduletest-simple-cmp");
+        const simpleCmp = this.template.querySelector("#securemoduletest-simple-cmp");
         simpleCmp.testContextInPublicMethod();
     }
 
@@ -143,7 +143,7 @@ export default class SanityChecks extends Element {
     @api
     testSecureElementPrototypeCounterMeasures() {
         // Try to access the internal prototype of a SecureElement
-        const el = this.root.querySelector("#content");
+        const el = this.template.querySelector("#content");
         const prototype = Object.getPrototypeOf(el);
         testUtil.assertTrue(prototype === HTMLDivElement.prototype); // Will start failing once W-4184609 or W-4180046 or W-4274468 is fixed
     }

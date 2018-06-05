@@ -41,6 +41,7 @@ function LockerService() {
         service.wrapComponent         = lib["wrapComponent"];
         service.wrapComponentEvent    = lib["wrapComponentEvent"];
         service.wrapEngine            = lib["wrapEngine"];
+        service.wrapLib               = lib["wrapLib"];
 
         // API for file-based components (will not be obfuscated by Closure Compiler).
 
@@ -92,18 +93,12 @@ function LockerService() {
         $A.warning(message);
     }
 
-    function registerEngineServices(serviceHooks) {
-        if ($A.componentService.moduleEngine && $A.componentService.moduleEngine["register"]) {
-            $A.componentService.moduleEngine["register"](serviceHooks);
-        }
-    }
-
     // App.js is built with two versions of AuraLocker, and we select at
     // runtime. In the future, we could move this to
     // initializeInjectedServices.
     function initialize(context) {
         if (isInitialized) { return; }
-        
+
         context = context || {};
         var isEnabled = !!context["ls"];
         var isStrictCSP = !!context["csp"];
@@ -126,8 +121,7 @@ function LockerService() {
                 "isStrictCSP": isStrictCSP,
                 "isFrozenRealm": isFrozenRealm,
                 "warn": warn,
-                "error": $A.auraError,
-                "registerEngineServices": registerEngineServices
+                "error": $A.auraError
             };
 
             var lib = window["AuraLocker"];

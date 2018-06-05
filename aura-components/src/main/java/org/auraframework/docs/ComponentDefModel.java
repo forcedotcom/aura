@@ -117,7 +117,7 @@ public class ComponentDefModel implements ModelInstance {
                     handledEvents.add(new AttributeModel(handler));
                 }
 
-                for (DefDescriptor<InterfaceDef> intf : cmpDef.getInterfaces()) {
+                for (DefDescriptor<InterfaceDef> intf : cmpDef.getDeclaredInterfaces()) {
                     if (hasAccess(definitionService.getDefinition(intf))) {
                         interfaces.add(intf.getNamespace() + ":" + intf.getName());
                     }

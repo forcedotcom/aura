@@ -26,10 +26,8 @@ import org.auraframework.impl.root.component.ComponentDefImpl.Builder;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.service.BuilderService;
 import org.auraframework.service.CachingService;
-import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -40,9 +38,6 @@ public class TestSerializeAbsentLayout implements Controller {
 
     @Inject
     private CachingService cachingService;
-
-    @Inject
-    private ContextService contextService;
 
     @Inject
     private DefinitionService definitionService;
@@ -56,7 +51,6 @@ public class TestSerializeAbsentLayout implements Controller {
         final long timestamp = System.nanoTime();
 
         // Services
-        final AuraContext context = contextService.getCurrentContext();
         final DefinitionService ds = definitionService;
 
         // Build Layout
@@ -69,10 +63,9 @@ public class TestSerializeAbsentLayout implements Controller {
         // which as a side effect included the auradev:componentClass component
         DefDescriptor<ComponentDef> componentClassDef = ds.getDefDescriptor(dynamicDependentComponent, ComponentDef.class);
         cachingService.getDefsCache().invalidate(componentClassDef);
-        ;
 
         // Add the dependency
-        context.addDynamicDef(cmpDef);
+        definitionService.addDynamicDef(cmpDef);
 
         // Return the component so our dependencies are included in the request.
         ComponentDefRefBuilder subbuilder = builderService.getComponentDefRefBuilder();

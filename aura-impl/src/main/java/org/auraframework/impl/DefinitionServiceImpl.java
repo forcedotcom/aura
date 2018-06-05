@@ -202,6 +202,13 @@ public class DefinitionServiceImpl implements DefinitionService {
         return getDefDescriptor(descriptor.getQualifiedName(), clazz, bundle);
     }
     // END TEMPORARY HACK TO SUPPORT TEST SUITES IN MAIN WITHOUT CHANGES
+ 
+    @Override
+    public <D extends Definition> void addDynamicDef(D def) {
+        contextService.assertEstablished();
+
+        contextService.getCurrentContext().addDynamicDef(def);
+    }
 
     /**
      * Get a definition.
@@ -217,7 +224,6 @@ public class DefinitionServiceImpl implements DefinitionService {
     @Override
     public <T extends Definition> T getDefinition(@CheckForNull DefDescriptor<T> descriptor) throws QuickFixException {
         contextService.assertEstablished();
-
 
         AuraContext context = contextService.getCurrentContext();
         T def = null;
@@ -974,23 +980,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         if (def == null) {
             return false;
         }
-        Set<DefDescriptor<InterfaceDef>> interfaces = def.getInterfaces();
-        DefDescriptor<? extends BaseComponentDef> parent = def.getExtendsDescriptor();
-        while (interfaces != null && interfaces.size() > 0 || (parent != null)) {
-            if (interfaces.contains(interfaceDef)) {
-                return true;
-            }
-            if (parent == null) {
-                break;
-            }
-            def = getDefinition(parent);
-            if (def == null) {
-                return false;
-            }
-            interfaces = def.getInterfaces();
-            parent = def.getExtendsDescriptor();
-        }
-        return false;
+        return def.isInstanceOf(interfaceDef);
     }
 
     // FIXME: These should move to caching service.

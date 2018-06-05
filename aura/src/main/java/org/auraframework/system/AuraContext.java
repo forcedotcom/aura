@@ -22,9 +22,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -36,15 +33,18 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.InstanceStack;
+import org.auraframework.service.CSPInliningService.InlineScriptMode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
-import org.auraframework.service.CSPInliningService.InlineScriptMode;
-
-import com.google.common.base.Optional;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 import org.auraframework.util.json.JsonSerializationContext;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 
 /**
  * AuraContext public interface

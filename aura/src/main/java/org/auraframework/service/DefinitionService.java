@@ -21,7 +21,6 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
@@ -39,9 +38,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * <p>
  * Service for loading, finding or interacting with a {@link Definition}.
  * </p>
- * <p>
- * Instances of all AuraServices should be retrieved from {@link Aura}
- * </p>
+ *
+ * This service should be injected.
  */
 public interface DefinitionService extends AuraService {
 
@@ -93,6 +91,13 @@ public interface DefinitionService extends AuraService {
     <T extends Definition> DefDescriptor<T> getDefDescriptor(DefDescriptor<?> desc, String prefix, Class<T> defClass);
 
     DefDescriptor<?> getDefDescriptor(String prefix, String namespace, String name, DefType defType);
+
+    /**
+     * Add a dynamically generated def to the set of available definitions.
+     *
+     * @param def The definition to add.
+     */
+    <D extends Definition> void addDynamicDef(D def);
 
     /**
      * Get the Definition associated with the descriptor passed in, compiling if
@@ -168,6 +173,7 @@ public interface DefinitionService extends AuraService {
      * @deprecated use #findByTags(null, tags)
      */
     @Nonnull
+    @Deprecated
     default Set<DefDescriptor<?>> findByTags(@Nonnull Set<String> tags) { return findByTags(null, tags);};
 
     /**

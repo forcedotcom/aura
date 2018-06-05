@@ -149,7 +149,22 @@ public interface BaseComponentDef extends RootDefinition {
 
     RenderType getRender();
 
+    /**
+     * Get the declared set of interfaces directly implemented by this component.
+     *
+     * @return the non-null set of interfaces.
+     * @deprecated use getDeclaredInterfaces()
+     */
+    @Deprecated
     Set<DefDescriptor<InterfaceDef>> getInterfaces();
+
+    /**
+     * Get the declared set of interfaces directly implemented by this component.
+     *
+     * @return the non-null set of interfaces.
+     */
+    Set<DefDescriptor<InterfaceDef>> getDeclaredInterfaces();
+
 
     boolean hasLocalDependencies() throws QuickFixException;
 

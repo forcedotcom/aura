@@ -944,7 +944,13 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     @Override
+    @Deprecated
     public Set<DefDescriptor<InterfaceDef>> getInterfaces() {
+        return interfaces;
+    }
+
+    @Override
+    public Set<DefDescriptor<InterfaceDef>> getDeclaredInterfaces() {
         return interfaces;
     }
 

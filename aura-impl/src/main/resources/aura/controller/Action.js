@@ -937,7 +937,6 @@ Action.prototype.finishAction = function(context) {
                     if (cb) {
                         if (this.defDependencies && $A.getContext().uriAddressableDefsEnabled) {
                             var that = this;
-                            var previousClearComponents = clearComponents;
                             clearComponents = false;
                             var componentsToFinish = this.components;
                             this.components = undefined;
@@ -954,14 +953,10 @@ Action.prototype.finishAction = function(context) {
                                     that.processFinishActionException(e, "Callback failed: ", err, true);
                                 } finally {
                                     $A.clientService.releaseCurrentAccess();
-                                    if (that.components && !that.storable && !this.remaining) {
-                                        context.finishComponentConfigs(id);
-                                        previousClearComponents = false;
-                                    }
-                                    context.setCurrentAction(previousAction);
-                                    if (previousClearComponents) {
+                                    if (componentsToFinish) {
                                         context.clearComponentConfigs(id);
                                     }
+                                    context.setCurrentAction(previousAction);
                                 }
                                 if (err) {
                                     throw err;
@@ -984,7 +979,7 @@ Action.prototype.finishAction = function(context) {
                 }
 
                 if (this.components && (cb || !this.storable || !$A.clientService.getActionStorage().isStorageEnabled())) {
-                    context.finishComponentConfigs(id);
+                    context.clearComponentConfigs(id);
                     clearComponents = false;
                 }
             } else {

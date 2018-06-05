@@ -114,7 +114,7 @@ Test.Tools.Aura.Stubs.Aura=new function(){
     this.GetContext = function(){
         return Stubs.GetObject({
             joinComponentConfigs : function() {},
-            finishComponentConfigs : function() {},
+            clearComponentConfigs : function() {},
             getNum : function() { return 0; },
         });
     };

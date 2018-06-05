@@ -541,7 +541,7 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
             $A.clientService.initDefs();
             $A.metricsService.initialize();
             $A.initPriv(config["instance"], config["token"], null, doNotInitializeServices);
-            $A.context.finishComponentConfigs($A.context.getCurrentAction().getId());
+            $A.context.clearComponentConfigs($A.context.getCurrentAction().getId());
             $A.context.setCurrentAction(null);
         });
     } else {

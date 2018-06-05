@@ -1151,7 +1151,7 @@ Test.Aura.Controller.ActionTest = function() {
                 target.finishAction({
                     setCurrentAction: function () {},
                     joinComponentConfigs: function () {},
-                    finishComponentConfigs: function () {}
+                    clearComponentConfigs: function () {}
                 });
             });
 
@@ -1167,7 +1167,7 @@ Test.Aura.Controller.ActionTest = function() {
                 joinComponentConfigs : function() {},
                 setCurrentAction : function() {}
             };
-            context.finishComponentConfigs = Stubs.GetMethod("id", null);
+            context.clearComponentConfigs = Stubs.GetMethod("id", null);
             context.clearComponentConfigs = Stubs.GetMethod("id", null);
             target.components = [ {
                 "creationPath" : "hi"
@@ -1188,7 +1188,7 @@ Test.Aura.Controller.ActionTest = function() {
                     "id" : expectedId
                 },
                 ReturnValue : null
-            } ], context.finishComponentConfigs.Calls);
+            } ], context.clearComponentConfigs.Calls);
         }
 
         [Fact]
@@ -1199,7 +1199,7 @@ Test.Aura.Controller.ActionTest = function() {
                 joinComponentConfigs : function() {},
                 setCurrentAction : function() {}
             };
-            context.finishComponentConfigs = Stubs.GetMethod("id", null);
+            context.clearComponentConfigs = Stubs.GetMethod("id", null);
             context.clearComponentConfigs = Stubs.GetMethod("id", null);
             target.components = [ {
                 "creationPath" : "hi"
@@ -1230,7 +1230,7 @@ Test.Aura.Controller.ActionTest = function() {
                 joinComponentConfigs : function() {},
                 setCurrentAction : function() {}
             };
-            context.finishComponentConfigs = Stubs.GetMethod("id", null);
+            context.clearComponentConfigs = Stubs.GetMethod("id", null);
             context.clearComponentConfigs = Stubs.GetMethod("id", null);
             target.components = [ {
                 "creationPath" : "hi"
@@ -1260,7 +1260,7 @@ Test.Aura.Controller.ActionTest = function() {
                     "id" : expectedId
                 },
                 ReturnValue : null
-            } ], context.finishComponentConfigs.Calls);
+            } ], context.clearComponentConfigs.Calls);
         }
     }
 

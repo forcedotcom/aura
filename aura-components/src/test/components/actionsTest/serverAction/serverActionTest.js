@@ -615,6 +615,11 @@
     testClearingPartialConfigsOnStorableActions : {
         failOnWarning: true,
         test : function(cmp) {
+
+            $A.test.expectAuraWarning('unused configs for 19;a: 19;a/*[0]' +
+                '{"componentDef":{"descriptor":"markup://loadLevelTest:serverComponent"},' +
+                '"creationPath":"/*[0]","model":{"string2":"meep","stringList":["foo","bar","beer"]}}');
+
             // Run storable action (no callback) that has unconsumed component configs
             var actionStorable = $A.get("c.aura://ComponentController.getComponent");
             actionStorable.setStorable();

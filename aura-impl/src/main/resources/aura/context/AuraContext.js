@@ -439,68 +439,6 @@ Aura.Context.AuraContext.prototype.joinComponentConfigs = function(otherComponen
 };
 
 /**
- * Internal routine to clear out component configs to factor out common code.
- *
- * @param {string} actionId the action id that we should clear.
- * @param {boolean} logit should we log as we go? including errors.
- * @return {number} the count of component configs removed.
- * @private
- */
-Aura.Context.AuraContext.prototype.internalClear = function(actionId, logit) {
-    var count = 0;
-    var removed = 0;
-    var error = "";
-    var prefix = actionId+"/";
-    var len = prefix.length;
-    var ccs = this.componentConfigs;
-
-    for ( var k in ccs ) {
-        if (ccs.hasOwnProperty(k) && (k === actionId || k.substr(0,len) === prefix)) {
-            removed += 1;
-            if (logit) {
-                $A.log("config not consumed: "+k, ccs[k]);
-                delete ccs[k];
-                if (error !== "") {
-                    error = error+", ";
-                }
-                error = error + k;
-            }
-        } else {
-            count += 1;
-        }
-    }
-    if (error !== "") {
-        $A.warning("unused configs for "+actionId+": "+error);
-    }
-    if (count === 0) {
-        this.componentConfigs = {};
-    } else if (logit) {
-        $A.log("leftover configs ", ccs);
-        throw new $A.auraError("leftover configs", null, $A.severity.QUIET);
-    }
-    return removed;
-};
-
-/**
- * finish off the component configs for an action.
- *
- * This routine looks through all of the pending component configs, and
- * flags any that are un-consumed at the end of the action. This is a
- * relatively strict enforcement, but since we have all of the partial
- * configs to create the components, it is not clear why we would leave
- * them lying around.
- *
- * The Rule: You must consume component configs in the action callback.
- * you may _not_ delay creating components.
- *
- * @param {string} actionId the action id that we should clear.
- * @private
- */
-Aura.Context.AuraContext.prototype.finishComponentConfigs = function(actionId) {
-    this.internalClear(actionId, true);
-};
-
-/**
  * Clear out pending component configs.
  *
  * This routine can be used in error conditions (or in tests) to clear out
@@ -513,7 +451,32 @@ Aura.Context.AuraContext.prototype.finishComponentConfigs = function(actionId) {
  * @export
  */
 Aura.Context.AuraContext.prototype.clearComponentConfigs = function(actionId) {
-    return this.internalClear(actionId, false);
+    var count = 0;
+    var removed = 0;
+    var error = "";
+    var prefix = actionId+"/";
+    var len = prefix.length;
+    var componentConfigs = this.componentConfigs;
+
+    for ( var config in componentConfigs ) {
+        if (componentConfigs.hasOwnProperty(config) && (config === actionId || config.substr(0,len) === prefix)) {
+            removed += 1;
+            if (error.length > 0) {
+                error = error + ", ";
+            }
+            error = error + config + JSON.stringify(componentConfigs[config]);
+            delete componentConfigs[config];
+        } else {
+            count += 1;
+        }
+    }
+    if (error.length > 0) {
+        $A.warning("unused configs for "+actionId+": "+error);
+    }
+    if (count === 0) {
+        this.componentConfigs = {};
+    }
+    return removed;
 };
 
 /**

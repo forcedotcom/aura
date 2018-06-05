@@ -39,6 +39,7 @@ function InteropComponent(config) {
     this.attributeValueProvider = config['attributes']['valueProvider'];
     this.owner = $A.clientService.getCurrentAccessGlobalId();
     this.currentClassMap = {};
+    this.references = {};
 
     this.attrNameToPropMap = this.componentDef.attrNameToPropMap;
     this.propNameToAttrMap = this.componentDef.propNameToAttrMap;
@@ -87,7 +88,6 @@ InteropComponent.prototype.hasNativeAPIExposed = function (eventName) {
 
     return exposeNativeAPI && exposeNativeAPI[eventName];
 };
-
 
 InteropComponent.prototype.setupAttributes = function(config) {
     var configValues = config && config['values'] || {};
@@ -710,10 +710,9 @@ InteropComponent.prototype.implementsDirectly = function(){
 
 /**
  * @protected
+ * @export
  */
 InteropComponent.prototype.getRenderer = function() {};
-
-InteropComponent.prototype.getReference = function() {};
 
 /**
  * @private

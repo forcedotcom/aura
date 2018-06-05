@@ -37,6 +37,7 @@ import org.junit.Test;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.io.Files;
+import org.lwc.diagnostic.DiagnosticLevel;
 
 /**
  * Tests for the ModulesCompiler implementations
@@ -126,6 +127,7 @@ public class ModulesCompilerTest extends UnitTestCase {
         sources.put("modules/errorInJs/errorInJs.js", sourceClass);
 
         ModulesCompilerData result = compiler.compile(entry, sources, BundleType.internal);
+        assertEquals(result.compilerReport.diagnostics.get(0).level, DiagnosticLevel.ERROR);
         assertTrue(result.compilerReport.success);
     }
 

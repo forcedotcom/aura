@@ -93,16 +93,14 @@ public class ModulesCompilerNode implements ModulesCompiler {
             CompilerReport report = compiler.compile(config);
             List<Diagnostic> diagnostics = report.diagnostics;
 
-
-            // TODO: see how we want to surface diagnostics
             if (report.success == false) {
-                String error = buildDiagnosticsError(entry, diagnostics);
+                String error = buildDiagnosticsError(entry, diagnostics, bundleType);
                 loggingService.error("ModulesCompilerNode: compiler error " + entry + ": " + error);
                 throw new RuntimeException(error);
             }
 
             if(diagnostics.size() > 0) {
-                String warning = buildDiagnosticsWarning(entry, diagnostics);
+                String warning = buildDiagnosticsWarning(entry, diagnostics, bundleType);
                 loggingService.warn("ModulesCompilerNode: compiler warning " + entry + ": " + warning);
             }
 
@@ -117,11 +115,11 @@ public class ModulesCompilerNode implements ModulesCompiler {
         return result;
     }
 
-    protected String buildDiagnosticsError(String entry, List<Diagnostic> diagnostics) {
+    protected String buildDiagnosticsError(String entry, List<Diagnostic> diagnostics, BundleType bundleType) {
         StringBuffer sb = new StringBuffer();
         sb.append("Invalid syntax encountered during compilation of " + entry + ": ");
         for (Diagnostic diagnostic : diagnostics) {
-            if (diagnostic.level.equals(DiagnosticLevel.ERROR) || diagnostic.level.equals(DiagnosticLevel.FATAL)) {
+            if (isDiagnosticError(diagnostic, bundleType)) {
                 sb.append('\n');
                 sb.append(diagnostic.message);
             }
@@ -130,18 +128,37 @@ public class ModulesCompilerNode implements ModulesCompiler {
         return sb.toString();
     }
 
-    // TODO: refactor
-    protected String buildDiagnosticsWarning(String entry, List<Diagnostic> diagnostics) {
+    protected String buildDiagnosticsWarning(String entry, List<Diagnostic> diagnostics, BundleType bundleType) {
         StringBuffer sb = new StringBuffer();
         sb.append("Syntax warning encountered during compilation " + entry + ": ");
         for (Diagnostic diagnostic : diagnostics) {
-            if (diagnostic.level.equals(DiagnosticLevel.WARNING)) {
+            if (isDiagnosticWarning(diagnostic, bundleType)) {
                 sb.append('\n');
                 sb.append(diagnostic.message);
             }
         }
 
         return sb.toString();
+    }
+
+    protected boolean isDiagnosticError(Diagnostic diagnostic, BundleType type) {
+        boolean hasFatal = diagnostic.level.equals(DiagnosticLevel.FATAL);
+
+        if (type == BundleType.platform) {
+            return hasFatal || diagnostic.level.equals(DiagnosticLevel.ERROR);
+        } else {
+            return hasFatal;
+        }
+    }
+
+    protected boolean isDiagnosticWarning(Diagnostic diagnostic, BundleType type) {
+        boolean hasWarning = diagnostic.level.equals(DiagnosticLevel.WARNING);
+
+        if (type == BundleType.internal) {
+            return hasWarning || diagnostic.level.equals(DiagnosticLevel.ERROR);
+        } else {
+            return hasWarning;
+        }
     }
 
     protected LwcCompiler getCompiler() {

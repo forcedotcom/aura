@@ -76,7 +76,7 @@
     position: function (component) {
         var attachToBody = component.get("v.attachToBody");
 
-        if (attachToBody === true) {
+        if (attachToBody === true) {            
             return this.positionAsBodyChild(component);
         } else {
             var element = component.find("popupTarget").getElement();
@@ -132,7 +132,12 @@
         if (target && element) {
             var manualPosition = component.get("v.manualPosition");
 
-            $A.util.attachToDocumentBody(component.getElement());
+            var container = component.getElement();
+            // W-5043854: fix edge issue, force the element out of viewport before attach to body.
+            if (!manualPosition) { // Should skip manual position.
+                container.style.top = "-9999px";
+            }
+            $A.util.attachToDocumentBody(container);
 
             if (manualPosition) {
                 element.classList.add("positioned");

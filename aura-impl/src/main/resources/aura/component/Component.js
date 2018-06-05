@@ -1521,7 +1521,8 @@ Component.prototype.fireChangeEvent=function(key,oldValue,newValue,index){
             dispatcher[eventDef.getDescriptor().getQualifiedName()] = {"default": observers};
             var changeEvent = new Aura.Event.Event({
                 "eventDef" : eventDef,
-                "eventDispatcher" : dispatcher
+                "eventDispatcher" : dispatcher,
+                "component" : this
             });
 
             changeEvent.setParams({

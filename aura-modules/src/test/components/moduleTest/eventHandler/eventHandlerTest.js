@@ -48,8 +48,10 @@
                 target.addValueHandler({
                     value: "v.value",
                     event: "change",
-                    globalId: cmp.getGlobalId(),                            
+                    globalId: cmp.getGlobalId(),
                     method: function(event) {
+                        var src = event.getSource();
+                        $A.test.assertEquals('new', src.get('v.value'));
                         cmp.set('v.handlerCalled', true);
                     }
                 });

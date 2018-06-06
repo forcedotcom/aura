@@ -1,0 +1,16 @@
+
+<aura:component>
+    <aura:attribute name="list" type="String[]"/>
+
+
+    <div class="container" aura:id="container">
+        <div> ==== Begin of Iteration ==== </div>
+        <aura:iteration items="{!v.list}" var="item" aura:id="iteration">
+            <aura:if isTrue="{! item != 'Skip' }">
+                <moduleTest:simpleCmp literal="{!item}" />
+            </aura:if>
+        </aura:iteration>
+        <div> ==== End of Iteration ==== </div>
+    </div>
+
+</aura:component>

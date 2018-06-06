@@ -562,23 +562,23 @@ InteropComponent.prototype.updateContainerElement = function (container, current
         return;
     }
 
-    var parentGetElements = concrete.getElements();
-    if (parentGetElements) {
-        if (parentGetElements.indexOf(currentElement) >= 0) {
-            concrete.disassociateElements();
+    // It needs to walk through all elements to prevent losing comment markers.
+    var parentAllElements = $A.renderingService.getAllElementsCopy(concrete);
 
-            for (var i = 0, len = parentGetElements.length; i < len; i++) {
-                var element = parentGetElements[i];
-                if (element === currentElement) {
-                    concrete.associateElement(newElement);
-                    $A.renderingService.addAuraClass(concrete, newElement);
-                } else {
-                    concrete.associateElement(element);
-                }
+    if (parentAllElements.indexOf(currentElement) >= 0) {
+        concrete.disassociateElements();
+
+        for (var i = 0; i < parentAllElements.length; i++) {
+            var element = parentAllElements[i];
+            if (element === currentElement) {
+                concrete.associateElement(newElement);
+                $A.renderingService.addAuraClass(concrete, newElement);
+            } else {
+                concrete.associateElement(element);
             }
-        } else if (parentGetElements.indexOf(newElement) >= 0) {
-            $A.renderingService.addAuraClass(concrete, newElement);
         }
+    } else if (parentAllElements.indexOf(newElement) >= 0) {
+        $A.renderingService.addAuraClass(concrete, newElement);
     }
 
     this.updateContainerElement(concrete.getContainer(), currentElement, newElement);

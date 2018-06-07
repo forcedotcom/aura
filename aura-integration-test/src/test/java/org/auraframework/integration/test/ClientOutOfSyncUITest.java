@@ -375,7 +375,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 String.format(
                         baseComponentTag,
                         "controller='java://org.auraframework.components.test.java.controller.JavaTestController'",
-                        "<button class='button' onclick='{!c.post}'>post</button><div id='click' onclick='{!c.clicked}'>click</div>"));
+                        "<br/><br/><br/><button class='button' onclick='{!c.post}'>post</button><div id='click' onclick='{!c.clicked}'>click</div>"));
         DefDescriptor<?> controllerDesc = definitionService
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
                         ControllerDef.class);
@@ -411,7 +411,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                         String.format(
                                 "controller='java://org.auraframework.components.test.java.controller.JavaTestController' provider='%s'",
                                 providerDesc.getQualifiedName()),
-                        "<button class='button' onclick='{!c.post}'>post</button><aura:attribute name='given' type='string' default=''/><div id='result'>{!v.given}</div>"));
+                        "<br/><br/><br/><button class='button' onclick='{!c.post}'>post</button><aura:attribute name='given' type='string' default=''/><div id='result'>{!v.given}</div>"));
         DefDescriptor<?> controllerDesc = definitionService
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
                         ControllerDef.class);
@@ -779,7 +779,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                         baseComponentTag,
                         "controller='java://org.auraframework.components.test.java.controller.JavaTestController'",
                         "<aura:attribute name='output' type='String'/>" +
-                        "<button class='button' onclick='{!c.post}'>post</button>" +
+                        "<br/><br/><br/><button class='button' onclick='{!c.post}'>post</button>" +
                         "<div id='out'>{!v.output}</div>"));
         DefDescriptor<?> controllerDesc = definitionService
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,

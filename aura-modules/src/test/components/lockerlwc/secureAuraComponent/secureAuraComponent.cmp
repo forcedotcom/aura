@@ -1,0 +1,22 @@
+<aura:component implements="aura:requireLocker">
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
+    <lockerlwc:parentsecure aura:id="parentSecure" />
+
+    <lockerlwc:lib aura:id="lib" property="lib" />
+    <lockerlwc:parentunsecure aura:id="parentUnsecure" />
+    <div id="div-aura-cmp">This is a div in an Aura Component</div>
+
+    <aura:method name="testAuraLWCCustomEventOnHostElement"/>
+    <aura:method name="testAuraLWCApiMethodOnHostElement"/>
+    <aura:method name="testAuraLWCDomEventOnHostElement"/>
+    <aura:method name="testSLWC2AuraApiReturnValue"/>
+    <aura:method name="testTemplateQuerySelectorReturnsSecureElement"/>
+    <aura:method name="testLWCCustomEventOnSelf"/>
+    <aura:method name="testSecureLWC2SecureLWCCustomEvent"/>
+    <aura:method name="testSecureLWC2SecureLWCDomEvent"/>
+    <aura:method name="testSecureLWC2UnsecureLWCCustomEvent"/>
+    <aura:method name="testSecureLWC2UnsecureLWCDOMEvent"/>
+    <aura:method name="testSecureLWC2SecureLWCCustomEventCrossNamespace"/>
+    <aura:method name="testUnsecureLWC2SecureLWCCustomEventCrossNamespace"/>
+    <aura:method name="testUnsecureLWC2SecureLWCCustomEvent"/>
+</aura:component>

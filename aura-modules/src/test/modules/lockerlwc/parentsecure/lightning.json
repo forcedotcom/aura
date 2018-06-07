@@ -1,0 +1,4 @@
+{
+    "requireLocker": "true",
+    "description": "A Lockerized LWC component"
+}

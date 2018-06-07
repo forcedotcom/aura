@@ -1,5 +1,5 @@
 {
-  "requireLocker": "true",
-  "description": "Module for performing DOM event tests",
-  "expose": true
+    "requireLocker": "true",
+    "description": "A module for performing parent to child tests",
+    "expose": true
 }

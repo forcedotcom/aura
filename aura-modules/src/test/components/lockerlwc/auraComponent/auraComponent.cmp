@@ -1,0 +1,8 @@
+<aura:component>
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
+    <lockerlwc:parentsecure aura:id="parentSecure" />
+
+    <lockerlwc:lib aura:id="lib" property="lib" />
+    <lockerlwc:parentunsecure aura:id="parentUnsecure" />
+    <div id="div-aura-cmp">This is a div in an Aura Component</div>
+</aura:component>

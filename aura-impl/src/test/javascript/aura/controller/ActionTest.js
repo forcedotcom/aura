@@ -154,6 +154,38 @@ Test.Aura.Controller.ActionTest = function() {
     }
 
     [ Fixture ]
+    function DefStorable() {
+        [Fact]
+        function DefStorableTrueCreatesStorableAction() {
+            var def = {
+                "isStorable":function() { return true; }
+            };
+            var target = newAction(def);
+            Assert.True(target.isStorable());
+        }
+
+        [Fact]
+        function DefStorableFalseCreatesNonStorableAction() {
+            var def = {
+                "isStorable":function() { return false; }
+            };
+            var target = newAction(def);
+            Assert.False(target.isStorable());
+        }
+
+        [Fact]
+        function DefStorableFalseCanSetStorableOnAction() {
+            var def = {
+                "isStorable":function() { return false; },
+                "isServerAction":function() { return true; }
+            };
+            var target = newAction(def);
+            mockActionDependencies(function() { target.setStorable(); });
+            Assert.True(target.isStorable());
+        }
+    }
+
+    [ Fixture ]
     function GetId() {
 
         var targetContextNum = "expectedContextNum";
@@ -2181,6 +2213,9 @@ Test.Aura.Controller.ActionTest = function() {
     [Fixture]
     function PrepareToSend() {
         var def = {
+            isStorable: function() {
+                return false;
+            },
             isPublicCachingEnabled: function() {
                 return true;
             },
@@ -2249,6 +2284,9 @@ Test.Aura.Controller.ActionTest = function() {
 
         var getDef = function(isPublicCachingEnabled, publicCachingExpiration) {
             return {
+                isStorable: function() {
+                    return false;
+                },
                 isPublicCachingEnabled: function() {
                     return isPublicCachingEnabled;
                 },

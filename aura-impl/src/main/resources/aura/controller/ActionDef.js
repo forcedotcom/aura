@@ -26,6 +26,7 @@ function ActionDef(config) {
     this.name = config[Json.ApplicationKey.NAME];
     this.descriptor = config[Json.ApplicationKey.DESCRIPTOR];
     this.actionType = config[Json.ApplicationKey.ACTIONTYPE];
+    this.storable = config[Json.ApplicationKey.STORABLE];
     this.meth = null;
     this.paramDefs = {};
     this.background = false;
@@ -135,6 +136,15 @@ ActionDef.prototype.isBackground = function() {
  */
 ActionDef.prototype.isCaboose = function() {
     return this.caboose === true;
+};
+
+/**
+ * Returns true if the action is defined as 'storable' (i.e. @AuraEnabled(cacheable=true) on the java class)
+ * @protected
+ * @returns {!boolean}
+ */
+ActionDef.prototype.isStorable = function() {
+    return this.storable === true;
 };
 
 /**

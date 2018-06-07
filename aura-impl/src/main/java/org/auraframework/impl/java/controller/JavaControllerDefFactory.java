@@ -148,6 +148,11 @@ public class JavaControllerDefFactory implements DefinitionFactory<JavaSourceImp
         actionBuilder.setBackground(method.isAnnotationPresent(BackgroundAction.class));
         actionBuilder.setCaboose(method.isAnnotationPresent(CabooseAction.class));
 
+        AuraEnabled auraEnabledAnnotation = method.getAnnotation(AuraEnabled.class);
+        if (auraEnabledAnnotation != null) {
+            actionBuilder.setCacheable(auraEnabledAnnotation.cacheable());
+        }
+
         ActionGroup actionGrouAnnotation = method.getAnnotation(ActionGroup.class);
         String actionGroup = (actionGrouAnnotation != null && actionGrouAnnotation.value() != null && !(actionGrouAnnotation.value().isEmpty())) ? actionGrouAnnotation.value() : null;
         actionBuilder.setActionGroup(actionGroup);
@@ -179,7 +184,8 @@ public class JavaControllerDefFactory implements DefinitionFactory<JavaSourceImp
      * @param controllerDesc a descriptor for the class.
      */
     public Map<String, JavaActionDef> createActions(Class<?> controllerClass,
-                                                    DefDescriptor<ControllerDef> controllerDesc) throws QuickFixException {
+                                                    DefDescriptor<ControllerDef> controllerDesc)
+            throws QuickFixException {
         Map<String, JavaActionDef> actions = Maps.newTreeMap();
         for (Method method : controllerClass.getMethods()) {
             if (method.isAnnotationPresent(AuraEnabled.class)) {

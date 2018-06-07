@@ -85,6 +85,7 @@ public interface Json {
         ATTRIBUTEDEFS("attributeDefs","ad"),
         BACKGROUND("background","b"),
         CABOOSE("caboose","ca"),
+        STORABLE("storable","st"),
         CDN_HOST("cdnHost", "ch"),
         CLASSNAME("className","cl"),
         CODE("code","co"),

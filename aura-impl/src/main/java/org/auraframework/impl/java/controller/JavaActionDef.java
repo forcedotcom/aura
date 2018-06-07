@@ -41,6 +41,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
     private final Method method;
     private final boolean background;
     private final boolean caboose;
+    private final boolean cacheable;
     private String actionGroup;
     private final boolean publicCachingEnabled;
     private final int publicCachingExpiration;
@@ -54,6 +55,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         this.method = builder.method;
         this.background = builder.background;
         this.caboose = builder.caboose;
+        this.cacheable = builder.cacheable;
         this.actionGroup = builder.actionGroup;
         this.publicCachingEnabled = builder.publicCachingEnabled;
         this.publicCachingExpiration = builder.publicCachingExpiration;
@@ -100,6 +102,11 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         return caboose;
     }
     
+    @Override
+    public boolean isCacheable() {
+        return cacheable;
+    }
+    
     public String getActionGroup() {
         return this.actionGroup;
     }
@@ -119,8 +126,15 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         json.writeMapEntry(Json.ApplicationKey.DESCRIPTOR, getDescriptor());
         json.writeMapEntry(Json.ApplicationKey.ACTIONTYPE, getActionType());
         json.writeMapEntry(Json.ApplicationKey.RETURNTYPE, getReturnType());
-        json.writeMapEntry(Json.ApplicationKey.BACKGROUND, isBackground());
-        json.writeMapEntry(Json.ApplicationKey.CABOOSE, isCaboose());
+        if (isBackground()) {
+            json.writeMapEntry(Json.ApplicationKey.BACKGROUND, isBackground());
+        }
+        if (isCaboose()) {
+            json.writeMapEntry(Json.ApplicationKey.CABOOSE, isCaboose());
+        }
+        if (isCacheable()) {
+            json.writeMapEntry(Json.ApplicationKey.STORABLE, isCacheable());
+        }
         String ag = getActionGroup();
         if (ag != null) {
             json.writeMapEntry(Json.ApplicationKey.ACTIONGROUP, ag);
@@ -153,6 +167,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         private List<String> loggableParams;
         private Class<?>[] javaParams;
         private Method method;
+        private boolean cacheable = false;
         private boolean background = false;
         private boolean caboose = false;
         private String actionGroup;
@@ -206,6 +221,10 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
 
         public void setBackground(boolean background) {
             this.background = background;
+        }
+
+        public void setCacheable(boolean cacheable) {
+            this.cacheable = cacheable;
         }
 
         public void setCaboose(boolean caboose) {

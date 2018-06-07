@@ -6,8 +6,6 @@
       "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$errorInForeground",
       "at":"SERVER",
       "rt":"java://org.auraframework.impl.java.controller.ParallelActionTestController$Record",
-      "b":false,
-      "ca":false,
       "pa":[
 
       ]
@@ -18,7 +16,6 @@
       "at":"SERVER",
       "rt":"java://void",
       "b":true,
-      "ca":false,
       "pa":[
 
       ]
@@ -29,7 +26,6 @@
       "at":"SERVER",
       "rt":"java://org.auraframework.impl.java.controller.ParallelActionTestController$Record",
       "b":true,
-      "ca":false,
       "pa":[
         {
           "name":"i",
@@ -42,8 +38,6 @@
       "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground",
       "at":"SERVER",
       "rt":"java://void",
-      "b":false,
-      "ca":false,
       "pa":[
 
       ]
@@ -53,8 +47,6 @@
       "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForegroundWithReturn",
       "at":"SERVER",
       "rt":"java://org.auraframework.impl.java.controller.ParallelActionTestController$Record",
-      "b":false,
-      "ca":false,
       "pa":[
         {
           "name":"i",
@@ -67,8 +59,6 @@
       "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForegroundWithStringReturn",
       "at":"SERVER",
       "rt":"java://java.lang.String",
-      "b":false,
-      "ca":false,
       "pa":[
         {
           "name":"s",
@@ -81,8 +71,6 @@
       "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$throwsClientOutOfSyncException",
       "at":"SERVER",
       "rt":"java://void",
-      "b":false,
-      "ca":false,
       "pa":[
 
       ]
@@ -92,8 +80,6 @@
       "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$throwsException",
       "at":"SERVER",
       "rt":"java://void",
-      "b":false,
-      "ca":false,
       "pa":[
 
       ]

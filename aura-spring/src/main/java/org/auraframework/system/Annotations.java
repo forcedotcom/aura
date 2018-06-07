@@ -53,6 +53,7 @@ public interface Annotations {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     @interface AuraEnabled {
+        boolean cacheable() default false;
     }
 
     @Retention(RetentionPolicy.RUNTIME)

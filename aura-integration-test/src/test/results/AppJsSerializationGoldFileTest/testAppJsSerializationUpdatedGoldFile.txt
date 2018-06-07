@@ -14393,8 +14393,6 @@ return {
         "descriptor":"java://org.auraframework.docs.DocsController/ACTION$getDemo",
         "at":"SERVER",
         "rt":"java://org.auraframework.instance.Component",
-        "b":false,
-        "ca":false,
         "ag":"docs",
         "pa":[
           {
@@ -14408,8 +14406,6 @@ return {
         "descriptor":"java://org.auraframework.docs.DocsController/ACTION$getReference",
         "at":"SERVER",
         "rt":"java://org.auraframework.instance.Component",
-        "b":false,
-        "ca":false,
         "ag":"docs",
         "pa":[
           {
@@ -14431,8 +14427,6 @@ return {
         "descriptor":"java://org.auraframework.docs.DocsController/ACTION$getTopic",
         "at":"SERVER",
         "rt":"java://org.auraframework.instance.Component",
-        "b":false,
-        "ca":false,
         "ag":"docs",
         "pa":[
           {
@@ -15273,8 +15267,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://ComponentController/ACTION$getApplication",
         "at":"SERVER",
         "rt":"java://org.auraframework.instance.Application",
-        "b":false,
-        "ca":false,
         "ag":"aura",
         "pa":[
           {
@@ -15296,8 +15288,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://ComponentController/ACTION$getApplicationDef",
         "at":"SERVER",
         "rt":"java://org.auraframework.def.ApplicationDef",
-        "b":false,
-        "ca":false,
         "ag":"aura",
         "pa":[
           {
@@ -15311,8 +15301,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://ComponentController/ACTION$getComponent",
         "at":"SERVER",
         "rt":"java://org.auraframework.instance.Instance",
-        "b":false,
-        "ca":false,
         "ag":"aura",
         "pa":[
           {
@@ -15334,8 +15322,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://ComponentController/ACTION$getComponentDef",
         "at":"SERVER",
         "rt":"java://org.auraframework.def.ComponentDef",
-        "b":false,
-        "ca":false,
         "ag":"aura",
         "pa":[
           {
@@ -15349,8 +15335,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://ComponentController/ACTION$getComponents",
         "at":"SERVER",
         "rt":"java://java.util.List",
-        "b":false,
-        "ca":false,
         "ag":"aura",
         "pa":[
           {
@@ -15364,8 +15348,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://ComponentController/ACTION$getDefinitions",
         "at":"SERVER",
         "rt":"java://java.util.List",
-        "b":false,
-        "ca":false,
         "ag":"aura",
         "pa":[
           {
@@ -15379,8 +15361,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://ComponentController/ACTION$getEventDef",
         "at":"SERVER",
         "rt":"java://org.auraframework.def.EventDef",
-        "b":false,
-        "ca":false,
         "ag":"aura",
         "pa":[
           {
@@ -15394,8 +15374,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://ComponentController/ACTION$loadLabels",
         "at":"SERVER",
         "rt":"java://java.lang.Boolean",
-        "b":false,
-        "ca":false,
         "ag":"aura",
         "pa":[
 
@@ -15406,7 +15384,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://ComponentController/ACTION$reportDeprecationUsages",
         "at":"SERVER",
         "rt":"java://void",
-        "b":false,
         "ca":true,
         "ag":"aura",
         "pa":[
@@ -15421,8 +15398,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://ComponentController/ACTION$reportFailedAction",
         "at":"SERVER",
         "rt":"java://void",
-        "b":false,
-        "ca":false,
         "ag":"aura",
         "pa":[
           {
@@ -15465,8 +15440,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://LabelController/ACTION$getLabel",
         "at":"SERVER",
         "rt":"java://java.lang.String",
-        "b":false,
-        "ca":false,
         "ag":"aura",
         "pa":[
           {
@@ -15489,8 +15462,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://StyleController/ACTION$applyTokens",
         "at":"SERVER",
         "rt":"java://java.lang.String",
-        "b":false,
-        "ca":false,
         "ag":"aura",
         "pa":[
           {
@@ -15513,8 +15484,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://TestController/ACTION$baseBallDivisions",
         "at":"SERVER",
         "rt":"java://org.auraframework.instance.Component",
-        "b":false,
-        "ca":false,
         "pa":[
 
         ]
@@ -15524,8 +15493,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://TestController/ACTION$basketBallDivisions",
         "at":"SERVER",
         "rt":"java://org.auraframework.instance.Component",
-        "b":false,
-        "ca":false,
         "pa":[
 
         ]
@@ -15535,8 +15502,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://TestController/ACTION$currentCallingDescriptor",
         "at":"SERVER",
         "rt":"java://java.lang.String",
-        "b":false,
-        "ca":false,
         "pa":[
 
         ]
@@ -15546,8 +15511,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://TestController/ACTION$doSomething",
         "at":"SERVER",
         "rt":"java://void",
-        "b":false,
-        "ca":false,
         "pa":[
 
         ]
@@ -15557,8 +15520,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://TestController/ACTION$getAppCacheUrls",
         "at":"SERVER",
         "rt":"java://java.util.List",
-        "b":false,
-        "ca":false,
         "pa":[
 
         ]
@@ -15568,8 +15529,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://TestController/ACTION$getBootstrapPublicCacheExpiration",
         "at":"SERVER",
         "rt":"java://int",
-        "b":false,
-        "ca":false,
         "pa":[
 
         ]
@@ -15579,8 +15538,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://TestController/ACTION$getNamedComponent",
         "at":"SERVER",
         "rt":"java://org.auraframework.instance.Component",
-        "b":false,
-        "ca":false,
         "pa":[
           {
             "name":"componentName",
@@ -15597,8 +15554,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://TestController/ACTION$getString",
         "at":"SERVER",
         "rt":"java://java.lang.String",
-        "b":false,
-        "ca":false,
         "pa":[
 
         ]
@@ -15608,8 +15563,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://TestController/ACTION$getStringWithNonUnicode",
         "at":"SERVER",
         "rt":"java://java.lang.String",
-        "b":false,
-        "ca":false,
         "pa":[
 
         ]
@@ -15619,8 +15572,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://TestController/ACTION$handleCustomException",
         "at":"SERVER",
         "rt":"java://void",
-        "b":false,
-        "ca":false,
         "pa":[
 
         ]
@@ -15630,8 +15581,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://TestController/ACTION$handleCustomExceptionWithData",
         "at":"SERVER",
         "rt":"java://void",
-        "b":false,
-        "ca":false,
         "pa":[
 
         ]
@@ -15641,8 +15590,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://TestController/ACTION$handleException",
         "at":"SERVER",
         "rt":"java://void",
-        "b":false,
-        "ca":false,
         "pa":[
 
         ]
@@ -15652,8 +15599,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://TestController/ACTION$handleExceptionWithThrownArgument",
         "at":"SERVER",
         "rt":"java://void",
-        "b":false,
-        "ca":false,
         "pa":[
 
         ]
@@ -15663,8 +15608,6 @@ $A.componentService.initControllerDefs([
         "descriptor":"aura://TestController/ACTION$throwException",
         "at":"SERVER",
         "rt":"java://java.lang.String",
-        "b":false,
-        "ca":false,
         "pa":[
 
         ]

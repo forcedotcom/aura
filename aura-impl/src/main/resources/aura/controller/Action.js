@@ -53,7 +53,7 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.actionId = Action.prototype.nextActionId++;
     this.id = this.actionId > 0 ? this.actionId + ";" + suffix : suffix;
     this.originalResponse = undefined;
-    this.storable = false;
+    this.storable = (def && def.isStorable());
     this.caboose = caboose;
     this.allAboardCallback = undefined;
     this.abortable = false;

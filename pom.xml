@@ -58,7 +58,7 @@
         <node.version>v4.2.1</node.version>
         <npm.version>2.14.7</npm.version>
         <eslint.extra.arg>--no-color</eslint.extra.arg>
-        <lwc.version>0.22.5</lwc.version>
+        <lwc.version>0.22.6</lwc.version>
     </properties>
     <repositories>
         <repository>

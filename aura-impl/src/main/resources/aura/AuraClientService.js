@@ -161,8 +161,8 @@ function AuraClientService (util) {
     this.lastSendTime = Date.now();
 
     this.moduleServices = {};
-    this.moduleSchemas = { "label" : this.labelSchemaResolver };
-    this.moduleSchemasCache = {};
+    this.moduleScopedImports = { "label" : this.labelScopedImportResolver };
+    this.moduleScopedImportsCache = {};
 
     // TODO: @dval We should send this from the server, but for LightningOut apps is a non-trivial change,
     // so for the time being I hard-coded the resource path here to ensure we can lazy fetch them.
@@ -2159,48 +2159,55 @@ AuraClientService.prototype.initializeInjectedServices = function(services) {
 };
 
 /**
- * Adds a schema resolver so modules can statically import from it
- * Example: ` import url from "resource://myCustomResource" `
+ * Adds a resolver for a scoped module import.
+ * 
+ * Example: ` import foo from "@salesforce/label/MyLabels.Foo" `
  *
+ * @param {String} scope The scope of import. For example, the scope of "@salesforce/label/MyLabels.Foo" would be "salesforce"
+ * @param {Function} resolver The function to be invoked when resolving the module import
  * This method needs to be exported (not platform)
  * so it can be invoked before framework initialization
  * @export
  */
-
-AuraClientService.prototype.addModuleSchemaResolver = function (schema, resolver) {
-    $A.assert(typeof resolver === 'function', 'Schema resolver must be a function');
-    $A.assert(this.moduleSchemas[schema] === undefined, 'Unable to add a resolver for schema ' + schema + '. A resolver its already registered');
-    this.moduleSchemas[schema] = resolver;
+AuraClientService.prototype.addScopedModuleResolver = function (scope, resolver) {
+    $A.assert(typeof resolver === 'function', 'Scoped module resolver must be a function');
+    $A.assert(this.moduleScopedImports[scope] === undefined, 'Unable to add a resolver for scope ' + scope + '. A resolver is already registered.');
+    this.moduleScopedImports[scope] = resolver;
 };
 
 /**
- * Resolve a given schema `schema://resourceuri` from a module static import
- * Schemas can be defined:
- *   - By default in framework (like label://)
- *   - $A.clientService.addModuleSchemaResolver
- *   - Service injection at the app level.
- * This method just guards and invokes a resolver for a given schema if registered.
+ * Resolves the import of a scoped module by invoking a resolver for the given
+ * scope if a resolver is registered.
+ * 
+ * @param {String} fullImport The entire path of the module being imported
+ * @param {String} scope The scope of the module import, e.g. "label" or "salesforce"
+ * @memberOf AuraClientService
+ * @private
 */
-AuraClientService.prototype.resolveSchemaDependency = function (schema, resourceUri, fullImport) {
-    if (!this.moduleSchemasCache[fullImport]) {
-        var resolver = this.moduleSchemas[schema];
-        $A.assert(resolver, "Unknown schema for '" + schema + '://' + resourceUri + "'. Either the schema is not supported or a resolver hasn't been provided.");
-        this.moduleSchemasCache[fullImport] = resolver(resourceUri);
+AuraClientService.prototype.resolveScopedModuleImport = function (scope, fullImport) {
+    if (!this.moduleScopedImportsCache[fullImport]) {
+        var resolver = this.moduleScopedImports[scope];
+        $A.assert(resolver, "No resolver found for scoped module import '" + fullImport + "'.");
+        this.moduleScopedImportsCache[fullImport] = resolver(fullImport);
     }
 
-    return this.moduleSchemasCache[fullImport];
+    return this.moduleScopedImportsCache[fullImport];
 };
 
 
 /**
- * Default resolver for label:// schema for module static imports
+ * Default resolver for the @label scoped module import.
+ * 
+ * @param {String} fullImport The entire path of the module being imported
  * @memberOf AuraClientService
  * @private
  */
-AuraClientService.prototype.labelSchemaResolver = function(resourceUri) {
-    var parts = resourceUri.split('.');
-    $A.assert(parts.length === 2, 'Malformed label URI. Static imports for label schema require two parts: section and key');
-    return $A.get("$Label." + resourceUri);
+AuraClientService.prototype.labelScopedImportResolver = function(fullImport) {
+    // strip off the "@label/" section of the import
+    var key = fullImport.substring(7);
+    var parts = key.split('.');
+    $A.assert(parts.length === 2, 'Malformed @label scoped module import. Static imports for @label modules require two parts: section and key');
+    return $A.get("$Label." + key);
 };
 
 /**

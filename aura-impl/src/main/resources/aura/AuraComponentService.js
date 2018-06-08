@@ -791,11 +791,11 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
 
         var desc;
         var depEntry;
-        var hasSchema = name[0] === '@';
+        var isScopedImport = name[0] === '@';
 
-        if (hasSchema) {
-            var schemaParts = name.substr(1).split('/');
-            return $A.clientService.resolveSchemaDependency(schemaParts[0], schemaParts[1], name);
+        if (isScopedImport) {
+            var moduleScope = name.substr(1).split('/')[0];
+            return $A.clientService.resolveScopedModuleImport(moduleScope, name);
         } else if (name.indexOf(":") !== -1) {
             // If it only contains a colon, we assume is an aura library (legacy)
             desc = "markup://" + name;

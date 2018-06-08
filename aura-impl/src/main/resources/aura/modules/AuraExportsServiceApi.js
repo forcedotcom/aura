@@ -32,8 +32,8 @@ Aura.ServiceApi = {
         $A.assert(targetDef.access === replacementDef.access, 'Access checks do not match');
         $A.componentService.moduleDefRegistry[targetDef.moduleName] = replacementDef;
     },
-    "registerSchema": function(schema, resolver) {
-        $A.clientService.addModuleSchemaResolver(schema, resolver);
+    "registerScopedModuleResolver": function(scope, resolver) {
+        $A.clientService.addScopedModuleResolver(scope, resolver);
     },
     "reifyActions": function(actions) {
         return $A.clientService.reifyActions(actions);

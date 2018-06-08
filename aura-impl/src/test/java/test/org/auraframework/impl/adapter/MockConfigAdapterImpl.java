@@ -174,6 +174,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     private Supplier<String> jwtTokenFunction = null;
     private Boolean isLockerServiceEnabledGlobally;
     private Boolean isActionPublicCachingEnabled = null;
+    private Boolean isBootstrapInliningEnabled = null;
 
     public MockConfigAdapterImpl() {
         super();
@@ -190,6 +191,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         jwtTokenFunction = null;
         isLockerServiceEnabledGlobally = null;
         isActionPublicCachingEnabled = null;
+        isBootstrapInliningEnabled = null;
     }
 
     @Override
@@ -414,5 +416,15 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         }
 
         return super.isActionPublicCachingEnabled();
+    }
+
+    @Override
+    public void setIsBootstrapInliningEnabled(boolean isBootstrapInliningEnabled) {
+        this.isBootstrapInliningEnabled = isBootstrapInliningEnabled;
+    }
+
+    @Override
+    public boolean isBootstrapInliningEnabled() {
+        return (isBootstrapInliningEnabled == null) ? super.isBootstrapInliningEnabled() : isBootstrapInliningEnabled;
     }
 }

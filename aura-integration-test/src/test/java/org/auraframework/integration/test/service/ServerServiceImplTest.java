@@ -843,13 +843,14 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testWriteTemplateHasNoCsrfTokenIfAppcacheEnabled() throws Exception {
+    public void testWriteTemplateHasNoCsrfTokenIfAppcacheEnabledAndBootstrapNotInlined() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, "useAppCache='true' render='client'", ""));
         AuraContext context = contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         context.setApplicationDescriptor(appDesc);
         ApplicationDef appDef = definitionService.getDefinition(appDesc);
 
+        getMockConfigAdapter().setIsBootstrapInliningEnabled(false);
         Component template = serverService.writeTemplate(context , appDef, null, null);
 
         String init = (String)template.getAttributes().getValue("auraInit");
@@ -857,6 +858,24 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         Map<String,Object> initMap = (Map<String, Object>) new JsonReader().read(init);
 
         assertEquals("Token should not be sent if appcache is enabled", false, initMap.containsKey("token"));
+    }
+
+    @Test
+    public void testWriteTemplateHasCsrfTokenIfBootstrapIsInlined() throws Exception {
+        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseApplicationTag, "useAppCache='true' render='client'", ""));
+        AuraContext context = contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+        context.setApplicationDescriptor(appDesc);
+        ApplicationDef appDef = definitionService.getDefinition(appDesc);
+
+        getMockConfigAdapter().setIsBootstrapInliningEnabled(true);
+        Component template = serverService.writeTemplate(context , appDef, null, null);
+
+        String init = (String)template.getAttributes().getValue("auraInit");
+        @SuppressWarnings("unchecked")
+        Map<String,Object> initMap = (Map<String, Object>) new JsonReader().read(init);
+
+        assertEquals("Token should be sent if bootstrap inlining is enabled", "aura", initMap.get("token"));
     }
 
     @Test

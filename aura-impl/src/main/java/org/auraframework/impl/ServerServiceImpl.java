@@ -702,7 +702,6 @@ public class ServerServiceImpl implements ServerService {
         JsonEncoder json = JsonEncoder.createJsonStream(writer, serializationContext);
         writer.append("window.Aura.appBootstrap = ");
         json.writeMapBegin();
-        json.writeMapEntry("inlined", true);
         json.writeMapKey("data");
         json.writeMapBegin();
 
@@ -874,10 +873,14 @@ public class ServerServiceImpl implements ServerService {
             auraInit.put("host", context.getContextPath());
             auraInit.put("pathPrefix", context.getPathPrefix());
 
+            boolean bootstrapInlined = configAdapter.isBootstrapInliningEnabled();
             // appcached apps must receive the token via bootstrap to avoid caching of the token
-            if (!manifestUtil.isManifestEnabled()) {
+            // When bootstrap is inlined, Its content would be cached in appCache either as part of the app template or inline.js.
+            // In the case of a stale cached token, aura actions would recover through action retry logic.
+            if (!manifestUtil.isManifestEnabled() || bootstrapInlined) {
                 auraInit.put("token", configAdapter.getCSRFToken());
             }
+            auraInit.put("bootstrapInlined", bootstrapInlined);
 
             auraInit.put("MaxParallelXHRCount", configAdapter.getMaxParallelXHRCount());
             auraInit.put("XHRExclusivity", configAdapter.getXHRExclusivity());

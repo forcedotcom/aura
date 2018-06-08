@@ -215,6 +215,7 @@ function AuraClientService (util) {
     this.collector = undefined;
     // if true will use one XHR to send each action (to be used with HTTP/2)
     this.xhrExclusivity = false;
+    this.bootstrapInlined = false;
 
     this.actionsQueued = [];
     this.actionsDeferred = [];
@@ -356,6 +357,19 @@ AuraClientService.prototype.setXHRExclusivity = function(xhrExclusivity) {
     }
     this.xhrExclusivity = xhrExclusivity;
 };
+
+/**
+ * When bootstrap is inlined, there will not be a separate request to load bootstrap.js instead its content
+ *  - will be inlined with inline.js content, which is either part of the app template(if the client supports CSP2) or as an external javascript resource.
+ *  - will not be cached in persistent storage such as indexDb.
+ *  - will be persisted in app cache(if the app have a manifest) for offline use and gets invalidated when AuraContext changes.
+ *
+ * @private
+ */
+AuraClientService.prototype.setBootstrapInlined = function(bootstrapInlined) {
+    this.bootstrapInlined = !!bootstrapInlined;
+};
+
 
 /**
  * Mark all currently queued (but not sent) actions as 'deferred'.
@@ -1885,8 +1899,8 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
             $A.log("AuraClientService.runAfterBootstrapReady(): Broadcasting token received during bootstrap");
             this.broadcastToken(this._token);
         }
-        this.checkBootstrapUIDs(Aura["appBootstrapCache"]);
-        if (!boot["inlined"]) {
+        if (!this.bootstrapInlined) {
+            this.checkBootstrapUIDs(Aura["appBootstrapCache"]);
             this.saveBootstrapToStorage(boot);
         }
     }

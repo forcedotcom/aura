@@ -420,6 +420,7 @@ AuraInstance.prototype.initAsync = function(config) {
     this.clientService.setNamespacePrivileges(config["ns"]);
     this.clientService.setQueueSize(config["MaxParallelXHRCount"]);
     this.clientService.setXHRExclusivity(config["XHRExclusivity"]);
+    this.clientService.setBootstrapInlined(config["bootstrapInlined"]);
     this.initializers = config["initializers"];
 
     // Context is created async because of the GVPs go though async storage checks
@@ -469,6 +470,13 @@ AuraInstance.prototype.initAsync = function(config) {
             });
         }
 
+        // When bootstrap is inlined, bootstrap.js won't be stored in action storage.
+        function bootstrapLoadPromise() {
+            return config["bootstrapInlined"]
+                ? Promise["resolve"]()
+                : new $A.clientService.loadBootstrapFromStorage();
+        }
+
         // Actions depend on defs depend on GVP (labels). so load them in dependency order and skip
         // loading depending items if anything fails to load.
 
@@ -480,10 +488,10 @@ AuraInstance.prototype.initAsync = function(config) {
             ensureCssLoaded().then(initializeApp).then(undefined, reportError);
         } else {
             Promise["all"]([
-                $A.clientService.loadBootstrapFromStorage(),
+                bootstrapLoadPromise(),
                 $A.componentService.restoreDefsFromStorage(context),
                 $A.clientService.populateActionsFilter(),
-                ensureCssLoaded
+                ensureCssLoaded()
             ])
                 .then(initializeApp, function (err) {
                     $A.log("Aura.initAsync: failed to load defs, get bootstrap or actions from storage", err);

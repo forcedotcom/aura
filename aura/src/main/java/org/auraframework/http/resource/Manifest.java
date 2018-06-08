@@ -17,6 +17,7 @@
 package org.auraframework.http.resource;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
 
@@ -40,6 +41,9 @@ import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Maps;
+import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.util.json.JsonSerializationContext;
+import org.auraframework.util.text.Hash;
 
 @ServiceComponent
 public class Manifest extends AuraResourceImpl {
@@ -149,6 +153,19 @@ public class Manifest extends AuraResourceImpl {
             attribs.put(UID, appUid);
 
             StringWriter sw = new StringWriter();
+
+            // When bootstrap is inlined with the html, it will be included in app cache and
+            // needs an app cache buster when the context changes.
+            if(configAdapter.isBootstrapInliningEnabled()) {
+                JsonSerializationContext serializationContext = context.getJsonSerializationContext();
+                StringWriter writer = new StringWriter();
+                JsonEncoder json = JsonEncoder.createJsonStream(writer, serializationContext);
+                json.writeValue(context);
+                writer.flush();
+                writer.close();
+                StringReader reader = new StringReader(writer.toString());
+                sw.write(String.format("# CONTEXT TOKEN: %s\n", new Hash(reader).toString()));
+            }
 
             String resetCssUrl = configAdapter.getResetCssURL();
             if (resetCssUrl != null) {

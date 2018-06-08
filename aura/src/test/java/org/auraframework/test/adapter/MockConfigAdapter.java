@@ -49,4 +49,6 @@ public interface MockConfigAdapter extends ConfigAdapter, MockBean {
     void setLockerServiceEnabled(boolean isLockerServiceEnabled);
 
     void setActionPublicCachingEnabled(boolean enabled);
+
+    void setIsBootstrapInliningEnabled(boolean isBootstrapInliningEnabled);
 }

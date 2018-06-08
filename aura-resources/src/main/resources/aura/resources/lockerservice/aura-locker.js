@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-06-05
- * Version: 0.4.19
+ * Generated: 2018-06-08
+ * Version: 0.4.20
  */
 
 (function (exports) {
@@ -52,6 +52,7 @@ const {
   getOwnPropertyDescriptor,
   getOwnPropertyDescriptors,
   getOwnPropertyNames,
+  getOwnPropertySymbols,
   isFrozen,
   keys,
   seal
@@ -4190,6 +4191,15 @@ function getSandbox(key, realmRec) {
   return sandbox;
 }
 
+function installPolyfills(realmRec) {
+  const { unsafeGlobal: g } = realmRec;
+
+  // https://github.com/tc39/proposal-observable/blob/master/src/Observable.js
+  if (!g.Symbol['observable']) {
+    Object.defineProperty(g.Symbol, 'observable', { value: g.Symbol('observable') });
+  }
+}
+
 /*
  * Copyright (C) 2017 salesforce.com, inc.
  *
@@ -4416,11 +4426,15 @@ function tamperProof(obj, prop, desc) {
 }
 
 function tamperProofAll(obj) {
-  const descs = getOwnPropertyDescriptors(obj);
-  for (const prop in descs) {
-    const desc = descs[prop];
-    tamperProof(obj, prop, desc);
+  if (!obj) {
+    return;
   }
+  const descs = getOwnPropertyDescriptors(obj);
+  if (!descs) {
+    return;
+  }
+  getOwnPropertyNames(obj).forEach(prop => tamperProof(obj, prop, descs[prop]));
+  getOwnPropertySymbols(obj).forEach(prop => tamperProof(obj, prop, descs[prop]));
 }
 
 function tamperProofProp(obj, prop) {
@@ -4435,19 +4449,23 @@ function repairDataProperties(realmRec) {
   const { intrinsics: i } = realmRec;
 
   [
-    i.ArrayIteratorPrototype,
-    i.DataViewPrototype,
-
     i.ObjectPrototype,
-    i.FunctionPrototype,
-
     i.ArrayPrototype,
     i.BooleanPrototype,
     i.DatePrototype,
     i.NumberPrototype,
     i.StringPrototype,
 
+    i.FunctionPrototype,
+    i.GeneratorPrototype,
+    i.AsyncFunctionPrototype,
+    i.AsyncGeneratorPrototype,
+
+    i.IteratorPrototype,
+    i.ArrayIteratorPrototype,
+
     i.PromisePrototype,
+    i.DataViewPrototype,
 
     i.TypedArray,
     i.Int8ArrayPrototype,
@@ -4512,6 +4530,8 @@ function init(options) {
 
   // None of these values can change after initialization.
   freeze(realmRec);
+
+  installPolyfills(realmRec);
 
   repairAccessors(realmRec);
   if (realmRec.shouldFreeze) {

@@ -1,4 +1,5 @@
 ({
+/*
     testNotStorable: {
         test : [
             function(cmp, helper) {
@@ -16,4 +17,5 @@
             }
         ]
     }
+*/
 })

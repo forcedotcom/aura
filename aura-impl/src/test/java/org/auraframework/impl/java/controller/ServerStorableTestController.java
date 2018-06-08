@@ -19,7 +19,7 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.system.Annotations.AuraEnabled;
 
-@ServiceComponent
+//@ServiceComponent
 public class ServerStorableTestController implements Controller {
 
     @AuraEnabled

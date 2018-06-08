@@ -1,2 +1,3 @@
-<aura:component controller="java://org.auraframework.impl.java.controller.ServerStorableTestController">
+<!-- <aura:component controller="java://org.auraframework.impl.java.controller.ServerStorableTestController"> -->
+<aura:component>
 </aura:component>

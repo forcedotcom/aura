@@ -129,5 +129,13 @@
         }
 
         this.sanitize(component, value);
+    },
+
+    addNoReferrerToLinks: function (component) {
+        var el = component.getElement();
+        var links = el.querySelectorAll("a");
+        for (var i=0; i<links.length; i++) {
+            links[i].setAttribute("rel", "noreferrer noopener");
+        }
     }
 })// eslint-disable-line semi

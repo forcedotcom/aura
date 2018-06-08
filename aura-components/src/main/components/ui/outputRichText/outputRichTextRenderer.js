@@ -29,5 +29,11 @@
             concreteHelper.escapeAndLinkifyText(component, concreteHelper);
         }
         return this.superRerender();
+    },
+
+    afterRender: function (cmp) {
+        var concreteHelper = cmp.getConcreteComponent().getDef().getHelper();
+        concreteHelper.addNoReferrerToLinks(cmp);
+        return this.superAfterRender();
     }
  })// eslint-disable-line semi

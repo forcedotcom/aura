@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-06-08
- * Version: 0.4.20
+ * Version: 0.4.21
  */
 
 (function (exports) {
@@ -1780,6 +1780,28 @@ const metadata$3 = {
   textContent: DEFAULT
 };
 
+const assert$1 = {
+  block: fn => fn(),
+  isTrue: (condition, message) => {
+    if (!condition) {
+      throw new Error(`Assertion failed: ${message}`);
+    }
+  },
+  isFalse: (condition, message) => {
+    if (condition) {
+      throw new Error(`Assertion failed: ${message}`);
+    }
+  },
+  invariant: (condition, message) => {
+    if (!condition) {
+      throw new Error(`Invariant violation: ${message}`);
+    }
+  },
+  fail: message => {
+    throw new Error(message);
+  }
+};
+
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
@@ -1804,13 +1826,32 @@ const metadata$4 = {
 
 const CALLBACK_ERROR = `Failed to execute 'addEventListener' on 'EventTarget': The callback provided as parameter 2 is not an object.`;
 
+function getWrappedEvent(e, key) {
+  if (!e) {
+    return e;
+  }
+  // If e is a wrapped event
+  if (isProxy(e)) {
+    // Wrapped with the required key, then nothing to do further
+    if (getKey(e) === key) {
+      return e;
+    }
+    assert$1.fail(
+      `Received a wrapped event(key: ${getKey(e)}) from a different locker(key: ${key})`
+    );
+    // If the browser is calling your listener, then you have access to the event
+    e = SecureObject.getRaw(e);
+  }
+  return SecureDOMEvent(e, key);
+}
+
 function createSecureListener(st, listener, key) {
   // If the listener is a function, we need to ignore any
   // handleEvent property set on it.
   if (typeof listener === 'function') {
     return function(e) {
       verifyAccess(st, listener, true);
-      const se = e && SecureDOMEvent(e, key);
+      const se = getWrappedEvent(e, key);
       listener.call(st, se);
     };
   }
@@ -1821,7 +1862,7 @@ function createSecureListener(st, listener, key) {
     if (typeof handleEvent === 'function') {
       return function(e) {
         verifyAccess(st, listener, true);
-        const se = e && SecureDOMEvent(e, key);
+        const se = getWrappedEvent(e, key);
         handleEvent.call(listener, se);
       };
     }
@@ -1917,25 +1958,6 @@ function createEventTargetMethodsStateless(config, prototype) {
     }
   };
 }
-
-const assert$1 = {
-  block: fn => fn(),
-  isTrue: (condition, message) => {
-    if (!condition) {
-      throw new Error(`Assertion failed: ${message}`);
-    }
-  },
-  isFalse: (condition, message) => {
-    if (condition) {
-      throw new Error(`Assertion failed: ${message}`);
-    }
-  },
-  invariant: (condition, message) => {
-    if (!condition) {
-      throw new Error(`Invariant violation: ${message}`);
-    }
-  }
-};
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -3330,7 +3352,9 @@ function SecureElement(el, key) {
       },
 
       set: function(target, property, value) {
-        if (property in basePrototype) {
+        // Deyan: TODO W-4808252, is this fine? custom element
+        if (property in basePrototype || property in target) {
+          // if (property in basePrototype) {
           if (!propertyIsSupported(target, property)) {
             warn(`SecureElement does not allow access to ${property}`);
             // setters on proxy trap must return true or throw
@@ -3683,7 +3707,7 @@ function SecureElement(el, key) {
 
     // Custom Element with properties
     if (isCustomElement(el) && customElementHook) {
-      customElementHook(el, prototype, tagNameSpecificConfig, key);
+      customElementHook(el, prototype, tagNameSpecificConfig);
     }
 
     defineProperties(prototype, tagNameSpecificConfig);
@@ -8849,7 +8873,7 @@ function getUnwrappedValue(cmp, filteredValue) {
   if (filteredValue) {
     if (isArray(filteredValue)) {
       return SecureObject.deepUnfilterMethodArguments(cmp, [], filteredValue);
-    } else if (isObject(filteredValue)) {
+    } else if (isPlainObject(filteredValue)) {
       return SecureObject.deepUnfilterMethodArguments(cmp, {}, filteredValue);
     } else if (getKey(filteredValue)) {
       return unwrap$1(cmp, filteredValue);
@@ -9861,12 +9885,10 @@ function registerAuraTypes(types) {
  * @param {*} el DOM element
  * @param {*} prototype Represents the psuedo protototype that will be used to create wrapped element
  * @param {*} tagNameSpecificConfig Temporary holder of tag specific config
- * @param {*} key locker key
  */
-function customElementHook$1(el, prototype, tagNameSpecificConfig, key) {
+function customElementHook$1(el, prototype, tagNameSpecificConfig) {
   assert$1.invariant(isCustomElement(el), 'Cannot call custom element hook on a non custom element');
   const methodOptions = {
-    defaultKey: key,
     unfilterEverything: function(args) {
       const st = this;
       return SecureObject.deepUnfilterMethodArguments(st, [], args);

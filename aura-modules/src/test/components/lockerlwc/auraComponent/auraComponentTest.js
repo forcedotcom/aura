@@ -149,35 +149,24 @@
         test: function (cmp, event, helper) {
             var module = cmp.find('parentSecure').getElement();
             module.testTemplateQuerySelectorReturnsSecureElement();
-
-            // TODO add wait for to make sure test executed successfully
-            // currently there is an issue with passing function parameters to Secure LWC components
         }
     },
     testLWCCustomEventOnSelf: {
         test: function (cmp, event, helper) {
             var module = cmp.find('parentSecure').getElement();
-            module.testLWCCustomEventOnSelf();
-            // TODO add wait for to make sure test executed successfully
-            // currently there is an issue with passing function parameters to Secure LWC components
+            return module.testLWCCustomEventOnSelf();
         }
     },
-    // Automation for W-5058359
-    _testSecureLWC2SecureLWCCustomEvent: {
+    testSecureLWC2SecureLWCCustomEvent: {
         test: function (cmp) {
             var module = cmp.find('parentSecure').getElement();
-            module.testSecureLWC2SecureLWCCustomEvent();
-            // TODO add wait for to make sure test executed successfully
-            // currently there is an issue with passing function parameters to Secure LWC components
+            return module.testSecureLWC2SecureLWCCustomEvent();
         }
     },
-    // Automation for W-5058359
-    _testSecureLWC2SecureLWCDomEvent: {
+    testSecureLWC2SecureLWCDomEvent: {
         test: function (cmp) {
             var module = cmp.find('parentSecure').getElement();
-            module.testSecureLWC2SecureLWCDomEvent();
-            // TODO add wait for to make sure test executed successfully
-            // currently there is an issue with passing function parameters to Secure LWC components
+            return module.testSecureLWC2SecureLWCDomEvent();
         }
     },
     // User Story: W-5058590
@@ -207,32 +196,22 @@
             );
         }
     },
-    // BUG W-5058711
-    _testSecureLWC2SecureLWCCustomEventCrossNamespace: {
+    testSecureLWC2SecureLWCCustomEventCrossNamespace: {
         test: function (cmp) {
             var module = cmp.find('parentSecure').getElement();
-            module.testSecureLWC2SecureLWCCustomEventCrossNamespace();
-            // TODO add wait for to make sure test executed successfully
-            // currently there is an issue with passing function parameters to Secure LWC components      
-
+            return module.testSecureLWC2SecureLWCCustomEventCrossNamespace();
         }
     },
-    // BUG W-5058711
-    _testUnsecureLWC2SecureLWCCustomEventCrossNamespace: {
+    testUnsecureLWC2SecureLWCCustomEventCrossNamespace: {
         test: function (cmp) {
             var module = cmp.find('parentUnsecure').getElement();
-            module.testUnsecureLWC2SecureLWCCustomEventCrossNamespace();
-            // TODO add wait for to make sure test executed successfully
-            // currently there is an issue with passing function parameters to Secure LWC components      
+            return module.testUnsecureLWC2SecureLWCCustomEventCrossNamespace();
         }
     },
-    // W-5058711
-    _testUnsecureLWC2SecureLWCCustomEvent: {
+    testUnsecureLWC2SecureLWCCustomEvent: {
         test: function (cmp) {
             var module = cmp.find('parentUnsecure').getElement();
-            module.testUnsecureLWC2SecureLWCCustomEvent();
-            // TODO add wait for to make sure test executed successfully
-            // currently there is an issue with passing function parameters to Secure LWC components      
+            return module.testUnsecureLWC2SecureLWCCustomEvent();
         }
     }
 })

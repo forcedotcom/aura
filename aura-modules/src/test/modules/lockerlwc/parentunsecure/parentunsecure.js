@@ -39,7 +39,7 @@ export default class ParentUnsecure extends Element {
             }
         });
 
-        testUtils.waitForTimeout(
+        const promise = testUtils.waitForPromise(
             true,
             function () {
                 return triggered;
@@ -48,6 +48,7 @@ export default class ParentUnsecure extends Element {
         );
 
         child.dispatchEvent(ev);
+        return promise;
     }
 
     @api testUnsecureLWC2SecureLWCCustomEvent() {
@@ -65,7 +66,7 @@ export default class ParentUnsecure extends Element {
             }
         });
 
-        testUtils.waitForTimeout(
+        const promise = testUtils.waitForPromise(
             true,
             function () {
                 return triggered;
@@ -74,6 +75,7 @@ export default class ParentUnsecure extends Element {
         );
 
         child.dispatchEvent(ev);
+        return promise;
     }
 
     assertCustomEvent(ev) {

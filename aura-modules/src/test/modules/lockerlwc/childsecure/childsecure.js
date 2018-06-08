@@ -1,7 +1,19 @@
-import { Element } from 'engine';
+import { Element, api } from 'engine';
 import * as testUtils from 'securemoduletest-test-util';
 
 export default class ChildSecure extends Element {
+    @api arrayProp = [91, 92, 93];
+    @api objProp = {
+        foo: 'bar',
+        bar: {
+            baz: 'foo'
+        }
+    };
+    @api stringProp = "childSecure";
+    @api booleanProp = false;
+    @api integerProp = 99;
+    @api foo;
+
     assertCustomEvent(ev) {
         testUtils.assertEquals(
             'SecureDOMEvent: [object CustomEvent]{ key: {"namespace":"lockerlwc"} }',
@@ -14,59 +26,8 @@ export default class ChildSecure extends Element {
             `${window}`,
             'Expected SecureWindow object in event handler'
         );
+        assertDataObject(ev.detail.data);
 
-        testUtils.assertEqualsValue({
-            foo: 'bar',
-            bar: {
-                baz: 'foo'
-            }
-        },
-            ev.detail.data.object,
-            'Expected object was not received in event data'
-        );
-        testUtils.assertEqualsValue([0, 1, 2], ev.detail.data.array, 'Expected array was not received in event data');
-        testUtils.assertEquals('foobar', ev.detail.data.string, 'Expected string was not received in event data');
-        testUtils.assertEquals(1, ev.detail.data.number, 'Expected number was not received in event data');
-        testUtils.assertEquals(true, ev.detail.data.boolean, 'Expected boolean was not received in event data');
-        if (ev.detail.data.isSecure) {
-            testUtils.assertEquals(
-                'SecureElement: [object HTMLDivElement]{ key: {"namespace":"lockerlwc"} }',
-                ev.detail.data.domElement.toString(),
-                'Should receive a SecureElement'
-            );
-        } else {
-            testUtils.assertEquals(undefined, ev.detail.data.domElement, 'Should not receive an element from an unlockerized environment');
-        }
-        testUtils.assertEquals(
-            'SecureWindow: [object Window]{ key: {"namespace":"lockerlwc"} }',
-            `${ev.detail.data.win}`,
-            'Expected window to be a SecureWindow'
-        );
-
-        testUtils.assertEquals(
-            'SecureDocument: [object HTMLDocument]{ key: {"namespace":"lockerlwc"} }',
-            `${ev.detail.data.doc}`,
-            'Expected document to be a SecureDocument: [object HTMLDocument]'
-        );
-
-        testUtils.assertEquals(
-            'SecureElement: [object HTMLBodyElement]{ key: {"namespace":"lockerlwc"} }',
-            `${ev.detail.data.body}`,
-            'Expected body to be a SecureElement: [object HTMLBodyElement]'
-        );
-
-        testUtils.assertEquals(
-            'SecureElement: [object HTMLHeadElement]{ key: {"namespace":"lockerlwc"} }',
-            `${ev.detail.data.head}`,
-            'Expected head to be a SecureElement: [object HTMLHeadElement]'
-        );
-
-        testUtils.assertEquals(
-            true,
-            ev.detail.data.func instanceof Function,
-            'Mismatch in expected function parameter'
-        );
-        ev.detail.data.func();
     }
 
     assertDOMEvent(ev) {
@@ -89,10 +50,74 @@ export default class ChildSecure extends Element {
         );
 
         testUtils.assertEquals(ev.target, undefined);
+        this.setAttribute('data-triggered', 'true');
     }
 
     connectedCallback() {
-        this.template.addEventListener('customEvent', this.assertCustomEvent);
-        this.template.addEventListener('click', this.assertDOMEvent);
+        this.template.addEventListener('customEvent', this.assertCustomEvent.bind(this));
+        this.template.addEventListener('click', this.assertDOMEvent.bind(this));
     }
+
+    @api assertParamsInPublicMethod(data) {
+        assertDataObject(data);
+    }
+}
+
+function assertDataObject(data) {
+    testUtils.assertEqualsValue({
+            foo: 'bar',
+            bar: {
+                baz: 'foo'
+            }
+        },
+        data.object,
+        'Expected object was not received in event data'
+    );
+    testUtils.assertEqualsValue([0, 1, 2], data.array, 'Expected array was not received in event data');
+    testUtils.assertEquals('foobar', data.string, 'Expected string was not received in event data');
+    testUtils.assertEquals(1, data.number, 'Expected number was not received in event data');
+    testUtils.assertEquals(true, data.boolean, 'Expected boolean was not received in event data');
+    if (data.isSecure) {
+        testUtils.assertEquals(
+            'SecureElement: [object HTMLDivElement]{ key: {"namespace":"lockerlwc"} }',
+            data.domElement.toString(),
+            'Should receive a SecureElement'
+        );
+    } else {
+        testUtils.assertEquals(
+            'SecureObject: [object HTMLDivElement]{ key: {"namespace":"lockerlwc"} }',
+            data.domElement.toString(),
+            'Should not receive an element from an unlockerized environment'
+        );
+    }
+    testUtils.assertEquals(
+        'SecureWindow: [object Window]{ key: {"namespace":"lockerlwc"} }',
+        `${data.win}`,
+        'Expected window to be a SecureWindow'
+    );
+
+    testUtils.assertEquals(
+        'SecureDocument: [object HTMLDocument]{ key: {"namespace":"lockerlwc"} }',
+        `${data.doc}`,
+        'Expected document to be a SecureDocument: [object HTMLDocument]'
+    );
+
+    testUtils.assertEquals(
+        'SecureElement: [object HTMLBodyElement]{ key: {"namespace":"lockerlwc"} }',
+        `${data.body}`,
+        'Expected body to be a SecureElement: [object HTMLBodyElement]'
+    );
+
+    testUtils.assertEquals(
+        'SecureElement: [object HTMLHeadElement]{ key: {"namespace":"lockerlwc"} }',
+        `${data.head}`,
+        'Expected head to be a SecureElement: [object HTMLHeadElement]'
+    );
+
+    testUtils.assertEquals(
+        true,
+        data.func instanceof Function,
+        'Mismatch in expected function parameter'
+    );
+    data.func();
 }

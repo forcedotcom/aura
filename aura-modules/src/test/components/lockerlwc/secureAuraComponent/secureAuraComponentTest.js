@@ -30,14 +30,12 @@
             cmp.testAuraLWCApiMethodOnHostElement();
         }
     },
-    // BUG T-2306581
-    _testAuraLWCDomEventOnHostElement: {
+    testAuraLWCDomEventOnHostElement: {
         test: function (cmp) {
             cmp.testAuraLWCDomEventOnHostElement();
         }
     },
-    // BUG W-4241255
-    _testSLWC2AuraApiReturnValue: {
+    testSLWC2AuraApiReturnValue: {
         test: function (cmp) {
             cmp.testSLWC2AuraApiReturnValue();
         }
@@ -52,16 +50,14 @@
             cmp.testLWCCustomEventOnSelf();
         }
     },
-    // BUG: W-5058359
-    _testSecureLWC2SecureLWCCustomEvent: {
+    testSecureLWC2SecureLWCCustomEvent: {
         test: function (cmp) {
-            cmp.testSecureLWC2SecureLWCCustomEvent();
+            return cmp.testSecureLWC2SecureLWCCustomEvent();
         }
     },
-    // BUG: W-5058359
-    _testSecureLWC2SecureLWCDomEvent: {
+    testSecureLWC2SecureLWCDomEvent: {
         test: function (cmp) {
-            cmp.testSecureLWC2SecureLWCDomEvent();
+            return cmp.testSecureLWC2SecureLWCDomEvent();
         }
     },
     // User Story: W-5058590
@@ -76,22 +72,24 @@
             cmp.testSecureLWC2UnsecureLWCDOMEvent();
         }
     },
-    // BUG W-5058711
-    _testSecureLWC2SecureLWCCustomEventCrossNamespace: {
+    testSecureLWC2SecureLWCCustomEventCrossNamespace: {
         test: function (cmp) {
-            cmp.testSecureLWC2SecureLWCCustomEventCrossNamespace();
+            return cmp.testSecureLWC2SecureLWCCustomEventCrossNamespace();
         }
     },
-    // BUG W-5058711
-    _testUnsecureLWC2SecureLWCCustomEventCrossNamespace: {
+    testUnsecureLWC2SecureLWCCustomEventCrossNamespace: {
         test: function (cmp) {
-            cmp.testUnsecureLWC2SecureLWCCustomEventCrossNamespace();
+            return cmp.testUnsecureLWC2SecureLWCCustomEventCrossNamespace();
         }
     },
-    // W-5058711
-    _testUnsecureLWC2SecureLWCCustomEvent: {
+    testUnsecureLWC2SecureLWCCustomEvent: {
         test: function (cmp) {
-            cmp._testUnsecureLWC2SecureLWCCustomEvent();
+            return cmp.testUnsecureLWC2SecureLWCCustomEvent();
+        }
+    },
+    testSLWC2SWLCParentCanCallAPIProp: {
+        test: function (cmp) {
+            return cmp.testSLWC2SWLCParentCanCallAPIProp();
         }
     }
 })

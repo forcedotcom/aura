@@ -171,7 +171,7 @@ export default class ParentSecure extends Element {
 
         this.assertIsSecureCustomEvent(ev);
 
-        testUtils.waitForTimeout(
+        const promise = testUtils.waitForPromise(
             true,
             function () {
                 return doneObj.triggered;
@@ -180,9 +180,9 @@ export default class ParentSecure extends Element {
         )
 
         this.dispatchEvent(ev);
+        return promise;
     }
 
-    // TODO update once fix is in place
     @api testSecureLWC2SecureLWCCustomEvent() {
         const doneObj = {};
         const child = this.template.querySelector('lockerlwc-childsecure');
@@ -190,8 +190,47 @@ export default class ParentSecure extends Element {
 
         const ev = new CustomEvent('customEvent', {
             detail: {
-                data: _this.getCustomEventData(doneObj, true)
-                    }
+                data: Object.assign(_this.getCustomEventData(doneObj, true), {isSecure : true})
+            }
+        });
+
+        this.assertIsSecureCustomEvent(ev);
+        const promise = testUtils.waitForPromise(
+            true,
+            function () {
+                return doneObj.triggered;
+            },
+            'Function in CustomEvent payload was not invoked '
+        );
+
+        child.dispatchEvent(ev);
+        return promise;
+    }
+
+    @api testSecureLWC2SecureLWCDomEvent() {
+        const child = this.template.querySelector('lockerlwc-childsecure');
+
+        const promise = testUtils.waitForPromise(
+            'true',
+            function () {
+                return child.getAttribute('data-triggered');
+            },
+            'Child component handler did not fire'
+        );
+
+        child.click();
+        return promise;
+    }
+
+    @api testSecureLWC2UnsecureLWCCustomEvent() {
+        const doneObj = {};
+        const child = this.template.querySelector('lockerlwc-parentunsecure');
+        const _this = this;
+
+        const ev = new CustomEvent('customEvent', {
+            detail: {
+                data: _this.getCustomEventData(doneObj)
+            }
         });
 
         this.assertIsSecureCustomEvent(ev);
@@ -206,84 +245,63 @@ export default class ParentSecure extends Element {
         child.dispatchEvent(ev);
     }
 
-    // TODO update once fix is in place
-    @api testSecureLWC2SecureLWCDomEvent() {
-        const child = this.template.querySelector('lockerlwc-childsecure');
-
-        testUtils.waitForTimeout(
-            'true',
-            function () {
-                return child.getAttribute('data-triggered');
-            },
-            'Child component handler did not fire'
-        );
-
-        child.click();
-    }
-
-    // TODO update once fix is in place
-    @api testSecureLWC2UnsecureLWCCustomEvent() {
-        const child = this.template.querySelector('lockerlwc-parentunsecure');
-        let triggered = false;
-        const _this = this;
-
-        const ev = new CustomEvent('customEvent', {
-            detail: {
-                data: Object.assign(_this.customEventData, {
-                    func: function () {
-                        triggered = true;
-                    }
-                })
-            }
-        });
-
-        this.assertIsSecureCustomEvent(ev);
-        testUtils.waitForTimeout(
-            true,
-            function () {
-                return triggered;
-            },
-            'Function in CustomEvent payload was not invoked '
-        );
-
-        child.dispatchEvent(ev);
-    }
-
-    // TODO update once fix is in place
     @api testSecureLWC2UnsecureLWCDOMEvent(cb) {
         const child = this.template.querySelector('lockerlwc-parentunsecure');
         child.callback = cb;
         child.click();
     }
 
-    // TODO update once fix is in place
     @api testSecureLWC2SecureLWCCustomEventCrossNamespace() {
+        const doneObj = {};
         const child = this.template.querySelector('securemoduletest-child');
-        let triggered = false;
         const _this = this;
 
         const ev = new CustomEvent('customEvent', {
             detail: {
-                data: Object.assign(_this.customEventData, {
-                    func: function () {
-                        triggered = true;
-                    }
-                })
+                data: _this.getCustomEventData(doneObj)
             }
         });
 
         this.assertIsSecureCustomEvent(ev);
-        testUtils.waitForTimeout(
+        const promise = testUtils.waitForPromise(
             true,
             function () {
-                return triggered;
+                return doneObj.triggered;
             },
             'Function in CustomEvent payload was not invoked '
         );
 
         child.dispatchEvent(ev);
+        return promise;
     }
 
+    @api
+    testSLWC2SWLCParentCanCallAPIProp() {
+        const doneObj = {};
+        const child = this.template.querySelector('lockerlwc-childsecure');
+
+        // Access properties
+        const expectedValue = {
+            foo: 'bar',
+            bar: {
+                baz: 'foo'
+            }
+        };
+        testUtils.assertEquals('childSecure', child.stringProp, 'Unable to access string property on child component');
+        testUtils.assertEquals(99, child.integerProp, 'Unable to access integer property on child component');
+        testUtils.assertFalse(child.booleanProp, 'Unable to access boolean property on child component');
+
+        testUtils.assertEqualsValue([91, 92, 93], child.arrayProp, 'Unable to access array on child component');
+        testUtils.assertEqualsValue(expectedValue, child.objProp, 'Unable to access object property on child component');
+
+        // Access public methods
+        testUtils.assertDefined(child.assertParamsInPublicMethod, 'Unable to access @api method on child component');
+        testUtils.assertTrue(child.assertParamsInPublicMethod instanceof Function, 'Unexpected wrapped value received on child');
+        child.assertParamsInPublicMethod(
+            Object.assign(this.getCustomEventData(doneObj, true), { isSecure : true })
+        );
+        testUtils.assertTrue(doneObj.triggered, 'Failed to execute callback in child component');
+    }
 
     assertTestAuraLWCDomEventOnHostElement(ev) {
         this.assertIsSecureDOMEvent(ev);

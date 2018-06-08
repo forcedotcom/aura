@@ -1,23 +1,23 @@
 import assert from 'assert';
 
 export function assertTrue(condition, message) {
-    assert(condition === true, message);
+    assert(condition === true, `Error message: ${message}\nExpected: true\nActual: ${condition}`);
 }
 
 export function assertFalse(condition, message) {
-    assert(condition === false, message);
+    assert(condition === false, `Error message: ${message}\nExpected: false\nActual: ${condition}`);
 }
 
 export function assertUndefined(condition, message) {
-    assert(condition === undefined, message);
+    assert(condition === undefined, `Error message: ${message}\nExpected: undefined\nActual: ${condition}`);
 }
 
 export function assertDefined(condition, message) {
-    assert(condition !== undefined, message);
+    assert(condition !== undefined, `Error message: ${message}\nActual: ${condition}`);
 }
 
 export function assertNotUndefinedOrNull(condition, message) {
-    assert(condition === undefined || condition === null, message);
+    assert(condition === undefined || condition === null, `Error message: ${message}\nExpected truthy value\nActual: ${condition}`);
 }
 
 export function assertStartsWith(start, full, message) {
@@ -28,7 +28,7 @@ export function assertContains(searchString, full, message) {
     assert(full && full.indexOf && (full.indexOf(searchString) !== -1), message);
 }
 export function assertEquals(expected, actual, message) {
-    assert(expected === actual, message);
+    assert(expected === actual, `Error message: ${message}\nExpected: ${expected}\nActual: ${actual}`);
 }
 
 export function assertEqualsValue(expected, compareObj, message) {
@@ -136,7 +136,7 @@ export function waitForPromise(expected, valueFn, message, threshold = 5000) {
                     }
                 }
             } catch (e) {
-                reject('Error executing valueFn in waitFor. ');
+                reject('Error executing valueFn in waitFor.');
             }
         };
         setTimeout(timerFn, 1);

@@ -19,4 +19,5 @@
     <aura:method name="testSecureLWC2SecureLWCCustomEventCrossNamespace"/>
     <aura:method name="testUnsecureLWC2SecureLWCCustomEventCrossNamespace"/>
     <aura:method name="testUnsecureLWC2SecureLWCCustomEvent"/>
+    <aura:method name="testSLWC2SWLCParentCanCallAPIProp"/>
 </aura:component>

@@ -231,9 +231,11 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                 minSource = getSource(path +".min.js");
             } catch (MalformedURLException e) {}
             if (source != null) {
+                source = "try {\n" + source + "\n} catch (e) {}\n";
                 libs.add(source);
             }
             if (minSource != null) {
+                minSource = "try {\n" + minSource + "\n} catch (e) {}\n";
                 libsMin.add(minSource);
             }
         });

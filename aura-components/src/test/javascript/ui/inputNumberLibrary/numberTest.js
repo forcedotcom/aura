@@ -50,13 +50,10 @@ Test.inputNumberLibrary = function () {
         }
     });
 
-
-    [Fixture]
-    function unFormatNumber () {
-
-        var mockLocaleEurope = Mocks.GetMock(Object.Global(),"$A",{
+    function mockAuraWithCurrency(currency) {
+        return Mocks.GetMock(Object.Global(),"$A",{
             get : function (attr) {
-                var attrs = { '$Locale.decimal' : ',', '$Locale.currency' : '€' };
+                var attrs = { '$Locale.decimal' : ',', '$Locale.currency' : currency };
                 return attrs[attr];
             },
             util:{
@@ -68,6 +65,13 @@ Test.inputNumberLibrary = function () {
                 }
             }
         })
+    } 
+    [Fixture]
+    function unFormatNumber () {
+
+        var mockLocaleEurope = mockAuraWithCurrency('€');
+
+        var mockNoCurrency = mockAuraWithCurrency('');
 
         [Fact]
         function unFormatNumberNumber() {
@@ -293,6 +297,68 @@ Test.inputNumberLibrary = function () {
                 Assert.Equal(4100000000, unFormatted);
             })
         }
+
+        [Fact]
+        function unFormatNumber_Locale41_Without_Currency() {
+            mockNoCurrency(function () {
+                var unFormatted = library.unFormatNumber('4,1b');
+                Assert.Equal(4100000000, unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Locale41_Currency_Is_Null() {
+            var mockNullCurrency = mockAuraWithCurrency(null)
+            mockNullCurrency(function () {
+                var unFormatted = library.unFormatNumber('4,1b');
+                Assert.Equal(4100000000, unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Locale41_Currency_Is_Undefined() {
+            var mockUndefinedCurrency = mockAuraWithCurrency(undefined)
+            mockUndefinedCurrency(function () {
+                var unFormatted = library.unFormatNumber('4,1b');
+                Assert.Equal(4100000000, unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Locale41_Currency_Is_Number() {
+            var mockUndefinedCurrency = mockAuraWithCurrency("a")
+            mockUndefinedCurrency(function () {
+                var unFormatted = library.unFormatNumber('4,1b');
+                Assert.Equal(4100000000, unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Locale41_Currency_Is_Object() {
+            var mockUndefinedCurrency = mockAuraWithCurrency({})
+            mockUndefinedCurrency(function () {
+                var unFormatted = library.unFormatNumber('4,1b');
+                Assert.Equal(4100000000, unFormatted);
+            })
+        }
+
+        [Fact]
+        function unFormatNumber_Locale41_Currency_Is_Array() {
+            var mockUndefinedCurrency = mockAuraWithCurrency([])
+            mockUndefinedCurrency(function () {
+                var unFormatted = library.unFormatNumber('4,1b');
+                Assert.Equal(4100000000, unFormatted);
+            })
+        }
+        
+        [Fact]
+        function unFormatNumber_Locale41_Currency_Is_CJK() {
+            var mockUndefinedCurrency = mockAuraWithCurrency('￥')
+            mockUndefinedCurrency(function () {
+                var unFormatted = library.unFormatNumber('￥4,1b');
+                Assert.Equal(4100000000, unFormatted);
+            })
+        }        
     }
 
     [Fixture]

@@ -47,6 +47,7 @@ import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.BundleSource;
+import org.auraframework.system.BundleSourceOption;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
@@ -56,6 +57,7 @@ import org.auraframework.util.FileMonitor;
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -145,7 +147,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
                     bundleDescriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, descriptor.getNamespace(),
                             descriptor.getName(), ComponentDef.class);
                 }
-                bundle = new BundleSourceImpl<>(bundleDescriptor, Maps.newConcurrentMap(), true);
+                bundle = new BundleSourceImpl<>(bundleDescriptor, Maps.newConcurrentMap(), EnumSet.of(BundleSourceOption.Minify));
                 bundles.put(getBundleKey(bundleDescriptor), bundle);
             }
             return bundle;

@@ -17,6 +17,7 @@ package org.auraframework.impl.factory;
 
 import javax.inject.Inject;
 
+import java.util.EnumSet;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.builder.BaseComponentDefBuilder;
 import org.auraframework.def.BaseComponentDef;
@@ -25,6 +26,7 @@ import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.ApiVersioned;
 import org.auraframework.system.BundleSource;
+import org.auraframework.system.BundleSourceOption;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
@@ -41,7 +43,9 @@ public abstract class BaseComponentDefFactory<T extends BaseComponentDef> extend
             return null;
         }
         BaseComponentDefBuilder<T> builder = (BaseComponentDefBuilder<T>)handler.getBuilder();
-        builder.setMinifyEnabled(source.isMinifyEnabled());
+        EnumSet<BundleSourceOption> bundleOptions = source.getOptions();
+        builder.setMinifyEnabled(bundleOptions.contains(BundleSourceOption.Minify));
+
         if (source instanceof ApiVersioned){
             builder.setAPIVersion(((ApiVersioned)source).getAPIVersion());
         }

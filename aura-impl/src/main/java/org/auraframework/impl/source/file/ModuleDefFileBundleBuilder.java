@@ -17,6 +17,7 @@ package org.auraframework.impl.source.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.BundleSource;
+import org.auraframework.system.BundleSourceOption;
 import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
@@ -105,7 +107,7 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
             // ignore file path issues
         }
 
-        return new BundleSourceImpl<>(modDesc, sourceMap, true);
+        return new BundleSourceImpl<>(modDesc, sourceMap, EnumSet.of(BundleSourceOption.Minify));
     }
 
     private void processBundle(File base, Map<DefDescriptor<?>, Source<?>> sourceMap,

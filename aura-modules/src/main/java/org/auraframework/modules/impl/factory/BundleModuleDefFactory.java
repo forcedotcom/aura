@@ -17,6 +17,7 @@ package org.auraframework.modules.impl.factory;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +43,7 @@ import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.BundleSource;
+import org.auraframework.system.BundleSourceOption;
 import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
@@ -51,6 +53,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.base.CharMatcher;
+import org.lwc.bundle.BundleType;
 
 /**
  * Provides ModuleDef implementation
@@ -81,6 +84,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
     public ModuleDef getDefinition(@CheckForNull DefDescriptor<ModuleDef> descriptor,
                                    @Nonnull BundleSource<ModuleDef> source) throws QuickFixException {
         Map<DefDescriptor<?>, Source<?>> sourceMap = source.getBundledParts();
+        EnumSet<BundleSourceOption> sourceOptions = source.getOptions();
 
         // get base source.
         Source<?> baseClassSource = sourceMap.get(descriptor);
@@ -139,7 +143,11 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
         ModulesCompilerData compilerData;
         try {
-            compilerData = modulesCompilerService.compile(componentPath, sources);
+            if (sourceOptions != null && sourceOptions.contains(BundleSourceOption.Lint)) {
+                compilerData = modulesCompilerService.compile(componentPath, sources, BundleType.platform);
+            } else {
+                compilerData = modulesCompilerService.compile(componentPath, sources);
+            }
         } catch (Exception e) {
             throw new InvalidDefinitionException(descriptor + ": " + e.getMessage(), location, e);
         }

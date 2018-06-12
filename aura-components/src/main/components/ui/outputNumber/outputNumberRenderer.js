@@ -29,7 +29,12 @@
                     $A.log(e);
                 }
                 if (nf) {
-                    formatted = nf.format(num);
+                    try {
+                        formatted = nf.format(num);
+                    } catch (e) {
+                        formatted = "Invalid number value";
+                        $A.log(e);
+                    }
                 }
             } else {
                 formatted = $A.localizationService.formatNumber(num);
@@ -53,7 +58,12 @@
                     $A.log(e);
                 }
                 if (nf) {
-                    formatted = nf.format(val);
+                    try {
+                        formatted = nf.format(val);
+                    } catch (e) {
+                        formatted = "Invalid number value";
+                        $A.log(e);
+                    }
                 }
             } else {
                 formatted = $A.localizationService.formatNumber(val);

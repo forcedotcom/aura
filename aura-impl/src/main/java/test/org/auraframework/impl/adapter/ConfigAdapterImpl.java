@@ -379,14 +379,17 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public String getAuraJSURL() {
+    		return contextService.getCurrentContext().getContextPath() + getAuraJSURLPath();
+    }
+    
+    protected String getAuraJSURLPath() {
         AuraContext context = contextService.getCurrentContext();
-        String contextPath = context.getContextPath();
         String suffix = context.getMode().getJavascriptMode().getSuffix();
         if (context.useCompatSource()) {
             suffix = suffix + "_compat";
         }
         String nonce = context.getFrameworkUID();
-        return String.format("%s/auraFW/javascript/%s/aura_%s.js", contextPath, nonce, suffix);
+        return String.format("/auraFW/javascript/%s/aura_%s.js", nonce, suffix);
     }
 
     /**

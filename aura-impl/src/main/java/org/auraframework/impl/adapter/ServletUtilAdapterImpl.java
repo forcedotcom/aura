@@ -566,9 +566,14 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     protected String commonJsUrl (String filepath, AuraContext context, Map<String,Object> attributes) {
         return commonJsUrl(filepath, context, attributes, AuraContext.EncodingStyle.Normal);
     }
-
+    
     protected String commonJsUrl (String filepath, AuraContext context, Map<String,Object> attributes, AuraContext.EncodingStyle encodingStyle) {
-        StringBuilder url = new StringBuilder(context.getContextPath()).append("/l/");
+        return context.getContextPath() + commonJsUrlPath(filepath, context, attributes, encodingStyle);
+    }
+
+    protected String commonJsUrlPath (String filepath, AuraContext context, Map<String,Object> attributes, AuraContext.EncodingStyle encodingStyle) {
+        StringBuilder url = new StringBuilder();
+        url.append("/l/");
         url.append(context.getEncodedURL(encodingStyle));
         url.append(filepath);
         if (attributes != null) {

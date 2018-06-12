@@ -857,7 +857,7 @@ public class AuraContextImpl implements AuraContext {
             
             String currentPathPrefix = getPathPrefix();
 
-            if (currentPathPrefix != null) {
+            if (style != EncodingStyle.AppResource && currentPathPrefix != null) {
                 json.writeMapEntry("pathPrefix", currentPathPrefix);
             }
 

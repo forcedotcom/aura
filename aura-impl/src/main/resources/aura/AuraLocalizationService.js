@@ -894,8 +894,7 @@ AuraLocalizationService.prototype.getLocalizedDateTimeLabels = function() {
             null, "AuraLocalizationService.getLocalizedDateTimeLabels");
 
     var langLocale = $A.get("$Locale.langLocale");
-    var l = this.getAvailableMomentLocale(langLocale);
-    return this.moment["localeData"](l);
+    return this.moment["localeData"](this.getAvailableMomentLocale(langLocale));
 };
 
 /**
@@ -1272,7 +1271,8 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
 
     // for 'week', we adjust days after resetting the time above
     if (unit === "week") {
-        var firstDayOfWeek = $A.get("$Locale.firstDayOfWeek");
+        // In $Locale, Sun-Sat is 1~7
+        var firstDayOfWeek = $A.get("$Locale.firstDayOfWeek") - 1;
         var weekday = (normalizedDate.getDay() + 7 - firstDayOfWeek) % 7;
         var offset = weekday * 864e5; // 24 * 60 * 60 * 1000
 

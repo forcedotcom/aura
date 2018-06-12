@@ -60,7 +60,8 @@ Test.Aura.AuraLocalizationServiceTest = function() {
                 if(value === "$Locale.numberFormat") return targetNumberFormat;
                 if(value === "$Locale.percentFormat") return targetPercentFormat;
                 if(value === "$Locale.currencyFormat") return targetCurrencyFormat;
-                if(value === "$Locale.firstDayOfWeek") return 1;
+                // In $Locale, Sun-Sat is 1~7
+                if(value === "$Locale.firstDayOfWeek") return 2;
             },
             localizationService: {
                 normalizeDateTimeUnit: function(unit) {

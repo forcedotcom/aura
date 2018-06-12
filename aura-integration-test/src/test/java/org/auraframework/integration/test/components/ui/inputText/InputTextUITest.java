@@ -39,7 +39,7 @@ public class InputTextUITest extends WebDriverTestCase {
     public static final String TEST_CMP = "/uitest/inputtext_updateontest.cmp";
     public static final String TEST_CMP_WITH_LABELS = "/uitest/inputtext_updateonwithlabeltest.cmp";
 
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD })
+    @ExcludeBrowsers({ BrowserType.FIREFOX, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD })
     @Test
     public void testUpdateOnAttribute_UsingStringSource() throws Exception {
         String event = "blur";
@@ -385,7 +385,7 @@ public class InputTextUITest extends WebDriverTestCase {
         assertEquals("Value of Input text shoud be updated", inputText, actualText);
     }
 
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.FIREFOX, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     @Test
     public void testInputTextWithEmptyLabel() throws Exception {
         open(TEST_CMP_WITH_LABELS);

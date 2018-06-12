@@ -191,16 +191,16 @@ public final class ModulesCompilerUtil {
                     }
                 }
 
-                Map<String, String[]> staticDescription = wo.staticDescription;
+                Map<String, Object> staticDescription = wo.staticDescription;
 
-                Map<String, String[]> staticFieldsMap = new HashMap<>();
+                Map<String, Object> staticFieldsMap = new HashMap<>();
                 if (staticDescription != null) {
                     Iterator<?> keys = staticDescription.keySet().iterator();
                     while (keys.hasNext()) {
                         String key = (String)keys.next();
-                        String[] staticFieldsValues = staticDescription.get(key);
-                        if (staticFieldsValues != null) {
-                            staticFieldsMap.put(key, staticFieldsValues);
+                        Object staticFieldValue = staticDescription.get(key);
+                        if (staticFieldValue != null) {
+                            staticFieldsMap.put(key, staticFieldValue);
                         }
                     }
                 }

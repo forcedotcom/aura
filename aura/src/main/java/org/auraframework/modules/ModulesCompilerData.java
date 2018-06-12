@@ -62,14 +62,14 @@ public final class ModulesCompilerData {
         public final String name;
         public final WireAdapter adapter;
         public final Map<String, String> params;
-        public final Map<String, String[]> staticFields;
+        public final Map<String, Object> staticFields;
 
         public WireDecoration(
                 String type,
                 String name,
                 WireAdapter adapter,
                 Map<String, String> params,
-                Map<String, String[]> staticFields) {
+                Map<String, Object> staticFields) {
             this.type = type;
             this.name = name;
             this.adapter = adapter;

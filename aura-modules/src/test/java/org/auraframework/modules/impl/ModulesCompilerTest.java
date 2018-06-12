@@ -37,7 +37,9 @@ import org.junit.Test;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.io.Files;
+import org.lwc.decorator.*;
 import org.lwc.diagnostic.DiagnosticLevel;
+import org.lwc.metadata.ReportMetadata;
 
 /**
  * Tests for the ModulesCompiler implementations
@@ -228,6 +230,81 @@ public class ModulesCompilerTest extends UnitTestCase {
 
     };
 
+    @Test
+    public void testOutputMetadataDecorators() throws Exception {
+        LwcCompiler compiler = new LwcCompiler(FACTORY);
+
+        Map<String, String> files = new HashMap<>();
+        files.put(
+                "foo.js",
+                "import { Element, api, wire, track } from 'engine';\n" +
+                        "import { getHello } from '@schema/foo.bar';\n" +
+                        "export default class Foo extends Element {\n" +
+                        "   @api greeting = 'bob';\n" +
+                        "   @track state = {};\n" +
+                        "   @wire(getHello, {recordIds: '$wireRecordIds',fields: ['first', 'second'], modes: ['mymode'], layoutTypes: ['layoutone', 'layouttwo'] ,optionalFields: '$wireOptionalFields'})\n" +
+                        "   wiredRecordUi({ error, data }) { this.isProviding = false; } \n" +
+                        "}"
+        );
+        files.put(
+                "foo.html",
+                "<template>\n" +
+                        "     <h1>{greetings}</h1>\n" +
+                        "</template>"
+        );
+
+        ArrayList<OutputConfig> outputConfigs = new ArrayList<>();
+        outputConfigs.add(new OutputConfig(false, false, new HashMap<>(), null));
+
+        CompilerConfig config = new CompilerConfig(
+                new Bundle("x", "foo", files, BundleType.internal),
+                outputConfigs
+        );
+        CompilerReport report = compiler.compile(config);
+
+        assertNotNull(report.metadata);
+        ReportMetadata metadata = report.metadata;
+        List<Decorator> decorators = metadata.decorators;
+
+        assertEquals(decorators.size(), 3);
+        ApiDecorator apiDecorator = (ApiDecorator) decorators.get(0);
+        WireDecorator wireDecorator = (WireDecorator) decorators.get(1);
+        TrackDecorator trackDecorator = (TrackDecorator) decorators.get(2);
+
+        // @api decorator
+        assertEquals(apiDecorator.type, DecoratorType.api);
+        assertEquals(apiDecorator.targets.get(0).type, DecoratorTargetType.property);
+        assertEquals(apiDecorator.targets.get(0).name, "greeting");
+
+        // track decorator
+        assertEquals(trackDecorator.type, DecoratorType.track);
+        assertEquals(trackDecorator.targets.get(0).type, DecoratorTargetType.property);
+        assertEquals(trackDecorator.targets.get(0).name, "state");
+
+
+
+        // deep dive into wire decorator
+        assertEquals(wireDecorator.type, DecoratorType.wire);
+
+        DecoratorTarget wireTarget = wireDecorator.targets.get(0);
+
+        assertEquals(wireTarget.type, DecoratorTargetType.method);
+        assertEquals(wireTarget.name, "wiredRecordUi");
+        assertEquals(wireTarget.adapter.name, "getHello");
+        assertEquals(wireTarget.adapter.reference, "@schema/foo.bar");
+        assertEquals(wireTarget.params.get("recordIds"), "wireRecordIds");
+        assertEquals(wireTarget.params.get("optionalFields"), "wireOptionalFields");
+
+        // static
+        assertEquals(((ArrayList<String>)wireTarget.staticDescription.get("fields")).size(), 2);
+        assertEquals(((ArrayList<String>)wireTarget.staticDescription.get("layoutTypes")).size(), 2);
+        assertEquals(((ArrayList<String>)wireTarget.staticDescription.get("layoutTypes")).get(0), "layoutone");
+        assertEquals(((ArrayList<String>)wireTarget.staticDescription.get("modes")).size(), 1);
+        assertEquals(((ArrayList<String>)wireTarget.staticDescription.get("modes")).get(0), "mymode");
+
+
+    };
+
 
     @Test
     public void testPlatformCompilerIntegration() throws Exception {
@@ -259,53 +336,52 @@ public class ModulesCompilerTest extends UnitTestCase {
         assertEquals(result.diagnostics.size(), 1);
         assertEquals(
                 result.code,
-                "define('x-foo', ['engine'], function (engine) {\n" +
-                        "\n" +
-                        "const style = undefined;\n" +
-                        "\n" +
-                        "function tmpl($api, $cmp, $slotset, $ctx) {\n" +
-                        "  const {\n" +
-                        "    d: api_dynamic,\n" +
-                        "    h: api_element\n" +
-                        "  } = $api;\n" +
-                        "\n" +
-                        "  return [api_element(\"h1\", {\n" +
-                        "    key: 1\n" +
-                        "  }, [api_dynamic($cmp.greetings)])];\n" +
-                        "}\n" +
-                        "\n" +
-                        "if (style) {\n" +
-                        "    tmpl.token = 'x-foo_foo';\n" + 
-                        "\n" +
-                        "    const style$$1 = document.createElement('style');\n" +
-                        "    style$$1.type = 'text/css';\n" +
-                        "    style$$1.dataset.token = 'x-foo_foo';\n" +
-                        "    style$$1.textContent = style('x-foo', 'x-foo_foo');\n" +
-                        "    document.head.appendChild(style$$1);\n" +
-                        "}" +
-                        "\n\n" +
-                        "class Foo extends engine.Element {\n" +
-                        "  constructor(...args) {\n" +
-                        "    var _temp;\n" +
-                        "\n" +
-                        "    return _temp = super(...args), this.greetings = 'Hello world!', _temp;\n" +
-                        "  }\n" +
-                        "\n" +
-                        "  render() {\n" +
-                        "    return tmpl;\n" +
-                        "  }\n" +
-                        "\n" +
-                        "}\n" +
-                        "Foo.publicProps = {\n" +
-                        "  greetings: {\n" +
-                        "    config: 0\n" +
-                        "  }\n" +
-                        "};\n" +
-                        "Foo.style = tmpl.style;\n" +
-                        "\n" +
-                        "return Foo;\n" +
-                        "\n" +
-                        "});\n"
+        "define('x-foo', ['engine'], function (engine) {\n" +
+                "\n" +
+                "     const style = undefined;\n" +
+                "\n" +
+                "     function tmpl($api, $cmp, $slotset, $ctx) {\n" +
+                "       const {\n" +
+                "         d: api_dynamic,\n" +
+                "         h: api_element\n" +
+                "       } = $api;\n" +
+                "\n" +
+                "       return [api_element(\"h1\", {\n" +
+                "         key: 1\n" +
+                "       }, [api_dynamic($cmp.greetings)])];\n" +
+                "     }\n" +
+                "\n" +
+                "     if (style) {\n " +
+                "        tmpl.token = 'x-foo_foo';\n\n " +
+                "        const style$$1 = document.createElement('style');\n " +
+                "        style$$1.type = 'text/css';\n " +
+                "        style$$1.dataset.token = 'x-foo_foo';\n " +
+                "        style$$1.textContent = style('x-foo', 'x-foo_foo');\n " +
+                "        document.head.appendChild(style$$1);\n" +
+                "     }\n" +
+                "\n" +
+                "     class Foo extends engine.Element {\n" +
+                "       constructor(...args) {\n" +
+                "         var _temp;\n" +
+                "\n" +
+                "         return _temp = super(...args), this.greetings = 'Hello world!', _temp;\n" +
+                "       }\n" +
+                "\n" +
+                "       render() {\n" +
+                "         return tmpl;\n" +
+                "       }\n" +
+                "\n" +
+                "     }\n" +
+                "     Foo.publicProps = {\n" +
+                "       greetings: {\n" +
+                "         config: 0\n" +
+                "       }\n" +
+                "     };\n" +
+                "     Foo.style = tmpl.style;\n" +
+                "\n" +
+                "     return Foo;\n" +
+                "\n" +
+                "});\n"
         );
     }
 

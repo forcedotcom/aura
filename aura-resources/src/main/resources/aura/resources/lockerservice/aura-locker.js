@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-06-08
- * Version: 0.4.21
+ * Generated: 2018-06-12
+ * Version: 0.4.22
  */
 
 (function (exports) {
@@ -4120,8 +4120,12 @@ SecureElement.secureQuerySelector = function(el, key, selector) {
 const sanitized = new WeakSet();
 
 function freezeIntrinsics(realmRec) {
-  const { intrinsics } = realmRec;
-  deepFreeze(intrinsics);
+  const { intrinsics, notFrozenIntrinsicNames } = realmRec;
+  const eagerFreezeIntrinsics = assign({}, intrinsics);
+  if (isArray(notFrozenIntrinsicNames)) {
+    notFrozenIntrinsicNames.forEach(prop => delete eagerFreezeIntrinsics[prop]);
+  }
+  deepFreeze(eagerFreezeIntrinsics);
 }
 
 function freezeIntrinsicsDeprecated(realmRec) {
@@ -4550,6 +4554,8 @@ function init(options) {
   realmRec.unsafeGlobal = options.unsafeGlobal;
   realmRec.unsafeEval = options.unsafeGlobal.eval;
   realmRec.unsafeFunction = options.unsafeGlobal.Function;
+  realmRec.notFrozenIntrinsicNames = options.notFrozenIntrinsicNames;
+
   realmRec.intrinsics = getIntrinsics(realmRec);
 
   // None of these values can change after initialization.
@@ -10109,6 +10115,7 @@ function initialize(types, api) {
 
   init({
     shouldFreeze: api.isFrozenRealm,
+    notFrozenIntrinsicNames: api.notFrozenIntrinsicNames,
     unsafeGlobal: window,
     unsafeEval: window.eval,
     unsafeFunction: window.Function

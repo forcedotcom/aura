@@ -116,6 +116,11 @@ function LockerService() {
             // avaiable with the current API on Aura Objects. This reduces the
             // complexity of what is passed to Aura.
             var api = {
+
+                // #if {"modes" : ["DOC","TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
+                "notFrozenIntrinsicNames" : ["Date", "DatePrototype", "Promise", "PromisePrototype", "JSON"],
+                // #end
+
                 "getPublicMethodNames": getPublicMethodNames,
                 "requireLocker": requireLocker,
                 "isStrictCSP": isStrictCSP,

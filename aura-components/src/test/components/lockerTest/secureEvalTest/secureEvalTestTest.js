@@ -4,19 +4,19 @@
     setUp: function(cmp) {
         cmp.set('v.testUtils', $A.test);
     },
-    
+
     testSecureEvalIsLockerized: {
       test: function(component) {
           component.testSecureEvalIsLockerized(component);
       }
     },
-    
-    _testGlobalIntrinsics: {
+
+    testFrozenIntrinsics: {
         test: function(component) {
-            component.testGlobalIntrinsics(component);
+            component.testFrozenIntrinsics(component);
         }
     },
-    
+
     _testHiddenIntrinsics: {
         test: function(component) {
             component.testHiddenIntrinsics(component);

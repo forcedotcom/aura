@@ -1,4 +1,4 @@
-({  
+({
     /**
      * Tests that eval is executing in the correct context.
      * eval() should be in a secureWindow and not in global window.
@@ -6,25 +6,25 @@
     testSecureEvalIsLockerized: function(component) {
       var testUtils = component.get('v.testUtils');
       var evalWindow = eval("window + ''");
-      testUtils.assertEquals('SecureWindow: [object Window]{ key: {"namespace":"lockerTest"} }', evalWindow, 
+      testUtils.assertEquals('SecureWindow: [object Window]{ key: {"namespace":"lockerTest"} }', evalWindow,
                              'SecureEval is not operating within a secureWindow!');
     },
-    
-    /** 
+
+    /**
      * Goes through all of the intrinsic properties present on the browser
      * and confirms they are all frozen by deepFreeze() inside of secureEval().
-     * 
+     *
      * Fails if any intrinsic is not frozen and than prints the un-frozen intrinsic in
      * the error.
      */
-    testGlobalIntrinsics: function(component, event, helper) {
+    testFrozenIntrinsics: function(component, event, helper) {
       var testUtils = component.get('v.testUtils');
-      
+
       /**
        * This is the list of all global intrinsics we expect to be present on the browser.
        * See: https://tc39.github.io/ecma262/#sec-well-known-intrinsic-objects (table #7)
        */
-      var expectedGlobalIntrinsics = [
+      var expectedIntrinsics = [
         'Array',
         'ArrayBuffer',
         'ArrayBuffer.prototype',
@@ -117,47 +117,45 @@
         'WeakSet',
         'WeakSet.prototype'
       ];
-      
+
+      var expectedNotFrozenIntrinsics = [
+        // These intrinsics do not need to be frozen (instance specific)
+        "Function",
+        "eval",
+        // These are not frozen in Aura test mode
+        "Date",
+        "Date.prototype",
+        "Promise",
+        "Promise.prototype",
+        "JSON"
+      ];
+
       /**
-       * Defines a list of intrinsics which are present on the current browser 
-       * for example, SharedArrayBuffer will return undefined on many up-to-date 
-       * browsers because many browsers removed it after spectre/meltdown.
-       * Hence, this list will not contain SharedArrayBuffer.
-       *
-       * Stored in the format ['Weakmap', window.weakMap] or [string, object]
-       */
-      var actualGlobalIntrinsics = [];
-      
-      /**
-       * Iterates through all expected intrinsics and determines which ones are visible on the 
+       * Iterates through all expected intrinsics and determines which ones are visible on the
        * current browser. These are added to actualGlobalIntrinsics.
        */
-      expectedGlobalIntrinsics.forEach(function(intrinsic) {
-        var obj = helper.getNestedObject(window, intrinsic);
-        if (obj !== 'undefined') {
-          actualGlobalIntrinsics.push([intrinsic, obj]);
+      expectedIntrinsics.forEach(function(name) {
+        var intrinsic = helper.getNestedObject(window, name);
+        if (intrinsic !== 'undefined') {
+          var isFrozen = Object.isFrozen(intrinsic);
+          if (expectedNotFrozenIntrinsics.includes(name)) {
+            testUtils.assertFalse(isFrozen, name + ' was frozen.');
+          } else {
+            testUtils.assertTrue(isFrozen, name + ' was not frozen.');
+          }
         }
       });
-      
-      /**
-       * Checks each actual global intrinsic to ensure it was frozen correctly.
-       * Assertion fails if it is not frozen correctly.
-       */
-      actualGlobalIntrinsics.forEach(function(intrinsic) {
-        var isFrozen = Object.isFrozen(intrinsic[1]);
-        testUtils.assertTrue(isFrozen, intrinsic[0] + ' was not frozen.');
-      });
     },
-    
+
     /**
      * Tests the intrinsics that are not present in global or window scope to ensure they too are frozen.
      */
     testHiddenIntrinsics: function(component) {
       var testUtils = component.get('v.testUtils');
-      
+
       /**
-       * The hidden intrinsics expected to be present on the browser. 
-       * This is a 2d array of ['name', 'expression'] where expression is a valid JS 
+       * The hidden intrinsics expected to be present on the browser.
+       * This is a 2d array of ['name', 'expression'] where expression is a valid JS
        * expression which can coerce the hidden intrinsic into scope to test if it was frozen correctly.
        */
       var expectedHiddenIntrinsics = [
@@ -184,10 +182,10 @@
        * A list of actual hidden intrinsics, after attempting to collect all of the actualHiddenIntrinsics.
        */
       var actualHiddenIntrinsics = [];
-      
+
       /**
-       * Look through each expected hidden intrinsic, attempting to obtain an instance of it 
-       * through the use of an eval() call. If we cannot obtain the hidden intrinsic, or the eval crashes 
+       * Look through each expected hidden intrinsic, attempting to obtain an instance of it
+       * through the use of an eval() call. If we cannot obtain the hidden intrinsic, or the eval crashes
        * we log an error. This usually indicates the particular browser does not suppor this intrinsic which is fine.
        */
       expectedHiddenIntrinsics.forEach(function(intrinsic) {
@@ -198,9 +196,9 @@
           console.error('could not not find ' + intrinsic[0]);
         }
       });
-      
+
       /**
-       * Iterate through the actual hidden intrinsics list and assert that the intriniscs 
+       * Iterate through the actual hidden intrinsics list and assert that the intriniscs
        * are all correctly frozen - else throw an error and halt the test.
        */
       actualHiddenIntrinsics.forEach(function(intrinsic) {

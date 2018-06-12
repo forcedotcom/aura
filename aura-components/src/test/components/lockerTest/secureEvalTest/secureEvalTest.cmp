@@ -18,7 +18,7 @@
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
-    <aura:method name="testGlobalIntrinsics" />
+    <aura:method name="testFrozenIntrinsics" />
     <aura:method name="testHiddenIntrinsics" />
     <aura:method name="testSecureEvalIsLockerized" />
     <div>Secure Eval test</div>

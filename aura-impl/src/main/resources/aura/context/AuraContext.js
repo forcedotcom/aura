@@ -64,6 +64,9 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.uriAddressableDefsEnabled = config[Json.ApplicationKey.URIADDRESSABLEDEFINITIONS];
     if (this.uriAddressableDefsEnabled === undefined) {
         this.uriAddressableDefsEnabled = !!this.getURIDefsStateFromQuery();
+    } else {
+        // ensure it's a boolean value
+        this.uriAddressableDefsEnabled = !!this.uriAddressableDefsEnabled;
     }
     this.cdnHost = config[Json.ApplicationKey.CDN_HOST];
     
@@ -229,7 +232,7 @@ Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic, in
     if(this.useCompatSource) {
         contextToSend["c"] = 1;
     }
-    contextToSend[Json.ApplicationKey.URIADDRESSABLEDEFINITIONS] = !!this.uriAddressableDefsEnabled;
+    contextToSend[Json.ApplicationKey.URIADDRESSABLEDEFINITIONS] = this.uriAddressableDefsEnabled;
     return $A.util.json.encode(contextToSend);
 };
 

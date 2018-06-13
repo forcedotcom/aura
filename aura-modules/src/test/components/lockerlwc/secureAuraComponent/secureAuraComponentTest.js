@@ -30,7 +30,8 @@
             cmp.testAuraLWCApiMethodOnHostElement();
         }
     },
-    testAuraLWCDomEventOnHostElement: {
+    // TODO: Due to a bug in how LWC engine patches target and currentTarget properties on event
+    _testAuraLWCDomEventOnHostElement: {
         test: function (cmp) {
             cmp.testAuraLWCDomEventOnHostElement();
         }
@@ -55,7 +56,8 @@
             return cmp.testSecureLWC2SecureLWCCustomEvent();
         }
     },
-    testSecureLWC2SecureLWCDomEvent: {
+    // TODO: Due to a bug in how LWC engine patches target and currentTarget properties on event
+    _testSecureLWC2SecureLWCDomEvent: {
         test: function (cmp) {
             return cmp.testSecureLWC2SecureLWCDomEvent();
         }

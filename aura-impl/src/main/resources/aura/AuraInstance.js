@@ -474,7 +474,7 @@ AuraInstance.prototype.initAsync = function(config) {
         function bootstrapLoadPromise() {
             return config["bootstrapInlined"]
                 ? Promise["resolve"]()
-                : new $A.clientService.loadBootstrapFromStorage();
+                : $A.clientService.loadBootstrapFromStorage();
         }
 
         // Actions depend on defs depend on GVP (labels). so load them in dependency order and skip

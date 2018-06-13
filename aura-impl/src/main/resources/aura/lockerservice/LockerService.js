@@ -126,8 +126,7 @@ function LockerService() {
                 "isStrictCSP": isStrictCSP,
                 "isFrozenRealm": isFrozenRealm,
                 "warn": warn,
-                "error": $A.auraError,
-                "unwrap": $A.componentService.moduleEngine["unwrap"]
+                "error": $A.auraError
             };
 
             var lib = window["AuraLocker"];

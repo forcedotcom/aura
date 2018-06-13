@@ -152,7 +152,13 @@ public class ModulesCompilerNode implements ModulesCompiler {
     }
 
     protected boolean isDiagnosticWarning(Diagnostic diagnostic, BundleType type) {
-        return diagnostic.level.equals(DiagnosticLevel.WARNING);
+        boolean hasWarning = diagnostic.level.equals(DiagnosticLevel.WARNING);
+
+        if (type == BundleType.internal) {
+            return hasWarning || diagnostic.level.equals(DiagnosticLevel.ERROR);
+        } else {
+            return hasWarning;
+        }
     }
 
     protected LwcCompiler getCompiler() {

@@ -38,6 +38,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.io.Files;
 import org.lwc.decorator.*;
+import org.lwc.diagnostic.DiagnosticLevel;
 import org.lwc.metadata.ReportMetadata;
 
 /**
@@ -113,8 +114,8 @@ public class ModulesCompilerTest extends UnitTestCase {
             fail("should report a syntax error");
         } catch (Exception e) {
             String message = Throwables.getRootCause(e).getMessage();
-            // since linting is disabled for inernal bundle types, the compiler will throw instead of producing diagnostic
-            assertEquals(message.contains("bad result: { SyntaxError: Unexpected token, expected { (2:4)"), true);
+            assertEquals(message, "Invalid syntax encountered during compilation of modules/errorInJs/errorInJs.js: \n" +
+                    "Parsing error: Unexpected token, expected \"{\" (2:4)");
         }
     }
 
@@ -128,7 +129,7 @@ public class ModulesCompilerTest extends UnitTestCase {
         sources.put("modules/errorInJs/errorInJs.js", sourceClass);
 
         ModulesCompilerData result = compiler.compile(entry, sources, BundleType.internal);
-        assertEquals(result.compilerReport.diagnostics.size(), 0);
+        assertEquals(result.compilerReport.diagnostics.get(0).level, DiagnosticLevel.ERROR);
         assertTrue(result.compilerReport.success);
     }
 
@@ -351,12 +352,11 @@ public class ModulesCompilerTest extends UnitTestCase {
                 "     }\n" +
                 "\n" +
                 "     if (style) {\n " +
-                "        tmpl.hostToken = 'x-foo_foo-host';\n " + 
-                "        tmpl.shadowToken = 'x-foo_foo';\n\n " +
+                "        tmpl.token = 'x-foo_foo';\n\n " +
                 "        const style$$1 = document.createElement('style');\n " +
                 "        style$$1.type = 'text/css';\n " +
                 "        style$$1.dataset.token = 'x-foo_foo';\n " +
-                "        style$$1.textContent = style('x-foo_foo');\n " +
+                "        style$$1.textContent = style('x-foo', 'x-foo_foo');\n " +
                 "        document.head.appendChild(style$$1);\n" +
                 "     }\n" +
                 "\n" +
@@ -377,6 +377,7 @@ public class ModulesCompilerTest extends UnitTestCase {
                 "         config: 0\n" +
                 "       }\n" +
                 "     };\n" +
+                "     Foo.style = tmpl.style;\n" +
                 "\n" +
                 "     return Foo;\n" +
                 "\n" +

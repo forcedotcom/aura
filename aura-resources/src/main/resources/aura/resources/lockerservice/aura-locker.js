@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-06-13
- * Version: 0.4.23
+ * Generated: 2018-06-12
+ * Version: 0.4.22
  */
 
 (function (exports) {
@@ -8674,71 +8674,6 @@ function SecureRTCPeerConnection(raw, key) {
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-let unwrap$2 = value => value;
-
-function registerEngineAPI(api) {
-  if (api && api.unwrap) {
-    unwrap$2 = api.unwrap;
-  }
-}
-
-/**
- * Add additional properties for custom elements
- * @param {*} el DOM element
- * @param {*} prototype Represents the psuedo protototype that will be used to create wrapped element
- * @param {*} tagNameSpecificConfig Temporary holder of tag specific config
- */
-function customElementHook$1(el, prototype, tagNameSpecificConfig) {
-  assert$1.invariant(isCustomElement(el), 'Cannot call custom element hook on a non custom element');
-  const methodOptions = {
-    unfilterEverything: function(args) {
-      const st = this;
-      return SecureObject.deepUnfilterMethodArguments(st, [], args);
-    }
-  };
-  getOwnPropertyNames(el).forEach(prop => {
-    const originalDescriptor = getOwnPropertyDescriptor(el, prop);
-    if (
-      !getOwnPropertyDescriptor(prototype, prop) &&
-      !getOwnPropertyDescriptor(tagNameSpecificConfig, prop)
-    ) {
-      // Wrap functions with a filtered method
-      if (
-        originalDescriptor.hasOwnProperty('value') &&
-        typeof originalDescriptor.value === 'function'
-      ) {
-        tagNameSpecificConfig[prop] = SecureObject.createFilteredMethodStateless(
-          prop,
-          prototype,
-          methodOptions
-        );
-      } else {
-        // Everything else has a wrapped getter/setter
-        tagNameSpecificConfig[prop] = SecureObject.createFilteredPropertyStateless(
-          prop,
-          prototype,
-          methodOptions
-        );
-      }
-    }
-  });
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -8823,8 +8758,7 @@ function getWrappedTemplatePrototype() {
     querySelector: {
       value: function(selector) {
         const template = SecureObject.getRaw(this);
-        let node = template.querySelector(selector);
-        node = unwrap$2(node);
+        const node = template.querySelector(selector);
         // TODO: JF/RJ - revisit this after DOM Access is finalized
         // Trust element with the wrapped template's key
         if (node) {
@@ -8836,8 +8770,7 @@ function getWrappedTemplatePrototype() {
     querySelectorAll: {
       value: function(selector) {
         const template = SecureObject.getRaw(this);
-        let rawNodeList = template.querySelectorAll(selector);
-        rawNodeList = unwrap$2(rawNodeList);
+        const rawNodeList = template.querySelectorAll(selector);
         if (rawNodeList) {
           // TODO: JF/RJ - revisit this after DOM Access is finalized
           // Trust the result given by lwc.
@@ -9085,8 +9018,7 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
       enumerable: true,
       value: function(selector) {
         const { value } = getOwnPropertyDescriptor(ElementPrototype, 'querySelector');
-        let node = value.call(this, selector);
-        node = unwrap$2(node);
+        const node = value.call(this, selector);
         // TODO: JF/RJ - revisit this after DOM Access is finalized
         // Trust element with the component instance's key
         if (node) {
@@ -9099,8 +9031,7 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
       enumerable: true,
       value: function(selector) {
         const { value } = getOwnPropertyDescriptor(ElementPrototype, 'querySelector');
-        let rawNodeList = value.call(this, selector);
-        rawNodeList = unwrap$2(rawNodeList);
+        const rawNodeList = value.call(this, selector);
         if (rawNodeList) {
           // TODO: JF/RJ - revisit this after DOM Access is finalized
           // Trust elements with the component instance's key
@@ -9941,6 +9872,63 @@ function registerAuraTypes(types) {
 }
 
 /*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * Add additional properties for custom elements
+ * @param {*} el DOM element
+ * @param {*} prototype Represents the psuedo protototype that will be used to create wrapped element
+ * @param {*} tagNameSpecificConfig Temporary holder of tag specific config
+ */
+function customElementHook$1(el, prototype, tagNameSpecificConfig) {
+  assert$1.invariant(isCustomElement(el), 'Cannot call custom element hook on a non custom element');
+  const methodOptions = {
+    unfilterEverything: function(args) {
+      const st = this;
+      return SecureObject.deepUnfilterMethodArguments(st, [], args);
+    }
+  };
+  getOwnPropertyNames(el).forEach(prop => {
+    const originalDescriptor = getOwnPropertyDescriptor(el, prop);
+    if (
+      !getOwnPropertyDescriptor(prototype, prop) &&
+      !getOwnPropertyDescriptor(tagNameSpecificConfig, prop)
+    ) {
+      // Wrap functions with a filtered method
+      if (
+        originalDescriptor.hasOwnProperty('value') &&
+        typeof originalDescriptor.value === 'function'
+      ) {
+        tagNameSpecificConfig[prop] = SecureObject.createFilteredMethodStateless(
+          prop,
+          prototype,
+          methodOptions
+        );
+      } else {
+        // Everything else has a wrapped getter/setter
+        tagNameSpecificConfig[prop] = SecureObject.createFilteredPropertyStateless(
+          prop,
+          prototype,
+          methodOptions
+        );
+      }
+    }
+  });
+}
+
+/*
  * Copyright (C) 2017 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
@@ -10136,7 +10124,6 @@ function initialize(types, api) {
   registerAuraTypes(types);
   registerAuraAPI(api);
   registerReportAPI(api);
-  registerEngineAPI(api);
   registerFilterTypeHook(filterTypeHook);
   registerIsUnfilteredTypeHook(isUnfilteredTypeHook);
   registerAddPropertiesHook$$1(windowAddPropertiesHook);

@@ -800,7 +800,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                         baseComponentTag,
                         "controller='java://org.auraframework.integration.test.ClientOutOfSyncUITest$TestController'",
                         "<aura:attribute name='output' type='String'/>" +
-                        "<button class='button' onclick='{!c.post}'>post</button>" +
+                        "<br/><br/><br/><button class='button' onclick='{!c.post}'>post</button>" +
                         "<div id='out'>{!v.output}</div>"));
         triggerServerAction();
         getAuraUITestingUtil().waitForElementText(outputLocator, "", true);

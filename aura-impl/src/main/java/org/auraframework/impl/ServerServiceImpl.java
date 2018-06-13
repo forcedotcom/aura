@@ -341,7 +341,6 @@ public class ServerServiceImpl implements ServerService {
     private String getAppCssString(Set<DefDescriptor<?>> dependencies) throws QuickFixException, IOException {
         Collection<BaseStyleDef> orderedStyleDefs = filterAndLoad(BaseStyleDef.class, dependencies, null);
         StringBuffer sb = new StringBuffer();
-        new CssVariableWriter(definitionService, contextService).write(sb);
         new StyleDefWriter(definitionService, styleAdapter, contextService.getCurrentContext())
             .writeStyleDefs(orderedStyleDefs, sb);
         return sb.toString();

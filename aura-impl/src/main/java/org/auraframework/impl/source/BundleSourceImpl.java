@@ -43,6 +43,18 @@ public class BundleSourceImpl<D extends Definition> implements BundleSource<D> {
      *
      * @param descriptor the descriptor for the bundle level descriptor.
      * @param bundleParts a map of all of the bundle parts, including the top level markup.
+     * @param minifyEnabled whether minify enabled
+     */
+    public BundleSourceImpl(DefDescriptor<D> descriptor, Map<DefDescriptor<?>, Source<?>> bundleParts,
+                            boolean minifyEnabled) {
+        this(descriptor, bundleParts, minifyEnabled ? EnumSet.of(BundleSourceOption.Minify) : EnumSet.noneOf(BundleSourceOption.class));
+    }
+
+    /**
+     * Create a bundle source.
+     *
+     * @param descriptor the descriptor for the bundle level descriptor.
+     * @param bundleParts a map of all of the bundle parts, including the top level markup.
      * @param options a set of bundle option enums to drive minification and linting
      */
     public BundleSourceImpl(DefDescriptor<D> descriptor, Map<DefDescriptor<?>, Source<?>> bundleParts,

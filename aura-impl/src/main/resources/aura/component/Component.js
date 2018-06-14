@@ -1314,6 +1314,12 @@ Component.prototype.get = function(key) {
     if(this.destroyed===1){
         return undefined;
     }
+
+    if(!$A.util.isString(key)) {
+        var msg = "The provided key (" + key + ") is not a string and cannot be used to look up values for the current component.";
+        throw new $A.auraError(msg);
+    }
+
     key = $A.expressionService.normalize(key);
     var path = key.split('.');
     var root = path.shift();

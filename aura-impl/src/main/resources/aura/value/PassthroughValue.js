@@ -148,6 +148,11 @@ PassthroughValue.prototype.fireChangeEvent = function(key, oldValue, value, inde
  * @export
  */
 PassthroughValue.prototype.get = function(key) {
+    if(!$A.util.isString(key)) {
+        var msg = "The provided key (" + key + ") is not a string and cannot be used to look up values for the current component.";
+        throw new $A.auraError(msg);
+    }
+
     var path = key.split('.');
     if (this.primaryProviders.hasOwnProperty(path[0])){
         var value = null;

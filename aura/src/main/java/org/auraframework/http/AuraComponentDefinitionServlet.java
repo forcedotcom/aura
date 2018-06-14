@@ -15,6 +15,26 @@
  */
 package org.auraframework.http;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Stream;
+
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -35,31 +55,12 @@ import org.auraframework.service.LoggingService;
 import org.auraframework.service.ServerService;
 import org.auraframework.service.ServerService.HYDRATION_TYPE;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
-
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.stream.Stream;
 
 public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
@@ -145,9 +146,14 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 return;
             }
 
-            // TODO remove hydration after performance anaylsis
+            // TODO choose appropriate hydration type after performance anaylsis
             if (hydrationType == null) {
-                hydrationType = HYDRATION_TYPE.one;
+                if (configAdapter.getDefaultMode() == Mode.PROD) {
+                    hydrationType = HYDRATION_TYPE.one;
+                } else {
+                    // in non prod modes, we want to use hydration in order to make it easier for developers to debug
+                    hydrationType = HYDRATION_TYPE.all;
+                }
             }
 
             // if locale provided, set the it on the context as a requested locale
@@ -375,17 +381,17 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         }
         return sb.toString();
     }
-    
+
     @Inject
     public void setDefinitionService(DefinitionService definitionService) {
         this.definitionService = definitionService;
     }
-    
+
     @Inject
     public void setServerService(ServerService serverService) {
         this.serverService = serverService;
     }
-    
+
     @Inject
     public void setLoggingService(LoggingService loggingService) {
         this.loggingService = loggingService;

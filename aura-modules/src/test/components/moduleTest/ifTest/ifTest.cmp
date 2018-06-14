@@ -4,7 +4,10 @@
     <ui:button aura:id="show" label="show" press="{!c.show}"/>
     <ui:button aura:id="hide" label="hide" press="{!c.hide}"/>
 
-    <aura:if isTrue="{!v.readyToRender}">
-        <moduleTest:simpleCmp/>
-    </aura:if>
+    <div aura:id="container">
+        <aura:if isTrue="{!v.readyToRender}">
+            <moduleTest:simpleCmp/>
+        </aura:if>
+    </div>
+
 </aura:component>

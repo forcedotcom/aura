@@ -16,16 +16,15 @@
 
 -->
 <aura:component render="client">
-    <aura:attribute name="bool1" type="Boolean" default="true"/>
-    <ui:button press="{!c.toggleBool1}" label="toggle bool1 to load new array with different range" aura:id="toggleBool1"/>
-    
-    <div aura:id="iterationBlock" class="iterationBlock">
-        <aura:renderif isTrue="{!v.bool1}">
-            <iterationTest:iterationWithIfInside start="1" end="10" />
-        <aura:set attribute="else">
-            <iterationTest:iterationWithIfInside start="11" end="20" />
-        </aura:set>
-        </aura:renderif>
+
+    <aura:attribute name="list" type="String[]"/>
+
+    <div class="container" aura:id="container">
+        <aura:iteration aura:id="iteration" items="{!v.list}" var="value" indexVar="index">
+            <aura:if isTrue="{! value != 'Skip1' &amp;&amp; value != 'Skip2' }">
+                <div> {!value} </div>
+            </aura:if>
+        </aura:iteration>
     </div>
-    
+
 </aura:component>

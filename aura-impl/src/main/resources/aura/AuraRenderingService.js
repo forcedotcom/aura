@@ -314,7 +314,7 @@ AuraRenderingService.prototype.unrender = function(components) {
                 // required now, because we use the first element to determine the postion when updating container chain during
                 // re-rendering facet.
                 if (oldContainerMarker !== currentContainerMarker) {
-                    this.replaceElementOnContainers(container, oldContainerMarker, currentContainerMarker);
+                    this.moveContainerReferencesToMarker(container, oldContainerMarker, currentContainerMarker);
                 }
 
                 // If we have beforeUnrenderElements, then we're in a component that should have its
@@ -383,11 +383,12 @@ AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) 
     }
 
     var updatedFacet = {
-        components:[],
-        facetInfo:[],
-        useFragment:false,
-        fullUnrender:false,
-        hasNewMarker:false
+        components: [],
+        unrenderedComponents: [],
+        facetInfo: [],
+        useFragment: false,
+        fullUnrender: false,
+        hasNewMarker: false
     };
     var renderCount = 0;
     if (component._facetInfo) {
@@ -416,7 +417,7 @@ AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) 
                 }
             }
             if (!found) {
-                updatedFacet.components.push({action:"render",component: child, oldIndex: -1, newIndex: i});
+                updatedFacet.components.push({action:"render",component: child, newIndex: i});
                 // the component will have a new marker from the new rendered component
                 if (i === 0) {
                     updatedFacet.hasNewMarker = true;
@@ -429,10 +430,11 @@ AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) 
         if (!updatedFacet.components.length) {
             updatedFacet.fullUnrender = true;
         }
+
         for (var x = 0; x < component._facetInfo.length; x++) {
             // component._facetInfo[x] should always be either a component or a falsy value
             if (component._facetInfo[x]) {
-                updatedFacet.components.unshift({action: "unrender",component: component._facetInfo[x], oldIndex: x, newIndex: -1});
+                updatedFacet.unrenderedComponents.unshift({action: "unrender", component: component._facetInfo[x], oldIndex: x});
             }
         }
     }
@@ -522,6 +524,7 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
     var target = referenceNode || marker.parentNode;
     var calculatedPosition = 0;
     var nextSibling = null;
+    var componentType = component.getType();
 
     var topVisit = this.rerenderFacetTopVisit;
     var beforeRerenderElements = null;
@@ -542,12 +545,65 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
         calculatedPosition += this.getInsertPosition(component, target);
     }
 
+    var unrenderedComponents = updatedFacet.unrenderedComponents;
+    // start unrendering from the last component on facet
+    for (var n = 0; n < unrenderedComponents.length; n++) {
+        var unrenderInfo = unrenderedComponents[n];
+        var unrenderedComponent = unrenderInfo.component;
+
+        // Skip, if the component has been destroyed
+        if (!unrenderedComponent.isValid()) {
+            continue;
+        }
+
+        // If the unrendered component used to be the first component on facet, we need to move marker.
+        // For html component, it should always has its own element as marker.
+        if (unrenderInfo.oldIndex === 0 && component.getType() !== "aura:html") {
+            marker = this.getMarker(component);
+            var allElements = this.getAllElements(unrenderedComponent);
+
+            if (marker === allElements[0]) {
+                var newMarker;
+                // If there will be a new marker from new rendered component, we should not move the marker to next sibling
+                // when unrendering the first component on facet. It needs the comment marker to insert the new rendered component.
+                if (updatedFacet.hasNewMarker || !marker.nextSibling || updatedFacet.fullUnrender) {
+                    newMarker = this.createMarker(marker, "unrender facet: " + component.getGlobalId());
+                    // for the new comment marker
+                    calculatedPosition += 1;
+                } else {
+                    // We can't just assume the nextSibling, it could belong to what we're unrendering.
+                    // Find the next element that this unrendering component does not own.
+                    var count = allElements.length - 1;
+                    nextSibling = marker.nextSibling;
+                    while (count && nextSibling.nextSibling) {
+                        nextSibling = nextSibling.nextSibling;
+                        count--;
+                    }
+                    newMarker = nextSibling;
+                }
+
+                this.setMarker(component, newMarker);
+                this.moveContainerReferencesToMarker(component, marker, newMarker);
+            }
+
+        }
+
+        if (unrenderedComponent.autoDestroy()) {
+            this.cleanComponent(unrenderedComponent.getGlobalId());
+            unrenderedComponent.destroy();
+        } else {
+            this.unrender(unrenderedComponent);
+            unrenderedComponent.disassociateElements();
+            this.cleanComponent(unrenderedComponent.getGlobalId());
+        }
+    }
+
     var components = updatedFacet.components;
     for (var i = 0; i < components.length; i++) {
         var info = components[i];
-        var cmpOnFacet = info.component;
+        var facetComponent = info.component;
 
-        if (!cmpOnFacet.isValid() && info.action !== "unrender") {
+        if (!facetComponent.isValid()) {
             continue;
         }
 
@@ -556,9 +612,9 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
             case "render":
                 // Dynamically created component uses its creator as its container when it gets created.
                 // The container needs to be updated when the component gets rendered.
-                cmpOnFacet.setContainerComponentId(component.globalId);
+                facetComponent.setContainerComponentId(component.globalId);
 
-                renderedElements = this.render(cmpOnFacet);
+                renderedElements = this.render(facetComponent);
                 if (updatedFacet.useFragment) {
                     Array.prototype.push.apply(ret, renderedElements);
                     calculatedPosition += renderedElements.length;
@@ -574,49 +630,19 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
                         calculatedPosition += renderedElements.length;
                     }
                 }
-                this.afterRenderStack.push(cmpOnFacet);
+                this.afterRenderStack.push(facetComponent);
                 break;
             case "rerender":
-                if (this.hasDirtyValue(cmpOnFacet)) {
-                    renderedElements = this.rerender(cmpOnFacet);
+                if (this.hasDirtyValue(facetComponent)) {
+                    renderedElements = this.rerender(facetComponent);
                 } else {
                     // We need a copy of the array.
-                    renderedElements = this.getAllElementsCopy(cmpOnFacet);
+                    renderedElements = this.getAllElementsCopy(facetComponent);
                 }
-                cmpOnFacet.disassociateElements();
-                this.associateElements(cmpOnFacet, renderedElements);
+                facetComponent.disassociateElements();
+                this.associateElements(facetComponent, renderedElements);
                 Array.prototype.push.apply(ret, renderedElements);
                 calculatedPosition += renderedElements.length;
-                break;
-            case "unrender":
-                marker = this.getMarker(component);
-
-                // for html component, it should always has its own element as marker
-                if (!this.isCommentMarker(marker) && component.getType() !== "aura:html") {
-
-                    // if there will be a new marker from new rendered component, we should not move the marker to next sibling
-                    // when unrendering the first component on facet
-                    if (updatedFacet.fullUnrender || !marker.nextSibling || (info.oldIndex === 0 && updatedFacet.hasNewMarker)) {
-                        var newMarker = this.createMarker(marker, "unrender facet: " + component.getGlobalId());
-                        this.setMarker(component, newMarker);
-                        // for the new comment marker
-                        calculatedPosition += 1;
-                    } else if (cmpOnFacet.isValid()) {
-                        this.moveSharedMarkerToSibling(component, cmpOnFacet);
-                    }
-
-                }
-
-                if (cmpOnFacet.isValid()) {
-                    if (cmpOnFacet.autoDestroy()) {
-                        this.cleanComponent(cmpOnFacet.getGlobalId());
-                        cmpOnFacet.destroy();
-                    } else {
-                        this.unrender(cmpOnFacet);
-                        cmpOnFacet.disassociateElements();
-                        this.cleanComponent(cmpOnFacet.getGlobalId());
-                    }
-                }
                 break;
         }
     }
@@ -627,14 +653,15 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
     }
 
     // JBUCH: HALO: FIXME: THIS IS SUB-OPTIMAL, BUT WE NEVER WANT TO REASSOCIATE HTML COMPONENTS
-    var type = component.getType();
-    if (type !== "aura:html") {
+    if (componentType !== "aura:html") {
         marker = this.getMarker(component);
+        // there's new marker from render or rerender
         if (ret.length > 0 && marker !== ret[0]) {
             this.setMarker(component, ret[0]);
-            // now clean up if necessary
-            if (this.isCommentMarker(marker)) {
-                this.moveReferencesToMarker(marker, ret[0]);
+            this.moveContainerReferencesToMarker(component, marker, ret[0]);
+
+            // clean up the old marker if it is not needed anymore
+            if (this.isCommentMarker(marker) && ret.indexOf(marker) < 0) {
                 this.removeElement(marker);
             }
         } else if (ret.length === 0 && marker) {
@@ -646,6 +673,7 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
         this.associateElements(component, ret);
 
         if (topVisit) {
+            // TODO: If we've upated markers on containers, we can just use marker to identify position.
             this.updateElementsOnContainers(component, oldElementContainerPositions, beforeRerenderElements);
         }
     }
@@ -656,7 +684,6 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
 
     return ret;
 };
-
 
 /**
  * Get the insert postion where the elements from component will be inserted on targetNode.
@@ -716,92 +743,6 @@ AuraRenderingService.prototype.getInsertPosition = function(component, targetNod
 
     // The position offset by the amount of untraced nodes.
     return totalPreSiblings + totalElements - length;
-};
-
-/**
- * Update component's marker to componentOnFacet's sibling element if component shares same marker with componentOnFacet.
- * It also updates component's container chain if the containers share the marker as well.
- *
- * This function is used in rerenderFacet() when unrendering component on facet.
- *
- * @private
- */
-AuraRenderingService.prototype.moveSharedMarkerToSibling = function(component, componentOnFacet) {
-    var marker = this.getMarker(component);
-    var allElements = this.getAllElements(componentOnFacet);
-    // do no need to move marker if the component does not share marker with the component on its facet
-    if (allElements[0] !== marker) {
-        return;
-    }
-
-    // We can't just assume the nextSibling, it could belong to what we're unrendering.
-    // Find the next element that this unrendering component does not own.
-    var count = allElements.length - 1;
-    var nextSibling = marker.nextSibling;
-    while (count && nextSibling.nextSibling) {
-        nextSibling = nextSibling.nextSibling;
-        count--;
-    }
-
-    this.setMarker(component, nextSibling);
-    // If old marker is still a shared marker, the shared marker in container chain may need to be updated as well.
-    // Otherwise, a comment marker will be inserted for containers which share the old marker when componentOnFacet gets destroyed.
-    if (this.isSharedMarker(marker)) {
-        var container = component.getConcreteComponent().getContainer();
-        while (container) {
-            var concrete = container.getConcreteComponent();
-            if (concrete.getType() === "aura:html") {
-                break;
-            }
-
-            if (this.getMarker(concrete) === marker) {
-                // We assume that nextSibling exists. If this function can be called without nextSibling check,
-                // use the current marker of 'component' to update container's marker
-                this.setMarker(concrete, nextSibling);
-            } else {
-                // the container does not share the old marker
-                break;
-            }
-            container = concrete.getContainer();
-        }
-    }
-};
-
-/**
- * Used in AuraRenderingService.unrender to update the new marker element in the container chain.
- *
- * Do not use this method in render or re-render. It doesn't apply aura-class to the new element.
- *
- * @private
- */
-AuraRenderingService.prototype.replaceElementOnContainers = function(component, oldElement, newElement) {
-
-    while (component) {
-        var concrete = component.getConcreteComponent();
-        // Stop updating elements for container chain if it is a HtmlComponent. This needs to match the render logic.
-        if (concrete.getType() === "aura:html" || concrete.isRendered() === false) {
-            return;
-        }
-
-        var allElements = this.getAllElements(concrete);
-        var index = allElements.indexOf(oldElement);
-        if (index > -1) {
-            allElements[index] = newElement;
-
-            // Because this replacement only happens when container component gets a new marker during child's unrender,
-            // the new element is supposed to be always comment marker.
-            // TODO: verify un-comment marker won't be here and remove the logic below.
-            if (!this.isCommentMarker(oldElement)) {
-                var elements = this.getElements(concrete);
-                index = elements.indexOf(oldElement);
-                if (index > -1) {
-                    elements.splice(index, 1);
-                }
-            }
-        }
-
-        component = concrete.getContainer();
-    }
 };
 
 /**
@@ -1565,6 +1506,34 @@ AuraRenderingService.prototype.removeElement = function(marker, container) {
 };
 
 /**
+ * This function is used in rerenderFacet() when unrendering component on facet.
+ * It is for tracking the change of the shared marker on component's container chain due to unrendering component
+ * on facet.
+ *
+ * @private
+ */
+AuraRenderingService.prototype.moveContainerReferencesToMarker = function(component, oldMarker, newMarker) {
+
+    var container = component.getConcreteComponent().getContainer();
+    while (container) {
+        var concrete = container.getConcreteComponent();
+        if (concrete.getType() === "aura:html" || concrete.isRendered() === false) {
+            break;
+        }
+
+        // if the container shares marker with component
+        if (this.getMarker(concrete) === oldMarker) {
+            this.setMarker(concrete, newMarker);
+        }
+
+        this.replaceMarkerElement(concrete, oldMarker, newMarker);
+
+        container = concrete.getContainer();
+    }
+
+};
+
+/**
  * All the components who are using the specified dom node as a marker need to now be moved to a comment marker.
  * This method doesn't check if you're moving from one comment node to another. That would be a waste of time, so
  * be aware you should verify that first.
@@ -1585,29 +1554,7 @@ AuraRenderingService.prototype.moveReferencesToMarker = function(marker, newMark
             }
 
             this.setMarker(cmp, newMarker);
-            var concrete = cmp.getConcreteComponent();
-            var elements = concrete.allElements;
-            var position;
-            if (!elements) {
-                concrete.elements = concrete.allElements = [newMarker];
-            } else {
-                position = elements.indexOf(marker);
-                if (position === -1) {
-                    // This seems like a problem, lets try to see if it happens
-                    $A.warning("AuraRenderingService.moveReferencesToMarker(): Missing marker on component " + cmp);
-                    // insert the new marker to behind if something is wrong
-                    position = elements.length;
-                }
-                var filteredElements = [];
-
-                elements[position] = newMarker;
-                for (var i=0;i<elements.length;i++) {
-                    if (!elements[i].aura_marker) {
-                        filteredElements.push(elements[i]);
-                    }
-                }
-                concrete.elements = filteredElements;
-            }
+            this.replaceMarkerElement(cmp, marker, newMarker);
         }
     }
 
@@ -1618,10 +1565,47 @@ AuraRenderingService.prototype.moveReferencesToMarker = function(marker, newMark
     }
 };
 
+AuraRenderingService.prototype.replaceMarkerElement = function(component, oldMarker, newMarker) {
+    var concrete = component.getConcreteComponent();
+    var allElements = concrete.allElements;
+
+    if (!allElements) {
+        concrete.allElements = [newMarker];
+        concrete.elements = [];
+        if (!this.isCommentMarker(newMarker)) {
+            concrete.elements.push(newMarker);
+        }
+        return;
+    }
+
+    if (allElements.indexOf(newMarker) > -1) {
+        return;
+    }
+
+    var position = allElements.indexOf(oldMarker);
+    if (position === -1) {
+        // This seems like a problem, lets try to see if it happens
+        $A.warning("AuraRenderingService.replaceMarkerElement(): Missing marker on component " + component);
+        // insert the new marker to behind if something is wrong
+        position = allElements.length;
+    }
+    allElements[position] = newMarker;
+
+    var filteredElements = [];
+    for (var i = 0; i < allElements.length; i++) {
+        if (!this.isCommentMarker(allElements[i])) {
+            filteredElements.push(allElements[i]);
+        }
+    }
+    concrete.elements = filteredElements;
+};
+
 /**
  * Are multiple components using this as a marker?
  * Shared markers need to have their other references moved before being able to remove the marker node from the dom.
  *
+ * TODO: this method is confusing.
+ * We probably should add another param of globalId to check if there's shared marker with the global Id.
  * @private
  */
 AuraRenderingService.prototype.isSharedMarker = function(marker) {

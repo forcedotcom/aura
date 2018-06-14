@@ -304,13 +304,15 @@ AttributeSet.prototype.set = function(key, value, component) {
         // as the parent is irrelevant and its value provider will be
         // "component".
         var facetValue=null;
-        for(var i = 0; i < facet.length; i++) {
+        for (var i = 0; i < facet.length; i++) {
             facetValue = facet[i];
             if(facetValue) {
                 while (facetValue instanceof PassthroughValue) {
                     facetValue = facetValue.getComponent();
                 }
-                if(facetValue.setContainerComponentId) {
+                // If the facet component has been rendered, its container should be the component who renders it.
+                // TODO: why do we set container in here? probably for event bubbling. Figure it out and make it right.
+                if (facetValue.setContainerComponentId && facetValue.isRendered() === false) {
                     facetValue.setContainerComponentId(component.globalId);
                 }
             }

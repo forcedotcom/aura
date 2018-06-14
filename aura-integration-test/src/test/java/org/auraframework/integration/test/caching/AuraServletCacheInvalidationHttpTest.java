@@ -24,7 +24,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -82,7 +81,9 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));
         }
-        assertTrue("AuraServlet did not accept lastMod param.", response.startsWith(AuraBaseServlet.CSRF_PROTECT));
+
+        assertTrue("Response was not valid JSON", new JsonReader().read(response) != null);
+        assertFalse("AuraServlet did not accept lastMod param.", response.endsWith("/*ERROR*/"));
     }
 
     /**

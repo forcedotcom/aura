@@ -207,9 +207,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             //
             if (format == Format.JSON) {
                 out = response.getWriter();
-                if (!written) {
-                    out.write(CSRF_PROTECT);
-                }
                 //
                 // If an exception happened while we were emitting JSON, we want the
                 // client to ignore the now-corrupt data structure. 404s and 500s

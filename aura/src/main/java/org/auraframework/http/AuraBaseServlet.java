@@ -30,7 +30,6 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 @SuppressWarnings("serial")
 public abstract class AuraBaseServlet extends HttpServlet {
     public static final String AURA_PREFIX = "aura.";
-    public static final String CSRF_PROTECT = "while(1);\n";
 
     /**
      * "Short" pages (such as manifest cookies and AuraFrameworkServlet pages) expire in 1 day.

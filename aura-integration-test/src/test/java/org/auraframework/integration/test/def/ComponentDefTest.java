@@ -29,7 +29,6 @@ import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.component.BaseComponentDefTest;
 import org.auraframework.service.CompilerService;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;

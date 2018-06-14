@@ -42,7 +42,6 @@ import org.auraframework.adapter.DefaultContentSecurityPolicy;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.impl.java.controller.PublicCachingTestController;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.system.AuraContext.Mode;
@@ -229,7 +228,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));
         }
-        new JsonReader().read(response.substring(AuraBaseServlet.CSRF_PROTECT.length()));
+        new JsonReader().read(response);
     }
 
     @Test
@@ -282,10 +281,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
         assertEquals("Status code should be 200", HttpStatus.SC_OK, statusCode);
 
-        assertTrue("response not wrapped with ERROR marker: " + response,
-                response.startsWith(AuraBaseServlet.CSRF_PROTECT + "*/") && response.endsWith("/*ERROR*/"));
-        response = response.substring(AuraBaseServlet.CSRF_PROTECT.length() + 2,
-                response.length() - "/*ERROR*/".length());
+        assertTrue("response not wrapped with ERROR marker: " + response, response.endsWith("/*ERROR*/"));
+        response = response.substring(2, response.length() - "/*ERROR*/".length());
+
         @SuppressWarnings("unchecked")
         Map<String, Object> json = (Map<String, Object>) new JsonReader().read(response);
         assertEquals(true, json.get("exceptionEvent"));
@@ -659,10 +657,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, getStatusCode(response));
         
         String body = getResponseBody(response);
-        assertTrue("Cannot find CSRF token in response body", body.startsWith(AuraBaseServlet.CSRF_PROTECT));
         
-        Map<String, Object> json = (Map<String, Object>) new JsonReader().read(body.substring(
-                AuraBaseServlet.CSRF_PROTECT.length()));
+        Map<String, Object> json = (Map<String, Object>) new JsonReader().read(body);
         List<Map<String, Object>> actions = (List<Map<String, Object>>) json.get("actions");
         assertEquals("Unexpected number of actions in response", 1, actions.size());
         assertEquals("Unexpected action state", "SUCCESS", actions.get(0).get("state"));

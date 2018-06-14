@@ -1755,7 +1755,7 @@ TestInstance.prototype.sendOverride = function(config, auraXHR, actions, method,
  * @private
  * @function Test#decodeOverride
  */
-TestInstance.prototype.decodeOverride = function(config, response, noStrip, timeOut) {
+TestInstance.prototype.decodeOverride = function(config, response, timeOut) {
     if (this.disconnected) {
         return { "status": "INCOMPLETE" };
     }
@@ -1782,7 +1782,7 @@ TestInstance.prototype.decodeOverride = function(config, response, noStrip, time
 
     }
     //now feed decode() with our copy of response
-    var res = config["fn"].call(config["scope"], oldResponse, noStrip, timeOut);
+    var res = config["fn"].call(config["scope"], oldResponse, timeOut);
     for (i = 0; i < post_callbacks.length; i++) {
         post_callbacks[i].postDecodeCallback(res);
     }

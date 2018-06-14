@@ -180,10 +180,6 @@
      */
     decodeResponse: function(response) {
         var text = response["responseText"];
-        // Strip off the while(1) at the beginning. Logic borrowed from AuraClientService.js#decode
-        if (text.charAt(0) === "w") {
-            text = text.substring(text.indexOf("\n")+1);
-        }
         return $A.test.json.decode(text);
     },
 
@@ -191,7 +187,7 @@
      * Encodes and pads the action response so AuraClientService can process it.
      */
     encodeResponse: function(response) {
-        return "while(1);\n" + $A.util.json.encode(response);
+        return $A.util.json.encode(response);
     },
 
     /**

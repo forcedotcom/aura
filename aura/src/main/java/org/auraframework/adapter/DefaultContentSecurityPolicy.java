@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.auraframework.Aura;
 import org.auraframework.http.CSP;
-import org.auraframework.http.CSPReporterServlet;
 import org.auraframework.service.CSPInliningService;
 
 /**

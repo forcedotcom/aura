@@ -2121,7 +2121,7 @@ Test.Aura.AuraClientServiceTest = function() {
             });
 
             mocksForDecode(function() {
-                actual = target.decode(undefined, undefined, true);
+                actual = target.decode(undefined, true);
             });
 
             Assert.Equal("INCOMPLETE", actual["status"]);
@@ -2139,7 +2139,7 @@ Test.Aura.AuraClientServiceTest = function() {
             });
 
             mocksForDecode(function() {
-                target.decode(undefined, undefined, true);
+                target.decode(undefined, true);
             });
 
             Assert.True(actual);
@@ -2156,7 +2156,7 @@ Test.Aura.AuraClientServiceTest = function() {
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
 
-                target.decode = function(response, noStrip, timedOut) {
+                target.decode = function(response, timedOut) {
                     actual = timedOut;
                     return response;
                 };

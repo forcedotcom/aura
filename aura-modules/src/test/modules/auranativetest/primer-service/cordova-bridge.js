@@ -4,8 +4,7 @@
 
 // $A.get("$Label.test.task_mode_today");
 const LABEL_EXAMPLE_MOCK =
-`while(1);
-{
+`{
   "actions":[
     {
       "id":"15;a",
@@ -200,8 +199,7 @@ const LABEL_EXAMPLE_MOCK =
 
 const ERROR_MOCK1_HTTP_STATUS_CODE = 200;
 const ERROR_MOCK1_CONTENT =
-`while(1);
-*/{
+`*/{
   "event":{
     "descriptor":"markup://aura:invalidSession",
     "attributes":{
@@ -214,8 +212,7 @@ const ERROR_MOCK1_CONTENT =
 }/*ERROR*/`;
 
 const ERROR_NO_TOKEN_MOCK_CONTENT =
-`while(1);
-*/{
+`*/{
   "event":{
     "descriptor":"markup://aura:invalidSession",
     "attributes":{

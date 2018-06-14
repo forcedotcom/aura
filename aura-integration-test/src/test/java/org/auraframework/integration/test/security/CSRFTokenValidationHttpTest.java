@@ -25,7 +25,6 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.util.EntityUtils;
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
@@ -82,7 +81,8 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
         if (statusCode != HttpStatus.SC_OK || !response.endsWith("/*ERROR*/")) {
             fail("Should not be able to post to aura servlet without a valid CSRF token");
         }
-        if (response.startsWith(AuraBaseServlet.CSRF_PROTECT)) {
+
+        if (response.startsWith("/*") == false) {
             response = "/*" + response;
         }
         Map<String, Object> json = (Map<String, Object>) new JsonReader().read(response);

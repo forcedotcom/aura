@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.instance.ApplicationInitializer;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.Instance;
@@ -28,7 +27,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
-import org.auraframework.util.json.JsonSerializationContext;
 
 import java.io.StringWriter;
 import java.util.Collection;

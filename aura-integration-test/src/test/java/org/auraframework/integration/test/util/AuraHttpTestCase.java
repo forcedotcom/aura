@@ -42,7 +42,6 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.impl.java.controller.DebugController;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.InstanceBuilderProvider;
@@ -671,13 +670,11 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                 HttpResponse response = getHttpClient().execute(post);
                 assertEquals(HttpStatus.SC_OK, getStatusCode(response));
                 rawResponse = getResponseBody(response);
-                assertEquals(AuraBaseServlet.CSRF_PROTECT,
-                        rawResponse.substring(0, AuraBaseServlet.CSRF_PROTECT.length()));
                 if (rawResponse.endsWith("/*ERROR*/")) {
                     fail("Error response:" + rawResponse);
                 }
                 Map<String, Object> json = (Map<String, Object>) new JsonReader()
-                .read(rawResponse.substring(AuraBaseServlet.CSRF_PROTECT.length()));
+                .read(rawResponse);
                 ArrayList<Map<String, Object>> actions = (ArrayList<Map<String, Object>>) json.get("actions");
                 for (Map<String, Object> action : actions) {
 

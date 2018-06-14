@@ -111,7 +111,6 @@ public class AuraServlet extends AuraBaseServlet {
     private static final long serialVersionUID = 2218469644108785216L;
 
     public final static String AURA_PREFIX = "aura.";
-    private final static String CSRF_PROTECT = "while(1);\n";
     private final static String UNKNOWN_FRAMEWORK_UID = "UNKNOWN";
     private final static String REPORT_ERROR_ACTION = "ComponentController/ACTION$reportFailedAction";
 
@@ -617,8 +616,6 @@ public class AuraServlet extends AuraBaseServlet {
             } else {
                 written = true;
             }
-
-            out.write(CSRF_PROTECT);
 
             serverService.run(message, context, out, attributes);
 

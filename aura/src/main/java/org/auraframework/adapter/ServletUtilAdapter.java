@@ -38,7 +38,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 public interface ServletUtilAdapter extends AuraAdapter {
     String AURA_PREFIX = "aura.";
-    String CSRF_PROTECT = "while(1);\n";
 
     /**
      * Hook at the beginning of any resource request.

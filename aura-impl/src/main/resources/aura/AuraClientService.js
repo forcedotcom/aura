@@ -442,12 +442,11 @@ AuraClientService.prototype.evalExporter = function(script, descriptor, type) {
  * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
  *
  * @param {XmlHttpRequest} response the XHR object.
- * @param {Boolean} [noStrip] true to not strip off the JSON hijacking prevention (while(1) prefix).
  * @param {Boolean} [timedOut] true if the XHR timed out; false otherwise.
  * @returns {Object} An object with properties 'status', which represents the status of the response, and potentially
  *          'message', which contains the decoded server response or an error message.
  */
-AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
+AuraClientService.prototype.decode = function(response, timedOut) {
     var ret = {};
 
     var e;
@@ -502,12 +501,8 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
             // if we encountered an exception once the response was committed
             // strip the malformed JSON
             text = text.substring(text.indexOf("*/")+2,text.lastIndexOf("/*"));
-        } else if (!noStrip === true && text.charAt(0) === "w") {
-            //
-            // strip off the while(1) at the beginning
-            //
-            text = text.substring(text.indexOf("\n") + 1);
         }
+
         var resp = $A.util.json.decode(text);
 
         // if the error on the server is meant to trigger a client-side event...
@@ -591,12 +586,6 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
             ret["status"] = "ERROR";
             return ret;
         }
-    }
-    //
-    // strip off the while(1) at the beginning
-    //
-    if (!noStrip === true && text.charAt(0) === "w") {
-        text = text.substring(text.indexOf("\n")+1);
     }
 
     var responseMessage = $A.util.json.decode(text);
@@ -3402,7 +3391,7 @@ AuraClientService.prototype.receive = function(auraXHR, timedOut) {
     var responseMessage;
     this.auraStack.push("AuraClientService$receive");
     try {
-        responseMessage = this.decode(auraXHR.request, false, timedOut);
+        responseMessage = this.decode(auraXHR.request, timedOut);
 
         if (responseMessage["status"] === "SUCCESS") {
             this.processResponses(auraXHR, responseMessage["message"]);

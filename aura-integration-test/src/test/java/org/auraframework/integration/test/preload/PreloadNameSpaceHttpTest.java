@@ -23,7 +23,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.auraframework.def.ApplicationDef;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.AuraTestLabels;
@@ -48,15 +47,12 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
     @AuraTestLabels("auraSanity")
     @Test
     public void testComponentDef() throws Exception {
-        String response = obtainResponseCheckStatus();
-
-        // Obtain a component which uses preloading namespaces
-        String componentInJson = response.substring(AuraBaseServlet.CSRF_PROTECT.length());
+        final String response = obtainResponseCheckStatus();
         Map<String, Object> outerMap;
         try {
-            outerMap = (Map<String, Object>) new JsonReader().read(componentInJson);
+            outerMap = (Map<String, Object>) new JsonReader().read(response);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse: "+componentInJson, e);
+            throw new RuntimeException("Failed to parse: "+response, e);
         }
         List<Object> actions = (List<Object>) outerMap.get("actions");
         Map<String, Object> action = (Map<String, Object>) actions.get(0);
@@ -76,13 +72,13 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
     public void testNoPreloadsOnContext() throws Exception {
         String response = obtainResponseCheckStatus();
 
-        // Grab the preloads attached to the context
-        String componentInJson = response.substring(AuraBaseServlet.CSRF_PROTECT.length());
+        
         Map<String, Object> outerMap;
         try {
-            outerMap = (Map<String, Object>) new JsonReader().read(componentInJson);
+            // Grab the preloads attached to the context
+            outerMap = (Map<String, Object>) new JsonReader().read(response);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse: "+componentInJson, e);
+            throw new RuntimeException("Failed to parse: "+response, e);
         }
         Map<String, Object> context = (Map<String, Object>) outerMap.get("context");
         ArrayList<String> preloads = (ArrayList<String>) context.get("preloads");
@@ -135,13 +131,12 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
     public void testDynamicNamespace() throws Exception {
         Assume.assumeTrue(configAdapter.uriAddressableDefsEnabled());
 
-        String response = obtainResponseCheckStatusDN();
-        String componentInJson = response.substring(AuraBaseServlet.CSRF_PROTECT.length());
+        final String response = obtainResponseCheckStatusDN();
         Map<String, Object> outerMap;
         try {
-            outerMap = (Map<String, Object>) new JsonReader().read(componentInJson);
+            outerMap = (Map<String, Object>) new JsonReader().read(response);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse: "+componentInJson, e);
+            throw new RuntimeException("Failed to parse: "+response, e);
         }
         Map<String,Object> context = (Map<String,Object>) outerMap.get("context");
         Map<String,String> componentUids = (Map<String,String>) context.get("descriptorUids");

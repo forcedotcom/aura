@@ -93,7 +93,8 @@
             }, "API method on SecureLWC element was not called");
         }
     },
-    testAuraLWCDomEventOnHostElement: {
+    // TODO: Due to a bug in how LWC engine patches target and currentTarget properties on event
+    _testAuraLWCDomEventOnHostElement: {
         test: function (cmp) {
             var module = cmp.find('parentSecure').getElement();
             var triggered = false;
@@ -163,7 +164,8 @@
             return module.testSecureLWC2SecureLWCCustomEvent();
         }
     },
-    testSecureLWC2SecureLWCDomEvent: {
+    // TODO: Due to a bug in how LWC engine patches target and currentTarget properties on event
+    _testSecureLWC2SecureLWCDomEvent: {
         test: function (cmp) {
             var module = cmp.find('parentSecure').getElement();
             return module.testSecureLWC2SecureLWCDomEvent();

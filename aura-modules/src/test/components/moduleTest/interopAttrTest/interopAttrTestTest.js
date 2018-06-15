@@ -13,7 +13,6 @@
                 var expected = 'false';
                 var element = cmp
                     .getElement()
-                    .shadowRoot
                     .querySelector(this.selector.literal);
                 return new Promise(function(resolve, reject) {
                     var actual = element.textContent;

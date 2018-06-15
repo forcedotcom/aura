@@ -16,6 +16,7 @@
 
 -->
 <aura:component>
+    <br/><br/><br/>
     <ui:dialogManager/>
     <aura:handler event="ui:closeDialog" action="{!c.closeDialog}"/>
     <ui:inputText aura:id="resultLabel" class="resultLabel" value=""/>

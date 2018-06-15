@@ -177,11 +177,9 @@
         return module.testSecureLWC2SecureLWCDomEvent();
     },
     // User Story: W-5058590
-    _testSecureLWC2UnsecureLWCCustomEvent: function (cmp) {
+    testSecureLWC2UnsecureLWCCustomEvent: function (cmp) {
         var module = cmp.find('parentSecure').getElement();
-        module.testSecureLWC2UnsecureLWCCustomEvent();
-        // TODO add wait for to make sure test executed successfully
-        // currently there is an issue with passing function parameters to Secure LWC components
+        return module.testSecureLWC2UnsecureLWCCustomEvent();
     },
     // User Story: W-4808252
     _testSecureLWC2UnsecureLWCDOMEvent: function (cmp) {

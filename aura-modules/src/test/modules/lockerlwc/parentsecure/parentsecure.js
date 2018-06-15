@@ -234,7 +234,7 @@ export default class ParentSecure extends Element {
         });
 
         this.assertIsSecureCustomEvent(ev);
-        testUtils.waitForTimeout(
+        const promise = testUtils.waitForPromise(
             true,
             function () {
                 return doneObj.triggered;
@@ -243,6 +243,7 @@ export default class ParentSecure extends Element {
         );
 
         child.dispatchEvent(ev);
+        return promise;
     }
 
     @api testSecureLWC2UnsecureLWCDOMEvent(cb) {

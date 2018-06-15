@@ -98,7 +98,7 @@ export default class ParentUnsecure extends Element {
         testUtils.assertEquals('foobar', ev.detail.data.string, 'Expected string was not received in event data');
         testUtils.assertEquals(1, ev.detail.data.number, 'Expected number was not received in event data');
         testUtils.assertEquals(true, ev.detail.data.boolean, 'Expected boolean was not received in event data');
-        testUtils.assertEquals(null, ev.detail.data.domElement, 'Should not receive a SecureElement');
+        testUtils.assertEquals('[object HTMLDivElement]', ev.detail.data.domElement.toString(), 'Should not receive a SecureElement');
         testUtils.assertEquals(
             '[object Window]',
             `${ev.detail.data.win}`,

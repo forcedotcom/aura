@@ -63,9 +63,9 @@
         }
     },
     // User Story: W-5058590
-    _testSecureLWC2UnsecureLWCCustomEvent: {
+    testSecureLWC2UnsecureLWCCustomEvent: {
         test: function (cmp) {
-            cmp.testSecureLWC2UnsecureLWCCustomEvent()
+            return cmp.testSecureLWC2UnsecureLWCCustomEvent()
         }
     },
     // User Story: W-4808252

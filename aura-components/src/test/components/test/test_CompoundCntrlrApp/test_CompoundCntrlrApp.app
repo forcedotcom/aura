@@ -17,6 +17,7 @@
 -->
 <aura:application controller="java://org.auraframework.components.test.java.controller.TestController" render="client">
     <aura:attribute name="label" type="String" default="Button"/>
+    <br/><br/><br/>
     <test:test_button label="{!v.label}" press="{!c.handleClick}" class="test_locator"/>
     <test:test_button label="{!v.label}" press="{!c.handleClickForNonUnicodeControllerResponse}" class="test_locator2" />
 </aura:application>

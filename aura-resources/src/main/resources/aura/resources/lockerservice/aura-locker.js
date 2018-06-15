@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-06-13
- * Version: 0.4.23
+ * Generated: 2018-06-15
+ * Version: 0.4.24
  */
 
 (function (exports) {
@@ -4120,11 +4120,7 @@ SecureElement.secureQuerySelector = function(el, key, selector) {
 const sanitized = new WeakSet();
 
 function freezeIntrinsics(realmRec) {
-  const { intrinsics, notFrozenIntrinsicNames } = realmRec;
-  const eagerFreezeIntrinsics = assign({}, intrinsics);
-  if (isArray(notFrozenIntrinsicNames)) {
-    notFrozenIntrinsicNames.forEach(prop => delete eagerFreezeIntrinsics[prop]);
-  }
+  const { eagerFreezeIntrinsics } = realmRec;
   deepFreeze(eagerFreezeIntrinsics);
 }
 
@@ -4474,7 +4470,7 @@ function tamperProofProp(obj, prop) {
  * These properties are subject to the override mistake.
  */
 function repairDataProperties(realmRec) {
-  const { intrinsics: i } = realmRec;
+  const { eagerFreezeIntrinsics: i } = realmRec;
 
   [
     i.ObjectPrototype,
@@ -4556,7 +4552,15 @@ function init(options) {
   realmRec.unsafeFunction = options.unsafeGlobal.Function;
   realmRec.notFrozenIntrinsicNames = options.notFrozenIntrinsicNames;
 
-  realmRec.intrinsics = getIntrinsics(realmRec);
+  const intrinsics = getIntrinsics(realmRec);
+
+  const eagerFreezeIntrinsics = assign({}, intrinsics);
+  if (isArray(realmRec.notFrozenIntrinsicNames)) {
+    realmRec.notFrozenIntrinsicNames.forEach(name => delete eagerFreezeIntrinsics[name]);
+  }
+
+  realmRec.intrinsics = intrinsics;
+  realmRec.eagerFreezeIntrinsics = eagerFreezeIntrinsics;
 
   // None of these values can change after initialization.
   freeze(realmRec);
@@ -7724,6 +7728,38 @@ SecureBlob.prototype = Blob.prototype;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+function SecureCustomEvent(CustomEventCtor, key) {
+  assert$1.invariant(CustomEventCtor !== undefined, 'CustomEvent constructor is undefined');
+  assert$1.invariant(key !== undefined, 'key is undefined');
+
+  return function() {
+    let args = Array.prototype.slice.call(arguments);
+    if (args.length > 0) {
+      // Because the event is bring constructed, the sandbox will be used as the accessor
+      args = SecureObject.deepUnfilterMethodArguments(getEnv$1(key), [], args);
+    } else {
+      assert$1.invariant(args.length > 0, 'Cannot invoke CustomEvent constructor without a name');
+    }
+    const event = new CustomEventCtor(...args);
+    return SecureDOMEvent(event, key);
+  };
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 let addPropertiesHook;
 function registerAddPropertiesHook$$1(hook) {
@@ -7790,7 +7826,6 @@ const metadata$$1 = {
       CredentialsContainer: FUNCTION,
       Crypto: FUNCTION,
       CryptoKey: FUNCTION,
-      CustomEvent: CTOR,
       DOMError: FUNCTION,
       DOMException: FUNCTION,
       DOMImplementation: FUNCTION,
@@ -8514,6 +8549,13 @@ function SecureWindow(sandbox, key) {
     });
   }
 
+  if ('CustomEvent' in win) {
+    defineProperty(o, 'CustomEvent', {
+      enumerable: true,
+      value: SecureCustomEvent(win['CustomEvent'], key)
+    });
+  }
+
   if ('File' in win) {
     let valueOverride;
     defineProperty(o, 'File', {
@@ -8888,7 +8930,7 @@ function getWrappedTemplatePrototype() {
 }
 
 function SecureTemplate(template, key) {
-  assert$1.invariant(isObject(key), 'Cannot invoke SecureTemplate wrapper with a valid key');
+  assert$1.invariant(isObject(key), 'Cannot invoke SecureTemplate wrapper without a valid key');
   assert$1.invariant(isObject(template), 'Expected template to be an object');
 
   let o = getFromCache(template, key);

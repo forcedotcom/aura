@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-06-18
- * Version: 0.4.26
+ * Generated: 2018-06-19
+ * Version: 0.4.27
  */
 
 (function (exports) {
@@ -3476,8 +3476,16 @@ function SecureElement(el, key) {
       }
     });
 
-    SecureElement.addStandardMethodAndPropertyOverrides(prototype, caseInsensitiveAttributes, key);
-
+    // Override standard methods and properties derived from Node interface
+    SecureElement.addStandardNodeMethodAndPropertyOverrides(prototype);
+    // Override standard methods and properties derived from Element interface
+    if (el instanceof Element) {
+      SecureElement.addStandardElementMethodAndPropertyOverrides(
+        prototype,
+        caseInsensitiveAttributes,
+        key
+      );
+    }
     defineProperties(prototype, {
       toString: {
         value: function() {
@@ -3798,11 +3806,7 @@ SecureElement.isValidAttributeName = function(raw, name, prototype, caseInsensit
   return false;
 };
 
-SecureElement.addStandardMethodAndPropertyOverrides = function(
-  prototype,
-  caseInsensitiveAttributes,
-  key
-) {
+SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
   defineProperties(prototype, {
     appendChild: {
       writable: true,
@@ -3842,45 +3846,6 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(
         }
 
         return newNode;
-      }
-    },
-
-    querySelector: {
-      writable: true,
-      value: function(selector) {
-        const raw = SecureObject.getRaw(this);
-        return SecureElement.secureQuerySelector(raw, getKey(this), selector);
-      }
-    },
-
-    insertAdjacentHTML: {
-      writable: true,
-      value: function(position, text) {
-        const raw = SecureObject.getRaw(this);
-
-        // Do not allow insertAdjacentHTML on shared elements (body/head)
-        if (SecureElement.isSharedElement(raw)) {
-          throw new error(
-            `SecureElement.insertAdjacentHTML cannot be used with ${raw.tagName} elements!`
-          );
-        }
-
-        let parent;
-        if (position === 'afterbegin' || position === 'beforeend') {
-          // We have access to el, nothing else to check.
-        } else if (position === 'beforebegin' || position === 'afterend') {
-          // Prevent writing outside secure node.
-          parent = raw.parentNode;
-          verifyAccess(this, parent, true);
-        } else {
-          throw new error(
-            "SecureElement.insertAdjacentHTML requires position 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'."
-          );
-        }
-
-        raw.insertAdjacentHTML(position, DOMPurify['sanitize'](text, domPurifyConfig));
-
-        trustChildNodes(this, parent || raw);
       }
     },
 
@@ -3954,6 +3919,53 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(
           }
         }
         return false;
+      }
+    }
+  });
+};
+
+SecureElement.addStandardElementMethodAndPropertyOverrides = function(
+  prototype,
+  caseInsensitiveAttributes,
+  key
+) {
+  defineProperties(prototype, {
+    querySelector: {
+      writable: true,
+      value: function(selector) {
+        const raw = SecureObject.getRaw(this);
+        return SecureElement.secureQuerySelector(raw, getKey(this), selector);
+      }
+    },
+
+    insertAdjacentHTML: {
+      writable: true,
+      value: function(position, text) {
+        const raw = SecureObject.getRaw(this);
+
+        // Do not allow insertAdjacentHTML on shared elements (body/head)
+        if (SecureElement.isSharedElement(raw)) {
+          throw new error(
+            `SecureElement.insertAdjacentHTML cannot be used with ${raw.tagName} elements!`
+          );
+        }
+
+        let parent;
+        if (position === 'afterbegin' || position === 'beforeend') {
+          // We have access to el, nothing else to check.
+        } else if (position === 'beforebegin' || position === 'afterend') {
+          // Prevent writing outside secure node.
+          parent = raw.parentNode;
+          verifyAccess(this, parent, true);
+        } else {
+          throw new error(
+            "SecureElement.insertAdjacentHTML requires position 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'."
+          );
+        }
+
+        raw.insertAdjacentHTML(position, DOMPurify['sanitize'](text, domPurifyConfig));
+
+        trustChildNodes(this, parent || raw);
       }
     },
 
@@ -4037,15 +4049,6 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(
       caseInsensitiveAttributes,
       undefined,
       undefined,
-      'name',
-      key
-    ),
-    removeAttributeNodeNS: SecureElement.createAttributeAccessMethodConfig(
-      'removeAttributeNodeNS',
-      prototype,
-      caseInsensitiveAttributes,
-      undefined,
-      true,
       'name',
       key
     )
@@ -7311,6 +7314,12 @@ function SecureDocument(doc, key) {
               title = String(title);
               const html = doc.implementation.createHTMLDocument(title);
               return SecureHTMLDocument(html, key);
+            }
+          },
+          // https://stackoverflow.com/questions/43317691/why-document-implementation-hasfeature-always-return-true/43317742
+          hasFeature: {
+            value: function() {
+              return true;
             }
           }
         });

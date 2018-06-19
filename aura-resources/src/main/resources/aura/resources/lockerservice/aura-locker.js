@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-06-15
- * Version: 0.4.25
+ * Generated: 2018-06-18
+ * Version: 0.4.26
  */
 
 (function (exports) {
@@ -7952,10 +7952,12 @@ function SecureDOMParser(key) {
           type = String(type);
           if (typeMap[type] === 'xml') {
             const xml = parser.parseFromString(data, type);
+            trustChildNodes(o, xml);
             return SecureXMLDocument(xml, key);
           }
           if (typeMap[type] === 'html') {
             const html = parser.parseFromString(data, type);
+            trustChildNodes(o, html);
             return SecureHTMLDocument(html, key);
           }
           throw new error(`SecureDOMParser does not support type "${type}"`);

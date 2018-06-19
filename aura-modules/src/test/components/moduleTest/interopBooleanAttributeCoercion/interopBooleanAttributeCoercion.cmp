@@ -2,6 +2,8 @@
     <aura:attribute name="trueAttribute" type="String" default="true"/>
     <aura:attribute name="falseAttribute" type="String" default="false"/>
 
+    <aura:handler name="init" value="{!this}" action="{! c.handleInit }" />
+
     <div>
         <moduleTest:interopBooleanAttribute
             aura:id="string-false"
@@ -60,6 +62,10 @@
         <moduleTest:interopBooleanAttribute
             aura:id="non-boolean-attribute-string-true"
             nonBooleanAttribute="true"
+        />
+
+        <moduleTest:interopBooleanAttribute
+            aura:id="no-component-attributes-specified"
         />
     </div>
 

@@ -40,6 +40,7 @@ function InteropComponent(config) {
     this.owner = $A.clientService.getCurrentAccessGlobalId();
     this.currentClassMap = {};
     this.references = {};
+    this.isPrimitiveString = {};
 
     this.attrNameToPropMap = this.componentDef.attrNameToPropMap;
     this.propNameToAttrMap = this.componentDef.propNameToAttrMap;
@@ -122,7 +123,6 @@ InteropComponent.prototype.setupAttributes = function(config) {
         // primitive string in order to support Aura's type coercion for boolean
         // attributes. This map is used later when we set property values on
         // the custom element.
-        this.isPrimitiveString = this.isPrimitiveString || {};
         this.isPrimitiveString[attribute] = typeof valueConfig === 'string';
 
         var valueProvider = config['valueProvider'];

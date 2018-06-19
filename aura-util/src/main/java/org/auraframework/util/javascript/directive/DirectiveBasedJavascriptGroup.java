@@ -312,9 +312,9 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
             wireCompatSource = getSource("lwc/wire-service/es5/wire.js");
             wireCompatMinSource = getSource("lwc/wire-service/es5/wire.min.js");
-
+  
             wireProdDebugSource = getSource("lwc/wire-service/es2017/wire_debug.js");
-            wireCompatProdDebugSource = getSource("lwc/wire-service/es2017/wire_debug.js");
+            wireCompatProdDebugSource = getSource("lwc/wire-service/es5/wire_debug.js");
 
             compatHelpersSource = getSource("lwc/proxy-compat/compat.js");
             compatHelpersMinSource = getSource("lwc/proxy-compat/compat.min.js");

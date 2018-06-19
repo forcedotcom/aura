@@ -156,7 +156,7 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
 
         var errors = [];
         storage.get(that.STORAGE_KEY, true)
-            .then(
+            ["then"](
                 undefined,
                 function(e) {
                     var message = "GlobalValueProviders.merge(): failed to load GVP values from storage, will overwrite storage with in-memory values.";
@@ -170,7 +170,7 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                     // do not rethrow
                 }
             )
-            .then(function(value) {
+            ["then"](function(value) {
                 // collect GVP values to persist. this includes updates to the GVPs
                 // incurred while waiting for the mutex, etc.
                 that.persistenceQueued = false;
@@ -220,7 +220,7 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                 }
                 return storage.set(that.STORAGE_KEY, toStore);
             })
-            .then(
+            ["then"](
                 function() {
                     if (that.getAbsentGvpValuesCookie()) {
                         // clear the cookie if persistence succeeds
@@ -309,7 +309,7 @@ GlobalValueProviders.prototype.loadFromStorage = function(callback) {
 
     var that = this;
     storage.get(this.STORAGE_KEY, true)
-        .then(function (value) {
+        ["then"](function (value) {
                 $A.run(function() {
                     if (value) {
                         that.merge(value, true);
@@ -321,7 +321,7 @@ GlobalValueProviders.prototype.loadFromStorage = function(callback) {
                     callback();
                 });
         })
-        .then(
+        ["then"](
             undefined,
             function() {
                 $A.run(function() {

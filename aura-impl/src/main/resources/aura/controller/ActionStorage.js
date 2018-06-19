@@ -87,7 +87,7 @@ ActionStorage.prototype.populateActionsFilter = function() {
 
     var that = this;
     // if filter is enabled, getAll() populates all persisted actions to filter
-    return this.getAll().then(function(items){
+    return this.getAll()["then"](function(items){
 
         var actionsStoredWithURIDefs = items[that.URI_DEFS_ENABLED_KEY];
         var uriEnabled = $A.getContext().uriAddressableDefsEnabled;
@@ -98,8 +98,8 @@ ActionStorage.prototype.populateActionsFilter = function() {
             (Object.keys(items).length > (actionsStoredWithURIDefs === undefined? 0: 1))) {
 
             $A.warning("Clearing actions db because uri addressable defs state was toggled");
-            return that.clear().then(function(){
-                return that.set(that.URI_DEFS_ENABLED_KEY, uriEnabled).then(function(){ return []; });
+            return that.clear()["then"](function(){
+                return that.set(that.URI_DEFS_ENABLED_KEY, uriEnabled)["then"](function(){ return []; });
             });
         } else if (actionsStoredWithURIDefs === undefined){
             that.set(that.URI_DEFS_ENABLED_KEY, uriEnabled);
@@ -200,7 +200,7 @@ ActionStorage.prototype.setAll = function(values) {
 
     var that = this;
     return storage.setAll(values)
-        .then(
+        ["then"](
             undefined,
             function(e) {
                 // TODO: if prior to this setAll() the entries existed in storage,
@@ -247,7 +247,7 @@ ActionStorage.prototype.getAll = function(actionKeys) {
     var that = this;
     var key;
     return storage.getAll(actionKeys, true)
-        .then(function(items) {
+        ["then"](function(items) {
             if (Array.isArray(actionKeys) && actionKeys.length > 0) {
                 for (var i = 0; i < actionKeys.length; i++) {
                     key = actionKeys[i];
@@ -274,7 +274,7 @@ ActionStorage.prototype.getAll = function(actionKeys) {
  */
 ActionStorage.prototype.get = function(actionKey) {
     return this.getAll([actionKey])
-        .then(
+        ["then"](
             function(items) {
                 return items? items[actionKey] : undefined;
             }

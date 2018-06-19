@@ -57,7 +57,7 @@ function CryptoAdapter(config) {
 
     var that = this;
     this.adapterInitializePromise = this.adapter.initialize()
-        .then(
+        ["then"](
             function() {
                 that.log(CryptoAdapter.LOG_LEVEL.INFO, "adapter.initialize(): internal IndexedDB adapter initialization completed");
             },
@@ -319,7 +319,7 @@ CryptoAdapter.prototype.initializeInternal = function() {
     }
 
     return Promise["all"]([CryptoAdapter.key, this.adapterInitializePromise])
-        .then(
+        ["then"](
             function keyReceived(values) {
                 // it's possible for key generation to fail, which we treat as a fatal
                 // error. all pending and future operations will fail.
@@ -331,7 +331,7 @@ CryptoAdapter.prototype.initializeInternal = function() {
             }
             // reject: no key received or indexeddb adapter failed. leave in reject state
             // so crypto adapter initialize() rejects
-        ).then(
+        )["then"](
             function verifySentinel() {
 
                 function handleInvalidSentinel() {
@@ -344,7 +344,7 @@ CryptoAdapter.prototype.initializeInternal = function() {
                 // check if existing data can be decrypted
                 that.log(CryptoAdapter.LOG_LEVEL.INFO, "initialize(): verifying sentinel");
                 return that.getItems([CryptoAdapter.SENTINEL], true)
-                    .then(
+                    ["then"](
                         function(values) {
                             // if sentinel value is incorrect then clear the store. crypto will operate with new key.
                             if (!values[CryptoAdapter.SENTINEL] || values[CryptoAdapter.SENTINEL].value !== CryptoAdapter.SENTINEL) {
@@ -356,7 +356,7 @@ CryptoAdapter.prototype.initializeInternal = function() {
                         handleInvalidSentinel
                     );
             }
-        ).then(
+        )["then"](
             function storeSentinel() {
                 // underlying store is setup, either as crypto or memory fallback. this store
                 // is now ready for use.
@@ -384,7 +384,7 @@ CryptoAdapter.prototype.getSize = function() {
 CryptoAdapter.prototype.getItems = function(keys, includeInternalKeys) {
     var that = this;
     return this.adapter.getItems(keys)
-        .then(
+        ["then"](
             function(values) {
                 var decrypted = {};
                 function decryptSucceeded(k, decryptedValue) {
@@ -408,7 +408,7 @@ CryptoAdapter.prototype.getItems = function(keys, includeInternalKeys) {
                         // the underlying adapter doesn't have it.
                     } else {
                         promise = that.decrypt(key, value)
-                            .then(
+                            ["then"](
                                 decryptSucceeded.bind(undefined, key),
                                 decryptFailed
                             );
@@ -416,7 +416,7 @@ CryptoAdapter.prototype.getItems = function(keys, includeInternalKeys) {
                     }
                 }
                 return Promise["all"](promises)
-                    .then(function() {
+                    ["then"](function() {
                         return decrypted;
                     });
             }
@@ -445,7 +445,7 @@ CryptoAdapter.prototype.decrypt = function(key, value) {
             that.key,
             value["value"]["cipher"]
         )
-        .then(
+        ["then"](
             function(decrypted) {
                 var obj = that.arrayBufferToObject(new Uint8Array(decrypted));
                 return {"expires": value["expires"], "value": obj};
@@ -552,7 +552,7 @@ CryptoAdapter.prototype.encryptToTuple = function(tuple) {
                 that.key,
                 itemArrayBuffer
             )
-            .then(
+            ["then"](
                 function (encrypted) {
                     var storable = {
                         "expires": tuple[1]["expires"],
@@ -584,7 +584,7 @@ CryptoAdapter.prototype.setItems = function(tuples) {
     }
 
     var that = this;
-    return Promise["all"](promises).then(
+    return Promise["all"](promises)["then"](
         function(encryptedTuples) {
             return that.adapter.setItems(encryptedTuples);
         },
@@ -615,7 +615,7 @@ CryptoAdapter.prototype.removeItems = function(keys) {
 CryptoAdapter.prototype.clear = function() {
     var that = this;
     return this.adapter.clear()
-        .then(
+        ["then"](
             function() {
                 return that.setSentinelItem();
             }
@@ -631,7 +631,7 @@ CryptoAdapter.prototype.sweep = function() {
     // underlying adapter may sweep the sentinel so always re-add it
     var that = this;
     return this.adapter.sweep()
-        .then(
+        ["then"](
             function() {
                 return that.setSentinelItem();
             }

@@ -3372,7 +3372,7 @@ AuraClientService.prototype.reifyActions = function(rawResponses) {
         }
     }, this);
 
-    return this.persistStorableActions(actionsToPersist).then(function () {
+    return this.persistStorableActions(actionsToPersist)["then"](function () {
         return { "storableActions": actionsToPersist, "nonStorableActions": nonStorableActions, "error": error };
     });
 };
@@ -3578,7 +3578,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
         if ("context" in responseMessage) {
             var responseContext = responseMessage["context"];
             context['merge'](responseContext);
-            $A.componentService.saveDefsToStorage(responseContext, context).then(undefined,
+            $A.componentService.saveDefsToStorage(responseContext, context)["then"](undefined,
                 // swallow any errors returned
                 function(){});
             allDefsInContextResponse = this.extractAllDefs(responseContext);
@@ -4122,7 +4122,7 @@ AuraClientService.prototype.isActionInStorage = function(descriptor, params, cal
         return;
     }
 
-    this.actionStorage.get(key).then(
+    this.actionStorage.get(key)["then"](
         function(value) {
             $A.run(function() {
                 callback(!!value);
@@ -4161,10 +4161,10 @@ AuraClientService.prototype.revalidateAction = function(descriptor, params, call
     }
 
     var that = this;
-    this.actionStorage.get(key).then(
+    this.actionStorage.get(key)["then"](
         function(value) {
             if (value) {
-                that.actionStorage.set(key, value).then(
+                that.actionStorage.set(key, value)["then"](
                     function() { callback(true); },
                     function(/*error*/) { callback(false); }
                 );
@@ -4204,7 +4204,7 @@ AuraClientService.prototype.invalidateAction = function(descriptor, params, succ
         return;
     }
 
-    this.actionStorage.remove(key).then(
+    this.actionStorage.remove(key)["then"](
         function() { successCallback(true); },
         errorCallback
     );
@@ -4437,7 +4437,7 @@ AuraClientService.prototype.populateActionsFilter = function() {
     }
 
     return this.actionStorage.populateActionsFilter()
-        .then(function(items) {
+        ["then"](function(items) {
             $A.log("ActionStorage: restored " + Object.keys(items).length + " actions");
         });
 };

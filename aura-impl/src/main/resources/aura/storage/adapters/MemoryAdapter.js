@@ -166,7 +166,7 @@ MemoryAdapter.prototype.setItems = function(tuples) {
         // async evict
         if (spaceNeeded > 0) {
             that.expireCache(spaceNeeded)
-                .then(
+                ["then"](
                     undefined,
                     function(e) {
                         that.log(MemoryAdapter.LOG_LEVEL.WARNING, "setItems(): error during eviction", e);

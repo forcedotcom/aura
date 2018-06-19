@@ -253,7 +253,7 @@ ComponentDefLoader.prototype.retrievePending = function(pending) {
     this.loading++;
     var that = this;
 
-    Promise.all(scriptPromises).then(function(){
+    Promise["all"](scriptPromises)["then"](function(){
         for (var j = 0; j < pending.callbacks.length; j++) {
             var scope = {idx:j, total:pending.callbacks.length, remaining:pending.callbacks.length-j-1};
             try {
@@ -282,7 +282,7 @@ ComponentDefLoader.prototype.retrievePending = function(pending) {
             // there was no callbacks, the error should still be surfaced
             $A.reportError("Error loading component definitions", e);
         }
-    }).then(this.loadingComplete, this.loadingComplete);
+    })["then"](this.loadingComplete, this.loadingComplete);
 };
 
 // Exists only so that instrumentation can hook into script tag load completes

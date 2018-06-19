@@ -485,7 +485,7 @@ AuraInstance.prototype.initAsync = function(config) {
 
         if (!$A.clientService.gvpsFromStorage) {
             $A.log("Aura.initAsync: GVP not loaded from storage so not loading defs or actions either");
-            ensureCssLoaded().then(initializeApp).then(undefined, reportError);
+            ensureCssLoaded()["then"](initializeApp)["then"](undefined, reportError);
         } else {
             Promise["all"]([
                 bootstrapLoadPromise(),
@@ -493,12 +493,12 @@ AuraInstance.prototype.initAsync = function(config) {
                 $A.clientService.populateActionsFilter(),
                 ensureCssLoaded()
             ])
-                .then(initializeApp, function (err) {
+                ["then"](initializeApp, function (err) {
                     $A.log("Aura.initAsync: failed to load defs, get bootstrap or actions from storage", err);
                     $A.clientService.clearActionsFilter();
                     return initializeApp();
                 })
-                .then(undefined, reportError);
+                ["then"](undefined, reportError);
         }
     });
 

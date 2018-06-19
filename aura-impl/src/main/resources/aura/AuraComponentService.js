@@ -1834,7 +1834,7 @@ AuraComponentService.prototype.restoreDefsFromStorage = function (context) {
  * @return {Promise} Promise when storage is cleared
  */
 AuraComponentService.prototype.clearDefsFromStorage = function (metricsPayload) {
-    return this.componentDefStorage.clear(metricsPayload).then(function(){
+    return this.componentDefStorage.clear(metricsPayload)["then"](function(){
         return this.actionStorage.clear();
     }.bind(this));
 };
@@ -1877,7 +1877,7 @@ AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
 
     // def AuraStorage mutual exclusion is not required to
     return self.pruneDefsFromStorage(defSizeKb + libSizeKb + evtSizeKb + moduleSizeKb)
-        .then(
+        ["then"](
             function(cleared) {
                 if (!cleared) {
                     // nothing was cleared from storage, we should be safe to store
@@ -1888,7 +1888,7 @@ AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
                 }
             }
         )
-        .then(
+        ["then"](
             undefined, // noop
             function(e) {
                 // there was an error during analysis, pruning, or saving defs. the persistent components and actions
@@ -2107,7 +2107,7 @@ AuraComponentService.prototype.buildDependencyGraph = function() {
     promises.push(this.componentDefStorage.getAll());
 
     // promise will reject if either getAll rejects
-    return Promise.all(promises).then(function (results) {
+    return Promise["all"](promises)["then"](function (results) {
         var actionEntries = results[0];
         var defEntries    = results[1];
         var defKeys       = Object.keys(defEntries);
@@ -2239,7 +2239,7 @@ AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph
     var actionStorage = $A.clientService.getActionStorage();
     var self          = this;
 
-    return defStorage.getSize().then(function(startingSize) {
+    return defStorage.getSize()["then"](function(startingSize) {
         var maxSize = defStorage.getMaxSize();
         // target is the lesser of
         // a) a percent of max size, and
@@ -2273,7 +2273,7 @@ AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph
                     promises.push(actionStorage.remove(actions[i], true));
                 }
 
-                return Promise["all"](promises).then(
+                return Promise["all"](promises)["then"](
                     function () {
                         $A.log("AuraComponentService.evictDefsFromStorage.removeActions(): removed " + promises.length + " actions");
                     }
@@ -2304,20 +2304,20 @@ AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph
                 }
 
                 removeActions(actions)
-                    .then(function() {
+                    ["then"](function() {
                         // track removed actions for future filtering
                         evicted.push.apply(evicted, actions);
                     })
-                    .then(function() {
+                    ["then"](function() {
                         return self.componentDefStorage.removeDefs(defs);
                     })
-                    .then(function() {
+                    ["then"](function() {
                         // track removed defs for future filtering
                         evicted.push.apply(evicted, defs);
 
                         // get the new size
                         return defStorage.getSize();
-                    }).then(
+                    })["then"](
                     function(newSize) {
                         // and recurse!
                         evictRecursively(keysToEvict, newSize);
@@ -2361,7 +2361,7 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
     // check space to determine if eviction is required. this is an approximate check meant to
     // avoid storage.getAll() and graph analysis which are expensive operations.
     return defStorage.getSize()
-        .then(
+        ["then"](
             function(size) {
                 currentSize = size;
                 var maxSize = defStorage.getMaxSize();
@@ -2390,7 +2390,7 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
                     "storageRequiredSize" : newSize
                 };
 
-                return self.clearDefsFromStorage(metricsPayload).then(function(){return true;});
+                return self.clearDefsFromStorage(metricsPayload)["then"](function(){return true;});
 
 
                 /*

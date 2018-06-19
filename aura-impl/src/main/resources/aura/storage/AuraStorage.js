@@ -71,7 +71,7 @@ var AuraStorage = function AuraStorage(config) {
         ));
 
     // initialize the adapter
-    this.adapter.initialize().then(this.adapterInitialize.bind(this, true), this.adapterInitialize.bind(this, false));
+    this.adapter.initialize()["then"](this.adapterInitialize.bind(this, true), this.adapterInitialize.bind(this, false));
 };
 
 /** Log levels */
@@ -132,13 +132,13 @@ AuraStorage.prototype.getSize = function() {
 AuraStorage.prototype.getSizeInternal = function(resolve, reject) {
     var that = this;
     this.adapter.getSize()
-        .then(
+        ["then"](
             function(size) {
                 that.stats.size = parseInt(size/1024.0, 10);
                 return size / 1024.0;
             }
         )
-        .then(resolve, reject);
+        ["then"](resolve, reject);
 };
 
 
@@ -200,7 +200,7 @@ AuraStorage.prototype.adapterInitialize = function(readyState, error) {
         var adapterClass = $A.storageService.getAdapterConfig(Aura.Storage.MemoryAdapter.NAME)["adapterClass"];
         this.adapter = new adapterClass(this.config);
         this.adapterAntiObfuscation(this.adapter);
-        this.adapter.initialize().then(this.adapterInitialize.bind(this, true), this.adapterInitialize.bind(this, false));
+        this.adapter.initialize()["then"](this.adapterInitialize.bind(this, true), this.adapterInitialize.bind(this, false));
         return;
     }
 
@@ -212,14 +212,14 @@ AuraStorage.prototype.adapterInitialize = function(readyState, error) {
         promise = new Promise(function(resolve, reject) {
             that.clearInternal(resolve, reject);
         })
-        .then(undefined, function() {
+        ["then"](undefined, function() {
             // no-op to move promise to resolve state
         });
     } else {
         promise = Promise["resolve"]();
     }
 
-    promise.then(function() {
+    promise["then"](function() {
         // flip the switch so subsequent requests are immediately processed
         that.ready = !!readyState;
         that.executeQueue();
@@ -283,7 +283,7 @@ AuraStorage.prototype.clearInternal = function(resolve, reject) {
     var that = this;
     this.operationsInFlight += 1;
     this.adapter.clear()
-        .then(
+        ["then"](
             function() {
                 that.operationsInFlight -= 1;
                 that.fireModified();
@@ -294,7 +294,7 @@ AuraStorage.prototype.clearInternal = function(resolve, reject) {
                 throw e;
             }
         )
-        .then(resolve, reject);
+        ["then"](resolve, reject);
 };
 
 
@@ -310,7 +310,7 @@ AuraStorage.prototype.get = function(key, includeExpired) {
     $A.assert(!includeExpired || $A.util.isBoolean(includeExpired), "AuraStorage.get(): 'includeExpired' must be a Boolean.");
 
     return this.getAll([key], includeExpired)
-        .then(
+        ["then"](
             function(items) {
                 if (items) {
                     return items[key];
@@ -378,7 +378,7 @@ AuraStorage.prototype.getAllInternal = function(keys, includeExpired, resolve, r
 
     this.operationsInFlight += 1;
     this.adapter.getItems(prefixedKeys, includeExpired)
-        .then(
+        ["then"](
             function(items) {
                 that.operationsInFlight -= 1;
 
@@ -404,7 +404,7 @@ AuraStorage.prototype.getAllInternal = function(keys, includeExpired, resolve, r
                 return results;
             }
         )
-        .then(
+        ["then"](
             undefined,
             function(e) {
                 that.operationsInFlight -= 1;
@@ -412,7 +412,7 @@ AuraStorage.prototype.getAllInternal = function(keys, includeExpired, resolve, r
                 throw e;
             }
         )
-        .then(resolve, reject);
+        ["then"](resolve, reject);
 };
 
 /**
@@ -510,7 +510,7 @@ AuraStorage.prototype.setAllInternal = function(values, resolve, reject) {
     var that = this;
     this.operationsInFlight += 1;
     this.adapter.setItems(storables)
-        .then(
+        ["then"](
             function() {
                 that.operationsInFlight -= 1;
                 var keys = Object.keys(values);
@@ -523,7 +523,7 @@ AuraStorage.prototype.setAllInternal = function(values, resolve, reject) {
                 throw e;
             }
         )
-        .then(resolve, reject);
+        ["then"](resolve, reject);
 
     this.sweep();
 };
@@ -566,7 +566,7 @@ AuraStorage.prototype.removeAllInternal = function(keys, doNotFireModified, reso
     var that = this;
     this.operationsInFlight += 1;
     this.adapter.removeItems(prefixedKeys)
-        .then(
+        ["then"](
             function() {
                 that.operationsInFlight -= 1;
                 if (that.debugLogging) {
@@ -585,7 +585,7 @@ AuraStorage.prototype.removeAllInternal = function(keys, doNotFireModified, reso
                 throw e;
             }
         )
-        .then(resolve, reject);
+        ["then"](resolve, reject);
 };
 
 
@@ -643,14 +643,14 @@ AuraStorage.prototype.sweep = function(ignoreInterval) {
 
     // start the sweep + prevent concurrent sweeps
     this.operationsInFlight += 1;
-    this.sweepPromise = this.adapter.sweep().then(
+    this.sweepPromise = this.adapter.sweep()["then"](
             undefined, // noop
             function(e) {
                 this.logError({ "operation":"sweep", "error":e });
                 throw e;
             }.bind(this)
         )
-        .then(doneSweeping.bind(this), doneSweeping.bind(this,true));
+        ["then"](doneSweeping.bind(this), doneSweeping.bind(this,true));
 
     return this.sweepPromise;
 };
@@ -810,14 +810,14 @@ AuraStorage.prototype.deleteStorageInternal = function(resolve, reject) {
 
     var that = this;
     this.adapter.deleteStorage()
-        .then(
+        ["then"](
             undefined,
             function(e) {
                 that.logError({ "operation":"deleteStorage", "error":e });
                 throw e;
             }
         )
-        .then(resolve, reject);
+        ["then"](resolve, reject);
 };
 
 /**

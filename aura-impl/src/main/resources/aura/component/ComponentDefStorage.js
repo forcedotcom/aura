@@ -198,7 +198,7 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtCo
         var values = that.defsToStore;
         that.defsToStore = undefined;
         return that.storage.setAll(values)
-            .then(
+            ["then"](
                 function resolve() {
                     $A.log("ComponentDefStorage: successfully stored " + Object.keys(toStore).length + " defs");
                 },
@@ -216,7 +216,7 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtCo
                     throw e;
                 }
             )
-            .then(resolve, reject);
+            ["then"](resolve, reject);
         });
 };
 
@@ -237,7 +237,7 @@ ComponentDefStorage.prototype.removeDefs = function(descriptors) {
 
     var that = this;
     return this.storage.removeAll(descriptors)
-        .then(
+        ["then"](
             function () {
                 $A.log("ComponentDefStorage: Successfully removed " + descriptors.length + " descriptors");
                 // TODO W-3375904 need to prune removed defs aura.context.loaded in a way that's safe with
@@ -282,7 +282,7 @@ ComponentDefStorage.prototype.getAll = function () {
 
     // note: def AuraStorage mutex is not acquired to improve performance. this does allow for
     // writes from another tab to overlap def loading, resulting in this tab dumping caches.
-    return this.storage.getAll([], true).then(
+    return this.storage.getAll([], true)["then"](
         function(items) {
             var result = {};
             for (var key in items) {
@@ -304,7 +304,7 @@ ComponentDefStorage.prototype.getAll = function () {
  */
 ComponentDefStorage.prototype.restoreAll = function(context) {
     return this.getAll()
-        .then(
+        ["then"](
             function(items) {
                 var libCount = 0;
                 var cmpCount = 0;
@@ -352,7 +352,7 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
                     + evtCount + " events, " + moduleDefs.length + " modules from storage into registry");
             }
         )
-        .then(
+        ["then"](
             undefined, // noop
             function(e) {
                 $A.warning("ComponentDefStorage: error during restore from storage, no component, library or event defs restored", e);
@@ -405,7 +405,7 @@ ComponentDefStorage.prototype.enqueue = function(execute) {
     });
 
     // when this promise resolves or rejects, unlock the mutex then run the next item in the queue
-    promise.then(
+    promise["then"](
         function() {
             try { that.mutexUnlock(); } catch (ignore) { /* ignored */ }
             executeQueue();
@@ -476,7 +476,7 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
                     var actionStorage = $A.clientService.getActionStorage();
                     if (actionStorage.isStoragePersistent()) {
                         // TODO W-3375904 need to reset the persistent actions filter
-                        actionClear = actionStorage.clear().then(
+                        actionClear = actionStorage.clear()["then"](
                             undefined, // noop on success
                             function(e) {
                                 $A.warning("ComponentDefStorage.clear: failure clearing actions store", e);
@@ -489,7 +489,7 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
                         actionClear = Promise["resolve"]();
                     }
 
-                    var defClear = that.storage.clear().then(
+                    var defClear = that.storage.clear()["then"](
                         undefined, // noop on success
                         function(e) {
                             $A.warning("ComponentDefStorage.clear: failure clearing cmp def store", e);
@@ -499,7 +499,7 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
                         }
                     );
 
-                    var promise = Promise.all([actionClear, defClear]).then(
+                    var promise = Promise["all"]([actionClear, defClear])["then"](
                         function() {
                             // done the clearing. metricsPayload is updated with any errors
                             $A.metricsService.transactionEnd("aura", "performance:evictedDefs");
@@ -511,7 +511,7 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
                     );
                     enqueueResolve(promise);
                 })
-            .then(resolve, reject);
+            ["then"](resolve, reject);
         });
     });
 };

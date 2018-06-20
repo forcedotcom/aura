@@ -45,14 +45,20 @@ Aura.Services.MetricsService = function MetricsService() {
 // Version
 Aura.Services.MetricsService.VERSION  = '2.2.0';
 
-Aura.Services.MetricsService.PERFTIME     = !!(window.performance && window.performance.now);
-Aura.Services.MetricsService.TIMER        = Aura.Services.MetricsService.PERFTIME ? function () { return Math.floor(window.performance.now() * 100) / 100; } : Date.now.bind(Date);
-Aura.Services.MetricsService.START        = 'start';
-Aura.Services.MetricsService.END          = 'end';
-Aura.Services.MetricsService.STAMP        = 'stamp';
-Aura.Services.MetricsService.DEFAULT      = 'default';
-Aura.Services.MetricsService.MAXTIME      = 30000; // Max time for a transaction to finish
-Aura.Services.MetricsService.CUSTOM_MARKS = 'custom';
+Aura.Services.MetricsService.PERFTIME      = !!(window.performance && window.performance.now);
+Aura.Services.MetricsService.TIMER         = Aura.Services.MetricsService.PERFTIME ? function () { return Math.floor(window.performance.now() * 100) / 100; } : Date.now.bind(Date);
+Aura.Services.MetricsService.START         = 'start';
+Aura.Services.MetricsService.END           = 'end';
+Aura.Services.MetricsService.STAMP         = 'stamp';
+Aura.Services.MetricsService.DEFAULT       = 'default';
+Aura.Services.MetricsService.MAXTIME       = 30000; // Max time for a transaction to finish
+Aura.Services.MetricsService.CUSTOM_MARKS  = 'custom';
+Aura.Services.MetricsService.WARM          = 'WARM';
+Aura.Services.MetricsService.COLD          = 'COLD';
+Aura.Services.MetricsService.WARM_ESTIMATE = 'WARM_ESTIMATE';
+Aura.Services.MetricsService.COLD_ESTIMATE = 'COLD_ESTIMATE';
+Aura.Services.MetricsService.UNKNOWN       = 'UNKNOWN';
+Aura.Services.MetricsService.WARM_SIZE     = 3000;
 
 /**
  * Initialize function
@@ -971,31 +977,52 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
         bootstrap["cache"]["gvps"] = $A.clientService.gvpsFromStorage;
 
         var frameworkRequests = {
-            "requestBootstrapJs" : "bootstrap.js",
-            "requestInlineJs"    : "inline.js",
-            "requestAppCss"      : "app.css",
-            "requestAppCoreJs"   : "appcore.js",
-            "requestAppJs"       : "app.js",
-            "requestAuraJs"      : "/aura_"
+            "requestBootstrapJs" : { name: "bootstrap.js", trackWarmCold: false },
+            "requestInlineJs"    : { name: "inline.js",    trackWarmCold: false },
+            "requestAppCss"      : { name: "app.css",      trackWarmCold: true  },
+            "requestAppCoreJs"   : { name: "appcore.js",   trackWarmCold: true  },
+            "requestAppJs"       : { name: "app.js",       trackWarmCold: true  },
+            "requestAuraJs"      : { name: "/aura_",       trackWarmCold: true  }
         };
 
-
         if (p.getEntries && (!bootstrap["allRequests"] || !bootstrap["allRequests"].length)) {
+            bootstrap["type"] = Aura.Services.MetricsService.UNKNOWN;
+            var coldResources = 0;
+            var totalRequestsToTrackWarmCold = 0;
+            var canTrackWarmCold = undefined;
+            var canTrackTransferSize = undefined;
             bootstrap["allRequests"] = [];
             $A.util.forEach(p.getEntries(), function (resource) {
                 if (resource.responseEnd < bootstrap["bootstrapEPT"]) {
                     var summaryRequest = this.summarizeResourcePerfInfo(resource);
                     bootstrap["allRequests"].push(summaryRequest);
-
                     for (var i in frameworkRequests) {
-                        if (resource.name.indexOf(frameworkRequests[i]) !== -1) {
-                            summaryRequest.name = frameworkRequests[i]; // mutate the processed resource
+                        if (resource.name.indexOf(frameworkRequests[i].name) !== -1) {
+                            if (frameworkRequests[i].trackWarmCold){
+                                if(canTrackWarmCold === undefined){
+                                    canTrackTransferSize = resource["transferSize"] !== undefined;
+                                    canTrackWarmCold = canTrackTransferSize || $A.util.isLocalStorageEnabled();
+                                }
+                                if(canTrackWarmCold){
+                                    totalRequestsToTrackWarmCold++;
+                                    if (this.wasResourceFetchedFromServer(i, resource)){
+                                        coldResources++;
+                                    }
+                                }
+                            }
+                            summaryRequest.name = frameworkRequests[i].name; // mutate the processed resource
                             bootstrap[i] = summaryRequest;
                             continue;
                         }
                     }
+
                 }
             }, this);
+            if (canTrackWarmCold && coldResources === totalRequestsToTrackWarmCold) {
+                bootstrap["type"] = canTrackTransferSize ? Aura.Services.MetricsService.COLD : Aura.Services.MetricsService.COLD_ESTIMATE;
+            } else if (canTrackWarmCold && coldResources === 0) {
+                bootstrap["type"] = canTrackTransferSize ? Aura.Services.MetricsService.WARM : Aura.Services.MetricsService.WARM_ESTIMATE;
+            }
         }
         var navigator = window["navigator"];
         var conn = navigator && navigator["connection"];
@@ -1008,4 +1035,22 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
     }
 
     return bootstrap;
+};
+
+Aura.Services.MetricsService.prototype.wasResourceFetchedFromServer = function (key, resource) {
+    // In Chrome, we want to use transferSize > 3000 as this is the defined way to determine between Warm and Cold 
+    if (resource["transferSize"] !== undefined){
+        return resource["transferSize"] > Aura.Services.MetricsService.WARM_SIZE;
+    } else {
+    // In other browsers we don't currently have access to transferSize, so instead we save the loaded resource url to
+    // local storage, and if the file is then loaded from the server again the url will have a different key and therefore
+    // register as cold. This is more succeptible to browser differences than transferSize (specifically Safari can sometimes
+    // act strangely), but for now it's the best way that we have
+        if (localStorage.getItem(key) === resource.name){
+            return false;
+        } else {
+            localStorage.setItem(key, resource.name);
+            return true;
+        }
+    }
 };

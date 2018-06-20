@@ -528,16 +528,12 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
 
     var topVisit = this.rerenderFacetTopVisit;
     var beforeRerenderElements = null;
-    var oldElementContainerPositions = null;
 
     // for the top visit, it needs to figure out the updated elements for the dirty component
     // to update the component's container chain
     if (topVisit) {
         this.rerenderFacetTopVisit = false;
         beforeRerenderElements = this.getAllElementsCopy(component);
-        // the positions are needed when updating elements on the containers, because if a component is unrendered
-        // during rerender, the marker element will be updated when moving marker's references.
-        oldElementContainerPositions = this.findElementsPositionFromContainers(component);
     }
 
     // If the parent is NOT my marker then look inside to find it's position.
@@ -673,8 +669,7 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
         this.associateElements(component, ret);
 
         if (topVisit) {
-            // TODO: If we've upated markers on containers, we can just use marker to identify position.
-            this.updateElementsOnContainers(component, oldElementContainerPositions, beforeRerenderElements);
+            this.updateElementsOnContainers(component, beforeRerenderElements);
         }
     }
 
@@ -769,54 +764,15 @@ AuraRenderingService.prototype.getLastSharedElementInCollection = function(cmpEl
 };
 
 /**
- * @param {Component} component - the component to be found from containers
- * @returns {Array} an arry of indexes that indicate where the component's elements are on the containers, from the bottom (direct) container to the top one
- *
- * @private
- */
-AuraRenderingService.prototype.findElementsPositionFromContainers = function(component) {
-    var indexSet = [];
-    var visited = {}; // concrete component global Ids
-    // it is possible to set a container component to child's component's attribute
-    visited[component.getGlobalId()] = true;
-
-    var firstElement = this.getAllElements(component)[0];
-
-    var container = component.getConcreteComponent().getContainer();
-    while (container) {
-        var concrete = container.getConcreteComponent();
-        var globalId = concrete.getGlobalId();
-
-        if (concrete.getType() === "aura:html" || concrete.isRendered() === false || visited[globalId] === true) {
-            break;
-        }
-
-        var allElements = this.getAllElements(concrete);
-        var index = allElements.indexOf(firstElement);
-        if (index < 0) {
-            $A.log("Rendering Warning: Container is missing children's elements. Container: " + concrete.getType());
-            break;
-        }
-
-        indexSet.push(index);
-        visited[globalId] = true;
-        container = concrete.getContainer();
-    }
-
-    return indexSet;
-};
-
-/**
  * Update elements through container chain.
  * When a dirty component gets rerendered, all containers of the component need to update their elements set accordingly.
  *
  * @param {Component} component - the component whose elements are used for updating containers
- * @param {Array} insertPositions - the old elements positions in the container's elements set, from the bottom (direct) container to the top one
- * @param {Array} oldElements - the elements before rerendering
+ * @param {Array} oldElements - the elements on the component before rerendering facet
  *
  * @private
  */
-AuraRenderingService.prototype.updateElementsOnContainers = function(component, insertPositions, oldElements) {
+AuraRenderingService.prototype.updateElementsOnContainers = function(component, oldElements) {
 
     var container = component.getConcreteComponent().getContainer();
     if (!container) {
@@ -828,9 +784,10 @@ AuraRenderingService.prototype.updateElementsOnContainers = function(component, 
     // check if there's any elements update during rerender
     var foundUpdate = updatedElements.length !== oldElements.length;
     if (foundUpdate === false) {
-        for (var n = 0; n < oldElements.length; n++) {
-            if (oldElements[n] !== updatedElements[n]) {
+        for (var i = 0; i < oldElements.length; i++) {
+            if (oldElements[i] !== updatedElements[i]) {
                 foundUpdate = true;
+                break;
             }
         }
     }
@@ -839,27 +796,39 @@ AuraRenderingService.prototype.updateElementsOnContainers = function(component, 
         return;
     }
 
-    // only update the containers which we know the elements' positions
-    for (var i = 0; i < insertPositions.length && container; i++) {
+    // concrete component global Ids
+    var visited = {};
+    // Currently, we set container id when setting attribute,
+    // so it is possible to set a container component to child's component's attribute.
+    // TODO: Figure out why do we need to set container id for setting attribute and remove this.
+    visited[component.getGlobalId()] = true;
+
+    // Marker on container chain should be always up to date
+    var marker = this.getMarker(component);
+
+    while (container) {
         var concrete = container.getConcreteComponent();
+        var globalId = concrete.getGlobalId();
+
         // Stop updating elements for container chain if it is a HtmlComponent. This needs to match the render logic.
-        if (concrete.getType() === "aura:html" || concrete.isRendered() === false) {
+        if (concrete.getType() === "aura:html" || concrete.isRendered() === false || visited[globalId] === true) {
             break;
         }
 
         var containerElements = this.getAllElementsCopy(concrete);
+        var index = containerElements.indexOf(marker);
+        if (index < 0) {
+            $A.log("Rendering Warning: Container is missing children's marker element. Container: " +
+                    concrete.getType() + ", Marker: " + marker);
+        } else {
+            // Replace old elements with updated elements
+            Array.prototype.splice.apply(containerElements, [index, oldElements.length].concat(updatedElements));
 
-        var index = insertPositions[i];
-        Array.prototype.splice.apply(containerElements, [index, oldElements.length].concat(updatedElements));
-
-        concrete.disassociateElements();
-        this.associateElements(concrete, containerElements);
-
-        // if the first element gets updated, marker needs to be reset
-        if (containerElements[0] && containerElements[0] !== this.getMarker(concrete)) {
-            this.setMarker(concrete, containerElements[0]);
+            concrete.disassociateElements();
+            this.associateElements(concrete, containerElements);
         }
 
+        visited[globalId] = true;
         container = concrete.getContainer();
     }
 };

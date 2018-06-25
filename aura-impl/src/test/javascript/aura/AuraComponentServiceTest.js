@@ -104,7 +104,7 @@ Test.Aura.AuraComponentServiceTest = function(){
                 clientService: {
                 },
                 getContext: function(){
-                	    return {getURIDefsState: function() {return {createCmp:true};}};
+                	    return {uriAddressableDefsEnabled:true};
                 }
             },
             "Json": {

@@ -83,9 +83,6 @@ Test.Aura.AuraClientServiceTest = function() {
                 },
                 isSessionStorageEnabled: function() {
                     return false;
-                },
-                getURIDefsState: function(){
-                    return null;
                 }
             },
             mark : function() {},

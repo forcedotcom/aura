@@ -67,7 +67,6 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     public final static String URI_DEFINITIONS_PATH = "/auraCmpDef";
 
     private final static StringParam appDescriptorParam = new StringParam("aura.app", 0, false);
-    private final static StringParam hydrationParam = new StringParam("_hydration", 0, false);
     private final static StringParam lockerParam = new StringParam("_l", 0, false);
     private final static StringParam localeParam = new StringParam("_l10n", 0, false);
     private final static StringParam styleParam = new StringParam("_style", 0, false);
@@ -87,7 +86,6 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
         String requestedUID = componentUIDParam.get(request);
         String appReferrrer = appDescriptorParam.get(request);
-        String hydration = hydrationParam.get(request);
         String locale = localeParam.get(request);
 
         List<String> requestedDescriptors = extractDescriptors(request);
@@ -113,16 +111,6 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             }
             String computedUID = allUIDs.toString();
 
-            // TODO remove hydration after performance anaylsis
-            HYDRATION_TYPE hydrationType = null;
-            if (StringUtils.isNotEmpty(hydration)) {
-                try {
-                    hydrationType = HYDRATION_TYPE.valueOf(hydration.toLowerCase());
-                } catch (Exception e) {
-                    // invalid hydration type, ignore
-                }
-            }
-
             int requestedHashCode = 0;
             if (descriptors.size() > 1) {
                 try {
@@ -139,21 +127,19 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 }
 
                 StringBuilder redirectUrl = getHost(request);
-                redirectUrl.append(generateRedirectURI(descriptors, hydrationType, computedUID, appReferrrer, locale, styleParam.get(request)));
+                redirectUrl.append(generateRedirectURI(descriptors, computedUID, appReferrrer, locale, styleParam.get(request)));
 
                 servletUtilAdapter.setNoCache(response);
                 response.sendRedirect(redirectUrl.toString());
                 return;
             }
 
-            // TODO choose appropriate hydration type after performance anaylsis
-            if (hydrationType == null) {
-                if (configAdapter.getDefaultMode() == Mode.PROD) {
-                    hydrationType = HYDRATION_TYPE.one;
-                } else {
-                    // in non prod modes, we want to use hydration in order to make it easier for developers to debug
-                    hydrationType = HYDRATION_TYPE.all;
-                }
+            HYDRATION_TYPE hydrationType;
+            if (configAdapter.getDefaultMode() == Mode.PROD) {
+                hydrationType = HYDRATION_TYPE.one;
+            } else {
+                // in non prod modes, we want to use hydration in order to make it easier for developers to debug
+                hydrationType = HYDRATION_TYPE.all;
             }
 
             // if locale provided, set the it on the context as a requested locale
@@ -188,10 +174,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             }
             dependencies.removeAll(definitionService.getDependencies(appUID));
 
-            if (hydrationType == HYDRATION_TYPE.one) {
-                hydrationType = HYDRATION_TYPE.all;
-            }
-            serverService.writeDefinitions(dependencies, responseStringWriter, false, 0, hydrationType, false);
+            serverService.writeDefinitions(dependencies, responseStringWriter, false, 0, HYDRATION_TYPE.all, false);
 
             if (!dependencies.isEmpty()) {
                 try {
@@ -318,8 +301,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         return descriptors;
     }
 
-    private String generateRedirectURI(Map<DefDescriptor<?>, String> descriptors, HYDRATION_TYPE hydrationType,
-                                       String computedUID, String appReferrrer, String locale, String styleContext) {
+    private String generateRedirectURI(Map<DefDescriptor<?>, String> descriptors, String computedUID, String appReferrrer, String locale, String styleContext) {
         StringBuilder redirectURI = new StringBuilder(URI_DEFINITIONS_PATH);
 
         // note, keep parameters in alpha order and keep in sync with componentDefLoader.js to increase chances of cache hits
@@ -327,11 +309,6 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         redirectURI.append("?");
         // app param
         redirectURI.append(appDescriptorParam.name).append("=").append(appReferrrer);
-
-        // TODO remove hydration after performance anaylsis
-        if (hydrationType != null) {
-            redirectURI.append("&").append(hydrationParam.name).append("=").append(hydrationType.toString());
-        }
 
         redirectURI.append("&").append(lockerParam.name).append("=").append(configAdapter.isLockerServiceEnabled());
 

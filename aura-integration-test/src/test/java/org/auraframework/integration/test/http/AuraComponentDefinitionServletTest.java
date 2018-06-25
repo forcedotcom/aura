@@ -86,10 +86,9 @@ public class AuraComponentDefinitionServletTest {
         auraComponentDefinitionServlet.setServletUtilAdapter(servletUtilAdapter);
     }
     
-    private void setMockRequestParameters(String auraApp, String hydration, String locker, String locale, String style, String def, String uid, String ... params) {
+    private void setMockRequestParameters(String auraApp, String locker, String locale, String style, String def, String uid, String ... params) {
         
         Mockito.when(request.getParameter("aura.app")).thenReturn(auraApp);
-        Mockito.when(request.getParameter("_hydration")).thenReturn(hydration);
         Mockito.when(request.getParameter("_l")).thenReturn(locker);
         Mockito.when(request.getParameter("_l10n")).thenReturn(locale);
         Mockito.when(request.getParameter("_style")).thenReturn(style);
@@ -107,7 +106,7 @@ public class AuraComponentDefinitionServletTest {
     @Test
     public void testMismatchUIDsendRedirectWithAllParams() throws Exception {
         // Arrange
-        setMockRequestParameters("myApp", "one", "true", "de", "styling", "def", "UID");
+        setMockRequestParameters("myApp", "true", "de", "styling", "def", "UID");
         DefDescriptor<Definition> defDescriptorMock = Mockito.mock(DefDescriptor.class);
         Mockito.when(defDescriptorMock.getNamespace()).thenReturn("namespace");
         Mockito.when(defDescriptorMock.getName()).thenReturn("name");
@@ -122,7 +121,7 @@ public class AuraComponentDefinitionServletTest {
         AuraPrivateAccessor.invoke(auraComponentDefinitionServlet, "doGet", request, response);
 
         // Assert
-        Mockito.verify(response).sendRedirect("https://example.host/auraCmpDef?aura.app=myApp&_hydration=one&_l=false&_l10n=de&_style=styling&_def=def:qualifiedName&_uid=DIFFERENT_UID");
+        Mockito.verify(response).sendRedirect("https://example.host/auraCmpDef?aura.app=myApp&_l=false&_l10n=de&_style=styling&_def=def:qualifiedName&_uid=DIFFERENT_UID");
     }
 
     @SuppressWarnings("unchecked")
@@ -130,7 +129,7 @@ public class AuraComponentDefinitionServletTest {
     public void testContainsRestrictedDefs() throws Exception {
         // Arrange
         //private Boolean containsOnlyRestrictedDefs = true;
-        setMockRequestParameters("myApp", "one", "true", "de", "styling", "def", "UID");
+        setMockRequestParameters("myApp", "true", "de", "styling", "def", "UID");
         DefDescriptor<Definition> defDescriptorMock = Mockito.mock(DefDescriptor.class);
         Mockito.when(defDescriptorMock.getNamespace()).thenReturn("def");
         Mockito.when(defDescriptorMock.getName()).thenReturn("name");
@@ -156,7 +155,7 @@ public class AuraComponentDefinitionServletTest {
     @Test
     public void testContainsNoRestrictedDefs() throws Exception {
         // Arrange
-        setMockRequestParameters("myApp", "one", "true", "de", "styling", "def", "UID");
+        setMockRequestParameters("myApp", "true", "de", "styling", "def", "UID");
         DefDescriptor<Definition> defDescriptorMock = Mockito.mock(DefDescriptor.class);
         Mockito.when(defDescriptorMock.getNamespace()).thenReturn("namespace");
         Mockito.when(defDescriptorMock.getName()).thenReturn("name");
@@ -182,7 +181,7 @@ public class AuraComponentDefinitionServletTest {
     @Test
     public void testContainsEmptyRestrictedNamespaces() throws Exception {
         // Arrange
-        setMockRequestParameters("myApp", "one", "true", "de", "styling", "def", "UID");
+        setMockRequestParameters("myApp", "true", "de", "styling", "def", "UID");
         DefDescriptor<Definition> defDescriptorMock = Mockito.mock(DefDescriptor.class);
         Mockito.when(defDescriptorMock.getNamespace()).thenReturn("namespace");
         Mockito.when(defDescriptorMock.getName()).thenReturn("name");

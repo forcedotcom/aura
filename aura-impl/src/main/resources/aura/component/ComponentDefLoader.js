@@ -28,7 +28,6 @@ function ComponentDefLoader() {
 ComponentDefLoader.UID_param = "_uid";
 ComponentDefLoader.DESCRIPTOR_param = "_def";
 ComponentDefLoader.APP_param = "aura.app";
-ComponentDefLoader.HYDRATION_param = "_hydration";
 ComponentDefLoader.LOCKER_param = "_l";
 ComponentDefLoader.STYLE_param = "_style";
 ComponentDefLoader.LOCALE_param = "_l10n";
@@ -36,42 +35,8 @@ ComponentDefLoader.UID_default = "LATEST";
 ComponentDefLoader.BASE_PATH = "/auraCmpDef?";
 ComponentDefLoader.MARKUP_param = "markup://";
 
-ComponentDefLoader.prototype.buildComponentUri = function(descriptor, uid) {
-    if (!descriptor || typeof descriptor !== "string") {
-        $A.reportError("Please provide a valid descriptor when building a component URI");
-        return undefined;
-    }
-    if (!uid || !$A.util.isString(uid)) {
-        uid = ComponentDefLoader.UID_default;
-    }
-    Aura["componentDefLoaderError"][uid] = [];
-
-    var host = $A.clientService._host;
-    var namespace = new Aura.System.DefDescriptor(descriptor).getNamespace();
-    if (!($A.clientService.isInternalNamespace(namespace) || $A.clientService.isPrivilegedNamespace(namespace))) {
-        host = $A.getContext().cdnHost || host;
-    }
-    return host + ComponentDefLoader.BASE_PATH
-         + this.buildURIAppParam()
-         + this.buildURIHydrationParam(this.getHydrationState())
-         + this.buildURILockerParam()
-         + this.buildURILocaleParam()
-         + this.buildURIStyleParam()
-         + "&" + ComponentDefLoader.DESCRIPTOR_param + "=" + descriptor
-         + "&" + ComponentDefLoader.UID_param + "=" + uid;
-};
-
 ComponentDefLoader.prototype.buildURIAppParam = function() {
     return ComponentDefLoader.APP_param + "=" + ComponentDefLoader.MARKUP_param + $A.getRoot().getType();
-};
-
-ComponentDefLoader.prototype.buildURIHydrationParam = function(hydration) {
-    //This may be overkill
-    if (!hydration || !hydration.length || typeof hydration !== "string") {
-        return "";
-    }
-
-    return "&" + ComponentDefLoader.HYDRATION_param + "=" + hydration;
 };
 
 ComponentDefLoader.prototype.buildURILockerParam = function() {
@@ -86,16 +51,6 @@ ComponentDefLoader.prototype.buildURIStyleParam = function() {
 ComponentDefLoader.prototype.buildURILocaleParam = function() {
     var locale = $A.get("$Locale.langLocale");
     return locale ? "&" + ComponentDefLoader.LOCALE_param + "=" + locale : "";
-};
-
-ComponentDefLoader.prototype.getHydrationState = function() {
-    var defState = $A.getContext().getURIDefsState();
-    if (defState && defState.hydration) {
-        return defState.hydration;
-    }
-
-    //Return an empty string (string is expected) for continuity
-    return "";
 };
 
 ComponentDefLoader.prototype.buildBundleComponentNamespace = function(descriptors, descriptorMap) {
@@ -125,10 +80,6 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     var namespaceMap = this.buildBundleComponentNamespace(descriptors, descriptorMap);
 
     var baseURI = ComponentDefLoader.BASE_PATH + this.buildURIAppParam();
-    var hydrationValue = this.getHydrationState();
-    if (hydrationValue && hydrationValue.length > 0) {
-        baseURI += this.buildURIHydrationParam(hydrationValue);
-    }
 
     baseURI += this.buildURILockerParam();
     baseURI += this.buildURILocaleParam();
@@ -229,19 +180,9 @@ ComponentDefLoader.prototype.buildURIString = function(uri, uid, descriptors) {
 
 ComponentDefLoader.prototype.getScriptPromises = function(descriptorMap) {
     var scriptPromises = [];
-    var defState = $A.getContext().getURIDefsState();
-    if (defState !== null && defState.bundleRequests) {
-        var URIs = this.buildBundleComponentUri(descriptorMap);
-        for (var idx=0; idx < URIs.length; idx++) {
-            scriptPromises.push(this.generateScriptTag(URIs[idx]));
-        }
-    } else {
-        var descriptors = Object.keys(descriptorMap);
-        for (var i=0, length=descriptors.length; i<length; i++) {
-            if (!$A.componentService.hasCacheableDefinitionOfAnyType(descriptors[i])) {
-                scriptPromises.push(this.generateScriptTag(this.buildComponentUri(descriptors[i], descriptorMap[descriptors[i]])));
-            }
-        }
+    var URIs = this.buildBundleComponentUri(descriptorMap);
+    for (var idx=0; idx < URIs.length; idx++) {
+        scriptPromises.push(this.generateScriptTag(URIs[idx]));
     }
     return scriptPromises;
 };

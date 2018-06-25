@@ -61,7 +61,6 @@ Test.Aura.Context.AuraContextTest = function() {
                         return value;
                     }
                 },
-                getURIDefsState: function(){},
                 isUndefinedOrNull: function (val) {
                     return val === undefined || val === null;
                 }
@@ -196,93 +195,6 @@ Test.Aura.Context.AuraContextTest = function() {
             });
 
             Assert.Equal(expected, actual);
-        }
-    }
-    
-
-    [Fixture]
-    function getURIDefsState() {
-
-        var uriDefsMock = function(delegate) {
-        	    withMocks([mock$A(), mockAura(), mockJson(), 
-              Mocks.GetMocks(Object.Global(), {
-                window: {
-                    location: {
-                        search: '?uriDefsState=%7B"bundleRequests"%3Afalse%2C"hydration"%3A"none"%7D'
-                    }
-                },
-                document:{createDocumentFragment:function() {}},
-                Json:function() {},
-                Aura: Aura,
-                $A:{
-                    getContext: function() {
-                        return {
-                            isURIAddressableDefsEnabled: function() {
-                                return true;
-                            }
-                        };
-                    }
-                }
-              })], delegate
-            );
-        };
-
-        [Fact]
-        function returnURIDefStateIfDefined() {
-            var actual;
-            var expected = "damodamodamo";
-
-            uriDefsMock(function(){
-                var targetContext = new Aura.Context.AuraContext({});
-                targetContext.uriDefsState = "damodamodamo";
-                actual = targetContext.getURIDefsState();
-            });
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fixture]
-        function URIDefStateUndefined() {
-
-            [Fact]
-            function uriDefsStateDefinedInURL() {
-                var actual;
-                var expected = {"bundleRequests":false, "hydration":"none", "createCmp":true};
-
-                uriDefsMock(function(){
-                    var targetContext = new Aura.Context.AuraContext({});
-                    actual = targetContext.getURIDefsState();
-                });
-                Assert.Equal(expected, actual);
-            }
-
-            [Fact]
-            function uriDefsStateDefinedInContext() {
-                var actual;
-                var expected = {"bundleRequests":true, "hydration":"one", "createCmp":true};
-
-                uriDefsMock(function(){
-                    window.location.search = '';
-                    var targetContext = new Aura.Context.AuraContext({"uad":1});
-                    actual = targetContext.getURIDefsState();
-                });
-
-                Assert.Equal(expected, actual);
-            }
-
-            [Fact]
-            function uriDefsStateDefinedNotInContextOrURL() {
-                var actual;
-                var expected = null;
-
-                uriDefsMock(function(){
-                    window.location.search = '';
-                    var targetContext = new Aura.Context.AuraContext({"uad":0});
-                    actual = targetContext.getURIDefsState();
-                });
-
-                Assert.Equal(expected, actual);
-            }
         }
     }
 

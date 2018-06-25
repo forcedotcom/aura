@@ -28,9 +28,12 @@ function AuraLocalizationService() {
 
     this.ZERO = "0";
 
-    this.localeCache = {};
+    this.momentLocaleCache = {};
+    this.intlLocaleCache = {};
 
     this.timeZoneFormatCache = {};
+
+    this.dateTimeFormatCache = {};
 
     this.cache = {
         format : {},
@@ -39,10 +42,31 @@ function AuraLocalizationService() {
 
     // DateTime
     this.dateTimeUnitAlias = {};
-    this.ISO_REGEX = /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
-    this.ISO_REGEX_NO_DASH = /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+    // [dateString, delimiter, timeString, offsetString]
+    this.ISO_REGEX = /^\s*((?:\d{4})-(?:\d\d-\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:\.\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+    this.ISO_REGEX_NO_DASH = /^\s*((?:\d{4})(?:\d\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:\.\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
     // month/day/year, hour:minute
     this.EN_US_DATETIME_PATTERN = /(\d{1,2})\/(\d{1,2})\/(\d{4})\D+(\d{1,2}):(\d{1,2})/;
+
+
+    this.ISO_OFFSET_PATTERN = /([+-]\d\d):?(\d\d)/;
+    // The order matters
+    this.ISO_DATE_PATTERNS = [
+        /(\d{4})-(\d\d)-(\d\d)/,
+        /(\d{4})-(\d\d)/,
+        /(\d{4})(\d\d)(\d\d)/,
+        /(\d{4})/
+    ];
+
+    this.ISO_TIME_PATTERNS = [
+        /(\d\d):(\d\d):(\d\d)\.(\d+)/,
+        /(\d\d):(\d\d):(\d\d)/,
+        /(\d\d):(\d\d)/,
+        /(\d\d)(\d\d)(\d\d)\.(\d+)/,
+        /(\d\d)(\d\d)(\d\d)/,
+        /(\d\d)(\d\d)/,
+        /(\d\d)/
+    ];
 
     // common time zones which are not supported by Intl API
     this.timeZoneMap = {
@@ -207,7 +231,7 @@ AuraLocalizationService.prototype.getDefaultCurrencyFormat = function() {
 AuraLocalizationService.prototype.displayDuration = function(duration, withSuffix) {
     if (this.moment["isDuration"](duration)) {
         $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInDays");
+                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDuration");
 
         return duration["humanize"](withSuffix);
     }
@@ -403,11 +427,15 @@ AuraLocalizationService.prototype.duration = function(num, unit) {
  * Formats a date.
  * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {String} formatString - A string containing tokens to format a date and time. For example, "YYYY-MM-DD" formats 15th January, 2017 as "2017-01-15".
- * 	The default format string comes from the $Locale value provider.
- *  For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
- * @return {String} A formatted and localized date string
+ * @param {String} [formatString] - (optional) A string containing tokens to format the given date. For example, "yyyy-MM-dd" formats 15th January, 2017 as "2017-01-15".
+ *   The default format string comes from the $Locale value provider.
+ *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
+ * @param {String} [locale] - (optional) A locale to format the given date.
+ *   The default value is from $Locale.langLocale.
+ *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
+ *   It falls back to the value in $Locale.langLocale if using unavailable locale.
+ * @return {String} A formatted and localized date string.
+ *
  * @memberOf AuraLocalizationService
  * @example
  * var date = new Date();
@@ -421,200 +449,30 @@ AuraLocalizationService.prototype.formatDate = function(date, formatString, loca
     if (this.moment["isMoment"](date)) {
         $A.deprecated("$A.localizationService.formatDate: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
                 null, "AuraLocalizationService.formatDate(moment)");
+
+        date = date["toDate"]();
     }
 
-    var mDate = this.moment(date);
-    if (!mDate || !mDate["isValid"]()) {
-        throw { message: "Invalid date value" };
-    }
-
-    if (!formatString) { // use default format
+    if (!formatString) {
         formatString = $A.get("$Locale.dateFormat");
     }
 
-    var langLocale = locale;
-    if (locale !== undefined) {
-        $A.deprecated("$A.localizationService.formatDate(date, formatString, locale) is deprecated. " +
-                "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
-                "by Locale Value Provider. It will be removed in an upcoming release.",
-                "Use $A.localizationService.formatDate(date, formatString)");
-
-        if (!this.isAvailableLocale(locale)) {
-            langLocale = $A.get("$Locale.langLocale");
-            $A.warning("AuraLocalizationService.formatDate(): Locale '" + locale + "' is not available. " +
-                    "Falls back to the locale in $Locale.langLocale: " + langLocale);
-        }
-    } else {
-        langLocale = $A.get("$Locale.langLocale");
-    }
-
-    return this.displayDateTime(mDate, formatString, langLocale);
-};
-
-/**
- * Formats a date in UTC.
- * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {String} formatString - A string containing tokens to format a date and time. For example, "YYYY-MM-DD" formats 15th January, 2017 as "2017-01-15".
- * 	The default format string comes from the $Locale value provider.
- *  For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
- * @return {String} A formatted and localized date string
- * @memberOf AuraLocalizationService
- * @example
- * var date = new Date();
- * // Returns date in UTC in the format "Oct 9, 2015"
- * $A.localizationService.formatDateUTC(date);
- * @public
- * @export
- * @platform
- */
-AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, locale) {
-    if (this.moment["isMoment"](date)) {
-        $A.deprecated("$A.localizationService.formatDateUTC: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
-                null, "AuraLocalizationService.formatDateUTC(moment)");
-    }
-
-    var mDate = this.moment["utc"](date);
-    if (!mDate || !mDate["isValid"]()) {
-        throw { message: "Invalid date value" };
-    }
-
-    if (!formatString) { // use default format
-        formatString = $A.get("$Locale.dateFormat");
-    }
-
-    var langLocale = locale;
-    if (locale !== undefined) {
-        $A.deprecated("$A.localizationService.formatDateUTC(date, formatString, locale) is deprecated. " +
-                "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
-                "by Locale Value Provider. It will be removed in an upcoming release.",
-                "Use $A.localizationService.formatDateUTC(date, formatString)");
-
-        if (!this.isAvailableLocale(locale)) {
-            langLocale = $A.get("$Locale.langLocale");
-            $A.warning("AuraLocalizationService.formatDateUTC(): Locale '" + locale + "' is not available. " +
-                    "Falls back to the locale in $Locale.langLocale: " + langLocale);
-        }
-    } else {
-        langLocale = $A.get("$Locale.langLocale");
-    }
-
-    return this.displayDateTime(mDate, formatString, langLocale);
-};
-
-/**
- * Formats a datetime.
- * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {String} formatString - A string containing tokens to format a date and time.
- * 	The default format string comes from the $Locale value provider.
- *  For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
- * @return {String} A formatted and localized datetime string
- * @memberOf AuraLocalizationService
- * @example
- * var date = new Date();
- * // Returns datetime in the format "Oct 9, 2015 9:00:00 AM"
- * $A.localizationService.formatDateTime(date);
- * @public
- * @export
- * @platform
- */
-AuraLocalizationService.prototype.formatDateTime = function(date, formatString, locale) {
-    if (this.moment["isMoment"](date)) {
-        $A.deprecated("$A.localizationService.formatDateTime: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
-                null, "AuraLocalizationService.formatDateTime(moment)");
-    }
-
-    var mDate = this.moment(date);
-    if (!mDate || !mDate["isValid"]()) {
-        throw { message: "Invalid date time value" };
-    }
-
-    if (!formatString) { // use default format
-        formatString = $A.get("$Locale.datetimeFormat");
-    }
-
-    var langLocale = locale;
-    if (locale !== undefined) {
-        $A.deprecated("$A.localizationService.formatDateTime(date, formatString, locale) is deprecated. " +
-                "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
-                "by Locale Value Provider. It will be removed in an upcoming release.",
-                "Use $A.localizationService.formatDateTime(date, formatString)");
-
-        if (!this.isAvailableLocale(locale)) {
-            langLocale = $A.get("$Locale.langLocale");
-            $A.warning("AuraLocalizationService.formatDateTime(): Locale '" + locale + "' is not available. " +
-                    "Falls back to the locale in $Locale.langLocale: " + langLocale);
-        }
-    } else {
-        langLocale = $A.get("$Locale.langLocale");
-    }
-
-    return this.displayDateTime(mDate, formatString, langLocale);
-};
-
-/**
- * Formats a datetime in UTC.
- * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {String} formatString - A string containing tokens to format a date and time.
- * 	The default format string comes from the $Locale value provider.
- *  For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
- * @return {String} A formatted and localized datetime string
- * @example
- * var date = new Date();
- * // Returns datetime in UTC in the format "Oct 9, 2015 4:00:00 PM"
- * $A.localizationService.formatDateTimeUTC(date);
- * @public
- * @export
- * @platform
- */
-AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatString, locale) {
-    if (this.moment["isMoment"](date)) {
-        $A.deprecated("$A.localizationService.formatDateTimeUTC: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
-                null, "AuraLocalizationService.formatDateTimeUTC(moment)");
-    }
-
-    var mDate = this.moment["utc"](date);
-    if (!mDate || !mDate["isValid"]()) {
-        throw { message: "Invalid date time value" };
-    }
-
-    if (!formatString) { // use default format
-        formatString = $A.get("$Locale.datetimeFormat");
-    }
-
-    var langLocale = locale;
-    if (locale !== undefined) {
-        $A.deprecated("$A.localizationService.formatDateTimeUTC(date, formatString, locale) is deprecated. " +
-                "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
-                "by Locale Value Provider. It will be removed in an upcoming release.",
-                "Use $A.localizationService.formatDateTimeUTC(date, formatString)");
-
-        if (!this.isAvailableLocale(locale)) {
-            langLocale = $A.get("$Locale.langLocale");
-            $A.warning("AuraLocalizationService.formatDateTimeUTC(): Locale '" + locale + "' is not available. " +
-                    "Falls back to the locale in $Locale.langLocale: " + langLocale);
-        }
-    } else {
-        langLocale = $A.get("$Locale.langLocale");
-    }
-
-    return this.displayDateTime(mDate, formatString, langLocale);
+    return this.formatDateTime(date, formatString, locale);
 };
 
 /**
  * Formats a time.
  * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {String} formatString - A string containing tokens to format a time.
- * 	The default format string comes from the $Locale value provider.
- *  For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
- * @return {String} A formatted and localized time string
+ * @param {String} [formatString] - (optional) A string containing tokens to format the given date.
+ *   The default format string comes from the $Locale value provider.
+ *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
+ * @param {String} [locale] - (optional) A locale to format the given date.
+ *   The default value is from $Locale.langLocale.
+ *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
+ *   It falls back to the value in $Locale.langLocale if using unavailable locale.
+ * @return {String} A formatted and localized time string.
+ *
  * @memberOf AuraLocalizationService
  * @example
  * var date = new Date();
@@ -628,48 +486,131 @@ AuraLocalizationService.prototype.formatTime = function(date, formatString, loca
     if (this.moment["isMoment"](date)) {
         $A.deprecated("$A.localizationService.formatTime: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
                 null, "AuraLocalizationService.formatTime(moment)");
+
+        date = date["toDate"]();
     }
 
-    var mDate = this.moment(date);
-    if (!mDate || !mDate["isValid"]()) {
-        throw { message: "Invalid time value" };
-    }
-
-    if (!formatString) { // use default format
+    if (!formatString) {
         formatString = $A.get("$Locale.timeFormat");
     }
 
-    var langLocale = locale;
-    if (locale !== undefined) {
+    return this.formatDateTime(date, formatString, locale);
+};
 
-        if (!this.isAvailableLocale(locale)) {
-            // temporarily suppress the warning if data is available due to perf issue W-4311258
-            // enable it once we have alternative solution for format date in user locale
-            $A.deprecated("$A.localizationService.formatTime(date, formatString, locale) is deprecated. " +
-                    "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
-                    "by Locale Value Provider. It will be removed in an upcoming release.",
-                    "Use $A.localizationService.formatTime(date, formatString)");
+/**
+ * Formats a datetime.
+ * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
+ * @param {String} [formatString] - (optional) A string containing tokens to format the given date.
+ *   The default format string comes from the $Locale value provider.
+ *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
+ * @param {String} [locale] - (optional) A locale to format the given date.
+ *   The default value is from $Locale.langLocale.
+ *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
+ *   It falls back to the value in $Locale.langLocale if using unavailable locale.
+ * @return {String} A formatted and localized date time string.
+ *
+ * @memberOf AuraLocalizationService
+ * @example
+ * var date = new Date();
+ * // Returns datetime in the format "Oct 9, 2015 9:00:00 AM"
+ * $A.localizationService.formatDateTime(date);
+ * @public
+ * @export
+ * @platform
+ */
+AuraLocalizationService.prototype.formatDateTime = function(date, formatString, locale) {
 
-            langLocale = $A.get("$Locale.langLocale");
-            $A.warning("AuraLocalizationService.formatTime(): Locale '" + locale + "' is not available. " +
-                    "Falls back to the locale in $Locale.langLocale: " + langLocale);
+    // TODO: verify prod logs. removing if there's no useage.
+    if (this.moment["isMoment"](date)) {
+        $A.deprecated("$A.localizationService.formatDateTime: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
+                null, "AuraLocalizationService.formatDateTime(moment)");
+
+        date = date["toDate"]();
+    }
+    else if (typeof date === "string") {
+
+        if (!this.isISO8601DateTimeString(date)) {
+            $A.warning("LocalizationService.parseDateTimeISO8601: The provided datetime string is not in ISO8601 format. " +
+                    "It will be parsed by native Date(), which may have different results across browsers and versions. " + date);
+
+            date = new Date(date);
+            // Date parsing includes browser timezone offset. For formatting, we need to respect the numbers in the string.
+            date.setTime(date.getTime() + date.getTimezoneOffset() * 6e4); // 60 * 1000
+            return date;
+        } else {
+            date = this.parseDateTimeISO8601(date);
         }
     } else {
-        langLocale = $A.get("$Locale.langLocale");
+        date = this.normalizeDateTimeInput(date);
     }
 
-    return this.displayDateTime(mDate, formatString, langLocale);
+    if (!this.isValidDateObject(date)) {
+        return "Invalid Date";
+    }
+
+    // default format
+    if (!formatString) {
+        formatString = $A.get("$Locale.datetimeFormat");
+    }
+
+    if (!locale) {
+        locale = $A.get("$Locale.langLocale");
+    }
+
+    return this.formatDateTimeToString(date, formatString, locale, false);
+};
+
+/**
+ * Formats a date in UTC.
+ * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
+ * @param {String} [formatString] - (optional) A string containing tokens to format the given date. For example, "yyyy-MM-dd" formats 15th January, 2017 as "2017-01-15".
+ *   The default format string comes from the $Locale value provider.
+ *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
+ * @param {String} [locale] - (optional) A locale to format the given date.
+ *   The default value is from $Locale.langLocale.
+ *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
+ *   It falls back to the value in $Locale.langLocale if using unavailable locale.
+ * @return {String} A formatted and localized date string.
+ *
+ * @memberOf AuraLocalizationService
+ * @example
+ * var date = new Date();
+ * // Returns date in UTC in the format "Oct 9, 2015"
+ * $A.localizationService.formatDateUTC(date);
+ * @public
+ * @export
+ * @platform
+ */
+AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, locale) {
+    if (this.moment["isMoment"](date)) {
+        $A.deprecated("$A.localizationService.formatDateUTC: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
+                null, "AuraLocalizationService.formatDateUTC(moment)");
+
+        date = date["toDate"]();
+    }
+
+    if (!formatString) {
+        formatString = $A.get("$Locale.dateFormat");
+    }
+
+    return this.formatDateTimeUTC(date, formatString, locale);
 };
 
 /**
  * Formats a time in UTC.
- * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {String} formatString - A string containing tokens to format a time.
- * 	The default format string comes from the $Locale value provider.
- *  For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
- * @return {String} a formatted and localized time string
+ * @param {String} [formatString] - (optional) A string containing tokens to format the given date.
+ *   The default format string comes from the $Locale value provider.
+ *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
+ * @param {String} [locale] - (optional) A locale to format the given date.
+ *   The default value is from $Locale.langLocale.
+ *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
+ *   It falls back to the value in $Locale.langLocale if using unavailable locale.
+ * @return {String} A formatted and localized time string.
+ *
  * @memberOf AuraLocalizationService
  * @example
  * var date = new Date();
@@ -683,37 +624,79 @@ AuraLocalizationService.prototype.formatTimeUTC = function(date, formatString, l
     if (this.moment["isMoment"](date)) {
         $A.deprecated("$A.localizationService.formatTimeUTC: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
                 null, "AuraLocalizationService.formatTimeUTC(moment)");
+
+        date = date["toDate"]();
     }
 
-    var mDate = this.moment["utc"](date);
-    if (!mDate || !mDate["isValid"]()) {
-        throw { message: "Invalid time value" };
-    }
-
-    if (!formatString) { // use default format
+    if (!formatString) {
         formatString = $A.get("$Locale.timeFormat");
     }
 
-    var langLocale = locale;
-    if (locale !== undefined) {
+    return this.formatDateTimeUTC(date, formatString, locale);
+};
 
-        if (!this.isAvailableLocale(locale)) {
-            // temporarily suppress the warning if data is available due to perf issue W-4311258.
-            // enable it once we have alternative solution for format datetime in user locale.
-            $A.deprecated("$A.localizationService.formatTimeUTC(date, formatString, locale) is deprecated. " +
-                    "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
-                    "by Locale Value Provider. It will be removed in an upcoming release.",
-                    "Use $A.localizationService.formatTimeUTC(date, formatString)");
+/**
+ * Formats a datetime in UTC.
+  * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
+ * @param {String} [formatString] - (optional) A string containing tokens to format the given date.
+ *   The default format string comes from the $Locale value provider.
+ *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
+ * @param {String} [locale] - (optional) A locale to format the given date.
+ *   The default value is from $Locale.langLocale.
+ *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
+ *   It falls back to the value in $Locale.langLocale if using unavailable locale.
+ * @return {String} A formatted and localized date time string.
+ *
+ * @example
+ * var date = new Date();
+ * // Returns datetime in UTC in the format "Oct 9, 2015 4:00:00 PM"
+ * $A.localizationService.formatDateTimeUTC(date);
+ * @public
+ * @export
+ * @platform
+ */
+AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatString, locale) {
+    if (this.moment["isMoment"](date)) {
+        $A.deprecated("$A.localizationService.formatDateTimeUTC: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
+                null, "AuraLocalizationService.formatDateTimeUTC(moment)");
 
-            langLocale = $A.get("$Locale.langLocale");
-            $A.warning("AuraLocalizationService.formatTimeUTC(): Locale '" + locale + "' is not available. " +
-                    "Falls back to the locale in $Locale.langLocale: " + langLocale);
+        date = date["toDate"]();
+    }
+    else if (typeof date === "string") {
+        var config = this.parseISOStringToConfig(date);
+        if (config === null) {
+            return "Invalid Date";
         }
+
+        var minute = config["minute"];
+        if (config["utcOffset"] !== undefined) {
+            minute -= config["utcOffset"];
+        }
+
+        // Ideally, we should use Date.UTC() to create the date object and use Intl with UTC timezone setting to format.
+        // But Intl does not give offset format as moment, so we need to handle offset string as special case. If using the above logic
+        // to format date, we need two configs to format date time and offset.
+        date = new Date(config["year"], config["month"] - 1, config["day"], config["hour"], minute, config["second"], config["millisecond"]);
+
     } else {
-        langLocale = $A.get("$Locale.langLocale");
+        date = this.normalizeDateTimeInput(date);
+        date = new Date(date.getTime() + date.getTimezoneOffset() * 6e4);
     }
 
-    return this.displayDateTime(mDate, formatString, langLocale);
+    if (!this.isValidDateObject(date)) {
+        return "Invalid Date";
+    }
+
+    if (!formatString) {
+        formatString = $A.get("$Locale.datetimeFormat");
+    }
+
+    if (!locale) {
+        locale = $A.get("$Locale.langLocale");
+    }
+
+    return this.formatDateTimeToString(date, formatString, locale, true);
 };
 
 /**
@@ -933,7 +916,7 @@ AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timeZo
     $A.assert(date instanceof Date, "AuraLocalizationService.getDateStringBasedOnTimezone(): 'date' must be a Date object.");
     $A.assert(typeof callback === "function", "AuraLocalizationService.getDateStringBasedOnTimezone(): 'callback' must be a function.");
 
-    if (!this.isValidDate(date)) {
+    if (!this.isValidDateObject(date)) {
         return callback("Invalid Date");
     }
 
@@ -996,7 +979,7 @@ AuraLocalizationService.prototype.isAfter = function(date1, date2, unit) {
     var normalizedDate1 = this.normalizeDateTimeInput(date1);
     var normalizedDate2 = this.normalizeDateTimeInput(date2);
 
-    if (!this.isValidDate(normalizedDate1) || !this.isValidDate(normalizedDate2)) {
+    if (!this.isValidDateObject(normalizedDate1) || !this.isValidDateObject(normalizedDate2)) {
         return false;
     }
 
@@ -1029,7 +1012,7 @@ AuraLocalizationService.prototype.isBefore = function(date1, date2, unit) {
     var normalizedDate1 = this.normalizeDateTimeInput(date1);
     var normalizedDate2 = this.normalizeDateTimeInput(date2);
 
-    if (!this.isValidDate(normalizedDate1) || !this.isValidDate(normalizedDate2)) {
+    if (!this.isValidDateObject(normalizedDate1) || !this.isValidDateObject(normalizedDate2)) {
         return false;
     }
 
@@ -1064,7 +1047,7 @@ AuraLocalizationService.prototype.isSame = function(date1, date2, unit) {
     var normalizedDate1 = this.normalizeDateTimeInput(date1);
     var normalizedDate2 = this.normalizeDateTimeInput(date2);
 
-    if (!this.isValidDate(normalizedDate1) || !this.isValidDate(normalizedDate2)) {
+    if (!this.isValidDateObject(normalizedDate1) || !this.isValidDateObject(normalizedDate2)) {
         return false;
     }
 
@@ -1162,16 +1145,27 @@ AuraLocalizationService.prototype.parseDateTimeISO8601 = function(dateTimeString
         return null;
     }
 
+    var date = null;
     if (!this.isISO8601DateTimeString(dateTimeString)) {
         $A.warning("LocalizationService.parseDateTimeISO8601: The provided datetime string is not in ISO8601 format. " +
-                "This method will return null for non-ISO8601 format string in upcoming release. " + dateTimeString);
+                "It will be parsed by native Date(), which may have different results across browsers and versions. " + dateTimeString);
+
+        date = new Date(dateTimeString);
+    } else {
+        var config = this.parseISOStringToConfig(dateTimeString);
+        if (config === null) {
+            return null;
+        }
+
+        if (config["utcOffset"] !== undefined) {
+            var minute = config["minute"] - config["utcOffset"];
+            date = new Date(Date.UTC(config["year"], config["month"] - 1, config["day"], config["hour"], minute, config["second"], config["millisecond"]));
+        } else {
+            date = new Date(config["year"], config["month"] - 1, config["day"], config["hour"], config["minute"], config["second"], config["millisecond"]);
+        }
     }
 
-    var mDate = this.moment(dateTimeString);
-    if (mDate && mDate["isValid"]()) {
-        return mDate["toDate"]();
-    }
-    return null;
+    return this.isValidDateObject(date)? date : null;
 };
 
 /**
@@ -1244,7 +1238,7 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, pa
 AuraLocalizationService.prototype.startOf = function(date, unit) {
     var normalizedDate = (date instanceof Date)? new Date(date.getTime()) : this.normalizeDateTimeInput(date);
     unit = this.normalizeDateTimeUnit(unit);
-    if (!unit || !this.isValidDate(normalizedDate)) {
+    if (!unit || !this.isValidDateObject(normalizedDate)) {
         return normalizedDate;
     }
 
@@ -1300,7 +1294,7 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
 AuraLocalizationService.prototype.endOf = function(date, unit) {
     var normalizedDate = this.startOf(date, unit);
     unit = this.normalizeDateTimeUnit(unit);
-    if (!unit || !this.isValidDate(normalizedDate)) {
+    if (!unit || !this.isValidDateObject(normalizedDate)) {
         return normalizedDate;
     }
 
@@ -1327,7 +1321,7 @@ AuraLocalizationService.prototype.toISOString = function(date) {
     $A.deprecated("$A.localizationService.toISOString(): The method is no longer supported by framework, and will be removed in an upcoming release.",
             "Use native method Date.toISOString() instead", "AuraLocalizationService.toISOString");
 
-    return this.isValidDate(date)? date.toISOString() : date;
+    return this.isValidDateObject(date)? date.toISOString() : date;
 };
 
 /**
@@ -1459,7 +1453,7 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
     $A.assert(typeof callback === "function", "AuraLocalizationService.UTCToWallTime(): 'callback' must be a function.");
 
     timezone = this.normalizeTimeZone(timezone);
-    if (timezone === "UTC" || !this.isValidDate(date)) {
+    if (timezone === "UTC" || !this.isValidDateObject(date)) {
         callback(date);
         return;
     }
@@ -1496,7 +1490,7 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
     $A.assert(typeof callback === "function", "AuraLocalizationService.WallTimeToUTC(): callback must be a function.");
 
     timezone = this.normalizeTimeZone(timezone);
-    if (timezone === "UTC" || !this.isValidDate(date)) {
+    if (timezone === "UTC" || !this.isValidDateObject(date)) {
         callback(date);
         return;
     }
@@ -1543,12 +1537,12 @@ AuraLocalizationService.prototype.init = function() {
     var userLocale = $A.get("$Locale.userLocaleLang") + "_" + $A.get("$Locale.userLocaleCountry");
     var ltngLocale = $A.get("$Locale.language") + "_" + $A.get("$Locale.userLocaleCountry");
 
-    this.localeCache[langLocale] = this.normalizeToMomentLocale(langLocale);
-    this.localeCache[userLocale] = this.normalizeToMomentLocale(userLocale);
-    this.localeCache[ltngLocale] = this.normalizeToMomentLocale(ltngLocale);
+    this.momentLocaleCache[langLocale] = this.normalizeToMomentLocale(langLocale);
+    this.momentLocaleCache[userLocale] = this.normalizeToMomentLocale(userLocale);
+    this.momentLocaleCache[ltngLocale] = this.normalizeToMomentLocale(ltngLocale);
 
     // set moment default locale
-    this.moment.locale(this.localeCache[langLocale]);
+    this.moment.locale(this.momentLocaleCache[langLocale]);
 
     this.setupDateTimeUnitAlias();
 };
@@ -1701,7 +1695,7 @@ AuraLocalizationService.prototype.zoneOffset = function(timestamp, timeZone) {
   };
 
 /**
- * Formats a Date object to the en-US date string.
+ * Formats a Date object to the en-US date time string.
  *
  * This method assumes the browser supports Intl API with time zone data.
  * @private
@@ -1714,7 +1708,7 @@ AuraLocalizationService.prototype.formatDateWithTimeZone = function(date, timeZo
 
     try {
         var timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
-        return this.formatDateTimeToString(timeZoneFormat, date);
+        return this.format(timeZoneFormat, date);
     } catch(e) {
         // The error should never happen here. The callers validate the arguments.
         // This is only for IE11 profiler. Intl API time zone polyfill gets messed up
@@ -1744,7 +1738,7 @@ AuraLocalizationService.prototype.parseEnUSDateTimeString = function(dateTimeStr
     return Date.UTC(match[3], match[1] - 1, match[2], match[4], match[5]);
 };
 
-AuraLocalizationService.prototype.formatDateTimeToString = function(dateTimeFormat, date) {
+AuraLocalizationService.prototype.format = function(dateTimeFormat, date) {
     // IE11 adds LTR / RTL mark in the formatted date time string
     return dateTimeFormat["format"](date).replace(/[\u200E\u200F]/g,'');
 };
@@ -1836,7 +1830,7 @@ AuraLocalizationService.prototype.normalizeLocale = function(locale) {
  * @private
  */
 AuraLocalizationService.prototype.getAvailableMomentLocale = function(locale) {
-    var momentLocale = this.localeCache[locale];
+    var momentLocale = this.momentLocaleCache[locale];
     return momentLocale? momentLocale : "en";
 };
 
@@ -1855,7 +1849,7 @@ AuraLocalizationService.prototype.isAvailableLocale = function(locale) {
         return false;
     }
 
-    if (this.localeCache.hasOwnProperty(locale)) {
+    if (this.momentLocaleCache.hasOwnProperty(locale)) {
         return true;
     }
 
@@ -1866,21 +1860,51 @@ AuraLocalizationService.prototype.isAvailableLocale = function(locale) {
     if (momentLocale === "en" && language !== "en") {
         return false;
     } else {
-        this.localeCache[locale] = momentLocale;
+        this.momentLocaleCache[locale] = momentLocale;
         return true;
     }
 };
 
-/**
- * Display date, datetime or time based on the format string.
- *
- * @private
- */
-AuraLocalizationService.prototype.displayDateTime = function(mDate, format, locale) {
-    if (locale) { // set locale locally
-        mDate["locale"](this.getAvailableMomentLocale(locale));
+AuraLocalizationService.prototype.formatDateTimeToString = function(date, formatString, locale, isUTCDate) {
+    locale = this.normalizeToIntlLocale(locale);
+
+    var cacheKey = locale + ":" + formatString;
+    var dateTimeFormat = this.dateTimeFormatCache[cacheKey];
+    if (dateTimeFormat === undefined) {
+        dateTimeFormat = new Aura.Utils.DateTimeFormat(formatString, locale);
+        this.dateTimeFormatCache[cacheKey] = dateTimeFormat;
     }
-    return mDate["format"](this.getNormalizedFormat(format));
+
+    var utcOffset = (isUTCDate === true)? 0 : (date.getTimezoneOffset() * -1);
+    return dateTimeFormat.format(date, utcOffset);
+};
+
+AuraLocalizationService.prototype.canFormatToParts = function() {
+    if (this.supportFormatToParts === undefined) {
+        this.supportFormatToParts = (new Intl["DateTimeFormat"]()["formatToParts"]) !== undefined;
+    }
+
+    return this.supportFormatToParts;
+};
+
+AuraLocalizationService.prototype.normalizeToIntlLocale = function(locale) {
+    if (this.intlLocaleCache.hasOwnProperty(locale)) {
+        return this.intlLocaleCache[locale];
+    }
+
+    var normalizedLocale = locale.split("_").join("-").replace("-EURO", "");
+
+    var supported = Intl["DateTimeFormat"]["supportedLocalesOf"](normalizedLocale);
+    if (supported.length === 0) {
+        $A.warning("LocalizationService: Unknown locale: " + locale + ". Falls back to 'en-US'.");
+        normalizedLocale = "en-US";
+    } else {
+        normalizedLocale = supported[0];
+    }
+
+    this.intlLocaleCache[locale] = normalizedLocale;
+
+    return normalizedLocale;
 };
 
 /**
@@ -1993,33 +2017,146 @@ AuraLocalizationService.prototype.addSubtract = function(date, num, unit, isSubt
  * @private
  */
 AuraLocalizationService.prototype.normalizeDateTimeInput = function(datetime) {
-    if ($A.util.isString(datetime)) {
-        return this.parseDateTimeString(datetime);
-    } else if ($A.util.isNumber(datetime)) {
-        return new Date(datetime);
-    } else if (datetime instanceof Date) {
-        return datetime;
+
+    if (typeof datetime === "string") {
+        datetime = this.parseDateTimeISO8601(datetime);
+    } else if (typeof datetime === "number") {
+        datetime = new Date(datetime);
     }
 
-    return new Date(NaN);
+    if (!this.isValidDateObject(datetime)) {
+        return new Date(NaN);
+    }
+
+    return datetime;
 };
 
-/**
- * Parses a datetime string into a Date object.
- * @param {String} dateTimeString - A datetime string in ISO8601 format. If the string is not in ISO8601 format, it uses native Date() to parse, which may have different results across browsers and versions.
- *
- * @private
- */
-AuraLocalizationService.prototype.parseDateTimeString = function(dateTimeString) {
-    if (!this.isISO8601DateTimeString(dateTimeString)) {
-        $A.warning("The provided datetime string is not in ISO8601 format. It will be parsed by native Date(), which may have different results across browsers and versions. ");
-        var date = new Date(dateTimeString);
-        // Date parsing includes browser timezone. To maintain current behavior, needs to remove it.
-        date.setTime(date.getTime() + date.getTimezoneOffset() * 6e4); // 60 * 1000
-        return date;
+AuraLocalizationService.prototype.weekInYear = function(date) {
+    var nonLeapLadder = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    var leapLadder = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
+
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+    var ordinal = day + (this.isLeapYear(year) ? leapLadder : nonLeapLadder)[month - 1];
+
+    var weekday = date.getDay();
+    if (weekday === 0) {
+        weekday = 7;
     }
 
-    return this.parseDateTimeISO8601(dateTimeString);
+    // weekday needs to be 1-7
+    var weekNumber = Math.floor((ordinal - weekday + 10) / 7);
+
+    return weekNumber;
+};
+
+AuraLocalizationService.prototype.isLeapYear = function(year) {
+    return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+};
+
+AuraLocalizationService.prototype.parseISOStringToConfig = function(dateTimeString) {
+
+    var match = this.ISO_REGEX.exec(dateTimeString) || this.ISO_REGEX_NO_DASH.exec(dateTimeString);
+
+    var i, tokens;
+    // date string
+    var year, month, day;
+    var dateString = match[1];
+    if (dateString === undefined) {
+        return null;
+    }
+
+    for (i = 0; i < this.ISO_DATE_PATTERNS.length; i++) {
+        var datePattern = this.ISO_DATE_PATTERNS[i];
+        tokens = datePattern.exec(dateString);
+        if (tokens) {
+            year = parseInt(tokens[1], 10);
+            month = parseInt(tokens[2], 10) || 1;
+            day = parseInt(tokens[3], 10) || 1;
+            break;
+        }
+    }
+
+    if (!this.isValidDate(year, month, day)) {
+        return null;
+    }
+
+    var hour, minute, second, millisecond;
+    hour = minute = second = millisecond = 0;
+    var timeString = match[3];
+    if (timeString !== undefined) {
+        for (i = 0; i < this.ISO_TIME_PATTERNS.length; i++) {
+            var timePattern = this.ISO_TIME_PATTERNS[i];
+            tokens = timePattern.exec(timeString);
+            if (tokens) {
+                hour = parseInt(tokens[1], 10) || 0;
+                minute = parseInt(tokens[2], 10) || 0;
+                second = parseInt(tokens[3], 10) || 0;
+                // only keep 3 digits for millisecond
+                millisecond = tokens[4]? parseInt(tokens[4].substring(0, 3), 10) : 0;
+                break;
+            }
+        }
+
+        if (!this.isValidTime(hour, minute, second, millisecond)) {
+            return null;
+        }
+    }
+
+    var utcOffset = undefined;
+    var offsetString = match[4];
+    if (offsetString !== undefined) {
+        if (offsetString !== "Z") {
+            tokens = this.ISO_OFFSET_PATTERN.exec(offsetString);
+            var offsetInMinute = parseInt(tokens[1], 10) * 60 + parseInt(tokens[2], 10);
+            if (!this.isValidOffset(offsetInMinute)) {
+                return null;
+            }
+            utcOffset = offsetInMinute;
+        } else {
+            utcOffset = 0;
+        }
+    }
+
+    return {
+        "year": year,
+        "month": month,
+        "day": day,
+        "hour": hour,
+        "minute": minute,
+        "second": second,
+        "millisecond": millisecond,
+        "utcOffset": utcOffset
+    };
+};
+
+
+AuraLocalizationService.prototype.daysInMonth = function (year, month) {
+    switch (month) {
+        case 2:
+            return (year % 4 === 0 && year % 100) || year % 400 === 0 ? 29 : 28;
+        case 4: case 6: case 9: case 12:
+            return 30;
+        default:
+            return 31;
+    }
+};
+
+AuraLocalizationService.prototype.isValidDate = function(year, month, day) {
+    return month >= 1 && month <= 13 && day >= 1 && day <= this.daysInMonth(year, month);
+};
+
+AuraLocalizationService.prototype.isValidTime = function(hour, minute, second, millisecond) {
+    return ((hour >=0 && hour < 24) || (hour === 24 && minute === minute === second === millisecond === 0)) &&
+           minute >= 0 && minute < 60 &&
+           second >= 0 && second < 60 &&
+           millisecond >= 0 && millisecond <= 999;
+};
+
+AuraLocalizationService.prototype.isValidOffset = function(offsetInMinute) {
+    // UTC-12 to UTC+14
+    return offsetInMinute >= -720 && offsetInMinute <= 840;
 };
 
 AuraLocalizationService.prototype.isISO8601DateTimeString = function(dateTimeString) {
@@ -2049,7 +2186,7 @@ AuraLocalizationService.prototype.setupDateTimeUnitAlias = function() {
     this.addDateTimeUnitAlias("millisecond", "ms");
 };
 
-AuraLocalizationService.prototype.isValidDate = function(date) {
+AuraLocalizationService.prototype.isValidDateObject = function(date) {
     return (date instanceof Date) && !isNaN(date.getTime());
 };
 

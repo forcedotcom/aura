@@ -20,7 +20,7 @@
         _helper.formatDate(concreteCmp);
         return this.superAfterRender();
     },
-    
+
     rerender: function(component) {
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();

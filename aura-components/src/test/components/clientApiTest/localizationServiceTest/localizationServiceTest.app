@@ -16,4 +16,7 @@
 
 -->
 <aura:application render="client">
+    <aura:attribute name="string" type="String"/>
+
+    {!v.string}
 </aura:application>

@@ -58,7 +58,7 @@
      */
     testInvalidFormat: {
         browsers: ['DESKTOP'],
-        attributes: {displayDatePicker: 'true', format: 'KKKKKK', loadDatePicker: 'true'},
+        attributes: {displayDatePicker: 'true', format: '!@#$%', loadDatePicker: 'true'},
         test: function (cmp) {
             cmp.find("datePicker").find("grid").selectToday();
 
@@ -67,8 +67,7 @@
                     return !!inputElement.value;
                 }, function() {
                     var actual = inputElement.value;
-                    // this is moment.format behavior
-                    $A.test.assertEquals("KKKKKK", actual, "Dates are not the same and they should be");
+                    $A.test.assertEquals("!@#$%", actual, "Dates are not the same and they should be");
                 });
         }
     },
@@ -87,9 +86,8 @@
 
     /**
      * Verify behavior when 'langLocale' attribute is assigned a different value.
-     * TODO: The usage is not valid anymore. Needs to change the app's locale on the server side.
      */
-    _testLangLocale: {
+    testLangLocale: {
         browsers: ['DESKTOP'],
         attributes: {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: 'es'},
         test: function (cmp) {

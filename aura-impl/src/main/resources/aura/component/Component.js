@@ -2312,6 +2312,8 @@ Component.prototype.setupAttributes = function(config, localCreation) {
                         configValues[defaultDef.getDescriptor().getName()] = valueFactory.create(defaultValue, this);
                     }
                 }
+            } else if (defaultDef.required && !configValues.hasOwnProperty(name)) {
+                $A.warning("While creating component '" + this.type + "' ; missing required attribute '" + name + "'. " + $A.clientService.getAccessStackHierarchy());
             }
             if(!setByDefault[name]&&partialAttributes&&partialAttributes[name]===configValues[name]){
                 setByDefault[name]=true;

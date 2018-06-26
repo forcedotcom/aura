@@ -319,5 +319,30 @@
                 $A.test.assertEquals(expected, actual, message);
             }
         ]
+    },
+
+    /** 
+     * Attribute must be set during init handler so we dynamically create the component and verify there were no errors
+     * thrown during the render.
+     * 
+     * See W-5096195 for more details.
+     */
+    testSetBooleanAttributeOnInit: {
+        test: [
+            function(cmp) {
+                var done = false;
+                $A.createComponent('moduletest:interopBooleanAttributeCoercionInit', {}, function(newCmp) {
+                    cmp.find('container').set('v.body', newCmp);
+                    done = true;
+                });
+
+                // error is likely to happen on re-render rather than cmp creation so do verification in next test stage
+                $A.test.addWaitFor(true, function() { return done; });
+            },
+            function(cmp) {
+                var errorMessageReceived = cmp.get('v.errorMessageReceived');
+                $A.test.assertUndefined(errorMessageReceived, "Should not have receieved error creating component, but got <" + errorMessageReceived + ">.");
+            }
+        ]
     }
 })

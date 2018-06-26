@@ -53,6 +53,11 @@ Aura.Utils.DateTimeFormat.prototype.format = function(date, utcOffset) {
         parts = this.dateTimeFormat["formatToParts"](date);
     }
 
+    // if offset is not given, using local offset
+    if (utcOffset === undefined) {
+        utcOffset = date.getTimezoneOffset() * -1 || 0;
+    }
+
     var dateTimeString = "";
     for (var i = 0; i < this.tokens.length; i++) {
         var token = this.tokens[i];
@@ -74,10 +79,16 @@ Aura.Utils.DateTimeFormat.prototype.format = function(date, utcOffset) {
             var dateTimeFormat = Intl["DateTimeFormat"](this.locale, token["config"]);
             dateTimeString += $A.localizationService.format(dateTimeFormat, date);
         } else if (token["field"] === "offset") {
-            if (utcOffset === undefined) {
-                utcOffset = date.getTimezoneOffset() * -1;
+            if (token["zone"] !== undefined) {
+                // This is to support 'z' token for datetime in UTC.
+                // It's a moment leaking, we should consider deprecating it.
+                if (utcOffset === 0) {
+                    dateTimeString += token["zone"];
+                }
+            } else {
+                dateTimeString += this.formatOffset(utcOffset, token["delimiter"]);
             }
-            dateTimeString += this.formatOffset(utcOffset, token["delimiter"]);
+
         } else {
             dateTimeString += this.findField(parts, token["field"]) || "";
         }
@@ -110,7 +121,8 @@ Aura.Utils.DateTimeFormat.prototype.getNumberFieldValue = function(token, date) 
                 if (hourCycle === "h24") {
                     return hour === 0? 24 : hour;
                 } else if (hourCycle === "h12") {
-                    return hour === 0? 12 : (hour % 12);
+                    hour = hour % 12;
+                    return hour === 0? 12 : hour;
                 }
             }
             return hour;
@@ -457,6 +469,10 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
             case "ZZ":
                 token["field"] = "offset";
                 token["delimiter"] = false;
+                break;
+            case "z": // leaked moment token
+                token["field"] = "offset";
+                token["zone"] = "UTC";
                 break;
 
             // day in week

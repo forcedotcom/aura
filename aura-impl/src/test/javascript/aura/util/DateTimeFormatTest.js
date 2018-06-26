@@ -400,6 +400,20 @@ Test.Aura.Util.DateTimeFormatTest = function() {
         }
 
         [Fact]
+        function FormatsDateTimeWithH12Cycle() {
+            var date = new Date(2014, 9, 23, 12);
+            var expected = "Oct 23, 2014 12:00:00 PM";
+            var actual;
+
+            mockAura(function() {
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy h:mm:ss a", "en-US");
+                actual = dateTimeFormat.format(date);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         function FormatsDateTimeWithOffset() {
             var date = new Date(2014, 9, 23, 16, 30, 45);
             var expected = "2014-10-23T04:30:45-07:00";

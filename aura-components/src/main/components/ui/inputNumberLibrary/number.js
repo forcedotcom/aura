@@ -94,7 +94,7 @@ function lib() { // eslint-disable-line no-unused-vars
                 // to avoid 4.1 * 1000000 = 4099999.9999999995
                 var decimalSeparatorIndex = numberOnlyPart.indexOf('.');
                 var fractionalDigitsNeeded = decimalSeparatorIndex >= 0 ? (numberOnlyPart.length - (decimalSeparatorIndex + exponent + 1)) : 0;
-                if (fractionalDigitsNeeded < 0) { 
+                if (fractionalDigitsNeeded < 0 || fractionalDigitsNeeded > 100) {
                     fractionalDigitsNeeded = 0; 
                 }
             

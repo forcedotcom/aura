@@ -57,7 +57,7 @@ import org.lwc.reference.Reference;
  */
 public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleDef {
 
-    private static final long serialVersionUID = -6851127890969275424L;
+    private static final long serialVersionUID = -6862338012969275424L;
 
     private String path;
     private final Set<String> moduleDependencies;

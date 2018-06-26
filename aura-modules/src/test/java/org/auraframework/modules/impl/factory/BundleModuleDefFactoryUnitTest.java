@@ -128,7 +128,7 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.PROD_COMPAT, mockCompiled);
 
 
-        CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class));
+        CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class), null);
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
         ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet("prop1", "prop2", "prop3"), Sets.newHashSet(), mockReport);
@@ -251,7 +251,7 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.COMPAT, mockCompiled);
         codeMap.put(CodeType.PROD_COMPAT, mockCompiled);
 
-        CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class));
+        CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class), null);
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
         ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet("prop1", "prop2", "prop3"), Sets.newHashSet(), mockReport);
@@ -379,7 +379,7 @@ public class BundleModuleDefFactoryUnitTest {
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
 
-        CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class));
+        CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class), null);
         ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), mockReport);
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
 

@@ -1,5 +1,6 @@
 import { Element, api } from 'engine';
 import * as testUtils from 'securemoduletest-test-util';
+import { LockerLWCEventName } from 'lockerlwc-lockerlwcevent';
 
 export default class ChildSecure extends Element {
     @api arrayProp = [91, 92, 93];
@@ -53,9 +54,20 @@ export default class ChildSecure extends Element {
         this.setAttribute('data-triggered', 'true');
     }
 
+    assertPlatformEventData(ev) {
+        testUtils.assertEquals(
+            'SecureDOMEvent: [object Event]{ key: {"namespace":"lockerlwc"} }',
+            `${ev}`,
+            'CustomEvent constructor should return a SecureEvent'
+        );
+
+        assertDataObject(ev.evData);
+    }
+
     connectedCallback() {
         this.template.addEventListener('customEvent', this.assertCustomEvent.bind(this));
         this.template.addEventListener('click', this.assertDOMEvent.bind(this));
+        this.template.addEventListener(LockerLWCEventName, this.assertPlatformEventData);
     }
 
     @api assertParamsInPublicMethod(data) {
@@ -65,11 +77,11 @@ export default class ChildSecure extends Element {
 
 function assertDataObject(data) {
     testUtils.assertEqualsValue({
-            foo: 'bar',
-            bar: {
-                baz: 'foo'
-            }
-        },
+        foo: 'bar',
+        bar: {
+            baz: 'foo'
+        }
+    },
         data.object,
         'Expected object was not received in event data'
     );

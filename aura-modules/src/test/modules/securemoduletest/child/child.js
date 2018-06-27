@@ -1,5 +1,6 @@
 import { Element, api } from 'engine';
 import * as testUtil from 'securemoduletest-test-util';
+import { LockerLWCEventName } from 'lockerlwc-lockerlwcevent';
 
 export default class Child extends Element {
     @api
@@ -86,7 +87,65 @@ export default class Child extends Element {
         ev.detail.data.func();
     }
 
+    assertPlatformEventPayload(ev) {
+        assertDataObject(ev.evData);
+    }
+
     connectedCallback() {
         this.template.addEventListener('customEvent', this.assertTestAuraLWCCustomEventOnHostElement);
+        this.template.addEventListener(LockerLWCEventName, this.assertPlatformEventPayload);
     }
+}
+
+function assertDataObject(data) {
+    testUtil.assertEqualsValue({
+        foo: 'bar',
+        bar: {
+            baz: 'foo'
+        }
+    },
+        data.object,
+        'Expected object was not received in event data'
+    );
+    testUtil.assertEqualsValue([0, 1, 2], data.array, 'Expected array was not received in event data');
+    testUtil.assertEquals('foobar', data.string, 'Expected string was not received in event data');
+    testUtil.assertEquals(1, data.number, 'Expected number was not received in event data');
+    testUtil.assertEquals(true, data.boolean, 'Expected boolean was not received in event data');
+
+    testUtil.assertEquals(
+        'SecureObject: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }',
+        data.domElement.toString(),
+        'Should not receive an element from an unlockerized environment'
+    );
+
+    testUtil.assertEquals(
+        'SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }',
+        `${data.win}`,
+        'Expected window to be a SecureWindow'
+    );
+
+    testUtil.assertEquals(
+        'SecureDocument: [object HTMLDocument]{ key: {"namespace":"secureModuleTest"} }',
+        `${data.doc}`,
+        'Expected document to be a SecureDocument: [object HTMLDocument]'
+    );
+
+    testUtil.assertEquals(
+        'SecureElement: [object HTMLBodyElement]{ key: {"namespace":"secureModuleTest"} }',
+        `${data.body}`,
+        'Expected body to be a SecureElement: [object HTMLBodyElement]'
+    );
+
+    testUtil.assertEquals(
+        'SecureElement: [object HTMLHeadElement]{ key: {"namespace":"secureModuleTest"} }',
+        `${data.head}`,
+        'Expected head to be a SecureElement: [object HTMLHeadElement]'
+    );
+
+    testUtil.assertEquals(
+        true,
+        data.func instanceof Function,
+        'Mismatch in expected function parameter'
+    );
+    data.func();
 }

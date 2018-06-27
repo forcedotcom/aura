@@ -213,5 +213,47 @@
             var module = cmp.find('parentUnsecure').getElement();
             return module.testUnsecureLWC2SecureLWCCustomEvent();
         }
+    },
+    testPlatformEventsOnSelf: {
+        test: function (cmp) {
+            var module = cmp.find('parentSecure').getElement();
+            var doneObj = {};
+            module.testPlatformEventsOnSelf(doneObj);
+            $A.test.addWaitForWithFailureMessage(
+                true,
+                function() {
+                    return doneObj.triggered;
+                },
+                'Platform event was not triggered'
+            )
+        }
+    },
+    testPlatformEventsOnChild: {
+        test: function (cmp) {
+            var module = cmp.find('parentSecure').getElement();
+            var doneObj = {};
+            module.testPlatformEventsOnChild(doneObj);
+            $A.test.addWaitForWithFailureMessage(
+                true,
+                function() {
+                    return doneObj.triggered;
+                },
+                'Platform event was not triggered'
+            )
+        }
+    },
+    testPlatformEventsOnChildCrossNamespace: {
+        test: function (cmp) {
+            var module = cmp.find('parentSecure').getElement();
+            var doneObj = {};
+            module.testPlatformEventsOnChildCrossNamespace(doneObj);
+            $A.test.addWaitForWithFailureMessage(
+                true,
+                function() {
+                    return doneObj.triggered;
+                },
+                'Platform event was not triggered'
+            )
+        }
     }
 })

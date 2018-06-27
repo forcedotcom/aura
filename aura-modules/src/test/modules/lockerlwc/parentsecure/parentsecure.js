@@ -1,12 +1,13 @@
 import { Element, api } from 'engine';
 import * as testUtils from 'securemoduletest-test-util';
+import { LockerLWCEvent, LockerLWCEventName } from 'lockerlwc-lockerlwcevent';
 
 export default class ParentSecure extends Element {
     // properties
     @api callback;
 
     // utilities
-    getCustomEventData(doneObj) {
+    getCustomEventData(doneObj, isSecure = false) {
         return {
             object: {
                 foo: 'bar',
@@ -23,7 +24,8 @@ export default class ParentSecure extends Element {
             doc: document,
             body: document.body,
             head: document.head,
-            func: this.createDoneCallback(doneObj)
+            func: this.createDoneCallback(doneObj),
+            isSecure
         };
     }
 
@@ -110,6 +112,14 @@ export default class ParentSecure extends Element {
         );
     }
 
+    assertIsSecureEvent(ev) {
+        testUtils.assertEquals(
+            'SecureDOMEvent: [object Event]{ key: {"namespace":"lockerlwc"} }',
+            `${ev}`,
+            'CustomEvent constructor should return a SecureEvent'
+        );
+    }
+
     assertCustomEventDataPayload(ev) {
         this.assertIsSecureCustomEvent(ev);
         this.assertIsSecureWindow(window);
@@ -190,7 +200,7 @@ export default class ParentSecure extends Element {
 
         const ev = new CustomEvent('customEvent', {
             detail: {
-                data: Object.assign(_this.getCustomEventData(doneObj, true), {isSecure : true})
+                data: _this.getCustomEventData(doneObj, true)
             }
         });
 
@@ -298,11 +308,33 @@ export default class ParentSecure extends Element {
         // Access public methods
         testUtils.assertDefined(child.assertParamsInPublicMethod, 'Unable to access @api method on child component');
         testUtils.assertTrue(child.assertParamsInPublicMethod instanceof Function, 'Unexpected wrapped value received on child');
-        child.assertParamsInPublicMethod(
-            Object.assign(this.getCustomEventData(doneObj, true), { isSecure : true })
-        );
+        child.assertParamsInPublicMethod(this.getCustomEventData(doneObj, true));
         testUtils.assertTrue(doneObj.triggered, 'Failed to execute callback in child component');
     }
+    @api testPlatformEventsOnSelf(objDone) {
+        this.addEventListener(LockerLWCEventName, (ev) => {
+            testUtils.assertEquals(
+                'SecureDOMEvent: [object Event]{ key: {"namespace":"lockerlwc"} }',
+                `${ev}`,
+                'Event constructor should return a SecureDOMEvent'
+            );
+            this.assertDataPayload(ev.evData);
+            ev.evData.func();
+        });
+
+        this.dispatchEvent(new LockerLWCEvent(this.getCustomEventData(objDone, true)));
+    }
+
+    @api testPlatformEventsOnChild(objDone) {
+        const child = this.template.querySelector('lockerlwc-childsecure');
+        child.dispatchEvent(new LockerLWCEvent(this.getCustomEventData(objDone, true)));
+    }
+
+    @api testPlatformEventsOnChildCrossNamespace(objDone) {
+        const child = this.template.querySelector('securemoduletest-child');
+        child.dispatchEvent(new LockerLWCEvent(this.getCustomEventData(objDone, true)));        
+    }
+
 
     assertTestAuraLWCDomEventOnHostElement(ev) {
         this.assertIsSecureDOMEvent(ev);

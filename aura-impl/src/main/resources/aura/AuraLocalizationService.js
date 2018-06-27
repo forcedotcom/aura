@@ -1881,7 +1881,21 @@ AuraLocalizationService.prototype.formatDateTimeToString = function(date, format
 
 AuraLocalizationService.prototype.canFormatToParts = function() {
     if (this.supportFormatToParts === undefined) {
-        this.supportFormatToParts = (new Intl["DateTimeFormat"]()["formatToParts"]) !== undefined;
+        var dateTimeFormat = new Intl["DateTimeFormat"]();
+        if (dateTimeFormat["formatToParts"] === undefined) {
+            this.supportFormatToParts = false;
+        } else {
+            try {
+                dateTimeFormat["formatToParts"](new Date());
+                this.supportFormatToParts = true;
+            } catch (e) {
+                // Mobile browser does not support formatToParts very well. Needs to do real
+                // call for checking support.
+                $A.log("The browser does not support Intl.DateTimeFormat.formatToParts" , e);
+                this.supportFormatToParts = false;
+            }
+        }
+
     }
 
     return this.supportFormatToParts;

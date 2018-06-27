@@ -11,7 +11,7 @@
       }
     },
 
-    testFrozenIntrinsics: {
+    _testFrozenIntrinsics: {
         test: function(component) {
             component.testFrozenIntrinsics(component);
         }

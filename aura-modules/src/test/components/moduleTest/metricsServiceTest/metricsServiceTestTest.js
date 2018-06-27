@@ -52,7 +52,7 @@
                 var instrumentation = cmp.find('lib');
                 instrumentation.perfStart('name', { foo: true });
                 instrumentation.perfEnd('name', { foo: true });
-                $A.test.assertEquals(trxId, 'ltng:performance');
+                $A.test.assertEquals(trxId, 'ltng:performance:name');
             }
         ]
     }

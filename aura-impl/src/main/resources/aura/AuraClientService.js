@@ -170,6 +170,7 @@ function AuraClientService (util) {
         "ckeditor": { resourceUrl : "/auraFW/resources/{fwuid}/ckeditor/ckeditor-4.x/rel/ckeditor.js" },
         "quill": { resourceUrl : "/auraFW/resources/{fwuid}/quill.js" }
     };
+    this.clientLibraryLoadsInProgress = 0;
 
     // Access Control
     this.accessStack=[];
@@ -754,6 +755,10 @@ AuraClientService.prototype.initializeClientLibraries = function () {
     }
 };
 
+AuraClientService.prototype.clientLibraryLoadComplete = function() {
+    // Empty function. used as instrumentation hook
+};
+
 /**
  * Reference an external JavaScript library which is registered on component by aura:clientLibrary.
  * It loads the required client library from the server if needed.
@@ -784,7 +789,15 @@ AuraClientService.prototype.loadClientLibrary = function(name, callback) {
     lib.loading = lib.loading || [];
     lib.loading.push($A.getCallback(callback));
 
+    if (lib.loading.length === 1) {
+        // only increment counter if this is the first attempt to load a client library
+        // script tags are not always added for a first time load. They are also set at
+        // initializeClientLibraries
+        this.clientLibraryLoadsInProgress++;
+    }
+    var that = this;
     function afterLoad() {
+        that.clientLibraryLoadsInProgress--;
         $A.metricsService.transactionEnd("aura", "performance:loadClientLibrary");
 
         lib.loaded = true;
@@ -793,6 +806,7 @@ AuraClientService.prototype.loadClientLibrary = function(name, callback) {
             lib.loading[i]();
         }
         lib.loading = [];
+        that.clientLibraryLoadComplete();
     }
 
     lib.script.onload = afterLoad;
@@ -1657,8 +1671,7 @@ AuraClientService.prototype.inFlightXHRs = function(excludeBackground) {
 
         return inFlight.length;
     }
-
-    return this.allXHRs.length - this.availableXHRs.length;
+    return (this.allXHRs.length - this.availableXHRs.length) + this.clientLibraryLoadsInProgress;
 };
 
 /**

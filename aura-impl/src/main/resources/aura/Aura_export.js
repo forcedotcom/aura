@@ -121,6 +121,15 @@ Aura.OverrideMap = function OverrideMap() {
                 $A.clientService.receive = orig;
             }
         ),
+        
+        "ClientService.clientLibraryLoadComplete" : new Aura.Utils.Override($A.clientService, $A.clientService.clientLibraryLoadComplete, false,
+            function(bound) {
+                $A.clientService.clientLibraryLoadComplete = bound;
+            },
+            function(orig) {
+                $A.clientService.clientLibraryLoadComplete = orig;
+            }
+        ),
 
         "ComponentService.createComponentPriv" : new Aura.Utils.Override($A.componentService, $A.componentService.createComponentPriv, false,
             function(bound) {

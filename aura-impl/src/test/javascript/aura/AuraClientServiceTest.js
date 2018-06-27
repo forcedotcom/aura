@@ -40,6 +40,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
     var mockGlobal = Mocks.GetMocks(Object.Global(), {
         "$A": {
+            getCallback: function(c) {return c},
             log : function() {},
             assert : function(condition, message) {
                 if(!condition){
@@ -86,6 +87,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 }
             },
             mark : function() {},
+            metricsService: { transactionStart: function() {} },
             getContext : function() {
                 return {
                     encodeForServer: function(includeDynamic, includeExtraPropertiesForCacheableXHR) {
@@ -1354,6 +1356,51 @@ Test.Aura.AuraClientServiceTest = function() {
 
             // callback gets called when lib is found and loaded
             Assert.Equal(1, callback.Calls.length);
+        }
+
+        [Fact]
+        function IncrementsLoadCounterWhenScriptTagAlreadyExists() {
+            var libName = "libname";
+            var lib = {
+                loaded: false,
+                script: {getAttribute:function(x){return x;}}
+            }
+
+            var callback = function() {};
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.clientLibraries[libName] = lib;
+
+                // Act
+                target.loadClientLibrary(libName, callback);
+            });
+
+            Assert.Equal(1, target.clientLibraryLoadsInProgress);
+        }
+
+        [Fact]
+        function DoesNotIncrementsLoadCounterWhenLoadAlreadyInProgress() {
+            var libName = "libname";
+            var lib = {
+                loaded: false,
+                loading: [function(){}],
+                script: {getAttribute:function(x){return x;}}
+            }
+
+            var callback = function() {};
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.clientLibraries[libName] = lib;
+
+                // Act
+                target.loadClientLibrary(libName, callback);
+            });
+
+            Assert.Equal(0, target.clientLibraryLoadsInProgress);
         }
     }
 

@@ -21,11 +21,11 @@ var USER = "user";
 var CLICK = "click";
 
 Aura.ExportsMetricsService = {
-    "perfStart": function (name, attributes) {
-        return $A.metricsService.transactionStart(LTNG, PERF, { "context": { "eventSource": name, "attributes": attributes }});
+    "perfStart": function (name, attributes, eventSource) {
+        return $A.metricsService.transactionStart(LTNG, PERF + ":" + name, { "context": { "eventSource": eventSource || name, "attributes": attributes }});
     },
-    "perfEnd": function (name, attributes) {
-        return $A.metricsService.transactionEnd(LTNG, PERF, { "context": { "eventSource": name, "attributes": attributes }});
+    "perfEnd": function (name, attributes, eventSource) {
+        return $A.metricsService.transactionEnd(LTNG, PERF + ":" + name, { "context": { "eventSource": eventSource || name, "attributes": attributes }});
     },
     "mark": function (ns, name, ctx) {
         return $A.metricsService.mark(ns, name, ctx);
@@ -39,11 +39,11 @@ Aura.ExportsMetricsService = {
     "time": function () {
        return $A.metricsService.time();
     },
-    "interaction": function (target, scope, context, eventSource) {
+    "interaction": function (target, scope, context, eventSource, eventType) {
         return $A.metricsService.transaction(LTNG, INTERACTION, {
             "context": {
                 "eventSource" : eventSource || CLICK,
-                "eventType"   : USER,
+                "eventType"   : eventType || USER,
                 "locator"     : {
                     "target"  : target,
                     "scope"   : scope,

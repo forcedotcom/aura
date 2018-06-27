@@ -144,8 +144,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
 
         [Fact]
         function FormatsDateTimeWithWeekday() {
-            var date = new Date(2014, 9, 23, 0, 30, 45);
-            var expected = "Thursday, October 23, 2014 12:30 AM";
+            var date = new Date(2014, 9, 23, 1, 30, 45);
+            var expected = "Thursday, October 23, 2014 1:30 AM";
             var actual;
 
             mockAura(function() {
@@ -228,8 +228,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
 
         [Fact]
         function FormatsLocalizedTime() {
-            var date = new Date(2014, 9, 23, 0, 30, 45);
-            var expected = "12:30 AM";
+            var date = new Date(2014, 9, 23, 23, 30, 45);
+            var expected = "11:30 PM";
             var actual;
 
             mockAura(function() {
@@ -242,8 +242,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
 
         [Fact]
         function FormatsLocalizedTimeWithSecond() {
-            var date = new Date(2014, 9, 23, 0, 30, 45);
-            var expected = "12:30:45 AM";
+            var date = new Date(2014, 9, 23, 14, 30, 45);
+            var expected = "2:30:45 PM";
             var actual;
 
             mockAura(function() {
@@ -442,6 +442,20 @@ Test.Aura.Util.DateTimeFormatTest = function() {
         }
 
         [Fact]
+        function Formats2DigitStyleYear() {
+            var date = new Date(2014, 9, 23);
+            var expected = "10/23/14";
+            var actual;
+
+            mockAura(function() {
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MM/dd/yy", "en-US");
+                actual = dateTimeFormat.format(date);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         function Formats24HourFormat() {
             var date = new Date(2014, 9, 23, 16, 30, 45);
             var expected = "Oct 23, 2014 16:30:45";
@@ -485,8 +499,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
 
         [Fact]
         function FormatsDateTimeWithWeekday() {
-            var date = new Date(2014, 9, 23, 0, 30, 45);
-            var expected = "Thursday, October 23, 2014 12:30 AM";
+            var date = new Date(2014, 9, 23, 1, 30, 45);
+            var expected = "Thursday, October 23, 2014 1:30 AM";
             var actual;
 
             mockAura(function() {

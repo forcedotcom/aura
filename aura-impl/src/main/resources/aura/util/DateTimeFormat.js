@@ -108,7 +108,11 @@ Aura.Utils.DateTimeFormat.prototype.getNumberFieldValue = function(token, date) 
         case "weekday":
             return date.getDay();
         case "year":
-            return date.getFullYear();
+            var year = date.getFullYear();
+            if (token["style"] === "2-digit") {
+                year = year%100;
+            }
+            return year;
         case "month":
             return date.getMonth() + 1;
         case "day":
@@ -255,6 +259,7 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                     config["year"] = "2-digit";
                 } else {
                     token["type"] = "number";
+                    token["style"] = "2-digit";
                     token["minDigits"] = 2;
                     token["localized"] = true;
                 }

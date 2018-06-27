@@ -120,4 +120,15 @@ public interface AuraLocalStore {
      */
     @Nonnull
     Map<DefDescriptor<? extends Definition>, Definition> getDefinitions();
+
+    /**
+     * Get a cache of access checks that is valid for the current local store.
+     *
+     * This map is actually a map from a key identifying both the accessor and the
+     * accessee to an error string. If the error string is null, access is granted.
+     *
+     * @return a map for access checks..
+     */
+    @Nonnull
+    Map<String, String> getAccessCheckCache();
 }

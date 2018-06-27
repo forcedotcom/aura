@@ -745,6 +745,13 @@ public interface AuraContext {
     RegistrySet getRegistries();
 
     /**
+     * Set the registry set for this context.
+     *
+     * @param registrySet the new registry set to use.
+     */
+    void setRegistries(RegistrySet registrySet);
+
+    /**
      * Set this context in 'system mode'.
      *
      * This is really a semi-private method used by the context adapter... Wish I had a better way to do it.

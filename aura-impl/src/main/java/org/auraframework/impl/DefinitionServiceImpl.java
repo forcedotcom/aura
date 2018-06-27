@@ -48,6 +48,7 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.context.AuraLocalStoreImpl;
 import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
 import org.auraframework.impl.linker.AccessChecker;
 import org.auraframework.impl.linker.AuraLinker;
@@ -69,10 +70,12 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraLocalStore;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.Location;
+import org.auraframework.system.RegistrySet;
 import org.auraframework.system.Source;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -1302,5 +1305,38 @@ public class DefinitionServiceImpl implements DefinitionService {
         if (!errors.isEmpty()) {
             throw new CompositeValidationException("Unable to load values for " + root, errors);
         }
+    }
+
+    private static class ResolverContextImpl implements ResolverContext {
+        private final RegistrySet registrySet;
+        private final AuraLocalStore localStore;
+
+        public ResolverContextImpl(RegistrySet registrySet, AuraLocalStore localStore) {
+            this.registrySet = registrySet;
+            this.localStore = localStore;
+        }
+
+        @Override
+        public RegistrySet getRegistrySet() {
+            return registrySet;
+        }
+
+        public AuraLocalStore getLocalStore() {
+            return localStore;
+        }
+    }
+
+    @Override
+    public ResolverContext createResolverContext(RegistrySet registrySet) {
+        return new ResolverContextImpl(registrySet, new AuraLocalStoreImpl());
+    }
+
+    @Override
+    public void setResolverContext(ResolverContext context) {
+        assert context instanceof ResolverContextImpl;
+        ResolverContextImpl contextImpl = (ResolverContextImpl)context;
+        AuraContext auraContext = contextService.getCurrentContext();
+        auraContext.setAuraLocalStore(contextImpl.getLocalStore());
+        auraContext.setRegistries(contextImpl.getRegistrySet());
     }
 }

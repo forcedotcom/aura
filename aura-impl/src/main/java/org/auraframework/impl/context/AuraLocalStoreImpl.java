@@ -53,12 +53,14 @@ public class AuraLocalStoreImpl implements AuraLocalStore {
     private final LocalInfo userStore;
     private LocalInfo systemStore;
     private LocalInfo currentStore;
+    private final Map<String, String> accessCheckCache;
 
     public AuraLocalStoreImpl() {
         this.userStore = new LocalInfo();
         this.systemStore = null;
         this.systemMode = false;
         this.currentStore = this.userStore;
+        this.accessCheckCache = new HashMap<>();
     }
 
     @Override
@@ -186,5 +188,10 @@ public class AuraLocalStoreImpl implements AuraLocalStore {
     @Override
     public Map<DefDescriptor<? extends Definition>, Definition> getDefinitions() {
         return Collections.unmodifiableMap(userStore.defs);
+    }
+
+    @Override
+    public Map<String, String> getAccessCheckCache() {
+        return accessCheckCache;
     }
 }

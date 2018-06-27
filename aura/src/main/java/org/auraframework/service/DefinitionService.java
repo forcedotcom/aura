@@ -29,6 +29,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.expression.PropertyReference;
+import org.auraframework.system.RegistrySet;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -325,4 +326,34 @@ public interface DefinitionService extends AuraService {
      * make sure all of our registries are built.
      */
     void warmCaches();
+
+    public interface ResolverContext {
+        RegistrySet getRegistrySet();
+    }
+
+    /**
+     * create a "context" for resolving definitions.
+     *
+     * This method, along with #setResolverContext(Object) can be used to manage the set of
+     * definitions available to the definition Service. During normal run-time, these methods
+     * should not be needed.
+     *
+     * The use case for this set of methods is when you want to update a set of definitions, and
+     * you need to validate the new definitions together as a set, and check them against the
+     * previous set of definitions. In the case of using some sort of database to save the defs,
+     * this will allow both the old and new definitions to be held simultaniously, and allow
+     * the caller to control which set is currently in use.
+     *
+     * @param registrySet the registry set for which we need a context.
+     * @return the context.
+     */
+    ResolverContext createResolverContext(RegistrySet registrySet);
+
+
+    /**
+     * set the current registry set context.
+     *
+     * @param context A context created by #createRegistrySetContext().
+     */
+    void setResolverContext(ResolverContext context);
 }

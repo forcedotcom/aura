@@ -156,9 +156,7 @@ public class AuraContextImpl implements AuraContext {
 
     private final Map<String, Boolean> clientClassesLoaded;
 
-    private final Map<String, String> accessCheckCache;
-
-    private final RegistrySet registries;
+    private RegistrySet registries;
 
     private final Set<String> restrictedNamespaces = new HashSet<>();
 
@@ -180,7 +178,6 @@ public class AuraContextImpl implements AuraContext {
         this.globalValues = new HashMap<>();
         this.localStore = new AuraLocalStoreImpl();
         this.clientClassesLoaded = new HashMap<>();
-        this.accessCheckCache = new HashMap<>();
     }
 
     @Override
@@ -968,12 +965,17 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public Map<String, String> getAccessCheckCache() {
-        return accessCheckCache;
+        return localStore.getAccessCheckCache();
     }
 
     @Override
     public RegistrySet getRegistries() {
         return this.registries;
+    }
+
+    @Override
+    public void setRegistries(RegistrySet registries) {
+        this.registries = registries;
     }
 
     @Override

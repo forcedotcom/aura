@@ -15,10 +15,11 @@
  */
 package org.auraframework.integration.test.context;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
@@ -47,10 +48,11 @@ import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 @ThreadHostileTest("Tests modify if locker service is enabled")
 public class AuraContextIntegrationTest extends AuraImplTestCase {
@@ -585,7 +587,7 @@ public class AuraContextIntegrationTest extends AuraImplTestCase {
         action.setCallerVersion("2.0");
         ctx.setCurrentAction(action);
         ctx.setApplicationDescriptor(
-                definitionService.getDefDescriptor("markup://componentTest:versionInServer", ComponentDef.class));
+        definitionService.getDefDescriptor("markup://componentTest:versionInServer", ComponentDef.class));
 
         String version = ctx.getAccessVersion();
         assertEquals("2.0", version);

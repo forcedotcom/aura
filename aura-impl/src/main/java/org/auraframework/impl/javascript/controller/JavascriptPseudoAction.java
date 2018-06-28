@@ -15,7 +15,13 @@
  */
 package org.auraframework.impl.javascript.controller;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.auraframework.def.ActionDef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.controller.AuraClientException;
@@ -25,11 +31,6 @@ import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.json.Json;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 /**
  * This represents the Java bookkeeping idea of a Javascript action.  It is not
  * runnable server-side, but is used for example as the echo of a failed client
@@ -38,7 +39,6 @@ import java.util.Map;
  * @since 194
  */
 public class JavascriptPseudoAction implements Action {
-
     private final DefDescriptor<ActionDef> descriptor;
     private String id;
     private List<Object> errorList;
@@ -151,17 +151,27 @@ public class JavascriptPseudoAction implements Action {
     }
 
     @Override
-    public void setCallingDescriptor(DefDescriptor<ComponentDef> descriptor) {
-        throw new UnsupportedOperationException("client-side Javascript actions do not have set calling descriptor");
+    public void setCallingDefinition(BaseComponentDef definition) {
+        throw new UnsupportedOperationException("client-side Javascript actions do not have set calling definition");
     }
 
-	@Override
-	public String getCallerVersion() {
-		throw new UnsupportedOperationException("client-side Javascript actions do not have set calling descriptor");
-	}
+    @Override
+    public String getCallerVersion() {
+        throw new UnsupportedOperationException("client-side Javascript actions do not have get caller version");
+    }
 
-	@Override
-	public void setCallerVersion(String callerVersion) {
-		throw new UnsupportedOperationException("client-side Javascript actions do not have set calling descriptor");
-	}
+    @Override
+    public void setCallerVersion(String callerVersion) {
+        throw new UnsupportedOperationException("client-side Javascript actions do not have set caller version");
+    }
+
+    @Override
+    public BaseComponentDef getCallingDefinition() {
+        throw new UnsupportedOperationException("client-side Javascript actions do not have get calling definition");
+    }
+
+    @Override
+    public void setCallingDescriptor(DefDescriptor<? extends BaseComponentDef> def) {
+        throw new UnsupportedOperationException("client-side Javascript actions do not have set calling descriptor");
+    }
 }

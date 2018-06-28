@@ -15,8 +15,10 @@
  */
 package org.auraframework.components.test.java.controller;
 
+import javax.inject.Inject;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.def.ComponentDef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.instance.Action;
@@ -24,8 +26,6 @@ import org.auraframework.service.ContextService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import javax.inject.Inject;
 
 @ServiceComponent
 public class VersionTestController implements Controller {
@@ -42,7 +42,7 @@ public class VersionTestController implements Controller {
     @AuraEnabled
     public String currentCallingDescriptor() {
         Action currentAction = contextService.getCurrentContext().getCurrentAction();
-        DefDescriptor<ComponentDef> defDescr = currentAction.getCallingDescriptor();
+        DefDescriptor<? extends BaseComponentDef> defDescr = currentAction.getCallingDescriptor();
         String qualifiedName = null;
         if(defDescr != null) {
             qualifiedName = defDescr.getQualifiedName();;

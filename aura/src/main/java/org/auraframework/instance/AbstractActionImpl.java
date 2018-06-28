@@ -19,16 +19,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import org.auraframework.def.ActionDef;
-import org.auraframework.def.ComponentDef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import javax.annotation.Nonnull;
 
 public abstract class AbstractActionImpl<T extends ActionDef> implements Action {
     public AbstractActionImpl(DefDescriptor<ControllerDef> controllerDescriptor, T actionDef,
@@ -130,13 +130,24 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     }
 
     @Override
-    public DefDescriptor<ComponentDef> getCallingDescriptor() {
+    public DefDescriptor<? extends BaseComponentDef> getCallingDescriptor() {
         return this.callingDescriptor;
     }
 
     @Override
-    public void setCallingDescriptor(DefDescriptor<ComponentDef> descriptor) {
+    public void setCallingDescriptor(DefDescriptor<? extends BaseComponentDef> descriptor) {
         this.callingDescriptor = descriptor;
+    }
+
+    @Override
+    public void setCallingDefinition(BaseComponentDef definition) {
+        this.callingDescriptor = definition.getDescriptor();
+        this.callingDefinition = definition;
+    }
+
+    @Override
+    public BaseComponentDef getCallingDefinition() {
+        return this.callingDefinition;
     }
 
     @Override
@@ -168,6 +179,7 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     protected final DefDescriptor<ControllerDef> controllerDescriptor;
     protected final T actionDef;
     protected State state;
-    protected DefDescriptor<ComponentDef> callingDescriptor;
+    protected BaseComponentDef callingDefinition;
+    protected DefDescriptor<? extends BaseComponentDef> callingDescriptor;
     protected String callerVersion;
 }

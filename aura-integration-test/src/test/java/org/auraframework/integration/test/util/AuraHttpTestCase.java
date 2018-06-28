@@ -15,9 +15,17 @@
  */
 package org.auraframework.integration.test.util;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -56,20 +64,13 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Base class with some helper methods specific to Aura.
  */
-@SuppressWarnings("deprecation")
 public abstract class AuraHttpTestCase extends IntegrationTestCase {
     @Inject
     protected ConfigAdapter configAdapter;
@@ -781,7 +782,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
 
         @Override
-        public void setCallingDescriptor(DefDescriptor<ComponentDef> descriptor) {
+        public void setCallingDescriptor(DefDescriptor<? extends BaseComponentDef> descriptor) {
         }
 
         @Override
@@ -791,6 +792,15 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
         @Override
         public void setCallerVersion(String callerVersion) {
+        }
+
+        @Override
+        public BaseComponentDef getCallingDefinition() {
+            return null;
+        }
+
+        @Override
+        public void setCallingDefinition(BaseComponentDef def) {
         }
     }
 }

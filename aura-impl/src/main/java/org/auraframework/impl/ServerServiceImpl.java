@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
@@ -34,8 +35,8 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.adapter.StyleAdapter;
-import org.auraframework.annotations.Annotations.ServiceComponentApplicationInitializer;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.annotations.Annotations.ServiceComponentApplicationInitializer;
 import org.auraframework.cache.Cache;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.ApplicationDef;
@@ -55,7 +56,6 @@ import org.auraframework.def.module.ModuleDef;
 import org.auraframework.http.BootstrapUtil;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.impl.cache.ApplicationInitializerCache;
-import org.auraframework.impl.css.CssVariableWriter;
 import org.auraframework.impl.css.StyleDefWriter;
 import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.instance.Action;
@@ -214,6 +214,60 @@ public class ServerServiceImpl implements ServerService {
         }
     }
 
+    /**
+     * Set up the calling definition and make sure we don't do bad things to perf.
+     *
+     * try hard not to fail here, as we are dealing with customer input.
+     *
+     * Note that this is fundamentally broken because of the fact that some descriptors cannot
+     * be retrieved as definitions. This is because we fail to honor the contract for some dynamic
+     * definitions. This should really be fixed.
+     *
+     * @param action the action to set up.
+     * @param context the context to use.
+     */
+    private void setupCallingDefinition(Action action, AuraContext context) {
+        DefDescriptor<? extends BaseComponentDef> callingDescriptor;
+        boolean found = false;
+
+        callingDescriptor = action.getCallingDescriptor();
+        if (callingDescriptor == null) {
+            return;
+        }
+        try {
+            if (definitionService.exists(callingDescriptor)) {
+                found = true;
+            } else {
+                DefDescriptor<? extends BaseComponentDef> appDescriptor;
+                appDescriptor = definitionService.getDefDescriptor(callingDescriptor.getQualifiedName(),
+                        ApplicationDef.class);
+                if (definitionService.exists(appDescriptor)) {
+                    // if we exist use this def.
+                    callingDescriptor = appDescriptor;
+                    found = true;
+                }
+            }
+        } catch (Exception e) {
+            // this should not happen, as "exists" should never throw, but if it does, just log it and continue.
+            exceptionAdapter.handleException(e);
+        }
+        action.setCallingDescriptor(callingDescriptor);
+        if (found) {
+            try {
+                if (!context.getPreloadedDefinitions().contains(callingDescriptor)) {
+                    String uid = definitionService.getUid(null, callingDescriptor);
+                    context.addPreloadedDefinitions(definitionService.getDependencies(uid));
+                }
+                action.setCallingDefinition(definitionService.getDefinition(callingDescriptor));
+            } catch (Exception qfe) {
+                // this really should not happen!
+                exceptionAdapter.handleException(qfe);
+            }
+        } else {
+            context.addPreloadedDefinitions(Sets.newHashSet(callingDescriptor));
+        }
+    }
+
     private int run(List<Action> actions, JsonEncoder json, int idx) throws IOException {
         AuraContext context = contextService.getCurrentContext();
         for (Action action : actions) {
@@ -224,27 +278,10 @@ public class ServerServiceImpl implements ServerService {
             }
             String aap = String.valueOf(++idx)+"$"+actionAndParams.toString();
             loggingService.startAction(aap, action);
+            setupCallingDefinition(action, context);
             Action oldAction = context.setCurrentAction(action);
             boolean earlyCleanup = false;
             try {
-                DefDescriptor<ComponentDef> callingDescriptor = action.getCallingDescriptor();
-                if (callingDescriptor != null && !context.getPreloadedDefinitions().contains(callingDescriptor)) {
-                    // we can assume that if the client is calling an action from a particular component, it has the component and we won't need to serialize it back
-                    // components referenced in the action will be added to the context and thus serialized back to the client
-                    try {
-                        context.addPreloadedDefinitions(definitionService.getDependencies(definitionService.getUid(null, callingDescriptor)));
-                    } catch (QuickFixException e) {
-                        // we assumed thed calling descriptor was a component, but it could be an application
-                        DefDescriptor<ApplicationDef> callingAppDescriptor = definitionService.getDefDescriptor(callingDescriptor.getQualifiedName(), ApplicationDef.class);
-                        try {
-                            context.addPreloadedDefinitions(definitionService.getDependencies(definitionService.getUid(null, callingAppDescriptor)));
-                        } catch (QuickFixException qfe) {
-                            // well, it's not a component, it's not an app... give up trying to exclude it from the set being serialized
-                        }
-                    } catch (Exception e) {
-                        // ignore other exceptions that may surface from trying to get the definition, like from layouts
-                    }
-                }
                 action.setup();
                 action.run();
             } catch (AuraExecutionException x) {
@@ -540,6 +577,7 @@ public class ServerServiceImpl implements ServerService {
 
     private void writeDefinitionStringToBuilder(Class defType, Set<DefDescriptor<?>> dependencies, TempFilter extraFilter,
                                                 AuraContext context, StringBuilder sb, String prefix, Set<String> serverSideDescriptor) {
+        @SuppressWarnings("unchecked")
         Collection<Definition> definitions = filterAndLoad(defType, dependencies, extraFilter);
         writeDefinitionStringToBuilder(definitions, context, sb, prefix, serverSideDescriptor);
     }

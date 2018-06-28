@@ -15,10 +15,15 @@
  */
 package org.auraframework.components.test.java.controller;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.ServerErrorUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.ds.servicecomponent.GlobalController;
@@ -31,10 +36,8 @@ import org.auraframework.system.Annotations.Key;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @ServiceComponent
 public class TestController implements GlobalController {
@@ -93,7 +96,7 @@ public class TestController implements GlobalController {
     @AuraEnabled
     public String currentCallingDescriptor() {
         Action currentAction = contextService.getCurrentContext().getCurrentAction();
-        DefDescriptor<ComponentDef> defDescr = currentAction.getCallingDescriptor();
+        DefDescriptor<? extends BaseComponentDef> defDescr = currentAction.getCallingDescriptor();
         String qualifiedName = null;
         if(defDescr != null) {
             qualifiedName = defDescr.getQualifiedName();;

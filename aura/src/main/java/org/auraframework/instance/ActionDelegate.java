@@ -20,13 +20,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.def.ActionDef;
-import org.auraframework.def.ComponentDef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.json.Json;
 
-public abstract class ActionDelegate implements Action {
+public class ActionDelegate implements Action {
     public ActionDelegate(Action original) {
         this.original = original;
     }
@@ -127,24 +127,34 @@ public abstract class ActionDelegate implements Action {
     }
 
     @Override
-    public DefDescriptor<ComponentDef> getCallingDescriptor() {
+    public DefDescriptor<? extends BaseComponentDef> getCallingDescriptor() {
         return original.getCallingDescriptor();
     }
 
     @Override
-    public void setCallingDescriptor(DefDescriptor<ComponentDef> descriptor) {
-        original.setCallingDescriptor(descriptor);
+    public void setCallingDefinition(BaseComponentDef definition) {
+        original.setCallingDefinition(definition);
     }
     
-	@Override
-	public String getCallerVersion() {
-		return original.getCallerVersion();
-	}
+    @Override
+    public BaseComponentDef getCallingDefinition() {
+        return original.getCallingDefinition();
+    }
+    
+    @Override
+    public String getCallerVersion() {
+            return original.getCallerVersion();
+    }
 
-	@Override
-	public void setCallerVersion(String callerVersion) {
-		original.setCallerVersion(callerVersion);
-	}
+    @Override
+    public void setCallerVersion(String callerVersion) {
+        original.setCallerVersion(callerVersion);
+    }
+
+    @Override
+    public void setCallingDescriptor(DefDescriptor<? extends BaseComponentDef> def) {
+        original.setCallingDescriptor(def);
+    }
 
     private Action original;
 }

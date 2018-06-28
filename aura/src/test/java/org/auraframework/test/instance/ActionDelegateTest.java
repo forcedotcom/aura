@@ -63,6 +63,7 @@ public class ActionDelegateTest {
 
         @SuppressWarnings("unchecked")
         DefDescriptor<ComponentDef> componentDescriptor = mock(DefDescriptor.class);
+        ComponentDef componentDef = mock(ComponentDef.class);
 
         for (Method m : Action.class.getMethods()) {
             Assert.assertFalse("Duplicate method name "+m.getName(), methodMap.containsKey(m.getName()));
@@ -90,8 +91,10 @@ public class ActionDelegateTest {
 
         oneCall(methodMap, calledMap, "getInstanceStack");
 
+        oneCall(methodMap, calledMap, "setCallingDefinition", componentDef);
         oneCall(methodMap, calledMap, "getCallingDescriptor");
         oneCall(methodMap, calledMap, "setCallingDescriptor", componentDescriptor);
+        oneCall(methodMap, calledMap, "getCallingDefinition");
         
         oneCall(methodMap, calledMap, "getCallerVersion");
         oneCall(methodMap, calledMap, "setCallerVersion", new String("version"));

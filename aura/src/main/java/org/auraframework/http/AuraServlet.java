@@ -263,7 +263,7 @@ public class AuraServlet extends AuraBaseServlet {
                 instance.setId((String) map.get("id"));
                 String cd = (String) map.get("callingDescriptor");
                 if (cd != null && !cd.equals("UNKNOWN")) {
-                    DefDescriptor<ComponentDef> callingDescriptor = definitionService.getDefDescriptor(cd, ComponentDef.class);
+                    DefDescriptor<? extends BaseComponentDef> callingDescriptor = definitionService.getDefDescriptor(cd, ComponentDef.class);
                     instance.setCallingDescriptor(callingDescriptor);
                 }
                 String v = (String) map.get("version");

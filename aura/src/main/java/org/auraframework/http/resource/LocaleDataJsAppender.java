@@ -95,8 +95,8 @@ public class LocaleDataJsAppender implements InlineJSAppender{
         if (defineLocaleJs.length() > 0) {
             String loadLocaleDataJs = String.format(
                     "\n(function(){\n" +
-                    "    function loadLocaleData(){\n%s}\n" +
-                    "    window.moment? loadLocaleData() : (window.Aura || (window.Aura = {}), window.Aura.loadLocaleData=loadLocaleData);\n" +
+                    "    function loadLocaleData(moment){\n%s}\n" +
+                    "    (window.Aura && window.Aura.moment)? loadLocaleData(window.Aura.moment) : (window.Aura || (window.Aura = {}), window.Aura.loadLocaleData=loadLocaleData);\n" +
                     "})();\n", defineLocaleJs.toString());
 
             out.append(loadLocaleDataJs);

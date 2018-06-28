@@ -22,7 +22,6 @@
     "Component": true,
     "CKEDITOR": true,
     "FORCE": true,
-    "moment": true,
     "exports": true,
     "iScroll": true,
     "unescape": true

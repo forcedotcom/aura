@@ -3033,10 +3033,10 @@ Test.Aura.AuraLocalizationServiceTest = function() {
     }
 
     [Fixture]
-    function init(){
+    function init() {
 
         [Fact]
-        function SetsMomentLocaleAsValueInLocaleProvider(){
+        function SetsMomentLocaleAsValueInLocaleProvider() {
             // Arrange
             var expected = "locale";
             var javaLocale = "JavaLocale";
@@ -3047,23 +3047,24 @@ Test.Aura.AuraLocalizationServiceTest = function() {
                 if (locale === javaLocale) { return expected; }
             }
 
-            var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
-                get: function(key) {
-                    if(key === "$Locale.langLocale") return javaLocale;
-                }
-            });
-
-            var mockMoment = Mocks.GetMock(Object.Global(), "moment", {
-                locale: function(locale) {
-                    actual = locale;
+            var mockAura = Mocks.GetMocks(Object.Global(), {
+                "$A": {
+                    get: function(key) {
+                        if(key === "$Locale.langLocale") return javaLocale;
+                    }
+                },
+                Aura: {
+                    moment: {
+                        locale: function(locale) {
+                            actual = locale;
+                        }
+                    }
                 }
             });
 
             // Act
-            mockUtil(function(){
-                mockMoment(function(){
-                    targetService.init();
-                });
+            mockAura(function(){
+                targetService.init();
             });
 
             // Assert
@@ -3071,7 +3072,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         }
 
         [Fact]
-        function AddsAvailableLocaleToCache(){
+        function AddsAvailableLocaleToCache() {
             // Arrange
             var expected = "locale";
             var javaLocale = "JavaLocale";
@@ -3081,21 +3082,22 @@ Test.Aura.AuraLocalizationServiceTest = function() {
                 if (locale === javaLocale) { return expected; }
             }
 
-            var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
-                get: function(key) {
-                    if(key === "$Locale.langLocale") return javaLocale;
+            var mockAura = Mocks.GetMocks(Object.Global(), {
+                "$A": {
+                    get: function(key) {
+                        if(key === "$Locale.langLocale") return javaLocale;
+                    }
+                },
+                Aura: {
+                    moment: {
+                        locale: function() {}
+                    }
                 }
             });
 
-            var mockMoment = Mocks.GetMock(Object.Global(), "moment", {
-                locale: function(locale) {}
-            });
-
             // Act
-            mockUtil(function(){
-                mockMoment(function(){
-                    targetService.init();
-                });
+            mockAura(function() {
+                targetService.init();
             });
 
             // Assert
@@ -3105,10 +3107,10 @@ Test.Aura.AuraLocalizationServiceTest = function() {
     }
 
     [Fixture]
-    function formatNumbers(){
+    function formatNumbers() {
 
         [Fact]
-        function formatNumber(){
+        function formatNumber() {
             // Arrange
             var expected = 101;
             var actual;

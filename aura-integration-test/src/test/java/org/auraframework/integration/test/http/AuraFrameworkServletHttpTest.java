@@ -56,7 +56,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
     @Inject
     private ConfigAdapter configAdapter;
-    
+
     /**
      * Starts a context with DEV mode.
      */
@@ -84,7 +84,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
         String charset = getCharset(httpResponse);
         String responseMime = getContentTypeFromResponse(httpResponse);
-        
+
         if (mimeType.startsWith("text/")) {
 
             assertEquals("Framework servlet not responding with correct encoding type.", AuraBaseServlet.UTF_ENCODING,
@@ -132,7 +132,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
         if (fake) {
             nonce = "thisisnotanonce";
-            
+
         } else {
             nonce = configAdapter.getAuraFrameworkNonce();
         }
@@ -316,7 +316,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         long expirationMillis = (df.parse(expires).getTime() - currentDate.getTime());
         assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
                 ApproximatelyEqual(expirationMillis, AuraBaseServlet.SHORT_EXPIRE, timeWindowExpiry));
-        
+
         assertDefaultAntiClickjacking(httpResponse, true, false);
     }
 
@@ -363,7 +363,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         assertEquals("Framework servlet not responding with correct encoding type.", AuraBaseServlet.UTF_ENCODING,
                 charset);
         assertEquals("Framework servlet not responding with correct mime type", "text/css", getContentTypeFromResponse(httpResponse));
-        
+
         SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
         Date currentDate = new Date();
         long expirationMillis = (df.parse(httpResponse.getFirstHeader(HttpHeaders.EXPIRES).getValue()).getTime()
@@ -400,21 +400,6 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
     @ThreadHostileTest("PRODUCTION")
     @Test
-    public void testExistingMinifiedResource() throws Exception {
-        getMockConfigAdapter().setIsProduction(true);
-
-        HttpGet get = obtainGetMethod("/auraFW/resources/moment/moment.js");
-        HttpResponse httpResponse = perform(get);
-        String response = getResponseBody(httpResponse);
-        checkExpired(httpResponse, "text/javascript");
-        assertDefaultAntiClickjacking(httpResponse, true, false);
-        assertTrue(response.contains("!function(a,b){"));
-
-        get.releaseConnection();
-    }
-
-    @ThreadHostileTest("PRODUCTION")
-    @Test
     public void testNonExistentMinifiedResource() throws Exception {
         getMockConfigAdapter().setIsProduction(true);
 
@@ -444,14 +429,14 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
         get.releaseConnection();
     }
-    
+
     private String getContentTypeFromResponse(HttpResponse response) {
     	final String contentType = response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue();
-    	
+
     	if(contentType.contains(";")) {
     		return contentType.substring(0, contentType.indexOf(";"));
     	}
-    	
+
     	return contentType;
 	}
 }

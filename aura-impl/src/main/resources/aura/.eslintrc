@@ -71,7 +71,6 @@
     "LayoutsDef": true,
     "LayoutItemDef": true,
     "localizationService": true,
-    "moment": true,
     "MetricsService": true,
     "MemoryStorageAdapter": true,
     "Model": true,

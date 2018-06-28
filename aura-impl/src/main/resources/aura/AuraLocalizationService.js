@@ -1514,19 +1514,19 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
  * @private
  */
 AuraLocalizationService.prototype.init = function() {
-    if (typeof moment === "undefined") {
+    if (Aura["moment"] === undefined) {
         $A.warning("moment is required to initialize Localization Service.");
         return;
     }
 
     // If locale data didn't get added in inline.js, then adding the locale data.
     if (Aura["loadLocaleData"]) {
-        Aura["loadLocaleData"]();
+        Aura["loadLocaleData"](Aura["moment"]);
         Aura["loadLocaleData"] = undefined;
     }
 
     // using local reference to prevent Aura depended moment gets overriden
-    this.moment = moment;
+    this.moment = Aura["moment"];
 
     // TODO: remove this when locales are consolidated.
     // Caching all available locales. This is for backward compatibility. At this moment, there are three locales

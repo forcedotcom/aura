@@ -15,14 +15,22 @@
  */
 package org.auraframework.impl.source.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.spy;
+import static org.powermock.api.mockito.PowerMockito.when;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import com.google.common.collect.Maps;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
@@ -33,13 +41,7 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
+import com.google.common.collect.Maps;
 
 /**
  * Unit tests for {@link ModuleDefFileBundleBuilder}
@@ -530,6 +532,74 @@ public class ModuleDefFileBundleBuilderUnitTest {
         doReturn(mockAppFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".app");
 
         assertTrue("bundle should match", moduleDefFileBundleBuilder.isBundleMatch(mockBaseFile));
+    }
+    
+    @Test
+    public void testDocumentationFiles() throws Exception {
+        File mockParentBaseFile = mock(File.class);
+        when(mockParentBaseFile.getName()).thenReturn("namespace");
+
+        File mockBaseFile = mock(File.class);
+        when(mockBaseFile.exists()).thenReturn(true);
+        when(mockBaseFile.getName()).thenReturn("module-cmp");
+        when(mockBaseFile.getParentFile()).thenReturn(mockParentBaseFile);
+
+        File mockJsFile = mock(File.class);
+        setupMockFile(mockJsFile, mockBaseFile, "module-cmp.js");
+        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
+
+        File mockTemplateFile = mock(File.class);
+        setupMockFile(mockTemplateFile, mockBaseFile, "module-cmp.html");
+
+        // NESTED
+
+        File mockNestFolder = mock(File.class);
+        when(mockNestFolder.isDirectory()).thenReturn(true);
+        when(mockNestFolder.getName()).thenReturn("__doc__");
+        when(mockNestFolder.getParentFile()).thenReturn(mockBaseFile);
+
+        File mockMarkdownFile = mock(File.class);
+        setupMockFile(mockMarkdownFile, mockBaseFile, String.join(File.separator, "__doc__","module-cmp.md"));
+        when(mockMarkdownFile.getParent()).thenReturn("__doc__");
+        when(mockMarkdownFile.getParentFile()).thenReturn(mockNestFolder);
+        DefDescriptor<DocumentationDef> markdownDesc = new DefDescriptorImpl<>(ModuleDef.MARKDOWN_PREFIX, "nameSpace", "moduleCmp-__doc__-module-cmp", DocumentationDef.class, module);
+
+        File mockAuradocFile = mock(File.class);
+        setupMockFile(mockAuradocFile, mockBaseFile, String.join(File.separator, "__doc__","module-cmp.auradoc"));
+        when(mockAuradocFile.getParent()).thenReturn("__doc__");
+        when(mockAuradocFile.getParentFile()).thenReturn(mockNestFolder);
+        DefDescriptor<DocumentationDef> auradocDesc = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp-__doc__-module-cmp", DocumentationDef.class, module);
+
+        File[] baseListFiles = new File[] { mockJsFile, mockTemplateFile, mockNestFolder };
+        File[] nestListFiles = new File[] { mockMarkdownFile, mockAuradocFile };
+
+        when(mockBaseFile.listFiles()).thenReturn(baseListFiles);
+        when(mockNestFolder.listFiles()).thenReturn(nestListFiles);
+
+        ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
+        Map<String, String> mockInternalNamespaces = Maps.newHashMap();
+        mockInternalNamespaces.put("namespace", "nameSpace");
+        when(mockConfigAdapter.getInternalNamespacesMap()).thenReturn(mockInternalNamespaces);
+
+        DefinitionService mockDefinitionService = mock(DefinitionService.class);
+        DefDescriptor<ModuleDef> moduleDesc = new DefDescriptorImpl<>(
+                DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
+        when(mockDefinitionService.getDefDescriptor("nameSpace:moduleCmp", ModuleDef.class))
+                .thenReturn(moduleDesc);
+
+        ModuleDefFileBundleBuilder moduleDefFileBundleBuilder = spy(new ModuleDefFileBundleBuilder());
+        moduleDefFileBundleBuilder.setConfigAdapter(mockConfigAdapter);
+        moduleDefFileBundleBuilder.setDefinitionService(mockDefinitionService);
+
+        doReturn(mockJsFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".js");
+        doReturn(mockTemplateFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".html");
+
+        BundleSource<?> moduleBundleSource = moduleDefFileBundleBuilder.buildBundle(mockBaseFile);
+
+        Map<DefDescriptor<?>, Source<?>> sourceMap = moduleBundleSource.getBundledParts();
+
+        assertEquals("incorrect markdown entry", String.join(File.separator,"namespace","module-cmp","__doc__","module-cmp.md"),  sourceMap.get(markdownDesc).getSystemId());
+        assertEquals("incorrect auradoc entry", String.join(File.separator,"namespace","module-cmp","__doc__","module-cmp.auradoc"),  sourceMap.get(auradocDesc).getSystemId());
     }
 
     private void setupMockFile(File mock, File base, String fileName) throws IOException {

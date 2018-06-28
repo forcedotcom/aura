@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -116,13 +117,10 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
             throws IOException {
 
         for (File file : base.listFiles()) {
-
             if (file.isDirectory()) {
-                if (file.getName().startsWith("__")) {
-                    // ignore files not needed for modules ie tests, snapshots, etc
-                    continue;
+                if (shouldProcessDirectory(file)) {                    
+                    processBundle(file, sourceMap, moduleDescriptor, moduleDescriptorFilePath, namespace);
                 }
-                processBundle(file, sourceMap, moduleDescriptor, moduleDescriptorFilePath, namespace);
                 continue;
             }
 
@@ -139,7 +137,7 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
             String baseDir = moduleDescriptorFilePath.substring(0, lastSeparator);
             String descriptorName = createDescriptorName(file, baseDir, moduleDescriptor.getName());
             String fileName = file.getName().toLowerCase();
-
+            String fileDir = base.getName();
 
             if (fileName.endsWith(".html")) {
                 descriptor = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, namespace, descriptorName, ModuleDef.class, moduleDescriptor);
@@ -165,6 +163,16 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
                 descriptor = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, namespace, xmlName, ModuleDef.class, moduleDescriptor);
                 format = Format.XML;
             }
+            
+            if (descriptor == null && fileDir.equals("__doc__") && fileName.endsWith(".md")) {
+                descriptor = new DefDescriptorImpl<>(ModuleDef.MARKDOWN_PREFIX, namespace, descriptorName, DocumentationDef.class, moduleDescriptor);
+                format = Format.MD;
+            }
+            
+            if (descriptor == null && fileDir.equals("__doc__") && fileName.endsWith(".auradoc")) {
+                descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, namespace, descriptorName, DocumentationDef.class, moduleDescriptor);
+                format = Format.XML;
+            }
 
             if (descriptor != null) {
                 sourceMap.put(descriptor, new FileSource<>(descriptor, file, format));
@@ -181,6 +189,12 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
 
     private File getFileFromBase(File base, String extension) {
         return new File(base, base.getName() + extension);
+    }
+
+    /** ignore files not needed for modules ie tests, snapshots, etc */
+    private boolean shouldProcessDirectory(File file) {
+        String name = file.getName();
+        return !name.startsWith("__") || name.equals("__doc__");
     }
 
     @Inject

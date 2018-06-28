@@ -17,10 +17,11 @@ package org.auraframework.modules.impl.factory;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.CheckForNull;
@@ -30,15 +31,22 @@ import javax.inject.Inject;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.MetaDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.impl.documentation.DescriptionDefImpl;
+import org.auraframework.impl.documentation.DocumentationDefImpl;
 import org.auraframework.impl.root.AttributeDefImpl;
+import org.auraframework.impl.root.MetaDefImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.modules.impl.metadata.ModulesMetadataService;
+import org.auraframework.service.CompilerService;
 import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
@@ -50,10 +58,13 @@ import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.text.Hash;
+import org.lwc.bundle.BundleType;
+import org.lwc.documentation.BundleDocumentation;
 
 import com.google.common.base.CharMatcher;
-import org.lwc.bundle.BundleType;
+import com.google.common.base.Joiner;
 
 /**
  * Provides ModuleDef implementation
@@ -63,6 +74,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
     
     private ModulesCompilerService modulesCompilerService;
     private ModulesMetadataService modulesMetadataService;
+    private CompilerService compilerService;
     private Set<String> validTags = Collections.emptySet();
 
     @Override
@@ -172,6 +184,9 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
         // xml metadata (-meta.xml)
         processMetadata(descriptor, builder, sourceMap);
+        
+        BundleDocumentation documentation = compilerData.compilerReport.documentation;
+        processDocumentation(descriptor, builder, sourceMap, documentation);
 
         return builder.build();
     }
@@ -183,8 +198,8 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
      * @param builder module def builder
      * @param sourceMap source map
      */
-    private void processMetadata(DefDescriptor<ModuleDef> descriptor, Builder builder, Map<DefDescriptor<?>,
-            Source<?>> sourceMap) throws QuickFixException {
+    private void processMetadata(DefDescriptor<ModuleDef> descriptor, Builder builder, 
+            Map<DefDescriptor<?>, Source<?>> sourceMap) throws QuickFixException {
         DefDescriptor<ModuleDef> xmlDescriptor = new DefDescriptorImpl<>(ModuleDef.META_PREFIX,
                 descriptor.getNamespace(), descriptor.getName() + "-" + ModuleDef.META_XML_NAME, ModuleDef.class, descriptor);
         Source<?> xmlSource = sourceMap.get(xmlDescriptor);
@@ -205,7 +220,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
      * @param sourceMap source map
      */
     private void processJson(DefDescriptor<ModuleDef> descriptor, Builder builder,
-                             Map<DefDescriptor<?>, Source<?>> sourceMap) throws QuickFixException {
+            Map<DefDescriptor<?>, Source<?>> sourceMap) throws QuickFixException {
         DefDescriptor<ModuleDef> jsonDescriptor = new DefDescriptorImpl<>(ModuleDef.META_PREFIX,
                 descriptor.getNamespace(), descriptor.getName() + "-" + ModuleDef.META_FILE_BASENAME, ModuleDef.class, descriptor);
         Source<?> jsonSource = sourceMap.get(jsonDescriptor);
@@ -216,6 +231,54 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         }
     }
 
+    /**
+     * Processes markdown and auradoc documentation files in the bundle.
+     */
+    private void processDocumentation(DefDescriptor<ModuleDef> descriptor, Builder builder, 
+            Map<DefDescriptor<?>, Source<?>> sourceMap, BundleDocumentation documentation) throws QuickFixException {
+        
+        // markdown
+        if (documentation != null && !AuraTextUtil.isEmptyOrWhitespace(documentation.getHtml())) { //TODO remove getHtml check after lwc update
+            DocumentationDefImpl.Builder docDefBuilder = new DocumentationDefImpl.Builder();
+            
+            docDefBuilder.setDescriptor(getDefDescriptor(sourceMap, ModuleDef.MARKDOWN_PREFIX, DocumentationDef.class));
+
+            DescriptionDefImpl.Builder descriptionBuilder = new DescriptionDefImpl.Builder();
+            descriptionBuilder.setName("main"); // only one description so arbitrary name is ok
+            descriptionBuilder.setDescription(documentation.getHtml());
+            DescriptionDefImpl description = descriptionBuilder.build();
+            docDefBuilder.addDescription(description.getName(), description);
+            
+            for (Entry<String, Object> entry : documentation.getMetadata().entrySet()) {
+                MetaDefImpl.Builder metaBuilder = new MetaDefImpl.Builder();
+                metaBuilder.setDescriptor(new DefDescriptorImpl<>(null, null, entry.getKey(), MetaDef.class));
+                Object value = entry.getValue();
+                if (value instanceof Iterable) {
+                    metaBuilder.setValue(Joiner.on(",").join((Iterable<?>)value));
+                } else if (value instanceof Map) {
+                    metaBuilder.setValue(Joiner.on(",").withKeyValueSeparator("=").join((Map<?, ?>)value));
+                }
+                else {
+                    metaBuilder.setValue(value.toString());
+                }
+                MetaDefImpl metaDef = metaBuilder.build();
+                docDefBuilder.addMeta(metaDef.getName(), metaDef);
+            }
+
+            builder.setDocumentationDef(docDefBuilder.build());
+        }
+        
+        // auradoc
+        DefDescriptor<DocumentationDef> auradocDesc = getDefDescriptor(sourceMap, DefDescriptor.MARKUP_PREFIX, DocumentationDef.class);
+        if (auradocDesc != null) {
+            Source<?> source = sourceMap.get(auradocDesc);
+            if (source != null) {
+                @SuppressWarnings("unchecked")
+                DocumentationDef def = compilerService.compile(auradocDesc, (Source<DocumentationDef>) source);
+                builder.setAuraDocumentationDef(def);
+            }
+        }
+    }
 
     /**
      * Processes different versions of the compiled code
@@ -294,6 +357,22 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         hashBuilder.addString(code);
         return hashBuilder.build().toString();
     }
+    
+    /**
+     * Finds a DefDescriptor from the sourceMap.
+     * @return The descriptor, or null if not found.
+     */
+    @SuppressWarnings("unchecked")
+    private <T extends Definition> DefDescriptor<T> getDefDescriptor(Map<DefDescriptor<?>, Source<?>> sourceMap, String prefix, Class<T> defType) {
+        if (sourceMap != null) {
+            for (DefDescriptor<?> descriptor : sourceMap.keySet()) {
+                if (defType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface()) && descriptor.getPrefix().equals(prefix)) {
+                    return (DefDescriptor<T>) descriptor;
+                }
+            }
+        }
+        return null;
+    }
 
     @Inject
     public void setModulesCompilerService(ModulesCompilerService modulesCompilerService) {
@@ -305,5 +384,10 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         this.modulesMetadataService = modulesMetadataService;
         // set valid tags once.
         this.validTags = Collections.unmodifiableSet(this.modulesMetadataService.getValidTags());
+    }
+    
+    @Inject
+    public void setCompilerService(CompilerService compilerService) {
+        this.compilerService = compilerService;
     }
 }

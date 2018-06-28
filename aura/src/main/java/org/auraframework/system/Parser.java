@@ -32,7 +32,7 @@ public interface Parser<D extends Definition> {
      * 
      */
     enum Format {
-        XML, JS, CSS, JAVA, TEMPLATE_CSS, APEX, SVG
+        XML, JS, CSS, JAVA, TEMPLATE_CSS, APEX, SVG, MD
     }
 
     Format getFormat();

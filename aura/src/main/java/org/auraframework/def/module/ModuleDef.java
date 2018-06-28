@@ -15,11 +15,12 @@
  */
 package org.auraframework.def.module;
 
+import java.util.List;
+
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.PlatformDef;
 import org.lwc.reference.Reference;
-
-import java.util.List;
 
 /**
  * Module Definition
@@ -37,6 +38,8 @@ public interface ModuleDef extends PlatformDef {
     String TEMPLATE_PREFIX = "template";
     // arbitrary descriptor prefix for metadata
     String META_PREFIX = "meta";
+    // prefix for markdown docs
+    String MARKDOWN_PREFIX = "markdown";
     // base name of metadata file
     String META_FILE_BASENAME = "lightning";
     // name of xml metadata file
@@ -78,4 +81,18 @@ public interface ModuleDef extends PlatformDef {
      * the standard prefix:name syntax. This will return that custom-element-name value.
      */
     String getCustomElementName();
+    
+    /**
+     * Gets the documentation represented by the markdown file within the bundle.
+     * <p>
+     * This is the long-form documentation for using this module within LWC. May be null.
+     */
+    DocumentationDef getDocumentationDef();
+    
+    /**
+     * Gets the documentation represented by the auradoc file within the bundle.
+     * <p>
+     * This is the long-form documentation for using this module within aura. May be null.
+     */
+    DocumentationDef getAuraDocumentationDef();
 }

@@ -28,6 +28,7 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDesignDef;
@@ -47,10 +48,9 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Json.ApplicationKey;
 import org.auraframework.validation.ReferenceValidationContext;
+import org.lwc.reference.Reference;
 
 import com.google.common.collect.Sets;
-import org.lwc.CompilerReport;
-import org.lwc.reference.Reference;
 
 /**
  * ModuleDef holds compiled code and serializes for client
@@ -71,6 +71,8 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     private Boolean requireLocker;
     private ModuleDesignDef moduleDesignDef;
     private Set<String> validTags;
+    private final DocumentationDef documentationDef;
+    private final DocumentationDef auraDocumentationDef;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
@@ -85,6 +87,8 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         this.validTags = builder.validTags;
         this.sourceReferences = builder.sourceReferences;
         this.metadataReferences = builder.metadataReferences;
+        this.documentationDef = builder.documentationDef;
+        this.auraDocumentationDef = builder.auraDocumentationDef;
     }
 
     @Override
@@ -118,6 +122,16 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     @Override
     public String getCustomElementName() {
         return this.customElementName;
+    }
+    
+    @Override
+    public DocumentationDef getDocumentationDef() {
+        return this.documentationDef;
+    }
+
+    @Override
+    public DocumentationDef getAuraDocumentationDef() {
+        return this.auraDocumentationDef;
     }
 
     @Override
@@ -306,6 +320,8 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private ModuleDesignDef moduleDesignDef = null;
         private Set<String> validTags = Collections.emptySet();
         private ModuleDesignDefImpl.Builder designBuilder;
+        private DocumentationDef documentationDef;
+        private DocumentationDef auraDocumentationDef;
 
         public Builder() {
             super(ModuleDef.class);
@@ -370,6 +386,14 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
 
         public void setSourceReferences(List<Reference> sourceReferences) {
             this.sourceReferences = sourceReferences;
+        }
+        
+        public void setDocumentationDef(DocumentationDef documentationDef) {
+            this.documentationDef = documentationDef;
+        }
+        
+        public void setAuraDocumentationDef(DocumentationDef documentationDef) {
+            this.auraDocumentationDef = documentationDef;
         }
 
         @Override

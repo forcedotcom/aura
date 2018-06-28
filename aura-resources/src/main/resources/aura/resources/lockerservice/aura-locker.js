@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-06-19
- * Version: 0.4.27
+ * Generated: 2018-06-28
+ * Version: 0.4.29
  */
 
 (function (exports) {
@@ -936,7 +936,20 @@ function deepFreeze(node) {
   }
 
   function doFreeze(obj) {
+    // Immediately freeze the object to ensure reactive
+    // objects such as proxies won't add properties
+    // during traversal, before they get frozen.
+
+    // Object are verified before being enqueued,
+    // therefore this is a valid candidate.
+    // Throws if this fails (strict mode).
+    freeze(obj);
+
+    // get stable/immutable outbound links before a Proxy has a chance to do
+    // something sneaky.
+    const proto = getPrototypeOf(obj);
     const descs = getOwnPropertyDescriptors(obj);
+    enqueue(proto);
     ownKeys(descs).forEach(name => {
       const desc = descs[name];
       if ('value' in desc) {
@@ -946,28 +959,25 @@ function deepFreeze(node) {
         enqueue(desc.set);
       }
     });
-    freeze(obj);
   }
 
-  // Process the freezingSet.
   function dequeue() {
     // New values added before forEach() has finished will be visited.
-    freezingSet.forEach(obj => {
-      doFreeze(obj);
-      enqueue(getPrototypeOf(obj));
-    });
+    freezingSet.forEach(doFreeze);
+  }
+
+  function commit() {
+    // "Committing" the changes upon exit guards against exceptions aborting
+    // the deep freeze process, which could leave the system in a state
+    // where unfrozen objects are never frozen when no longer discoverable by
+    // subsequent invocations of deep-freeze because all object owning a reference
+    // to them are frozen.
+    freezingSet.forEach(frozenSet.add, frozenSet);
   }
 
   enqueue(node);
   dequeue();
-
-  // "Committing" the changes upon exit guards against exceptions aborting
-  // the deep freeze process, which could leave the system in a state
-  // where unfrozen objects are never frozen when no longer discoverable by
-  // subsequent invocations of deep-freeze because all object owning a reference
-  // to them are frozen.
-
-  freezingSet.forEach(frozenSet.add, frozenSet);
+  commit();
 }
 
 /*
@@ -1108,8 +1118,9 @@ function createEvalEvaluatorFactory(sandbox) {
 
 class FreezingHandler {
   constructor(sandbox) {
-    const { realmRec: { unsafeGlobal } } = sandbox;
+    const { realmRec: { unsafeGlobal, unsafeEval } } = sandbox;
     this.unsafeGlobal = unsafeGlobal;
+    this.unsafeEval = unsafeEval;
   }
   setInternalEval() {
     // This sentinel allows one scoped direct eval.
@@ -1124,9 +1135,12 @@ class FreezingHandler {
     if (prop === 'eval') {
       if (this.isInternalEval) {
         this.isInternalEval = false;
-        return this.unsafeGlobal.eval;
+        return this.unsafeEval;
       }
       return target.eval;
+    }
+    if (prop === Symbol.unscopables) {
+      return undefined;
     }
     // Properties of global.
     if (prop in target) {
@@ -1199,16 +1213,39 @@ function createEvalEvaluator(sandbox) {
  * the safety of evalEvaluator for confinement.
  */
 function createFunctionEvaluator(sandbox) {
-  const { realmRec: { unsafeFunction } } = sandbox;
+  const { realmRec: { unsafeFunction, unsafeGlobal } } = sandbox;
 
   const evaluator = function(...params) {
-    const functionBody = params.pop() || '';
-    // Conditionaly appends a new line to prevent execution during
-    // construction.
-    const functionParams = params.join(',') + (params.length > 0 ? '\n' : '');
+    const functionBody = `${params.pop() || ''}`;
+    let functionParams = `${params.join(',')}`;
+
+    // Is this a real functionBody, or is someone attempting an injection
+    // attack? This will throw a SyntaxError if the string is not actually a
+    // function body. We coerce the body into a real string above to prevent
+    // someone from passing an object with a toString() that returns a safe
+    // string the first time, but an evil string the second time.
+    // eslint-disable-next-line no-new, new-cap
+    new unsafeFunction(functionBody);
+
+    if (functionParams.includes(')')) {
+      // If the formal parameters string include ) - an illegal
+      // character - it may make the combined function expression
+      // compile. We avoid this problem by checking for this early on.
+
+      // note: v8 throws just like this does, but chrome accepts e.g. 'a = new Date()'
+      throw new unsafeGlobal.SyntaxError('Function arg string contains parenthesis');
+      // todo: shim integrity threat if they change SyntaxError
+    }
+
+    if (functionParams.length > 0) {
+      // If the formal parameters include an unbalanced block comment, the
+      // function must be rejected. Since JavaScript does not allow nested
+      // comments we can include a trailing block comment to catch this.
+      functionParams += '\n/*``*/';
+    }
+
     const src = `(function(${functionParams}){\n${functionBody}\n})`;
-    // evalEvaluator is created after FunctionEvaluator,
-    // so we can't link directly to it.
+
     return sandbox.evalEvaluator(src);
   };
 
@@ -4243,19 +4280,39 @@ function installPolyfills(realmRec) {
  * limitations under the License.
  */
 
+// TODO: This repair will make it out as its own independent shim since
+// it's required for confinement but not part of the Realm specifications.
+
+// TODO: Only apply the repair on platform where this is necessary..
+
 // Adapted from SES/Caja
 // Copyright (C) 2011 Google Inc.
 // https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
 // https://github.com/google/caja/blob/master/src/com/google/caja/ses/repairES5.js
 
+// Prevent an adversary from using TOCTTOU (time-of-check-to-time-of-use) to
+// skip some intermediate ancestors by stringify/propify the property name
+// once, first.
+
+function asPropertyName(prop) {
+  if (typeof prop === 'symbol') {
+    return prop;
+  }
+  return `${prop}`;
+}
+
+// Prevent accessing global properties by calling legacy accessors with
+// thisArg == null, causing the real window object to be exposed to the
+// function as thisArg when the getter is invoked.
+// https://bugzilla.mozilla.org/show_bug.cgi?id=1253016
+
+// Prevent bypassing access checks on all required objects and leak
+// anything from another page.
+// https://bugs.chromium.org/p/chromium/issues/detail?id=403596
+
 function repairAccessors(realmRec) {
   const { unsafeGlobal } = realmRec;
 
-  // W-2961201 Prevent execution in the global context.
-
-  // Fixing properties of Object to comply with strict mode
-  // and ES2016 semantics, we do this by redefining them while in 'use strict'
-  // https://tc39.github.io/ecma262/#sec-object.prototype.__defineGetter__
   defineProperties(unsafeGlobal.Object.prototype, {
     __defineGetter__: {
       value: function(prop, func) {
@@ -4277,6 +4334,7 @@ function repairAccessors(realmRec) {
     },
     __lookupGetter__: {
       value: function(prop) {
+        prop = asPropertyName(prop);
         let base = this;
         let desc;
         while (base && !(desc = getOwnPropertyDescriptor(base, prop))) {
@@ -4287,6 +4345,7 @@ function repairAccessors(realmRec) {
     },
     __lookupSetter__: {
       value: function(prop) {
+        prop = asPropertyName(prop);
         let base = this;
         let desc;
         while (base && !(desc = getOwnPropertyDescriptor(base, prop))) {
@@ -4399,20 +4458,44 @@ function repairFunctions(realmRec) {
  *
  * Because of lack of sufficient foresight at the time, ES5 unfortunately
  * specified that a simple assignment to a non-existent property must fail if
- * it would override a non-writable data property of the same name. (In
- * retrospect, this was a mistake, but it is now too late and we must live
- * with the consequences.) As a result, simply freezing an object to make it
- * tamper proof has the unfortunate side effect of breaking previously correct
- * code that is considered to have followed JS best practices, if this
- * previous code used assignment to override.
+ * it would override a non-writable data property of the same name (e.g. the
+ * target object doesn't have an own-property by that name, but it inherits
+ * from an object which does, and the inherited property is non-writable).
+ * (In retrospect, this was a mistake, but it is now too late and we must
+ * live with the consequences.) As a result, simply freezing an object to
+ * make it tamper proof has the unfortunate side effect of breaking
+ * previously correct code that is considered to have followed JS best
+ * practices, if this previous code used assignment to override.
  *
- * To work around this mistake, deepFreeze(), prior to freezing, needs to replace
+ * For example, the following code violates no JavaScript best practice but
+ * nevertheless fails without the repair:
+ *
+ * Object.freeze(Object.prototype);
+ *
+ * function Point(x, y) {
+ *   this.x = x;
+ *   this.y = y;
+ * }
+ *
+ * Point.prototype.toString = function() { return `<${this.x},${this.y}>`; };
+ *
+ * The problem is that the override will cause the assignment to
+ * Point.prototype.toString to fail because Point.prototype inherits from
+ * Object.prototype, and Object.freeze made Object.prototype.toString into a
+ * non-writable data property.
+ *
+ * Another common pattern is:
+ *
+ *  Object.freeze(Error.prototype);
+ *  e = new Error();
+ *  e.message = 'something';
+ *
+ * To work around this mistake, deepFreeze(), prior to freezing, replaces
  * selected configurable own data properties with accessor properties which
  * simulate what we should have specified -- that assignments to derived
  * objects succeed if otherwise possible.
  */
-
-function tamperProof(obj, prop, desc) {
+function beMutable(obj, prop, desc) {
   if ('value' in desc && desc.configurable) {
     const value = desc.value;
 
@@ -4437,8 +4520,8 @@ function tamperProof(obj, prop, desc) {
         defineProperty(this, prop, {
           value: newValue,
           writable: true,
-          enumerable: desc.enumerable,
-          configurable: desc.configurable
+          enumerable: true,
+          configurable: true
         });
       }
     }
@@ -4447,12 +4530,12 @@ function tamperProof(obj, prop, desc) {
       get: getter,
       set: setter,
       enumerable: desc.enumerable,
-      configurable: desc.configurable
+      configurable: false
     });
   }
 }
 
-function tamperProofAll(obj) {
+function beMutableProperties(obj) {
   if (!obj) {
     return;
   }
@@ -4460,13 +4543,13 @@ function tamperProofAll(obj) {
   if (!descs) {
     return;
   }
-  getOwnPropertyNames(obj).forEach(prop => tamperProof(obj, prop, descs[prop]));
-  getOwnPropertySymbols(obj).forEach(prop => tamperProof(obj, prop, descs[prop]));
+  getOwnPropertyNames(obj).forEach(prop => beMutable(obj, prop, descs[prop]));
+  getOwnPropertySymbols(obj).forEach(prop => beMutable(obj, prop, descs[prop]));
 }
 
-function tamperProofProp(obj, prop) {
+function beMutableProperty(obj, prop) {
   const desc = getOwnPropertyDescriptor(obj, prop);
-  tamperProof(obj, prop, desc);
+  beMutable(obj, prop, desc);
 }
 
 /**
@@ -4501,9 +4584,7 @@ function repairDataProperties(realmRec) {
     i.Uint8Array,
     i.Uint16Array,
     i.Uint32Array
-  ].forEach(proto => {
-    tamperProofAll(proto);
-  });
+  ].forEach(beMutableProperties);
 
   [
     i.ErrorPrototype,
@@ -4513,9 +4594,7 @@ function repairDataProperties(realmRec) {
     i.SyntaxErrorPrototype,
     i.TypeErrorPrototype,
     i.URIErrorPrototype
-  ].forEach(proto => {
-    tamperProofProp(proto, 'message');
-  });
+  ].forEach(proto => beMutableProperty(proto, 'message'));
 }
 
 /*
@@ -4571,8 +4650,9 @@ function init(options) {
   installPolyfills(realmRec);
 
   repairAccessors(realmRec);
+  repairFunctions(realmRec);
+
   if (realmRec.shouldFreeze) {
-    repairFunctions(realmRec);
     repairDataProperties(realmRec);
     freezeIntrinsics(realmRec);
   }
@@ -6999,6 +7079,71 @@ SecureHTMLDocument.toString = function() {
  * limitations under the License.
  */
 
+function SecureDOMImplementation(implementation, key) {
+  let o = getFromCache(implementation, key);
+  if (o) {
+    return o;
+  }
+
+  o = create$1(null, {
+    toString: {
+      value: function() {
+        return `SecureDOMImplemenation: ${implementation} { key: ${JSON.stringify(key)} }`;
+      }
+    }
+  });
+
+  defineProperties(o, {
+    createDocument: {
+      value: function(...args) {
+        return implementation.createDocument(...args);
+      }
+    },
+    createDocumentType: {
+      value: function(...args) {
+        return implementation.createDocumentType(...args);
+      }
+    },
+    createHTMLDocument: {
+      enumerable: true,
+      writable: false,
+      value: function(title) {
+        title = String(title);
+        const html = implementation.createHTMLDocument(title);
+        trustChildNodes(o, html);
+        return SecureHTMLDocument(html, key);
+      }
+    },
+    hasFeature: {
+      value: function() {
+        return true;
+      }
+    }
+  });
+
+  setRef(o, implementation, key);
+  addToCache(implementation, o, key);
+  registerProxy(o);
+
+  return freeze(o);
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 const metadata$5 = {
   prototypes: {
     HTMLDocument: {
@@ -7305,27 +7450,7 @@ function SecureDocument(doc, key) {
     },
     implementation: {
       enumerable: true,
-      value: (function() {
-        const o = create$1(doc.implementation, {
-          createHTMLDocument: {
-            enumerable: true,
-            writable: false,
-            value: function(title) {
-              title = String(title);
-              const html = doc.implementation.createHTMLDocument(title);
-              return SecureHTMLDocument(html, key);
-            }
-          },
-          // https://stackoverflow.com/questions/43317691/why-document-implementation-hasfeature-always-return-true/43317742
-          hasFeature: {
-            value: function() {
-              return true;
-            }
-          }
-        });
-
-        return freeze(o);
-      })()
+      value: SecureDOMImplementation(doc.implementation, key)
     }
   });
 
@@ -10556,9 +10681,7 @@ function SecureAuraComponent(component, key) {
   // The shape of the component depends on the methods exposed in the definitions:
   const methodsNames = getPublicMethodNames(component);
   if (methodsNames && methodsNames.length) {
-    methodsNames.forEach(methodName =>
-      SecureObject.addMethodIfSupported(o, component, methodName, { defaultKey: key })
-    );
+    methodsNames.forEach(methodName => SecureObject.addMethodIfSupported(o, component, methodName));
   }
 
   setRef(o, component, key);
@@ -10666,7 +10789,6 @@ function SecureAuraComponentRef(component, key) {
     // If SecureAuraComponentRef is an unlockerized component, then let it
     // have access to raw arguments
     const methodOptions = {
-      defaultKey: key,
       unfilterEverything: !requireLocker(component)
         ? function(args) {
             return deepUnfilterMethodArguments([], args);

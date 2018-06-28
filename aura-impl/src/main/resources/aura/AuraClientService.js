@@ -4451,7 +4451,7 @@ AuraClientService.prototype.populateActionsFilter = function() {
 
     return this.actionStorage.populateActionsFilter()
         ["then"](function(items) {
-            $A.log("ActionStorage: restored " + Object.keys(items).length + " actions");
+            $A.log("ActionStorage: restored " + (items ? Object.keys(items).length : 0) + " actions");
         });
 };
 

@@ -80,8 +80,6 @@ public class AuraContextImpl implements AuraContext {
 
     private static final Logger logger = Logger.getLogger(AuraContextImpl.class);
 
-    private final Set<DefDescriptor<?>> staleChecks = new HashSet<>();
-
     private final Mode mode;
 
     private final Authentication access;
@@ -407,11 +405,6 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public boolean hasChecked(DefDescriptor<?> d) {
-        return staleChecks.contains(d);
-    }
-
-    @Override
     public boolean isPreloading() {
         return preloading;
     }
@@ -506,11 +499,6 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public void setRequestedLocales(List<Locale> requestedLocales) {
         this.requestedLocales = requestedLocales;
-    }
-
-    @Override
-    public void setStaleCheck(DefDescriptor<?> d) {
-        staleChecks.add(d);
     }
 
     @Override

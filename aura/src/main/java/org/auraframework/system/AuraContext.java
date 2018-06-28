@@ -203,18 +203,6 @@ public interface AuraContext {
     JsonSerializationContext getJsonSerializationContext();
 
     /**
-     * @return whether the descriptor has been checked for freshness in this thread
-     */
-    boolean hasChecked(DefDescriptor<?> d);
-
-    /**
-     * Sets that the given descriptor was checked for freshness, and so shouldn't be checked again
-     *
-     * @param d descriptor that was checked
-     */
-    void setStaleCheck(DefDescriptor<?> d);
-
-    /**
      * @return the current component being processed in the tree (for use by controllers and models)
      */
     BaseComponent<?, ?> getCurrentComponent();

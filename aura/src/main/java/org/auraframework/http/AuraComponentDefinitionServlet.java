@@ -157,6 +157,10 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 loggingService.warn("attempting to populate labels for requested definitions: " + StringUtils.join(requestedDescriptors, ","), qfe);
             }
 
+            for (DefDescriptor<?> descriptor : descriptors.keySet()) {
+                definitionService.updateLoaded(descriptor);
+            }
+
             Set<DefDescriptor<?>> dependencies = new HashSet<>();
             descriptors.entrySet().stream().forEach((entry)->{
                 dependencies.addAll(definitionService.getDependencies(entry.getValue()));
@@ -184,13 +188,17 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                     // this should not throw a QFE
                     loggingService.warn("attempting to populate labels for requested definitions: " + StringUtils.join(requestedDescriptors, ","), qfe);
                 }
+
+                for (DefDescriptor<?> descriptor : dependencies) {
+                    definitionService.updateLoaded(descriptor);
+                }
             }
 
-            // write Labels
-            String labels = serializeLabels(context);
-            if (StringUtils.isNotEmpty(labels)) {
-                responseStringWriter.write("$A.getContext().mergeLabels(");
-                responseStringWriter.write(labels);
+            // write Value Providers Labels and Global
+            String gvps = serializeGVPs(context);
+            if (StringUtils.isNotEmpty(gvps)) {
+                responseStringWriter.write("$A.getContext().mergeGVPs(");
+                responseStringWriter.write(gvps);
                 responseStringWriter.write(");");
             }
 
@@ -346,15 +354,44 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         return redirectURI.toString();
     }
 
-    private String serializeLabels(AuraContext ctx) throws IOException {
+    private String serializeGVPs(AuraContext ctx) throws IOException {
         StringBuilder sb = new StringBuilder();
         Json json = new JsonEncoder(sb, ctx.isDevMode());
-        GlobalValueProvider valueProvider = ctx.getGlobalProviders().get(AuraValueProviderType.LABEL.getPrefix());
-        if (valueProvider != null && !valueProvider.isEmpty()) {
+        Map<String, GlobalValueProvider> globalProvidersMap = ctx.getGlobalProviders();
+        GlobalValueProvider labelValueProvider = globalProvidersMap.get(AuraValueProviderType.LABEL.getPrefix());
+
+        boolean firstEntry = true;
+
+        if (labelValueProvider != null && !labelValueProvider.isEmpty()) {
+            json.writeArrayBegin();
             json.writeMapBegin();
-            json.writeMapEntry("type", valueProvider.getValueProviderKey().getPrefix());
-            json.writeMapEntry("values", valueProvider.getData());
+            json.writeMapEntry("type", labelValueProvider.getValueProviderKey().getPrefix());
+            json.writeMapEntry("values", labelValueProvider.getData());
             json.writeMapEnd();
+            firstEntry = false;
+        }
+
+        // only if srcdoc was updated should we update the GVP
+        // once it's set it should remain that way and URI def requests don't get the context to know if it was already set
+        Boolean srcdocEnabled = ctx.validateGlobal("srcdoc") && (Boolean)ctx.getGlobal("srcdoc");
+        if (srcdocEnabled != null && srcdocEnabled.booleanValue()) {
+                if (!firstEntry) {
+                    json.writeComma();
+                } else {
+                    json.writeArrayBegin();
+                }
+                json.writeMapBegin();
+                json.writeMapEntry("type", AuraValueProviderType.GLOBAL.getPrefix());
+                json.writeMapKey("values");
+                json.writeMapBegin();
+                json.writeMapEntry("srcdoc", globalProvidersMap.get(AuraValueProviderType.GLOBAL.getPrefix()).getData().get("srcdoc"));
+                json.writeMapEnd();
+                json.writeMapEnd();
+                firstEntry = false;
+        }
+
+        if (!firstEntry) {
+            json.writeArrayEnd();
         }
         return sb.toString();
     }

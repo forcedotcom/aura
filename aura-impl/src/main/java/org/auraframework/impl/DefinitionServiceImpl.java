@@ -109,7 +109,7 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     private LoggingService loggingService;
 
-    private ConfigAdapter configAdapter;
+    protected ConfigAdapter configAdapter;
 
     private AccessChecker accessChecker;
 

@@ -290,8 +290,8 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext, allowMissmatch
  * @param $Label mapping of additional labels to add
  * @export
  */
-Aura.Context.AuraContext.prototype.mergeLabels = function(labels) {
-    this.globalValueProviders.merge([labels]);
+Aura.Context.AuraContext.prototype.mergeGVPs = function(gvps) {
+    this.globalValueProviders.merge(gvps);
 };
 
 /**

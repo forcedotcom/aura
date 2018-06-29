@@ -234,13 +234,13 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
     /**
      * Processes markdown and auradoc documentation files in the bundle.
      */
-    private void processDocumentation(DefDescriptor<ModuleDef> descriptor, Builder builder, 
+    private void processDocumentation(DefDescriptor<ModuleDef> descriptor, Builder builder,
             Map<DefDescriptor<?>, Source<?>> sourceMap, BundleDocumentation documentation) throws QuickFixException {
-        
+
         // markdown
-        if (documentation != null && !AuraTextUtil.isEmptyOrWhitespace(documentation.getHtml())) { //TODO remove getHtml check after lwc update
+        if (documentation != null) {
             DocumentationDefImpl.Builder docDefBuilder = new DocumentationDefImpl.Builder();
-            
+
             docDefBuilder.setDescriptor(getDefDescriptor(sourceMap, ModuleDef.MARKDOWN_PREFIX, DocumentationDef.class));
 
             DescriptionDefImpl.Builder descriptionBuilder = new DescriptionDefImpl.Builder();
@@ -248,7 +248,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             descriptionBuilder.setDescription(documentation.getHtml());
             DescriptionDefImpl description = descriptionBuilder.build();
             docDefBuilder.addDescription(description.getName(), description);
-            
+
             for (Entry<String, Object> entry : documentation.getMetadata().entrySet()) {
                 MetaDefImpl.Builder metaBuilder = new MetaDefImpl.Builder();
                 metaBuilder.setDescriptor(new DefDescriptorImpl<>(null, null, entry.getKey(), MetaDef.class));
@@ -257,8 +257,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                     metaBuilder.setValue(Joiner.on(",").join((Iterable<?>)value));
                 } else if (value instanceof Map) {
                     metaBuilder.setValue(Joiner.on(",").withKeyValueSeparator("=").join((Map<?, ?>)value));
-                }
-                else {
+                } else {
                     metaBuilder.setValue(value.toString());
                 }
                 MetaDefImpl metaDef = metaBuilder.build();
@@ -267,7 +266,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
             builder.setDocumentationDef(docDefBuilder.build());
         }
-        
+
         // auradoc
         DefDescriptor<DocumentationDef> auradocDesc = getDefDescriptor(sourceMap, DefDescriptor.MARKUP_PREFIX, DocumentationDef.class);
         if (auradocDesc != null) {

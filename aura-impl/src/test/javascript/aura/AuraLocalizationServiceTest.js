@@ -2156,6 +2156,19 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             // Assert
             Assert.Equal(expected, actual.toISOString());
         }
+
+        [Fact]
+        function ParseDateTimeISO8601LeapYear() {
+            // Arrange
+            var expected = new Date(2016, 1, 29).toISOString();
+            var targetService = new Aura.Services.AuraLocalizationService();
+
+            // Act
+            var actual = targetService.parseDateTimeISO8601("2016-02-29");
+
+            // Assert
+            Assert.Equal(expected, actual.toISOString());
+        }
     }
 
     [Fixture]

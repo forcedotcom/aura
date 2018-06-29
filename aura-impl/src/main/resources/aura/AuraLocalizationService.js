@@ -537,7 +537,6 @@ AuraLocalizationService.prototype.formatDateTime = function(date, formatString, 
             date = new Date(date);
             // Date parsing includes browser timezone offset. For formatting, we need to respect the numbers in the string.
             date.setTime(date.getTime() + date.getTimezoneOffset() * 6e4); // 60 * 1000
-            return date;
         } else {
             date = this.parseDateTimeISO8601(date);
         }
@@ -2150,7 +2149,7 @@ AuraLocalizationService.prototype.daysInMonth = function (year, month) {
     switch (month) {
         case 2:
             return (year % 4 === 0 && year % 100) || year % 400 === 0 ? 29 : 28;
-        case 4: case 6: case 9: case 12:
+        case 4: case 6: case 9: case 11:
             return 30;
         default:
             return 31;

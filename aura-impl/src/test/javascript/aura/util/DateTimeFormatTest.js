@@ -116,8 +116,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
 
         [Fact]
         function Formats24HourFormatWithPaddings() {
-            var date = new Date(2014, 9, 23, 4, 30, 45);
-            var expected = "Oct 23, 2014 04:30:45";
+            var date = new Date(2014, 9, 3, 4, 30, 45);
+            var expected = "Oct 03, 2014 04:30:45";
             var actual;
 
             mockAura(function() {
@@ -128,6 +128,7 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             Assert.Equal(expected, actual);
         }
 
+
         [Fact]
         function FormatsDateTimeWithH24Cycle() {
             var date = new Date(2014, 9, 23, 0, 30, 45);
@@ -136,6 +137,20 @@ Test.Aura.Util.DateTimeFormatTest = function() {
 
             mockAura(function() {
                 var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy kk:mm:ss", "en-US");
+                actual = dateTimeFormat.format(date);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function FormatsMidnightWithNoPadding() {
+            var date = new Date(2014, 9, 23, 0, 0, 0, 0);
+            var expected = "0:0";
+            var actual;
+
+            mockAura(function() {
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("H:m", "en-US");
                 actual = dateTimeFormat.format(date);
             });
 
@@ -456,6 +471,20 @@ Test.Aura.Util.DateTimeFormatTest = function() {
         }
 
         [Fact]
+        function FormatsMidnightWithNoPadding() {
+            var date = new Date(2014, 9, 23, 0, 0, 0, 0);
+            var expected = "0:0";
+            var actual;
+
+            mockAura(function() {
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("H:m", "en-US");
+                actual = dateTimeFormat.format(date);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         function Formats24HourFormat() {
             var date = new Date(2014, 9, 23, 16, 30, 45);
             var expected = "Oct 23, 2014 16:30:45";
@@ -471,8 +500,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
 
         [Fact]
         function Formats24HourFormatWithPaddings() {
-            var date = new Date(2014, 9, 23, 4, 30, 45);
-            var expected = "Oct 23, 2014 04:30:45";
+            var date = new Date(2014, 9, 3, 4, 30, 45);
+            var expected = "Oct 03, 2014 04:30:45";
             var actual;
 
             mockAura(function() {

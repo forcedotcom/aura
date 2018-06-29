@@ -333,14 +333,10 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
 
             // hours
             case "H":
+                // process individually, since 2-digit will be used when 'hour12' is off
                 token["field"] = "hour";
-                if (this.canUseConfig("hour", "numeric")) {
-                    config["hour"] = "numeric";
-                    config["hour12"] = false;
-                } else {
-                    token["type"] = "number";
-                    token["localized"] = true;
-                }
+                token["type"] = "number";
+                token["localized"] = true;
                 break;
             case "HH":
                 token["field"] = "hour";

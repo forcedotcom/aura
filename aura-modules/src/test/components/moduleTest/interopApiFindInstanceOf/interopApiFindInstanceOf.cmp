@@ -1,0 +1,5 @@
+<aura:component>
+    <div aura:id='wrapper'>
+        <moduleTest:simpleCmp aura:id="target" />
+    </div>
+</aura:component>

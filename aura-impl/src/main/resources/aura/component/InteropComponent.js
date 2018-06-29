@@ -688,8 +688,8 @@ InteropComponent.prototype.findInstancesOf = function(){
 /**
  * @private
  */
-InteropComponent.prototype.findInstanceOf = function(){
-    return null;
+InteropComponent.prototype.findInstanceOf = function(type){
+    return this.getType() === type ? this : null;
 };
 
 /**

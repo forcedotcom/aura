@@ -188,7 +188,7 @@ PassthroughValue.prototype.getPrimaryProviderKeys = function() {
 };
 
 /**
- * Get the definition of the valueProvider component. 
+ * Get the definition of the valueProvider component.
  * If the immediate value provider for this passthrough value is another passthrough value
  * it will resolve up the chain till it finds a valid component.
  */
@@ -314,11 +314,10 @@ PassthroughValue.prototype.removeValueHandler = function(config) {
  * @export
  */
 PassthroughValue.prototype.set = function(key, value, ignoreChanges) {
-    $A.assert($A.util.isString(key),
-              "PassthroughValue.prototype.set should be called with a valid key!\n"+
-              "[key]: " + key + '\n' +
-              "[primaryProviders]: " + this.primaryProviders + '\n' +
-              "[falls back component]: " + this.component + '\n');
+    if (typeof key !== "string") {
+        throw new $A.auraError("PassthroughValue.set: 'key' must be a string. Found " + key);
+    }
+
     var path = key.split('.');
 
     if (this.primaryProviders.hasOwnProperty(path[0])){

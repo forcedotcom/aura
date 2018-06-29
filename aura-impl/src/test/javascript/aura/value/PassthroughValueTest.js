@@ -17,54 +17,44 @@ Function.RegisterNamespace("Test.Aura.Value");
 
 [Fixture]
 Test.Aura.Value.PassthroughValueTest = function(){
-    var _passThroughValue;
+    var PassthroughValueCtor;
 
     Mocks.GetMocks(Object.Global(), {
     })(function(){
         Import("aura-impl/src/main/resources/aura/value/PassthroughValue.js");
-        _passThroughValue = PassthroughValue;
-        delete PassthroughValue
+        PassthroughValueCtor = PassthroughValue;
+        delete PassthroughValue;
     });
 
-    function getAuraMock(during) {
-        return 
-    }
+    var mockAura = Mocks.GetMock(Object.Global(), "$A", {
+        auraError: function (message) {
+            this.message = message;
+       },
+    });
 
     [Fixture]
-    function set(){
+    function set() {
+
         [Fact]
-        function AssertFailedWhenKeyUndefined(){
+        function ThrowsErrorForNonStringKey() {
             // Arrange
-            var expectedPrimaryProviders = ["foo", "bar"];
-            var expectedFallbackComponent = "cmp";
-            var ptv = new _passThroughValue(expectedPrimaryProviders, expectedFallbackComponent);
+            var expected = "PassthroughValue.set: 'key' must be a string. Found undefined";
+
+            var primaryProviders = ["foo", "bar"];
+            var component = "cmp";
+            var target = new PassthroughValueCtor(primaryProviders, component);
 
             // Act
             var actual;
-            Mocks.GetMocks(Object.Global(), {
-                $A: {
-                    assert: function(condition, message) {
-                        throw message;
-                    },
-                    util: {
-                        isString: function(obj) {
-                            return false;
-                        }
-                    }
-                }
-            })(function() {
+            mockAura(function() {
                 try {
-                    ptv.set(undefined, null, true);
+                    target.set(undefined, null, true);
                 } catch (e) {
-                    actual = e;
+                    actual = e.message;
                 }
             });
 
             // Assert
-            var expected = "PassthroughValue.prototype.set should be called with a valid key!\n"+
-                "[key]: " + undefined + '\n' +
-                "[primaryProviders]: " + expectedPrimaryProviders + '\n' +
-                "[falls back component]: " + expectedFallbackComponent + '\n';
             Assert.Equal(expected, actual);
         }
     }

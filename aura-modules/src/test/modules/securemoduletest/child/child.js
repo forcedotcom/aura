@@ -3,6 +3,22 @@ import * as testUtil from 'securemoduletest-test-util';
 import { LockerLWCEventName } from 'lockerlwc-lockerlwcevent';
 
 export default class Child extends Element {
+    get interopData() {
+        return {
+                object: {
+                    foo: 'bar'
+                },
+                array: [1],
+                domElement: this.template.querySelector('#p-securemoduletest-child'),
+                sharedObjects: {
+                    window, 
+                    document, 
+                    body: document.body, 
+                    head: document.head
+                }
+        }
+    }
+    
     @api
     testInitEventOnElementOfChildModule() {
         let domEvent;
@@ -21,6 +37,71 @@ export default class Child extends Element {
         // cannot detect if wrapped object is a proxy
         testUtil.assertContains("Event", domEvent.toString(), "Expected event(wrapped by engine)");
         testUtil.assertEquals(this, targetElement, "Expected event.target to be retargeted to host");
+    }
+
+    @api
+    triggerFooEvent() {
+        const ev = new CustomEvent('foo', {
+            bubbles: true,
+            detail: this.interopData
+        });
+
+        this.dispatchEvent(ev);
+    }
+
+    @api
+    testAura2SLWCApiMethodCNReceive() {
+        return this.interopData;
+    }
+
+    @api
+    testAura2SLWCApiMethodCNSend(data) {
+        testUtil.assertEqualsValue(
+            {foo: 'bar'},
+            data.object,
+            'Mismatch in object parameter value'
+        );
+        testUtil.assertEqualsValue(
+            [1,2,3],
+            data.array,
+            'Mismatch in array parameter value'
+        );
+        testUtil.assertEquals(
+            'SecureObject: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }',
+            data.domElement.toString(),
+            'Should receive a SecureElement'
+        );
+        testUtil.assertEquals(
+            'SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }',
+            `${data.win}`,
+            'Expected window to be a SecureWindow'
+        );
+
+        testUtil.assertEquals(
+            'SecureDocument: [object HTMLDocument]{ key: {"namespace":"secureModuleTest"} }',
+            `${data.doc}`,
+            'Expected document to be a SecureDocument: [object HTMLDocument]'
+        );
+
+        testUtil.assertEquals(
+            'SecureElement: [object HTMLBodyElement]{ key: {"namespace":"secureModuleTest"} }',
+            `${data.body}`,
+            'Expected body to be a SecureElement: [object HTMLBodyElement]'
+        );
+
+        testUtil.assertEquals(
+            'SecureElement: [object HTMLHeadElement]{ key: {"namespace":"secureModuleTest"} }',
+            `${data.head}`,
+            'Expected head to be a SecureElement: [object HTMLHeadElement]'
+        );
+
+        testUtil.assertEquals(
+            true,
+            data.func instanceof Function,
+            'Mismatch in expected function parameter'
+        );
+
+        data.func();
     }
 
     assertTestAuraLWCCustomEventOnHostElement(ev) {

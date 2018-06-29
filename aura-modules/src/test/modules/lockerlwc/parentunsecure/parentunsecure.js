@@ -20,8 +20,22 @@ export default class ParentUnsecure extends Element {
             win: window,
             doc: document,
             body: document.body,
-            head: document.head
+            head: document.head,
+            func: function(cb) {
+                if (cb) {
+                    cb();
+                }
+            }
         };
+    }
+
+    @api testAura2ULWCCustomEventReceive() {
+        const ev = new CustomEvent('fromUnsecureLWC', {
+            bubbles: true,
+            detail: this.customEventData
+        });
+
+        this.dispatchEvent(ev);
     }
 
     @api testUnsecureLWC2SecureLWCCustomEventCrossNamespace() {
@@ -76,6 +90,10 @@ export default class ParentUnsecure extends Element {
 
         child.dispatchEvent(ev);
         return promise;
+    }
+
+    @api testAuraUnsecureLWCApiMethodOnHostElement() {
+        return this.customEventData;
     }
 
     assertCustomEvent(ev) {
@@ -154,8 +172,49 @@ export default class ParentUnsecure extends Element {
         }
     }
 
+    assertInteropEvent(ev) {
+        const { object, array, domElement, sharedObjects } = ev.detail;
+        testUtils.assertEqualsValue({foo: 'bar'}, object, 'Mismatch in object parameter');
+        testUtils.assertEqualsValue([1], array, 'Mismatch in array parameter');
+        testUtils.assertEquals(
+            '[object HTMLDivElement]', 
+            domElement.toString(), 
+            'Mismatch in domElement parameter'
+        );
+
+        testUtils.assertEquals(
+            '[object Window]',
+            sharedObjects.window.toString(),
+            'Mismatch in window parameter'
+        );
+
+        testUtils.assertEquals(
+            '[object HTMLDocument]',
+            sharedObjects.document.toString(),
+            'Mismatch in document parameter'
+        );
+
+        testUtils.assertEquals(
+            '[object HTMLBodyElement]',
+            sharedObjects.body.toString(),
+            'Mismatch in body parameter'
+        );
+
+        testUtils.assertEquals(
+            '[object HTMLHeadElement]',
+            sharedObjects.head.toString(),
+            'Mismatch in head parameter'
+        );
+
+
+        if (ev.detail.callback) {
+            ev.detail.callback();
+        }
+    }
+
     connectedCallback() {
         this.template.addEventListener('customEvent', this.assertCustomEvent);
         this.template.addEventListener('click', this.assertDOMEvent.bind(this));
+        this.template.addEventListener('secureAura', this.assertInteropEvent);
     }
 }

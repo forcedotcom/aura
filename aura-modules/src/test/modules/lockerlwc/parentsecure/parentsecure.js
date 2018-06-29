@@ -153,15 +153,24 @@ export default class ParentSecure extends Element {
         this.assertIsFunction(data.func);
     }
 
+    @api triggerCustomEvent() {
+        const ev = new CustomEvent('foo', {
+            bubbles: true,
+            detail: this.getCustomEventData(),
+        });
+
+        this.dispatchEvent(ev);
+    }
+
     // tests
-    @api testAuraLWCApiMethodOnHostElement(data, cb) {
+    @api testAura2SLWCApiMethodSend(data, cb) {
         this.assertDataPayload(data);
         this.assertIsFunction(data.func);
         data.func();
         cb();
     }
 
-    @api testSLWC2AuraApiReturnValue() {
+    @api testAura2SLWCApiMethodReceive() {
         return this.getCustomEventData();
     }
 
@@ -374,7 +383,7 @@ export default class ParentSecure extends Element {
     }
 
     connectedCallback() {
-        this.addEventListener('testAuraLWCCustomEventOnHostElement', (ev) => {
+        this.addEventListener('testAura2SLWCCustomEventReceive', (ev) => {
             this.assertCustomEventDataPayload(ev);
             this.assertIsFunction(ev.detail.data.func);
             ev.detail.data.func();

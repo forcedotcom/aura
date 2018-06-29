@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 ({
-    testAuraLWCCustomEventOnHostElement: function (cmp, event, helper) {
+    testAura2SLWCCustomEventSend: function (cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
         var module = cmp.find('parentSecure').getElement();
         var triggered = false;
 
-        var customEvent = new CustomEvent('testAuraLWCCustomEventOnHostElement', {
+        var customEvent = new CustomEvent('testAura2SLWCCustomEventReceive', {
             detail: {
                 data: {
                     object: {
@@ -50,7 +50,102 @@
             return triggered;
         }, "Custom event handler was not triggered on component");
     },
-    testAuraLWCApiMethodOnHostElement: function (cmp, event, helper) {
+    testAura2SLWCCustomEventReceive: function(cmp) {
+        var module = cmp.find('parentSecure').getElement();
+        var testUtils = cmp.get('v.testUtils');
+        var triggered = false;
+        module.addEventListener('foo', function(ev) {
+            testUtils.assertEquals('bar', ev.detail.object.foo, 'Mismatch in object parameter');
+            testUtils.assertEquals(3, ev.detail.array.length, 'Mismatch in array length');
+            testUtils.assertEquals(0, ev.detail.array[0], 'Mismatch in array parameter');
+            testUtils.assertEquals(1, ev.detail.array[1], 'Mismatch in array parameter');
+            testUtils.assertEquals(2, ev.detail.array[2], 'Mismatch in array parameter');
+            testUtils.assertEquals(
+                'SecureElement: [object HTMLDivElement]{ key: {"namespace":"lockerlwc"} }', 
+                ev.detail.domElement.toString(), 
+                'Mismatch in domElement parameter'
+            );
+            testUtils.assertEquals(
+                'SecureWindow: [object Window]{ key: {"namespace":"lockerlwc"} }', 
+                ev.detail.win.toString(), 
+                'Mismatch in shared object window parameter'
+            );
+            testUtils.assertEquals(
+                'SecureDocument: [object HTMLDocument]{ key: {"namespace":"lockerlwc"} }', 
+                ev.detail.doc.toString(), 
+                'Mismatch in shared object document parameter'
+            );
+            testUtils.assertEquals(
+                'SecureElement: [object HTMLBodyElement]{ key: {"namespace":"lockerlwc"} }', 
+                ev.detail.body.toString(), 
+                'Mismatch in shared object body parameter'
+            );
+            testUtils.assertEquals(
+                'SecureElement: [object HTMLHeadElement]{ key: {"namespace":"lockerlwc"} }', 
+                ev.detail.head.toString(), 
+                'Mismatch in shared object head parameter'
+            );
+            triggered = true;
+        });
+
+        module.triggerCustomEvent();
+        testUtils.addWaitForWithFailureMessage(
+            true,
+            function() {
+                return triggered;
+            },
+            'Event handler in Aura component should have been triggered by event in LWC child component'
+        );
+
+    },
+    testAura2SLWCCustomEventCNReceive: function(cmp) {
+        var div = cmp.find('capturingDiv').getElement();
+        var module = cmp.find('securemoduletestChild');
+        var testUtils = cmp.get('v.testUtils');
+        var triggered = false;
+        div.addEventListener('foo', function(ev) {
+            testUtils.assertEquals('bar', ev.detail.object.foo, 'Mismatch in object parameter');
+            testUtils.assertEquals(1, ev.detail.array[0], 'Mismatch in array parameter');
+            testUtils.assertEquals(1, ev.detail.array.length, 'Mismatch in array length');
+            testUtils.assertEquals(
+                'SecureObject: [object HTMLParagraphElement]{ key: {"namespace":"lockerlwc"} }', 
+                ev.detail.domElement.toString(), 
+                'Mismatch in domElement parameter'
+            );
+            testUtils.assertEquals(
+                'SecureWindow: [object Window]{ key: {"namespace":"lockerlwc"} }', 
+                ev.detail.sharedObjects.window.toString(), 
+                'Mismatch in shared object window parameter'
+            );
+            testUtils.assertEquals(
+                'SecureDocument: [object HTMLDocument]{ key: {"namespace":"lockerlwc"} }', 
+                ev.detail.sharedObjects.document.toString(), 
+                'Mismatch in shared object document parameter'
+            );
+            testUtils.assertEquals(
+                'SecureElement: [object HTMLBodyElement]{ key: {"namespace":"lockerlwc"} }', 
+                ev.detail.sharedObjects.body.toString(), 
+                'Mismatch in shared object body parameter'
+            );
+            testUtils.assertEquals(
+                'SecureElement: [object HTMLHeadElement]{ key: {"namespace":"lockerlwc"} }', 
+                ev.detail.sharedObjects.head.toString(), 
+                'Mismatch in shared object head parameter'
+            );
+            triggered = true;
+        });
+
+        module.triggerFooEvent();
+        testUtils.addWaitForWithFailureMessage(
+            true,
+            function() {
+                return triggered;
+            },
+            'Event handler in Aura component should have been triggered by event in LWC child component'
+        );
+
+    },
+    testAura2SLWCApiMethodSend: function (cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
         var module = cmp.find('parentSecure').getElement();
         var triggered = false;
@@ -80,7 +175,7 @@
 
         var cb = function () { triggered = true; };
 
-        module.testAuraLWCApiMethodOnHostElement(data, cb);
+        module.testAura2SLWCApiMethodSend(data, cb);
 
         testUtils.addWaitForWithFailureMessage(true, function () {
             return fnParamTriggered;
@@ -90,25 +185,10 @@
             return triggered;
         }, "API method on SecureLWC element was not called");
     },
-    testAuraLWCDomEventOnHostElement: function (cmp) {
+    testAura2SLWCApiMethodReceive: function (cmp) {
         var testUtils = cmp.get("v.testUtils");
-        var module = cmp.find('parentSecure').getElement();
-        var triggered = false;
-        var cb = function () {
-            triggered = true;
-        }
-
-        module.callback = cb;
-        module.click();
-
-        testUtils.addWaitForWithFailureMessage(true, function () {
-            return triggered;
-        }, "DOM Event was not triggered on LWC host element");
-    },
-    testSLWC2AuraApiReturnValue: function (cmp) {
-        var testUtils = cmp.get("v.testUtils");
-        var module = cmp.find('parentSecure').getElement();
-        var returned = module.testSLWC2AuraApiReturnValue();
+        var module = cmp.find('parentSecure');
+        var returned = module.testAura2SLWCApiMethodReceive();
         var complete = false;
         testUtils.assertEquals('bar', returned.object.foo, 'Expected object value mismatched');
         testUtils.assertEquals(3, returned.array.length, 'Expected array length mismatched');
@@ -160,6 +240,189 @@
             'Test did not complete in timely manner'
         )
     },
+    testAura2SLWCApiMethodCNReceive: function(cmp) {
+        var testUtils = cmp.get('v.testUtils');
+        var module = cmp.find('securemoduletestChild');
+        var returned = module.testAura2SLWCApiMethodCNReceive();
+
+        testUtils.assertEquals('bar', returned.object.foo, 'Mismatch in object parameter');
+        testUtils.assertEquals(1, returned.array[0], 'Mismatch in array parameter');
+        testUtils.assertEquals(1, returned.array.length, 'Mismatch in array length');
+        testUtils.assertEquals(
+            'SecureObject: [object HTMLParagraphElement]{ key: {"namespace":"lockerlwc"} }', 
+            returned.domElement.toString(), 
+            'Mismatch in domElement parameter'
+        );
+        testUtils.assertEquals(
+            'SecureWindow: [object Window]{ key: {"namespace":"lockerlwc"} }', 
+            returned.sharedObjects.window.toString(), 
+            'Mismatch in shared object window parameter'
+        );
+        testUtils.assertEquals(
+            'SecureDocument: [object HTMLDocument]{ key: {"namespace":"lockerlwc"} }', 
+            returned.sharedObjects.document.toString(), 
+            'Mismatch in shared object document parameter'
+        );
+        testUtils.assertEquals(
+            'SecureElement: [object HTMLBodyElement]{ key: {"namespace":"lockerlwc"} }', 
+            returned.sharedObjects.body.toString(), 
+            'Mismatch in shared object body parameter'
+        );
+        testUtils.assertEquals(
+            'SecureElement: [object HTMLHeadElement]{ key: {"namespace":"lockerlwc"} }', 
+            returned.sharedObjects.head.toString(), 
+            'Mismatch in shared object head parameter'
+        );
+    },
+    testAura2SLWCApiMethodCNSend: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var module = cmp.find('securemoduletestChild');
+        var triggered = false;
+        var data = {
+            object: {
+                foo: 'bar',
+            },
+            array: [1, 2, 3],
+            domElement: document.querySelector('#div-aura-cmp'),
+            func: function () {
+                triggered = true;
+            },
+            win: window,
+            doc: document,
+            body: document.body,
+            head: document.head,
+        };
+
+        module.testAura2SLWCApiMethodCNSend(data);
+
+        testUtils.addWaitForWithFailureMessage(true, function () {
+            return triggered;
+        }, "API method on SecureLWC element was not called");
+    },
+    testAura2SLWCDomEventOnHostElement: function (cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var module = cmp.find('parentSecure').getElement();
+        var triggered = false;
+        var cb = function () {
+            triggered = true;
+        }
+
+        module.callback = cb;
+        module.click();
+
+        testUtils.addWaitForWithFailureMessage(true, function () {
+            return triggered;
+        }, "DOM Event was not triggered on LWC host element");
+    },
+    // end Secure Aura to Secure LWC Tests
+
+    // begin Secure Aura to Unsecure LWC Tests
+    testAura2ULWCCustomEventReceive: function(cmp) {
+        var testUtils = cmp.get('v.testUtils');
+        var triggered = false;
+        var div = cmp.find('capturingDiv').getElement();
+        var module = cmp.find('parentUnsecure');
+
+        div.addEventListener('fromUnsecureLWC', function(ev) {
+            testUtils.assertEquals(
+                'SecureDOMEvent: [object CustomEvent]{ key: {"namespace":"lockerlwc"} }',
+                ev.toString(),
+                'Expected a SecureDOMEvent in handler'
+            );
+
+            testUtils.assertEquals('bar', ev.detail.object.foo, 'Expected object value mismatched');
+            testUtils.assertEquals(3, ev.detail.array.length, 'Expected array length mismatched');
+            testUtils.assertEquals(0, ev.detail.array[0], 'Expected array value mismatched');
+            testUtils.assertEquals(1, ev.detail.array[1], 'Expected array value mismatched');
+            testUtils.assertEquals(2, ev.detail.array[2], 'Expected array value mismatched');
+            testUtils.assertEquals('foobar', ev.detail.string, 'Expected string value mismatched');
+            testUtils.assertEquals(1, ev.detail.number, 'Expected number value mismatched');
+            testUtils.assertEquals(true, ev.detail.boolean, 'Expected boolean value mismatched');
+            testUtils.assertEquals(
+                'SecureObject: [object HTMLDivElement]{ key: {"namespace":"lockerlwc"} }',
+                ev.detail.domElement.toString(),
+                'Expected DOMElement value mismatched'
+            );
+            testUtils.assertEquals(
+                'SecureWindow: [object Window]{ key: {"namespace":"lockerlwc"} }',
+                ev.detail.win.toString(),
+                'Expected Window value mismatched'
+            );
+            testUtils.assertEquals(
+                'SecureDocument: [object HTMLDocument]{ key: {"namespace":"lockerlwc"} }',
+                ev.detail.doc.toString(),
+                'Expected Document value mismatched'
+            );
+            testUtils.assertEquals(
+                'SecureElement: [object HTMLBodyElement]{ key: {"namespace":"lockerlwc"} }',
+                ev.detail.body.toString(),
+                'Expected body value mismatched'
+            );
+            testUtils.assertEquals(
+                'SecureElement: [object HTMLHeadElement]{ key: {"namespace":"lockerlwc"} }',
+                ev.detail.head.toString(),
+                'Expected head value mismatched'
+            );
+            testUtils.assertEquals(
+                true,
+                ev.detail.func instanceof Function,
+                'Expected function type mismatched'
+            );
+            ev.detail.func(function () {
+                triggered = true;
+            });
+    
+        });
+
+        module.testAura2ULWCCustomEventReceive();
+
+        testUtils.addWaitForWithFailureMessage(
+            true,
+            function() {
+                return triggered;
+            },
+            'CustomEvent handler on child unsecured LWC component was not triggered'
+        );
+    },
+    testAuraUnsecureLWCApiMethodOnHostElement: function(cmp) {
+        var testUtils = cmp.get('v.testUtils');
+
+        var module = cmp.find('parentUnsecure');
+        var returned = module.testAuraUnsecureLWCApiMethodOnHostElement();
+
+        testUtils.assertEquals('bar', returned.object.foo, 'Mismatch in object parameter first key');
+        testUtils.assertEquals('foo', returned.object.bar.baz, 'Mismatch in object parameter 2nd key');
+        testUtils.assertEquals(3, returned.array.length, 'Mismatch in array length');
+        testUtils.assertEquals(0, returned.array[0], 'Mismatch in array entry 1');
+        testUtils.assertEquals(1, returned.array[1], 'Mismatch in array entry 2');
+        testUtils.assertEquals(2, returned.array[2], 'Mismatch in array entry 3');
+        testUtils.assertEquals(
+            'SecureObject: [object HTMLDivElement]{ key: {"namespace":"lockerlwc"} }',
+            returned.domElement.toString(),
+            'Mismatch in domElement parameter'
+        );
+        testUtils.assertEquals(
+            'SecureWindow: [object Window]{ key: {"namespace":"lockerlwc"} }', 
+            returned.win.toString(), 
+            'Mismatch in shared object window parameter'
+        );
+        testUtils.assertEquals(
+            'SecureDocument: [object HTMLDocument]{ key: {"namespace":"lockerlwc"} }', 
+            returned.doc.toString(), 
+            'Mismatch in shared object document parameter'
+        );
+        testUtils.assertEquals(
+            'SecureElement: [object HTMLBodyElement]{ key: {"namespace":"lockerlwc"} }', 
+            returned.body.toString(), 
+            'Mismatch in shared object body parameter'
+        );
+        testUtils.assertEquals(
+            'SecureElement: [object HTMLHeadElement]{ key: {"namespace":"lockerlwc"} }', 
+            returned.head.toString(), 
+            'Mismatch in shared object head parameter'
+        );
+    },
+    // end Secure Aura to Unsecure LWC Tests
     testTemplateQuerySelectorReturnsSecureElement: function (cmp, event, helper) {
         var module = cmp.find('parentSecure').getElement();
         module.testTemplateQuerySelectorReturnsSecureElement();

@@ -20,27 +20,58 @@
     setUp: function (cmp) {
         cmp.set("v.testUtils", $A.test);
     },
-    testAuraLWCCustomEventOnHostElement: {
+
+    // begin Secure Aura to Secure LWC Communication tests
+    testAura2SLWCCustomEventSend: {
         test: function (cmp, event, helper) {
-            cmp.testAuraLWCCustomEventOnHostElement();
+            cmp.testAura2SLWCCustomEventSend();
         }
     },
-    testAuraLWCApiMethodOnHostElement: {
+    testAura2SLWCCustomEventReceive: {
         test: function (cmp, event, helper) {
-            cmp.testAuraLWCApiMethodOnHostElement();
+            cmp.testAura2SLWCCustomEventReceive();
+        }
+    },
+    testAura2SLWCCustomEventCNReceive: {
+        test: function(cmp) {
+            return cmp.testAura2SLWCCustomEventCNReceive();
+        }
+    },
+    testAura2SLWCApiMethodSend: {
+        test: function (cmp, event, helper) {
+            cmp.testAura2SLWCApiMethodSend();
+        }
+    },
+    testAura2SLWCApiMethodReceive: {
+        test: function (cmp, event, helper) {
+            cmp.testAura2SLWCApiMethodReceive();
+        }
+    },
+    testAura2SLWCApiMethodCNSend: {
+        test: function(cmp) {
+            cmp.testAura2SLWCApiMethodCNSend();
+        }
+    },
+    testAura2SLWCApiMethodCNReceive: {
+        test: function(cmp) {
+            cmp.testAura2SLWCApiMethodCNReceive();
         }
     },
     // TODO: Due to a bug in how LWC engine patches target and currentTarget properties on event
-    _testAuraLWCDomEventOnHostElement: {
+    _testAura2SLWCDomEventOnHostElement: {
         test: function (cmp) {
-            cmp.testAuraLWCDomEventOnHostElement();
+            cmp.testAura2SLWCDomEventOnHostElement();
         }
     },
-    testSLWC2AuraApiReturnValue: {
-        test: function (cmp) {
-            cmp.testSLWC2AuraApiReturnValue();
+    // end Secure Aura to Secure LWC Communication tests
+
+    // begin Secure Aura to Unsecure LWC Communication tests
+    testAura2ULWCCustomEventReceive: {
+        test: function(cmp) {
+            cmp.testAura2ULWCCustomEventReceive();
         }
     },
+    // end Secure Aura to Unsecure LWC Communication tests
     testTemplateQuerySelectorReturnsSecureElement: {
         test: function (cmp, event, helper) {
             cmp.testTemplateQuerySelectorReturnsSecureElement();
@@ -92,6 +123,16 @@
     testSLWC2SWLCParentCanCallAPIProp: {
         test: function (cmp) {
             return cmp.testSLWC2SWLCParentCanCallAPIProp();
+        }
+    },
+    testAura2SLWCApiMethodCNSend: {
+        test: function(cmp) {
+            return cmp.testAura2SLWCApiMethodCNSend();
+        }
+    },
+    testAuraUnsecureLWCApiMethodOnHostElement: {
+        test: function(cmp) {
+            return cmp.testAuraUnsecureLWCApiMethodOnHostElement();
         }
     }
 })

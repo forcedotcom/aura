@@ -22,7 +22,7 @@
             var module = cmp.find('parentSecure').getElement();
             var triggered = false;
 
-            var customEvent = new CustomEvent('testAuraLWCCustomEventOnHostElement', {
+            var customEvent = new CustomEvent('testAura2SLWCCustomEventReceive', {
                 detail: {
                     data: {
                         object: {
@@ -51,6 +51,55 @@
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return triggered;
             }, "Custom event handler was not triggered on component");
+        }
+    },
+    testAura2SLWCCustomEventReceive: {
+        test: function(cmp) {
+            var module = cmp.find('parentSecure').getElement();
+            var div = cmp.find('capturingDiv').getElement();
+            var triggered = false;
+            div.addEventListener('foo', function(ev) {
+                $A.test.assertEquals('bar', ev.detail.object.foo, 'Mismatch in object parameter');
+                $A.test.assertEquals(3, ev.detail.array.length, 'Mismatch in array length');
+                $A.test.assertEquals(0, ev.detail.array[0], 'Mismatch in array parameter');
+                $A.test.assertEquals(1, ev.detail.array[1], 'Mismatch in array parameter');
+                $A.test.assertEquals(2, ev.detail.array[2], 'Mismatch in array parameter');
+                $A.test.assertEquals(
+                    '[object HTMLDivElement]', 
+                    ev.detail.domElement.toString(), 
+                    'Mismatch in domElement parameter'
+                );
+                $A.test.assertEquals(
+                    '[object Window]', 
+                    ev.detail.win.toString(), 
+                    'Mismatch in shared object window parameter'
+                );
+                $A.test.assertEquals(
+                    '[object HTMLDocument]', 
+                    ev.detail.doc.toString(), 
+                    'Mismatch in shared object document parameter'
+                );
+                $A.test.assertEquals(
+                    '[object HTMLBodyElement]', 
+                    ev.detail.body.toString(), 
+                    'Mismatch in shared object body parameter'
+                );
+                $A.test.assertEquals(
+                    '[object HTMLHeadElement]', 
+                    ev.detail.head.toString(), 
+                    'Mismatch in shared object head parameter'
+                );
+                triggered = true;
+            });
+            module.triggerCustomEvent();
+            $A.test.addWaitForWithFailureMessage(
+                true,
+                function() {
+                    return triggered;
+                },
+                'Event handler in Aura component should have been triggered by event in LWC child component'
+            );
+
         }
     },
     testAuraLWCApiMethodOnHostElement: {
@@ -82,7 +131,7 @@
 
             var cb = function () { triggered = true; };
 
-            module.testAuraLWCApiMethodOnHostElement(data, cb);
+            module.testAura2SLWCApiMethodSend(data, cb);
 
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return fnParamTriggered;
@@ -113,7 +162,7 @@
     testSLWC2AuraApiReturnValue: {
         test: function (cmp) {
             var module = cmp.find('parentSecure').getElement();
-            var returned = module.testSLWC2AuraApiReturnValue();
+            var returned = module.testAura2SLWCApiMethodReceive();
             var complete = false;
             $A.test.assertEquals('bar', returned.object.foo, 'Expected object value mismatched');
             $A.test.assertEquals(3, returned.array.length, 'Expected array length mismatched');
@@ -255,5 +304,39 @@
                 'Platform event was not triggered'
             )
         }
+    },
+    testAuraUnsecureLWCEventOnHostElement: {
+        test: function(cmp) {
+            var module = cmp.find('parentUnsecure').getElement();
+            var triggered = false;
+            var ev = new CustomEvent('secureAura', {
+                bubbles: true,
+                cancelable: true,
+                detail: {
+                    object: {foo: 'bar'},
+                    array: [1],
+                    domElement: cmp.find('capturingDiv').getElement(),
+                    sharedObjects: {
+                        window: window,
+                        document: document,
+                        body: document.body,
+                        head: document.head
+                    },
+                    callback: function() {
+                        triggered = true;
+                    }
+                }
+            });
+
+            module.dispatchEvent(ev);
+            $A.test.addWaitForWithFailureMessage(
+                true,
+                function() {
+                    return triggered;
+                },
+                'CustomEvent handler on child unsecured LWC component was not triggered'
+            );
+        }
     }
+
 })

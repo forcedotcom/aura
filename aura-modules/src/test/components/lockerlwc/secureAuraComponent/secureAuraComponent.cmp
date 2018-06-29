@@ -3,21 +3,37 @@
     <lockerlwc:parentsecure aura:id="parentSecure" />
 
     <lockerlwc:lib aura:id="lib" property="lib" />
-    <lockerlwc:parentunsecure aura:id="parentUnsecure" />
-    <div id="div-aura-cmp">This is a div in an Aura Component</div>
+    <div id="div-aura-cmp">
+        This is a div in an Aura Component
+        <div aura:id="capturingDiv">
+            <lockerlwc:parentunsecure aura:id="parentUnsecure" />
+            <securemoduletest:child aura:id="securemoduletestChild"></securemoduletest:child>
+        </div>
+    </div>
 
-    <aura:method name="testAuraLWCCustomEventOnHostElement"/>
-    <aura:method name="testAuraLWCApiMethodOnHostElement"/>
-    <aura:method name="testAuraLWCDomEventOnHostElement"/>
-    <aura:method name="testSLWC2AuraApiReturnValue"/>
-    <aura:method name="testTemplateQuerySelectorReturnsSecureElement"/>
-    <aura:method name="testLWCCustomEventOnSelf"/>
-    <aura:method name="testSecureLWC2SecureLWCCustomEvent"/>
-    <aura:method name="testSecureLWC2SecureLWCDomEvent"/>
-    <aura:method name="testSecureLWC2UnsecureLWCCustomEvent"/>
-    <aura:method name="testSecureLWC2UnsecureLWCDOMEvent"/>
-    <aura:method name="testSecureLWC2SecureLWCCustomEventCrossNamespace"/>
-    <aura:method name="testUnsecureLWC2SecureLWCCustomEventCrossNamespace"/>
-    <aura:method name="testUnsecureLWC2SecureLWCCustomEvent"/>
-    <aura:method name="testSLWC2SWLCParentCanCallAPIProp"/>
+    <!-- Secure Aura to Secure LWC communication -->
+    <aura:method name="testAura2SLWCCustomEventSend" />
+    <aura:method name="testAura2SLWCCustomEventReceive" />
+    <aura:method name="testAura2SLWCCustomEventCNReceive" />
+    <aura:method name="testAura2SLWCApiMethodSend" />
+    <aura:method name="testAura2SLWCApiMethodReceive" />
+    <aura:method name="testAura2SLWCApiMethodCNSend" />
+    <aura:method name="testAura2SLWCApiMethodCNReceive" />
+    <aura:method name="testAura2SLWCDomEventOnHostElement" />
+    
+    <!-- Secure Aura to Unsecure LWC communication -->
+    <aura:method name="testAura2ULWCCustomEventReceive" />
+    <aura:method name="testAuraUnsecureLWCApiMethodOnHostElement" />
+
+    <!-- LWC to LWC communication tests -->
+    <aura:method name="testTemplateQuerySelectorReturnsSecureElement" />
+    <aura:method name="testLWCCustomEventOnSelf" />
+    <aura:method name="testSecureLWC2SecureLWCCustomEvent" />
+    <aura:method name="testSecureLWC2SecureLWCDomEvent" />
+    <aura:method name="testSecureLWC2UnsecureLWCCustomEvent" />
+    <aura:method name="testSecureLWC2UnsecureLWCDOMEvent" />
+    <aura:method name="testSecureLWC2SecureLWCCustomEventCrossNamespace" />
+    <aura:method name="testUnsecureLWC2SecureLWCCustomEventCrossNamespace" />
+    <aura:method name="testUnsecureLWC2SecureLWCCustomEvent" />
+    <aura:method name="testSLWC2SWLCParentCanCallAPIProp" />
 </aura:component>

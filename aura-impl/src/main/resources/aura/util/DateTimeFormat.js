@@ -103,6 +103,8 @@ Aura.Utils.DateTimeFormat.prototype.format = function(date, utcOffset) {
  */
 Aura.Utils.DateTimeFormat.prototype.getNumberFieldValue = function(token, date) {
     switch (token["field"]) {
+        case "quarter":
+            return $A.localizationService.quarterInYear(date);
         case "weekInYear":
             return $A.localizationService.weekInYear(date);
         case "weekday":
@@ -514,6 +516,10 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                         "weekday": "long"
                     };
                 }
+                break;
+            case "Q":
+                token["field"] = "quarter";
+                token["type"] = "number";
                 break;
 
             // week in year

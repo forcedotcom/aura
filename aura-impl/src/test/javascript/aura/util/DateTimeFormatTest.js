@@ -199,6 +199,19 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             Assert.Equal(expected, actual);
         }
 
+        function FormatsQuarter() {
+            var date = new Date(2014, 8, 30);
+            var expected = "3";
+            var actual;
+
+            mockAura(function() {
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("Q", "en-US");
+                actual = dateTimeFormat.format(date);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
         [Fact]
         function FormatsDayOfWeekNumber() {
             var date = new Date(2018, 4, 17);

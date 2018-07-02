@@ -2044,6 +2044,15 @@ AuraLocalizationService.prototype.normalizeDateTimeInput = function(datetime) {
     return datetime;
 };
 
+/**
+ * Get the quarter number of the given date, 1 - 4.
+ * @param {Date} date
+ * @returns {number}
+ */
+AuraLocalizationService.prototype.quarterInYear = function(date) {
+    return Math.floor(date.getMonth() / 3) + 1;
+};
+
 AuraLocalizationService.prototype.weekInYear = function(date) {
     var nonLeapLadder = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
     var leapLadder = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];

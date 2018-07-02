@@ -1,0 +1,28 @@
+import { Element, api } from 'engine';
+import * as testUtils from 'securemoduletest-test-util';
+
+export default class SecureTemplateTester extends Element {
+    @api
+    testQuerySelector() {
+        const result = this.template.querySelector('#div-in-parent');
+        testUtils.assertDefined(result);
+        assertNodeDetail(result, {tagName: 'DIV', id: 'div-in-parent'});
+    }
+
+    @api
+    testQuerySelectorAll() {
+        const childNodes = this.template.querySelectorAll('*');
+        testUtils.assertEquals(3, childNodes.length);
+        assertNodeDetail(childNodes[0], {tagName: 'DIV', id: 'div-in-parent'});
+        assertNodeDetail(childNodes[1], {tagName: 'SPAN', id: 'span-in-parent'});
+        assertNodeDetail(childNodes[2], {tagName: 'LOCKERLWC-PARENTSECURE', id: 'parentsecure'});
+    }
+}
+
+const secureElementRegex = /^SecureElement: \[object .*\]{ key: {"namespace":"lockerlwc"} }/;
+function assertNodeDetail(actualNode, expectedDetail) {
+    for ( let [prop, expectedPropValue] of Object.entries(expectedDetail)) {
+        testUtils.assertEquals(expectedPropValue, actualNode[prop]);
+    }
+    testUtils.assertTrue(secureElementRegex.test(actualNode.toString()));
+}

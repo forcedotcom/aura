@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 ({
+    // List of components that create their own labels instead of ui:input
+    COMPONENTS_THAT_CREATE_OWN_LABEL: ['force:quill'],
     SUPPORTED_FIELDHELP_COMPONENTS: ['ui:tooltip', 'force:icon'],
 
     buildBody: function (component) {
@@ -22,6 +24,10 @@
         var innerBody;
         var body = [];
         var wrapperTag;
+
+        if (this.componentCreatesOwnLabel(component)) {
+            return;
+        }
 
         if (!$A.util.isEmpty(labelAttribute) || isCompound) {
             if (isCompound) {
@@ -138,6 +144,23 @@
         });
 
         return innerBody;
+    },
+
+    /**
+     * Identify if the component is one which will create its own label instead of 
+     * letting ui:input create it
+     * 
+     * ex. force:quill requires a span label and very specific wiring up for a11y
+     *     that it does by itself; we want to just delegate the responsibility of
+     *     creating the label to that component itself in those cases
+     */
+    componentCreatesOwnLabel: function(cmp) {
+        for (var i = 0; i < this.COMPONENTS_THAT_CREATE_OWN_LABEL.length; i++) {
+            if (cmp.getAttributeValueProvider().isInstanceOf(this.COMPONENTS_THAT_CREATE_OWN_LABEL[i])) {
+                return true;
+            }
+        }
+        return false;
     },
 
     /**

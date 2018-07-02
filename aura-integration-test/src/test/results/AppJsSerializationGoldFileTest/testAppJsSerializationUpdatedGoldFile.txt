@@ -7166,6 +7166,9 @@ return {
     }
   },
   "helper":{
+    "COMPONENTS_THAT_CREATE_OWN_LABEL":[
+      "force:quill"
+    ],
     "SUPPORTED_FIELDHELP_COMPONENTS":[
       "ui:tooltip",
       "force:icon"
@@ -7176,6 +7179,10 @@ return {
         var innerBody;
         var body = [];
         var wrapperTag;
+
+        if (this.componentCreatesOwnLabel(component)) {
+            return;
+        }
 
         if (!$A.util.isEmpty(labelAttribute) || isCompound) {
             if (isCompound) {
@@ -7289,6 +7296,14 @@ return {
         });
 
         return innerBody;
+    },
+    "componentCreatesOwnLabel":function(cmp) {
+        for (var i = 0; i < this.COMPONENTS_THAT_CREATE_OWN_LABEL.length; i++) {
+            if (cmp.getAttributeValueProvider().isInstanceOf(this.COMPONENTS_THAT_CREATE_OWN_LABEL[i])) {
+                return true;
+            }
+        }
+        return false;
     },
     "renderFieldHelpComponent":function(component) {
         var fieldHelpComponent = component.get('v.fieldHelpComponent');

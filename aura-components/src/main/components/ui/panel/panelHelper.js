@@ -203,6 +203,7 @@
                 if ($A.util.isFunction(keyHandler)) {
                     $A.util.on(panelEl, 'keydown', keyHandler);
                 }
+
                 if (cmp.get('v.closeOnClickOut')) {
                     //Need to attach event in setTimeout in case the same click event that fires the show panel event
                     //bubbles up to the document, and if the closeOnClickOut is true, it causes the panel to close right away
@@ -244,15 +245,19 @@
                 self.positioningLib.panelPositioning.reposition();
                 cmp.positioned = true;
                 requestAnimationFrame($A.getCallback(function() {
-                    panelEl.style.opacity = '1';
-                    self.lib.panelLibCore.show(cmp, conf);
+                    self._showPanel(cmp, panelEl, conf);
                 }));
 
             }));
         } else {
-            this.lib.panelLibCore.show(cmp, conf);
+            this._showPanel(cmp, panelEl, conf);
         }
 
+    },
+
+    _showPanel: function(cmp, panel, conf) {
+        panel.style.opacity = '1';
+        this.lib.panelLibCore.show(cmp, conf);
     },
 
     reposition: function(cmp, callback) {

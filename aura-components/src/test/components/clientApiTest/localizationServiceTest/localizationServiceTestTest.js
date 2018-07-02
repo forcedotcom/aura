@@ -46,8 +46,8 @@
      */
     testFormatDateTimeToLocalizedString: {
         test: function(cmp) {
-            var expected = "mars 12, 2014 3:22:30 AM";
-            var date = new Date(2014, 2, 12, 3, 22, 30);
+            var expected = "mars 12, 2014 3:02:03 AM";
+            var date = new Date(2014, 2, 12, 3, 2, 3);
             var format = "MMM dd, yyyy h:mm:ss A";
 
             var actual = $A.localizationService.formatDate(date, format, "fr_FR");

@@ -405,14 +405,14 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                 }
                 break;
             case "mm":
+                // process individually, since 0 is not formatted as 2-digit if hour is numeric
                 token["field"] = "minute";
-                if (this.canUseConfig("minute", "2-digit")) {
-                    config["minute"] = "2-digit";
-                } else {
-                    token["type"] = "number";
-                    token["minDigits"] = 2;
-                    token["localized"] = true;
-                }
+                token["type"] = "number";
+                token["minDigits"] = 2;
+                token["localized"] = true;
+
+                // 'minute' setting is still needed to show second
+                config["minute"] = "2-digit";
                 break;
 
             // seconds

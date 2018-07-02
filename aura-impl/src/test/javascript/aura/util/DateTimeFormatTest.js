@@ -415,8 +415,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
 
         [Fact]
         function FormatsDateTime() {
-            var date = new Date(2014, 9, 23, 16, 30, 45);
-            var expected = "Oct 23, 2014 4:30:45 PM";
+            var date = new Date(2014, 9, 23, 16, 5, 45);
+            var expected = "Oct 23, 2014 4:05:45 PM";
             var actual;
 
             mockAura(function() {

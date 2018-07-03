@@ -2375,12 +2375,13 @@ AuraClientService.prototype.collectStorableAction = function(action, index) {
  * @param actionItem
  * @param response
  * @param callback who's first parameter is a boolean
+ * @param callbackArg, to be passed to callback after boolean
  * @private
  */
-AuraClientService.prototype.allDefsExistOnClient = function(actionItem, response, callback) {
+AuraClientService.prototype.allDefsExistOnClient = function(actionItem, response, callback, callbackArg) {
     var exist = false;
     if (response === undefined) {
-        callback(exist);
+        callback(exist, callbackArg);
         return;
     }
     var deps = response["defDependencies"];
@@ -2395,7 +2396,7 @@ AuraClientService.prototype.allDefsExistOnClient = function(actionItem, response
                 }
             }
             $A.componentService.loadComponentDefs(deps, function(err){
-                callback(!err, err);
+                callback(!err, callbackArg, err);
             });
             return;
         } else {
@@ -2414,7 +2415,7 @@ AuraClientService.prototype.allDefsExistOnClient = function(actionItem, response
                         }
                     }
                 });
-                callback(exist);
+                callback(exist, callbackArg);
                 return;
             }
             exist = true;
@@ -2422,7 +2423,7 @@ AuraClientService.prototype.allDefsExistOnClient = function(actionItem, response
     } else {
         exist = true;
     }
-    callback(exist);
+    callback(exist, callbackArg);
 };
 
 /**
@@ -2484,15 +2485,14 @@ AuraClientService.prototype.processStorableActions = function() {
     this.actionStorage.getAll(Object.keys(keysToActions))
         .then(
             function(items) {
-                var value, actionItem;
-                var existsCallback = function(exists) {
+                var existsCallback = function(exists, args) {
                     try {
                         if (exists) {
-                            that.executeStoredAction(actionItem.action, value, that.collector.collected, actionItem.index);
+                            that.executeStoredAction(args.actionItem.action, args.value, that.collector.collected, args.actionItem.index);
                             that.collector.actionsToCollect -= 1;
                             that.finishCollection();
                         } else {
-                            that.collectServerAction(actionItem.action, actionItem.index);
+                            that.collectServerAction(args.actionItem.action, args.actionItem.index);
                         }
                     } catch (e) {
                         $A.logger.reportError(e);
@@ -2500,11 +2500,15 @@ AuraClientService.prototype.processStorableActions = function() {
                 };
                 for (var k in keysToActions) {
                     arr = keysToActions[k];
-                    value = items[k];
+                    var value = items[k];
 
                     for (var j = 0; j < arr.length; j++) {
-                        actionItem = arr[j];
-                        that.allDefsExistOnClient(actionItem, value, existsCallback);
+                        if (!value) {
+                            // it wasn't found in storage, even though we think it should be there.
+                            that.collectServerAction(arr[j].action, arr[j].index);
+                            continue;
+                        }
+                        that.allDefsExistOnClient(arr[j], value, existsCallback, {value: value, actionItem:arr[j]});
                     }
                 }
                 that.finishCollection();

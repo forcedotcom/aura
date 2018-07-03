@@ -42,7 +42,6 @@ Test.Aura.AuraLocalizationServiceTest = function() {
 
     var targetService = new Aura.Services.AuraLocalizationService();
 
-    var targetTime = "12:00:00";
     var targetNumberFormat = "nFormat";
     var targetPercentFormat = "pFormat";
     var targetCurrencyFormat = "cFormat";

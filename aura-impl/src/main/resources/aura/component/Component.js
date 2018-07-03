@@ -718,7 +718,7 @@ Component.prototype.addValueHandler = function(config) {
     if(config["method"]){
         config["method"]=$A.getCallback(config["method"]);
     }
-    this.addChangeHandler(config);    
+    this.addChangeHandler(config);
 };
 
 // PRIVATE
@@ -1289,7 +1289,7 @@ Component.prototype.clearReference = function(key) {
         key = $A.expressionService.normalize(key);
         $A.assert(key.indexOf('.') > -1, "Unable to clear reference for key '" + key + "'. No value provider was specified. Did you mean 'v." + key + "'?");
         var path = key.split('.');
-        var valueProvider = this.getValueProvider(path.shift(), this);
+        var valueProvider = this.getValueProvider(path.shift());
         $A.assert(valueProvider, "Unknown value provider for key '" + key + "'.");
         $A.assert(valueProvider.clearReference, "Value provider does not implement clearReference() method.");
         var subPath = path.join('.');
@@ -1323,7 +1323,7 @@ Component.prototype.get = function(key) {
     key = $A.expressionService.normalize(key);
     var path = key.split('.');
     var root = path.shift();
-    var valueProvider = this.getValueProvider(root, this);
+    var valueProvider = this.getValueProvider(root);
     if (path.length) {
         if(!valueProvider){
             $A.assert(false, "Unable to get value for key '" + key + "'. No value provider was found for '" + root + "'.");
@@ -1377,7 +1377,7 @@ Component.prototype.set = function(key, value, ignoreChanges) {
 
         var path = key.split('.');
         var root = path.shift();
-        var valueProvider = this.getValueProvider(root, this);
+        var valueProvider = this.getValueProvider(root);
 
         if (!valueProvider) {
             $A.assert(false, "Unable to set value for key '" + key + "'. No value provider was found for '" + root + "'.");
@@ -1672,13 +1672,21 @@ Component.prototype.getContainer = function() {
  * @platform
  * @export
  */
-Component.prototype.addValueProvider=function(key,valueProvider){
-    if(!this.destroyed) {
-        $A.assert($A.util.isString(key), "Component.addValueProvider(): 'key' must be a valid String.");
-        $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf("," + key.toLowerCase() + ",") === -1, "Component.addValueProvider(): '" + key + "' is a reserved valueProvider.");
-        $A.assert(!$A.util.isUndefinedOrNull(valueProvider), "Component.addValueProvider(): 'valueProvider' is required.");
-        this.valueProviders[key] = valueProvider;
+Component.prototype.addValueProvider = function(key, valueProvider) {
+    if (this.destroyed) {
+        return;
     }
+
+    $A.assert($A.util.isString(key), "Component.addValueProvider(): 'key' must be a valid String.");
+    $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf("," + key.toLowerCase() + ",") === -1, "Component.addValueProvider(): '" + key + "' is a reserved valueProvider.");
+    $A.assert(!$A.util.isUndefinedOrNull(valueProvider), "Component.addValueProvider(): 'valueProvider' is required.");
+
+    if (this.valueProviders[key] !== undefined) {
+        $A.warning("The value provider already existes: " + key);
+        return;
+    }
+
+    this.valueProviders[key] = valueProvider;
 };
 
 /**
@@ -1686,11 +1694,16 @@ Component.prototype.addValueProvider=function(key,valueProvider){
  * @param {String} key string by which to identify the valueProvider to remove.
  * @public
  */
-Component.prototype.removeValueProvider=function(key){
-    if(!this.destroyed) {
-        $A.assert($A.util.isString(key), "Component.removeValueProvider(): 'key' must be a valid String.");
-        $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf("," + key.toLowerCase() + ",") === -1, "Component.removeValueProvider(): '" + key + "' is a reserved valueProvider and can not be removed.");
-        this.valueProviders[key] = null;
+Component.prototype.removeValueProvider = function(key) {
+    if (this.destroyed) {
+        return;
+    }
+
+    $A.assert($A.util.isString(key), "Component.removeValueProvider(): 'key' must be a valid String.");
+    $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf("," + key.toLowerCase() + ",") === -1, "Component.removeValueProvider(): '" + key + "' is a reserved valueProvider and can not be removed.");
+
+    if (this.valueProviders.hasOwnProperty(key)) {
+        this.valueProviders[key] = undefined;
     }
 };
 
@@ -2075,7 +2088,7 @@ Component.prototype.getVersion = function() {
 };
 
 /**
- * get version from context access stack
+ * Get version from context access stack
  *
  * @private
  */
@@ -2083,9 +2096,20 @@ Component.prototype.getVersionInternal = function() {
     return $A.clientService.getAccessVersion(this.getType().split(':')[0]);
 };
 
+/**
+ * Get value provider
+ * @param {string} key A string by which to identify the valueProvider.
+ * @private
+ */
 Component.prototype.getValueProvider = function(key) {
-    $A.assert($A.util.isString(key), "Component.getValueProvider(): 'key' must be a valid String.");
-    return this.valueProviders[key]||this.valueProviders[key.toLowerCase()];
+    if (this.valueProviders.hasOwnProperty(key)) {
+        return this.valueProviders[key];
+    }
+
+    key = key.toLowerCase();
+    if (this.valueProviders.hasOwnProperty(key)) {
+        return this.valueProviders[key];
+    }
 };
 
 /**
@@ -2112,9 +2136,9 @@ Component.prototype.setupValueProviders = function(customValueProviders) {
     vp["null"]=null;
     vp["version"] = this.version ? this.version : this.getVersionInternal();
 
-    if(customValueProviders) {
+    if (customValueProviders) {
         for (var key in customValueProviders) {
-            this.addValueProvider(key,customValueProviders[key]);
+            this.addValueProvider(key, customValueProviders[key]);
         }
     }
 };

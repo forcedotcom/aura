@@ -22,11 +22,15 @@ Function.RegisterNamespace("Test.Aura.Component");
 Function.RegisterNamespace("Aura.Component");
 
 [Fixture]
-Test.Aura.Component.ComponentTest=function(){
+Test.Aura.Component.ComponentTest = function() {
     var Aura = {
         "Component": {},
         "Attribute": {},
-        "Errors": {}
+        "Errors": {},
+        "Utils": {
+            "SecureFilters": {},
+            "Util": {}
+        }
     };
     var _PassthroughValue;
 
@@ -37,7 +41,11 @@ Test.Aura.Component.ComponentTest=function(){
         "AuraError": function(){},// Prevent Global
         "PassthroughValue": function(){},// Prevent Global
         "StackFrame": function(){},
-        "ErrorStackParser": function(){}
+        "ErrorStackParser": function(){},
+        "navigator": {
+            "userAgent": ""
+        },
+        "window": {}
     })(function(){
         [Import("aura-impl/src/main/resources/aura/component/Component.js"),
          Import("aura-impl/src/main/resources/aura/component/EventValueProvider.js"),
@@ -47,7 +55,8 @@ Test.Aura.Component.ComponentTest=function(){
          Import("aura-impl/src/main/resources/aura/attribute/AttributeSet.js"),
          Import("aura-impl/src/main/resources/aura/polyfill/stackframe.js"),
          Import("aura-impl/src/main/resources/aura/polyfill/error-stack-parser.js"),
-         Import("aura-impl/src/main/resources/aura/error/AuraError.js")]
+         Import("aura-impl/src/main/resources/aura/error/AuraError.js"),
+         Import("aura-impl/src/main/resources/aura/util/Util.js")]
 
         _PassthroughValue = PassthroughValue;
     });
@@ -69,6 +78,7 @@ Test.Aura.Component.ComponentTest=function(){
             "EventValueProvider": Aura.Component.EventValueProvider,
             "$A": {
                 assert:function(condition,message){if(!condition)throw new Error(message)},
+                warning: function(){},
                 error:function(message){throw new Error(message)},
                 getContext:function(){return {
                     getCurrentAction:function(){
@@ -141,20 +151,11 @@ Test.Aura.Component.ComponentTest=function(){
                     cleanComponent: function(){}
                 },
                 util:{
-                    apply:function(){
-                    },
-                    isArray:function(target){
-                        return target instanceof Array;
-                    },
-                    isFunction:function(target){
-                        return target instanceof Function;
-                    },
-                    isString:function(target){
-                        return typeof(target) == "string";
-                    },
-                    isUndefinedOrNull:function(){
-                        return true
-                    }
+                    apply: function(){},
+                    isArray: Aura.Utils.Util.prototype.isArray,
+                    isFunction: Aura.Utils.Util.prototype.isFunction,
+                    isString: Aura.Utils.Util.prototype.isString,
+                    isUndefinedOrNull: Aura.Utils.Util.prototype.isUndefinedOrNull
                 },
                 lockerService: {
                     trust: function() {},
@@ -186,6 +187,134 @@ Test.Aura.Component.ComponentTest=function(){
             });
 
             Assert.False(fired);
+        }
+    }
+
+    [Fixture]
+    function addValueProvider() {
+
+        [Fact]
+        function DoesNotOverrideExistingValueProvider() {
+            // Arrange
+            var expected = "expectedProvider";
+            var key = "providerKey";
+            var actual;
+
+            mockFramework(function() {
+                var component = new Aura.Component.Component({});
+                component.valueProviders[key] = expected;
+
+                // Act
+                component.addValueProvider(key, "newProvider");
+                actual = component.getValueProvider(key);
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function DoesNotOverridePrototype() {
+            // Arrange
+            var provider = "newProvider";
+            var key = "__proto__";
+            var component;
+
+            mockFramework(function() {
+                component = new Aura.Component.Component({});
+
+                // Act
+                component.addValueProvider(key, provider);
+            });
+
+            // Assert
+            var actual = component.valueProviders[key];
+            Assert.False(actual === provider);
+        }
+
+        [Fact]
+        function AddsCustomValueProvider() {
+            // Arrange
+            var expected = "expectedProvider";
+            var key = "providerKey";
+            var actual;
+
+            mockFramework(function() {
+                var component = new Aura.Component.Component({});
+
+                // Act
+                component.addValueProvider(key, expected);
+                actual = component.getValueProvider(key);
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function removeValueProvider() {
+
+        [Fact]
+        function DoesNotRemovePrototypeProperty() {
+            // Arrange
+            var key = "__proto__";
+            var component;
+
+            mockFramework(function() {
+                component = new Aura.Component.Component({});
+
+                // Act
+                component.removeValueProvider(key);
+            });
+
+            // Assert
+            var actual = component.valueProviders[key];
+            Assert.NotUndefined(actual);
+        }
+
+        [Fact]
+        function DoesNotRemoveReservedProperty() {
+            // Arrange
+            var expected = "expectedProvider";
+            var key = "v";
+            var actual;
+
+            mockFramework(function() {
+                var component = new Aura.Component.Component({});
+                component.valueProviders[key] = expected;
+
+                // Act
+                try {
+                    component.removeValueProvider(key);
+                } catch (e) {
+                    // param assert failure
+                }
+
+                actual = component.getValueProvider(key);
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function RemovesCustomValueProvider() {
+            // Arrange
+            var key = "providerKey";
+            var actual;
+
+            mockFramework(function() {
+                var component = new Aura.Component.Component({});
+                component.addValueProvider(key, "newProvider");
+
+                // Act
+                component.removeValueProvider(key);
+                actual = component.getValueProvider(key);
+            });
+
+            // Assert
+            Assert.Undefined(actual);
         }
     }
 

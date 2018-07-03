@@ -253,6 +253,28 @@ ComponentDefLoader.prototype.onerror = function(uri, reject){
     }, reject);
 };
 
+ComponentDefLoader.prototype.createScriptElement = function(uri, onload, onerror) {
+    var script = document.createElement("script");
+    script["type"] = "text/javascript";
+    script["src"] = uri;
+    script["onload"] = function() {
+        onload();
+        script["onload"] = script["onerror"] = undefined;
+        document.body.removeChild(script);
+    };
+    script["onerror"] = function(){
+        onerror();
+        script["onload"] = script["onerror"] = undefined;
+        document.body.removeChild(script);
+    };
+    script["nonce"] = $A.getContext().scriptNonce;
+    document.body.appendChild(script);
+};
+
+ComponentDefLoader.prototype.setScriptGenerator = function (method) {
+    this.prototype.createScriptElement = method;
+};
+
 ComponentDefLoader.prototype.generateScriptTag = function(uri) {
     if (!uri) {
         return Promise["resolve"]();
@@ -260,21 +282,14 @@ ComponentDefLoader.prototype.generateScriptTag = function(uri) {
 
     var that = this;
     return new Promise(function(resolve, reject) {
-        var script = document.createElement("script");
-        script["type"] = "text/javascript";
-        script["src"] = uri;
-        script["onload"] = function () {
-            that.checkForError(uri, resolve, reject);
-            script["onload"] = script["onerror"] = undefined;
-            document.body.removeChild(script);
-        };
-        script["onerror"] = function(){
-            that.onerror(uri, reject);
-            script["onload"] = script["onerror"] = undefined;
-            document.body.removeChild(script);
-        };
-        script["nonce"] = $A.getContext().scriptNonce;
-        document.body.appendChild(script);
+        that.createScriptElement(uri,
+            function () {
+                that.checkForError(uri, resolve, reject);
+            },
+            function () {
+                that.onerror(uri, reject);
+            }
+        );
     });
 };
 

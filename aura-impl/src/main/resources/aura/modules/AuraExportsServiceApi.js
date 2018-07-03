@@ -63,5 +63,8 @@ Aura.ServiceApi = {
         if ($A.initializers) {
             return $A.initializers[name];
         }
+    },
+    "replaceComponentDefLoader": function(method) {
+        $A.componentService.componentDefLoader.setScriptGenerator(method);
     }
 };

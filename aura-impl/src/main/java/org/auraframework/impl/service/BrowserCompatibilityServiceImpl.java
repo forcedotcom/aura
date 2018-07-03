@@ -47,6 +47,7 @@ public class BrowserCompatibilityServiceImpl implements BrowserCompatibilityServ
         return bi.isBrowser(UserAgent.CHROME, 56, true) ||
                 bi.isBrowser(UserAgent.FIREFOX, 53, true) ||
                 bi.isBrowser(UserAgent.EDGE, 15, true) ||
-                bi.isBrowser(UserAgent.SAFARI, 11, true);
+                bi.isBrowser(UserAgent.SAFARI, 11, true) ||
+                bi.isBrowser(UserAgent.OTHER_WEBKIT, 11, true);
     }
 }

@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.util;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import static org.auraframework.impl.util.BrowserConsts.BROWSER_AXIS_1_0;
 import static org.auraframework.impl.util.BrowserConsts.BROWSER_AXIS_1_1;
 import static org.auraframework.impl.util.BrowserConsts.BROWSER_AXIS_1_2;
@@ -48,9 +51,6 @@ import static org.auraframework.impl.util.BrowserConsts.BROWSER_SOAP_LITE;
 import static org.auraframework.impl.util.BrowserConsts.BROWSER_TIBCO_BW;
 import static org.auraframework.impl.util.BrowserConsts.BROWSER_XMLSPY;
 import static org.auraframework.impl.util.BrowserConsts.XBROWSER_IE_7;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * User agent variants. These are generally for use by {@link BrowserUserAgent} and {@link BrowserInfo}. Check those
@@ -976,11 +976,19 @@ public enum UserAgent {
      * Gets the major version for this browser as an int, or 0 if unknown.
      *
      * 
-     * @param userAgent a non-null user agent String to parse
+     * @param ua a non-null user agent String to parse
      * 
      * @return the version (an int from 0-999)
      */
-    int majorVersion(String userAgent) {
+    int majorVersion(String ua) {
+        try {
+            if (ua.contains(UA.IOS)) {
+                int verStart = ua.indexOf(UA.IOS) + 4; // 4 = "ios/".length()
+                int verEnd = ua.indexOf(UA.DOT, verStart);
+                return Integer.parseInt(ua.substring(verStart, verEnd));
+            }
+        } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
+        }
         return UA.UNSPECIFIED;
     }
 
@@ -1155,6 +1163,7 @@ public enum UserAgent {
         static final String IPHONE = "iphone";
         static final String IPAD = "ipad";
         static final String IPOD = "ipod";
+        static final String IOS = "ios/";
         static final String MAC = "mac";
         static final String MAC68K = "68k";
         static final String MAC68000 = "68000";

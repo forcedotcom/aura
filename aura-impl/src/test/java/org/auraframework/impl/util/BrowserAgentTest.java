@@ -15,14 +15,6 @@
  */
 package org.auraframework.impl.util;
 
-import com.google.common.collect.Lists;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
-import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +22,16 @@ import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import org.auraframework.impl.service.BrowserCompatibilityServiceImpl;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
+import com.google.common.collect.Lists;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -91,6 +93,8 @@ public class BrowserAgentTest extends UnitTestCase {
         assertThat("Is IE10", computed.isIE10(), is(expected.ie10));
         assertThat("Is IE11", computed.isIE11(), is(expected.ie11));
         assertThat("Form factor", computed.getFormFactor(), is(expected.formFactor));
+
+        assertThat("Is Browser 'Compat'", new BrowserCompatibilityServiceImpl().isCompatible(expected.userAgent), is(expected.isCompat));
     }
 
     private static BrowserTestInfo readExpectedBrowserInfo(String line) {
@@ -114,6 +118,7 @@ public class BrowserAgentTest extends UnitTestCase {
         info.ie9 = Boolean.valueOf(tokenizer.nextToken());
         info.ie10 = Boolean.valueOf(tokenizer.nextToken());
         info.ie11 = Boolean.valueOf(tokenizer.nextToken());
+        info.isCompat = Boolean.valueOf(tokenizer.nextToken());
         info.userAgent = tokenizer.nextToken("*");
 
         return info;
@@ -149,6 +154,8 @@ public class BrowserAgentTest extends UnitTestCase {
         boolean ie9;
         boolean ie10;
         boolean ie11;
+
+        boolean isCompat;
 
         @Override
         public String toString() {

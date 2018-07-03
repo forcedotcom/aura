@@ -1335,6 +1335,23 @@
             this.verifyPointerPresent(true);
         }]
     },
+
+    testPanelHideAndShow: {
+        attributes : {"testPanelType" : "panel"},
+        test: [function(cmp) {
+            this.createPanel(cmp);
+        }, function(cmp) {
+            $A.test.clickOrTouch(cmp.find('hidePanelBtn').getElement());
+            this.waitForPanelHidden();
+        }, function(cmp) {
+            $A.test.clickOrTouch(cmp.find('showPanelBtn').getElement());
+            this.waitForPanelDialogOpen();
+        }, function(cmp) {
+            var panel = $A.test.getElementByClass('uiPanel')[0];
+            $A.test.assertTrue(panel.classList.contains('open'));
+            $A.test.assertEquals('1', panel.style.opacity);
+        }]
+    },
     
     /**************************************************PANEL POSITION TEST ENDS**************************************************/
     
@@ -1422,6 +1439,13 @@
                 return !$A.util.isUndefinedOrNull(panel);
             }, "Panel was not " + expectedState);
         }
+    },
+
+    waitForPanelHidden : function() {
+        $A.test.addWaitForWithFailureMessage(true, function() {
+            var panel = $A.test.getElementByClass('uiPanel')[0];
+            return !panel.classList.contains('open');
+        }, "Panel was not hidden");
     },
     
     getGlobalIdForPanelModal : function(panelNumber){

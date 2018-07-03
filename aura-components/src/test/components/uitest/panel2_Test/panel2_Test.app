@@ -96,12 +96,15 @@
 		returnFocusElement="{!v.testReturnFocusElement}"
 		showFirstButton="{!v.testShowFirstButton}" />
 	
+	<ui:button aura:id="showPanelBtn" label="Show Panel" press="{!c.showPanel}" class="showPanelBtnClass"/>
+	<ui:button aura:id="hidePanelBtn" label="Hide Panel" press="{!c.hidePanel}" class="hidePanelBtnClass"/>
+
 	 <section class="managerContainers">
     <div class="manager">
         <ui:panelManager2 aura:id="pm" useSharedContainer="true">
             <aura:set attribute="registeredPanels">
-                    <ui:panel alias="panel"/>
-                    <ui:modal alias="modal"/>
+                    <ui:panel alias="panel" aura:id="panel" />
+                    <ui:modal alias="modal" aura:id="modal" />
             </aura:set>
         </ui:panelManager2>
         <ui:containerManager/>

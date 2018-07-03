@@ -68,6 +68,14 @@
 						cmp.find("idDestroyed").set("v.value", panelId);
 					}
 				}).fire();
+	},
+
+	showPanel: function(cmp) {
+		cmp.find('pm').find('panel').show()
+	},
+
+	hidePanel: function(cmp) {
+		cmp.find('pm').find('panel').hide()
 	}
 
 })

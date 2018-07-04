@@ -867,13 +867,31 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
                 var depName = entry.dependencies[i];
                 // Exclude component classes, engine, schema dependencies and exports(dependency for a lib module)
                 if (typeof deps[i] !== 'function' && depName !== "engine" && depName[0] !== '@' && depName !== "exports") {
-                    var depDefDescriptor = new DefDescriptor(this.moduleNameToDescriptorLookup[depName]);
-                    var depNamespace = depDefDescriptor.getNamespace();
+                    // Bug W-5153637: using a workaround to get the dependency module's namespace until a util is available
+                    var depNamespace;
+                    if (depName.indexOf(":") !== -1) {
+                        // If it only contains a colon, we assume is an aura library (legacy)
+                        depNamespace = depName.split(':').shift();
+                    } else {
+                        // module dependency
+                        var depNameParts = depName.split('-');
+                        depNamespace = depNameParts.shift();
+                        var aliasedNamespace = namespaceAliases[depNamespace];
+                        if (aliasedNamespace) {
+                            // module name with aliased namespace
+                            var aliasedDepDesc = aliasedNamespace + "-" + depNameParts.join("-");
+                            var aliasedDepDefinition = this.moduleDefRegistry[aliasedDepDesc];
+                            if (aliasedDepDefinition) {
+                                depName = aliasedDepDesc;
+                            }
+                        }
+                    }
                     var depIsInternalNamespace = $A.clientService.isInternalNamespace(depNamespace);
                     var wrappedLibDependency = $A.lockerService.wrapLib(
                         deps[i],
-                        $A.lockerService.getKeyForNamespace(depNamespace),
-                        !depIsInternalNamespace || (depIsInternalNamespace && this.moduleDefRegistry[depName][Json.ApplicationKey.REQUIRELOCKER])
+                        $A.lockerService.getKeyForNamespace(namespace),
+                        !depIsInternalNamespace || (depIsInternalNamespace && this.moduleDefRegistry[depName][Json.ApplicationKey.REQUIRELOCKER]),
+                        entry.dependencies[i]
                     );
                     deps.splice(i, 1, wrappedLibDependency);
                 }

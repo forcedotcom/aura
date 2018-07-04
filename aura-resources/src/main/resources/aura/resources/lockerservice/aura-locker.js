@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-06-28
- * Version: 0.4.29
+ * Generated: 2018-07-03
+ * Version: 0.4.30
  */
 
 (function (exports) {
@@ -49,27 +49,46 @@ const {
   create: create$1,
   defineProperties,
   freeze,
+  defineProperty,
+  deleteProperty,
+  getPrototypeOf,
   getOwnPropertyDescriptor,
   getOwnPropertyDescriptors,
   getOwnPropertyNames,
   getOwnPropertySymbols,
   isFrozen,
   keys,
-  seal
+  seal,
+  setPrototypeOf
 } = Object;
 
-const {
-  defineProperty,
-  deleteProperty,
-  getPrototypeOf,
-  has,
-  ownKeys,
-  setPrototypeOf
-} = Reflect;
+const { apply, has, ownKeys } = Reflect;
 
+/**
+ * Currying is the process of transforming a function that takes multiple
+ * arguments into a function that takes just a single argument and returns
+ * another function if any arguments are still needed.
+ *
+ * Here we create such a function that take one argument, a function that needs
+ * to be applied on an object, and return a new function that encapsulates
+ * the function and can be applied on an object.
+ *
+ * Without uncurryThis():
+ * hasOwnProperty = Object.prototype.hasOwnProperty;
+ * hasOwnProperty.apply(someObject);
+ *
+ * With uncurryThis():
+ * hasOwnProperty = curryThis(Object.prototype.hasOwnProperty);
+ * hasOwnProperty(someObject);
+ *
+ * Using uncurryThis(), more than just a syntactic sugar, is an effective
+ * defense mechanism which prevents .call() and .apply() from been tampered
+ * by any code that loads after uncurryThis() and before freezing.
+ */
+const curryThis = fn => (thisArg, ...args) => apply(fn, thisArg, args);
 
-const objectToString = Object.prototype.toString;
-const objectHasOwnProperty = Object.prototype.hasOwnProperty;
+const toString = curryThis(Object.prototype.toString);
+const hasOwnProperty = curryThis(Object.prototype.hasOwnProperty);
 
 /**
  * Converts ArrayBuffer to UTF-8 String
@@ -1286,6 +1305,32 @@ function createFunctionEvaluator(sandbox) {
  * limitations under the License.
  */
 
+let warn = typeof console !== 'undefined' ? console.warn : function() {}; // eslint-disable-line no-console
+let error = Error;
+
+function registerReportAPI(api) {
+  if (api) {
+    warn = api.warn;
+    error = api.error;
+  }
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 function SecureScriptElement() {}
 
 // TODO: this should be removed once Locker has a proper configuration mechanism in place
@@ -1475,11 +1520,14 @@ SecureScriptElement.run = function(st) {
     const key = getKey(st);
     if (xhr.readyState === 4 && xhr.status === 200) {
       const code = xhr.responseText;
-      evaluate(code, key, scriptUrl);
-
-      el.dispatchEvent(new Event('load'));
+      try {
+        evaluate(code, key, scriptUrl);
+        el.dispatchEvent(new Event('load'));
+      } catch (e) {
+        warn(`Failed to load script at ${scriptUrl}: ${e.message}`);
+        el.dispatchEvent(new Event('error'));
+      }
     }
-
     // DCHASMAN TODO W-2837800 Add in error handling for 404's etc
   };
 
@@ -1495,32 +1543,6 @@ SecureScriptElement.run = function(st) {
 
   xhr.send();
 };
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-let warn = typeof console !== 'undefined' ? console.warn : function() {}; // eslint-disable-line no-console
-let error = Error;
-
-function registerReportAPI(api) {
-  if (api) {
-    warn = api.warn;
-    error = api.error;
-  }
-}
 
 /**
  * Sanitizes a URL string . Will prevent:
@@ -1580,9 +1602,7 @@ function assert(condition) {
 // rely on the more expensive operation.
 
 function isObjectObject(value) {
-  return (
-    typeof value === 'object' && value !== null && objectToString.call(value) === '[object Object]'
-  );
+  return typeof value === 'object' && value !== null && toString(value) === '[object Object]';
 }
 
 // https://github.com/jonschlinkert/is-plain-object
@@ -4514,7 +4534,7 @@ function beMutable(obj, prop, desc) {
         const name = obj.constructor.name;
         throw new TypeError(`Cannot assign to read only property '${prop}' of object '${name}'`);
       }
-      if (objectHasOwnProperty.call(this, prop)) {
+      if (hasOwnProperty(this, prop)) {
         this[prop] = newValue;
       } else {
         defineProperty(this, prop, {
@@ -4543,8 +4563,7 @@ function beMutableProperties(obj) {
   if (!descs) {
     return;
   }
-  getOwnPropertyNames(obj).forEach(prop => beMutable(obj, prop, descs[prop]));
-  getOwnPropertySymbols(obj).forEach(prop => beMutable(obj, prop, descs[prop]));
+  ownKeys(obj).forEach(prop => beMutable(obj, prop, descs[prop]));
 }
 
 function beMutableProperty(obj, prop) {
@@ -8535,15 +8554,21 @@ function canCreateFromHTML(blobParts) {
   return true;
 }
 
-function SecureBlob(blobParts = [], opts) {
+function SecureBlob(blobParts = [], options = {}) {
   // prevent array index accessor hijacking
   blobParts = [].concat(blobParts);
 
   // prevent property getters hijacking
-  opts = assign({}, opts);
+  // coerce everything to string
+  const opts = {
+    type: String(options.type).toLowerCase(),
+    endings: String(options.endings)
+  };
 
-  // prevent shapeshifting attacks on type property
-  opts.type = String(opts.type).toLowerCase();
+  if (opts.endings === 'undefined') {
+    // let default browser value take over
+    delete opts.endings;
+  }
 
   if (opts.type === 'undefined') {
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types
@@ -9248,6 +9273,7 @@ function SecureWindow(sandbox, key) {
     },
     DOMParser: {
       enumerable: true,
+      writable: true, // this should be overwritable by RTC
       value: SecureDOMParser(key)
     },
     Document: {
@@ -9689,51 +9715,51 @@ const metadata$9 = {
       host: READ_ONLY_PROPERTY
     },
     ARIA: {
-      ariaAutoComplete: DEFAULT,
-      ariaChecked: DEFAULT,
-      ariaCurrent: DEFAULT,
-      ariaDisabled: DEFAULT,
-      ariaExpanded: DEFAULT,
-      ariaHasPopUp: DEFAULT,
-      ariaHidden: DEFAULT,
-      ariaInvalid: DEFAULT,
-      ariaLabel: DEFAULT,
-      ariaLevel: DEFAULT,
-      ariaMultiLine: DEFAULT,
-      ariaMultiSelectable: DEFAULT,
-      ariaOrientation: DEFAULT,
-      ariaPressed: DEFAULT,
-      ariaReadOnly: DEFAULT,
-      ariaRequired: DEFAULT,
-      ariaSelected: DEFAULT,
-      ariaSort: DEFAULT,
-      ariaValueMax: DEFAULT,
-      ariaValueMin: DEFAULT,
-      ariaValueNow: DEFAULT,
-      ariaValueText: DEFAULT,
-      ariaLive: DEFAULT,
-      ariaRelevant: DEFAULT,
-      ariaAtomic: DEFAULT,
-      ariaBusy: DEFAULT,
-      ariaActiveDescendant: DEFAULT,
-      ariaControls: DEFAULT,
-      ariaDescribedBy: DEFAULT,
-      ariaFlowTo: DEFAULT,
-      ariaLabelledBy: DEFAULT,
-      ariaOwns: DEFAULT,
-      ariaPosInSet: DEFAULT,
-      ariaSetSize: DEFAULT,
-      ariaColCount: DEFAULT,
-      ariaColIndex: DEFAULT,
-      ariaDetails: DEFAULT,
-      ariaErrorMessage: DEFAULT,
-      ariaKeyShortcuts: DEFAULT,
-      ariaModal: DEFAULT,
-      ariaPlaceholder: DEFAULT,
-      ariaRoleDescription: DEFAULT,
-      ariaRowCount: DEFAULT,
-      ariaRowIndex: DEFAULT,
-      ariaRowSpan: DEFAULT,
+      'aria-autocomplete': DEFAULT,
+      'aria-checked': DEFAULT,
+      'aria-current': DEFAULT,
+      'aria-disabled': DEFAULT,
+      'aria-expanded': DEFAULT,
+      'aria-haspopup': DEFAULT,
+      'aria-hidden': DEFAULT,
+      'aria-invalid': DEFAULT,
+      'aria-label': DEFAULT,
+      'aria-level': DEFAULT,
+      'aria-multiline': DEFAULT,
+      'aria-multiselectable': DEFAULT,
+      'aria-orientation': DEFAULT,
+      'aria-pressed': DEFAULT,
+      'aria-readonly': DEFAULT,
+      'aria-required': DEFAULT,
+      'aria-selected': DEFAULT,
+      'aria-sort': DEFAULT,
+      'aria-valuemax': DEFAULT,
+      'aria-valuemin': DEFAULT,
+      'aria-valuenow': DEFAULT,
+      'aria-valuetext': DEFAULT,
+      'aria-live': DEFAULT,
+      'aria-relevant': DEFAULT,
+      'aria-atomic': DEFAULT,
+      'aria-busy': DEFAULT,
+      'aria-activedescendant': DEFAULT,
+      'aria-controls': DEFAULT,
+      'aria-describedby': DEFAULT,
+      'aria-flowto': DEFAULT,
+      'aria-labelledby': DEFAULT,
+      'aria-owns': DEFAULT,
+      'aria-posinset': DEFAULT,
+      'aria-setsize': DEFAULT,
+      'aria-colcount': DEFAULT,
+      'aria-colindex': DEFAULT,
+      'aria-details': DEFAULT,
+      'aria-errormessage': DEFAULT,
+      'aria-keyshortcuts': DEFAULT,
+      'aria-modal': DEFAULT,
+      'aria-placeholder': DEFAULT,
+      'aria-roledescription': DEFAULT,
+      'aria-rowcount': DEFAULT,
+      'aria-rowindex': DEFAULT,
+      'aria-rowspan': DEFAULT,
       role: DEFAULT
     }
   }
@@ -10118,13 +10144,32 @@ function SecureEngine(engine, key) {
  * limitations under the License.
  */
 
+// This is a whitelist from Kevin V, this has to be updated if any new wire adapters are introduced
+const internalLibs = [
+  'lightning-flexipage-service',
+  'lightning-ui-api-actions',
+  'lightning-ui-api-record',
+  'lightning-ui-api-record-ui',
+  'lightning-ui-api-object-info',
+  'lightning-ui-api-list-ui',
+  'lightning-ui-api-lookups',
+  'lightning-navigation'
+];
+function isWhitelistedLib(libDesc) {
+  return internalLibs.includes(libDesc);
+}
+
 /**
  * Create a wrapped library
  * @param {Object} lib Library being imported
  * @param {Object} key Locker key of the module importing the library
  * @param {Boolean} requireLocker Should the library being imported be lockeried
  */
-function SecureLib(lib, key, requireLocker) {
+function SecureLib(lib, key, requireLocker, desc) {
+  if (isWhitelistedLib(desc)) {
+    return lib;
+  }
+
   let o = getFromCache(lib, key);
   if (o) {
     return o;
@@ -11143,8 +11188,8 @@ function wrapEngine(engine, key) {
   return secureEngine;
 }
 
-function wrapLib(lib, key, requireLocker$$1) {
-  return SecureLib(lib, key, requireLocker$$1);
+function wrapLib(lib, key, requireLocker$$1, desc) {
+  return SecureLib(lib, key, requireLocker$$1, desc);
 }
 
 exports.create = create$$1;

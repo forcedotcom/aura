@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-06-28
- * Version: 0.4.29
+ * Generated: 2018-07-03
+ * Version: 0.4.30
  */
 
 (function (exports) {
@@ -122,7 +122,7 @@ function wrapEngine(engine, key) {
   return engine;
 }
 
-function wrapLib(lib, key, requireLocker) {
+function wrapLib(lib, key, requireLocker, desc) {
   return lib;
 }
 

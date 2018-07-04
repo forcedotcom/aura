@@ -141,8 +141,9 @@
 		testUtils.assertEquals('undefined', (function() { return (function(){ return this; })(); })() + '', 'Expected this === undefined in IIFE');
     testUtils.assertEquals('undefined', (function() { return eval('(function(){ return this; })()'); })() + '', 'Expected this === undefined IIFE evaled with eval');
 		testUtils.assertEquals('undefined', (function() { return new Function('return this')(); })() + '', 'Expected this === undefined in IIFE evaled with Function');
-// Enable when Freezing is enabled W
-//		testUtils.assertEquals('undefined', (function() { return ({}).constructor.constructor('return this')(); })() + '', 'Expected this === undefined in IIFE evaled with Function constructor');
+
+    // Check on Function obtained by climbing up the proto chain
+    testUtils.assertEquals('function (){}', (function() { return ({}).constructor.constructor('return this') + ''; })() + '', 'Expected realm function constructor to silently fail.');
 
     // Check defense against malicious function body
     try {

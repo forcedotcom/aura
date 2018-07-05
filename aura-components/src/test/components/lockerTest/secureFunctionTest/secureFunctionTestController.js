@@ -34,9 +34,7 @@
                 "Document passed via SecureFunction from other Locker not filtered properly");
         testUtils.assertTrue(otherWindow.toString().indexOf("SecureWindow") === 0,
                 "Window passed via SecureFunction from other Locker not filtered properly");
-        
-        // TODO(W-3835420): window/document should be refilterd to this Lockers window
-        //testUtils.assertTrue(otherWindow.toString().indexOf("lockerTestOtherNamespace") === -1,
-        //        "Window passed via SecureFunction from other Locker should be own window, not other Locker window");
+        testUtils.assertTrue(otherWindow.toString().indexOf("lockerTestOtherNamespace") === -1,
+               "Window passed via SecureFunction from other Locker should be own window, not other Locker window");
     }
 })

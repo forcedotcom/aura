@@ -27,6 +27,7 @@
     
     <aura:attribute name="overflowData" type="Map" access="PRIVATE" description="Internal object used to store overflow information"/>
     <aura:attribute name="tabHeaders" type="Aura.Component[]" access="PRIVATE" />
+    <aura:attribute name="ariaLabel" type="String" description="Aria label of the tab list." />
 
     <aura:registerevent name="setActive" type="ui:tabsetEvent" description="This event is fired from the parent component to activate a tab item."/>
     <aura:registerevent name="addTab" type="ui:tabsetEvent" description="This event is fired from the parent component to add a tab item." />
@@ -55,7 +56,7 @@
         <ui:resizeObserver onresize="{!c.onResize}"/>
     </aura:if>
 
-    <div class="{!v.class}" aura:id="div" role="tablist">
+    <div class="{!v.class}" aura:id="div" role="tablist" aria-label="{!v.ariaLabel}">
         <ul class="tabs__nav" aura:id="tabItemsContainer" role="presentation" onkeydown="{!c.onKeyDown}">
             {!v.tabHeaders}
             <aura:if isTrue="{!v.useOverflowMenu}">

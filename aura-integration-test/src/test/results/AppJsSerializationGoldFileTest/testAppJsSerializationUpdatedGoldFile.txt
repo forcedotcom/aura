@@ -10387,7 +10387,8 @@ return {
     ["overflowIcon","aura://Aura.Component[]","I",false,[]],
     ["name","aura://String","I",false],
     ["overflowData","aura://Map","p",false,null],
-    ["tabHeaders","aura://Aura.Component[]","p",false,[]]
+    ["tabHeaders","aura://Aura.Component[]","p",false,[]],
+    ["ariaLabel","aura://String","I",false]
   ],
   "re":[
     {
@@ -10553,7 +10554,13 @@ return {
                     "target":"ui:tabBar",
                     "path":"v.class"
                   },
-                  "role":"tablist"
+                  "role":"tablist",
+                  "aria-label":{
+                    "exprType":"PROPERTY",
+                    "byValue":false,
+                    "target":"ui:tabBar",
+                    "path":"v.ariaLabel"
+                  }
                 }
               },
               "tag":{
@@ -12974,6 +12981,7 @@ return {
     ["tabItems","aura://List","p",false,[]],
     ["name","aura://String","I",false],
     ["lazyRenderTabs","aura://Boolean","I",false,false],
+    ["ariaLabel","aura://String","I",false],
     ["useOverflowMenu","aura://Boolean","I",false,false],
     ["overflowLabel","aura://String","I",false,"More"]
   ],
@@ -13226,6 +13234,15 @@ return {
                             "byValue":false,
                             "target":"ui:tabset",
                             "path":"v.tabItems"
+                          }
+                        },
+                        "ariaLabel":{
+                          "descriptor":"ariaLabel",
+                          "value":{
+                            "exprType":"PROPERTY",
+                            "byValue":false,
+                            "target":"ui:tabset",
+                            "path":"v.ariaLabel"
                           }
                         },
                         "onTabActivated":{

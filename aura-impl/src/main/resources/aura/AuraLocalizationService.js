@@ -45,6 +45,8 @@ function AuraLocalizationService() {
     // [dateString, delimiter, timeString, offsetString]
     this.ISO_REGEX = /^\s*((?:\d{4})-(?:\d\d-\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:\.\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
     this.ISO_REGEX_NO_DASH = /^\s*((?:\d{4})(?:\d\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:\.\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+    // hh:mm, hh:mm:ss, hh:mm:ss.SSS, hh:mmZ, hh:mm:ssZ, hh:mm:ss.SSSZ
+    this.ISO_TIME_REGEX = /^\s*(\d\d:\d\d(?::\d\d(?:\.\d+)?)?)((?:[\+\-]\d\d(?::?\d\d)?)|(?:\s*Z))?$/;
     // month/day/year, hour:minute
     this.EN_US_DATETIME_PATTERN = /(\d{1,2})\/(\d{1,2})\/(\d{4})\D+(\d{1,2}):(\d{1,2})/;
 
@@ -2078,35 +2080,44 @@ AuraLocalizationService.prototype.isLeapYear = function(year) {
 };
 
 AuraLocalizationService.prototype.parseISOStringToConfig = function(dateTimeString) {
-
-    var match = this.ISO_REGEX.exec(dateTimeString) || this.ISO_REGEX_NO_DASH.exec(dateTimeString);
-
     var i, tokens;
     // date string
     var year, month, day;
-    var dateString = match[1];
-    if (dateString === undefined) {
-        return null;
-    }
+    var timeOnly = false;
 
-    for (i = 0; i < this.ISO_DATE_PATTERNS.length; i++) {
-        var datePattern = this.ISO_DATE_PATTERNS[i];
-        tokens = datePattern.exec(dateString);
-        if (tokens) {
-            year = parseInt(tokens[1], 10);
-            month = parseInt(tokens[2], 10) || 1;
-            day = parseInt(tokens[3], 10) || 1;
-            break;
+    var match = this.ISO_REGEX.exec(dateTimeString) || this.ISO_REGEX_NO_DASH.exec(dateTimeString);
+    if (match === null) {
+        match = this.ISO_TIME_REGEX.exec(dateTimeString);
+        if (match === null) {
+            return null;
         }
-    }
 
-    if (!this.isValidDate(year, month, day)) {
-        return null;
+        timeOnly = true;
+        var date = new Date();
+        year = date.getFullYear();
+        month = date.getMonth() + 1;
+        day = date.getDate();
+    } else {
+        var dateString = match[1];
+        for (i = 0; i < this.ISO_DATE_PATTERNS.length; i++) {
+            var datePattern = this.ISO_DATE_PATTERNS[i];
+            tokens = datePattern.exec(dateString);
+            if (tokens) {
+                year = parseInt(tokens[1], 10);
+                month = parseInt(tokens[2], 10) || 1;
+                day = parseInt(tokens[3], 10) || 1;
+                break;
+            }
+        }
+
+        if (!this.isValidDate(year, month, day)) {
+            return null;
+        }
     }
 
     var hour, minute, second, millisecond;
     hour = minute = second = millisecond = 0;
-    var timeString = match[3];
+    var timeString = timeOnly === false? match[3] : match[1];
     if (timeString !== undefined) {
         for (i = 0; i < this.ISO_TIME_PATTERNS.length; i++) {
             var timePattern = this.ISO_TIME_PATTERNS[i];
@@ -2127,7 +2138,7 @@ AuraLocalizationService.prototype.parseISOStringToConfig = function(dateTimeStri
     }
 
     var utcOffset = undefined;
-    var offsetString = match[4];
+    var offsetString = timeOnly === false? match[4] : match[2];
     if (offsetString !== undefined) {
         if (offsetString !== "Z") {
             tokens = this.ISO_OFFSET_PATTERN.exec(offsetString);
@@ -2182,7 +2193,8 @@ AuraLocalizationService.prototype.isValidOffset = function(offsetInMinute) {
 };
 
 AuraLocalizationService.prototype.isISO8601DateTimeString = function(dateTimeString) {
-    return this.ISO_REGEX.test(dateTimeString) || this.ISO_REGEX_NO_DASH.test(dateTimeString);
+    return this.ISO_REGEX.test(dateTimeString) || this.ISO_REGEX_NO_DASH.test(dateTimeString) ||
+            this.ISO_TIME_REGEX.test(dateTimeString);
 };
 
 AuraLocalizationService.prototype.normalizeDateTimeUnit = function(unit) {

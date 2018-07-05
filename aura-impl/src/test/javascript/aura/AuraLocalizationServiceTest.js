@@ -2168,6 +2168,53 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             // Assert
             Assert.Equal(expected, actual.toISOString());
         }
+
+        [Fact]
+        function ParseTimeOnly() {
+            // Arrange
+            var date = new Date();
+            date.setHours(16, 22, 0, 0);
+            var expected = date.toISOString();
+            var targetService = new Aura.Services.AuraLocalizationService();
+
+            // Act
+            var actual = targetService.parseDateTimeISO8601("16:22");
+
+            // Assert
+            Assert.Equal(expected, actual.toISOString());
+        }
+
+        [Fact]
+        function ParseTimeWithZ() {
+            // Arrange
+            var date = new Date();
+            date.setUTCFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+            date.setUTCHours(16, 22, 3, 123);
+            var expected = date.toISOString();
+            var targetService = new Aura.Services.AuraLocalizationService();
+
+            // Act
+            var actual = targetService.parseDateTimeISO8601("16:22:03.123Z");
+
+            // Assert
+            Assert.Equal(expected, actual.toISOString());
+        }
+
+        [Fact]
+        function ParseTimeWithOffset() {
+            // Arrange
+            var date = new Date();
+            date.setUTCFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+            date.setUTCHours(15, 22, 3, 123);
+            var expected = date.toISOString();
+            var targetService = new Aura.Services.AuraLocalizationService();
+
+            // Act
+            var actual = targetService.parseDateTimeISO8601("16:22:03.123+01:00");
+
+            // Assert
+            Assert.Equal(expected, actual.toISOString());
+        }
     }
 
     [Fixture]

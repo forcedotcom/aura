@@ -108,7 +108,7 @@
             testUtils.assertEquals(1, ev.detail.array[0], 'Mismatch in array parameter');
             testUtils.assertEquals(1, ev.detail.array.length, 'Mismatch in array length');
             testUtils.assertEquals(
-                'SecureObject: [object HTMLParagraphElement]{ key: {"namespace":"lockerlwc"} }', 
+                'SecureElement: [object HTMLParagraphElement]{ key: {"namespace":"lockerlwc"} }',
                 ev.detail.domElement.toString(), 
                 'Mismatch in domElement parameter'
             );
@@ -249,7 +249,7 @@
         testUtils.assertEquals(1, returned.array[0], 'Mismatch in array parameter');
         testUtils.assertEquals(1, returned.array.length, 'Mismatch in array length');
         testUtils.assertEquals(
-            'SecureObject: [object HTMLParagraphElement]{ key: {"namespace":"lockerlwc"} }', 
+            'SecureElement: [object HTMLParagraphElement]{ key: {"namespace":"lockerlwc"} }',
             returned.domElement.toString(), 
             'Mismatch in domElement parameter'
         );
@@ -339,7 +339,7 @@
             testUtils.assertEquals(1, ev.detail.number, 'Expected number value mismatched');
             testUtils.assertEquals(true, ev.detail.boolean, 'Expected boolean value mismatched');
             testUtils.assertEquals(
-                'SecureObject: [object HTMLDivElement]{ key: {"namespace":"lockerlwc"} }',
+                'SecureElement: [object HTMLDivElement]{ key: {"namespace":"lockerlwc"} }',
                 ev.detail.domElement.toString(),
                 'Expected DOMElement value mismatched'
             );
@@ -397,7 +397,7 @@
         testUtils.assertEquals(1, returned.array[1], 'Mismatch in array entry 2');
         testUtils.assertEquals(2, returned.array[2], 'Mismatch in array entry 3');
         testUtils.assertEquals(
-            'SecureObject: [object HTMLDivElement]{ key: {"namespace":"lockerlwc"} }',
+            'SecureElement: [object HTMLDivElement]{ key: {"namespace":"lockerlwc"} }',
             returned.domElement.toString(),
             'Mismatch in domElement parameter'
         );

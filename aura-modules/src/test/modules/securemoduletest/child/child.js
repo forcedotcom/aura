@@ -30,9 +30,8 @@ export default class Child extends Element {
         const event = document.createEvent("HTMLEvents");
         event.initEvent("change", false, true);
         this.dispatchEvent(event);
-        /** TODO: W-4462187 will fix this and these lines can be uncommented then
-         testUtil.assertStartsWith("SecureDOMEvent", domEvent.toString());
-         testUtil.assertStartsWith("SecureElement", domEvent.target.toString(), "Expected event.target to return SecureElement"); **/
+        testUtil.assertStartsWith("SecureDOMEvent", domEvent.toString());
+        testUtil.assertStartsWith("SecureElement", domEvent.target.toString(), "Expected event.target to return SecureElement");
         testUtil.assertDefined(domEvent, "Event handler never called after firing event created via document.createEvent");
         // cannot detect if wrapped object is a proxy
         testUtil.assertContains("Event", domEvent.toString(), "Expected event(wrapped by engine)");
@@ -131,7 +130,7 @@ export default class Child extends Element {
         testUtil.assertEquals(1, ev.detail.data.number, 'Expected number was not received in event data');
         testUtil.assertEquals(true, ev.detail.data.boolean, 'Expected boolean was not received in event data');
         testUtil.assertEquals(
-            'SecureObject: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }',
+            'SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }',
             ev.detail.data.domElement.toString(),
             'Should receive a SecureElement'
         );
@@ -194,9 +193,9 @@ function assertDataObject(data) {
     testUtil.assertEquals(true, data.boolean, 'Expected boolean was not received in event data');
 
     testUtil.assertEquals(
-        'SecureObject: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }',
+        'SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }',
         data.domElement.toString(),
-        'Should not receive an element from an unlockerized environment'
+        'Should receive a SecureElement from an unlockerized environment'
     );
 
     testUtil.assertEquals(

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-07-03
- * Version: 0.4.30
+ * Generated: 2018-07-05
+ * Version: 0.4.31
  */
 
 (function (exports) {
@@ -197,6 +197,35 @@ const domPurifyConfig = {
     'target'
   ]
 };
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+function isCustomElement(el) {
+  return el.tagName && el.tagName.indexOf('-') > 0;
+}
+
+function isDOMElementOrNode(el) {
+  return (
+    typeof el === 'object' &&
+    ((typeof HTMLElement === 'object' && el instanceof HTMLElement) ||
+      (typeof Node === 'object' && el instanceof Node) ||
+      (typeof el.nodeType === 'number' && typeof el.nodeName === 'string'))
+  );
+}
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -2031,6 +2060,84 @@ function createEventTargetMethodsStateless(config, prototype) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+let lwcUnwrap = value => value;
+
+function registerEngineAPI(api) {
+  if (api && api.unwrap) {
+    lwcUnwrap = api.unwrap;
+  }
+}
+
+/**
+ * Add additional properties for custom elements
+ * @param {*} el DOM element
+ * @param {*} prototype Represents the psuedo protototype that will be used to create wrapped element
+ * @param {*} tagNameSpecificConfig Temporary holder of tag specific config
+ */
+function customElementHook$1(el, prototype, tagNameSpecificConfig) {
+  assert$1.invariant(isCustomElement(el), 'Cannot call custom element hook on a non custom element');
+  const methodOptions = {
+    unfilterEverything: function(args) {
+      const st = this;
+      return SecureObject.deepUnfilterMethodArguments(st, [], args);
+    }
+  };
+  getOwnPropertyNames(el).forEach(prop => {
+    const originalDescriptor = getOwnPropertyDescriptor(el, prop);
+    if (
+      !getOwnPropertyDescriptor(prototype, prop) &&
+      !getOwnPropertyDescriptor(tagNameSpecificConfig, prop)
+    ) {
+      // Wrap functions with a filtered method
+      if (
+        originalDescriptor.hasOwnProperty('value') &&
+        typeof originalDescriptor.value === 'function'
+      ) {
+        tagNameSpecificConfig[prop] = SecureObject.createFilteredMethodStateless(
+          prop,
+          prototype,
+          methodOptions
+        );
+      } else {
+        // Everything else has a wrapped getter/setter
+        tagNameSpecificConfig[prop] = SecureObject.createFilteredPropertyStateless(
+          prop,
+          prototype,
+          methodOptions
+        );
+      }
+    }
+  });
+}
+
+/**
+ * Was node created by lwc engine?
+ * @param {Node} node node to check
+ */
+function isAnLWCNode(node) {
+  assert$1.invariant(node, 'Checking an undefined value to be node');
+  // This is a workaround for now, we have requested LWC for an api to get this information (W-5143776)
+  if (node !== lwcUnwrap(node)) {
+    return true;
+  }
+  return false;
+}
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 const proxyMap = newWeakMap();
 function addProxy(proxy, raw) {
@@ -2082,29 +2189,9 @@ if (typeof window !== 'undefined') {
  * limitations under the License.
  */
 
-function isCustomElement(el) {
-  return el.tagName && el.tagName.indexOf('-') > 0;
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-let customElementHook;
+let customElementHook$$1;
 function registerCustomElementHook(hook) {
-  customElementHook = hook;
+  customElementHook$$1 = hook;
 }
 
 const REGEX_CONTAINS_IMPORT = /import/i;
@@ -3296,9 +3383,10 @@ function cloneFiltered(el, st) {
   const root = el.cloneNode(false);
   function cloneChildren(parent, parentClone) {
     const childNodes = parent.childNodes;
+    const isParentAnLWCNode = isAnLWCNode(parent);
     for (let i = 0; i < childNodes.length; i++) {
       const child = childNodes[i];
-      if (hasAccess(st, child) || child.nodeType === Node.TEXT_NODE) {
+      if (hasAccess(st, child) || child.nodeType === Node.TEXT_NODE || isParentAnLWCNode) {
         const childClone = child.cloneNode(false);
         parentClone.appendChild(childClone);
         trust$1(st, childClone);
@@ -3516,7 +3604,15 @@ function SecureElement(el, key) {
     // See inputValueTracking.js
     // https://github.com/facebook/react/blob/master/packages/react-dom/src/client/inputValueTracking.js
     ['checked', 'value'].forEach(prop => {
-      const descriptor = getOwnPropertyDescriptor(el.constructor.prototype, prop);
+      let elementProto = {};
+      // TODO: W-5143278 bug on lwc, remove try catch after bug is fixed
+      try {
+        elementProto = el.constructor.prototype;
+      } catch (e) {
+        elementProto = lwcUnwrap(el).constructor.prototype;
+      }
+      // End TODO: W-5143278
+      const descriptor = getOwnPropertyDescriptor(elementProto, prop);
       if (descriptor) {
         defineProperty(prototype.constructor.prototype, prop, {
           configurable: descriptor.configurable,
@@ -3771,8 +3867,8 @@ function SecureElement(el, key) {
     }
 
     // Custom Element with properties
-    if (isCustomElement(el) && customElementHook) {
-      customElementHook(el, prototype, tagNameSpecificConfig);
+    if (isCustomElement(el) && customElementHook$$1) {
+      customElementHook$$1(el, prototype, tagNameSpecificConfig);
     }
 
     defineProperties(prototype, tagNameSpecificConfig);
@@ -3966,7 +4062,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
       value: function() {
         const raw = SecureObject.getRaw(this);
         // If this is a shared element, delegate the call to the shared element, no need to check for access
-        if (SecureElement.isSharedElement(raw)) {
+        if (SecureElement.isSharedElement(raw) || isAnLWCNode(raw)) {
           return raw.hasChildNodes();
         }
         const childNodes = raw.childNodes;
@@ -4169,7 +4265,7 @@ SecureElement.secureQuerySelector = function(el, key, selector) {
   for (let n = 0; n < rawAll.length; n++) {
     const raw = rawAll[n];
     const rawKey = getKey(raw);
-    if (rawKey === key || SecureElement.isSharedElement(raw)) {
+    if (rawKey === key || SecureElement.isSharedElement(raw) || isAnLWCNode(raw)) {
       return SecureElement(raw, key);
     }
   }
@@ -4915,15 +5011,6 @@ SecureObject.getRaw = function getRaw(so) {
   return raw;
 };
 
-SecureObject.isDOMElementOrNode = function(el) {
-  return (
-    typeof el === 'object' &&
-    ((typeof HTMLElement === 'object' && el instanceof HTMLElement) ||
-      (typeof Node === 'object' && el instanceof Node) ||
-      (typeof el.nodeType === 'number' && typeof el.nodeName === 'string'))
-  );
-};
-
 /**
  * Filter the given raw object with the accessors key and provide a filtered view.
  * Best used when the type of "raw" is not known
@@ -5037,7 +5124,7 @@ SecureObject.filterEverything = function(st, raw, options) {
       }
       if (swallowed) {
         mutated = raw !== swallowed;
-      } else if (SecureObject.isDOMElementOrNode(raw)) {
+      } else if (isDOMElementOrNode(raw)) {
         if (belongsToLocker || SecureElement.isSharedElement(raw)) {
           swallowed = SecureElement(raw, key);
         } else if (!options) {
@@ -9630,71 +9717,6 @@ function SecureRTCPeerConnection(raw, key) {
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-let unwrap$2 = value => value;
-
-function registerEngineAPI(api) {
-  if (api && api.unwrap) {
-    unwrap$2 = api.unwrap;
-  }
-}
-
-/**
- * Add additional properties for custom elements
- * @param {*} el DOM element
- * @param {*} prototype Represents the psuedo protototype that will be used to create wrapped element
- * @param {*} tagNameSpecificConfig Temporary holder of tag specific config
- */
-function customElementHook$1(el, prototype, tagNameSpecificConfig) {
-  assert$1.invariant(isCustomElement(el), 'Cannot call custom element hook on a non custom element');
-  const methodOptions = {
-    unfilterEverything: function(args) {
-      const st = this;
-      return SecureObject.deepUnfilterMethodArguments(st, [], args);
-    }
-  };
-  getOwnPropertyNames(el).forEach(prop => {
-    const originalDescriptor = getOwnPropertyDescriptor(el, prop);
-    if (
-      !getOwnPropertyDescriptor(prototype, prop) &&
-      !getOwnPropertyDescriptor(tagNameSpecificConfig, prop)
-    ) {
-      // Wrap functions with a filtered method
-      if (
-        originalDescriptor.hasOwnProperty('value') &&
-        typeof originalDescriptor.value === 'function'
-      ) {
-        tagNameSpecificConfig[prop] = SecureObject.createFilteredMethodStateless(
-          prop,
-          prototype,
-          methodOptions
-        );
-      } else {
-        // Everything else has a wrapped getter/setter
-        tagNameSpecificConfig[prop] = SecureObject.createFilteredPropertyStateless(
-          prop,
-          prototype,
-          methodOptions
-        );
-      }
-    }
-  });
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -9779,26 +9801,14 @@ function getWrappedTemplatePrototype() {
     querySelector: {
       value: function(selector) {
         const template = SecureObject.getRaw(this);
-        let node = template.querySelector(selector);
-        node = unwrap$2(node);
-        // TODO: JF/RJ - revisit this after DOM Access is finalized
-        // Trust element with the wrapped template's key
-        if (node) {
-          trust$1(this, node);
-        }
+        const node = template.querySelector(selector);
         return SecureObject.filterEverything(this, node);
       }
     },
     querySelectorAll: {
       value: function(selector) {
         const template = SecureObject.getRaw(this);
-        let rawNodeList = template.querySelectorAll(selector);
-        rawNodeList = unwrap$2(rawNodeList);
-        if (rawNodeList) {
-          // TODO: JF/RJ - revisit this after DOM Access is finalized
-          // Trust the result given by lwc.
-          rawNodeList.forEach(node => trust$1(this, node));
-        }
+        const rawNodeList = template.querySelectorAll(selector);
         return SecureObject.filterEverything(this, rawNodeList);
       }
     }
@@ -10041,13 +10051,7 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
       enumerable: true,
       value: function(selector) {
         const { value } = getOwnPropertyDescriptor(ElementPrototype, 'querySelector');
-        let node = value.call(this, selector);
-        node = unwrap$2(node);
-        // TODO: JF/RJ - revisit this after DOM Access is finalized
-        // Trust element with the component instance's key
-        if (node) {
-          trust$1(this, node);
-        }
+        const node = value.call(this, selector);
         return getFilteredValue(this, node);
       }
     },
@@ -10055,13 +10059,7 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
       enumerable: true,
       value: function(selector) {
         const { value } = getOwnPropertyDescriptor(ElementPrototype, 'querySelector');
-        let rawNodeList = value.call(this, selector);
-        rawNodeList = unwrap$2(rawNodeList);
-        if (rawNodeList) {
-          // TODO: JF/RJ - revisit this after DOM Access is finalized
-          // Trust elements with the component instance's key
-          rawNodeList.forEach(node => trust$1(this, node));
-        }
+        const rawNodeList = value.call(this, selector);
         return getFilteredValue(this, rawNodeList);
       }
     }
@@ -10958,6 +10956,10 @@ function filterTypeHook(raw, key, belongsToLocker) {
     return SecureAuraEvent(raw, key);
   } else if (raw instanceof AuraPropertyReferenceValue) {
     return SecureAuraPropertyReferenceValue(raw, key);
+  } else if (isDOMElementOrNode(raw) && isAnLWCNode(raw)) {
+    // DOM elements create by engine are not subjected to access checks
+    // They will be wrapped using the key of the accessor and directly passed down
+    return SecureElement(raw, key);
   }
   return null;
 }

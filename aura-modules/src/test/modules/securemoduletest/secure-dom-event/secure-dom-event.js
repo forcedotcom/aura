@@ -14,14 +14,8 @@ export default class SecureDOMEventClazz extends Element {
             domEvent = e;
         });
         element.click();
-        /** TODO: W-4462187 will fix this and these lines can be uncommented then
-         testUtil.assertStartsWith("SecureDOMEvent", domEvent.toString());
-         testUtil.assertStartsWith("SecureElement", domEvent.target.toString(), "Expected event.target to return SecureElement"); **/
-
-        // cannot detect if wrapped object is a proxy
-        testUtil.assertContains("MouseEvent", domEvent.toString(), "Expected event(wrapped by engine)");
-        testUtil.assertContains("HTMLDivElement", domEvent.target.toString(), "Expect event.target to be element(wrapped by engine)");
-
+        testUtil.assertStartsWith("SecureDOMEvent", domEvent.toString());
+        testUtil.assertStartsWith("SecureElement", domEvent.target.toString(), "Expected event.target to return SecureElement");
         testUtil.assertEquals("click", domEvent.type, "Unexpected DOM event type");
         // Verify non-wrapped method is still accessible
         testUtil.assertEquals("number", typeof domEvent.timeStamp);

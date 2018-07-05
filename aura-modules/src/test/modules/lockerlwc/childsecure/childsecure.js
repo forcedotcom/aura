@@ -97,9 +97,9 @@ function assertDataObject(data) {
         );
     } else {
         testUtils.assertEquals(
-            'SecureObject: [object HTMLDivElement]{ key: {"namespace":"lockerlwc"} }',
+            'SecureElement: [object HTMLDivElement]{ key: {"namespace":"lockerlwc"} }',
             data.domElement.toString(),
-            'Should not receive an element from an unlockerized environment'
+            'Should receive SecureElement from an unlockerized environment'
         );
     }
     testUtils.assertEquals(

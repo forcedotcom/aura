@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-07-05
- * Version: 0.4.31
+ * Generated: 2018-07-06
+ * Version: 0.4.32
  */
 
 (function (exports) {
@@ -9732,9 +9732,17 @@ function SecureRTCPeerConnection(raw, key) {
 const metadata$9 = {
   prototypes: {
     ShadowRoot: {
-      mode: READ_ONLY_PROPERTY,
+      childNodes: READ_ONLY_PROPERTY,
+      compareDocumentPosition: FUNCTION_RAW_ARGS,
+      contains: FUNCTION_RAW_ARGS,
       delegatesFocus: READ_ONLY_PROPERTY,
-      host: READ_ONLY_PROPERTY
+      firstChild: READ_ONLY_PROPERTY,
+      mode: READ_ONLY_PROPERTY,
+      hasChildNodes: FUNCTION,
+      host: READ_ONLY_PROPERTY,
+      innerHTML: READ_ONLY_PROPERTY,
+      lastChild: READ_ONLY_PROPERTY,
+      textContent: READ_ONLY_PROPERTY
     },
     ARIA: {
       'aria-autocomplete': DEFAULT,

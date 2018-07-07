@@ -22,13 +22,15 @@
     <aura:attribute name="shouldTest_disconnectedCallback_hook" type="Boolean" default="false" description="Flag to indicate which lifecycle is being tested"/>
     <aura:attribute name="shouldTest_renderedCallback_hook" type="Boolean" default="false" description="Flag to indicate which lifecycle is being tested"/>
     <aura:attribute name="title" type="Boolean" default="false"/>
-    <secureModuleTest:componentLifecycleTester
-            aura:id="componentLifecycleTester"
-            shouldTestConstructorHook="{!v.shouldTest_constructor_hook}"
-            shouldTestConnectedCallbackHook="{!v.shouldTest_connectedCallback_hook}"
-            shouldTestDisconnectedCallbackHook="{!v.shouldTest_disconnectedCallback_hook}"
-            shouldTestRenderedCallbackHook="{!v.shouldTest_renderedCallback_hook}"
-            title="{!v.title}"/>
+    <div aura:id="capturingDiv">
+        <secureModuleTest:componentLifecycleTester
+                aura:id="componentLifecycleTester"
+                shouldTestConstructorHook="{!v.shouldTest_constructor_hook}"
+                shouldTestConnectedCallbackHook="{!v.shouldTest_connectedCallback_hook}"
+                shouldTestDisconnectedCallbackHook="{!v.shouldTest_disconnectedCallback_hook}"
+                shouldTestRenderedCallbackHook="{!v.shouldTest_renderedCallback_hook}"
+                title="{!v.title}"/>
+    </div>
     <aura:method name="componentLifecycleTester">
         <aura:attribute name="testCaseConfirmationFlag" type="String"/>
     </aura:method>

@@ -29,7 +29,15 @@ function AuraLocalizationService() {
     this.ZERO = "0";
 
     this.momentLocaleCache = {};
-    this.intlLocaleCache = {};
+
+    // needs to hardcode some locales which are not identified by browers
+    this.intlLocaleCache = {
+        "no_NO": "nb",
+        "tl_PH": "fil",
+        "sh_BA": "hr",
+        "sh_ME": "hr",
+        "sh_CS": "hr"
+    };
 
     this.timeZoneFormatCache = {};
 

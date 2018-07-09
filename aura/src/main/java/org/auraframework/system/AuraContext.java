@@ -22,6 +22,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -777,8 +779,11 @@ public interface AuraContext {
 
     /**
      * get a flag indicating whether app.js split is enabled
+     * @param request the servlet request
      * @return true if split is enabled, false if only one app.js file is desired.
      */
+    boolean isAppJsSplitEnabled(HttpServletRequest request);
+    
     boolean isAppJsSplitEnabled();
     
     /**

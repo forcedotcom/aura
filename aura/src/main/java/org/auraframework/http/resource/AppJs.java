@@ -41,7 +41,7 @@ public class AppJs extends AuraResourceImpl {
 
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException {
-        boolean isSplitEnabled = context.isAppJsSplitEnabled();
+        boolean isSplitEnabled = context.isAppJsSplitEnabled(request);
         Set<DefDescriptor<?>> dependencies = isSplitEnabled ?
                     appJsUtilAdapter.getPartDependencies(request, response, context, 1) :
                     servletUtilAdapter.verifyTopLevel(request, response, context);

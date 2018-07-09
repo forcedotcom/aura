@@ -29,6 +29,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.css.StyleContext;
@@ -985,9 +987,14 @@ public class AuraContextImpl implements AuraContext {
     public boolean useCompatSource() {
         return this.useCompatSource;
     }
-
+    
     @Override
     public boolean isAppJsSplitEnabled() {
+    		return isAppJsSplitEnabled(null);
+    }
+    
+    @Override
+    public boolean isAppJsSplitEnabled(HttpServletRequest request) {
         return true;
     }
     

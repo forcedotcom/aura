@@ -19,15 +19,16 @@
  * This class is implemented by browsers native Intl APIs.
  *
  * @param {string} formatString - A string containing tokens to format a date and time.
- * @param {string} locale - A locale which is supported by Intl.DateTimeFormat.
+ * @param {string} localeName - A locale which is supported by Intl.DateTimeFormat.
  *
  * @constructor
- * @export
  */
-Aura.Utils.DateTimeFormat = function(formatString, locale) {
-    this.locale = locale;
-    this.tokens = this.parseFormatStringToTokens(formatString);
+Aura.Utils.DateTimeFormat = function(formatString, localeName) {
+    this.locale = $A.localizationService.createLocale(localeName);
+    this.localeName = this.locale.getName();
     this.supportFormatToParts = $A.localizationService.canFormatToParts();
+
+    this.tokens = this.parseFormatStringToTokens(formatString);
 
     this.config = {};
 
@@ -48,7 +49,7 @@ Aura.Utils.DateTimeFormat.prototype.format = function(date, utcOffset) {
     if (this.supportFormatToParts === true) {
         // Initiates the date time format when it gets called for the first time.
         if (this.dateTimeFormat === undefined) {
-            this.dateTimeFormat = Intl["DateTimeFormat"](this.locale, this.config);
+            this.dateTimeFormat = Intl["DateTimeFormat"](this.localeName, this.config);
         }
         parts = this.dateTimeFormat["formatToParts"](date);
     }
@@ -70,13 +71,19 @@ Aura.Utils.DateTimeFormat.prototype.format = function(date, utcOffset) {
             switch (token["field"]) {
                 case "dayperiod":
                     // special case
-                    dateTimeString += this.getLocalizedMeridiem(date);
+                    dateTimeString += this.locale.getMeridiem(date);
+                    break;
+                case "month":
+                    dateTimeString += this.locale.getMonth(date.getMonth(), token["style"]);
+                    break;
+                case "weekday":
+                    dateTimeString += this.locale.getWeekday(date.getDay(), token["style"]);
                     break;
                 default:
                     dateTimeString += this.formatStringField(token["config"], date);
             }
         } else if (token["type"] === "localizedFormat") {
-            var dateTimeFormat = Intl["DateTimeFormat"](this.locale, token["config"]);
+            var dateTimeFormat = Intl["DateTimeFormat"](this.localeName, token["config"]);
             dateTimeString += $A.localizationService.format(dateTimeFormat, date);
         } else if (token["field"] === "offset") {
             if (token["zone"] !== undefined) {
@@ -90,11 +97,242 @@ Aura.Utils.DateTimeFormat.prototype.format = function(date, utcOffset) {
             }
 
         } else {
-            dateTimeString += this.findField(parts, token["field"]) || "";
+            dateTimeString += $A.localizationService.findField(parts, token["field"]) || "";
         }
     }
 
     return dateTimeString;
+};
+
+/**
+ * Parse datetime string into Date object.
+ *
+ * @param {String} dateTimeString
+ * @param {Boolean} strictParsing
+ * @param {Boolean} isUTC
+ * @returns {Date} A date for the given datetime string, null if datetime string represents an invalid date.
+ */
+Aura.Utils.DateTimeFormat.prototype.parse = function(dateTimeString, strictParsing, isUTC) {
+    // the values in config should be all numbers
+    var config = {};
+
+    for (var i = 0; i < this.tokens.length && dateTimeString.length > 0; i++) {
+        var token = this.tokens[i];
+        var value = token["value"];
+        var parsedString;
+
+        // Hmmss, hmmss, kmmss
+        if (token["field"] === "hour" && value.length === 1) {
+            var nextToken = this.tokens[i + 1];
+            if (nextToken && nextToken["value"] === "mm") {
+                value = value + "mm";
+                i += 1;
+
+                nextToken = this.tokens[i + 1];
+                if (nextToken && nextToken["value"] === "ss") {
+                    value = value + "ss";
+                    i += 1;
+                }
+            }
+        }
+
+        // localizedFormat is only for formatting
+        if (token["literal"] === true || token["type"] === "localizedFormat") {
+            // matching from start
+            parsedString = value;
+        } else {
+            var pattern = this.getRegExpPattern(value, strictParsing);
+            var match = dateTimeString.match(pattern);
+            if (match) {
+                parsedString = match[0];
+                switch (token["field"]) {
+                    case "offset":
+                        config["offset"] = $A.localizationService.parseOffset(parsedString);
+                        break;
+                    case "month":
+                        // Note: 1-12 means Jan - Dec in config
+                        config["month"] = this.locale.parseMonth(parsedString, token["style"] || this.config["month"]) + 1;
+                        break;
+                    case "dayperiod":
+                        config["isPM"] = this.locale.isPM(parsedString);
+                        break;
+                    case "weekday":
+                        // for verification
+                        config["weekday"] = this.locale.parseWeekday(parsedString, token["style"] || this.config["weekday"]);
+                        break;
+                    case "hour":
+                        // Grouped pattern, Hmm, Hmmss, hmm, ...
+                        if (match.length > 1) {
+                            config["hour"] = parseInt(match[1]);
+                            config["minute"] = parseInt(match[2]);
+                            if (match.length === 4) {
+                                config["second"] = parseInt(match[3]);
+                            }
+                        } else {
+                            config["hour"] = parseInt(parsedString);
+                        }
+                        break;
+                    default:
+                        // if it's hour, need to figure out the cycle
+                        config[token["field"]] = parseInt(parsedString);
+                }
+            } else {
+                if (strictParsing) {
+                    return null;
+                }
+                parsedString = value;
+            }
+
+        }
+
+        var matchStart = dateTimeString.indexOf(parsedString);
+        if (matchStart < 0) {
+            return null;
+        }
+
+        var remainingStart = matchStart + parsedString.length;
+        dateTimeString = dateTimeString.substring(remainingStart);
+    }
+
+    if (strictParsing && (i !== this.tokens.length || dateTimeString.length > 0)) {
+        return null;
+    }
+
+    var date = new Date();
+
+    var year = config["year"] || date.getFullYear();
+    var month = config["month"] || date.getMonth() + 1;
+    var day = config["day"] || date.getDate();
+
+    if (!$A.localizationService.isValidDate(year, month, day)) {
+        return null;
+    }
+
+    var hour = config["hour"] || 0;
+    if (config["isPM"]) {
+        hour = (hour % 12) + 12;
+    }
+    var minute = config["minute"] || 0;
+    var second = config["second"] || 0;
+    var millisecond = config["millisecond"] || 0;
+    if (!$A.localizationService.isValidTime(hour, minute, second, millisecond)) {
+        return null;
+    }
+
+    var utcOffset = config["offset"];
+    // Invalid offset
+    if (utcOffset === null) {
+        return null;
+    } else if (utcOffset) {
+        minute -= utcOffset;
+    }
+
+    // if offset is given, then given time is relative to UTC
+    if (isUTC || utcOffset !== undefined) {
+        date.setUTCFullYear(year, month - 1, day);
+        date.setUTCHours(hour, minute, second, millisecond);
+    } else {
+        date.setFullYear(year, month - 1, day);
+        date.setHours(hour, minute, second, millisecond);
+    }
+
+    return date;
+};
+
+/**
+ *  Get RegExp pattern for the given token string.
+ *
+ * @param {String} tokenString
+ * @param {Boolean} strictParsing
+ */
+Aura.Utils.DateTimeFormat.prototype.getRegExpPattern = function(tokenString, strictParsing) {
+
+    switch (tokenString) {
+        case "y":
+        case "Y":
+            return $A.localizationService.UNSIGNED_NUMBER;
+
+        case "E":
+            return $A.localizationService.DIGIT1;
+
+        case "M":
+        case "d":
+        case "D":
+        case "H":
+        case "h":
+        case "k":
+        case "m":
+        case "s":
+            return $A.localizationService.DIGIT1_2;
+
+        case "yy":
+        case "YY":
+        case "MM":
+        case "dd":
+        case "DD":
+        case "HH":
+        case "hh":
+        case "kk":
+        case "mm":
+        case "ss":
+            return strictParsing ?
+                $A.localizationService.DIGIT2 :
+                $A.localizationService.DIGIT1_2;
+
+        case "yyyy":
+        case "YYYY":
+            return strictParsing ?
+                $A.localizationService.DIGIT4 :
+                $A.localizationService.DIGIT1_4;
+
+        case "MMM":
+            return this.locale.getShortMonthPattern();
+
+        case "MMMM":
+            return this.locale.getLongMonthPattern();
+
+        case "EE":
+            // The narrow type string may be ambiguous, like Tue and Thur are both T.
+            // We may not want to validate on this.
+            return this.locale.getNarrowWeekdayPattern();
+
+        case "EEE":
+            return this.locale.getShortWeekdayPattern();
+
+        case "EEEE":
+            return this.locale.getLongWeekdayPattern();
+
+        case "Hmm":
+        case "hmm":
+        case "kmm":
+            return $A.localizationService.HOUR_MIN;
+        case "Hmmss":
+        case "hmmss":
+        case "kmmss":
+            return $A.localizationService.HOUR_MIN_SEC;
+
+        case "S":
+            return strictParsing ?
+                $A.localizationService.DIGIT1 :
+                $A.localizationService.DIGIT1_3;
+        case "SS":
+            return strictParsing ?
+                $A.localizationService.DIGIT2 :
+                $A.localizationService.DIGIT1_3;
+        case "SSS":
+            return strictParsing ?
+                $A.localizationService.DIGIT3 :
+                $A.localizationService.DIGIT1_3;
+
+        case "a":
+        case "A":
+            return this.locale.getMeridiemPattern();
+
+        case "Z":
+        case "ZZ":
+            return $A.localizationService.ISO_OFFSET_PATTERN;
+    }
+
 };
 
 /**
@@ -142,45 +380,10 @@ Aura.Utils.DateTimeFormat.prototype.getNumberFieldValue = function(token, date) 
 };
 
 /**
- * Get localized meridiem string for the given date, i.e. AM, PM
- * @private
- */
-Aura.Utils.DateTimeFormat.prototype.getLocalizedMeridiem = function(date) {
-    if (this.meridiemFormat === undefined) {
-        this.meridiemFormat = Intl["DateTimeFormat"](this.locale, {
-            "hour12": true,
-            "hour": "2-digit",
-            "minute": "2-digit"
-        });
-    }
-
-    if (this.supportFormatToParts === true) {
-        return this.getLocalizedDateTimeField(date, this.meridiemFormat, "dayperiod");
-    }
-
-    // The browsers which don't support DateTimeFormat.formatToParts rely on the config to parse out the labels
-    var hackyDate = (date.getHours() < 12)? new Date(2012, 11, 20, 11, 11) : new Date(2012, 11, 20, 23, 11, 0);
-    var timeString = $A.localizationService.format(this.meridiemFormat, hackyDate);
-
-    return timeString.replace(/ ?.{2}:.{2} ?/, "");
-};
-
-/**
- * Get the localied value string for the given field from a date.
- * It can be used only if Intl.DateTimeFormat.formatToParts() is supported.
- * @private
- */
-Aura.Utils.DateTimeFormat.prototype.getLocalizedDateTimeField = function(date, dateTimeFormat, field) {
-    var parts = dateTimeFormat["formatToParts"](date);
-    return this.findField(parts, field) || "";
-};
-
-/**
  * Format time zone offset into an ISO 8601 string.
  * @private
  */
 Aura.Utils.DateTimeFormat.prototype.formatOffset = function(offsetInMinute, delimiter) {
-
     var offsetString;
     if (offsetInMinute < 0) {
         offsetString = "-";
@@ -293,9 +496,7 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                     config["month"] = "short";
                 } else {
                     token["type"] = "string";
-                    token["config"] = {
-                        "month": "short"
-                    };
+                    token["style"] = "short";
                 }
                 break;
             case "MMMM":
@@ -304,9 +505,7 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                     config["month"] = "long";
                 } else {
                     token["type"] = "string";
-                    token["config"] = {
-                        "month": "long"
-                    };
+                    token["style"] = "long";
                 }
                 break;
 
@@ -490,9 +689,7 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                     config["weekday"] = "narrow";
                 } else {
                     token["type"] = "string";
-                    token["config"] = {
-                        "weekday": "narrow"
-                    };
+                    token["style"] = "narrow";
                 }
                 break;
             case "EEE":
@@ -501,9 +698,7 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                     config["weekday"] = "short";
                 } else {
                     token["type"] = "string";
-                    token["config"] = {
-                        "weekday": "short"
-                    };
+                    token["style"] = "short";
                 }
                 break;
             case "EEEE":
@@ -512,9 +707,7 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                     config["weekday"] = "long";
                 } else {
                     token["type"] = "string";
-                    token["config"] = {
-                        "weekday": "long"
-                    };
+                    token["style"] = "long";
                 }
                 break;
             case "Q":
@@ -690,30 +883,4 @@ Aura.Utils.DateTimeFormat.prototype.parseFormatStringToTokens = function(formatS
  */
 Aura.Utils.DateTimeFormat.prototype.canUseConfig = function(field, setting) {
     return this.supportFormatToParts === true && (this.config[field] === undefined || this.config[field] === setting);
-};
-
-/**
- * Get the value of a filed from the parts which is returned from Intl.DateTimeFormat.formatToParts().
- * @private
- */
-Aura.Utils.DateTimeFormat.prototype.findField = function(parts, type) {
-    for (var i = 0; i < parts.length; i++) {
-        var part = parts[i];
-        if (part["type"].toLowerCase() === type) {
-            return part["value"];
-        }
-    }
-
-    return null;
-};
-
-
-// TODO: implement for parsing APIs
-Aura.Utils.DateTimeFormat.prototype.parse = function(dateTimeString) {
-    return dateTimeString;
-};
-
-// TODO: implement for parsing APIs
-Aura.Utils.DateTimeFormat.prototype.getRegExpPattern = function() {
-
 };

@@ -42,41 +42,14 @@ function AuraLocalizationService() {
     this.timeZoneFormatCache = {};
 
     this.dateTimeFormatCache = {};
+    this.localeCache = {};
 
     this.cache = {
         format : {},
         strictModeFormat : {}
     };
 
-    // DateTime
     this.dateTimeUnitAlias = {};
-    // [dateString, delimiter, timeString, offsetString]
-    this.ISO_REGEX = /^\s*((?:\d{4})-(?:\d\d-\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:\.\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
-    this.ISO_REGEX_NO_DASH = /^\s*((?:\d{4})(?:\d\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:\.\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
-    // hh:mm, hh:mm:ss, hh:mm:ss.SSS, hh:mmZ, hh:mm:ssZ, hh:mm:ss.SSSZ
-    this.ISO_TIME_REGEX = /^\s*(\d\d:\d\d(?::\d\d(?:\.\d+)?)?)((?:[\+\-]\d\d(?::?\d\d)?)|(?:\s*Z))?$/;
-    // month/day/year, hour:minute
-    this.EN_US_DATETIME_PATTERN = /(\d{1,2})\/(\d{1,2})\/(\d{4})\D+(\d{1,2}):(\d{1,2})/;
-
-
-    this.ISO_OFFSET_PATTERN = /([+-]\d\d):?(\d\d)/;
-    // The order matters
-    this.ISO_DATE_PATTERNS = [
-        /(\d{4})-(\d\d)-(\d\d)/,
-        /(\d{4})-(\d\d)/,
-        /(\d{4})(\d\d)(\d\d)/,
-        /(\d{4})/
-    ];
-
-    this.ISO_TIME_PATTERNS = [
-        /(\d\d):(\d\d):(\d\d)\.(\d+)/,
-        /(\d\d):(\d\d):(\d\d)/,
-        /(\d\d):(\d\d)/,
-        /(\d\d)(\d\d)(\d\d)\.(\d+)/,
-        /(\d\d)(\d\d)(\d\d)/,
-        /(\d\d)(\d\d)/,
-        /(\d\d)/
-    ];
 
     // common time zones which are not supported by Intl API
     this.timeZoneMap = {
@@ -94,6 +67,34 @@ function AuraLocalizationService() {
         "US/Samoa": "Pacific/Pago_Pago",
         "Pacific-New": "America/Los_Angeles"
     };
+
+    // [dateString, delimiter, timeString, offsetString]
+    this.ISO_REGEX = /^\s*((?:\d{4})-(?:\d\d-\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:\.\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+    this.ISO_REGEX_NO_DASH = /^\s*((?:\d{4})(?:\d\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:\.\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+    // hh:mm, hh:mm:ss, hh:mm:ss.SSS, hh:mmZ, hh:mm:ssZ, hh:mm:ss.SSSZ
+    this.ISO_TIME_REGEX = /^\s*(\d\d:\d\d(?::\d\d(?:\.\d+)?)?)((?:[\+\-]\d\d(?::?\d\d)?)|(?:\s*Z))?$/;
+    // month/day/year, hour:minute
+    this.EN_US_DATETIME_PATTERN = /(\d{1,2})\/(\d{1,2})\/(\d{4})\D+(\d{1,2}):(\d{1,2})/;
+
+    this.ISO_OFFSET_PATTERN = /(Z)|([+-]\d\d):?(\d\d)/;
+
+    // The order matters
+    this.ISO_DATE_PATTERNS = [
+        /(\d{4})-(\d\d)-(\d\d)/,
+        /(\d{4})-(\d\d)/,
+        /(\d{4})(\d\d)(\d\d)/,
+        /(\d{4})/
+    ];
+
+    this.ISO_TIME_PATTERNS = [
+        /(\d\d):(\d\d):(\d\d)\.(\d+)/,
+        /(\d\d):(\d\d):(\d\d)/,
+        /(\d\d):(\d\d)/,
+        /(\d\d)(\d\d)(\d\d)\.(\d+)/,
+        /(\d\d)(\d\d)(\d\d)/,
+        /(\d\d)(\d\d)/,
+        /(\d\d)/
+    ];
 }
 
 /**
@@ -931,7 +932,7 @@ AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timeZo
 
     timeZone = this.normalizeTimeZone(timeZone);
 
-    var dateTimeString = this.formatDateWithTimeZone(date, timeZone);
+    var dateTimeString = this.formatDateToEnUSString(date, timeZone);
     var match = this.EN_US_DATETIME_PATTERN.exec(dateTimeString);
 
     callback(match[3] + "-" + match[1] + "-" + match[2]);
@@ -1570,7 +1571,7 @@ AuraLocalizationService.prototype.normalizeTimeZone = function(timeZone) {
         return this.timeZoneMap[normalizedTimeZone];
     }
 
-    var timeZoneFormat = this.createDateTimeFormatByTimeZone(normalizedTimeZone);
+    var timeZoneFormat = this.createEnUSDateTimeFormat(normalizedTimeZone);
     if (timeZoneFormat !== null) {
         return normalizedTimeZone;
     }
@@ -1585,7 +1586,7 @@ AuraLocalizationService.prototype.normalizeTimeZone = function(timeZone) {
             return "UTC";
         }
 
-        timeZoneFormat = this.createDateTimeFormatByTimeZone(normalizedTimeZone);
+        timeZoneFormat = this.createEnUSDateTimeFormat(normalizedTimeZone);
         if (timeZoneFormat !== null) {
             this.timeZoneMap[timeZone] = normalizedTimeZone;
             return normalizedTimeZone;
@@ -1696,7 +1697,7 @@ AuraLocalizationService.prototype.zoneOffset = function(timestamp, timeZone) {
     // clean up second and millisecond from timestamp
     var date = new Date(timestamp);
     date.setSeconds(0, 0);
-    var dateTimeString = this.formatDateWithTimeZone(date, timeZone);
+    var dateTimeString = this.formatDateToEnUSString(date, timeZone);
     var zoneTs = this.parseEnUSDateTimeString(dateTimeString);
 
     // converts to minutes
@@ -1709,14 +1710,14 @@ AuraLocalizationService.prototype.zoneOffset = function(timestamp, timeZone) {
  * This method assumes the browser supports Intl API with time zone data.
  * @private
  */
-AuraLocalizationService.prototype.formatDateWithTimeZone = function(date, timeZone) {
+AuraLocalizationService.prototype.formatDateToEnUSString = function(date, timeZone) {
 
     if (this.formatErrorFromIntl) {
         return this.formatDateTime(date, "MM/dd/yyyy, hh:mm");
     }
 
     try {
-        var timeZoneFormat = this.createDateTimeFormatByTimeZone(timeZone);
+        var timeZoneFormat = this.createEnUSDateTimeFormat(timeZone);
         return this.format(timeZoneFormat, date);
     } catch(e) {
         // The error should never happen here. The callers validate the arguments.
@@ -1752,7 +1753,7 @@ AuraLocalizationService.prototype.format = function(dateTimeFormat, date) {
     return dateTimeFormat["format"](date).replace(/[\u200E\u200F]/g,'');
 };
 
-AuraLocalizationService.prototype.createDateTimeFormatByTimeZone = function(timeZone) {
+AuraLocalizationService.prototype.createEnUSDateTimeFormat = function(timeZone) {
     var timeZoneFormat = this.timeZoneFormatCache[timeZone];
     if (timeZoneFormat !== undefined) {
         return timeZoneFormat;
@@ -1777,6 +1778,33 @@ AuraLocalizationService.prototype.createDateTimeFormatByTimeZone = function(time
     this.timeZoneFormatCache[timeZone] = timeZoneFormat;
 
     return timeZoneFormat;
+};
+
+AuraLocalizationService.prototype.createDateTimeFormat = function(formatString, locale) {
+    locale = this.normalizeToIntlLocale(locale);
+
+    var cacheKey = locale + ":" + formatString;
+    var dateTimeFormat = this.dateTimeFormatCache[cacheKey];
+    if (dateTimeFormat === undefined) {
+        dateTimeFormat = new Aura.Utils.DateTimeFormat(formatString, locale);
+        this.dateTimeFormatCache[cacheKey] = dateTimeFormat;
+    }
+    return dateTimeFormat;
+};
+
+/**
+ * For now, this method is only used in DateTimeFormat, so we can assume that
+ * the localeName is always supported by Intl API. If we need to use it in
+ * AuraLocalizationService, needs to normalizeToIntlLocale().
+ */
+AuraLocalizationService.prototype.createLocale = function(localeName) {
+    var locale = this.localeCache[localeName];
+    if (locale === undefined) {
+        locale = new Aura.Utils.Locale(localeName);
+        this.localeCache[localeName] = locale;
+    }
+
+    return locale;
 };
 
 /**
@@ -1875,14 +1903,7 @@ AuraLocalizationService.prototype.isAvailableLocale = function(locale) {
 };
 
 AuraLocalizationService.prototype.formatDateTimeToString = function(date, formatString, locale, isUTCDate) {
-    locale = this.normalizeToIntlLocale(locale);
-
-    var cacheKey = locale + ":" + formatString;
-    var dateTimeFormat = this.dateTimeFormatCache[cacheKey];
-    if (dateTimeFormat === undefined) {
-        dateTimeFormat = new Aura.Utils.DateTimeFormat(formatString, locale);
-        this.dateTimeFormatCache[cacheKey] = dateTimeFormat;
-    }
+    var dateTimeFormat = this.createDateTimeFormat(formatString, locale);
 
     var utcOffset = (isUTCDate === true)? 0 : (date.getTimezoneOffset() * -1);
     return dateTimeFormat.format(date, utcOffset);
@@ -1911,23 +1932,48 @@ AuraLocalizationService.prototype.canFormatToParts = function() {
 };
 
 AuraLocalizationService.prototype.normalizeToIntlLocale = function(locale) {
-    if (this.intlLocaleCache.hasOwnProperty(locale)) {
-        return this.intlLocaleCache[locale];
+
+    var intlLocale = this.intlLocaleCache[locale];
+    if (intlLocale === undefined) {
+        intlLocale = locale.split("_").join("-").replace("-EURO", "");
+
+        var supported = Intl["DateTimeFormat"]["supportedLocalesOf"](intlLocale);
+        if (supported.length === 0) {
+            $A.warning("LocalizationService: Unknown locale: " + locale + ". Falls back to 'en-US'.");
+            intlLocale = "en-US";
+        } else {
+            intlLocale = supported[0];
+        }
+
+        this.intlLocaleCache[locale] = intlLocale;
     }
 
-    var normalizedLocale = locale.split("_").join("-").replace("-EURO", "");
+    return intlLocale;
+};
 
-    var supported = Intl["DateTimeFormat"]["supportedLocalesOf"](normalizedLocale);
-    if (supported.length === 0) {
-        $A.warning("LocalizationService: Unknown locale: " + locale + ". Falls back to 'en-US'.");
-        normalizedLocale = "en-US";
-    } else {
-        normalizedLocale = supported[0];
+/**
+ * Get the localied value string for the given field from a date.
+ * It can be used only if Intl.DateTimeFormat.formatToParts() is supported.
+ * @private
+ */
+AuraLocalizationService.prototype.getLocalizedDateTimeField = function(date, dateTimeFormat, field) {
+    var parts = dateTimeFormat["formatToParts"](date);
+    return this.findField(parts, field) || "";
+};
+
+/**
+ * Get the value of a filed from the parts which is returned from Intl.DateTimeFormat.formatToParts().
+ * @private
+ */
+AuraLocalizationService.prototype.findField = function(parts, type) {
+    for (var i = 0; i < parts.length; i++) {
+        var part = parts[i];
+        if (part["type"].toLowerCase() === type) {
+            return part["value"];
+        }
     }
 
-    this.intlLocaleCache[locale] = normalizedLocale;
-
-    return normalizedLocale;
+    return null;
 };
 
 /**
@@ -2087,6 +2133,29 @@ AuraLocalizationService.prototype.isLeapYear = function(year) {
     return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
 };
 
+/**
+ * Parse offset string into minutes
+ *
+ * @param {String} offsetString
+ * @returns {Number} the offset in minutes, null if offset is invalid
+ */
+AuraLocalizationService.prototype.parseOffset = function(offsetString) {
+    var tokens = this.ISO_OFFSET_PATTERN.exec(offsetString);
+    if (tokens === null) {
+        return null;
+    }
+
+    if (tokens[0] === "Z") {
+        return 0;
+    } else {
+        var offsetInMinute = parseInt(tokens[2], 10) * 60 + parseInt(tokens[3], 10);
+        if (!this.isValidOffset(offsetInMinute)) {
+            return null;
+        }
+        return offsetInMinute;
+    }
+};
+
 AuraLocalizationService.prototype.parseISOStringToConfig = function(dateTimeString) {
     var i, tokens;
     // date string
@@ -2148,15 +2217,9 @@ AuraLocalizationService.prototype.parseISOStringToConfig = function(dateTimeStri
     var utcOffset = undefined;
     var offsetString = timeOnly === false? match[4] : match[2];
     if (offsetString !== undefined) {
-        if (offsetString !== "Z") {
-            tokens = this.ISO_OFFSET_PATTERN.exec(offsetString);
-            var offsetInMinute = parseInt(tokens[1], 10) * 60 + parseInt(tokens[2], 10);
-            if (!this.isValidOffset(offsetInMinute)) {
-                return null;
-            }
-            utcOffset = offsetInMinute;
-        } else {
-            utcOffset = 0;
+        utcOffset = this.parseOffset(offsetString);
+        if (utcOffset === null) {
+            return null;
         }
     }
 
@@ -2171,7 +2234,6 @@ AuraLocalizationService.prototype.parseISOStringToConfig = function(dateTimeStri
         "utcOffset": utcOffset
     };
 };
-
 
 AuraLocalizationService.prototype.daysInMonth = function (year, month) {
     switch (month) {

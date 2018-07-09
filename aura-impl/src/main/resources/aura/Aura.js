@@ -123,6 +123,7 @@ function noop() {}
 // #include aura.util.Bitset
 // #include aura.util.DateTimeFormat
 // #include aura.util.Duration
+// #include aura.util.Locale
 // #include aura.util.NumberFormat
 // #include aura.util.Mutex
 // #include aura.util.DocLevelHandler

@@ -31,7 +31,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
         "AuraLocalizationService": function(){},
     })(function() {
         [Import("aura-impl/src/main/resources/aura/AuraLocalizationService.js")]
-        [Import("aura-impl/src/main/resources/aura/util/DateTimeFormat.js")]
+        [Import("aura-impl/src/main/resources/aura/util/DateTimeFormat.js"),
+         Import("aura-impl/src/main/resources/aura/util/Locale.js")]
     });
 
     [Fixture]
@@ -399,16 +400,14 @@ Test.Aura.Util.DateTimeFormatTest = function() {
     [Fixture]
     function formatWithoutFormatToPartsSupport() {
 
+        var localizationService = new Aura.Services.AuraLocalizationService();
+        localizationService.canFormatToParts = function() {
+            return false;
+        };
+
         var mockAura = Mocks.GetMocks(Object.Global(), {
             "$A": {
-                localizationService: {
-                    canFormatToParts: function() {
-                        return false;
-                    },
-                    format: Aura.Services.AuraLocalizationService.prototype.format,
-                    weekInYear: Aura.Services.AuraLocalizationService.prototype.weekInYear,
-                    isLeapYear: Aura.Services.AuraLocalizationService.prototype.isLeapYear
-                }
+                "localizationService": localizationService
             },
             "Aura": Aura
         });

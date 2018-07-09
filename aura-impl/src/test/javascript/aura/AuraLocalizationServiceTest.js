@@ -37,6 +37,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         [Import("aura-impl/src/main/resources/aura/AuraLocalizationService.js")]
         [Import("aura-impl/src/main/resources/aura/util/Duration.js"),
          Import("aura-impl/src/main/resources/aura/util/DateTimeFormat.js"),
+         Import("aura-impl/src/main/resources/aura/util/Locale.js"),
          Import("aura-impl/src/main/resources/aura/util/Util.js")]
     });
 
@@ -2320,7 +2321,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             var targetService = new Aura.Services.AuraLocalizationService();
             var expected = "America/Los_Angeles";
             var actual;
-            targetService.formatDateWithTimeZone = function(date, timeZone) {
+            targetService.formatDateToEnUSString = function(date, timeZone) {
                 actual = timeZone;
             };
 
@@ -3349,7 +3350,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             // Arrange
             var expected = "expectedTimeZone";
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.createDateTimeFormatByTimeZone = function(timeZone) {
+            targetService.createEnUSDateTimeFormat = function(timeZone) {
                 if (expected === timeZone) {
                     return {};
                 }
@@ -3393,7 +3394,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             // Arrange
             var expected = "expectedTimeZone";
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.createDateTimeFormatByTimeZone = function(timeZone) {
+            targetService.createEnUSDateTimeFormat = function(timeZone) {
                 if (expected === timeZone) {
                     return {};
                 }
@@ -3411,7 +3412,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             // Arrange
             var expected = "expectedTimeZone";
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.createDateTimeFormatByTimeZone = function(timeZone) {
+            targetService.createEnUSDateTimeFormat = function(timeZone) {
                 if (expected === timeZone) {
                     return {};
                 }
@@ -3442,7 +3443,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             // Arrange
             var timeZone = "TimeZone";
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.createDateTimeFormatByTimeZone = function() {
+            targetService.createEnUSDateTimeFormat = function() {
                 return null;
             };
 

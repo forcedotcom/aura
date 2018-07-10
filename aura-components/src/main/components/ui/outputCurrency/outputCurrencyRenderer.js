@@ -23,9 +23,10 @@
         var formatted;
         if (($A.util.isNumber(num) || $A.util.isString(num)) && !$A.util.isEmpty(num) && !isNaN(num)) {
             var hasFormat = !$A.util.isEmpty(f);
-            if (hasFormat || currencySymbol) {
-                var nf;
-                try {
+            try {
+                if (hasFormat || currencySymbol) {
+                    var nf;
+
                     var symbols;
                     if (currencySymbol) {
                         symbols = {
@@ -40,15 +41,16 @@
                         f = $A.get("$Locale.currencyFormat");
                     }
                     nf = $A.localizationService.getNumberFormat(f, symbols);
-                } catch (e) {
-                    formatted = "Invalid format attribute";
-                    $A.log(e);
+
+                    if (nf) {
+                        formatted = nf.format(num);
+                    }
+                } else {
+                    formatted = $A.localizationService.formatCurrency(num);
                 }
-                if (nf) {
-                    formatted = nf.format(num);
-                }
-            } else {
-                formatted = $A.localizationService.formatCurrency(num);
+            } catch (e) {
+                formatted = "Invalid format attribute";
+                $A.log(e);
             }
             span.textContent = span.innerText = formatted;
         }
@@ -57,16 +59,16 @@
 
     rerender: function outputNumberRerenderer(cmp) {
         if (cmp.isDirty("v.value") || cmp.isDirty("v.format") || cmp.isDirty("v.currencyCode") || cmp.isDirty("v.currencySymbol")) {
-        	var formatted = '';
+            var formatted = '';
             var f = cmp.get("v.format");
             var val = cmp.get("v.value");
             var currencyCode = cmp.get("v.currencyCode");
             var currencySymbol = cmp.get("v.currencySymbol") || currencyCode;
             if (($A.util.isNumber(val) || $A.util.isString(val)) && !$A.util.isEmpty(val) && !isNaN(val)) {
                 var hasFormat = !$A.util.isEmpty(f);
-                if (hasFormat || currencySymbol) {
-                    var nf;
-                    try {
+                try {
+                    if (hasFormat || currencySymbol) {
+                        var nf;
                         var symbols;
                         if (currencySymbol) {
                             symbols = {
@@ -81,19 +83,20 @@
                             f = $A.get("$Locale.currencyFormat");
                         }
                         nf = $A.localizationService.getNumberFormat(f, symbols);
-                    } catch (e) {
-                        formatted = "Invalid format attribute";
-                        $A.log(e);
+
+                        if (nf) {
+                            formatted = nf.format(val);
+                        }
+                    } else {
+                        formatted = $A.localizationService.formatCurrency(val);
                     }
-                    if (nf) {
-                        formatted = nf.format(val);
-                    }
-                } else {
-                    formatted = $A.localizationService.formatCurrency(val);
+                } catch (e) {
+                    formatted = "Invalid format attribute";
+                    $A.log(e);
                 }
             }
             var span = cmp.find("span");
             span.getElement().textContent = span.getElement().innerText = formatted;
         }
     }
- })// eslint-disable-line semi
+})// eslint-disable-line semi

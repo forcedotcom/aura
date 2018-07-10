@@ -37,7 +37,12 @@
                     }
                 }
             } else {
-                formatted = $A.localizationService.formatNumber(num);
+                try {
+                    formatted = $A.localizationService.formatNumber(num);
+                } catch (e) {
+                    formatted = "Invalid number value";
+                    $A.log(e);
+                }
             }
             span.textContent = span.innerText = formatted;
         }
@@ -66,7 +71,12 @@
                     }
                 }
             } else {
-                formatted = $A.localizationService.formatNumber(val);
+                try {
+                    formatted = $A.localizationService.formatNumber(val);
+                } catch (e) {
+                    formatted = "Invalid number value";
+                    $A.log(e);
+                }
             }
         }
         var span = cmp.find("span");

@@ -50,7 +50,7 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
 
     @Flapper
     @Test
-    @TargetBrowsers({BrowserType.IE11}) // IE11 is the main place we care about compat
+    @TargetBrowsers({BrowserType.IE11, BrowserType.GOOGLECHROME}) // IE11 is the main place we care about compat, Chrome for sanity
     public void testInteropCompatProd() throws Exception {
         open(BOOTSTRAP_APP_URL, Mode.PROD);
         doInteropTest();
@@ -66,6 +66,7 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
 
     @Flapper
     @Test
+    @TargetBrowsers({BrowserType.IE11, BrowserType.GOOGLECHROME}) // IE11 is the main place we care about compat, Chrome for sanity
     public void testInteropMinifiedCompat() throws Exception {
         open(BOOTSTRAP_APP_URL + "?aura.compat=1", Mode.SELENIUM);
         doInteropTest();
@@ -81,6 +82,7 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
 
     @Flapper
     @Test
+    @TargetBrowsers({BrowserType.IE11, BrowserType.GOOGLECHROME}) // IE11 is the main place we care about compat, Chrome for sanity
     public void testInteropDevCompat() throws Exception {
         open(BOOTSTRAP_APP_URL + "?aura.compat=1", Mode.DEV);
         doInteropTest();

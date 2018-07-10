@@ -67,6 +67,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     public final static String URI_DEFINITIONS_PATH = "/auraCmpDef";
 
     private final static StringParam appDescriptorParam = new StringParam("aura.app", 0, false);
+    private final static StringParam formFactorParam = new StringParam("_ff", 0, false);
     private final static StringParam lockerParam = new StringParam("_l", 0, false);
     private final static StringParam localeParam = new StringParam("_l10n", 0, false);
     private final static StringParam styleParam = new StringParam("_style", 0, false);
@@ -87,6 +88,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         String requestedUID = componentUIDParam.get(request);
         String appReferrrer = appDescriptorParam.get(request);
         String locale = localeParam.get(request);
+        String formFactor = formFactorParam.get(request);
 
         List<String> requestedDescriptors = extractDescriptors(request);
 
@@ -127,7 +129,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 }
 
                 StringBuilder redirectUrl = getHost(request);
-                redirectUrl.append(generateRedirectURI(descriptors, computedUID, appReferrrer, locale, styleParam.get(request)));
+                redirectUrl.append(generateRedirectURI(descriptors, computedUID, appReferrrer, formFactor, locale, styleParam.get(request)));
 
                 servletUtilAdapter.setNoCache(response);
                 response.sendRedirect(redirectUrl.toString());
@@ -143,9 +145,11 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             }
 
             // if locale provided, set the it on the context as a requested locale
+            Locale l = null;
             if (StringUtils.isNotEmpty(locale)) {
-                setLocale(new Locale(locale));
+                l = new Locale(locale);
             }
+            updateContext(l, formFactor, appReferrrer);
 
             serverService.writeDefinitions(descriptors.keySet(), responseStringWriter, false, 0, hydrationType, false);
 
@@ -224,8 +228,10 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         }
     }
 
-    protected void setLocale(Locale locale) {
-        contextService.getCurrentContext().setRequestedLocales(Arrays.asList(locale));
+    protected void updateContext(Locale locale, String formFactor, String applicationName) {
+        if (locale != null) {
+            contextService.getCurrentContext().setRequestedLocales(Arrays.asList(locale));
+        }
     }
 
     protected StringBuilder getHost(HttpServletRequest request) {
@@ -309,7 +315,8 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         return descriptors;
     }
 
-    private String generateRedirectURI(Map<DefDescriptor<?>, String> descriptors, String computedUID, String appReferrrer, String locale, String styleContext) {
+    private String generateRedirectURI(Map<DefDescriptor<?>, String> descriptors, String computedUID, String appReferrrer,
+                                       String formFactor, String locale, String styleContext) {
         StringBuilder redirectURI = new StringBuilder(URI_DEFINITIONS_PATH);
 
         // note, keep parameters in alpha order and keep in sync with componentDefLoader.js to increase chances of cache hits
@@ -317,6 +324,8 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         redirectURI.append("?");
         // app param
         redirectURI.append(appDescriptorParam.name).append("=").append(appReferrrer);
+
+        redirectURI.append("&").append(formFactorParam.name).append("=").append(formFactor);
 
         redirectURI.append("&").append(lockerParam.name).append("=").append(configAdapter.isLockerServiceEnabled());
 

@@ -25,18 +25,24 @@ function ComponentDefLoader() {
 }
 
 // params start with "_" to avoid namespace collisions
-ComponentDefLoader.UID_param = "_uid";
-ComponentDefLoader.DESCRIPTOR_param = "_def";
 ComponentDefLoader.APP_param = "aura.app";
+ComponentDefLoader.FORFMFACTOR_param = "_ff";
 ComponentDefLoader.LOCKER_param = "_l";
-ComponentDefLoader.STYLE_param = "_style";
 ComponentDefLoader.LOCALE_param = "_l10n";
+ComponentDefLoader.STYLE_param = "_style";
+ComponentDefLoader.DESCRIPTOR_param = "_def";
+ComponentDefLoader.UID_param = "_uid";
+
 ComponentDefLoader.UID_default = "LATEST";
 ComponentDefLoader.BASE_PATH = "/auraCmpDef?";
-ComponentDefLoader.MARKUP_param = "markup://";
+ComponentDefLoader.MARKUP = "markup://";
 
 ComponentDefLoader.prototype.buildURIAppParam = function() {
-    return ComponentDefLoader.APP_param + "=" + ComponentDefLoader.MARKUP_param + $A.getRoot().getType();
+    return ComponentDefLoader.APP_param + "=" + ComponentDefLoader.MARKUP + $A.getRoot().getType();
+};
+
+ComponentDefLoader.prototype.buildFormFactorParam = function() {
+    return "&" + ComponentDefLoader.FORFMFACTOR_param + "=" + $A.get("$Browser.formFactor");
 };
 
 ComponentDefLoader.prototype.buildURILockerParam = function() {
@@ -81,6 +87,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
 
     var baseURI = ComponentDefLoader.BASE_PATH + this.buildURIAppParam();
 
+    baseURI += this.buildFormFactorParam();
     baseURI += this.buildURILockerParam();
     baseURI += this.buildURILocaleParam();
     baseURI += this.buildURIStyleParam();

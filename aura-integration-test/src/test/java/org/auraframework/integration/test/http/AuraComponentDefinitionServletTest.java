@@ -15,12 +15,9 @@
  */
 package org.auraframework.integration.test.http;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.PrintWriter;
-import java.util.Set;
 import java.util.HashSet;
-
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,10 +27,10 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.http.AuraComponentDefinitionServlet;
 import org.auraframework.service.ContextService;
-import org.auraframework.system.AuraContext;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.ServerService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +38,8 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import static org.junit.Assert.assertTrue;
 
 public class AuraComponentDefinitionServletTest {
 
@@ -121,7 +120,7 @@ public class AuraComponentDefinitionServletTest {
         AuraPrivateAccessor.invoke(auraComponentDefinitionServlet, "doGet", request, response);
 
         // Assert
-        Mockito.verify(response).sendRedirect("https://example.host/auraCmpDef?aura.app=myApp&_l=false&_l10n=de&_style=styling&_def=def:qualifiedName&_uid=DIFFERENT_UID");
+        Mockito.verify(response).sendRedirect("https://example.host/auraCmpDef?aura.app=myApp&_ff=null&_l=false&_l10n=de&_style=styling&_def=def:qualifiedName&_uid=DIFFERENT_UID");
     }
 
     @SuppressWarnings("unchecked")

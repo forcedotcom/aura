@@ -30,5 +30,11 @@
         test: function(cmp) {
             cmp.find('secureTemplate').testQuerySelectorAll();
         }
+    },
+
+    testChildNodes: {
+        test: function(cmp) {
+          cmp.find('secureTemplate').testChildNodes();
+        }
     }
 })

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-07-06
- * Version: 0.4.32
+ * Generated: 2018-07-11
+ * Version: 0.4.33
  */
 
 (function (exports) {
@@ -3382,8 +3382,9 @@ const metadata$2 = {
 function cloneFiltered(el, st) {
   const root = el.cloneNode(false);
   function cloneChildren(parent, parentClone) {
+    const { isAnLWCNode: isAnLWCNode$$1 } = lwcHelpers;
     const childNodes = parent.childNodes;
-    const isParentAnLWCNode = isAnLWCNode(parent);
+    const isParentAnLWCNode = isAnLWCNode$$1(parent);
     for (let i = 0; i < childNodes.length; i++) {
       const child = childNodes[i];
       if (hasAccess(st, child) || child.nodeType === Node.TEXT_NODE || isParentAnLWCNode) {
@@ -4060,9 +4061,10 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
 
     hasChildNodes: {
       value: function() {
+        const { isAnLWCNode: isAnLWCNode$$1 } = lwcHelpers;
         const raw = SecureObject.getRaw(this);
         // If this is a shared element, delegate the call to the shared element, no need to check for access
-        if (SecureElement.isSharedElement(raw) || isAnLWCNode(raw)) {
+        if (SecureElement.isSharedElement(raw) || isAnLWCNode$$1(raw)) {
           return raw.hasChildNodes();
         }
         const childNodes = raw.childNodes;
@@ -4262,10 +4264,11 @@ SecureElement.isSharedElement = function(el) {
 
 SecureElement.secureQuerySelector = function(el, key, selector) {
   const rawAll = el.querySelectorAll(selector);
+  const { isAnLWCNode: isAnLWCNode$$1 } = lwcHelpers;
   for (let n = 0; n < rawAll.length; n++) {
     const raw = rawAll[n];
     const rawKey = getKey(raw);
-    if (rawKey === key || SecureElement.isSharedElement(raw) || isAnLWCNode(raw)) {
+    if (rawKey === key || SecureElement.isSharedElement(raw) || isAnLWCNode$$1(raw)) {
       return SecureElement(raw, key);
     }
   }
@@ -4974,6 +4977,12 @@ function registerFilterTypeHook(hook) {
 let isUnfilteredTypeHook$1;
 function registerIsUnfilteredTypeHook(hook) {
   isUnfilteredTypeHook$1 = hook;
+}
+const lwcHelpers = { isAnLWCNode: () => false };
+function registerLWCHelpers(helpers) {
+  if (helpers) {
+    Object.assign(lwcHelpers, helpers);
+  }
 }
 
 function SecureObject(thing, key) {
@@ -6189,6 +6198,7 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
   };
 
   descriptor.get = function() {
+    const { isAnLWCNode } = lwcHelpers;
     let value = raw[propertyName];
 
     // Continue from the current object until we find an accessible object.
@@ -6197,7 +6207,7 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
       const accesorProperty = options.propertyName || propertyName;
       while (value) {
         const hasAccess$$1 = hasAccess(st, value);
-        if (hasAccess$$1 || SecureElement.isSharedElement(value)) {
+        if (hasAccess$$1 || SecureElement.isSharedElement(value) || isAnLWCNode(value)) {
           break;
         }
         value = value[accesorProperty];
@@ -11134,6 +11144,7 @@ function initialize(types, api) {
   registerEngineAPI(api);
   registerFilterTypeHook(filterTypeHook);
   registerIsUnfilteredTypeHook(isUnfilteredTypeHook);
+  registerLWCHelpers({ isAnLWCNode: isAnLWCNode });
   registerAddPropertiesHook$$1(windowAddPropertiesHook);
   registerAddPropertiesHook$1(navigatorAddPropertiesHook);
   registerCustomElementHook(customElementHook$1);

@@ -252,9 +252,9 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
         }
 
         [Fact]
-        function shouldSplitTooLongRequestIntoTwoURIs(){
+        function shouldSplitTooLongRequestIntoThreeURIs(){
             var actual;
-            var expect = 2;
+            var expect = 3;
             mockAura(function () {
                 var defLoader = new Aura.Component.ComponentDefLoader();
                 var descriptorMap = {};

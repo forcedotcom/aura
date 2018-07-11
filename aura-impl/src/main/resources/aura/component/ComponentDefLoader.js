@@ -107,11 +107,11 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
         // URI length for IE needs to be below 2000 characters.
         maxLength = 1800;
     } else {
-        // Commonly, app servers are configured with a request header size of 16k
-        //   this includes URL and any additional Headers, like Cookies
-        //   initially buffering for standard headers Accept*, Host, Referrer, Connection.
+        // Commonly, app or proxy servers are configured with a request header size of 8k - 16k
+        // this includes URL and any additional Headers, like Cookies
+        // initially buffering for standard headers Accept*, Host, Referrer, Connection.
         // This information can vary, reducing the size further to help ensure we stay under the limit
-        maxLength = 15000 - document.cookie.length - window.navigator.userAgent.length;
+        maxLength = 8000 - document.cookie.length - window.navigator.userAgent.length;
     }
 
     for (var i=0; i<namespaces.length; i++) {

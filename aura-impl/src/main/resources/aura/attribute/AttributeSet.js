@@ -87,7 +87,9 @@ AttributeSet.prototype.get = function(key, component) {
     var value = undefined;
     var path = null;
     var attribute=key;
-    key=key.replace(/^body\b/g,"body."+component.globalId);
+    if (key.lastIndexOf("body", 0) === 0) {
+        key=key.replace(/^body\b/g,"body."+component.globalId);
+    }
     if(key.indexOf('.')>-1){
         path=key.split('.');
         attribute=path[0];
@@ -234,7 +236,9 @@ AttributeSet.prototype.set = function(key, value, component) {
     var target = this.values;
     var path = null;
     var attribute=key;
-    key=key.replace(/^body\b/g,"body."+component.globalId);
+    if (key.lastIndexOf("body", 0) === 0) {
+        key=key.replace(/^body\b/g,"body."+component.globalId);
+    }
     if(key.indexOf('.')>-1){
         path=key.split('.');
         attribute=path[0];

@@ -63,20 +63,20 @@
                 </div>
             </aura:if>
             <div class="dateBar">
-                <div class="datepicker__filter--month">
-                    <div class="prevLinks">
+                <div class="datepicker__filter--month slds-grid slds-grid_align-spread slds-grow">
+                    <div class="prevLinks slds-align-middle">
                         <a aura:id="prevMonth" class="navLink prevMonth" title="Go to previous month" onclick="{!c.goToPrevMonth}" onkeydown="{!c.handleKeydown}">
                             <span class="assistiveText">Go to previous month</span>
                         </a>
                     </div>
-                    <div class="nextLinks">
+                    <div class="nextLinks slds-align-middle">
                         <a aura:id="nextMonth" class="navLink nextMonth" title="Go to next month" onclick="{!c.goToNextMonth}" onkeydown="{!c.handleKeydown}">
                             <span class="assistiveText">Go to next month</span>
                         </a>
                     </div>
                     <!-- This will only match windows phone -->
                     <aura:if isTrue="{!$Browser.formFactor != 'DESKTOP'}">
-                        <h2 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle">
+                        <h2 aria-live="assertive" aria-atomic="true" class="monthYear slds-align-middle" aura:id="calTitle">
                             <ui:outputText aura:id="monthTitle" value=""/>
                             <label>
                                 <span class="assistiveText">Pick a Year</span>
@@ -89,7 +89,7 @@
                     </aura:if>
                 </div>
                 <aura:if isTrue="{!$Browser.formFactor == 'DESKTOP'}">
-                    <div class="picklist datepicker__filter--year">
+                    <div class="slds-shrink-none">
                         <label>
                             <span class="assistiveText">Pick a Year</span>
                             <select class="slds-select picklist__label" aura:id="yearTitle" onchange="{!c.yearChange}" onkeydown="{!c.handleKeydown}"/>

@@ -373,6 +373,11 @@ InteropComponent.prototype.setGlobalAttribute = function (element, attrName, val
  * @export
  */
 InteropComponent.prototype.get = function (key) {
+    if(!$A.util.isString(key)) {
+        var msg = "The provided key (" + key + ") is not a string and cannot be used to look up values for the current component.";
+        throw new $A.auraError(msg);
+    }
+    
     key = $A.expressionService.normalize(key);
     var path = key.split('.');
     path.shift(); // remove provider

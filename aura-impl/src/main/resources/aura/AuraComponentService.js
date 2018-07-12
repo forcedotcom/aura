@@ -1086,22 +1086,23 @@ AuraComponentService.prototype.hasCacheableDefinitionOfAnyType = function(descri
 };
 
 AuraComponentService.prototype.loadComponentDefs = function(descriptorMap, callback) {
+    var missingDescriptorMap = {};
     for (var descriptor in descriptorMap) {
         try {
-            if (this.hasCacheableDefinitionOfAnyType(descriptor)) {
-                delete descriptorMap[descriptor];
+            if (!this.hasCacheableDefinitionOfAnyType(descriptor)) {
+                missingDescriptorMap[descriptor] = descriptorMap[descriptor];
             }
         } catch (e) {
             // ignore any exception raised
         }
     }
 
-    if (!$A.util.isObject(descriptorMap) || Object.keys(descriptorMap).length === 0) {
+    if (!$A.util.isObject(missingDescriptorMap) || Object.keys(missingDescriptorMap).length === 0) {
         callback();
         return;
     }
 
-    this.componentDefLoader.loadComponentDefs(descriptorMap, callback);
+    this.componentDefLoader.loadComponentDefs(missingDescriptorMap, callback);
 };
 
 /**

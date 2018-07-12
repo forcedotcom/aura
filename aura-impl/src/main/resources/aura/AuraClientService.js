@@ -161,7 +161,7 @@ function AuraClientService (util) {
     this.lastSendTime = Date.now();
 
     this.moduleServices = {};
-    this.moduleScopedImports = { "label" : this.labelScopedImportResolver };
+    this.moduleScopedImports = { "label" : this.labelScopedImportResolver, "salesforce": this.defaultSalesforceImportResolver };
     this.moduleScopedImportsCache = {};
 
     // TODO: @dval We should send this from the server, but for LightningOut apps is a non-trivial change,
@@ -2187,7 +2187,6 @@ AuraClientService.prototype.initializeInjectedServices = function(services) {
  */
 AuraClientService.prototype.addScopedModuleResolver = function (scope, resolver) {
     $A.assert(typeof resolver === 'function', 'Scoped module resolver must be a function');
-    $A.assert(this.moduleScopedImports[scope] === undefined, 'Unable to add a resolver for scope ' + scope + '. A resolver is already registered.');
     this.moduleScopedImports[scope] = resolver;
 };
 
@@ -2210,8 +2209,9 @@ AuraClientService.prototype.resolveScopedModuleImport = function (scope, fullImp
     return this.moduleScopedImportsCache[fullImport];
 };
 
-
 /**
+ * Remove this in 218. Replaced by @salesforce/label
+ * 
  * Default resolver for the @label scoped module import.
  * 
  * @param {String} fullImport The entire path of the module being imported
@@ -2224,6 +2224,32 @@ AuraClientService.prototype.labelScopedImportResolver = function(fullImport) {
     var parts = key.split('.');
     $A.assert(parts.length === 2, 'Malformed @label scoped module import. Static imports for @label modules require two parts: section and key');
     return $A.get("$Label." + key);
+};
+
+/**
+ * Default resolver for the @salesforce scoped module import. This allows off-core projects to  still have access to
+ * a sub-set of @salesforce imports in their modules, such as labels, and can be overridden by core to provide the full
+ * set of @salesforce imports.
+ * 
+ * This is registered at the framework level rather than the app level to allow things like component tests that load a
+ * cmp file directly in the browser to still function.
+ * 
+ * W-5187044: Investigate if we can do this injection in the test runner flow instead and if that is a complete and
+ * adequete solution.
+ * 
+ * @param {String} fullImport The entire path of the module being imported
+ * @memberOf AuraClientService
+ * @private
+ */
+AuraClientService.prototype.defaultSalesforceImportResolver = function(fullImport) {
+    // strip off the "@salesforce/" section of the import
+    var path = fullImport.substring(12);
+    var parts = path.split('/');
+    var key = parts[0];
+    if (key && key === 'label') {
+        return $A.get("$Label." + parts[1]);
+    }
+    return undefined;
 };
 
 /**

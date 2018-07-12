@@ -184,7 +184,7 @@
         ]
     },
 
-    testNoReferrerAttribute: {
+    testNoOpenerAttribute: {
         attributes : {
             textValue: 'visit salesforce.com for more details'
         },
@@ -193,7 +193,7 @@
                 var link = cmp.find("richTextComp").getElement().querySelector("a");
                 var rel = link && link.getAttribute("rel");
                 $A.test.assertNotNull(rel);
-                $A.test.assertEquals(rel, "noreferrer noopener");
+                $A.test.assertEquals(rel, "noopener");
             }
         ]
     },

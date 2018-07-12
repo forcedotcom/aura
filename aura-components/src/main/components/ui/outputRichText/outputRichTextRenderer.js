@@ -33,7 +33,7 @@
 
     afterRender: function (cmp) {
         var concreteHelper = cmp.getConcreteComponent().getDef().getHelper();
-        concreteHelper.addNoReferrerToLinks(cmp);
+        concreteHelper.addNoOpenerToLinks(cmp);
         return this.superAfterRender();
     }
  })// eslint-disable-line semi

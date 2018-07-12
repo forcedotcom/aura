@@ -69,7 +69,7 @@ function lib() { //eslint-disable-line no-unused-vars
         if (match.toLowerCase().lastIndexOf("http", 0) !== 0 && match.toLowerCase().lastIndexOf("ftp", 0) !== 0) {
             href = "http://" + href;
         }
-        return "<a href=\"" + href + "\" target=\"_blank\" rel=\"noreferrer noopener\">" + match + "</a>";
+        return "<a href=\"" + href + "\" target=\"_blank\" rel=\"noopener\">" + match + "</a>";
     };
     var createEmailLink = function(match) {
         return "<a href=\"mailto:" + match + "\">" + match + "</a>";

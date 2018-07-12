@@ -78,11 +78,6 @@ Test.Aura.AuraLocalizationServiceTest = function() {
 
     [Fixture]
     function displayDuration() {
-        var mockMoment = {
-            isDuration: function() {
-                return false;
-            }
-        };
 
         [Fact]
         function displayDuration() {
@@ -150,8 +145,11 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         function displayDurationInDays() {
             // Arrange
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
+            targetService.isValidDuration = function() {
+                return true;
+            }
 
+            var actual;
             var expected = "expected";
             var mockAsUnit = Stubs.GetMethod("day", expected);
             var mockDuration = {
@@ -159,18 +157,23 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             };
 
             // Act
-            var actual = targetService.displayDurationInDays(mockDuration);
+            mockUtil(function() {
+                actual = targetService.displayDurationInDays(mockDuration);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        function displayDurationInHours(){
+        function displayDurationInHours() {
             // Arrange
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
+            targetService.isValidDuration = function() {
+                return true;
+            }
 
+            var actual;
             var expected = "expected";
             var mockAsUnit = Stubs.GetMethod("hour", expected);
             var mockDuration = {
@@ -178,17 +181,22 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             };
 
             // Act
-            var actual = targetService.displayDurationInHours(mockDuration);
+            mockUtil(function() {
+                actual = targetService.displayDurationInHours(mockDuration);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        function displayDurationInMilliseconds(){
+        function displayDurationInMilliseconds() {
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
+            targetService.isValidDuration = function() {
+                return true;
+            }
 
+            var actual;
             var expected = "expected";
             var mockAsUnit = Stubs.GetMethod("millisecond", expected);
             var mockDuration = {
@@ -196,7 +204,9 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             };
 
             // Act
-            var actual = targetService.displayDurationInMilliseconds(mockDuration);
+            mockUtil(function() {
+                actual = targetService.displayDurationInMilliseconds(mockDuration);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -205,8 +215,11 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         [Fact]
         function displayDurationInMinutes() {
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
+            targetService.isValidDuration = function() {
+                return true;
+            }
 
+            var actual;
             var expected = "expected";
             var mockAsUnit = Stubs.GetMethod("minute", expected);
             var mockDuration = {
@@ -214,7 +227,9 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             };
 
             // Act
-            var actual = targetService.displayDurationInMinutes(mockDuration);
+            mockUtil(function() {
+                actual = targetService.displayDurationInMinutes(mockDuration);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -223,8 +238,11 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         [Fact]
         function displayDurationInMonths() {
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
+            targetService.isValidDuration = function() {
+                return true;
+            }
 
+            var actual;
             var expected = "expected";
             var mockAsUnit = Stubs.GetMethod("month", expected);
             var mockDuration = {
@@ -232,7 +250,9 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             };
 
             // Act
-            var actual = targetService.displayDurationInMonths(mockDuration);
+            mockUtil(function() {
+                actual = targetService.displayDurationInMonths(mockDuration);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -241,8 +261,11 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         [Fact]
         function displayDurationInSeconds() {
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
+            targetService.isValidDuration = function() {
+                return true;
+            }
 
+            var actual;
             var expected = "expected";
             var mockAsUnit = Stubs.GetMethod("second", expected);
             var mockDuration = {
@@ -250,7 +273,9 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             };
 
             // Act
-            var actual = targetService.displayDurationInSeconds(mockDuration);
+            mockUtil(function() {
+                actual = targetService.displayDurationInSeconds(mockDuration);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -259,8 +284,11 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         [Fact]
         function displayDurationInYears() {
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
+            targetService.isValidDuration = function() {
+                return true;
+            }
 
+            var actual;
             var expected = "expected";
             var mockAsUnit = Stubs.GetMethod("year", expected);
             var mockDuration = {
@@ -268,7 +296,9 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             };
 
             // Act
-            var actual = targetService.displayDurationInYears(mockDuration);
+            mockUtil(function() {
+                actual = targetService.displayDurationInYears(mockDuration);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -282,17 +312,14 @@ Test.Aura.AuraLocalizationServiceTest = function() {
     [Fixture]
     function getDuration() {
 
-        var mockMoment = {
-            isDuration: function() {
-                return false;
-            }
-        };
-
         [Fact]
         function getDaysInDuration() {
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
+            targetService.isValidDuration = function() {
+                return true;
+            }
 
+            var actual;
             var expected = "expected";
             var mockGetUnit = Stubs.GetMethod("year", expected);
             var mockDuration = {
@@ -300,7 +327,9 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             };
 
             // Act
-            var actual = targetService.getDaysInDuration(mockDuration);
+            mockUtil(function() {
+                actual = targetService.getDaysInDuration(mockDuration);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -309,8 +338,11 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         [Fact]
         function getHoursInDuration() {
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
+            targetService.isValidDuration = function() {
+                return true;
+            }
 
+            var actual;
             var expected = "expected";
             var mockGetUnit = Stubs.GetMethod("hour", expected);
             var mockDuration = {
@@ -318,7 +350,9 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             };
 
             // Act
-            var actual = targetService.getHoursInDuration(mockDuration);
+            mockUtil(function() {
+                actual = targetService.getHoursInDuration(mockDuration);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -327,8 +361,11 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         [Fact]
         function getMillisecondsInDuration() {
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
+            targetService.isValidDuration = function() {
+                return true;
+            }
 
+            var actual;
             var expected = "expected";
             var mockGetUnit = Stubs.GetMethod("millisecond", expected);
             var mockDuration = {
@@ -336,7 +373,9 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             };
 
             // Act
-            var actual = targetService.getMillisecondsInDuration(mockDuration);
+            mockUtil(function() {
+                actual = targetService.getMillisecondsInDuration(mockDuration);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -345,8 +384,11 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         [Fact]
         function getMinutesInDuration() {
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
+            targetService.isValidDuration = function() {
+                return true;
+            }
 
+            var actual;
             var expected = "expected";
             var mockGetUnit = Stubs.GetMethod("minute", expected);
             var mockDuration = {
@@ -354,17 +396,22 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             };
 
             // Act
-            var actual = targetService.getMinutesInDuration(mockDuration);
+            mockUtil(function() {
+                actual = targetService.getMinutesInDuration(mockDuration);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        function getMonthsInDuration(){
+        function getMonthsInDuration() {
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
+            targetService.isValidDuration = function() {
+                return true;
+            }
 
+            var actual;
             var expected = "expected";
             var mockGetUnit = Stubs.GetMethod("month", expected);
             var mockDuration = {
@@ -372,7 +419,9 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             };
 
             // Act
-            var actual = targetService.getMonthsInDuration(mockDuration);
+            mockUtil(function() {
+                actual = targetService.getMonthsInDuration(mockDuration);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -381,8 +430,11 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         [Fact]
         function getSecondsInDuration() {
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
+            targetService.isValidDuration = function() {
+                return true;
+            }
 
+            var actual;
             var expected = "expected";
             var mockGetUnit = Stubs.GetMethod("second", expected);
             var mockDuration = {
@@ -390,7 +442,9 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             };
 
             // Act
-            var actual = targetService.getSecondsInDuration(mockDuration);
+            mockUtil(function() {
+                actual = targetService.getSecondsInDuration(mockDuration);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -399,8 +453,11 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         [Fact]
         function getYearsInDuration() {
             var targetService = new Aura.Services.AuraLocalizationService();
-            targetService.moment = mockMoment;
+            targetService.isValidDuration = function() {
+                return true;
+            }
 
+            var actual;
             var expected = "expected";
             var mockGetUnit = Stubs.GetMethod("year", expected);
             var mockDuration = {
@@ -408,7 +465,9 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             };
 
             // Act
-            var actual = targetService.getYearsInDuration(mockDuration);
+            mockUtil(function() {
+                actual = targetService.getYearsInDuration(mockDuration);
+            });
 
             // Assert
             Assert.Equal(expected, actual);

@@ -192,17 +192,6 @@ Aura.Utils.Duration.prototype.absFloor = function(number) {
  * @export
  * @platform
  */
-Aura.Utils.Duration.prototype.clone = function() {
-    $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
-            null, "Duration.clone");
-    return this.momentDuration["clone"]();
-};
-
-/**
- * @deprecated
- * @export
- * @platform
- */
 Aura.Utils.Duration.prototype.humanize = function(withSuffix) {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             null, "Duration.humanize");
@@ -383,81 +372,4 @@ Aura.Utils.Duration.prototype.asYears = function() {
     $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
             "Use '$A.localizationService.displayDurationInYears()'", "Duration.asYears");
     return this.momentDuration["asYears"]();
-};
-
-/**
- * @deprecated
- * @export
- * @platform
- */
-Aura.Utils.Duration.prototype.add = function(number, unit) {
-    $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
-            null, "Duration.add");
-    return this.momentDuration["add"](number, unit);
-};
-
-/**
- * @deprecated
- * @export
- * @platform
- */
-Aura.Utils.Duration.prototype.subtract = function(number, unit) {
-    $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
-            null, "Duration.subtract");
-    return this.momentDuration["subtract"](number, unit);
-};
-
-/**
- * @deprecated
- * @export
- * @platform
- */
-Aura.Utils.Duration.prototype.as = function(unit) {
-    $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
-            null, "Duration.as");
-    return this.momentDuration["as"](unit);
-};
-
-/**
- * @deprecated
- * @export
- * @platform
- */
-Aura.Utils.Duration.prototype.get = function(unit) {
-    $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
-            null, "Duration.get");
-    return this.momentDuration["get"](unit);
-};
-
-/**
- * @deprecated
- * @export
- * @platform
- */
-Aura.Utils.Duration.prototype.toJSON = function() {
-    $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
-            null, "Duration.toJSON");
-    return this.momentDuration["toJSON"]();
-};
-
-/**
- * @deprecated
- * @export
- * @platform
- */
-Aura.Utils.Duration.prototype.toISOString = function() {
-    $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
-            null, "Duration.toISOString");
-    return this.momentDuration["toISOString"]();
-};
-
-/**
- * @deprecated
- * @export
- * @platform
- */
-Aura.Utils.Duration.prototype.locale = function(locale) {
-    $A.deprecated("This method is not officially supported by framework and will be removed in upcoming release.",
-            null, "Duration.locale");
-    return this.momentDuration["locale"](locale);
 };

@@ -240,11 +240,8 @@ AuraLocalizationService.prototype.getDefaultCurrencyFormat = function() {
  * @platform
  */
 AuraLocalizationService.prototype.displayDuration = function(duration, withSuffix) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDuration");
-
-        return duration["humanize"](withSuffix);
+    if (!this.isValidDuration(duration)) {
+        return "Invalid Duration";
     }
 
     return duration.displayDuration(withSuffix);
@@ -264,14 +261,11 @@ AuraLocalizationService.prototype.displayDuration = function(duration, withSuffi
  * @platform
  */
 AuraLocalizationService.prototype.displayDurationInDays = function(duration) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInDays");
-
-        return duration["asDays"]();
+    if (!this.isValidDuration(duration)) {
+        return 0;
     }
 
-    return duration.asUnit("day");
+    return duration.asUnit("day") || 0;
 };
 
 /**
@@ -288,14 +282,11 @@ AuraLocalizationService.prototype.displayDurationInDays = function(duration) {
  * @platform
  */
 AuraLocalizationService.prototype.displayDurationInHours = function(duration) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInHours");
-
-        return duration["asHours"]();
+    if (!this.isValidDuration(duration)) {
+        return 0;
     }
 
-    return duration.asUnit("hour");
+    return duration.asUnit("hour") || 0;
 };
 
 /**
@@ -312,14 +303,11 @@ AuraLocalizationService.prototype.displayDurationInHours = function(duration) {
  * @platform
  */
 AuraLocalizationService.prototype.displayDurationInMilliseconds = function(duration) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInMilliseconds");
-
-        return duration["asMilliseconds"]();
+    if (!this.isValidDuration(duration)) {
+        return 0;
     }
 
-    return duration.asUnit("millisecond");
+    return duration.asUnit("millisecond") || 0;
 };
 
 /**
@@ -336,14 +324,11 @@ AuraLocalizationService.prototype.displayDurationInMilliseconds = function(durat
  * @platform
  */
 AuraLocalizationService.prototype.displayDurationInMinutes = function(duration) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInMinutes");
-
-        return duration["asMinutes"]();
+    if (!this.isValidDuration(duration)) {
+        return 0;
     }
 
-    return duration.asUnit("minute");
+    return duration.asUnit("minute") || 0;
 };
 
 /**
@@ -360,14 +345,11 @@ AuraLocalizationService.prototype.displayDurationInMinutes = function(duration) 
  * @platform
  */
 AuraLocalizationService.prototype.displayDurationInMonths = function(duration) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInMonths");
-
-        return duration["asMonths"]();
+    if (!this.isValidDuration(duration)) {
+        return 0;
     }
 
-    return duration.asUnit("month");
+    return duration.asUnit("month") || 0;
 };
 
 /**
@@ -384,14 +366,11 @@ AuraLocalizationService.prototype.displayDurationInMonths = function(duration) {
  * @platform
  */
 AuraLocalizationService.prototype.displayDurationInSeconds = function(duration) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInSeconds");
-
-        return duration["asSeconds"]();
+    if (!this.isValidDuration(duration)) {
+        return 0;
     }
 
-    return duration.asUnit("second");
+    return duration.asUnit("second") || 0;
 };
 
 /**
@@ -408,14 +387,11 @@ AuraLocalizationService.prototype.displayDurationInSeconds = function(duration) 
  * @platform
  */
 AuraLocalizationService.prototype.displayDurationInYears = function(duration) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.displayDurationInYears");
-
-        return duration["asYears"]();
+    if (!this.isValidDuration(duration)) {
+        return 0;
     }
 
-    return duration.asUnit("year");
+    return duration.asUnit("year") || 0;
 };
 
 /**
@@ -723,14 +699,11 @@ AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatStrin
  * @platform
  */
 AuraLocalizationService.prototype.getDaysInDuration = function(duration) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getDaysInDuration");
-
-        return duration["days"]();
+    if (!this.isValidDuration(duration)) {
+        return 0;
     }
 
-    return duration.getUnit("day");
+    return duration.getUnit("day") || 0;
 };
 
 /**
@@ -747,14 +720,11 @@ AuraLocalizationService.prototype.getDaysInDuration = function(duration) {
  * @platform
  */
 AuraLocalizationService.prototype.getHoursInDuration = function(duration) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getHoursInDuration");
-
-        return duration["hours"]();
+    if (!this.isValidDuration(duration)) {
+        return 0;
     }
 
-    return duration.getUnit("hour");
+    return duration.getUnit("hour") || 0;
 };
 
 /**
@@ -767,14 +737,11 @@ AuraLocalizationService.prototype.getHoursInDuration = function(duration) {
  * @platform
  */
 AuraLocalizationService.prototype.getMillisecondsInDuration = function(duration) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getMillisecondsInDuration");
-
-        return duration["milliseconds"]();
+    if (!this.isValidDuration(duration)) {
+        return 0;
     }
 
-    return duration.getUnit("millisecond");
+    return duration.getUnit("millisecond") || 0;
 };
 
 /**
@@ -791,14 +758,11 @@ AuraLocalizationService.prototype.getMillisecondsInDuration = function(duration)
  * @platform
  */
 AuraLocalizationService.prototype.getMinutesInDuration = function(duration) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getMillisecondsInDuration");
-
-        return duration["minutes"]();
+    if (!this.isValidDuration(duration)) {
+        return 0;
     }
 
-    return duration.getUnit("minute");
+    return duration.getUnit("minute") || 0;
 };
 
 /**
@@ -815,14 +779,11 @@ AuraLocalizationService.prototype.getMinutesInDuration = function(duration) {
  * @platform
  */
 AuraLocalizationService.prototype.getMonthsInDuration = function(duration) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getMonthsInDuration");
-
-        return duration["months"]();
+    if (!this.isValidDuration(duration)) {
+        return 0;
     }
 
-    return duration.getUnit("month");
+    return duration.getUnit("month") || 0;
 };
 
 /**
@@ -839,14 +800,11 @@ AuraLocalizationService.prototype.getMonthsInDuration = function(duration) {
  * @platform
  */
 AuraLocalizationService.prototype.getSecondsInDuration = function(duration) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getSecondsInDuration");
-
-        return duration["seconds"]();
+    if (!this.isValidDuration(duration)) {
+        return 0;
     }
 
-    return duration.getUnit("second");
+    return duration.getUnit("second") || 0;
 };
 
 /**
@@ -863,14 +821,11 @@ AuraLocalizationService.prototype.getSecondsInDuration = function(duration) {
  * @platform
  */
 AuraLocalizationService.prototype.getYearsInDuration = function(duration) {
-    if (this.moment["isDuration"](duration)) {
-        $A.deprecated("moment Duration object will not be supported in upcoming release.",
-                "Use Duration object returned by $A.localizationService.duration()", "AuraLocalizationService.getYearsInDuration");
-
-        return duration["years"]();
+    if (!this.isValidDuration(duration)) {
+        return 0;
     }
 
-    return duration.getUnit("year");
+    return duration.getUnit("year") || 0;
 };
 
 /**
@@ -2292,6 +2247,10 @@ AuraLocalizationService.prototype.setupDateTimeUnitAlias = function() {
 
 AuraLocalizationService.prototype.isValidDateObject = function(date) {
     return (date instanceof Date) && !isNaN(date.getTime());
+};
+
+AuraLocalizationService.prototype.isValidDuration = function(duration) {
+    return duration instanceof Aura.Utils.Duration;
 };
 
 Aura.Services.AuraLocalizationService = AuraLocalizationService;

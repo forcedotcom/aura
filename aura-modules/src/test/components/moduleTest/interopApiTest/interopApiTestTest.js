@@ -38,5 +38,20 @@
                 $A.test.assertEquals(actual.evaluate(), 'foo');
             }
         ]
-    }
+    },
+
+    testAddEventHandler: {
+        browsers : [ 'GOOGLECHROME' ],
+        test: [
+            function(cmp) {
+                var actual;
+                var target = cmp.find('target');
+                
+                target.addEventHandler("aura:doneRendering", function(){
+                    // Should be added without an exception.
+                    // Can't test that it actually happens since its already rendered.
+                });
+            }
+        ]
+    },
 })

@@ -421,6 +421,7 @@ AuraInstance.prototype.initAsync = function(config) {
     this.clientService.setQueueSize(config["MaxParallelXHRCount"]);
     this.clientService.setXHRExclusivity(config["XHRExclusivity"]);
     this.clientService.setBootstrapInlined(config["bootstrapInlined"]);
+    this.clientService.setCssVars(config["cssVariables"]);
     this.initializers = config["initializers"];
 
     // Context is created async because of the GVPs go though async storage checks

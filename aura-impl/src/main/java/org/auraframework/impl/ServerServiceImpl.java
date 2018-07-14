@@ -56,6 +56,7 @@ import org.auraframework.def.module.ModuleDef;
 import org.auraframework.http.BootstrapUtil;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.impl.cache.ApplicationInitializerCache;
+import org.auraframework.impl.css.CssVariableWriter;
 import org.auraframework.impl.css.StyleDefWriter;
 import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.instance.Action;
@@ -921,6 +922,8 @@ public class ServerServiceImpl implements ServerService {
 
             auraInit.put("MaxParallelXHRCount", configAdapter.getMaxParallelXHRCount());
             auraInit.put("XHRExclusivity", configAdapter.getXHRExclusivity());
+            auraInit.put("cssVariables", CssVariableWriter.getCssVariables(definitionService, contextService));
+
             if (configAdapter.isBootstrapModelExclusionEnabled()) {
                 auraInit.put("initializers", new Literal(serializeInitializers(context)));
             }

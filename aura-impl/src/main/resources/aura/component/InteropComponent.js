@@ -440,6 +440,21 @@ InteropComponent.prototype.set = function (key, value) {
 
 };
 
+function getWrappedInteropEventListener(listener, element) {
+    var descriptor = {
+        configurable: true,
+        enumerable: true,
+        value: element
+    };
+    return function(event) {
+        Object.defineProperties(event, {
+            target: descriptor,
+            currentTarget: descriptor
+        });
+        listener(event);
+    };
+}
+
 InteropComponent.prototype.attachOnChangeToElement = function (element) {
     var self = this;
     function handleInteropChange(event) {
@@ -454,7 +469,7 @@ InteropComponent.prototype.attachOnChangeToElement = function (element) {
         }
     }
 
-    element.addEventListener('change', handleInteropChange);
+    element.addEventListener('change', getWrappedInteropEventListener(handleInteropChange, element));
 };
 
 /**

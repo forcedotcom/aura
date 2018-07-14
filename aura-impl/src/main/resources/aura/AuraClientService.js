@@ -162,6 +162,7 @@ function AuraClientService (util) {
 
     this.moduleServices = {};
     this.moduleScopedImports = { "label" : this.labelScopedImportResolver, "salesforce": this.defaultSalesforceImportResolver };
+    this.cssVars = {}; // To support custom variables in IE11 we need to serialized them to the client
     this.moduleScopedImportsCache = {};
 
     // TODO: @dval We should send this from the server, but for LightningOut apps is a non-trivial change,
@@ -401,6 +402,12 @@ AuraClientService.prototype.deferPendingActions = function() {
                 action.setDeferred();
             }
         }
+    }
+};
+
+AuraClientService.prototype.setCssVars = function (cssVars) {
+    if (cssVars) {
+        this.cssVars = cssVars;
     }
 };
 
@@ -2246,10 +2253,18 @@ AuraClientService.prototype.defaultSalesforceImportResolver = function(fullImpor
     var path = fullImport.substring(12);
     var parts = path.split('/');
     var key = parts[0];
-    if (key && key === 'label') {
-        return $A.get("$Label." + parts[1]);
+
+    switch (key) {
+        case 'label': 
+            return $A.get("$Label." + parts[1]);
+        case 'css':
+            return function (cssVar) {
+                return $A.clientService.cssVars[cssVar.slice(2)];
+            };
+
+        default: 
+            return undefined;
     }
-    return undefined;
 };
 
 /**

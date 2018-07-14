@@ -25,10 +25,7 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.service.LoggingService;
-import org.lwc.CompilerConfig;
-import org.lwc.CompilerReport;
-import org.lwc.LwcCompiler;
-import org.lwc.OutputConfig;
+import org.lwc.*;
 import org.lwc.bundle.Bundle;
 import org.lwc.bundle.BundleType;
 import org.lwc.diagnostic.Diagnostic;
@@ -43,8 +40,8 @@ public class ModulesCompilerNode implements ModulesCompiler {
 
     private final LoggingService loggingService;
     protected final NodeLambdaFactory factory;
-
     private static final NodeLambdaFactory FACTORY = NodeLambdaFactorySidecar.INSTANCE;
+    private static final StylesheetConfig stylesheetConfig = createStylesheetConfig();
 
     protected LwcCompiler compiler;
 
@@ -85,7 +82,7 @@ public class ModulesCompilerNode implements ModulesCompiler {
         }
 
         Bundle bundle = new Bundle(namespace, name, normalizedSources, bundleType);
-        CompilerConfig config = new CompilerConfig(bundle, configs);
+        CompilerConfig config = new CompilerConfig(bundle, configs, stylesheetConfig);
 
         ModulesCompilerData result;
 
@@ -113,6 +110,14 @@ public class ModulesCompilerNode implements ModulesCompiler {
         }
 
         return result;
+    }
+
+    private static StylesheetConfig createStylesheetConfig() {
+        Map<String,String> customPropertiesMap = new HashMap<String, String>();
+        customPropertiesMap.put("type","module");
+        customPropertiesMap.put("name","@salesforce/css/customProperties");
+        
+        return new StylesheetConfig(new CustomPropertiesConfig(true, customPropertiesMap));
     }
 
     protected String buildDiagnosticsError(String entry, List<Diagnostic> diagnostics, BundleType bundleType) {

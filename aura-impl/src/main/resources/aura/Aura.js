@@ -23,13 +23,12 @@ Aura["bootstrap"] = Aura["bootstrap"] || {};
 Aura["bootstrap"]["visibilityStateStart"] = document.visibilityState;
 Aura.bootstrapMark = function (mark, value) {
     //#if {"excludeModes" : ["PRODUCTION"]}
-    if (window.console&&window.console.timeStamp) {
+    if (window.console && window.console.timeStamp) {
         window.console.timeStamp(mark);
     }
     //#end
     this["bootstrap"][mark] = value || this.time();
 };
-
 
 // bootstrap robustness:
 // - all files required for bootstrap are loaded with sync <script> tags

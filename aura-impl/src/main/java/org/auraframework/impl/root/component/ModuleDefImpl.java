@@ -57,7 +57,7 @@ import com.google.common.collect.Sets;
  */
 public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleDef {
 
-    private static final long serialVersionUID = -6862338012969275424L;
+    private static final long serialVersionUID = -7973449123070386535L;
 
     private String path;
     private final Set<String> moduleDependencies;

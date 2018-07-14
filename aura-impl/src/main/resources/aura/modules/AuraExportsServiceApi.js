@@ -64,6 +64,9 @@ Aura.ServiceApi = {
             return $A.initializers[name];
         }
     },
+    "getCSSVar": function(cssVarName) {
+        return $A.clientService.cssVars[cssVarName];
+    },
     "replaceComponentDefLoader": function(method) {
         $A.componentService.componentDefLoader.setScriptGenerator(method);
     }

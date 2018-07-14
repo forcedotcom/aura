@@ -29,8 +29,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -42,6 +41,34 @@ public class CssVariableWriter {
     private static Pattern validName = Pattern.compile("^([a-z_]|-[a-z_-])[a-z\\d_-]*", Pattern.CASE_INSENSITIVE);
     private static Pattern invalidValue = Pattern.compile("[\\{\\}]|\\/\\/|\\/\\*");
     private static String variableDeclaration = "--lwc-%s: %s;\n";
+    private static String prefix = "lwc-%s";
+
+    static public Map getCssVariables(DefinitionService definitionService, ContextService contextService) throws QuickFixException {
+        AuraContext context = contextService.getCurrentContext();
+        List<DefDescriptor<TokensDef>> tokenOverrides = getTokenDefs(context, definitionService);
+        Map<String, Object> tokenMap = new HashMap<String, Object>();
+
+        if (tokenOverrides != null && tokenOverrides.size() > 0) {
+
+            TokenCache tokens = context.getStyleContext().getTokens();
+            Set<String> names = tokens != null && !tokens.isEmpty() ? tokens.getNames(tokenOverrides) : null;
+
+            if (names != null && names.size() > 0) {
+                for (String name : names) {
+                    if (isValidName(name)) {
+                        Optional<Object> value = tokens.getToken(name);
+                        if (isValidValue(value)) {
+                            tokenMap.put(String.format(prefix, name), value.get());
+                        }
+                    }
+                }
+            }
+
+            return tokenMap;
+        }
+
+        return null;
+    }
 
     public CssVariableWriter(DefinitionService definitionService, ContextService contextService){
         this.definitionService = definitionService;
@@ -51,7 +78,7 @@ public class CssVariableWriter {
     public void write(Appendable out) throws QuickFixException, IOException {
         StringBuilder cssVariables = new StringBuilder();
         AuraContext context = contextService.getCurrentContext();
-        List<DefDescriptor<TokensDef>> tokenOverrides = getTokenDefs(context);
+        List<DefDescriptor<TokensDef>> tokenOverrides = getTokenDefs(context, definitionService);
 
         if (tokenOverrides != null && tokenOverrides.size() > 0) {
 
@@ -78,15 +105,15 @@ public class CssVariableWriter {
         }
     }
 
-    private boolean isValidValue(Optional<Object> optionalValue) {
+    private static boolean isValidValue(Optional<Object> optionalValue) {
         return optionalValue.isPresent() && !invalidValue.matcher(optionalValue.get().toString()).find();
     }
 
-    private boolean isValidName(String name) {
+    private static boolean isValidName(String name) {
         return StringUtils.hasText(name) && validName.matcher(name).matches();
     }
 
-    private List<DefDescriptor<TokensDef>> getTokenDefs(AuraContext context) throws QuickFixException {
+    private static List<DefDescriptor<TokensDef>> getTokenDefs(AuraContext context, DefinitionService definitionService) throws QuickFixException {
         DefDescriptor<? extends BaseComponentDef> applicationDescriptor = context.getApplicationDescriptor();
         ApplicationDef def = null;
 

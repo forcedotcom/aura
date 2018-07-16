@@ -502,7 +502,7 @@ InteropComponent.prototype.setupInteropInstance = function () {
         var propName = this.attrNameToPropMap[attrName];
 
         if (attrName.indexOf('on') === 0 && !propName) {
-            element.addEventListener(attrName.substring(2), value, false);
+            element.addEventListener(attrName.substring(2), getWrappedInteropEventListener(value, element));
         } else if (!propName && this.isHtmlGlobalAttr(attrName)) { // first check we are not overriding this attrName
             this.setGlobalAttribute(element, attrName, value);
         } else {

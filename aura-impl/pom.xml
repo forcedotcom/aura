@@ -216,28 +216,43 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <configuration>
-                            <workingDirectory>${aura.home}</workingDirectory>
-                        </configuration>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
                         <executions>
                             <execution>
-                                <id>install-node-npm</id>
-                                <phase>pre-clean</phase>
-                            </execution>
-                            <execution>
-                                <id>npm-install</id>
-                                <phase>pre-clean</phase>
-                            </execution>
-                            <execution>
-                                <id>run-xunit</id>
-                                <phase>test</phase>
+                                <id>npm install (initialize)</id>
                                 <goals>
-                                    <goal>npm</goal>
+                                    <goal>exec</goal>
                                 </goals>
+                                <phase>initialize</phase>
                                 <configuration>
-                                    <arguments>run --color=false test -- /dependency:./aura-util/src/test/tools/xUnit/dependencies /output:text /strict:${xunit.js.isStrict} /verbose:false ${project.basedir}/src/test/javascript</arguments>
+                                    <executable>npm</executable>
+                                    <arguments>
+                                        <argument>install</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>npm run test (test)</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>test</phase>
+                                <configuration>
+                                    <executable>npm</executable>
+                                    <arguments>
+                                        <argument>--project ${aura.home}</argument>
+                                        <argument>run</argument>
+                                        <argument>--color=false</argument>
+                                        <argument>test</argument>
+                                        <argument>--</argument>
+                                        <argument>/dependency:./aura-util/src/test/tools/xUnit/dependencies</argument>
+                                        <argument>/output:text</argument>
+                                        <argument>/strict:${xunit.js.isStrict}</argument>
+                                        <argument>/verbose:false</argument>
+                                        <argument>${project.basedir}/src/test/javascript</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>
@@ -250,28 +265,35 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <configuration>
-                            <workingDirectory>${project.parent.basedir}</workingDirectory>
-                        </configuration>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
                         <executions>
                             <execution>
-                                <id>install-node-npm</id>
-                                <phase>pre-clean</phase>
-                            </execution>
-                            <execution>
-                                <id>npm-install</id>
-                                <phase>pre-clean</phase>
-                            </execution>
-                            <execution>
-                                <id>grunt-build-framework</id>
+                                <id>npm install (initialize)</id>
                                 <goals>
-                                    <goal>grunt</goal>
+                                    <goal>exec</goal>
                                 </goals>
                                 <phase>pre-clean</phase>
                                 <configuration>
-                                    <arguments>--no-color eslint:framework</arguments>
+                                    <executable>npm</executable>
+                                    <arguments>
+                                        <argument>install</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>npm run test (test)</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>pre-clean</phase>
+                                <configuration>
+                                    <executable>grunt</executable>
+                                    <arguments>
+                                        <argument>--no-color</argument>
+                                        <argument>eslint:framework</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>

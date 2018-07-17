@@ -36,8 +36,24 @@ You need:
 
 * JDK 1.8
 * Apache Maven 3
+* Node 4.1.0+
+* NPM 2.2.0+
+* Chromedriver 2.37
 
-### Step 1: Clone Aura git repo and build Archetype
+### Step 1: Install Node, NPM and Chromedriver
+
+1. Install Node and NPM (https://nodejs.org/en/download/)
+2. Download Google Chromedriver for your OS
+    - Mac (http://http://chromedriver.storage.googleapis.com/2.37/chromedriver_mac64.zip)
+    - Linux (http://http://chromedriver.storage.googleapis.com/2.37/chromedriver_linux64.zip)
+3. Unzip chromedriver into `~/bin/`
+4. Ensure node, npm and chromedriver appear within your PATH variable (run `echo $PATH` within your command line window).
+   If you cannot see node, npm or chromedriver within your PATH, be sure to add it to your PATH via the export function, eg:
+     `echo "export PATH=$PATH:$HOME/bin" >> $HOME/.bash_profile`
+   Or paste it directly into your $HOME/.bash_profile, $HOME/.profile, $HOME/.bashrc etc files
+
+
+### Step 2: Clone Aura git repo and build Archetype
 
 1. Open a command line window.
 2. Clone or download Aura maven project using the above github button.

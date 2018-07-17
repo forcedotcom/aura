@@ -53,10 +53,6 @@
         <xunit.js.currentModule>${project.basedir}</xunit.js.currentModule>
         <spring.version>4.3.6.RELEASE</spring.version>
         <jetty.version>9.4.5.v20170502</jetty.version>
-        <node.download.root.url>http://repo.auraframework.org/simple/plugins-release-local/node/</node.download.root.url>
-        <npm.download.root.url>http://repo.auraframework.org/simple/plugins-release-local/npm/</npm.download.root.url>
-        <node.version>v4.2.1</node.version>
-        <npm.version>2.14.7</npm.version>
         <eslint.extra.arg>--no-color</eslint.extra.arg>
         <lwc.version>0.24.1</lwc.version>
     </properties>
@@ -887,30 +883,9 @@
                                         <execute />
                                     </action>
                                 </pluginExecution>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>com.github.eirslett</groupId>
-                                        <artifactId>frontend-maven-plugin</artifactId>
-                                        <goals>
-                                            <goal>install-node-and-npm</goal>
-                                            <goal>npm</goal>
-                                            <goal>grunt</goal>
-                                        </goals>
-
-                                        <versionRange>[0.0,)</versionRange>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>com.savage7.maven.plugins</groupId>
-                    <artifactId>maven-external-dependency-plugin</artifactId>
-                    <version>0.5</version>
                 </plugin>
 	            <plugin>
 	                <groupId>org.apache.maven.plugins</groupId>
@@ -948,19 +923,6 @@
                         <installDirectory>${aura.home}</installDirectory>
                     </configuration>
                     <executions>
-                        <execution>
-                            <id>install-node-npm</id>
-                            <phase>disabled</phase>
-                            <goals>
-                                <goal>install-node-and-npm</goal>
-                            </goals>
-                            <configuration>
-                                <nodeVersion>${node.version}</nodeVersion>
-                                <npmVersion>${npm.version}</npmVersion>
-                                <nodeDownloadRoot>${node.download.root.url}</nodeDownloadRoot>
-                                <npmDownloadRoot>${npm.download.root.url}${npm.version}/</npmDownloadRoot>
-                            </configuration>
-                        </execution>
                         <execution>
                             <id>npm-install</id>
                             <phase>disabled</phase>

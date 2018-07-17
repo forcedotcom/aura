@@ -130,7 +130,6 @@
         </dependency>
     </dependencies>
     <properties>
-        <chromedriver.download.root.url>http://chromedriver.storage.googleapis.com</chromedriver.download.root.url>
         <chromedriver.version>2.37</chromedriver.version>
         <jetty.spawn>true</jetty.spawn>
         <jetty.resources>${basedir}/../aura/src/main/webapp</jetty.resources>
@@ -144,12 +143,12 @@
         <testSetupPhase>disabled</testSetupPhase>
         <testTeardownPhase>disabled</testTeardownPhase>
         <user.timezone>GMT</user.timezone>
-        <webdriver.chrome.driver>${basedir}/bin/chromedriverlauncher</webdriver.chrome.driver>
+        <webdriver.chrome.driver>/bin/chromedriver</webdriver.chrome.driver>
         <webdriver.remote.server /> <!-- http://localhost:4444/wd/hub/ -->
         <webdriver.reusebrowser>true</webdriver.reusebrowser>
         <webdriver.browser.type>GOOGLECHROME</webdriver.browser.type> <!-- refer to org.auraframework.test.WebDriverUtil.BrowserType enums for valid values -->
         <webdriver.browser.runheadless>true</webdriver.browser.runheadless>
-		<webdriver.timeout>60</webdriver.timeout>
+		<webdriver.timeout>90</webdriver.timeout>
         <sauce.record.video>false</sauce.record.video>
         <sauce.record.screenshots>false</sauce.record.screenshots>
         <xdisplay.exec>Xvfb</xdisplay.exec>
@@ -294,63 +293,7 @@
           				</transformationSets>
         			</configuration>
       			</plugin>
-                <plugin>
-                    <groupId>com.savage7.maven.plugins</groupId>
-                    <artifactId>maven-external-dependency-plugin</artifactId>
-                    <configuration>
-                        <createChecksum>false</createChecksum>
-                        <skipChecksumVerification>true</skipChecksumVerification>
-                        <force>false</force>
-                        <artifactItems>
-                            <artifactItem>
-                                <groupId>com.google.code</groupId>
-                                <artifactId>chromedriver</artifactId>
-                                <version>${chromedriver.version}</version>
-                                <packaging>zip</packaging>
-                                <classifier>${platform.chromedriver}</classifier>
-                                <downloadUrl>${chromedriver.download.root.url}/{version}/{artifactId}_{classifier}.zip</downloadUrl>
-                                <install>true</install>
-                            </artifactItem>
-                        </artifactItems>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>get-external-dependencies</id>
-                            <phase>generate-test-resources</phase>
-                            <goals>
-                                <goal>resolve-external</goal>
-                                <goal>install-external</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>unpack-chromedriver</id>
-                            <phase>process-test-resources</phase>
-                            <goals>
-                                <goal>unpack</goal>
-                            </goals>
-                            <configuration>
-                                <artifactItems>
-                                    <artifactItem>
-                                        <groupId>com.google.code</groupId>
-                                        <artifactId>chromedriver</artifactId>
-                                        <version>${chromedriver.version}</version>
-                                        <type>zip</type>
-                                        <classifier>${platform.chromedriver}</classifier>
-                                        <overWrite>true</overWrite>
-                                        <outputDirectory>target/bin</outputDirectory>
-                                    </artifactItem>
-                                </artifactItems>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
+     			<plugin>
 	                <!--This plugin's configuration is used to store Eclipse m2e settings
 	                    only. It has no influence on the Maven build itself. -->
                     <groupId>org.eclipse.m2e</groupId>
@@ -370,20 +313,6 @@
                                     </pluginExecutionFilter>
                                     <action>
                                         <execute />
-                                    </action>
-                                </pluginExecution>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>com.savage7.maven.plugins</groupId>
-                                        <artifactId>maven-external-dependency-plugin</artifactId>
-                                        <versionRange>[0.1,)</versionRange>
-                                        <goals>
-                                            <goal>resolve-external</goal>
-                                            <goal>install-external</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -547,10 +476,6 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.savage7.maven.plugins</groupId>
-                        <artifactId>maven-external-dependency-plugin</artifactId>
-                    </plugin>
-                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
                     </plugin>
@@ -569,7 +494,7 @@
                 </os>
             </activation>
             <properties>
-                <platform.chromedriver>linux${sun.arch.data.model}</platform.chromedriver>
+                <platform.chromedriver>/bin/chromedriver</platform.chromedriver>
             </properties>
         </profile>
         <profile>
@@ -580,7 +505,7 @@
                </property>
             </activation>
             <properties>
-                <platform.chromedriver>linux${sun.arch.data.model}</platform.chromedriver>
+                <platform.chromedriver>/bin/chromedriver</platform.chromedriver>
             </properties>
         </profile>
         <profile>
@@ -604,7 +529,7 @@
             <properties>
                 <xdisplay.skip>true</xdisplay.skip>
                 <platform.chromedriver>win32</platform.chromedriver>
-                <webdriver.chrome.driver>${basedir}/target/bin/chromedriver.exe</webdriver.chrome.driver>
+                <webdriver.chrome.driver>/bin/chromedriver.exe</webdriver.chrome.driver>
             </properties>
         </profile>
         <profile>
@@ -661,7 +586,6 @@
                                 <webdriver.reusebrowser>${webdriver.reusebrowser}</webdriver.reusebrowser>
                                 <webdriver.browser.type>${webdriver.browser.type}</webdriver.browser.type>
                                 <webdriver.device.name>${webdriver.device.name}</webdriver.device.name>
-                                <webdriver.platform.version>${webdriver.platform.version}</webdriver.platform.version>
                                 <skipIntTests>${skipIntTests}</skipIntTests>
                             </systemPropertyVariables>
                             <environmentVariables>
@@ -693,10 +617,6 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.savage7.maven.plugins</groupId>
-                        <artifactId>maven-external-dependency-plugin</artifactId>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -762,28 +682,46 @@
                         </configuration>
                     </plugin>
                     <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <configuration>
-                            <workingDirectory>${project.parent.basedir}</workingDirectory>
-                        </configuration>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
                         <executions>
                             <execution>
-                                <id>install-node-npm</id>
-                                <phase>pre-clean</phase>
-                            </execution>
-                            <execution>
-                                <id>npm-install</id>
-                                <phase>pre-clean</phase>
-                            </execution>
-                            <execution>
-                                <id>run-xunit</id>
-                                <phase>test</phase>
+                                <id>npm install (initialize)</id>
                                 <goals>
-                                    <goal>npm</goal>
+                                    <goal>exec</goal>
                                 </goals>
+                                <phase>initialize</phase>
                                 <configuration>
-                                    <arguments>run --color=false test -- /dependency:./aura-util/src/test/tools/xUnit/dependencies /strict:${xunit.js.isStrict} /output:${xunit.js.format} /verbose:false ${xunit.js.testPath} /coverage:${xunit.js.coverage} /logFile:${project.build.directory}/js-coverage/${xunit.js.currentModule}/jscoverage.json ${xunit.js.testPath}</arguments>
+                                    <executable>npm</executable>
+                                    <arguments>
+                                        <argument>install</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>npm run test (test)</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>test</phase>
+                                <configuration>
+                                    <executable>npm</executable>
+                                    <arguments>
+                                        <argument>--project ${aura.home}</argument>
+                                        <argument>run</argument>
+                                        <argument>--color=false</argument>
+                                        <argument>test</argument>
+                                        <argument>--</argument>
+                                        <argument>/dependency:./aura-util/src/test/tools/xUnit/dependencies</argument>
+                                        <argument>/output:${xunit.js.format}</argument>
+                                        <argument>/strict:${xunit.js.isStrict}</argument>
+                                        <argument>/verbose:false</argument>
+                                        <argument>${xunit.js.testPath}</argument>
+                                        <argument>/coverage:${xunit.js.coverage}</argument>
+                                        <argument>/logFile:${project.build.directory}/js-coverage/${xunit.js.currentModule}/jscoverage.json</argument>
+                                        <argument>${xunit.js.testPath}</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>

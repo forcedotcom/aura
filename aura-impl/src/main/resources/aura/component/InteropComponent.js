@@ -440,6 +440,8 @@ InteropComponent.prototype.set = function (key, value) {
 
 };
 
+InteropComponent.originalCurrentTargetDescriptor = Object.getOwnPropertyDescriptor(Event.prototype, "currentTarget");
+
 function getWrappedInteropEventListener(listener, element) {
     var descriptor = {
         configurable: true,
@@ -449,7 +451,7 @@ function getWrappedInteropEventListener(listener, element) {
     return function(event) {
         Object.defineProperties(event, {
             target: descriptor,
-            currentTarget: descriptor
+            currentTarget: InteropComponent.originalCurrentTargetDescriptor
         });
         listener(event);
     };

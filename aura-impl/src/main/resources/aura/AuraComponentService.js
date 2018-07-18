@@ -729,12 +729,15 @@ AuraComponentService.prototype.initModuleDefs = function(modules) {
     var attributeDefs = Json.ApplicationKey.ATTRIBUTEDEFS;
 
     modules.forEach(function (module) {
-        var exporter = { "exporter": module[code] };
-        exporter[minVersion] = module[minVersion];
-        exporter[access] = module[access];
-        exporter[requireLocker] = module[requireLocker];
-        exporter[attributeDefs] = module[attributeDefs];
-        moduleDefRegistry[module[Json.ApplicationKey.DESCRIPTOR]] = moduleDefRegistry[module[Json.ApplicationKey.NAME]] = exporter;
+        // don't override existing entries
+        if (!moduleDefRegistry[module[Json.ApplicationKey.DESCRIPTOR]]) {
+            var exporter = { "exporter": module[code] };
+            exporter[minVersion] = module[minVersion];
+            exporter[access] = module[access];
+            exporter[requireLocker] = module[requireLocker];
+            exporter[attributeDefs] = module[attributeDefs];
+            moduleDefRegistry[module[Json.ApplicationKey.DESCRIPTOR]] = moduleDefRegistry[module[Json.ApplicationKey.NAME]] = exporter;
+        }
     });
 };
 

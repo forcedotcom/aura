@@ -54,13 +54,10 @@ function GlobalValueProviders(gvp, initCallback) {
         this.valueProviders[type] = valueProvider;
     }
 
-    var that = this;
-    this.loadFromStorage(function() {
-        that.load(gvp);
-        if (initCallback) {
-            initCallback(that);
-        }
-    });
+    this.load(gvp);
+    if (initCallback) {
+        initCallback(this);
+    }
 }
 
 /**
@@ -296,19 +293,19 @@ GlobalValueProviders.prototype.getStorage = function () {
 
 /**
  * load GVPs from storage if available
+ * @return {Promise} a promise that resolves when GVPs are loaded.
  * @private
  */
-GlobalValueProviders.prototype.loadFromStorage = function(callback) {
+GlobalValueProviders.prototype.loadFromStorage = function() {
     // If persistent storage is active then write through for disconnected support
     var storage = this.getStorage();
     // If GVP values absence is known, avoid loading from storage
     if (!storage || this.getAbsentGvpValuesCookie()) {
-        callback();
-        return;
+        return Promise["resolve"]();
     }
 
     var that = this;
-    storage.get(this.STORAGE_KEY, true)
+    return storage.get(this.STORAGE_KEY, true)
         ["then"](function (value) {
                 $A.run(function() {
                     if (value) {
@@ -317,16 +314,13 @@ GlobalValueProviders.prototype.loadFromStorage = function(callback) {
                         // some GVP values were loaded from storage
                         that.LOADED_FROM_PERSISTENT_STORAGE = true;
                     }
-
-                    callback();
                 });
         })
         ["then"](
             undefined,
             function() {
                 $A.run(function() {
-                    // error retrieving from storage
-                    callback();
+                    // error retrieving from storage, do not rethrow
                 });
             }
         );

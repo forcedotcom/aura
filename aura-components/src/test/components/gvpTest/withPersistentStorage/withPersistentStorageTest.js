@@ -44,58 +44,6 @@
         ]
     },
 
-    testGvpsAreLoadedFromStorageWhenOffline: {
-        // TODO: W-3306953
-        labels : ["flapper"],
-        test: [
-            function setLabelToStorage(cmp) {
-                var storage = $A.storageService.getStorage("actions");
-                var item = {
-                    "type": "$Label",
-                    "values": {
-                        "section": {
-                            "name": "expected"
-                        }
-                    }
-                };
-
-                return storage.set("globalValueProviders", [item])
-            },
-            // for debugging only. remove it if found the flapping cause.
-            function verifyLabelInStorage(cmp) {
-                var that = this;
-                var storage = $A.storageService.getStorage("actions");
-                return cmp.helper.storage.storageContents.waitForStorageByPredicate(
-                        storage,
-                        function labelFoundPredicate(items) {
-                            var labels = that.getLabelGvp(items);
-                            if (!labels) {
-                                return undefined;
-                            }
-
-                            $A.test.assertDefined(labels["section"]);
-                            $A.test.assertEquals("expected", labels["section"]["name"]);
-                            return true;
-                        }
-                );
-            },
-            function initGvpsWhileOffline(cmp) {
-                var completed = false;
-
-                $A.test.setServerReachable(false);
-                $A.test.addCleanup(function(){ $A.test.setServerReachable(true); });
-
-                $A.getContext().initGlobalValueProviders({}, function() {
-                    $A.test.assertEquals("expected", $A.get("$Label.section.name"),
-                            "Failed to load label from Storage.");
-                    completed = true;
-                });
-
-                $A.test.addWaitFor(true, function(){ return completed; });
-            }
-        ]
-    },
-
     /**
      * Gets the $Label GVP value. This utility is useful because of the unusual persistence shape
      * of GVPs.

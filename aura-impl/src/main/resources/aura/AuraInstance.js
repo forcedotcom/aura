@@ -480,27 +480,39 @@ AuraInstance.prototype.initAsync = function(config) {
 
         // Actions depend on defs depend on GVP (labels). so load them in dependency order and skip
         // loading depending items if anything fails to load.
+        function gvpLoadPromise () {
+            // When Uridefs are enabled, componentDef storage is disabled and no need to apply action filters.
+            // For multi-tab scenario, Actions persisted by one tab would be accessible for other tabs.
+            if (context.uriAddressableDefsEnabled) {
+                $A.clientService.setPersistedActionsFilter(false);
+                return Promise["resolve"]();
+            } else {
+                return context.globalValueProviders.loadFromStorage();
+            }
+        }
 
-        //  do not modify - used by bootstrapRobustness() and instrumentation
-        $A.clientService.gvpsFromStorage = context.globalValueProviders.LOADED_FROM_PERSISTENT_STORAGE;
+        gvpLoadPromise()["then"](function() {
+            //  do not modify - used by bootstrapRobustness() and instrumentation
+            $A.clientService.gvpsFromStorage = context.globalValueProviders.LOADED_FROM_PERSISTENT_STORAGE;
 
-        if (!$A.clientService.gvpsFromStorage) {
-            $A.log("Aura.initAsync: GVP not loaded from storage so not loading defs or actions either");
-            ensureCssLoaded()["then"](initializeApp)["then"](undefined, reportError);
-        } else {
+            if (!$A.clientService.gvpsFromStorage) {
+                $A.log("Aura.initAsync: GVP not loaded from storage so not loading defs or actions either");
+                ensureCssLoaded()["then"](initializeApp)["then"](undefined, reportError);
+            } else {
             Promise["all"]([
                 bootstrapLoadPromise(),
                 $A.componentService.restoreDefsFromStorage(context),
                 $A.clientService.populateActionsFilter(),
                 ensureCssLoaded()
             ])
-                ["then"](initializeApp, function (err) {
+                    ["then"](initializeApp, function (err) {
                     $A.log("Aura.initAsync: failed to load defs, get bootstrap or actions from storage", err);
                     $A.clientService.clearActionsFilter();
                     return initializeApp();
                 })
-                ["then"](undefined, reportError);
-        }
+                    ["then"](undefined, reportError);
+            }
+        });
     });
 
     this.clientService.initDefs();

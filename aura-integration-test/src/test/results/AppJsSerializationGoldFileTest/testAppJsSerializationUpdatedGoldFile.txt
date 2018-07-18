@@ -4840,6 +4840,24 @@ return {
                 "value":[
                   {
                     "componentDef":{
+                      "descriptor":"markup://aura:expression"
+                    },
+                    "attributes":{
+                      "values":{
+                        "value":{
+                          "descriptor":"value",
+                          "value":{
+                            "exprType":"PROPERTY",
+                            "byValue":false,
+                            "target":"ui:legend",
+                            "path":"v.requiredIndicator"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "componentDef":{
                       "descriptor":"markup://aura:html"
                     },
                     "attributes":{
@@ -4911,24 +4929,6 @@ return {
                             "byValue":false,
                             "target":"ui:legend",
                             "path":"v.body"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "componentDef":{
-                      "descriptor":"markup://aura:expression"
-                    },
-                    "attributes":{
-                      "values":{
-                        "value":{
-                          "descriptor":"value",
-                          "value":{
-                            "exprType":"PROPERTY",
-                            "byValue":false,
-                            "target":"ui:legend",
-                            "path":"v.requiredIndicator"
                           }
                         }
                       }

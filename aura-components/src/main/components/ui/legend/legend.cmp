@@ -23,9 +23,9 @@
     <aura:attribute name="requiredIndicator" type="Aura.Component[]" description="A component that displays the indicator for the required field. "/>
 
     <legend class="{!v.class}" aura:id="legendElement">
+        {!v.requiredIndicator}
         <span title="{!v.title}" class="{!v.labelDisplay ? null : 'assistiveText' }">{!v.legend}</span>
         {!v.body}
-        {!v.requiredIndicator}
     </legend>
 
 </aura:component>

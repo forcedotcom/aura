@@ -126,10 +126,14 @@ QueuedActionsMetricsPlugin.prototype.actionsProcessResponses = function() {
     var perfSummary = message && message["perfSummary"];
     if (perfSummary && perfSummary["version"] === "core") {
         var actions = perfSummary["actions"] || {};
+        var xhrServerTime = perfSummary["request"];
         var keys = Object.keys(actions);
-        for (var i = 0; i < keys.length; i++) {
+        var numberOfActions = keys.length;
+        for (var i = 0; i < numberOfActions; i++) {
             var id = keys[i];
             var serverTime = actions[id];
+            serverTime["xhrServerTime"] = xhrServerTime;
+            serverTime["boxCarCount"] = numberOfActions;
             this.metricsService["mark"](QueuedActionsMetricsPlugin.NAME, 'receive', {
                 "id"         : id,
                 "serverTime" : serverTime

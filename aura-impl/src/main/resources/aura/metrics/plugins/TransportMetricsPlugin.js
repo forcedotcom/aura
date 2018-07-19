@@ -29,6 +29,9 @@ var TransportMetricsPlugin = function TransportMetricsPlugin(config) {
 TransportMetricsPlugin.NAME = "transport";
 TransportMetricsPlugin.ORIGIN = window.location && window.location.origin;
 TransportMetricsPlugin.AURA_URL = TransportMetricsPlugin.ORIGIN + '/aura';
+TransportMetricsPlugin.SERVER_TIMING_HEADER = "Server-Timing";
+TransportMetricsPlugin.SERVER_TIMING_TOTAL = "total";
+TransportMetricsPlugin.SERVER_TIMING_DURATION = "dur";
 
 /** @export */
 TransportMetricsPlugin.prototype.initialize = function (metricsService) {
@@ -52,6 +55,61 @@ TransportMetricsPlugin.prototype.disable = function () {
         this["enabled"] = false;
         this.unbind(this.metricsService);
     }
+};
+
+/**
+ * 
+ * @param {XMLHttpRequest} request
+ * @returns {number} header value 
+ */
+TransportMetricsPlugin.prototype.getServerTimingTotal = function (request) {
+    var serverTimingHeader = request.getResponseHeader(TransportMetricsPlugin.SERVER_TIMING_HEADER);
+    if (typeof serverTimingHeader === "string") {
+        var serverTiming = this.parseServerTimingHeader(serverTimingHeader);
+        var totalKey = serverTiming[TransportMetricsPlugin.SERVER_TIMING_TOTAL];
+        var totalValue = totalKey && totalKey[TransportMetricsPlugin.SERVER_TIMING_DURATION];
+        if (isNaN(totalValue)) {
+            return undefined;
+        } else {
+            return totalValue;
+        }
+    } else {
+        return undefined;
+    }
+};
+
+/**
+ * Parse Server-Timing using spec: https://w3c.github.io/server-timing/
+ * @param {string} serverTimingHeader
+ * @returns {object} Server Timing Object
+ */
+TransportMetricsPlugin.prototype.parseServerTimingHeader = function (serverTimingHeader) {
+    serverTimingHeader = serverTimingHeader.toLowerCase();
+    var serverTiming = {};
+    try {
+        if (serverTimingHeader.length > 0) {
+            var typeSplit = serverTimingHeader.split(",");
+            for (var i = 0; i < typeSplit.length; i++) {
+                var typeDetailSplit = typeSplit[i].split(";");
+                var name = typeDetailSplit[0].trim();
+                serverTiming[name] = {};
+                for (var j = 1; j < typeDetailSplit.length; j++) {
+                    var metricKeyValue = typeDetailSplit[j].split("=");
+                    if (metricKeyValue.length === 2) {
+                        var keyName = metricKeyValue[0].trim();
+                        var metricValue = metricKeyValue[1].trim();
+                        if (keyName === TransportMetricsPlugin.SERVER_TIMING_DURATION) {
+                            metricValue = parseInt(metricValue);
+                        }
+                        serverTiming[name][keyName] = metricValue;
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        // ignore the exception and bail out on parsing server timing header
+    }
+    return serverTiming;
 };
 
 TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, actions, method, options */) {
@@ -119,11 +177,16 @@ TransportMetricsPlugin.prototype.receiveOverride = function(/* config, auraXHR *
             });
         }
     }
-
+    // https://www.w3.org/TR/server-timing/
+    // If there's a server timing header, use that
+    var serverTiming = this.getServerTimingTotal(auraXHR.request);
+    if (serverTiming !== undefined) {
+        endMark["context"]["serverTime"] = serverTiming;
+    }
     var ret = config["fn"].apply(config["scope"], arguments);
     // the decoded and json parsed message is only available in the response to this method
     var perfSummary = ret && ret["message"] && ret["message"]["perfSummary"];
-    if (perfSummary && perfSummary["version"] === "core") {
+    if (serverTiming === undefined && perfSummary && perfSummary["version"] === "core") {
         endMark["context"]["serverTime"] = perfSummary["request"];
     }
     return ret;

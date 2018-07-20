@@ -15,14 +15,15 @@
  */
 package org.auraframework.http;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-
-import com.google.common.collect.Lists;
 
 /**
  * This class provides functionality for building Content Security Policy 1.0
@@ -132,11 +133,18 @@ public class CSP {
      * See {@link CSP} for example usage.
      */
     public static class PolicyBuilder {
-        private static final List<String> DIRECTIVE_WITHOUT_VALUE_PLACEHOLDER = Lists.newArrayList("");
+        private static final Set<String> DIRECTIVE_WITHOUT_VALUE_PLACEHOLDER = Collections.singleton("");
 
         public PolicyBuilder() {}
 
-        private EnumMap<Directive, List<String>> directives = new EnumMap<>(Directive.class);
+        /**
+         * This uses {@link java.util.Set}s to enforce unique elements in
+         * source-list and ancestor-source-list directive values. 
+         * 
+         * Implementation note: {@link java.util.LinkedHashSet} maintains output
+         * parity for the sake of existing tests that expect output in a specific order.
+         */
+        private EnumMap<Directive, Set<String>> directives = new EnumMap<>(Directive.class);
 
         public PolicyBuilder default_src(String... sources) {
             return extend(Directive.DEFAULT, sources);
@@ -179,13 +187,13 @@ public class CSP {
         }
 
         public PolicyBuilder sandbox(String... flags) {
-            directives.put(Directive.SANDBOX, Lists.newArrayList(flags));
+            directives.put(Directive.SANDBOX, new LinkedHashSet<>(Arrays.asList(flags)));
             return this;
         }
 
         public PolicyBuilder report_uri(String... uris) {
          // If the Report URI is empty or null, don't add report-uri directive at all
-            List<String> reportURIs = Lists.newArrayList(uris).stream().filter(StringUtils::isNotBlank).collect(Collectors.toList());
+            Set<String> reportURIs = Arrays.stream(uris).filter(StringUtils::isNotBlank).collect(Collectors.toCollection(LinkedHashSet::new));
             if (reportURIs.size() > 0) {
                 directives.put(Directive.REPORT_URI, reportURIs);
             }
@@ -201,7 +209,7 @@ public class CSP {
         }
 
         public PolicyBuilder referrer(String referrer) {
-            directives.put(Directive.REFERRER, Lists.newArrayList(referrer));
+            directives.put(Directive.REFERRER, new LinkedHashSet<>(Arrays.asList(referrer)));
             return this;
         }
 
@@ -212,9 +220,9 @@ public class CSP {
         }
 
         private PolicyBuilder extend(Directive directive, String... sources) {
-            List<String> list = directives.get(directive);
+            Set<String> list = directives.get(directive);
             if (list == null) {
-                directives.put(directive, Lists.newArrayList(sources));
+                directives.put(directive, new LinkedHashSet<>(Arrays.asList(sources)));
             } else {
                 for (String src : sources) {
                     list.add(src);
@@ -230,7 +238,7 @@ public class CSP {
 
             while(keys.hasNext()) {
                 Directive dir = keys.next();
-                List<String> values = directives.get(dir);
+                Set<String> values = directives.get(dir);
                 if (!values.isEmpty()) {
                     if (sb.length() > 0) {
                         sb.append("; ");

@@ -204,8 +204,43 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
         }
 
         [Fixture]
-        function passedDescriptorIsArray() {
+        function existingDefinitionsAreExcluded() {
+            var hasCacheableDefinitionOfAnyTypeOverride = function(descriptor) {
+                return descriptor == "two:two";
+            };
+            var defaultMockCopy = {};
+            Object.assign(defaultMockCopy, defaultMock);
+            defaultMockCopy["$A"]["componentService"]["hasCacheableDefinitionOfAnyType"] = hasCacheableDefinitionOfAnyTypeOverride;
 
+            var actual;
+            var expect = {"one":{"one":1}};
+            Mocks.GetMocks(Object.Global(), defaultMockCopy)(function(){
+                var descriptors = {"one:one":1, "two:two":2};
+                actual = new Aura.Component.ComponentDefLoader().buildBundleComponentNamespace(Object.keys(descriptors), descriptors, {counter:0});
+            });
+            Assert.Equal(expect, actual);
+        }
+
+        [Fixture]
+        function pendingRequestedDefinitionsAreExcluded() {
+            var hasCacheableDefinitionOfAnyTypeOverride = function(descriptor) {
+                return descriptor == "two:two";
+            };
+            var defaultMockCopy = {};
+            Object.assign(defaultMockCopy, defaultMock);
+            defaultMockCopy["$A"]["componentService"]["hasCacheableDefinitionOfAnyType"] = hasCacheableDefinitionOfAnyTypeOverride;
+
+            var actual;
+            var expect = {"four":{"four":4}};
+            Mocks.GetMocks(Object.Global(), defaultMockCopy)(function(){
+                var descriptors = {"one:one":1, "two:two":2, "three:three": 3};
+                var defLoader = new Aura.Component.ComponentDefLoader();
+                defLoader.buildBundleComponentNamespace(Object.keys(descriptors), descriptors, {counter:0});
+
+                descriptors = {"two:two":2, "three:three": 3, "four:four": 4};
+                actual = defLoader.buildBundleComponentNamespace(Object.keys(descriptors), descriptors, {counter:0});
+            });
+            Assert.Equal(expect, actual);
         }
     }
 

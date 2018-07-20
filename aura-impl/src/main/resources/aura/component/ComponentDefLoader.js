@@ -22,6 +22,7 @@ function ComponentDefLoader() {
     this.pending = null;
     this.loading = 0;
     this.counter = 0;
+    this.requestedDescriptors = {};
 }
 
 // params start with "_" to avoid namespace collisions
@@ -59,7 +60,18 @@ ComponentDefLoader.prototype.buildURILocaleParam = function() {
     return locale ? "&" + ComponentDefLoader.LOCALE_param + "=" + locale : "";
 };
 
-ComponentDefLoader.prototype.buildBundleComponentNamespace = function(descriptors, descriptorMap) {
+ComponentDefLoader.prototype.processRequested = function() {
+    for (var descriptor in this.requestedDescriptors) {
+        if ($A.componentService.hasCacheableDefinitionOfAnyType(descriptor)) {
+            for (var i=0; i<this.requestedDescriptors[descriptor].length; i++) {
+                this.requestedDescriptors[descriptor][i].finalize();
+            }
+            delete this.requestedDescriptors[descriptor];
+        }
+    }
+};
+
+ComponentDefLoader.prototype.buildBundleComponentNamespace = function(descriptors, descriptorMap, existingRequested) {
     if (!$A.util.isArray(descriptors)) {
         //Should we return an empty object here or raise an error?
         return {};
@@ -69,6 +81,14 @@ ComponentDefLoader.prototype.buildBundleComponentNamespace = function(descriptor
         if ($A.componentService.hasCacheableDefinitionOfAnyType(descriptors[i])) {
             continue;
         }
+        if ($A.util.isArray(this.requestedDescriptors[descriptors[i]])) {
+            // we don't have the definition yet, but it was requested already
+            // it should be currently pending
+            this.requestedDescriptors[descriptors[i]].push(existingRequested);
+            existingRequested.counter++;
+            continue;
+        }
+        this.requestedDescriptors[descriptors[i]] = [];
         var descriptor = new Aura.System.DefDescriptor(descriptors[i]);
         if (!(descriptor.getNamespace() in namespaceMap)) {
             namespaceMap[descriptor.getNamespace()] = {};
@@ -83,7 +103,17 @@ ComponentDefLoader.prototype.buildBundleComponentNamespace = function(descriptor
 
 ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     var descriptors = Object.keys(descriptorMap);
-    var namespaceMap = this.buildBundleComponentNamespace(descriptors, descriptorMap);
+    var existingRequested = {
+        counter: 0,
+        finalize: function(){
+            this.counter--;
+            if (this.counter <= 0) {
+                this.resolve();
+            }
+        }
+    };
+
+    var namespaceMap = this.buildBundleComponentNamespace(descriptors, descriptorMap, existingRequested);
 
     var baseURI = ComponentDefLoader.BASE_PATH + this.buildURIAppParam();
 
@@ -163,6 +193,10 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     uris.push([uri, uid, hasRestrictedNamespaces]);
 
     var processedURI = [];
+    if (existingRequested.counter > 0) {
+        processedURI.push(new Promise(function(resolve){existingRequested.resolve = resolve;}));
+    }
+
     for(var def=0; def<uris.length; def++) {
         var finalURI = this.buildURIString(uris[def][0], uris[def][1], descriptors);
         Aura["componentDefLoaderError"][finalURI.uid] = [];
@@ -188,8 +222,13 @@ ComponentDefLoader.prototype.buildURIString = function(uri, uid, descriptors) {
 ComponentDefLoader.prototype.getScriptPromises = function(descriptorMap) {
     var scriptPromises = [];
     var URIs = this.buildBundleComponentUri(descriptorMap);
-    for (var idx=0; idx < URIs.length; idx++) {
-        scriptPromises.push(this.generateScriptTag(URIs[idx]));
+    var idx = 0;
+    if (URIs.length > 0 && !$A.util.isString(URIs[0])) {
+        scriptPromises.push(URIs[0]);
+        idx = 1;
+    }
+    while (idx < URIs.length) {
+        scriptPromises.push(this.generateScriptTag(URIs[idx++]));
     }
     return scriptPromises;
 };
@@ -252,6 +291,7 @@ ComponentDefLoader.prototype.checkForError = function (uri, resolve, reject) {
         }
     }
     resolve();
+    this.processRequested();
 };
 
 ComponentDefLoader.prototype.onerror = function(uri, reject){
@@ -279,7 +319,7 @@ ComponentDefLoader.prototype.createScriptElement = function(uri, onload, onerror
 };
 
 ComponentDefLoader.prototype.setScriptGenerator = function (method) {
-    this.prototype.createScriptElement = method;
+    ComponentDefLoader.prototype.createScriptElement = method;
 };
 
 ComponentDefLoader.prototype.generateScriptTag = function(uri) {

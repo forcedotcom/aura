@@ -1094,6 +1094,12 @@ AuraComponentService.prototype.loadComponentDefs = function(descriptorMap, callb
         try {
             if (!this.hasCacheableDefinitionOfAnyType(descriptor)) {
                 missingDescriptorMap[descriptor] = descriptorMap[descriptor];
+            } else {
+                if (this.componentDefLoader.requestedDescriptors[descriptor]) {
+                    // the descriptor exists and we previously requested it
+                    // clean up the map tracking the requested ones
+                    delete this.componentDefLoader.requestedDescriptors[descriptor];
+                }
             }
         } catch (e) {
             // ignore any exception raised

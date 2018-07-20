@@ -2345,6 +2345,25 @@ TestInstance.prototype.setURIDefsState = function(newState) {
 };
 
 /**
+ * allows one to inject their own script loader for URI definitions
+ * @param method - function that is called with URI, onload, onerror that is a replacement for creating a script dom element
+ * @export
+ */
+TestInstance.prototype.replaceComponentDefLoader = function(method) {
+    Aura.ServiceApi["replaceComponentDefLoader"](method);
+};
+
+/**
+ * Calls into componentService loadComponentDefs
+ * @param descriptors - map of descriptors to uid (or definition)
+ * @param callback - method called after components are loaded
+ * @export
+ */
+TestInstance.prototype.loadComponentDefs = function(descriptors, callback) {
+    $A.componentService.loadComponentDefs(descriptors, callback);
+};
+
+/**
  * Json instance for test. Used to export Json methods for testing.
  *
  * @export

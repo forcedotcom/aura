@@ -50,7 +50,9 @@ export default class ChildSecure extends Element {
             'event.currentTarget should be a SecureElement'
         );
 
-        testUtils.assertEquals(ev.target, undefined);
+        testUtils.assertEquals('SecureElement: [object HTMLElement]{ key: {"namespace":"lockerlwc"} }',
+            `${ev.target}`,
+            'event.target should be SecureElement');
         this.setAttribute('data-triggered', 'true');
     }
 

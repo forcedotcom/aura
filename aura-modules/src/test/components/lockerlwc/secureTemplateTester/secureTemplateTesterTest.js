@@ -18,15 +18,15 @@
     // TODO W-4363273: Bug in BrowserCompatibilityServiceImpl, serving compat version of aura fw js in Safari 11
     browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
 
-    // W-5137406
-    _testQuerySelector: {
+    // Automation for W-5137406
+    testQuerySelector: {
         test: function(cmp) {
             cmp.find('secureTemplate').testQuerySelector();
         }
     },
 
-    // W-5137406
-    _testQuerySelectorAll: {
+    // Automation for W-5137406
+    testQuerySelectorAll: {
         test: function(cmp) {
             cmp.find('secureTemplate').testQuerySelectorAll();
         }

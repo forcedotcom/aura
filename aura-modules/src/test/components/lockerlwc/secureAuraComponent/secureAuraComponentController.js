@@ -439,13 +439,11 @@
         var module = cmp.find('parentSecure').getElement();
         return module.testSecureLWC2SecureLWCDomEvent();
     },
-    // User Story: W-5058590
     testSecureLWC2UnsecureLWCCustomEvent: function (cmp) {
         var module = cmp.find('parentSecure').getElement();
         return module.testSecureLWC2UnsecureLWCCustomEvent();
     },
-    // User Story: W-4808252
-    _testSecureLWC2UnsecureLWCDOMEvent: function (cmp) {
+    testSecureLWC2UnsecureLWCDOMEvent: function (cmp) {
         var testUtils = cmp.get("v.testUtils");
         var module = cmp.find('parentSecure').getElement();
         var triggered = false;

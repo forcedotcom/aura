@@ -59,7 +59,7 @@
             cmp.testAura2SLWCApiMethodCNReceive();
         }
     },
-    // TODO: Due to a bug in how LWC engine patches target and currentTarget properties on event
+    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
     _testAura2SLWCDomEventOnHostElement: {
         test: function (cmp) {
             cmp.testAura2SLWCDomEventOnHostElement();
@@ -106,7 +106,7 @@
             return cmp.testSecureLWC2UnsecureLWCCustomEvent()
         }
     },
-    // User Story: W-4808252
+    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
     _testSecureLWC2UnsecureLWCDOMEvent: {
         test: function (cmp) {
             cmp.testSecureLWC2UnsecureLWCDOMEvent();

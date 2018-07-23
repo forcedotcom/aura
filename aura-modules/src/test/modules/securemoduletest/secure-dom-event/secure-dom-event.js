@@ -14,8 +14,10 @@ export default class SecureDOMEventClazz extends Element {
             domEvent = e;
         });
         element.click();
-        testUtil.assertStartsWith("SecureDOMEvent", domEvent.toString());
-        testUtil.assertStartsWith("SecureElement", domEvent.target.toString(), "Expected event.target to return SecureElement");
+        testUtil.assertStartsWith("SecureDOMEvent", domEvent.toString(),
+            "Expected event param in listener to be a wrapped event");
+        testUtil.assertStartsWith("SecureElement", domEvent.target.toString(),
+            "Expected event.target to return SecureElement");
         testUtil.assertEquals("click", domEvent.type, "Unexpected DOM event type");
         // Verify non-wrapped method is still accessible
         testUtil.assertEquals("number", typeof domEvent.timeStamp);
@@ -34,8 +36,10 @@ export default class SecureDOMEventClazz extends Element {
         event.initEvent("change", false, true);
         element.dispatchEvent(event);
         testUtil.assertDefined(domEvent, "Event handler never called after firing event created via document.createEvent");
-        testUtil.assertStartsWith("SecureDOMEvent", domEvent.toString());
-        testUtil.assertStartsWith("SecureElement", targetElem.toString(), "Expected event.target to return SecureElement");
+        testUtil.assertStartsWith("SecureDOMEvent", domEvent.toString(),
+            "Expected event param in listener to be a wrapped event");
+        testUtil.assertStartsWith("SecureElement", targetElem.toString(),
+            "Expected event.target to return SecureElement");
     }
 
     @api
@@ -49,13 +53,14 @@ export default class SecureDOMEventClazz extends Element {
         const event = document.createEvent("HTMLEvents");
         event.initEvent("change", false, true);
         this.dispatchEvent(event);
-        /** TODO: W-4462187 will fix this and these lines can be uncommented then
-         testUtil.assertStartsWith("SecureDOMEvent", domEvent.toString());
-         testUtil.assertStartsWith("SecureElement", domEvent.target.toString(), "Expected event.target to return SecureElement"); **/
-        testUtil.assertDefined(domEvent, "Event handler never called after firing event created via document.createEvent");
-        // cannot detect if wrapped object is a proxy
-        testUtil.assertContains("Event", domEvent.toString(), "Expected event(wrapped by engine)");
-        testUtil.assertEquals(this, targetElement, "Expected event.target to be retargeted to host");
+        testUtil.assertDefined(domEvent,
+            "Event handler never called after firing event created via document.createEvent");
+        testUtil.assertStartsWith("SecureDOMEvent", domEvent.toString(),
+            "Expected event param in listener to be a wrapped event");
+        testUtil.assertStartsWith("SecureElement", domEvent.target.toString(),
+            "Expected event.target to return SecureElement");
+        testUtil.assertEquals("SECUREMODULETEST-SECURE-DOM-EVENT", targetElement.tagName,
+            "Expected event.target to be retargeted to host");
     }
 
     // W-4462187
@@ -118,9 +123,8 @@ export default class SecureDOMEventClazz extends Element {
     }
 
     assertClickHandlerCalled() {
-        // W-4462187 will fix this and these lines can be uncommented then
-        // testUtil.assertStartsWith("SecureElement", this._event.target.toString());
-        testUtil.assertContains("HTMLButtonElement", this._event.target.toString());
+        testUtil.assertStartsWith("SecureElement", this._event.target.toString(),
+            "Expected event target in listener to be a wrapped element");
         this._event = null;
     }
 

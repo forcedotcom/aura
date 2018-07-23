@@ -351,7 +351,7 @@ export default class ParentSecure extends Element {
         this.assertIsSecureDocument(document);
         this.assertIsSecureElement(ev.currentTarget);
 
-        testUtils.assertEquals(ev.target, undefined);
+        this.assertIsSecureElement(ev.target);
         if (this.callback) {
             this.callback();
         }

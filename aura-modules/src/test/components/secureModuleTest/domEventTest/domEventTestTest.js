@@ -21,36 +21,33 @@
         }
     },
 
-    // W-4437423, W-4837438
-    _testInitEventOnTemplateElement: {
+    // Automation for W-4437423
+    testInitEventOnTemplateElement: {
         test: function(cmp) {
             cmp.domEventTester("testInitEventOnTemplateElement");
         }
     },
 
-    // TODO: W-4462187
-    _testEventView: {
+    testEventView: {
         test: function(cmp) {
             cmp.domEventTester("testEventView");
         }
     },
 
-    // TODO: W-4837438
-    _testEventTargetOfHtmlElementHandler: {
+    testEventTargetOfHtmlElementHandler: {
         test: function(cmp) {
             cmp.domEventTester("testEventTargetOfHtmlElementHandler");
         }
     },
 
-    // TODO: W-4837438
+    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
     _testInitEventOnElementOfChildModule: {
         test: function(cmp) {
             cmp.domEventTester("testInitEventOnElementOfChildModule");
         }
     },
 
-    // TODO: W-4837438
-    _testCustomEvent: {
+    testCustomEvent: {
         test: function(cmp) {
             cmp.domEventTester("testCustomEvent");
         }

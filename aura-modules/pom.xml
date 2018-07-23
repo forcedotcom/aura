@@ -175,6 +175,26 @@
                             </arguments>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>compile-test-modules</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>${component.test.compile.phase}</phase>
+                        <configuration>
+                            <executable>${java.home}/bin/java</executable>
+                            <classpathScope>test</classpathScope>
+                            <arguments>
+                                <argument>-Daura.home=${basedir}/..</argument>
+                                <argument>-Daura.modules=true</argument>
+                                <argument>-classpath</argument>
+                                <classpath />
+                                <argument>org.auraframework.tools.definition.AuraCompiler</argument>
+                                <argument>${basedir}/src/test/modules</argument>
+                                <argument>${project.build.testOutputDirectory}/${module.test.dir}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

@@ -32,12 +32,10 @@ import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDesignDef;
-import org.auraframework.def.module.ModuleExampleDef;
 import org.auraframework.def.module.impl.ModuleDesignDefImpl;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.PlatformDefImpl;
-import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
@@ -61,38 +59,36 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
 
     private static final long serialVersionUID = -7973449123070386535L;
 
-    private final String path;
+    private String path;
     private final Set<String> moduleDependencies;
     private final String customElementName;
     private Set<DefDescriptor<?>> dependencies = null;
-    private final Map<CodeType, String> codes;
+    private Map<CodeType, String> codes;
     private final Set<PropertyReference> labelReferences;
-    private final Double minVersion;
-    private final List<Reference> sourceReferences;
-    private final List<Reference> metadataReferences;
-    private final Boolean requireLocker;
-    private final ModuleDesignDef moduleDesignDef;
-    private final Set<String> validTags;
+    private Double minVersion;
+    private List<Reference> sourceReferences;
+    private List<Reference> metadataReferences;
+    private Boolean requireLocker;
+    private ModuleDesignDef moduleDesignDef;
+    private Set<String> validTags;
     private final DocumentationDef documentationDef;
     private final DocumentationDef auraDocumentationDef;
-    private final List<ModuleExampleDef> examples;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
         this.path = builder.path;
-        this.codes = AuraUtil.immutableMap(builder.codes);
-        this.moduleDependencies = AuraUtil.immutableSet(builder.moduleDependencies);
+        this.codes = builder.codes;
+        this.moduleDependencies = builder.moduleDependencies;
         this.customElementName = builder.customElementName;
-        this.labelReferences = AuraUtil.immutableSet(builder.labelReferences);
+        this.labelReferences = builder.labelReferences;
         this.minVersion = builder.minVersion;
         this.requireLocker = builder.requireLocker;
         this.moduleDesignDef = builder.moduleDesignDef;
-        this.validTags = AuraUtil.immutableSet(builder.validTags);
-        this.sourceReferences = AuraUtil.immutableList(builder.sourceReferences);
-        this.metadataReferences = AuraUtil.immutableList(builder.metadataReferences);
+        this.validTags = builder.validTags;
+        this.sourceReferences = builder.sourceReferences;
+        this.metadataReferences = builder.metadataReferences;
         this.documentationDef = builder.documentationDef;
         this.auraDocumentationDef = builder.auraDocumentationDef;
-        this.examples = AuraUtil.immutableList(builder.examples);
     }
 
     @Override
@@ -136,11 +132,6 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     @Override
     public DocumentationDef getAuraDocumentationDef() {
         return this.auraDocumentationDef;
-    }
-
-    @Override
-    public List<ModuleExampleDef> getExamples() {
-        return examples;
     }
 
     @Override
@@ -331,8 +322,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private ModuleDesignDefImpl.Builder designBuilder;
         private DocumentationDef documentationDef;
         private DocumentationDef auraDocumentationDef;
-        private List<ModuleExampleDef> examples;
-        
+
         public Builder() {
             super(ModuleDef.class);
         }
@@ -341,9 +331,6 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
             this.codes = codes;
         }
 
-        public void setExamples(List<ModuleExampleDef> examples) {
-            this.examples = examples;
-        }
         public void setPath(String path) {
             this.path = path;
         }

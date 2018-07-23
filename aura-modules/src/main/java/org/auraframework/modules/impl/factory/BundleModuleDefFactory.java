@@ -16,20 +16,13 @@
 package org.auraframework.modules.impl.factory;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -43,10 +36,6 @@ import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.MetaDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
-import org.auraframework.def.module.ModuleExampleDef;
-import org.auraframework.def.module.ModuleExampleFileDef;
-import org.auraframework.def.module.impl.ModuleExampleDefImpl;
-import org.auraframework.def.module.impl.ModuleExampleFileDefImpl;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.documentation.DescriptionDefImpl;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
@@ -67,7 +56,6 @@ import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
-import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -77,22 +65,12 @@ import org.lwc.documentation.BundleDocumentation;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Ordering;
 
 /**
  * Provides ModuleDef implementation
  */
 @ServiceComponent
 public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<ModuleDef>, ModuleDef> {
-    
-    private static final String EXAMPLE_PREFIX =  File.separatorChar + ModuleExampleDef.EXAMPLES_DIRNAME + File.separatorChar;
     
     private ModulesCompilerService modulesCompilerService;
     private ModulesMetadataService modulesMetadataService;
@@ -152,11 +130,11 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
         Map<String, String> sources = new HashMap<>();
 
-        // Gather compiler sources: loop over Sources and get contents of all files, excluding __examples__ (for now)
+        // loop and get contents of all files in the bundle
         sourceMap.forEach( (desc, entrySource) -> {
             String path = entrySource.getSystemId();
             String relativePath = path.substring(start + 1);
-            if (entrySource instanceof TextSource && !desc.getPrefix().equals(ModuleDef.META_PREFIX) && !desc.getName().startsWith(EXAMPLE_PREFIX)) {
+            if (entrySource instanceof TextSource && !desc.getPrefix().equals(ModuleDef.META_PREFIX)) {
                 // ignore json config because compiler will do nothing with it
                 sources.put(relativePath, ((TextSource<?>) entrySource).getContents());
             }
@@ -187,7 +165,6 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         }
         Map<CodeType, String> codes = processCodes(descriptor, compilerData.codes, location);
         builder.setCodes(codes);
-        
         builder.setModuleDependencies(compilerData.bundleDependencies);
         builder.setLabels(compilerData.labels);
         builder.setOwnHash(calculateOwnHash(descriptor, codes));
@@ -207,21 +184,12 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
         // xml metadata (-meta.xml)
         processMetadata(descriptor, builder, sourceMap);
+        
+        BundleDocumentation documentation = compilerData.compilerReport.documentation;
+        processDocumentation(descriptor, builder, sourceMap, documentation);
 
-        try {
-            // __doc__
-            BundleDocumentation documentation = compilerData.compilerReport.documentation;
-            processDocumentation(descriptor, builder, sourceMap, documentation);
-            
-            // __examples__
-            processExamples(descriptor, builder, sourceMap, documentation);
-        } catch (Exception e) {
-            builder.setParseError(e);
-        }
         return builder.build();
     }
-
-   
 
     /**
      * Process xml metadata
@@ -308,166 +276,6 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                 DocumentationDef def = compilerService.compile(auradocDesc, (Source<DocumentationDef>) source);
                 builder.setAuraDocumentationDef(def);
             }
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    private List<ExampleMetadata> getMetadataList(BundleDocumentation documentation) {
-        if (documentation == null) {
-            return Collections.emptyList();
-        }
-        Map<String, Object> metadata = documentation.getMetadata();
-        if (metadata == null) {
-            return Collections.emptyList();
-        }
-        Object possibleExamples = metadata.get("examples");
-        if (possibleExamples == null) {
-            return Collections.emptyList();
-        }
-        if (!(possibleExamples instanceof List)) {
-            throw new RuntimeException(
-                    String.format("Invalid documentation format for 'examples', expected a list, received %s.",
-                            possibleExamples.getClass().toString()));
-        }
-        // safe cast
-        List<Object> exampleList = (List<Object>) possibleExamples;
-        List<Map<String, Object>> validatedExamples = new ArrayList<>(exampleList.size());
-        for (Iterator<Object> iterator = exampleList.iterator(); iterator.hasNext();) {
-            Object validate = iterator.next();
-            if (!(validate instanceof Map)) {
-                throw new RuntimeException(String.format(
-                        "Invalid documentation format for a list value of 'examples', expected an object, received %s.",
-                        possibleExamples.getClass().toString()));
-            }
-            Map<String, Object> object = (Map<String, Object>) validate;
-            if (object.get("name") == null) {
-                throw new RuntimeException(
-                        "Invalid documentation format for a list value of 'examples'. Expected an object that specifies the the value 'name'.");
-            }
-            validatedExamples.add(object);
-        }
-
-        List<ExampleMetadata> examples = validatedExamples.stream()
-            // map to ExampleMetadata structure
-            .map(map -> {
-                ExampleMetadata exampleMetadata = new ExampleMetadata();
-    
-                exampleMetadata.name = (String) map.get("name");
-                Object possibleLabel = map.get("label");
-                if (possibleLabel instanceof String) {
-                    exampleMetadata.label = (String) possibleLabel;
-                }
-                Object possibleDescription = map.get("description");
-                if (possibleDescription instanceof String) {
-                    exampleMetadata.description = (String) possibleDescription;
-                }
-    
-                return exampleMetadata;
-            }).collect(Collectors.toList());
-        return examples;
-    }
-    
-
-    /**
-     * Processes __examples__ included in the bundle.
-     * @param documentation 
-     */
-    private void processExamples(DefDescriptor<ModuleDef> descriptor, Builder builder,
-            Map<DefDescriptor<?>, Source<?>> sourceMap, BundleDocumentation documentation) {
-
-        // List the list of example metadata from the bundle documentation. 
-        List<ExampleMetadata> metadata = getMetadataList(documentation);
-
-        // Index/group the metadata by example name
-        Map<String, ExampleMetadata> examplesByNameMap = index(metadata);
-
-        // filter out non-examples from the list of all Bundle sources in the sourceMap. 
-
-        List<Map.Entry<DefDescriptor<?>, Source<?>>> exampleSources = sourceMap
-            .entrySet()
-            .stream()
-            .filter(entry -> {
-                String key = entry.getKey().getName();
-                if (key != null && key.startsWith(EXAMPLE_PREFIX)) {
-                    return true;
-                }
-                return false;
-            })
-            .collect(Collectors.toList());
-        
-        // Index/group sources by example name
-        ListMultimap<String, Entry<DefDescriptor<?>, Source<?>>> sourcesByNameMultimap = Multimaps
-            .index(exampleSources, entry -> {
-                String exampleFileName = entry.getValue().getDescriptor().getName();
-                String exampleFullName = exampleFileName.substring(EXAMPLE_PREFIX.length());
-                List<String> splitName = Splitter.on(File.separatorChar).splitToList(exampleFullName);
-                return Iterables.getFirst(splitName, "");
-            });
-        
-        // if no example metadata (from documentation) is specified, allow everything. Otherwise, filter out things that
-        // don't appear in the metadata example list.
-        ListMultimap<String, Entry<DefDescriptor<?>, Source<?>>> filtered;
-        if (!metadata.isEmpty()) {
-             filtered = Multimaps
-                .filterKeys(sourcesByNameMultimap, exampleName -> examplesByNameMap.get(exampleName) != null);
-        } else{ 
-            filtered = sourcesByNameMultimap;
-        }
-
-        // Check the reverse: if there IS a documentation metadata entry that refers to
-        // an example, make sure that example actually exists, or else throw error.
-        for (ExampleMetadata exampleMetadata : metadata) {
-            if (!filtered.containsKey(exampleMetadata.name)) {
-                throw new RuntimeException(String.format(
-                    "Invalid documentation for a list value of 'examples'. Example %s referenced in documentation examples list, but it does not exist as an example. ",
-                    exampleMetadata.name));
-            }
-        }
-        
-        // convert the map entries to just its source
-        ListMultimap<String, Source<?>> examplesToSources = Multimaps
-            .transformValues(filtered, entry -> entry.getValue());
-        
-        List<ModuleExampleDef> examples = examplesToSources
-            .keySet()
-            .stream()
-            .map(exampleName -> {
-                List<Source<?>> sources = examplesToSources.get(exampleName);
-                ExampleMetadata meta = examplesByNameMap.get(exampleName);
-    
-                String label = meta != null && meta.label != null ? meta.label : exampleName;
-                String description = meta != null && meta.description != null ? meta.description : "";
-                
-                List<ModuleExampleFileDef> defSources = sources
-                    .stream()
-                    .filter(source -> {
-                        return source instanceof TextSource;
-                    }).
-                    map(source -> {
-                        String contents = ((TextSource<?>) source).getContents();
-                        DefDescriptor<?> desc = ((TextSource<?>) source).getDescriptor();
-                        return new ModuleExampleFileDefImpl(desc.getName(), contents);
-                    })
-                    .collect(Collectors.toList());
-                
-                return new ModuleExampleDefImpl(exampleName, label, description, defSources);
-            })
-            .collect(Collectors.toList());
-        
-        if (!examplesByNameMap.isEmpty()) {
-            // sort the list according to metadata
-            Ordering<String> ordering = Ordering.explicit(new ArrayList<>(examplesByNameMap.keySet()));
-            Collections.sort(examples, Comparator.<ModuleExampleDef, String>
-                comparing(exampleDef -> exampleDef.getName(), ordering));
-        }
-        builder.setExamples(examples);
-    }
-
-    private Map<String, ExampleMetadata> index(List<ExampleMetadata> metadata) {
-        try {
-            return Maps.uniqueIndex(metadata, m -> m.name);
-        } catch (Exception log) {
-            throw new RuntimeException("Example metadata contains a duplicate entry: "+ log.getMessage());
         }
     }
 

@@ -207,6 +207,7 @@ function AuraClientService (util) {
     // = 0 on initial page load state or if appcache is not in use.
     // otherwise ranges from 0 to 100.
     this.appCacheProgress = 0;
+    this.appCacheUpdateCount = 0;
 
     this.NOOP = function() {};
 
@@ -1358,6 +1359,7 @@ AuraClientService.prototype.handleAppCache = function() {
     }
 
     function handleAppcacheDownloading(e) {
+        acs.appCacheUpdateCount = 0;
         acs.appcacheDownloadingEventFired = true;
         var progress = Math.round(100 * e.loaded / e.total);
         showProgress(progress + 1);
@@ -1369,6 +1371,7 @@ AuraClientService.prototype.handleAppCache = function() {
     }
 
     function handleAppcacheNoUpdate() {
+        acs.appCacheUpdateCount = 0;
         showProgress(100);
 
         // appcache refresh indicates all files are up to date but the app has indicated the app/fwk
@@ -1383,6 +1386,7 @@ AuraClientService.prototype.handleAppCache = function() {
     }
 
     function handleAppcacheObsolete() {
+        acs.appCacheUpdateCount = 0;
         // appcache is in use but obsolete (eg manifest returned 4xx), must request the .app?t from server
         // to allow for auth, etc redirect. if server redirects back to .app then browser starts appcache
         // refresh cycle and fires relevant events.
@@ -1546,6 +1550,11 @@ AuraClientService.prototype.setOutdated = function() {
 AuraClientService.prototype.updateAppCacheIfOnlineAndIdle = function() {
     if ((!("onLine" in window.navigator) || window.navigator.onLine) && window.applicationCache.status === window.applicationCache.IDLE) {
         // perform only when online (OR onLine not supported) and appcache IDLE status
+        // break application cache update error loop. eg App cache update that result in manifest 5xx triggers an error which in turn cause an update.
+        if(this.appCacheUpdateCount++ > AuraClientService.INCOMPLETE_BOOT_THRESHOLD) {
+            $A.log("[AuraClientService.updateAppCacheIfOnlineAndIdle]: Application cache update count passed a given threshold and is ignored.");
+            return false;
+        }
         try {
             // force browser to keep trying to get updated js resources as manifest should be updated at this point
             $A.log("[AuraClientService.updateAppCacheIfOnlineAndIdle]: Check for app cache updates using applicationCache.update()");

@@ -2024,12 +2024,17 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
                 if($A.clientService.logAccessFailures){
                     $A.error(null,new $A.auraError(message));
                 }
+                if (!callback || !$A.util.isFunction(callback)) {
+                    throw new Error(message);
+                }
             }else{
                 if($A.clientService.logAccessFailures){
                     $A.warning(message);
                 }
                 if(def) {
                     cmp = new (this.getComponentClass(descriptor, def))(config);
+                } else if (!callback || !$A.util.isFunction(callback)) {
+                    throw new Error(message);
                 }
             }
         }

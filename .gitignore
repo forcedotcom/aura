@@ -22,6 +22,7 @@ tags
 aura-impl/src/test/eslint/
 node
 node_modules
+package-lock.json
 rebel.xml
 
 # Best framework specifics

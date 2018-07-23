@@ -95,4 +95,12 @@ public interface ModuleDef extends PlatformDef {
      * This is the long-form documentation for using this module within aura. May be null.
      */
     DocumentationDef getAuraDocumentationDef();
+
+    /**
+     * Gets the examples represented by a collection of modules under the
+     * "__examples__" folder of the bundle.
+     *
+     */
+    List<ModuleExampleDef> getExamples();
+
 }

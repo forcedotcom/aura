@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-07-11
- * Version: 0.4.33
+ * Generated: 2018-07-24
+ * Version: 0.4.34
  */
 
 (function (exports) {
@@ -42,7 +42,6 @@
 // by the tree shaking process.
 
 const { isArray } = Array;
-
 
 const {
   assign,
@@ -78,17 +77,20 @@ const { apply, has, ownKeys } = Reflect;
  * hasOwnProperty.apply(someObject);
  *
  * With uncurryThis():
- * hasOwnProperty = curryThis(Object.prototype.hasOwnProperty);
+ * hasOwnProperty = uncurryThis(Object.prototype.hasOwnProperty);
  * hasOwnProperty(someObject);
  *
  * Using uncurryThis(), more than just a syntactic sugar, is an effective
  * defense mechanism which prevents .call() and .apply() from been tampered
  * by any code that loads after uncurryThis() and before freezing.
  */
-const curryThis = fn => (thisArg, ...args) => apply(fn, thisArg, args);
+const uncurryThis = fn => (thisArg, ...args) => apply(fn, thisArg, args);
 
-const toString = curryThis(Object.prototype.toString);
-const hasOwnProperty = curryThis(Object.prototype.hasOwnProperty);
+const toString = uncurryThis(Object.prototype.toString);
+const hasOwnProperty = uncurryThis(Object.prototype.hasOwnProperty);
+const bind = uncurryThis(Function.prototype.bind);
+const slice = uncurryThis(Array.prototype.slice);
+
 
 /**
  * Converts ArrayBuffer to UTF-8 String
@@ -2069,6 +2071,29 @@ function registerEngineAPI(api) {
 }
 
 /**
+ * Get the api shape of a custom element
+ *
+ * <element>.__proto__ => instanceof superElmProto + public property descriptors
+ * <element>.__proto__.__proto__ => superElmProto which is an instance of BaseCustomElementProto
+ * <element>.proto__.__proto__.__proto__ => superElmProto aka globalElmProto, instance of BaseCustomElementProto
+ * <element>.proto__.__proto__.__proto__.__proto__ => BaseCustomElementProto aka HTMLElement(native class), has constructor property
+ *
+ * @param {*} elm
+ * @return {Object} Map of property to descriptor
+ */
+function getCustomElementPropertyDescriptors(elm) {
+  const namesToDescriptorMap = {};
+  // Escape hatch to detect when we have reached the native HTMLElement definition
+  if (elm.hasOwnProperty('constructor') === true) {
+    return namesToDescriptorMap;
+  }
+  getOwnPropertyNames(elm).forEach(propName => {
+    namesToDescriptorMap[propName] = getOwnPropertyDescriptor(elm, propName);
+  });
+  return assign(getCustomElementPropertyDescriptors(getPrototypeOf(elm)), namesToDescriptorMap);
+}
+
+/**
  * Add additional properties for custom elements
  * @param {*} el DOM element
  * @param {*} prototype Represents the psuedo protototype that will be used to create wrapped element
@@ -2082,8 +2107,9 @@ function customElementHook$1(el, prototype, tagNameSpecificConfig) {
       return SecureObject.deepUnfilterMethodArguments(st, [], args);
     }
   };
-  getOwnPropertyNames(el).forEach(prop => {
-    const originalDescriptor = getOwnPropertyDescriptor(el, prop);
+  const namesToDescriptorMap = getCustomElementPropertyDescriptors(lwcUnwrap(el));
+  keys(namesToDescriptorMap).forEach(prop => {
+    const originalDescriptor = namesToDescriptorMap[prop];
     if (
       !getOwnPropertyDescriptor(prototype, prop) &&
       !getOwnPropertyDescriptor(tagNameSpecificConfig, prop)
@@ -4235,7 +4261,7 @@ SecureElement.createAttributeAccessMethodConfig = function(
     writable: true,
     value: function() {
       const raw = SecureObject.getRaw(this);
-      let args = SecureObject.ArrayPrototypeSlice.call(arguments);
+      let args = slice(arguments);
 
       let name = args[namespaced ? 1 : 0];
       if (nameProp) {
@@ -5203,7 +5229,7 @@ SecureObject.filterArguments = function(st, args, options) {
     return result;
   }
 
-  args = SecureObject.ArrayPrototypeSlice.call(args);
+  args = slice(args);
 
   if (options && options.beforeCallback) {
     options.beforeCallback.apply(st, args);
@@ -6858,9 +6884,6 @@ SecureObject.deepUnfilterMethodArguments = function(st, baseObject, members) {
   }
   return baseObject;
 };
-
-SecureObject.FunctionPrototypeBind = Function.prototype.bind;
-SecureObject.ArrayPrototypeSlice = Array.prototype.slice;
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -9407,23 +9430,13 @@ function SecureWindow(sandbox, key) {
     setTimeout: {
       enumerable: true,
       value: function(callback) {
-        return setTimeout.apply(
-          win,
-          [SecureObject.FunctionPrototypeBind.call(callback, o)].concat(
-            SecureObject.ArrayPrototypeSlice.call(arguments, 1)
-          )
-        );
+        return setTimeout.apply(win, [bind(callback, o)].concat(slice(arguments, 1)));
       }
     },
     setInterval: {
       enumerable: true,
       value: function(callback) {
-        return setInterval.apply(
-          win,
-          [SecureObject.FunctionPrototypeBind.call(callback, o)].concat(
-            SecureObject.ArrayPrototypeSlice.call(arguments, 1)
-          )
-        );
+        return setInterval.apply(win, [bind(callback, o)].concat(slice(arguments, 1)));
       }
     },
     location: {
@@ -9497,7 +9510,7 @@ function SecureWindow(sandbox, key) {
         return (
           formDataValueOverride ||
           function() {
-            const args = SecureObject.ArrayPrototypeSlice.call(arguments);
+            const args = slice(arguments);
             // make sure we have access to any <form> passed in to constructor
             let form;
             if (args.length > 0) {
@@ -9755,51 +9768,51 @@ const metadata$9 = {
       textContent: READ_ONLY_PROPERTY
     },
     ARIA: {
-      'aria-autocomplete': DEFAULT,
-      'aria-checked': DEFAULT,
-      'aria-current': DEFAULT,
-      'aria-disabled': DEFAULT,
-      'aria-expanded': DEFAULT,
-      'aria-haspopup': DEFAULT,
-      'aria-hidden': DEFAULT,
-      'aria-invalid': DEFAULT,
-      'aria-label': DEFAULT,
-      'aria-level': DEFAULT,
-      'aria-multiline': DEFAULT,
-      'aria-multiselectable': DEFAULT,
-      'aria-orientation': DEFAULT,
-      'aria-pressed': DEFAULT,
-      'aria-readonly': DEFAULT,
-      'aria-required': DEFAULT,
-      'aria-selected': DEFAULT,
-      'aria-sort': DEFAULT,
-      'aria-valuemax': DEFAULT,
-      'aria-valuemin': DEFAULT,
-      'aria-valuenow': DEFAULT,
-      'aria-valuetext': DEFAULT,
-      'aria-live': DEFAULT,
-      'aria-relevant': DEFAULT,
-      'aria-atomic': DEFAULT,
-      'aria-busy': DEFAULT,
-      'aria-activedescendant': DEFAULT,
-      'aria-controls': DEFAULT,
-      'aria-describedby': DEFAULT,
-      'aria-flowto': DEFAULT,
-      'aria-labelledby': DEFAULT,
-      'aria-owns': DEFAULT,
-      'aria-posinset': DEFAULT,
-      'aria-setsize': DEFAULT,
-      'aria-colcount': DEFAULT,
-      'aria-colindex': DEFAULT,
-      'aria-details': DEFAULT,
-      'aria-errormessage': DEFAULT,
-      'aria-keyshortcuts': DEFAULT,
-      'aria-modal': DEFAULT,
-      'aria-placeholder': DEFAULT,
-      'aria-roledescription': DEFAULT,
-      'aria-rowcount': DEFAULT,
-      'aria-rowindex': DEFAULT,
-      'aria-rowspan': DEFAULT,
+      ariaAutoComplete: DEFAULT,
+      ariaChecked: DEFAULT,
+      ariaCurrent: DEFAULT,
+      ariaDisabled: DEFAULT,
+      ariaExpanded: DEFAULT,
+      ariaHasPopUp: DEFAULT,
+      ariaHidden: DEFAULT,
+      ariaInvalid: DEFAULT,
+      ariaLabel: DEFAULT,
+      ariaLevel: DEFAULT,
+      ariaMultiLine: DEFAULT,
+      ariaMultiSelectable: DEFAULT,
+      ariaOrientation: DEFAULT,
+      ariaPressed: DEFAULT,
+      ariaReadOnly: DEFAULT,
+      ariaRequired: DEFAULT,
+      ariaSelected: DEFAULT,
+      ariaSort: DEFAULT,
+      ariaValueMax: DEFAULT,
+      ariaValueMin: DEFAULT,
+      ariaValueNow: DEFAULT,
+      ariaValueText: DEFAULT,
+      ariaLive: DEFAULT,
+      ariaRelevant: DEFAULT,
+      ariaAtomic: DEFAULT,
+      ariaBusy: DEFAULT,
+      ariaActiveDescendant: DEFAULT,
+      ariaControls: DEFAULT,
+      ariaDescribedBy: DEFAULT,
+      ariaFlowTo: DEFAULT,
+      ariaLabelledBy: DEFAULT,
+      ariaOwns: DEFAULT,
+      ariaPosInSet: DEFAULT,
+      ariaSetSize: DEFAULT,
+      ariaColCount: DEFAULT,
+      ariaColIndex: DEFAULT,
+      ariaDetails: DEFAULT,
+      ariaErrorMessage: DEFAULT,
+      ariaKeyShortcuts: DEFAULT,
+      ariaModal: DEFAULT,
+      ariaPlaceholder: DEFAULT,
+      ariaRoleDescription: DEFAULT,
+      ariaRowCount: DEFAULT,
+      ariaRowIndex: DEFAULT,
+      ariaRowSpan: DEFAULT,
       role: DEFAULT
     }
   }
@@ -9912,6 +9925,65 @@ function SecureTemplate(template, key) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const GlobalAndAriaProperties = [
+  // global properties
+  'dir',
+  'id',
+  'accessKey',
+  'title',
+  'lang',
+  'hidden',
+  'draggable',
+  'tabIndex',
+  // Aria attributes
+  'ariaAutoComplete',
+  'ariaChecked',
+  'ariaCurrent',
+  'ariaDisabled',
+  'ariaExpanded',
+  'ariaHasPopUp',
+  'ariaHidden',
+  'ariaInvalid',
+  'ariaLabel',
+  'ariaLevel',
+  'ariaMultiLine',
+  'ariaMultiSelectable',
+  'ariaOrientation',
+  'ariaPressed',
+  'ariaReadOnly',
+  'ariaRequired',
+  'ariaSelected',
+  'ariaSort',
+  'ariaValueMax',
+  'ariaValueMin',
+  'ariaValueNow',
+  'ariaValueText',
+  'ariaLive',
+  'ariaRelevant',
+  'ariaAtomic',
+  'ariaBusy',
+  'ariaActiveDescendant',
+  'ariaControls',
+  'ariaDescribedBy',
+  'ariaFlowTo',
+  'ariaLabelledBy',
+  'ariaOwns',
+  'ariaPosInSet',
+  'ariaSetSize',
+  'ariaColCount',
+  'ariaColIndex',
+  'ariaDetails',
+  'ariaErrorMessage',
+  'ariaKeyShortcuts',
+  'ariaModal',
+  'ariaPlaceholder',
+  'ariaRoleDescription',
+  'ariaRowCount',
+  'ariaRowIndex',
+  'ariaRowSpan',
+  'role'
+];
+
 /**
  * this should return a secure value
  * @param {*} cmp component instance who is accessing the value
@@ -9937,6 +10009,46 @@ function getUnwrappedValue(cmp, filteredValue) {
     }
   }
   return filteredValue;
+}
+
+const ElementPropDescriptorMap = {};
+function getRawPropertyDescriptor(ElementPrototype, propName) {
+  let descriptor = ElementPropDescriptorMap[propName];
+  if (descriptor) {
+    return descriptor;
+  }
+  descriptor = ElementPropDescriptorMap[propName] = getOwnPropertyDescriptor(
+    ElementPrototype,
+    propName
+  );
+  return descriptor;
+}
+
+/**
+ * Creates a wrapped property descriptor on properties that are lazily defined on Element
+ * @param {*} ElementPrototype Prototype of the base Element class from LWC
+ * @param {string} propName
+ */
+function createWrappedPropertyDescriptorStateless(ElementPrototype, propName) {
+  return {
+    enumerable: true,
+    get() {
+      const { get } = getRawPropertyDescriptor(ElementPrototype, propName);
+      assert$1.invariant(get, 'Refering to an unsupported property of the Element base class');
+      if (!get) {
+        return undefined;
+      }
+      const rawValue = get.call(this);
+      return getFilteredValue(this, rawValue);
+    },
+
+    set(filteredValue) {
+      const { set } = getRawPropertyDescriptor(ElementPrototype, propName);
+      if (set) {
+        set.call(this, getUnwrappedValue(this, filteredValue));
+      }
+    }
+  };
 }
 
 // Hooks to be used by engine
@@ -10060,7 +10172,7 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
     template: {
       enumerable: true,
       get: function() {
-        const { get } = getOwnPropertyDescriptor(ElementPrototype, 'template');
+        const { get } = getRawPropertyDescriptor(ElementPrototype, 'template');
         const rawValue = get.call(this);
         return SecureTemplate(rawValue, lockerKey);
       }
@@ -10068,7 +10180,7 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
     querySelector: {
       enumerable: true,
       value: function(selector) {
-        const { value } = getOwnPropertyDescriptor(ElementPrototype, 'querySelector');
+        const { value } = getRawPropertyDescriptor(ElementPrototype, 'querySelector');
         const node = value.call(this, selector);
         return getFilteredValue(this, node);
       }
@@ -10076,11 +10188,16 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
     querySelectorAll: {
       enumerable: true,
       value: function(selector) {
-        const { value } = getOwnPropertyDescriptor(ElementPrototype, 'querySelector');
+        const { value } = getRawPropertyDescriptor(ElementPrototype, 'querySelector');
         const rawNodeList = value.call(this, selector);
         return getFilteredValue(this, rawNodeList);
       }
     }
+  });
+
+  GlobalAndAriaProperties.forEach(propName => {
+    const wrappedDescriptor = createWrappedPropertyDescriptorStateless(ElementPrototype, propName);
+    defineProperty(SecureElementPrototype, propName, wrappedDescriptor);
   });
 
   // Fetch the properties on LWCElement.prototype and cache them
@@ -10093,7 +10210,7 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
   // TOOD: RJ/JF Revisit whether we should whitelist instead of all properties
   lwcElementProtoPropNames.forEach(propName => {
     if (!SecureElementPrototype.hasOwnProperty(propName)) {
-      const originalDescriptor = getOwnPropertyDescriptor(ElementPrototype, propName);
+      const originalDescriptor = getRawPropertyDescriptor(ElementPrototype, propName);
       const wrappedDescriptor = getWrappedDescriptor(originalDescriptor);
       defineProperty(SecureElementPrototype, propName, wrappedDescriptor);
     }

@@ -1083,7 +1083,8 @@ AuraComponentService.prototype.hasCacheableDefinitionOfAnyType = function(descri
     var desc = this.getDescriptorFromConfig(descriptor);
     return  !!this.hasModuleDefinition(desc) ||
         !!this.componentDefRegistry[desc] ||
-        (this.savedComponentConfigs[desc] && Object.keys(this.savedComponentConfigs[desc]).length > 1) ||
+        (this.savedComponentConfigs[desc] &&
+            (Object.keys(this.savedComponentConfigs[desc]).length > 1) || $A.util.isFunction(this.savedComponentConfigs[desc])) ||
         !!this.hasLibrary(desc) ||
         !!$A.eventService.getEventDef(desc);
 };

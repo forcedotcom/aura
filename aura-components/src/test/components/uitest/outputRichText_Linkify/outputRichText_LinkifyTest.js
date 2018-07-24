@@ -198,6 +198,39 @@
         ]
     },
 
+    testCommaNextToHTTPLink: {
+        attributes: {
+            textValue: 'visit https://www.salesforce.com/company/msa.jsp, to download the agreement'
+        },
+        test: [
+            function(cmp) {
+                this.assertLinkHref(cmp, 'https://www.salesforce.com/company/msa.jsp');
+            }
+        ]
+    },
+
+    testCommaNextToSimpleLink: {
+        attributes: {
+            textValue: 'visit salesforce.com/company/msa.jsp, to download the agreement'
+        },
+        test: [
+            function(cmp) {
+                this.assertLinkHref(cmp, 'http://salesforce.com/company/msa.jsp');
+            }
+        ]
+    },
+
+    testCommaNextToComplexLink: {
+        attributes: {
+            textValue: 'visit https://salesforce.com/company/msa.jsp#internal?a=b&c=d, to download the agreement'
+        },
+        test: [
+            function(cmp) {
+                this.assertLinkHref(cmp, 'https://salesforce.com/company/msa.jsp#internal?a=b&c=d');
+            }
+        ]
+    },
+
     assertLinksPresent: function(cmp, hrefText, checkValue) {
         $A.test.addWaitForWithFailureMessage(true,
             function() {
@@ -211,6 +244,16 @@
                     $A.test.assertEquals(textValue, cmp.get("v.textValue"));
                 }
             }
+        )
+    },
+
+    assertLinkHref: function (cmp, expectedHref) {
+        $A.test.addWaitForWithFailureMessage(
+            true,
+            function() {
+                var link = cmp.find("richTextComp").getElement().querySelector("a");
+                return link && expectedHref === link.href;
+            }, 'The generated link does not match the expected link'
         )
     },
 

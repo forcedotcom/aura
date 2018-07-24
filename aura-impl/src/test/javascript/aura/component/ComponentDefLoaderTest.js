@@ -370,7 +370,7 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
             var expect = '{"uriString":"a&_uid=555555","uid":555555}';
             mockAura(function () {
                 var defLoader = new Aura.Component.ComponentDefLoader();
-                actual = JSON.stringify(defLoader.buildURIString("a", "b", ["c", "d", "e"]));
+                actual = JSON.stringify(defLoader.buildURIString("a", "b", 3));
             });
 
             Assert.Equal(expect, actual);
@@ -382,7 +382,7 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
             var expect = '{"uriString":"a&_uid=LATEST-0","uid":"LATEST-0"}';
             mockAura(function () {
                 var defLoader = new Aura.Component.ComponentDefLoader();
-                actual = JSON.stringify(defLoader.buildURIString("a", "", ["c", "d", "e"]));
+                actual = JSON.stringify(defLoader.buildURIString("a", "", 3));
             });
 
             Assert.Equal(expect, actual);
@@ -394,7 +394,7 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
             var expect = '{"uriString":"a&_uid=555555","uid":555555}';
             mockAura(function () {
                 var defLoader = new Aura.Component.ComponentDefLoader();
-                actual = JSON.stringify(defLoader.buildURIString("a", "b", ["c", "d", "e"]));
+                actual = JSON.stringify(defLoader.buildURIString("a", "b", 3));
             });
 
             Assert.Equal(expect, actual);
@@ -406,7 +406,7 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
             var expect = '{"uriString":"a&_uid=b","uid":"b"}';
             mockAura(function () {
                 var defLoader = new Aura.Component.ComponentDefLoader();
-                actual = JSON.stringify(defLoader.buildURIString("a", "b", []));
+                actual = JSON.stringify(defLoader.buildURIString("a", "b", 0));
             });
 
             Assert.Equal(expect, actual);

@@ -125,6 +125,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     var uri = "";
     var uris = [];
     var hasRestrictedNamespaces = false;
+    var numberOfDescriptorsInUid = 0;
 
     var uid = "";
     var namespaces = Object.keys(namespaceMap).sort();
@@ -159,7 +160,12 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
                     if (additionalURI.length + name.length + uri.length > maxLength) {
                         uri += additionalURI;
                         uris.push([uri, uid, hasRestrictedNamespaces]);
-                        uid = $A.util.isString(namespaceMap[namespaces[i]][name]) ?  namespaceMap[namespaces[i]][name] : "";
+                        if ($A.util.isString(namespaceMap[namespaces[i]][name])) {
+                            uid = namespaceMap[namespaces[i]][name];
+                            numberOfDescriptorsInUid++;
+                        } else {
+                            uid = "";
+                        }
                         additionalURI =  "&" + namespaces[i] + "=" + name;
                         uri = "";
                         hasRestrictedNamespaces = isRestrictedNamespace;
@@ -168,6 +174,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
                         var additional_def_uid = namespaceMap[namespaces[i]][name];
                         if ($A.util.isString(additional_def_uid)) {
                             uid += additional_def_uid;
+                            numberOfDescriptorsInUid++;
                         }
                     }
                 }
@@ -186,6 +193,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
             var def_uid = namespaceMap[namespaces[i]][names[j]];
             if ($A.util.isString(def_uid)) {
                 uid += def_uid;
+                numberOfDescriptorsInUid++;
             }
         }
     }
@@ -200,7 +208,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     }
 
     for(var def=0; def<uris.length; def++) {
-        var finalURI = this.buildURIString(uris[def][0], uris[def][1], descriptors);
+        var finalURI = this.buildURIString(uris[def][0], uris[def][1], numberOfDescriptorsInUid);
         Aura["componentDefLoaderError"][finalURI.uid] = [];
         var host = $A.clientService._host;
         if (!uris[def][2]) {
@@ -211,10 +219,10 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     return processedURI;
 };
 
-ComponentDefLoader.prototype.buildURIString = function(uri, uid, descriptors) {
+ComponentDefLoader.prototype.buildURIString = function(uri, uid, numberOfDescriptorsInUid) {
     if (!uid.length) {
         uid = ComponentDefLoader.UID_default + "-" + (this.counter++);
-    } else if (descriptors.length > 1) {
+    } else if (numberOfDescriptorsInUid > 1) {
         uid = $A.util.getHashCode(uid);
     }
 

@@ -128,7 +128,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
 
     var uid = "";
     var namespaces = Object.keys(namespaceMap).sort();
-    if (namespaces.length === 0) {
+    if (namespaces.length === 0 && existingRequested.counter === 0) {
         return uris;
     }
 
@@ -190,7 +190,9 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
         }
     }
 
-    uris.push([uri, uid, hasRestrictedNamespaces]);
+    if (uri !== "") {
+        uris.push([uri, uid, hasRestrictedNamespaces]);
+    }
 
     var processedURI = [];
     if (existingRequested.counter > 0) {

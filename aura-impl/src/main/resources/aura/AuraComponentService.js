@@ -2019,7 +2019,7 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
             }
 
             cmp = new classConstructor(config);
-        }else{
+        } else if (def) {
             var message="Access Check Failed! AuraComponentService.createComponentFromConfig(): '" + descriptor + "' is not visible to '" + currentAccessCmp + "'.";
             if($A.clientService.enableAccessChecks) {
                 if($A.clientService.logAccessFailures){
@@ -2032,11 +2032,7 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
                 if($A.clientService.logAccessFailures){
                     $A.warning(message);
                 }
-                if(def) {
-                    cmp = new (this.getComponentClass(descriptor, def))(config);
-                } else if (!callback || !$A.util.isFunction(callback)) {
-                    throw new Error(message);
-                }
+                cmp = new (this.getComponentClass(descriptor, def))(config);
             }
         }
         if (callback && $A.util.isFunction(callback)) {

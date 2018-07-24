@@ -27,8 +27,7 @@
             cmp.testAura2SLWCCustomEventSend();
         }
     },
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testAura2SLWCCustomEventReceive: {
+    testAura2SLWCCustomEventReceive: {
         test: function (cmp, event, helper) {
             cmp.testAura2SLWCCustomEventReceive();
         }
@@ -38,8 +37,7 @@
             return cmp.testAura2SLWCCustomEventCNReceive();
         }
     },
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testAura2SLWCApiMethodSend: {
+    testAura2SLWCApiMethodSend: {
         test: function (cmp, event, helper) {
             cmp.testAura2SLWCApiMethodSend();
         }
@@ -59,8 +57,7 @@
             cmp.testAura2SLWCApiMethodCNReceive();
         }
     },
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testAura2SLWCDomEventOnHostElement: {
+    testAura2SLWCDomEventOnHostElement: {
         test: function (cmp) {
             cmp.testAura2SLWCDomEventOnHostElement();
         }
@@ -75,45 +72,37 @@
     },
     // end Secure Aura to Unsecure LWC Communication tests
 
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testTemplateQuerySelectorReturnsSecureElement: {
+    testTemplateQuerySelectorReturnsSecureElement: {
         test: function (cmp, event, helper) {
             cmp.testTemplateQuerySelectorReturnsSecureElement();
         }
     },
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testLWCCustomEventOnSelf: {
+    testLWCCustomEventOnSelf: {
         test: function (cmp, event, helper) {
             cmp.testLWCCustomEventOnSelf();
         }
     },
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testSecureLWC2SecureLWCCustomEvent: {
+    testSecureLWC2SecureLWCCustomEvent: {
         test: function (cmp) {
             return cmp.testSecureLWC2SecureLWCCustomEvent();
         }
     },
-    // TODO: Due to a bug in how LWC engine patches target and currentTarget properties on event
-    _testSecureLWC2SecureLWCDomEvent: {
+    testSecureLWC2SecureLWCDomEvent: {
         test: function (cmp) {
             return cmp.testSecureLWC2SecureLWCDomEvent();
         }
     },
-    // User Story: W-5058590
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testSecureLWC2UnsecureLWCCustomEvent: {
+    testSecureLWC2UnsecureLWCCustomEvent: {
         test: function (cmp) {
             return cmp.testSecureLWC2UnsecureLWCCustomEvent()
         }
     },
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testSecureLWC2UnsecureLWCDOMEvent: {
+    testSecureLWC2UnsecureLWCDOMEvent: {
         test: function (cmp) {
             cmp.testSecureLWC2UnsecureLWCDOMEvent();
         }
     },
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testSecureLWC2SecureLWCCustomEventCrossNamespace: {
+    testSecureLWC2SecureLWCCustomEventCrossNamespace: {
         test: function (cmp) {
             return cmp.testSecureLWC2SecureLWCCustomEventCrossNamespace();
         }
@@ -128,8 +117,7 @@
             return cmp.testUnsecureLWC2SecureLWCCustomEvent();
         }
     },
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testSLWC2SWLCParentCanCallAPIProp: {
+    testSLWC2SWLCParentCanCallAPIProp: {
         test: function (cmp) {
             return cmp.testSLWC2SWLCParentCanCallAPIProp();
         }

@@ -18,8 +18,8 @@
             cmp.testDollarAuraIsSecure();
         }
     },
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testDollarAuraNotAccessibleInModules: {
+
+    testDollarAuraNotAccessibleInModules: {
         test: function (cmp) {
             cmp.testDollarAuraNotAccessibleInModules();
         }
@@ -33,14 +33,12 @@
             cmp.testMiscGlobalsNotAccessibleInModules();
         }
     },
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testWindowIsSecure: {
+    testWindowIsSecure: {
         test: function (cmp) {
             cmp.testWindowIsSecure();
         }
     },
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testEngineIsSecure: {
+    testEngineIsSecure: {
         test: function (cmp) {
             cmp.testEngineIsSecure();
         }
@@ -127,14 +125,12 @@
         }
     },
 
-    // W-4240480: Because of LS has not fully hooked into locker-membrane, appendChild() will fail (Documented here W-4389861)
-    _testAppendDynamicallyCreatedDivToMarkup: {
+    testAppendDynamicallyCreatedDivToMarkup: {
         test: function(cmp) {
             cmp.sanityChecksTester("testAppendDynamicallyCreatedDivToMarkup");
         }
     },
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testContextInModule: {
+    testContextInModule: {
         test: function(cmp) {
             cmp.sanityChecksTester("testContextInModule");
         }

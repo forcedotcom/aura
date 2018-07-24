@@ -226,8 +226,7 @@
             return module.testSecureLWC2UnsecureLWCCustomEvent();
         }
     },
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testSecureLWC2UnsecureLWCDOMEvent: {
+    testSecureLWC2UnsecureLWCDOMEvent: {
         test: function (cmp) {
             var module = cmp.find('parentSecure').getElement();
             var triggered = false;

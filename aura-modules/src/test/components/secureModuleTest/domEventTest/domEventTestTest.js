@@ -40,8 +40,7 @@
         }
     },
 
-    // TODO: Uncomment once issues after LWC 0.24.1 are fixed
-    _testInitEventOnElementOfChildModule: {
+    testInitEventOnElementOfChildModule: {
         test: function(cmp) {
             cmp.domEventTester("testInitEventOnElementOfChildModule");
         }

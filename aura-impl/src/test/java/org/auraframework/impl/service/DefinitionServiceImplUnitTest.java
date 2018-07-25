@@ -201,43 +201,6 @@ public class DefinitionServiceImplUnitTest {
         return descriptor;
     }
 
-    @Test
-    public void testGetDefinitionLogsOnMissingNamespace() throws Exception {
-        DefinitionService definitionService = createDefinitionServiceWithMocks();
-        setupContext(definitionService);
-        DefDescriptor<Definition> descriptor = getMockDescriptor();
-        QuickFixException expected = null;
-
-        try {
-            definitionService.getDefinition(descriptor);
-        } catch (QuickFixException e) {
-            expected = e;
-        }
-        Assert.assertNotNull("Should have gotten a definition not found exception", expected);
-        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(loggingService, Mockito.times(1)).warn(captor.capture());
-        Assert.assertTrue(captor.getValue().startsWith("Registry not found for"));
-    }
-
-    @Test
-    public void testGetDefinitionLogsOnMissingDefinition() throws Exception {
-        DefinitionService definitionService = createDefinitionServiceWithMocks();
-        setupContext(definitionService);
-        DefDescriptor<Definition> descriptor = getMockDescriptor();
-        QuickFixException expected = null;
-        registries.setupRegistryFor(descriptor, registry1, null);
-
-        try {
-            definitionService.getDefinition(descriptor);
-        } catch (QuickFixException e) {
-            expected = e;
-        }
-        Assert.assertNotNull("Should have gotten a definition not found exception", expected);
-        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(loggingService, Mockito.times(1)).warn(captor.capture());
-        Assert.assertTrue(captor.getValue().contains("not found in registry registry1"));
-    }
-
 
 // <T extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName, Class<T> defClass);
 // <T extends Definition, B extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName, Class<T> defClass, DefDescriptor<B> bundle);

@@ -488,10 +488,10 @@ public class AuraLinker {
         DefRegistry registry = registries.getRegistryFor(compiling.descriptor);
         if (registry == null) {
             localStore.addDefinition(compiling.descriptor, null);
-            StringBuffer message = new StringBuffer(
-                    "Registry not found for " + compiling.descriptor + " in registry set: "
-                    +registries.toString());
-            loggingService.warn(message.toString());
+//            StringBuffer message = new StringBuffer(
+//                    "Registry not found for " + compiling.descriptor + " in registry set: "
+//                    +registries.toString());
+//            loggingService.warn(message.toString());
             return false;
         }
 
@@ -515,12 +515,12 @@ public class AuraLinker {
         compiling.def = registry.getDef(compiling.descriptor);
         if (compiling.def == null) {
             localStore.addDefinition(compiling.descriptor, null);
-            StringBuffer message = new StringBuffer(compiling.descriptor + " not found in registry " + registry);
-            registry.find(new DescriptorFilter("*")).stream().forEach((currentDescriptor)->{
-                message.append(currentDescriptor);
-                message.append(", ");
-            });
-            loggingService.warn(message.toString());
+//            StringBuffer message = new StringBuffer(compiling.descriptor + " not found in registry " + registry);
+//            registry.find(new DescriptorFilter("*")).stream().forEach((currentDescriptor)->{
+//                message.append(currentDescriptor);
+//                message.append(", ");
+//            });
+//            loggingService.warn(message.toString());
             return false;
         }
         compiling.built = true;

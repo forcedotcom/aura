@@ -1044,13 +1044,47 @@ Test.Aura.AuraClientServiceTest = function() {
         }
 
         [Fact]
-        function SendsXhrIfActionsFilterIsNotInitialized() {
+        function SendsXhrIfActionsFilterIsNotEnabled() {
             // Arrange
             var target;
             var mockAction = new MockAction("server", true);
 
             var mockStorage = {
                 isStoragePersistent: function() {
+                    return true;
+                },
+                isActionsFilterEnabled: function() {
+                    return false;
+                },
+                isKeyAbsentFromCache: function() {
+                    return true;
+                }
+            };
+
+            mockGlobal(function () {
+                target = getMockedService();
+                target.send = Stubs.GetMethod(true);
+                target.actionStorage = mockStorage;
+
+                // Act
+                target.enqueueAction(mockAction);
+            });
+
+            // Assert
+            Assert.Equal(1, target.send.Calls.length);
+        }
+
+        [Fact]
+        function SendsXhrIfActionsFilterIsEnabledAndNotInitialized() {
+            // Arrange
+            var target;
+            var mockAction = new MockAction("server", true);
+
+            var mockStorage = {
+                isStoragePersistent: function() {
+                    return true;
+                },
+                isActionsFilterEnabled: function() {
                     return true;
                 },
                 isActionsFilterInitialized: function() {
@@ -1081,8 +1115,8 @@ Test.Aura.AuraClientServiceTest = function() {
                 isStoragePersistent: function() {
                     return true;
                 },
-                isActionsFilterInitialized: function() {
-                    return true;
+                isActionsFilterEnabled: function() {
+                    return false;
                 },
                 isKeyAbsentFromCache: function() {
                     return true;
@@ -1112,8 +1146,8 @@ Test.Aura.AuraClientServiceTest = function() {
                 isStoragePersistent: function() {
                     return true;
                 },
-                isActionsFilterInitialized: function() {
-                    return true;
+                isActionsFilterEnabled: function() {
+                    return false;
                 },
                 isKeyAbsentFromCache: function() {
                     return false;

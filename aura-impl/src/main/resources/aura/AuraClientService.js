@@ -4158,8 +4158,13 @@ AuraClientService.prototype.isActionAbsentFromStorage = function(action) {
         return true;
     }
 
-    // if actions filter has not been set up yet, assume a cache miss
-    if (!this.actionStorage.isStoragePersistent() || !this.actionStorage.isActionsFilterInitialized()) {
+    // if storage is not persistent, it's a cache miss.
+    if (!this.actionStorage.isStoragePersistent()) {
+        return true;
+    }
+
+    // if actions filter is enabled and has not been set up yet, assume a cache miss
+    if (this.actionStorage.isActionsFilterEnabled() && !this.actionStorage.isActionsFilterInitialized()) {
         return true;
     }
 

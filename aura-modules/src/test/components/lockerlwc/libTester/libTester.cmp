@@ -1,0 +1,10 @@
+<aura:component implements="aura:requireLocker">
+
+    <lockerlwc:testSecureImports aura:id="test-secure-imports"/>
+    <lockerlwc:testUnsecureImports aura:id="test-unsecure-imports"/>
+
+    <!-- LWC Component to LWC Lib communication tests -->
+    <aura:method name="testSecureToUnsecureLib" />
+    <aura:method name="testUnsecureToUnsecureLib" />
+
+</aura:component>

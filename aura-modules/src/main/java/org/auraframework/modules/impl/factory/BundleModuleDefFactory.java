@@ -58,7 +58,6 @@ import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.text.Hash;
 import org.lwc.bundle.BundleType;
 import org.lwc.documentation.BundleDocumentation;
@@ -245,7 +244,9 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
             DescriptionDefImpl.Builder descriptionBuilder = new DescriptionDefImpl.Builder();
             descriptionBuilder.setName("main"); // only one description so arbitrary name is ok
-            descriptionBuilder.setDescription(documentation.getHtml());
+            if (documentation.getHtml().isPresent()) {
+                descriptionBuilder.setDescription(documentation.getHtml().get());
+            }
             DescriptionDefImpl description = descriptionBuilder.build();
             docDefBuilder.addDescription(description.getName(), description);
 

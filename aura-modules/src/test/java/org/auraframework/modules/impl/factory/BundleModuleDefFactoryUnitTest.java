@@ -118,13 +118,13 @@ public class BundleModuleDefFactoryUnitTest {
 
     private ModulesCompilerService mockModulesCompilerService() throws Exception {
         CompilerReport compilerReport = new CompilerReport(true, "version", new ArrayList<>(), new ArrayList<>(),
-                new ReportMetadata(null, null), null);
+                new ReportMetadata(null, null, null), null);
         return mockModulesCompilerService(compilerReport);
     }
 
     private ModulesCompilerService mockModulesCompilerService(BundleDocumentation bundleDocumentation) throws Exception {
         CompilerReport compilerReport = new CompilerReport(true, "version", new ArrayList<>(), new ArrayList<>(),
-                new ReportMetadata(null, null), bundleDocumentation);
+                new ReportMetadata(null, null, null), bundleDocumentation);
         return mockModulesCompilerService(compilerReport);
     }
 
@@ -428,7 +428,7 @@ public class BundleModuleDefFactoryUnitTest {
                 descriptor, mockFile("cmp.js"),
                 markdownDesc, mockFile("__doc__/cmp.markdown")));
 
-        BundleDocumentation bundleDocumentation = new BundleDocumentation("<p>hello world!</p>", null);
+        BundleDocumentation bundleDocumentation = new BundleDocumentation("classDescription", "<p>hello world!</p>", null);
         ModulesCompilerService modulesCompilerService = mockModulesCompilerService(bundleDocumentation);
 
         BundleModuleDefFactory factory = new BundleModuleDefFactory();
@@ -459,7 +459,7 @@ public class BundleModuleDefFactoryUnitTest {
                 descriptor, mockFile("cmp.js"),
                 markdownDesc, mockFile("__doc__/cmp.markdown")));
 
-        BundleDocumentation bundleDocumentation = new BundleDocumentation("<p>hello world!</p>", null);
+        BundleDocumentation bundleDocumentation = new BundleDocumentation("classDescription", "<p>hello world!</p>", null);
         ModulesCompilerService modulesCompilerService = mockModulesCompilerService(bundleDocumentation);
 
         BundleModuleDefFactory factory = new BundleModuleDefFactory();
@@ -496,7 +496,7 @@ public class BundleModuleDefFactoryUnitTest {
         meta.put("number", new Integer(1));
         meta.put("boolean", new Boolean(false));
         meta.put("list", Lists.newArrayList("one", "two", "three"));
-        BundleDocumentation bundleDocumentation = new BundleDocumentation("<p>hello world!</p>", meta);
+        BundleDocumentation bundleDocumentation = new BundleDocumentation("classDescription", "<p>hello world!</p>", meta);
 
         ModulesCompilerService modulesCompilerService = mockModulesCompilerService(bundleDocumentation);
 
@@ -593,7 +593,7 @@ public class BundleModuleDefFactoryUnitTest {
 
         Diagnostic diagnostic = new Diagnostic(DiagnosticLevel.FATAL, "Unable to parse front matter", Optional.empty(), Optional.empty());
         CompilerReport compilerReport = new CompilerReport(false, "version", Lists.newArrayList(diagnostic),
-                new ArrayList<>(), new ReportMetadata(null, null), null);
+                new ArrayList<>(), new ReportMetadata(null, null, null), null);
         ModulesCompilerService modulesCompilerService = mockModulesCompilerService(compilerReport);
 
         // current compiler behavior throws runtime exception when there is a compiler error

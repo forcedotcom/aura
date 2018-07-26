@@ -32,6 +32,8 @@
 
     <aura:dependency resource="markup://ui:actionMenuItem" />
 
+    <aura:handler name="destroy" value="{!this}" action="{!c.handleDestroy}"/>
+
     <aura:method name="focus"/>
     
     <aura:locator target="overflowTrigger" alias="overflow" description="Tab Overflow Menu Trigger"/>

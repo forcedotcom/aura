@@ -8729,6 +8729,9 @@ return {
 	},
     "updateMenuItems":function(cmp, evt, helper) {
 		helper.updateMenuItems(cmp);
+	},
+    "handleDestroy":function(cmp, evt, helper) {
+		helper.handleDestroy(cmp);
 	}
   },
   "helper":{
@@ -8791,6 +8794,14 @@ return {
 			cmp.find('menuList').get("e.refresh").fire();
 		}
 	},
+    "handleDestroy":function(cmp) {
+		var items = this.getMenuItemCache(cmp);
+		for (var item in items) {
+			if (items.hasOwnProperty(item)) {
+				items[item].destroy();
+			}
+		}
+	},
     "triggerTab":function(cmp, name, index, focus) {
 		var params = {
 			name : name,
@@ -8845,6 +8856,19 @@ return {
     }
   ],
   "hd":[
+    {
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.handleDestroy"
+      },
+      "v":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"this"
+      },
+      "n":"destroy"
+    },
     {
       "x":{
         "exprType":"PROPERTY",

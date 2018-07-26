@@ -34,6 +34,10 @@
 	
 	updateMenuItems: function(cmp, evt, helper) {
 		helper.updateMenuItems(cmp);
+	},
+
+	handleDestroy: function(cmp, evt, helper) {
+		helper.handleDestroy(cmp);
 	}
 	
 })// eslint-disable-line semi

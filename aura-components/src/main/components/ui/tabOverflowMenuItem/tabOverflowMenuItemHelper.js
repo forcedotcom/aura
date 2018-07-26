@@ -78,6 +78,15 @@
 		}
 	},
 
+	handleDestroy: function(cmp) {
+		var items = this.getMenuItemCache(cmp);
+		for (var item in items) {
+			if (items.hasOwnProperty(item)) {
+				items[item].destroy();
+			}
+		}
+	},
+
 	/**
 	 * Fire an event to activate the specified tab.
 	 *

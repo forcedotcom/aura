@@ -100,14 +100,16 @@
         }
     },
 
-    testOpen_HttpsUrl: {
+    // TODO: Rewrite in Jest as per:  @W-4945039@ modifying window.confirm
+    _testOpen_HttpsUrl: {
         // "window.open" will not open a new window for mobile autobuild runs.
         test: function(cmp) {
             cmp.testOpen_HttpsUrl();
         }
     },
 
-    testOpen_HttpUrl: {
+    // TODO: Rewrite in Jest as per:  @W-4945039@ modifying window.confirm
+    _testOpen_HttpUrl: {
         // "window.open" will not open a new window for mobile autobuild runs.
         test: function(cmp) {
             cmp.testOpen_HttpUrl();

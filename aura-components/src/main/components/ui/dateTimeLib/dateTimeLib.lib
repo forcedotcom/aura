@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:library description="Helper functions for date and time components.">
+<aura:library description="Helper functions for date and time components." support="DEPRECATED">
     <aura:include name="dateTimeService"/>
 </aura:library>

@@ -18,7 +18,7 @@
 <aura:component
     extends="ui:abstractList"
     implements="ui:autocompleteListInterface"
-    support="proto"
+    support="DEPRECATED"
     description="This component is used in ui:autocomplete to provide a list of options to the input component.To customize the list option behavior, use the selectListOption, listHighlight, and updateAriaAttributes events.">
 
     <aura:attribute access="PRIVATE" name="privateItems" type="Object[]"/>

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component support="BETA" extensible="true" extends="ui:input" implements="ui:inputDateComponent" description="A component for entering a date range.">
+<aura:component support="DEPRECATED" extensible="true" extends="ui:input" implements="ui:inputDateComponent" description="A component for entering a date range.">
     <aura:attribute name="startInputPlaceholder" type="String" description="The hint for the start date input. If empty, will be set based on the 'format' value."/>
     <aura:attribute name="endInputPlaceholder" type="String" description="The hint for the end date input. If empty, will be set based on the 'format' value."/>
     <aura:attribute name="startDate" type="String" description="Start date in the format yyyy-mm-dd."/>

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:tableCell, ui:hasGridEvents, ui:visible" extensible="true" description="Provides the date in a ui:datePickerGrid component.">
+<aura:component support="DEPRECATED" implements="ui:tableCell, ui:hasGridEvents, ui:visible" extensible="true" description="Provides the date in a ui:datePickerGrid component.">
     <aura:attribute name="label" type="String" description="The text displayed on the component."/>
     <aura:attribute name="ariaSelected" type="Boolean" default="false" description="The date highlighted."/>
     <aura:attribute name="tabIndex" type="Integer" default="-1" description="The tab index of the anchor element."/>

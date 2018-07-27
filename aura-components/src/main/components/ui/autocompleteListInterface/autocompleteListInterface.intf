@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:interface support="beta" extends="ui:visible">
+<aura:interface support="DEPRECATED" extends="ui:visible">
 
     <!-- attributes needed by this component -->
     <aura:attribute name="keyword" type="String" description="The keyword used to match list options."/>

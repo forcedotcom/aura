@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:library description="Helper functions to format numbers for inputs.">
+<aura:library description="Helper functions to format numbers for inputs." support="DEPRECATED">
     <aura:include name="number"/>
 </aura:library>

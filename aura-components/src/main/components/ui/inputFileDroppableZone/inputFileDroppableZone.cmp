@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="false">
+<aura:component support="DEPRECATED" extensible="false">
 
     <!-- Imports -->
     <aura:import library="ui:classNamesLibrary"  property="lib" />

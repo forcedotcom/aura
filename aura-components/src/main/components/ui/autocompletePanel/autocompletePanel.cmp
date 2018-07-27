@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component defaultFlavor="lookup" description="A wrapper component for the list of results in ui:autocomplete." >
+<aura:component support="DEPRECATED" defaultFlavor="lookup" description="A wrapper component for the list of results in ui:autocomplete." >
     <aura:import library="ui:panelPositioningLib" property="lib" />
     <aura:attribute name="referenceElement" type="Object" description="The reference element that's attached to the panel containing the list of results."/>
     <aura:attribute name="visible" type="boolean" default="false" access="INTERNAL" description="Specifies whether the panel is visible. The default is false."/>

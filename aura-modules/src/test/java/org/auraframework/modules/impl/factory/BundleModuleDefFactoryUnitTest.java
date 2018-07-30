@@ -68,6 +68,8 @@ import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.lwc.CompilerReport;
+import org.lwc.classmember.ClassMember;
+import org.lwc.classmember.MemberType;
 import org.lwc.diagnostic.Diagnostic;
 import org.lwc.diagnostic.DiagnosticLevel;
 import org.lwc.documentation.BundleDocumentation;
@@ -143,7 +145,7 @@ public class BundleModuleDefFactoryUnitTest {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         String basePath = String.join(File.separator,"User","me","project","src","main","modules","namespace","module-cmp");
-        
+
         FileSource<?> jsFileSource = mockFile(basePath, "module-cmp.js", "javascript code here");
         FileSource<?> htmlFileSource = mockFile(basePath, "module-cmp.html", "template code here");
         FileSource<?> jsonFileSource = mockFile(basePath, "lightning.json", "{ description: 'hello there', expose: 'true', minVersion: '12.3' }");
@@ -176,11 +178,20 @@ public class BundleModuleDefFactoryUnitTest {
         when(mockBundleSource.getBundledParts()).thenReturn(mockBundledParts);
 
         Map<CodeType, String> mockCodeMap = mockCodeMap();
-        
+
         CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class), null);
 
-        ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);        
-        ModulesCompilerData compilerData = new ModulesCompilerData(mockCodeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet("prop1", "prop2", "prop3"), Sets.newHashSet(), mockReport);
+        ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
+
+        ModulesCompilerData compilerData = new ModulesCompilerData(mockCodeMap,
+                Sets.newHashSet(),
+                Sets.newHashSet(),
+                Sets.newHashSet(
+                        new ClassMember("prop1", MemberType.PROPERTY, null, null),
+                        new ClassMember("prop2", MemberType.PROPERTY, null, null),
+                        new ClassMember("prop3", MemberType.PROPERTY, null, null)),
+                Sets.newHashSet(),
+                mockReport);
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
@@ -219,7 +230,7 @@ public class BundleModuleDefFactoryUnitTest {
     @Test
     public void testNamespaceFolderWithHyphen() throws Exception {
         String basePath = String.join(File.separator,"User","me","project","src","main","modules","name-space","module-cmp");
-        
+
         FileSource<?> jsFileSource = mockFile(basePath, "moduleCmp.js", "javascript code here");
         FileSource<?> htmlFileSource = mockFile(basePath, "moduleCmp.html", "template code here");
 
@@ -246,11 +257,11 @@ public class BundleModuleDefFactoryUnitTest {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         String basePath = String.join(File.separator,"User","me","project","src","main","modules","nameSpace","module-cmp");
-        
+
         FileSource<?> jsFileSource = mockFile(basePath, "moduleCmp.js", "javascript code here");
         FileSource<?> htmlFileSource = mockFile(basePath, "moduleCmp.html", "template code here");
         FileSource<?> jsonFileSource = mockFile(basePath, "lightning.json", "{ description: 'hello there', expose: 'true', minVersion: '12.3' }");
-        
+
         String xml =
                 "<LightningComponentBundle>\n" +
                     "<isExposed>true</isExposed>\n" +
@@ -281,8 +292,16 @@ public class BundleModuleDefFactoryUnitTest {
         Map<CodeType, String> mockCodeMap = mockCodeMap();
         CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class), null);
 
-        ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);        
-        ModulesCompilerData compilerData = new ModulesCompilerData(mockCodeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet("prop1", "prop2", "prop3"), Sets.newHashSet(), mockReport);
+        ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
+        ModulesCompilerData compilerData = new ModulesCompilerData(mockCodeMap,
+                Sets.newHashSet(),
+                Sets.newHashSet(),
+                Sets.newHashSet(
+                        new ClassMember("prop1", MemberType.PROPERTY, null, null),
+                        new ClassMember("prop2", MemberType.PROPERTY, null, null),
+                        new ClassMember("prop3", MemberType.PROPERTY, null, null)),
+                Sets.newHashSet(),
+                mockReport);
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
@@ -333,7 +352,7 @@ public class BundleModuleDefFactoryUnitTest {
     public void testMissingModeCode() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
         String basePath = String.join(File.separator,"User","me","project","src","main","modules","namespace","module-cmp");
-        
+
         FileSource<?> jsFileSource = mockFile(basePath, "module-cmp.js", "javascript code here");
         FileSource<?> htmlFileSource = mockFile(basePath, "module-cmp.html", "template code here");
 
@@ -371,7 +390,7 @@ public class BundleModuleDefFactoryUnitTest {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         String basePath = String.join(File.separator,"User","me","project","src","main","modules","namespace","module-cmp");
-        
+
         FileSource<?> jsFileSource = mockFile(basePath, "module-cmp.js", "javascript code here");
         FileSource<?> htmlFileSource = mockFile(basePath, "module-cmp.html", "template code here");
 
@@ -428,7 +447,7 @@ public class BundleModuleDefFactoryUnitTest {
                 descriptor, mockFile("cmp.js"),
                 markdownDesc, mockFile("__doc__/cmp.markdown")));
 
-        BundleDocumentation bundleDocumentation = new BundleDocumentation("classDescription", "<p>hello world!</p>", null);
+        BundleDocumentation bundleDocumentation = new BundleDocumentation(null, "<p>hello world!</p>", null);
         ModulesCompilerService modulesCompilerService = mockModulesCompilerService(bundleDocumentation);
 
         BundleModuleDefFactory factory = new BundleModuleDefFactory();
@@ -459,7 +478,7 @@ public class BundleModuleDefFactoryUnitTest {
                 descriptor, mockFile("cmp.js"),
                 markdownDesc, mockFile("__doc__/cmp.markdown")));
 
-        BundleDocumentation bundleDocumentation = new BundleDocumentation("classDescription", "<p>hello world!</p>", null);
+        BundleDocumentation bundleDocumentation = new BundleDocumentation(null, "<p>hello world!</p>", null);
         ModulesCompilerService modulesCompilerService = mockModulesCompilerService(bundleDocumentation);
 
         BundleModuleDefFactory factory = new BundleModuleDefFactory();
@@ -496,7 +515,7 @@ public class BundleModuleDefFactoryUnitTest {
         meta.put("number", new Integer(1));
         meta.put("boolean", new Boolean(false));
         meta.put("list", Lists.newArrayList("one", "two", "three"));
-        BundleDocumentation bundleDocumentation = new BundleDocumentation("classDescription", "<p>hello world!</p>", meta);
+        BundleDocumentation bundleDocumentation = new BundleDocumentation(null, "<p>hello world!</p>", meta);
 
         ModulesCompilerService modulesCompilerService = mockModulesCompilerService(bundleDocumentation);
 
@@ -608,5 +627,75 @@ public class BundleModuleDefFactoryUnitTest {
         } catch (InvalidDefinitionException e) {
             assertTrue(e.getMessage().contains("Unable to parse front matter"));
         }
+    }
+
+    @Test
+    public void testModuleDescriptionPresent() throws Exception {
+        DefDescriptor<ModuleDef> descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX,
+                "namespace", "cmp", ModuleDef.class);
+
+        BundleSource<ModuleDef> mockBundleSource = mockBundleSource(ImmutableMap.of(
+                descriptor, mockFile("cmp.js")));
+
+        BundleDocumentation bundleDocumentation = new BundleDocumentation("the description", null, null);
+        ModulesCompilerService modulesCompilerService = mockModulesCompilerService(bundleDocumentation);
+
+        BundleModuleDefFactory factory = new BundleModuleDefFactory();
+        factory.setModulesCompilerService(modulesCompilerService);
+
+        ModuleDef moduleDef = factory.getDefinition(descriptor, mockBundleSource);
+
+        String expected = "the description";
+        String actual = moduleDef.getDescription();
+
+        assertEquals("did not set description on moduledef", expected, actual);
+    }
+
+    @Test
+    public void testAttributes() throws Exception {
+        DefDescriptor<ModuleDef> descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX,
+                "namespace", "cmp", ModuleDef.class);
+
+        BundleSource<ModuleDef> mockBundleSource = mockBundleSource(ImmutableMap.of(
+                descriptor, mockFile("cmp.js")));
+
+        CompilerReport mockReport = new CompilerReport(true,
+                "version",
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ReportMetadata(null, null, null),
+                null);
+
+        ModulesCompilerData compilerData = new ModulesCompilerData(mockCodeMap(),
+                new HashSet<>(),
+                new HashSet<>(),
+                Sets.newHashSet(
+                        new ClassMember("prop1", MemberType.PROPERTY, "api", "prop1 description"),
+                        new ClassMember("prop2", MemberType.PROPERTY, "api", "prop2 description")),
+                new HashSet<>(),
+                mockReport);
+
+        ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
+        when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
+
+        BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
+        moduleDefFactory.setModulesCompilerService(mockCompiler);
+
+        ModuleDef moduleDef = moduleDefFactory.getDefinition(descriptor, mockBundleSource);
+
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = moduleDef.getAttributeDefs();
+        assertEquals("expected to find three attributes on module def", 2, attributes.size());
+
+        DefDescriptor<AttributeDef> desc = new DefDescriptorImpl<>(null, null, "prop1", AttributeDef.class);
+        AttributeDef attr = attributes.get(desc);
+        assertNotNull("could not find attribute with name 'prop1'", attr);
+        assertTrue("attribute 'prop1' should have access global", attr.getAccess().isGlobal());
+        assertEquals("attribute 'prop1' did not have expected description", "prop1 description", attr.getDescription());
+
+        desc = new DefDescriptorImpl<>(null, null, "prop2", AttributeDef.class);
+        attr = attributes.get(desc);
+        assertNotNull("could not find attribute with name 'prop2'", attr);
+        assertTrue("attribute 'prop2' should have access global", attr.getAccess().isGlobal());
+        assertEquals("attribute 'prop2' did not have expected description", "prop2 description", attr.getDescription());
     }
 }

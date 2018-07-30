@@ -27,23 +27,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.Optional;
-
 
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.modules.ModulesCompilerData.WireAdapter;
 import org.auraframework.modules.ModulesCompilerData.WireDecoration;
-import org.lwc.CompilerReport;
-import org.lwc.OutputConfig;
-import org.lwc.bundle.BundleResult;
-import org.lwc.decorator.Decorator;
-import org.lwc.decorator.DecoratorTarget;
-import org.lwc.decorator.DecoratorTargetAdapter;
-import org.lwc.metadata.ReportMetadata;
-import org.lwc.reference.Reference;
 import org.auraframework.tools.node.api.NodeBundle;
 import org.auraframework.tools.node.api.NodeLambdaFactory;
 import org.auraframework.tools.node.impl.NodeBundleBuilder;
@@ -53,6 +44,16 @@ import org.auraframework.util.IOUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.lwc.CompilerReport;
+import org.lwc.OutputConfig;
+import org.lwc.bundle.BundleResult;
+import org.lwc.classmember.ClassMember;
+import org.lwc.classmember.MemberType;
+import org.lwc.decorator.Decorator;
+import org.lwc.decorator.DecoratorTarget;
+import org.lwc.decorator.DecoratorTargetAdapter;
+import org.lwc.metadata.ReportMetadata;
+import org.lwc.reference.Reference;
 
 public final class ModulesCompilerUtil {
 
@@ -142,21 +143,32 @@ public final class ModulesCompilerUtil {
        return ret;
    }
 
-    static Set<String> parsePublicProperties(List<DecoratorTarget> targets) {
+    static Set<ClassMember> parsePublicProperties(List<DecoratorTarget> targets, List<ClassMember> classMembers) {
         if (targets == null) {
             return Collections.emptySet();
         }
 
-        Set<String> ret = new HashSet<>();
+        Map<String, ClassMember> publicClassMembers = new HashMap<>(targets.size());
+        for (ClassMember member : classMembers) {
+            Optional<String> decorator = member.getDecorator();
+            if (decorator.isPresent() && decorator.get().equals("api")) {
+                publicClassMembers.put(member.getName(), member);
+            }
+        }
+
+        Set<ClassMember> ret = new HashSet<>();
 
         for (DecoratorTarget publicDecoration : targets) {
-
             if (publicDecoration != null) {
                 try {
                     if (publicDecoration.type.name().equals("property")) {
-                        ret.add(publicDecoration.name);
+                        ClassMember found = publicClassMembers.get(publicDecoration.name);
+                        // TODO: get rid of this junk when we fold decorators into class members
+                        ClassMember member = found != null ?
+                                found : new ClassMember(publicDecoration.name, MemberType.PROPERTY, null, null);
+                        ret.add(member);
                     }
-                } catch (JSONException e){
+                } catch (JSONException e) {
                     // ignore
                 }
             }
@@ -221,7 +233,7 @@ public final class ModulesCompilerUtil {
         return wireDecorations;
     }
 
-    
+
 
 
     // this is open-source to platform compiler output conversion
@@ -272,7 +284,7 @@ public final class ModulesCompilerUtil {
         }
 
         List<Decorator> decorators = metadata.decorators;
-        Set<String> publicProperties = Collections.emptySet();
+        Set<ClassMember> publicProperties = Collections.emptySet();
         Set<WireDecoration> wireDecorations = Collections.emptySet();
 
         // TODO: convert to use Java classes
@@ -281,7 +293,7 @@ public final class ModulesCompilerUtil {
             List<DecoratorTarget> decorations = decorator.targets;
 
             if (type.equals("api")) {
-                publicProperties = parsePublicProperties(decorations);
+                publicProperties = parsePublicProperties(decorations, metadata.classMembers);
             } else if (type.equals("wire")) {
                 wireDecorations = parseWireDecorations(decorations);
             }

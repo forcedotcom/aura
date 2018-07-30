@@ -20,17 +20,53 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.MetaDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
 import org.junit.Test;
 
 public class ModulesDocumentationTest extends AuraImplTestCase {
     @Inject
     DefinitionService definitionService;
+
+    @Test
+    public void testModuleDescription() throws Exception {
+        DefDescriptor<ModuleDef> descriptor = definitionService.getDefDescriptor("moduleTest:documentedCmp", ModuleDef.class);
+        ModuleDef definition = definitionService.getDefinition(descriptor);
+
+        String expected = "This component is documented.";
+        String actual = definition.getDescription();
+        assertEquals("moduledef did not have expected description", expected, actual);
+    }
+
+    @Test
+    public void testPublicPropDescription() throws Exception {
+        DefDescriptor<ModuleDef> descriptor = definitionService.getDefDescriptor("moduleTest:documentedCmp", ModuleDef.class);
+        ModuleDef definition = definitionService.getDefinition(descriptor);
+
+        AttributeDef attr = definition.getAttributeDef("enabled");
+
+        String expected = "Whether this thing is enabled.";
+        String actual = attr.getDescription();
+        assertEquals("attribute 'enabled' did not have expected description", expected, actual);
+    }
+
+    @Test
+    public void testPublicAccessorPropDescription() throws Exception {
+        DefDescriptor<ModuleDef> descriptor = definitionService.getDefDescriptor("moduleTest:documentedCmp", ModuleDef.class);
+        ModuleDef definition = definitionService.getDefinition(descriptor);
+
+        AttributeDef attr = definition.getAttributeDef("something");
+
+        String expected = "Fear is the mind-killer.";
+        String actual = attr.getDescription();
+        assertEquals("attribute 'something' did not have expected description", expected, actual);
+    }
 
     @Test
     public void testBundleWithMarkdownDocumentation() throws Exception {
@@ -61,11 +97,11 @@ public class ModulesDocumentationTest extends AuraImplTestCase {
         expectedValue = "true";
         actualValue = metaDefs.get("boolean").getEscapedValue();
         assertEquals("did not get expected meta value for 'boolean'", expectedValue, actualValue);
-        
+
         expectedValue = "one,two";
         actualValue = metaDefs.get("list").getEscapedValue();
         assertEquals("did not get expected meta value for 'list'", expectedValue, actualValue);
-        
+
         expectedValue = "a=a,b=b";
         actualValue = metaDefs.get("map").getEscapedValue();
         assertEquals("did not get expected meta value for 'map'", expectedValue, actualValue);

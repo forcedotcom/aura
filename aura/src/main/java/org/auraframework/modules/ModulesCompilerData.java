@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.lwc.CompilerReport;
+import org.lwc.classmember.ClassMember;
 
 /**
  * POJO with the data ModulesCompilerService generates
@@ -29,7 +30,7 @@ public final class ModulesCompilerData {
     public final Map<CodeType, String> codes;
     public final Set<String> bundleDependencies;
     public final Set<String> labels;
-    public final Set<String> publicProperties;
+    public final Set<ClassMember> publicProperties;
     public final Set<WireDecoration> wireDecorations;
     public final CompilerReport compilerReport;
 
@@ -37,7 +38,7 @@ public final class ModulesCompilerData {
             Map<CodeType, String> codes,
             Set<String> bundleDependencies,
             Set<String> labels,
-            Set<String> publicProperties,
+            Set<ClassMember> publicProperties,
             Set<WireDecoration> wireDecorations) {
         this(codes, bundleDependencies, labels, publicProperties, wireDecorations, null);
     }
@@ -46,7 +47,7 @@ public final class ModulesCompilerData {
             Map<CodeType, String> codes,
             Set<String> bundleDependencies,
             Set<String> labels,
-            Set<String> publicProperties,
+            Set<ClassMember> publicProperties,
             Set<WireDecoration> wireDecorations,
             CompilerReport report) {
         this.codes = codes;

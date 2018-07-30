@@ -22,6 +22,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.CheckForNull;
@@ -60,6 +61,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 import org.lwc.bundle.BundleType;
+import org.lwc.classmember.ClassMember;
 import org.lwc.documentation.BundleDocumentation;
 
 import com.google.common.base.CharMatcher;
@@ -70,7 +72,7 @@ import com.google.common.base.Joiner;
  */
 @ServiceComponent
 public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<ModuleDef>, ModuleDef> {
-    
+
     private ModulesCompilerService modulesCompilerService;
     private ModulesMetadataService modulesMetadataService;
     private CompilerService compilerService;
@@ -170,11 +172,28 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setValidTags(this.validTags);
         builder.setSourceReferences(compilerData.compilerReport.metadata.references);
 
-        Set<String> publicProperties = compilerData.publicProperties;
-        for (String attribute : publicProperties) {
-            DefDescriptor<AttributeDef> attributeDefDesc = new DefDescriptorImpl<>(null, null, attribute, AttributeDef.class);
-            AttributeDef attributeDef = new AttributeDefImpl(attributeDefDesc, null, null, null, false, null, null, new DefinitionAccessImpl(Access.GLOBAL));
-            builder.addAttributeDef(attributeDefDesc, attributeDef);
+        BundleDocumentation bundleDoc = compilerData.compilerReport.documentation;
+        if (bundleDoc != null) {
+            Optional<String> description = bundleDoc.getClassDescription();
+            if (description.isPresent()) {
+                builder.setDescription(description.get());
+            }
+        }
+
+        Set<ClassMember> publicProperties = compilerData.publicProperties;
+        for (ClassMember property : publicProperties) {
+            String attributeName = property.getName();
+            AttributeDefImpl.Builder attrBuilder = new AttributeDefImpl.Builder();
+            DefDescriptor<AttributeDef> attributeDefDesc = new DefDescriptorImpl<>(null, null, attributeName, AttributeDef.class);
+            attrBuilder.setDescriptor(attributeDefDesc);
+            attrBuilder.setAccess(new DefinitionAccessImpl(Access.GLOBAL));
+
+            Optional<String> description = property.getDescription();
+            if (description.isPresent()) {
+                attrBuilder.setDescription(description.get());
+            }
+
+            builder.addAttributeDef(attributeDefDesc, attrBuilder.build());
         }
 
         // json metadata (lightning.json)
@@ -183,7 +202,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
         // xml metadata (-meta.xml)
         processMetadata(descriptor, builder, sourceMap);
-        
+
         BundleDocumentation documentation = compilerData.compilerReport.documentation;
         processDocumentation(descriptor, builder, sourceMap, documentation);
 
@@ -197,7 +216,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
      * @param builder module def builder
      * @param sourceMap source map
      */
-    private void processMetadata(DefDescriptor<ModuleDef> descriptor, Builder builder, 
+    private void processMetadata(DefDescriptor<ModuleDef> descriptor, Builder builder,
             Map<DefDescriptor<?>, Source<?>> sourceMap) throws QuickFixException {
         DefDescriptor<ModuleDef> xmlDescriptor = new DefDescriptorImpl<>(ModuleDef.META_PREFIX,
                 descriptor.getNamespace(), descriptor.getName() + "-" + ModuleDef.META_XML_NAME, ModuleDef.class, descriptor);
@@ -237,16 +256,14 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             Map<DefDescriptor<?>, Source<?>> sourceMap, BundleDocumentation documentation) throws QuickFixException {
 
         // markdown
-        if (documentation != null) {
+        if (documentation != null && documentation.getHtml().isPresent()) {
             DocumentationDefImpl.Builder docDefBuilder = new DocumentationDefImpl.Builder();
 
             docDefBuilder.setDescriptor(getDefDescriptor(sourceMap, ModuleDef.MARKDOWN_PREFIX, DocumentationDef.class));
 
             DescriptionDefImpl.Builder descriptionBuilder = new DescriptionDefImpl.Builder();
             descriptionBuilder.setName("main"); // only one description so arbitrary name is ok
-            if (documentation.getHtml().isPresent()) {
-                descriptionBuilder.setDescription(documentation.getHtml().get());
-            }
+            descriptionBuilder.setDescription(documentation.getHtml().get());
             DescriptionDefImpl description = descriptionBuilder.build();
             docDefBuilder.addDescription(description.getName(), description);
 
@@ -357,7 +374,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         hashBuilder.addString(code);
         return hashBuilder.build().toString();
     }
-    
+
     /**
      * Finds a DefDescriptor from the sourceMap.
      * @return The descriptor, or null if not found.
@@ -385,7 +402,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         // set valid tags once.
         this.validTags = Collections.unmodifiableSet(this.modulesMetadataService.getValidTags());
     }
-    
+
     @Inject
     public void setCompilerService(CompilerService compilerService) {
         this.compilerService = compilerService;

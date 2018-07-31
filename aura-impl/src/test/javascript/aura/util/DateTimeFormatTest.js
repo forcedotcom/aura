@@ -52,7 +52,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy h:mm:ss a", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy h:mm:ss a", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -66,7 +67,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("yyyy-MM-ddThh:mm:ssZ", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("yyyy-MM-ddThh:mm:ssZ", locale);
                 actual = dateTimeFormat.format(date, -420);
             });
 
@@ -80,7 +82,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("yyyy-MM-dd h:mm ZZ", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("yyyy-MM-dd h:mm ZZ", locale);
                 actual = dateTimeFormat.format(date, 0);
             });
 
@@ -94,7 +97,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("yyyy-MM-ddThh:mm:ss.SSS", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("yyyy-MM-ddThh:mm:ss.SSS", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -108,7 +112,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy H:mm:ss", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy H:mm:ss", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -122,7 +127,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy HH:mm:ss", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy HH:mm:ss", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -137,7 +143,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy kk:mm:ss", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy kk:mm:ss", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -151,7 +158,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("H:m", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("H:m", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -165,7 +173,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("EEEE, MMMM dd, yyyy h:mm a", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("EEEE, MMMM dd, yyyy h:mm a", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -179,7 +188,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("ww", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("ww", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -193,7 +203,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("ww", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("ww", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -206,7 +217,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("Q", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("Q", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -220,7 +232,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("E", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("E", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -234,7 +247,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("EEE", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("EEE", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -248,7 +262,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("EEEE", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("EEEE", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -262,7 +277,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("LT", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("LT", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -276,7 +292,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("LTS", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("LTS", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -290,7 +307,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("L", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("L", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -304,7 +322,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("l", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("l", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -318,7 +337,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("LL", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("LL", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -332,7 +352,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("ll", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("ll", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -346,7 +367,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("LLL", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("LLL", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -360,7 +382,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("lll", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("lll", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -374,7 +397,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("LLLL", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("LLLL", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -388,7 +412,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("llll", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("llll", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -419,7 +444,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy h:mm:ss a", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy h:mm:ss a", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -433,7 +459,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy h:mm:ss a", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy h:mm:ss a", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -447,7 +474,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("yyyy-MM-ddThh:mm:ssZ", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("yyyy-MM-ddThh:mm:ssZ", locale);
                 actual = dateTimeFormat.format(date, -420);
             });
 
@@ -461,7 +489,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("yyyy-MM-ddThh:mm:ss.SSS", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("yyyy-MM-ddThh:mm:ss.SSS", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -475,7 +504,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MM/dd/yy", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MM/dd/yy", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -489,7 +519,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("H:m", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("H:m", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -503,7 +534,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy H:mm:ss", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy H:mm:ss", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -517,7 +549,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy HH:mm:ss", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy HH:mm:ss", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -531,7 +564,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy kk:mm:ss", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy kk:mm:ss", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -545,7 +579,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("EEEE, MMMM dd, yyyy h:mm a", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("EEEE, MMMM dd, yyyy h:mm a", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -559,7 +594,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("ww", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("ww", locale);
                 actual = dateTimeFormat.format(date);
             });
 
@@ -573,7 +609,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var actual;
 
             mockAura(function() {
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat("ww", "en-US");
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("ww", locale);
                 actual = dateTimeFormat.format(date);
             });
 

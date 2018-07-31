@@ -1667,28 +1667,17 @@ AuraLocalizationService.prototype.zoneOffset = function(timestamp, timeZone) {
  */
 AuraLocalizationService.prototype.formatDateToEnUSString = function(date, timeZone) {
 
-    if (this.formatErrorFromIntl) {
-        return this.formatDateTime(date, "MM/dd/yyyy, hh:mm");
-    }
+    var timeZoneFormat = this.createEnUSDateTimeFormat(timeZone);
+    var dateString = this.format(timeZoneFormat, date);
 
-    try {
-        var timeZoneFormat = this.createEnUSDateTimeFormat(timeZone);
-        return this.format(timeZoneFormat, date);
-    } catch(e) {
-        // The error should never happen here. The callers validate the arguments.
-        // This is only for IE11 profiler. Intl API time zone polyfill gets messed up
-        // when start profiling on IE11. If the following code gets executed, we assume
-        // that Intl does not work correctly.
-        $A.warning("Intl API throws an unexpected error.", e);
-        this.formatErrorFromIntl = true;
-        return this.formatDateTime(date, "MM/dd/yyyy, hh:mm");
-    }
+    // If something wrong with the native funtion, using local time as fallback
+    return dateString !== null? dateString : this.formatDateTime(date, "MM/dd/yyyy, hh:mm");
 };
 
 /**
  * Parse a datetime string in en-US format, "month/day/year, hour:minute", to a timestamp in millisecond in UTC
  *
- * @param {String} dateTimeString - a datetime string in en-US format, "month/day/year, hour:minute"
+ * @param {string} dateTimeString - a datetime string in en-US format, "month/day/year, hour:minute"
  * @returns {Number} timestamp in millisecond
  *
  * @private
@@ -1703,9 +1692,31 @@ AuraLocalizationService.prototype.parseEnUSDateTimeString = function(dateTimeStr
     return Date.UTC(match[3], match[1] - 1, match[2], match[4], match[5]);
 };
 
+/**
+ * This function is a wrapper for Intl.DateTimeFormat.format() to make sure the consistency across the
+ * browsers.
+ * The caller should always validate the values. If it returns null, it means there was something wrong
+ * with the native function.
+ *
+ * @private
+ */
 AuraLocalizationService.prototype.format = function(dateTimeFormat, date) {
-    // IE11 adds LTR / RTL mark in the formatted date time string
-    return dateTimeFormat["format"](date).replace(/[\u200E\u200F]/g,'');
+    if (this.formatErrorFromIntl) {
+        return null;
+    }
+
+    try {
+        // IE11 adds LTR / RTL mark in the formatted date time string
+        return dateTimeFormat["format"](date).replace(/[\u200E\u200F]/g,'');
+    } catch (e) {
+        // The error should never happen here. The callers validate the arguments.
+        // This is only for IE11 profiler. Intl API time zone polyfill gets messed up
+        // when start profiling on IE11. If the following code gets executed, we assume
+        // that Intl does not work correctly.
+        $A.warning("Intl API throws an unexpected error.", e);
+        this.formatErrorFromIntl = true;
+        return null;
+    }
 };
 
 AuraLocalizationService.prototype.createEnUSDateTimeFormat = function(timeZone) {
@@ -1735,12 +1746,13 @@ AuraLocalizationService.prototype.createEnUSDateTimeFormat = function(timeZone) 
     return timeZoneFormat;
 };
 
-AuraLocalizationService.prototype.createDateTimeFormat = function(formatString, locale) {
-    locale = this.normalizeToIntlLocale(locale);
+AuraLocalizationService.prototype.createDateTimeFormat = function(formatString, localeName) {
+    localeName = this.normalizeToIntlLocale(localeName);
 
-    var cacheKey = locale + ":" + formatString;
+    var cacheKey = localeName + ":" + formatString;
     var dateTimeFormat = this.dateTimeFormatCache[cacheKey];
     if (dateTimeFormat === undefined) {
+        var locale = this.createLocale(localeName);
         dateTimeFormat = new Aura.Utils.DateTimeFormat(formatString, locale);
         this.dateTimeFormatCache[cacheKey] = dateTimeFormat;
     }

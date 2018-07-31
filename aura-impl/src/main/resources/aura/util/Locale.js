@@ -35,6 +35,8 @@ Aura.Utils.Locale = function(localeName) {
     this.monthNamesParse = {};
     this.weekdayNamesParse = {};
     this.meridiemNamesParse = undefined;
+
+    this.numberFormats = {};
 };
 
 Aura.Utils.Locale.prototype.getName = function() {
@@ -112,6 +114,9 @@ Aura.Utils.Locale.prototype.createMonthNames = function(style) {
     for (var i = 0; i < 12; i++) {
         date.setMonth(i);
         var month = $A.localizationService.format(monthFormat, date);
+        if (!month) {
+            continue;
+        }
         monthNames.push(month);
         monthNamesParse.push(month.toLowerCase());
     }
@@ -181,8 +186,10 @@ Aura.Utils.Locale.prototype.createMeridiemNames = function() {
     } else {
         // If the browser does not support DateTimeFormat.formatToParts, relying on the pattern to parse.
         // IE11 doesn't provide default value for dayperiod for the locales which don't use 12-hour clock.
-        am = $A.localizationService.format(meridiemFormat, amDate).replace(/ ?.{2}:.{2} ?/, "") || "AM";
-        pm = $A.localizationService.format(meridiemFormat, pmDate).replace(/ ?.{2}:.{2} ?/, "") || "PM";
+        var timeString = $A.localizationService.format(meridiemFormat, amDate);
+        am = (timeString && timeString.replace(/ ?.{2}:.{2} ?/, "")) || "AM";
+        timeString = $A.localizationService.format(meridiemFormat, pmDate);
+        pm = (timeString && timeString.replace(/ ?.{2}:.{2} ?/, "")) || "PM";
     }
 
     this.meridiemNames = [am, pm];
@@ -263,6 +270,9 @@ Aura.Utils.Locale.prototype.createWeekdayNames = function(style) {
     for (var i = 1; i < 8; i++) {
         date.setDate(i);
         var weekday = $A.localizationService.format(weekdayFormat, date);
+        if (!weekday) {
+            continue;
+        }
         weekdayNames.push(weekday);
         weekdayNamesParse.push(weekday.toLowerCase());
     }
@@ -270,3 +280,19 @@ Aura.Utils.Locale.prototype.createWeekdayNames = function(style) {
     this.weekdayNames[style] = weekdayNames;
     this.weekdayNamesParse[style] = weekdayNamesParse;
 };
+
+Aura.Utils.Locale.prototype.formatNumber = function(num, minIntegerDigits, maxFractionDigits) {
+    var key = minIntegerDigits + ":" + maxFractionDigits;
+    var numberFormat = this.numberFormats[key];
+    if (numberFormat === undefined) {
+        numberFormat = new Intl["NumberFormat"](this.intlLocale, {
+            "useGrouping": false,
+            "minimumIntegerDigits": minIntegerDigits,
+            "maximumFractionDigits": maxFractionDigits
+        });
+        this.numberFormats[key] = numberFormat;
+    }
+
+    return numberFormat["format"](num);
+};
+

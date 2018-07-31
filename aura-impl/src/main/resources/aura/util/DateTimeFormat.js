@@ -19,19 +19,18 @@
  * This class is implemented by browsers native Intl APIs.
  *
  * @param {string} formatString - A string containing tokens to format a date and time.
- * @param {string} localeName - A locale which is supported by Intl.DateTimeFormat.
+ * @param {Locale} locale - A locale object which provides localized date and number strings.
  *
  * @constructor
  */
-Aura.Utils.DateTimeFormat = function(formatString, localeName) {
-    this.locale = $A.localizationService.createLocale(localeName);
+Aura.Utils.DateTimeFormat = function(formatString, locale) {
+    this.locale = locale;
     this.localeName = this.locale.getName();
+
     this.supportFormatToParts = $A.localizationService.canFormatToParts();
 
     this.tokens = this.parseFormatStringToTokens(formatString);
-
     this.config = {};
-
     this.hydrateTokensAndConfig(this.tokens, this.config);
 };
 
@@ -79,8 +78,6 @@ Aura.Utils.DateTimeFormat.prototype.format = function(date, utcOffset) {
                 case "weekday":
                     dateTimeString += this.locale.getWeekday(date.getDay(), token["style"]);
                     break;
-                default:
-                    dateTimeString += this.formatStringField(token["config"], date);
             }
         } else if (token["type"] === "localizedFormat") {
             var dateTimeFormat = Intl["DateTimeFormat"](this.localeName, token["config"]);
@@ -397,16 +394,7 @@ Aura.Utils.DateTimeFormat.prototype.formatOffset = function(offsetInMinute, deli
         offsetString += ":";
     }
 
-    return  offsetString + this.formatNumberField(offsetInMinute % 60, 2);
-};
-
-/**
- * Format an token with string type. Used in format().
- * @private
- */
-Aura.Utils.DateTimeFormat.prototype.formatStringField = function(dateTimeFormatConfig, date) {
-    var dateTimeFormat = new Intl["DateTimeFormat"](this.locale, dateTimeFormatConfig);
-    return $A.localizationService.format(dateTimeFormat, date);
+    return offsetString + this.formatNumberField(offsetInMinute % 60, 2);
 };
 
 /**
@@ -414,21 +402,23 @@ Aura.Utils.DateTimeFormat.prototype.formatStringField = function(dateTimeFormatC
  * @private
  */
 Aura.Utils.DateTimeFormat.prototype.formatNumberField = function(num, minDigits, localized) {
-    if (!localized) {
-        var numString = num.toString();
-        if (numString.length < minDigits) {
-            return (Array(minDigits).join("0") + numString).slice(-minDigits);
-        } else {
-            return numString.toString();
+    if (localized && !this.formatErrorFromIntl) {
+        try {
+            return this.locale.formatNumber(num, minDigits, 0);
+        } catch (e) {
+            // This should never happen, but on IE11, when profiler is enabled,
+            // Intl.NumberFormat will fail to be initiated. This only impacts
+            // perf testing for now.
+            this.formatErrorFromIntl = true;
         }
     }
 
-    return new Intl["NumberFormat"](this.locale, {
-        "useGrouping": false,
-        "minimumIntegerDigits": minDigits,
-        "maximumFractionDigits": 0
-    })["format"](num);
-
+    var numString = num.toString();
+    if (numString.length < minDigits) {
+        return (Array(minDigits).join("0") + numString).slice(-minDigits);
+    } else {
+        return numString.toString();
+    }
 };
 
 /**

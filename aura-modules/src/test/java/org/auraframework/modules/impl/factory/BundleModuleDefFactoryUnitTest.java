@@ -441,11 +441,11 @@ public class BundleModuleDefFactoryUnitTest {
                 "namespace", "cmp", ModuleDef.class);
 
         DefDescriptor<DocumentationDef> markdownDesc = new DefDescriptorImpl<>(ModuleDef.MARKDOWN_PREFIX,
-                "namespace", "cmp-__doc__-cmp", DocumentationDef.class, descriptor);
+                "namespace", "cmp-__docs__-cmp", DocumentationDef.class, descriptor);
 
         BundleSource<ModuleDef> mockBundleSource = mockBundleSource(ImmutableMap.of(
                 descriptor, mockFile("cmp.js"),
-                markdownDesc, mockFile("__doc__/cmp.markdown")));
+                markdownDesc, mockFile("__docs__/cmp.markdown")));
 
         BundleDocumentation bundleDocumentation = new BundleDocumentation(null, "<p>hello world!</p>", null);
         ModulesCompilerService modulesCompilerService = mockModulesCompilerService(bundleDocumentation);
@@ -472,11 +472,11 @@ public class BundleModuleDefFactoryUnitTest {
                 "namespace", "cmp", ModuleDef.class);
 
         DefDescriptor<DocumentationDef> markdownDesc = new DefDescriptorImpl<>(ModuleDef.MARKDOWN_PREFIX,
-                "namespace", "cmp-__doc__-cmp", DocumentationDef.class, descriptor);
+                "namespace", "cmp-__docs__-cmp", DocumentationDef.class, descriptor);
 
         BundleSource<ModuleDef> mockBundleSource = mockBundleSource(ImmutableMap.of(
                 descriptor, mockFile("cmp.js"),
-                markdownDesc, mockFile("__doc__/cmp.markdown")));
+                markdownDesc, mockFile("__docs__/cmp.markdown")));
 
         BundleDocumentation bundleDocumentation = new BundleDocumentation(null, "<p>hello world!</p>", null);
         ModulesCompilerService modulesCompilerService = mockModulesCompilerService(bundleDocumentation);
@@ -504,11 +504,11 @@ public class BundleModuleDefFactoryUnitTest {
                 "namespace", "cmp", ModuleDef.class);
 
         DefDescriptor<DocumentationDef> markdownDesc = new DefDescriptorImpl<>(ModuleDef.MARKDOWN_PREFIX,
-                "namespace", "cmp-__doc__-cmp", DocumentationDef.class, descriptor);
+                "namespace", "cmp-__docs__-cmp", DocumentationDef.class, descriptor);
 
         BundleSource<ModuleDef> mockBundleSource = mockBundleSource(ImmutableMap.of(
                 descriptor, mockFile("cmp.js"),
-                markdownDesc, mockFile("__doc__/cmp.markdown")));
+                markdownDesc, mockFile("__docs__/cmp.markdown")));
 
         Map<String, Object> meta = Maps.newHashMap();
         meta.put("string", "string");
@@ -552,15 +552,15 @@ public class BundleModuleDefFactoryUnitTest {
                 "namespace", "cmp", ModuleDef.class);
 
         DefDescriptor<DocumentationDef> markdownDesc = new DefDescriptorImpl<>(ModuleDef.MARKDOWN_PREFIX,
-                "namespace", "cmp-__doc__-cmp", DocumentationDef.class, descriptor);
+                "namespace", "cmp-__docs__-cmp", DocumentationDef.class, descriptor);
 
         DefDescriptor<DocumentationDef> auradocDesc = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX,
-                "namespace", "cmp-__doc__-cmp", DocumentationDef.class, descriptor);
+                "namespace", "cmp-__docs__-cmp", DocumentationDef.class, descriptor);
 
         BundleSource<ModuleDef> mockBundleSource = mockBundleSource(ImmutableMap.of(
                 descriptor, mockFile("cmp.js"),
-                markdownDesc, mockFile("__doc__/cmp.markdown"),
-                auradocDesc, mockFile("__doc__/cmp.auradoc")));
+                markdownDesc, mockFile("__docs__/cmp.markdown"),
+                auradocDesc, mockFile("__docs__/cmp.auradoc")));
 
         ModulesCompilerService modulesCompilerService = mockModulesCompilerService();
 
@@ -601,11 +601,11 @@ public class BundleModuleDefFactoryUnitTest {
                 "namespace", "cmp", ModuleDef.class);
 
         DefDescriptor<DocumentationDef> markdownDesc = new DefDescriptorImpl<>(ModuleDef.MARKDOWN_PREFIX,
-                "namespace", "cmp-__doc__-cmp", DocumentationDef.class, descriptor);
+                "namespace", "cmp-__docs__-cmp", DocumentationDef.class, descriptor);
 
         BundleSource<ModuleDef> mockBundleSource = mockBundleSource(ImmutableMap.of(
                 descriptor, mockFile("cmp.js"),
-                markdownDesc, mockFile("__doc__/cmp.markdown")));
+                markdownDesc, mockFile("__docs__/cmp.markdown")));
 
         Map<CodeType, String> mockCodeMap = mock(EnumMap.class);
         when(mockCodeMap.get(any(CodeType.class))).thenReturn("define()");

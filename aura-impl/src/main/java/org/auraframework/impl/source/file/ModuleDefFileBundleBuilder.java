@@ -118,7 +118,7 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
 
         for (File file : base.listFiles()) {
             if (file.isDirectory()) {
-                if (shouldProcessDirectory(file)) {                    
+                if (shouldProcessDirectory(file)) {
                     processBundle(file, sourceMap, moduleDescriptor, moduleDescriptorFilePath, namespace);
                 }
                 continue;
@@ -163,13 +163,13 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
                 descriptor = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, namespace, xmlName, ModuleDef.class, moduleDescriptor);
                 format = Format.XML;
             }
-            
-            if (descriptor == null && fileDir.equals("__doc__") && fileName.endsWith(".md")) {
+
+            if (descriptor == null && fileDir.equals("__docs__") && fileName.endsWith(".md")) {
                 descriptor = new DefDescriptorImpl<>(ModuleDef.MARKDOWN_PREFIX, namespace, descriptorName, DocumentationDef.class, moduleDescriptor);
                 format = Format.MD;
             }
-            
-            if (descriptor == null && fileDir.equals("__doc__") && fileName.endsWith(".auradoc")) {
+
+            if (descriptor == null && fileDir.equals("__docs__") && fileName.endsWith(".auradoc")) {
                 descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, namespace, descriptorName, DocumentationDef.class, moduleDescriptor);
                 format = Format.XML;
             }
@@ -194,7 +194,7 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
     /** ignore files not needed for modules ie tests, snapshots, etc */
     private boolean shouldProcessDirectory(File file) {
         String name = file.getName();
-        return !name.startsWith("__") || name.equals("__doc__");
+        return !name.startsWith("__") || name.equals("__docs__");
     }
 
     @Inject

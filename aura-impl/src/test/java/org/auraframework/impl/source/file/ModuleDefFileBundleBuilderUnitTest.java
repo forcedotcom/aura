@@ -533,7 +533,7 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         assertTrue("bundle should match", moduleDefFileBundleBuilder.isBundleMatch(mockBaseFile));
     }
-    
+
     @Test
     public void testDocumentationFiles() throws Exception {
         File mockParentBaseFile = mock(File.class);
@@ -555,20 +555,20 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         File mockNestFolder = mock(File.class);
         when(mockNestFolder.isDirectory()).thenReturn(true);
-        when(mockNestFolder.getName()).thenReturn("__doc__");
+        when(mockNestFolder.getName()).thenReturn("__docs__");
         when(mockNestFolder.getParentFile()).thenReturn(mockBaseFile);
 
         File mockMarkdownFile = mock(File.class);
-        setupMockFile(mockMarkdownFile, mockBaseFile, String.join(File.separator, "__doc__","module-cmp.md"));
-        when(mockMarkdownFile.getParent()).thenReturn("__doc__");
+        setupMockFile(mockMarkdownFile, mockBaseFile, String.join(File.separator, "__docs__","module-cmp.md"));
+        when(mockMarkdownFile.getParent()).thenReturn("__docs__");
         when(mockMarkdownFile.getParentFile()).thenReturn(mockNestFolder);
-        DefDescriptor<DocumentationDef> markdownDesc = new DefDescriptorImpl<>(ModuleDef.MARKDOWN_PREFIX, "nameSpace", "moduleCmp-__doc__-module-cmp", DocumentationDef.class, module);
+        DefDescriptor<DocumentationDef> markdownDesc = new DefDescriptorImpl<>(ModuleDef.MARKDOWN_PREFIX, "nameSpace", "moduleCmp-__docs__-module-cmp", DocumentationDef.class, module);
 
         File mockAuradocFile = mock(File.class);
-        setupMockFile(mockAuradocFile, mockBaseFile, String.join(File.separator, "__doc__","module-cmp.auradoc"));
-        when(mockAuradocFile.getParent()).thenReturn("__doc__");
+        setupMockFile(mockAuradocFile, mockBaseFile, String.join(File.separator, "__docs__","module-cmp.auradoc"));
+        when(mockAuradocFile.getParent()).thenReturn("__docs__");
         when(mockAuradocFile.getParentFile()).thenReturn(mockNestFolder);
-        DefDescriptor<DocumentationDef> auradocDesc = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp-__doc__-module-cmp", DocumentationDef.class, module);
+        DefDescriptor<DocumentationDef> auradocDesc = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp-__docs__-module-cmp", DocumentationDef.class, module);
 
         File[] baseListFiles = new File[] { mockJsFile, mockTemplateFile, mockNestFolder };
         File[] nestListFiles = new File[] { mockMarkdownFile, mockAuradocFile };
@@ -598,8 +598,8 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         Map<DefDescriptor<?>, Source<?>> sourceMap = moduleBundleSource.getBundledParts();
 
-        assertEquals("incorrect markdown entry", String.join(File.separator,"namespace","module-cmp","__doc__","module-cmp.md"),  sourceMap.get(markdownDesc).getSystemId());
-        assertEquals("incorrect auradoc entry", String.join(File.separator,"namespace","module-cmp","__doc__","module-cmp.auradoc"),  sourceMap.get(auradocDesc).getSystemId());
+        assertEquals("incorrect markdown entry", String.join(File.separator,"namespace","module-cmp","__docs__","module-cmp.md"),  sourceMap.get(markdownDesc).getSystemId());
+        assertEquals("incorrect auradoc entry", String.join(File.separator,"namespace","module-cmp","__docs__","module-cmp.auradoc"),  sourceMap.get(auradocDesc).getSystemId());
     }
 
     private void setupMockFile(File mock, File base, String fileName) throws IOException {

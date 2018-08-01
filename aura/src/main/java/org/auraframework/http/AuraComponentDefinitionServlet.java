@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.output.StringBuilderWriter;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.auraframework.adapter.ConfigAdapter;
@@ -147,7 +148,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             // if locale provided, set the it on the context as a requested locale
             Locale l = null;
             if (StringUtils.isNotEmpty(locale)) {
-                l = new Locale(locale);
+                l = LocaleUtils.toLocale(locale);
             }
             updateContext(l, formFactor, appReferrrer);
 

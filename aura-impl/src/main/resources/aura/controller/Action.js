@@ -947,6 +947,10 @@ Action.prototype.finishAction = function(context) {
                                 if (componentsToFinish) {
                                     that.components = componentsToFinish;
                                 }
+                                if (err) {
+                                    that.state = "ERROR";
+                                    that.message = err.message;
+                                }
                                 try {
                                     cb["fn"].call(cb["s"], that, that.cmp);
                                 } catch (e) {

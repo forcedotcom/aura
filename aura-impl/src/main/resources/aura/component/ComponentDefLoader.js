@@ -128,6 +128,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     var numberOfDescriptorsInUid = 0;
 
     var uid = "";
+    var unknownUID = false;
     var namespaces = Object.keys(namespaceMap).sort();
     if (namespaces.length === 0 && existingRequested.counter === 0) {
         return uris;
@@ -159,7 +160,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
                     var name = names[name_idx];
                     if (additionalURI.length + name.length + uri.length > maxLength) {
                         uri += additionalURI;
-                        uris.push([uri, uid, hasRestrictedNamespaces]);
+                        uris.push([uri, uid, hasRestrictedNamespaces, unknownUID]);
                         if ($A.util.isString(namespaceMap[namespaces[i]][name])) {
                             uid = namespaceMap[namespaces[i]][name];
                             numberOfDescriptorsInUid++;
@@ -168,11 +169,15 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
                         }
                         additionalURI =  "&" + namespaces[i] + "=" + name;
                         uri = "";
+                        unknownUID = false;
                         hasRestrictedNamespaces = isRestrictedNamespace;
                     } else {
                         additionalURI += (name_idx>0?",":"") + name;
                         var additional_def_uid = namespaceMap[namespaces[i]][name];
                         if ($A.util.isString(additional_def_uid)) {
+                            if (additional_def_uid.length === 0) {
+                                unknownUID = true;
+                            }
                             uid += additional_def_uid;
                             numberOfDescriptorsInUid++;
                         }
@@ -181,9 +186,10 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
                 uri = additionalURI;
                 names.length = 0;
             } else {
-                uris.push([uri, uid, hasRestrictedNamespaces]);
+                uris.push([uri, uid, hasRestrictedNamespaces, unknownUID]);
                 uid = "";
                 uri = additionalURI;
+                unknownUID = false;
                 hasRestrictedNamespaces = isRestrictedNamespace;
             }
         } else {

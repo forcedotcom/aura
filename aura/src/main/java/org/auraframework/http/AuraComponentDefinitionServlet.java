@@ -372,6 +372,8 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
         if (labelValueProvider != null && !labelValueProvider.isEmpty()) {
             json.writeArrayBegin();
+            // seems odd, but we're not using json.writeArrayEntry, which assumes you write a comma every entry and it's tracking if it's first or not
+            json.writeComma();
             json.writeMapBegin();
             json.writeMapEntry("type", labelValueProvider.getValueProviderKey().getPrefix());
             json.writeMapEntry("values", labelValueProvider.getData());

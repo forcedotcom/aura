@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:interface extends="ui:inputDateComponent" support="DEPRECATED" description="Common interface across input date/time components">
+<aura:interface extends="ui:inputDateComponent" support="PROTO" description="Common interface across input date/time components">
     <aura:attribute name="timezone" type="String" description="The timezone ID, for example, America/Los_Angeles."/>
     <aura:attribute name="dateFormat" type="String" description="The java.text.SimpleDateFormat style format for the date."/>
     <aura:attribute name="timeFormat" type="String" description="The java.text.SimpleDateFormat style format for the time."/>

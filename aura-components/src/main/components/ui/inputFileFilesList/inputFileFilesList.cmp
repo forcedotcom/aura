@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component support="DEPRECATED" extensible="true" description="Displays a list of selected file names and their sizes. This component is used in ui:inputFile.">
+<aura:component extensible="true" description="Displays a list of selected file names and their sizes. This component is used in ui:inputFile.">
     <!-- Attributes -->
     <aura:attribute name="files" type="Object" description="The files to be uploaded." />
         <!-- Private attribute -->

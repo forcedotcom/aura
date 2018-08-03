@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:interface support="DEPRECATED" description="Interface for components that can be initialized asynchronously">
+<aura:interface support="BETA" description="Interface for components that can be initialized asynchronously">
     <aura:registerEvent name="load" type="ui:load"/>
 </aura:interface>

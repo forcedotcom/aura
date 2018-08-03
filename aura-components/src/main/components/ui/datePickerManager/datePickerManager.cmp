@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component support="DEPRECATED" description="Represents a date picker manager that renders a single ui:datePicker component for multiple date input components. To manage multiple date pickers, include only one instance of this component.">
+<aura:component description="Represents a date picker manager that renders a single ui:datePicker component for multiple date input components. To manage multiple date pickers, include only one instance of this component.">
 	<aura:handler event="ui:showDatePicker" action="{!c.handleShowDatePicker}"/>
     <aura:handler event="ui:hideDatePicker" action="{!c.handleHideDatePicker}"/>
     <aura:handler event="ui:registerDatePickerManager" action="{!c.handleRegistration}"/>

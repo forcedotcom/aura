@@ -15,9 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component support="BETA" description="Manages the asynchronous initialization of components.">
-    <aura:attribute name="maxConcurrency" default="1" required="true" type="Integer" description="Max number of components that can be loaded concurrently"/>
-    
-    <aura:handler event="ui:asyncComponentRegister" action="{!c.registerAsyncComponent}"/>
-    <aura:handler event="ui:asyncComponentLoaded" action="{!c.asyncComponentLoadedCallback}"/>
+<aura:component extensible="true" support="PROTO">
+    TODO: ui:calendar
 </aura:component>

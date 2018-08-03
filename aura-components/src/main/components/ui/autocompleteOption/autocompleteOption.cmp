@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="PRIVILEGED" extends="ui:interactive" extensible="true" support="DEPRECATED"
+<aura:component access="PRIVILEGED" extends="ui:interactive" extensible="true" support="beta"
     implements="ui:autocompleteOptionTemplate" 
     description="This component represents list options in an ui:autocomplete component. The options are displayed when an input keyword matches an item in the data provider.">
     

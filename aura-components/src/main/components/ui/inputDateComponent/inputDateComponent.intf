@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:interface support="DEPRECATED" description="Common interface across input date components">
+<aura:interface support="GA" description="Common interface across input date components">
     <aura:attribute name="value" type="String" access="GLOBAL" description="The input value of the date/time as an ISO string."/>
     <aura:attribute name="format" type="String" access="GLOBAL" description="The java.text.SimpleDateFormat style format string."/>
     <aura:attribute name="displayDatePicker" type="Boolean" default="false" access="GLOBAL" description="Indicates if an icon that triggers the date picker is displayed in the field. The default is false."/>

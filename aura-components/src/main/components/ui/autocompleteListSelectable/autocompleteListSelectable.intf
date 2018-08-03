@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:interface support="DEPRECATED" description="Denotes whether or not an autocomplete list header or footer item is selectable.">
+<aura:interface support="PROTO" description="Denotes whether or not an autocomplete list header or footer item is selectable.">
     <aura:attribute name="selectable" type="Boolean" default="true" description="Whether or not the list item is selectable."/>
 </aura:interface>

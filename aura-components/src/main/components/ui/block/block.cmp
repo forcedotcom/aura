@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" support="DEPRECATED"
+<aura:component extensible="true" implements="ui:visible" support="GA"
     description="Use this component to create a two or three column layout.">
 
     <aura:attribute name="overflow" type="Boolean" default="false" description="Allows you to specify whether the &lt;ui:block&gt; permits overflow for its contents. Defaults to false, which means that content that overflows the boundaries of the component will be clipped."/>

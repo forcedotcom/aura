@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:interface access="PRIVILEGED" support="DEPRECATED" description="Provides common attributes for numerical input.">
+<aura:interface access="PRIVILEGED" support="GA" description="Provides common attributes for numerical input.">
     <aura:attribute name="value" type="Decimal" access="GLOBAL" description="The input value of the number."/>
     <aura:attribute name="max" access="PRIVILEGED" type="Decimal" default="99999999999999" description="Specifies the maximum value allowed. Setting this higher than the default value can result in rounding of the value in some clients. Works with HTML5 only. This value defaults to 99999999999999."/>
     <aura:attribute name="min" access="PRIVILEGED" type="Decimal" default="-99999999999999" description="Specifies the minimum value allowed. Setting this lower than the default value can result in rounding of the value in some clients. Works with HTML5 only. This value defaults to -99999999999999."/>

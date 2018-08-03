@@ -288,7 +288,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
         
         ClientOutOfSyncException coos = new ClientOutOfSyncException("throw from test");
-        Mockito.doThrow(coos).when(definitionService).updateLoaded(Matchers.any());        
+        Mockito.doThrow(coos).when(definitionService).updateLoaded(Matchers.any(DefDescriptor.class));
         
         DefinitionNotFoundException qfe = Mockito.mock(DefinitionNotFoundException.class);
         Mockito.doThrow(qfe).when(servlet).readMessage(Matchers.any());

@@ -16,6 +16,7 @@
 package org.auraframework.impl;
 
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -600,6 +601,11 @@ public class DefinitionServiceImpl implements DefinitionService {
         return matched;
     }
 
+    @Override
+    public void updateLoaded(DefDescriptor<?> loading) throws QuickFixException, ClientOutOfSyncException {
+        updateLoaded(Arrays.asList(loading));
+    }
+
     /**
      * Take in the information off the context and sanitize, populating dependencies.
      *
@@ -620,12 +626,12 @@ public class DefinitionServiceImpl implements DefinitionService {
      * Note that removing things from the 'loaded' set should send them back to
      * the client, and allow our future requests to be smaller.
      *
-     * @param loading The descriptor we think we are loading.
+     * @param loading The descriptors we think we are loading.
      * @throws ClientOutOfSyncException if the uid on something is a mismatch
      * @throws QuickFixException if a definition can't be compiled.
      */
     @Override
-    public void updateLoaded(DefDescriptor<?> loading) throws QuickFixException, ClientOutOfSyncException {
+    public void updateLoaded(Collection<DefDescriptor<?>> loading) throws QuickFixException, ClientOutOfSyncException {
         AuraContext context;
 
         contextService.assertEstablished();
@@ -695,13 +701,18 @@ public class DefinitionServiceImpl implements DefinitionService {
         // If this fails, we will throw an exception, and all will be
         // well.
         //
-        if (loading != null && !context.getPreloadedDefinitions().contains(loading) && !context.getLoaded().containsKey(loading)) {
-            String uid = getUid(null, loading);
+        if (loading != null) {
+            for (DefDescriptor<?> load : loading) {
+                if (!context.getPreloadedDefinitions().contains(load) && !context.getLoaded().containsKey(load)) {
 
-            if (uid == null) {
-                throw new DefinitionNotFoundException(loading, null);
-            } else {
-                context.addLoaded(loading, uid);
+                    String uid = getUid(null, load);
+
+                    if (uid == null) {
+                        throw new DefinitionNotFoundException(load, null);
+                    } else {
+                        context.addLoaded(load, uid);
+                    }
+                }
             }
         }
     }

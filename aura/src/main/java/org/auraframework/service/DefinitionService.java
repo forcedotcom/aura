@@ -15,6 +15,7 @@
  */
 package org.auraframework.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -205,11 +206,20 @@ public interface DefinitionService extends AuraService {
     /**
      * update the set of loaded descriptors, and validate.
      *
-     * @param loading the descriptor that we are loading if any.
+     * @param loading the descriptors that we are loading if any.
      * @throws ClientOutOfSyncException if one of the defs is out of date.
      * @throws QuickFixException if a definition can't be compiled.
      */
     void updateLoaded(DefDescriptor<?> loading) throws QuickFixException, ClientOutOfSyncException;
+    
+    /**
+     * update the set of loaded descriptors, and validate.
+     *
+     * @param loading the descriptors that we are loading if any.
+     * @throws ClientOutOfSyncException if one of the defs is out of date.
+     * @throws QuickFixException if a definition can't be compiled.
+     */
+    void updateLoaded(Collection<DefDescriptor<?>> loading) throws QuickFixException, ClientOutOfSyncException;
 
     /**
      * Get the UID associated with a descriptor.

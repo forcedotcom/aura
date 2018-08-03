@@ -15,6 +15,7 @@
  */
 package org.auraframework.integration.test.context;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +85,7 @@ public class AuraContextIntegrationTest extends AuraImplTestCase {
         Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
         clientLoaded.put(appDesc, definitionService.getUid(null, appDesc));
         context.setClientLoaded(clientLoaded);
-        definitionService.updateLoaded(null);
+        definitionService.updateLoaded(Arrays.asList());
 
         assertEquals("{\"descriptor\":\"markup://preloadTest:dependenciesApp\"}", JsonEncoder.serialize(appDef));
     }

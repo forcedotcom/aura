@@ -162,9 +162,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 loggingService.warn("attempting to populate labels for requested definitions: " + StringUtils.join(requestedDescriptors, ","), qfe);
             }
 
-            for (DefDescriptor<?> descriptor : descriptors.keySet()) {
-                definitionService.updateLoaded(descriptor);
-            }
+           definitionService.updateLoaded(descriptors.keySet());
 
             Set<DefDescriptor<?>> dependencies = new HashSet<>();
             descriptors.entrySet().stream().forEach((entry)->{

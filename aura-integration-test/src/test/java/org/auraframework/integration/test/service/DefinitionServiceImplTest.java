@@ -16,6 +16,7 @@
 package org.auraframework.integration.test.service;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -364,7 +365,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertNull("No preloads initially", context.getPreloadedDefinitions());
 
         // null input should not affect the loaded set
-        definitionService.updateLoaded(null);
+        definitionService.updateLoaded(Arrays.asList());
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
         assertEquals("Loaded set should only have client loaded", 1, loaded.size());
         assertEquals("Wrong uid for preloaded", clientUid, loaded.get(clientDesc));
@@ -374,7 +375,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertTrue("Preloads missing parent", preloads.contains(clientDesc));
 
         // one more try to make sure
-        definitionService.updateLoaded(null);
+        definitionService.updateLoaded(Arrays.asList());
         loaded = context.getLoaded();
         assertEquals("Loaded set should not have changed size", 1, loaded.size());
         assertEquals("Preloaded uid should not have changed", clientUid, loaded.get(clientDesc));
@@ -514,7 +515,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertEquals("Loaded set should only have added component", 1, loaded.size());
 
         // null input should not affect the loaded set
-        definitionService.updateLoaded(null);
+        definitionService.updateLoaded(Arrays.asList());
         loaded = context.getLoaded();
         assertEquals("Loaded set should not have changed size", 1, loaded.size());
         assertEquals("uid should not have been updated", uid, loaded.get(cmpDesc));
@@ -579,7 +580,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         AuraContext context = contextService.startContext(Mode.PROD, Format.JSON,
                 Authentication.AUTHENTICATED);
         assertNull(context.getPreloadedDefinitions());
-        definitionService.updateLoaded(null);
+        definitionService.updateLoaded(Arrays.asList());
         assertEquals(0, context.getPreloadedDefinitions().size());
     }
 
@@ -599,7 +600,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         context.setClientLoaded(ImmutableMap.<DefDescriptor<?>, String> of(clientDesc, uid));
         assertNull("Preloads shouldn't be set until update", context.getPreloadedDefinitions());
 
-        definitionService.updateLoaded(null);
+        definitionService.updateLoaded(Arrays.asList());
         Set<DefDescriptor<?>> preloads = context.getPreloadedDefinitions();
         assertTrue("Preloads missing parent from client", preloads.contains(clientDesc));
         assertTrue("Preloads missing dependency of client", preloads.contains(depDesc));
@@ -653,7 +654,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertEquals("Parent missing from loaded set", clientUid, loaded.get(clientDesc));
         assertEquals("Dependency missing from loaded set", depUid, loaded.get(depDesc));
 
-        definitionService.updateLoaded(null);
+        definitionService.updateLoaded(Arrays.asList());
 
         // dependency is redundant with client set, so it should be removed from loaded set
         loaded = context.getLoaded();
@@ -692,7 +693,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertEquals("Parent missing from loaded set", clientUid, loaded.get(clientDesc));
         assertEquals("Dependency missing from loaded set", depUid, loaded.get(depDesc));
 
-        definitionService.updateLoaded(null);
+        definitionService.updateLoaded(Arrays.asList());
 
         // dependency is redundant with client set, so it should be removed from loaded set
         loaded = context.getLoaded();
@@ -737,7 +738,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertEquals("Component missing from loaded set", compUid, loaded.get(compDesc));
         assertEquals("Template missing from loaded set", tempUid, loaded.get(tempDesc));
 
-        definitionService.updateLoaded(null);
+        definitionService.updateLoaded(Arrays.asList());
 
         // dependency is redundant with client set, so it should be removed from loaded set
         loaded = context.getLoaded();
@@ -782,7 +783,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertEquals("Component missing from loaded set", compUid, loaded.get(compDesc));
         assertEquals("Template missing from loaded set", tempUid, loaded.get(tempDesc));
 
-        definitionService.updateLoaded(null);
+        definitionService.updateLoaded(Arrays.asList());
 
         // dependency is redundant with client set, so it should be removed from loaded set
         loaded = context.getLoaded();

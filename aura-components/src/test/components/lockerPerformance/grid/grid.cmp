@@ -22,6 +22,8 @@
             </aura:iteration>
           </select>
 
+          or
+
           <select aura:id="name" onchange="{!c.selectName}">
             <option value="ALL">
                 ALL

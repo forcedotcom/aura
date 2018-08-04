@@ -16,6 +16,7 @@ function createAuraTableComponentTest(count, validate) {
 
     if (validate) {
         var expected = 120;
+        var cmp = this.api.create(config);
         var els = this.api.render(cmp);
         var table = els[0];
         var actual = table.querySelectorAll("td").length;

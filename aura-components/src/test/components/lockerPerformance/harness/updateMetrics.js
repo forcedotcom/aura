@@ -20,7 +20,7 @@ var METRIC = {
   "-18": "a"
 };
 
-function formatSI(num) {
+function formatSI(num, hasSign) {
   if (num === 0) {
     return "0";
   }
@@ -35,7 +35,7 @@ function formatSI(num) {
     num *= 1000;
     scale -= 3;
   }
-  return sign + parseFloat(num.toFixed(num > 1000 ? 0 : 3)) + METRIC[scale];
+  return (hasSign ? sign : '') + parseFloat(num.toFixed(num > 1000 ? 0 : 3)) + METRIC[scale];
 }
 
 function speed(bench) {
@@ -57,7 +57,7 @@ function speed(bench) {
   var sample = stats.sample;
   var size = sample.length;
 
-  return "{hz} ops/s ±{rme}%\n{time}s ±{rme}%\n({size} samples)"
+  return "{hz} ops/s ±{rme}%\n{time}s/op ±{rme}%\n({size} samples)"
     .replace("{hz}", hz.toFixed(hz < 100 ? 2 : 0))
     .replace("{rme}", rme.toFixed(1))
     .replace("{time}", formatSI(time))
@@ -86,10 +86,7 @@ function getU(sampleA, sampleB) {
 }
 
 function getZ(U, sizeA, sizeB) {
-  return (
-    (U - sizeA * sizeB / 2) /
-    Math.sqrt(sizeA * sizeB * (sizeA + sizeB + 1) / 12)
-  );
+  return (U - sizeA * sizeB / 2) / Math.sqrt(sizeA * sizeB * (sizeA + sizeB + 1) / 12);
 }
 
 /**
@@ -112,281 +109,17 @@ var UTable = {
   "17": [6, 11, 17, 22, 28, 34, 39, 45, 51, 57, 63, 67, 75, 81, 87],
   "18": [7, 12, 18, 24, 30, 36, 42, 48, 55, 61, 67, 74, 80, 86, 93, 99],
   "19": [7, 13, 19, 25, 32, 38, 45, 52, 58, 65, 72, 78, 85, 92, 99, 106, 113],
-  "20": [
-    8,
-    14,
-    20,
-    27,
-    34,
-    41,
-    48,
-    55,
-    62,
-    69,
-    76,
-    83,
-    90,
-    98,
-    105,
-    112,
-    119,
-    127
-  ],
-  "21": [
-    8,
-    15,
-    22,
-    29,
-    36,
-    43,
-    50,
-    58,
-    65,
-    73,
-    80,
-    88,
-    96,
-    103,
-    111,
-    119,
-    126,
-    134,
-    142
-  ],
-  "22": [
-    9,
-    16,
-    23,
-    30,
-    38,
-    45,
-    53,
-    61,
-    69,
-    77,
-    85,
-    93,
-    101,
-    109,
-    117,
-    125,
-    133,
-    141,
-    150,
-    158
-  ],
-  "23": [
-    9,
-    17,
-    24,
-    32,
-    40,
-    48,
-    56,
-    64,
-    73,
-    81,
-    89,
-    98,
-    106,
-    115,
-    123,
-    132,
-    140,
-    149,
-    157,
-    166,
-    175
-  ],
-  "24": [
-    10,
-    17,
-    25,
-    33,
-    42,
-    50,
-    59,
-    67,
-    76,
-    85,
-    94,
-    102,
-    111,
-    120,
-    129,
-    138,
-    147,
-    156,
-    165,
-    174,
-    183,
-    192
-  ],
-  "25": [
-    10,
-    18,
-    27,
-    35,
-    44,
-    53,
-    62,
-    71,
-    80,
-    89,
-    98,
-    107,
-    117,
-    126,
-    135,
-    145,
-    154,
-    163,
-    173,
-    182,
-    192,
-    201,
-    211
-  ],
-  "26": [
-    11,
-    19,
-    28,
-    37,
-    46,
-    55,
-    64,
-    74,
-    83,
-    93,
-    102,
-    112,
-    122,
-    132,
-    141,
-    151,
-    161,
-    171,
-    181,
-    191,
-    200,
-    210,
-    220,
-    230
-  ],
-  "27": [
-    11,
-    20,
-    29,
-    38,
-    48,
-    57,
-    67,
-    77,
-    87,
-    97,
-    107,
-    118,
-    125,
-    138,
-    147,
-    158,
-    168,
-    178,
-    188,
-    199,
-    209,
-    219,
-    230,
-    240,
-    250
-  ],
-  "28": [
-    12,
-    21,
-    30,
-    40,
-    50,
-    60,
-    70,
-    80,
-    90,
-    101,
-    111,
-    122,
-    132,
-    143,
-    154,
-    164,
-    175,
-    186,
-    196,
-    207,
-    218,
-    228,
-    239,
-    250,
-    261,
-    272
-  ],
-  "29": [
-    13,
-    22,
-    32,
-    42,
-    52,
-    62,
-    73,
-    83,
-    94,
-    105,
-    116,
-    127,
-    138,
-    149,
-    160,
-    171,
-    182,
-    193,
-    204,
-    215,
-    226,
-    238,
-    249,
-    260,
-    271,
-    282,
-    294
-  ],
-  "30": [
-    13,
-    23,
-    33,
-    43,
-    54,
-    65,
-    76,
-    87,
-    98,
-    109,
-    120,
-    131,
-    143,
-    154,
-    166,
-    177,
-    189,
-    200,
-    212,
-    223,
-    235,
-    247,
-    258,
-    270,
-    282,
-    293,
-    305,
-    317
-  ]
+  "20": [8, 14, 20, 27, 34, 41, 48, 55, 62, 69, 76, 83, 90, 98, 105, 112, 119, 127],
+  "21": [8, 15, 22, 29, 36, 43, 50, 58, 65, 73, 80, 88, 96, 103, 111, 119, 126, 134, 142],
+  "22": [9, 16, 23, 30, 38, 45, 53, 61, 69, 77, 85, 93, 101, 109, 117, 125, 133, 141, 150, 158],
+  "23": [9, 17, 24, 32, 40, 48, 56, 64, 73, 81, 89, 98, 106, 115, 123, 132, 140, 149, 157, 166, 175],
+  "24": [10, 17, 25, 33, 42, 50, 59, 67, 76, 85, 94, 102, 111, 120, 129, 138, 147, 156, 165, 174, 183, 192],
+  "25": [10, 18, 27, 35, 44, 53, 62, 71, 80, 89, 98, 107, 117, 126, 135, 145, 154, 163, 173, 182, 192, 201, 211],
+  "26": [11, 19, 28, 37, 46, 55, 64, 74, 83, 93, 102, 112, 122, 132, 141, 151, 161, 171, 181, 191, 200, 210, 220, 230],
+  "27": [11, 20, 29, 38, 48, 57, 67, 77, 87, 97, 107, 118, 125, 138, 147, 158, 168, 178, 188, 199, 209, 219, 230, 240, 250],
+  "28": [12, 21, 30, 40, 50, 60, 70, 80, 90, 101, 111, 122, 132, 143, 154, 164, 175, 186, 196, 207, 218, 228, 239, 250, 261, 272],
+  "29": [13, 22, 32, 42, 52, 62, 73, 83, 94, 105, 116, 127, 138, 149, 160, 171, 182, 193, 204, 215, 226, 238, 249, 260, 271, 282, 294],
+  "30": [13, 23, 33, 43, 54, 65, 76, 87, 98, 109, 120, 131, 143, 154, 166, 177, 189, 200, 212, 223, 235, 247, 258, 270, 282, 293, 305, 317]
 };
 
 function getUCritical(maxSize, minSize) {
@@ -433,27 +166,18 @@ function compare(suite) {
     // - Reject Ho when the z-stat is greater than 1.96 or less than -1.96.
     // - Reject the test otherwise.
     var zStat = getZ(U, size0, size1);
-    reason = "(require |z| > 1.96, got z = {zStat})".replace(
-      "{zStat}",
-      zStat.toFixed(2)
-    );
+    reason = "(require |z| > 1.96, got z = {zStat})".replace("{zStat}", zStat.toFixed(2));
     if (!(Math.abs(zStat) > 1.96)) {
-      return "{message}\n{reason}"
-        .replace("{message}", INVALID)
-        .replace("{reason}", reason);
+      return "{message}\n{reason}".replace("{message}", INVALID).replace("{reason}", reason);
     }
   } else {
     // When the sample size is small, use the table of critical values.
     // - Reject Ho when the U value is less than or equal to the critical U value.
     // - Reject the test otherwise.
     var UCritical = getUCritical(maxSize, minSize);
-    reason = "(require U <= Uc, got U = {U} and Uc = {critical})"
-      .replace("{U}", U.toFixed(2))
-      .replace("{UCritical}", UCritical.toFixed(2));
+    reason = "(require U <= Uc, got U = {U} and Uc = {critical})".replace("{U}", U.toFixed(2)).replace("{UCritical}", UCritical.toFixed(2));
     if (!(U <= UCritical)) {
-      return "{message}\n{reason}"
-        .replace("{message}", INVALID)
-        .replace("{reason}", reason);
+      return "{message}\n{reason}".replace("{message}", INVALID).replace("{reason}", reason);
     }
   }
 
@@ -463,11 +187,11 @@ function compare(suite) {
   var rme = suite[0].stats.rme + suite[1].stats.rme;
   var time = 1 / suite[1 - fast].hz - 1 / suite[fast].hz;
 
-  return "{name} {ratio}x ±{rme}%\n{time}s ±{rme}%\n{reason}"
+  return "{name} {ratio}x ±{rme}%\n{time}s/op ±{rme}%\n{reason}"
     .replace("{name}", name)
     .replace("{ratio}", ratio.toFixed(2))
     .replace("{rme}", rme.toFixed(1))
-    .replace("{time}", formatSI(time))
+    .replace("{time}", formatSI(time, true))
     .replace("{rme}", rme.toFixed(1))
     .replace("{reason}", reason);
 }

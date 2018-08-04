@@ -5,13 +5,7 @@ function createJQueryTableComponentTest(count, validate) {
     ? "markup://lockerPerformance:testJQueryTableSecure"
     : "markup://lockerPerformance:testJQueryTable";
 
-  // Create a 25x25 array.
-  var cols = ["a", "b", "c", "d", "e"];
-  var rows = [cols, cols, cols, cols, cols];
-  var config = {
-    descriptor: descriptor,
-    attributes: { headers: cols, content: rows }
-  };
+  var config = { descriptor: descriptor };
 
   while (count--) {
     var cmp = this.api.create(config);
@@ -19,10 +13,11 @@ function createJQueryTableComponentTest(count, validate) {
   }
 
   if (validate) {
-    var expected = 1;
+    var expected = 120;
     var cmp = this.api.create(config);
     var els = this.api.render(cmp);
-    var actual = els.length;
+    var table = els[0];
+    var actual = table.querySelectorAll("td").length;
     this.api.assert(actual === expected, expected, actual);
     cmp.destroy();
   }

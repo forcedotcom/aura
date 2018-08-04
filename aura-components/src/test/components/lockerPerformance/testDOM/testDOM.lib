@@ -3,4 +3,8 @@
     <aura:include name="innerHTMLTest" export="innerHTMLTest"/>
     <aura:include name="createDOMTableComponentTest" export="createDOMTableComponentTest"/>
     <aura:include name="renderDOMTableComponentTest" export="renderDOMTableComponentTest"/>
+    <aura:include name="cloneNodeTest" export="cloneNodeTest"/>
+    <aura:include name="querySelectorAll10" export="querySelectorAll10"/>
+    <aura:include name="querySelectorAll100" export="querySelectorAll100"/>
+    <aura:include name="querySelectorAll1000" export="querySelectorAll1000"/>
 </aura:library>

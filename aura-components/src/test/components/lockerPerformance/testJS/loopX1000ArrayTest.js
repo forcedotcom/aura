@@ -1,9 +1,9 @@
 // Measure the cost of
 // adding items to an array, an iterating over it.
-/* exported loopX10ArrayTest */
+/* exported loopX1000ArrayTest */
 
-function loopX10ArrayTest(count, validate) {
-  var n = 10;
+function loopX1000ArrayTest(count, validate) {
+  var n = 1000;
 
   var arr = this.api.wrap([]);
   for (var i = 0; i < n; i++) {

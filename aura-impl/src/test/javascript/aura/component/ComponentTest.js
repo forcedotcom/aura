@@ -915,4 +915,100 @@ Test.Aura.Component.ComponentTest = function() {
             Assert.Equal(res, expected);
         }
     }
+
+    [Fixture]
+    function disassociateElements() {
+
+        [Fact]
+        function ResetsElementSetIfCmpIsConcrete() {
+            // Arrange
+            var target;
+            var element = "element";
+
+            mockFramework(function() {
+                target = new Aura.Component.Component({},true);
+                target.getConcreteComponent = function() {
+                    return target;
+                }
+                target.elements = [element];
+                target.allElements = [element];
+
+                // Act
+                target.disassociateElements();
+            });
+
+            // Assert
+            Assert.Equal(0, target.allElements.length);
+        }
+    }
+
+    [Fixture]
+    function associateElement() {
+
+        [Fact]
+        function AddElementToElementSetIfCmpIsConcrete() {
+            // Arrange
+            var target;
+            var expected = "element";
+
+            mockFramework(function() {
+                target = new Aura.Component.Component({},true);
+                target.getConcreteComponent = function() {
+                    return target;
+                };
+                target.associateRenderedBy = function() {};
+
+                // Act
+                target.associateElement(expected);
+            });
+
+            // Assert
+            Assert.Equal(expected, target.allElements[0]);
+        }
+
+        [Fact]
+        function DoesNotAddElementIfCmpIsNotConcrete() {
+            // Arrange
+            var target;
+            mockFramework(function() {
+                target = new Aura.Component.Component({},true);
+                target.getConcreteComponent = function() {
+                    return target;
+                };
+                target.concreteComponentId = "has_been_destroyed";
+
+                // Act
+                target.associateElement("element");
+            });
+
+            // Assert
+            Assert.Undefined(target.allElements);
+        }
+    }
+
+    [Fixture]
+    function getElements() {
+
+        [Fact]
+        function ReturnsElementsIfCmpIsConcrete() {
+            // Arrange
+            var target;
+            var expected = "element";
+            var actual;
+
+            mockFramework(function() {
+                target = new Aura.Component.Component({},true);
+                target.getConcreteComponent = function() {
+                    return target;
+                }
+                target.elements = [expected];
+
+                // Act
+                actual = target.getElements();
+            });
+
+            // Assert
+            Assert.Equal(expected, actual[0]);
+        }
+    }
 }

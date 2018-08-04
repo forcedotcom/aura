@@ -1156,10 +1156,15 @@ Component.prototype.getSuper = function() {
  * @export
  */
 Component.prototype.associateElement = function(element) {
-    if (!this.isConcrete()) {
-        var concrete = this.getConcreteComponent();
+    var concrete = this.getConcreteComponent();
+    if (concrete !== this) {
         concrete.associateElement(element);
-    } else {
+    } else if (this.isConcrete()) {
+        // For now, there're two cases which getConcreteComponent() returns
+        // the component itself. 1) the component is concrete, 2) the concrete
+        // component has been destroyed. We should only associate the element to
+        // concrete component.
+
         if (!this.elements) {
             this.elements = [];
         }
@@ -1185,8 +1190,8 @@ Component.prototype.associateElement = function(element) {
  * @export
  */
 Component.prototype.disassociateElements = function() {
-    if (!this.isConcrete()) {
-        var concrete = this.getConcreteComponent();
+    var concrete = this.getConcreteComponent();
+    if (concrete !== this) {
         concrete.disassociateElements();
     } else {
         if (this.elements) {
@@ -1206,8 +1211,8 @@ Component.prototype.disassociateElements = function() {
  * @export
  */
 Component.prototype.getElements = function() {
-    if (!this.isConcrete()) {
-        var concrete = this.getConcreteComponent();
+    var concrete = this.getConcreteComponent();
+    if (concrete !== this) {
         return concrete.getElements();
     } else {
         return (this.elements && this.elements.slice(0)) || [];
@@ -1573,7 +1578,7 @@ Component.prototype.autoDestroy = function(destroy) {
 Component.prototype.getConcreteComponent = function() {
     // Using && and || vs ? and : so that if the get of the get of the id fails, we still return a component instance.
     // If you destroy the concrete, then the concrete of the super becomes itself.
-    return this.concreteComponentId && $A.componentService.get(this.concreteComponentId) || this;
+    return (this.concreteComponentId && $A.componentService.get(this.concreteComponentId)) || this;
 };
 
 /**

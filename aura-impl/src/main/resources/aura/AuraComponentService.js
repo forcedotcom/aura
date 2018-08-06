@@ -22,7 +22,7 @@
  */
 function AuraComponentService() {
     // Def registries
-    this.moduleEngine           = Aura["Engine"];
+    this.moduleEngine           = Aura["LWC"] || /* legacy */ Aura["Engine"];
     this.wireService            = Aura["WireService"];
 
     // remove globals
@@ -87,8 +87,8 @@ AuraComponentService.prototype.initCoreModules = function () {
     var compat = window["Aura"] && window["Aura"]["compat"];
     var babelHelpers = compat && compat["babelHelpers"];
     var ProxyObject = window["Proxy"] || {};
-
-    this.addModule("markup://engine", "engine", [], null, this.moduleEngine);
+    this.addModule("markup://lwc", "lwc", [], null, this.moduleEngine);
+    this.addModule("markup://engine", "engine", [], null, this.moduleEngine); // @dval: legacy -> Remove me in 218
     this.addModule("markup://wire-service", "wire-service", [], null, this.wireService);
     this.addModule("markup://assert", "assert", [], null, Aura.ExportsAssert);
     this.addModule("markup://logger", "logger", [], null, Aura.ExportsLogger);

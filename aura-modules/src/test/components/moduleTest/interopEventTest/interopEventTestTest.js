@@ -127,7 +127,7 @@
             },
         ]
     },
-	testUnwrapEventDetailFromRaptorComponent: {
+	testUnwrapEventDetailFromLWCComponent: {
         // this is specifically for ie11
 		test: [
 			function (cmp) {
@@ -150,7 +150,7 @@
 			},
 		]
 	},
-	testUnwrapEventDetailAsProxyFromRaptorComponent: {
+	testUnwrapEventDetailAsProxyFromLWCComponent: {
 		// this is specifically for ie11
 		test: [
 			function (cmp) {

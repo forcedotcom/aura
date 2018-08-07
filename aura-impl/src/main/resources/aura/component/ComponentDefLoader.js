@@ -120,6 +120,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     baseURI += this.buildFormFactorParam();
     baseURI += this.buildURILockerParam();
     baseURI += this.buildURILocaleParam();
+    // if the last parameter here changes, an adjustment needs to be made to checkForError method
     baseURI += this.buildURIStyleParam();
 
     var uri = "";
@@ -152,6 +153,16 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
             hasRestrictedNamespaces = true;
         }
         var names = Object.keys(namespaceMap[namespaces[i]]).sort();
+
+        if (namespaces.length === 1 && names.length ===1) {
+            uri = "&" + ComponentDefLoader.DESCRIPTOR_param + "=" + ComponentDefLoader.MARKUP + namespaces[i] + ":" + names[0];
+            if ($A.util.isString(namespaceMap[namespaces[i]][names[0]])) {
+                uid = namespaceMap[namespaces[i]][names[0]];
+                numberOfDescriptorsInUid++;
+            }
+            break;
+        }
+
         var additionalURI = "&" + namespaces[i] + "=" + names.join(",");
         if (additionalURI.length + uri.length > maxLength) {
             if (additionalURI.length > maxLength) {
@@ -215,7 +226,6 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
 
     for(var def=0; def<uris.length; def++) {
         var finalURI = this.buildURIString(uris[def][0], uris[def][1], numberOfDescriptorsInUid);
-        Aura["componentDefLoaderError"][finalURI.uid] = [];
         var host = $A.clientService._host;
         if (!uris[def][2]) {
             host = $A.getContext().cdnHost || host;
@@ -296,15 +306,22 @@ ComponentDefLoader.prototype.loadingComplete = function() {
 };
 
 ComponentDefLoader.prototype.checkForError = function (uri, resolve, reject) {
-    var uidRegexp = new RegExp(ComponentDefLoader.UID_param + "=([^&]*)");
-    var uid = uri.match(uidRegexp);
-    if (uid && uid.length > 1) {
-        uid = uid[1];
-        // TODO: these aren't being loaded by the browser due to the current error status by the server
-        if (Aura["componentDefLoaderError"][uid] && Aura["componentDefLoaderError"][uid].length > 0) {
-            reject(Aura["componentDefLoaderError"][uid].pop());
-            return;
+    var startIndexParam = this.buildURIStyleParam();
+    if (startIndexParam.length === 0) {
+        startIndexParam = this.buildURILocaleParam();
+        if (startIndexParam.length === 0) {
+            startIndexParam = this.buildURILockerParam();
         }
+    }
+    var startIndex = uri.indexOf(startIndexParam) + startIndexParam.length;
+    var endIndex = uri.indexOf("&" + ComponentDefLoader.UID_param + "=");
+    var loaderErrorString = uri.substr(startIndex, endIndex-startIndex);
+    if (loaderErrorString.indexOf("&_def=") === 0) {
+        loaderErrorString = loaderErrorString.substr(6);
+    }
+    if (Aura["componentDefLoaderError"][loaderErrorString] && Aura["componentDefLoaderError"][loaderErrorString].length > 0) {
+        reject(Aura["componentDefLoaderError"][loaderErrorString].pop());
+        return;
     }
     resolve();
     this.processRequested();

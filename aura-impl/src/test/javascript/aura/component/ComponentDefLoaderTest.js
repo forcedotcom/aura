@@ -276,10 +276,10 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
         [Fact]
         function shouldBuildBundleURI() {
             var actual;
-            var expect = '/auraCmpDef?aura.app=markup://test_type&_ff=null&_l=true&test=thing&_uid=someUid';
+            var expect = '/auraCmpDef?aura.app=markup://test_type&_ff=null&_l=true&test=thing,thing2&_uid=555555';
             mockAura(function () {
                 var defLoader = new Aura.Component.ComponentDefLoader();
-                var descriptorMap = {"test:thing": "someUid"};
+                var descriptorMap = {"test:thing": "someUid", "test:thing2": "someUid"};
                 actual = defLoader.buildBundleComponentUri(descriptorMap)[0];
             });
 

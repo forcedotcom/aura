@@ -213,10 +213,21 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
         } catch (Exception e) {
             PrintWriter out = response.getWriter();
-            if (requestedUID!=null) {
-                requestedUID = requestedUID.replaceAll("[^a-zA-Z0-9-]+","");
+
+            String loaderErrorString = request.getQueryString().split("&" + componentUIDParam.name)[0];
+            loaderErrorString = loaderErrorString.substring(loaderErrorString.lastIndexOf("&_") + 2);
+            int nextAnd = loaderErrorString.indexOf("&");
+            if (nextAnd < 0) {
+                if (loaderErrorString.startsWith("def=")) {
+                    nextAnd = 4;
+                } else {
+                    nextAnd = 0;
+                }
             }
-            out.append("Aura.componentDefLoaderError['").append(requestedUID).append("'].push(/*");
+            loaderErrorString = loaderErrorString.substring(nextAnd);
+            loaderErrorString = loaderErrorString.replaceAll("[^&=_:/a-zA-Z0-9-]+","");
+
+            out.append(String.format("if(!Aura.componentDefLoaderError['%s']){Aura.componentDefLoaderError['%s'] = []} Aura.componentDefLoaderError['%s'].push(/*", loaderErrorString, loaderErrorString, loaderErrorString));
             servletUtilAdapter.handleServletException(e, false, context, request, response, true);
             out.append(");\n");
             servletUtilAdapter.setNoCache(response);
@@ -336,30 +347,39 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             redirectURI.append("&").append(styleParam.name).append("=").append(styleContext);
         }
 
-        if (descriptors.size() == 1) {
-            redirectURI.append("&").append(defDescriptorParam.name).append("=").append(descriptors.entrySet().iterator().next().getKey().getQualifiedName());
-        } else {
-            String previousNamespace = null;
-            boolean firstName = true;
-            for (DefDescriptor descriptor : descriptors.keySet()) {
-                if (!descriptor.getNamespace().equals(previousNamespace)) {
-                    previousNamespace = descriptor.getNamespace();
-                    redirectURI.append("&").append(previousNamespace).append("=");
-                    firstName = true;
-                }
-                if (firstName) {
-                    firstName = false;
-                } else {
-                    redirectURI.append(",");
-                }
-                redirectURI.append(descriptor.getName());
-            }
+        redirectURI.append(generateDefinitionsURIParameters(descriptors));
+
+        if (descriptors.size() > 1) {
             computedUID = String.format("%d", computedUID.hashCode());
         }
 
         redirectURI.append("&").append(componentUIDParam.name).append("=").append(computedUID);
 
         return redirectURI.toString();
+    }
+
+    private String generateDefinitionsURIParameters(Map<DefDescriptor<?>, String> descriptors) {
+        StringBuilder parameters = new StringBuilder();
+        if (descriptors.size() == 1) {
+            parameters.append("&").append(defDescriptorParam.name).append("=").append(descriptors.entrySet().iterator().next().getKey().getQualifiedName());
+        } else {
+            String previousNamespace = null;
+            boolean firstName = true;
+            for (DefDescriptor descriptor : descriptors.keySet()) {
+                if (!descriptor.getNamespace().equals(previousNamespace)) {
+                    previousNamespace = descriptor.getNamespace();
+                    parameters.append("&").append(previousNamespace).append("=");
+                    firstName = true;
+                }
+                if (firstName) {
+                    firstName = false;
+                } else {
+                    parameters.append(",");
+                }
+                parameters.append(descriptor.getName());
+            }
+        }
+        return parameters.toString();
     }
 
     private String serializeGVPs(AuraContext ctx) throws IOException {

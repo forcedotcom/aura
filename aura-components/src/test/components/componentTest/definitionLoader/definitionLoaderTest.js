@@ -4,7 +4,6 @@
 
             var callbacksCalled = [];
             var onloadOfTwoCalledBeforeCallbackOfThree = null;
-            window["callbacksCalled"] = callbacksCalled;
 
             var descriptorSetOne = {"markup://one:defExistsOnClient":100, "markup://one:defOnServer":101};
             var descriptorSetTwo = {"markup://two:two":200, "markup://one:defOnServer":101};
@@ -34,24 +33,22 @@
             // 1 should load and fire callback, then two callback called.
 
             var loadedCallbacks = {};
-            var callbackOrder = ["three=three", "two=two", "one=defOnServer"];
             var defsToInsert = ["markup://three:three", "markup://two:two", "markup://one:defOnServer"];
 
             var checkOtherLoaded = function(){
-                if (callbackOrder.length > 0) {
+                if (defsToInsert.length > 0) {
                     var found = false;
                     for (var uriLoaded in loadedCallbacks) {
-                        if (uriLoaded.indexOf(callbackOrder[0]) != -1) {
+                        if (uriLoaded.indexOf(defsToInsert[0]) !== -1) {
                             found = true;
                             $A.componentService.addComponent(defsToInsert[0], {"d":"", "a":""});
-                            defsToInsert = defsToInsert.slice(1);
-                            if (callbackOrder[0] === "two=two") {
+                            if (defsToInsert[0] === "markup://two:two") {
                                 if (onloadOfTwoCalledBeforeCallbackOfThree === null) {
                                     onloadOfTwoCalledBeforeCallbackOfThree = true;
                                 }
                             }
+                            defsToInsert = defsToInsert.slice(1);
                             loadedCallbacks[uriLoaded]();
-                            callbackOrder = callbackOrder.slice(1);
                             delete loadedCallbacks[uriLoaded];
                             break;
                         }
@@ -60,13 +57,12 @@
                         setTimeout(checkOtherLoaded, 30);
                     }
                 }
-            }
+            };
 
             $A.test.replaceComponentDefLoader(function(uri, onload){
-                if (uri.indexOf(callbackOrder[0]) != -1) {
+                if (uri.indexOf(defsToInsert[0]) !== -1) {
                     $A.componentService.addComponent(defsToInsert[0], {"d":"", "a":""});
                     defsToInsert = defsToInsert.slice(1);
-                    callbackOrder = callbackOrder.slice(1);
                     setTimeout(function(){
                         onload();
                         setTimeout(checkOtherLoaded, 1);
@@ -77,7 +73,6 @@
             });
 
             // these have to be loaded "async" breaing the UI Thread, thus these setTimeouts
-
             $A.test.loadComponentDefs(descriptorSetOne, callbackOne);
             setTimeout(function() {
                 $A.test.loadComponentDefs(descriptorSetTwo, callbackTwo);
@@ -87,7 +82,7 @@
             }, 100);
 
             $A.test.addWaitFor(true, function() {
-                return !$A.test.isActionPending() && (callbacksCalled.length == 3);
+                return !$A.test.isActionPending() && (callbacksCalled.length === 3);
             }, function(){
                 $A.test.assertTrue(callbacksCalled[0] === "three" && onloadOfTwoCalledBeforeCallbackOfThree,
                     "'three' should have been calledback first : " + callbacksCalled +

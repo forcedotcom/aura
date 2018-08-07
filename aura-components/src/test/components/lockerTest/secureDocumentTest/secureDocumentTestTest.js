@@ -160,7 +160,7 @@
         }
     },
 
-    testJavascriptPseudoScheme: {
+    _testJavascriptPseudoScheme: {
         test: function(component) {
             component.testJavascriptPseudoScheme();
         }

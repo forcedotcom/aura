@@ -12,7 +12,8 @@
         cmp.set("v.testUtils", $A.test);
     },
 
-    testClosedProperty: {
+    // W-5303375: This test does not work in autobuild because it involves a confirmation dialog
+    _testClosedProperty: {
         test: function (cmp) {
             cmp.testClosedProperty();
         }

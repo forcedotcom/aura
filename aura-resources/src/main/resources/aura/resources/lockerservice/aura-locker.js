@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-07-24
- * Version: 0.4.34
+ * Generated: 2018-08-06
+ * Version: 0.5.2
  */
 
 (function (exports) {
@@ -142,6 +142,39 @@ function getObjectLikeProto() {
   return emptyProto;
 }
 
+/**
+ * Sanitizes a URL string . Will prevent:
+ * - usage of UTF-8 control characters. Update BLACKLIST constant to support more
+ * - usage of \n, \t in url strings
+ * @param {String} urlString
+ * @returns {String}
+ */
+function sanitizeURLString(urlString) {
+  const BLACKLIST = /[\u2029\u2028\n\r\t]/gi;
+
+  // false, '', undefined, null
+  if (!urlString) {
+    return urlString;
+  }
+
+  if (typeof urlString !== 'string') {
+    throw new TypeError('URL argument is not a string');
+  }
+
+  return urlString.replace(BLACKLIST, '');
+}
+
+/**
+ * Sanitizes for a DOM element. Typical use would be when wanting to sanitize for
+ * an href or src attribute of an element or window.open
+ * @param {*} url
+ */
+function sanitizeURLForElement(url) {
+  const normalized = document.createElement('a');
+  normalized.href = url;
+  return sanitizeURLString(normalized.href);
+}
+
 const DEFAULT = {};
 const FUNCTION = { type: 'function' };
 const FUNCTION_TRUST_RETURN_VALUE = { type: 'function', trustReturnValue: true };
@@ -215,18 +248,110 @@ const domPurifyConfig = {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+function assert(condition) {
+  if (!condition) {
+    throw new Error();
+  }
+}
+
+// TODO: remove these functions. Our filtering mechanism should not
+// rely on the more expensive operation.
+
+function isObjectObject(value) {
+  return typeof value === 'object' && value !== null && toString(value) === '[object Object]';
+}
+
+// https://github.com/jonschlinkert/is-plain-object
+// Copyright © 2017, Jon Schlinkert. Released under the MIT License.
+function isPlainObject(value) {
+  if (isObjectObject(value) === false) {
+    return false;
+  }
+
+  // If has modified constructor
+  const ctor = value.constructor;
+  if (typeof ctor !== 'function') {
+    return false;
+  }
+
+  try {
+    // If has modified prototype
+    const proto = ctor.prototype;
+    if (isObjectObject(proto) === false) {
+      return false;
+    }
+    // If constructor does not have an Object-specific method
+    if (proto.hasOwnProperty('isPrototypeOf') === false) {
+      return false;
+    }
+  } catch (e) {
+    /* Assume is  object when throws */
+  }
+
+  // Most likely a plain Object
+  return true;
+}
+
+/**
+ * Basic URL Scheme checking utility.
+ * Checks for http: and https: url schemes.
+ * @param {String} url
+ * @return {Boolean}
+ */
+function isValidURLScheme(url) {
+  const normalized = document.createElement('a');
+  normalized.href = url;
+  return normalized.protocol === 'https:' || normalized.protocol === 'http:';
+}
+
+/**
+ * Displays a popup asking if the user wants to exit the current domain.
+ * Returns a boolean of the result of that popup.
+ * @return {Boolean}
+ */
+
+
+/**
+ * Determines if a link points to a third-party domain.
+ * @param {Object} currentDomain
+ * @param {Object} newDomain
+ * @return {Boolean}
+ */
+
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 function isCustomElement(el) {
   return el.tagName && el.tagName.indexOf('-') > 0;
 }
 
 function isDOMElementOrNode(el) {
-  return (
-    typeof el === 'object' &&
-    ((typeof HTMLElement === 'object' && el instanceof HTMLElement) ||
-      (typeof Node === 'object' && el instanceof Node) ||
-      (typeof el.nodeType === 'number' && typeof el.nodeName === 'string'))
-  );
+  // Its possible that checking el.nodeType on a window in
+  // an iframe will cause an access DOMException.
+  // In that case, its not a DOMElementOrNode, so return false
+  try {
+    return (
+      typeof el === 'object' &&
+      ((typeof HTMLElement === 'object' && el instanceof HTMLElement) ||
+        (typeof Node === 'object' && el instanceof Node) ||
+        (typeof el.nodeType === 'number' && typeof el.nodeName === 'string'))
+    );
+  } catch (e) {
+    return false;
+  }
 }
 
 /*
@@ -1574,148 +1699,6 @@ SecureScriptElement.run = function(st) {
 
   xhr.send();
 };
-
-/**
- * Sanitizes a URL string . Will prevent:
- * - usage of UTF-8 control characters. Update BLACKLIST constant to support more
- * - usage of \n, \t in url strings
- * @param {String} urlString
- * @returns {String}
- */
-function sanitizeURLString(urlString) {
-  const BLACKLIST = /[\u2029\u2028\n\r\t]/gi;
-
-  // false, '', undefined, null
-  if (!urlString) {
-    return urlString;
-  }
-
-  if (typeof urlString !== 'string') {
-    throw new TypeError('URL argument is not a string');
-  }
-
-  return urlString.replace(BLACKLIST, '');
-}
-
-/**
- * Sanitizes for a DOM element. Typical use would be when wanting to sanitize for
- * an href or src attribute of an element or window.open
- * @param {*} url
- */
-function sanitizeURLForElement(url) {
-  const normalized = document.createElement('a');
-  normalized.href = url;
-  return sanitizeURLString(normalized.href);
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-function assert(condition) {
-  if (!condition) {
-    throw new Error();
-  }
-}
-
-// TODO: remove these functions. Our filtering mechanism should not
-// rely on the more expensive operation.
-
-function isObjectObject(value) {
-  return typeof value === 'object' && value !== null && toString(value) === '[object Object]';
-}
-
-// https://github.com/jonschlinkert/is-plain-object
-// Copyright © 2017, Jon Schlinkert. Released under the MIT License.
-function isPlainObject(value) {
-  if (isObjectObject(value) === false) {
-    return false;
-  }
-
-  // If has modified constructor
-  const ctor = value.constructor;
-  if (typeof ctor !== 'function') {
-    return false;
-  }
-
-  try {
-    // If has modified prototype
-    const proto = ctor.prototype;
-    if (isObjectObject(proto) === false) {
-      return false;
-    }
-    // If constructor does not have an Object-specific method
-    if (proto.hasOwnProperty('isPrototypeOf') === false) {
-      return false;
-    }
-  } catch (e) {
-    /* Assume is  object when throws */
-  }
-
-  // Most likely a plain Object
-  return true;
-}
-
-/**
- * Basic URL Scheme checking utility.
- * Checks for http: and https: url schemes.
- * @param {String} url
- * @return {Boolean}
- */
-function isValidURLScheme(url) {
-  const normalized = document.createElement('a');
-  normalized.href = url;
-  return normalized.protocol === 'https:' || normalized.protocol === 'http:';
-}
-
-/**
- * Displays a popup asking if the user wants to exit the current domain.
- * Returns a boolean of the result of that popup.
- * @return {Boolean}
- */
-function confirmNavigationAwayFromCurrentDomain() {
-  let currentLocation = `${window.location.protocol}//${window.location.hostname}`;
-  currentLocation += window.location.port.length ? `:${window.location.port}` : '';
-
-  // eslint-disable-next-line
-  if (confirm(`You are exiting ${currentLocation}. Continue?`)) {
-    return true;
-  }
-  return false;
-}
-
-/**
- * Determines if a link points to a third-party domain.
- * @param {Object} currentDomain
- * @param {Object} newDomain
- * @return {Boolean}
- */
-function isSameLocation(currentDomain, newDomain) {
-  if (currentDomain.protocol !== newDomain.protocol) {
-    return false;
-  }
-
-  if (currentDomain.hostname !== newDomain.hostname) {
-    return false;
-  }
-
-  if (currentDomain.port !== newDomain.port) {
-    return false;
-  }
-
-  return true;
-}
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -7927,6 +7910,35 @@ SecureXMLDocument.toString = function() {
  * limitations under the License.
  */
 
+const ERROR_MESSAGES = {
+  assign: 'SecureLocation.assign only supports http://, https:// schemes.',
+  replace: 'SecureLocation.replace supports http://, https:// schemes and relative urls.',
+  href: 'SecureLocation.href only supports http://, https:// schemes and relative urls.',
+  protocol: 'SecureLocation.protocol only supports http://, https:// schemes.'
+};
+
+/**
+ * Creates a confirmation dialog to ask the user if they would like to navigate away from
+ * the current domain. This is in an effort to prevent phishing attacks, e.g. salesforce.com -> saelsforce.com
+ *
+ * @param targetURL location to check against current location
+ * @param currentURL current location else, use window.location.href
+ */
+function confirmLocationChange(targetURL, currentURL) {
+  const c = document.createElement('a');
+  const t = document.createElement('a');
+  c.href = currentURL;
+  t.href = targetURL;
+  const isSameLocation$$1 = c.protocol === t.protocol && c.hostname === t.hostname;
+
+  if (!isSameLocation$$1) {
+    // eslint-disable-next-line
+    return confirm(`You are exiting ${c.hostname}. Continue?`);
+  }
+
+  return true;
+}
+
 function SecureLocation(loc, key) {
   let o = getFromCache(loc, key);
   if (o) {
@@ -7938,51 +7950,76 @@ function SecureLocation(loc, key) {
       value: function() {
         return loc.href;
       }
+    },
+    href: {
+      get: function() {
+        return loc.href;
+      },
+      set: function(href) {
+        href = sanitizeURLForElement(href);
+        if (!isValidURLScheme(href)) {
+          throw new error(ERROR_MESSAGES['href']);
+        }
+        if (confirmLocationChange(href, loc.href)) {
+          loc.href = href;
+        }
+        return true;
+      }
+    },
+    protocol: {
+      get: function() {
+        return loc.protocol;
+      },
+      set: function(protocol) {
+        protocol = String(protocol);
+        if (isValidURLScheme(protocol)) {
+          loc.protocol = protocol;
+        } else {
+          throw new error(ERROR_MESSAGES['protocol']);
+        }
+        return true;
+      }
     }
   });
 
-  [
-    'href',
-    'protocol',
-    'host',
-    'hostname',
-    'port',
-    'pathname',
-    'search',
-    'hash',
-    'username',
-    'password',
-    'origin'
-  ].forEach(property => SecureObject.addPropertyIfSupported(o, loc, property));
+  ['host', 'hostname'].forEach(property => {
+    defineProperty(o, property, {
+      get: function() {
+        return loc[property];
+      },
+      set: function(val) {
+        val = String(val);
+        if (confirmLocationChange(`${loc.protocol}//${val}`)) {
+          loc[property] = val;
+        }
+        return true;
+      }
+    });
+  });
 
-  ['reload', 'replace'].forEach(method => SecureObject.addMethodIfSupported(o, loc, method));
+  ['pathname', 'search', 'hash', 'username', 'password', 'origin', 'port'].forEach(property =>
+    SecureObject.addPropertyIfSupported(o, loc, property)
+  );
 
-  /**
-   * When a location.assign() call is found the href provided is evaluated
-   * to ensure it is a legal scheme. 'http' and 'https' are considered
-   * legal, while other schemes will throw an error because they present a possibility for
-   * un-intended script execution.
-   */
-  SecureObject.addMethodIfSupported(o, loc, 'assign', {
-    beforeCallback: function(href) {
-      if (href && typeof href === 'string' && href.length > 1) {
-        const dummy = document.createElement('a');
-        dummy.href = href;
+  ['replace', 'assign'].forEach(method => {
+    defineProperty(o, method, {
+      writable: true,
+      enumerable: true,
+      value: function(url) {
+        url = sanitizeURLForElement(url);
 
-        if (dummy.protocol === 'http:' || dummy.protocol === 'https:') {
-          if (!isSameLocation(window.location, dummy)) {
-            if (!confirmNavigationAwayFromCurrentDomain()) {
-              throw new error('User opted not to exit the current domain');
-            }
-          }
-          return href;
+        if (!isValidURLScheme(url)) {
+          throw new error(ERROR_MESSAGES[method]);
         }
 
-        throw new error('SecureLocation.assign only supports http://, https:// schemes.');
+        if (confirmLocationChange(url)) {
+          loc[method](url);
+        }
       }
-      return undefined;
-    }
+    });
   });
+
+  SecureObject.addMethodIfSupported(o, loc, 'reload');
 
   setRef(o, loc, key);
   addToCache(loc, o, key);
@@ -9470,25 +9507,25 @@ function SecureWindow(sandbox, key) {
     SecureObject.addMethodIfSupported(o, win, name)
   );
 
-  ['open'].forEach(name =>
-    SecureObject.addMethodIfSupported(o, win, name, {
-      beforeCallback: function(url) {
-        // If an url was provided to window.open()
-        if (url) {
-          // coerce argument to string and sanitize.
-          const urlString = sanitizeURLForElement(url);
-          // try to open only if we have a non-empty string
-          if (urlString.length > 1) {
-            if (!isValidURLScheme(urlString)) {
-              throw new error(
-                'SecureWindow.open supports http://, https:// schemes and relative urls.'
-              );
-            }
-          }
-        }
+  defineProperty(o, 'open', {
+    enumerable: true,
+    writable: true,
+    value: function(href, ...args) {
+      href = sanitizeURLForElement(href);
+      if (!isValidURLScheme(href)) {
+        throw new error(
+          'SecureWindow.open supports http://, https:// schemes and relative urls.'
+        );
       }
-    })
-  );
+
+      if (confirmLocationChange(href, win.location.href)) {
+        const filteredArgs = SecureObject.filterArguments(o, [href, ...args]);
+        const res = win.open(...filteredArgs);
+        return SecureObject.filterEverything(o, res);
+      }
+      return null;
+    }
+  });
 
   if ('localStorage' in win) {
     defineProperty(o, 'localStorage', {

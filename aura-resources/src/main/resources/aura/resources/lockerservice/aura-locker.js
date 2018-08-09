@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-08-06
- * Version: 0.5.2
+ * Generated: 2018-08-08
+ * Version: 0.5.3
  */
 
 (function (exports) {
@@ -7910,21 +7910,18 @@ SecureXMLDocument.toString = function() {
  * limitations under the License.
  */
 
-const ERROR_MESSAGES = {
-  assign: 'SecureLocation.assign only supports http://, https:// schemes.',
-  replace: 'SecureLocation.replace supports http://, https:// schemes and relative urls.',
-  href: 'SecureLocation.href only supports http://, https:// schemes and relative urls.',
-  protocol: 'SecureLocation.protocol only supports http://, https:// schemes.'
-};
+function getSupportedSchemesErrorMessage(method, object) {
+  return `${object}.${method} supports http://, https:// schemes and relative urls.`;
+}
 
 /**
  * Creates a confirmation dialog to ask the user if they would like to navigate away from
  * the current domain. This is in an effort to prevent phishing attacks, e.g. salesforce.com -> saelsforce.com
  *
- * @param targetURL location to check against current location
  * @param currentURL current location else, use window.location.href
+ * @param targetURL location to check against current location
  */
-function confirmLocationChange(targetURL, currentURL) {
+function confirmLocationChange(currentURL, targetURL) {
   const c = document.createElement('a');
   const t = document.createElement('a');
   c.href = currentURL;
@@ -7958,9 +7955,9 @@ function SecureLocation(loc, key) {
       set: function(href) {
         href = sanitizeURLForElement(href);
         if (!isValidURLScheme(href)) {
-          throw new error(ERROR_MESSAGES['href']);
+          throw new error(getSupportedSchemesErrorMessage('href', 'SecureLocation'));
         }
-        if (confirmLocationChange(href, loc.href)) {
+        if (confirmLocationChange(loc.href, href)) {
           loc.href = href;
         }
         return true;
@@ -7972,11 +7969,10 @@ function SecureLocation(loc, key) {
       },
       set: function(protocol) {
         protocol = String(protocol);
-        if (isValidURLScheme(protocol)) {
-          loc.protocol = protocol;
-        } else {
-          throw new error(ERROR_MESSAGES['protocol']);
+        if (!isValidURLScheme(protocol)) {
+          throw new error(getSupportedSchemesErrorMessage('protocol', 'SecureLocation'));
         }
+        loc.protocol = protocol;
         return true;
       }
     }
@@ -7989,7 +7985,7 @@ function SecureLocation(loc, key) {
       },
       set: function(val) {
         val = String(val);
-        if (confirmLocationChange(`${loc.protocol}//${val}`)) {
+        if (confirmLocationChange(loc.href, `${loc.protocol}//${val}`)) {
           loc[property] = val;
         }
         return true;
@@ -8005,14 +8001,14 @@ function SecureLocation(loc, key) {
     defineProperty(o, method, {
       writable: true,
       enumerable: true,
-      value: function(url) {
+      value(url) {
         url = sanitizeURLForElement(url);
 
         if (!isValidURLScheme(url)) {
-          throw new error(ERROR_MESSAGES[method]);
+          throw new error(getSupportedSchemesErrorMessage(method, 'SecureLocation'));
         }
 
-        if (confirmLocationChange(url)) {
+        if (confirmLocationChange(loc.href, url)) {
           loc[method](url);
         }
       }
@@ -9510,19 +9506,18 @@ function SecureWindow(sandbox, key) {
   defineProperty(o, 'open', {
     enumerable: true,
     writable: true,
-    value: function(href, ...args) {
+    value(href, ...args) {
       href = sanitizeURLForElement(href);
       if (!isValidURLScheme(href)) {
-        throw new error(
-          'SecureWindow.open supports http://, https:// schemes and relative urls.'
-        );
+        throw new error(getSupportedSchemesErrorMessage('open', 'SecureWindow'));
       }
 
-      if (confirmLocationChange(href, win.location.href)) {
+      if (confirmLocationChange(win.location.href, href)) {
         const filteredArgs = SecureObject.filterArguments(o, [href, ...args]);
         const res = win.open(...filteredArgs);
         return SecureObject.filterEverything(o, res);
       }
+      // window.open spec expects a null return value if the operation fails
       return null;
     }
   });

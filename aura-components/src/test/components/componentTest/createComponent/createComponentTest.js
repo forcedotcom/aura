@@ -193,7 +193,7 @@
 
     testReturnsActionErrorMessageForUnknownComponentType:{
         test:function(){
-            var expected="Could not find def descriptor for: markup://bogus:bogus";
+            var expected="No COMPONENT named markup://bogus:bogus found";
             var actual=null;
             var actionComplete = false;
 
@@ -372,7 +372,7 @@
 
     testPassesActionErrorMessageWhenCreatingMultipleComponents:{
         test:function(){
-            var expected="Could not find def descriptor for: markup://bogus:bogus";
+            var expected = "No COMPONENT named markup://bogus:bogus found";
             var actual;
             var actionComplete = false;
 

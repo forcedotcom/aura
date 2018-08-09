@@ -105,7 +105,7 @@ public class AuraComponentDefinitionServletTest {
     @Test
     public void testMismatchUIDsendRedirectWithAllParams() throws Exception {
         // Arrange
-        setMockRequestParameters("myApp", "true", "de", "styling", "def", "UID");
+        setMockRequestParameters("myApp", "true", "", "styling", "def", "UID");
         DefDescriptor<Definition> defDescriptorMock = Mockito.mock(DefDescriptor.class);
         Mockito.when(defDescriptorMock.getNamespace()).thenReturn("namespace");
         Mockito.when(defDescriptorMock.getName()).thenReturn("name");
@@ -120,7 +120,7 @@ public class AuraComponentDefinitionServletTest {
         AuraPrivateAccessor.invoke(auraComponentDefinitionServlet, "doGet", request, response);
 
         // Assert
-        Mockito.verify(response).sendRedirect("https://example.host/auraCmpDef?aura.app=myApp&_ff=null&_l=false&_l10n=de&_style=styling&_def=def:qualifiedName&_uid=DIFFERENT_UID");
+        Mockito.verify(response).sendRedirect("https://example.host/auraCmpDef?aura.app=myApp&_ff=null&_l=false&_l10n=&_style=styling&_def=def:qualifiedName&_uid=DIFFERENT_UID");
     }
 
     @SuppressWarnings("unchecked")

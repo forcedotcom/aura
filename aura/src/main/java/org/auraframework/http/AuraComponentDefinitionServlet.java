@@ -105,6 +105,13 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 throw new InvalidDefinitionException("Descriptor required", null);
             }
 
+            // if locale provided, set the it on the context as a requested locale
+            Locale l = null;
+            if (StringUtils.isNotEmpty(locale)) {
+                l = LocaleUtils.toLocale(locale);
+            }
+            updateContext(l, formFactor, appReferrrer);
+
             Map<DefDescriptor<?>, String> descriptors = mapDescriptorsToDefDesriptorAndUid(requestedDescriptors);
 
             StringBuilder allUIDs = new StringBuilder();
@@ -144,13 +151,6 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 // in non prod modes, we want to use hydration in order to make it easier for developers to debug
                 hydrationType = HYDRATION_TYPE.all;
             }
-
-            // if locale provided, set the it on the context as a requested locale
-            Locale l = null;
-            if (StringUtils.isNotEmpty(locale)) {
-                l = LocaleUtils.toLocale(locale);
-            }
-            updateContext(l, formFactor, appReferrrer);
 
             serverService.writeDefinitions(descriptors.keySet(), responseStringWriter, false, 0, hydrationType, false);
 
@@ -299,26 +299,31 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<DefDescriptor<?>, String> mapDescriptorsToDefDesriptorAndUid(List<String> requestedDescriptors) {
+    private Map<DefDescriptor<?>, String> mapDescriptorsToDefDesriptorAndUid(List<String> requestedDescriptors) throws Exception {
         Map<DefDescriptor<?>, String> descriptors = new TreeMap<>(
                 Comparator.comparing((DefDescriptor defDescriptor)->{return defDescriptor.getNamespace();})
                         .thenComparing((DefDescriptor defDescriptor)->{return defDescriptor.getName();}));
 
 
         for (String requestedDefDescriptor: requestedDescriptors) {
-            boolean found = false;
+            Exception trackedException = null;
             for (Class defType : DESCRIPTOR_DEF_TYPES) {
                 try {
                     DefDescriptor defDescriptor = definitionService.getDefDescriptor(requestedDefDescriptor, defType);
                     String uid = definitionService.getUid(null, defDescriptor);
                     descriptors.put(defDescriptor, uid);
-                    found = true;
+                    trackedException = null;
                     break;
                 } catch (Exception e) {
+                    if (defType == ComponentDef.class) {
+                        trackedException = e;
+                    } else if (trackedException == null) {
+                        trackedException = e;
+                    }
                 }
             }
-            if (!found) {
-                throw new RuntimeException("Could not find def descriptor for: " + requestedDefDescriptor);
+            if (trackedException != null) {
+                throw trackedException;
             }
         }
 

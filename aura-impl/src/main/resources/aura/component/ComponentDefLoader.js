@@ -221,10 +221,10 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
 
     var processedURI = [];
     if (existingRequested.counter > 0) {
-        processedURI.push(new Promise(function(resolve){existingRequested.resolve = resolve;}));
+        processedURI.push(new Promise(function(resolve){ existingRequested.resolve = resolve; }));
     }
 
-    for(var def=0; def<uris.length; def++) {
+    for (var def=0; def<uris.length; def++) {
         var finalURI = this.buildURIString(uris[def][0], uris[def][1], numberOfDescriptorsInUid);
         var host = $A.clientService._host;
         if (!uris[def][2]) {
@@ -278,6 +278,16 @@ ComponentDefLoader.prototype.retrievePending = function(pending) {
         }
         that.loading--;
     }, function(e){
+	if ($A.util.isObject(e) && e.hasOwnProperty("event")) {
+	    try {
+		$A.clientService.setCurrentAccess(pending.access);
+		$A.clientService.parseAndFireEvent(e.event);
+	    } catch (e1) {
+		// ignore event exception, continue with callbacks with original error
+	    } finally {
+		$A.clientService.releaseCurrentAccess();
+	    }
+	}
         for (var j = 0, p_length = pending.callbacks.length; j < p_length; j++) {
             try {
                 // all callbacks get the error if only one errors, we aren't tracking which def was for which callback
@@ -305,7 +315,7 @@ ComponentDefLoader.prototype.loadingComplete = function() {
     // no-op empty function
 };
 
-ComponentDefLoader.prototype.checkForError = function (uri, resolve, reject) {
+ComponentDefLoader.prototype.getError = function (uri) {
     var startIndexParam = this.buildURIStyleParam();
     if (startIndexParam.length === 0) {
         startIndexParam = this.buildURILocaleParam();
@@ -320,17 +330,9 @@ ComponentDefLoader.prototype.checkForError = function (uri, resolve, reject) {
         loaderErrorString = loaderErrorString.substr(6);
     }
     if (Aura["componentDefLoaderError"][loaderErrorString] && Aura["componentDefLoaderError"][loaderErrorString].length > 0) {
-        reject(Aura["componentDefLoaderError"][loaderErrorString].pop());
-        return;
+        return Aura["componentDefLoaderError"][loaderErrorString].pop();
     }
-    resolve();
-    this.processRequested();
-};
-
-ComponentDefLoader.prototype.onerror = function(uri, reject){
-    this.checkForError(uri, function(){
-        reject("An unknown error occurred attempting to fetch definitions at: " + uri);
-    }, reject);
+    return undefined;
 };
 
 ComponentDefLoader.prototype.createScriptElement = function(uri, onload, onerror) {
@@ -364,10 +366,21 @@ ComponentDefLoader.prototype.generateScriptTag = function(uri) {
     return new Promise(function(resolve, reject) {
         that.createScriptElement(uri,
             function () {
-                that.checkForError(uri, resolve, reject);
+                var error = that.getError(uri);
+                if (error === undefined) {
+                    resolve();
+                    that.processRequested();
+                } else {
+                    reject(error);
+                }
             },
             function () {
-                that.onerror(uri, reject);
+                var error = that.getError(uri);
+                if (error === undefined) {
+                    reject("An unknown error occurred attempting to fetch definitions at: " + uri);
+                } else {
+                    reject(error);
+                }
             }
         );
     });
@@ -375,7 +388,7 @@ ComponentDefLoader.prototype.generateScriptTag = function(uri) {
 
 ComponentDefLoader.prototype.schedulePending = function() {
     var that = this;
-    this.pending = { callbacks: [], descriptorMap: {} };
+    this.pending = { callbacks: [], descriptorMap: {}, access: $A.clientService.currentAccess };
     window.setTimeout(function() {
         that.retrievePending.call(that, that.pending);
         that.pending = null;

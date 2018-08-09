@@ -248,7 +248,7 @@
           errorMessage = error.message;
         }
 
-        testUtils.assertEquals(errorMessage, 'SecureLocation.assign only supports http://, https:// schemes.', 'a javascript: pseudo scheme was not correctly sanitized');
+        testUtils.assertEquals(errorMessage, 'SecureLocation.assign supports http://, https:// schemes and relative urls.', 'a javascript: pseudo scheme was not correctly sanitized');
     },
 
     /**

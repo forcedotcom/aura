@@ -225,7 +225,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 }
             }
             loaderErrorString = loaderErrorString.substring(nextAnd);
-            loaderErrorString = loaderErrorString.replaceAll("[^&=_:/a-zA-Z0-9-]+","");
+            loaderErrorString = loaderErrorString.replaceAll("[^&=_,:/a-zA-Z0-9-]+","");
 
             out.append(String.format("if(!Aura.componentDefLoaderError['%s']){Aura.componentDefLoaderError['%s'] = []} Aura.componentDefLoaderError['%s'].push(/*", loaderErrorString, loaderErrorString, loaderErrorString));
             servletUtilAdapter.handleServletException(e, false, context, request, response, true);

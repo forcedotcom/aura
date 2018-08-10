@@ -161,7 +161,7 @@ function AuraClientService (util) {
     this.lastSendTime = Date.now();
 
     this.moduleServices = {};
-    this.moduleScopedImports = { "label" : this.labelScopedImportResolver, "salesforce": this.defaultSalesforceImportResolver };
+    this.moduleScopedImports = { "salesforce": this.defaultSalesforceImportResolver };
     this.cssVars = {}; // To support custom variables in IE11 we need to serialized them to the client
     this.moduleScopedImportsCache = {};
 
@@ -2211,7 +2211,7 @@ AuraClientService.prototype.addScopedModuleResolver = function (scope, resolver)
  * scope if a resolver is registered.
  * 
  * @param {String} fullImport The entire path of the module being imported
- * @param {String} scope The scope of the module import, e.g. "label" or "salesforce"
+ * @param {String} scope The scope of the module import, e.g. "salesforce"
  * @memberOf AuraClientService
  * @private
 */
@@ -2223,23 +2223,6 @@ AuraClientService.prototype.resolveScopedModuleImport = function (scope, fullImp
     }
 
     return this.moduleScopedImportsCache[fullImport];
-};
-
-/**
- * Remove this in 218. Replaced by @salesforce/label
- * 
- * Default resolver for the @label scoped module import.
- * 
- * @param {String} fullImport The entire path of the module being imported
- * @memberOf AuraClientService
- * @private
- */
-AuraClientService.prototype.labelScopedImportResolver = function(fullImport) {
-    // strip off the "@label/" section of the import
-    var key = fullImport.substring(7);
-    var parts = key.split('.');
-    $A.assert(parts.length === 2, 'Malformed @label scoped module import. Static imports for @label modules require two parts: section and key');
-    return $A.get("$Label." + key);
 };
 
 /**

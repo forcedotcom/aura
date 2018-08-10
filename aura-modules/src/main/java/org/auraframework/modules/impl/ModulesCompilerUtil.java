@@ -58,7 +58,6 @@ import org.lwc.reference.Reference;
 public final class ModulesCompilerUtil {
 
     static final String COMPILER_HANDLER = "src/lwc/invokeCompile.js";
-    static final String LABEL_SCHEMA = "@label/";
 
     private static NodeBundle COMPILER_BUNDLE;
 

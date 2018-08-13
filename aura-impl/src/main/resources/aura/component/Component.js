@@ -177,20 +177,19 @@ function Component(config, localCreation) {
             act.releaseCreationPath(this.creationPath);
         }
 
-        if(this.getDef().hasInit()) {
+        if (this.getDef().hasInit()) {
             this.fire("init");
         }
     } catch (e) {
-        if (e instanceof $A.auraError) {
-            if (!e["component"]) {
-                e.setComponent(config && config["componentDef"] && config["componentDef"]["descriptor"]);
-            }
-            throw e;
-        } else {
-            var creationError = new $A.auraError("Component class instance initialization error", e);
-            creationError.setComponent(config && config["componentDef"] && config["componentDef"]["descriptor"]);
-            throw creationError;
+        var auraError = e;
+        if (!(e instanceof $A.auraError)) {
+            auraError = new $A.auraError("Failed to initialize a component", e);
         }
+
+        if (!auraError["component"]) {
+            auraError.setComponent(config && config["componentDef"] && config["componentDef"]["descriptor"]);
+        }
+        throw auraError;
     }
 }
 

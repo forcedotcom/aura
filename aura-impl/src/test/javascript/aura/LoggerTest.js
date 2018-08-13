@@ -835,6 +835,25 @@ Test.Aura.LoggerTest = function() {
             });
             Assert.False(actual);
         }
+
+        [Fact]
+        function ReturnFalseIfAuraErrorIsFromBootstrap() {
+            // Arrange
+            var e = new Error();
+            e.message = "bootstrap error";
+            e.stack = "{anonymous}()@https://cheng.lightning.mobile1.t.force.com/l/context/bootstrap.js?jwt=jwt:15:20\n\
+                       {anonymous}()@https://cheng.lightning.mobile1.t.force.com/l/context/bootstrap.js?jwt=jwt:18:2";
+
+            var actual;
+            getAuraMock(function() {
+                var ae = new $A.auraError(null, e);
+                // Act
+                actual = logger.isExternalError(ae);
+            });
+
+            // Assert
+            Assert.False(actual);
+        }
     }
 
     [Fixture]

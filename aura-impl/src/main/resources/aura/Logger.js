@@ -257,14 +257,15 @@ Logger.prototype.isAuraFile = function(fileName) {
     }
 
     return fileName.match(/aura_[^\.]+\.js$/gi) ||         // includes aura
-           fileName.match("engine.js") ||                  // includes module engine
-           fileName.match("engine.min.js") ||              // includes module engine PROD
+           fileName.indexOf("engine.js") > -1 ||           // includes module engine
+           fileName.indexOf("engine.min.js") > -1 ||       // includes module engine PROD
            fileName.indexOf('/components/') > -1  ||       // includes components
            fileName.indexOf('/libraries/') > -1 ||         // includes libraries
            fileName.indexOf('/jslibrary/') > -1 ||         // includes client libraries
            fileName.indexOf('/auraFW/resources/') > -1 ||  // includes client libraries
-           fileName.match("appcore.js") ||                 // includes appcore.js
-           fileName.match("app.js");
+           fileName.indexOf("bootstrap.js") > -1 ||        // includes bootstrap.js
+           fileName.indexOf("appcore.js") > -1 ||          // includes appcore.js
+           fileName.indexOf("app.js") > -1;
 };
 
 /**

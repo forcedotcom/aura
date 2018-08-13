@@ -29,7 +29,7 @@ function lib() { //eslint-disable-line no-unused-vars
      * For more details on how this regex is constructed, refer to UrlUtil.java in core.
      */
     var linksMatchingRegex =
-        "((?:(?:https?|ftp|file):\\/\\/[-A-Z0-9+@#\\/%?=~_|!:.;]*(?:&(?!lt;|quot;|gt;|#39;)[\\w=%;]*)*)|" +
+        "((?:(?:https?|ftp|file):\\/\\/[-A-Z0-9+@#\\/%?=~_|()!:.;]*(?:&(?!lt;|quot;|gt;|#39;)[\\w=%;]*)*)[^?.,!&< ]|" +
         "(?:\\b(?:[a-z0-9](?:[-a-z0-9]{0,62}[a-z0-9])?\\.)+(?:AC|AD|AE|AERO|AF|AG|AI|AL|AM|AN|AO|AQ|AR|ARPA|AS|" +
         "ASIA|AT|AU|AW|AX|AZ|BA|BB|BD|BE|BF|BG|BH|BI|BIZ|BJ|BM|BN|BO|BR|BS|BT|BV|BW|BY|BZ|CA|CAT|CC|CD|CF|CG|CH|" +
         "CI|CK|CL|CM|CN|CO|COM|COOP|CR|CU|CV|CX|CY|CZ|DE|DJ|DK|DM|DO|DZ|EC|EDU|EE|EG|ER|ES|ET|EU|FI|FJ|FK|FM|FO|" +
@@ -41,7 +41,7 @@ function lib() { //eslint-disable-line no-unused-vars
         "UG|UK|US|UY|UZ|VA|VC|VE|VG|VI|VN|VU|WF|WS|XN--0ZWM56D|XN--11B5BS3A9AJ6G|XN--80AKHBYKNJ4F|XN--9T4B11YI5A|" +
         "XN--DEBA0AD|XN--FIQS8S|XN--FIQZ9S|XN--G6W251D|XN--HGBK6AJ7F53BBA|XN--HLCJ6AYA9ESC7A|XN--J6W193G|XN--JXALPDLP|" +
         "XN--KGBECHTV|XN--KPRW13D|XN--KPRY57D|XN--MGBAAM7A8H|XN--MGBERP4A5D4AR|XN--P1AI|XN--WGBH1C|XN--ZCKZAH|YE|YT|" +
-        "ZA|ZM|ZW)\\b[\\w/.]*(?:\\?(?:&?(?!quot;|amp;|lt;|gt;|#39;)[\\w=%&#;]*)*)*))|([\\w-\\.\\+_]{1,64}@(?:[\\w-])" +
+        "ZA|ZM|ZW)\\b[\\w/.()]*(?:\\?(?:&?(?!quot;|amp;|lt;|gt;|#39;)[\\w=%&#;]*)*)*))|([\\w-\\.\\+_]{1,64}@(?:[\\w-])" +
         "{1,255}(?:\\.[\\w-]{1,255}){1,10})";
 
     var whitelistedTagsMatchingRegex =

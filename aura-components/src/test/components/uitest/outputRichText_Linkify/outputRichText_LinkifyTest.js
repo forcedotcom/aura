@@ -198,7 +198,7 @@
         ]
     },
 
-    testCommaNextToHTTPLink: {
+    testCommaNextToHTTPSLink: {
         attributes: {
             textValue: 'visit https://www.salesforce.com/company/msa.jsp, to download the agreement'
         },
@@ -227,6 +227,39 @@
         test: [
             function(cmp) {
                 this.assertLinkHref(cmp, 'https://salesforce.com/company/msa.jsp#internal?a=b&c=d');
+            }
+        ]
+    },
+
+    testPeriodNextToSimpleLink: {
+        attributes: {
+            textValue: 'visit https://www.salesforce.com/company/msa.jsp. To download the agreement'
+        },
+        test: [
+            function(cmp) {
+                this.assertLinkHref(cmp, 'https://www.salesforce.com/company/msa.jsp');
+            }
+        ]
+    },
+
+    testPeriodNextToComplexLink: {
+        attributes: {
+            textValue: 'visit https://salesforce.com/company/msa.jsp#internal?a=b&c=d. to download the agreement'
+        },
+        test: [
+            function(cmp) {
+                this.assertLinkHref(cmp, 'https://salesforce.com/company/msa.jsp#internal?a=b&c=d');
+            }
+        ]
+    },
+
+    testLinkWithParenthesis: {
+        attributes: {
+            textValue: 'Checkout http://example.com/test(a).html for more info'
+        },
+        test: [
+            function(cmp) {
+                this.assertLinkHref(cmp, 'http://example.com/test(a).html');
             }
         ]
     },

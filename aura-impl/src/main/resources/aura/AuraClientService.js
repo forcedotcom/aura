@@ -1078,7 +1078,7 @@ AuraClientService.prototype.actualDumpCachesAndReload = function(metricsPayload)
     }
 
     $A.componentService.clearDefsFromStorage(metricsPayload)
-        .then(reload, reload);
+        ["then"](reload, reload);
 };
 
 /**
@@ -2027,7 +2027,7 @@ AuraClientService.prototype.checkBootstrapUpgrade = function() {
         // save the new version of bootstrap to storage BEFORE notifying the app so that if the app chooses
         // to reload the app then cache contains the latest bootstrap value.
         this.saveBootstrapToStorage(Aura["appBootstrap"])
-            .then(fireApplicationRefreshed, fireApplicationRefreshed);
+            ["then"](fireApplicationRefreshed, fireApplicationRefreshed);
     }
 };
 
@@ -2096,7 +2096,7 @@ AuraClientService.prototype.loadBootstrapFromStorage = function() {
 
     // else load from storage
     return storage.get(AuraClientService.BOOTSTRAP_KEY)
-        .then(
+        ["then"](
             function(value) {
                 if (value) {
                     Aura["appBootstrapCacheStatus"] = "loaded";
@@ -2129,7 +2129,7 @@ AuraClientService.prototype.saveBootstrapToStorage = function(boot) {
 
     var that = this;
     var defsPromise = $A.componentService.saveDefsToStorage(boot["context"], $A.getContext())
-        .then(
+        ["then"](
             undefined,
             function(e) {
                 $A.warning("AuraClientService.saveBootstrapToStorage(): failed to persist bootstrap.js defs: " + e);
@@ -2138,7 +2138,7 @@ AuraClientService.prototype.saveBootstrapToStorage = function(boot) {
         );
 
     var bootstrapPromise = storage.set(AuraClientService.BOOTSTRAP_KEY, boot)
-        .then(
+        ["then"](
             undefined,
             function(e) {
                 $A.warning("AuraClientService.saveBootstrapToStorage(): failed to persist bootstrap.js: " + e);
@@ -2516,7 +2516,7 @@ AuraClientService.prototype.processStorableActions = function() {
 
     var that = this;
     this.actionStorage.getAll(Object.keys(keysToActions))
-        .then(
+        ["then"](
             function(items) {
                 var existsCallback = function(exists, args) {
                     try {
@@ -2556,7 +2556,7 @@ AuraClientService.prototype.processStorableActions = function() {
                 }
             }
         )
-        .then(
+        ["then"](
             undefined,
             function(error) {
                 // something is really wrong. no clear way to recover so at least report
@@ -2595,7 +2595,7 @@ AuraClientService.prototype.persistStorableActions = function(actions) {
 
     if (doStore && this.actionStorage.isStorageEnabled()) {
         return this.actionStorage.setAll(values)
-            .then(
+            ["then"](
                 undefined,
                 function(error){
                     // storage problems should warn rather than the aggressive error.

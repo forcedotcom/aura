@@ -450,7 +450,7 @@ AuraInstance.prototype.initAsync = function(config) {
         }
 
         function initializeApp () {
-            return $A.clientService.initializeApplication().then(function (bootConfig) {
+            return $A.clientService.initializeApplication()["then"](function (bootConfig) {
                 $A.run(function () {
                     $A.initPriv(bootConfig);
                 });

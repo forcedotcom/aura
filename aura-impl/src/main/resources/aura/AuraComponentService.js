@@ -2422,11 +2422,11 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
                 // def AuraStorage mutex
 
                 return self.buildDependencyGraph()
-                    .then(function(graph) {
+                    ["then"](function(graph) {
                         var keysToEvict = self.sortDependencyGraph(graph);
                             return self.evictDefsFromStorage(keysToEvict, graph, requiredSpaceKb);
                     })
-                   .then(
+                   ["then"](
                         function(evicted) {
                             $A.log("AuraComponentService.pruneDefsFromStorage: evicted " + evicted.length + " component defs and actions");
                         }

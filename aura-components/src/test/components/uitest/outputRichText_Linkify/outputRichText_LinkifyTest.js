@@ -264,6 +264,17 @@
         ]
     },
 
+    testLinkWithHyphensAndDotsInParams: {
+        attributes:{
+            textValue: 'Open https://ightning.force.com/aura?r=49&ui-force-components-controllers-recordGlobalValueProvider.RecordGvp.saveRecord=1 for more Info'
+        },
+        test: [
+            function(cmp) {
+                this.assertLinkHref(cmp, 'https://ightning.force.com/aura?r=49&ui-force-components-controllers-recordGlobalValueProvider.RecordGvp.saveRecord=1')
+            }
+        ]
+    },
+
     assertLinksPresent: function(cmp, hrefText, checkValue) {
         $A.test.addWaitForWithFailureMessage(true,
             function() {

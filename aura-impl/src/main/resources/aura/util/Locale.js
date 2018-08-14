@@ -190,9 +190,9 @@ Aura.Utils.Locale.prototype.createMeridiemNames = function() {
         // If the browser does not support DateTimeFormat.formatToParts, relying on the pattern to parse.
         // IE11 doesn't provide default value for dayperiod for the locales which don't use 12-hour clock.
         var timeString = $A.localizationService.format(meridiemFormat, amDate);
-        am = (timeString && timeString.replace(/ ?.{2}:.{2} ?/, "")) || "AM";
+        am = (timeString && timeString.replace(".", "").replace(/ ?.{2}:.{2} ?/, "")) || "AM";
         timeString = $A.localizationService.format(meridiemFormat, pmDate);
-        pm = (timeString && timeString.replace(/ ?.{2}:.{2} ?/, "")) || "PM";
+        pm = (timeString && timeString.replace(".", "").replace(/ ?.{2}:.{2} ?/, "")) || "PM";
     }
 
     this.meridiemNames = [am, pm];

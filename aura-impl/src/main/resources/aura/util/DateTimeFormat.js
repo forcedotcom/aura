@@ -45,7 +45,9 @@ Aura.Utils.DateTimeFormat = function(formatString, locale) {
  */
 Aura.Utils.DateTimeFormat.prototype.format = function(date, utcOffset) {
     var parts;
-    if (this.supportFormatToParts === true) {
+
+    // For date before 1970, formatToParts() doesn't have consistent behavior across browsers.
+    if (this.supportFormatToParts === true && date.getFullYear() >= 1970) {
         // Initiates the date time format when it gets called for the first time.
         if (this.dateTimeFormat === undefined) {
             this.dateTimeFormat = Intl["DateTimeFormat"](this.localeName, this.config);
@@ -61,8 +63,11 @@ Aura.Utils.DateTimeFormat.prototype.format = function(date, utcOffset) {
     var dateTimeString = "";
     for (var i = 0; i < this.tokens.length; i++) {
         var token = this.tokens[i];
+
         if (token["literal"] === true) {
             dateTimeString += token["value"];
+        } else if (token["useConfig"] === true && parts) {
+            dateTimeString += $A.localizationService.findField(parts, token["field"]);
         } else if (token["type"] === "number") {
             var value = this.getNumberFieldValue(token, date);
             dateTimeString += this.formatNumberField(value, (token["minDigits"] || 1), token["localized"]);
@@ -70,7 +75,7 @@ Aura.Utils.DateTimeFormat.prototype.format = function(date, utcOffset) {
             switch (token["field"]) {
                 case "dayperiod":
                     // special case
-                    dateTimeString += this.locale.getMeridiem(date);
+                    dateTimeString += this.locale.getMeridiem(date.getHours());
                     break;
                 case "month":
                     dateTimeString += this.locale.getMonth(date.getMonth(), token["style"]);
@@ -92,9 +97,6 @@ Aura.Utils.DateTimeFormat.prototype.format = function(date, utcOffset) {
             } else {
                 dateTimeString += this.formatOffset(utcOffset, token["delimiter"]);
             }
-
-        } else {
-            dateTimeString += $A.localizationService.findField(parts, token["field"]) || "";
         }
     }
 
@@ -442,22 +444,24 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                 token["field"] = "year";
                 if (this.canUseConfig("year", "numeric")) {
                     config["year"] = "numeric";
-                } else {
-                    token["type"] = "number";
-                    token["localized"] = true;
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "number";
+                token["localized"] = true;
                 break;
             case "yy":
             case "YY": // leaked moment token
                 token["field"] = "year";
                 if (this.canUseConfig("year", "2-digit")) {
                     config["year"] = "2-digit";
-                } else {
-                    token["type"] = "number";
-                    token["style"] = "2-digit";
-                    token["minDigits"] = 2;
-                    token["localized"] = true;
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "number";
+                token["style"] = "2-digit";
+                token["minDigits"] = 2;
+                token["localized"] = true;
                 break;
 
             // months
@@ -465,38 +469,42 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                 token["field"] = "month";
                 if (this.canUseConfig("month", "numeric")) {
                     config["month"] = "numeric";
-                } else {
-                    token["type"] = "number";
-                    token["localized"] = true;
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "number";
+                token["localized"] = true;
                 break;
             case "MM":
                 token["field"] = "month";
                 if (this.canUseConfig("month", "2-digit")) {
                     config["month"] = "2-digit";
-                } else {
-                    token["type"] = "number";
-                    token["minDigits"] = 2;
-                    token["localized"] = true;
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "number";
+                token["minDigits"] = 2;
+                token["localized"] = true;
                 break;
             case "MMM":
                 token["field"] = "month";
                 if (this.canUseConfig("month", "short")) {
                     config["month"] = "short";
-                } else {
-                    token["type"] = "string";
-                    token["style"] = "short";
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "string";
+                token["style"] = "short";
                 break;
             case "MMMM":
                 token["field"] = "month";
                 if (this.canUseConfig("month", "long")) {
                     config["month"] = "long";
-                } else {
-                    token["type"] = "string";
-                    token["style"] = "long";
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "string";
+                token["style"] = "long";
                 break;
 
             // dates
@@ -505,21 +513,23 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                 token["field"] = "day";
                 if (this.canUseConfig("day", "numeric")) {
                     config["day"] = "numeric";
-                } else {
-                    token["type"] = "number";
-                    token["localized"] = true;
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "number";
+                token["localized"] = true;
                 break;
             case "dd":
             case "DD": // leaked moment token
                 token["field"] = "day";
                 if (this.canUseConfig("day", "2-digit")) {
                     config["day"] = "2-digit";
-                } else {
-                    token["type"] = "number";
-                    token["minDigits"] = 2;
-                    token["localized"] = true;
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "number";
+                token["minDigits"] = 2;
+                token["localized"] = true;
                 break;
 
             // hours
@@ -534,22 +544,24 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                 if (this.canUseConfig("hour", "2-digit")) {
                     config["hour"] = "2-digit";
                     config["hour12"] = false;
-                } else {
-                    token["type"] = "number";
-                    token["minDigits"] = 2;
-                    token["localized"] = true;
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "number";
+                token["minDigits"] = 2;
+                token["localized"] = true;
                 break;
             case "h":
                 token["field"] = "hour";
                 if (this.canUseConfig("hour", "numeric")) {
                     config["hour"] = "numeric";
                     config["hour12"] = true;
-                } else {
-                    token["type"] = "number";
-                    token["hourCycle"] = "h12";
-                    token["localized"] = true;
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "number";
+                token["hourCycle"] = "h12";
+                token["localized"] = true;
                 break;
             case "hh":
                 // process individually, since 2-digit will be ignored when 'hour12' is on
@@ -588,10 +600,11 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                 token["field"] = "minute";
                 if (this.canUseConfig("minute", "numeric")) {
                     config["minute"] = "numeric";
-                } else {
-                    token["type"] = "number";
-                    token["localized"] = true;
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "number";
+                token["localized"] = true;
                 break;
             case "mm":
                 // process individually, since 0 is not formatted as 2-digit if hour is numeric
@@ -609,18 +622,20 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                 token["field"] = "second";
                 if (this.canUseConfig("second", "numeric")) {
                     config["second"] = "numeric";
-                } else {
-                    token["type"] = "number";
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "number";
                 break;
             case "ss":
                 token["field"] = "second";
                 if (this.canUseConfig("second", "2-digit")) {
                     config["second"] = "2-digit";
-                } else {
-                    token["type"] = "number";
-                    token["minDigits"] = 2;
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "number";
+                token["minDigits"] = 2;
                 break;
 
             // milliseconds
@@ -648,9 +663,10 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                     // 'hour' is needed to show dayperiod
                     // if hour12 is on, 'hour' can only be numeric, see 'hh'
                     config["hour"] = "numeric";
-                } else {
-                    token["type"] = "string";
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "string";
                 break;
 
             // time zone offset
@@ -677,28 +693,31 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
                 token["field"] = "weekday";
                 if (this.canUseConfig("weekday", "narrow")) {
                     config["weekday"] = "narrow";
-                } else {
-                    token["type"] = "string";
-                    token["style"] = "narrow";
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "string";
+                token["style"] = "narrow";
                 break;
             case "EEE":
                 token["field"] = "weekday";
                 if (this.canUseConfig("weekday", "short")) {
                     config["weekday"] = "short";
-                } else {
-                    token["type"] = "string";
-                    token["style"] = "short";
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "string";
+                token["style"] = "short";
                 break;
             case "EEEE":
                 token["field"] = "weekday";
                 if (this.canUseConfig("weekday", "long")) {
                     config["weekday"] = "long";
-                } else {
-                    token["type"] = "string";
-                    token["style"] = "long";
+                    token["useConfig"] = true;
                 }
+
+                token["type"] = "string";
+                token["style"] = "long";
                 break;
             case "Q":
                 token["field"] = "quarter";

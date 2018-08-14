@@ -140,10 +140,13 @@ Aura.Utils.Locale.prototype.isPM = function(meridiemString) {
     return this.meridiemNamesParse[1] === meridiemString.toLowerCase();
 };
 
-
-Aura.Utils.Locale.prototype.getMeridiem = function(date) {
+/**
+ *
+ * @param {number} hour A number between 0 and 23. 0-11 means AM, 12-23 means PM.
+ */
+Aura.Utils.Locale.prototype.getMeridiem = function(hour) {
     var meridiems = this.getMeridiems();
-    return (date.getHours() < 12)? meridiems[0] : meridiems[1];
+    return (hour < 12)? meridiems[0] : meridiems[1];
 };
 
 

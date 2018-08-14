@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-08-08
- * Version: 0.5.3
+ * Generated: 2018-08-14
+ * Version: 0.5.4
  */
 
 (function (exports) {
@@ -5107,6 +5107,7 @@ SecureObject.filterEverything = function(st, raw, options) {
       setKey(raw, defaultKey);
     }
 
+    addToCache(raw, swallowed, key);
     registerProxy(swallowed);
     registerSecureFunction(swallowed);
   } else if (t === 'object') {

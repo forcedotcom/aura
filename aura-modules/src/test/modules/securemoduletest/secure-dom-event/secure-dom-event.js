@@ -63,6 +63,22 @@ export default class SecureDOMEventClazz extends Element {
             "Expected event.target to be retargeted to host");
     }
 
+    @api
+    testRemoveEventListenerOnTemplateElement() {
+        let domEvent;
+        const event = new Event("change");
+        const eventFunction = function(e) {
+            domEvent = e;
+        }
+
+        this.addEventListener("change", eventFunction);
+        this.removeEventListener("change", eventFunction);
+        this.dispatchEvent(event);
+
+        testUtil.assertUndefined(domEvent,
+            "Event handler was called after firing event created via document.createEvent!");
+    }
+
     // W-4462187
     @api
     testEventView() {

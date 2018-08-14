@@ -28,6 +28,12 @@
         }
     },
 
+    testRemoveEventListenerOnTemplateElement: {
+        test: function(cmp) {
+            cmp.domEventTester("testRemoveEventListenerOnTemplateElement");
+        }
+    },
+
     testEventView: {
         test: function(cmp) {
             cmp.domEventTester("testEventView");

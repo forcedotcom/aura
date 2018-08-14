@@ -1392,21 +1392,26 @@ TestInstance.prototype.getElementByClass = function(classname) {
  *            canBubble Optional. True if the event can be bubbled, defaults to true.
  * @param {Boolean}
  *            cancelable Optional. Indicates whether the event is cancelable or not, defaults to true.
+ * @param {Object}
+ *            attributes Optional. Extra set of attributes to create the Event object with.
  * @export
  * @function Test#fireDomEvent
  */
-TestInstance.prototype.fireDomEvent = function(element, eventName, canBubble, cancelable) {
+TestInstance.prototype.fireDomEvent = function(element, eventName, canBubble, cancelable, attributes) {
     var event;
-    if (document.createEvent) {
-        event = document.createEvent("HTMLEvents");
-
+    if (typeof Event === "function") {
         canBubble = $A.util.isUndefinedOrNull(canBubble) ? true : canBubble;
         cancelable = $A.util.isUndefinedOrNull(cancelable) ? true : cancelable;
 
-        event.initEvent(eventName, canBubble, cancelable);
+        attributes = $A.util.isUndefinedOrNull(attributes) ? {} : attributes;
+        attributes["bubbles"] = canBubble;
+        attributes["cancelable"] = cancelable;
+
+        event = new Event(eventName, attributes);
 
         element.dispatchEvent(event);
     } else {
+        // for IE
         event = document.createEventObject();
         event.eventType = eventName;
 
@@ -1427,10 +1432,11 @@ TestInstance.prototype.fireDomEvent = function(element, eventName, canBubble, ca
  * @function Test#clickOrTouch
  */
 TestInstance.prototype.clickOrTouch = function(element, canBubble, cancelable) {
-    if ($A.util.isUndefinedOrNull(element.click)) {
-        this.fireDomEvent(element, "click", canBubble, cancelable);
-    } else {
+    if ($A.util.isString(element.type) && (typeof element.click === "function")) {
+        // input elements don't work to fire click event, must use the click method
         element.click();
+    } else {
+        this.fireDomEvent(element, "click", canBubble, cancelable, {"composed": true});
     }
 };
 

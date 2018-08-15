@@ -31,23 +31,20 @@ import org.lwc.bundle.BundleType;
 import org.lwc.diagnostic.Diagnostic;
 import org.lwc.diagnostic.DiagnosticLevel;
 import org.auraframework.tools.node.api.NodeLambdaFactory;
-import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
 
 /**
  * ModulesCompiler implementation that spawns a process to invoke node
  */
-public class ModulesCompilerNode implements ModulesCompiler {
+public final class ModulesCompilerNode implements ModulesCompiler {
 
-    private final LoggingService loggingService;
-    protected final NodeLambdaFactory factory;
-    private static final NodeLambdaFactory FACTORY = NodeLambdaFactorySidecar.INSTANCE;
     private static final StylesheetConfig stylesheetConfig = createStylesheetConfig();
-
-    protected LwcCompiler compiler;
-
+    
+    private final LoggingService loggingService;
+    private final LwcCompiler compiler;
+    
     protected ModulesCompilerNode(NodeLambdaFactory factory, LoggingService loggingService) throws Exception {
-        this.factory = factory;
         this.loggingService = loggingService;
+        compiler = new LwcCompiler(factory);
     }
 
     @Override
@@ -57,8 +54,6 @@ public class ModulesCompilerNode implements ModulesCompiler {
 
     @Override
     public ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType) throws Exception {
-        LwcCompiler compiler = getCompiler();
-
         Path path = Paths.get(entry);
 
         // get name and namespace
@@ -129,7 +124,6 @@ public class ModulesCompilerNode implements ModulesCompiler {
                 sb.append(diagnostic.message);
             }
         }
-
         return sb.toString();
     }
 
@@ -142,7 +136,6 @@ public class ModulesCompilerNode implements ModulesCompiler {
                 sb.append(diagnostic.message);
             }
         }
-
         return sb.toString();
     }
 
@@ -158,12 +151,5 @@ public class ModulesCompilerNode implements ModulesCompiler {
 
     protected boolean isDiagnosticWarning(Diagnostic diagnostic, BundleType type) {
         return diagnostic.level.equals(DiagnosticLevel.WARNING);
-    }
-
-    protected LwcCompiler getCompiler() {
-        if (this.compiler == null) {
-            this.compiler = new LwcCompiler(FACTORY);
-        }
-        return this.compiler;
     }
 }

@@ -48,7 +48,7 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
 
     @Override
     public final ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
-        return this.compile(entry, sources, BundleType.internal);
+        return compile(entry, sources, BundleType.internal);
     }
 
     @Override

@@ -67,7 +67,6 @@ import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.tools.node.api.NodeLambdaFactory;
-import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.IOUtil;
@@ -860,7 +859,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public NodeLambdaFactory nodeServiceFactory() {
-        return NodeLambdaFactorySidecar.INSTANCE;
+        return NodeLambdaFactory.DEFAULT;
     }
 
     /**

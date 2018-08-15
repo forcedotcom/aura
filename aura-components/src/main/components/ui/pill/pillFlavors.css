@@ -53,8 +53,11 @@
     border-radius:2px;
 }
 
+.THIS .deleteAction {
+    margin-left: 8px;
+}
+
 .THIS .deleteIcon {
-    padding-left: 8px;
     color: #888888;
 }
 

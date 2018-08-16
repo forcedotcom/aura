@@ -12,9 +12,10 @@
     ElementPropertiesWhitelist: [
         "attributes",
         "classList", "className", "id", "tagName", "innerHTML", "namespaceURI",
-        "scrollHeight", "scrollLeft", "scrollTop", "scrollWidth", "nextElementSibling", "previousElementSibling"
+        "scrollHeight", "scrollLeft", "scrollTop", "scrollWidth", "nextElementSibling",
+        "previousElementSibling", "firstElementChild", "lastElementChild"
     ],
-    ElementPropertiesBlacklist: ['childElementCount', 'firstElementChild', 'lastElementChild'],
+    ElementPropertiesBlacklist: ['childElementCount'],
 
     HTMLPropertiesWhitelist: ['accessKey', 'contentEditable', 'isContentEditable',
                               'dataset', 'dir', 'lang', 'spellcheck', 'style', 'tabIndex', 'title'],

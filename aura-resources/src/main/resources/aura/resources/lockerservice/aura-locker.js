@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-08-14
- * Version: 0.5.4
+ * Generated: 2018-08-16
+ * Version: 0.5.5
  */
 
 (function (exports) {
@@ -3297,6 +3297,7 @@ const metadata$2 = {
       clientTop: DEFAULT,
       clientWidth: DEFAULT,
       closest: FUNCTION,
+      firstElementChild: SKIP_OPAQUE,
       getAttribute: FUNCTION,
       getAttributeNS: FUNCTION,
       getAttributeNode: FUNCTION,
@@ -3315,6 +3316,7 @@ const metadata$2 = {
       insertAdjacentElement: FUNCTION,
       insertAdjacentHTML: FUNCTION,
       insertAdjacentText: FUNCTION,
+      lastElementChild: SKIP_OPAQUE,
       localName: DEFAULT,
       matches: FUNCTION,
       namespaceURI: DEFAULT,

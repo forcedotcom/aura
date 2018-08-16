@@ -689,8 +689,8 @@ public class ServerServiceImpl implements ServerService {
                     return cache.get(getKey(de, descriptor, key), loader);
                 } catch (ExecutionException e) {
                     // Don't interfere if the callable caused these exceptions.
-                    Throwables.throwIfInstanceOf(e.getCause(), IOException.class);
-                    Throwables.throwIfInstanceOf(e.getCause(), QuickFixException.class);
+                    Throwables.propagateIfInstanceOf(e.getCause(), IOException.class);
+                    Throwables.propagateIfInstanceOf(e.getCause(), QuickFixException.class);
                     // Wraps with a RuntimeException for others exceptions.
                     throw new RuntimeException(e);
                 }
@@ -702,13 +702,18 @@ public class ServerServiceImpl implements ServerService {
             return loader.call();
         } catch (Exception e) {
             // Don't interfere if the call caused these exceptions.
-            Throwables.throwIfInstanceOf(e, IOException.class);
-            Throwables.throwIfInstanceOf(e, QuickFixException.class);
+            Throwables.propagateIfInstanceOf(e, IOException.class);
+            Throwables.propagateIfInstanceOf(e, QuickFixException.class);
+
+            // TODO: once we upgrade to guava 20+ (not just OSS), we can replace these deprecated calls.
             // Re-throw as-is if it's a RuntimeException.
-            Throwables.throwIfUnchecked(e);
             // Wraps with a RuntimeException for others exceptions.
-            throw new RuntimeException(e);
+            // Throwables.throwIfUnchecked(e);
+            // throw new RuntimeException(e);
+            Throwables.propagate(e);
         }
+
+        return null;
     }
 
     private String getKey(DependencyEntry de, DefDescriptor<?> descriptor, String key) {

@@ -127,7 +127,8 @@ function LockerService() {
                 "isFrozenRealm": isFrozenRealm,
                 "warn": warn,
                 "error": $A.auraError,
-                "unwrap": $A.componentService.moduleEngine && $A.componentService.moduleEngine["unwrap"]
+                "unwrap": $A.componentService.moduleEngine && $A.componentService.moduleEngine["unwrap"],
+                "severity": $A.severity
             };
 
             var lib = window["AuraLocker"];

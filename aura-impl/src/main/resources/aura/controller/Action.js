@@ -1266,6 +1266,10 @@ Action.prototype.toJSON = function() {
     if (isVersioned) {
         json["version"] = version;
     }
+    
+    if (this.storable) {
+        json["storable"] = this.storable;
+    }
 
     return json;
 };

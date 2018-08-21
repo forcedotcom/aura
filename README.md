@@ -45,8 +45,8 @@ You need:
 
 1. Install Node and NPM (https://nodejs.org/en/download/)
 2. Download Google Chromedriver for your OS
-    - Mac (http://http://chromedriver.storage.googleapis.com/2.41/chromedriver_mac64.zip)
-    - Linux (http://http://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip)
+    - Mac (http://chromedriver.storage.googleapis.com/2.41/chromedriver_mac64.zip)
+    - Linux (http://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip)
 3. Unzip chromedriver into `~/bin/`
 4. Ensure node, npm and chromedriver appear within your PATH variable (run `echo $PATH` within your command line window).
    If you cannot see node, npm or chromedriver within your PATH, be sure to add it to your PATH via the export function, eg:

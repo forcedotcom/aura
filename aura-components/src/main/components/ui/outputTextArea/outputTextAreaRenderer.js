@@ -24,5 +24,10 @@
             helper.linkifyText(component);
         }
         return this.superRerender();
+    },
+
+    afterRender: function (component, helper) {
+        helper.decorateLinks(component);
+        return this.superAfterRender();
     }
 })// eslint-disable-line semi

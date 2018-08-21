@@ -22,5 +22,23 @@
         }
 
         component.set("v.displayValue", value);
+    },
+
+    handleLinkClick: function (url, event) {
+        var forceEvent = $A.getEvt("markup://force:navigateToURL");
+        if (forceEvent) {
+            event.preventDefault();
+            forceEvent.setParams({ "url": url}).fire();
+        }
+    },
+
+    decorateLinks: function (component) {
+        var el = component.getElement();
+        var links = (el && el.querySelectorAll("a")) || [];
+        for (var i=0; i<links.length; i++) {
+            var url = links[i].href;
+            links[i].setAttribute("rel", "noopener");
+            links[i].addEventListener('click', $A.getCallback(this.handleLinkClick).bind(this, url));
+        }
     }
 });

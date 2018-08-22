@@ -858,19 +858,21 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
             // Eval the definition in a restricted scope
             entry.definition = $A.lockerService.createForModule(entry.definition.toString(), defDescriptor);
 
-            // Provide SecureEngine as a dependency if "engine" was imported by the module
-            var index = entry.dependencies.indexOf("engine");
+            // Provide SecureEngine as a dependency if "engine" or "lwc" was imported by the module
+            var index = entry.dependencies.indexOf("lwc");
+            if (index === -1) { index = entry.dependencies.indexOf("engine"); }
             if (index !== -1) {
                 deps.splice(
                     index,
                     1,
                     $A.lockerService.wrapEngine(deps[index], $A.lockerService.getKeyForNamespace(defDescriptor.getNamespace())));
             }
+
             // Inspect dependencies and decide which library modules to wrap
             for (var i = 0; i < deps.length; i++) {
                 var depName = entry.dependencies[i];
                 // Exclude component classes, engine, schema dependencies and exports(dependency for a lib module)
-                if (typeof deps[i] !== 'function' && depName !== "engine" && depName[0] !== '@' && depName !== "exports") {
+                if (typeof deps[i] !== 'function' && depName !== "engine" && depName !== "lwc" && depName[0] !== '@' && depName !== "exports") {
                     var depDefDescriptor = new DefDescriptor(this.moduleNameToDescriptorLookup[depName]);
                     var depNamespace = depDefDescriptor.getNamespace();
                     var depIsInternalNamespace = $A.clientService.isInternalNamespace(depNamespace);

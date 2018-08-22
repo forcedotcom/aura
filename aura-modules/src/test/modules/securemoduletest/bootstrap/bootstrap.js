@@ -1,4 +1,5 @@
-import { Element, createElement, toString, api } from 'engine';
+import { Element, createElement, toString, api } from 'lwc';
+
 import * as testUtil from 'securemoduletest-test-util';
 import * as simpleLib from 'securemoduletest-simple-lib';
 

@@ -1025,7 +1025,7 @@ Action.prototype.finishAction = function(context) {
 Action.prototype.processFinishActionException = function(e, message, err, raise) {
     var failedMessage = message + (this.def?this.def.toString():"");
     if (err) {
-        failedMessage += "\nAdditionally, Component Definition loader failure: " + err;
+        failedMessage += "\nAdditionally, Component Definition loader failure: " + JSON.stringify(err);
     }
     $A.warning(failedMessage, e);
     e.message = e.message ? (e.message + '\n' + failedMessage) : failedMessage;

@@ -15,9 +15,6 @@
  */
 package org.auraframework.impl.context;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +25,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -75,6 +71,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 public class AuraContextImpl implements AuraContext {
     // JBUCH: TEMPORARY FLAG FOR 202 CRUC. REMOVE IN 204.
@@ -813,7 +812,7 @@ public class AuraContextImpl implements AuraContext {
                                 entry.getKey().getQualifiedName()), entry.getValue());
                     }
                 }
-                
+
                 if (loadedStrings.size() > 0) {
                     json.writeMapKey("loaded");
                     json.writeMap(loadedStrings);
@@ -855,50 +854,54 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
 
-            if (configAdapter.isLockerServiceEnabled()) {
-                json.writeMapEntry("ls", 1);
-            }
-            
-            if (configAdapter.isStrictCSPEnforced()) {
-                json.writeMapEntry("csp", 1);
-            }
+            if (style != EncodingStyle.Css) {
+                if (configAdapter.isLockerServiceEnabled()) {
+                    json.writeMapEntry("ls", 1);
+                }
 
-            if (configAdapter.isFrozenRealmEnabled()) {
-                json.writeMapEntry("fr", 1);
-            }
 
-            if (nonce != null && style == EncodingStyle.Full){
-                json.writeMapEntry("scriptNonce", nonce);
-            }
+                if (style == EncodingStyle.Full) {
+                    if (configAdapter.isStrictCSPEnforced()) {
+                        json.writeMapEntry("csp", 1);
+                    }
 
-            if (style == EncodingStyle.Full) {
-                Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
-                if (!moduleNamespaceAliases.isEmpty()) {
-                    json.writeMapEntry("mna", moduleNamespaceAliases);
-                }	
-            }
+                    if (configAdapter.isFrozenRealmEnabled()) {
+                        json.writeMapEntry("fr", 1);
+                    }
 
-            if (this.useCompatSource()) {
-                json.writeMapEntry("c", 1);
-            }
+                    if (nonce != null) {
+                        json.writeMapEntry("scriptNonce", nonce);
+                    }
 
-            if (this.forceCompat()) {
-                json.writeMapEntry("fc", 1);
-            }
+                    Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
+                    if (!moduleNamespaceAliases.isEmpty()) {
+                        json.writeMapEntry("mna", moduleNamespaceAliases);
+                    }
 
-            boolean uriAddressableExplicitlyDisabled = false;
-            try {
-                uriAddressableExplicitlyDisabled = definitionService.hasInterface(appDesc, definitionService.getDefDescriptor("aura:uriDefinitionsDisabled", InterfaceDef.class));
-            } catch (QuickFixException qfe) {
-                // ignore
-            }
+                    if (this.useCompatSource()) {
+                        json.writeMapEntry("c", 1);
+                    }
 
-            if (configAdapter.uriAddressableDefsEnabled() || uriAddressableExplicitlyDisabled) {
-                json.writeMapEntry(Json.ApplicationKey.URIADDRESSABLEDEFINITIONS, uriAddressableExplicitlyDisabled? 0: 1);
-            }
-            
-            if (configAdapter.cdnEnabled()) {
-                json.writeMapEntry(Json.ApplicationKey.CDN_HOST, configAdapter.getCDNDomain());
+                    if (this.forceCompat()) {
+                        json.writeMapEntry("fc", 1);
+                    }
+
+                    boolean uriAddressableExplicitlyDisabled = false;
+                    try {
+                        uriAddressableExplicitlyDisabled = definitionService.hasInterface(appDesc, definitionService.getDefDescriptor("aura:uriDefinitionsDisabled", InterfaceDef.class));
+                    } catch (QuickFixException qfe) {
+                        // ignore
+                    }
+
+                    if (configAdapter.uriAddressableDefsEnabled() || uriAddressableExplicitlyDisabled) {
+                        json.writeMapEntry(Json.ApplicationKey.URIADDRESSABLEDEFINITIONS, uriAddressableExplicitlyDisabled ? 0 : 1);
+                    }
+
+                    if (configAdapter.cdnEnabled()) {
+                        json.writeMapEntry(Json.ApplicationKey.CDN_HOST, configAdapter.getCDNDomain());
+                    }
+
+                }
             }
 
             json.writeMapEnd();

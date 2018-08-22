@@ -15,6 +15,10 @@
  */
 package org.auraframework.integration.test.adapter.format.html;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.inject.Inject;
+
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -25,10 +29,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
-
-import javax.inject.Inject;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Tests for BaseComponentDefHTMLFormatAdapter, as it relates to ApplicationDef
@@ -116,13 +116,10 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         String isLockerServiceEnabled =  configAdapter.isLockerServiceEnabled() ? ",\"ls\":1" : "";
-        String isStrictCSPEnforced = configAdapter.isStrictCSPEnforced() ? ",\"csp\":1" : "";
-        String isFrozenRealmEnabled = configAdapter.isFrozenRealmEnabled() ? ",\"fr\":1" : "";
-        String lockerConfig = isLockerServiceEnabled + isStrictCSPEnforced + isFrozenRealmEnabled;
         
         String expectedSubPath = AuraTextUtil.urlencode(String.format(
-                "{\"mode\":\"UTEST\",\"app\":\"%s\",\"pathPrefix\":\"\",\"test\":\"org.auraframework.integration.test.adapter.format.html.ApplicationDefHTMLFormatAdapterTest.testWriteManifest\"%s,\"uad\":1}",
-                desc.getDescriptorName(), lockerConfig));
+                "{\"mode\":\"UTEST\",\"app\":\"%s\",\"pathPrefix\":\"\",\"test\":\"org.auraframework.integration.test.adapter.format.html.ApplicationDefHTMLFormatAdapterTest.testWriteManifest\"%s}",
+                desc.getDescriptorName(), isLockerServiceEnabled));
         String expectedAttribute = " manifest=\"/l/" + expectedSubPath + "/app.manifest";
         
         if (!tag.contains(expectedAttribute)) {

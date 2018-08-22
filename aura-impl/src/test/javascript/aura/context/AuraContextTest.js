@@ -17,9 +17,10 @@ Function.RegisterNamespace("Test.Aura.Context");
 
 [Fixture]
 Test.Aura.Context.AuraContextTest = function() {
-
+    var _componentDefLoaderParameter;
     var Aura = {
-        Context: {}, 
+        Context: {},
+        Component: {ComponentDefLoaderParameter: _componentDefLoaderParameter},
         time: function() { return 0; }
     };
 
@@ -28,6 +29,10 @@ Test.Aura.Context.AuraContextTest = function() {
         window: {}
     })(function(){
         [Import("aura-impl/src/main/resources/aura/context/AuraContext.js")]
+        [Import("aura-impl/src/main/resources/aura/component/ComponentDefLoader.js")]
+        _componentDefLoaderParameter = ComponentDefLoaderParameter;
+        delete ComponentDefLoaderParameter;
+        delete ComponentDefLoader;
     });
 
     /**
@@ -44,7 +49,7 @@ Test.Aura.Context.AuraContextTest = function() {
     };
 
     var mock$A = function(events) {
-        return Mocks.GetMock(Object.Global(), '$A', Stubs.GetObject({}, {
+        return Mocks.GetMocks(Object.Global(), {'$A': Stubs.GetObject({}, {
             util: {
                 apply: function(baseObject, members) {
                     for (var key in members) {
@@ -56,6 +61,7 @@ Test.Aura.Context.AuraContextTest = function() {
                 },
                 applyNotFromPrototype: function() {},
                 isArray: function(obj) { return obj instanceof Array; },
+                isString: function(obj) { return typeof obj === "string" },
                 json: {
                     encode: function(value) {
                         return value;
@@ -72,11 +78,13 @@ Test.Aura.Context.AuraContextTest = function() {
                     }
                 }
             }
-        }));
+        }),
+        AuraError:function(msg){throw msg;}});
     }; 
 
     var mockAura = function(events) {
         return Mocks.GetMock(Object.Global(), 'Aura', Stubs.GetObject({}, {
+            Component: {ComponentDefLoaderParameter: _componentDefLoaderParameter},
             Provider: {
                 GlobalValueProviders: function() {
                     return {

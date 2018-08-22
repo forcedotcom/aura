@@ -17,7 +17,7 @@ Function.RegisterNamespace("Test.Aura.Component");
 
 [Fixture]
 Test.Aura.Component.ComponentDefLoaderTest = function() {
-    var _componentDefLoader;
+    var _componentDefLoader, _componentDefLoaderParameter;
     var reportError = Stubs.GetMethod("message", true);
 
     Mocks.GetMocks(Object.Global(), {
@@ -26,13 +26,16 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
     })(function() {
         Import("aura-impl/src/main/resources/aura/component/ComponentDefLoader.js");
         _componentDefLoader = ComponentDefLoader;
+        _componentDefLoaderParameter = ComponentDefLoaderParameter;
         delete ComponentDefLoader;
+        delete ComponentDefLoaderParameter;
     });
 
     var defaultMock = {
         "Aura": {
             "Component": {
-                "ComponentDefLoader": _componentDefLoader
+                "ComponentDefLoader": _componentDefLoader,
+                "ComponentDefLoaderParameter": _componentDefLoaderParameter
             },
             "componentDefLoaderError": {},
             "System": {
@@ -90,7 +93,14 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
                 return {
                     "cdnHost": "cdnHost",
                     "styleContext":{},
-                    "getContextPath": function(){return "";}
+                    "getContextPath": function(){return "";},
+                    "getURIComponentDefinitionsParameters": function() {
+                        return [
+                            new _componentDefLoaderParameter("aura.app", function(){return "markup://test_type";}),
+                            new _componentDefLoaderParameter("_ff", function(){return "null";}),
+                            new _componentDefLoaderParameter("_l", function(){return "true";})
+                        ];
+                    }
                };
             },
             "get": function(thing) {
@@ -118,18 +128,15 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
         [Fact]
         function defaultVariablesDefined() {
             var actual;
-            var expect = "_uid,_def,aura.app,_l,LATEST,/auraCmpDef?,markup://,_ff";
+            var expect = "_uid,_def,LATEST,/auraCmpDef?,markup://";
             mockAura(function () {
                 var defLoader = Aura.Component.ComponentDefLoader;
                 actual = [
                     defLoader.UID_param,
                     defLoader.DESCRIPTOR_param,
-                    defLoader.APP_param,
-                    defLoader.LOCKER_param,
                     defLoader.UID_default,
                     defLoader.BASE_PATH,
-                    defLoader.MARKUP,
-                    defLoader.FORFMFACTOR_param
+                    defLoader.MARKUP
                 ];
             });
 
@@ -148,38 +155,6 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
                 defLoader = new Aura.Component.ComponentDefLoader();
             });
             Assert.Equal(expect, defLoader.pending);
-        }
-    }
-
-    [Fixture]
-    function buildURIAppParam() {
-
-        [Fact]
-        function shouldReturnAppQueryStringKeyAndValue() {
-            var actual;
-            var expect = "aura.app=markup://test_type";
-            mockAura(function () {
-                var defLoader = new Aura.Component.ComponentDefLoader();
-                actual = defLoader.buildURIAppParam();
-            });
-
-            Assert.Equal(expect, actual);
-        }
-    }
-
-    [Fixture]
-    function buildURILockerParam() {
-
-        [Fact]
-        function shouldReturnLockerQueryStringKeyAndValue() {
-            var actual;
-            var expect = "&_l=true";
-            mockAura(function () {
-                var defLoader = new Aura.Component.ComponentDefLoader();
-                actual = defLoader.buildURILockerParam();
-            });
-
-            Assert.Equal(expect, actual);
         }
     }
 

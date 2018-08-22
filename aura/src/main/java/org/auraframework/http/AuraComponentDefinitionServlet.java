@@ -67,20 +67,20 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
     public final static String URI_DEFINITIONS_PATH = "/auraCmpDef";
 
-    private final static StringParam appDescriptorParam = new StringParam("aura.app", 0, false);
-    private final static StringParam formFactorParam = new StringParam("_ff", 0, false);
-    private final static StringParam lockerParam = new StringParam("_l", 0, false);
-    private final static StringParam localeParam = new StringParam("_l10n", 0, false);
-    private final static StringParam styleParam = new StringParam("_style", 0, false);
-    private final static StringParam defDescriptorParam = new StringParam("_def", 0, false);
-    private final static StringParam componentUIDParam = new StringParam("_uid", 0, false);
+    protected final static StringParam appDescriptorParam = new StringParam("aura.app", 0, false);
+    protected final static StringParam formFactorParam = new StringParam("_ff", 0, false);
+    protected final static StringParam lockerParam = new StringParam("_l", 0, false);
+    protected final static StringParam localeParam = new StringParam("_l10n", 0, false);
+    protected final static StringParam styleParam = new StringParam("_style", 0, false);
+    protected final static StringParam defDescriptorParam = new StringParam("_def", 0, false);
+    protected final static StringParam componentUIDParam = new StringParam("_uid", 0, false);
 
-    private final static List<Class> DESCRIPTOR_DEF_TYPES = Arrays.asList(ModuleDef.class, ComponentDef.class, EventDef.class, LibraryDef.class);
+    protected final static List<Class> DESCRIPTOR_DEF_TYPES = Arrays.asList(ModuleDef.class, ComponentDef.class, EventDef.class, LibraryDef.class);
 
-    private DefinitionService definitionService;
-    private LoggingService loggingService;
-    private ServerService serverService;
-    private ContextService contextService;
+    protected DefinitionService definitionService;
+    protected LoggingService loggingService;
+    protected ServerService serverService;
+    protected ContextService contextService;
     protected ConfigAdapter configAdapter;
 
     @Override
@@ -88,8 +88,6 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
         String requestedUID = componentUIDParam.get(request);
         String appReferrrer = appDescriptorParam.get(request);
-        String locale = localeParam.get(request);
-        String formFactor = formFactorParam.get(request);
 
         List<String> requestedDescriptors = extractDescriptors(request);
 
@@ -105,12 +103,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 throw new InvalidDefinitionException("Descriptor required", null);
             }
 
-            // if locale provided, set the it on the context as a requested locale
-            Locale l = null;
-            if (StringUtils.isNotEmpty(locale)) {
-                l = LocaleUtils.toLocale(locale);
-            }
-            updateContext(l, formFactor, appReferrrer);
+            updateContext(request);
 
             Map<DefDescriptor<?>, String> descriptors = mapDescriptorsToDefDesriptorAndUid(requestedDescriptors);
 
@@ -137,7 +130,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 }
 
                 StringBuilder redirectUrl = getHost(request);
-                redirectUrl.append(generateRedirectURI(descriptors, computedUID, appReferrrer, formFactor, locale, styleParam.get(request)));
+                redirectUrl.append(generateRedirectURI(descriptors, computedUID, request));
 
                 servletUtilAdapter.setNoCache(response);
                 response.sendRedirect(redirectUrl.toString());
@@ -238,9 +231,16 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         }
     }
 
-    protected void updateContext(Locale locale, String formFactor, String applicationName) {
-        if (locale != null) {
-            contextService.getCurrentContext().setRequestedLocales(Arrays.asList(locale));
+    protected void updateContext(HttpServletRequest request) {
+
+        // if locale provided, set the it on the context as a requested locale
+        Locale l = null;
+        String locale = localeParam.get(request);
+        if (StringUtils.isNotEmpty(locale)) {
+            l = LocaleUtils.toLocale(locale);
+        }
+        if (l != null) {
+            contextService.getCurrentContext().setRequestedLocales(Arrays.asList(l));
         }
     }
 
@@ -330,27 +330,35 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         return descriptors;
     }
 
-    private String generateRedirectURI(Map<DefDescriptor<?>, String> descriptors, String computedUID, String appReferrrer,
-                                       String formFactor, String locale, String styleContext) {
+    protected String generateAdditionalParameters(HttpServletRequest request) {
+        // Override in customization
+        return "";
+    }
+
+    private String generateRedirectURI(Map<DefDescriptor<?>, String> descriptors, String computedUID, HttpServletRequest request) {
         StringBuilder redirectURI = new StringBuilder(URI_DEFINITIONS_PATH);
 
         // note, keep parameters in alpha order and keep in sync with componentDefLoader.js to increase chances of cache hits
         // with the exception of '_def', all definitions requested will be towards the end, followed by UID last, since it's calculated based on defs.
         redirectURI.append("?");
         // app param
-        redirectURI.append(appDescriptorParam.name).append("=").append(appReferrrer);
+        redirectURI.append(appDescriptorParam.name).append("=").append(appDescriptorParam.get(request));
 
-        redirectURI.append("&").append(formFactorParam.name).append("=").append(formFactor);
+        redirectURI.append("&").append(formFactorParam.name).append("=").append(formFactorParam.get(request));
 
         redirectURI.append("&").append(lockerParam.name).append("=").append(configAdapter.isLockerServiceEnabled());
 
+        String locale = localeParam.get(request);
         if (locale != null) {
             redirectURI.append("&").append(localeParam.name).append("=").append(locale);
         }
 
+        String styleContext = styleParam.get(request);
         if (styleContext != null) {
             redirectURI.append("&").append(styleParam.name).append("=").append(styleContext);
         }
+
+        redirectURI.append(generateAdditionalParameters(request));
 
         redirectURI.append(generateDefinitionsURIParameters(descriptors));
 

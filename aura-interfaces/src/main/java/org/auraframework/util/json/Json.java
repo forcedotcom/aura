@@ -149,6 +149,7 @@ public interface Json {
         TOKENS("tokens","tk"),
         TYPE("type","t"),
         URIADDRESSABLEDEFINITIONS("uriAddressableDefs", "uad"),
+        URIADDRESSABLEDEFINITIONSPARAMETERS("uriAddressableDefintionsParameters", "uadp"),
         VALUE("v"/*"value"*/,"v"),
         VALUES("values","vv"),
         VALUEPROVIDER("valueProvider","vp");

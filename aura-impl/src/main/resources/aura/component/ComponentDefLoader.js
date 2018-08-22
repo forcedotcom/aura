@@ -23,13 +23,10 @@ function ComponentDefLoader() {
     this.loading = 0;
     this.counter = 0;
     this.requestedDescriptors = {};
+    this.lastContextParameterName;
 }
 
 // params start with "_" to avoid namespace collisions
-ComponentDefLoader.APP_param = "aura.app";
-ComponentDefLoader.FORFMFACTOR_param = "_ff";
-ComponentDefLoader.LOCKER_param = "_l";
-ComponentDefLoader.LOCALE_param = "_l10n";
 ComponentDefLoader.STYLE_param = "_style";
 ComponentDefLoader.DESCRIPTOR_param = "_def";
 ComponentDefLoader.UID_param = "_uid";
@@ -38,26 +35,19 @@ ComponentDefLoader.UID_default = "LATEST";
 ComponentDefLoader.BASE_PATH = "/auraCmpDef?";
 ComponentDefLoader.MARKUP = "markup://";
 
-ComponentDefLoader.prototype.buildURIAppParam = function() {
-    return ComponentDefLoader.APP_param + "=" + ComponentDefLoader.MARKUP + $A.getRoot().getType();
-};
-
-ComponentDefLoader.prototype.buildFormFactorParam = function() {
-    return "&" + ComponentDefLoader.FORFMFACTOR_param + "=" + $A.get("$Browser.formFactor");
-};
-
-ComponentDefLoader.prototype.buildURILockerParam = function() {
-    return "&" + ComponentDefLoader.LOCKER_param + "=" + $A.lockerService.isEnabled();
-};
-
-ComponentDefLoader.prototype.buildURIStyleParam = function() {
-    var cuid = $A.getContext().styleContext.cuid;
-    return cuid ? "&" + ComponentDefLoader.STYLE_param + "=" + cuid : "";
-};
-
-ComponentDefLoader.prototype.buildURILocaleParam = function() {
-    var locale = $A.get("$Locale.langLocale");
-    return locale ? "&" + ComponentDefLoader.LOCALE_param + "=" + locale : "";
+ComponentDefLoader.prototype.getContextParameters = function() {
+    var params = $A.getContext().getURIComponentDefinitionsParameters();
+    var returnQueryString = "";
+    for (var i=0; i < params.length; i++) {
+        if (i > 0) {
+            returnQueryString = returnQueryString + "&";
+        }
+        returnQueryString = returnQueryString + params[i].name + "=" + params[i].getValue();
+    }
+    if (this.lastContextParameterName === undefined) {
+        this.lastContextParameterName = params[params.length-1].name;
+    }
+    return returnQueryString;
 };
 
 ComponentDefLoader.prototype.processRequested = function() {
@@ -115,13 +105,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
 
     var namespaceMap = this.buildBundleComponentNamespace(descriptors, descriptorMap, existingRequested);
 
-    var baseURI = ComponentDefLoader.BASE_PATH + this.buildURIAppParam();
-
-    baseURI += this.buildFormFactorParam();
-    baseURI += this.buildURILockerParam();
-    baseURI += this.buildURILocaleParam();
-    // if the last parameter here changes, an adjustment needs to be made to checkForError method
-    baseURI += this.buildURIStyleParam();
+    var baseURI = ComponentDefLoader.BASE_PATH + this.getContextParameters();
 
     var uri = "";
     var uris = [];
@@ -316,14 +300,7 @@ ComponentDefLoader.prototype.loadingComplete = function() {
 };
 
 ComponentDefLoader.prototype.getError = function (uri) {
-    var startIndexParam = this.buildURIStyleParam();
-    if (startIndexParam.length === 0) {
-        startIndexParam = this.buildURILocaleParam();
-        if (startIndexParam.length === 0) {
-            startIndexParam = this.buildURILockerParam();
-        }
-    }
-    var startIndex = uri.indexOf(startIndexParam) + startIndexParam.length;
+   var startIndex = uri.indexOf("&", uri.indexOf(this.lastContextParameterName) + this.lastContextParameterName.length);
     var endIndex = uri.indexOf("&" + ComponentDefLoader.UID_param + "=");
     var loaderErrorString = uri.substr(startIndex, endIndex-startIndex);
     if (loaderErrorString.indexOf("&_def=") === 0) {
@@ -419,4 +396,20 @@ ComponentDefLoader.prototype.loadComponentDefs = function(descriptorMap, callbac
     }
 };
 
+/**
+ * Simple Object to define a paramter for uri definition
+ * @constructor
+ */
+function ComponentDefLoaderParameter(name, valueMethod) {
+    if (!$A.util.isString(name)) {
+        throw new AuraError("paramter name must be a string, but was: " + (typeof name));
+    }
+    this.name = name;
+    if (typeof valueMethod !== "function") {
+        throw new AuraError("valueMethod must be a function, but was: " + (typeof valueMethod));
+    }
+    this.getValue = valueMethod;
+}
+
 Aura.Component.ComponentDefLoader = ComponentDefLoader;
+Aura.Component.ComponentDefLoaderParameter = ComponentDefLoaderParameter;

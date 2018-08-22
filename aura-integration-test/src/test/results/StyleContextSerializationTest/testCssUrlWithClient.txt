@@ -1,1 +1,1 @@
-/l/{"mode":"UTEST","app":"#REPLACED#","styleContext":{"c":"webkit","cuid":-791796990},"pathPrefix":"","test":"org.auraframework.integration.test.css.StyleContextSerializationTest.testCssUrlWithClient","ls":1,"csp":1,"fr":1,"uad":1}/app.css
+/l/{"mode":"UTEST","app":"#REPLACED#","styleContext":{"c":"webkit","cuid":-791796990},"pathPrefix":"","test":"org.auraframework.integration.test.css.StyleContextSerializationTest.testCssUrlWithClient"}/app.css

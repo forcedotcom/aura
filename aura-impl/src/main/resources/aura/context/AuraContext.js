@@ -63,6 +63,24 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     }
     this.uriAddressableDefsEnabled = !!config[Json.ApplicationKey.URIADDRESSABLEDEFINITIONS];
     this.cdnHost = config[Json.ApplicationKey.CDN_HOST];
+    this.uriAddressableDefinitionsParameters = [
+        new Aura.Component.ComponentDefLoaderParameter("aura.app", function(){
+            return "markup://" + $A.getRoot().getType();
+        }),
+        new Aura.Component.ComponentDefLoaderParameter("_ff", function(){
+            return $A.get("$Browser.formFactor");
+        }),
+        new Aura.Component.ComponentDefLoaderParameter("_l", function(){
+            return $A.lockerService.isEnabled();
+        }),
+        new Aura.Component.ComponentDefLoaderParameter("_l10n", function(){
+            return $A.get("$Locale.langLocale");
+        }),
+        new Aura.Component.ComponentDefLoaderParameter("_style", function(){
+            return $A.getContext().styleContext.cuid;
+        })
+    ];
+    this.appSpecificURIDefinitionsParameters = undefined;
     
     var that = this;
 
@@ -613,6 +631,29 @@ Aura.Context.AuraContext.prototype.getActionPublicCacheKey = function() {
  */
 Aura.Context.AuraContext.prototype.isURIAddressableDefsEnabled = function() {
     return this.uriAddressableDefsEnabled;
+};
+
+/**
+ * @return {Array} of parameters that will be used in the URI for fetching a component definition
+ */
+Aura.Context.AuraContext.prototype.getURIComponentDefinitionsParameters = function () {
+    if (this.appSpecificURIDefinitionsParameters === undefined) {
+        var application = $A.getRoot();
+        if (application["getURIComponentDefinitionParameters"]) {
+            var params = application["getURIComponentDefinitionParameters"]();
+            for (var i=0; i<params.length; i++) {
+                var paramName = params[i][0];
+                if (paramName[0] !== "_") {
+                    paramName = "_" + paramName;
+                }
+                this.uriAddressableDefinitionsParameters.push(
+                    new Aura.Component.ComponentDefLoaderParameter(paramName, params[i][1])
+                );
+            }
+        }
+        this.appSpecificURIDefinitionsParameters = true;
+    }
+    return this.uriAddressableDefinitionsParameters;
 };
 
 /**

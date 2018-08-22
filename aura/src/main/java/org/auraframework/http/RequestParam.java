@@ -22,7 +22,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 /**
  */
 public abstract class RequestParam<T> {
-    protected final String name;
+    public final String name;
     protected final boolean required;
 
     protected RequestParam(String name, boolean required) {

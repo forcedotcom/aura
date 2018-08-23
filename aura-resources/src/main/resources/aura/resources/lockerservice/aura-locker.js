@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-08-16
- * Version: 0.5.5
+ * Generated: 2018-08-23
+ * Version: 0.5.6
  */
 
 (function (exports) {
@@ -1463,11 +1463,17 @@ function createFunctionEvaluator(sandbox) {
 
 let warn = typeof console !== 'undefined' ? console.warn : function() {}; // eslint-disable-line no-console
 let error = Error;
+let severity = {
+  QUIET: 'QUIET',
+  FATAL: 'FATAL',
+  ALERT: 'ALERT'
+};
 
 function registerReportAPI(api) {
   if (api) {
     warn = api.warn;
     error = api.error;
+    severity = api.severity;
   }
 }
 
@@ -4808,7 +4814,11 @@ function evaluate(src, key, sourceURL) {
     src += `\n//# sourceURL=${sourceURL}`;
   }
 
-  return sandbox.evalEvaluator(src);
+  try {
+    return sandbox.evalEvaluator(src);
+  } catch (e) {
+    throw new error(e.message || 'Evaluation error', e, severity.QUIET);
+  }
 }
 
 /*
@@ -10277,10 +10287,19 @@ function SecureEngine(engine, key) {
     return o;
   }
 
+  assert$1.invariant(
+    engine['LightningElement'] === engine['Element'],
+    'Element should be an alias for LightningElement '
+  );
+  const secureLWCElement = SecureLWCElementFactory(engine['LightningElement'], key);
   o = create$1(null, {
+    LightningElement: {
+      enumerable: true,
+      value: secureLWCElement
+    },
     Element: {
       enumerable: true,
-      value: SecureLWCElementFactory(engine['Element'], key)
+      value: secureLWCElement
     },
     toString: {
       value: function() {

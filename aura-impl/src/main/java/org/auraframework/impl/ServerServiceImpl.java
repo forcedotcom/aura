@@ -722,7 +722,11 @@ public class ServerServiceImpl implements ServerService {
 
     private TemplateUtil templateUtil = new TemplateUtil();
 
-    private String serializeInlineContext(AuraContext context) throws QuickFixException, IOException {
+    @Override
+    public String serializeContext(AuraContext context) throws QuickFixException, IOException {
+        DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
+        context.addPreloadedDefinitions(definitionService.getDependencies(definitionService.getUid(null, app)));
+
         // ensure all labels are loaded in context before serializing GVPs
         bootstrapUtil.loadLabelsToContext(context, this.definitionService);
 
@@ -788,7 +792,8 @@ public class ServerServiceImpl implements ServerService {
         return writer.toString();
     }
 
-    private String serializeInitializers(AuraContext context) throws IOException {
+    @Override
+    public String serializeInitializers(AuraContext context) throws IOException {
         JsonSerializationContext serializationContext = context.getJsonSerializationContext();
         StringWriter writer = new StringWriter();
         JsonEncoder json = JsonEncoder.createJsonStream(writer, serializationContext);
@@ -840,9 +845,8 @@ public class ServerServiceImpl implements ServerService {
                 if (!configAdapter.isBootstrapModelExclusionEnabled()) {
                     appInstance = instanceService.getInstance(app, componentAttributes);
                 }
-                context.addPreloadedDefinitions(definitionService.getDependencies(definitionService.getUid(null, app)));
 
-                serializedContext = serializeInlineContext(context);
+                serializedContext = serializeContext(context);
 
                 String appBootstrap = serializeAppBootstrap(appInstance, context);
                 attributes.put("appBootstrap", appBootstrap);

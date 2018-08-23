@@ -35,6 +35,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.Component;
 import org.auraframework.service.RenderingService;
+import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.ClientOutOfSyncException;
@@ -55,6 +56,7 @@ public class Manifest extends AuraResourceImpl {
 
     // FIXME: this is horrendous we actually render the manifest as a component.
     private RenderingService renderingService;
+    private ServerService serverService;
     private ManifestUtil manifestUtil;
 
     public Manifest() {
@@ -157,14 +159,14 @@ public class Manifest extends AuraResourceImpl {
             // When bootstrap is inlined with the html, it will be included in app cache and
             // needs an app cache buster when the context changes.
             if(configAdapter.isBootstrapInliningEnabled()) {
-                JsonSerializationContext serializationContext = context.getJsonSerializationContext();
-                StringWriter writer = new StringWriter();
-                JsonEncoder json = JsonEncoder.createJsonStream(writer, serializationContext);
-                json.writeValue(context);
-                writer.flush();
-                writer.close();
-                StringReader reader = new StringReader(writer.toString());
+                StringReader reader = new StringReader(serverService.serializeContext(context));
                 sw.write(String.format("# CONTEXT TOKEN: %s\n", new Hash(reader).toString()));
+            }
+
+            // When using app initializers instead of models, add app cache buster when app initializer data changes.
+            if(configAdapter.isBootstrapModelExclusionEnabled()) {
+                StringReader reader = new StringReader(serverService.serializeInitializers(context));
+                sw.write(String.format("# APP INITIALIZER TOKEN: %s\n", new Hash(reader).toString()));
             }
 
             String resetCssUrl = configAdapter.getResetCssURL();
@@ -252,6 +254,11 @@ public class Manifest extends AuraResourceImpl {
     @Inject
     public void setRenderingService(RenderingService renderingService) {
         this.renderingService = renderingService;
+    }
+
+    @Inject
+    public void setServerService(ServerService serverService) {
+        this.serverService = serverService;
     }
 
     public void setManifestUtil(ManifestUtil manifestUtil) {

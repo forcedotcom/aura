@@ -24,6 +24,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -155,7 +156,7 @@ public final class ModulesCompilerUtil {
             }
         }
 
-        Set<ClassMember> ret = new HashSet<>();
+        Set<ClassMember> ret = new LinkedHashSet<>();
 
         for (DecoratorTarget publicDecoration : targets) {
             if (publicDecoration != null) {

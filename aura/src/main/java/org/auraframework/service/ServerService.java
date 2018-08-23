@@ -77,14 +77,14 @@ public interface ServerService extends AuraService {
      * @throws QuickFixException if the definitions could not be compiled.
      */
     void writeAppCss(Set<DefDescriptor<?>> dependencies, Writer out) throws IOException, QuickFixException;
-    
+
     <T extends BaseComponentDef> Component writeTemplate(AuraContext context, T value, Map<String, Object> componentAttributes, Appendable out) throws IOException, QuickFixException;
 
     /**
      * write out SVG.
-     * 
+     *
      * This writes out a single SVG for the requested app/component to the response.
-     * 
+     *
      * @param out the appendable
      * @throws IOException if unable to write to the response
      * @throws QuickFixException if the definitions could not be compiled.
@@ -94,15 +94,19 @@ public interface ServerService extends AuraService {
 
     /**
      * write out the complete set of definitions in JS.
-     * 
+     *
      * This generates a complete set of definitions for an app in JS+JSON.
      */
     void writeDefinitions(Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex, HYDRATION_TYPE hydrationType) throws IOException, QuickFixException;
-    
+
     default void writeDefinitions(Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex) throws IOException, QuickFixException {
         writeDefinitions(dependencies, out, hasParts, partIndex, HYDRATION_TYPE.all, true);
     }
 
     void writeDefinitions(Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex,
             HYDRATION_TYPE hydrationType, boolean preloading) throws IOException, QuickFixException;
+
+    String serializeInitializers(AuraContext context) throws IOException;
+
+    String serializeContext(AuraContext context) throws QuickFixException, IOException;
 }

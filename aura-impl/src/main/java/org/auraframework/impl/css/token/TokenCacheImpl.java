@@ -154,7 +154,7 @@ public final class TokenCacheImpl implements TokenCache {
 
     @Override
     public Map<String, String> activeDynamicTokens() {
-        Map<String, String> map = Maps.newHashMap();
+        Map<String, String> map = Maps.newLinkedHashMap();
 
         // no need to consult #orderedForEvaluation because we are using a map
         for (DefDescriptor<TokensDef> descriptor : descriptors) {

@@ -62,7 +62,6 @@ import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.validation.ReferenceValidationContext;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.base.Function;
@@ -1151,68 +1150,35 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * No dependencies by default. Test method for {@link org.auraframework.def.BaseComponentDef#getDependencies()}.
-     */
-    @Test
-    public void testGetDependenciesWithoutDependencies() throws QuickFixException {
-        T baseComponentDef = define(baseTag, "", "");
-        assertTrue("Dependencies should not be present if not specified on component", baseComponentDef
-                .getDependencies().isEmpty());
-    }
-
-    /**
-     * Dependency returned for default namespace. Test method for
-     * {@link org.auraframework.def.BaseComponentDef#getDependencies()}.
-     */
-    @Test
-    public void testGetDependenciesDefaultNamespace() throws QuickFixException {
-        T baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://aura:*\" type=\"EVENT\"/>");
-        assertEquals("Dependency not found", "[markup://aura:*[EVENT]]", baseComponentDef.getDependencies().toString());
-    }
-
-    /**
-     * Dependency returned for non-default namespace. Test method for
-     * {@link org.auraframework.def.BaseComponentDef#getDependencies()}.
-     */
-    @Test
-    public void testGetDependenciesNonDefaultNamespace() throws QuickFixException {
-        T baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://auratest:*\" type=\"EVENT\"/>");
-        assertEquals("Dependency not found", "[markup://auratest:*[EVENT]]", baseComponentDef.getDependencies().toString());
-    }
-
-    /**
      * InvalidDefinitionException for nonexistent dependency.
      */
     @Test
-    @Ignore("this is no longer thrown")
-    public void testDependencyNonExistent() {
-        try {
-            define(baseTag, "", "<aura:dependency resource=\"*://idontexist:*\"/>");
-            fail("Should not be able to load non-existant resource as dependency");
-        } catch (QuickFixException e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Invalid dependency ://idontexist:*[COMPONENT]");
-        }
+    public void testDependencyNonExistent() throws Exception {
+        define(baseTag, "", "<aura:dependency resource=\"*://idontexist:*\"/>");
     }
 
     /**
      * InvalidDefinitionException for invalid dependency.
      */
     @Test
-    public void testDependencyInvalid() {
+    public void testDependencyInvalid() throws Exception {
         // Invalid descriptor pattern
         try {
             define(baseTag, "", "<aura:dependency resource=\"*://auratest.*\"/>");
             fail("Should not be able to load resource, bad DefDescriptor format");
-        } catch (QuickFixException e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Invalid namespace of auratest.* in *://auratest.*");
+        } catch (InvalidDefinitionException e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "Unable to parse resource");
         }
+    }
 
+    @Test
+    public void testDependencyInvalidWithColon() throws Exception {
         // Another invalid descriptor pattern
         try {
             define(baseTag, "", "<aura:dependency resource=\"*:auratest:*\"/>");
             fail("Should not be able to load resource, bad DefDescriptor format");
-        } catch (QuickFixException e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Invalid name of auratest:* in *:auratest:*");
+        } catch (InvalidDefinitionException e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "Unable to parse resource");
         }
     }
 
@@ -1684,6 +1650,26 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         } catch (DefinitionNotFoundException e) {
             assertTrue(e.getMessage().contains("No COMPONENT named markup://aura:fooBar999"));
         }
+    }
+
+    @Test
+    public void testAuraDependencyParse() throws Exception {
+        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", "<aura:dependency resource='auradev:testDataProvider' />"));
+        T def = definitionService.getDefinition(desc);
+        assertTrue("Should have the correct dependency",
+                def.getDependencySet().contains(
+                    new DefDescriptorImpl<>("markup", "auradev", "testDataProvider", ComponentDef.class)));
+    }
+
+    @Test
+    public void testAuraDependencyParseGlob() throws Exception {
+        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", "<aura:dependency resource='auradev:*Provider' />"));
+        T def = definitionService.getDefinition(desc);
+        assertTrue("Should have the correct dependency",
+                def.getDependencySet().contains(
+                    new DefDescriptorImpl<>("markup", "auradev", "testDataProvider", ComponentDef.class)));
     }
 
     /**

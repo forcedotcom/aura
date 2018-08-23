@@ -63,7 +63,7 @@ import com.google.common.collect.Maps;
  */
 public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> implements ApplicationDef {
 
-    private static final long serialVersionUID = 3967927701473071621L;
+    private static final long serialVersionUID = 1L;
 
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
     private final List<DefDescriptor<ComponentDef>> trackedDependencies;

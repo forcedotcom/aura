@@ -46,7 +46,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionReference;
-import org.auraframework.def.DependencyDef;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.HelperDef;
@@ -93,7 +93,7 @@ import com.google.common.collect.Sets;
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
-    private static final long serialVersionUID = -5640566031972178622L;
+    private static final long serialVersionUID = 1L;
 
     public static final DefDescriptor<InterfaceDef> ROOT_MARKER = new DefDescriptorImpl<>(
             "markup", "aura", "rootComponent", InterfaceDef.class);
@@ -139,7 +139,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     private final RenderType render;
 
-    private final List<DependencyDef> dependencies;
+    private final List<DescriptorFilter> dependencies;
     private final List<ClientLibraryDef> clientLibraries;
     private final Map<String, LocatorDef> locatorDefs;
 
@@ -257,10 +257,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         super.validateDefinition();
         if (this.componentBuildError != null) {
             throw this.componentBuildError;
-        }
-
-        for (DependencyDef def : dependencies) {
-            def.validateDefinition();
         }
 
         for (AttributeDef att : this.attributeDefs.values()) {
@@ -426,9 +422,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         super.validateReferences(validationContext);
-        for (DependencyDef def : dependencies) {
-            def.validateReferences(validationContext);
-        }
 
         for (AttributeDef att : this.attributeDefs.values()) {
             att.validateReferences(validationContext);
@@ -620,11 +613,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
     }
 
-    @Override
-    public List<DependencyDef> getDependencies() {
-        return this.dependencies;
-    }
-
     /**
      * Recursively adds the ComponentDescriptors of all components in this ComponentDef's children to the provided set.
      * The set may then be used to analyze freshness of all of those types to see if any of them should be recompiled
@@ -695,8 +683,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             }
         }
 
-        for (DependencyDef dep : this.dependencies) {
-            dep.appendDependencies(dependencies, this);
+        for (DescriptorFilter dep : this.dependencies) {
+            Set<DefDescriptor<?>> found = Aura.getDefinitionService().find(dep, getDescriptor());
+            if (found.size() == 0) {
+                // This should warn, but let's not error out here.
+            }
+            dependencies.addAll(found);
         }
         if (externalModelDescriptor != null) {
             dependencies.add(externalModelDescriptor);
@@ -1437,7 +1429,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         public Set<PropertyReference> expressionRefs;
 
         public String render;
-        public List<DependencyDef> dependencies;
+        public List<DescriptorFilter> dependencies;
         public List<ClientLibraryDef> clientLibraries;
         private RenderType renderType;
 
@@ -1554,7 +1546,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         @Override
-        public Builder<T> addDependency(DependencyDef dependency) {
+        public Builder<T> addDependency(DescriptorFilter dependency) {
             if (this.dependencies == null) {
                 this.dependencies = new ArrayList<>();
             }

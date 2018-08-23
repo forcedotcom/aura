@@ -23,7 +23,7 @@ import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DependencyDef;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
@@ -132,7 +132,7 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
 
     BaseComponentDefBuilder<T> setMinifyEnabled(boolean minify);
 
-    BaseComponentDefBuilder<T> addDependency(DependencyDef dependency);
+    BaseComponentDefBuilder<T> addDependency(DescriptorFilter dependency);
 
     void finish();
 }

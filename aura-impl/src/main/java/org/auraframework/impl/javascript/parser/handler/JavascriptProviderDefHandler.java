@@ -49,7 +49,7 @@ public class JavascriptProviderDefHandler extends JavascriptHandler<ProviderDef,
     @Override
     protected ProviderDef createDefinition(String code) throws QuickFixException, IOException {
     	setDefBuilderFields(builder);
-        new JavascriptTokenizer(getParentDescriptor(), code, getLocation()).process(builder);
+        new JavascriptTokenizer(code, getLocation()).process(builder);
 
         Map<String, Object> map = codeToMap(code);
     	if (map.isEmpty()) {

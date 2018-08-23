@@ -59,17 +59,6 @@ public interface BaseComponentDef extends RootDefinition {
     boolean isTemplate();
 
     /**
-     * Get the set of dependencies declared on this component.
-     *
-     * These dependencies must be loaded for the component to be functional, either at the initial load time or before
-     * rendering. These dependencies are in the form of DescriptorFilters which can then be used to match the actual
-     * descriptors.
-     *
-     * @return the list of declared dependencies for the component.
-     */
-    List<DependencyDef> getDependencies();
-
-    /**
      * Get the set of dependencies tracked by the server.
      *
      * These only dependencies that the client should indicates has having or not, using the 'loaded"

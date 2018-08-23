@@ -21,10 +21,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.builder.JavascriptCodeBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.DependencyDef;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RemotableDefinition;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -37,7 +38,7 @@ public abstract class BaseJavascriptDef<T extends Definition> extends Definition
 
     private final String code;
     private final Set<PropertyReference> expressionRefs;
-    private final Set<DependencyDef> dependencies;
+    private final Set<DescriptorFilter> dependencies;
 
     public BaseJavascriptDef(Builder<T> builder) {
         super(builder);
@@ -64,8 +65,12 @@ public abstract class BaseJavascriptDef<T extends Definition> extends Definition
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         if (this.dependencies != null && !this.dependencies.isEmpty()) {
-            for (DependencyDef dep : this.dependencies) {
-                dep.appendDependencies(dependencies);
+            for (DescriptorFilter dep : this.dependencies) {
+                Set<DefDescriptor<?>> found = Aura.getDefinitionService().find(dep, getDescriptor());
+                if (found.size() == 0) {
+                    // This should warn, but let's not error out here.
+                }
+                dependencies.addAll(found);
             }
         }
     }
@@ -80,7 +85,7 @@ public abstract class BaseJavascriptDef<T extends Definition> extends Definition
         public String code;
 
         public Set<PropertyReference> expressionRefs;
-        public Set<DependencyDef> dependencies;
+        public Set<DescriptorFilter> dependencies;
 
         public Builder(Class<T> defClass) {
             super(defClass);
@@ -92,7 +97,7 @@ public abstract class BaseJavascriptDef<T extends Definition> extends Definition
         }
 
         @Override
-        public void addDependency(DependencyDef dependency) {
+        public void addDependency(DescriptorFilter dependency) {
             if (this.dependencies == null) {
                 this.dependencies = new HashSet<>();
             }

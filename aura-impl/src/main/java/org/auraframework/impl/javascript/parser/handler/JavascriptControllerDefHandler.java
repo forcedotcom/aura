@@ -54,7 +54,7 @@ public class JavascriptControllerDefHandler extends JavascriptHandler<Controller
     @Override
     protected JavascriptControllerDef createDefinition(String code) throws IOException, QuickFixException {
         setDefBuilderFields(builder);
-        new JavascriptTokenizer(getParentDescriptor(), code, getLocation()).process(builder);
+        new JavascriptTokenizer(code, getLocation()).process(builder);
 
         Map<String, Object> map = codeToMap(code);
         Map<String, JavascriptActionDef> actions = createActionMap(map);
@@ -66,16 +66,16 @@ public class JavascriptControllerDefHandler extends JavascriptHandler<Controller
     }
 
     private Map<String, JavascriptActionDef> createActionMap(Map<String, Object> map) {
-		Map<String, JavascriptActionDef> actions = new TreeMap<>();
-	    for (Entry<String, Object> entry : map.entrySet()) {
-	        Object value = entry.getValue();
-	        if (value != null && value instanceof JsFunction) {
-	            String name = entry.getKey();
-	            JavascriptActionDef action = createActionDef(name);
-	            actions.put(name, action);
-	        }
-	    }
-	    return actions;
+        Map<String, JavascriptActionDef> actions = new TreeMap<>();
+        for (Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value != null && value instanceof JsFunction) {
+                String name = entry.getKey();
+                JavascriptActionDef action = createActionDef(name);
+                actions.put(name, action);
+            }
+        }
+        return actions;
     }
 
     private JavascriptActionDef createActionDef(String name) {

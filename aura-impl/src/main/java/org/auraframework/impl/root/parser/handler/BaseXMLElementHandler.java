@@ -137,11 +137,7 @@ public abstract class BaseXMLElementHandler {
     }
 
     protected boolean isDefaultNamespaceUsed(String ns) {
-        return source != null
-                && source.isDefaultNamespaceSupported() // default namespace is supported by the source
-                && (AuraTextUtil.isNullEmptyOrWhitespace(ns) // and (the namespace is empty
-                || source.getDefaultNamespace().equals(ns)) // or has the default namespace)
-                && !source.getDefaultNamespace().equals(source.getDescriptor().getNamespace()); // and the source has a different ns from the default
+        return source != null && source.isDefaultNamespaceUsed(ns);
     }
 
     protected void readElement() throws XMLStreamException, QuickFixException {

@@ -15,7 +15,7 @@
  */
 package org.auraframework.builder;
 
-import org.auraframework.def.DependencyDef;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.expression.PropertyReference;
 
 /**
@@ -39,5 +39,5 @@ public interface JavascriptCodeBuilder {
      * Add a dependency (fully qualified names) found in the JavaScript code.
      * @param dependency The dependency.
      */
-    void addDependency(DependencyDef dependency);
+    void addDependency(DescriptorFilter dependency);
 }

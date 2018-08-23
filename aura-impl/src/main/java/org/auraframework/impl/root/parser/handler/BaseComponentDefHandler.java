@@ -200,8 +200,11 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             builder.facets.add(new AttributeDefRefHandler<>(this, xmlReader, source, isInInternalNamespace,
                     definitionService, configAdapter, definitionParserAdapter).getElement());
         } else if (DependencyDefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.addDependency(new DependencyDefHandler<>(this, xmlReader, source, isInInternalNamespace,
-                    definitionService, configAdapter, definitionParserAdapter).getElement());
+            try {
+                builder.addDependency(new DependencyDefHandler(xmlReader, source).parse());
+            } catch (QuickFixException qfe) {
+                setParseError(qfe);
+            }
         } else if (ClientLibraryDefHandler.TAG.equalsIgnoreCase(tag)) {
             builder.addClientLibrary(new ClientLibraryDefHandler<>(this, xmlReader, source, isInInternalNamespace,
                     definitionService, configAdapter, definitionParserAdapter).getElement());

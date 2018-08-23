@@ -162,7 +162,7 @@ public interface DefinitionService extends AuraService {
      * @param matcher the matcher to find descriptors
      * @param referenceDescriptor if matcher contains a wildcard, will be used to filter matches based on access
      */
-    Set<DefDescriptor<?>> find(DescriptorFilter matcher, BaseComponentDef referenceDescriptor);
+    Set<DefDescriptor<?>> find(DescriptorFilter matcher, DefDescriptor<?> referenceDescriptor);
 
     /**
      * Find the set of components that have a tag.

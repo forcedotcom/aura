@@ -32,7 +32,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
-import org.auraframework.def.DependencyDef;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
@@ -96,7 +96,7 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
     protected List<AttributeDefRef> facets;
     protected Set<PropertyReference> expressionRefs;
     protected String render;
-    protected List<DependencyDef> dependencies;
+    protected List<DescriptorFilter> dependencies;
     @Mock
     protected DefDescriptor<ControllerDef> mockControllerDesc;
     protected ControllerDef mockControllerDef;

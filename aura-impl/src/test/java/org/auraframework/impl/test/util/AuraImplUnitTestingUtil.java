@@ -35,7 +35,6 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
-import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
@@ -57,7 +56,6 @@ import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.AttributeImpl;
-import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
@@ -381,18 +379,6 @@ public class AuraImplUnitTestingUtil {
                                                       SerializeToType serializeTo, Location location, DefinitionAccess access) {
         return new AttributeDefImpl(definitionService.getDefDescriptor(name, AttributeDef.class),
                 parentDescriptor, typeDefDescriptor, defaultValue, required, serializeTo, location, access);
-    }
-
-    public DependencyDef makeDependencyDef(DefDescriptor<? extends RootDefinition> parentDescriptor,
-            String resource, String type, Location location) {
-        DependencyDefImpl.Builder builder;
-
-        builder = new DependencyDefImpl.Builder();
-        builder.setParentDescriptor(parentDescriptor);
-        builder.setResource(resource);
-        builder.setLocation(location);
-        builder.setType(type);
-        return builder.build();
     }
 
     public AttributeDefRefImpl makeAttributeDefRef() {

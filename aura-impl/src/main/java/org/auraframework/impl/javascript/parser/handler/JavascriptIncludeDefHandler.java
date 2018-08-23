@@ -33,7 +33,7 @@ public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, I
     @Override
     protected IncludeDef createDefinition(String code) throws QuickFixException {
         setDefBuilderFields(builder);
-        new JavascriptTokenizer(getParentDescriptor(), code, getLocation()).process(builder);
+        new JavascriptTokenizer(code, getLocation()).process(builder);
         builder.setCode(code);
         return builder.build();
     }

@@ -21,17 +21,16 @@ import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamReader;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Sets;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.module.ModuleDef;
-import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -39,7 +38,10 @@ import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDef, ApplicationDefImpl.Builder> {
 
@@ -119,12 +121,8 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         if (!AuraTextUtil.isNullEmptyOrWhitespace(preloadNames)) {
             List<String> preloads = AuraTextUtil.splitSimple(",", preloadNames);
             for (String preload : preloads) {
-                DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
-                ddb.setParentDescriptor(this.defDescriptor);
-                ddb.setLocation(getLocation());
-                ddb.setResource(preload);
-                ddb.setType("APPLICATION,COMPONENT,STYLE,EVENT");
-                builder.addDependency(ddb.build());
+                builder.addDependency(new DescriptorFilter("markup://"+preload+":*",
+                            Lists.newArrayList(DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT, DefType.STYLE)));
             }
         }
 

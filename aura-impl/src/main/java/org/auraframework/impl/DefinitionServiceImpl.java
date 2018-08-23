@@ -422,7 +422,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     }
 
     @Override
-    public Set<DefDescriptor<?>> find(DescriptorFilter matcher, BaseComponentDef referenceDescriptor) {
+    public Set<DefDescriptor<?>> find(DescriptorFilter matcher, DefDescriptor<?> referenceDescriptor) {
         final String filterKey = matcher.toString();
         Set<DefDescriptor<?>> matched = Sets.newHashSet();
         GlobMatcher namespaceMatcher = matcher.getNamespaceMatch();
@@ -517,7 +517,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                                         .filter(regRes -> {
                                             try {
                                                 return accessChecker.checkAccess(
-                                                    referenceDescriptor.getDescriptor(),
+                                                    referenceDescriptor,
                                                     getUnlinkedDefinition(regRes),
                                                     context.getAccessCheckCache());
                                             } catch (QuickFixException e) {

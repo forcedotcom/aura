@@ -15,15 +15,11 @@
  */
 package org.auraframework.integration.test.root.parser.handler;
 
-import java.util.List;
-
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.DependencyDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.NoAccessException;
@@ -2109,7 +2105,5 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
 
         Definition def = definitionService.getDefinition(descriptor);
         // test is successful because this didn't throw an exception trying to access a non-global component with the wildcard match
-        List<DependencyDef> dependencies = ((ComponentDefImpl) def).getDependencies();
-        assertEquals("Should have one dependency: " + dependencies, 1, dependencies.size());
     }
 }

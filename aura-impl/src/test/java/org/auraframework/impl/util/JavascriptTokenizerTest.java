@@ -20,7 +20,7 @@ import java.util.List;
 import org.auraframework.builder.JavascriptCodeBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.DependencyDef;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.Location;
@@ -43,7 +43,7 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     @Test
     public void testProcessDoesNothingWithSimpleCode() throws Exception {
         String code = "";
-        JavascriptTokenizer tokenizer = new JavascriptTokenizer(parentDescriptor, code, location);
+        JavascriptTokenizer tokenizer = new JavascriptTokenizer(code, location);
 
         tokenizer.process(builder);
         Mockito.verifyNoMoreInteractions(builder);
@@ -52,7 +52,7 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     @Test
     public void testProcessAddsLabelForSingleLabel() throws Exception {
         String code = "({a: function() { $A.get($Label.xxx.yyy); }})";
-        JavascriptTokenizer tokenizer = new JavascriptTokenizer(parentDescriptor, code, location);
+        JavascriptTokenizer tokenizer = new JavascriptTokenizer(code, location);
 
         tokenizer.process(builder);
 
@@ -68,7 +68,7 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     @Test
     public void testProcessAddsLabelForMultipleLabels() throws Exception {
         String code = "({a: function() { $A.get($Label.xxx.yyy); }, b: function() { $A.get($Label.yyy.zzz); }})";
-        JavascriptTokenizer tokenizer = new JavascriptTokenizer(parentDescriptor, code, location);
+        JavascriptTokenizer tokenizer = new JavascriptTokenizer(code, location);
 
         tokenizer.process(builder);
 
@@ -89,7 +89,7 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     @Test
     public void testProcessDoesNothingWithOnePartLabel() throws Exception {
         String code = "({a: function() { $A.get($Label.xxx); }})";
-        JavascriptTokenizer tokenizer = new JavascriptTokenizer(parentDescriptor, code, location);
+        JavascriptTokenizer tokenizer = new JavascriptTokenizer(code, location);
 
         tokenizer.process(builder);
         Mockito.verifyNoMoreInteractions(builder);
@@ -98,23 +98,22 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     @Test
     public void testProcessAddsDependencyForSingleDependency() throws Exception {
         String code = "({a: function() { $A.createComponent(\"markup://ui:outputText\"); }})";
-        JavascriptTokenizer tokenizer = new JavascriptTokenizer(parentDescriptor, code, location);
+        JavascriptTokenizer tokenizer = new JavascriptTokenizer(code, location);
 
         tokenizer.process(builder);
 
-        ArgumentCaptor<DependencyDef> capture = ArgumentCaptor.forClass(DependencyDef.class);
+        ArgumentCaptor<DescriptorFilter> capture = ArgumentCaptor.forClass(DescriptorFilter.class);
         Mockito.verify(builder, Mockito.times(1)).addDependency(capture.capture());
-        DependencyDef dependency = capture.getValue();
-        assertEquals(location, dependency.getLocation());
-        assertEquals("markup", dependency.getDependency().getPrefixMatch().toString());
-        assertEquals("ui", dependency.getDependency().getNamespaceMatch().toString());
-        assertEquals("outputText", dependency.getDependency().getNameMatch().toString());
-        assertEquals(5, dependency.getDependency().getDefTypes().size());
-        assertTrue(dependency.getDependency().getDefTypes().contains(DefType.COMPONENT));
-        assertTrue(dependency.getDependency().getDefTypes().contains(DefType.LIBRARY));
-        assertTrue(dependency.getDependency().getDefTypes().contains(DefType.INTERFACE));
-        assertTrue(dependency.getDependency().getDefTypes().contains(DefType.EVENT));
-        assertTrue(dependency.getDependency().getDefTypes().contains(DefType.MODULE));
+        DescriptorFilter dependency = capture.getValue();
+        assertEquals("markup", dependency.getPrefixMatch().toString());
+        assertEquals("ui", dependency.getNamespaceMatch().toString());
+        assertEquals("outputText", dependency.getNameMatch().toString());
+        assertEquals(5, dependency.getDefTypes().size());
+        assertTrue(dependency.getDefTypes().contains(DefType.COMPONENT));
+        assertTrue(dependency.getDefTypes().contains(DefType.LIBRARY));
+        assertTrue(dependency.getDefTypes().contains(DefType.INTERFACE));
+        assertTrue(dependency.getDefTypes().contains(DefType.EVENT));
+        assertTrue(dependency.getDefTypes().contains(DefType.MODULE));
         Mockito.verifyNoMoreInteractions(builder);
     }
 
@@ -122,36 +121,34 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     public void testProcessAddsDependencyForMultipleDependencies() throws Exception {
         String code = "({a: function() { $A.createComponent(\"markup://ui:outputText\"); }, "
                       +" b: function() { $A.createComponent(\"markup://aura:inputText\"); }})";
-        JavascriptTokenizer tokenizer = new JavascriptTokenizer(parentDescriptor, code, location);
+        JavascriptTokenizer tokenizer = new JavascriptTokenizer(code, location);
 
         tokenizer.process(builder);
 
-        ArgumentCaptor<DependencyDef> capture = ArgumentCaptor.forClass(DependencyDef.class);
+        ArgumentCaptor<DescriptorFilter> capture = ArgumentCaptor.forClass(DescriptorFilter.class);
         Mockito.verify(builder, Mockito.times(2)).addDependency(capture.capture());
 
         capture.getValue();
-        List<DependencyDef> dependencies = capture.getAllValues();
-        assertEquals(location, dependencies.get(0).getLocation());
-        assertEquals("markup", dependencies.get(0).getDependency().getPrefixMatch().toString());
-        assertEquals("ui", dependencies.get(0).getDependency().getNamespaceMatch().toString());
-        assertEquals("outputText", dependencies.get(0).getDependency().getNameMatch().toString());
-        assertEquals(5, dependencies.get(0).getDependency().getDefTypes().size());
-        assertTrue(dependencies.get(0).getDependency().getDefTypes().contains(DefType.COMPONENT));
-        assertTrue(dependencies.get(0).getDependency().getDefTypes().contains(DefType.LIBRARY));
-        assertTrue(dependencies.get(0).getDependency().getDefTypes().contains(DefType.INTERFACE));
-        assertTrue(dependencies.get(0).getDependency().getDefTypes().contains(DefType.EVENT));
-        assertTrue(dependencies.get(0).getDependency().getDefTypes().contains(DefType.MODULE));
+        List<DescriptorFilter> dependencies = capture.getAllValues();
+        assertEquals("markup", dependencies.get(0).getPrefixMatch().toString());
+        assertEquals("ui", dependencies.get(0).getNamespaceMatch().toString());
+        assertEquals("outputText", dependencies.get(0).getNameMatch().toString());
+        assertEquals(5, dependencies.get(0).getDefTypes().size());
+        assertTrue(dependencies.get(0).getDefTypes().contains(DefType.COMPONENT));
+        assertTrue(dependencies.get(0).getDefTypes().contains(DefType.LIBRARY));
+        assertTrue(dependencies.get(0).getDefTypes().contains(DefType.INTERFACE));
+        assertTrue(dependencies.get(0).getDefTypes().contains(DefType.EVENT));
+        assertTrue(dependencies.get(0).getDefTypes().contains(DefType.MODULE));
 
-        assertEquals(location, dependencies.get(1).getLocation());
-        assertEquals("markup", dependencies.get(1).getDependency().getPrefixMatch().toString());
-        assertEquals("aura", dependencies.get(1).getDependency().getNamespaceMatch().toString());
-        assertEquals("inputText", dependencies.get(1).getDependency().getNameMatch().toString());
-        assertEquals(5, dependencies.get(1).getDependency().getDefTypes().size());
-        assertTrue(dependencies.get(1).getDependency().getDefTypes().contains(DefType.COMPONENT));
-        assertTrue(dependencies.get(1).getDependency().getDefTypes().contains(DefType.LIBRARY));
-        assertTrue(dependencies.get(1).getDependency().getDefTypes().contains(DefType.INTERFACE));
-        assertTrue(dependencies.get(1).getDependency().getDefTypes().contains(DefType.EVENT));
-        assertTrue(dependencies.get(0).getDependency().getDefTypes().contains(DefType.MODULE));
+        assertEquals("markup", dependencies.get(1).getPrefixMatch().toString());
+        assertEquals("aura", dependencies.get(1).getNamespaceMatch().toString());
+        assertEquals("inputText", dependencies.get(1).getNameMatch().toString());
+        assertEquals(5, dependencies.get(1).getDefTypes().size());
+        assertTrue(dependencies.get(1).getDefTypes().contains(DefType.COMPONENT));
+        assertTrue(dependencies.get(1).getDefTypes().contains(DefType.LIBRARY));
+        assertTrue(dependencies.get(1).getDefTypes().contains(DefType.INTERFACE));
+        assertTrue(dependencies.get(1).getDefTypes().contains(DefType.EVENT));
+        assertTrue(dependencies.get(0).getDefTypes().contains(DefType.MODULE));
 
         Mockito.verifyNoMoreInteractions(builder);
     }
@@ -159,7 +156,7 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     @Test
     public void testProcessDoesNotAddDependencyForBrokenDescriptor() throws Exception {
         String code = "({a: function() { $A.createComponent(\"markup://ui:\"); }})";
-        JavascriptTokenizer tokenizer = new JavascriptTokenizer(parentDescriptor, code, location);
+        JavascriptTokenizer tokenizer = new JavascriptTokenizer(code, location);
 
         tokenizer.process(builder);
 

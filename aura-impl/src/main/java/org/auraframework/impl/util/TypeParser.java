@@ -31,6 +31,8 @@ public class TypeParser {
      */
     private static final Pattern TAG_PATTERN = Pattern.compile("(?:([\\w*]+)://)?(?:([\\w\\-*]+)[:.])?([\\w*]+)");
 
+    private static final Pattern TAG_PATTERN_STRICT = Pattern.compile("^(?:([\\w*]+)://)?(?:([\\w\\-*]+):)?([\\w*]+)$");
+
     /**
      * Pattern for class descriptors: java://foo.bar.baz Group 0 = QName = java://foo.bar.baz Group 1 = prefix = java
      * Group 2 = namespace = foo.bar Group 3 = name = baz
@@ -38,6 +40,29 @@ public class TypeParser {
     private static final Pattern CLASS_PATTERN = Pattern
             .compile("\\A(?:([\\w*]+)://)?((?:[\\w*]|\\.)*?)?\\.?+([\\w,$*-]*?(?:\\[])?)(<[\\w.,(<[\\w.,]+>)]+>)?\\z");
 
+    /**
+     * Parses a type that is a tag. See TAG_PATTERN above
+     * @param qualifiedName
+     * @return a Type instance or null
+     */
+    public static Type parseTagStrict(String qualifiedName) {
+
+    	Type type = null;
+        Matcher tagMatcher = TAG_PATTERN_STRICT.matcher(qualifiedName);
+        if (tagMatcher.matches()) {
+            String prefix = tagMatcher.group(1);
+            String namespace = tagMatcher.group(2);
+            String name = tagMatcher.group(3);
+            if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+                name = namespace;
+                namespace = null;
+            }
+            
+            type = new Type(prefix, namespace, name, null);
+        }
+    	
+    	return type;
+    }
     /**
      * Parses a type that is a tag. See TAG_PATTERN above
      * @param qualifiedName

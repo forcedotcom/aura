@@ -19,11 +19,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.auraframework.builder.JavascriptCodeBuilder;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
-import org.auraframework.impl.root.DependencyDefImpl;
+import org.auraframework.impl.root.parser.handler.DependencyDefHandler;
 import org.auraframework.system.Location;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
 /**
@@ -37,12 +36,10 @@ public class JavascriptTokenizer {
     private static final Pattern QUALIFIED_NAME_PATTERN = Pattern.compile("(markup://\\w+:\\w+)",
             Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
-    private final DefDescriptor<? extends RootDefinition> parentDescriptor;
     private final String code;
     private final Location location;
 
-    public JavascriptTokenizer(DefDescriptor<? extends RootDefinition> parentDescriptor, String code, Location location) {
-        this.parentDescriptor = parentDescriptor;
+    public JavascriptTokenizer(String code, Location location) {
         this.code = code;
         this.location = location;
     }
@@ -73,18 +70,16 @@ public class JavascriptTokenizer {
     private void addDependencies(JavascriptCodeBuilder builder)  {
         Matcher matcher = QUALIFIED_NAME_PATTERN.matcher(code);
         while (matcher.find()) {
-            String resource = matcher.group();
-
-            DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
-            ddb.setParentDescriptor(parentDescriptor);
-            ddb.setLocation(location);
-            ddb.setResource(resource);
             //
             // JS can only get "root" definitions, minus applications, as applications can only be loaded
             // as a "top level" load. Libraries could arguably be excluded.
             //
-            ddb.setType("COMPONENT,INTERFACE,EVENT,LIBRARY,MODULE");
-            builder.addDependency(ddb.build());
+            try {
+                builder.addDependency(DependencyDefHandler.generateFilter(null, matcher.group(), 
+                                                        "COMPONENT,INTERFACE,EVENT,LIBRARY,MODULE", location));
+            } catch (QuickFixException qfe) {
+                // ignore dependencies that can't be parsed
+            }
         }
     }
 }

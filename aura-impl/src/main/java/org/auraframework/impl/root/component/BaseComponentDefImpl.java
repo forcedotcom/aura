@@ -327,6 +327,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         return localDeps == Boolean.TRUE;
     }
 
+    @Override
+    public List<DescriptorFilter> getDependencies() {
+        return this.dependencies;
+    }
+
     private boolean hasLocalDependencies(Set<DefDescriptor<?>> visited) throws QuickFixException {
         if (localDeps == null) {
             computeLocalDependencies(visited);

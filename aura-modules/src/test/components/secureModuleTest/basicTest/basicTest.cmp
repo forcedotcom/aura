@@ -22,11 +22,11 @@
     <aura:method name="testDollarAuraIsSecure"/>
     <aura:method name="testDollarAuraNotAccessibleInModules"/>
     <aura:method name="testWindowIsSecure"/>
-    <aura:method name="testEngineIsSecure"/>
+    <aura:method name="testLWCIsSecure"/>
     <aura:method name="testOptOutOfLockerUsingMetaData"/>
     <aura:method name="testMiscGlobalsNotAccessibleInModules"/>
     <!-- <aura:method name="testEngineIsImmutable"/> -->
-    <aura:method name="testElementIsImmutable"/>
+    <aura:method name="testLightningElementIsImmutable"/>
     <aura:method name="testSecureModulesInUnsupportedBrowsers"/>
 
     <!-- secureModuleTest:bootstrap is a test module with some basic setup and checks -->

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-08-23
- * Version: 0.5.6
+ * Generated: 2018-08-24
+ * Version: 0.5.7
  */
 
 (function (exports) {
@@ -2053,7 +2053,7 @@ function createEventTargetMethodsStateless(config, prototype) {
  */
 let lwcUnwrap = value => value;
 
-function registerEngineAPI(api) {
+function registerLWCAPI(api) {
   if (api && api.unwrap) {
     lwcUnwrap = api.unwrap;
   }
@@ -2126,7 +2126,7 @@ function customElementHook$1(el, prototype, tagNameSpecificConfig) {
 }
 
 /**
- * Was node created by lwc engine?
+ * Was node created by lwc?
  * @param {Node} node node to check
  */
 function isAnLWCNode(node) {
@@ -10056,30 +10056,33 @@ function getUnwrappedValue(cmp, filteredValue) {
   return filteredValue;
 }
 
-const ElementPropDescriptorMap = {};
-function getRawPropertyDescriptor(ElementPrototype, propName) {
-  let descriptor = ElementPropDescriptorMap[propName];
+const LightningElementPropDescriptorMap = {};
+function getRawPropertyDescriptor(LightningElementPrototype, propName) {
+  let descriptor = LightningElementPropDescriptorMap[propName];
   if (descriptor) {
     return descriptor;
   }
-  descriptor = ElementPropDescriptorMap[propName] = getOwnPropertyDescriptor(
-    ElementPrototype,
+  descriptor = LightningElementPropDescriptorMap[propName] = getOwnPropertyDescriptor(
+    LightningElementPrototype,
     propName
   );
   return descriptor;
 }
 
 /**
- * Creates a wrapped property descriptor on properties that are lazily defined on Element
- * @param {*} ElementPrototype Prototype of the base Element class from LWC
+ * Creates a wrapped property descriptor on properties that are lazily defined on LightningElement
+ * @param {*} LightningElementPrototype Prototype of the base LightningElement class from LWC
  * @param {string} propName
  */
-function createWrappedPropertyDescriptorStateless(ElementPrototype, propName) {
+function createWrappedPropertyDescriptorStateless(LightningElementPrototype, propName) {
   return {
     enumerable: true,
     get() {
-      const { get } = getRawPropertyDescriptor(ElementPrototype, propName);
-      assert$1.invariant(get, 'Refering to an unsupported property of the Element base class');
+      const { get } = getRawPropertyDescriptor(LightningElementPrototype, propName);
+      assert$1.invariant(
+        get,
+        'Refering to an unsupported property of the LightningElement base class'
+      );
       if (!get) {
         return undefined;
       }
@@ -10088,7 +10091,7 @@ function createWrappedPropertyDescriptorStateless(ElementPrototype, propName) {
     },
 
     set(filteredValue) {
-      const { set } = getRawPropertyDescriptor(ElementPrototype, propName);
+      const { set } = getRawPropertyDescriptor(LightningElementPrototype, propName);
       if (set) {
         set.call(this, getUnwrappedValue(this, filteredValue));
       }
@@ -10096,7 +10099,7 @@ function createWrappedPropertyDescriptorStateless(ElementPrototype, propName) {
   };
 }
 
-// Hooks to be used by engine
+// Hooks to be used by LWC
 function generateInstanceHooks(st) {
   return {
     callHook: function(cmp, fn, args) {
@@ -10118,20 +10121,20 @@ function generateInstanceHooks(st) {
 
 let lwcElementProtoPropNames;
 
-function SecureLWCElementFactory(LWCElement, key) {
-  let o = getFromCache(LWCElement, key);
+function SecureLightningElementFactory(LightningElement, key) {
+  let o = getFromCache(LightningElement, key);
   if (o) {
     return o;
   }
-  o = SecureLWCElementFactory.getWrappedLWCElement(LWCElement, key);
+  o = SecureLightningElementFactory.getWrappedLightningElement(LightningElement, key);
 
-  setRef(o, LWCElement, key);
-  addToCache(LWCElement, o, key);
+  setRef(o, LightningElement, key);
+  addToCache(LightningElement, o, key);
   freeze(o);
   return o;
 }
 
-SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
+SecureLightningElementFactory.getWrappedLightningElement = function(LightningElement, lockerKey) {
   function getWrappedDescriptor(rawDescriptor) {
     const { value, get, set, enumerable, configurable, writable } = rawDescriptor;
     function wrappedMethod() {
@@ -10174,9 +10177,9 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
     };
   }
 
-  function SecureLWCElement() {
-    if (this instanceof SecureLWCElement) {
-      LWCElement.prototype.constructor.call(this, generateInstanceHooks(this));
+  function SecureLightningElement() {
+    if (this instanceof SecureLightningElement) {
+      LightningElement.prototype.constructor.call(this, generateInstanceHooks(this));
 
       /**
        *  `this` represents the user mode instance. No need to wrap this object or protect it
@@ -10187,7 +10190,7 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
       const pseudoInstance = create$1(null, {
         toString: {
           value: function() {
-            return LWCElement.prototype.toString.call(this);
+            return LightningElement.prototype.toString.call(this);
           }
         }
       });
@@ -10195,29 +10198,29 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
       setRef(this, pseudoInstance, lockerKey);
       registerProxy(this);
     } else {
-      // TODO: Caridy - This trick leaks Element into sandboxes, we will figure a better way.
-      return LWCElement;
+      // TODO: Caridy - This trick leaks LightningElement into sandboxes, we will figure a better way.
+      return LightningElement;
     }
   }
 
   // eslint-disable-next-line no-underscore-dangle
-  SecureLWCElement.__circular__ = true;
-  const SecureElementPrototype = (SecureLWCElement.prototype = getObjectLikeProto());
-  const ElementPrototype = LWCElement.prototype;
+  SecureLightningElement.__circular__ = true;
+  const SecureLElementPrototype = (SecureLightningElement.prototype = getObjectLikeProto());
+  const LElementPrototype = LightningElement.prototype;
 
   // Special properties
-  defineProperties(SecureElementPrototype, {
+  defineProperties(SecureLElementPrototype, {
     toString: {
       value: function() {
-        return `SecureLWCElement ${ElementPrototype.toString.call(this)}{ key: ${JSON.stringify(
-          lockerKey
-        )} }`;
+        return `SecureLightningElement ${LElementPrototype.toString.call(
+          this
+        )}{ key: ${JSON.stringify(lockerKey)} }`;
       }
     },
     template: {
       enumerable: true,
       get: function() {
-        const { get } = getRawPropertyDescriptor(ElementPrototype, 'template');
+        const { get } = getRawPropertyDescriptor(LElementPrototype, 'template');
         const rawValue = get.call(this);
         return SecureTemplate(rawValue, lockerKey);
       }
@@ -10225,7 +10228,7 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
     querySelector: {
       enumerable: true,
       value: function(selector) {
-        const { value } = getRawPropertyDescriptor(ElementPrototype, 'querySelector');
+        const { value } = getRawPropertyDescriptor(LElementPrototype, 'querySelector');
         const node = value.call(this, selector);
         return getFilteredValue(this, node);
       }
@@ -10233,7 +10236,7 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
     querySelectorAll: {
       enumerable: true,
       value: function(selector) {
-        const { value } = getRawPropertyDescriptor(ElementPrototype, 'querySelector');
+        const { value } = getRawPropertyDescriptor(LElementPrototype, 'querySelector');
         const rawNodeList = value.call(this, selector);
         return getFilteredValue(this, rawNodeList);
       }
@@ -10241,29 +10244,29 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
   });
 
   GlobalAndAriaProperties.forEach(propName => {
-    const wrappedDescriptor = createWrappedPropertyDescriptorStateless(ElementPrototype, propName);
-    defineProperty(SecureElementPrototype, propName, wrappedDescriptor);
+    const wrappedDescriptor = createWrappedPropertyDescriptorStateless(LElementPrototype, propName);
+    defineProperty(SecureLElementPrototype, propName, wrappedDescriptor);
   });
 
-  // Fetch the properties on LWCElement.prototype and cache them
+  // Fetch the properties on LightningElement.prototype and cache them
   if (!lwcElementProtoPropNames) {
-    lwcElementProtoPropNames = getOwnPropertyNames(ElementPrototype);
+    lwcElementProtoPropNames = getOwnPropertyNames(LElementPrototype);
     lwcElementProtoPropNames.splice(lwcElementProtoPropNames.indexOf('constructor'), 1);
   }
 
   // Remaining properties
   // TOOD: RJ/JF Revisit whether we should whitelist instead of all properties
   lwcElementProtoPropNames.forEach(propName => {
-    if (!SecureElementPrototype.hasOwnProperty(propName)) {
-      const originalDescriptor = getRawPropertyDescriptor(ElementPrototype, propName);
+    if (!SecureLElementPrototype.hasOwnProperty(propName)) {
+      const originalDescriptor = getRawPropertyDescriptor(LElementPrototype, propName);
       const wrappedDescriptor = getWrappedDescriptor(originalDescriptor);
-      defineProperty(SecureElementPrototype, propName, wrappedDescriptor);
+      defineProperty(SecureLElementPrototype, propName, wrappedDescriptor);
     }
   });
-  freeze(SecureLWCElement);
-  freeze(SecureElementPrototype);
+  freeze(SecureLightningElement);
+  freeze(SecureLElementPrototype);
 
-  return SecureLWCElement;
+  return SecureLightningElement;
 };
 
 /*
@@ -10281,17 +10284,17 @@ SecureLWCElementFactory.getWrappedLWCElement = function(LWCElement, lockerKey) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function SecureEngine(engine, key) {
-  let o = getFromCache(engine, key);
+function SecureLWC(lwc, key) {
+  let o = getFromCache(lwc, key);
   if (o) {
     return o;
   }
 
   assert$1.invariant(
-    engine['LightningElement'] === engine['Element'],
+    lwc['LightningElement'] === lwc['Element'],
     'Element should be an alias for LightningElement '
   );
-  const secureLWCElement = SecureLWCElementFactory(engine['LightningElement'], key);
+  const secureLWCElement = SecureLightningElementFactory(lwc['LightningElement'], key);
   o = create$1(null, {
     LightningElement: {
       enumerable: true,
@@ -10303,14 +10306,14 @@ function SecureEngine(engine, key) {
     },
     toString: {
       value: function() {
-        return `SecureEngine: ${engine}{ key: ${JSON.stringify(key)} }`;
+        return `SecureLWC: ${lwc}{ key: ${JSON.stringify(key)} }`;
       }
     }
   });
   freeze(o);
 
-  setRef(o, engine, key);
-  addToCache(engine, o, key);
+  setRef(o, lwc, key);
+  addToCache(lwc, o, key);
 
   return o;
 }
@@ -11134,7 +11137,6 @@ function registerAuraTypes(types) {
 let isLockerInitialized = false;
 
 const namespaceToKey = new Map();
-const engineToSecureEngine = new Map();
 
 function filterTypeHook(raw, key, belongsToLocker) {
   if (raw instanceof AuraAction) {
@@ -11146,7 +11148,7 @@ function filterTypeHook(raw, key, belongsToLocker) {
   } else if (raw instanceof AuraPropertyReferenceValue) {
     return SecureAuraPropertyReferenceValue(raw, key);
   } else if (isDOMElementOrNode(raw) && isAnLWCNode(raw)) {
-    // DOM elements create by engine are not subjected to access checks
+    // DOM elements create by lwc are not subjected to access checks
     // They will be wrapped using the key of the accessor and directly passed down
     return SecureElement(raw, key);
   }
@@ -11312,7 +11314,7 @@ function initialize(types, api) {
   registerAuraTypes(types);
   registerAuraAPI(api);
   registerReportAPI(api);
-  registerEngineAPI(api);
+  registerLWCAPI(api);
   registerFilterTypeHook(filterTypeHook);
   registerIsUnfilteredTypeHook(isUnfilteredTypeHook);
   registerLWCHelpers({ isAnLWCNode: isAnLWCNode });
@@ -11371,13 +11373,8 @@ function wrapComponentEvent(component, event) {
   return event instanceof AuraEvent ? SecureAuraEvent(event, key) : SecureDOMEvent(event, key);
 }
 
-function wrapEngine(engine, key) {
-  let secureEngine = engineToSecureEngine.get(key);
-  if (!secureEngine) {
-    secureEngine = SecureEngine(engine, key);
-    engineToSecureEngine.set(key, secureEngine);
-  }
-  return secureEngine;
+function wrapLWC(lwc, key) {
+  return SecureLWC(lwc, key);
 }
 
 function wrapLib(lib, key, requireLocker$$1, desc) {
@@ -11400,7 +11397,7 @@ exports.trust = trust$$1;
 exports.unwrap = unwrap$$1;
 exports.wrapComponent = wrapComponent;
 exports.wrapComponentEvent = wrapComponentEvent;
-exports.wrapEngine = wrapEngine;
+exports.wrapLWC = wrapLWC;
 exports.wrapLib = wrapLib;
 
 }((this.AuraLocker = this.AuraLocker || {})));

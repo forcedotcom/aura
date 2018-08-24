@@ -18,9 +18,9 @@ export function testDollarAuraNotAccessibleInInternalLib() {
     testUtil.assertEquals("undefined", typeof $A, "Expected $A to be not accessible in internal library"); // eslint-disable-line lwc/no-aura
 }
 
-export function testEngineIsSecureInInternalLib() {
-    testUtil.assertStartsWith("SecureEngine", toString(), "Expected engine to return" +
-        "SecureEngine in internal library");
+export function testLWCIsSecureInInternalLib() {
+    testUtil.assertStartsWith("SecureLWC", toString(), "Expected engine to return" +
+        "SecureLWC in internal library");
 }
 
 export function testDocumentIsSecureInInternalLib() {

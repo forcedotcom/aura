@@ -30,25 +30,25 @@
         testUtils.assertTrue(returnStatus);
     },
 
-    testEngineIsSecure: function (cmp) {
+    testLWCIsSecure: function (cmp) {
         var testUtils = cmp.get("v.testUtils");
         var testModule = cmp.find("bootstrap");
-        var returnStatus = testModule.testEngineIsSecure();
+        var returnStatus = testModule.testLWCIsSecure();
         testUtils.assertTrue(returnStatus);
     },
 
-    testElementIsImmutable: function (cmp) {
+    testLightningElementIsImmutable: function (cmp) {
         var testUtils = cmp.get("v.testUtils");
         var testModule = cmp.find("importElement");
-        testUtils.assertTrue(testModule.testDefiningNewPropertiesOnElement());
-        testUtils.assertTrue(testModule.testModifyExistingPropertiesOnElement());
+        testUtils.assertTrue(testModule.testDefiningNewPropertiesOnLightningElement());
+        testUtils.assertTrue(testModule.testModifyExistingPropertiesOnLightningElement());
     },
 
     testOptOutOfLockerUsingMetaData: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var testModule = cmp.find("nonLockerized");
         testUtils.assertTrue(testModule.testWindowIsUnsecure());
-        testUtils.assertTrue(testModule.testEngineIsUnsecure());
+        testUtils.assertTrue(testModule.testLWCIsUnsecure());
     },
 
     testSecureModulesInUnsupportedBrowsers: function(cmp) {

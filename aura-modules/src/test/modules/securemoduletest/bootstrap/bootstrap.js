@@ -1,4 +1,4 @@
-import { LightningElement, createElement, toString, api } from "lwc";
+import { LightningElement, createElement, toString, api } from 'lwc';
 import * as testUtil from 'securemoduletest-test-util';
 import * as simpleLib from 'securemoduletest-simple-lib';
 
@@ -24,14 +24,14 @@ export default class Bootstrap extends LightningElement {
     }
 
     @api
-    testEngineIsSecure() {
-        testUtil.assertStartsWith("SecureEngine", toString(), "Expected engine to return" +
-            "SecureEngine in interop component");
-        testUtil.assertDefined(LightningElement, "SecureEngine is preventing access to Element in interop component");
-        testUtil.assertUndefined(createElement, "SecureEngine is leaking properties in interop component");
+    testLWCIsSecure() {
+        testUtil.assertStartsWith("SecureLWC", toString(), "Expected engine to return" +
+            "SecureLWC in interop component");
+        testUtil.assertDefined(LightningElement, "SecureLWC is preventing access to LightningElement in interop component");
+        testUtil.assertUndefined(createElement, "SecureLWC is leaking properties in interop component");
         engineIsSecureInLocalFunc();
         const simpleCmp = this.template.querySelector("#securemoduletest-simple-cmp");
-        return simpleCmp.testEngineIsSecure() && simpleLib.testEngineIsSecure();
+        return simpleCmp.testLWCIsSecure() && simpleLib.testLWCIsSecure();
     }
 
     @api
@@ -55,8 +55,8 @@ function windowIsSecureInLocalFunc() {
 }
 
 function engineIsSecureInLocalFunc() {
-    testUtil.assertStartsWith("SecureEngine", toString(), "Expected engine to return" +
-        "SecureEngine in local functions");
+    testUtil.assertStartsWith("SecureLWC", toString(), "Expected engine to return" +
+        "SecureLWC in local functions");
 }
 
 function dollarAuraNotAccessibleInLocalFunc() {

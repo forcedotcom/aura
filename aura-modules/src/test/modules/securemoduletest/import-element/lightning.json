@@ -1,4 +1,4 @@
 {
   "requireLocker": "true",
-  "description": "component module which imports Element from engine"
+  "description": "component module which imports LightningElement from engine"
 }

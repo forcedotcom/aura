@@ -37,11 +37,11 @@ export default class Simple extends LightningElement {
     }
 
     @api
-    testEngineIsSecure() {
-        testUtil.assertStartsWith("SecureEngine", toString(), "Expected engine to return" +
-            "SecureEngine in module");
-        testUtil.assertDefined(LightningElement, "SecureEngine is preventing access to Element in module");
-        testUtil.assertUndefined(createElement, "SecureEngine is leaking properties in module");
+    testLWCIsSecure() {
+        testUtil.assertStartsWith("SecureLWC", toString(), "Expected engine to return" +
+            "SecureLWC in module");
+        testUtil.assertDefined(LightningElement, "SecureLWC is preventing access to LightningElement in module");
+        testUtil.assertUndefined(createElement, "SecureLWC is leaking properties in module");
         return true;
     }
 

@@ -40,7 +40,7 @@ function LockerService() {
         service.unwrap                = lib["unwrap"];
         service.wrapComponent         = lib["wrapComponent"];
         service.wrapComponentEvent    = lib["wrapComponentEvent"];
-        service.wrapEngine            = lib["wrapEngine"];
+        service.wrapLWC               = lib["wrapLWC"];
         service.wrapLib               = lib["wrapLib"];
 
         // API for file-based components (will not be obfuscated by Closure Compiler).

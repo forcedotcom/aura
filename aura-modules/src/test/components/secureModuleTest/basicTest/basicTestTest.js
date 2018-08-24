@@ -38,9 +38,9 @@
             cmp.testWindowIsSecure();
         }
     },
-    testEngineIsSecure: {
+    testLWCIsSecure: {
         test: function (cmp) {
-            cmp.testEngineIsSecure();
+            cmp.testLWCIsSecure();
         }
     },
 
@@ -57,9 +57,9 @@
         }
     },
 
-    testElementIsImmutable: {
+    testLightningElementIsImmutable: {
         test: function (cmp) {
-            cmp.testElementIsImmutable();
+            cmp.testLightningElementIsImmutable();
         }
     },
 
@@ -98,9 +98,9 @@
         }
     },
 
-    testEngineIsSecureInInternalLib: {
+    testLWCIsSecureInInternalLib: {
         test: function(cmp) {
-            cmp.sanityChecksTester("testEngineIsSecureInInternalLib");
+            cmp.sanityChecksTester("testLWCIsSecureInInternalLib");
         }
     },
 

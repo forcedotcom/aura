@@ -39,8 +39,8 @@ export default class SanityChecks extends LightningElement {
     }
 
     @api
-    testEngineIsSecureInInternalLib() {
-        helper.testEngineIsSecureInInternalLib();
+    testLWCIsSecureInInternalLib() {
+        helper.testLWCIsSecureInInternalLib();
     }
 
     @api

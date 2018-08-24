@@ -15,10 +15,10 @@ export default class Simple extends LightningElement {
     }
 
     @api
-    testEngineIsUnsecure() {
+    testLWCIsUnsecure() {
         // Verify that createElement can be accessed
         testUtil.assertDefined(createElement, "Expected to have access to all properties of engine");
-        testUtil.assertTrue(toString().indexOf("SecureEngine") === -1, "Expected to not see SecureEngine");
+        testUtil.assertTrue(toString().indexOf("SecureLWC") === -1, "Expected to not see SecureLWC");
         return true;
     }
 }

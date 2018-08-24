@@ -14,9 +14,9 @@ export function testDollarAuraNotAccessibleInModules() {
     return true;
 }
 
-export function testEngineIsSecure() {
-    testUtil.assertStartsWith("SecureEngine", toString(), "Expected engine to return" +
-        "SecureEngine in library");
+export function testLWCIsSecure() {
+    testUtil.assertStartsWith("SecureLWC", toString(), "Expected engine to return" +
+        "SecureLWC in library");
     engineIsSecureInLocalFunc();
     return true;
 }
@@ -31,8 +31,8 @@ function windowIsSecureInLocalFunc() {
 }
 
 function engineIsSecureInLocalFunc() {
-    testUtil.assertStartsWith("SecureEngine", toString(), "Expected engine to return" +
-        "SecureEngine in local functions of library module");
+    testUtil.assertStartsWith("SecureLWC", toString(), "Expected engine to return" +
+        "SecureLWC in local functions of library module");
 }
 
 function dollarAuraNotAccessibleInLocalFunc() {

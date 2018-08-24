@@ -1,4 +1,4 @@
-import { Element, api } from 'engine';
+import { LightningElement, api } from "lwc";
 import * as testUtil from 'securemoduletest-test-util';
 
 const SECURE_ELEMENT_REGEX = /^SecureElement: \[.+\]{ key: {"namespace":"secureModuleTest"} }$/
@@ -18,7 +18,7 @@ const isSecureDocument = function(doc) {
     );
 }
 
-export default class ComponentLifecycleTester extends Element {
+export default class ComponentLifecycleTester extends LightningElement {
     // Boolean flags to indicate which lifecycle hooks are being tested
     @api shouldTestConstructorHook = false;
     @api shouldTestConnectedCallbackHook = false;

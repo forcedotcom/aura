@@ -1,8 +1,8 @@
 import { processData, getData } from 'securemoduletest-non-lockerized-lib';
-import { Element, api } from 'engine';
+import { LightningElement, api } from "lwc";
 import * as testUtils from 'securemoduletest-test-util';
 
-export default class TestSecureImports extends Element {
+export default class TestSecureImports extends LightningElement {
     get data() {
         return {
             object: {

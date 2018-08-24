@@ -239,8 +239,8 @@ public class AuraClientExceptionUtilUnitTest extends UnitTestCase {
     @Test
     public void testGenerateCodeSnippet() {
         String code = 
-                "(function $globalEvalIIFE$(){with(arguments[1]||{}){with(arguments[0]||{}){return (function() { $A.componentService.addModule('markup://moduleTest:simpleCmp', 'moduletest-simple-cmp', ['moduletest-text-cmp', 'engine', 'moduleTest:testLib'], function (_moduletestTextCmp, engine, moduleTest_testLib) { 'use strict';\n"+
-                "class Simple extends engine.Element {\n"+
+                "(function $globalEvalIIFE$(){with(arguments[1]||{}){with(arguments[0]||{}){return (function() { $A.componentService.addModule('markup://moduleTest:simpleCmp', 'moduletest-simple-cmp', ['moduletest-text-cmp', 'lwc', 'moduleTest:testLib'], function (_moduletestTextCmp, lwc, moduleTest_testLib) { 'use strict';\n"+
+                "class Simple extends lwc.LightningElement {\n"+
                 "    handlePressEvent(e) {\n"+
                 "        foo\n"+
                 "        const event = new CustomEvent('press', {\n"+

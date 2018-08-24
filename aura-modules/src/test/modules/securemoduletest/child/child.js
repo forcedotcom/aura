@@ -1,8 +1,8 @@
-import { Element, api } from 'engine';
+import { LightningElement, api } from "lwc";
 import * as testUtil from 'securemoduletest-test-util';
 import { LockerLWCEventName } from 'lockerlwc-lockerlwcevent';
 
-export default class Child extends Element {
+export default class Child extends LightningElement {
     get interopData() {
         return {
                 object: {

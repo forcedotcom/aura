@@ -867,7 +867,6 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
                     1,
                     $A.lockerService.wrapEngine(deps[index], $A.lockerService.getKeyForNamespace(defDescriptor.getNamespace())));
             }
-
             // Inspect dependencies and decide which library modules to wrap
             for (var i = 0; i < deps.length; i++) {
                 var depName = entry.dependencies[i];

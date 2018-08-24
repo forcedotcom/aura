@@ -1,6 +1,6 @@
-import { Element, api } from "engine";
+import { LightningElement, api } from "lwc";
 
-export default class LockerizedCmp extends Element {
+export default class LockerizedCmp extends LightningElement {
     @api
     divide(a, b) {
         return a / b;

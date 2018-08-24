@@ -1,6 +1,6 @@
-import { api, track, Element } from 'engine';
+import { api, track, LightningElement } from "lwc";
 
-export default class GlobalAttrsOverrideTests extends Element {
+export default class GlobalAttrsOverrideTests extends LightningElement {
     @track state = {};
 
     @api get ariaDescribedBy() {

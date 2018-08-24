@@ -1,7 +1,7 @@
-import { Element } from "engine";
+import { LightningElement } from "lwc";
 import * as testUtil from 'securemoduletest-test-util';
 
-export default class TestConstructor extends Element {
+export default class TestConstructor extends LightningElement {
     constructor() {
         super();
         // Verify that render method has access to secure wrappers when invoked through interop

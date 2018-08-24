@@ -68,7 +68,7 @@ public class ModulesCompilerTest extends UnitTestCase {
         String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8);
 
         assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
-        assertEquals("[x-test, engine]", compilerData.bundleDependencies.toString());
+        assertEquals("[x-test, lwc]", compilerData.bundleDependencies.toString());
     }
 
     @Test
@@ -158,8 +158,8 @@ public class ModulesCompilerTest extends UnitTestCase {
         Map<String, String> files = new HashMap<>();
         files.put(
                 "foo.js",
-                "import { Element, api } from 'engine';\n" +
-                        "export default class Foo extends Element {\n" +
+                "import { LightningElement, api } from 'lwc';\n" +
+                        "export default class Foo extends LightningElement {\n" +
                         "    @api greetings = 'Hello world!';\n" +
                         "}"
         );
@@ -197,8 +197,8 @@ public class ModulesCompilerTest extends UnitTestCase {
         Map<String, String> files = new HashMap<>();
         files.put(
                 "foo.js",
-                "import { Element, api } from 'engine';\n" +
-                        "export default class Foo extends Element {\n" +
+                "import { LightningElement, api } from 'lwc';\n" +
+                        "export default class Foo extends LightningElement {\n" +
                         "    @api greetings = 'Hello world!';\n" +
                         "}"
         );
@@ -236,9 +236,9 @@ public class ModulesCompilerTest extends UnitTestCase {
         Map<String, String> files = new HashMap<>();
         files.put(
                 "foo.js",
-                "import { Element, api, wire, track } from 'engine';\n" +
+                "import { LightningElement, api, wire, track } from 'lwc';\n" +
                         "import { getHello } from '@schema/foo.bar';\n" +
-                        "export default class Foo extends Element {\n" +
+                        "export default class Foo extends LightningElement {\n" +
                         "   @api greeting = 'bob';\n" +
                         "   @track state = {};\n" +
                         "   @wire(getHello, {recordIds: '$wireRecordIds',fields: ['first', 'second'], modes: ['mymode'], layoutTypes: ['layoutone', 'layouttwo'] ,optionalFields: '$wireOptionalFields'})\n" +
@@ -312,8 +312,8 @@ public class ModulesCompilerTest extends UnitTestCase {
         Map<String, String> files = new HashMap<>();
         files.put(
                 "foo.js",
-                "import { Element, api } from 'engine';\n" +
-                        "export default class Foo extends Element {\n" +
+                "import { LightningElement, api } from 'lwc';\n" +
+                        "export default class Foo extends LightningElement {\n" +
                         "    @api greetings = 'Hello world!';\n" +
                         "}"
         );
@@ -335,7 +335,7 @@ public class ModulesCompilerTest extends UnitTestCase {
         assertEquals(result.diagnostics.size(), 1);
         assertEquals(
                 result.code,
-        "define('x-foo', ['engine'], function (engine) {\n" +
+        "define('x-foo', ['lwc'], function (lwc) {\n" +
                 "\n" +
                 "     const style = undefined;\n" +
                 "\n" +
@@ -360,7 +360,7 @@ public class ModulesCompilerTest extends UnitTestCase {
                 "        document.head.appendChild(style$$1);\n" +
                 "     }\n" +
                 "\n" +
-                "     class Foo extends engine.Element {\n" +
+                "     class Foo extends lwc.LightningElement {\n" +
                 "       constructor(...args) {\n" +
                 "         var _temp;\n" +
                 "\n" +
@@ -391,9 +391,9 @@ public class ModulesCompilerTest extends UnitTestCase {
         Map<String, String> files = new HashMap<>();
 
         files.put(
-                "lockerized-cmp.js", "import { Element, api } from \"engine\";\n" +
+                "lockerized-cmp.js", "import { LightningElement, api } from \"lwc\";\n" +
                 "\n" +
-                "export default class LockerizedCmp extends Element {\n" +
+                "export default class LockerizedCmp extends LightningElement {\n" +
                 "    @api\n" +
                 "    divide(a, b) {\n" +
                 "        return a / b;\n" +
@@ -420,8 +420,8 @@ public class ModulesCompilerTest extends UnitTestCase {
         Map<String, String> files = new HashMap<>();
         files.put(
                 "foo.js",
-                "import { Element, api } from 'engine';\n import mytemplate from './nonmatch.html';\n" +
-                        "export default class Foo extends Element {\n" +
+                "import { LightningElement, api } from 'lwc';\n import mytemplate from './nonmatch.html';\n" +
+                        "export default class Foo extends LightningElement {\n" +
                         "    @api greetings = 'Hello world!';\n" +
                         "    render() { return mytemplate; }\n" +
                         "}"
@@ -447,8 +447,8 @@ public class ModulesCompilerTest extends UnitTestCase {
         Map<String, String> files = new HashMap<>();
         files.put(
                 "foo.js",
-                "import { Element, api } from 'engine';\n import mytemplate from './foo.html';\n" +
-                        "export default class Foo extends Element {\n" +
+                "import { LightningElement, api } from 'lwc';\n import mytemplate from './foo.html';\n" +
+                        "export default class Foo extends LightningElement {\n" +
                         "    @api greetings = 'Hello world!';\n" +
                         "    render() { return mytemplate; }\n" +
                         "}"

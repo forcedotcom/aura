@@ -1,8 +1,8 @@
-import { Element, api } from 'engine';
+import { LightningElement, api } from "lwc";
 
 const DEFAULT_HREF = 'javascript:void(0);'; // eslint-disable-line no-script-url
 
-export default class NavItem extends Element {
+export default class NavItem extends LightningElement {
     @api href = DEFAULT_HREF;
 
     connectedCallback() {

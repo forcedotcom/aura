@@ -1,6 +1,6 @@
-import { Element, api } from 'engine';
+import { LightningElement, api } from "lwc";
 
-export default class Text extends Element {
+export default class Text extends LightningElement {
     static labels = ['task_mode_today.en', 'task_mode_today.de'];
     @api text;
 }

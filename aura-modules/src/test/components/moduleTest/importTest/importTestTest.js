@@ -6,7 +6,7 @@
                 var c = cmp.find("import-cmp");
                 return new Promise(function(resolve, reject) {
                     c.getElement(function(element) {
-                        $A.test.assertDefined(element, "import of 'engine' element should return a defined object");
+                        $A.test.assertDefined(element, "import of 'lwc' element should return a defined object");
                         resolve();
                     });
                 });

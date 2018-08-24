@@ -1,4 +1,4 @@
-import { Element, api } from "engine";
-export default class Bar extends Element {
+import { LightningElement, api } from "lwc";
+export default class Bar extends LightningElement {
     @api min = "D5";
 }

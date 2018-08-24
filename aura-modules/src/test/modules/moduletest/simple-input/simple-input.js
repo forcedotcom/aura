@@ -1,6 +1,6 @@
-import { Element, api } from "engine";
+import { LightningElement, api } from "lwc";
 
-export default class SimpleInput extends Element {
+export default class SimpleInput extends LightningElement {
     @api
     get value() {
         return this.root.querySelector('input').value;

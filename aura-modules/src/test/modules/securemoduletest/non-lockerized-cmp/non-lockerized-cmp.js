@@ -1,7 +1,7 @@
-import { Element, createElement, toString, track, api } from "engine";
+import { LightningElement, createElement, toString, track, api } from "lwc";
 import * as testUtil from 'securemoduletest-test-util';
 
-export default class Simple extends Element {
+export default class Simple extends LightningElement {
     @track message = 'Hello Locker!';
 
     @api

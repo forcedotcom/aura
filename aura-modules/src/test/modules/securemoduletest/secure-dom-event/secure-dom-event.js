@@ -1,7 +1,7 @@
-import { Element, track, api } from 'engine';
+import { LightningElement, track, api } from "lwc";
 import * as testUtil from 'securemoduletest-test-util';
 
-export default class SecureDOMEventClazz extends Element {
+export default class SecureDOMEventClazz extends LightningElement {
     _event = null;
     @track accounts = [{ id: 1, Name: "account1" }];
     @track boolVar = true;

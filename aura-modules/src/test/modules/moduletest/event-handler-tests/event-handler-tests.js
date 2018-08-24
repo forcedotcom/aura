@@ -1,6 +1,6 @@
-import { api, Element } from "engine";
+import { api, LightningElement } from "lwc";
 
-export default class EventHandlerTests extends Element {
+export default class EventHandlerTests extends LightningElement {
     @api value;
 
     handleSomething() {

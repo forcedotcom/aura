@@ -1,5 +1,5 @@
-import { Element, api } from 'engine';
-export default class Composite extends Element {
+import { LightningElement, api } from "lwc";
+export default class Composite extends LightningElement {
     @api literal = "Default literal";
     @api bound = "Default bound";
     @api unbound = "Default unbound";

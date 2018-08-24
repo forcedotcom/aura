@@ -1,6 +1,6 @@
-import { Element, api } from "engine";
+import { LightningElement, api } from "lwc";
 
-export default class MappedAttrTests extends Element {
+export default class MappedAttrTests extends LightningElement {
     @api format = "default-format";
     @api msg = "default-val1";
 

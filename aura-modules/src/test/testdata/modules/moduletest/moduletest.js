@@ -1,6 +1,6 @@
-import { Element, api } from "engine";
+import { LightningElement, api } from "lwc";
 
-export default class Test extends Element {
+export default class Test extends LightningElement {
     @api stringQuote = 'str"ing';
     @api stringDoubleQuote = "str'ing";
     @api stringBacktick = `key=${"test tick"}`;

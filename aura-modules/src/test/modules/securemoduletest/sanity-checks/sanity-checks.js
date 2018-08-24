@@ -1,9 +1,9 @@
-import { Element, api } from 'engine';
+import { LightningElement, api } from "lwc";
 import * as testUtil from 'securemoduletest-test-util';
 import * as helper from './helper.js';
 import sanityChecksHtml from './sanity-checks.html';
 
-export default class SanityChecks extends Element {
+export default class SanityChecks extends LightningElement {
     @api testRenderer = false;
 
     render() {

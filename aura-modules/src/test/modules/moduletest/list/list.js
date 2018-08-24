@@ -1,5 +1,5 @@
-import { Element, api } from 'engine';
+import { LightningElement, api } from "lwc";
 
-export default class List extends Element {
+export default class List extends LightningElement {
     @api items = [];
 }

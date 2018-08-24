@@ -1,11 +1,11 @@
-import { api, Element } from 'engine';
+import { api, LightningElement } from "lwc";
 // eslint-disable-next-line lwc/no-compat
 import aura from 'aura';
 // eslint-disable-next-line lwc/no-compat-module-storage
 import storage from 'aura-storage';
 import { identity } from 'moduletest-simple-lib';
 
-export default class ImportCmp extends Element {
+export default class ImportCmp extends LightningElement {
     state = {
         libImport: identity('expected'),
     };
@@ -13,7 +13,7 @@ export default class ImportCmp extends Element {
     // @api functions are called from aura component moduleTest:importTest
     @api
     getElement(f) {
-        f(Element);
+        f(LightningElement);
     }
 
     @api

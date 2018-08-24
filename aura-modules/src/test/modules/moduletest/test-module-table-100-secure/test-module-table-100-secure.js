@@ -1,6 +1,6 @@
-import { Element, track } from "engine";
+import { LightningElement, track } from "lwc";
 
-export default class TestModuleTable100Secure extends Element {
+export default class TestModuleTable100Secure extends LightningElement {
   @track headers;
   @track content;
 

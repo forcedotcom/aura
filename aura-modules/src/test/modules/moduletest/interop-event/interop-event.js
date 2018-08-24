@@ -1,6 +1,6 @@
-import { Element, api, track } from "engine";
+import { LightningElement, api, track } from "lwc";
 
-export default class InteropEvent extends Element {
+export default class InteropEvent extends LightningElement {
     @api value;
     @api detailsAsProxy;
     @api removeCallback;

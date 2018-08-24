@@ -1,6 +1,6 @@
-import { Element, api } from 'engine';
+import { LightningElement, api } from "lwc";
 
-export default class BidirectionalPrimitive extends Element {
+export default class BidirectionalPrimitive extends LightningElement {
     @api primitive;
 
     connectedCallback() {

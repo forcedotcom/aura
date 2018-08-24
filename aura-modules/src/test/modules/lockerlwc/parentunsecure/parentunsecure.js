@@ -1,7 +1,7 @@
-import { Element, api } from 'engine';
+import { LightningElement, api } from "lwc";
 import * as testUtils from 'securemoduletest-test-util';
 
-export default class ParentUnsecure extends Element {
+export default class ParentUnsecure extends LightningElement {
     @api callback;
 
     get customEventData() {

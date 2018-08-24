@@ -1,5 +1,5 @@
-import { Element, api } from 'engine';
+import { LightningElement, api } from "lwc";
 
-export default class TestModuleTable extends Element {
+export default class TestModuleTable extends LightningElement {
   @api row;
 }

@@ -1,9 +1,9 @@
-import { Element, api, track } from "engine";
+import { LightningElement, api, track } from "lwc";
 // eslint-disable-next-line no-unused-vars, lwc/no-aura-libs
 import { const1 } from "moduleTest:testLib";
 import { log } from "./util.js"; // eslint-disable-line no-unused-vars
 
-export default class Simple extends Element {
+export default class Simple extends LightningElement {
     @api literal = "Default literal";
     @api bound = "Default bound";
     @api unbound = "Default unbound";

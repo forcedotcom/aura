@@ -1,9 +1,9 @@
-import { Element, api } from 'engine';
+import { LightningElement, api } from "lwc";
 
 /**
  * This component is documented.
  */
-export default class DocumentedCmp extends Element {
+export default class DocumentedCmp extends LightningElement {
 	/**
 	 * Whether this thing is enabled.
 	 *

@@ -1,8 +1,8 @@
-import { Element, createElement, toString, api } from "engine";
+import { LightningElement, createElement, toString, api } from "lwc";
 import * as testUtil from 'securemoduletest-test-util';
 import simpleCmpHtml from './simple-cmp.html';
 
-export default class Simple extends Element {
+export default class Simple extends LightningElement {
     @api literal = "Default literal";
     @api bound = "Default bound";
     @api unbound = "Default unbound";
@@ -40,7 +40,7 @@ export default class Simple extends Element {
     testEngineIsSecure() {
         testUtil.assertStartsWith("SecureEngine", toString(), "Expected engine to return" +
             "SecureEngine in module");
-        testUtil.assertDefined(Element, "SecureEngine is preventing access to Element in module");
+        testUtil.assertDefined(LightningElement, "SecureEngine is preventing access to Element in module");
         testUtil.assertUndefined(createElement, "SecureEngine is leaking properties in module");
         return true;
     }

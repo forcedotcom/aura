@@ -1,4 +1,4 @@
-define('modules-moduletest', ['x-test', 'engine'], function (_xTest, engine) {
+define('modules-moduletest', ['x-test', 'lwc'], function (_xTest, lwc) {
 
     const style = undefined;
 
@@ -24,7 +24,7 @@ define('modules-moduletest', ['x-test', 'engine'], function (_xTest, engine) {
         document.head.appendChild(style$$1);
     }
 
-    class Test extends engine.Element {
+    class Test extends lwc.LightningElement {
       constructor(...args) {
         var _temp;
 

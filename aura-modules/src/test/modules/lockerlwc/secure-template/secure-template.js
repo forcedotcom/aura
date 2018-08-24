@@ -1,7 +1,7 @@
-import { Element, api } from 'engine';
+import { LightningElement, api } from "lwc";
 import * as testUtils from 'securemoduletest-test-util';
 
-export default class SecureTemplateTester extends Element {
+export default class SecureTemplateTester extends LightningElement {
     @api
     testChildNodes() {
       const childNodes = this.template.childNodes;

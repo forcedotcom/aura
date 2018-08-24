@@ -1,5 +1,5 @@
-import { Element, api } from 'engine';
+import { LightningElement, api } from "lwc";
 
-export default class Alpha extends Element {
+export default class Alpha extends LightningElement {
     @api text;
 }

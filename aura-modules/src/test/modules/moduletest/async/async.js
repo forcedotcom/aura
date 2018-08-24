@@ -1,4 +1,4 @@
-import { Element } from 'engine';
+import { LightningElement } from "lwc";
 
 function resolveAfter1Sec(x) {
     return new Promise(resolve => {
@@ -13,7 +13,7 @@ async function testFun(number) {
     return t;
 }
 
-export default class Async extends Element {
+export default class Async extends LightningElement {
     connectedCallback() {
         testFun(7).then((n) => {
             console.log('YAY!', n); // eslint-disable-line no-console

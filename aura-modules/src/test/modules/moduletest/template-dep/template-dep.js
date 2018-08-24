@@ -1,3 +1,3 @@
-import { Element } from 'engine';
-export default class TemplateCmp extends Element {
+import { LightningElement } from "lwc";
+export default class TemplateCmp extends LightningElement {
 }

@@ -1,9 +1,8 @@
-import { Element, createElement, toString, api } from 'lwc';
-
+import { LightningElement, createElement, toString, api } from "lwc";
 import * as testUtil from 'securemoduletest-test-util';
 import * as simpleLib from 'securemoduletest-simple-lib';
 
-export default class Bootstrap extends Element {
+export default class Bootstrap extends LightningElement {
     @api
     testWindowIsSecure() {
         testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
@@ -28,7 +27,7 @@ export default class Bootstrap extends Element {
     testEngineIsSecure() {
         testUtil.assertStartsWith("SecureEngine", toString(), "Expected engine to return" +
             "SecureEngine in interop component");
-        testUtil.assertDefined(Element, "SecureEngine is preventing access to Element in interop component");
+        testUtil.assertDefined(LightningElement, "SecureEngine is preventing access to Element in interop component");
         testUtil.assertUndefined(createElement, "SecureEngine is leaking properties in interop component");
         engineIsSecureInLocalFunc();
         const simpleCmp = this.template.querySelector("#securemoduletest-simple-cmp");

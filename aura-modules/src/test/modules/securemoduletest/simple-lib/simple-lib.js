@@ -1,5 +1,5 @@
 import * as testUtil from 'securemoduletest-test-util';
-import { toString } from 'engine';
+import { toString } from "lwc";
 
 export function testWindowIsSecure() {
     testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"

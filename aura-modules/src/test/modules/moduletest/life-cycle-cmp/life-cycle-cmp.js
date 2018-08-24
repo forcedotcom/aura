@@ -1,6 +1,6 @@
-import { Element, api, dangerousObjectMutation } from "engine";
+import { LightningElement, api, dangerousObjectMutation } from "lwc";
 
-export default class LifeCycleCmp extends Element {
+export default class LifeCycleCmp extends LightningElement {
     @api lifeCycleLog = [];
 
     connectedCallback() {

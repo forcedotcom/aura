@@ -1,6 +1,6 @@
-import { Element, api } from 'engine';
+import { LightningElement, api } from "lwc";
 
-export default class InteropBooleanAttribute extends Element {
+export default class InteropBooleanAttribute extends LightningElement {
     // What makes this a boolean attribute from the perspective of the interop
     // layer is that its default value is boolean false.
     @api get booleanAttribute() {

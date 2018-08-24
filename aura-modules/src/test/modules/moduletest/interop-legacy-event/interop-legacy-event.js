@@ -1,6 +1,6 @@
-import { Element, api, unwrap } from "engine";
+import { LightningElement, api, unwrap } from "lwc";
 
-export default class InteropLegacyEvent extends Element {
+export default class InteropLegacyEvent extends LightningElement {
     @api
     triggerEvent() {
         // a bug in Chrome prevents us from using focus() here. Fixed in Chome 67.

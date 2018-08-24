@@ -1,5 +1,5 @@
-import { Element, track } from 'engine';
-export default class Foo extends Element {
+import { LightningElement, track } from "lwc";
+export default class Foo extends LightningElement {
     @track title = 'recursive test';
     @track items;
 

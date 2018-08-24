@@ -1,6 +1,6 @@
-import { Element, track, api } from 'engine';
+import { LightningElement, track, api } from "lwc";
 
-export default class ObjectOperationsCmp extends Element {
+export default class ObjectOperationsCmp extends LightningElement {
     @track assignVal = { inner: "i'm default value." };
     @track constructedObject;
     @track createdObj;

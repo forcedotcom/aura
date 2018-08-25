@@ -859,8 +859,21 @@ public class AuraContextImpl implements AuraContext {
                     json.writeMapEntry("ls", 1);
                 }
 
+                if (this.useCompatSource()) {
+                    json.writeMapEntry("c", 1);
+                }
+
+                if (this.forceCompat()) {
+                    json.writeMapEntry("fc", 1);
+                }
 
                 if (style == EncodingStyle.Full) {
+
+                    Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
+                    if (!moduleNamespaceAliases.isEmpty()) {
+                        json.writeMapEntry("mna", moduleNamespaceAliases);
+                    }
+
                     if (configAdapter.isStrictCSPEnforced()) {
                         json.writeMapEntry("csp", 1);
                     }
@@ -871,19 +884,6 @@ public class AuraContextImpl implements AuraContext {
 
                     if (nonce != null) {
                         json.writeMapEntry("scriptNonce", nonce);
-                    }
-
-                    Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
-                    if (!moduleNamespaceAliases.isEmpty()) {
-                        json.writeMapEntry("mna", moduleNamespaceAliases);
-                    }
-
-                    if (this.useCompatSource()) {
-                        json.writeMapEntry("c", 1);
-                    }
-
-                    if (this.forceCompat()) {
-                        json.writeMapEntry("fc", 1);
                     }
 
                     boolean uriAddressableExplicitlyDisabled = false;

@@ -21,7 +21,7 @@
     controller="java://org.auraframework.docs.DocsController"
     useAppcache="false"
     locationChangeEvent="auradocs:locationChange"
-    implements="auraStorage:refreshObserver">
+    implements="auraStorage:refreshObserver,aura:uriDefinitionsDisabled">
 
     <aura:dependency resource="auradocs:*" />
     <aura:dependency resource="auraStorage:*" />

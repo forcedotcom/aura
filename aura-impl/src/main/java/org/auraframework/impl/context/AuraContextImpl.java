@@ -772,6 +772,10 @@ public class AuraContextImpl implements AuraContext {
         allowedGlobalValues.put(approvedName, new GlobalValue(publicallyWritable, defaultValue));
     }
 
+    protected String getSerializationVersion() {
+        return String.format("%d", ServerServiceImpl.AURA_SERIALIZATION_VERSION);
+    }
+
     @Override
     public String serialize(EncodingStyle style) {
         StringBuffer sb = new StringBuffer();
@@ -794,7 +798,7 @@ public class AuraContextImpl implements AuraContext {
                 // AppJs does not include fwuid
                 if (style == EncodingStyle.AppResource) {
                     // AppJs does contain this serialization version as a cache busting key we can use when we change the format of the file.
-                    json.writeMapEntry("serializationVersion", ServerServiceImpl.AURA_SERIALIZATION_VERSION);
+                    json.writeMapEntry("serializationVersion", getSerializationVersion());
                 } else if (style == EncodingStyle.Css) {
                     // don't include a serialized version nor fwuid
                 } else {

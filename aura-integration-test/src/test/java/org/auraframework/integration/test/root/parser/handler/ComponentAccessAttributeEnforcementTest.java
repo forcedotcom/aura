@@ -2104,6 +2104,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcmpwithdependencydeclaration", NamespaceAccess.CUSTOM);
 
         Definition def = definitionService.getDefinition(descriptor);
-        // test is successful because this didn't throw an exception trying to access a non-global component with the wildcard match
+        assertNotNull("We should get a definition back successfully", def);
     }
 }

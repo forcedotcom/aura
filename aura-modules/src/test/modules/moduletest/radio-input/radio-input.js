@@ -8,7 +8,6 @@ export default class RadioInput extends LightningElement {
         return this._checked;
     }
 
-    @api
     set checked(value) {
         this._checked = value;
     }

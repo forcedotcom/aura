@@ -6,7 +6,7 @@ export default class InteropBooleanAttribute extends LightningElement {
     @api get booleanAttribute() {
         return this._booleanAttribute || false;
     }
-    @api set booleanAttribute(value) {
+    set booleanAttribute(value) {
         this._booleanAttribute = value;
     }
 
@@ -15,7 +15,7 @@ export default class InteropBooleanAttribute extends LightningElement {
     @api get nonBooleanAttribute() {
         return this._nonBooleanAttribute;
     }
-    @api set nonBooleanAttribute(value) {
+    set nonBooleanAttribute(value) {
         this._nonBooleanAttribute = value;
     }
 }

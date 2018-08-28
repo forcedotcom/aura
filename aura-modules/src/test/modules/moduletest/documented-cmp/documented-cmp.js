@@ -24,7 +24,7 @@ export default class DocumentedCmp extends LightningElement {
 		return this._something;
 	}
 
-	@api set something(value) {
+	set something(value) {
 		this.something = value;
 	}
 

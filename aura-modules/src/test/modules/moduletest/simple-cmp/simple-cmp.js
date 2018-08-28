@@ -63,7 +63,6 @@ export default class Simple extends LightningElement {
         return this._nullValueTest;
     }
 
-    @api
     set nullValueTest(value) {
         this._nullValueTest = value;
     }

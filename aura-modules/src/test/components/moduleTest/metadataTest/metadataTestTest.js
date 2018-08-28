@@ -16,6 +16,7 @@
                         'nested',
                         'nullValueTest',
                         'literal',
+                        'myAccessor'
                     ];
                     $A.test.assertEquals(expected.sort().join(' '), cmp.get('v.attributeList').sort().join(' '));
                 });

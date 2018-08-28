@@ -6,7 +6,6 @@ export default class SimpleInput extends LightningElement {
         return this.root.querySelector('input').value;
     }
 
-    @api
     set value(value) {
         this.root.querySelector('input').value = value;
     }

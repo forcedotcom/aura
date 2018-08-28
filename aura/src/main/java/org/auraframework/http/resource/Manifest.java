@@ -16,16 +16,7 @@
 
 package org.auraframework.http.resource;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.google.common.collect.Maps;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -35,16 +26,20 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.Component;
 import org.auraframework.service.RenderingService;
-import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import com.google.common.collect.Maps;
-import org.auraframework.util.json.JsonEncoder;
-import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.util.text.Hash;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.Map;
 
 @ServiceComponent
 public class Manifest extends AuraResourceImpl {
@@ -56,7 +51,6 @@ public class Manifest extends AuraResourceImpl {
 
     // FIXME: this is horrendous we actually render the manifest as a component.
     private RenderingService renderingService;
-    private ServerService serverService;
     private ManifestUtil manifestUtil;
 
     public Manifest() {
@@ -254,11 +248,6 @@ public class Manifest extends AuraResourceImpl {
     @Inject
     public void setRenderingService(RenderingService renderingService) {
         this.renderingService = renderingService;
-    }
-
-    @Inject
-    public void setServerService(ServerService serverService) {
-        this.serverService = serverService;
     }
 
     public void setManifestUtil(ManifestUtil manifestUtil) {

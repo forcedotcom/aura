@@ -297,6 +297,17 @@
         ]
     },
 
+    testLinkWithNewline: {
+        attributes:{
+            textValue: 'Open http://salesforce.com\n for more Info'
+        },
+        test: [
+            function(cmp) {
+                this.assertLinkHref(cmp, 'http://salesforce.com/')
+            }
+        ]
+    },
+
     assertLinksPresent: function(cmp, hrefText, checkValue) {
         $A.test.addWaitForWithFailureMessage(true,
             function() {

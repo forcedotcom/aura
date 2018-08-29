@@ -3027,23 +3027,24 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [Fact]
-        function ReturnsNbForNorNorwegian(){
+        [Fact, Data({locale: "no_No", expected: "nb"}, // Norwegian
+                    {locale: "in_ID", expected: "id"}, // Indonesian
+                    {locale: "iw_IL", expected: "he"})] // Hebrew
+        function ReturnsMomentIdentifierForSpecialLocale(data) {
             // Arrange
-            var expected = "nb";
             var targetService = new Aura.Services.AuraLocalizationService();
 
             targetService.moment = {
                 locales: function(){
-                    return [expected];
+                    return [data.expected];
                 }
             };
 
             // Act
-            var actual = targetService.normalizeToMomentLocale("no_No");
+            var actual = targetService.normalizeToMomentLocale(data.locale);
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(data.expected, actual);
         }
     }
 

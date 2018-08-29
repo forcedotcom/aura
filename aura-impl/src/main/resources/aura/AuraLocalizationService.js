@@ -28,6 +28,11 @@ function AuraLocalizationService() {
 
     this.ZERO = "0";
 
+    this.momentLanguages = {
+        "iw": "he", // Hebrew
+        "in": "id", // Indonesian
+        "no": "nb"  // Norwegian
+    };
     this.momentLocaleCache = {};
 
     // needs to hardcode some locales which are not identified by browers
@@ -1794,8 +1799,8 @@ AuraLocalizationService.prototype.normalizeToMomentLocale = function(locale) {
     var tokens = normalized.split("-", 2);
 
     // momentJs uses 'nb' as Norwegian
-    if (tokens[0] === "no") {
-        tokens[0] = "nb";
+    if (this.momentLanguages[tokens[0]]) {
+        tokens[0] = this.momentLanguages[tokens[0]];
     }
 
     if (tokens.length > 1) {

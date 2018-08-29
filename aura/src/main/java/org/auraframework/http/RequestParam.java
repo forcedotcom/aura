@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.auraframework.throwable.AuraRuntimeException;
 
 /**
+ * @param <T> The type of variable being stored/returned by this class.
  */
 public abstract class RequestParam<T> {
     public final String name;
@@ -54,8 +55,7 @@ public abstract class RequestParam<T> {
     }
 
     public static class MissingParamException extends AuraRuntimeException {
-        /**
-         */
+
         private static final long serialVersionUID = -1357285133277767121L;
         private static final String message = "Missing parameter value for %s";
 
@@ -95,12 +95,13 @@ public abstract class RequestParam<T> {
             super(name, required);
         }
 
+        @SuppressWarnings("boxing")
         @Override
         public Boolean get(HttpServletRequest request) {
             String ret = getRawValue(request);
 
             if (ret == null) {
-                return false;
+                return Boolean.FALSE;
             }
 
             return "1".equals(ret) || "true".equalsIgnoreCase(ret) || "yes".equalsIgnoreCase(ret);

@@ -80,7 +80,8 @@ public class CSPReporterServlet extends HttpServlet {
         Map<String, Object> report = null;
 
         try {
-            BufferedReader reader = req.getReader();
+            @SuppressWarnings("resource")
+			BufferedReader reader = req.getReader();
             report = (Map<String, Object>)new JsonReader().read(reader);
         } catch (Exception e) {
             /* TODO: report an error*/

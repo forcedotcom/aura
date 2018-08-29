@@ -38,6 +38,7 @@ public class AuraDocsRewriteFilter implements Filter {
 
     @Override
     public void destroy() {
+        // Nothing needs to be destroyed
     }
 
     @Override

@@ -71,11 +71,15 @@ public class AuraCSPFilter implements Filter {
 
     @Override
     public void init(FilterConfig config) throws ServletException {
+        // Nothing needs to be initialized
     }
 
     @Override
-    public void destroy() {}
+    public void destroy() {
+        // Nothing needs to be destroyed
+    }
 
+    @SuppressWarnings("static-method")
     protected String getPolicy(String url) {
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
         PolicyBuilder p = new PolicyBuilder();
@@ -107,7 +111,7 @@ public class AuraCSPFilter implements Filter {
      * NOTE: this should be fixed sooner rather than later, because the initial template *is*
      * configurable by consumers, and is therefore a vector for attack.
      */
-    protected final boolean doesUrlAllowInline(String url) {
+    protected final static boolean doesUrlAllowInline(String url) {
         for (String pattern : INLINE_ALLOWED_URLS) {
             if (url.matches(pattern)) {
                 return true;
@@ -119,17 +123,17 @@ public class AuraCSPFilter implements Filter {
 
     private static String getFrameworkJsSuffixRegex() {
         StringBuilder sb = new StringBuilder();
-        sb.append("(");
+        sb.append('(');
         boolean first = true;
         for (String suffix : JavascriptGeneratorMode.getSuffixes()) {
             if (!first) {
-                sb.append("|");
+                sb.append('|');
             }
             sb.append(suffix);
 
             first = false;
         }
-        sb.append(")");
+        sb.append(')');
 
         return sb.toString();
     }

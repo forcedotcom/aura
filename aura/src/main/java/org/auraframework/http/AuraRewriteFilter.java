@@ -46,6 +46,7 @@ public class AuraRewriteFilter implements Filter {
 
     @Override
     public void destroy() {
+        // Nothing needs to be destroyed.
     }
 
     private static String createURI(String namespace, String name, String defType, String access, String qs) {
@@ -95,5 +96,4 @@ public class AuraRewriteFilter implements Filter {
     public void init(FilterConfig config) throws ServletException {
         servletContext = config.getServletContext();
     }
-
 }

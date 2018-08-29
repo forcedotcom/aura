@@ -61,7 +61,16 @@ import org.apache.commons.lang3.StringUtils;
  * </code>
  */
 public class CSP {
+
+    private CSP() {
+        	// This class is only static methods and should not be instantiated
+    }
+
     public static final class Header {
+        	private Header() {
+            // This class is only static methods and should not be instantiated
+        }
+
         public static final String SECURE = "Content-Security-Policy";
         public static final String REPORT_ONLY = "Content-Security-Policy-Report-Only";
     }
@@ -135,8 +144,6 @@ public class CSP {
     public static class PolicyBuilder {
         private static final Set<String> DIRECTIVE_WITHOUT_VALUE_PLACEHOLDER = Collections.singleton("");
 
-        public PolicyBuilder() {}
-
         /**
          * This uses {@link java.util.Set}s to enforce unique elements in
          * source-list and ancestor-source-list directive values. 
@@ -194,7 +201,7 @@ public class CSP {
         public PolicyBuilder report_uri(String... uris) {
          // If the Report URI is empty or null, don't add report-uri directive at all
             Set<String> reportURIs = Arrays.stream(uris).filter(StringUtils::isNotBlank).collect(Collectors.toCollection(LinkedHashSet::new));
-            if (reportURIs.size() > 0) {
+            if (!reportURIs.isEmpty()) {
                 directives.put(Directive.REPORT_URI, reportURIs);
             }
             return this;
@@ -220,12 +227,12 @@ public class CSP {
         }
 
         private PolicyBuilder extend(Directive directive, String... sources) {
-            Set<String> list = directives.get(directive);
-            if (list == null) {
+            Set<String> set = directives.get(directive);
+            if (set == null) {
                 directives.put(directive, new LinkedHashSet<>(Arrays.asList(sources)));
             } else {
                 for (String src : sources) {
-                    list.add(src);
+                    set.add(src);
                 }
             }
             return this;
@@ -247,7 +254,7 @@ public class CSP {
                     sb.append(dir);
 
                     for (String value : values) {
-                        sb.append(" ").append(value);
+                        sb.append(' ').append(value);
                     }
                 }
             }

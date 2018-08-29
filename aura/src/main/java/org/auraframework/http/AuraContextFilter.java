@@ -58,6 +58,7 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
+@SuppressWarnings("deprecation")
 public class AuraContextFilter implements Filter {
     public static final EnumParam<AuraContext.Mode> mode = new EnumParam<>(AuraServlet.AURA_PREFIX
             + "mode", false, AuraContext.Mode.class);
@@ -171,9 +172,9 @@ public class AuraContextFilter implements Filter {
         } catch (InvalidParamException e) {
             HttpServletResponse response = (HttpServletResponse) res;
             response.setStatus(500);
+            @SuppressWarnings("resource")
             Appendable out = response.getWriter();
             out.append(e.getMessage());
-            return;
         } finally {
             try {
                 if (loggingService != null) {
@@ -191,7 +192,8 @@ public class AuraContextFilter implements Filter {
         }
     }
 
-    protected AuraContext startContext(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,ServletException {
+    @SuppressWarnings({ "boxing", "unused" })
+    protected AuraContext startContext(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
 
         Format f = format.get(request);
@@ -321,7 +323,7 @@ public class AuraContextFilter implements Filter {
             }
             try {
                 configMap = (Map<String, Object>) new JsonReader().read(config);
-            } catch (Throwable throwable){
+            } catch (Throwable throwable) {
                 //config map was invalid. log the bad json and move on. Callers are protected against null.
                 loggingService.warn("aura.config was invalid JSON:" + config, throwable);
             }
@@ -329,7 +331,7 @@ public class AuraContextFilter implements Filter {
         return configMap;
     }
 
-    private Mode getModeParam(HttpServletRequest request, Map<String, Object> configMap) {
+    private static Mode getModeParam(HttpServletRequest request, Map<String, Object> configMap) {
         // Get the passed in mode param.
         // Check the aura.mode param first then fall back to the mode value
         // embedded in the aura.context param
@@ -364,6 +366,7 @@ public class AuraContextFilter implements Filter {
      * Whether compat module should be served based on browser
      *
      * @param request http request
+     * @param configMap The configs containing the context.
      * @param mode Aura context mode
      * @return whether compat module should be served
      */
@@ -381,9 +384,11 @@ public class AuraContextFilter implements Filter {
      * force compat mode
      *
      * @param request http request
+     * @param configMap The configs containing the context.
      * @param mode Aura context mode
      * @return whether compat module should be served
      */
+    @SuppressWarnings("static-method")
     protected boolean forceCompat(HttpServletRequest request, Map<String, Object> configMap, Mode mode) {
         if (configMap != null) {
             // when fc is present, it's a request to fetch module compiled code in compatibility mode
@@ -402,14 +407,13 @@ public class AuraContextFilter implements Filter {
         return false;
     }
 
-    private boolean configMapContains(@Nonnull String key, @Nonnull String value, @Nonnull Map<String, Object> configMap) {
+    private static boolean configMapContains(@Nonnull String key, @Nonnull String value, @Nonnull Map<String, Object> configMap) {
         // configMap is present when processing requests with url encoded AuraContext ie app.js
         if (configMap.containsKey(key)) {
             String configValue = String.valueOf(configMap.get(key));
             return value.equals(configValue);
-        } else {
-            return false;
         }
+        return false;
     }
 
     private DefDescriptor<? extends BaseComponentDef> getAppParam(HttpServletRequest request, Map<String, Object> configMap) {
@@ -439,9 +443,8 @@ public class AuraContextFilter implements Filter {
         if (configMap != null) {
             if (configMap.containsKey("apck")) {
                 return (String) configMap.get("apck");
-            } else {
-                return null;
             }
+            return null;
         }
         return configAdapter.getActionPublicCacheKey();
     }
@@ -452,6 +455,7 @@ public class AuraContextFilter implements Filter {
 
     @Override
     public void destroy() {
+        // Nothing needs to be destroyed
     }
 
     @Override

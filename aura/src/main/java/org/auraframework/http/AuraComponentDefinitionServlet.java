@@ -20,7 +20,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -63,7 +62,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 
+import com.google.common.collect.Maps;
+
 public class AuraComponentDefinitionServlet extends AuraBaseServlet {
+
+    private static final long serialVersionUID = -63006586456859622L;
 
     public final static String URI_DEFINITIONS_PATH = "/auraCmpDef";
 
@@ -75,7 +78,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     protected final static StringParam defDescriptorParam = new StringParam("_def", 0, false);
     protected final static StringParam componentUIDParam = new StringParam("_uid", 0, false);
 
-    protected final static List<Class> DESCRIPTOR_DEF_TYPES = Arrays.asList(ModuleDef.class, ComponentDef.class, EventDef.class, LibraryDef.class);
+    protected final static List<Class<? extends Definition>> DESCRIPTOR_DEF_TYPES = Arrays.asList(ModuleDef.class, ComponentDef.class, EventDef.class, LibraryDef.class);
 
     protected DefinitionService definitionService;
     protected LoggingService loggingService;
@@ -94,140 +97,141 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         response.setContentType("text/javascript");
         response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
 
-        StringBuilderWriter responseStringWriter = new StringBuilderWriter();
+        try (final StringBuilderWriter responseStringWriter = new StringBuilderWriter()) {
 
-        AuraContext context = contextService.getCurrentContext();
-
-        try {
-            if (requestedDescriptors.size() == 0) {
-                throw new InvalidDefinitionException("Descriptor required", null);
-            }
-
-            updateContext(request);
-
-            Map<DefDescriptor<?>, String> descriptors = mapDescriptorsToDefDesriptorAndUid(requestedDescriptors);
-
-            StringBuilder allUIDs = new StringBuilder();
-
-            for (Entry defDesc : descriptors.entrySet()) {
-                allUIDs.append(defDesc.getValue());
-            }
-            String computedUID = allUIDs.toString();
-
-            int requestedHashCode = 0;
-            if (descriptors.size() > 1) {
-                try {
-                    requestedHashCode = Integer.parseInt(requestedUID);
-                } catch (NumberFormatException nfe) {
-                    loggingService.warn("Requested uid should have been a hash of the UIDs", nfe);
-                }
-            }
-
-            if ((descriptors.size() == 1 && !computedUID.equals(requestedUID)) ||
-                (descriptors.size() > 1  && computedUID.hashCode() != requestedHashCode)) {
-                if ("null".equals(requestedUID)) {
-                    throw new InvalidDefinitionException("requestedComponentUID can't be 'null'", null);
-                }
-
-                StringBuilder redirectUrl = getHost(request);
-                redirectUrl.append(generateRedirectURI(descriptors, computedUID, request));
-
-                servletUtilAdapter.setNoCache(response);
-                response.sendRedirect(redirectUrl.toString());
-                return;
-            }
-
-            HYDRATION_TYPE hydrationType;
-            if (configAdapter.getDefaultMode() == Mode.PROD) {
-                hydrationType = HYDRATION_TYPE.one;
-            } else {
-                // in non prod modes, we want to use hydration in order to make it easier for developers to debug
-                hydrationType = HYDRATION_TYPE.all;
-            }
-
-            serverService.writeDefinitions(descriptors.keySet(), responseStringWriter, false, 0, hydrationType, false);
-
+            AuraContext context = contextService.getCurrentContext();
+    
             try {
-                definitionService.populateGlobalValues(AuraValueProviderType.LABEL.getPrefix(),
-                        mapDescriptorToDefinition(descriptors.keySet()));
-            } catch (QuickFixException qfe) {
-                // this should not throw a QFE
-                loggingService.warn("attempting to populate labels for requested definitions: " + StringUtils.join(requestedDescriptors, ","), qfe);
-            }
-
-           definitionService.updateLoaded(descriptors.keySet());
-
-            Set<DefDescriptor<?>> dependencies = new HashSet<>();
-            descriptors.entrySet().stream().forEach((entry)->{
-                dependencies.addAll(definitionService.getDependencies(entry.getValue()));
-            });
-            dependencies.removeAll(descriptors.keySet());
-
-            DefDescriptor<ApplicationDef> appDescriptor = definitionService.getDefDescriptor(appReferrrer, ApplicationDef.class);
-            String appUID;
-            try {
-                appUID = definitionService.getUid(null, appDescriptor);
-            } catch (DefinitionNotFoundException dnfe) {
-                // mainly tests directly access components as top level without an app.
-                // if neither exist, let the error bubble up
-                appUID = definitionService.getUid(null, definitionService.getDefDescriptor(appReferrrer, ComponentDef.class));
-            }
-            dependencies.removeAll(definitionService.getDependencies(appUID));
-
-            serverService.writeDefinitions(dependencies, responseStringWriter, false, 0, HYDRATION_TYPE.all, false);
-
-            if (!dependencies.isEmpty()) {
+                if (requestedDescriptors.size() == 0) {
+                    throw new InvalidDefinitionException("Descriptor required", null);
+                }
+    
+                updateContext(request);
+    
+                Map<DefDescriptor<?>, String> descriptors = mapDescriptorsToDefDesriptorAndUid(requestedDescriptors);
+    
+                StringBuilder allUIDs = new StringBuilder();
+    
+                for (Entry<DefDescriptor<?>, String> defDesc : descriptors.entrySet()) {
+                    allUIDs.append(defDesc.getValue());
+                }
+                String computedUID = allUIDs.toString();
+    
+                int requestedHashCode = 0;
+                if (descriptors.size() > 1) {
+                    try {
+                        requestedHashCode = Integer.parseInt(requestedUID);
+                    } catch (NumberFormatException nfe) {
+                        loggingService.warn("Requested uid should have been a hash of the UIDs", nfe);
+                    }
+                }
+    
+                if ((descriptors.size() == 1 && !computedUID.equals(requestedUID)) ||
+                    (descriptors.size() > 1  && computedUID.hashCode() != requestedHashCode)) {
+                    if ("null".equals(requestedUID)) {
+                        throw new InvalidDefinitionException("requestedComponentUID can't be 'null'", null);
+                    }
+    
+                    StringBuilder redirectUrl = getHost(request);
+                    redirectUrl.append(generateRedirectURI(descriptors, computedUID, request));
+    
+                    servletUtilAdapter.setNoCache(response);
+                    response.sendRedirect(redirectUrl.toString());
+                    return;
+                }
+    
+                HYDRATION_TYPE hydrationType;
+                if (configAdapter.getDefaultMode() == Mode.PROD) {
+                    hydrationType = HYDRATION_TYPE.one;
+                } else {
+                    // in non prod modes, we want to use hydration in order to make it easier for developers to debug
+                    hydrationType = HYDRATION_TYPE.all;
+                }
+    
+                serverService.writeDefinitions(descriptors.keySet(), responseStringWriter, false, 0, hydrationType, false);
+    
                 try {
-                    String providerPrefix = AuraValueProviderType.LABEL.getPrefix();
-                    definitionService.populateGlobalValues(providerPrefix, mapDescriptorToDefinition(dependencies));
+                    definitionService.populateGlobalValues(AuraValueProviderType.LABEL.getPrefix(),
+                            mapDescriptorToDefinition(descriptors.keySet()));
                 } catch (QuickFixException qfe) {
                     // this should not throw a QFE
                     loggingService.warn("attempting to populate labels for requested definitions: " + StringUtils.join(requestedDescriptors, ","), qfe);
                 }
-
-                for (DefDescriptor<?> descriptor : dependencies) {
-                    definitionService.updateLoaded(descriptor);
+    
+                definitionService.updateLoaded(descriptors.keySet());
+    
+                Set<DefDescriptor<?>> dependencies = new HashSet<>();
+                descriptors.entrySet().stream().forEach((entry)->{
+                    dependencies.addAll(definitionService.getDependencies(entry.getValue()));
+                });
+                dependencies.removeAll(descriptors.keySet());
+    
+                DefDescriptor<ApplicationDef> appDescriptor = definitionService.getDefDescriptor(appReferrrer, ApplicationDef.class);
+                String appUID;
+                try {
+                    appUID = definitionService.getUid(null, appDescriptor);
+                } catch (DefinitionNotFoundException dnfe) {
+                    // mainly tests directly access components as top level without an app.
+                    // if neither exist, let the error bubble up
+                    appUID = definitionService.getUid(null, definitionService.getDefDescriptor(appReferrrer, ComponentDef.class));
                 }
-            }
-
-            // write Value Providers Labels and Global
-            String gvps = serializeGVPs(context);
-            if (StringUtils.isNotEmpty(gvps)) {
-                responseStringWriter.write("$A.getContext().mergeGVPs(");
-                responseStringWriter.write(gvps);
-                responseStringWriter.write(");");
-            }
-
-            if(containsRestrictedDefs(context, descriptors)) {
-                servletUtilAdapter.setLongCachePrivate(response);
-            } else {
-                servletUtilAdapter.setLongCache(response);
-            }
-
-        } catch (Exception e) {
-            PrintWriter out = response.getWriter();
-
-            String loaderErrorString = request.getQueryString().split("&" + componentUIDParam.name)[0];
-            loaderErrorString = loaderErrorString.substring(loaderErrorString.lastIndexOf("&_") + 2);
-            int nextAnd = loaderErrorString.indexOf("&");
-            if (nextAnd < 0) {
-                if (loaderErrorString.startsWith("def=")) {
-                    nextAnd = 4;
+                dependencies.removeAll(definitionService.getDependencies(appUID));
+    
+                serverService.writeDefinitions(dependencies, responseStringWriter, false, 0, HYDRATION_TYPE.all, false);
+    
+                if (!dependencies.isEmpty()) {
+                    try {
+                        String providerPrefix = AuraValueProviderType.LABEL.getPrefix();
+                        definitionService.populateGlobalValues(providerPrefix, mapDescriptorToDefinition(dependencies));
+                    } catch (QuickFixException qfe) {
+                        // this should not throw a QFE
+                        loggingService.warn("attempting to populate labels for requested definitions: " + StringUtils.join(requestedDescriptors, ","), qfe);
+                    }
+    
+                    for (DefDescriptor<?> descriptor : dependencies) {
+                        definitionService.updateLoaded(descriptor);
+                    }
+                }
+    
+                // write Value Providers Labels and Global
+                String gvps = serializeGVPs(context);
+                if (StringUtils.isNotEmpty(gvps)) {
+                    responseStringWriter.write("$A.getContext().mergeGVPs(");
+                    responseStringWriter.write(gvps);
+                    responseStringWriter.write(");");
+                }
+    
+                if(containsRestrictedDefs(context, descriptors)) {
+                    servletUtilAdapter.setLongCachePrivate(response);
                 } else {
-                    nextAnd = 0;
+                    servletUtilAdapter.setLongCache(response);
                 }
+    
+            } catch (Exception e) {
+                @SuppressWarnings("resource")
+                PrintWriter out = response.getWriter();
+    
+                String loaderErrorString = request.getQueryString().split("&" + componentUIDParam.name)[0];
+                loaderErrorString = loaderErrorString.substring(loaderErrorString.lastIndexOf("&_") + 2);
+                int nextAnd = loaderErrorString.indexOf("&");
+                if (nextAnd < 0) {
+                    if (loaderErrorString.startsWith("def=")) {
+                        nextAnd = 4;
+                    } else {
+                        nextAnd = 0;
+                    }
+                }
+                loaderErrorString = loaderErrorString.substring(nextAnd);
+                loaderErrorString = loaderErrorString.replaceAll("[^&=_,:/a-zA-Z0-9-]+","");
+    
+                out.append(String.format("if(!Aura.componentDefLoaderError['%s']){Aura.componentDefLoaderError['%s'] = []} Aura.componentDefLoaderError['%s'].push(/*", loaderErrorString, loaderErrorString, loaderErrorString));
+                servletUtilAdapter.handleServletException(e, false, context, request, response, true);
+                out.append(");\n");
+                servletUtilAdapter.setNoCache(response);
+                response.setStatus(HttpStatus.SC_OK);
+            } finally {
+                response.getWriter().print(responseStringWriter.toString());
             }
-            loaderErrorString = loaderErrorString.substring(nextAnd);
-            loaderErrorString = loaderErrorString.replaceAll("[^&=_,:/a-zA-Z0-9-]+","");
-
-            out.append(String.format("if(!Aura.componentDefLoaderError['%s']){Aura.componentDefLoaderError['%s'] = []} Aura.componentDefLoaderError['%s'].push(/*", loaderErrorString, loaderErrorString, loaderErrorString));
-            servletUtilAdapter.handleServletException(e, false, context, request, response, true);
-            out.append(");\n");
-            servletUtilAdapter.setNoCache(response);
-            response.setStatus(HttpStatus.SC_OK);
-        } finally {
-            response.getWriter().print(responseStringWriter.toString());
-            responseStringWriter.close();
         }
     }
 
@@ -247,14 +251,14 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     protected StringBuilder getHost(HttpServletRequest request) {
         StringBuilder sb = new StringBuilder("http");
         if (configAdapter.isSecureRequest(request)) {
-            sb.append("s");
+            sb.append('s');
         }
-        sb.append("://");
-        sb.append(request.getHeader("Host"));
+        sb.append("://")
+          .append(request.getHeader("Host"));
         return sb;
     }
 
-    private Boolean containsRestrictedDefs(AuraContext context, Map<DefDescriptor<?>, String> requestedDescriptors) {
+    private static boolean containsRestrictedDefs(AuraContext context, Map<DefDescriptor<?>, String> requestedDescriptors) {
 
         Set<String> restrictedNamespaces = context.getRestrictedNamespaces();
         Stream<String> nameSpaces = requestedDescriptors.entrySet().stream().map(e -> e.getKey().getNamespace());
@@ -263,10 +267,9 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         return hasRestrictedName;
     }
 
-    @SuppressWarnings("unchecked")
     private Map<DefDescriptor<?>, Definition> mapDescriptorToDefinition(Set<DefDescriptor<?>> descriptors) {
-        Map<DefDescriptor<?>, Definition> map = new HashMap<>();
-        for (DefDescriptor defDescriptor : descriptors) {
+        Map<DefDescriptor<?>, Definition> map = Maps.newHashMapWithExpectedSize(descriptors.size());
+        for (DefDescriptor<?> defDescriptor : descriptors) {
             try {
                 map.put(defDescriptor, definitionService.getDefinition(defDescriptor));
             } catch (QuickFixException e) {
@@ -277,7 +280,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         return map;
     }
 
-    private List<String> extractDescriptors(HttpServletRequest request) {
+    private static List<String> extractDescriptors(HttpServletRequest request) {
         String requestedComponentDescriptor = defDescriptorParam.get(request);
 
         if (StringUtils.isNotEmpty(requestedComponentDescriptor)) {
@@ -298,18 +301,17 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         return requestedDescriptors;
     }
 
-    @SuppressWarnings("unchecked")
     private Map<DefDescriptor<?>, String> mapDescriptorsToDefDesriptorAndUid(List<String> requestedDescriptors) throws Exception {
         Map<DefDescriptor<?>, String> descriptors = new TreeMap<>(
-                Comparator.comparing((DefDescriptor defDescriptor)->{return defDescriptor.getNamespace();})
-                        .thenComparing((DefDescriptor defDescriptor)->{return defDescriptor.getName();}));
+                Comparator.comparing((DefDescriptor<?> defDescriptor)->{return defDescriptor.getNamespace();})
+                        .thenComparing((DefDescriptor<?> defDescriptor)->{return defDescriptor.getName();}));
 
 
         for (String requestedDefDescriptor: requestedDescriptors) {
             Exception trackedException = null;
-            for (Class defType : DESCRIPTOR_DEF_TYPES) {
+            for (Class<? extends Definition> defType : DESCRIPTOR_DEF_TYPES) {
                 try {
-                    DefDescriptor defDescriptor = definitionService.getDefDescriptor(requestedDefDescriptor, defType);
+                    DefDescriptor<? extends Definition> defDescriptor = definitionService.getDefDescriptor(requestedDefDescriptor, defType);
                     String uid = definitionService.getUid(null, defDescriptor);
                     descriptors.put(defDescriptor, uid);
                     trackedException = null;
@@ -330,32 +332,34 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         return descriptors;
     }
 
+    @SuppressWarnings("static-method")
     protected String generateAdditionalParameters(HttpServletRequest request) {
         // Override in customization
         return "";
     }
 
+    @SuppressWarnings("boxing")
     private String generateRedirectURI(Map<DefDescriptor<?>, String> descriptors, String computedUID, HttpServletRequest request) {
         StringBuilder redirectURI = new StringBuilder(URI_DEFINITIONS_PATH);
 
         // note, keep parameters in alpha order and keep in sync with componentDefLoader.js to increase chances of cache hits
         // with the exception of '_def', all definitions requested will be towards the end, followed by UID last, since it's calculated based on defs.
-        redirectURI.append("?");
+        redirectURI.append('?');
         // app param
-        redirectURI.append(appDescriptorParam.name).append("=").append(appDescriptorParam.get(request));
+        redirectURI.append(appDescriptorParam.name).append('=').append(appDescriptorParam.get(request));
 
-        redirectURI.append("&").append(formFactorParam.name).append("=").append(formFactorParam.get(request));
+        redirectURI.append('&').append(formFactorParam.name).append('=').append(formFactorParam.get(request));
 
-        redirectURI.append("&").append(lockerParam.name).append("=").append(configAdapter.isLockerServiceEnabled());
+        redirectURI.append('&').append(lockerParam.name).append('=').append(configAdapter.isLockerServiceEnabled());
 
         String locale = localeParam.get(request);
         if (locale != null) {
-            redirectURI.append("&").append(localeParam.name).append("=").append(locale);
+            redirectURI.append('&').append(localeParam.name).append('=').append(locale);
         }
 
         String styleContext = styleParam.get(request);
         if (styleContext != null) {
-            redirectURI.append("&").append(styleParam.name).append("=").append(styleContext);
+            redirectURI.append('&').append(styleParam.name).append('=').append(styleContext);
         }
 
         redirectURI.append(generateAdditionalParameters(request));
@@ -366,28 +370,28 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             computedUID = String.format("%d", computedUID.hashCode());
         }
 
-        redirectURI.append("&").append(componentUIDParam.name).append("=").append(computedUID);
+        redirectURI.append('&').append(componentUIDParam.name).append('=').append(computedUID);
 
         return redirectURI.toString();
     }
 
-    private String generateDefinitionsURIParameters(Map<DefDescriptor<?>, String> descriptors) {
+    private static String generateDefinitionsURIParameters(Map<DefDescriptor<?>, String> descriptors) {
         StringBuilder parameters = new StringBuilder();
         if (descriptors.size() == 1) {
-            parameters.append("&").append(defDescriptorParam.name).append("=").append(descriptors.entrySet().iterator().next().getKey().getQualifiedName());
+            parameters.append('&').append(defDescriptorParam.name).append('=').append(descriptors.entrySet().iterator().next().getKey().getQualifiedName());
         } else {
             String previousNamespace = null;
             boolean firstName = true;
-            for (DefDescriptor descriptor : descriptors.keySet()) {
+            for (DefDescriptor<?> descriptor : descriptors.keySet()) {
                 if (!descriptor.getNamespace().equals(previousNamespace)) {
                     previousNamespace = descriptor.getNamespace();
-                    parameters.append("&").append(previousNamespace).append("=");
+                    parameters.append('&').append(previousNamespace).append('=');
                     firstName = true;
                 }
                 if (firstName) {
                     firstName = false;
                 } else {
-                    parameters.append(",");
+                    parameters.append(',');
                 }
                 parameters.append(descriptor.getName());
             }
@@ -395,7 +399,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         return parameters.toString();
     }
 
-    private String serializeGVPs(AuraContext ctx) throws IOException {
+    private static String serializeGVPs(AuraContext ctx) throws IOException {
         StringBuilder sb = new StringBuilder();
         Json json = new JsonEncoder(sb, ctx.isDevMode());
         Map<String, GlobalValueProvider> globalProvidersMap = ctx.getGlobalProviders();
@@ -416,8 +420,9 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
         // only if srcdoc was updated should we update the GVP
         // once it's set it should remain that way and URI def requests don't get the context to know if it was already set
-        Boolean srcdocEnabled = ctx.validateGlobal("srcdoc") && (Boolean)ctx.getGlobal("srcdoc");
-        if (srcdocEnabled != null && srcdocEnabled.booleanValue()) {
+        if (ctx.validateGlobal("srcdoc")) {
+            final Boolean srcdocEnabled = (Boolean)ctx.getGlobal("srcdoc");
+            if(srcdocEnabled != null && srcdocEnabled.booleanValue()) {
                 if (!firstEntry) {
                     json.writeComma();
                 } else {
@@ -431,6 +436,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 json.writeMapEnd();
                 json.writeMapEnd();
                 firstEntry = false;
+            }
         }
 
         if (!firstEntry) {

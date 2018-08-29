@@ -50,6 +50,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
 
     private MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
     
+    @SuppressWarnings("boxing")
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ResourceLoader resourceLoader = configAdapter.getResourceLoader();
@@ -70,94 +71,91 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             servletUtilAdapter.setCSPHeaders(null, request, response);
         }
 
-        InputStream in = null;
-        try {
+        //
+        // Careful with race conditions here, we should only call regenerateAuraJS
+        // _before_ we get the nonce.
+        //
+        configAdapter.regenerateAuraJS();
+        // framework uid is combination of aura js and resources uid
+        String currentUid = configAdapter.getAuraFrameworkNonce();
+        // match entire path once, looking for root, optional nonce, and
+        // rest-of-path
+        Matcher matcher = RESOURCES_PATTERN.matcher(path);
+        if (!matcher.matches()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        String nonceUid = matcher.group(2);
+        String file = null;
+        boolean haveUid = false;
+        boolean matchedUid = false;
+        file = matcher.group(3);
+        if (nonceUid != null) {
+            nonceUid = nonceUid.substring(1);
+        }
 
+        // process path (not in a function because can't use non-synced
+        // member vars in servlet)
+        String format = null;
+
+        String root = matcher.group(1);
+
+        if (root.equals("resources")) {
+            format = "/aura/resources%s";
+        } else if (root.equals("javascript")) {
+            format = "/aura/javascript%s";
+        }
+        if (format == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        if (currentUid != null && currentUid.equals(nonceUid)) {
             //
-            // Careful with race conditions here, we should only call regenerateAuraJS
-            // _before_ we get the nonce.
+            // If we match the nonce and we have an if-modified-since, we
+            // can just send back a not modified. Timestamps don't matter.
+            // Note that this fails to check existence, but browsers
+            // shouldn't ask for things that don't exist with an
+            // if-modified-since.
             //
-            configAdapter.regenerateAuraJS();
-            // framework uid is combination of aura js and resources uid
-            String currentUid = configAdapter.getAuraFrameworkNonce();
-            // match entire path once, looking for root, optional nonce, and
-            // rest-of-path
-            Matcher matcher = RESOURCES_PATTERN.matcher(path);
-            if (!matcher.matches()) {
+            // This is the earliest that we can check for the nonce, since
+            // we only have the nonce after calling regenerate...
+            //
+            // DANGER: we have to be sure that the framework nonce actually
+            // includes all of the resources that may be requested...
+            //
+            if (ifModifiedSince != -1) {
+                response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+                return;
+            }
+            matchedUid = true;
+            haveUid = true;
+        } else {
+            //
+            // Whoops, we have a mismatched nonce.
+            //
+            matchedUid = false;
+        }
+
+        boolean isProduction = configAdapter.isProduction();
+        StaticResource staticResource = new FileStaticResource(file, format, nonceUid, isProduction, resourceLoader);
+
+        //
+        // Check whether path has wrong nonce or the path contains no nonce
+        //
+        if (nonceUid != null && !matchedUid) {
+
+            Boolean hasUid = staticResource.hasUid();
+
+            if (hasUid == null) {
+                // no resource found
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-            String nonceUid = matcher.group(2);
-            String file = null;
-            boolean haveUid = false;
-            boolean matchedUid = false;
-            file = matcher.group(3);
-            if (nonceUid != null) {
-                nonceUid = nonceUid.substring(1);
-            }
 
-            // process path (not in a function because can't use non-synced
-            // member vars in servlet)
-            String format = null;
+            haveUid = hasUid;
+        }
 
-            String root = matcher.group(1);
-
-            if (root.equals("resources")) {
-                format = "/aura/resources%s";
-            } else if (root.equals("javascript")) {
-                format = "/aura/javascript%s";
-            }
-            if (format == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
-            }
-            if (currentUid != null && currentUid.equals(nonceUid)) {
-                //
-                // If we match the nonce and we have an if-modified-since, we
-                // can just send back a not modified. Timestamps don't matter.
-                // Note that this fails to check existence, but browsers
-                // shouldn't ask for things that don't exist with an
-                // if-modified-since.
-                //
-                // This is the earliest that we can check for the nonce, since
-                // we only have the nonce after calling regenerate...
-                //
-                // DANGER: we have to be sure that the framework nonce actually
-                // includes all of the resources that may be requested...
-                //
-                if (ifModifiedSince != -1) {
-                    response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-                    return;
-                }
-                matchedUid = true;
-                haveUid = true;
-            } else {
-                //
-                // Whoops, we have a mismatched nonce.
-                //
-                matchedUid = false;
-            }
-
-            boolean isProduction = configAdapter.isProduction();
-            StaticResource staticResource = new FileStaticResource(file, format, nonceUid, isProduction, resourceLoader);
-
-            //
-            // Check whether path has wrong nonce or the path contains no nonce
-            //
-            if (nonceUid != null && !matchedUid) {
-
-                Boolean hasUid = staticResource.hasUid();
-
-                if (hasUid == null) {
-                    // no resource found
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    return;
-                }
-
-                haveUid = hasUid;
-            }
-
-            in = staticResource.getResourceStream();
+        try (final InputStream in = staticResource.getResourceStream()) {
 
             //
             // Check if it exists. DANGER: if there is a nonce, this is really an
@@ -206,14 +204,6 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             }
 
             IOUtil.copyStream(in, response.getOutputStream());
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (Throwable t) {
-                    // totally ignore failure to close.
-                }
-            }
         }
     }
 
@@ -222,13 +212,13 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
         this.configAdapter = configAdapter;
     }
     
-    public boolean isAuthenticatedAppRequest(HttpServletRequest request) {
+    public static boolean isAuthenticatedAppRequest(HttpServletRequest request) {
         Cookie[] requestCookies = request.getCookies();
         String requestPathInfo = request.getPathInfo();
         if (requestCookies != null) {
             for (Cookie cookie: requestCookies) {
                 String cookieName = cookie.getName();
-                if (cookieName.equals("sid") && !(request.getPathInfo() != null && (requestPathInfo.endsWith(".js") || requestPathInfo.endsWith(".css")))) {
+                if ("sid".equals(cookieName) && !(request.getPathInfo() != null && (requestPathInfo.endsWith(".js") || requestPathInfo.endsWith(".css")))) {
                     return true;
                 } 
             }

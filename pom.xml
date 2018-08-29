@@ -570,12 +570,14 @@
                         <exclude>**/src/test/data/**</exclude>
                         <exclude>**/.gitignore</exclude>
                         <exclude>**/.index</exclude>
+                        <exclude>**/target/**</exclude>
                         <exclude>**/version.prop</exclude>
                         <exclude>aura/src/main/resources/**</exclude>
-                        <exclude>aura-resources/src/main/resources/**</exclude>
-                        <exclude>aura-modules/src/main/resources/**</exclude>
                         <exclude>aura-archetype/src/main/resources/archetype-resources/**</exclude>
-                        <exclude>**/target/**</exclude>
+                        <exclude>aura-components/src/main/components/.eslintrc</exclude>
+                        <exclude>aura-integration-test/src/test/java/aura/resources/nosuffix</exclude>
+                        <exclude>aura-modules/src/main/resources/**</exclude>
+                        <exclude>aura-resources/src/main/resources/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>

@@ -49,6 +49,7 @@ public class AuraResourceRewriteFilter implements Filter {
 
     @Override
     public void destroy() {
+        // Nothing needs to be destroyed
     }
 
     private static String createURI(String context, String format, String type, String lookup) {

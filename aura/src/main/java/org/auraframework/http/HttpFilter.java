@@ -25,22 +25,22 @@ import javax.servlet.http.HttpServletResponse;
 
 @FunctionalInterface
 public interface HttpFilter {
-	public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-			throws IOException, ServletException;
+    public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws IOException, ServletException;
 
-	default HttpFilter andThen(HttpFilter after) {
-		Objects.requireNonNull(after);
-		final HttpFilter before = this;
-		return (request, response, chain) -> {
-			before.doFilter(request, response, (req, res) -> {
-				after.doFilter((HttpServletRequest) req, (HttpServletResponse) res, chain);
-			});
-		};
-	}
+    default HttpFilter andThen(HttpFilter after) {
+        Objects.requireNonNull(after);
+        final HttpFilter before = this;
+        return (request, response, chain) -> {
+            before.doFilter(request, response, (req, res) -> {
+                after.doFilter((HttpServletRequest) req, (HttpServletResponse) res, chain);
+            });
+        };
+    }
 
-	default HttpFilter compose(HttpFilter before) {
-		Objects.requireNonNull(before);
-		final HttpFilter after = this;
-		return before.andThen(after);
-	}
+    default HttpFilter compose(HttpFilter before) {
+        Objects.requireNonNull(before);
+        final HttpFilter after = this;
+        return before.andThen(after);
+    }
 }

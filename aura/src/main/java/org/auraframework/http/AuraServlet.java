@@ -21,6 +21,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +30,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,9 +68,6 @@ import org.auraframework.throwable.SystemErrorException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * The servlet for initialization and actions in Aura.
@@ -126,6 +124,10 @@ public class AuraServlet extends AuraBaseServlet {
     public final static EnumParam<DefType> defTypeParam = new EnumParam<>(AURA_PREFIX + "deftype", false,
             DefType.class);
 
+    private final static String HTTP_PROTOCOL = "http://";
+    private final static String DEFAULT_URI_SCHEME = "http";
+    private final static String SECURE_URI_SCHEME = DEFAULT_URI_SCHEME + "s";
+    
     private final static BooleanParam isActionParam = new BooleanParam(AURA_PREFIX + "isAction", false);
     private final static StringParam csrfToken = new StringParam(AURA_PREFIX + "token", 0, true);
     private final static StringParam formatAdapterParam = new StringParam(AURA_PREFIX + "formatAdapter", 0, false);
@@ -161,32 +163,32 @@ public class AuraServlet extends AuraBaseServlet {
      * @returns true if we are finished with the request.
      */
     private void handleNoCacheRedirect(String nocache, HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+            HttpServletResponse response) {
 
         response.setContentType("text/plain");
         response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
         String newLocation = "/";
         try {
             final URI uri = new URI(nocache);
-            final String fragment = uri.getFragment();
-            final String query = uri.getQuery();
-            final String scheme = uri.getScheme();
             final String path = uri.getPath();
             final StringBuffer sb = request.getRequestURL();
-            String httpProtocol = "http://";
-            String defaultUriScheme = "http";
-            String secureUriScheme = "https";
-            int dIndex = sb.indexOf(httpProtocol);
 
             //
             // Make sure we were handed an absolute path, if not, we simply dump the
             // path and redirect to root.
             //
             if (path != null && path.length() > 0 && path.charAt(0) == '/') {
+                
+                final String fragment = uri.getFragment();
+                final String query = uri.getQuery();
+                final String scheme = uri.getScheme();
+                
+                final int dIndex = sb.indexOf(HTTP_PROTOCOL);
+                
                 // if nocache has https specified, or the request is secure,
                 // modify sb if it's http
-                if (((scheme != null && scheme.equals(secureUriScheme)) || request.isSecure()) && dIndex == 0) {
-                    sb.replace(dIndex, dIndex + defaultUriScheme.length(), secureUriScheme);
+                if (((scheme != null && scheme.equals(SECURE_URI_SCHEME)) || request.isSecure()) && dIndex == 0) {
+                    sb.replace(dIndex, dIndex + DEFAULT_URI_SCHEME.length(), SECURE_URI_SCHEME);
                 }
 
                 int index = sb.indexOf("//");
@@ -194,10 +196,10 @@ public class AuraServlet extends AuraBaseServlet {
                 sb.setLength(index);
                 sb.append(path);
                 if (query != null && !query.isEmpty()) {
-                    sb.append("?").append(query);
+                    sb.append('?').append(query);
                 }
                 if (fragment != null && !fragment.isEmpty()) {
-                    sb.append("#").append(fragment);
+                    sb.append('#').append(fragment);
                 }
                 newLocation = sb.toString();
             }
@@ -222,15 +224,17 @@ public class AuraServlet extends AuraBaseServlet {
             return null;
         }
         // this throws a json parse exception if it can't read.
-        Map<?, ?> message = (Map<?, ?>) new JsonReader().read(new StringReader(input));
+        @SuppressWarnings("unchecked")
+        Map<String, List<Map<String, ?>>> message = (Map<String, List<Map<String, ?>>>) new JsonReader().read(new StringReader(input));
         if (message == null) {
             return null;
         }
-        List<?> actions = (List<?>) message.get("actions");
-        List<Action> actionList = Lists.newArrayList();
+        List<Map<String, ?>> actions = message.get("actions");
+        final List<Action> actionList;
         if (actions != null) {
-            for (Object action : actions) {
-                Map<?, ?> map = (Map<?, ?>) action;
+                actionList = new ArrayList<>(actions.size());
+            for (Map<String, ?> action : actions) {
+                Map<String, ?> map = action;
 
                 // FIXME: ints are getting translated into BigDecimals here.
                 @SuppressWarnings("unchecked")
@@ -241,7 +245,7 @@ public class AuraServlet extends AuraBaseServlet {
                     // If we do, just ignore it, and continue;
                     continue;
                 }
-                ActionDef def;
+                final ActionDef def;
                 try {
                     def = definitionService.getDefinition(qualifiedName, ActionDef.class);
                 } catch (QuickFixException qfe) {
@@ -250,7 +254,7 @@ public class AuraServlet extends AuraBaseServlet {
                     // it on the floor and continue.
                     continue;
                 }
-                Action instance;
+                final Action instance;
                 try {
                     instance = (Action) instanceService.getInstance(def, params);
                 } catch (QuickFixException qfe) {
@@ -277,6 +281,8 @@ public class AuraServlet extends AuraBaseServlet {
 
                 actionList.add(instance);
             }
+        } else {
+                actionList = Collections.emptyList();
         }
 
         return new Message(actionList);
@@ -294,10 +300,6 @@ public class AuraServlet extends AuraBaseServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        AuraContext context;
-        String tagName;
-        DefType defType;
-        ServletContext servletContext = getServletContext();
 
         //
         // Pre-hook
@@ -312,6 +314,8 @@ public class AuraServlet extends AuraBaseServlet {
             return;
         }
 
+        final AuraContext context;
+        
         //
         // Initial setup. This should never fail.
         //
@@ -326,7 +330,7 @@ public class AuraServlet extends AuraBaseServlet {
             // at this point we simply broke.
             //
             exceptionAdapter.handleException(re);
-            servletUtilAdapter.send404(servletContext, request, response);
+            servletUtilAdapter.send404(getServletContext(), request, response);
             return;
         }
         String nocache = nocacheParam.get(request);
@@ -335,7 +339,7 @@ public class AuraServlet extends AuraBaseServlet {
             return;
         }
 
-        DefDescriptor<? extends BaseComponentDef> defDescriptor;
+        final DefDescriptor<? extends BaseComponentDef> defDescriptor;
 
         //
         // Now check and fetch parameters.
@@ -345,19 +349,19 @@ public class AuraServlet extends AuraBaseServlet {
         // I would love for a simpler way to be figured out.
         //
         try {
-            tagName = getTagName(request);
-            defType = defTypeParam.get(request, DefType.COMPONENT);
+            final String tagName = getTagName(request);
+            final DefType defType = defTypeParam.get(request, DefType.COMPONENT);
             if (tagName == null || tagName.isEmpty()) {
                 throw new AuraRuntimeException("Invalid request, tag must not be empty");
             }
 
             Mode mode = context.getMode();
             if (!servletUtilAdapter.isValidDefType(defType, mode)) {
-                servletUtilAdapter.send404(servletContext, request, response);
+                servletUtilAdapter.send404(getServletContext(), request, response);
                 return;
             }
 
-            Class<? extends BaseComponentDef> defClass = defType == DefType.APPLICATION ? ApplicationDef.class : ComponentDef.class;
+            Class<? extends BaseComponentDef> defClass = (defType == DefType.APPLICATION) ? ApplicationDef.class : ComponentDef.class;
             defDescriptor = definitionService.getDefDescriptor(tagName, defClass);
         } catch (Throwable t) {
             servletUtilAdapter.handleServletException(new SystemErrorException(t), false, context, request, response, false);
@@ -369,7 +373,7 @@ public class AuraServlet extends AuraBaseServlet {
 
     private <T extends BaseComponentDef> void internalGet(HttpServletRequest request,
                                                           HttpServletResponse response, DefDescriptor<T> defDescriptor, AuraContext context)
-            throws ServletException, IOException {
+            throws IOException {
         T def;
         try {
             context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
@@ -409,8 +413,7 @@ public class AuraServlet extends AuraBaseServlet {
             // we could not do the csp headers until all inline js hashes had been collected
             servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
 
-            PrintWriter writer = response.getWriter();
-            writer.append(out.toString());
+            response.getWriter().append(out.toString());
 
         } catch (Throwable e) {
             try {
@@ -435,7 +438,7 @@ public class AuraServlet extends AuraBaseServlet {
     }
 
 
-    private Map<String, Object> getComponentAttributes(HttpServletRequest request) {
+    private static Map<String, Object> getComponentAttributes(HttpServletRequest request) {
         Enumeration<String> attributeNames = request.getParameterNames();
         Map<String, Object> attributes = new HashMap<>();
 
@@ -459,42 +462,49 @@ public class AuraServlet extends AuraBaseServlet {
      * @param request the HTTP GET request
      * @return if the isAction and message params were specified
      */
-    private boolean isActionGetRequest(HttpServletRequest getRequest) {
-        return isActionParam.get(getRequest, false) && messageParam.get(getRequest) != null;
+    @SuppressWarnings("boxing")
+    private static boolean isActionGetRequest(HttpServletRequest getRequest) {
+        return isActionParam.get(getRequest, false) && (messageParam.get(getRequest) != null);
     }
 
-    private boolean isBootstrapAction(Message message, boolean productionMode) {
+    private static boolean isBootstrapAction(Message message, boolean productionMode) {
         // The bootstrap action cannot not have a CSRF token so we let it through
         boolean isBootstrapAction = false;
-        if (message.getActions().size() == 1) {
-            Action action = message.getActions().get(0);
-            String name = action.getDescriptor().getQualifiedName();
-            if (name.equals("aura://ComponentController/ACTION$getApplication")
-                    || (name.equals("aura://ComponentController/ACTION$getComponent") && !productionMode)) {
-                //
-                // Oooooh this is _ugly_, digging in to the internals like this. There has got to be
-                // a better way.
-                //
-                Boolean loadLabels=(Boolean)(action.getParams()!=null?action.getParams().get("chainLoadLabels"):null);
-                isBootstrapAction = Boolean.TRUE.equals(loadLabels);
-            }
-        } else if (message.getActions().size() == 2) {
-            Action action = message.getActions().get(0);
-            String name = action.getDescriptor().getQualifiedName();
-            if (name.equals("aura://ComponentController/ACTION$getApplication")
-                    || (name.equals("aura://ComponentController/ACTION$getComponent") && productionMode)) {
-                isBootstrapAction = true;
-            }
-            Action labelAction = message.getActions().get(1);
-            name = labelAction.getDescriptor().getQualifiedName();
-            if (!name.equals("aura://ComponentController/ACTION$loadLabels")) {
-                isBootstrapAction = false;
-            }
+        final Action action;
+        String name;
+        switch(message.getActions().size()) {
+            case 1:
+                action = message.getActions().get(0);
+                name = action.getDescriptor().getQualifiedName();
+                if ("aura://ComponentController/ACTION$getApplication".equals(name)
+                        || ("aura://ComponentController/ACTION$getComponent".equals(name) && !productionMode)) {
+                    //
+                    // Oooooh this is _ugly_, digging in to the internals like this. There has got to be
+                    // a better way.
+                    //
+                    Boolean loadLabels = (action.getParams() != null) ? (Boolean)action.getParams().get("chainLoadLabels") : null;
+                    isBootstrapAction = Boolean.TRUE.equals(loadLabels);
+                }
+                break;
+            case 2:
+                action = message.getActions().get(0);
+                name = action.getDescriptor().getQualifiedName();
+                if ("aura://ComponentController/ACTION$getApplication".equals(name)
+                        || ("aura://ComponentController/ACTION$getComponent".equals(name) && productionMode)) {
+                    isBootstrapAction = true;
+                }
+                Action labelAction = message.getActions().get(1);
+                name = labelAction.getDescriptor().getQualifiedName();
+                if (!"aura://ComponentController/ACTION$loadLabels".equals(name)) {
+                    isBootstrapAction = false;
+                }
+                break;
         }
         return isBootstrapAction;
     }
 
-    private void handleActionRequest(HttpServletRequest request, HttpServletResponse response, boolean isGet) throws ServletException, IOException {
+    @SuppressWarnings("null")
+    private void handleActionRequest(HttpServletRequest request, HttpServletResponse response, boolean isGet) throws IOException {
         AuraContext context = contextService.getCurrentContext();
         response.setCharacterEncoding(UTF_ENCODING);
         boolean written = false;
@@ -522,7 +532,7 @@ public class AuraServlet extends AuraBaseServlet {
             } finally {
                 loggingService.stopTimer(LoggingService.TIMER_DESERIALIZATION);
             }
-            if (message == null && messageError == null) {
+            if ((message == null) && (messageError == null)) {
                 throw new AuraHandledException("Invalid request, no message");
             }
 
@@ -530,14 +540,14 @@ public class AuraServlet extends AuraBaseServlet {
             String fwUID = configAdapter.getAuraFrameworkNonce();
 
             if (!fwUID.equals(context.getFrameworkUID())) {
-                if (UNKNOWN_FRAMEWORK_UID.equals(context.getFrameworkUID()) && message != null) {
+                if (UNKNOWN_FRAMEWORK_UID.equals(context.getFrameworkUID()) && (message != null)) {
                     // we had a serious boostrap issue and want to log the failed action (5x reload)
                     // an unknown fwuid, only execute failed actions. we don't want anything else
                     // potentially creeping in.  at this point the sid should have already been checked
                     // and the user is authenticated, but their browser is in a hosed state
-                    List<Action> actions = Lists.newArrayList();
+                    List<Action> actions = new ArrayList<>();
                     for (Action action : message.getActions()) {
-                        if (action != null && action.getDescriptor() != null
+                        if ((action != null) && (action.getDescriptor() != null)
                                 && !REPORT_ERROR_ACTION.equals(action.getDescriptor().getDescriptorName())) {
                             actions.add(action);
                         }
@@ -545,7 +555,7 @@ public class AuraServlet extends AuraBaseServlet {
                     // this will write the response to the output, and then the COOS will be appended,
                     // so the resulting json response will be invalid
                     // but this case should only happen when the code isn't even checking for a response.
-                    if (actions.size() > 0) {
+                    if (!actions.isEmpty()) {
                         serverService.run(new Message(actions), context, response.getWriter(), null);
                     }
                 }
@@ -562,7 +572,7 @@ public class AuraServlet extends AuraBaseServlet {
                 // Check only if client app out of sync
                 try {
                     definitionService.updateLoaded(applicationDescriptor);
-                } catch (QuickFixException qfe) {
+                } catch (QuickFixException ignore) {
                     // Ignore quick fix. If we got a 'new' quickfix, it will be thrown as
                     // a client out of sync exception, since the UID will not match.
                 }
@@ -590,8 +600,7 @@ public class AuraServlet extends AuraBaseServlet {
 
             Map<String, Object> attributes = null;
             if (isBootstrapAction) {
-                attributes = Maps.newHashMap();
-                attributes.put("token", configAdapter.getCSRFToken());
+                attributes = Collections.singletonMap("token", configAdapter.getCSRFToken());
             } else if (!isGet) {
                 configAdapter.validateCSRFToken(csrfToken.get(request));
             }
@@ -599,8 +608,9 @@ public class AuraServlet extends AuraBaseServlet {
             // some of the CSP headers depend on the app, so pass in the app descriptor here
             servletUtilAdapter.setCSPHeaders(applicationDescriptor, request, response);
 
-            PrintWriter servletOut = response.getWriter();
-            Writer out = servletOut;
+            @SuppressWarnings("resource")
+    	        PrintWriter servletOut = response.getWriter();
+            final Writer out;
             boolean publiclyCacheable = isGet && context.getActionPublicCacheKey() != null
                     && context.getActionPublicCacheKey().equals(configAdapter.getActionPublicCacheKey());
             if (publiclyCacheable) {
@@ -614,6 +624,7 @@ public class AuraServlet extends AuraBaseServlet {
                 // Remove the Browser GVP as we don't want browser-specific in the cache.
                 context.getGlobalProviders().remove(AuraValueProviderType.BROWSER.getPrefix());
             } else {
+                out = servletOut;
                 written = true;
             }
 
@@ -633,7 +644,6 @@ public class AuraServlet extends AuraBaseServlet {
             }
         } catch (InvalidParamException | MissingParamException ipe) {
             servletUtilAdapter.handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
-            return;
         } catch (JsonParseException jpe) {
             servletUtilAdapter.handleServletException(new SystemErrorException(jpe), false, context, request, response, false);
         } catch (Exception e) {
@@ -665,6 +675,7 @@ public class AuraServlet extends AuraBaseServlet {
      * @param request http request
      * @return tag name param
      */
+    @SuppressWarnings("static-method")
     protected String getTagName(HttpServletRequest request) {
         return tag.get(request);
     }

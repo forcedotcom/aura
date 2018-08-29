@@ -28,12 +28,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 
-import java.io.StringWriter;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 /**
  * Shared bootstrap logic used for both the bootstrap resource and bootstrap inlining
  */
@@ -57,14 +51,17 @@ public class BootstrapUtil {
             "    }\n" +
             "}());";
 
+    @SuppressWarnings("static-method")
     public String getPrependScript() {
         return PREPEND_JS;
     }
 
+    @SuppressWarnings("static-method")
     public String getAppendScript() {
         return APPEND_JS;
     }
 
+    @SuppressWarnings("static-method")
     public void loadLabelsToContext(AuraContext context, DefinitionService definitionService) throws QuickFixException {
         String uid = definitionService.getUid(null, context.getApplicationDescriptor());
         String root = AuraValueProviderType.LABEL.getPrefix();
@@ -73,6 +70,7 @@ public class BootstrapUtil {
         labelValueProvider.loadValues(labels);
     }
 
+    @SuppressWarnings("static-method")
     public void serializeApplication(Instance<?> appInstance, AuraContext context, JsonEncoder json) throws IOException {
         if (appInstance != null) {
             json.writeMapEntry("app", appInstance);

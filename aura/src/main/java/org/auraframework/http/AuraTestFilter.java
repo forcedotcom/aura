@@ -84,7 +84,8 @@ import com.google.common.collect.Lists;
 @ServiceComponent
 public class AuraTestFilter {
 
-    private static final int DEFAULT_JSTEST_TIMEOUT = 30;
+    @SuppressWarnings("boxing")
+    private static final Integer DEFAULT_JSTEST_TIMEOUT = 30;
     private static final String BASE_URI = "/aura";
     private static final String GET_URI = BASE_URI
             + "?aura.tag=%s%%3A%s&aura.deftype=%s&aura.mode=%s&aura.format=%s&aura.access=%s&aura.jstestrun=%s";
@@ -168,12 +169,12 @@ public class AuraTestFilter {
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException,
             IOException {
-        if (testContextAdapter == null || configAdapter == null || configAdapter.isProduction()) {
+        if ((testContextAdapter == null) || (configAdapter == null) || configAdapter.isProduction()) {
             chain.doFilter(request, response);
             return;
         }
 
-        if (testCaseFilters != null && testCaseFilters.size() > 0) {
+        if (testCaseFilters != null && !testCaseFilters.isEmpty()) {
             final AtomicBoolean handled = new AtomicBoolean(false);
 
             for (HttpFilter filter : testCaseFilters) {
@@ -198,6 +199,7 @@ public class AuraTestFilter {
         HttpServletRequest request = (HttpServletRequest)req;
         HttpServletResponse response = (HttpServletResponse)res;
         TestContext testContext = getTestContext(request);
+        @SuppressWarnings("boxing")
         boolean doResetTest = testReset.get(request, false);
         if (testContext != null && doResetTest) {
             testContext.getLocalDefs().clear();
@@ -220,8 +222,8 @@ public class AuraTestFilter {
                     Format format = context.getFormat();
                     switch (format) {
                     case HTML:
-                        TestCaseDef testDef;
-                        String targetUri;
+                        final TestCaseDef testDef;
+                        final String targetUri;
                         try {
                             TestSuiteDef suiteDef = getTestSuite(targetDescriptor);
                             testDef = getTestCase(suiteDef, testToRun);
@@ -254,7 +256,7 @@ public class AuraTestFilter {
                                 // There was an error in the original response, so just write the response out.
                                 response.getWriter().write(capturedResponse);
                             } else {
-                                int timeout = testTimeout.get(request, DEFAULT_JSTEST_TIMEOUT);
+                                Integer timeout = testTimeout.get(request, DEFAULT_JSTEST_TIMEOUT);
                                 String testTag = buildJsTestScriptTag(targetDescriptor, testToRun, timeout, capturedResponse);
                                 injectScriptTags(response.getWriter(), capturedResponse, testTag);
                             }
@@ -264,13 +266,13 @@ public class AuraTestFilter {
                         servletUtilAdapter.setNoCache(response);
                         response.setContentType(servletUtilAdapter.getContentType(Format.JS));
                         response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
-                        int timeout = testTimeout.get(request, DEFAULT_JSTEST_TIMEOUT);
+                        Integer timeout = testTimeout.get(request, DEFAULT_JSTEST_TIMEOUT);
                         writeJsTestScript(response.getWriter(), targetDescriptor, testToRun, timeout);
                         return;
                     default:
                         // Pass it on.
                     }
-                } else if (testToRun != null && testToRun.isEmpty()) {
+                } else if ((testToRun != null) && testToRun.isEmpty()) {
                     Object origRequest = request.getAttribute(AuraResourceServlet.ORIG_REQUEST_URI);
                     String message = String.format("AuraTestFilter.innerFilter(): Empty jstestrun: %s?%s original request: %s",
                             request.getRequestURL(), request.getQueryString(), origRequest);
@@ -285,16 +287,16 @@ public class AuraTestFilter {
                 // TODO: delete JSTEST mode
                 String jstestAppRequest = jstestAppFlag.get(request);
                 Mode mode = AuraContextFilter.mode.get(request, Mode.PROD);
-                if (mode == Mode.JSTEST || mode == Mode.JSTESTDEBUG || jstestAppRequest != null) {
+                if ((mode == Mode.JSTEST) || (mode == Mode.JSTESTDEBUG) || (jstestAppRequest != null)) {
 
                     mode = mode.toString().endsWith("DEBUG") ? Mode.AUTOJSTESTDEBUG : Mode.AUTOJSTEST;
 
                     String qs = String.format("descriptor=%s&defType=%s", targetDescriptor.getDescriptorName(),
                             targetDescriptor.getDefType().name());
                     String testName = null;
-                    if (jstestAppRequest != null && !jstestAppRequest.isEmpty()) {
+                    if ((jstestAppRequest != null) && !jstestAppRequest.isEmpty()) {
                         testName = jstestAppRequest;
-                    } else if (testToRun != null && !testToRun.isEmpty()) {
+                    } else if ((testToRun != null) && !testToRun.isEmpty()) {
                         testName = testToRun;
                     }
                     if (testName != null) {
@@ -332,13 +334,13 @@ public class AuraTestFilter {
         chain.doFilter(request, response);
     }
 
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         processInjection(filterConfig);
 
         String testRunnerAppNamespace = filterConfig.getInitParameter("testRunnerAppNamespace");
         String testRunnerAppName = filterConfig.getInitParameter("testRunnerAppName");
 
-        if (testRunnerAppNamespace != null && testRunnerAppName != null) {
+        if ((testRunnerAppNamespace != null) && (testRunnerAppName != null)) {
             this.testRunnerAppNamespace = testRunnerAppNamespace;
             this.testRunnerAppName = testRunnerAppName;
         }
@@ -351,7 +353,7 @@ public class AuraTestFilter {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> getConfigMap(HttpServletRequest request) {
+    private static Map<String, Object> getConfigMap(HttpServletRequest request) {
         Map<String, Object> configMap = null;
         String config = contextConfig.get(request);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(config)) {
@@ -366,25 +368,19 @@ public class AuraTestFilter {
 
     private TestContext getTestContext(HttpServletRequest request) {
         Map<String, Object> configMap = getConfigMap(request);
-        String key = null;
+
         // Config takes precedence over param because the value is not expected to change during a test and it
         // is less likely to have been modified unintentionally when from the config.
-        if (configMap != null) {
-            key = (String) configMap.get("test");
-        }
-        if (key == null) {
-            key = testContextKey.get(request);
-        }
+        final String key = (configMap != null) ? (String) configMap.get("test") : testContextKey.get(request);
         if (key == null) {
             return null;
-        } else {
-            return testContextAdapter.getTestContext(key);
         }
+        return testContextAdapter.getTestContext(key);
     }
 
     private TestSuiteDef getTestSuite(DefDescriptor<?> targetDescriptor) throws QuickFixException {
         DefDescriptor<TestSuiteDef> suiteDesc = definitionService.getDefDescriptor(
-                DefDescriptor.JAVASCRIPT_PREFIX+"://"+targetDescriptor.getNamespace()+"."+targetDescriptor.getName(),
+                DefDescriptor.JAVASCRIPT_PREFIX + "://"+targetDescriptor.getNamespace() + '.' + targetDescriptor.getName(),
                 TestSuiteDef.class, targetDescriptor);
         definitionService.getDefinition(targetDescriptor); // prime target def first
         return definitionService.getDefinition(suiteDesc);
@@ -419,14 +415,14 @@ public class AuraTestFilter {
 
     private void loadTestMocks(AuraContext context, boolean doReset, Collection<Definition> mocks) {
         // TODO: fix error handling
-        if (mocks == null || mocks.isEmpty()) {
+        if ((mocks == null) || mocks.isEmpty()) {
             return;
         }
 
         boolean error = false;
         for (Definition def : mocks) {
             try {
-                if (doReset && def instanceof Resettable) {
+                if (doReset && (def instanceof Resettable)) {
                     ((Resettable) def).reset();
                 }
                 context.addDynamicDef(def);
@@ -446,7 +442,7 @@ public class AuraTestFilter {
         Map<String, Object> targetAttributes = testDef.getAttributeValues();
 
         // Force "legacy" style tests until ready
-        if (!ENABLE_FREEFORM_TESTS && targetAttributes == null) {
+        if (!ENABLE_FREEFORM_TESTS && (targetAttributes == null)) {
             targetAttributes = ImmutableMap.of();
         }
 
@@ -457,7 +453,7 @@ public class AuraTestFilter {
             for (Entry<String, Object> entry : targetAttributes.entrySet()) {
                 String key = entry.getKey();
                 String value;
-                if (entry.getValue() instanceof Map<?, ?> || entry.getValue() instanceof List<?>) {
+                if ((entry.getValue() instanceof Map<?, ?>) || (entry.getValue() instanceof List<?>)) {
                     value = JsonEncoder.serialize(entry.getValue());
                 } else {
                     value = entry.getValue().toString();
@@ -471,45 +467,45 @@ public class AuraTestFilter {
             String qs = URLEncodedUtils.format(newParams, "UTF-8") + hash;
             return createURI(targetDescriptor.getNamespace(), targetDescriptor.getName(),
                     targetDescriptor.getDefType(), null, Format.HTML, Authentication.AUTHENTICATED.name(), NO_RUN, qs);
-        } else {
-            // Free-form tests will load only the target component's template.
-            // TODO: Allow specifying the template on the test.
-            // TODO: Load proxy app for cmps, apps must loadApplication.
-            final BaseComponentDef originalDef = (BaseComponentDef) definitionService.getDefinition(targetDescriptor);
-            final ComponentDef targetTemplate = originalDef.getTemplateDef();
-            String newDescriptorString = String
-                    .format("%s$%s", targetDescriptor.getDescriptorName(), testDef.getName());
-            final DefDescriptor<ApplicationDef> newDescriptor = definitionService.getDefDescriptor(
-                    newDescriptorString, ApplicationDef.class);
-            final ApplicationDef dummyDef = definitionService.getDefinition("aurajstest:blank",
-                    ApplicationDef.class);
-            BaseComponentDef targetDef = (BaseComponentDef) Proxy.newProxyInstance(
-                    originalDef.getClass().getClassLoader(),
-                    new Class<?>[] { ApplicationDef.class },
-                    new InvocationHandler() {
-                        @Override
-                        public Object invoke(Object proxy, Method method, Object[] args)
-                                throws Throwable {
-                            switch (method.getName()) {
-                            case "getDescriptor":
-                                return newDescriptor;
-                            case "getTemplateDef":
-                                return targetTemplate;
-                            case "isLocallyRenderable":
-                                return method.invoke(originalDef, args);
-                            default:
-                                return method.invoke(dummyDef, args);
-                            }
-                        }
-                    });
-            TestContext testContext = testContextAdapter.getTestContext(testDef.getQualifiedName());
-            testContext.getLocalDefs().add(targetDef);
-            return createURI(newDescriptor.getNamespace(), newDescriptor.getName(),
-                    newDescriptor.getDefType(), null, Format.HTML, Authentication.AUTHENTICATED.name(), NO_RUN, null);
         }
+        // Free-form tests will load only the target component's template.
+        // TODO: Allow specifying the template on the test.
+        // TODO: Load proxy app for cmps, apps must loadApplication.
+        final BaseComponentDef originalDef = (BaseComponentDef) definitionService.getDefinition(targetDescriptor);
+        final ComponentDef targetTemplate = originalDef.getTemplateDef();
+        String newDescriptorString = String
+                .format("%s$%s", targetDescriptor.getDescriptorName(), testDef.getName());
+        final DefDescriptor<ApplicationDef> newDescriptor = definitionService.getDefDescriptor(
+                newDescriptorString, ApplicationDef.class);
+        final ApplicationDef dummyDef = definitionService.getDefinition("aurajstest:blank",
+                ApplicationDef.class);
+        BaseComponentDef targetDef = (BaseComponentDef) Proxy.newProxyInstance(
+                originalDef.getClass().getClassLoader(),
+                new Class<?>[] { ApplicationDef.class },
+                new InvocationHandler() {
+                    @Override
+                    public Object invoke(Object proxy, Method method, Object[] args)
+                            throws Throwable {
+                        switch (method.getName()) {
+                        case "getDescriptor":
+                            return newDescriptor;
+                        case "getTemplateDef":
+                            return targetTemplate;
+                        case "isLocallyRenderable":
+                            return method.invoke(originalDef, args);
+                        default:
+                            return method.invoke(dummyDef, args);
+                        }
+                    }
+                }
+        );
+        TestContext testContext = testContextAdapter.getTestContext(testDef.getQualifiedName());
+        testContext.getLocalDefs().add(targetDef);
+        return createURI(newDescriptor.getNamespace(), newDescriptor.getName(),
+                newDescriptor.getDefType(), null, Format.HTML, Authentication.AUTHENTICATED.name(), NO_RUN, null);
     }
 
-    private String captureResponse(ServletRequest req, ServletResponse res, String testName, String uri) throws ServletException,
+    private static String captureResponse(ServletRequest req, ServletResponse res, String testName, String uri) throws ServletException,
             IOException {
         CapturingResponseWrapper responseWrapper = new CapturingResponseWrapper((HttpServletResponse) res){
             @Override
@@ -521,7 +517,7 @@ public class AuraTestFilter {
                 if (test.find()) {
                     location = test.replaceAll(testName);
                 } else {
-                    location = location + (location.indexOf('?') < 0 ? "?" : "&") + jstestToRun.name + "=" + testName;
+                    location = location + ((location.indexOf('?') < 0) ? '?' : '&') + jstestToRun.name + '=' + testName;
                 }
                 super.sendRedirect(location);
             }
@@ -537,7 +533,7 @@ public class AuraTestFilter {
         return responseWrapper.getCapturedResponseString();
     }
 
-    private String buildJsTestScriptTag(DefDescriptor<?> targetDescriptor, String testName, int timeout, String original) {
+    private String buildJsTestScriptTag(DefDescriptor<?> targetDescriptor, String testName, Integer timeout, String original) {
         String tag = "";
 
         // Inject test framework script tag if it isn't on page already. Unlikely, but framework may not
@@ -550,6 +546,7 @@ public class AuraTestFilter {
         }
 
         // Inject tag to load and execute test.
+        @SuppressWarnings("boxing")
         String qs = String.format("aura.testTimeout=%s&aura.nonce=%s", timeout, System.nanoTime());
         String suiteSrcUrl = createURI(targetDescriptor.getNamespace(), targetDescriptor.getName(),
                 targetDescriptor.getDefType(), null, Format.JS, Authentication.AUTHENTICATED.name(), testName, qs);
@@ -565,7 +562,7 @@ public class AuraTestFilter {
         return tag;
     }
 
-    private void injectScriptTags(Appendable out, String originalResponse, String tags) throws IOException {
+    private static void injectScriptTags(Appendable out, String originalResponse, String tags) throws IOException {
         // Look for closing body or html tag and insert before that, otherwise just append to the original.
         // TODO: Inject at top, after Test.js can compile and run separately from Aura.js.
         Matcher bodyMatcher = bodyEndTagPattern.matcher(originalResponse);
@@ -584,8 +581,7 @@ public class AuraTestFilter {
         out.append(originalResponse.substring(insertionPoint));
     }
 
-    private void writeJsTestScript(PrintWriter out, DefDescriptor<?> targetDescriptor, String testName, int testTimeout)
-            throws IOException {
+    private void writeJsTestScript(PrintWriter out, DefDescriptor<?> targetDescriptor, String testName, Integer testTimeout) {
         TestSuiteDef suiteDef;
         TestCaseDef testDef;
         try {
@@ -600,37 +596,37 @@ public class AuraTestFilter {
         out.append(
                 String.format(
                     "var suiteCode=%2$s\n;" +
-                    "var testBootstrapFunction = function(testName, suiteProps, testTimeout) { \n"+
-                            "if(!$A.test.isComplete()) {\n"+
-                                "if(window.sessionStorage) {\n"+
-                                    "var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
+                    "var testBootstrapFunction = function(testName, suiteProps, testTimeout) { \n" +
+                            "if(!$A.test.isComplete()) {\n" +
+                                "if(window.sessionStorage) {\n" +
+                                    "var oldStatus = sessionStorage.getItem('TestRunStatus'); \n" +
                                     "sessionStorage.setItem('TestRunStatus',(oldStatus?oldStatus:'')+'Run '+testName+', timeStamp#'+$A.test.time()+'.'); \n"+
-                                "}\n"+
+                                "}\n" +
                                 "$A.test.run(testName, suiteProps, testTimeout, Aura['appBootstrap'] && Aura['appBootstrap']['error']); \n"+
-                            "} else {\n"+
-                                "if(window.sessionStorage) {\n"+
-                                    "var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
-                                    "sessionStorage.setItem('TestRunStatus',(oldStatus?oldStatus:'')+'Skip '+testName+', Test Already Complete, timeStamp#'+$A.test.time()+'.'); \n"+
-                                "}\n"+
-                            "}\n"+
-                    "}; \n"+
+                            "} else {\n" +
+                                "if(window.sessionStorage) {\n" +
+                                    "var oldStatus = sessionStorage.getItem('TestRunStatus'); \n" +
+                                    "sessionStorage.setItem('TestRunStatus',(oldStatus?oldStatus:'')+'Skip '+testName+', Test Already Complete, timeStamp#'+$A.test.time()+'.'); \n" +
+                                "}\n" +
+                            "}\n" +
+                    "}; \n" +
                     "if(window && window.Aura && window.Aura.appBootstrapStatus === 'loaded' " +//bootstrap is finished
-                         "&& window.$A && window.$A.test && window.$A.test.isComplete instanceof Function ) { \n"+//but the test wasn't
-                         "if(window.sessionStorage) {\n"+
-                                //"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
-                                "sessionStorage.setItem('TestRunStatus','Run %1$s directly, as bootstrap finish before we can push test to its run-after, timeStamp#'+$A.test.time()+'.'); \n"+
-                         "}\n"+
-                         "testBootstrapFunction('%1$s', suiteCode, '%3$s'); \n"+
-                    "} else {\n"+
-                        "if(window.sessionStorage) {\n"+
+                         "&& window.$A && window.$A.test && window.$A.test.isComplete instanceof Function ) { \n" +//but the test wasn't
+                         "if(window.sessionStorage) {\n" +
+                                //"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n" +
+                                "sessionStorage.setItem('TestRunStatus','Run %1$s directly, as bootstrap finish before we can push test to its run-after, timeStamp#'+$A.test.time()+'.'); \n" +
+                         "}\n" +
+                         "testBootstrapFunction('%1$s', suiteCode, '%3$s'); \n" +
+                    "} else {\n" +
+                        "if(window.sessionStorage) {\n" +
                             //"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
-                            "sessionStorage.setItem('TestRunStatus','Push %1$s to bootstrap run after, timeStamp#'+((window.$A && window.$A.test) ? $A.test.time():Date.now())+'.'); \n"+
+                            "sessionStorage.setItem('TestRunStatus','Push %1$s to bootstrap run after, timeStamp#'+((window.$A && window.$A.test) ? $A.test.time():Date.now())+'.'); \n" +
                         "}\n"+
-                        "window.Aura || (window.Aura = {}); \n"+
-                        "window.Aura.afterBootstrapReady || (window.Aura.afterBootstrapReady = []); \n"+
-                        "window.Aura.afterBootstrapReady.push(testBootstrapFunction.bind(this, '%1$s', suiteCode, '%3$s')); \n"+
+                        "window.Aura || (window.Aura = {}); \n" +
+                        "window.Aura.afterBootstrapReady || (window.Aura.afterBootstrapReady = []); \n" +
+                        "window.Aura.afterBootstrapReady.push(testBootstrapFunction.bind(this, '%1$s', suiteCode, '%3$s')); \n" +
                     "} \n"
-                    ,testName, suiteDef.getCode()+"\t\n", testTimeout)
+                    ,testName, suiteDef.getCode() + "\t\n", testTimeout)
         );
     }
 
@@ -668,7 +664,7 @@ public class AuraTestFilter {
                 return definitionService.getDefDescriptor(
                         String.format("%s:%s", namespace, name), type.getPrimaryInterface());
             }
-        } catch (Throwable t) {
+        } catch (Throwable ignore) {
             // Ignore. Pass request onto core servlets.
         }
         return null;

@@ -16,6 +16,7 @@
 package org.auraframework.http;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraResource;
-
-import com.google.common.collect.Maps;
 
 /**
  * The aura resource servlet.
@@ -47,7 +46,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
     private static final long serialVersionUID = -3642790050433142397L;
     public static final String ORIG_REQUEST_URI = "aura.origRequestURI";
 
-    private final Map<String,AuraResource> nameToResource = Maps.newHashMap();
+    private final Map<String, AuraResource> nameToResource = new HashMap<>();
 
     private ContextService contextService;
     

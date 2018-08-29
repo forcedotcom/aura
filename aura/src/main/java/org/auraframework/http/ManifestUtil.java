@@ -63,6 +63,8 @@ public class ManifestUtil {
 
     /**
      * Is AppCache allowed by the current configuration?
+     * 
+     * @return {@code true} if AppCache is allowed.
      */
     public boolean isManifestEnabled() {
         if (!configAdapter.isClientAppcacheEnabled()) {
@@ -76,15 +78,15 @@ public class ManifestUtil {
             @SuppressWarnings("unchecked")
             DefDescriptor<ApplicationDef> appDefDesc = (DefDescriptor<ApplicationDef>)desc;
             try {
-            	ApplicationDef appDef = definitionService.getUnlinkedDefinition(appDefDesc);
-            	if(appDef != null) {
-	                Boolean useAppcache = appDef.isAppcacheEnabled();
-	                if (useAppcache != null) {
-	                    return useAppcache.booleanValue();
-	                }
-            	}
+                ApplicationDef appDef = definitionService.getUnlinkedDefinition(appDefDesc);
+                if(appDef != null) {
+                    Boolean useAppcache = appDef.isAppcacheEnabled();
+                if (useAppcache != null) {
+                    return useAppcache.booleanValue();
+                }
+            }
                 return false;
-            } catch (QuickFixException e) {
+            } catch (QuickFixException ignore) {
                 return false;
             }
         }
@@ -102,10 +104,10 @@ public class ManifestUtil {
             StringBuilder sb = new StringBuilder();
             if (context.getMode() != Mode.PROD) {
                 sb.append(context.getMode());
-                sb.append("_");
+                sb.append('_');
             }
             sb.append(context.getApplicationDescriptor().getNamespace());
-            sb.append("_");
+            sb.append('_');
             sb.append(context.getApplicationDescriptor().getName());
             sb.append(MANIFEST_COOKIE_TAIL);
             return sb.toString();

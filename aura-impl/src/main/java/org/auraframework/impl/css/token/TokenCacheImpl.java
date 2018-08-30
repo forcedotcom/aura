@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.google.common.collect.Ordering;
 import org.auraframework.Aura;
 import org.auraframework.css.TokenCache;
 import org.auraframework.def.DefDescriptor;
@@ -77,8 +78,8 @@ public final class TokenCacheImpl implements TokenCache {
         }
 
         this.originals = origs.build();
-        this.descriptors = ImmutableList.copyOf(unique);
-        this.reversed = this.descriptors.reverse();
+        this.descriptors = Ordering.natural().immutableSortedCopy(unique);
+        this.reversed = ImmutableList.copyOf(unique).reverse();
 
         ImmutableTable.Builder<String, DefDescriptor<TokensDef>, String> table = ImmutableTable.builder();
         for (DefDescriptor<TokensDef> descriptor : this.descriptors) { // iterate through the unique list

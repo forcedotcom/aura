@@ -74,7 +74,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
 
     private static final String ATTRIBUTE_RENDER = "render";
     protected static final String ATTRIBUTE_TEMPLATE = "template";
-    private static final String ATTRIBUTE_PROVIDER = "provider";
     private static final String ATTRIBUTE_EXTENSIBLE = "extensible";
     private static final String ATTRIBUTE_ABSTRACT = "abstract";
     private static final String ATTRIBUTE_IMPLEMENTS = "implements";
@@ -93,7 +92,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             .addAll(RootTagHandler.ALLOWED_ATTRIBUTES).build();
 
     protected static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-            ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE, ATTRIBUTE_PROVIDER,
+            ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE,
             ATTRIBUTE_STYLE, ATTRIBUTE_HELPER, ATTRIBUTE_RENDERER,
             ATTRIBUTE_DEFAULT_FLAVOR, ATTRIBUTE_DYNAMICALLY_FLAVORABLE)
             .addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.INTERNAL_ALLOWED_ATTRIBUTES)
@@ -388,13 +387,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             }
 
             builder.setClientProviderDef(getBundledDef(ProviderDef.class, "js"));
-            String providerName = getAttributeValue(ATTRIBUTE_PROVIDER);
-            if (providerName != null) {
-                List<String> providerNames = AuraTextUtil.splitSimpleAndTrim(providerName, ",", 0);
-                for (String provider : providerNames) {
-                    builder.addProvider(provider);
-                }
-            }
 
             String templateName = getAttributeValue(ATTRIBUTE_TEMPLATE);
             if (templateName != null) {

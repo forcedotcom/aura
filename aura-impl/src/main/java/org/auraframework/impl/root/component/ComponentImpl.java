@@ -40,8 +40,9 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * The real runtime component thing that sits in the tree. The Component
- * interface is just what is exposed to models
+ * The real runtime component thing that sits in the tree.
+ *
+ * The Component interface is just what is exposed to models
  */
 @Serialization(referenceType = ReferenceType.IDENTITY)
 public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Component> implements Component {
@@ -75,9 +76,7 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
         super(descriptor, extender, attributeValueProvider, concreteComponent);
     }
 
-    // FIXME - move to builder
-    @Override
-    protected void injectComponent() throws QuickFixException {
+    private void injectComponent() throws QuickFixException {
         if (this.intfDescriptor != null) {
             AuraContext context = Aura.getContextService().getCurrentContext();
             context.pushCallingDescriptor(descriptor);
@@ -161,6 +160,8 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
                 attributeValueProvider.index(this);
             }
         }
+
+        injectComponent();
 
         super.finishInit();
     }

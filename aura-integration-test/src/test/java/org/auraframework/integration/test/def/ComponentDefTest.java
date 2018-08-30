@@ -15,23 +15,29 @@
  */
 package org.auraframework.integration.test.def;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
 
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.BaseComponentDef.RenderType;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.ProviderDef;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.component.BaseComponentDefTest;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.CompilerService;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
+
+import com.google.common.collect.Sets;
 
 public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
     @Inject
@@ -414,5 +420,86 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         //assert
         assertNotNull("An exception was not raised when an import was added to a link", exception);
         assertExceptionMessageContains(exception, InvalidDefinitionException.class, "import attribute is not allowed in link tags");
+    }
+
+    /**
+     * InvalidDefinitionException if provider is empty.
+     */
+    @Test
+    public void testProviderEmpty() throws Exception {
+        try {
+            define(baseTag, "provider=''", "");
+            fail("Should not be able to load component with empty provider");
+        } catch (QuickFixException e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "QualifiedName is required for descriptors");
+        }
+    }
+
+    /**
+     * DefinitionNotFoundException if provider is invalid.
+     */
+    @Test
+    public void testProviderInvalid() throws Exception {
+        try {
+            define(baseTag, "provider='oops'", "");
+            fail("Should not be able to load component with invalid provider");
+        } catch (QuickFixException e) {
+            checkExceptionStart(e, DefinitionNotFoundException.class, "No PROVIDER named java://oops found");
+        }
+    }
+
+    /**
+     * isLocallyRenderable is false when component has a Javascript Provider. Test method for
+     * {@link BaseComponentDef#isLocallyRenderable()}.
+     */
+    @Test
+    public void testIsLocallyRenderableWithClientsideProvider() throws QuickFixException {
+        ComponentDef baseComponentDef = define(baseTag, "provider='js://test.test_JSProvider_Interface'", "");
+        assertEquals("Rendering detection logic is not on.", RenderType.AUTO, baseComponentDef.getRender());
+        assertFalse("When a component has client renderers, the component should not be serverside renderable.",
+                baseComponentDef.isLocallyRenderable());
+    }
+
+    /**
+     * hasLocalDependencies is false if super has local provider dependency. Test method for
+     * {@link BaseComponentDef#hasLocalDependencies()}.
+     */
+    @Test
+    public void testHasLocalDependenciesInheritedServersideProvider() throws QuickFixException {
+        String parentContent = String.format(baseTag,
+                "extensible='true' provider='java://org.auraframework.impl.java.provider.TestProviderAbstractBasic'",
+                "");
+        DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(getDefClass(), parentContent);
+
+        DefDescriptor<ComponentDef> child = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "extends='" + parent.getDescriptorName() + "'", ""));
+        assertFalse(
+                "When a component's parent has serverside provider dependency, the component should not be marked as server dependent.",
+                definitionService.getDefinition(child).hasLocalDependencies());
+    }
+
+    /**
+     * hasLocalDependencies is true if component only has serverside provider. Test method for
+     * {@link BaseComponentDef#hasLocalDependencies()}.
+     */
+    @Test
+    public void testHasLocalDependenciesWithServersideProvider() throws QuickFixException {
+        ComponentDef baseComponentDef = define(baseTag,
+                "abstract='true' provider='java://org.auraframework.impl.java.provider.TestProviderAbstractBasic'", "");
+        assertTrue("Abstract Component with serverside providers have server dependecies.", definitionService
+                .getDefinition(baseComponentDef.getDescriptor()).hasLocalDependencies());
+    }
+    
+    @Test
+    public void testAppendDependenciesWithServerProvider() throws QuickFixException {
+        DefDescriptor<?> providerDesc = definitionService.getDefDescriptor(
+                "java://org.auraframework.impl.java.provider.ConcreteProvider", ProviderDef.class);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                getDefClass(),
+                String.format(baseTag, String.format(" provider='%s' ", providerDesc), ""));
+        Set<DefDescriptor<?>> dependencies = definitionService.getDefinition(cmpDesc).getDependencySet();
+        Set<DefDescriptor<?>> expected = Sets.newHashSet(providerDesc,
+                new DefDescriptorImpl<>("markup", "aura", "component", ComponentDef.class));
+        assertMatchedDependencies(expected, dependencies);
     }
 }

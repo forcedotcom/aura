@@ -59,8 +59,4 @@ public class ApplicationImpl extends BaseComponentImpl<ApplicationDef, Applicati
             }
         }
     }
-
-    @Override
-    protected void injectComponent() {
-    }
 }

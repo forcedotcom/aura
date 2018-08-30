@@ -437,8 +437,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<InterfaceDef> intfDesc = addSourceAutoCleanup(InterfaceDef.class, "<aura:interface/>");
         DefDescriptor<EventDef> eventDesc = addSourceAutoCleanup(EventDef.class,
                 "<aura:event type='component' support='GA'/>");
-        DefDescriptor<?> providerDesc = definitionService.getDefDescriptor(
-                "java://org.auraframework.impl.java.provider.ConcreteProvider", ProviderDef.class);
         DefDescriptor<?> modelDesc = definitionService.getDefDescriptor(
                 "java://org.auraframework.impl.java.model.TestModel", ModelDef.class);
         DefDescriptor<?> controllerDesc = definitionService.getDefDescriptor(
@@ -452,8 +450,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 String.format(
                         baseTag,
                         String.format(
-                                "extends='%s' implements='%s' provider='%s' model='%s' controller='%s' renderer='%s'",
-                                parentDesc.getDescriptorName(), intfDesc.getDescriptorName(), providerDesc, modelDesc,
+                                "extends='%s' implements='%s' model='%s' controller='%s' renderer='%s'",
+                                parentDesc.getDescriptorName(), intfDesc.getDescriptorName(), modelDesc,
                                 controllerDesc, rendererDesc),
                         String.format(
                                 "<%s/><aura:registerevent name='evt' type='%s'/>", childDesc.getDescriptorName(),
@@ -466,20 +464,25 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
         Set<DefDescriptor<?>> dependencies = definitionService.getDefinition(cmpDesc).getDependencySet();
 
-        Set<DefDescriptor<?>> expected = Sets.newHashSet(parentDesc, childDesc, intfDesc, providerDesc, modelDesc,
+        Set<DefDescriptor<?>> expected = Sets.newHashSet(parentDesc, childDesc, intfDesc, modelDesc,
                 controllerDesc, eventDesc, styleDesc, rendererDesc);
-        if (!dependencies.containsAll(expected)) {
+        assertMatchedDependencies(expected, dependencies);
+    }
+
+    public void assertMatchedDependencies(Set<DefDescriptor<?>> expected, Set<DefDescriptor<?>> actual) {
+        if (!actual.containsAll(expected)) {
             StringBuilder msg = new StringBuilder("missing dependencies:");
-            expected.removeAll(dependencies);
+            expected.removeAll(actual);
             expected.forEach((desc) -> {
                 msg.append(" " + desc.getDefType() + "-" + desc);
             });
             fail(msg.toString());
         }
-        if (!expected.containsAll(dependencies)) {
+        if (!expected.containsAll(actual)) {
+            Set<DefDescriptor<?>> actualCopy = Sets.newHashSet(actual);
             StringBuilder msg = new StringBuilder("extra dependencies:");
-            dependencies.removeAll(expected);
-            dependencies.forEach((desc) -> {
+            actualCopy.removeAll(expected);
+            actualCopy.forEach((desc) -> {
                 msg.append(" " + desc.getDefType() + "-" + desc);
             });
             fail(msg.toString());
@@ -521,8 +524,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 String.format(
                         baseTag,
                         String.format(
-                                "extends='%s' implements='%s' provider='%s' model='%s' controller='%s' renderer='%s' helper='%s'",
-                                parentDesc.getDescriptorName(), intfDesc.getDescriptorName(), providerDesc, modelDesc,
+                                "extends='%s' implements='%s' model='%s' controller='%s' renderer='%s' helper='%s'",
+                                parentDesc.getDescriptorName(), intfDesc.getDescriptorName(), modelDesc,
                                 controllerDesc, rendererDesc, helperDesc),
                         String.format(
                                 "<%s/><aura:registerevent name='evt' type='%s'/>", childDesc.getDescriptorName(),
@@ -536,23 +539,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         Set<DefDescriptor<?>> dependencies = definitionService.getDefinition(cmpDesc).getDependencySet();
 
         Set<DefDescriptor<?>> expected = Sets.newHashSet(parentDesc, childDesc, intfDesc, eventDesc, styleDesc,
-                providerDesc, modelDesc, controllerDesc, rendererDesc, helperDesc);
-        if (!dependencies.containsAll(expected)) {
-            StringBuilder msg = new StringBuilder("missing dependencies:");
-            expected.removeAll(dependencies);
-            expected.forEach((desc) -> {
-                msg.append(" " + desc.getDefType() + "-" + desc);
-            });
-            fail(msg.toString());
-        }
-        if (!expected.containsAll(dependencies)) {
-            StringBuilder msg = new StringBuilder("extra dependencies:");
-            dependencies.removeAll(expected);
-            dependencies.forEach((desc) -> {
-                msg.append(" " + desc.getDefType() + "-" + desc);
-            });
-            fail(msg.toString());
-        }
+                modelDesc, controllerDesc, rendererDesc, helperDesc);
+        assertMatchedDependencies(expected, dependencies);
     }
 
     /**
@@ -665,32 +653,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             fail("Should not be able to load component with invalid renderer");
         } catch (QuickFixException e) {
             checkExceptionStart(e, DefinitionNotFoundException.class, "No RENDERER named js://oops found");
-        }
-    }
-
-    /**
-     * InvalidDefinitionException if provider is empty.
-     */
-    @Test
-    public void testProviderEmpty() throws Exception {
-        try {
-            define(baseTag, "provider=''", "");
-            fail("Should not be able to load component with empty provider");
-        } catch (QuickFixException e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "QualifiedName is required for descriptors");
-        }
-    }
-
-    /**
-     * DefinitionNotFoundException if provider is invalid.
-     */
-    @Test
-    public void testProviderInvalid() throws Exception {
-        try {
-            define(baseTag, "provider='oops'", "");
-            fail("Should not be able to load component with invalid provider");
-        } catch (QuickFixException e) {
-            checkExceptionStart(e, DefinitionNotFoundException.class, "No PROVIDER named java://oops found");
         }
     }
 
@@ -1235,18 +1197,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * isLocallyRenderable is false when component has a Javascript Provider. Test method for
-     * {@link BaseComponentDef#isLocallyRenderable()}.
-     */
-    @Test
-    public void testIsLocallyRenderableWithClientsideProvider() throws QuickFixException {
-        T baseComponentDef = define(baseTag, "provider='js://test.test_JSProvider_Interface'", "");
-        assertEquals("Rendering detection logic is not on.", RenderType.AUTO, baseComponentDef.getRender());
-        assertFalse("When a component has client renderers, the component should not be serverside renderable.",
-                baseComponentDef.isLocallyRenderable());
-    }
-
-    /**
      * isLocallyRenderable is false when component includes a Javascript controller. Test method for
      * {@link BaseComponentDef#isLocallyRenderable()}.
      */
@@ -1389,19 +1339,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * hasLocalDependencies is true if component only has serverside provider. Test method for
-     * {@link BaseComponentDef#hasLocalDependencies()}.
-     */
-    @Test
-    public void testHasLocalDependenciesWithServersideProvider() throws QuickFixException {
-        T baseComponentDef = define(baseTag,
-                "abstract='true' provider='java://org.auraframework.impl.java.provider.TestProviderAbstractBasic'", "");
-        assertTrue("Abstract Component with serverside providers have server dependecies.", definitionService
-                .getDefinition(baseComponentDef.getDescriptor()).hasLocalDependencies());
-    }
-    
-
-    /**
      * hasLocalDependencies is true if super has local model dependency. Test method for
      * {@link BaseComponentDef#hasLocalDependencies()}.
      */
@@ -1453,24 +1390,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 String.format(baseTag, "extends='" + parent.getDescriptorName() + "'", ""));
         assertFalse(
                 "When a component's parent has a clientside renderer dependency, the component should not be marked as server dependent.",
-                definitionService.getDefinition(child).hasLocalDependencies());
-    }
-
-    /**
-     * hasLocalDependencies is false if super has local provider dependency. Test method for
-     * {@link BaseComponentDef#hasLocalDependencies()}.
-     */
-    @Test
-    public void testHasLocalDependenciesInheritedServersideProvider() throws QuickFixException {
-        String parentContent = String.format(baseTag,
-                "extensible='true' provider='java://org.auraframework.impl.java.provider.TestProviderAbstractBasic'",
-                "");
-        DefDescriptor<T> parent = addSourceAutoCleanup(getDefClass(), parentContent);
-
-        DefDescriptor<T> child = addSourceAutoCleanup(getDefClass(),
-                String.format(baseTag, "extends='" + parent.getDescriptorName() + "'", ""));
-        assertFalse(
-                "When a component's parent has serverside provider dependency, the component should not be marked as server dependent.",
                 definitionService.getDefinition(child).hasLocalDependencies());
     }
 

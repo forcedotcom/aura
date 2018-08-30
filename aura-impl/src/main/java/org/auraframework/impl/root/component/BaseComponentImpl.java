@@ -256,7 +256,6 @@ BaseComponent<D, I> {
     protected void finishInit() throws QuickFixException {
         AuraContext context = contextService.getCurrentContext();
 
-        injectComponent();
         createModel();
 
         context.getInstanceStack().setAttributeName("$");
@@ -304,8 +303,6 @@ BaseComponent<D, I> {
     }
 
     protected abstract void createSuper() throws DefinitionNotFoundException, QuickFixException;
-
-    protected abstract void injectComponent() throws QuickFixException;
 
     @Override
     public D getComponentDef() throws QuickFixException {

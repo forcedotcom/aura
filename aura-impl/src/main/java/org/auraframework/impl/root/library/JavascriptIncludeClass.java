@@ -20,13 +20,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.impl.javascript.BaseJavascriptClass;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptWriter;
 
@@ -82,7 +82,7 @@ public class JavascriptIncludeClass extends BaseJavascriptClass {
         protected String generate() throws QuickFixException {
 
             jsDescriptor = getClientDescriptor(includeDefRefBuilder.getDescriptor());
-            if (AuraTextUtil.isNullEmptyOrWhitespace(jsDescriptor)) {
+            if (StringUtils.isBlank(jsDescriptor)) {
                 throw new InvalidDefinitionException("Include classes require a non empty fully qualified name", null);
             }
 
@@ -144,8 +144,8 @@ public class JavascriptIncludeClass extends BaseJavascriptClass {
             }
 
             boolean hasAliases = aliases != null && !aliases.isEmpty();
-            boolean hasExport = !AuraTextUtil.isNullEmptyOrWhitespace(export);
-            hasCode = !AuraTextUtil.isNullEmptyOrWhitespace(include);
+            boolean hasExport = !StringUtils.isBlank(export);
+            hasCode = !StringUtils.isBlank(include);
 
             if (hasAliases || hasExport || !hasCode) {
                 out.append("function lib(");

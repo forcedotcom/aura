@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.builder.BaseComponentDefBuilder;
@@ -1036,7 +1037,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         if(!context.getClientClassLoaded(descriptor)) {
             boolean minify = context.getMode().minify();
             String code = getCode(minify);
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(code)) {
+            if (!StringUtils.isBlank(code)) {
                 json.writeMapEntry(ApplicationKey.COMPONENTCLASS, code);
             }
         }
@@ -1210,7 +1211,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     public static String convertToLocker(String code) {
 
-        if (AuraTextUtil.isNullEmptyOrWhitespace(code)) {
+        if (StringUtils.isBlank(code)) {
             return code;
         }
 

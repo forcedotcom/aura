@@ -15,10 +15,13 @@
  */
 package org.auraframework.impl.type;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
@@ -33,13 +36,7 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  */
@@ -81,7 +78,7 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
 
     @Override
     public Object valueOf(Object stringRep) {
-        if(stringRep instanceof String && AuraTextUtil.isNullEmptyOrWhitespace(stringRep.toString())) {
+        if(stringRep instanceof String && StringUtils.isBlank(stringRep.toString())) {
             stringRep = new ArrayList<ComponentDefRef>();
         }
         return stringRep;

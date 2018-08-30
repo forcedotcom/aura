@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
@@ -38,7 +39,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
 /**
  * Abstract definition reference handler
@@ -74,7 +74,7 @@ public abstract class BaseDefRefHandler<T extends DefinitionReference, P extends
         super.readSystemAttributes();
         builder.setLocalId(getSystemAttributeValue("id"));
         String load = getSystemAttributeValue("load");
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(load)) {
+        if (!StringUtils.isBlank(load)) {
             Load loadVal;
             try {
                 loadVal = Load.valueOf(load.toUpperCase());
@@ -89,7 +89,7 @@ public abstract class BaseDefRefHandler<T extends DefinitionReference, P extends
         }
 
         String flavor = getSystemAttributeValue("flavor");
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(flavor)) {
+        if (!StringUtils.isBlank(flavor)) {
             TextTokenizer tt = TextTokenizer.tokenize(flavor, getLocation());
             builder.setFlavor(tt.asValue(getParentHandler()));
         }
@@ -107,7 +107,7 @@ public abstract class BaseDefRefHandler<T extends DefinitionReference, P extends
             String prefix = xmlReader.getAttributePrefix(i);
             if (!XMLHandler.isSystemPrefixed(attName, prefix)) {
                 // W-2316503: remove compatibility code for both SJSXP and Woodstox
-                if (!AuraTextUtil.isNullEmptyOrWhitespace(prefix) && !attName.contains(":")) {
+                if (!StringUtils.isBlank(prefix) && !attName.contains(":")) {
                     attName = prefix + ":" + attName;
                 }
                 DefDescriptor<AttributeDef> att = definitionService.getDefDescriptor(attName, AttributeDef.class);

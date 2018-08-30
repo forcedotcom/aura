@@ -18,6 +18,7 @@ package org.auraframework.impl.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.builder.JavascriptCodeBuilder;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.parser.handler.DependencyDefHandler;
@@ -45,7 +46,7 @@ public class JavascriptTokenizer {
     }
 
     public void process(JavascriptCodeBuilder builder) {
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(code)) {
+        if (!StringUtils.isBlank(code)) {
             parseLabels(builder);
             addDependencies(builder);
         }

@@ -15,7 +15,12 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.RequiredVersionDef;
@@ -25,11 +30,8 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
 public class RequiredVersionDefHandler<P extends RootDefinition> extends ParentedTagHandler<RequiredVersionDefImpl, P> {
 
@@ -78,8 +80,8 @@ public class RequiredVersionDefHandler<P extends RootDefinition> extends Parente
     protected void readAttributes() throws InvalidAccessValueException {
         String namespace = getAttributeValue(ATTRIBUTE_NAMESPACE);
         String version = getAttributeValue(ATTRIBUTE_VERSION);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(namespace)
-                || AuraTextUtil.isNullEmptyOrWhitespace(version)) {
+        if (StringUtils.isBlank(namespace)
+                || StringUtils.isBlank(version)) {
             error("Attribute '%s' and '%s' are required on <%s>", ATTRIBUTE_NAMESPACE, ATTRIBUTE_VERSION, TAG);
         }
         builder.setDescriptor(definitionService.getDefDescriptor(namespace, RequiredVersionDef.class));

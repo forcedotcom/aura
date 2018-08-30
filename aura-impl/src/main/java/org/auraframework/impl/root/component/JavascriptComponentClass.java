@@ -19,6 +19,7 @@ package org.auraframework.impl.root.component;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.module.ModuleDef;
@@ -26,7 +27,6 @@ import org.auraframework.impl.javascript.BaseJavascriptClass;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.BasicJsonSerializationContext;
 import org.auraframework.util.json.JsonEncoder;
 
@@ -147,7 +147,7 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
                 throw new InvalidDefinitionException("No descriptor", getLocation());
             }
             jsDescriptor = descriptor.getQualifiedName();
-            if (AuraTextUtil.isNullEmptyOrWhitespace(jsDescriptor)) {
+            if (StringUtils.isBlank(jsDescriptor)) {
                 throw new InvalidDefinitionException("Component classes require a non empty fully qualified name",
                         null);
             }
@@ -230,28 +230,28 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
             hasCode = false;
 
             // TODO: tag line # for controller
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(controllerCode)) {
+            if (!StringUtils.isBlank(controllerCode)) {
                 json.writeMapKey("controller");
                 json.writeLiteral(controllerCode);
                 hasCode = true;
             }
 
             // TODO: tag line # for helper
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(helperCode)) {
+            if (!StringUtils.isBlank(helperCode)) {
                 json.writeMapKey("helper");
                 json.writeLiteral(helperCode);
                 hasCode = true;
             }
 
             // TODO: tag line # for renderer
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(rendererCode)) {
+            if (!StringUtils.isBlank(rendererCode)) {
                 json.writeMapKey("renderer");
                 json.writeLiteral(rendererCode);
                 hasCode = true;
             }
 
             // TODO: tag line # for provider
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(providerCode)) {
+            if (!StringUtils.isBlank(providerCode)) {
                 json.writeMapKey("provider");
                 json.writeLiteral(providerCode);
                 hasCode = true;

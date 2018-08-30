@@ -17,17 +17,19 @@
 package org.auraframework.impl.root.parser.handler.design;
 
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.design.DesignLayoutAttributeDef;
 import org.auraframework.impl.design.DesignLayoutAttributeDefImpl;
 import org.auraframework.impl.root.parser.handler.BaseXMLElementHandler;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
 public class DesignLayoutAttributeDefHandler extends BaseXMLElementHandler {
     public final static String TAG = "design:layoutattribute";
@@ -66,7 +68,7 @@ public class DesignLayoutAttributeDefHandler extends BaseXMLElementHandler {
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
+        if (!StringUtils.isBlank(text)) {
             error("No literal text allowed in attribute design definition");
         }
     }

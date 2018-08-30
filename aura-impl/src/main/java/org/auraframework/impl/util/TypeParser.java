@@ -18,7 +18,7 @@ package org.auraframework.impl.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.auraframework.util.AuraTextUtil;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Util to handle parsing of tags and classes
@@ -53,7 +53,7 @@ public class TypeParser {
             String prefix = tagMatcher.group(1);
             String namespace = tagMatcher.group(2);
             String name = tagMatcher.group(3);
-            if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+            if (StringUtils.isBlank(name)) {
                 name = namespace;
                 namespace = null;
             }
@@ -76,7 +76,7 @@ public class TypeParser {
             String prefix = tagMatcher.group(1);
             String namespace = tagMatcher.group(2);
             String name = tagMatcher.group(3);
-            if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+            if (StringUtils.isBlank(name)) {
                 name = namespace;
                 namespace = null;
             }

@@ -15,7 +15,12 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.RootDefinitionBuilder;
@@ -30,11 +35,8 @@ import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
 public class EventDefHandler extends RootTagHandler<EventDef> {
 
@@ -125,7 +127,7 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
+        if (!StringUtils.isBlank(text)) {
             error("No literal text allowed in event definition");
         }
     }

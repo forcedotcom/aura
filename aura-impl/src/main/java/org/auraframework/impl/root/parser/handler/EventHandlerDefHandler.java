@@ -15,7 +15,13 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.RootDefinition;
@@ -29,12 +35,8 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
 public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
 
@@ -71,7 +73,7 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
         builder.setLocation(getLocation());
 
         String event = getAttributeValue(ATTRIBUTE_EVENT);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(event)) {
+        if (!StringUtils.isBlank(event)) {
             builder.setDescriptor(getDefDescriptor(event, EventDef.class));
         }
 

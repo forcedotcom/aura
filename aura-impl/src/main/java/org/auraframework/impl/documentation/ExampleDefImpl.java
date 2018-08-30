@@ -15,6 +15,10 @@
  */
 package org.auraframework.impl.documentation;
 
+import java.io.IOException;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.builder.ExampleDefBuilder;
 import org.auraframework.def.ComponentDef;
@@ -23,11 +27,7 @@ import org.auraframework.def.ExampleDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
-
-import java.io.IOException;
-import java.util.Set;
 
 public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements ExampleDef {
 
@@ -70,15 +70,15 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
 
-        if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+        if (StringUtils.isBlank(name)) {
             throw new InvalidDefinitionException("<aura:example> must have attribute 'name'.", getLocation());
         }
 
-        if (AuraTextUtil.isNullEmptyOrWhitespace(label)) {
+        if (StringUtils.isBlank(label)) {
             throw new InvalidDefinitionException("<aura:example> must have attribute 'label'.", getLocation());
         }
 
-        if (AuraTextUtil.isNullEmptyOrWhitespace(description)) {
+        if (StringUtils.isBlank(description)) {
             throw new InvalidDefinitionException("<aura:example> must contain a description.", getLocation());
         }
 

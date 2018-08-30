@@ -15,6 +15,14 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.util.Collections;
+import java.util.List;
+
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ComponentDefRef;
@@ -26,12 +34,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
-
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Tag handler has a parent
@@ -73,7 +75,7 @@ public abstract class ParentedTagHandler<T extends Definition, P extends Definit
     protected List<ComponentDefRef> tokenizeChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
 
-        boolean skip = AuraTextUtil.isNullEmptyOrWhitespace(text);
+        boolean skip = StringUtils.isBlank(text);
 
         if (!skip) {
             TextTokenizer tokenizer = TextTokenizer.tokenize(text, getLocation());
@@ -135,7 +137,7 @@ public abstract class ParentedTagHandler<T extends Definition, P extends Definit
         String text = xmlReader.getText();
         String ret = "";
 
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
+        if (!StringUtils.isBlank(text)) {
             ret = AuraTextUtil.replaceSimple(text,  new String[]{"<", ">"}, new String[]{"&lt;", "&gt;"});
         }
 

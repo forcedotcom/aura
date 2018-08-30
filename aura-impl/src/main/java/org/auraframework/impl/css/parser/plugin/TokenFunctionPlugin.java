@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.TokenValueProvider;
 import org.auraframework.system.Location;
@@ -172,7 +173,7 @@ public final class TokenFunctionPlugin implements Plugin {
     }
 
     private String expression(String raw, Syntax syntax) throws QuickFixException {
-        if (AuraTextUtil.isNullEmptyOrWhitespace(raw)) {
+        if (StringUtils.isBlank(raw)) {
             throw new ParserException(syntax, EMPTY_FUNCTION);
         }
 

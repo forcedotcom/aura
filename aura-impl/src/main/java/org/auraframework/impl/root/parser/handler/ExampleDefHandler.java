@@ -15,7 +15,12 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DefDescriptor;
@@ -25,11 +30,8 @@ import org.auraframework.impl.documentation.ExampleDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
 public class ExampleDefHandler extends ParentedTagHandler<ExampleDefImpl, DocumentationDef> {
 
@@ -66,19 +68,19 @@ public class ExampleDefHandler extends ParentedTagHandler<ExampleDefImpl, Docume
     @Override
     protected void readAttributes() {
         String ref = getAttributeValue(ATTRIBUTE_REF);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(ref)) {
+        if (StringUtils.isBlank(ref)) {
             error("Attribute '%s' is required on <%s>", ATTRIBUTE_REF, TAG);
         }
         builder.setRef(ref);
 
         String name = getAttributeValue(ATTRIBUTE_NAME);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+        if (StringUtils.isBlank(name)) {
             error("Attribute '%s' is required on <%s>", ATTRIBUTE_NAME, TAG);
         }
         builder.setName(name);
 
         String label = getAttributeValue(ATTRIBUTE_LABEL);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(label)) {
+        if (StringUtils.isBlank(label)) {
             error("Attribute '%s' is required on <%s>", ATTRIBUTE_LABEL, TAG);
         }
         builder.setLabel(label);

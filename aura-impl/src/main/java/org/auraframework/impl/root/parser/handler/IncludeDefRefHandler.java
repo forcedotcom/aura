@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.IncludeDef;
@@ -36,7 +37,6 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -81,7 +81,7 @@ public class IncludeDefRefHandler extends XMLHandler<IncludeDefRefImpl> {
         builder.setDescriptor(definitionService.getDefDescriptor(String.format("js://%s.%s", parentDescriptor.getNamespace(), name), IncludeDef.class, parentDescriptor));
 
         String importNames = getAttributeValue(ATTRIBUTE_IMPORTS);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(importNames)) {
+        if (!StringUtils.isBlank(importNames)) {
             List<DefDescriptor<IncludeDef>> imports = new LinkedList<>();
             for (String importName : Arrays.asList(importNames.trim().split("\\s*\\,\\s*"))) {
                 String[] parts = importName.split(":");
@@ -103,13 +103,13 @@ public class IncludeDefRefHandler extends XMLHandler<IncludeDefRefImpl> {
         }
 
         String aliases = getAttributeValue(ATTRIBUTE_ALIASES);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(aliases)) {
+        if (!StringUtils.isBlank(aliases)) {
             List<String> aliasList = Arrays.asList(aliases.trim().split("\\s*\\,\\s*"));
             builder.setAliases(aliasList);
         }
 
         String export = getAttributeValue(ATTRIBUTE_EXPORT);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(export)) {
+        if (!StringUtils.isBlank(export)) {
             builder.setExport(export);
         }
         builder.setDescription(getAttributeValue(RootTagHandler.ATTRIBUTE_DESCRIPTION));

@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.root.parser.handler.design.DesignAttributeDefHandler;
@@ -85,7 +86,7 @@ public abstract class XMLHandler<T extends Definition> extends BaseXMLElementHan
     @Override
     protected String getAttributeValue(String name) {
         String value = xmlReader.getAttributeValue(null, name);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(value)) {
+        if (StringUtils.isBlank(value)) {
             for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
                 if (xmlReader.getAttributeLocalName(i).equalsIgnoreCase(name)) {
                     return xmlReader.getAttributeValue(i);
@@ -113,7 +114,7 @@ public abstract class XMLHandler<T extends Definition> extends BaseXMLElementHan
             // sjsxp
             // defaults to setting attribute prefix regardless of IS_NAMESPACE_AWARE setting
             value = getAttributeValue(name);
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(value)) {
+            if (!StringUtils.isBlank(value)) {
                 // ensure system prefixed value of attribute ie "id" vs "aura:id"
                 for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
                     if (xmlReader.getAttributeLocalName(i).equalsIgnoreCase(name)

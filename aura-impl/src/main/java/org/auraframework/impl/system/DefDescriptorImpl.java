@@ -16,6 +16,9 @@
 
 package org.auraframework.impl.system;
 
+import java.io.IOException;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -25,9 +28,7 @@ import org.auraframework.impl.util.TypeParser.Type;
 import org.auraframework.service.ContextService;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
-import java.io.IOException;
 
 /**
  */
@@ -85,7 +86,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     public DefDescriptorImpl(String qualifiedName, Class<T> defClass, DefDescriptor<?> bundle, ContextService contextService) {
         this.bundle = bundle;
         this.defType = DefType.getDefType(defClass);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(qualifiedName)) {
+        if (StringUtils.isBlank(qualifiedName)) {
             throw new AuraRuntimeException("QualifiedName is required for descriptors");
         }
 
@@ -171,7 +172,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 break;
         }
 
-        if (AuraTextUtil.isNullEmptyOrWhitespace(prefix)) {
+        if (StringUtils.isBlank(prefix)) {
             prefix = contextService.getCurrentContext().getDefaultPrefix(defType);
             if (prefix != null) {
                 qualifiedName = buildQualifiedName(prefix, namespace, name);

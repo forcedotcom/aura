@@ -15,7 +15,14 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
+import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
+
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.FlavorDefaultDef;
@@ -25,14 +32,8 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
-import java.util.Set;
-
-import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
+import com.google.common.collect.ImmutableSet;
 
 public class FlavorDefaultDefHandler extends ParentedTagHandler<FlavorDefaultDef, FlavorsDef> {
     protected static final String TAG = "aura:flavor";
@@ -66,14 +67,14 @@ public class FlavorDefaultDefHandler extends ParentedTagHandler<FlavorDefaultDef
     @Override
     protected void readAttributes() throws InvalidDefinitionException {
         String componentFilter = getAttributeValue(ATTRIBUTE_COMPONENT);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(componentFilter)) {
+        if (!StringUtils.isBlank(componentFilter)) {
             builder.setComponent(componentFilter);
         } else {
             throw new InvalidDefinitionException("Missing required attribute 'component'", getLocation());
         }
 
         String flavorFilter = getAttributeValue(ATTRIBUTE_DEFAULT);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(flavorFilter)) {
+        if (!StringUtils.isBlank(flavorFilter)) {
             builder.setFlavor(flavorFilter);
         } else {
             throw new InvalidDefinitionException("Missing required attribute 'default'", getLocation());
@@ -91,7 +92,7 @@ public class FlavorDefaultDefHandler extends ParentedTagHandler<FlavorDefaultDef
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(xmlReader.getText())) {
+        if (!StringUtils.isBlank(xmlReader.getText())) {
             error("No literal text allowed in %s tag", TAG);
         }
     }

@@ -15,6 +15,11 @@
  */
 package org.auraframework.impl.system;
 
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -22,12 +27,7 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
-
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * subdef impl, passes most stuff except for name through to the parent
@@ -50,7 +50,7 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
     public static final Pattern SUBDEF_PATTERN = Pattern.compile("\\A((?:[\\w\\\\*]+://)?.*)/(\\w+)\\$(\\w+)\\z");
 
     protected SubDefDescriptorImpl(DefDescriptor<P> parentDescriptor, String subName, Class<T> defClass) {
-        if (AuraTextUtil.isNullEmptyOrWhitespace(subName)) {
+        if (StringUtils.isBlank(subName)) {
             throw new AuraRuntimeException("Sub definition name cannot be null");
         }
         this.parentDescriptor = parentDescriptor;

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LocatorContextDef;
@@ -27,7 +28,6 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 /**
@@ -62,7 +62,7 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
         if (mode != Mode.PROD) {
             // only send down description in non-prod mode. This is useful when generating
             // meta data about locators on the client
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(description)) {
+            if (!StringUtils.isBlank(description)) {
                json.writeMapEntry("description", description);
             }
         }

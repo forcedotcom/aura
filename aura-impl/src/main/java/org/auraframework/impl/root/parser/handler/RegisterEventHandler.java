@@ -15,7 +15,12 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DefDescriptor;
@@ -29,12 +34,8 @@ import org.auraframework.system.Location;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * handler for aura:registerEvent tag
@@ -67,12 +68,12 @@ public class RegisterEventHandler<P extends RootDefinition> extends ParentedTagH
     @Override
     protected void readAttributes() throws QuickFixException {
         String name = getAttributeValue(ATTRIBUTE_NAME);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+        if (StringUtils.isBlank(name)) {
             error("name is a required attribute on tag registerevent");
         }
         
         String type = getAttributeValue(ATTRIBUTE_TYPE);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(type)) {
+        if (StringUtils.isBlank(type)) {
             error("type attribute is required on registerevent");
         }
         

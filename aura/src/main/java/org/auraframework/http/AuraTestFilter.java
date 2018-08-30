@@ -39,6 +39,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -356,7 +357,7 @@ public class AuraTestFilter {
     private static Map<String, Object> getConfigMap(HttpServletRequest request) {
         Map<String, Object> configMap = null;
         String config = contextConfig.get(request);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(config)) {
+        if (!StringUtils.isBlank(config)) {
             if (config.startsWith(AuraTextUtil.urlencode("{"))) {
                 // Decode encoded context json. Serialized AuraContext json always starts with "{"
                 config = AuraTextUtil.urldecode(config);
@@ -553,7 +554,7 @@ public class AuraTestFilter {
 
         if (contextService.isEstablished()) {
             String contextPath = contextService.getCurrentContext().getContextPath();
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(contextPath)) {
+            if (!StringUtils.isBlank(contextPath)) {
                 suiteSrcUrl = contextPath + suiteSrcUrl;
             }
         }

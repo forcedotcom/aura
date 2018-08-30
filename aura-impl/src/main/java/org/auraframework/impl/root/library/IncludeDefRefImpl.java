@@ -18,6 +18,7 @@ package org.auraframework.impl.root.library;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
@@ -98,7 +99,7 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
 
     @Override
     public void validateDefinition() throws QuickFixException {
-        if (AuraTextUtil.isNullEmptyOrWhitespace(getName())) { throw new InvalidDefinitionException(
+        if (StringUtils.isBlank(getName())) { throw new InvalidDefinitionException(
                 String.format("%s must specify a name", IncludeDefRefHandler.TAG), getLocation()); }
         if (!AuraTextUtil.isValidNCNameIdentifier(getName())) { throw new InvalidDefinitionException(
                 String.format("%s 'name' attribute must be a valid NCName identifier", IncludeDefRefHandler.TAG),

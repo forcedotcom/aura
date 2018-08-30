@@ -22,6 +22,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.TokenDef;
@@ -32,7 +33,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -79,7 +79,7 @@ public final class TokenDefHandler extends ParentedTagHandler<TokenDef, TokensDe
     @Override
     protected void readAttributes() {
         String name = getAttributeValue(ATTRIBUTE_NAME);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+        if (StringUtils.isBlank(name)) {
             // normally this check would be handled by TokenDefImpl#validateDefinition, but waiting till then would
             // result in the get def descriptor below throwing a nondescript error message
             error("Missing required attribute 'name' on %s", TAG);
@@ -89,7 +89,7 @@ public final class TokenDefHandler extends ParentedTagHandler<TokenDef, TokensDe
         value = getAttributeValue(ATTRIBUTE_VALUE);// value (to be set on builder later, cuz it might throw a QFE)
 
         String allowedProperties = getAttributeValue(ATTRIBUTE_PROPERTY); // comma-separated list of property names
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(allowedProperties)) {
+        if (!StringUtils.isBlank(allowedProperties)) {
             builder.setAllowedProperties(allowedProperties);
         }
 
@@ -121,7 +121,7 @@ public final class TokenDefHandler extends ParentedTagHandler<TokenDef, TokensDe
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(xmlReader.getText())) {
+        if (!StringUtils.isBlank(xmlReader.getText())) {
             error("No literal text allowed in %s tag", TAG);
         }
     }

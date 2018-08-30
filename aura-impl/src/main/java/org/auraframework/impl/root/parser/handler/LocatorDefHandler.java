@@ -20,6 +20,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.LocatorDef;
@@ -28,7 +29,6 @@ import org.auraframework.impl.root.locator.LocatorDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -76,7 +76,7 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
+        if (!StringUtils.isBlank(text)) {
             error("No literal text allowed in " + TAG);
         }
     }
@@ -89,11 +89,11 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
         String alias = getAttributeValue(ATTRIBUTE_ALIAS);
         String isPrimitive = getAttributeValue(ATTRIBUTE_ISPRIMITIVE);
 
-        if (AuraTextUtil.isNullEmptyOrWhitespace(target)) {
+        if (StringUtils.isBlank(target)) {
             error("The attribute '%s' is required on '<%s>'.", ATTRIBUTE_TARGET, TAG);
         }
 
-        if (AuraTextUtil.isNullEmptyOrWhitespace(description)) {
+        if (StringUtils.isBlank(description)) {
             error("The attribute '%s' is required on '<%s>'.", ATTRIBUTE_DESCRIPTION, TAG);
         }
         
@@ -102,13 +102,13 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
         builder.setTarget(target);
         
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(alias)) {
+        if (!StringUtils.isBlank(alias)) {
         	builder.setAlias(alias);
         } else if (target.equals(ANY_TARGET_SELECTOR)) {
             error (String.format("You must specify an alias when using the any target selector '%s' on '<%s>'", ANY_TARGET_SELECTOR, TAG));
         }
         
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(isPrimitive)) {
+        if (!StringUtils.isBlank(isPrimitive)) {
             builder.setIsPrimitive(Boolean.parseBoolean(isPrimitive));
         }
     }

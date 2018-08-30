@@ -15,7 +15,14 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
+import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
+
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.TokensDef;
@@ -24,13 +31,8 @@ import org.auraframework.impl.css.token.TokensImportDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Set;
-
-import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
+import com.google.common.collect.ImmutableSet;
 
 public class TokensImportDefHandler extends ParentedTagHandler<TokensImportDef, TokensDef> {
     protected static final String TAG = "aura:import";
@@ -63,7 +65,7 @@ public class TokensImportDefHandler extends ParentedTagHandler<TokensImportDef, 
     @Override
     protected void readAttributes() {
         String name = getAttributeValue(ATTRIBUTE_NAME);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+        if (StringUtils.isBlank(name)) {
             error("Missing required attribute 'name' on ", TAG);
         }
         builder.setImportDescriptor(definitionService.getDefDescriptor(name, TokensDef.class));
@@ -77,7 +79,7 @@ public class TokensImportDefHandler extends ParentedTagHandler<TokensImportDef, 
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(xmlReader.getText())) {
+        if (!StringUtils.isBlank(xmlReader.getText())) {
             error("No literal text allowed in %s tag", TAG);
         }
     }

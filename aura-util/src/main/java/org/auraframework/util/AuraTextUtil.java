@@ -192,14 +192,6 @@ public class AuraTextUtil {
         return temp.toString();
     }
 
-    public static boolean isNullEmptyOrWhitespace(CharSequence str) {
-        if (str == null) {
-            return true;
-        }
-
-        return isEmptyOrWhitespace(str);
-    }
-
     public static boolean isNullOrEmpty(CharSequence str) {
         if (str == null) {
             return true;

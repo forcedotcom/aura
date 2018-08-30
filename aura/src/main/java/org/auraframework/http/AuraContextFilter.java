@@ -15,13 +15,12 @@
  */
 package org.auraframework.http;
 
-import com.google.common.collect.Maps;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.servlet.Filter;
@@ -33,6 +32,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.auraframework.AuraDeprecated;
 import org.auraframework.adapter.ConfigAdapter;
@@ -57,6 +57,8 @@ import org.auraframework.system.Client;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+
+import com.google.common.collect.Maps;
 
 @SuppressWarnings("deprecation")
 public class AuraContextFilter implements Filter {
@@ -316,7 +318,7 @@ public class AuraContextFilter implements Filter {
     private Map<String, Object> getConfigMap(HttpServletRequest request) {
         Map<String, Object> configMap = null;
         String config = contextConfig.get(request);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(config)) {
+        if (!StringUtils.isBlank(config)) {
             if (config.startsWith(AuraTextUtil.urlencode("{"))) {
                 // Decode encoded context json. Serialized AuraContext json always starts with "{"
                 config = AuraTextUtil.urldecode(config);

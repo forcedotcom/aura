@@ -19,6 +19,7 @@ package org.auraframework.impl.root;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.builder.DefinitionReferenceBuilder;
 import org.auraframework.def.AttributeDef;
@@ -31,7 +32,6 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.AuraContext;
-import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.Maps;
 
@@ -185,7 +185,7 @@ public abstract class DefinitionReferenceImpl<T extends Definition> extends Defi
 
         @Override
         public DefinitionReferenceBuilder<T, P> setLocalId(String localId) {
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(localId)) {
+            if (!StringUtils.isBlank(localId)) {
                 this.localId = localId;
             }
             return this;

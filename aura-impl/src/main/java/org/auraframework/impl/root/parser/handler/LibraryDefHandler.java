@@ -21,6 +21,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.RootDefinitionBuilder;
@@ -32,8 +33,6 @@ import org.auraframework.impl.root.library.LibraryDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
-
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
@@ -98,7 +97,7 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
+        if (!StringUtils.isBlank(text)) {
             error("No literal text allowed in " + TAG);
         }
     }

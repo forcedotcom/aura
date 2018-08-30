@@ -15,7 +15,14 @@
  */
 package org.auraframework.impl.util;
 
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
@@ -33,14 +40,8 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
-import org.auraframework.util.AuraTextUtil;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.google.common.collect.Sets;
 
 /**
  * Parses expressions and literal text. Those tokens can then be converted into
@@ -106,7 +107,7 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
      * @throws AuraValidationException
      */
     private void doTokenize() throws AuraValidationException {
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
+        if (!StringUtils.isBlank(text)) {
             int lastMatch = 0;
             Matcher matcher = EXPRESSION_PATTERN.matcher(text);
 

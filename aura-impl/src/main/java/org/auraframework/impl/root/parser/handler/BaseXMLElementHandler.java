@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.impl.factory.XMLParserBase;
 import org.auraframework.system.Location;
 import org.auraframework.system.TextSource;
@@ -94,7 +95,7 @@ public abstract class BaseXMLElementHandler {
 
     protected String getAttributeValue(String name) {
         String value = xmlReader.getAttributeValue(null, name);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(value)) {
+        if (StringUtils.isBlank(value)) {
             for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
                 if (xmlReader.getAttributeLocalName(i).equalsIgnoreCase(name)) {
                     return xmlReader.getAttributeValue(i);
@@ -110,7 +111,7 @@ public abstract class BaseXMLElementHandler {
 
     protected Double getDoubleAttributeValue(String name) {
         String attrValue = getAttributeValue(name);
-        return AuraTextUtil.isNullEmptyOrWhitespace(attrValue)? null : Double.valueOf(attrValue);
+        return StringUtils.isBlank(attrValue)? null : Double.valueOf(attrValue);
     }
 
     protected String getTagName() {

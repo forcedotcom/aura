@@ -22,6 +22,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.RootDefinitionBuilder;
@@ -271,7 +272,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
-        boolean skip = AuraTextUtil.isNullEmptyOrWhitespace(text);
+        boolean skip = StringUtils.isBlank(text);
         if (!skip) {
             TextTokenizer tokenizer = TextTokenizer.tokenize(text, getLocation());
             body.addAll(tokenizer.asComponentDefRefs(this));
@@ -409,7 +410,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             builder.setAccess(readAccessAttribute());
 
             String defaultFlavor = getAttributeValue(ATTRIBUTE_DEFAULT_FLAVOR);
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(defaultFlavor)) {
+            if (!StringUtils.isBlank(defaultFlavor)) {
                 builder.setDefaultFlavor(defaultFlavor);
             }
 

@@ -15,6 +15,12 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.RootDefinitionBuilder;
@@ -28,11 +34,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Set;
 
 public class FlavorsDefHandler extends FileTagHandler<FlavorsDef> {
     protected static final String TAG = "aura:flavors";
@@ -93,7 +94,7 @@ public class FlavorsDefHandler extends FileTagHandler<FlavorsDef> {
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(xmlReader.getText())) {
+        if (!StringUtils.isBlank(xmlReader.getText())) {
             error("No literal text allowed in %s tag", TAG);
         }
     }

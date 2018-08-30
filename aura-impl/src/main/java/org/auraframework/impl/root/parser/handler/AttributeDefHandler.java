@@ -18,6 +18,8 @@ package org.auraframework.impl.root.parser.handler;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
@@ -32,8 +34,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.util.List;
@@ -99,7 +99,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     protected void readAttributes() {
         String name = getAttributeValue(ATTRIBUTE_NAME);
 
-        if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+        if (StringUtils.isBlank(name)) {
             error("Attribute '%s' is required on <%s>", ATTRIBUTE_NAME, TAG);
         }
 
@@ -111,7 +111,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
 
         String type = Optional.fromNullable(getAttributeValue(ATTRIBUTE_TYPE)).or(defaultType).orNull();
 
-        if (AuraTextUtil.isNullEmptyOrWhitespace(type)) {
+        if (StringUtils.isBlank(type)) {
             error("Attribute '%s' is required on <%s>", ATTRIBUTE_TYPE, TAG);
         }
 

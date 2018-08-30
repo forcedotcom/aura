@@ -17,12 +17,12 @@ package org.auraframework.impl.documentation;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.builder.DescriptionDefBuilder;
 import org.auraframework.def.DescriptionDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 public class DescriptionDefImpl extends DefinitionImpl<DescriptionDef> implements DescriptionDef {
@@ -45,7 +45,7 @@ public class DescriptionDefImpl extends DefinitionImpl<DescriptionDef> implement
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-        if (AuraTextUtil.isNullEmptyOrWhitespace(description)) {
+        if (StringUtils.isBlank(description)) {
             throw new InvalidDefinitionException("<aura:description> must contain a description.", getLocation());
         }
     }

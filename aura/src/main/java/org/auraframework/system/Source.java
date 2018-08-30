@@ -15,10 +15,10 @@
  */
 package org.auraframework.system;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.util.AuraTextUtil;
 
 /**
  * Interface for a Source.
@@ -80,7 +80,7 @@ public interface Source<D extends Definition> {
 
     default boolean isDefaultNamespaceUsed(String ns) {
         return isDefaultNamespaceSupported() // default namespace is supported by the source
-                && (AuraTextUtil.isNullEmptyOrWhitespace(ns) // and (the namespace is empty
+                && (StringUtils.isBlank(ns) // and (the namespace is empty
                     || getDefaultNamespace().equals(ns)) // or has the default namespace)
                 && !getDefaultNamespace().equals(getDescriptor().getNamespace()); // and a different ns from the default
     }

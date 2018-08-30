@@ -16,6 +16,13 @@
 
 package org.auraframework.impl.root.parser.handler.design;
 
+import java.util.Collections;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.design.DesignItemsDef;
 import org.auraframework.def.design.DesignLayoutAttributeDef;
 import org.auraframework.def.design.DesignLayoutComponentDef;
@@ -25,12 +32,6 @@ import org.auraframework.impl.root.parser.handler.BaseXMLElementHandler;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Collections;
-import java.util.Set;
 
 public class DesignItemsDefHandler extends BaseXMLElementHandler {
     public final static String TAG = "design:layoutitems";
@@ -73,7 +74,7 @@ public class DesignItemsDefHandler extends BaseXMLElementHandler {
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
+        if (!StringUtils.isBlank(text)) {
             error("No literal text allowed in attribute design definition");
         }
     }

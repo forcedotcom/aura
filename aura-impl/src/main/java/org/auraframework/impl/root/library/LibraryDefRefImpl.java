@@ -18,6 +18,7 @@ package org.auraframework.impl.root.library;
 import java.io.IOException;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LibraryDef;
@@ -78,7 +79,7 @@ public class LibraryDefRefImpl extends DefinitionImpl<LibraryDef> implements Lib
 
     @Override
     public void validateDefinition() throws QuickFixException {
-        if (AuraTextUtil.isNullEmptyOrWhitespace(property)) {
+        if (StringUtils.isBlank(property)) {
             throw new InvalidDefinitionException(String.format("%s missing property attribute", LibraryDefRefHandler.TAG),
                     getLocation());
         }

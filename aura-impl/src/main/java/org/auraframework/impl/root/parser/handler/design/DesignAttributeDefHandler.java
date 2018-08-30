@@ -20,6 +20,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.InterfaceDef;
@@ -109,7 +110,7 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
             }
         }
 
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+        if (!StringUtils.isBlank(name)) {
             builder.setDescriptor(definitionService.getDefDescriptor(name, DesignAttributeDef.class));
             builder.setName(name);
         } else {
@@ -151,7 +152,7 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(xmlReader.getText())) {
+        if (!StringUtils.isBlank(xmlReader.getText())) {
             error("No literal text allowed in attribute design definition");
         }
     }

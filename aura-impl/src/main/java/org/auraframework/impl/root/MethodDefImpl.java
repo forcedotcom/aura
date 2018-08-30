@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.MethodDef;
@@ -76,7 +77,7 @@ public final class MethodDefImpl extends RootDefinitionImpl<MethodDef> implement
         // JBUCH: HACK: FIND BETTER FIX
         json.writeMapEntry("name", parentDescriptor.getNamespace()+":"+descriptor.getName());
         json.writeValue(getAccess());
-        if(!AuraTextUtil.isNullEmptyOrWhitespace(action)) {
+        if(!StringUtils.isBlank(action)) {
             json.writeMapEntry("action", action);
         }
         if(attributeDefs!=null&&!attributeDefs.isEmpty()) {

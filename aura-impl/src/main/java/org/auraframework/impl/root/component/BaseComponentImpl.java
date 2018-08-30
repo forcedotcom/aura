@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
@@ -61,7 +62,6 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
@@ -508,7 +508,7 @@ BaseComponent<D, I> {
     @Override
     public void index(Component component) {
         String id = component.getLocalId();
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(id)) {
+        if (!StringUtils.isBlank(id)) {
             List<String> globalIds = index.get(id);
             if (globalIds == null) {
                 globalIds = Lists.newArrayList();

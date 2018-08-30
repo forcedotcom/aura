@@ -20,6 +20,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.DefBuilder;
@@ -35,7 +36,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -96,22 +96,22 @@ public final class TokensDefHandler extends FileTagHandler<TokensDef> {
         super.readAttributes();
 
         String parent = getAttributeValue(ATTRIBUTE_EXTENDS);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(parent)) {
+        if (!StringUtils.isBlank(parent)) {
             builder.setExtendsDescriptor(definitionService.getDefDescriptor(parent.trim(), TokensDef.class));
         }
 
         String provider = getAttributeValue(ATTRIBUTE_PROVIDER);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(provider)) {
+        if (!StringUtils.isBlank(provider)) {
             builder.setDescriptorProvider(definitionService.getDefDescriptor(provider, TokenDescriptorProviderDef.class));
         }
 
         String mapProvider = getAttributeValue(ATTRIBUTE_MAP_PROVIDER);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(mapProvider)) {
+        if (!StringUtils.isBlank(mapProvider)) {
             builder.setMapProvider(definitionService.getDefDescriptor(mapProvider, TokenMapProviderDef.class));
         }
 
         String serialize = getAttributeValue(ATTRIBUTE_SERIALIZE);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(serialize)) {
+        if (!StringUtils.isBlank(serialize)) {
             builder.setSerialize(Boolean.parseBoolean(serialize));
         }
 
@@ -159,7 +159,7 @@ public final class TokensDefHandler extends FileTagHandler<TokensDef> {
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(xmlReader.getText())) {
+        if (!StringUtils.isBlank(xmlReader.getText())) {
             error("No literal text allowed in TokensDef");
         }
     }

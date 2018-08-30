@@ -130,21 +130,6 @@ public class AuraTextUtilTest extends UnitTestCase {
     }
 
     @Test
-    public void testIsNullEmptyOrWhitespace() {
-        assertEquals(true, AuraTextUtil.isNullEmptyOrWhitespace(null));
-        assertEquals(true, AuraTextUtil.isNullEmptyOrWhitespace(""));
-        assertEquals(false, AuraTextUtil.isNullEmptyOrWhitespace("a"));
-        assertEquals(true, AuraTextUtil.isNullEmptyOrWhitespace(" "));
-        assertEquals(true, AuraTextUtil.isNullEmptyOrWhitespace("\t"));
-        assertEquals(true, AuraTextUtil.isNullEmptyOrWhitespace("\t\n "));
-        assertEquals(true, AuraTextUtil.isNullEmptyOrWhitespace("\r\n "));
-        assertEquals(true,
-                AuraTextUtil
-                        .isNullEmptyOrWhitespace("\u0001\u0002\u0003\u0004\u0005\u0006\u0007\u0008\u0009\u0010\u0011 "));
-        assertEquals(false, AuraTextUtil.isNullEmptyOrWhitespace("\t\n a"));
-    }
-
-    @Test
     public void testIsNullOrEmpty() {
         assertEquals(true, AuraTextUtil.isNullOrEmpty(null));
         assertEquals(true, AuraTextUtil.isNullOrEmpty(""));

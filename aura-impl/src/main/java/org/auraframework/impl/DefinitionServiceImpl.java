@@ -32,6 +32,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.cache.Cache;
@@ -85,7 +86,6 @@ import org.auraframework.throwable.quickfix.CompositeValidationException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
 
@@ -728,7 +728,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     public DefDescriptor<?> getDefDescriptor(@CheckForNull String prefix, @Nonnull String namespace,
                                              @Nonnull String name, @Nonnull DefType defType) {
         StringBuilder sb = new StringBuilder();
-        if (AuraTextUtil.isNullEmptyOrWhitespace(prefix)) {
+        if (StringUtils.isBlank(prefix)) {
             prefix = contextService.getCurrentContext().getDefaultPrefix(defType);
         }
         sb.append(prefix.toLowerCase());

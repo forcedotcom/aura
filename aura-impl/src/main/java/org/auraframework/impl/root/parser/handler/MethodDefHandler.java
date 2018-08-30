@@ -15,7 +15,12 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
@@ -29,9 +34,7 @@ import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
 /**
  */
@@ -70,7 +73,7 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         String name = getAttributeValue(ATTRIBUTE_NAME);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+        if (StringUtils.isBlank(name)) {
             error("The attribute '%s' is required on '<%s>'.", ATTRIBUTE_NAME, TAG);
         }
         this.defDescriptor = definitionService.getDefDescriptor(name, MethodDef.class);
@@ -85,7 +88,7 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
     protected void readAttributes() {
         String name = getAttributeValue(ATTRIBUTE_NAME);
 
-        if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+        if (StringUtils.isBlank(name)) {
             error("The attribute '%s' is required on '<%s>'.", ATTRIBUTE_NAME, TAG);
         }
 

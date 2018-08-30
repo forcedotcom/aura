@@ -18,21 +18,20 @@ package org.auraframework.util.type.converter;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.type.Converter;
 import org.springframework.context.annotation.Lazy;
 
 
 @Lazy
-@SuppressWarnings("rawtypes")
 @ServiceComponent
 public class StringToHashMapConverter implements Converter<String, HashMap> {
 
     @Override
     public HashMap<String, Object> convert(String value) {
-        if(AuraTextUtil.isNullEmptyOrWhitespace(value)) {
+        if(StringUtils.isBlank(value)) {
             return new HashMap<>();
         }
         JsonStreamReader reader = new JsonStreamReader(value);

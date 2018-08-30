@@ -16,17 +16,18 @@
 
 package org.auraframework.impl.root.parser.handler.genericxml;
 
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.genericxml.GenericXmlElement;
 import org.auraframework.def.genericxml.GenericXmlValidator;
 import org.auraframework.impl.root.GenericXmlElementImpl;
 import org.auraframework.impl.root.parser.handler.BaseXMLElementHandler;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Set;
 
 /**
  * Generic tag handler.
@@ -69,7 +70,7 @@ public class GenericXmlElementHandler extends BaseXMLElementHandler {
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
+        if (!StringUtils.isBlank(text)) {
             if (!validator.allowsTextLiteral()) {
                 error("Tag <%s> can not contain text", tagName);
             } else {

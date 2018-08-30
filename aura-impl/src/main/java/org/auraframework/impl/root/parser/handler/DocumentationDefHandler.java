@@ -21,6 +21,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.DocumentationDefBuilder;
@@ -33,7 +34,6 @@ import org.auraframework.impl.documentation.DocumentationDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
 public class DocumentationDefHandler extends FileTagHandler<DocumentationDef> {
 
@@ -105,7 +105,7 @@ public class DocumentationDefHandler extends FileTagHandler<DocumentationDef> {
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
+        if (!StringUtils.isBlank(text)) {
             throw new XMLStreamException(String.format(
                     "<%s> can contain only <aura:description> and <aura:example> tags.\nFound text: %s",
                     getHandledTag(), text));

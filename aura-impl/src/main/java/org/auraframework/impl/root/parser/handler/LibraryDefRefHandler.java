@@ -21,12 +21,13 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.library.LibraryDefRefImpl;
 import org.auraframework.service.DefinitionService;
@@ -34,7 +35,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -72,7 +72,7 @@ public class LibraryDefRefHandler extends XMLHandler<LibraryDefRef> {
         builder.setLocation(getLocation());
 
         String library = getAttributeValue(ATTRIBUTE_LIBRARY);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(library)) {
+        if (StringUtils.isBlank(library)) {
             throw new InvalidDefinitionException(String.format("%s missing library attribute", TAG), getLocation());
         }
 
@@ -86,7 +86,7 @@ public class LibraryDefRefHandler extends XMLHandler<LibraryDefRef> {
         }
 
         String property = getAttributeValue(ATTRIBUTE_PROPERTY);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(property)) {
+        if (StringUtils.isBlank(property)) {
             throw new InvalidDefinitionException(String.format("%s missing property attribute", TAG), getLocation());
         }
         builder.setProperty(property.trim());

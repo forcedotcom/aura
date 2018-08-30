@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ApplicationDef;
@@ -112,13 +113,13 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         super.readAttributes();
 
         String locationChangeEvent = getAttributeValue(ATTRIBUTE_LOCATION_CHANGE_EVENT);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(locationChangeEvent)) {
+        if (!StringUtils.isBlank(locationChangeEvent)) {
             builder.locationChangeEventDescriptor = definitionService.getDefDescriptor(locationChangeEvent,
                     EventDef.class);
         }
 
         String preloadNames = getAttributeValue(ATTRIBUTE_PRELOAD);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(preloadNames)) {
+        if (!StringUtils.isBlank(preloadNames)) {
             List<String> preloads = AuraTextUtil.splitSimple(",", preloadNames);
             for (String preload : preloads) {
                 builder.addDependency(new DescriptorFilter("markup://"+preload+":*",
@@ -127,7 +128,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         }
 
         String trackedDependecies = getAttributeValue(ATTRIBUTE_TRACK);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(trackedDependecies)) {
+        if (!StringUtils.isBlank(trackedDependecies)) {
             List<String> trackedList = AuraTextUtil.splitSimple(",", trackedDependecies);
             for (String tracked : trackedList) {
             	DefDescriptor<ComponentDef> trackedDef = definitionService.getDefDescriptor(tracked, ComponentDef.class);
@@ -137,7 +138,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
         String servicesAttribute = getAttributeValue(ATTRIBUTE_SERVICES);
         Set<String> serviceDescriptors = Sets.newHashSet(configAdapter.getRequiredServices());
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(servicesAttribute)) {
+        if (!StringUtils.isBlank(servicesAttribute)) {
             for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(servicesAttribute)) {
                 serviceDescriptors.add(name);
             }
@@ -150,22 +151,22 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         }
 
         String isAppcacheEnabled = getAttributeValue(ATTRIBUTE_APPCACHE_ENABLED);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(isAppcacheEnabled)) {
+        if (!StringUtils.isBlank(isAppcacheEnabled)) {
             builder.isAppcacheEnabled = Boolean.parseBoolean(isAppcacheEnabled);
         }
 
         String additionalAppCacheURLs = getAttributeValue(ATTRIBUTE_ADDITIONAL_APPCACHE_URLS);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(additionalAppCacheURLs)) {
+        if (!StringUtils.isBlank(additionalAppCacheURLs)) {
             builder.additionalAppCacheURLs = additionalAppCacheURLs;
         }
 
         String tokenOverrides = getAttributeValue(ATTRIBUTE_TOKEN_OVERRIDES);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(tokenOverrides)) {
+        if (!StringUtils.isBlank(tokenOverrides)) {
             builder.setTokenOverrides(tokenOverrides);
         }
         
         String flavorOverrides = getAttributeValue(ATTRIBUTE_FLAVOR_OVERRIDES);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(flavorOverrides)) {
+        if (!StringUtils.isBlank(flavorOverrides)) {
             builder.setFlavorOverrides(definitionService.getDefDescriptor(flavorOverrides, FlavorsDef.class));
         } else {
             FlavorsDef flavors = getBundledDef(FlavorsDef.class, DefDescriptor.MARKUP_PREFIX);
@@ -175,7 +176,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         }
 
         String bootstrapPublicCacheExpiration = getAttributeValue(ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(bootstrapPublicCacheExpiration)) {
+        if (!StringUtils.isBlank(bootstrapPublicCacheExpiration)) {
             builder.bootstrapPublicCacheExpiration = bootstrapPublicCacheExpiration;
         }
     }

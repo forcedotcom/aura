@@ -34,10 +34,12 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
@@ -67,7 +69,6 @@ import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.tools.node.api.NodeLambdaFactory;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.javascript.JavascriptGroup;
@@ -503,7 +504,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             } catch (IOException e) {
                 // ignore
             }
-            validateCss = AuraTextUtil.isNullEmptyOrWhitespace(validateCssString)
+            validateCss = StringUtils.isBlank(validateCssString)
                     || Boolean.parseBoolean(validateCssString.trim());
         }
     }

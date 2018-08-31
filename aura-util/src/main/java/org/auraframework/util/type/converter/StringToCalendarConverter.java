@@ -16,6 +16,7 @@
 package org.auraframework.util.type.converter;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.util.date.AuraDateUtil;
 import org.auraframework.util.type.Converter;
 import org.springframework.context.annotation.Lazy;
 
@@ -34,11 +35,17 @@ public class StringToCalendarConverter implements Converter<String, Calendar> {
         if (value == null || value.isEmpty()) {
             return null;
         }
-        // This converter handles Calendars that are serialized as milliseconds
-        // since Jan 1 1970
-        Long milliseconds = Long.valueOf(value);
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(milliseconds);
+        Long milliseconds;
+        try {
+            milliseconds = Long.valueOf(value);
+        } catch (NumberFormatException nfe) {
+            milliseconds = AuraDateUtil.isoToLong(value);
+        }
+        Calendar cal = null;
+        if(milliseconds != null) {
+            cal = Calendar.getInstance();
+            cal.setTimeInMillis(milliseconds);
+        }
         return cal;
     }
 

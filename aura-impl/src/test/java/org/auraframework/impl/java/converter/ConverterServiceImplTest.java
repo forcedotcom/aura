@@ -17,6 +17,7 @@ package org.auraframework.impl.java.converter;
 
 import org.auraframework.impl.util.AuraLocaleImpl;
 import org.auraframework.service.ConverterService;
+import org.auraframework.util.date.AuraDateUtil;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.type.ConversionException;
 import org.auraframework.util.type.CustomAbstractType;
@@ -509,7 +510,7 @@ public class ConverterServiceImplTest extends UnitTestCase {
      */
     @Test
     public void testStringToCalendar() throws Exception {
-        Calendar c1, c2, c3;
+        Calendar c1, c2, c3, c4;
 
         c1 = Calendar.getInstance();
         c1.setTimeInMillis(1234L);
@@ -518,7 +519,10 @@ public class ConverterServiceImplTest extends UnitTestCase {
         c3 = Calendar.getInstance();
         c3.setTimeInMillis(12345678901234L);
 
-        runPassPairs(Calendar.class, new Object[] { "1234", c1, "-1234", c2, "12345678901234", c3, }, false);
+        c4 = Calendar.getInstance();
+        String s4 =  "2018-08-23T23:33:53.404Z";
+        c4.setTimeInMillis(AuraDateUtil.isoToLong(s4));
+        runPassPairs(Calendar.class, new Object[] { "1234", c1, "-1234", c2, "12345678901234", c3, s4, c4}, false);
     }
 
     /**

@@ -63,6 +63,28 @@
             $A.test.assertEquals('5.0%', $A.test.getText(component.find('span').getElement()), "Percentage not correct");
         }
     },
+    
+    /**
+     * Test that numbers in exponential format when presented as a
+     * String are properly formatted
+     */
+    testExponentialNegative: {
+        attributes : {value : "4.656e-6", format : '#,##0.0000%'},
+        test: function(component) {
+            $A.test.assertEquals('0.0005%', $A.test.getText(component.find('span').getElement()), "Percentage not correct");
+        }
+    },
+    
+    /**
+     * Test that numbers in exponential format when presented as a
+     * String are properly formatted
+     */
+    testExponentialPositive: {
+        attributes : {value : '4.6567654211224e+6', format : '#,##0.0000%'},
+        test: function(component) {
+            $A.test.assertEquals('465,676,542.1122%', $A.test.getText(component.find('span').getElement()), "Percentage not correct");
+        }
+    },
 
     /**
      * Verify that the scale is applied

@@ -71,7 +71,7 @@ Aura.Utils.NumberFormat = function NumberFormat(format, symbols) {
                 parsePhase = 1;
                 prefixEnd = i;
                 i--;
-                continue;
+                break;
             } else {
                 this.checkForSpecialChar(c);
             }
@@ -121,7 +121,7 @@ Aura.Utils.NumberFormat = function NumberFormat(format, symbols) {
                 // on to the suffix phase
                 suffixStart = i--;
                 parsePhase = 2;
-                continue;
+                break;
             }
             break;
         case 2:
@@ -241,23 +241,44 @@ Aura.Utils.NumberFormat.prototype.translateDigits = function(charArray) {
 };
 
 /**
- * Format a number into a string. Accepts a string of the format "#.#" for formatting numbers
- * requiring greater than double precision.
- * @param {Number|String} number The number to be formatted.
+ * Format a number into a string. Accepts a string of the format "#.#"
+ * for formatting numbers requiring greater than double precision.
+ * @param {!Number|String} number The number to be formatted.
  * @export
  */
 Aura.Utils.NumberFormat.prototype.format = function(number) {
-    var ns;
     if ($A.util.isString(number)) {
-        ns = number;
-    } else {
-        if (!$A.util.isFiniteNumber(number)) {
-            throw new Error("Unable to format " + number);
+        if (number.charAt(0) === "+") {
+            number = number.substring(1);
         }
-        // convert to string
-        ns = String(number);
+        // If the number is a String and in exponential format we
+        // need to normalize it so it no longer has the exponential in
+        // it.
+        if ((number.indexOf("e") > -1) || number.indexOf("E") > -1) {
+            number = number.replace(/^(-)?(\d+)\.?(\d*)e([+\-]?\d+)$/i, function normalizeExponential (match, sign, integer, decimal, exponential) { // eslint-disable-line no-useless-escape
+                exponential = Number(exponential);
+                
+                var isExpontnetialNegative  = (exponential < 0),
+                    normalizedIntegerLength = integer.length + exponential,
+                    length = (isExpontnetialNegative ? integer : decimal).length;
+                
+                exponential = Math.abs(exponential);
+                exponential = (exponential >= length) ? (exponential - length + isExpontnetialNegative) : 0;
+
+                var paddingZeros   = (new Array(exponential + 1)).join("0"),
+                    floatingNumber = isExpontnetialNegative ? (paddingZeros + (integer + decimal)) : ((integer + decimal) + paddingZeros);
+                normalizedIntegerLength += (isExpontnetialNegative ? paddingZeros.length : 0);
+                
+                sign = (sign || "");
+                return sign + floatingNumber.substr(0, normalizedIntegerLength) + (normalizedIntegerLength < floatingNumber.length ? ("." + floatingNumber.substr(normalizedIntegerLength)) : "");
+            });
+        }
+    } else if (!$A.util.isFiniteNumber(number)) {
+        throw new Error('Unable to format. Not a valid number, "' + number + '"');
+    } else {
+        number = Number(number).toFixed(this.maxFractionDigits + this.multiplier);
     }
-    var charArray = ns.split("");
+    var charArray = number.split("");
 
     // check if its negative
     var negative = false;
@@ -368,7 +389,7 @@ Aura.Utils.NumberFormat.prototype.format = function(number) {
         for (i = fracLength; i > this.minFractionDigits && result[result.length-1] === '0'; i--) {
             result.pop();
         }
-        if(result[result.length - 1] === this.symbols["decimalSeparator"]) {
+        if (result[result.length - 1] === this.symbols["decimalSeparator"]) {
             result.pop();
         }
     }

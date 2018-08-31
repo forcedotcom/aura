@@ -120,7 +120,7 @@ ComponentClassRegistry.prototype.buildComponentClass = function(componentPropert
 
 /**
  * Augment the component class properties with their respective inheritance. The
- * inner classes are "static" classes, and currenltly, only the helper is inherited.
+ * inner classes are "static" classes. Currently, only the helper is inherited.
  * @param {Object} componentProperties The pre-built component properties.
  */
 ComponentClassRegistry.prototype.buildInheritance = function(componentProperties) {

@@ -490,11 +490,16 @@ InteropComponent.prototype.render = function () {
 };
 
 InteropComponent.prototype.setupInteropInstance = function () {
+    var shadowDomFallback = true;
+    //#if {"excludeModes" : ["PRODUCTION"]}
+    shadowDomFallback = !this.isShadowDomUriFlagSet();
+    //#end
+
     // W-4708703 This cache needs to be init/reset whenever we setup an interop instance
     this.currentClassMap = {};
 
     var Ctor = this.interopClass;
-    var element = $A.componentService.moduleEngine['createElement'](this.componentDef.elementName, { 'is': Ctor });
+    var element = $A.componentService.moduleEngine['createElement'](this.componentDef.elementName, { 'is': Ctor, 'fallback': shadowDomFallback });
     var cmp = this;
     element.__customElement = 1;
     this.attachOnChangeToElement(element);
@@ -537,6 +542,23 @@ InteropComponent.prototype.setupInteropInstance = function () {
     }.bind(this));
 
     return element;
+};
+
+/**
+ * Allow users to toggle Shadow DOM enablement via a URI param for local testing.
+ * 
+ * For example, loading the following would enable Shadow DOM: localhost:9090/foo/bar.cmp?aura.shadowDom=1
+ */
+InteropComponent.prototype.isShadowDomUriFlagSet = function() {
+    var query = location.search.substr(1);
+    var items = query.split('&');
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i].split('=');
+        if (item[0] === 'aura.shadowDom') {
+            return decodeURIComponent(item[1]) === '1';
+        }
+    }
+    return false;
 };
 
 /*

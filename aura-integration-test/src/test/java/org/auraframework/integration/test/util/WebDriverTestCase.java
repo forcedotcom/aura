@@ -74,6 +74,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -1202,5 +1203,38 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         injectBeans();
         logger.info(String.format("Running: %s.%s", getClass().getName(), getName()));
         runTest();
+    }
+
+    /**
+     * Returns the shadowRoot property of a given element. This is a necessary prerequisite to query for items inside
+     * an elements Shadow DOM.
+     * 
+     * @param element the WebElement to retrieve the shadowRoot property of.
+     * @return        the shadowRoot DOM subtree of a given WebElement. 
+     */
+    public WebElement getShadowRoot(WebElement element) {
+        return (WebElement) ((JavascriptExecutor)getDriver()).executeScript("return arguments[0].shadowRoot", element);
+    }
+
+    /**
+     * Returns an element inside of a Shadow DOM. The list of passed in selectors will be iterated over and at each
+     * element found, the shadowRoot property will be expanded before doing the next query.
+     * 
+     * @param selectors an array of By selectors where each selector besides the final one is a shadow boundary.
+     * @return          an element inside a Shadow DOM or null if none is found.
+     */
+    public WebElement findElementInShadowDom(By[] selectors) {
+        WebElement curr = null;
+        for (int i = 0; i < selectors.length; i++) {
+            if (curr == null) {
+                curr = findDomElement(selectors[i]);
+            } else {
+                curr = curr.findElement(selectors[i]);
+            }
+            if (i != selectors.length-1) {
+                curr = getShadowRoot(curr);
+            }
+        }
+        return curr;
     }
 }

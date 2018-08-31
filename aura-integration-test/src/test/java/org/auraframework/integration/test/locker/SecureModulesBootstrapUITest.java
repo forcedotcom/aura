@@ -16,6 +16,7 @@
 package org.auraframework.integration.test.locker;
 
 import org.auraframework.integration.test.modules.ui.ModulesBootstrapUITest;
+import org.openqa.selenium.By;
 
 /**
  * Verify that the bootstrap app works fine with lockerized modules
@@ -25,6 +26,8 @@ public class SecureModulesBootstrapUITest extends ModulesBootstrapUITest{
     @Override
     public void setUp() throws Exception {
         BOOTSTRAP_APP_URL = "/secureModuleTest/interopBootstrap.app";
+        BY_SIMPLE_CMP = By.cssSelector("securemoduletest-simple-cmp");
+        BY_SIMPLE_CMP_TEXT = new By[] { BY_SIMPLE_CMP, By.cssSelector(".i-am-modules") };
         super.setUp();
     }
 }

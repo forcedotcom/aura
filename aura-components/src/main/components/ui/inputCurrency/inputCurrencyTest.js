@@ -65,6 +65,16 @@
             this.assertCmpElemValues(component, 12345.67, "$12,345.67");
         }
     },
+    
+    /**
+     * Test decimal value with rounding
+     */
+    testDecimalCurrencyWithRounding: {
+        attributes: {value: 1.045},
+        test: function (component) {
+            this.assertCmpElemValues(component, 1.045, "$1.05");
+        }
+    },
 
     /*
      * Test negative value

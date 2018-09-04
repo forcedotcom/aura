@@ -147,17 +147,35 @@ Test.Aura.Util.NumberFormatTest = function() {
             Assert.Equal(expected, result);
         }
 
-        [Fact]
-        function formatSmallPositiveWithRoundup() {
-            var format = "0.######";
-            var symbols = {"decimalSeparator": ".",
+        [Fact, Data({value: "0.0000016", expected: "0.000002"},
+                    {value: "0.0000015", expected: "0.000002"},
+                    {value: "0.0000014", expected: "0.000001"})]
+        function formatSmallPositiveWithRoundup(data) {
+            var format = "0.######",
+                symbols = {"decimalSeparator": ".",
                            "groupingSeparator": ",",
                            "currency": "$",
                            "currencyCode": "USD",
-                           "zeroDigit": "0" };
-            var value = "0.0000016";
-            var expected = "0.000002";
-            var result;
+                           "zeroDigit": "0" },
+                result;
+
+            auraMock(function() {
+                var target = new Aura.Utils.NumberFormat(format, symbols);
+                result = target.format(data.value);
+            });
+            Assert.Equal(data.expected, result);
+        }
+        
+        [Fact]
+        function formatLargeFractionDigits() {
+            var format = "#,##0.####################",
+                symbols = {"decimalSeparator": ".",
+                           "groupingSeparator": ",",
+                           "zeroDigit": "0" 
+                },
+                value = "123456789.123456",
+                expected = "123,456,789.123456",
+                result;
 
             auraMock(function() {
                 var target = new Aura.Utils.NumberFormat(format, symbols);
@@ -361,10 +379,12 @@ Test.Aura.Util.NumberFormatTest = function() {
             Assert.Equal(data.expected, result);
         }
         
-        [Fact, Data({value: 4.656e-6,   expected: "0.0005%",    format: "#,##0.0000%"},
-                    {value: "4.656e-6", expected: "0.0005%",    format: "#,##0.0000%"},
-                    {value: 4.1e-6,     expected: "0.0004100%", format: "#,##0.0000000%"},
-                    {value: "4.1e-6",   expected: "0.0004100%", format: "#,##0.0000000%"})]
+        [Fact, Data({value: 4.656e-6,   expected: "0.0005%",                format: "#,##0.0000%"},
+                    {value: "4.656e-6", expected: "0.0005%",                format: "#,##0.0000%"},
+                    {value: 4.1e-6,     expected: "0.0004100%",             format: "#,##0.0000000%"},
+                    {value: "4.1e-6",   expected: "0.0004100%",             format: "#,##0.0000000%"},
+                    {value: "4.1e-20",  expected: "0.0000000000000000041%", format: "#,##0.0000000000000000000%"},
+                    {value: "4.5e-20",  expected: "0.000000000000000005%",  format: "#,##0.000000000000000000%"})]
         function formatWhenNumberIsExponentialNegative(data) {
             var symbols = {
                     "decimalSeparator":  ".",
@@ -378,25 +398,6 @@ Test.Aura.Util.NumberFormatTest = function() {
                 result = target.format(data.value);
             });
             Assert.Equal(data.expected, result);
-        }
-        
-        [Fact]
-        function formatWhenNumberIsExponentialNegativeAsString() {
-            var format = "#,##0.0000%",
-                symbols = {
-                    "decimalSeparator":  ".",
-                    "groupingSeparator": ",",
-                    "zeroDigit":         "0"
-                },
-                value = "4.656e-6",
-                expected = "0.0005%",
-                result;
-
-            auraMock(function() {
-                var target = new Aura.Utils.NumberFormat(format, symbols);
-                result = target.format(value);
-            });
-            Assert.Equal(expected, result);
         }
     }
 

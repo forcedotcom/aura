@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * @description A Value wrapper for a function call.
  * @constructor
- * @protected
- * @export
  */
-function FunctionCallValue(config, valueProvider){
+function FunctionCallValue(config, valueProvider) {
     this.valueProvider = valueProvider;
     this.byValue = config["byValue"];
     if (!(config["code"] instanceof Function)) {
@@ -45,12 +44,11 @@ FunctionCallValue.prototype.expressionFunctions = new ExpressionFunctions();
 
 /**
  * Sets the isDirty flag to false.
- * @export
  */
 FunctionCallValue.prototype.isDirty = function(){
-	for (var i = 0; i < this.args.length; i++) {
+    for (var i = 0; i < this.args.length; i++) {
         var arg = this.args[i];
-        if (aura.util.isExpression(arg) && arg.isDirty()) {
+        if ($A.util.isExpression(arg) && arg.isDirty()) {
             return true;
         }
     }
@@ -62,12 +60,12 @@ FunctionCallValue.prototype.isDirty = function(){
  * Throws an error if vp is not provided.
  * @param {Object} valueProvider The value provider to resolve.
  */
-FunctionCallValue.prototype.evaluate = function(valueProvider){
+FunctionCallValue.prototype.evaluate = function(valueProvider) {
     $A.clientService.setCurrentAccess(this.context);
     try {
         var result = this.code(valueProvider || this.valueProvider, this.expressionFunctions);
-        if(!this.hasOwnProperty("result")){
-            this["result"]=result;
+        if (!this.hasOwnProperty("result")) {
+            this["result"] = result;
         }
         return result;
     } finally {
@@ -75,17 +73,14 @@ FunctionCallValue.prototype.evaluate = function(valueProvider){
     }
 };
 
-/**
- * @export
- */
-FunctionCallValue.prototype.addChangeHandler=function(cmp, key, fcv) {
+FunctionCallValue.prototype.addChangeHandler = function(cmp, key, fcv) {
     if (this.byValue) {
         return;
     }
 
     for (var i = 0; i < this.args.length; i++) {
         var arg = this.args[i];
-        if (aura.util.isExpression(arg)) {
+        if ($A.util.isExpression(arg)) {
             if (arg instanceof PropertyReferenceValue) {
                 arg.addChangeHandler(cmp, key, fcv ? fcv : this.getChangeHandler(cmp, key, this));
             } else {
@@ -95,27 +90,27 @@ FunctionCallValue.prototype.addChangeHandler=function(cmp, key, fcv) {
     }
 };
 
-FunctionCallValue.prototype.getChangeHandler=function(cmp, key, fcv) {
-    return function FunctionCallValue$getChangeHandler(event) {
+FunctionCallValue.prototype.getChangeHandler = function(cmp, key, fcv) {
+    return function FunctionCallValue$getChangeHandler() {
         var result = fcv.evaluate();
         if (fcv["result"] !== result) {
-          fcv["result"] = result;
-          $A.renderingService.addDirtyValue(key, cmp);
-          cmp.fireChangeEvent(key, event.getParam("oldValue"), event.getParam("value"), event.getParam("index"));
+            var oldValue = fcv["result"];
+            fcv["result"] = result;
+
+            $A.renderingService.addDirtyValue(key, cmp);
+            cmp.fireChangeEvent(key, oldValue, result);
         }
     };
 };
 
-/**
- * @export
- */
-FunctionCallValue.prototype.removeChangeHandler=function(cmp, key){
-    if(this.byValue){
+FunctionCallValue.prototype.removeChangeHandler = function(cmp, key) {
+    if (this.byValue) {
         return;
     }
+
     for (var i = 0; i < this.args.length; i++) {
         var arg = this.args[i];
-        if (aura.util.isExpression(arg)) {
+        if ($A.util.isExpression(arg)) {
             arg.removeChangeHandler(cmp, key);
         }
     }
@@ -123,7 +118,6 @@ FunctionCallValue.prototype.removeChangeHandler=function(cmp, key){
 
 /**
  * Destroys the value wrapper.
- * @export
  */
 FunctionCallValue.prototype.destroy = function(){
 //#if {"modes" : ["STATS"]}
@@ -137,14 +131,12 @@ FunctionCallValue.prototype.destroy = function(){
 };
 
 /**
- * Returns the JS function.
+ * Returns the JS function code.
  * Helpful for logging/debugging.
- * @returns {String} FunctionCallValue
- * @export
+ * @returns {string}
  */
-FunctionCallValue.prototype.toString = function(){
+FunctionCallValue.prototype.toString = function() {
     return this.code.toString();
 };
 
 Aura.Value.FunctionCallValue = FunctionCallValue;
-

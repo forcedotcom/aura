@@ -1,4 +1,20 @@
-#!/bin/sh
+#!/bin/sh -p
+
+set -ue
+
+MODE="";
+
+while getopts ":d" opt; do
+  case ${opt} in
+    d ) MODE="--inspect --debug-brk"
+      ;;
+    \? ) echo "Usage: xunit [-d] [file/folder of the test(s) to run]"
+      exit;
+      ;;
+  esac
+done
+
+shift $((OPTIND -1))
 
 cd `dirname $0`/..
 
@@ -7,5 +23,5 @@ if [ $? -eq 1 ];
 then
     mvn install -DskipUnitTests -DskipJsDoc -Pxunit.js -Dxunit.js.format=text -DskipComponentCompile -Dxunit.js.verbose=true $1
 else
-    node aura-util/src/test/tools/xUnit/xUnit.js.Console.js /dependency:aura-util/src/test/tools/xUnit/dependencies /strict:false /verbose:false ${1:-aura-impl/src/test/javascript/ aura-components/src/test/javascript}
+    node $MODE ./aura-util/src/test/tools/xUnit/xUnit.js.Console.js /dependency:aura-util/src/test/tools/xUnit/dependencies /strict:false /verbose:false ${1:-./aura-impl/src/test/javascript/ ./aura-components/src/test/javascript}
 fi

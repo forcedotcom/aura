@@ -1,0 +1,5 @@
+#!/bin/sh -p
+
+set -ue
+
+`dirname $0`/xunit -d "$@"

@@ -390,7 +390,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
 
             String templateName = getAttributeValue(ATTRIBUTE_TEMPLATE);
             if (templateName != null) {
-                builder.templateDefDescriptor = definitionService.getDefDescriptor(templateName, ComponentDef.class);
+                builder.templateDefDescriptor = getDefDescriptor(templateName, ComponentDef.class);
             }
 
             builder.setDocumentationDef(getBundledDef(DocumentationDef.class, DefDescriptor.MARKUP_PREFIX));

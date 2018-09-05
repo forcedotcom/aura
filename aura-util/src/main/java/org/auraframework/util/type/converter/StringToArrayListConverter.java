@@ -15,14 +15,14 @@
  */
 package org.auraframework.util.type.converter;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.type.Converter;
 import org.springframework.context.annotation.Lazy;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 /**
@@ -60,8 +60,7 @@ public class StringToArrayListConverter implements Converter<String, ArrayList> 
                 // Didn't parse, fall back to splitSimple down below.
             }
         }
-        List<String> splitList = AuraTextUtil.splitSimple(",", value);
-        return (ArrayList<String>) splitList;
+        return new ArrayList<>(Arrays.asList(StringUtils.splitByWholeSeparatorPreserveAllTokens(value, ",")));
     }
 
     @Override

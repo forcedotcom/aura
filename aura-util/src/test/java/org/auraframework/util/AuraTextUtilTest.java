@@ -251,6 +251,7 @@ public class AuraTextUtilTest extends UnitTestCase {
     }
 
     private static final SplitMatch[] splitTrimTests = new SplitMatch[] {
+            new SplitMatch("", ",", 1, new String[] { "" }),
             new SplitMatch("a", ",", 1, new String[] { "a" }),
             new SplitMatch("a,b", ",", 1, new String[] { "a", "b" }),
             new SplitMatch("axxxb", "xxx", 1, new String[] { "a", "b" }),
@@ -283,6 +284,7 @@ public class AuraTextUtilTest extends UnitTestCase {
     }
 
     private static final SplitMatch[] splitLimitTrimTests = new SplitMatch[] {
+            new SplitMatch("", ",", 1, new String[] { "" }),
             new SplitMatch("a   ", ",", 1, new String[] { "a" }),
             new SplitMatch("a , b", ",", 1, new String[] { "a , b" }),
             new SplitMatch("axxx b", "xxx", 1, new String[] { "axxx b" }),

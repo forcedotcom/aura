@@ -15,21 +15,23 @@
  */
 package org.auraframework.util;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ObjectArrays;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ObjectArrays;
 
 /**
  * Collection of utility methods for manipulating or testing strings.
@@ -273,9 +275,13 @@ public class AuraTextUtil {
      * @param delimiter The delimiter to split the string using
      * @param str The string to split
      * @return String list or, if str was null, then null
+     * @deprecated use StringUtils.split(str, delimiter);
      */
     public static List<String> splitSimple(String delimiter, String str) {
-        return splitSimple(delimiter, str, 4);
+        if (StringUtils.isEmpty(str)) {
+            return Arrays.asList(str);
+        }
+        return Arrays.asList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter));
     }
 
     /**
@@ -298,117 +304,38 @@ public class AuraTextUtil {
      *            arbitrarily large, and if you will only access the returned list sequentially with an iterator, then
      *            use 0 to tell this method to use a LinkedList
      * @return String list or, if str was null, then null
+     * @deprecated use StringUtils.split(str, delimiter);
      */
     public static List<String> splitSimple(String delimiter, String str, int expectedSize) {
-        return splitSimple(str, delimiter, expectedSize, false);
+        return splitSimple(delimiter, str);
     }
 
-    private static List<String> splitSimple(String s, String split, int expectedSize, boolean shouldTrim) {
-        return splitSimple(s, split, expectedSize, shouldTrim, false);
-    }
-
-    private static List<String> splitSimple(String str, String delimiter, int expectedSize, boolean shouldTrim,
-            boolean ignoreTrailingEmpty) {
-        if (str == null) {
-            return null;
-        }
-        List<String> result = (expectedSize == 0) ? new ArrayList<>() : new ArrayList<>(expectedSize);
-
-        if (delimiter.length() == 0) {
-            if (!ignoreTrailingEmpty) {
-                throw new IllegalArgumentException();
-            }
-
-            // Special case to match java's behavior
-            char[] chars = new char[str.length()];
-            str.getChars(0, str.length(), chars, 0);
-            result.add("");
-            for (char c : chars) {
-                result.add(Character.toString(c));
-            }
-            return result;
-        }
-
-        // Special case to match java's behavior
-        if (ignoreTrailingEmpty && "".equals(str)) {
-            result.add("");
-            return result;
-        }
-
-        int start = 0;
-        int indexof;
-        while ((indexof = str.indexOf(delimiter, start)) != -1) {
-            String substring = str.substring(start, indexof);
-            if (shouldTrim) {
-                substring = substring.trim();
-            }
-            result.add(substring);
-            start = indexof + delimiter.length();
-            if (start >= str.length()) {
-                break;
-            }
-        }
-        if (start == str.length()) {
-            result.add("");
-        } else if (start < str.length()) {
-            String substring = str.substring(start);
-            if (shouldTrim) {
-                substring = substring.trim();
-            }
-            result.add(substring);
-        }
-        if (ignoreTrailingEmpty && result.size() > 0) {
-            // Discard empty substrings at the end
-            for (int i = result.size() - 1; i >= 0; i--) {
-                if (result.get(i).equals("")) {
-                    result.remove(i);
-                } else {
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
+    /**
+     * @deprecated use StringUtils.split(str, delimiter, limitSize)
+     * @param str
+     * @param delimiter
+     * @param limitSize
+     * @return
+     */
     public static List<String> splitSimpleLimit(String str, String delimiter, int limitSize) {
-        return splitSimpleLimit(str, delimiter, limitSize, false);
+        if (StringUtils.isEmpty(str)) {
+            return Arrays.asList(str);
+        }
+        return Arrays.asList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter, limitSize));
     }
 
+    /**
+     * @deprecated use StringUtils.split(str, delimiter, limitSize) and map StringUtils.trim with a java lambda
+     * @param str
+     * @param delimiter
+     * @param limitSize
+     * @return
+     */
     public static List<String> splitSimpleLimitAndTrim(String str, String delimiter, int limitSize) {
-        return splitSimpleLimit(str, delimiter, limitSize, true);
-    }
-
-    private static List<String> splitSimpleLimit(String str, String delimiter, int limitSize, boolean shouldTrim) {
-        if (str == null) {
-            return null;
+        if (StringUtils.isEmpty(str)) {
+            return Arrays.asList(str);
         }
-        List<String> result = new ArrayList<>(limitSize);
-        int count = limitSize - 1;
-        int start = 0;
-        int indexof;
-
-        while (count > 0 && (indexof = str.indexOf(delimiter, start)) != -1) {
-            String substring = str.substring(start, indexof);
-            if (shouldTrim) {
-                substring = substring.trim();
-            }
-            result.add(substring);
-            count -= 1;
-            start = indexof + delimiter.length();
-            if (start >= str.length()) {
-                break;
-            }
-        }
-        if (count == 0 || start < str.length()) {
-            String substring = str.substring(start);
-            if (shouldTrim) {
-                substring = substring.trim();
-            }
-            result.add(substring);
-        } else if (start == str.length()) {
-            result.add("");
-        }
-        return result;
+        return Arrays.asList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter, limitSize)).stream().map(StringUtils::trim).collect(Collectors.toList());
     }
 
     /**
@@ -495,6 +422,7 @@ public class AuraTextUtil {
      * <br>
      * This is more efficient than String.split or TextUtil.split because it does not use a regular expression.
      *
+     * @deprecated use StringUtils.split and map StringUtils.trim with a stream / lambda
      * @param str The string to split
      * @param delimiter The delimiter to split the string using
      * @param expectedSize The expected number of elements in the output list. If you don't know, or if it could be
@@ -503,7 +431,10 @@ public class AuraTextUtil {
      * @return String list or, if str was null, then null
      */
     public static List<String> splitSimpleAndTrim(String str, String delimiter, int expectedSize) {
-        return splitSimple(str, delimiter, expectedSize, true);
+        if (StringUtils.isEmpty(str)) {
+            return Arrays.asList(str);
+        }
+        return Arrays.asList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter)).stream().map(StringUtils::trim).collect(Collectors.toList());
     }
 
     /**

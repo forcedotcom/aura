@@ -64,7 +64,8 @@ QueuedActionsMetricsPlugin.prototype.enqueueActionOverride = function() {
             "storable"     : action.isStorable(),
             "background"   : action.isBackground(),
             "cmp"          : (cmp && cmp.getType()) || "none",
-            "def"          : action.getDef().toString()
+            "def"          : action.getDef().toString(),
+            "params"       : action.getLoggableParams()
         });
     }
 

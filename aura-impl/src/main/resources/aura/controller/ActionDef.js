@@ -203,4 +203,15 @@ ActionDef.prototype.toString = function() {
     return this.descriptor.toString();
 };
 
+ActionDef.prototype.getLoggableParams = function(){
+    var loggableParams = [];
+    var paramDefs = this.paramDefs;
+    for ( var key in paramDefs) {
+        if(paramDefs[key]["loggable"]){
+            loggableParams.push(key);
+        }
+    }
+    return loggableParams;
+};
+
 Aura.Controller.ActionDef = ActionDef;

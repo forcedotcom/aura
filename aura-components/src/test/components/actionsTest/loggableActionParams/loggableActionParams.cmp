@@ -1,0 +1,5 @@
+<aura:component controller="java://org.auraframework.components.test.java.controller.JavaTestController">
+    <aura:attribute name="actualParam" type="String"/>
+    <aura:attribute name="expectedParam" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+</aura:component>

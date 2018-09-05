@@ -128,11 +128,12 @@ public class JavaControllerDefFactory implements DefinitionFactory<JavaSourceImp
                     DefDescriptor<TypeDef> typeDefDesc = definitionService.getDefDescriptor(qn, TypeDef.class);
 
                     String paramName = ((Key) annotation).value();
+                    boolean isLoggable = ((Key) annotation).loggable();
                     ValueDef valueDef = new JavaValueDef(paramName, typeDefDesc, new Location(
-                            controllerClass.getName() + "." + name, 0));
+                            controllerClass.getName() + "." + name, 0), isLoggable);
                     params.add(valueDef);
                     
-                    if (((Key)annotation).loggable()) {
+                    if (isLoggable) {
                         loggableParams.add(paramName);
                     }
                 }

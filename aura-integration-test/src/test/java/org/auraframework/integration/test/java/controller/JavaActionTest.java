@@ -236,7 +236,7 @@ public class JavaActionTest extends AuraImplTestCase {
         cache.put(dk, JavaValueDefDescMocked);
 
         // jvd doesn't matter that much for triggering QFE, as we only used it as the Object param
-        JavaValueDef jvd = new JavaValueDef("tvdQFE", JavaValueDefDesc, null);
+        JavaValueDef jvd = new JavaValueDef("tvdQFE", JavaValueDefDesc, null, false);
         Map<String, Object> args = new HashMap<>();
         args.put("keya", jvd);
         ControllerDef controllerDef = getJavaControllerDef("java://org.auraframework.integration.test.java.controller.TestControllerOnlyForJavaControllerTest");

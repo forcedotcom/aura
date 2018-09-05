@@ -43,12 +43,14 @@ public class JavaValueDef extends DefinitionImpl<ValueDef> implements ValueDef {
     private final String name;
     private final DefDescriptor<TypeDef> typeDescriptor;
     private final Method getter;
+    private final boolean loggable;
 
-    public JavaValueDef(String name, DefDescriptor<TypeDef> typeDescriptor, Location location) {
+    public JavaValueDef(String name, DefDescriptor<TypeDef> typeDescriptor, Location location, boolean loggable) {
         super(null, location, new DefinitionAccessImpl(Access.INTERNAL));
         this.name = name;
         this.typeDescriptor = typeDescriptor;
         this.getter = null;
+        this.loggable = loggable;
     }
 
     public JavaValueDef(String name, Method getter, DefDescriptor<TypeDef> typeDescriptor, Location location) {
@@ -56,6 +58,7 @@ public class JavaValueDef extends DefinitionImpl<ValueDef> implements ValueDef {
         this.name = name;
         this.getter = getter;
         this.typeDescriptor = typeDescriptor;
+        this.loggable = false;
     }
 
     public static String getMemberName(String name) {
@@ -96,6 +99,9 @@ public class JavaValueDef extends DefinitionImpl<ValueDef> implements ValueDef {
         json.writeMapBegin();
         json.writeMapEntry("name", getName());
         json.writeMapEntry("type", typeDescriptor);
+        if (loggable) {
+            json.writeMapEntry("loggable", true);
+        }
         json.writeMapEnd();
     }
 

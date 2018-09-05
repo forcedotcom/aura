@@ -15327,7 +15327,8 @@ $A.componentService.initControllerDefs([
         "pa":[
           {
             "name":"name",
-            "type":"java://java.lang.String"
+            "type":"java://java.lang.String",
+            "loggable":true
           },
           {
             "name":"attributes",
@@ -15335,7 +15336,8 @@ $A.componentService.initControllerDefs([
           },
           {
             "name":"chainLoadLabels",
-            "type":"java://java.lang.Boolean"
+            "type":"java://java.lang.Boolean",
+            "loggable":true
           }
         ]
       },
@@ -15348,7 +15350,8 @@ $A.componentService.initControllerDefs([
         "pa":[
           {
             "name":"name",
-            "type":"java://java.lang.String"
+            "type":"java://java.lang.String",
+            "loggable":true
           }
         ]
       },
@@ -15361,7 +15364,8 @@ $A.componentService.initControllerDefs([
         "pa":[
           {
             "name":"name",
-            "type":"java://java.lang.String"
+            "type":"java://java.lang.String",
+            "loggable":true
           },
           {
             "name":"attributes",
@@ -15369,7 +15373,8 @@ $A.componentService.initControllerDefs([
           },
           {
             "name":"chainLoadLabels",
-            "type":"java://java.lang.Boolean"
+            "type":"java://java.lang.Boolean",
+            "loggable":true
           }
         ]
       },
@@ -15382,7 +15387,8 @@ $A.componentService.initControllerDefs([
         "pa":[
           {
             "name":"name",
-            "type":"java://java.lang.String"
+            "type":"java://java.lang.String",
+            "loggable":true
           }
         ]
       },
@@ -15408,7 +15414,8 @@ $A.componentService.initControllerDefs([
         "pa":[
           {
             "name":"names",
-            "type":"java://java.util.List<java.lang.String>"
+            "type":"java://java.util.List<java.lang.String>",
+            "loggable":true
           }
         ]
       },
@@ -15421,7 +15428,8 @@ $A.componentService.initControllerDefs([
         "pa":[
           {
             "name":"name",
-            "type":"java://java.lang.String"
+            "type":"java://java.lang.String",
+            "loggable":true
           }
         ]
       },

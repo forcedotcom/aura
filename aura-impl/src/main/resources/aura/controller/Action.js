@@ -407,6 +407,20 @@ Action.prototype.getParams = function() {
 };
 
 /**
+ * Gets the collection of loggable parameters for this Action.
+ *
+ * @returns {Object} The key/value pairs that specify the loggable action parameters.
+ */
+Action.prototype.getLoggableParams = function() {
+    var loggableParams = {};
+    var loggableParamsKeys = this.def.getLoggableParams();
+    for ( var key = 0; key < loggableParamsKeys.length; ++key) {
+        loggableParams[loggableParamsKeys[key]] = this.params[loggableParamsKeys[key]];
+    }
+    return loggableParams;
+};
+
+/**
  * Gets the component for this Action.
  *
  * @returns {Component} the component, if any.

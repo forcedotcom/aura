@@ -162,7 +162,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                 compilerData = modulesCompilerService.compile(componentPath, sources);
             }
         } catch (Exception e) {
-            throw new InvalidDefinitionException(descriptor + ": " + e.getMessage(), location, e);
+            throw new InvalidDefinitionException(e.getMessage(), location, e);
         }
         Map<CodeType, String> codes = processCodes(descriptor, compilerData.codes, location);
         builder.setCodes(codes);

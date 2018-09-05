@@ -146,7 +146,7 @@ public class ModulesCompilerTest extends UnitTestCase {
             fail("should report a syntax error");
         } catch (Exception e) {
             String message = Throwables.getRootCause(e).getMessage();
-            assertEquals(message, "Invalid syntax encountered during compilation of modules/errorInJs/errorInJs.js: \n" +
+            assertEquals(message, "Invalid syntax encountered in the 'errorInJs.js' file of the 'modules:errorInJs' component: \n" +
                     "Unexpected console statement.");
         }
     }

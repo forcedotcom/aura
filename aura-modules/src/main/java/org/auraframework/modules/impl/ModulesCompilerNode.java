@@ -18,11 +18,14 @@ package org.auraframework.modules.impl;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.service.LoggingService;
 import org.lwc.*;
@@ -38,6 +41,7 @@ import org.auraframework.tools.node.api.NodeLambdaFactory;
 public final class ModulesCompilerNode implements ModulesCompiler {
 
     private static final StylesheetConfig stylesheetConfig = createStylesheetConfig();
+    private static final String DIAGNOTICS_HEADER_TEMPLATE = "Invalid syntax encountered in the '%s' file of the '%s:%s' component: ";
     
     private final LoggingService loggingService;
     private final LwcCompiler compiler;
@@ -86,13 +90,13 @@ public final class ModulesCompilerNode implements ModulesCompiler {
             List<Diagnostic> diagnostics = report.diagnostics;
 
             if (report.success == false) {
-                String error = buildDiagnosticsError(entry, diagnostics, bundleType);
+                String error = buildDiagnosticsError(bundle, entry, diagnostics, bundleType);
                 loggingService.error("ModulesCompilerNode: compiler error " + entry + ": " + error);
                 throw new RuntimeException(error);
             }
 
             if(diagnostics.size() > 0) {
-                String warning = buildDiagnosticsWarning(entry, diagnostics, bundleType);
+                String warning = buildDiagnosticsWarning(bundle, entry, diagnostics, bundleType);
                 loggingService.warn("ModulesCompilerNode: compiler warning " + entry + ": " + warning);
             }
 
@@ -115,9 +119,9 @@ public final class ModulesCompilerNode implements ModulesCompiler {
         return new StylesheetConfig(new CustomPropertiesConfig(true, customPropertiesMap));
     }
 
-    protected String buildDiagnosticsError(String entry, List<Diagnostic> diagnostics, BundleType bundleType) {
+    protected String buildDiagnosticsError(Bundle bundle, String entry, List<Diagnostic> diagnostics, BundleType bundleType) {
         StringBuffer sb = new StringBuffer();
-        sb.append("Invalid syntax encountered during compilation of " + entry + ": ");
+        sb.append(buildDiagnosticHeader(bundle,entry));
         for (Diagnostic diagnostic : diagnostics) {
             if (isDiagnosticError(diagnostic, bundleType)) {
                 sb.append('\n');
@@ -127,9 +131,9 @@ public final class ModulesCompilerNode implements ModulesCompiler {
         return sb.toString();
     }
 
-    protected String buildDiagnosticsWarning(String entry, List<Diagnostic> diagnostics, BundleType bundleType) {
+    protected String buildDiagnosticsWarning(Bundle bundle, String entry, List<Diagnostic> diagnostics, BundleType bundleType) {
         StringBuffer sb = new StringBuffer();
-        sb.append("Syntax warning encountered during compilation " + entry + ": ");
+        sb.append(buildDiagnosticHeader(bundle,entry));
         for (Diagnostic diagnostic : diagnostics) {
             if (isDiagnosticWarning(diagnostic, bundleType)) {
                 sb.append('\n');
@@ -139,6 +143,16 @@ public final class ModulesCompilerNode implements ModulesCompiler {
         return sb.toString();
     }
 
+    protected String buildDiagnosticHeader(Bundle bundle, String entry) {
+        return String.format(DIAGNOTICS_HEADER_TEMPLATE,
+			Arrays.stream(StringUtils.split(entry, "/"))
+			.filter(StringUtils::isNotBlank)
+			.filter(x -> !x.equals(bundle.namespace))
+			.filter(x -> !x.equals(bundle.name))
+			.collect(Collectors.joining("/")),
+			bundle.namespace, bundle.name);
+    }
+    
     protected boolean isDiagnosticError(Diagnostic diagnostic, BundleType type) {
         boolean hasFatal = diagnostic.level.equals(DiagnosticLevel.FATAL);
 

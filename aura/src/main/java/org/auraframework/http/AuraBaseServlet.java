@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 @SuppressWarnings("serial")
@@ -64,6 +65,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
     }
     
     @Inject
+    @Lazy
     public void setServletUtilAdapter(ServletUtilAdapter servletUtilAdapter) {
         this.servletUtilAdapter = servletUtilAdapter;
     }

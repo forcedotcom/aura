@@ -34,6 +34,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.collect.Maps;
 
@@ -50,6 +51,7 @@ public class TestSuiteDefHTMLFormatAdapter extends HTMLFormatAdapter<TestSuiteDe
     private RenderingService renderingService;
 
     @Inject
+    @Lazy
     private ServletUtilAdapter servletUtilAdapter;
 
     @Override

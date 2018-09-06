@@ -29,6 +29,7 @@ import org.auraframework.service.IntegrationService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 import javax.inject.Inject;
 
@@ -80,6 +81,7 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Inject
+    @Lazy
     public void setServletUtilAdapter(ServletUtilAdapter servletUtilAdapter) {
         this.servletUtilAdapter = servletUtilAdapter;
     }

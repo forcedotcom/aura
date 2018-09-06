@@ -31,12 +31,15 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.AuraContext;
 
+import org.springframework.context.annotation.Lazy;
+
 import com.google.common.collect.Sets;
 
 @ServiceComponent
 public class AppJsUtilAdapterImpl implements AppJsUtilAdapter {
 
     @Inject
+    @Lazy
     private ServletUtilAdapter servletUtilAdapter; 
 
     @Override

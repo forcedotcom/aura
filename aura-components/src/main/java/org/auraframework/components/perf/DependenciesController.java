@@ -59,6 +59,7 @@ import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -79,6 +80,7 @@ public class DependenciesController implements Controller {
     ContextService contextService;
 
     @Inject
+    @Lazy
     ServletUtilAdapter servletUtilAdapter;
 
     @AuraEnabled

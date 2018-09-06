@@ -41,6 +41,8 @@ import org.auraframework.system.AuraResource;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 
+import org.springframework.context.annotation.Lazy;
+
 import com.google.common.collect.Maps;
 
 @ServiceComponent
@@ -113,6 +115,7 @@ public abstract class AuraResourceImpl implements AuraResource {
      * @param servletUtilAdapter the servletUtilAdapter to set
      */
     @Inject
+    @Lazy
     public void setServletUtilAdapter(ServletUtilAdapter servletUtilAdapter) {
         this.servletUtilAdapter = servletUtilAdapter;
     }

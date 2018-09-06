@@ -33,6 +33,7 @@ import org.auraframework.test.client.UserAgent;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
+import org.springframework.context.annotation.Lazy;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ import java.util.Set;
 public class StyleContextSerializationTest extends AuraImplTestCase {
 
     @Inject
+    @Lazy
     private ServletUtilAdapter servletUtilAdapter;
 
     @UnAdaptableTest("core add info about if we are on desktop, we don't")

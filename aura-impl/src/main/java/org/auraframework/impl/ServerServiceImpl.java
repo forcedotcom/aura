@@ -84,6 +84,7 @@ import org.auraframework.util.AuraTextUtil.JSONEscapedFunctionStringBuilder;
 import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -117,6 +118,7 @@ public class ServerServiceImpl implements ServerService {
     private DefinitionService definitionService;
 
     @Inject
+    @Lazy
     private ServletUtilAdapter servletUtilAdapter;
 
     @Inject

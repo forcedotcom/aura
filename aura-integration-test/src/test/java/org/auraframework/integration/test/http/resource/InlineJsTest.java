@@ -46,6 +46,7 @@ import org.auraframework.system.AuraContext;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -72,6 +73,7 @@ public class InlineJsTest extends AuraImplTestCase {
     private InstanceService instanceService;
 
     @Inject
+    @Lazy
     private ServletUtilAdapter servletUtilAdapter;
 
     @Inject

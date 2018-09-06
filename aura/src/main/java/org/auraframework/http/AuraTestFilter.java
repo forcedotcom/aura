@@ -74,6 +74,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import com.google.common.collect.ImmutableMap;
@@ -159,6 +160,7 @@ public class AuraTestFilter {
     }
 
     @Inject
+    @Lazy
     public void setServletUtilAdapter(ServletUtilAdapter servletUtilAdapter) {
         this.servletUtilAdapter = servletUtilAdapter;
     }

@@ -47,9 +47,13 @@ import org.auraframework.service.RenderingService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import com.google.common.collect.Maps;
 
 public class ManifestTest extends AuraImplTestCase {
 
@@ -72,6 +76,7 @@ public class ManifestTest extends AuraImplTestCase {
     private InstanceService instanceService;
 
     @Inject
+    @Lazy
     private ServletUtilAdapter servletUtilAdapter;
 
     @Inject
@@ -281,6 +286,7 @@ public class ManifestTest extends AuraImplTestCase {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testManifestIncludesClientLibraries() throws Exception {
         // Arrange
@@ -295,8 +301,9 @@ public class ManifestTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        ServletUtilAdapter spyServletUtilAdapter = Mockito.spy(this.servletUtilAdapter);
+        ServletUtilAdapter spyServletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
         String expected = "clientLibraryUrl";
+        doReturn(Arrays.asList(expected)).when(spyServletUtilAdapter).getScripts(any(AuraContext.class), Matchers.anyBoolean(), Matchers.anyBoolean(), Matchers.anyMap());
         doReturn(Arrays.asList(expected)).when(spyServletUtilAdapter).getJsClientLibraryUrls(any(AuraContext.class));
 
         Manifest manifest = getManifest();

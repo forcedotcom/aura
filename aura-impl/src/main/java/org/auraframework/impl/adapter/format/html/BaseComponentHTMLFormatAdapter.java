@@ -40,6 +40,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.JsonEncoder;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -63,6 +64,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
     private ConfigAdapter configAdapter;
 
     @Inject
+    @Lazy
     private ServletUtilAdapter servletUtilAdapter;
 
     @Override

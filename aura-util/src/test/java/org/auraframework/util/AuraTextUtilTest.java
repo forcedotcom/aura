@@ -15,12 +15,12 @@
  */
 package org.auraframework.util;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.auraframework.util.AuraTextUtil.JSONEscapedFunctionStringBuilder;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class AuraTextUtilTest extends UnitTestCase {
     /**
@@ -208,7 +208,11 @@ public class AuraTextUtilTest extends UnitTestCase {
             this.input = input;
             this.delimiter = delimiter;
             this.expectedSize = expectedSize;
-            this.result = Arrays.asList(result);
+            if (result != null) {
+                this.result = Arrays.asList(result);
+            } else {
+                this.result = null;
+            }
         }
 
         @Override
@@ -220,6 +224,10 @@ public class AuraTextUtilTest extends UnitTestCase {
             String label = toString();
             int i;
 
+            if (this.result == null || actual == null) {
+                assertEquals(this.result, actual);
+                return;
+            }
             assertEquals(label + " size mismatch", this.result.size(), actual.size());
             for (i = 0; i < this.result.size(); i += 1) {
                 assertEquals(label + " item mismatch at " + i, this.result.get(i), actual.get(i));
@@ -228,6 +236,8 @@ public class AuraTextUtilTest extends UnitTestCase {
     };
 
     private static final SplitMatch[] splitTests = new SplitMatch[] {
+            new SplitMatch(null, ",", 0, null),
+            new SplitMatch("", ",", 1, new String[] { "" }),
             new SplitMatch("a", ",", 1, new String[] { "a" }),
             new SplitMatch("a,b", ",", 1, new String[] { "a", "b" }),
             new SplitMatch("axxxb", "xxx", 1, new String[] { "a", "b" }),
@@ -298,6 +308,14 @@ public class AuraTextUtilTest extends UnitTestCase {
         for (SplitMatch sm : splitLimitTrimTests) {
             sm.checkResult(AuraTextUtil.splitSimpleLimitAndTrim(sm.input, sm.delimiter, sm.expectedSize));
         }
+    }
+
+    @Test
+    public void testSplitReturnsModifiableCollection() {
+        List<String> result = AuraTextUtil.splitSimple(",", "a,b");
+        result.remove(result.size() - 1);
+        assertEquals("result should have been left with only one element after splitting to two and removing the last one", 1, result.size());
+        assertEquals("result should have been left with just 'a'", "a", result.get(0));
     }
 
     private final static StringPair[] INIT_CAP_PAIRS = new StringPair[] { new StringPair(null, null),

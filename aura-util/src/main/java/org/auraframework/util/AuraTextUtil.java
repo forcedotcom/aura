@@ -22,6 +22,7 @@ import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Lists;
 import com.google.common.collect.ObjectArrays;
 
 /**
@@ -273,15 +275,13 @@ public class AuraTextUtil {
      * be fixed with a refactoring.
      *
      * @param delimiter The delimiter to split the string using
-     * @param str The string to split
+     * @param string The string to split
      * @return String list or, if str was null, then null
      * @deprecated use StringUtils.split(str, delimiter);
      */
-    public static List<String> splitSimple(String delimiter, String str) {
-        if (StringUtils.isEmpty(str)) {
-            return Arrays.asList(str);
-        }
-        return Arrays.asList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter));
+    public static List<String> splitSimple(String delimiter, String string) {
+        return checkForEmptyOrNull(string,
+                str -> Lists.newArrayList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter)));
     }
 
     /**
@@ -312,30 +312,37 @@ public class AuraTextUtil {
 
     /**
      * @deprecated use StringUtils.split(str, delimiter, limitSize)
-     * @param str
+     * @param string
      * @param delimiter
      * @param limitSize
      * @return
      */
-    public static List<String> splitSimpleLimit(String str, String delimiter, int limitSize) {
-        if (StringUtils.isEmpty(str)) {
-            return Arrays.asList(str);
-        }
-        return Arrays.asList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter, limitSize));
+    public static List<String> splitSimpleLimit(String string, String delimiter, int limitSize) {
+        return checkForEmptyOrNull(string,
+                str -> Lists.newArrayList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter, limitSize)));
     }
 
     /**
      * @deprecated use StringUtils.split(str, delimiter, limitSize) and map StringUtils.trim with a java lambda
-     * @param str
+     * @param string
      * @param delimiter
      * @param limitSize
      * @return
      */
-    public static List<String> splitSimpleLimitAndTrim(String str, String delimiter, int limitSize) {
-        if (StringUtils.isEmpty(str)) {
-            return Arrays.asList(str);
+    public static List<String> splitSimpleLimitAndTrim(String string, String delimiter, int limitSize) {
+        return checkForEmptyOrNull(string,
+                str -> Lists.newArrayList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter, limitSize)).stream().map(StringUtils::trim).collect(Collectors.toList())
+        );
+    }
+
+    private static List<String> checkForEmptyOrNull(String str, Function<String, List<String>> function) {
+        if (str == null) {
+            return null;
         }
-        return Arrays.asList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter, limitSize)).stream().map(StringUtils::trim).collect(Collectors.toList());
+        if (StringUtils.isEmpty(str)) {
+            return Lists.newArrayList(str);
+        }
+        return function.apply(str);
     }
 
     /**
@@ -423,18 +430,16 @@ public class AuraTextUtil {
      * This is more efficient than String.split or TextUtil.split because it does not use a regular expression.
      *
      * @deprecated use StringUtils.split and map StringUtils.trim with a stream / lambda
-     * @param str The string to split
+     * @param string The string to split
      * @param delimiter The delimiter to split the string using
      * @param expectedSize The expected number of elements in the output list. If you don't know, or if it could be
      *            arbitrarily large, and if you will only access the returned list sequentially with an iterator, then
      *            use 0 to tell this method to use a LinkedList
      * @return String list or, if str was null, then null
      */
-    public static List<String> splitSimpleAndTrim(String str, String delimiter, int expectedSize) {
-        if (StringUtils.isEmpty(str)) {
-            return Arrays.asList(str);
-        }
-        return Arrays.asList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter)).stream().map(StringUtils::trim).collect(Collectors.toList());
+    public static List<String> splitSimpleAndTrim(String string, String delimiter, int expectedSize) {
+        return checkForEmptyOrNull(string,
+                str -> Lists.newArrayList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter)).stream().map(StringUtils::trim).collect(Collectors.toList()));
     }
 
     /**

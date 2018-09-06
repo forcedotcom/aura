@@ -474,11 +474,6 @@
                 <artifactId>json</artifactId>
                 <version>20160810</version>
             </dependency>
-            <dependency>
-                <groupId>com.salesforce.sld4j</groupId>
-                <artifactId>sld4j</artifactId>
-                <version>1.0.0</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>

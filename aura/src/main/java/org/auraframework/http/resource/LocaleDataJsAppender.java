@@ -137,7 +137,7 @@ public class LocaleDataJsAppender implements InlineJSAppender{
     }
 
     public String getMomentLocale(String locale) {
-        if(locale == null) {
+        if (locale == null) {
             return "en";
         }
 
@@ -146,9 +146,10 @@ public class LocaleDataJsAppender implements InlineJSAppender{
         String[] tokens = normalized.split("-");
 
         // special case for converting Java locale to momentJs Locale
-        // momentJs use "nb" as Norwegian
-        if ("no".equals(tokens[0])) {
-            tokens[0] = "nb";
+        switch (tokens[0]) {
+            case "no": tokens[0] = "nb"; break; // Norwegian
+            case "iw": tokens[0] = "he"; break; // Hebrew
+            case "in": tokens[0] = "id"; break; // Indonesian
         }
 
         String momentLocale = null;

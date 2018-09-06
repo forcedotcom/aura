@@ -65,4 +65,22 @@ public class LocaleDataJsAppenderTest extends AuraImplTestCase {
         String expected = "nb";
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void testGetMomentLocaleForIndonesian() {
+        LocaleDataJsAppender appender = getInlineJs();
+        String actual = appender.getMomentLocale("in_ID");
+
+        String expected = "id";
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetMomentLocaleForHebrew() {
+        LocaleDataJsAppender appender = getInlineJs();
+        String actual = appender.getMomentLocale("iw_IL");
+
+        String expected = "he";
+        assertEquals(expected, actual);
+    }
 }

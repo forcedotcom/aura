@@ -111,6 +111,13 @@ public class JavaTestController implements Controller {
         }
     }
 
+    @AuraEnabled
+    public Map<String,Object> getSelectedObjectParamLogging(@Key(value = "logparam", loggable = true) Map<String,Object> logparam,
+                                          @Key(value = "strparam", loggable = true) String strparam,
+                                          @Key(value = "otherparam") Map<String,Object> otherparam) {
+        return logparam;
+    }
+
     /**
      * Note: these cases are pretty specific to js://test.testActionExceptions
      * 

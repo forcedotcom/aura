@@ -415,7 +415,8 @@ Action.prototype.getLoggableParams = function() {
     var loggableParams = {};
     var loggableParamsKeys = this.def.getLoggableParams();
     for ( var key = 0; key < loggableParamsKeys.length; ++key) {
-        loggableParams[loggableParamsKeys[key]] = this.params[loggableParamsKeys[key]];
+        var paramsValue = this.params[loggableParamsKeys[key]];
+        loggableParams[loggableParamsKeys[key]] = typeof paramsValue === "object" ? JSON.stringify(paramsValue) : paramsValue;
     }
     return loggableParams;
 };

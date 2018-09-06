@@ -58,15 +58,18 @@ QueuedActionsMetricsPlugin.prototype.enqueueActionOverride = function() {
     var cmp = action.getComponent();
 
     if (action.getDef().isServerAction()) {
-        this.metricsService["mark"](QueuedActionsMetricsPlugin.NAME, 'enqueue', {
+        var mark = this.metricsService["mark"](QueuedActionsMetricsPlugin.NAME, 'enqueue', {
             "id"           : action.getId(),
             "abortable"    : action.isAbortable(),
             "storable"     : action.isStorable(),
             "background"   : action.isBackground(),
             "cmp"          : (cmp && cmp.getType()) || "none",
-            "def"          : action.getDef().toString(),
-            "params"       : action.getLoggableParams()
+            "def"          : action.getDef().toString()
         });
+        var params =  action.getLoggableParams();
+        if(!$A.util.isEmpty(params)){
+            mark["params"] = params;
+        }
     }
 
     //console.log('>>> ActionEnqueue :: %s [%s]', action.getId(), action.getDef()+'');

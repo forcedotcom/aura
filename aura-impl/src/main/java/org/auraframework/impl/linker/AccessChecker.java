@@ -237,6 +237,10 @@ public class AccessChecker {
                     // not internal namespace && namespace allowed to be used externally && module has minVersion
                     return null;
                 }
+                if (!isReferencingInternal && !configAdapter.isInternalNamespace(targetNamespace)) {
+                    // both referencing and target namespace are custom namespace
+                    return null;
+                }
             }
             from = " from " + referencingNamespace + ":" + referencingDescriptor.getName();
         }

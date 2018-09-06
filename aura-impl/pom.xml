@@ -102,6 +102,15 @@
             <artifactId>ios-client</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.salesforce.sld4j</groupId>
+            <artifactId>sld4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <properties>
         <aura.home>${basedir}/..</aura.home>

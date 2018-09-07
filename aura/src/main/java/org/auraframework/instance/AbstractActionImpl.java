@@ -91,6 +91,16 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     @Override
     public void setStorable() {
         storable = true;
+    }
+
+    @Override
+    public boolean isOfflineAction() {
+        return offlineAction;
+    }
+
+    @Override
+    public void markOfflineAction() {
+        offlineAction = true;
         if (actionId == null) {
             // Only set the ID if it was not previously set.
             setId("s");
@@ -173,6 +183,7 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     private String actionId;
     @Nonnull private final List<Action> actions;
     private boolean storable;
+    private boolean offlineAction;
     private InstanceStack instanceStack;
 
     @Nonnull protected final Map<String, Object> paramValues;

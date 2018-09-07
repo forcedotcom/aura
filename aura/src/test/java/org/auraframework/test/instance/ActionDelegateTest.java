@@ -87,6 +87,8 @@ public class ActionDelegateTest {
         oneCall(methodMap, calledMap, "logParams", (Object)null);
         oneCall(methodMap, calledMap, "isStorable");
         oneCall(methodMap, calledMap, "setStorable");
+        oneCall(methodMap, calledMap, "isOfflineAction");
+        oneCall(methodMap, calledMap, "markOfflineAction");
         oneCall(methodMap, calledMap, "getParams");
 
         oneCall(methodMap, calledMap, "getInstanceStack");

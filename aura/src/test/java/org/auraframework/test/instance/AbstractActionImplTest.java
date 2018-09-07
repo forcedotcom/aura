@@ -137,11 +137,23 @@ public class AbstractActionImplTest {
         Assert.assertEquals("isStorable should be initialized to false", false, test.isStorable());
         test.setStorable();
         Assert.assertEquals("isStorable should change on setStorable", true, test.isStorable());
-        Assert.assertEquals("id should change on setStorable", "s", test.getId());
-        test.setId("x");
         test.setStorable();
         Assert.assertEquals("isStorable should not change on second setStorable", true, test.isStorable());
-        Assert.assertEquals("id should not change on second setStorable", "x", test.getId());
+    }
+
+    @Test
+    public void testOfflineAction() {
+        ActionDef def = Mockito.mock(ActionDef.class);
+        Action test = new MyAction(null, def, null);
+
+        Assert.assertEquals("isOfflineAction should be initialized to false", false, test.isOfflineAction());
+        test.markOfflineAction();
+        Assert.assertEquals("isOfflineAction should change on markOfflineAction", true, test.isOfflineAction());
+        Assert.assertEquals("id should change on markOfflineAction", "s", test.getId());
+        test.setId("x");
+        test.markOfflineAction();
+        Assert.assertEquals("isOfflineAction should not change on second markOfflineAction", true, test.isOfflineAction());
+        Assert.assertEquals("id should not change on second markOfflineAction", "x", test.getId());
     }
 
     @Test

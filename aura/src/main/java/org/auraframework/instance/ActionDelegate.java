@@ -107,6 +107,16 @@ public class ActionDelegate implements Action {
     }
 
     @Override
+    public boolean isOfflineAction() {
+        return original.isOfflineAction();
+    }
+
+    @Override
+    public void markOfflineAction() {
+        original.markOfflineAction();
+    }
+
+    @Override
     public String toString() {
         return original.toString();
     }

@@ -132,7 +132,17 @@ public class JavascriptPseudoAction implements Action {
 
     @Override
     public void setStorable() {
-        // no nothing
+        // do nothing
+    }
+
+    @Override
+    public boolean isOfflineAction() {
+        return false;
+    }
+
+    @Override
+    public void markOfflineAction() {
+        // do nothing
     }
 
     @Override

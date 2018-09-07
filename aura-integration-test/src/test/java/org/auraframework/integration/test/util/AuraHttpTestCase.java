@@ -760,6 +760,15 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
 
         @Override
+        public boolean isOfflineAction() {
+            return false;
+        }
+
+        @Override
+        public void markOfflineAction() {
+        }
+
+        @Override
         public Map<String, Object> getParams() {
             return null;
         }

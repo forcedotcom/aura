@@ -110,10 +110,12 @@ public interface Action extends Instance<ActionDef> {
 
             if (action.isStorable()) {
                 json.writeMapEntry("storable", true);
+            }
 
+            if (action.isOfflineAction()) {
                 json.writeMapEntry("action", action.getDescriptor().getQualifiedName());
 
-                // Include params for storable server actions
+                // Include params for offline server actions
                 Map<String, Object> params = action.getParams();
                 if (params != null && !params.isEmpty()) {
                     json.writeMapEntry("params", params);
@@ -134,6 +136,10 @@ public interface Action extends Instance<ActionDef> {
     boolean isStorable();
 
     void setStorable();
+
+    boolean isOfflineAction();
+
+    void markOfflineAction();
 
     Map<String, Object> getParams();
 

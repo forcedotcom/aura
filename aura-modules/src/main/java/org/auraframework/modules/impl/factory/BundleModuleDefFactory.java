@@ -44,6 +44,7 @@ import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.MetaDefImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
+import org.auraframework.impl.service.CompilerServiceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.modules.impl.metadata.ModulesMetadataService;
@@ -53,6 +54,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.BundleSourceOption;
+import org.auraframework.system.CompileOptions;
 import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
@@ -96,8 +98,14 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
     @Override
     public ModuleDef getDefinition(@CheckForNull DefDescriptor<ModuleDef> descriptor,
                                    @Nonnull BundleSource<ModuleDef> source) throws QuickFixException {
+        return this.getDefinition(descriptor, source, CompilerServiceImpl.DEFAULT_COMPILE_OPTIONS);
+    }
+
+    @Override
+    public ModuleDef getDefinition(@CheckForNull DefDescriptor<ModuleDef> descriptor,
+                                   @Nonnull BundleSource<ModuleDef> source, CompileOptions compileOptions) throws QuickFixException {
         Map<DefDescriptor<?>, Source<?>> sourceMap = source.getBundledParts();
-        EnumSet<BundleSourceOption> sourceOptions = source.getOptions();
+        EnumSet<BundleSourceOption> sourceOptions = compileOptions.getSourceOptions();
 
         // get base source.
         Source<?> baseClassSource = sourceMap.get(descriptor);
@@ -156,11 +164,12 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
         ModulesCompilerData compilerData;
         try {
+            BundleType bundleType = BundleType.internal;
             if (sourceOptions != null && sourceOptions.contains(BundleSourceOption.Lint)) {
-                compilerData = modulesCompilerService.compile(componentPath, sources, BundleType.platform);
-            } else {
-                compilerData = modulesCompilerService.compile(componentPath, sources);
+                bundleType = BundleType.platform;
             }
+            compilerData = modulesCompilerService.compile(componentPath, sources, bundleType, compileOptions.getNamespaceMapping());
+
         } catch (Exception e) {
             throw new InvalidDefinitionException(e.getMessage(), location, e);
         }

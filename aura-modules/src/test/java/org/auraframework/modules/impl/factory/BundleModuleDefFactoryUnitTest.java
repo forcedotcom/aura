@@ -68,6 +68,7 @@ import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.lwc.CompilerReport;
+import org.lwc.bundle.BundleType;
 import org.lwc.classmember.ClassMember;
 import org.lwc.classmember.MemberType;
 import org.lwc.diagnostic.Diagnostic;
@@ -135,7 +136,7 @@ public class BundleModuleDefFactoryUnitTest {
                 new HashSet<>(), new HashSet<>(), compilerReport);
 
         ModulesCompilerService modulesCompilerService = mock(ModulesCompilerService.class);
-        when(modulesCompilerService.compile(anyString(), anyMap())).thenReturn(compilerData);
+        when(modulesCompilerService.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenReturn(compilerData);
 
         return modulesCompilerService;
     }
@@ -192,7 +193,7 @@ public class BundleModuleDefFactoryUnitTest {
                         new ClassMember("prop3", MemberType.PROPERTY, null, null)),
                 Sets.newHashSet(),
                 mockReport);
-        when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
+        when(mockCompiler.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
         moduleDefFactory.setModulesCompilerService(mockCompiler);
@@ -302,7 +303,7 @@ public class BundleModuleDefFactoryUnitTest {
                         new ClassMember("prop3", MemberType.PROPERTY, null, null)),
                 Sets.newHashSet(),
                 mockReport);
-        when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
+        when(mockCompiler.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
         moduleDefFactory.setModulesCompilerService(mockCompiler);
@@ -371,7 +372,7 @@ public class BundleModuleDefFactoryUnitTest {
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
         ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet());
-        when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
+        when(mockCompiler.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
         moduleDefFactory.setModulesCompilerService(mockCompiler);
@@ -409,7 +410,7 @@ public class BundleModuleDefFactoryUnitTest {
 
         CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class), null);
         ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), mockReport);
-        when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
+        when(mockCompiler.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
         moduleDefFactory.setModulesCompilerService(mockCompiler);
@@ -566,6 +567,7 @@ public class BundleModuleDefFactoryUnitTest {
 
         CompilerService compilerService = mock(CompilerService.class);
         DocumentationDef mockAuradocDef = mock(DocumentationDef.class);
+
         when(compilerService.compile(same(auradocDesc), any(Source.class))).thenReturn(mockAuradocDef);
 
         BundleModuleDefFactory factory = new BundleModuleDefFactory();
@@ -616,7 +618,7 @@ public class BundleModuleDefFactoryUnitTest {
         ModulesCompilerService modulesCompilerService = mockModulesCompilerService(compilerReport);
 
         // current compiler behavior throws runtime exception when there is a compiler error
-        when(modulesCompilerService.compile(anyString(), anyMap())).thenThrow(new RuntimeException("Unable to parse front matter"));
+        when(modulesCompilerService.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenThrow(new RuntimeException("Unable to parse front matter"));
 
         BundleModuleDefFactory factory = new BundleModuleDefFactory();
         factory.setModulesCompilerService(modulesCompilerService);
@@ -676,7 +678,7 @@ public class BundleModuleDefFactoryUnitTest {
                 mockReport);
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
-        when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
+        when(mockCompiler.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
         moduleDefFactory.setModulesCompilerService(mockCompiler);

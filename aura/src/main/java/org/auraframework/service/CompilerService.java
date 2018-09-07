@@ -19,6 +19,7 @@ import javax.annotation.Nonnull;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.system.CompileOptions;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -46,4 +47,16 @@ public interface CompilerService {
      * @throws QuickFixException if theere was a problem loading the def.
      */
     <D extends Definition> D compile(DefDescriptor<D> descriptor, @Nonnull Source<D> source) throws QuickFixException;
+
+    /**
+     * Compile with addition of compile options for linting, minification, and namespace mapping
+     *
+     * @param descriptor descriptor
+     * @param source source to compile
+     * @param compileOptions compile options for linting, minification, and namespace mapping
+     * @param <D> definition type
+     * @return definition
+     * @throws QuickFixException
+     */
+    <D extends Definition> D compile(DefDescriptor<D> descriptor, @Nonnull Source<D> source, CompileOptions compileOptions) throws QuickFixException;
 }

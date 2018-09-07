@@ -27,4 +27,5 @@ public interface ModulesCompiler {
     
     ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception;
     ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType) throws Exception;
+    ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType, Map<String, String> namespaceMapping) throws Exception;
 }

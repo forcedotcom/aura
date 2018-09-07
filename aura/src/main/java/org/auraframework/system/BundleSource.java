@@ -15,7 +15,6 @@
  */
 package org.auraframework.system;
 
-import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,15 +41,8 @@ public interface BundleSource<D extends Definition> extends Source<D> {
      */
     Map<DefDescriptor<?>,Source<?>> getBundledParts();
 
-    /**
-     * Set of bundle source options: minify and lint
-     *
-     * @return an enum set of enabled bundle source options
-     * */
-    EnumSet<BundleSourceOption> getOptions();
-
     // This is temporary while we create bundles.
-    public static final Set<DefType> bundleDefTypes = new ImmutableSet.Builder<DefType>()
+    Set<DefType> bundleDefTypes = new ImmutableSet.Builder<DefType>()
         .add(DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT,
                 DefType.INTERFACE, DefType.LIBRARY, DefType.TOKENS, DefType.FLAVOR_BUNDLE).build();
 }

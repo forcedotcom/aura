@@ -147,7 +147,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
                     bundleDescriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, descriptor.getNamespace(),
                             descriptor.getName(), ComponentDef.class);
                 }
-                bundle = new BundleSourceImpl<>(bundleDescriptor, Maps.newConcurrentMap(), EnumSet.of(BundleSourceOption.Minify));
+                bundle = new BundleSourceImpl<>(bundleDescriptor, Maps.newConcurrentMap());
                 bundles.put(getBundleKey(bundleDescriptor), bundle);
             }
             return bundle;

@@ -22,6 +22,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.system.CompileOptions;
 import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -70,6 +71,11 @@ public class CompilerServiceImplTest extends AuraImplTestCase {
 
         @Override
         public D getDefinition(DefDescriptor<D> descriptor, S source) throws QuickFixException {
+            return defs.get(source);
+        }
+
+        @Override
+        public D getDefinition(DefDescriptor<D> descriptor, S source, CompileOptions compileOptions) throws QuickFixException {
             return defs.get(source);
         }
     }

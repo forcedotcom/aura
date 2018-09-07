@@ -86,6 +86,6 @@ public class EventDefFileBundleBuilder implements FileBundleSourceBuilder {
                 // error
             }
         }
-        return new BundleSourceImpl<>(evtDesc, sourceMap, EnumSet.of(BundleSourceOption.Minify));
+        return new BundleSourceImpl<>(evtDesc, sourceMap);
     }
 }

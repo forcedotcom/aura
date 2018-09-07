@@ -16,7 +16,6 @@
 package org.auraframework.impl.source.file;
 
 import java.io.File;
-import java.util.EnumSet;
 import java.util.Map;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -28,7 +27,6 @@ import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.BundleSource;
-import org.auraframework.system.BundleSourceOption;
 import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
@@ -86,6 +84,6 @@ public class TokensDefFileBundleBuilder implements FileBundleSourceBuilder {
                 // error
             }
         }
-        return new BundleSourceImpl<>(tokensDesc, sourceMap, EnumSet.of(BundleSourceOption.Minify));
+        return new BundleSourceImpl<>(tokensDesc, sourceMap);
     }
 }

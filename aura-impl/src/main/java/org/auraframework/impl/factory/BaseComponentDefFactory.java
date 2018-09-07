@@ -23,10 +23,12 @@ import org.auraframework.builder.BaseComponentDefBuilder;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
+import org.auraframework.impl.service.CompilerServiceImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.ApiVersioned;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.BundleSourceOption;
+import org.auraframework.system.CompileOptions;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
@@ -36,14 +38,19 @@ public abstract class BaseComponentDefFactory<T extends BaseComponentDef> extend
     protected ContextService contextService;
 
     @Override
-    public T getDefinition(DefDescriptor<T> descriptor, BundleSource<T> source)
+    public T getDefinition(DefDescriptor<T> descriptor, BundleSource<T> source) throws QuickFixException {
+        return this.getDefinition(descriptor, source, CompilerServiceImpl.DEFAULT_COMPILE_OPTIONS);
+    }
+
+    @Override
+    public T getDefinition(DefDescriptor<T> descriptor, BundleSource<T> source, CompileOptions compileOptions)
             throws QuickFixException {
         RootTagHandler<T> handler = getDefinitionBuilder(descriptor, source);
         if (handler == null) {
             return null;
         }
         BaseComponentDefBuilder<T> builder = (BaseComponentDefBuilder<T>)handler.getBuilder();
-        EnumSet<BundleSourceOption> bundleOptions = source.getOptions();
+        EnumSet<BundleSourceOption> bundleOptions = compileOptions.getSourceOptions();
         builder.setMinifyEnabled(bundleOptions.contains(BundleSourceOption.Minify));
 
         if (source instanceof ApiVersioned){

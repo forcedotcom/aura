@@ -65,4 +65,18 @@ public interface DefinitionFactory<S extends Source<D>, D extends Definition> {
      * @throws QuickFixException if there is any error reading the definition.
      */
     D getDefinition(@CheckForNull DefDescriptor<D> descriptor, @Nonnull S source) throws QuickFixException;
+
+    /**
+     * Returns definition from source with compile options to specify lint, minification, and namespace mapping
+     * default implementation calls getDefinition without CompileOptions
+     *
+     * @param descriptor
+     * @param source
+     * @param compileOptions compile options
+     * @return definition
+     * @throws QuickFixException
+     */
+    default D getDefinition(@CheckForNull DefDescriptor<D> descriptor, @Nonnull S source, CompileOptions compileOptions) throws QuickFixException {
+        return getDefinition(descriptor, source);
+    }
 }

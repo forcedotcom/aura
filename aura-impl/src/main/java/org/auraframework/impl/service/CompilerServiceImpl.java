@@ -15,15 +15,19 @@
  */
 package org.auraframework.impl.service;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.service.CompilerService;
+import org.auraframework.system.BundleSourceOption;
+import org.auraframework.system.CompileOptions;
 import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
@@ -39,6 +43,9 @@ import com.google.common.collect.Maps;
  */
 @ServiceComponent
 public class CompilerServiceImpl implements CompilerService {
+    // By default BundleSourceOption disables linting and enables minification for javascript processing.
+    public static final CompileOptions DEFAULT_COMPILE_OPTIONS = new CompileOptions(EnumSet.of(BundleSourceOption.Minify), null);
+
     @Inject
     private List<DefinitionFactory<?, ?>> factories;
 
@@ -65,7 +72,7 @@ public class CompilerServiceImpl implements CompilerService {
     }
 
     private <S extends Source<D>, D extends Definition> D getDefinitionTypeSafe(DefDescriptor<D> descriptor,
-            S source, Class<D> type) throws QuickFixException {
+            S source, Class<D> type, CompileOptions compileOptions) throws QuickFixException {
         if (source == null) {
             return null;
         }
@@ -79,18 +86,32 @@ public class CompilerServiceImpl implements CompilerService {
         if (factory == null) {
             return null;
         }
-        D def = factory.getDefinition(descriptor, source);
+        D def = factory.getDefinition(descriptor, source, compileOptions);
         if (def != null) {
             def.validateDefinition();
         }
         return def;
     }
 
+    /**
+     * Default compile options have BundleSourceOption.Minify and no lint
+     *
+     * @param descriptor descriptor
+     * @param source the source to compile.
+     * @param <D> definition type
+     * @return compiled definition
+     * @throws QuickFixException
+     */
     @Override
     public <D extends Definition> D compile(DefDescriptor<D> descriptor, Source<D> source) throws QuickFixException {
+        return this.compile(descriptor, source, DEFAULT_COMPILE_OPTIONS);
+    }
+
+    @Override
+    public <D extends Definition> D compile(DefDescriptor<D> descriptor, @Nonnull Source<D> source, CompileOptions compileOptions) throws QuickFixException {
         @SuppressWarnings("unchecked")
         Class<D> clazz = (Class<D>)descriptor.getDefType().getPrimaryInterface();
-        return getDefinitionTypeSafe(descriptor, source, clazz);
+        return getDefinitionTypeSafe(descriptor, source, clazz, compileOptions);
     }
 
     @Override
@@ -102,7 +123,7 @@ public class CompilerServiceImpl implements CompilerService {
         if (source == null) {
             return null;
         }
-        return getDefinitionTypeSafe(descriptor, source, clazz);
+        return getDefinitionTypeSafe(descriptor, source, clazz, DEFAULT_COMPILE_OPTIONS);
     }
 
     /**

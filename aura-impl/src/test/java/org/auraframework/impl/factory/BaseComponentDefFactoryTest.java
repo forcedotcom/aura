@@ -59,7 +59,7 @@ public abstract class BaseComponentDefFactoryTest<D extends BaseComponentDef> ex
      * Constructor for the common tests on both application and component bundles.
      *
      * @param tag the start tag, with a two %s in it for attributes and contents.
-     * @param type the deftype
+     * @param defClass the def class
      */
     protected BaseComponentDefFactoryTest(String tag, Class<D> defClass) {
         this.tag = tag;

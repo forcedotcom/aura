@@ -53,11 +53,16 @@ public final class ModulesCompilerNode implements ModulesCompiler {
 
     @Override
     public ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
-        return this.compile(entry, sources, BundleType.internal);
+        return this.compile(entry, sources, BundleType.internal, null);
     }
 
     @Override
     public ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType) throws Exception {
+        return this.compile(entry, sources, bundleType, null);
+    }
+
+    @Override
+    public ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType, Map<String, String> namespaceMapping) throws Exception {
         Path path = Paths.get(entry);
 
         // get name and namespace
@@ -80,7 +85,7 @@ public final class ModulesCompilerNode implements ModulesCompiler {
             normalizedSources.put((relativeBundlePath.relativize(Paths.get(sourceKey))).toString(), sources.get(sourceKey));
         }
 
-        Bundle bundle = new Bundle(namespace, name, normalizedSources, bundleType);
+        Bundle bundle = new Bundle(namespace, name, normalizedSources, bundleType, namespaceMapping);
         CompilerConfig config = new CompilerConfig(bundle, configs, stylesheetConfig);
 
         ModulesCompilerData result;

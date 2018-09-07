@@ -759,7 +759,7 @@ public class AuraTestingUtil {
                     formatMap.get(type));
             map.put(descriptor, source);
         }
-        return new BundleSourceImpl<D>(bundleDescriptor, map, EnumSet.of(BundleSourceOption.Minify));
+        return new BundleSourceImpl<D>(bundleDescriptor, map);
     }
 
     /**

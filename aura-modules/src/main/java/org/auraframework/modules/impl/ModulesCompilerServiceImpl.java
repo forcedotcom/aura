@@ -48,15 +48,20 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
 
     @Override
     public final ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
-        return compile(entry, sources, BundleType.internal);
+        return compile(entry, sources, BundleType.internal, null);
     }
 
     @Override
-    public final ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType) throws Exception {
+    public ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType) throws Exception {
+        return compile(entry, sources, bundleType, null);
+    }
+
+    @Override
+    public final ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType, Map<String, String> namespaceMapping) throws Exception {
         // need to create compiler lazily to avoid the core modularity enforcer
         compiler = getCompiler();
         long startNanos = System.nanoTime();
-        ModulesCompilerData data = compiler.compile(entry, sources, bundleType);
+        ModulesCompilerData data = compiler.compile(entry, sources, bundleType, namespaceMapping);
         long elapsedMillis = (System.nanoTime() - startNanos) / 1000000;
         
         // TODO: keep the log bc it is consumed in splunk.

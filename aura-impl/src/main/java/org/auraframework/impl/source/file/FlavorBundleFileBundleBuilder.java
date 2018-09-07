@@ -23,13 +23,11 @@ import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.BundleSource;
-import org.auraframework.system.BundleSourceOption;
 import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 
 import java.io.File;
-import java.util.EnumSet;
 import java.util.Map;
 
 @ServiceComponent
@@ -72,6 +70,6 @@ public class FlavorBundleFileBundleBuilder implements FileBundleSourceBuilder {
                 // error
             }
         }
-        return new BundleSourceImpl<>(bundleDesc, sourceMap, EnumSet.of(BundleSourceOption.Minify));
+        return new BundleSourceImpl<>(bundleDesc, sourceMap);
     }
 }

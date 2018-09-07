@@ -15,14 +15,11 @@
  */
 package org.auraframework.impl.source;
 
-
-import java.util.EnumSet;
 import java.util.Map;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.BundleSource;
-import org.auraframework.system.BundleSourceOption;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 
@@ -36,32 +33,16 @@ import org.auraframework.system.Source;
 public class BundleSourceImpl<D extends Definition> implements BundleSource<D> {
     private final DefDescriptor<D> descriptor;
     private final Map<DefDescriptor<?>,Source<?>> bundleParts;
-    private final EnumSet<BundleSourceOption> options;
 
     /**
      * Create a bundle source.
      *
      * @param descriptor the descriptor for the bundle level descriptor.
      * @param bundleParts a map of all of the bundle parts, including the top level markup.
-     * @param minifyEnabled whether minify enabled
      */
-    public BundleSourceImpl(DefDescriptor<D> descriptor, Map<DefDescriptor<?>, Source<?>> bundleParts,
-                            boolean minifyEnabled) {
-        this(descriptor, bundleParts, minifyEnabled ? EnumSet.of(BundleSourceOption.Minify) : EnumSet.noneOf(BundleSourceOption.class));
-    }
-
-    /**
-     * Create a bundle source.
-     *
-     * @param descriptor the descriptor for the bundle level descriptor.
-     * @param bundleParts a map of all of the bundle parts, including the top level markup.
-     * @param options a set of bundle option enums to drive minification and linting
-     */
-    public BundleSourceImpl(DefDescriptor<D> descriptor, Map<DefDescriptor<?>, Source<?>> bundleParts,
-                            EnumSet<BundleSourceOption> options) {
+    public BundleSourceImpl(DefDescriptor<D> descriptor, Map<DefDescriptor<?>, Source<?>> bundleParts) {
         this.descriptor = descriptor;
         this.bundleParts = bundleParts;
-        this.options = options;
     }
 
     @Override
@@ -97,11 +78,6 @@ public class BundleSourceImpl<D extends Definition> implements BundleSource<D> {
     @Override
     public DefDescriptor<D> getDescriptor() {
         return descriptor;
-    }
-
-    @Override
-    public EnumSet<BundleSourceOption> getOptions() {
-        return options;
     }
 
     @Override

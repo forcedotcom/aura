@@ -139,6 +139,6 @@ public class ApplicationDefFileBundleBuilder implements FileBundleSourceBuilder 
                 // error
             }
         }
-        return new BundleSourceImpl<>(cmpDesc, sourceMap, EnumSet.of(BundleSourceOption.Minify));
+        return new BundleSourceImpl<>(cmpDesc, sourceMap);
     }
 }

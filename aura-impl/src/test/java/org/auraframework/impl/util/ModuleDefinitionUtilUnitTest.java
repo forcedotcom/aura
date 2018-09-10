@@ -41,7 +41,7 @@ public class ModuleDefinitionUtilUnitTest {
         ConfigAdapter configAdapter = mock(ConfigAdapter.class);
         when(configAdapter.getInternalNamespacesMap()).thenReturn(internalNamespaces);
 
-        String actual = ModuleDefinitionUtil.convertToAuraDescriptor("namespace-some-cool-thing", configAdapter);
+        String actual = ModuleDefinitionUtil.convertToAuraDescriptor("namespace/someCoolThing", configAdapter);
         assertEquals("Expected descriptor does not match", "nameSpace:someCoolThing", actual);
     }
 
@@ -54,9 +54,9 @@ public class ModuleDefinitionUtilUnitTest {
         ConfigAdapter configAdapter = mock(ConfigAdapter.class);
         when(configAdapter.getInternalNamespacesMap()).thenReturn(internalNamespaces);
 
-        String descriptor = ModuleDefinitionUtil.convertToAuraDescriptor("namespace", "some-cool-thing", configAdapter);
+        String descriptor = ModuleDefinitionUtil.convertToAuraDescriptor("namespace", "someCoolThing", configAdapter);
         assertEquals("Expected descriptor does not match", "nameSpace:someCoolThing", descriptor);
-        descriptor = ModuleDefinitionUtil.convertToAuraDescriptor("namespace", "some-cool-thing_bob", configAdapter);
+        descriptor = ModuleDefinitionUtil.convertToAuraDescriptor("namespace", "someCoolThing_bob", configAdapter);
         assertEquals("Expected descriptor does not match", "nameSpace:someCoolThing_bob", descriptor);
     }
 
@@ -70,7 +70,7 @@ public class ModuleDefinitionUtilUnitTest {
         when(configAdapter.getInternalNamespacesMap()).thenReturn(internalNamespaces);
 
         // modules containing folder is named "modules" by convention
-        String path = "/User/user/projects/stealth/src/main/modules/namespace/some-awesome-thing/some-awesome-thing.js";
+        String path = "/User/user/projects/stealth/src/main/modules/namespace/someAwesomeThing/someAwesomeThing.js";
 
         DefDescriptor<?> moduleDescriptor = ModuleDefinitionUtil.getModuleDescriptorFromFilePath(path, configAdapter);
         assertEquals("descriptor DefType is incorrect", DefType.MODULE, moduleDescriptor.getDefType());

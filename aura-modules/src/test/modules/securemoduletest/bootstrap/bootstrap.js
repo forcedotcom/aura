@@ -1,6 +1,6 @@
 import { LightningElement, createElement, toString, api } from 'lwc';
-import * as testUtil from 'securemoduletest-test-util';
-import * as simpleLib from 'securemoduletest-simple-lib';
+import * as testUtil from "securemoduletest/testUtil";
+import * as simpleLib from "securemoduletest/simpleLib";
 
 export default class Bootstrap extends LightningElement {
     @api

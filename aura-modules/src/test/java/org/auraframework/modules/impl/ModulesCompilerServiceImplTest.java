@@ -55,7 +55,7 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
         String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8);
 
         assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
-        assertEquals("[x-test, lwc]", compilerData.bundleDependencies.toString());
+        assertEquals("[lwc, x/test]", compilerData.bundleDependencies.toString());
     }
     
     @Test

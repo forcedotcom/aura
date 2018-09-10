@@ -72,7 +72,7 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
     @Test
     public void testCreateAuraClientExceptionWithModuleStacktrace() {
         String stacktrace =
-         "AppNavBarItem.handleClick()@http://errortest.lightning.localhost.soma.force.com:6109/components/one-app-nav-bar-item.js:68:15\n"+
+         "AppNavBarItem.handleClick()@http://errortest.lightning.localhost.soma.force.com:6109/components/one/appNavBarItem.js:68:15\n"+
          "Object.boundFn()@http://errortest.lightning.localhost.soma.force.com:6109/auraFW/resources/tl_W7omHGRGQiu-tfZgpug/engine/engine.js:91:31\n"+
          "invokeHandler()@http://errortest.lightning.localhost.soma.force.com:6109/auraFW/resources/tl_W7omHGRGQiu-tfZgpug/engine/engine.js:2825:13\n"+
          "handleEvent()@http://errortest.lightning.localhost.soma.force.com:6109/auraFW/resources/tl_W7omHGRGQiu-tfZgpug/engine/engine.js:2853:5\n"+

@@ -1,6 +1,6 @@
 import { LightningElement, api } from "lwc";
-import * as testUtils from 'securemoduletest-test-util';
-import { LockerLWCEventName } from 'lockerlwc-lockerlwcevent';
+import * as testUtils from "securemoduletest/testUtil";
+import { LockerLWCEventName } from "lockerlwc/lockerlwcevent";
 
 export default class ChildSecure extends LightningElement {
     @api arrayProp = [91, 92, 93];

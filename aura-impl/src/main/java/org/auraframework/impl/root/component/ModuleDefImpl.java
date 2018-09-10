@@ -61,6 +61,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
 
     private String path;
     private final Set<String> moduleDependencies;
+    private final String moduleName;
     private final String customElementName;
     private Set<DefDescriptor<?>> dependencies = null;
     private Map<CodeType, String> codes;
@@ -79,6 +80,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         this.path = builder.path;
         this.codes = builder.codes;
         this.moduleDependencies = builder.moduleDependencies;
+        this.moduleName = builder.moduleName;
         this.customElementName = builder.customElementName;
         this.labelReferences = builder.labelReferences;
         this.minVersion = builder.minVersion;
@@ -148,7 +150,8 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
 
             json.writeMapBegin();
             json.writeMapEntry(ApplicationKey.DESCRIPTOR, getDescriptor().getQualifiedName());
-            json.writeMapEntry(ApplicationKey.NAME, this.customElementName);
+            json.writeMapEntry(ApplicationKey.NAME, this.moduleName);
+            json.writeMapEntry(ApplicationKey.CUSTOMELEMENT, this.customElementName);
             json.writeValue(getAccess());
             json.writeMapEntry(ApplicationKey.CODE, code);
             if (this.minVersion != null) {
@@ -209,9 +212,9 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
                 if (definitionService.exists(libraryDefDescriptor)) {
                     results.add(libraryDefDescriptor);
                 }
-            } else if (dep.contains("-")) {
+            } else if (dep.contains("/")) {
                 if (!isAuraDependency(dep)) {
-                    String colon = StringUtils.replaceOnce(dep, "-", ":");
+                    String colon = StringUtils.replaceOnce(dep, "/", ":");
                     String[] split = colon.split(":");
                     String namespace = split[0];
                     String name = split[1];
@@ -312,6 +315,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private String path;
         private Map<CodeType, String> codes;
         private Set<String> moduleDependencies;
+        private String moduleName;
         private String customElementName;
         private Set<PropertyReference> labelReferences = new HashSet<>();
         private List<Reference> sourceReferences = Collections.emptyList();
@@ -338,6 +342,10 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         public void setModuleDependencies(Set<String> dependencies) {
             this.moduleDependencies = dependencies;
         }
+        
+        public void setModuleName(String moduleName) {
+        	this.moduleName = moduleName;
+        }
 
         public void setCustomElementName(String customElementName) {
             this.customElementName = customElementName;
@@ -351,6 +359,10 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
                 }
                 this.labelReferences.add(new PropertyReferenceImpl(label, location));
             }
+        }
+        
+        public String getCustomElementName() {
+        	return this.customElementName;
         }
 
         public void setRequireLocker(Boolean requireLocker) {

@@ -727,6 +727,7 @@ AuraComponentService.prototype.initModuleDefs = function(modules) {
     var access = Json.ApplicationKey.ACCESS;
     var requireLocker = Json.ApplicationKey.REQUIRELOCKER;
     var attributeDefs = Json.ApplicationKey.ATTRIBUTEDEFS;
+    var customElement = Json.ApplicationKey.CUSTOMELEMENT;
 
     modules.forEach(function (module) {
         // don't override existing entries
@@ -736,6 +737,7 @@ AuraComponentService.prototype.initModuleDefs = function(modules) {
             exporter[access] = module[access];
             exporter[requireLocker] = module[requireLocker];
             exporter[attributeDefs] = module[attributeDefs];
+            exporter[customElement] = module[customElement];
             moduleDefRegistry[module[Json.ApplicationKey.DESCRIPTOR]] = moduleDefRegistry[module[Json.ApplicationKey.NAME]] = exporter;
         }
     });
@@ -905,6 +907,7 @@ AuraComponentService.prototype.createInteropComponentDef = function (descriptor)
         definition   : module.definition,
         descriptor   : module.descriptor,
         moduleName   : module.moduleName,
+        elementName  : module[Json.ApplicationKey.CUSTOMELEMENT],
         access       : module[Json.ApplicationKey.ACCESS],
         minVersion   : module[Json.ApplicationKey.MINVERSION],
         attributeDefs: module[Json.ApplicationKey.ATTRIBUTEDEFS],

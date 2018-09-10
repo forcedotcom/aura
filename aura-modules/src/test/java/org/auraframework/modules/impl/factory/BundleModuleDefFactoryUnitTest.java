@@ -145,10 +145,10 @@ public class BundleModuleDefFactoryUnitTest {
     public void testGetDefinition() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
-        String basePath = String.join(File.separator,"User","me","project","src","main","modules","namespace","module-cmp");
+        String basePath = String.join(File.separator,"User","me","project","src","main","modules","namespace","moduleCmp");
 
-        FileSource<?> jsFileSource = mockFile(basePath, "module-cmp.js", "javascript code here");
-        FileSource<?> htmlFileSource = mockFile(basePath, "module-cmp.html", "template code here");
+        FileSource<?> jsFileSource = mockFile(basePath, "moduleCmp.js", "javascript code here");
+        FileSource<?> htmlFileSource = mockFile(basePath, "moduleCmp.html", "template code here");
         FileSource<?> jsonFileSource = mockFile(basePath, "lightning.json", "{ description: 'hello there', expose: 'true', minVersion: '12.3' }");
 
         String xml =
@@ -162,10 +162,10 @@ public class BundleModuleDefFactoryUnitTest {
                     "   <tag>home__tag</tag>\n" +
                     "</tags>\n" +
                 "</LightningComponentBundle>";
-        FileSource<?> xmlMetadataFileSource = mockFile(basePath, "module-cmp.js-meta.xml", xml);
+        FileSource<?> xmlMetadataFileSource = mockFile(basePath, "moduleCmp.js-meta.xml", xml);
 
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
-        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-moduleCmp", ModuleDef.class, module);
         DefDescriptor<ModuleDef> json = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, "nameSpace", "moduleCmp-" + ModuleDef.META_FILE_BASENAME, ModuleDef.class, module);
         DefDescriptor<ModuleDef> xmlMetadata = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, "nameSpace", "moduleCmp-" + ModuleDef.META_XML_NAME, ModuleDef.class, module);
 
@@ -230,7 +230,7 @@ public class BundleModuleDefFactoryUnitTest {
 
     @Test
     public void testNamespaceFolderWithHyphen() throws Exception {
-        String basePath = String.join(File.separator,"User","me","project","src","main","modules","name-space","module-cmp");
+        String basePath = String.join(File.separator,"User","me","project","src","main","modules","name-space","moduleCmp");
 
         FileSource<?> jsFileSource = mockFile(basePath, "moduleCmp.js", "javascript code here");
         FileSource<?> htmlFileSource = mockFile(basePath, "moduleCmp.html", "template code here");
@@ -249,7 +249,7 @@ public class BundleModuleDefFactoryUnitTest {
             moduleDefFactory.getDefinition(module, mockBundleSource);
             fail("Should have thrown InvalidDefinitionException due to bad naming convention for modules");
         } catch (InvalidDefinitionException ide) {
-            assertTrue("Incorrect exception message", ide.getMessage().startsWith("Namespace cannot have a hyphen."));
+            assertTrue("Incorrect exception message", ide.getMessage().startsWith("Module name cannot have a hyphens."));
         }
     }
 
@@ -257,7 +257,7 @@ public class BundleModuleDefFactoryUnitTest {
     public void testNamespaceFolderUpperCase() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
-        String basePath = String.join(File.separator,"User","me","project","src","main","modules","nameSpace","module-cmp");
+        String basePath = String.join(File.separator,"User","me","project","src","main","modules","nameSpace","moduleCmp");
 
         FileSource<?> jsFileSource = mockFile(basePath, "moduleCmp.js", "javascript code here");
         FileSource<?> htmlFileSource = mockFile(basePath, "moduleCmp.html", "template code here");
@@ -325,40 +325,15 @@ public class BundleModuleDefFactoryUnitTest {
     }
 
     @Test
-    public void testNameFolderUpperCase() throws Exception {
-        String basePath = String.join(File.separator,"User","me","project","src","main","modules","namespace","module-Cmp");
-
-        FileSource<?> jsFileSource = mockFile(basePath, "module-Cmp.js", "javascript code here");
-        FileSource<?> htmlFileSource = mockFile(basePath, "module-Cmp.html", "template code here");
-
-        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "namespace", "modulecmp", ModuleDef.class);
-        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "namespace", "modulecmp-moduleCmp", ModuleDef.class, module);
-
-        BundleSource<ModuleDef> mockBundleSource = mockBundleSource(ImmutableMap.of(
-                module, jsFileSource,
-                template, htmlFileSource));
-
-        BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
-        moduleDefFactory.setModulesMetadataService(new ModulesMetadataServiceImpl());
-
-        try {
-            moduleDefFactory.getDefinition(module, mockBundleSource);
-            fail("Should have thrown InvalidDefinitionException due to bad naming convention for modules");
-        } catch (InvalidDefinitionException ide) {
-            assertTrue("Incorrect exception message", ide.getMessage().startsWith("Use lowercase and hyphens for module file names."));
-        }
-    }
-
-    @Test
     public void testMissingModeCode() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
-        String basePath = String.join(File.separator,"User","me","project","src","main","modules","namespace","module-cmp");
+        String basePath = String.join(File.separator,"User","me","project","src","main","modules","namespace","moduleCmp");
 
-        FileSource<?> jsFileSource = mockFile(basePath, "module-cmp.js", "javascript code here");
-        FileSource<?> htmlFileSource = mockFile(basePath, "module-cmp.html", "template code here");
+        FileSource<?> jsFileSource = mockFile(basePath, "moduleCmp.js", "javascript code here");
+        FileSource<?> htmlFileSource = mockFile(basePath, "moduleCmp.html", "template code here");
 
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
-        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-moduleCmp", ModuleDef.class, module);
 
         Map<DefDescriptor<?>, Source<?>> mockBundledParts = Maps.newHashMap();
         mockBundledParts.put(module, jsFileSource);
@@ -390,13 +365,13 @@ public class BundleModuleDefFactoryUnitTest {
     public void testValidateLabels() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
-        String basePath = String.join(File.separator,"User","me","project","src","main","modules","namespace","module-cmp");
+        String basePath = String.join(File.separator,"User","me","project","src","main","modules","namespace","moduleCmp");
 
         FileSource<?> jsFileSource = mockFile(basePath, "module-cmp.js", "javascript code here");
         FileSource<?> htmlFileSource = mockFile(basePath, "module-cmp.html", "template code here");
 
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
-        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-moduleCmp", ModuleDef.class, module);
 
         Map<DefDescriptor<?>, Source<?>> mockBundledParts = Maps.newHashMap();
         mockBundledParts.put(module, jsFileSource);

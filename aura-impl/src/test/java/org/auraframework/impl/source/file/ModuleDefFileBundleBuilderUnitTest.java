@@ -58,20 +58,20 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         File mockBaseFile = mock(File.class);
         when(mockBaseFile.exists()).thenReturn(true);
-        when(mockBaseFile.getName()).thenReturn("module-cmp");
+        when(mockBaseFile.getName()).thenReturn("moduleCmp");
         when(mockBaseFile.getParentFile()).thenReturn(mockParentBaseFile);
 
         File mockJsFile = mock(File.class);
-        setupMockFile(mockJsFile, mockBaseFile, "module-cmp.js");
+        setupMockFile(mockJsFile, mockBaseFile, "moduleCmp.js");
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
 
         File mockCssFile = mock(File.class);
-        setupMockFile(mockCssFile, mockBaseFile, "module-cmp.css");
-        DefDescriptor<ModuleDef> css = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
+        setupMockFile(mockCssFile, mockBaseFile, "moduleCmp.css");
+        DefDescriptor<ModuleDef> css = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, "nameSpace", "moduleCmp-moduleCmp", ModuleDef.class, module);
 
         File mockTemplateFile = mock(File.class);
-        setupMockFile(mockTemplateFile, mockBaseFile, "module-cmp.html");
-        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
+        setupMockFile(mockTemplateFile, mockBaseFile, "moduleCmp.html");
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-moduleCmp", ModuleDef.class, module);
 
         File mockUtilJsFile = mock(File.class);
         setupMockFile(mockUtilJsFile, mockBaseFile, "utils.js");
@@ -86,7 +86,7 @@ public class ModuleDefFileBundleBuilderUnitTest {
         DefDescriptor<ModuleDef> json = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, "nameSpace", "moduleCmp-" + ModuleDef.META_FILE_BASENAME, ModuleDef.class, module);
 
         File mockMetaXMLFile = mock(File.class);
-        setupMockFile(mockMetaXMLFile, mockBaseFile, "module-cmp.js-meta.xml");
+        setupMockFile(mockMetaXMLFile, mockBaseFile, "moduleCmp.js-meta.xml");
         DefDescriptor<ModuleDef> meta = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, "nameSpace", "moduleCmp-" + ModuleDef.META_XML_NAME, ModuleDef.class, module);
 
         File[] baseListFiles = new File[] { mockJsFile, mockCssFile, mockTemplateFile, mockJsonFile, mockMetaXMLFile, mockUtilJsFile, mockDataJsFile };
@@ -120,86 +120,15 @@ public class ModuleDefFileBundleBuilderUnitTest {
         Map<DefDescriptor<?>, Source<?>> sourceMap = moduleBundleSource.getBundledParts();
 
         assertEquals("number of entries for module bundle source differs", baseListFiles.length, sourceMap.size());
-        assertEquals("incorrect base js entry", String.join(File.separator,"namespace","module-cmp","module-cmp.js"), sourceMap.get(module).getSystemId());
-        assertEquals("incorrect base css entry", String.join(File.separator,"namespace","module-cmp","module-cmp.css"), sourceMap.get(css).getSystemId());
-        assertEquals("incorrect base template entry", String.join(File.separator,"namespace","module-cmp","module-cmp.html"), sourceMap.get(template).getSystemId());
-        assertEquals("incorrect base utils js entry", String.join(File.separator,"namespace","module-cmp","utils.js"),  sourceMap.get(utilJs).getSystemId());
-        assertEquals("incorrect base data js entry", String.join(File.separator,"namespace","module-cmp","data.js"), sourceMap.get(dataJs).getSystemId());
-        assertEquals("incorrect base json entry", String.join(File.separator,"namespace","module-cmp","lightning.json"), sourceMap.get(json).getSystemId());
-        assertEquals("incorrect base xml entry", String.join(File.separator,"namespace","module-cmp","module-cmp.js-meta.xml"), sourceMap.get(meta).getSystemId());
+        assertEquals("incorrect base js entry", String.join(File.separator,"namespace","moduleCmp","moduleCmp.js"), sourceMap.get(module).getSystemId());
+        assertEquals("incorrect base css entry", String.join(File.separator,"namespace","moduleCmp","moduleCmp.css"), sourceMap.get(css).getSystemId());
+        assertEquals("incorrect base template entry", String.join(File.separator,"namespace","moduleCmp","moduleCmp.html"), sourceMap.get(template).getSystemId());
+        assertEquals("incorrect base utils js entry", String.join(File.separator,"namespace","moduleCmp","utils.js"),  sourceMap.get(utilJs).getSystemId());
+        assertEquals("incorrect base data js entry", String.join(File.separator,"namespace","moduleCmp","data.js"), sourceMap.get(dataJs).getSystemId());
+        assertEquals("incorrect base json entry", String.join(File.separator,"namespace","moduleCmp","lightning.json"), sourceMap.get(json).getSystemId());
+        assertEquals("incorrect base xml entry", String.join(File.separator,"namespace","moduleCmp","moduleCmp.js-meta.xml"), sourceMap.get(meta).getSystemId());
     }
 
-    /**
-     * naming convention check occurs in module def factory so we still want to produce
-     * the bundle source
-     */
-    @Test
-    public void testStillBuildsWithBadNames() throws Exception {
-
-        File mockParentBaseFile = mock(File.class);
-        when(mockParentBaseFile.getName()).thenReturn("name-space");
-
-        File mockBaseFile = mock(File.class);
-        when(mockBaseFile.exists()).thenReturn(true);
-        when(mockBaseFile.getName()).thenReturn("moduleCmp");
-        when(mockBaseFile.getParentFile()).thenReturn(mockParentBaseFile);
-
-        File mockJsFile = mock(File.class);
-        setupMockFile(mockJsFile, mockBaseFile, "moduleCmp.js");
-        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "name-space", "modulecmp", ModuleDef.class);
-
-        File mockCssFile = mock(File.class);
-        setupMockFile(mockCssFile, mockBaseFile, "moduleCmp.css");
-        DefDescriptor<ModuleDef> css = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, "name-space", "modulecmp-moduleCmp", ModuleDef.class, module);
-
-        File mockTemplateFile = mock(File.class);
-        setupMockFile(mockTemplateFile, mockBaseFile, "moduleCmp.html");
-        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "name-space", "modulecmp-moduleCmp", ModuleDef.class, module);
-
-        File mockUtilJsFile = mock(File.class);
-        setupMockFile(mockUtilJsFile, mockBaseFile, "utils.js");
-        DefDescriptor<ModuleDef> utilJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "name-space", "modulecmp-utils", ModuleDef.class, module);
-
-        File mockDataJsFile = mock(File.class);
-        setupMockFile(mockDataJsFile, mockBaseFile, "data.js");
-        DefDescriptor<ModuleDef> dataJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "name-space", "modulecmp-data", ModuleDef.class, module);
-
-        File[] baseListFiles = new File[] { mockJsFile, mockCssFile, mockTemplateFile, mockUtilJsFile, mockDataJsFile };
-
-        when(mockBaseFile.listFiles()).thenReturn(baseListFiles);
-
-        ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-        Map<String, String> mockInternalNamespaces = Maps.newHashMap();
-        when(mockConfigAdapter.getInternalNamespacesMap()).thenReturn(mockInternalNamespaces);
-
-        DefinitionService mockDefinitionService = mock(DefinitionService.class);
-        DefDescriptor<ComponentDef> cmpDesc = new DefDescriptorImpl<>(
-                DefDescriptor.MARKUP_PREFIX, "name-space", "modulecmp", ComponentDef.class);
-        DefDescriptor<ModuleDef> moduleDesc = new DefDescriptorImpl<>(
-                DefDescriptor.MARKUP_PREFIX, "name-space", "modulecmp", ModuleDef.class);
-        when(mockDefinitionService.getDefDescriptor("name-space:modulecmp", ComponentDef.class))
-                .thenReturn(cmpDesc);
-        when(mockDefinitionService.getDefDescriptor("name-space:modulecmp", ModuleDef.class))
-                .thenReturn(moduleDesc);
-
-        ModuleDefFileBundleBuilder moduleDefFileBundleBuilder = spy(new ModuleDefFileBundleBuilder());
-        moduleDefFileBundleBuilder.setConfigAdapter(mockConfigAdapter);
-        moduleDefFileBundleBuilder.setDefinitionService(mockDefinitionService);
-
-        doReturn(mockJsFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".js");
-        doReturn(mockTemplateFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".html");
-
-        BundleSource<?> moduleBundleSource = moduleDefFileBundleBuilder.buildBundle(mockBaseFile);
-
-        Map<DefDescriptor<?>, Source<?>> sourceMap = moduleBundleSource.getBundledParts();
-
-        assertEquals("number of entries for module bundle source differs", baseListFiles.length, sourceMap.size());
-        assertEquals("incorrect base js entry", String.join(File.separator,"name-space","moduleCmp","moduleCmp.js"), sourceMap.get(module).getSystemId());
-        assertEquals("incorrect base css entry", String.join(File.separator,"name-space","moduleCmp","moduleCmp.css"), sourceMap.get(css).getSystemId());
-        assertEquals("incorrect base template entry", String.join(File.separator,"name-space","moduleCmp","moduleCmp.html"), sourceMap.get(template).getSystemId());
-        assertEquals("incorrect base utils js entry", String.join(File.separator,"name-space","moduleCmp","utils.js"),  sourceMap.get(utilJs).getSystemId());
-        assertEquals("incorrect base data js entry", String.join(File.separator,"name-space","moduleCmp","data.js"), sourceMap.get(dataJs).getSystemId());
-    }
 
     @Test
     public void testNestedBundle() throws Exception {
@@ -211,20 +140,20 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         File mockBaseFile = mock(File.class);
         when(mockBaseFile.exists()).thenReturn(true);
-        when(mockBaseFile.getName()).thenReturn("module-cmp");
+        when(mockBaseFile.getName()).thenReturn("moduleCmp");
         when(mockBaseFile.getParentFile()).thenReturn(mockParentBaseFile);
 
         File mockJsFile = mock(File.class);
-        setupMockFile(mockJsFile, mockBaseFile, "module-cmp.js");
+        setupMockFile(mockJsFile, mockBaseFile, "moduleCmp.js");
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
 
         File mockCssFile = mock(File.class);
-        setupMockFile(mockCssFile, mockBaseFile, "module-cmp.css");
-        DefDescriptor<ModuleDef> css = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
+        setupMockFile(mockCssFile, mockBaseFile, "moduleCmp.css");
+        DefDescriptor<ModuleDef> css = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, "nameSpace", "moduleCmp-moduleCmp", ModuleDef.class, module);
 
         File mockTemplateFile = mock(File.class);
-        setupMockFile(mockTemplateFile, mockBaseFile, "module-cmp.html");
-        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
+        setupMockFile(mockTemplateFile, mockBaseFile, "moduleCmp.html");
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-moduleCmp", ModuleDef.class, module);
 
         File mockUtilJsFile = mock(File.class);
         setupMockFile(mockUtilJsFile, mockBaseFile, "utils.js");
@@ -242,7 +171,7 @@ public class ModuleDefFileBundleBuilderUnitTest {
         when(mockNestFolder.getParentFile()).thenReturn(mockBaseFile);
 
         File mockNestUtilJsFile = mock(File.class);
-        setupMockFile(mockNestUtilJsFile, mockBaseFile, String.join(File.separator, "nest","utils.js"));
+        setupMockFile(mockNestUtilJsFile, mockBaseFile, String.join(File.separator, "nest", "utils.js"));
         when(mockNestUtilJsFile.getParent()).thenReturn("nest");
         when(mockNestUtilJsFile.getParentFile()).thenReturn(mockNestFolder);
         DefDescriptor<ModuleDef> nestedUtilJs =  new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-nest-utils", ModuleDef.class, module);
@@ -324,15 +253,15 @@ public class ModuleDefFileBundleBuilderUnitTest {
         Map<DefDescriptor<?>, Source<?>> sourceMap = moduleBundleSource.getBundledParts();
 
         assertEquals("number of entries for module bundle source differs", 9, sourceMap.size());
-        assertEquals("incorrect base js entry", String.join(File.separator,"namespace","module-cmp","module-cmp.js"), sourceMap.get(module).getSystemId());
-        assertEquals("incorrect base css entry", String.join(File.separator,"namespace","module-cmp","module-cmp.css"), sourceMap.get(css).getSystemId());
-        assertEquals("incorrect base template entry", String.join(File.separator,"namespace","module-cmp","module-cmp.html"), sourceMap.get(template).getSystemId());
-        assertEquals("incorrect base utils js entry", String.join(File.separator,"namespace","module-cmp","utils.js"),  sourceMap.get(utilJs).getSystemId());
-        assertEquals("incorrect base data js entry", String.join(File.separator,"namespace","module-cmp","data.js"), sourceMap.get(dataJs).getSystemId());
-        assertEquals("incorrect nested utils js entry", String.join(File.separator,"namespace","module-cmp","nest","utils.js"),  sourceMap.get(nestedUtilJs).getSystemId());
-        assertEquals("incorrect nested data js entry", String.join(File.separator,"namespace","module-cmp","nest","data.js"), sourceMap.get(nestedDataJs).getSystemId());
-        assertEquals("incorrect second nested utils js entry", String.join(File.separator,"namespace","module-cmp","nest","egg","utils.js"),  sourceMap.get(secondNestedUtilJs).getSystemId());
-        assertEquals("incorrect second nested data js entry", String.join(File.separator,"namespace","module-cmp","nest","egg","data.js"), sourceMap.get(secondNestedDataJs).getSystemId());
+        assertEquals("incorrect base js entry", String.join(File.separator,"namespace","moduleCmp","moduleCmp.js"), sourceMap.get(module).getSystemId());
+        assertEquals("incorrect base css entry", String.join(File.separator,"namespace","moduleCmp","moduleCmp.css"), sourceMap.get(css).getSystemId());
+        assertEquals("incorrect base template entry", String.join(File.separator,"namespace","moduleCmp","moduleCmp.html"), sourceMap.get(template).getSystemId());
+        assertEquals("incorrect base utils js entry", String.join(File.separator,"namespace","moduleCmp","utils.js"),  sourceMap.get(utilJs).getSystemId());
+        assertEquals("incorrect base data js entry", String.join(File.separator,"namespace","moduleCmp","data.js"), sourceMap.get(dataJs).getSystemId());
+        assertEquals("incorrect nested utils js entry", String.join(File.separator,"namespace","moduleCmp","nest","utils.js"),  sourceMap.get(nestedUtilJs).getSystemId());
+        assertEquals("incorrect nested data js entry", String.join(File.separator,"namespace","moduleCmp","nest","data.js"), sourceMap.get(nestedDataJs).getSystemId());
+        assertEquals("incorrect second nested utils js entry", String.join(File.separator,"namespace","moduleCmp","nest","egg","utils.js"),  sourceMap.get(secondNestedUtilJs).getSystemId());
+        assertEquals("incorrect second nested data js entry", String.join(File.separator,"namespace","moduleCmp","nest","egg","data.js"), sourceMap.get(secondNestedDataJs).getSystemId());
     }
 
     @Test
@@ -343,11 +272,11 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         File mockBaseFile = mock(File.class);
         when(mockBaseFile.exists()).thenReturn(true);
-        when(mockBaseFile.getName()).thenReturn("module-cmp");
+        when(mockBaseFile.getName()).thenReturn("moduleCmp");
         when(mockBaseFile.getParentFile()).thenReturn(mockParentBaseFile);
 
         File mockHtmlFile = mock(File.class);
-        setupMockFile(mockHtmlFile, mockBaseFile, "module-cmp.html");
+        setupMockFile(mockHtmlFile, mockBaseFile, "moduleCmp.html");
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "namespace", "moduleCmp", ModuleDef.class);
 
         File mockJsFile = mock(File.class);
@@ -383,7 +312,7 @@ public class ModuleDefFileBundleBuilderUnitTest {
         Map<DefDescriptor<?>, Source<?>> sourceMap = moduleBundleSource.getBundledParts();
 
         assertEquals("number of entries for module bundle source differs", baseListFiles.length, sourceMap.size());
-        assertEquals("incorrect base html entry", String.join(File.separator,"namespace","module-cmp","module-cmp.html"), sourceMap.get(module).getSystemId());
+        assertEquals("incorrect base html entry", String.join(File.separator,"namespace","moduleCmp","moduleCmp.html"), sourceMap.get(module).getSystemId());
     }
 
     @Test
@@ -541,15 +470,15 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         File mockBaseFile = mock(File.class);
         when(mockBaseFile.exists()).thenReturn(true);
-        when(mockBaseFile.getName()).thenReturn("module-cmp");
+        when(mockBaseFile.getName()).thenReturn("moduleCmp");
         when(mockBaseFile.getParentFile()).thenReturn(mockParentBaseFile);
 
         File mockJsFile = mock(File.class);
-        setupMockFile(mockJsFile, mockBaseFile, "module-cmp.js");
+        setupMockFile(mockJsFile, mockBaseFile, "moduleCmp.js");
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
 
         File mockTemplateFile = mock(File.class);
-        setupMockFile(mockTemplateFile, mockBaseFile, "module-cmp.html");
+        setupMockFile(mockTemplateFile, mockBaseFile, "moduleCmp.html");
 
         // NESTED
 
@@ -559,16 +488,16 @@ public class ModuleDefFileBundleBuilderUnitTest {
         when(mockNestFolder.getParentFile()).thenReturn(mockBaseFile);
 
         File mockMarkdownFile = mock(File.class);
-        setupMockFile(mockMarkdownFile, mockBaseFile, String.join(File.separator, "__docs__","module-cmp.md"));
+        setupMockFile(mockMarkdownFile, mockBaseFile, String.join(File.separator, "__docs__", "moduleCmp.md"));
         when(mockMarkdownFile.getParent()).thenReturn("__docs__");
         when(mockMarkdownFile.getParentFile()).thenReturn(mockNestFolder);
-        DefDescriptor<DocumentationDef> markdownDesc = new DefDescriptorImpl<>(ModuleDef.MARKDOWN_PREFIX, "nameSpace", "moduleCmp-__docs__-module-cmp", DocumentationDef.class, module);
+        DefDescriptor<DocumentationDef> markdownDesc = new DefDescriptorImpl<>(ModuleDef.MARKDOWN_PREFIX, "nameSpace", "moduleCmp-__docs__-moduleCmp", DocumentationDef.class, module);
 
         File mockAuradocFile = mock(File.class);
-        setupMockFile(mockAuradocFile, mockBaseFile, String.join(File.separator, "__docs__","module-cmp.auradoc"));
+        setupMockFile(mockAuradocFile, mockBaseFile, String.join(File.separator, "__docs__","moduleCmp.auradoc"));
         when(mockAuradocFile.getParent()).thenReturn("__docs__");
         when(mockAuradocFile.getParentFile()).thenReturn(mockNestFolder);
-        DefDescriptor<DocumentationDef> auradocDesc = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp-__docs__-module-cmp", DocumentationDef.class, module);
+        DefDescriptor<DocumentationDef> auradocDesc = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp-__docs__-moduleCmp", DocumentationDef.class, module);
 
         File[] baseListFiles = new File[] { mockJsFile, mockTemplateFile, mockNestFolder };
         File[] nestListFiles = new File[] { mockMarkdownFile, mockAuradocFile };
@@ -598,8 +527,8 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         Map<DefDescriptor<?>, Source<?>> sourceMap = moduleBundleSource.getBundledParts();
 
-        assertEquals("incorrect markdown entry", String.join(File.separator,"namespace","module-cmp","__docs__","module-cmp.md"),  sourceMap.get(markdownDesc).getSystemId());
-        assertEquals("incorrect auradoc entry", String.join(File.separator,"namespace","module-cmp","__docs__","module-cmp.auradoc"),  sourceMap.get(auradocDesc).getSystemId());
+        assertEquals("incorrect markdown entry", String.join(File.separator,"namespace","moduleCmp","__docs__","moduleCmp.md"),  sourceMap.get(markdownDesc).getSystemId());
+        assertEquals("incorrect auradoc entry", String.join(File.separator,"namespace","moduleCmp","__docs__","moduleCmp.auradoc"),  sourceMap.get(auradocDesc).getSystemId());
     }
 
     private void setupMockFile(File mock, File base, String fileName) throws IOException {

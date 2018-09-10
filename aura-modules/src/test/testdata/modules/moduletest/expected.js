@@ -1,4 +1,4 @@
-define('modules-moduletest', ['x-test', 'lwc'], function (_xTest, lwc) {
+define('modules/moduletest', ['x/test', 'lwc'], function (_xTest, lwc) {
 
     const style = undefined;
 

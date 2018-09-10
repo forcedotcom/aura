@@ -100,7 +100,7 @@ public class AuraClientExceptionUtilUnitTest extends UnitTestCase {
     @Test
     public void testParseStacktraceWithModuleCmpSourceUrlInStacktrace() {
         AuraClientException auraClientException = Mockito.mock(AuraClientException.class);
-        String jsStack = "eval()@http://pre-compiling.lightning.localhost.soma.force.com:6109/components/one-app-nav-bar-item.js:57:23";
+        String jsStack = "eval()@http://pre-compiling.lightning.localhost.soma.force.com:6109/components/one/appNavBarItem.js:57:23";
         DefinitionService definitionService = Mockito.mock(DefinitionService.class);
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
         ContextService contextService = Mockito.mock(ContextService.class);

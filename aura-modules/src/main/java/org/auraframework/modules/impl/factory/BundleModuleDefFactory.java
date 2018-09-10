@@ -66,6 +66,7 @@ import org.lwc.bundle.BundleType;
 import org.lwc.classmember.ClassMember;
 import org.lwc.documentation.BundleDocumentation;
 
+import com.google.common.base.CaseFormat;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
 
@@ -129,12 +130,8 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
         Location location = new Location(baseClassSource);
 
-        if (namespace.contains("-")) {
-            throw new InvalidDefinitionException("Namespace cannot have a hyphen. Not " + namespace, location);
-        }
-
-        if (CharMatcher.javaUpperCase().matchesAnyOf(name)) {
-            throw new InvalidDefinitionException("Use lowercase and hyphens for module file names. Not " + name, location);
+        if (namespace.contains("-") || name.contains("-")) {
+            throw new InvalidDefinitionException("Module name cannot have a hyphens. Not " + namespace + "/" + name, location);
         }
 
         Map<String, String> sources = new HashMap<>();
@@ -160,7 +157,8 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
         // module
         builder.setPath(baseFilePath);
-        builder.setCustomElementName(namespace + "-" + name);
+        builder.setModuleName(namespace + '/' + name);
+        builder.setCustomElementName(namespace + '-' + CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, name));
 
         ModulesCompilerData compilerData;
         try {

@@ -32,7 +32,7 @@ function InteropComponentDef(config) {
     this.definition       = config.definition;
     this.moduleName       = config.moduleName;
     this.interopClass     = config.interopClass;
-    this.elementName      = this.moduleName;
+    this.elementName      = config.elementName;
     this.interopClassName = this.descriptor.getNamespace() + "$" + this.descriptor.getName();
     this.minVersion       = config.minVersion;
     this.attributeDefs    = new AttributeDefSet(config.attributeDefs, this.descriptor.getNamespace());

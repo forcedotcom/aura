@@ -1,5 +1,5 @@
 import { LightningElement, api } from "lwc";
-import * as testUtils from 'securemoduletest-test-util';
+import * as testUtils from "securemoduletest/testUtil";
 
 export default class ParentUnsecure extends LightningElement {
     @api callback;

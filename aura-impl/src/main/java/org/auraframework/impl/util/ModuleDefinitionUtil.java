@@ -38,8 +38,8 @@ public final class ModuleDefinitionUtil {
      * @return Aura descriptor name
      */
     public static String convertToAuraDescriptor(String moduleComponentName, @Nonnull ConfigAdapter configAdapter) {
-        String namespace = moduleComponentName.split("-")[0];
-        String name = moduleComponentName.substring(moduleComponentName.indexOf('-')+1);
+        String namespace = moduleComponentName.split("/")[0];
+        String name = moduleComponentName.split("/")[1];
         return convertToAuraDescriptor(namespace, name, configAdapter);
     }
 
@@ -57,9 +57,6 @@ public final class ModuleDefinitionUtil {
         if (internalNamespace != null) {
             namespace = internalNamespace;
         }
-
-        // camel case by default to match Aura naming convention
-        name = CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, name);
 
         return namespace + ":" + name;
     }

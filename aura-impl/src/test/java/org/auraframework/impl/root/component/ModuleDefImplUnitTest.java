@@ -82,7 +82,7 @@ public class ModuleDefImplUnitTest {
         dependencies.add("proxy-compat/getKey");
         dependencies.add("proxy-compat/setKey");
         dependencies.add("@salesforce/resource-url/my_image");
-        dependencies.add("namespace-component-name");
+        dependencies.add("namespace/componentName");
         moduleDefBuilder.setModuleDependencies(dependencies);
 
         ModuleDef moduleDef = moduleDefBuilder.build();

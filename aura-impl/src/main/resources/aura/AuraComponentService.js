@@ -808,12 +808,12 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
             // module dependency
             desc = name;
             // process aliased ns
-            var names = name.split('-');
+            var names = name.split('/');
             var ns = names.shift();
             var aliased = namespaceAliases[ns];
             if (aliased) {
                 // module name with aliased namespace
-                var aliasedDesc = aliased + "-" + names.join("-");
+                var aliasedDesc = aliased + "/" + names.join("/");
                 var aliasedDep = this.moduleDefRegistry[aliasedDesc];
                 if (aliasedDep) {
                     // set references to aliased module if it exists

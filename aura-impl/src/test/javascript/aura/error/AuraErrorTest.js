@@ -534,12 +534,12 @@ show()@https://gus.lightning.force.com/components/ui/panel.js:3:398";
         [Fact]
         function HashGenStringUsesFileNameWhenUsingEval() {
             var innerError = new Error();
-            innerError.stack = innerError.stack = "componentConstructor.Component.get()@https://rrc.lightning.force.com/auraFW/javascript/7xvQoUlws8Dh5a-Nu656BQ/aura_proddebug.js:16789:29\n\
+            innerError.stack = "componentConstructor.Component.get()@https://rrc.lightning.force.com/auraFW/javascript/7xvQoUlws8Dh5a-Nu656BQ/aura_proddebug.js:16789:29\n\
 eval()@https://rrc.lightning.force.com/components/force/relatedListSingleContainer.js\n\
 Object.init()@https://rrc.lightning.force.com/components/force/relatedListSingleContainer.js:71:30\n\
 init()@https://rrc.lightning.force.com/components/force/relatedListSingleContainer.js:15:16";
 
-            var expected = "force:relatedListSingleContainer$eval()$relatedListSingleContainer.js";
+            var expected = "force:relatedListSingleContainer$eval()$/force/relatedListSingleContainer.js";
             var actual;
 
             getAuraMock(function() {
@@ -552,12 +552,29 @@ init()@https://rrc.lightning.force.com/components/force/relatedListSingleContain
         }
 
         [Fact]
+        function HashGenFileNameIncludesNamespacePrefixForCustomComponents() {
+            var innerError = new Error();
+            innerError.stack = "eval()@https://customer.instance.force.com/components/c/my_component.js:3546:66";
+
+            var expected = "selfService:profileMenu$eval()$/c/my_component.js";
+            var actual;
+
+            getAuraMock(function() {
+                var auraError = new Aura.Errors.AuraError(null, innerError);
+                auraError["component"] = "selfService:profileMenu";
+                actual = Aura.Errors.GenerateErrorIdHashGen(auraError.component, auraError.stackFrames);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         function HashGenStringUsesFileNameWhenUsingEvalFromLibraries() {
             var innerError = new Error();
-            innerError.stack = innerError.stack = "eval()@https://support.mulesoft.com/libraries/force:relatedListsDataManagerLibrary.js:11:129\n\
-Object.eval()@https://support.mulesoft.com/components/force/relatedListContainerDataProvider.js:3:163";
+            innerError.stack = "eval()@https://support.customer.com/libraries/force:relatedListsDataManagerLibrary.js:11:129\n\
+Object.eval()@https://support.customer.com/components/force/relatedListContainerDataProvider.js:3:163";
 
-            var expected = "my:component$eval()$force:relatedListsDataManagerLibrary.js";
+            var expected = "my:component$eval()$/libraries/force:relatedListsDataManagerLibrary.js";
             var actual;
 
             getAuraMock(function() {

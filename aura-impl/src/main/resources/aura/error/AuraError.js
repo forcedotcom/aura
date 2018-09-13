@@ -174,11 +174,14 @@ Aura.Errors.GenerateErrorIdHashGen = function(componentName, stackFrames) {
 
     // If function name is not known, or was eval, also include filename
     if((functionName === undefined || functionName === "eval()") && fileUrl !== undefined) {
-        hashGen += "$" + fileUrl.split("/").pop();
+        var parts = fileUrl.split("/");
+        var file = parts.slice(Math.max(parts.length - 2, 0)).join("/");
+        hashGen += "$/" + file;
     }
 
     return hashGen;
 };
+
 
 AuraError.prototype = new Error();
 AuraError.prototype.constructor = AuraError;

@@ -785,8 +785,17 @@ AuraInstance.prototype.isCustomerError = function(e) {
             if ($A.isCustomerComponent(e["component"])) {
                 return true;
             } else if (e["componentStack"]) {
-                return $A.isCustomerComponentStack(e["componentStack"]);
+                if($A.isCustomerComponentStack(e["componentStack"])) {
+                    return true;
+                }
             }
+        }
+        
+        // If the stacktraceIdGen includes tracking from a customer file, return true.
+        // We assume its a customer file, when the /c/ namespace is included. 
+        // Expected matching stacktraceIdGen is ns:component$method$/c/filename.js
+        if(e["stacktraceIdGen"] && (/\$\/c\/./g).test(e["stacktraceIdGen"])) {
+            return true;
         }
     }
     return false;

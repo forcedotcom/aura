@@ -15,71 +15,122 @@
  */
 Function.RegisterNamespace("Test.Aura");
 
-[Fixture, Skip]
+[Fixture]
 Test.Aura.AuraInstanceTests = function() {
+    var _AuraError;
+    var _StackFrame;
+    var _ErrorStackParser;
+    var _murmurHash3;
+    var _generateErrorId;
+    var _generateErrorIdHashGen;
+    var _Util;
+    var _AuraInstance;
+    var PerfShim;
 
-    // mockNamespace(function() {
-    //     Import("aura-impl/src/main/resources/aura/Logger.js");
-    //     Import("aura-impl/src/main/resources/aura/polyfill/Json.js");
-    //     Import("aura-impl/src/main/resources/aura/util/Mutex.js");
-    //     Import("aura-impl/src/main/resources/aura/util/SecureFilters.js");
-    //     Import("aura-impl/src/main/resources/aura/util/SizeEstimator.js");
-    //     Import("aura-impl/src/main/resources/aura/util/Style.js");
-    //     Import("aura-impl/src/main/resources/aura/util/Util.js");
-    //     Import("aura-impl/src/main/resources/aura/util/PerfShim.js");
-    //
-    //     System.Environment.Write("\n\n\nLOGGER: " + Aura.Utils.Logger + "\n\n\n");
-    //
-    //     Import("aura-impl/src/main/resources/aura/Aura.js");
-    //
-    //     System.Environment.Write("\n\n\nLOGGER2: " + Aura.Utils.Logger + "\n\n\n");
-    // });
+    Mocks.GetMocks(Object.Global(), {
+        "Aura": {
+            "Errors": {},
+            "Utils": {
+                "SecureFilters": {}
+            }
+        },
+        "navigator": {
+            "userAgent": ""
+        },
+        "window": {},
+        "PerfShim": {}
+    })(function() {
+        // Aura Error portion
+        Import("aura-impl/src/main/resources/aura/polyfill/stackframe.js");
+        Import("aura-impl/src/main/resources/aura/polyfill/error-stack-parser.js");
+        Import("aura-impl/src/main/resources/aura/error/AuraError.js");
+        Import("aura-impl/src/main/resources/aura/util/Util.js");
+        _StackFrame = StackFrame;
+        _ErrorStackParser = ErrorStackParser;
+        _AuraError = AuraError;
+        _murmurHash3 = Aura.Errors.MurmurHash3;
+        _generateErrorId = Aura.Errors.GenerateErrorId;
+        _generateErrorIdHashGen = Aura.Errors.GenerateErrorIdHashGen;
+        _Util = Aura.Utils.Util;
+        delete StackFrame;
+        delete ErrorStackParser;
+        delete AuraError;
 
-    // [Fixture]
-    // function deprecated(){
-    //     [Fact]
-    //     function ThrowsIfNoSinceDateOrDueDateSpecified(){
-    //         var expected="DEPRECATED - blah blah blah";
-    //
-    //         var actual=Record.Exception(function(){
-    //             $A.$deprecated$();
-    //         });
-    //
-    //         Assert.Equal(expected,actual);
-    //     }
-    // }
-    //
-    // [Fixture, AuraUtil]
-    // function util(){
-    //     [Fact]
-    //     function exists(){
-    //         var expected="foo bar";
-    //         var target=expected.split(' ');
-    //
-    //         var actual=$A.util.format("{0} {1}",target[0], target[1]);
-    //
-    //         Assert.Equal(expected,actual);
-    //     }
-    // }
-    //
-    // [Fixture, MockDom]
-    // function muckWithWindow(){
-    //     [Fact]
-    //     function exists(){
-    //         var expected="bar";
-    //
-    //         subjectUnderTest(expected);
-    //         var actual=window.foo;
-    //
-    //
-    //         Assert.Equal(expected,actual);
-    //     }
-    //
-    //     function subjectUnderTest(value){
-    //         window.foo=value;
-    //     }
-    //
-    // }
+        // Aura instance portion
+        Import("aura-impl/src/main/resources/aura/AuraInstance.js");
+        _AuraInstance = AuraInstance;
+        delete AuraInstance;
+    });
+
+    function getAuraMock(during) {
+        return Mocks.GetMocks(Object.Global(), {
+            "Aura": {
+                Errors: {
+                    AuraError: _AuraError,
+                    StackFrame: _StackFrame,
+                    StackParser: _ErrorStackParser,
+                    MurmurHash3: _murmurHash3,
+                    GenerateErrorId: _generateErrorId,
+                    GenerateErrorIdHashGen: _generateErrorIdHashGen,
+                }
+            },
+            "$A": {
+                // To create util object, it needs to import couple more files,
+                // so only injects needed function here.
+                util: {
+                    hyphensToCamelCase: _Util.prototype.hyphensToCamelCase
+                },
+                "auraError": _AuraError,
+                "isCustomerError": _AuraInstance.prototype.isCustomerError
+            }
+
+        })(during);
+    }
+    
+    [Fixture]
+    function isCustomerErrorTests(){
+        [Fact]
+        function CustomerErrorsFilteredBySourceOfError(){
+            var innerError = new Error();
+            innerError.stack = "eval()@https://customer.instance.force.com/components/c/my_component.js:3546:66";
+
+            var actual;
+
+            getAuraMock(function() {
+                var auraError = new Aura.Errors.AuraError(null, innerError);
+                auraError.setComponent("selfService:profileMenu");
+
+                $A.isCustomerComponent = function() { return false; };
+                $A.isCustomerComponentStack = function() { return false; };
+
+                actual = $A.isCustomerError(auraError);
+            });
+
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        function SystemErrorsNotFilteredBySourceOfError(){
+            var innerError = new Error();
+            innerError.stack = "eval()@https://support.customer.com/libraries/force:relatedListsDataManagerLibrary.js:11:129\n\
+Object.eval()@https://support.customer.com/components/force/relatedListContainerDataProvider.js:3:163";
+
+            var actual;
+
+            getAuraMock(function() {
+                var auraError = new Aura.Errors.AuraError(null, innerError);
+                auraError.setComponent("system:component");
+
+                $A.isCustomerComponent = function() { return false; };
+                $A.isCustomerComponentStack = function() { return false; };
+
+                actual = $A.isCustomerError(auraError);
+            });
+
+            Assert.False(actual);
+        }
+    
+    }
 
 
 };

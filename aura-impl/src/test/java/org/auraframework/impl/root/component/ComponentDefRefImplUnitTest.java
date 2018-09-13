@@ -23,7 +23,6 @@ import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefinitionReference.Load;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.root.component.ComponentDefRefImpl.Builder;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
@@ -36,7 +35,6 @@ public class ComponentDefRefImplUnitTest extends
     protected Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues;
     protected DefDescriptor<InterfaceDef> intfDescriptor;
     protected String localId;
-    protected Load load;
 
     @Override
     protected void setupValidateReferences() throws Exception {
@@ -54,7 +52,6 @@ public class ComponentDefRefImplUnitTest extends
     @Override
     protected ComponentDefRef buildDefinition(Builder builder) throws Exception {
         builder.setLocalId(this.localId);
-        builder.setLoad(this.load);
         if (this.attributeValues != null) {
             for (Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : attributeValues.entrySet()) {
                 builder.setAttribute(entry.getKey(), entry.getValue());

@@ -1233,40 +1233,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * isLocallyRenderable is false when a facet of a component has a component marked for LAZY loading, the component
-     * should always be rendered client side. Test method for {@link BaseComponentDef#isLocallyRenderable()}.
-     */
-    @Test
-    public void testIsLocallyRenderableWithLazyLoadedFacet() throws QuickFixException {
-        DefDescriptor<ComponentDef> facetDesc = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component> <aura:text aura:load='LAZY'/></aura:component>");
-        T baseComponentDef = define(baseTag, "", String.format("<%s/>", facetDesc.getDescriptorName()));
-        assertEquals("Rendering detection logic is not on.", RenderType.AUTO, baseComponentDef.getRender());
-        assertFalse(
-                "When a component has a inner component set to lazy load, the parent should be rendered clientside.",
-                baseComponentDef.isLocallyRenderable());
-    }
-
-    /**
-     * isLocallyRenderable is false when lazy loading specification in parent is reflected in child and components which
-     * use the child. Test method for {@link BaseComponentDef#isLocallyRenderable()}.
-     */
-    @Test
-    public void testIsLocallyRenderableWithInheritedLazyLoadedFacet() throws QuickFixException {
-        DefDescriptor<ComponentDef> parentDesc = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component extensible='true'> <aura:text aura:load='LAZY'/></aura:component>");
-        DefDescriptor<ComponentDef> childDesc = addSourceAutoCleanup(ComponentDef.class,
-                String.format("<aura:component extends='%s'></aura:component>", parentDesc.getDescriptorName()));
-        assertFalse("Lazy loading information is not chained through inheritance.",
-                definitionService.getDefinition(childDesc)
-                        .isLocallyRenderable());
-        T baseComponentDef = define(baseTag, "", String.format("<%s/>", childDesc.getDescriptorName()));
-        assertEquals("Rendering detection logic is not on.", RenderType.AUTO, baseComponentDef.getRender());
-        assertFalse("Lazy loading information is not chained through inheritance.",
-                baseComponentDef.isLocallyRenderable());
-    }
-
-    /**
      * hasLocalDependencies is true if component has serverside model. Test method for
      * {@link BaseComponentDef#hasLocalDependencies()}.
      */
@@ -1524,51 +1490,15 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * When a facet is marked for Lazy/Exclusive loading, parentDef has a LazyComponentDefRef
+     * When a facet is marked for Lazy/Exclusive loading make sure it is allowed.
      */
     @Test
     public void testFacetLazyLoaded() throws QuickFixException {
         DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "", "<aura:text aura:load='LAZY'/>"));
         T def = definitionService.getDefinition(desc);
-        AttributeDefRef body = getBodyAttributeFromDef(def);
-        assertTrue(body.getValue() instanceof List);
-        List<?> bodyCmps = (List<?>) body.getValue();
-        assertEquals(1, bodyCmps.size());
-        assertTrue(bodyCmps.get(0) instanceof DefinitionReference);
-        assertEquals("markup://aura:text", ((DefDescriptor<?>) ((DefinitionReference) bodyCmps.get(0))
-                .getAttributeDefRef("refDescriptor").getValue()).getQualifiedName());
-    }
-
-    /**
-     * When a facet is marked for Lazy/Exclusive loading, parentDef has a LazyComponentDefRef.
-     */
-    @Test
-    public void testFacetExclusivelyLoaded() throws QuickFixException {
-        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(),
-                String.format(baseTag, "", "<aura:text aura:load='Exclusive'/>"));
-        T def = definitionService.getDefinition(desc);
-        AttributeDefRef body = getBodyAttributeFromDef(def);
-        assertTrue(body.getValue() instanceof List);
-        List<?> bodyCmps = (List<?>) body.getValue();
-        assertEquals(1, bodyCmps.size());
-        assertTrue(bodyCmps.get(0) instanceof DefinitionReference);
-        assertEquals(true, ((DefinitionReference    ) bodyCmps.get(0)).getAttributeDefRef("exclusive").getValue());
-    }
-
-    /**
-     * Should not be able to lazy load a non-existing component.
-     */
-    @Test
-    public void testFacetLazyLoadNonExistentComponent() throws Exception {
-        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(),
-                String.format(baseTag, "", "<aura:fooBar999 aura:load='LAZY'/>"));
-        try {
-            definitionService.getDefinition(desc);
-            fail("should not be able to use a non-existing component by marking it to be lazy loaded");
-        } catch (DefinitionNotFoundException e) {
-            assertTrue(e.getMessage().contains("No COMPONENT named markup://aura:fooBar999"));
-        }
+        // just assert that the def is compiled.
+        assertNotNull(def);
     }
 
     @Test
@@ -1589,45 +1519,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertTrue("Should have the correct dependency",
                 def.getDependencySet().contains(
                     new DefDescriptorImpl<>("markup", "auradev", "testDataProvider", ComponentDef.class)));
-    }
-
-    /**
-     * Should not be able to lazy load a component with an invalid attribute.
-     */
-    @Test
-    public void testFacetLazyLoadWithNonExistentAttribute() throws Exception {
-        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(),
-                String.format(baseTag, "", "<aura:text aura:load='LAZY' fooBar999='hoze'/>"));
-        try {
-            definitionService.getDefinition(desc);
-            fail("should not be able to use a non-existing attribute by marking it to be lazy loaded");
-        } catch (InvalidReferenceException e) {
-            assertTrue(e.getMessage().contains("Attribute fooBar999 does not exist"));
-        }
-    }
-
-    /**
-     * Should not be able to lazy load a component with an invalid attribute.
-     */
-    @Test
-    public void testFacetLazyLoadWithNonBasicAttribute() throws Exception {
-        DefDescriptor<ComponentDef> cmpAttr = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component><aura:attribute name='cmps' type='Aura.Component'/> </aura:component>");
-        DefDescriptor<T> desc = addSourceAutoCleanup(
-                getDefClass(),
-                String.format(baseTag, "",
-                        "<" + cmpAttr.getDescriptorName() + " aura:load='LAZY'>" + "<aura:set attribute='cmps'>"
-                                + "<aura:text/>" + "</aura:set>" + "</" + cmpAttr.getDescriptorName() + ">"));
-        try {
-            definitionService.getDefinition(desc);
-            fail("should not be able to use a non-basic attribute type in lazy loaded component");
-        } catch (QuickFixException e) {
-            checkExceptionFull(
-                    e,
-                    InvalidReferenceException.class,
-                    "Lazy Component References can only have attributes of simple types passed in (cmps is not simple)",
-                    desc.getQualifiedName());
-        }
     }
 
     @Test

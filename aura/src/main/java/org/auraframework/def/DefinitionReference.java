@@ -26,17 +26,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 public interface DefinitionReference extends Definition {
 
-    enum Load {
-        DEFAULT, LAZY, EXCLUSIVE
-    }
-
     Map<DefDescriptor<AttributeDef>, AttributeDefRef> getAttributeValues();
 
     AttributeDefRef getAttributeDefRef(String name);
 
     String getLocalId();
-
-    Load getLoad();
 
     /**
      * Returns true if this ref was marked with aura:flavorable. See {@link FlavoredStyleDef}.

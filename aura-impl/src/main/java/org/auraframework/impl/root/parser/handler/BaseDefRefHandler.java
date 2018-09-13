@@ -31,7 +31,6 @@ import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionReference;
-import org.auraframework.def.DefinitionReference.Load;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.DefinitionReferenceImpl.Builder;
 import org.auraframework.impl.util.TextTokenizer;
@@ -73,21 +72,6 @@ public abstract class BaseDefRefHandler<T extends DefinitionReference, P extends
     protected void readSystemAttributes() throws QuickFixException {
         super.readSystemAttributes();
         builder.setLocalId(getSystemAttributeValue("id"));
-        String load = getSystemAttributeValue("load");
-        if (!StringUtils.isBlank(load)) {
-            Load loadVal;
-            try {
-                loadVal = Load.valueOf(load.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new AuraRuntimeException(String.format("Invalid value '%s' specified for 'aura:load' attribute",
-                        load), getLocation());
-            }
-            builder.setLoad(loadVal);
-            if (loadVal == Load.LAZY || loadVal == Load.EXCLUSIVE) {
-                ((BaseComponentDefHandler) getParentHandler()).setRender("client");
-            }
-        }
-
         String flavor = getSystemAttributeValue("flavor");
         if (!StringUtils.isBlank(flavor)) {
             TextTokenizer tt = TextTokenizer.tokenize(flavor, getLocation());

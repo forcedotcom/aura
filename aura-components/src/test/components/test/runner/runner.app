@@ -34,7 +34,7 @@
 			</span>
 		</header>
 		<section class="center">
-    		<test:runnerContainer aura:id="container" scope="{!v.scope}" keyword="{!v.keyword}" aura:load="lazy"/>
+    		<test:runnerContainer aura:id="container" scope="{!v.scope}" keyword="{!v.keyword}"/>
     	</section>
     	<footer>
     		<span class="status-bar"></span>

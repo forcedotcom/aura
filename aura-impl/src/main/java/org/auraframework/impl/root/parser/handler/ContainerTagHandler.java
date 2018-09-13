@@ -26,7 +26,6 @@ import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
-import org.auraframework.def.DefinitionReference.Load;
 import org.auraframework.def.HtmlTag;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.DefinitionAccessImpl;
@@ -165,21 +164,6 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
             return new HTMLComponentDefRefHandler<>(parentHandler, tag, xmlReader, source, isInInternalNamespace,
                     definitionService, configAdapter, definitionParserAdapter);
         } else {
-            String loadString = getSystemAttributeValue("load");
-            if (loadString != null) {
-                Load load = null;
-                try {
-                    load = Load.valueOf(loadString.toUpperCase());
-                } catch (IllegalArgumentException e) {
-                    throw new AuraRuntimeException(String.format(
-                            "Invalid value '%s' specified for 'aura:load' attribute", loadString), getLocation());
-                }
-                if (load == Load.LAZY || load == Load.EXCLUSIVE) {
-                    return new LazyComponentDefRefHandler<>(parentHandler, tag, xmlReader, source, isInInternalNamespace,
-                            definitionService, configAdapter, definitionParserAdapter);
-                }
-            }
-
             return new ComponentDefRefHandler<>(parentHandler, xmlReader, source, isInInternalNamespace,
                     definitionService, configAdapter, definitionParserAdapter);
         }

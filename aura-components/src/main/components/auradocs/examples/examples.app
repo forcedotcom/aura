@@ -32,7 +32,7 @@
 		</pre>
 	</ui:message>
 
-	<auradocs:examplesc name="{!v.name}" aura:load="lazy"/>
+	<auradocs:examplesc name="{!v.name}"/>
     
     <footer>Copyright &copy; 2013 salesforce.com, inc.</footer>
 </aura:application>

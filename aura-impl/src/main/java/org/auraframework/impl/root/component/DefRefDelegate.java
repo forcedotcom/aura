@@ -81,7 +81,6 @@ public class DefRefDelegate implements DefinitionReference {
         builder.setHasFlavorableChild(false);
         builder.setIsFlavorable(false);
         builder.setLocalId(componentDefRef.getLocalId());
-        builder.setLoad(componentDefRef.getLoad());
         builder.setAttributes(componentDefRef.getAttributeValues());
 
         return builder.build();
@@ -100,11 +99,6 @@ public class DefRefDelegate implements DefinitionReference {
     @Override
     public String getLocalId() {
         return select().getLocalId();
-    }
-
-    @Override
-    public Load getLoad() {
-        return select().getLoad();
     }
 
     @Override

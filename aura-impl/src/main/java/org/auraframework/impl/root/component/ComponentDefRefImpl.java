@@ -146,10 +146,6 @@ public class ComponentDefRefImpl extends DefinitionReferenceImpl<ComponentDef> i
             json.writeMapEntry("componentDef", def);
             json.writeMapEntry("localId", localId);
 
-            if (load != Load.DEFAULT) {
-                json.writeMapEntry("load", load);
-            }
-
             if (isFlavorable) {
                 json.writeMapEntry("flavorable", isFlavorable);
             }

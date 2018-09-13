@@ -354,46 +354,6 @@
     },
 
     /**
-     * Create a component with a facet that is marked for lazy loading.
-     * This is 2 levels of lazy loading, first the component itself is lazy loaded, then the facet inside the component is lazy loaded.
-     */
-    testCreateComponentWithLazyFacet:{
-        test:[function(cmp){
-            var helper = cmp.getDef().getHelper();
-            $A.createComponent("loadLevelTest:serverWithLazyChild", null, function(newCmp) {
-            	var body = cmp.get("v.body");
-                body.push(newCmp);
-                cmp.set("v.body", body);
-            });
-
-            $A.test.addWaitFor(
-                true,
-                function(){
-                    var body = cmp.get('v.body');
-                    if (body.length > 0) {
-                        var c = body[0];
-                        if (c.getDef().getDescriptor().getQualifiedName() === "markup://loadLevelTest:serverWithLazyChild") {
-                            return true;
-                        }
-                    }
-                    return false;
-                },
-                function(){
-                    var serverCmp = cmp.get('v.body')[0];
-                    var kid = serverCmp.find('kid');
-                    $A.test.assertEquals("placeholder", kid.getDef().getDescriptor().getName());
-
-                    helper.resumeGateId(cmp, "lazyKid");
-
-                    $A.test.addWaitFor("serverComponent", function(){
-                        kid = serverCmp.find('kid');
-                        return kid.getDef().getDescriptor().getName();
-                });
-            });
-        }]
-    },
-
-    /**
      * Create the same component multiple times using the same source of data for the created components attributes
      * and verify the destruction of the initial components does not affect future components. In other words,
      * verify attribute data is properly cloned when created new components.

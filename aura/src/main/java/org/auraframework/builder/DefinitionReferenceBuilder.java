@@ -22,7 +22,6 @@ import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionReference;
-import org.auraframework.def.DefinitionReference.Load;
 import org.auraframework.def.FlavoredStyleDef;
 
 /**
@@ -54,11 +53,6 @@ public interface DefinitionReferenceBuilder<T extends DefinitionReference, P ext
      * set the local id for the component instance.
      */
     DefinitionReferenceBuilder<T, P> setLocalId(String value);
-
-    /**
-     * set whether the component is lazy loadable or not.
-     */
-    DefinitionReferenceBuilder<T, P> setLoad(Load load);
 
     /**
      * Mark that this element can be flavored.

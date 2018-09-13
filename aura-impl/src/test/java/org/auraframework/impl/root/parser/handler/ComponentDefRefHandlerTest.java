@@ -20,7 +20,6 @@ import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefinitionReference;
-import org.auraframework.def.DefinitionReference.Load;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -105,46 +104,6 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
     @Test
     public void testGetHandledTag() {
         assertEquals("Component Reference", cdrHandler.getHandledTag());
-    }
-
-    /**
-     * Verify aura:load specification for componentdef refs.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testReadSystemAttributes() throws Exception {
-        // 1. Verify specifying a invalid load specification
-        cdrHandler = createComponentDefHandler("<fake:component aura:load='foo'/>");
-        try {
-            cdrHandler.readSystemAttributes();
-            fail("Should not be able to specify an invalid load value.");
-        } catch (AuraRuntimeException expected) {
-            assertTrue("unexpected message: " + expected.getMessage(),
-                    expected.getMessage().contains("Invalid value 'foo' specified for 'aura:load' attribute"));
-        }
-
-        // 2. Verify specifying blank string as load specification
-        cdrHandler = createComponentDefHandler("<fake:component aura:load=' '/>");
-        cdrHandler.readSystemAttributes();
-        assertEquals("Empty aura:load value should result in default load",
-                Load.DEFAULT, cdrHandler.createDefinition().getLoad());
-
-        // 3. Verify default load specification
-        cdrHandler = createComponentDefHandler("<fake:component/>");
-        cdrHandler.readSystemAttributes();
-        assertEquals("Failed to use DEFAULT load level", Load.DEFAULT, cdrHandler.createDefinition().getLoad());
-
-        // 4. Verify LAZY load specification
-        cdrHandler = createComponentDefHandler("<fake:component aura:load='LAZY'/>");
-        cdrHandler.readSystemAttributes();
-        assertEquals("Failed to read LAZY load level.", Load.LAZY, cdrHandler.createDefinition().getLoad());
-
-        // 5. Verify load specification is not case sensitive
-        cdrHandler = createComponentDefHandler("<fake:component aura:lOAd='ExcluSiVe'/>");
-        cdrHandler.readSystemAttributes();
-        assertEquals("Attribute aura:load value is case insensitive",
-                Load.EXCLUSIVE, cdrHandler.createDefinition().getLoad());
     }
 
     @Test

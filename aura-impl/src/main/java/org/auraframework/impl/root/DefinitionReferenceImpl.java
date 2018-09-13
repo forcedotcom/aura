@@ -45,7 +45,6 @@ public abstract class DefinitionReferenceImpl<T extends Definition> extends Defi
     protected final Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues;
     private final int hashCode;
     protected final String localId;
-    protected final Load load;
     protected final boolean isFlavorable;
     protected final boolean hasFlavorableChild;
     protected final Object flavor;
@@ -55,7 +54,6 @@ public abstract class DefinitionReferenceImpl<T extends Definition> extends Defi
         this.attributeValues = AuraUtil.immutableMap(builder.attributeValues);
         this.hashCode = AuraUtil.hashCode(descriptor, location);
         this.localId = builder.localId;
-        this.load = builder.load;
         this.isFlavorable = builder.isFlavorable;
         this.hasFlavorableChild = builder.hasFlavorableChild;
         this.flavor = builder.flavor;
@@ -99,11 +97,6 @@ public abstract class DefinitionReferenceImpl<T extends Definition> extends Defi
     }
 
     @Override
-    public Load getLoad() {
-        return load;
-    }
-
-    @Override
     public boolean isFlavorable() {
         return isFlavorable;
     }
@@ -123,7 +116,6 @@ public abstract class DefinitionReferenceImpl<T extends Definition> extends Defi
 
         public Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues;
         public String localId;
-        public Load load = Load.DEFAULT;
         public boolean isFlavorable;
         public boolean hasFlavorableChild;
         public Object flavor;
@@ -188,12 +180,6 @@ public abstract class DefinitionReferenceImpl<T extends Definition> extends Defi
             if (!StringUtils.isBlank(localId)) {
                 this.localId = localId;
             }
-            return this;
-        }
-
-        @Override
-        public DefinitionReferenceBuilder<T, P> setLoad(Load load) {
-            this.load = load;
             return this;
         }
 

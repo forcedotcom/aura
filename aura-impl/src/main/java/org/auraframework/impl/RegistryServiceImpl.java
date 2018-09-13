@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -98,7 +99,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     private Optional<Collection<RegistryAdapter>> adaptersInject;
 
     @Inject
-    Collection<FileBundleSourceBuilder> builders;
+    private Collection<FileBundleSourceBuilder> builders;
 
     private Collection<RegistryAdapter> adapters;
 
@@ -113,7 +114,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
 
     private AuraGlobalControllerDefRegistry globalControllerDefRegistry;
 
-    private ConcurrentHashMap<ComponentLocationAdapter, SourceLocationInfo> locationMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<ComponentLocationAdapter, Set<SourceLocationInfo>> locationMap = new ConcurrentHashMap<>();
 
     private static String SERVICECOMPONENT_PREFIX = "servicecomponent";
 
@@ -124,6 +125,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             DefDescriptor.CUSTOM_FLAVOR_PREFIX,
             DefDescriptor.JAVASCRIPT_PREFIX);
 
+    // TODO add DefType.Module
     private static final Set<DefType> ALL_MARKUP_DEFTYPES = EnumSet.of(
             DefType.APPLICATION,
             DefType.COMPONENT,
@@ -147,9 +149,9 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             DefType.TOKENS
             );
 
-    private static final Set<String> MODULE_PREFIXES = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
+    private static final Set<String> MODULE_PREFIXES = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX); // TODO: delete
 
-    private static final Set<DefType> MODULE_DEFTYPES = EnumSet.of(DefType.MODULE);
+    private static final Set<DefType> MODULE_DEFTYPES = EnumSet.of(DefType.MODULE); // TODO: delete
 
     private static class SourceLocationInfo {
         public final List<DefRegistry> staticLocationRegistries;
@@ -190,8 +192,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         }
     }
 
-    private DefRegistry[] getStaticRegistries(ComponentLocationAdapter location) {
-        String pkg = location.getComponentSourcePackageAlways();
+    private DefRegistry[] getStaticRegistries(ComponentLocationAdapter location, boolean modules) {
+        String pkg = modules ? location.getModuleSourcePackageAlways() : location.getComponentSourcePackageAlways();
         if (pkg == null) {
             return null;
         }
@@ -217,7 +219,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     }
 
     /**
-     * mark namespaces as internal.
+     * mark namespaces as internal. TODO: see what I can do here
      *
      * Note that this code is very broken, especially the bit about modules. Positional enforcement is a sure
      * way to make things break.
@@ -240,13 +242,30 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         }
     }
 
-    private SourceLocationInfo createSourceLocationInfo(ComponentLocationAdapter location) {
-        boolean modules = location.type() == DefType.MODULE;
-        DefRegistry[] staticRegs = getStaticRegistries(location);
-        String pkg = location.getComponentSourcePackage();
+    private Set<SourceLocationInfo> createSourceLocationInfos(ComponentLocationAdapter location) {
+        boolean hasCmpSource = location.getComponentSourceDir() != null || location.getComponentSourcePackageAlways() != null;
+        boolean hasModSource = location.getModuleSourceDir() != null || location.getModuleSourcePackageAlways()  != null;
+        boolean isUnified = hasCmpSource && hasModSource;
+
+        if (isUnified) {
+            SourceLocationInfo cmpSli = createSourceLocationInfo(location, false);
+            SourceLocationInfo modSli = createSourceLocationInfo(location, true);
+            return ImmutableSet.of(cmpSli, modSli);
+        } else if (hasModSource) {
+            return ImmutableSet.of(createSourceLocationInfo(location, true));
+        } else {
+            return ImmutableSet.of(createSourceLocationInfo(location, false));
+        }
+    }
+
+    private SourceLocationInfo createSourceLocationInfo(ComponentLocationAdapter location, boolean modules) {
+        File sourceDir = modules ? location.getModuleSourceDir() : location.getComponentSourceDir();
+        String pkg = modules ? location.getModuleSourcePackage() : location.getComponentSourcePackage();
+
+        DefRegistry[] staticRegs = getStaticRegistries(location, modules);
         String canonical = null;
         BundleSourceLoader markupLoader = null;
-        List<DefRegistry> markupRegistries = Lists.newArrayList();
+        List<DefRegistry> markupRegistries = new ArrayList<>();
         ModuleFileBundleSourceLoader moduleBundleSourceLoader = null;
         if (pkg != null) {
             if (!modules) {
@@ -257,13 +276,12 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                 moduleBundleSourceLoader = new ModuleFileBundleSourceLoader(pkg, fileMonitor, builders);
                 markupLoader = moduleBundleSourceLoader;
             }
-        } else if (location.getComponentSourceDir() != null) {
-            File components = location.getComponentSourceDir();
-            if (!components.canRead() || !components.canExecute() || !components.isDirectory()) {
-                loggingService.warn("Unable to find " + components + ", ignored.");
+        } else if (sourceDir != null) {
+            if (!sourceDir.canRead() || !sourceDir.canExecute() || !sourceDir.isDirectory()) {
+                loggingService.warn("Unable to find " + sourceDir + ", ignored.");
             } else {
                 try {
-                    canonical = components.getCanonicalPath();
+                    canonical = sourceDir.getCanonicalPath();
                 } catch (IOException ioe) {
                     // doh! ignore, not sure what we can do.
                     throw new AuraRuntimeException("unable to get canonical path", ioe);
@@ -276,11 +294,11 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                     fileMonitor.addDirectory(canonical, creationTime);
                 }
                 if (!modules) {
-                    markupLoader = new FileBundleSourceLoader(components, fileMonitor, builders);
+                    markupLoader = new FileBundleSourceLoader(sourceDir, fileMonitor, builders);
                     markupRegistries.add(new BundleAwareDefRegistry(markupLoader,
                             MARKUP_PREFIXES, ALL_MARKUP_DEFTYPES, compilerService, true));
                 } else {
-                    moduleBundleSourceLoader = new ModuleFileBundleSourceLoader(components, fileMonitor, builders);
+                    moduleBundleSourceLoader = new ModuleFileBundleSourceLoader(sourceDir, fileMonitor, builders);
                     markupLoader = moduleBundleSourceLoader;
                 }
             }
@@ -313,24 +331,24 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         return new SourceLocationInfo(staticRegs, canonical, markupRegistries);
     }
 
-    private SourceLocationInfo getSourceLocationInfo(ComponentLocationAdapter location) {
-        SourceLocationInfo sli = locationMap.get(location);
+    private Set<SourceLocationInfo> getSourceLocationInfo(ComponentLocationAdapter location) {
+        Set<SourceLocationInfo> sli = locationMap.get(location);
         if (sli != null) {
             return sli;
         }
-        sli = createSourceLocationInfo(location);
+        sli = createSourceLocationInfos(location);
         locationMap.putIfAbsent(location, sli);
         return sli;
     }
 
     /**
      * Get the component location adapter registries
-     * 
+     *
      * @param filterIn if non-null get only the location adapters that match the filter
      */
     private List<DefRegistry> getCLARegistries(Predicate<ComponentLocationAdapter> filterIn) {
         Collection<ComponentLocationAdapter> markupLocations = getLocationAdapters();
-        List<DefRegistry> regBuild = Lists.newArrayList();
+        List<DefRegistry> regBuild = new ArrayList<>();
 
         regBuild.add(AuraStaticTypeDefRegistry.INSTANCE);
         regBuild.add(globalControllerDefRegistry);
@@ -339,11 +357,13 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             for (ComponentLocationAdapter location : markupLocations) {
                 if (location != null) {
                     if (filterIn == null || filterIn.test(location)) {
-                        SourceLocationInfo sli = getSourceLocationInfo(location);
-                        if (!sli.isChanged() && sli.staticLocationRegistries != null) {
-                            regBuild.addAll(sli.staticLocationRegistries);
-                        } else {
-                            regBuild.addAll(sli.markupRegistries);
+                        Set<SourceLocationInfo> slis = getSourceLocationInfo(location);
+                        for (SourceLocationInfo sli : slis) {
+                            if (!sli.isChanged() && sli.staticLocationRegistries != null) {
+                                regBuild.addAll(sli.staticLocationRegistries);
+                            } else {
+                                regBuild.addAll(sli.markupRegistries);
+                            }
                         }
                     }
                 }
@@ -402,7 +422,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             throw new Error(e.getCause());
         }
     }
-    
+
     @Override
     public RegistrySet buildRegistrySet(Mode mode, Authentication access, Predicate<ComponentLocationAdapter> filterIn) {
         List<DefRegistry> registries = getCLARegistries(filterIn);
@@ -449,11 +469,13 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                 File file = new File(filePath);
                 try {
                     String canonical = file.getCanonicalPath();
-                    for (SourceLocationInfo sli : locationMap.values()) {
-                        if (sli.baseDir != null && canonical.startsWith(sli.baseDir)) {
-                            sli.setChanged(true);
-                            for (DefRegistry registry : sli.markupRegistries) {
-                                registry.reset();
+                    for (Set<SourceLocationInfo> set : locationMap.values()) {
+                        for (SourceLocationInfo sli : set) {
+                            if (sli.baseDir != null && canonical.startsWith(sli.baseDir)) {
+                                sli.setChanged(true);
+                                for (DefRegistry registry : sli.markupRegistries) {
+                                    registry.reset();
+                                }
                             }
                         }
                     }
@@ -542,6 +564,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
      */
     public List<ComponentLocationAdapter> getLocationAdapters() {
         // Synchronize on this because location adapters can be replaced.
+        // TODO delete this
         synchronized(this) {
             if (this.sortedAdapters == null) {
                 List<ComponentLocationAdapter> temporaryWorkingSet;

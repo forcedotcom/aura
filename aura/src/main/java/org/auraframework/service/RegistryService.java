@@ -42,10 +42,10 @@ public interface RegistryService {
      * @return a RegistrySet that can be used and is thread safe.
      */
     RegistrySet getDefaultRegistrySet(Mode mode, Authentication access);
-    
+
     /**
      * Build RegistrySet
-     * 
+     *
      * @param mode Mode for the current context
      * @param access access level for the current context
      * @param filterIn if non-null build only the location adapters that match the filter
@@ -64,7 +64,7 @@ public interface RegistryService {
      */
     DefRegistry getRegistry(File directory);
 
-    DefRegistry getModulesRegistry(File directory);
+    DefRegistry getModulesRegistry(File directory); // remove?
 
     /**
      * Get a registry set based on a single registry.

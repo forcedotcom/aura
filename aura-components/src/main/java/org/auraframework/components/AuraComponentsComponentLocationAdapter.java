@@ -26,7 +26,10 @@ import org.springframework.context.annotation.Lazy;
 @ServiceComponent
 public class AuraComponentsComponentLocationAdapter extends ComponentLocationAdapter.Impl {
     public AuraComponentsComponentLocationAdapter() {
-        super(Paths.get(AuraUtil.getAuraHome(), "aura-components", "src", "main", "components").toFile(),
-              null, "components_aura_components");
+        super(
+            Paths.get(AuraUtil.getAuraHome(), "aura-components", "src", "main", "components").toFile(),
+            "components_aura_components",
+            null,
+            null);
     }
 }

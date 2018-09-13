@@ -31,7 +31,6 @@ import com.google.common.collect.Sets;
 @Lazy
 @ServiceComponent
 public class StringComponentLocationAdapter implements ComponentLocationAdapter {
-
     @Inject
     StringSourceLoader loader;
 
@@ -46,17 +45,27 @@ public class StringComponentLocationAdapter implements ComponentLocationAdapter 
     }
 
     @Override
-    public File getJavaGeneratedSourceDir() {
-        return null;
-    }
-
-    @Override
     public String getComponentSourcePackage() {
         return null;
     }
 
     @Override
     public String getComponentSourcePackageAlways() {
+        return null;
+    }
+
+    @Override
+    public File getModuleSourceDir() {
+        return null;
+    }
+
+    @Override
+    public String getModuleSourcePackage() {
+        return null;
+    }
+
+    @Override
+    public String getModuleSourcePackageAlways() {
         return null;
     }
 

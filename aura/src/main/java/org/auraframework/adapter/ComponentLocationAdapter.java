@@ -16,87 +16,145 @@
 package org.auraframework.adapter;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.SourceLoader;
 
-import com.google.common.collect.Sets;
-
-/**
- */
 public interface ComponentLocationAdapter extends AuraAdapter {
-
     File getComponentSourceDir();
-
-    File getJavaGeneratedSourceDir();
 
     String getComponentSourcePackage();
 
-    String getComponentSourcePackageAlways();
+    String getComponentSourcePackageAlways(); // TODO rename or consolidate
+
+    default File getModuleSourceDir() { return null; };
+
+    default String getModuleSourcePackage() { return null; };
+
+    default String getModuleSourcePackageAlways() {return null; }; // TODO rename or consolidate
 
     Set<SourceLoader> getSourceLoaders();
 
-    DefType type();
+    @Deprecated
+    default DefType type() { return DefType.COMPONENT; }; // TODO delete
 
     class Impl implements ComponentLocationAdapter {
-
         private final File componentSourceDir;
-        private final File javaGeneratedSourceDir;
         private final String componentSourcePackage;
-        private final String packageAlways;
-        private final Set<SourceLoader> loaders = Sets.<SourceLoader> newHashSet();
+        private final String componentPackageAlways;
+        private final File moduleSourceDir;
+        private final String moduleSourcePackage;
+        private final String modulePackageAlways;
+        private final Set<SourceLoader> loaders = new HashSet<>();
+
+        // TODO componentSourceDir should be nullable
+        // TODO consolidate constructors
+        // TODO delete javaGeneratedSourceDir params
 
         public Impl(File componentSourceDir) {
             this(componentSourceDir, null);
         }
 
+        @Deprecated
         public Impl(File componentSourceDir, File javaGeneratedSourceDir) {
             this(componentSourceDir, javaGeneratedSourceDir, null);
         }
 
+        @Deprecated
         public Impl(File componentSourceDir, File javaGeneratedSourceDir, String componentSourcePackage) {
-            this.packageAlways = componentSourcePackage;
-            if (componentSourceDir.exists() || componentSourcePackage == null) {
-                this.componentSourceDir = componentSourceDir;
-                this.javaGeneratedSourceDir = javaGeneratedSourceDir;
-                this.componentSourcePackage = null;
-            } else {
-                this.componentSourcePackage = componentSourcePackage;
+            if (type() == DefType.MODULE) { // yucky for now, but subclasses should only reference enum value
+                this.modulePackageAlways = componentSourcePackage;
+                if ((componentSourceDir != null && componentSourceDir.exists()) || componentSourcePackage == null) {
+                    this.moduleSourceDir = componentSourceDir;
+                    this.moduleSourcePackage = null;
+                } else {
+                    this.moduleSourcePackage = componentSourcePackage;
+                    this.moduleSourceDir = null;
+                }
                 this.componentSourceDir = null;
-                this.javaGeneratedSourceDir = null;
+                this.componentSourcePackage = null;
+                this.componentPackageAlways = null;
+            } else {
+                this.componentPackageAlways = componentSourcePackage;
+                if ((componentSourceDir != null && componentSourceDir.exists()) || componentSourcePackage == null) {
+                    this.componentSourceDir = componentSourceDir;
+                    this.componentSourcePackage = null;
+                } else {
+                    this.componentSourcePackage = componentSourcePackage;
+                    this.componentSourceDir = null;
+                }
+                this.moduleSourceDir = null;
+                this.moduleSourcePackage = null;
+                this.modulePackageAlways = null;
             }
         }
 
-        public Impl(SourceLoader loader) {
-            if (loader != null) {
-                loaders.add(loader);
-            }
-            this.componentSourceDir = null;
-            this.javaGeneratedSourceDir = null;
-            this.componentSourcePackage = null;
-            this.packageAlways = null;
-        }
-
+        @Deprecated
         public Impl(String componentSourcePackage) {
             if (componentSourcePackage != null && !componentSourcePackage.isEmpty()) {
-                this.componentSourcePackage = componentSourcePackage;
-                this.packageAlways = componentSourcePackage;
+                if (type() == DefType.MODULE) {
+                    this.moduleSourcePackage = componentSourcePackage;
+                    this.modulePackageAlways = componentSourcePackage;
+                    this.componentSourcePackage = null;
+                    this.componentPackageAlways = null;
+                } else {
+                    this.componentSourcePackage = componentSourcePackage;
+                    this.componentPackageAlways = componentSourcePackage;
+                    this.moduleSourcePackage = null;
+                    this.modulePackageAlways = null;
+                }
                 this.componentSourceDir = null;
-                this.javaGeneratedSourceDir = null;
+                this.moduleSourceDir = null;
             } else {
                 throw new IllegalArgumentException("componentSourcePackage is null or empty: " + componentSourcePackage);
             }
         }
 
-        @Override
-        public File getComponentSourceDir() {
-            return this.componentSourceDir;
+        @Deprecated
+        public Impl(SourceLoader loader) {
+            if (loader != null) {
+                loaders.add(loader);
+            }
+            this.componentSourceDir = null;
+            this.componentSourcePackage = null;
+            this.componentPackageAlways = null;
+            this.moduleSourceDir = null;
+            this.moduleSourcePackage = null;
+            this.modulePackageAlways = null;
+        }
+
+        // final constructors
+        // 1) String componentSourceDir (most consumers in core use this version currently)
+        // 2) File componentSourceDir, String componentSourcePackage, File moduleSourceDir, String moduleSourcePackage
+
+        public Impl(File componentSourceDir, String componentSourcePackage,
+                    File moduleSourceDir, String moduleSourcePackage) {
+            // TODO don't really like handling the logic this way
+            if ((componentSourceDir != null && componentSourceDir.exists()) || componentSourcePackage == null) {
+                this.componentSourceDir = componentSourceDir;
+                this.componentSourcePackage = null;
+            } else {
+                this.componentSourcePackage = componentSourcePackage;
+                this.componentSourceDir = null;
+            }
+
+            if ((moduleSourceDir != null && moduleSourceDir.exists()) || moduleSourcePackage == null) {
+                this.moduleSourceDir = moduleSourceDir;
+                this.moduleSourcePackage = null;
+            } else {
+                this.moduleSourcePackage = moduleSourcePackage;
+                this.moduleSourceDir = null;
+            }
+
+            this.componentPackageAlways = componentSourcePackage;
+            this.modulePackageAlways = moduleSourcePackage;
         }
 
         @Override
-        public File getJavaGeneratedSourceDir() {
-            return this.javaGeneratedSourceDir;
+        public File getComponentSourceDir() {
+            return this.componentSourceDir;
         }
 
         @Override
@@ -106,7 +164,22 @@ public interface ComponentLocationAdapter extends AuraAdapter {
 
         @Override
         public String getComponentSourcePackageAlways() {
-            return packageAlways;
+            return componentPackageAlways;
+        }
+
+        @Override
+        public File getModuleSourceDir() {
+            return moduleSourceDir;
+        }
+
+        @Override
+        public String getModuleSourcePackage() {
+            return moduleSourcePackage;
+        }
+
+        @Override
+        public String getModuleSourcePackageAlways() {
+            return modulePackageAlways;
         }
 
         @Override
@@ -122,6 +195,7 @@ public interface ComponentLocationAdapter extends AuraAdapter {
          * @return DEFAULT DefType.COMPONENT for Aura components
          */
         @Override
+        @Deprecated
         public DefType type() {
             return DefType.COMPONENT;
         }
@@ -132,12 +206,6 @@ public interface ComponentLocationAdapter extends AuraAdapter {
             sb.append("ComponentLocationAdapter(CSD=");
             if (componentSourceDir != null) {
                 sb.append(componentSourceDir.getPath());
-            } else {
-                sb.append("null");
-            }
-            sb.append(", JGSD=");
-            if (javaGeneratedSourceDir != null) {
-                sb.append(javaGeneratedSourceDir.getPath());
             } else {
                 sb.append("null");
             }
@@ -152,6 +220,5 @@ public interface ComponentLocationAdapter extends AuraAdapter {
             sb.append(")");
             return sb.toString();
         }
-
     }
 }

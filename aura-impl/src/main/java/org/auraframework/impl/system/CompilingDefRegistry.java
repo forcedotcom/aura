@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.system;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,9 +29,6 @@ import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 public class CompilingDefRegistry implements DefRegistry {
     private static final long serialVersionUID = -4852130888436267039L;
@@ -56,9 +55,9 @@ public class CompilingDefRegistry implements DefRegistry {
     public CompilingDefRegistry(SourceLoader sourceLoader, Set<String> prefixes, Set<DefType> defTypes,
                                 CompilerService compilerService) {
         this.sourceLoader = sourceLoader;
-        this.namespaces = Sets.newHashSet();
-        this.registry = Maps.newHashMap();
-        this.prefixes = Sets.newHashSet();
+        this.namespaces = new HashSet<>();
+        this.registry = new HashMap<>();
+        this.prefixes = new HashSet<>();
         this.creationTime = System.currentTimeMillis();
         for (String prefix : prefixes) {
             this.prefixes.add(prefix.toLowerCase());
@@ -93,7 +92,7 @@ public class CompilingDefRegistry implements DefRegistry {
         if (holder == null) {
             return null;
         }
-        synchronized (holder) { 
+        synchronized (holder) {
             if (!holder.initialized) {
                 try {
                     @SuppressWarnings("unchecked")
@@ -120,7 +119,7 @@ public class CompilingDefRegistry implements DefRegistry {
 
     @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
-        Set<DefDescriptor<?>> ret = Sets.newHashSet();
+        Set<DefDescriptor<?>> ret = new HashSet<>();
 
         for (DefDescriptor<?> key : registry.keySet()) {
             if (matcher.matchDescriptor(key)) {

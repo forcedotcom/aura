@@ -15,7 +15,7 @@
  */
 package org.auraframework.provider.api;
 
-
+// TODO delete?
 public interface ComponentPackageProvider {
     String getComponentSourcePackage();
 }

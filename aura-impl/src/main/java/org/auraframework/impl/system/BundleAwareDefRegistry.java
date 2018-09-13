@@ -17,6 +17,8 @@ package org.auraframework.impl.system;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,9 +38,6 @@ import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.GlobMatcher;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * A bundle aware registry.
@@ -83,8 +82,8 @@ public class BundleAwareDefRegistry implements DefRegistry {
                                   Collection<String> namespaces, CompilerService compilerService,
                                   boolean cacheable) {
         this.sourceLoader = sourceLoader;
-        this.registry = Maps.newHashMap();
-        this.prefixes = Sets.newHashSet();
+        this.registry = new HashMap<>();
+        this.prefixes = new HashSet<>();
         this.creationTime = System.currentTimeMillis();
         for (String prefix : prefixes) {
             this.prefixes.add(prefix.toLowerCase());
@@ -92,10 +91,10 @@ public class BundleAwareDefRegistry implements DefRegistry {
         this.defTypes = defTypes;
         this.compilerService = compilerService;
         if (namespaces == null) {
-            this.namespaces = Sets.newHashSet();
+            this.namespaces = new HashSet<>();
             this.constantNamespaces = false;
         } else {
-            this.namespaces = Sets.newHashSet(namespaces);
+            this.namespaces = new HashSet<>(namespaces);
             this.constantNamespaces = true;
         }
         this.cacheable = cacheable;
@@ -168,7 +167,7 @@ public class BundleAwareDefRegistry implements DefRegistry {
         if (holder == null) {
             return null;
         }
-        synchronized (holder) { 
+        synchronized (holder) {
             if (!holder.initialized) {
                 try {
                     DefDescriptor<BundleDef> canonical = holder.descriptor;
@@ -208,10 +207,10 @@ public class BundleAwareDefRegistry implements DefRegistry {
 
     @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
-        Set<DefDescriptor<?>> matches = Sets.newHashSet();
+        Set<DefDescriptor<?>> matches = new HashSet<>();
         boolean nonBundle = true;
         if (matcher.getDefTypes() != null) {
-            Set<DefType> tmp = Sets.newHashSet(matcher.getDefTypes());
+            Set<DefType> tmp = new HashSet<>(matcher.getDefTypes());
             tmp.removeAll(BundleSource.bundleDefTypes);
             nonBundle = (tmp.size() > 0);
         }

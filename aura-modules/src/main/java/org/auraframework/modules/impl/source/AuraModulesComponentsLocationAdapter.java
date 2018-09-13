@@ -26,6 +26,9 @@ import org.springframework.context.annotation.Lazy;
 @ServiceComponent
 public class AuraModulesComponentsLocationAdapter extends ComponentLocationAdapter.Impl {
     public AuraModulesComponentsLocationAdapter() {
-        super(AuraModulesFiles.COMPONENTS_DIR.asFile(), null, "components_aura_modules");
+        super(AuraModulesFiles.COMPONENTS_DIR.asFile(),
+                "components_aura_modules",
+                AuraModulesFiles.MODULES_DIR.asFile(),
+                "modules_aura_modules");
     }
 }

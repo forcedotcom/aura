@@ -41,9 +41,9 @@ public class ActionWithKeyOverride extends ActionDelegate {
             throw new IllegalArgumentException(ERROR_ACTIONTOEXECUTE_MISSING);
         }
         this.actionAsKey = actionAsKey;
-        actionAsKey.setStorable();
+        actionAsKey.markOfflineAction();
         this.actionToExecute = actionToExecute;
-        actionToExecute.setStorable();
+        actionToExecute.markOfflineAction();
     }
     
     // ----

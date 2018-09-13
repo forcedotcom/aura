@@ -56,8 +56,8 @@ public class ActionWithKeyOverrideTest {
         Action action = new ActionWithKeyOverride(actionAsKey, actionToExecute);
 
         // Verify
-        Mockito.verify(actionAsKey, Mockito.times(1)).setStorable();
-        Mockito.verify(actionToExecute, Mockito.times(1)).setStorable();
+        Mockito.verify(actionAsKey, Mockito.times(1)).markOfflineAction();
+        Mockito.verify(actionToExecute, Mockito.times(1)).markOfflineAction();
         Assert.assertNotNull("ActionWithKeyOverride was not properly created.", action);
     }
 
@@ -93,8 +93,8 @@ public class ActionWithKeyOverrideTest {
         Mockito.verify(actionAsKey, Mockito.times(1)).getParams();
         Mockito.verify(actionAsKey, Mockito.times(1)).getDescriptor();
         Mockito.verify(actionAsKey, Mockito.times(1)).isStorable();
-        // 2 because ActionWithKeyOverride constructor sets this on actionAsKey.
-        Mockito.verify(actionAsKey, Mockito.times(2)).setStorable();
+        Mockito.verify(actionAsKey, Mockito.times(1)).setStorable();
+        Mockito.verify(actionAsKey, Mockito.times(1)).markOfflineAction();
         Mockito.verify(actionAsKey, Mockito.times(1)).getId();
         Mockito.verify(actionAsKey, Mockito.times(1)).setId(any(String.class));
 
@@ -103,7 +103,8 @@ public class ActionWithKeyOverrideTest {
         //
         Mockito.verify(actionToExecute, Mockito.times(1)).setId(any(String.class));
         Mockito.verify(actionToExecute, Mockito.times(1)).getInstanceStack();
-        Mockito.verify(actionToExecute, Mockito.times(2)).setStorable();
+        Mockito.verify(actionToExecute, Mockito.times(1)).setStorable();
+        Mockito.verify(actionToExecute, Mockito.times(1)).markOfflineAction();
 
         // Delegates to actionToExecute
         Mockito.verify(actionToExecute, Mockito.times(1)).run();

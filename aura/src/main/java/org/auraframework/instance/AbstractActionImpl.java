@@ -100,6 +100,7 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
 
     @Override
     public void markOfflineAction() {
+        setStorable();
         offlineAction = true;
         if (actionId == null) {
             // Only set the ID if it was not previously set.

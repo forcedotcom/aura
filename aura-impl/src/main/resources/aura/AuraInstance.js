@@ -481,10 +481,7 @@ AuraInstance.prototype.initAsync = function(config) {
         // Actions depend on defs depend on GVP (labels). so load them in dependency order and skip
         // loading depending items if anything fails to load.
         function gvpLoadPromise () {
-            // When Uridefs are enabled, componentDef storage is disabled and no need to apply action filters.
-            // For multi-tab scenario, Actions persisted by one tab would be accessible for other tabs.
             if (context.uriAddressableDefsEnabled) {
-                $A.clientService.setPersistedActionsFilter(false);
                 return Promise["resolve"]();
             } else {
                 return context.globalValueProviders.loadFromStorage();

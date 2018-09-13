@@ -41,6 +41,7 @@ function ActionStorage() {
     this.actionsFilterEnabled = true;
 
     this.actionsFilterInited = false;
+    this.actionsFilterPopulated = false;
 }
 
 ActionStorage.prototype.STORAGE_NAME = "actions";
@@ -71,6 +72,9 @@ ActionStorage.prototype.setupActionsFilter = function() {
     } else {
         this.actionKeysFilter = {};
         this.actionsFilterInited = true;
+
+        // Lazily populate actions filter after bootstrap.
+        this.populateActionsFilter();
     }
 
     return this.actionsFilterInited;
@@ -80,6 +84,11 @@ ActionStorage.prototype.setupActionsFilter = function() {
  * Populates the persisted actions filter if applicable.
  */
 ActionStorage.prototype.populateActionsFilter = function() {
+    if(this.actionsFilterPopulated) {
+        return Promise["resolve"]();
+    }
+    this.actionsFilterPopulated = true;
+
     // if filter is not set up
     if (!this.isStoragePersistent() || !this.setupActionsFilter()) {
         return Promise["resolve"]();

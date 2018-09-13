@@ -228,6 +228,7 @@ Test.Aura.Controller.ActionStorageTest = function () {
         [Fact]
         function AddsKeysToCache() {
             var target = new Aura.Controller.ActionStorage();
+            target.populateActionsFilter = ResolvePromise;
             var mockStorage = {
                 setAll: function() {
                     return ResolvePromise();
@@ -261,6 +262,7 @@ Test.Aura.Controller.ActionStorageTest = function () {
         [Fact]
         function RemovesKeysFromCacheIfFailsToStore() {
             var target = new Aura.Controller.ActionStorage();
+            target.populateActionsFilter = ResolvePromise;
             target.setupActionsFilter();
             target.actionKeysFilter = {"key1": true};
             var mockStorage = {
@@ -297,6 +299,7 @@ Test.Aura.Controller.ActionStorageTest = function () {
         [Fact]
         function AddsKeysToCacheIfGetValuesFromStorage() {
             var target = new Aura.Controller.ActionStorage();
+            target.populateActionsFilter = ResolvePromise;
             target.setupActionsFilter();
             var values = {
                 "key1": "value1",
@@ -329,6 +332,7 @@ Test.Aura.Controller.ActionStorageTest = function () {
         [Fact]
         function RemovesNonExistingKeysFromCacheIfFailsToGet() {
             var target = new Aura.Controller.ActionStorage();
+            target.populateActionsFilter = ResolvePromise;
             target.setupActionsFilter();
             target["key2"] = true;
 
@@ -366,6 +370,7 @@ Test.Aura.Controller.ActionStorageTest = function () {
         [Fact]
         function RemovesKeysFromCache() {
             var target = new Aura.Controller.ActionStorage();
+            target.populateActionsFilter = ResolvePromise;
             target.setupActionsFilter();
             target.actionKeysFilter["key1"] = true;
             target.actionKeysFilter["key2"] = true;
@@ -401,6 +406,7 @@ Test.Aura.Controller.ActionStorageTest = function () {
         [Fact]
         function ResetsCache() {
             var target = new Aura.Controller.ActionStorage();
+            target.populateActionsFilter = ResolvePromise;
             target.setupActionsFilter();
             target.actionKeysFilter["key1"] = true;
             target.actionKeysFilter["key2"] = true;
@@ -456,6 +462,7 @@ Test.Aura.Controller.ActionStorageTest = function () {
         [Fact]
         function ReturnsTrueIfFilterIsSetup() {
             var target = new Aura.Controller.ActionStorage();
+            target.populateActionsFilter = ResolvePromise;
             target.setupActionsFilter();
 
             var actual = target.setupActionsFilter();
@@ -465,12 +472,26 @@ Test.Aura.Controller.ActionStorageTest = function () {
         [Fact]
         function InitsFilterIfFilterIsEnabled() {
             var target = new Aura.Controller.ActionStorage();
+            target.populateActionsFilter = ResolvePromise;
             target.enableActionsFilter(true);
 
             target.setupActionsFilter();
 
             var actual = target.actionKeysFilter;
             Assert.Equal({}, actual);
+        }
+
+        [Fact]
+        function PopulatesActionsFilter() {
+            var target = new Aura.Controller.ActionStorage();
+            target.enableActionsFilter(true);
+            target.isStoragePersistent = function() { return true; };
+            var mockGetAll =  Stubs.GetMethod({"then":function(){}});
+            target.getAll = mockGetAll;
+
+            target.setupActionsFilter();
+
+            Assert.Equal(1, mockGetAll.Calls.length);
         }
 
     }
@@ -487,7 +508,6 @@ Test.Aura.Controller.ActionStorageTest = function () {
 
             target.populateActionsFilter();
 
-            var actual = target.actionKeysFilter;
             Assert.Equal(1, mockGetAll.Calls.length);
         }
     }

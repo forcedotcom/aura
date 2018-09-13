@@ -96,7 +96,7 @@ public final class ModulesCompilerNode implements ModulesCompiler {
 
             if (report.success == false) {
                 String error = buildDiagnosticsError(bundle, entry, diagnostics, bundleType);
-                loggingService.error("ModulesCompilerNode: compiler error " + entry + ": " + error);
+                loggingService.warn("ModulesCompilerNode: compiler error " + entry + ": " + error);
                 throw new RuntimeException(error);
             }
 
@@ -109,7 +109,7 @@ public final class ModulesCompilerNode implements ModulesCompiler {
             result = ModulesCompilerUtil.parsePlatformCompilerOutput(report);
 
         } catch (Exception xr) {
-            loggingService.error("ModulesCompilerNode: exception compiling (retry failed) " + entry + ": " + xr, xr);
+            loggingService.warn("ModulesCompilerNode: exception compiling (retry failed) " + entry + ": " + xr, xr);
             throw xr;
         }
 

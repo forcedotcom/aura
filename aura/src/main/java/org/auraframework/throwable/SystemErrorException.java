@@ -52,11 +52,22 @@ public class SystemErrorException extends ClientSideEventException {
             throw new AuraRuntimeException(x);
         }
     }
+    
+    /**
+     * This message will be included in the JS code generated from the {@link #getDefaultHandler()}. Any
+     * class which overrides this method must make sure the content is JS/EcmaScript escaped.
+     * 
+     * @return The error message to display to the user.
+     */
+    @SuppressWarnings("static-method")
+    String getDefaultHandlerMessage() {
+        return "[SystemErrorException from server] unknown error";
+    }
 
     @Override
     public JsFunction getDefaultHandler() {
-        return new JsFunction(ImmutableList.<String> of(), 
-                "var e=new Error('[SystemErrorException from server] unknown error');" +
+        return new JsFunction(ImmutableList.<String> of(),
+                "var e=new Error('" + getDefaultHandlerMessage() + "');" +
                 "e.reported=true;" +
                 "throw e;");
     }

@@ -41,13 +41,16 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraHandledException;
+import org.auraframework.throwable.AuraRequestInputException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -62,8 +65,10 @@ import org.springframework.web.context.support.GenericWebApplicationContext;
 
 import test.org.auraframework.impl.adapter.ConfigAdapterImpl;
 
-
 public class AuraServletTest extends UnitTestCase {
+    
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Inject
     private ContextService contextService;
@@ -222,6 +227,14 @@ public class AuraServletTest extends UnitTestCase {
             expected = jpe;
         }
         assertNotNull("Bad JSON should result in an exception", expected);
+    }
+    
+    @Test
+    public void testReadMessageInvalidFormatJSON() throws QuickFixException {
+        thrown.expect(AuraRequestInputException.class);
+        thrown.expectMessage("[AuraClientInputException from server] Unexpected request input. Expected input format: \"Aura request data must be sent as JSON map of data\".");
+        
+        originalServlet.readMessage("3.141592653589793238462643383279");
     }
 
     @Test

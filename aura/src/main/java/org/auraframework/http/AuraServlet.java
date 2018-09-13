@@ -61,6 +61,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Message;
+import org.auraframework.throwable.AuraRequestInputException;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
@@ -219,13 +220,18 @@ public class AuraServlet extends AuraBaseServlet {
      * @return a message, or null.
      * @throws QuickFixException if there is an error instantiating the action (not action not found).
      */
+    @SuppressWarnings("unchecked")
     public Message readMessage(String input) throws QuickFixException {
         if (input == null) {
             return null;
         }
         // this throws a json parse exception if it can't read.
-        @SuppressWarnings("unchecked")
-        Map<String, List<Map<String, ?>>> message = (Map<String, List<Map<String, ?>>>) new JsonReader().read(new StringReader(input));
+        final Map<String, List<Map<String, ?>>> message;
+        try {
+            message = (Map<String, List<Map<String, ?>>>) new JsonReader().read(new StringReader(input));
+        } catch(final ClassCastException cce) {
+            throw new AuraRequestInputException(cce, input, "Aura request data must be sent as JSON map of data");
+        }
         if (message == null) {
             return null;
         }
@@ -237,7 +243,6 @@ public class AuraServlet extends AuraBaseServlet {
                 Map<String, ?> map = action;
 
                 // FIXME: ints are getting translated into BigDecimals here.
-                @SuppressWarnings("unchecked")
                 Map<String, Object> params = (Map<String, Object>) map.get("params");
                 String qualifiedName = (String)map.get("descriptor");
                 if (qualifiedName == null) {
@@ -282,7 +287,7 @@ public class AuraServlet extends AuraBaseServlet {
                 actionList.add(instance);
             }
         } else {
-                actionList = Collections.emptyList();
+            actionList = Collections.emptyList();
         }
 
         return new Message(actionList);
@@ -642,11 +647,11 @@ public class AuraServlet extends AuraBaseServlet {
                 written = true;
                 servletOut.write(out.toString());
             }
-        } catch (InvalidParamException | MissingParamException ipe) {
+        } catch (final InvalidParamException | MissingParamException | JsonParseException ipe) {
             servletUtilAdapter.handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
-        } catch (JsonParseException jpe) {
-            servletUtilAdapter.handleServletException(new SystemErrorException(jpe), false, context, request, response, false);
-        } catch (Exception e) {
+        } catch(final AuraRequestInputException arie) {
+            servletUtilAdapter.handleServletException(arie, false, context, request, response, false);
+        } catch (final Exception e) {
             servletUtilAdapter.handleServletException(e, false, context, request, response, written);
         }
     }

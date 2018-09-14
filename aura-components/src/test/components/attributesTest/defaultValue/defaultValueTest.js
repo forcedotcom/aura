@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 ({
-
     testObjectDataTypeAndDefaultValue : {
         test : function(cmp) {
             this.verifyDefaultValuesOfObjectDataType(cmp);
@@ -43,34 +42,119 @@
 
     testSetTypeWithStringDefaultValue : {
         test : function(cmp) {
-            var except = ['a', 'b', 'c'];
+            var expected = ["'a'", "'b'", "'c'"];
             var actual = cmp.get("v.setDefaultWithString");
             $A.test.assertTrue($A.util.isArray(actual));
             // Set is unordered
-            var result = $A.test.compareValues(except.sort(), actual.sort());
-            $A.test.assertTrue(result['match'], result['reasons']);
+            actual = actual.sort();
+            var result = $A.test.compareValues(expected, actual);
+            $A.test.assertTrue(result.match, "Expected: " + JSON.stringify(expected) + " but Actual: " + JSON.stringify(actual));
+        }
+    },
+    
+    testSetTypeWithStringDefaultValueWithCommaInIt : {
+        test : function(cmp) {
+            var expected = ["'a", "'b", "'c", "a'", "b'", "c'"];
+            var actual = cmp.get("v.setDefaultWithStringWithCommaInIt");
+            $A.test.assertTrue($A.util.isArray(actual));
+            // Set is unordered
+            actual = actual.sort();
+            var result = $A.test.compareValues(expected, actual);
+            $A.test.assertTrue(result.match, "Expected: " + JSON.stringify(expected) + " but Actual: " + JSON.stringify(actual));
+        }
+    },
+    
+    testSetTypeWithDefaultWithBracketStringWithCommaInIt : {
+        test : function(cmp) {
+            var expected = ["1,1", "2,2", "3,3"];
+            var actual = cmp.get("v.setDefaultWithBracketStringWithCommaInIt");
+            $A.test.assertTrue($A.util.isArray(actual));
+            // Set is unordered
+            actual = actual.sort();
+            var result = $A.test.compareValues(expected, actual);
+            $A.test.assertTrue(result.match, "Expected: " + JSON.stringify(expected) + " but Actual: " + JSON.stringify(actual));
         }
     },
 
-    testSetTypeWithStringDefaultValue : {
+    testSetTypeWithStringDefaultValueNumbers : {
         test : function(cmp) {
-            var except = [1, 2, 3];
+            var expected = [1, 2, 3];
             var actual = cmp.get("v.setDefaultWithBracketString");
             $A.test.assertTrue($A.util.isArray(actual));
             // Set is unordered
-            var result = $A.test.compareValues(except.sort(), actual.sort());
-            $A.test.assertTrue(result['match'], result['reasons']);
+            actual = actual.sort();
+            var result = $A.test.compareValues(expected, actual);
+            $A.test.assertTrue(result.match, "Expected: " + JSON.stringify(expected) + " but Actual: " + JSON.stringify(actual));
         }
     },
 
     testSetTypeWithStringElementContainBrancketDefaultValue : {
         test : function(cmp) {
-            var except = ['[1]', '2', '3'];
+            var expected = ['2', '3', '[1]'];
             var actual = cmp.get("v.setDefaultWithStringContainBracket");
             $A.test.assertTrue($A.util.isArray(actual));
             // Set is unordered
-            var result = $A.test.compareValues(except.sort(), actual.sort());
-            $A.test.assertTrue(result['match'], result['reasons']);
+            actual = actual.sort();
+            var result = $A.test.compareValues(expected, actual);
+            $A.test.assertTrue(result.match, "Expected: " + JSON.stringify(expected) + " but Actual: " + JSON.stringify(actual));
+        }
+    },
+    
+    testListTypeWithEmptyDefaultValue : {
+        test : function(cmp) {
+            var actual = cmp.get("v.listDefaultWithEmpty");
+            $A.test.assertTrue($A.util.isArray(actual));
+            $A.test.assertEquals(0, actual.length);
+        }
+    },
+
+    testListTypeWithStringDefaultValue : {
+        test : function(cmp) {
+            var expected = ["'a'", "'b'", "'c'"];
+            var actual = cmp.get("v.listDefaultWithString");
+            $A.test.assertTrue($A.util.isArray(actual));
+            var result = $A.test.compareValues(expected, actual);
+            $A.test.assertTrue(result.match, "Expected: " + JSON.stringify(expected) + " but Actual: " + JSON.stringify(actual));
+        }
+    },
+    
+    testListTypeWithStringDefaultValueWithCommaInIt : {
+        test : function(cmp) {
+            var expected = ["'a", "a'", "'b", "b'", "'c", "c'"];
+            var actual = cmp.get("v.listDefaultWithStringWithCommaInIt");
+            $A.test.assertTrue($A.util.isArray(actual));
+            var result = $A.test.compareValues(expected, actual);
+            $A.test.assertTrue(result.match, "Expected: " + JSON.stringify(expected) + " but Actual: " + JSON.stringify(actual));
+        }
+    },
+    
+    testListTypeWithDefaultWithBracketStringWithCommaInIt : {
+        test : function(cmp) {
+            var expected = ["1,1", "2,2", "3,3"];
+            var actual = cmp.get("v.listDefaultWithBracketStringWithCommaInIt");
+            $A.test.assertTrue($A.util.isArray(actual));
+            var result = $A.test.compareValues(expected, actual);
+            $A.test.assertTrue(result.match, "Expected: " + JSON.stringify(expected) + " but Actual: " + JSON.stringify(actual));
+        }
+    },
+
+    testListTypeWithStringDefaultValueNumbers : {
+        test : function(cmp) {
+            var expected = [1, 2, 3];
+            var actual = cmp.get("v.listDefaultWithBracketString");
+            $A.test.assertTrue($A.util.isArray(actual));
+            var result = $A.test.compareValues(expected, actual);
+            $A.test.assertTrue(result.match, "Expected: " + JSON.stringify(expected) + " but Actual: " + JSON.stringify(actual));
+        }
+    },
+
+    testListTypeWithStringElementContainBrancketDefaultValue : {
+        test : function(cmp) {
+            var expected = ['[1]', '2', '3'];
+            var actual = cmp.get("v.listDefaultWithStringContainBracket");
+            $A.test.assertTrue($A.util.isArray(actual));
+            var result = $A.test.compareValues(expected, actual);
+            $A.test.assertTrue(result.match, "Expected: " + JSON.stringify(expected) + " but Actual: " + JSON.stringify(actual));
         }
     },
 
@@ -97,7 +181,7 @@
                 $A.test.assertUndefined(cmp.get("v.StrAttributeWithDefaultValue"));
                 this.waitForErrorModal(
                         function(){
-                            $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(), "' is not visible to '",
                                     "Access Check Failed! AttributeSet.get(): attribute 'StrAttributeWithDefaultValue' of component 'markup://attributesTest:defaultValue",
                                         "markup://attributesTest:defaultValue");
                     });
@@ -107,7 +191,7 @@
                 $A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithDefaultValue"));
                 this.waitForErrorModal(
                     function(){
-                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(), "' is not visible to '",
                                 "Access Check Failed! AttributeSet.get(): attribute 'strATTRIBUTEWithDefaultValue' of component 'markup://attributesTest:defaultValue",
                                     "markup://attributesTest:defaultValue");
                     });
@@ -120,7 +204,7 @@
                 $A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithDefaultValue"));
                 this.waitForErrorModal(
                     function(){
-                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(), "' is not visible to '",
                                 "Access Check Failed! AttributeSet.get(): attribute 'strATTRIBUTEWithDefaultValue' of component 'markup://attributesTest:defaultValue",
                                     "markup://attributesTest:defaultValue");
                     });
@@ -133,55 +217,55 @@
      * being creates already has its def at the client.
      */
     testNewComponentChangingDefaultValues : {
-        test : function(cmp) {
-            var self = this;
+        test : function(/*cmp*/) {
+            var that = this;
             $A.createComponent("attributesTest:defaultValue", {},
                 function (newComp) {
-                    self.verifyChangingAttributeValues(newComp);
+                    that.verifyChangingAttributeValues(newComp);
                 }
             );
         }
     },
 
     testNewComponentDefaultValueBasicDataTypes: {
-        test: function(cmp) {
-            var self = this;
+        test: function(/*cmp*/) {
+            var that = this;
             $A.createComponent("attributesTest:defaultValue", {},
                 function (newComp) {
-                    self.verifyDefaultValuesOfBasicDataType(newComp);
+                    that.verifyDefaultValuesOfBasicDataType(newComp);
                 }
             );
         }
     },
 
     testNewComponentDefaultValueObjectDataType: {
-        test: function(cmp) {
-            var self = this;
+        test: function(/*cmp*/) {
+            var that = this;
             $A.createComponent("attributesTest:defaultValue", {},
                 function(newComp) {
-                    self.verifyDefaultValuesOfObjectDataType(newComp);
+                    that.verifyDefaultValuesOfObjectDataType(newComp);
                 }
             );
         }
     },
 
     testNewComponentDefaultValueListDataType: {
-        test: function(cmp) {
-            var self = this;
+        test: function(/*cmp*/) {
+            var that = this;
             $A.createComponent("attributesTest:defaultValue", {},
                 function (newComp) {
-                    self.verifyDefaultValuesOfListDataType(newComp);
+                    that.verifyDefaultValuesOfListDataType(newComp);
                 }
             );
         }
     },
 
     testNewComponentDefaultValueMapDataType: {
-        test: function(cmp) {
-            var self = this;
+        test: function(/*cmp*/) {
+            var that = this;
             $A.createComponent("attributesTest:defaultValue", {},
                 function (newComp) {
-                    self.verifyDefaultValuesOfMapDataType(newComp);
+                    that.verifyDefaultValuesOfMapDataType(newComp);
                 }
             );
         }
@@ -248,7 +332,7 @@
         $A.test.assertEquals("Saturday Night Live", testCmp.get("v.strAttributeWithNoDefaultValue"),
                 "Failed to change value of attribute.");
 
-        testCmp.set("v.objAttributeWithDefaultValue", "['white','black']")
+        testCmp.set("v.objAttributeWithDefaultValue", "['white','black']");
         $A.test.assertEquals("['white','black']", testCmp.get("v.objAttributeWithDefaultValue"),
                 "Failed to change value of attribute.");
 
@@ -311,7 +395,6 @@
             $A.test.assertFalsy(cmp.get("v.booleanDefaultWithNoValue"),
                     "Boolean attribute without defined default value should have falsy value.");
 
-            var attributeType = "boolean";
             $A.test.assertEquals(true, cmp.get("v.booleanDefaultWithStringTrue"),
                     "boolean attribute value did not match default value as true in String.");
             $A.test.assertEquals(false, cmp.get("v.booleanDefaultWithStringFalse"),
@@ -332,7 +415,6 @@
             $A.test.assertFalsy(cmp.get("v.stringDefaultWithNoValue"),
                     "String attribute without defined default value should have falsy value.");
 
-            var attributeType = "string";
             var expected = "test string";
             $A.test.assertEquals(expected, cmp.get("v.stringDefaultWithString"),
                     "string attribute value did not match default value in String.");
@@ -461,5 +543,4 @@
         $A.test.assertFalsy(testCmp.get("v.strAttributeWithNoDefaultValue"),
                 "Attributes without default value should have undefined as value");
     }
-
 })

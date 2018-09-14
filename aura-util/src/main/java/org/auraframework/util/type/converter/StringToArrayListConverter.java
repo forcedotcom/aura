@@ -60,6 +60,14 @@ public class StringToArrayListConverter implements Converter<String, ArrayList> 
                 // Didn't parse, fall back to splitSimple down below.
             }
         }
+        
+        // This flow is considered deprecated because it does not respect the single or double quotes.
+        // For example, "'a,a','b,b'" will become {"'a", "a'", "'b", "b'"} splitting on the commas in the Strings 
+        // Another example, "'a','b'" will become {"'a'", "'b'"} preserving the single quotes in the Strings
+        // This is being tracked in bug: W-5416395
+       
+        // TODO display a warning to the developer to use the square bracket syntax.
+
         return new ArrayList<>(Arrays.asList(StringUtils.splitByWholeSeparatorPreserveAllTokens(value, ",")));
     }
 

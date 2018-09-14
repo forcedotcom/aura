@@ -26,6 +26,12 @@ import org.springframework.context.annotation.Lazy;
 
 import com.google.common.collect.Sets;
 
+/**
+ * Converts a {@link String} to a {@link HashSet}.
+ *
+ * <p><i>Note: The suppress warnings "rawtypes" here is because of the broken Java handling of parameterized
+ * types. It is not possible to properly type things here (syntax errors result).</i></p>
+ */
 @Lazy
 @SuppressWarnings("rawtypes")
 @ServiceComponent
@@ -45,11 +51,18 @@ public class StringToHashSetConverter implements Converter<String, HashSet> {
              try {
                  final JsonStreamReader reader = new JsonStreamReader(value);
                  reader.next();
-                 return Sets.newHashSet(reader.getList());
-             } catch (Exception e) {
+                 return new HashSet<>(reader.getList());
+             } catch (Exception ignore) {
                  // Didn't parse, fall back to splitSimple down below.
              }
         }
+
+        // This flow is considered deprecated because it does not respect the single or double quotes.
+        // For example, "'a,a','b,b'" will become {"'a", "a'", "'b", "b'"} splitting on the commas in the Strings 
+        // Another example, "'a','b'" will become {"'a'", "'b'"} preserving the single quotes in the Strings
+        // This is being tracked in bug: W-5416395
+        
+        // TODO display a warning to the developer to use the square bracket syntax.
         List<String> splitList = AuraTextUtil.splitSimple(",", value);
         return Sets.newHashSet(splitList);
     }
@@ -68,5 +81,4 @@ public class StringToHashSetConverter implements Converter<String, HashSet> {
     public Class<?>[] getToParameters() {
         return null;
     }
-
 }

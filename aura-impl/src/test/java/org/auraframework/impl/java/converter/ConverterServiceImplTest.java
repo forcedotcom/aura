@@ -15,6 +15,18 @@
  */
 package org.auraframework.impl.java.converter;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+
+import javax.inject.Inject;
+
 import org.auraframework.impl.util.AuraLocaleImpl;
 import org.auraframework.service.ConverterService;
 import org.auraframework.util.date.AuraDateUtil;
@@ -29,16 +41,7 @@ import org.auraframework.util.type.CustomPairType;
 import org.auraframework.util.type.CustomParentType;
 import org.junit.Test;
 
-import javax.inject.Inject;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
+import com.google.common.collect.Maps;
 
 /**
  * Verify implementation of JavaLocalizedconverterService used to convert data from a
@@ -329,31 +332,31 @@ public class ConverterServiceImplTest extends UnitTestCase {
      * aura-util/java/src/aura/util/type/converter/StringToBooleanConverter.java
      */
     @Test
-    public void testBoolean() throws Exception {
+    public void testBoolean() {
         runPassPairs(Boolean.class, new Object[] { "true", Boolean.TRUE, "false", Boolean.FALSE, "True", Boolean.TRUE,
                 "False", Boolean.FALSE, "truE", Boolean.TRUE, "falsE", Boolean.FALSE, "yes", Boolean.FALSE, "on",
                 Boolean.FALSE, "1", Boolean.FALSE, }, true);
     }
 
     /**
-     * Long to Date.
+     * {@link Long} to {@link Date}.
      * 
      * aura-util/java/src/aura/util/type/converter/LongToDateConverter.java
      */
     @Test
-    public void testLongToDate() throws Exception {
+    public void testLongToDate() {
         runPassPairs(Date.class, new Object[] { Long.valueOf(0L), new Date(0), Long.valueOf(-1234L), new Date(-1234L),
                 Long.valueOf(12345678901234L), new Date(12345678901234L), }, true);
     }
 
     /**
-     * String to array list.
+     * {@link String} to {@link ArrayList}.
      * 
      * aura-util/java/src/aura/util/type/converter/StringToArrayListConverter.
      * java
      */
     @Test
-    public void testStringToArrayList() throws Exception {
+    public void testStringToArrayList() {
         runPassPairs(
                 ArrayList.class,
                 new Object[] { "a,,b, c,d , e ",
@@ -362,7 +365,7 @@ public class ConverterServiceImplTest extends UnitTestCase {
     }
 
     /**
-     * String to list.
+     * {@link String} to {@link List}.
      * 
      * FIXME W-1336388: does this converter make any sense? List vs. ArrayList
      * gives very different results.
@@ -370,7 +373,7 @@ public class ConverterServiceImplTest extends UnitTestCase {
      * aura-util/java/src/aura/util/type/converter/StringToListConverter.java
      */
     @Test
-    public void testStringToList() throws Exception {
+    public void testStringToList() {
         runPassPairs(List.class,
                 new Object[] { "a,,b, c,d , e ",
                         new ArrayList<>(Arrays.asList(new String[] { "a,,b, c,d , e " })), "",
@@ -378,7 +381,7 @@ public class ConverterServiceImplTest extends UnitTestCase {
     }
 
     /**
-     * ArrayList of String to array of dates.
+     * {@link ArrayList} of {@link String} to array of {@link Date}s.
      * 
      * FIXME W-1336388: This converter is totally bogus, it doesn't act like
      * other string to date converters, meaning that we have a totally
@@ -388,14 +391,14 @@ public class ConverterServiceImplTest extends UnitTestCase {
      * .java
      */
     @Test
-    public void testStringToDateArray() throws Exception {
+    public void testStringToDateArray() {
         runPassPairs(Date.class, Date[].class,
                 new Object[] { new ArrayList<>(Arrays.asList(new String[] { "1234", "2345", "-3456" })),
                         new Date[] { new Date(1234L), new Date(2345L), new Date(-3456) } });
     }
 
     /**
-     * String to date only.
+     * {@link String} to {@link Date} only.
      * 
      * FIXME W-1336388: This converter is totally bogus, it doesn't act like
      * other string to date converters, meaning that we have a totally
@@ -404,7 +407,7 @@ public class ConverterServiceImplTest extends UnitTestCase {
      * aura-util/java/src/aura/util/type/converter/StringToDateOnlyConverter.
      * java
      */
-    // public void testStringToDateOnly() throws Exception {
+    // public void testStringToDateOnly() {
     // runPassPairs(DateOnly.class,
     // new Object [] {
     // "2000-01-01", new DateOnly(946684800000L),
@@ -414,23 +417,23 @@ public class ConverterServiceImplTest extends UnitTestCase {
     // }
 
     /**
-     * Boolean to string.
+     * {@link Boolean} to {@link String}.
      * 
      * aura-util/java/src/aura/util/type/converter/BooleanToStringConverter.java
      */
     @Test
-    public void testBooleanToString() throws Exception {
+    public void testBooleanToString() {
         runPassPairs(String.class, new Object[] { Boolean.TRUE, "true", Boolean.FALSE, "false", }, true);
     }
 
     /**
-     * Big Decimal to string.
+     * {@link BigDecimal} to {@link String}.
      * 
      * aura-util/java/src/aura/util/type/converter/BigDecimalToStringConverter.
      * java
      */
     @Test
-    public void testBigDecimalToString() throws Exception {
+    public void testBigDecimalToString() {
         runPassPairs(String.class, new Object[] { new BigDecimal(0), "0", new BigDecimal(12345678901234L),
                 "12345678901234", new BigDecimal(-12345678901234L), "-12345678901234",
                 new BigDecimal("12345678.901234"), "12345678.901234", new BigDecimal("-12345678.901234"),
@@ -438,13 +441,13 @@ public class ConverterServiceImplTest extends UnitTestCase {
     }
 
     /**
-     * String to big decimal.
+     * {@link String} to {@link BigDecimal}.
      * 
      * aura-util/java/src/aura/util/type/converter/StringToBigDecimalConverter.
      * java
      */
     @Test
-    public void testStringToBigDecimal() throws Exception {
+    public void testStringToBigDecimal() {
         runPassPairs(BigDecimal.class, new Object[] { "0", new BigDecimal(0), "12345678901234",
                 new BigDecimal(12345678901234L), "-12345678901234", new BigDecimal(-12345678901234L),
                 "12345678.901234", new BigDecimal("12345678.901234"), "-12345678.901234",
@@ -452,12 +455,12 @@ public class ConverterServiceImplTest extends UnitTestCase {
     }
 
     /**
-     * Long to Integer
+     * {@link Long} to {@link Integer}
      * 
      * aura-util/java/src/aura/util/type/converter/LongToIntegerConverter.java
      */
     @Test
-    public void testLongToInteger() throws Exception {
+    public void testLongToInteger() {
         runPassPairs(Integer.class, new Object[] { new Long(1234), new Integer(1234), new Long(-1234),
                 new Integer(-1234), new Long(Integer.MAX_VALUE), new Integer(Integer.MAX_VALUE),
                 new Long(Integer.MIN_VALUE), new Integer(Integer.MIN_VALUE), new Long(Integer.MAX_VALUE + 1L),
@@ -465,43 +468,43 @@ public class ConverterServiceImplTest extends UnitTestCase {
     }
 
     /**
-     * ArrayList to Integer array.
+     * {@link ArrayList} to {@link Integer} array.
      * 
      * aura-util/java/src/aura/util/type/converter/
      * ArrayListToIntegerArrayConverter.java
      */
     @Test
-    public void testArrayListToIntegerArray() throws Exception {
+    public void testArrayListToIntegerArray() {
         runPassPairs(Integer.class, Integer[].class,
                 new Object[] { new ArrayList<>(Arrays.asList(new String[] { "0", "-1234", "1234567890" })),
                         new Integer[] { new Integer(0), new Integer(-1234), new Integer(1234567890), }, });
     }
 
     /**
-     * String to integer converter.
+     * {@link String} to {@link Integer} converter.
      * 
      * aura-util/java/src/aura/util/type/converter/StringToIntegerConverter.java
      */
     @Test
-    public void testStringToInteger() throws Exception {
+    public void testStringToInteger() {
         runPassPairs(Integer.class, new Object[] { "0", new Integer(0), "-1234", new Integer(-1234), "1234567890",
                 new Integer(1234567890), }, true);
     }
 
     /**
-     * String to String array.
+     * {@link String} to {@code String} array.
      * 
      * aura-util/java/src/aura/util/type/converter/StringToStringArrayConverter.
      * java
      */
     @Test
-    public void testStringToStringArray() throws Exception {
+    public void testStringToStringArray() {
         runPassPairs(String.class, String[].class, new Object[] { "a,,b, c,d , e ",
                 new String[] { "a", "", "b", " c", "d ", " e " }, "", new String[] {}, });
     }
 
     /**
-     * String to Calendar.
+     * {@link String} to {@link Calendar}.
      * 
      * FIXME W-1336388: This, again, is inconsistent.
      * 
@@ -509,7 +512,7 @@ public class ConverterServiceImplTest extends UnitTestCase {
      * java
      */
     @Test
-    public void testStringToCalendar() throws Exception {
+    public void testStringToCalendar() {
         Calendar c1, c2, c3, c4;
 
         c1 = Calendar.getInstance();
@@ -526,7 +529,7 @@ public class ConverterServiceImplTest extends UnitTestCase {
     }
 
     /**
-     * ArrayList to String array.
+     * {@link ArrayList} to {@link String} array.
      * 
      * FIXME W-1336388: This is bizarre, as this one trims.
      * 
@@ -534,20 +537,20 @@ public class ConverterServiceImplTest extends UnitTestCase {
      * ArrayListToStringArrayConverter.java
      */
     @Test
-    public void testArrayListToStringArray() throws Exception {
+    public void testArrayListToStringArray() {
         runPassPairs(String.class, String[].class,
                 new Object[] { new ArrayList<>(Arrays.asList(new String[] { " a ", "b", " ", "c" })),
                         new String[] { "a", "b", "", "c" }, });
     }
 
     /**
-     * ArrayList to Boolean array.
+     * {@link ArrayList} to {@link Boolean} array.
      * 
      * aura-util/java/src/aura/util/type/converter/
      * ArrayListToBooleanArrayConverter.java
      */
     @Test
-    public void testArrayListToBooleanArray() throws Exception {
+    public void testArrayListToBooleanArray() {
         runPassPairs(Boolean.class, Boolean[].class,
                 new Object[] { new ArrayList<>(Arrays.asList(new Boolean[] { Boolean.TRUE, Boolean.FALSE })),
                         new Boolean[] { Boolean.TRUE, Boolean.FALSE }, });
@@ -562,78 +565,78 @@ public class ConverterServiceImplTest extends UnitTestCase {
     }
 
     /**
-     * String to hash set.
+     * {@link String} to {@link HashSet}.
      * 
      * aura-util/java/src/aura/util/type/converter/StringToHashSetConverter.java
      */
     @Test
-    public void testStringToHashSet() throws Exception {
+    public void testStringToHashSet() {
         runPassPairs(HashSet.class,
                 new Object[] { "a,b, c, d ",
                         new HashSet<>(Arrays.asList(new String[] { "a", "b", " c", " d " })), }, true);
     }
 
     /**
-     * String to double.
+     * {@link String} to {@link Double}.
      * 
      * aura-util/java/src/aura/util/type/converter/StringToDoubleConverter.java
      */
     @Test
-    public void testStringToDouble() throws Exception {
+    public void testStringToDouble() {
         runPassPairs(Double.class, new Object[] { "1234.1234", new Double(1234.1234), }, true);
     }
 
     /**
-     * String to long.
+     * {@link String} to {@link Long}.
      * 
      * aura-util/java/src/aura/util/type/converter/StringToLongConverter.java
      */
     @Test
-    public void testStringToLong() throws Exception {
+    public void testStringToLong() {
         runPassPairs(Long.class, new Object[] { "1", new Long(1), "-1234", new Long(-1234), }, true);
     }
 
     /**
-     * Integer to string.
+     * {@link Integer} to {@link String}.
      * 
      * aura-util/java/src/aura/util/type/converter/IntegerToStringConverter.java
      */
     @Test
-    public void testIntegerToString() throws Exception {
+    public void testIntegerToString() {
         runPassPairs(String.class, new Object[] { new Integer(0), "0", new Integer(1234567890), "1234567890",
                 new Integer(-1234567890), "-1234567890", }, true);
     }
 
     /**
-     * Big Decimal to Integer.
+     * {@link BigDecimal} to {@link Integer}.
      * 
      * aura-util/java/src/aura/util/type/converter/BigDecimalToIntegerConverter.
      * java
      */
     @Test
-    public void testBigDecimalToInteger() throws Exception {
+    public void testBigDecimalToInteger() {
         runPassPairs(Integer.class, new Object[] { new BigDecimal(1234567890), new Integer(1234567890),
                 new BigDecimal(-1234567890), new Integer(-1234567890), }, true);
     }
 
     /**
-     * String to Date.
+     * {@link String} to {@link Date}.
      * 
      * aura-util/java/src/aura/util/type/converter/StringToDateConverter.java
      */
     @Test
-    public void testStringToDate() throws Exception {
+    public void testStringToDate() {
         runPassPairs(Date.class, new Object[] {}, true);
     }
 
     /**
-     * String to HashMap.
+     * {@link String} to {@link HashMap}.
      * 
      * aura-util/java/src/aura/util/type/converter/StringToHashMapConverter.java
      */
     @Test
-    public void testStringToHashMap() throws Exception {
-        HashMap<String, String> out = new HashMap<>();
+    public void testStringToHashMap() {
+        HashMap<String, String> out = Maps.newLinkedHashMapWithExpectedSize(2);
 
         out.put("a", "b");
         out.put("c", "d");
@@ -641,24 +644,24 @@ public class ConverterServiceImplTest extends UnitTestCase {
     }
 
     /**
-     * Long to String.
+     * {@link Long} to {@link String}.
      * 
      * aura-util/java/src/aura/util/type/converter/LongToStringConverter.java
      */
     @Test
-    public void testLongToString() throws Exception {
+    public void testLongToString() {
         runPassPairs(String.class, new Object[] { new Long(0), "0", new Long(12345678901234L), "12345678901234",
                 new Long(-12345678901234L), "-12345678901234", }, true);
     }
 
     /**
-     * Big decimal to long.
+     * {@link BigDecimal} to {@link Long}.
      * 
      * aura-util/java/src/aura/util/type/converter/BigDecimalToLongConverter.
      * java
      */
     @Test
-    public void testBigDecimalToLong() throws Exception {
+    public void testBigDecimalToLong() {
         runPassPairs(Long.class, new Object[] { new BigDecimal(12345678901234L), new Long(12345678901234L),
                 new BigDecimal(-12345678901234L), new Long(-12345678901234L), }, true);
     }

@@ -111,6 +111,15 @@
 
     <aura:attribute type="Set" name="setDefaultWithEmpty" default=""/>
     <aura:attribute type="Set" name="setDefaultWithString" default="'a','b','c'"/>
+    <aura:attribute type="Set" name="setDefaultWithStringWithCommaInIt" default="'a,a','b,b','c,c'"/>
     <aura:attribute type="Set" name="setDefaultWithBracketString" default="[1,2,3]"/>
+    <aura:attribute type="Set" name="setDefaultWithBracketStringWithCommaInIt" default="['1,1','2,2','3,3']"/>
     <aura:attribute type="Set" name="setDefaultWithStringContainBracket" default="['[1]','2','3']"/>
+    
+    <aura:attribute type="List" name="listDefaultWithEmpty" default=""/>
+    <aura:attribute type="List" name="listDefaultWithString" default="'a','b','c'"/>
+    <aura:attribute type="List" name="listDefaultWithStringWithCommaInIt" default="'a,a','b,b','c,c'"/>
+    <aura:attribute type="List" name="listDefaultWithBracketString" default="[1,2,3]"/>
+    <aura:attribute type="List" name="listDefaultWithBracketStringWithCommaInIt" default="['1,1','2,2','3,3']"/>
+    <aura:attribute type="List" name="listDefaultWithStringContainBracket" default="['[1]','2','3']"/>
 </aura:component>

@@ -492,7 +492,7 @@ InteropComponent.prototype.render = function () {
 InteropComponent.prototype.setupInteropInstance = function () {
     var shadowDomFallback = true;
     //#if {"excludeModes" : ["PRODUCTION"]}
-    shadowDomFallback = !this.isShadowDomUriFlagSet();
+    shadowDomFallback = !(this.isShadowDomUriFlagSet() || $A.getContext().isShadowDomEnabled());
     //#end
 
     // W-4708703 This cache needs to be init/reset whenever we setup an interop instance

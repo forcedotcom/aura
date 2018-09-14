@@ -864,18 +864,14 @@ public class AuraContextImpl implements AuraContext {
                 }
 
                 if (this.useCompatSource()) {
-                    json.writeMapEntry("c", 1);
-                }
-
-                if (this.forceCompat()) {
-                    json.writeMapEntry("fc", 1);
+                    json.writeMapEntry(Json.ApplicationKey.COMPAT, 1);
                 }
 
                 if (style == EncodingStyle.Full) {
 
                     Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
                     if (!moduleNamespaceAliases.isEmpty()) {
-                        json.writeMapEntry("mna", moduleNamespaceAliases);
+                        json.writeMapEntry(Json.ApplicationKey.MODULENAMESPACEALIASES, moduleNamespaceAliases);
                     }
 
                     if (configAdapter.isStrictCSPEnforced()) {
@@ -884,6 +880,10 @@ public class AuraContextImpl implements AuraContext {
 
                     if (configAdapter.isFrozenRealmEnabled()) {
                         json.writeMapEntry("fr", 1);
+                    }
+
+                    if (configAdapter.shadowDomEnabled()) {
+                        json.writeMapEntry(Json.ApplicationKey.SHADOWDOM, 1);
                     }
 
                     if (nonce != null) {

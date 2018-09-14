@@ -55,8 +55,9 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.allowedGlobals = config["allowedGlobals"];
     this.globals = config["globals"];
     this.tokens={};
-    this.useCompatSource = !!config["c"];
-    this.moduleNamespaceAliases = config["mna"] || {};
+    this.useCompatSource = !!config[Json.ApplicationKey.COMPAT];
+    this.shadowDomEnabled = !!config[Json.ApplicationKey.SHADOWDOM];
+    this.moduleNamespaceAliases = config[Json.ApplicationKey.MODULENAMESPACEALIASES] || {};
     this.actionPublicCachingEnabled = !!config["apce"];
     if (this.actionPublicCachingEnabled) {
         this.actionPublicCacheKey = config["apck"];
@@ -669,4 +670,11 @@ Aura.Context.AuraContext.prototype.isCDNEnabled = function() {
  */
 Aura.Context.AuraContext.prototype.isCompat = function() {
     return this.useCompatSource;
+};
+
+/**
+ * @return {boolean} if shadow dom enabled
+ */
+Aura.Context.AuraContext.prototype.isShadowDomEnabled = function() {
+    return this.shadowDomEnabled;
 };

@@ -55,6 +55,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
@@ -76,7 +77,6 @@ public class AuraContextFilter implements Filter {
     private static final StringParam num = new StringParam(AuraServlet.AURA_PREFIX + "num", 0, false);
     private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
     protected static final StringParam pageURI = new StringParam(AuraServlet.AURA_PREFIX + "pageURI", 0, false);
-    protected static final BooleanParam modulesParam = new BooleanParam(AuraServlet.AURA_PREFIX + "modules", false);
     protected static final BooleanParam compatParam = new BooleanParam(AuraServlet.AURA_PREFIX + "compat", false);
 
     private AuraTestFilter testFilter;
@@ -233,7 +233,7 @@ public class AuraContextFilter implements Filter {
         
         context.setClient(new Client(request.getHeader(HttpHeaders.USER_AGENT)));
 
-        context.setForceCompat(forceCompat(request, configMap, m));
+        context.setForceCompat(forceCompat(request, m));
         context.setUseCompatSource(context.forceCompat() || useCompatSource(request, configMap, m));
 
         context.setActionPublicCacheKey(getActionPublicCacheKey(configMap));
@@ -375,7 +375,7 @@ public class AuraContextFilter implements Filter {
     protected boolean useCompatSource(HttpServletRequest request, Map<String, Object> configMap, Mode mode) {
         if (configMap != null) {
             // when c is present, it's a request to fetch module compiled code in compatibility mode
-            return configMapContains("c", "1", configMap);
+            return configMapContains(Json.ApplicationKey.COMPAT.toString(), "1", configMap);
         }
 
         String uaHeader = request.getHeader(HttpHeaders.USER_AGENT);
@@ -383,20 +383,14 @@ public class AuraContextFilter implements Filter {
     }
 
     /**
-     * force compat mode
+     * force compat mode by specifying aura.compat url param
      *
      * @param request http request
-     * @param configMap The configs containing the context.
      * @param mode Aura context mode
      * @return whether compat module should be served
      */
     @SuppressWarnings("static-method")
-    protected boolean forceCompat(HttpServletRequest request, Map<String, Object> configMap, Mode mode) {
-        if (configMap != null) {
-            // when fc is present, it's a request to fetch module compiled code in compatibility mode
-            return configMapContains("fc", "1", configMap);
-        }
-
+    protected boolean forceCompat(HttpServletRequest request, Mode mode) {
         if (mode == Mode.DEV || mode == Mode.SELENIUM) {
             // DO NOT allow url param override in prod
             String forceCompatEnabledParam = request.getParameter(AuraServlet.AURA_PREFIX + "compat");
@@ -405,7 +399,6 @@ public class AuraContextFilter implements Filter {
                 return compatParam.get(request);
             }
         }
-
         return false;
     }
 

@@ -50,7 +50,7 @@ import com.google.common.collect.Sets;
  */
 public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
 
-    public static interface AuraContextJsonSerializerProvider {
+    public interface AuraContextJsonSerializerProvider {
         AuraContextJsonSerializer createAuraContextJsonSerializer(ConfigAdapter configAdapter,
                 TestContextAdapter testContextAdapter, DefinitionService definitionService);
     }
@@ -331,15 +331,15 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
 
         Map<String, String> moduleNamespaceAliases = configAdapter.getModuleNamespaceAliases();
         if (!moduleNamespaceAliases.isEmpty()) {
-            json.writeMapEntry("mna", moduleNamespaceAliases);
+            json.writeMapEntry(Json.ApplicationKey.MODULENAMESPACEALIASES, moduleNamespaceAliases);
         }
 
         if (ctx.useCompatSource()) {
-            json.writeMapEntry("c", 1);
+            json.writeMapEntry(Json.ApplicationKey.COMPAT, 1);
         }
 
-        if (ctx.forceCompat()) {
-            json.writeMapEntry("fc", 1);
+        if (configAdapter.shadowDomEnabled()) {
+            json.writeMapEntry(Json.ApplicationKey.SHADOWDOM, 1);
         }
 
         if (isApplication) {

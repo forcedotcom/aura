@@ -886,4 +886,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public String getCSPReportUri(){ return CSPReporterServlet.URL; }
+
+    @Override
+    public boolean shadowDomEnabled() {
+        return false;
+    }
 }

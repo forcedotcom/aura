@@ -263,4 +263,6 @@ public interface ConfigAdapter extends AuraAdapter {
      * @return the report-uri for CSP directives
      */
     String getCSPReportUri();
+
+    boolean shadowDomEnabled();
 }

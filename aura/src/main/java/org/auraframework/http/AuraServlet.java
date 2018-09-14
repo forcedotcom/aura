@@ -230,7 +230,7 @@ public class AuraServlet extends AuraBaseServlet {
         try {
             message = (Map<String, List<Map<String, ?>>>) new JsonReader().read(new StringReader(input));
         } catch(final ClassCastException cce) {
-            throw new AuraRequestInputException(cce, input, "Aura request data must be sent as JSON map of data");
+            throw new AuraRequestInputException(cce, input, "Data in a request must be a map of name-value pairs in JSON format");
         }
         if (message == null) {
             return null;

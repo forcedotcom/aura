@@ -232,7 +232,7 @@ public class AuraServletTest extends UnitTestCase {
     @Test
     public void testReadMessageInvalidFormatJSON() throws QuickFixException {
         thrown.expect(AuraRequestInputException.class);
-        thrown.expectMessage("[AuraClientInputException from server] Unexpected request input. Expected input format: \"Aura request data must be sent as JSON map of data\".");
+        thrown.expectMessage("[AuraClientInputException from server] Unexpected request input. Expected input format: \"Data in a request must be a map of name-value pairs in JSON format\".");
         
         originalServlet.readMessage("3.141592653589793238462643383279");
     }

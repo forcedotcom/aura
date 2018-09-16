@@ -243,7 +243,7 @@ Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic, in
         contextToSend["apck"] = this.actionPublicCacheKey;
     }
     if(this.useCompatSource) {
-        contextToSend["c"] = 1;
+        contextToSend[Json.ApplicationKey.COMPAT] = 1;
     }
     contextToSend[Json.ApplicationKey.URIADDRESSABLEDEFINITIONS] = this.uriAddressableDefsEnabled;
     return $A.util.json.encode(contextToSend);
@@ -463,7 +463,6 @@ Aura.Context.AuraContext.prototype.joinComponentConfigs = function(otherComponen
  *
  * @public
  * @param {string} actionId the action id that we should clear.
- * @return {number} the count of component configs removed.
  * @export
  */
 Aura.Context.AuraContext.prototype.clearComponentConfigs = function(actionId) {

@@ -33,6 +33,7 @@ public class TestJs extends TestResource {
 
     @Override
     void write(HttpServletResponse response, TestSuiteDef testSuite, String testName) throws IOException {
+        @SuppressWarnings("resource")
         Writer writer = response.getWriter();
         writer.append(""
         		+ "(function(name,suite){"

@@ -61,7 +61,7 @@ public class ExpressionRenderer implements Renderer {
             if (!inTemplate) {
                 // We don't escape all the HTML characters, because quotes in particular
                 // would cause problems.
-                escaped = escaped.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+                escaped = escaped.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
             }
             rc.getCurrent().append(escaped);
         } else if (value instanceof List) {

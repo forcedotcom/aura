@@ -16,7 +16,16 @@
 
 package org.auraframework.http.resource;
 
-import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -32,14 +41,7 @@ import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Map;
+import com.google.common.collect.Maps;
 
 @ServiceComponent
 public class Manifest extends AuraResourceImpl {
@@ -107,7 +109,7 @@ public class Manifest extends AuraResourceImpl {
                     definitionService.updateLoaded(descr);
                     appOk = true;
                 }
-            } catch (QuickFixException | ClientOutOfSyncException ex) {
+            } catch (QuickFixException | ClientOutOfSyncException ignore) {
                 // QuickFixException
                 // ignore qfe, since we really don't care... the manifest will be 404ed.
                 // This will eventually cause the browser to give up. Note that this case
@@ -140,7 +142,7 @@ public class Manifest extends AuraResourceImpl {
             // write these signatures in multiple places, but we just
             // need to make sure that they are in at least one place.
             //
-            Map<String, Object> attribs = Maps.newHashMap();
+            Map<String, Object> attribs = Maps.newHashMapWithExpectedSize(4);
             String appUid = getContextAppUid(context);
             String nonce = configAdapter.getAuraFrameworkNonce();
             // Since we don't get the UID from our URL, we set it here.
@@ -233,7 +235,7 @@ public class Manifest extends AuraResourceImpl {
         if (app != null) {
             try {
                 return definitionService.getUid(null, app);
-            } catch (QuickFixException e) {
+            } catch (QuickFixException ignore) {
                 // This is perfectly possible, but the error is handled in more
                 // contextually-sensible places. For here, we know there's no
                 // meaningful uid, so we fall through and return null.

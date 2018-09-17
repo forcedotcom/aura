@@ -15,10 +15,10 @@
  */
 package org.auraframework.http.resource;
 
+import java.io.InputStream;
+
 import org.auraframework.system.StaticResource;
 import org.auraframework.util.resource.ResourceLoader;
-
-import java.io.InputStream;
 
 /**
  * Delivers static file resources
@@ -58,14 +58,12 @@ public class FileStaticResource implements StaticResource {
             path = String.format(format, "/" + nonceUid + file);
             if (resourceLoader.getResource(path) != null) {
                 // file exists so doesn't have a nonce
-                return false;
-            } else {
-                return null;
+                return Boolean.FALSE;
             }
-        } else {
-            // nonce exists but not matching
-            return true;
+            return null;
         }
+        // nonce exists but not matching
+        return Boolean.TRUE;
     }
 
     /**

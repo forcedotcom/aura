@@ -166,5 +166,5 @@ public class ActionDelegate implements Action {
         original.setCallingDescriptor(def);
     }
 
-    private Action original;
+    private final Action original;
 }

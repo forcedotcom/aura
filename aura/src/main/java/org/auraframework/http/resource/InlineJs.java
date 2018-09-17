@@ -94,6 +94,7 @@ public class InlineJs extends AuraResourceImpl {
         servletUtilAdapter.setNoCache(response);
 
         // Prevents Mhtml Xss exploit:
+        @SuppressWarnings("resource")
         PrintWriter out = response.getWriter();
         out.write("\n    ");
 
@@ -160,5 +161,4 @@ public class InlineJs extends AuraResourceImpl {
             }
         }
     }
-
 }

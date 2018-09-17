@@ -40,9 +40,9 @@ import com.google.common.collect.ImmutableList;
 public class AuraCSPInliningService implements CSPInliningService {
     static final long serialVersionUID = -5862171003552767370L;
     
-    static String INLINE = "<script>%s</script>";
-    static String INLINE_NONCE = "<!--\"'--><script nonce=\"%s\">%s</script>";
-    static String NONCE_INJECTION_PROTECTION = "<!--\"'-->";
+    static final String INLINE = "<script>%s</script>";
+    static final String INLINE_NONCE = "<!--\"'--><script nonce=\"%s\">%s</script>";
+    static final String NONCE_INJECTION_PROTECTION = "<!--\"'-->";
 
     private List<CSPInliningRule> rules;
 
@@ -59,7 +59,7 @@ public class AuraCSPInliningService implements CSPInliningService {
         AuraContext context = contextService.getCurrentContext();
         List<String> directives = new ArrayList<>();
         InlineScriptMode scriptMode = getInlineMode();
-        switch (scriptMode){
+        switch (scriptMode) {
             case HASH:
                 ImmutableList<String> scriptHashes = context.getScriptHashes();
                 for (String hash: scriptHashes){
@@ -79,7 +79,7 @@ public class AuraCSPInliningService implements CSPInliningService {
 
     @Override
     public void processScript(String script) {
-        switch(getInlineMode()){
+        switch(getInlineMode()) {
             case HASH:
                 contextService.getCurrentContext().addScriptHash(hashScript(script));
                 break;
@@ -93,7 +93,7 @@ public class AuraCSPInliningService implements CSPInliningService {
 
     @Override
     public void writeInlineScriptAttributes(Appendable out) throws IOException {
-        if (getInlineMode() == NONCE){
+        if (getInlineMode() == NONCE) {
             ensureNoncePresent();
             out.append(String.format(" nonce=\"%s\" ", contextService.getCurrentContext().getScriptNonce()));
         }
@@ -101,9 +101,9 @@ public class AuraCSPInliningService implements CSPInliningService {
 
     @Override
     public void writeInlineScript(String script, Appendable out) throws IOException {
-        if (script != null && script.length() > 0) {
+        if ((script != null) && (script.length() > 0)) {
             processScript(script);
-            switch(getInlineMode()){
+            switch(getInlineMode()) {
                 case UNSAFEINLINE:
                 case HASH:
                     out.append(String.format(INLINE, script));
@@ -147,7 +147,7 @@ public class AuraCSPInliningService implements CSPInliningService {
         }
     }
 
-    String hashScript(String script) {
+    static final String hashScript(String script) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             digest.update(script.getBytes());
@@ -161,7 +161,7 @@ public class AuraCSPInliningService implements CSPInliningService {
 
     private void ensureNoncePresent() {
         AuraContext currentContext = contextService.getCurrentContext();
-        if (currentContext.getScriptNonce() == null){
+        if (currentContext.getScriptNonce() == null) {
             Random r = new Random();
             String nonce = new UUID(r.nextLong(), r.nextLong()).toString();
             currentContext.setScriptNonce(nonce);

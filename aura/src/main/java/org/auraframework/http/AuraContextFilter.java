@@ -389,7 +389,7 @@ public class AuraContextFilter implements Filter {
      * @param mode Aura context mode
      * @return whether compat module should be served
      */
-    @SuppressWarnings("static-method")
+    @SuppressWarnings({ "static-method", "boxing" })
     protected boolean forceCompat(HttpServletRequest request, Mode mode) {
         if (mode == Mode.DEV || mode == Mode.SELENIUM) {
             // DO NOT allow url param override in prod

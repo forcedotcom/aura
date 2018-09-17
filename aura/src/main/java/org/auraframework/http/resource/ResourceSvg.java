@@ -47,7 +47,7 @@ public class ResourceSvg extends AuraResourceImpl {
             response.setHeader(HttpHeaders.CACHE_CONTROL, "private,must-revalidate,max-age=0");
 
             String fqn = lookup.get(request);
-            if (fqn == null || fqn.isEmpty()) {
+            if ((fqn == null) || fqn.isEmpty()) {
                 fqn = context.getApplicationDescriptor().getQualifiedName();
             }
             DefDescriptor<SVGDef> svg = definitionService.getDefDescriptor(fqn, SVGDef.class);
@@ -57,14 +57,14 @@ public class ResourceSvg extends AuraResourceImpl {
             String etag = request.getHeader(HttpHeaders.IF_NONE_MATCH);
             //generate the new etag from the definitions hash
             //note per rfc7232 etags are a opaque quoted string
-            String hash = "\"" + def.getOwnHash() + "\"";
+            String hash = '"' + def.getOwnHash() + '"';
             //For security reasons, if the user fetches the svg from the browser directly we
             //force the browser to download the file
             if (request.getHeader(HttpHeaders.REFERER) == null) {
                 response.setContentType(null);
                 response.setHeader("Content-Disposition", "attachment; filename=resources.svg");
                 //Otherwise check the etag, if it matches that reply with a 304, unchanged
-            } else if (etag != null && etag.equals(hash)) {
+            } else if ((etag != null) && etag.equals(hash)) {
                 response.setStatus(304);
                 return;
             }

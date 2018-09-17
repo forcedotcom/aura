@@ -16,8 +16,10 @@
 package org.auraframework.instance;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,9 +28,6 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.Json;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * A 'stack' of components specifying the position in the tree.
@@ -49,7 +48,7 @@ public class InstanceStack {
 
     public InstanceStack() {
         this.path = new StringBuilder();
-        this.stack = Lists.newArrayList();
+        this.stack = new ArrayList<>();
         this.current = new Entry(null, path.length());
         setAttributeName("body");
         setAttributeIndex(0);
@@ -168,13 +167,17 @@ public class InstanceStack {
             throw new AuraRuntimeException("Setting name illegally");
         }
         current.name = name;
-        path.append("/");
-        if (name.equals("body")) {
-            path.append("*");
-        } else if (name.equals("realbody")) {
-            path.append("+");
-        } else {
-            path.append(name);
+        path.append('/');
+        switch(name) {
+            case "body":
+                path.append('*');
+                break;
+            case "realbody":
+                path.append('+');
+                break;
+            default:
+                path.append(name);
+                break;
         }
         current.namePos = path.length();
     }
@@ -204,9 +207,9 @@ public class InstanceStack {
             throw new AuraRuntimeException("missing clearAttributeIndex");
         }
         current.index = index;
-        path.append("[");
+        path.append('[');
         path.append(index);
-        path.append("]");
+        path.append(']');
     }
 
     /**
@@ -231,22 +234,14 @@ public class InstanceStack {
      * get the top of the stack.
      */
     public Instance<?> peek() {
-        if (current != null) {
-            return current.instance;
-        } else {
-            return null;
-        }
+        return (current != null) ? current.instance : null;
     }
 
     /**
      * get the top of the access stack.
      */
     public Instance<?> getAccess() {
-        if (current != null) {
-            return current.getAccess();
-        } else {
-            return null;
-        }
+        return (current != null) ? current.getAccess() : null;
     }
 
     /** Get the next 'id' for a component.
@@ -271,7 +266,7 @@ public class InstanceStack {
      */
     public void registerComponent(BaseComponent<?, ?> component) {
         if (componentRegistry == null) {
-            componentRegistry = Maps.newLinkedHashMap();
+            componentRegistry = new LinkedHashMap<>();
         }
         //
         // We should be able to assert that the component is not in our registry, but
@@ -307,6 +302,9 @@ public class InstanceStack {
      * A private class to sort by creation path.
      */
     private static class CreationPathSorter implements Comparator<BaseComponent<?, ?>> {
+        
+        CreationPathSorter() {}
+        
         @Override
         public int compare(BaseComponent<?, ?> arg0, BaseComponent<?, ?> arg1) {
             return arg0.getPath().compareTo(arg1.getPath());
@@ -324,7 +322,7 @@ public class InstanceStack {
             //
             return;
         }
-        List<BaseComponent<?, ?>> sorted = Lists.newArrayList();
+        List<BaseComponent<?, ?>> sorted = new ArrayList<>();
 
         for (BaseComponent<?,?> component : components.values()) {
             if (component.hasLocalDependencies()) {
@@ -341,20 +339,22 @@ public class InstanceStack {
     /**
      * Internal routine to get a stack info frame.
      */
-    private void addStackInfo(Entry e, List<String> info) {
-        StringBuffer sb = new StringBuffer();
-        if (e.instance != null) {
-            sb.append(e.instance.getDescriptor());
-            if (e.name != null) {
-                sb.append(".");
-                sb.append(e.name);
-                if (e.index != -1) {
-                    sb.append("[");
-                    sb.append(e.index);
-                    sb.append("]");
-                }
+    private static void addStackInfo(Entry e, List<String> info) {
+        if (e.instance == null) {
+            return;
+        }
+        final StringBuffer sb = new StringBuffer();
+        sb.append(e.instance.getDescriptor());
+        if (e.name != null) {
+            sb.append('.');
+            sb.append(e.name);
+            if (e.index != -1) {
+                sb.append('[');
+                sb.append(e.index);
+                sb.append(']');
             }
         }
+        
         if (sb.length() > 0) {
             info.add(sb.toString());
         }
@@ -364,7 +364,7 @@ public class InstanceStack {
      * Get the current instance stack.
      */
     public List<String> getStackInfo() {
-        List<String> info = Lists.newArrayList();
+        List<String> info = new ArrayList<>();
 
         if (current != null) {
             addStackInfo(current, info);
@@ -404,27 +404,27 @@ public class InstanceStack {
 
         public void pushAccess(Instance<?> instance) {
             if (accessStack == null) {
-                accessStack = Lists.newArrayList();
+                accessStack = new ArrayList<>();
             }
             accessStack.add(instance);
         }
 
         public Instance<?> popAccess() {
-            if (accessStack == null || accessStack.size() == 0) {
+            if ((accessStack == null) || accessStack.isEmpty()) {
                 return null;
             }
-            return accessStack.remove(accessStack.size()-1);
+            return accessStack.remove(accessStack.size() - 1);
         }
         
         public Instance<?> getAccess() {
-            if (accessStack != null && accessStack.size() > 0) {
-                return accessStack.get(accessStack.size()-1);
+            if ((accessStack != null) && !accessStack.isEmpty()) {
+                return accessStack.get(accessStack.size() - 1);
             }
             return instance;
         }
 
         public String accessString() {
-            if (accessStack != null && accessStack.size() > 0) {
+            if (accessStack != null && !accessStack.isEmpty()) {
                 return accessStack.toString();
             }
             return "";
@@ -432,9 +432,9 @@ public class InstanceStack {
 
         @Override
         public String toString() {
-            return "" + this.instance + " @ " + this.index + accessString();
+            return this.instance + " @ " + this.index + accessString();
         }
-    };
+    }
 
     private Map<String, BaseComponent<?, ?>> componentRegistry = null;
     private int nextId = 1;

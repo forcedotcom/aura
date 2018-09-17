@@ -15,10 +15,9 @@
  */
 package org.auraframework.def.module.impl;
 
-
-import org.auraframework.def.module.*;
+import org.auraframework.def.module.ModuleDesignDef;
+import org.auraframework.def.module.TagConfigs;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.springframework.util.StringUtils;
 
 /**
@@ -90,7 +89,7 @@ public class ModuleDesignDefImpl implements ModuleDesignDef {
             return this.tagConfigs;
         }
 
-        public ModuleDesignDefImpl build() throws QuickFixException {
+        public ModuleDesignDefImpl build() {
             return new ModuleDesignDefImpl(this);
         }
     }

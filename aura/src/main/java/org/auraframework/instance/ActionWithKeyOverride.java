@@ -29,8 +29,8 @@ public class ActionWithKeyOverride extends ActionDelegate {
 
     public static final String ERROR_ACTIONTOEXECUTE_MISSING = "actionToExecute required.";
     public static final String ERROR_ACTIONASKEY_MISSING = "actionAsKey required.";
-    private Action actionAsKey;
-    private Action actionToExecute;
+    private final Action actionAsKey;
+    private final Action actionToExecute;
     
     public ActionWithKeyOverride(Action actionAsKey, Action actionToExecute) {
         super(actionToExecute);

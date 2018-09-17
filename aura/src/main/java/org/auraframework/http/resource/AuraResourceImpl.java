@@ -18,6 +18,7 @@ package org.auraframework.http.resource;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -25,6 +26,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
@@ -40,10 +42,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraResource;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
-
 import org.springframework.context.annotation.Lazy;
-
-import com.google.common.collect.Maps;
 
 @ServiceComponent
 public abstract class AuraResourceImpl implements AuraResource {
@@ -170,13 +169,14 @@ public abstract class AuraResourceImpl implements AuraResource {
         this.manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
     }
 
-    private final StringParam attributesParam = new StringParam("aura.attributes", 0, false);
+    private static final StringParam ATTRIBUTES_PARAM = new StringParam("aura.attributes", 0, false);
 
+    @SuppressWarnings("static-method")
     protected Map<String, Object> getComponentAttributes(HttpServletRequest request) {
         if (request == null) {
             return null;
         }
-        String attributesString = attributesParam.get(request);
+        String attributesString = ATTRIBUTES_PARAM.get(request);
         if (attributesString != null) {
             try {
                 if (attributesString.startsWith(AuraTextUtil.urlencode("{"))) {
@@ -186,8 +186,8 @@ public abstract class AuraResourceImpl implements AuraResource {
                 @SuppressWarnings("unchecked")
                 Map<String,Object> result = (Map<String, Object>) new JsonReader().read(attributesString);
                 // Strip any whitespace-keyed params
-                for (Object key : result.keySet().toArray()) {
-                    if (key.toString().trim().isEmpty()) {
+                for (String key : result.keySet()) {
+                    if (StringUtils.isBlank(key)) {
                         result.remove(key);
                     }
                 }
@@ -195,20 +195,19 @@ public abstract class AuraResourceImpl implements AuraResource {
             } catch (Exception e) {
                 return null;
             }
-        } else {
-            Enumeration<String> attributeNames = request.getParameterNames();
-            Map<String, Object> attributes = Maps.newHashMap();
-
-            while (attributeNames.hasMoreElements()) {
-                String name = attributeNames.nextElement().trim();
-                if (!name.startsWith("aura.") && !name.isEmpty()) {
-                    Object value = new StringParam(name, 0, false).get(request);
-
-                    attributes.put(name, value);
-                }
-            }
-            return attributes;
         }
+        Enumeration<String> attributeNames = request.getParameterNames();
+        Map<String, Object> attributes = new HashMap<>();
+
+        while (attributeNames.hasMoreElements()) {
+            String name = attributeNames.nextElement().trim();
+            if (!name.startsWith("aura.") && !name.isEmpty()) {
+                String value = new StringParam(name, 0, false).get(request);
+
+                attributes.put(name, value);
+            }
+        }
+        return attributes;
     }
 
     /**
@@ -218,8 +217,8 @@ public abstract class AuraResourceImpl implements AuraResource {
     public static class AuraResourceException extends Exception {
         private static final long serialVersionUID = 4630562679200875774L;
 
-        private String resourceName;
-        private int statusCode;
+        private final String resourceName;
+        private final int statusCode;
 
         public AuraResourceException(String resourceName, int statusCode, String message, Throwable cause) {
             super(message, cause);
@@ -241,6 +240,4 @@ public abstract class AuraResourceImpl implements AuraResource {
             return statusCode;
         }
     }
-
-};
-
+}

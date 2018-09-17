@@ -16,19 +16,20 @@
 
 package org.auraframework.http.resource;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.auraframework.adapter.AppJsUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.service.ServerService.HYDRATION_TYPE;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Set;
 
 @ServiceComponent
 public class AppCoreJs extends AuraResourceImpl {
@@ -47,6 +48,7 @@ public class AppCoreJs extends AuraResourceImpl {
         }
 
         try {
+            @SuppressWarnings("resource")
             PrintWriter writer = response.getWriter();
             writer.append(AppJsUtilAdapter.APPJS_PREREQ);
             serverService.writeDefinitions(dependencies, writer, true, 0, HYDRATION_TYPE.all);

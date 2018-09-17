@@ -72,22 +72,22 @@ public class LocaleDataJsAppender implements InlineJSAppender{
         // in Locale Value Provider. Keep them all available for now to avoid breaking consumers.
         String langMomentLocale = this.getMomentLocale(langLocale.toString());
         String userMomentLocale = this.getMomentLocale(userLocale.toString());
-        String ltngMomentLocale = this.getMomentLocale(langLocale.getLanguage() + "_" + userLocale.getCountry());
+        String ltngMomentLocale = this.getMomentLocale(langLocale.getLanguage() + '_' + userLocale.getCountry());
 
         StringBuilder defineLocaleJs = new StringBuilder();
         // "en" data has been included in moment lib, no need to load locale data
         if (!"en".equals(langMomentLocale)) {
             String content = this.localeData.get(langMomentLocale);
-            defineLocaleJs.append(content).append("\n");
+            defineLocaleJs.append(content).append('\n');
         }
 
         // if user locale is same as language locale, not need to load again
-        if (!"en".equals(userMomentLocale) && userMomentLocale != null && !userMomentLocale.equals(langMomentLocale)) {
+        if (!"en".equals(userMomentLocale) && (userMomentLocale != null) && !userMomentLocale.equals(langMomentLocale)) {
             String content = this.localeData.get(userMomentLocale);
             defineLocaleJs.append(content);
         }
 
-        if (!"en".equals(ltngMomentLocale) && ltngMomentLocale != null && !ltngMomentLocale.equals(langMomentLocale) && !ltngMomentLocale.equals(userMomentLocale)) {
+        if (!"en".equals(ltngMomentLocale) && (ltngMomentLocale != null) && !ltngMomentLocale.equals(langMomentLocale) && !ltngMomentLocale.equals(userMomentLocale)) {
             String content = this.localeData.get(ltngMomentLocale);
             defineLocaleJs.append(content);
         }
@@ -142,7 +142,7 @@ public class LocaleDataJsAppender implements InlineJSAppender{
         }
 
         // normalize Java locale string to moment locale
-        String normalized = locale.toLowerCase().replace("_", "-");
+        String normalized = locale.toLowerCase().replace('_', '-');
         String[] tokens = normalized.split("-");
 
         // special case for converting Java locale to momentJs Locale
@@ -154,7 +154,7 @@ public class LocaleDataJsAppender implements InlineJSAppender{
 
         String momentLocale = null;
         if (tokens.length > 1) {
-            momentLocale = tokens[0] + "-" + tokens[1];
+            momentLocale = tokens[0] + '-' + tokens[1];
             if (localeData.containsKey(momentLocale)) {
                 return momentLocale;
             }
@@ -171,5 +171,4 @@ public class LocaleDataJsAppender implements InlineJSAppender{
     public Set<String> getMomentLocales() {
         return localeData.keySet();
     }
-
 }

@@ -62,13 +62,13 @@ public class HtmlRenderer implements Renderer {
     @Inject
     CSPInliningService inliningService;
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "null" })
     @Override
     public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {
         String tag = (String) component.getAttributes().getValue("tag");
         String id = component.getLocalId();
         List<Component> body = (List<Component>) component.getAttributes().getValue("body");
-        boolean script = (tag != null && tag.equals("script") && body != null && body.size() > 0);
+        boolean script = ((tag != null) && "script".equals(tag) && (body != null) && !body.isEmpty());
         String scriptBody = "";
         boolean isCspInlineSupported = inliningService.getInlineMode() != InlineScriptMode.UNSUPPORTED;
 
@@ -100,23 +100,23 @@ public class HtmlRenderer implements Renderer {
                         "})"
                 );
                 for (int i = 0; i < numParens; i++) {
-                    rc.getCurrent().append("(");
+                    rc.getCurrent().append('(');
                 }
                 rc.getCurrent().append(
                         "(function(){"
                 );
             }
 
-            for (Component nested: body) {
+            for (Component nested : body) {
                 renderingService.render(nested, rc);
             }
 
             if (lockerRequired) {
                 rc.getCurrent().append(
-                        "}"
+                        '}'
                 );
                 for (int i = 0; i < numParens; i++) {
-                    rc.getCurrent().append(")");
+                    rc.getCurrent().append(')');
                 }
                 rc.getCurrent().append(
                         ", '" + namespace + "');\n"
@@ -132,7 +132,7 @@ public class HtmlRenderer implements Renderer {
             inliningService.processScript(scriptBody);
         }
         Appendable out = rc.getCurrent();
-        if (tag.equalsIgnoreCase("script") && isCspInlineSupported){
+        if ("script".equalsIgnoreCase(tag) && isCspInlineSupported) {
             inliningService.preScriptAppend(out);
         }
         out.append('<');
@@ -144,7 +144,7 @@ public class HtmlRenderer implements Renderer {
             for (Map.Entry<DefDescriptor<AttributeDef>, Object> entry : htmlAttributes.entrySet()) {
                 Object value = entry.getValue();
                 DefDescriptor<AttributeDef> attDef = entry.getKey();
-                if (id != null && "id".equals(attDef.getName())) {
+                if ((id != null) && "id".equals(attDef.getName())) {
                     //
                     // FIXME: This is an error!
                     // Actually, having an id attribute is very dangerous, and
@@ -159,19 +159,19 @@ public class HtmlRenderer implements Renderer {
 
                     String v = value.toString();
                     if (v.startsWith("/auraFW") ) {
-                    	String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-                    	if(!contextPath.isEmpty()) {
-                    		// prepend any Aura resource urls with servlet context path
-                    		v = contextPath + v;
-                    	}
+                        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
+                        if(!contextPath.isEmpty()) {
+                    	        // prepend any Aura resource urls with servlet context path
+                            v = contextPath + v;
+                        }
                     }
 
-                    out.append(' ');
-                    out.append(entry.getKey().getName());
-                    out.append('=');
-                    out.append('"');
-                    out.append(v);
-                    out.append('"');
+                    out.append(' ')
+                       .append(entry.getKey().getName())
+                       .append('=')
+                       .append('"')
+                       .append(v)
+                       .append('"');
                 }
             }
         }
@@ -182,7 +182,7 @@ public class HtmlRenderer implements Renderer {
             out.append('"');
         }
 
-        if (body != null && body.size() > 0 && !tag.equalsIgnoreCase("script")) {
+        if ((body != null) && !body.isEmpty() && !"script".equalsIgnoreCase(tag)) {
             out.append('>');
             for (Component nested : body) {
                 renderingService.render(nested, rc);
@@ -190,10 +190,10 @@ public class HtmlRenderer implements Renderer {
             out.append("</");
             out.append(tag);
             out.append('>');
-        } else if (tag.equalsIgnoreCase("script")){
+        } else if ("script".equalsIgnoreCase(tag)) {
             inliningService.writeInlineScriptAttributes(out);
             out.append(String.format(">%s</%s>", scriptBody, tag));
-        } else if (tag.equalsIgnoreCase("div")) {
+        } else if ("div".equalsIgnoreCase(tag)) {
             out.append("></");
             out.append(tag);
             out.append('>');

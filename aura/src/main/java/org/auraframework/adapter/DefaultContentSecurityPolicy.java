@@ -169,11 +169,11 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
     }
 
     /** Creates a shared, immutable list for same-origin-only */
-    private List<String> getSameOrigin() {
-    	List<String> sameOrigin = new ArrayList<String>(1);
-    	sameOrigin.add(null);
-        
-    	return sameOrigin;
+    private static List<String> getSameOrigin() {
+        List<String> sameOrigin = new ArrayList<>(1);
+        sameOrigin.add(null);
+
+        return sameOrigin;
     }
 
     @Override
@@ -213,7 +213,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
             return ARRAY_ANY;
         } else if (terms.size() == 0) {
             return ARRAY_NONE;
-        } else if (terms.size() == 1 && terms.contains(null)) {
+        } else if ((terms.size() == 1) && terms.contains(null)) {
             return ARRAY_SELF_ONLY;
         }
         String[] result = new String[terms.size()];
@@ -228,5 +228,4 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         }
         return result;
     }
-
 }

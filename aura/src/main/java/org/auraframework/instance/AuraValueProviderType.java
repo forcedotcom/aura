@@ -30,6 +30,8 @@ public enum AuraValueProviderType implements ValueProviderType {
     LOCALE("$Locale", true),
     GLOBAL("$Global", true);
 
+    private static final Map<String, AuraValueProviderType> prefixMap;
+    
     static {
         Map<String, AuraValueProviderType> m = Maps.newHashMapWithExpectedSize(values().length);
         for (AuraValueProviderType t : values()) {
@@ -37,9 +39,8 @@ public enum AuraValueProviderType implements ValueProviderType {
         }
         prefixMap = ImmutableMap.copyOf(m);
     }
-    private static final Map<String, AuraValueProviderType> prefixMap;
 
-    public static AuraValueProviderType getTypeByPrefix(Object prefix) {
+    public static AuraValueProviderType getTypeByPrefix(String prefix) {
         return prefixMap.get(prefix);
     }
 

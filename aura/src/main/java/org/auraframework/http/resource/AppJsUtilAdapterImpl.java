@@ -17,6 +17,7 @@
 package org.auraframework.http.resource;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -30,10 +31,7 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.AuraContext;
-
 import org.springframework.context.annotation.Lazy;
-
-import com.google.common.collect.Sets;
 
 @ServiceComponent
 public class AppJsUtilAdapterImpl implements AppJsUtilAdapter {
@@ -52,13 +50,13 @@ public class AppJsUtilAdapterImpl implements AppJsUtilAdapter {
 
     @Override
     public Set<DefDescriptor<?>> getPartDependencies(Set<DefDescriptor<?>> dependencies, DefDescriptor<? extends BaseComponentDef> appDesc, int partIndex) {
-        if (dependencies == null || appDesc == null) {
+        if ((dependencies == null) || (appDesc == null)) {
             return null;
         }
 
         String appName = appDesc.getQualifiedName();
-        Set<DefDescriptor<?>> dependenciesPart1 = Sets.newHashSet();
-        Set<DefDescriptor<?>> dependenciesPart2 = Sets.newHashSet();
+        Set<DefDescriptor<?>> dependenciesPart1 = new HashSet<>();
+        Set<DefDescriptor<?>> dependenciesPart2 = new HashSet<>();
         int size = dependencies.size();
         Iterator<DefDescriptor<?>> it = dependencies.iterator();
         for (int i = 0; i < size && it.hasNext(); i++) {
@@ -70,12 +68,13 @@ public class AppJsUtilAdapterImpl implements AppJsUtilAdapter {
             }
         }
     
-        return partIndex == 0 ? dependenciesPart1 : dependenciesPart2;
+        return (partIndex == 0) ? dependenciesPart1 : dependenciesPart2;
     }
 
+    @SuppressWarnings("static-method")
     protected boolean filterCriteria(DefDescriptor<?> dependencyDescriptor, String appName) {
         String componentNamespace = dependencyDescriptor.getNamespace();
-        return componentNamespace == null ||
+        return (componentNamespace == null) ||
                 componentNamespace.equalsIgnoreCase("aura") ||
                 componentNamespace.equalsIgnoreCase("ui");
     }

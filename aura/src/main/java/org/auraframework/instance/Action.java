@@ -80,7 +80,7 @@ public interface Action extends Instance<ActionDef> {
 
     Serializer SERIALIZER = new Serializer();
 
-    class Serializer extends NoneSerializer<Action> {
+    static class Serializer extends NoneSerializer<Action> {
 
         @Override
         public void serialize(Json json, Action action) throws IOException {
@@ -109,7 +109,7 @@ public interface Action extends Instance<ActionDef> {
             json.writeMapEntry("error", action.getErrors());
 
             if (action.isStorable()) {
-                json.writeMapEntry("storable", true);
+                json.writeMapEntry("storable", Boolean.TRUE);
             }
 
             if (action.isOfflineAction()) {
@@ -117,7 +117,7 @@ public interface Action extends Instance<ActionDef> {
 
                 // Include params for offline server actions
                 Map<String, Object> params = action.getParams();
-                if (params != null && !params.isEmpty()) {
+                if ((params != null) && !params.isEmpty()) {
                     json.writeMapEntry("params", params);
                 }
             }

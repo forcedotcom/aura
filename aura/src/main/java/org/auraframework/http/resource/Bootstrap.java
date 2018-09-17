@@ -56,6 +56,7 @@ public class Bootstrap extends AuraResourceImpl {
         super("bootstrap.js", Format.JS);
     }
 
+    @SuppressWarnings("boxing")
     protected void setCacheHeaders(HttpServletResponse response, DefDescriptor<? extends BaseComponentDef> appDesc)
             throws QuickFixException {
         Integer cacheExpiration = null;
@@ -65,7 +66,7 @@ public class Bootstrap extends AuraResourceImpl {
             ApplicationDef appDef = (ApplicationDef) definitionService.getDefinition(appDesc);
             cacheExpiration = appDef.getBootstrapPublicCacheExpiration();
         }
-        if (cacheExpiration != null && cacheExpiration > 0) {
+        if ((cacheExpiration != null) && (cacheExpiration > 0)) {
             servletUtilAdapter.setCacheTimeout(response, cacheExpiration.longValue() * 1000, false);
         } else {
             servletUtilAdapter.setNoCache(response);
@@ -108,7 +109,7 @@ public class Bootstrap extends AuraResourceImpl {
             json.writeMapEnd();
             json.writeMapEntry("md5", out.getMD5());
             context.setPreloading(false);
-            context.setUriDefsEnabled(false);
+            context.setUriDefsEnabled(Boolean.FALSE);
             json.writeMapEntry("context", context);
 
             // CSRF token is usually handled in inline.js, but in the few cases
@@ -182,6 +183,7 @@ public class Bootstrap extends AuraResourceImpl {
     private void writeError(Throwable t, HttpServletResponse response, AuraContext context) throws IOException {
         response.resetBuffer();
         servletUtilAdapter.setNoCache(response);
+        @SuppressWarnings("resource")
         PrintWriter out = response.getWriter();
         out.print(bootstrapUtil.getPrependScript());
         JsonEncoder json = JsonEncoder.createJsonStream(out, context.getJsonSerializationContext());
@@ -190,5 +192,4 @@ public class Bootstrap extends AuraResourceImpl {
         json.writeMapEnd();
         out.print(bootstrapUtil.getAppendScript());
     }
-
 }

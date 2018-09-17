@@ -29,7 +29,7 @@ import org.auraframework.system.AuraContext;
 public interface AppJsUtilAdapter {
 
     static final String APPJS_PREREQ = "\"undefined\"===typeof Aura&&(Aura={});Aura.bootstrap||(Aura.bootstrap={});Aura.frameworkJsReady||(Aura.ApplicationDefs={cmpExporter:{},libExporter:{}},$A={componentService:{addComponent:function(a,b){Aura.ApplicationDefs.cmpExporter[a]=b},addLibraryExporter:function(a,b){Aura.ApplicationDefs.libExporter[a]=b},initEventDefs:function(a){Aura.ApplicationDefs.eventDefs=a},initLibraryDefs:function(a){Aura.ApplicationDefs.libraryDefs=a},initControllerDefs:function(a){Aura.ApplicationDefs.controllerDefs=a},initModuleDefs:function(a){Aura.ApplicationDefs.moduleDefs=a}}});\n";
-    static final String APPJS_APPEND = "\n";
+    static final char   APPJS_APPEND = '\n';
     static final String APPCOREJS_READY = "Aura.appCoreJsReady=true;";
     static final String APPJS_READY = "Aura.appJsReady=true;";
     static final String EXECUTE_APPDEFSREADY = "Aura.appDefsReady&&Aura.appDefsReady();";

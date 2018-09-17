@@ -17,8 +17,8 @@ package org.auraframework.modules.impl.metadata;
 
 import org.auraframework.def.PlatformDef.SupportLevel;
 import org.auraframework.def.module.ModuleDef;
-import org.auraframework.impl.root.component.ModuleDefImpl;
 import org.auraframework.impl.source.file.FileSource;
+import org.auraframework.modules.impl.def.ModuleDefImpl;
 import org.auraframework.modules.impl.metadata.xml.ApiVersionElementHandler;
 import org.auraframework.modules.impl.metadata.xml.ExposeElementHandler;
 import org.auraframework.modules.impl.metadata.xml.MinApiVersionElementHandler;

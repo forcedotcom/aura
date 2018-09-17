@@ -17,7 +17,7 @@ package org.auraframework.modules.impl.metadata.xml;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.DefinitionAccessImpl;
-import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
+import org.auraframework.modules.impl.def.ModuleDefImpl.Builder;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.TextSource;
 

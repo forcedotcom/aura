@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.root.component;
+package org.auraframework.modules.impl.def;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -22,6 +22,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.modules.impl.def.ModuleDefImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;

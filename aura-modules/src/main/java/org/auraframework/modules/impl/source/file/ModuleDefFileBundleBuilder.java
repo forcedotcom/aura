@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.source.file;
+package org.auraframework.modules.impl.source.file;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +26,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.source.BundleSourceImpl;
+import org.auraframework.impl.source.file.FileSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
 import org.auraframework.service.DefinitionService;

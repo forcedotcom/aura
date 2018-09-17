@@ -18,9 +18,7 @@
  */
 package org.auraframework.impl.util;
 
-import java.io.Serializable;
 import java.text.DateFormat;
-import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -30,11 +28,8 @@ import org.auraframework.util.AuraLocale;
  * Encapsulates all the metadata to construct any localization related objects
  * for a given view.
  */
-public class AuraLocaleImpl implements AuraLocale, Serializable {
+public class AuraLocaleImpl implements AuraLocale {
 
-    /**
-     * Used for Serialization to ensure class consistency.
-     */
     private static final long serialVersionUID = -6304227771656336193L;
 
     private final Locale systemLocale;
@@ -46,18 +41,16 @@ public class AuraLocaleImpl implements AuraLocale, Serializable {
     private final Locale dateLocale;
 
     private final Locale languageLocale;
-    
+
     private final Locale numberLocale;
 
     private final TimeZone timeZone;
-    
-    private final Boolean isEasternNameStyle;
 
     /**
      * Creates a a default instance.
      */
     public AuraLocaleImpl() {
-        this(null, null, null, null, null, null, null, false);
+        this(null, null, null, null, null, null, null);
     }
 
     /**
@@ -67,7 +60,7 @@ public class AuraLocaleImpl implements AuraLocale, Serializable {
      * @param defaultLocale the Locale to use
      */
     public AuraLocaleImpl(Locale defaultLocale) {
-        this(defaultLocale, null, null, null, null, null, null, false);
+        this(defaultLocale, null, null, null, null, null, null);
     }
 
     /**
@@ -78,23 +71,7 @@ public class AuraLocaleImpl implements AuraLocale, Serializable {
      * @param timeZone the TimeZone to use
      */
     public AuraLocaleImpl(Locale defaultLocale, TimeZone timeZone) {
-        this(defaultLocale, null, null, null, null, null, timeZone, false);
-    }
-
-    /**
-     * Creates an instance with the given values without nameStyle.
-     * @param defaultLocale the Locale to use unless otherwise overridden
-     * @param currencyLocale the Locale to use for currency amounts if any
-     * @param dateLocale the Locale to use for dates and times if any
-     * @param languageLocale the Locale to use for Strings if any
-     * @param numberLocale the Locale to use for numbers, including percentages
-     *            if any
-     * @param systemLocale the Locale to specify as the system default if any
-     * @param timeZone the TimeZone to use
-     */
-    public AuraLocaleImpl(Locale defaultLocale, Locale currencyLocale, Locale dateLocale, Locale languageLocale,
-            Locale numberLocale, Locale systemLocale, TimeZone timeZone) {
-        this(defaultLocale, currencyLocale, dateLocale, languageLocale, numberLocale, systemLocale, timeZone, false);
+        this(defaultLocale, null, null, null, null, null, timeZone);
     }
 
     /**
@@ -109,17 +86,17 @@ public class AuraLocaleImpl implements AuraLocale, Serializable {
      *            if any
      * @param systemLocale the Locale to specify as the system default if any
      * @param timeZone the TimeZone to use
-     * @param nameStyle the flag to indicate if the name is in eastern style (LastName FirstName)
      */
     public AuraLocaleImpl(Locale defaultLocale, Locale currencyLocale, Locale dateLocale, Locale languageLocale,
-            Locale numberLocale, Locale systemLocale, TimeZone timeZone, Boolean isEasternNameStyle) {
+            Locale numberLocale, Locale systemLocale, TimeZone timeZone) {
 
-        this.defaultLocale = (defaultLocale != null) ? defaultLocale : (Locale.getDefault() != null) ? Locale.getDefault() : Locale.ENGLISH;
+        this.defaultLocale = (defaultLocale != null) ? defaultLocale : this.getJavaDefaultLocale();
+
         this.currencyLocale = (currencyLocale != null) ? currencyLocale : this.defaultLocale;
         this.dateLocale = (dateLocale != null) ? dateLocale : this.defaultLocale;
         this.languageLocale = (languageLocale != null) ? languageLocale : this.defaultLocale;
         this.numberLocale = (numberLocale != null) ? numberLocale : this.defaultLocale;
-        this.systemLocale = (systemLocale != null) ? systemLocale : (Locale.getDefault() != null) ? Locale.getDefault() : Locale.ENGLISH;
+        this.systemLocale = (systemLocale != null) ? systemLocale : this.defaultLocale;
 
         if (timeZone == null) {
             try {
@@ -133,7 +110,6 @@ public class AuraLocaleImpl implements AuraLocale, Serializable {
             }
         }
         this.timeZone = timeZone;
-        this.isEasternNameStyle = isEasternNameStyle;
     }
 
     @Override
@@ -155,7 +131,7 @@ public class AuraLocaleImpl implements AuraLocale, Serializable {
     public Locale getDateLocale() {
         return this.dateLocale;
     }
-    
+
     @Override
     public Locale getLanguageLocale() {
         return this.languageLocale;
@@ -176,14 +152,8 @@ public class AuraLocaleImpl implements AuraLocale, Serializable {
         return this.timeZone;
     }
 
-    @Override
-    public Calendar getCalendar() {
-        return Calendar.getInstance(getTimeZone(), getDateLocale());
+    private Locale getJavaDefaultLocale() {
+        Locale locale = Locale.getDefault();
+        return locale != null? locale : Locale.ENGLISH;
     }
-
-    @Override
-    public Boolean isEasternNameStyle() {
-        return this.isEasternNameStyle;
-    }
-
 }

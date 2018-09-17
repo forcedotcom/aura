@@ -18,6 +18,7 @@
  */
 package org.auraframework.adapter;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -78,9 +79,26 @@ public interface LocalizationAdapter extends AuraAdapter {
     Boolean showJapaneseImperialYear();
 
     /**
-     * @return the text direction to show for the current locale.  
-     * This is overridable based on the preference of the user to allow psuedo-localization of RTL
+     * Returns a text direction string for the given locale.
+     *
+     * @param locale - the given locale
+     * @return a text direction string for the given locale
      */
-    String getTextDirection();
+    String getHtmlTextDirection(Locale locale);
+
+    /**
+     * Returns a BCP 47 language tag for the given locale.
+     *
+     * @param locale - the given locale
+     * @return a BCP 47 string representing the locale
+     */
+    String getHtmlLanguage(Locale locale);
+
+    /**
+     * Returns if a locale uses eastern name style, last first[ middle][ suffix].
+     *
+     * @return true if the locale uses eastern name style
+     */
+    boolean isEasternNameStyle(Locale locale);
 
 }

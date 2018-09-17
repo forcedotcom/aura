@@ -344,7 +344,7 @@ public interface LocalizationService extends AuraService {
      *            allows, the value will be rounded
      * @return a String representation of the number
      */
-    String formatNumber(Double number, int minFractionDigits, int maxFractionDigits);
+    String formatNumber(double number, int minFractionDigits, int maxFractionDigits);
 
     /**
      * Format a BigDecimal for localized display.
@@ -1197,13 +1197,45 @@ public interface LocalizationService extends AuraService {
      */
     String formatNumber(Number number, Locale locale, int minFractionDigits, int maxFractionDigits);
 
-    // Format patterns
+    /**
+     * Returns a short date time format pattern.
+     */
+    String getShortDateTimeFormatPattern();
 
-    String getDateFormatPattern();
+    /**
+     * Returns a medium date time format pattern.
+     */
+    String getMediumDateTimeFormatPattern();
 
-    String getDateTimeFormatPattern();
+    /**
+     * Returns a long date time format pattern.
+     */
+    String getLongDateTimeFormatPattern();
 
-    String getTimeFormatPattern();
+    /**
+     * Returns a short date format pattern.
+     */
+    String getShortDateFormatPattern();
+
+    /**
+     * Returns a medium date format pattern.
+     */
+    String getMediumDateFormatPattern();
+
+    /**
+     * Returns a long date format pattern.
+     */
+    String getLongDateFormatPattern();
+
+    /**
+     * Returns a medium time format pattern.
+     */
+    String getMediumTimeFormatPattern();
+
+    /**
+     * Returns a short time format pattern.
+     */
+    String getShortTimeFormatPattern();
 
     String getNumberFormatPattern();
 

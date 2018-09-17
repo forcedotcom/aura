@@ -174,13 +174,51 @@ public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLoc
     }
 
     @Override
-    public String getTextDirection() {
-        String dir = "ltr";
-        switch (getAuraLocale().getLanguageLocale().getLanguage()) {
-        case "he":  case "ji":  case "ar":  case "iw":  case "yi":  case "fa":  case "ur":
-            dir = "rtl";
-        default:
+    public String getHtmlTextDirection(Locale locale) {
+        switch (locale.getLanguage()) {
+            case "ar": // Arabic
+            case "fa": // Persian
+            case "he": // Hebrew
+            case "iw": // Hebrew
+            case "ji": // Yiddish
+            case "ur": // Urdu
+            case "yi": // Yiddish
+                return "rtl";
+            // special case for en_IL for pseudo-localization.
+            case "en":
+            case "eo":
+                if ("IL".equals(locale.getCountry())) {
+                    return "rtl";
+                }
         }
-        return dir;
+
+        return "ltr";
     }
+
+    @Override
+    public String getHtmlLanguage(Locale locale) {
+        switch (locale.getLanguage()) {
+            case "sh":
+                return "sr-Latn";
+            case "zh":
+                // Handle simplified VS traditional Chinese
+                String country = locale.getCountry();
+                switch (country) {
+                    case "TW":
+                    case "HK":
+                        return "zh-Hant-" + country;
+                    case "SG":
+                    case "CN":
+                        return "zh-Hans-" + country;
+                }
+        }
+
+        return locale.toLanguageTag();
+    }
+
+    @Override
+    public boolean isEasternNameStyle(Locale locale) {
+        return false;
+    }
+
 }

@@ -43,38 +43,52 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
 public class LocaleValueProvider implements GlobalValueProvider {
-    public static String USER_LOCALE_LANGUAGE = "userLocaleLang";
-    public static String USER_LOCALE_COUNTRY = "userLocaleCountry";
 
-    public static String LANGUAGE = "language";
-    public static String COUNTRY = "country";
-    public static String VARIANT = "variant";
-    public static String LANGUAGE_LOCALE = "langLocale";
+    public static final String USER_LOCALE_LANGUAGE = "userLocaleLang";
+    public static final String USER_LOCALE_COUNTRY = "userLocaleCountry";
 
-    public static String MONTH_NAME = "nameOfMonths";
-    public static String TODAY_LABEL = "labelForToday";
-    public static String WEEKDAY_NAME = "nameOfWeekdays";
-    public static String FIRST_DAY_OF_WEEK = "firstDayOfWeek";
+    public static final String LANGUAGE = "language";
+    public static final String COUNTRY = "country";
+    public static final String VARIANT = "variant";
+    public static final String LANGUAGE_LOCALE = "langLocale";
 
-    public static String NUMBER_FORMAT = "numberFormat";
-    public static String PERCENT_FORMAT = "percentFormat";
-    public static String CURRENCY_FORMAT = "currencyFormat";
+    public static final String TIME_ZONE = "timezone";
 
-    public static String DATE_FORMAT = "dateFormat";
-    public static String DATETIME_FORMAT = "datetimeFormat";
-    public static String TIME_FORMAT = "timeFormat";
-    public static String TIME_ZONE = "timezone";
-    public static String CURRENCY_CODE = "currencyCode";
+    public static final String MONTH_NAME = "nameOfMonths";
+    public static final String TODAY_LABEL = "labelForToday";
+    public static final String WEEKDAY_NAME = "nameOfWeekdays";
+    public static final String FIRST_DAY_OF_WEEK = "firstDayOfWeek";
 
-    // symbols
-    public static String DECIMAL = "decimal";
-    public static String GROUPING = "grouping";
-    public static String CURRENCY = "currency";
-    public static String ZERO_DIGIT = "zero";
+    // Number formats
+    public static final String NUMBER_FORMAT = "numberFormat";
+    public static final String PERCENT_FORMAT = "percentFormat";
+    public static final String CURRENCY_FORMAT = "currencyFormat";
 
-    public static String IS_EASTERN_NAME_STYLE = "isEasternNameStyle";
-    public static String SHOW_JAPANESE_IMPERIAL_YEAR = "showJapaneseImperialYear";
-    public static String DIR = "dir";
+    // Date time formats
+    public static final String DATE_FORMAT = "dateFormat";
+    public static final String SHORT_DATE_FORMAT = "shortDateFormat";
+    public static final String LONG_DATE_FORMAT = "longDateFormat";
+
+    public static final String DATETIME_FORMAT = "datetimeFormat";
+    public static final String SHORT_DATETIME_FORMAT = "shortDatetimeFormat";
+    public static final String LONG_DATETIME_FORMAT = "longDatetimeFormat";
+
+    public static final String TIME_FORMAT = "timeFormat";
+    public static final String SHORT_TIME_FORMAT = "shortTimeFormat";
+
+    // Symbols
+    public static final String CURRENCY_CODE = "currencyCode";
+    public static final String DECIMAL = "decimal";
+    public static final String GROUPING = "grouping";
+    public static final String CURRENCY = "currency";
+    public static final String ZERO_DIGIT = "zero";
+
+    public static final String IS_EASTERN_NAME_STYLE = "isEasternNameStyle";
+    public static final String SHOW_JAPANESE_IMPERIAL_YEAR = "showJapaneseImperialYear";
+
+    // HTML localization
+    public static final String DIR = "dir";
+    public static final String LANG = "lang";
 
     private final Map<String, Object> data;
     private final DefinitionService definitionService;
@@ -85,49 +99,52 @@ public class LocaleValueProvider implements GlobalValueProvider {
         Builder<String, Object> builder = ImmutableMap.builder();
 
         AuraLocale auraLocale = localizationAdapter.getAuraLocale();
-
         Locale userLocale = auraLocale.getLocale();
-        Locale lang = auraLocale.getLanguageLocale();
+        Locale langLocale = auraLocale.getLanguageLocale();
 
         builder.put(USER_LOCALE_LANGUAGE, userLocale.getLanguage());
         builder.put(USER_LOCALE_COUNTRY, userLocale.getCountry());
-        builder.put(LANGUAGE, lang.getLanguage());
-        builder.put(COUNTRY, lang.getCountry());
-        builder.put(VARIANT, lang.getVariant());
-        builder.put(LANGUAGE_LOCALE, lang.toString());
+        builder.put(LANGUAGE, langLocale.getLanguage());
+        builder.put(COUNTRY, langLocale.getCountry());
+        builder.put(VARIANT, langLocale.getVariant());
+        builder.put(LANGUAGE_LOCALE, langLocale.toString());
 
-        builder.put(MONTH_NAME, this.getNameOfMonths(auraLocale));
-        builder.put(WEEKDAY_NAME, this.getNameOfWeekdays(auraLocale));
+        builder.put(MONTH_NAME, this.getNameOfMonths(langLocale));
+        builder.put(WEEKDAY_NAME, this.getNameOfWeekdays(langLocale));
         builder.put(TODAY_LABEL, this.getLabelForToday(localizationAdapter));
 
         builder.put(FIRST_DAY_OF_WEEK, Calendar.getInstance(auraLocale.getTimeZone(), userLocale).getFirstDayOfWeek());
 
-        String timezoneId = auraLocale.getTimeZone().getID();
-        builder.put(TIME_ZONE, timezoneId);
+        builder.put(TIME_ZONE, auraLocale.getTimeZone().getID());
 
-        builder.put(IS_EASTERN_NAME_STYLE, auraLocale.isEasternNameStyle());
-        if ("ja".equals(userLocale.getLanguage())) {
-            builder.put(SHOW_JAPANESE_IMPERIAL_YEAR, localizationAdapter.showJapaneseImperialYear());
-        }
+        // date time formats
+        builder.put(DATE_FORMAT, localizationService.getMediumDateFormatPattern());
+        builder.put(SHORT_DATE_FORMAT, localizationService.getShortDateFormatPattern());
+        builder.put(LONG_DATE_FORMAT, localizationService.getLongDateFormatPattern());
+        builder.put(DATETIME_FORMAT, localizationService.getMediumDateTimeFormatPattern());
+        builder.put(SHORT_DATETIME_FORMAT, localizationService.getShortDateTimeFormatPattern());
+        builder.put(LONG_DATETIME_FORMAT, localizationService.getLongDateTimeFormatPattern());
+        builder.put(TIME_FORMAT, localizationService.getMediumTimeFormatPattern());
+        builder.put(SHORT_TIME_FORMAT, localizationService.getShortTimeFormatPattern());
 
-        // FORMAT PATTERNS
-        builder.put(DATE_FORMAT, localizationService.getDateFormatPattern());
-        builder.put(DATETIME_FORMAT, localizationService.getDateTimeFormatPattern());
-        builder.put(TIME_FORMAT, localizationService.getTimeFormatPattern());
-
+        // number formats
         builder.put(NUMBER_FORMAT, localizationService.getNumberFormatPattern());
         builder.put(DECIMAL, localizationService.getDecimalSeparator());
         builder.put(GROUPING, localizationService.getGroupingSeparator());
         builder.put(ZERO_DIGIT, localizationService.getZeroDigit());
-
         builder.put(PERCENT_FORMAT, localizationService.getPercentFormatPattern());
-
         // Don't localize the patterns
         builder.put(CURRENCY_FORMAT, localizationService.getCurrencyFormatPattern());
         builder.put(CURRENCY_CODE, localizationService.getCurrencyCode());
         builder.put(CURRENCY, localizationService.getCurrencySymbol());
 
-        builder.put(DIR, localizationAdapter.getTextDirection());
+        builder.put(DIR, localizationAdapter.getHtmlTextDirection(langLocale));
+        builder.put(LANG, localizationAdapter.getHtmlLanguage(langLocale));
+
+        builder.put(IS_EASTERN_NAME_STYLE, localizationAdapter.isEasternNameStyle(userLocale));
+        if ("ja".equals(userLocale.getLanguage())) {
+            builder.put(SHOW_JAPANESE_IMPERIAL_YEAR, localizationAdapter.showJapaneseImperialYear());
+        }
 
         data = builder.build();
     }
@@ -164,11 +181,10 @@ public class LocaleValueProvider implements GlobalValueProvider {
         return data;
     }
 
-    private List<LocalizedLabel> getNameOfMonths(AuraLocale locale) {
-        Locale lang = locale.getLanguageLocale();
-        Calendar cal = Calendar.getInstance(lang);
-        Map<String, Integer> shortNames = cal.getDisplayNames(Calendar.MONTH, Calendar.SHORT_STANDALONE, lang);
-        Map<String, Integer> fullNames = cal.getDisplayNames(Calendar.MONTH, Calendar.LONG_STANDALONE, lang);
+    private List<LocalizedLabel> getNameOfMonths(Locale locale) {
+        Calendar cal = Calendar.getInstance(locale);
+        Map<String, Integer> shortNames = cal.getDisplayNames(Calendar.MONTH, Calendar.SHORT_STANDALONE, locale);
+        Map<String, Integer> fullNames = cal.getDisplayNames(Calendar.MONTH, Calendar.LONG_STANDALONE, locale);
         ArrayList<LocalizedLabel> monthList = new ArrayList<>(13);
         // We always return 13 months, which is the maximum known used calendar months atm
         for (int i = Calendar.JANUARY; i <= Calendar.UNDECIMBER; i++) {
@@ -199,13 +215,13 @@ public class LocaleValueProvider implements GlobalValueProvider {
         return today;
     }
 
-    private List<LocalizedLabel> getNameOfWeekdays(AuraLocale locale) {
-        DateFormatSymbols weekdaySymbols = DateFormatSymbols.getInstance(locale.getLanguageLocale());
+    private List<LocalizedLabel> getNameOfWeekdays(Locale locale) {
+        DateFormatSymbols weekdaySymbols = DateFormatSymbols.getInstance(locale);
         String[] weekdays = weekdaySymbols.getWeekdays();
         String[] shortWeekdays = weekdaySymbols.getShortWeekdays();
         ArrayList<LocalizedLabel> weekdayList = new ArrayList<>(7);
         for (int i = 1; i < weekdays.length; i++) {
-            weekdayList.add(new LocalizedLabel(weekdays[i], shortWeekdays[i].toUpperCase(locale.getLanguageLocale())));
+            weekdayList.add(new LocalizedLabel(weekdays[i], shortWeekdays[i].toUpperCase(locale)));
         }
         return weekdayList;
     }

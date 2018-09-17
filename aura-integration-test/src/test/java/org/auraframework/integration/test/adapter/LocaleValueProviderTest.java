@@ -103,11 +103,6 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
                     e.getMessage());
         }
 
-        try {
-            lvp.validate(null);
-            fail("Expected NullPointerException for null PropertyReference");
-        } catch (NullPointerException expected) {
-        }
     }
 
     // semi-integration test checks that value provider is created and validated
@@ -188,9 +183,9 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
         assertLocaleProperties(Arrays.asList(new Locale("en", "CA")), localeProperties);
     }
 
-    private void assertLocaleProperties(List<Locale> localeList, HashMap<String, Object> localeProperties) {
+    private void assertLocaleProperties(List<Locale> localeList, Map<String, Object> localeProperties) {
         AuraContext context = contextService.getCurrentContext();
-        context.setRequestedLocales(localeList == null ? null : localeList);
+        context.setRequestedLocales(localeList);
         LocaleValueProvider lvp = new LocaleValueProvider(localizationService, localizationAdapter, definitionService);
         String countryName = localeList == null ? "" : localeList.get(0).getCountry();
         for (Map.Entry<String, Object> entry : localeProperties.entrySet()) {

@@ -19,7 +19,6 @@
 package org.auraframework.util;
 
 import java.io.Serializable;
-import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -97,17 +96,4 @@ public interface AuraLocale extends Serializable {
      */
     public TimeZone getTimeZone();
 
-    /**
-     * Returns a Calendar based on the Locale and TimeZone of this instance.
-     *
-     * @return a Calendar
-     */
-    public Calendar getCalendar();
-
-    /**
-     * Returns if a name is in eastern style: true - name is in eastern style: last first[ middle][ suffix]
-     *
-     * @return a Boolean
-     */
-    public Boolean isEasternNameStyle();
 }

@@ -31,7 +31,6 @@ import org.auraframework.service.LocalizationService;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
-import org.auraframework.util.number.AuraNumberFormat;
 
 import com.ibm.icu.text.DecimalFormat;
 import com.ibm.icu.text.DecimalFormatSymbols;
@@ -249,7 +248,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public String formatNumber(Double number, int minFractionDigits, int maxFractionDigits) {
+    public String formatNumber(double number, int minFractionDigits, int maxFractionDigits) {
         return formatNumber(number, null, minFractionDigits, maxFractionDigits);
     }
 
@@ -683,8 +682,9 @@ public class LocalizationServiceImpl implements LocalizationService {
         if (locale == null) {
             locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
         }
-        NumberFormat nf = NumberFormat.getInstance(locale);
-        return AuraNumberFormat.parseStrict(number, nf);
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+        numberFormat.setParseStrict(true);
+        return numberFormat.parse(number);
     }
 
     @Override
@@ -700,8 +700,9 @@ public class LocalizationServiceImpl implements LocalizationService {
         if (locale == null) {
             locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
         }
-        NumberFormat nf = NumberFormat.getPercentInstance(locale);
-        return AuraNumberFormat.parseStrict(percent, nf).doubleValue();
+        NumberFormat numberFormat = NumberFormat.getPercentInstance(locale);
+        numberFormat.setParseStrict(true);
+        return numberFormat.parse(percent).doubleValue();
     }
 
     @Override
@@ -717,10 +718,10 @@ public class LocalizationServiceImpl implements LocalizationService {
         if (locale == null) {
             locale = this.localizationAdapter.getAuraLocale().getCurrencyLocale();
         }
-        DecimalFormat df = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
-        df.setParseBigDecimal(true);
-        // TODO: use parseStrict when ICU4J is updated >= 51.2
-        return ((com.ibm.icu.math.BigDecimal) AuraNumberFormat.parse(currency, df, false)).toBigDecimal();
+        DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
+        decimalFormat.setParseBigDecimal(true);
+        decimalFormat.setParseStrict(true);
+        return ((com.ibm.icu.math.BigDecimal) decimalFormat.parse(currency)).toBigDecimal();
     }
 
     @Override
@@ -777,13 +778,13 @@ public class LocalizationServiceImpl implements LocalizationService {
         if (locale == null) {
             locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
         }
-        DecimalFormat df = (DecimalFormat) NumberFormat.getInstance(locale);
-        df.setParseBigDecimal(true);
+        DecimalFormat decimalFormat = (DecimalFormat)NumberFormat.getNumberInstance(locale);
+        decimalFormat.setParseBigDecimal(true);
         // icu BigDecimal to java BigDecimal
         if (strict) {
-            return ((com.ibm.icu.math.BigDecimal) AuraNumberFormat.parseStrict(number, df)).toBigDecimal();
+            decimalFormat.setParseStrict(strict);
         }
-        return ((com.ibm.icu.math.BigDecimal) AuraNumberFormat.parse(number, df, false)).toBigDecimal();
+        return ((com.ibm.icu.math.BigDecimal) decimalFormat.parse(number)).toBigDecimal();
     }
 
     @Override
@@ -819,29 +820,43 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public String getDateFormatPattern() {
-        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
-        // Extracted from LocaleValueProvider
-        // Why do we use java.text.DateFormat for date, time, but ICU for numbers
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, auraLocale.getDateLocale());
-        SimpleDateFormat sdf = (SimpleDateFormat) dateFormat;
-        return sdf.toPattern();
+    public String getShortDateFormatPattern() {
+        return this.getDateFormatPattern(DateFormat.SHORT);
     }
 
     @Override
-    public String getDateTimeFormatPattern() {
-        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
-        DateFormat datetimeFormat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, auraLocale.getDateLocale());
-        SimpleDateFormat sdf = (SimpleDateFormat) datetimeFormat;
-        return sdf.toPattern();
+    public String getMediumDateFormatPattern() {
+        return this.getDateFormatPattern(DateFormat.MEDIUM);
     }
 
     @Override
-    public String getTimeFormatPattern() {
-        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
-        DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.DEFAULT, auraLocale.getDateLocale());
-        SimpleDateFormat sdf = (SimpleDateFormat) timeFormat;
-        return sdf.toPattern();
+    public String getLongDateFormatPattern() {
+        return this.getDateFormatPattern(DateFormat.LONG);
+    }
+
+    @Override
+    public String getShortDateTimeFormatPattern() {
+        return this.getDateTimeFormatPattern(DateFormat.SHORT);
+    }
+
+    @Override
+    public String getMediumDateTimeFormatPattern() {
+        return this.getDateTimeFormatPattern(DateFormat.MEDIUM);
+    }
+
+    @Override
+    public String getLongDateTimeFormatPattern() {
+        return this.getDateTimeFormatPattern(DateFormat.LONG);
+    }
+
+    @Override
+    public String getShortTimeFormatPattern() {
+        return this.getTimeFormatPattern(DateFormat.SHORT);
+    }
+
+    @Override
+    public String getMediumTimeFormatPattern() {
+        return this.getTimeFormatPattern(DateFormat.MEDIUM);
     }
 
     @Override
@@ -893,7 +908,6 @@ public class LocalizationServiceImpl implements LocalizationService {
         return cdfs.getCurrencySymbol();
     }
 
-
     private DecimalFormat getDecimalFormatForNumber() {
         AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
         // Why do we use ICU for numbers and java for Dates ?
@@ -915,6 +929,23 @@ public class LocalizationServiceImpl implements LocalizationService {
         return cdf.getDecimalFormatSymbols();
     }
 
+    private String getDateFormatPattern(int dateStyle) {
+        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
+        DateFormat dateFormat = DateFormat.getDateInstance(dateStyle, auraLocale.getDateLocale());
+        return ((SimpleDateFormat) dateFormat).toPattern();
+    }
+
+    private String getDateTimeFormatPattern(int dateTimeStyle) {
+        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
+        DateFormat datetimeFormat = DateFormat.getDateTimeInstance(dateTimeStyle, dateTimeStyle, auraLocale.getDateLocale());
+        return ((SimpleDateFormat) datetimeFormat).toPattern();
+    }
+
+    private String getTimeFormatPattern(int timeStyle) {
+        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
+        DateFormat timeFormat = DateFormat.getTimeInstance(timeStyle, auraLocale.getDateLocale());
+        return ((SimpleDateFormat) timeFormat).toPattern();
+    }
 
     @Autowired
     public void setLocalizationAdapter(LocalizationAdapter adapter) {

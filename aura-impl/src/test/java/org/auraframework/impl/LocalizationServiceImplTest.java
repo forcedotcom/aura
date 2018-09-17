@@ -29,7 +29,6 @@ import java.util.TimeZone;
 import org.auraframework.impl.service.testdata.LocalizationServiceTestData;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.test.util.AuraTestCase;
-import org.auraframework.util.number.AuraNumberFormat;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
@@ -481,31 +480,6 @@ public class LocalizationServiceImplTest extends AuraTestCase {
                 try {
                     localizationService.parseDouble(num);
                     fail("No Exception thrown when trying to parse \'" + num + "\' into double");
-                } catch (Exception e) {
-                    // Expected error from AuraNumberformat.parse(...)
-                    checkExceptionFull(e, ParseException.class, getErrorMsg(num));
-                }
-            }
-        }
-    }
-
-    @Test
-    public void testStrictNumberParsing() throws ParseException {
-        NumberFormat nf = null;
-        Map<Locale, String[]> strictParserTestNumberStrings = new HashMap<>();
-        strictParserTestNumberStrings.put(Locale.ENGLISH, new String[] { "100.200,300", "1 1", "1.1.1.1" });
-        strictParserTestNumberStrings.put(Locale.FRANCE, new String[] { "1 1 1 1", "1.1.1", "00. 000 000",
-        "100,200.300" });
-        strictParserTestNumberStrings.put(Locale.CHINESE, new String[] { "1, 0,0", "100'2" });
-        strictParserTestNumberStrings.put(Locale.GERMAN, new String[] { "100,200,300.456", "0.123,456,789",
-        "111.111,111.111" });
-
-        for (Locale locale : strictParserTestNumberStrings.keySet()) {
-            for (String num : strictParserTestNumberStrings.get(locale)) {
-                try {
-                    nf = NumberFormat.getInstance(locale);
-                    AuraNumberFormat.parseStrict(num, nf);
-                    fail("No Exception thrown for value:" + num + " and locale:" + locale.getDisplayName());
                 } catch (Exception e) {
                     // Expected error from AuraNumberformat.parse(...)
                     checkExceptionFull(e, ParseException.class, getErrorMsg(num));

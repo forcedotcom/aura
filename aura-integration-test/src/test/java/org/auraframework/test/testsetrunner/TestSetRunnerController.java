@@ -15,8 +15,11 @@
  */
 package org.auraframework.test.testsetrunner;
 
-import junit.framework.TestFailure;
-import junit.framework.TestResult;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.ds.servicecomponent.Controller;
@@ -24,13 +27,10 @@ import org.auraframework.integration.test.util.TestExecutor;
 import org.auraframework.integration.test.util.TestExecutor.TestRun;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.test.perf.util.PerfExecutorTestCase;
 import org.auraframework.test.util.WebDriverProvider;
 
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import junit.framework.TestFailure;
+import junit.framework.TestResult;
 
 /**
  * This controller handles the execution and result collection of test cases on behalf of client-initiated requests.
@@ -45,10 +45,10 @@ public class TestSetRunnerController implements Controller {
      */
     @AuraEnabled
     public void runTestSet(@Key("testSet") List<String> tests, @Key("scope") String scope, @Key("headless") boolean headless) throws Exception {
-        changeStatus(tests, "ENQUEUED", scope);
+        changeStatus(tests, "ENQUEUED");
         System.setProperty(WebDriverProvider.BROWSER_RUN_HEADLESS_PROPERTY, headless ? "true" : "false");
         for (String name : tests) {
-            StatefulTestRun testRunner = new StatefulTestRun(name, scope);
+            StatefulTestRun testRunner = new StatefulTestRun(name);
             TestExecutor.getInstance().submit(testRunner);
         }
     }
@@ -59,9 +59,9 @@ public class TestSetRunnerController implements Controller {
      * @param tests the tests to update
      * @param status the new status to give to the tests
      */
-    private void changeStatus(List<String> tests, String status, String scope) throws Exception {
+    private void changeStatus(List<String> tests, String status) throws Exception {
         for (String t : tests) {
-            TestSetRunnerState testRunnerState = TestSetRunnerState.getInstanceByScope(scope);
+            TestSetRunnerState testRunnerState = TestSetRunnerState.getFuncInstance();
             testRunnerState.setTestProp(t, "status", status);
             testRunnerState.setTestProp(t, "exception", "");
         }
@@ -73,7 +73,7 @@ public class TestSetRunnerController implements Controller {
     @AuraEnabled
     public Map<String, Object> pollForTestRunStatus(@Key("scope") String scope) throws Exception {
         Map<String, Object> r = new HashMap<>();
-        Map<String, Map<String, Object>> m = TestSetRunnerState.getInstanceByScope(scope).getTestsWithPropertiesMap();
+        Map<String, Map<String, Object>> m = TestSetRunnerState.getFuncInstance().getTestsWithPropertiesMap();
         r.put("testsRunning", TestExecutor.getInstance().isActive());
         r.put("testsWithPropsMap", m);
         return r;
@@ -84,23 +84,15 @@ public class TestSetRunnerController implements Controller {
      */
     private class StatefulTestRun extends TestRun {
         private final String testName;
-		private String scope;
 
         public StatefulTestRun(String testName) {
             super(TestSetRunnerState.getFuncInstance().getInventory().get(testName), new TestResult());
             this.testName = testName;
         }
         
-        public StatefulTestRun(String testName, String scope) {
-            super(TestSetRunnerState.getInstanceByScope(scope).getInventory().get(testName), new TestResult());
-            this.testName = testName;
-            this.scope = scope;
-        }
-
         @Override
         public TestResult call() throws Exception {
-            TestSetRunnerState testRunnerState = TestSetRunnerState.getInstanceByScope(scope);
-            boolean finished = false;
+            TestSetRunnerState testRunnerState = TestSetRunnerState.getFuncInstance();
             assert (test != null) : "Encountered an unknown test: " + testName;
             testRunnerState.setTestProp(testName, "status", "RUNNING");
 
@@ -109,9 +101,7 @@ public class TestSetRunnerController implements Controller {
             // Gather the results.
             if (result.wasSuccessful()) {
                 testRunnerState.setTestProp(testName, "status", "PASSED");
-                finished = true;
             } else {
-            	finished = true;
                 testRunnerState.setTestProp(testName, "status", "FAILED");
                 StringBuffer res = new StringBuffer("Failures:\n");
                 for (Enumeration<TestFailure> fs = result.failures(); fs.hasMoreElements();) {
@@ -128,14 +118,6 @@ public class TestSetRunnerController implements Controller {
                 }
                 System.out.println(res.toString());
             }
-            
-            // Perf special handling
-            // @dval: This makes no sense here because it exposes a perf Class
-            // Remove all this once we refactor the perfRunner.
-            if (finished && test instanceof PerfExecutorTestCase) {
-            	testRunnerState.setTestProp(testName, "perfInfo", ((PerfExecutorTestCase)test).getLastCollectedMetrics().toString());
-            }
-            
             return result;
         }
     }

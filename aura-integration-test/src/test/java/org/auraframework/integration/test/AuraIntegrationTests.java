@@ -31,7 +31,6 @@ import org.auraframework.integration.test.util.TestExecutor.TestRun;
 import org.auraframework.test.util.WebDriverProvider;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.ServiceLocator;
-import org.auraframework.util.test.perf.PerfUtil;
 import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;
 
@@ -48,8 +47,6 @@ import junit.framework.TestSuite;
  *
  * If the "testNameContains" system property is set, filter tests to run only those tests containing the provided string
  * (case-insensitive).
- *
- * If the "runPerfTests" system property is set, it will run the tests that are annotated with @PerfTest
  */
 public class AuraIntegrationTests extends TestSuite {
     public static final boolean TEST_SHUFFLE = Boolean.parseBoolean(System.getProperty("testShuffle", "false"));
@@ -57,7 +54,6 @@ public class AuraIntegrationTests extends TestSuite {
     private static final Logger logger = Logger.getLogger(AuraIntegrationTests.class.getName());
 
     private final String[] namesFragment;
-    private static final boolean RUN_PERF_TESTS = System.getProperty("runPerfTests") != null;
 
     private final List<String> skipTests;
 
@@ -94,9 +90,6 @@ public class AuraIntegrationTests extends TestSuite {
         logger.info("Building test inventories");
         if (namesFragment != null) {
             logger.info("Filtering by test names containing: " + Arrays.toString(namesFragment));
-        }
-        if (RUN_PERF_TESTS) {
-            logger.info("Filtering only test annotated with @PerfTest");
         }
         Set<TestInventory> inventories = ServiceLocator.get().getAll(TestInventory.class);
         List<Callable<TestResult>> queue = Lists.newLinkedList();
@@ -166,11 +159,6 @@ public class AuraIntegrationTests extends TestSuite {
                 }
             } else if (!skipTests.isEmpty() && skipTests.contains(testName)) {
                 return;
-            }
-            if (RUN_PERF_TESTS) {
-                if (!PerfUtil.hasPerfTestAnnotation((TestCase) test)) {
-                    return;
-                }
             }
             TestRun callable = new TestRun(test, result);
             if (TestExecutor.isThreadHostile(test)) {

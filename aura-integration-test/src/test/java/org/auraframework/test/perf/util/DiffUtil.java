@@ -23,11 +23,6 @@ public interface DiffUtil<T> {
     public URL getUrl();
 
     /**
-     * @return the test this DiffUtils is used for
-     */
-    public PerfExecutorTestCase getTest();
-
-    /**
      * @param testResults actual test results
      * @param sb assertion message to use
      */

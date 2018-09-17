@@ -148,7 +148,7 @@
         <webdriver.reusebrowser>true</webdriver.reusebrowser>
         <webdriver.browser.type>GOOGLECHROME</webdriver.browser.type> <!-- refer to org.auraframework.test.WebDriverUtil.BrowserType enums for valid values -->
         <webdriver.browser.runheadless>true</webdriver.browser.runheadless>
-		<webdriver.timeout>90</webdriver.timeout>
+        <webdriver.timeout>90</webdriver.timeout>
         <sauce.record.video>false</sauce.record.video>
         <sauce.record.screenshots>false</sauce.record.screenshots>
         <xdisplay.exec>Xvfb</xdisplay.exec>
@@ -268,34 +268,34 @@
                         </execution>
                     </executions>
                 </plugin>
-     			<plugin>
-        			<groupId>org.codehaus.mojo</groupId>
-        			<artifactId>xml-maven-plugin</artifactId>
-        			<version>1.0</version>
-       				<executions>
-          				<execution>
-          					<phase>post-integration-test</phase>
-            				<goals>
-              					<goal>transform</goal>
-            				</goals>
-          				</execution>
-        			</executions>
-        			<configuration>
-          				<transformationSets>
-            				<transformationSet>
-              					<dir>${basedir}/target/failsafe-reports</dir>
-              					<includes>
-              						<include>TEST-org.auraframework.integration.test.AuraIntegrationTests.xml</include>
-              					</includes>
-              					<outputDir>${project.build.directory}/failsafe-reports</outputDir>
-              					<stylesheet>${basedir}/target/tools/jstest/jstest-junit.xslt</stylesheet>
-           					 </transformationSet>
-          				</transformationSets>
-        			</configuration>
-      			</plugin>
-     			<plugin>
-	                <!--This plugin's configuration is used to store Eclipse m2e settings
-	                    only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>xml-maven-plugin</artifactId>
+                    <version>1.0</version>
+                    <executions>
+                        <execution>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>transform</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <transformationSets>
+                            <transformationSet>
+                                <dir>${basedir}/target/failsafe-reports</dir>
+                                <includes>
+                                    <include>TEST-org.auraframework.integration.test.AuraIntegrationTests.xml</include>
+                                </includes>
+                                <outputDir>${project.build.directory}/failsafe-reports</outputDir>
+                                <stylesheet>${basedir}/target/tools/jstest/jstest-junit.xslt</stylesheet>
+                            </transformationSet>
+                        </transformationSets>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <!--This plugin's configuration is used to store Eclipse m2e settings
+                      only. It has no influence on the Maven build itself. -->
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
                     <version>1.0.0</version>
@@ -359,44 +359,18 @@
                         <artifactId>maven-failsafe-plugin</artifactId>
                     </plugin>
                     <plugin>
-	           			<groupId>org.apache.maven.plugins</groupId>
-	           			<artifactId>maven-resources-plugin</artifactId>
-	            		<executions>
-	                		<execution>
-	                    		<id>copy-jstest</id>
-	                        	<phase>generate-test-resources</phase>
-	                    	</execution>
-	                	</executions>
-	            	</plugin>
-     				<plugin>
-        				<groupId>org.codehaus.mojo</groupId>
-        				<artifactId>xml-maven-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-jstest</id>
+                                <phase>generate-test-resources</phase>
+                            </execution>
+                        </executions>
                     </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>perfTests</id>
-            <activation>
-                <property>
-                    <name>perfTests</name>
-                </property>
-            </activation>
-            <properties>
-				<testClasses>**/*PerfTests.java</testClasses>
-                <testPhase>integration-test</testPhase>
-                <testSetupPhase>pre-integration-test</testSetupPhase>
-                <testTeardownPhase>post-integration-test</testTeardownPhase>
-            </properties>
-            <build>
-                <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <artifactId>xml-maven-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>
@@ -500,9 +474,9 @@
         <profile>
             <id>ubuntu12</id>
             <activation>
-               <property>
-                 <name>env.UBUNTU12</name>
-               </property>
+                <property>
+                    <name>env.UBUNTU12</name>
+                </property>
             </activation>
             <properties>
                 <platform.chromedriver>/bin/chromedriver</platform.chromedriver>

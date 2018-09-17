@@ -16,7 +16,7 @@
 package org.auraframework.integration.test.components.ui.inputMultiSelect;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
-import org.auraframework.util.test.annotation.PerfTest;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -75,7 +75,7 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
     /**
      * Select one. Choose one option. Deselect one. Deselect one option.
      */
-    @PerfTest
+    @Test
     public void testInputSelectSingle() throws Exception {
         open(URL);
 
@@ -105,6 +105,7 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
     /**
      * Select multiple. Choose multiple options. Deselect multiple. Deselect multiple options.
      */
+    @Test
     public void testInputSelectDeselectMultiple() throws Exception {
         open(URL);
         // select multiple
@@ -131,6 +132,7 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
     /**
      * Select all. Select all options. Deselect all. Deselect all options.
      */
+    @Test
     public void testInputSelectDeselectAll() throws Exception {
         open(URL);
 

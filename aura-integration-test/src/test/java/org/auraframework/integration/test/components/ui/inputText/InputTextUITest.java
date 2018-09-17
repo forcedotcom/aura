@@ -20,7 +20,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
-import org.auraframework.util.test.annotation.PerfTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -226,7 +225,6 @@ public class InputTextUITest extends WebDriverTestCase {
         doTestUpdateOnAttributeWithCertainEventsAllBrowsers(TEST_CMP);
     }
 
-    @PerfTest
     @Test
     public void testUpdateOnAttributeWithLabelsWithCertainEventsAllBrowsers() throws Exception {
         doTestUpdateOnAttributeWithCertainEventsAllBrowsers(TEST_CMP_WITH_LABELS);

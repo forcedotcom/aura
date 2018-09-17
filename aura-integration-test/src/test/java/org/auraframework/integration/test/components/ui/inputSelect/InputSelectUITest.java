@@ -20,7 +20,6 @@ import java.util.List;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
-import org.auraframework.util.test.annotation.PerfTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -42,7 +41,6 @@ public class InputSelectUITest extends WebDriverTestCase {
      * 
      * @throws Exception
      */
-    @PerfTest
     @Test
     public void testSelectingOption() throws Exception {
         selectId = "dynamicSelect";

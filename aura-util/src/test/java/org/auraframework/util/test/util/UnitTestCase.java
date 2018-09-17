@@ -15,17 +15,30 @@
  */
 package org.auraframework.util.test.util;
 
-import com.google.common.collect.Sets;
-import configuration.TestConfig;
-import junit.framework.TestCase;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.Stack;
+import java.util.logging.Logger;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.adapter.SourceControlAdapter;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.auraframework.util.test.diff.GoldFileUtils;
-import org.auraframework.util.test.perf.metrics.PerfMetrics;
-import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
 import org.auraframework.util.test.runner.AuraUnitTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -42,22 +55,11 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.web.context.ContextLoader;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.Stack;
-import java.util.logging.Logger;
+import com.google.common.collect.Sets;
+
+import configuration.TestConfig;
+
+import junit.framework.TestCase;
 
 /**
  * Base class for all aura tests.
@@ -77,7 +79,6 @@ public abstract class UnitTestCase extends TestCase {
 
     private Collection<File> tempFiles = null;
     private Stack<Runnable> tearDownSteps = null;
-    private PerfMetricsComparator perfMetricsComparator = PerfMetricsComparator.DEFAULT_INSTANCE;
 
     @Rule
     public TestName testName = new TestName();
@@ -192,23 +193,6 @@ public abstract class UnitTestCase extends TestCase {
 
     private String explicitGoldResultsFolder;
 
-    /**
-     * @return a non null value to specify a results folder for the gold files and to avoid the automatic results folder
-     *         location logic
-     */
-    public final String getExplicitPerfResultsFolder() {
-        return explicitPerfResultsFolder;
-    }
-
-    /**
-     * Overrides the default gold results folder location
-     */
-    public final void setExplicitPerfResultsFolder(String folder) {
-        explicitPerfResultsFolder = folder;
-    }
-
-    private String explicitPerfResultsFolder;
-
     public String getGoldFileName() {
         return getName();
     }
@@ -247,18 +231,6 @@ public abstract class UnitTestCase extends TestCase {
 
     protected void serializeAndGoldFile(Object actual, String suffix) throws Exception {
         goldFileJson(toJson(actual), suffix);
-    }
-
-    protected final void assertGoldMetrics(PerfMetrics actual) throws Exception {
-        goldFileUtils.assertPerfDiff(this, getGoldFileName() + ".json", actual);
-    }
-
-    public PerfMetricsComparator getPerfMetricsComparator() {
-        return perfMetricsComparator;
-    }
-
-    public void setPerfMetricsComparator(PerfMetricsComparator perfMetricsComparator) {
-        this.perfMetricsComparator = perfMetricsComparator;
     }
 
     protected void serializeAndGoldFile(Object actual) throws Exception {

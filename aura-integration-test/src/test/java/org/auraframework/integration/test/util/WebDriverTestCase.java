@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.codec.binary.Base64;
@@ -50,10 +49,6 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.perf.PerfResultsUtil;
-import org.auraframework.test.perf.PerfWebDriverUtil;
-import org.auraframework.test.perf.metrics.PerfMetricsCollector;
-import org.auraframework.test.perf.util.PerfExecutorTestCase;
 import org.auraframework.test.util.AuraUITestingUtil;
 import org.auraframework.test.util.SauceUtil;
 import org.auraframework.test.util.WebDriverProvider;
@@ -63,13 +58,8 @@ import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.annotation.FreshBrowserInstance;
 import org.auraframework.util.test.annotation.WebDriverTest;
-import org.auraframework.util.test.perf.PerfUtil;
-import org.auraframework.util.test.perf.metrics.PerfMetrics;
-import org.auraframework.util.test.perf.metrics.PerfRunsCollector;
-import org.auraframework.util.test.perf.rdp.RDPNotification;
 import org.eclipse.jetty.util.log.Log;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.By;
@@ -82,15 +72,11 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasTouchScreen;
 import org.openqa.selenium.interactions.touch.FlickAction;
 import org.openqa.selenium.interactions.touch.TouchActions;
-import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
@@ -101,6 +87,7 @@ import org.uiautomation.ios.client.uiamodels.impl.augmenter.IOSDriverAugmenter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
 import junit.framework.AssertionFailedError;
 
 /**
@@ -124,8 +111,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     private BrowserType currentBrowserType = null;
     private AuraUITestingUtil auraUITestingUtil;
     private Boolean needsFreshBrowser = null;
-
-    protected PerfWebDriverUtil perfWebDriverUtil;
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ ElementType.TYPE, ElementType.METHOD })
@@ -203,11 +188,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             currentBrowserType = browserType;
         }
 
-        if (isPerfTest()) {
-            runPerfTests();
-            return;
-        }
-
         for (int i = 0; i <= FLAPPER_NUM_RETRIES; i++) {
             try {
                 // re-initialize driver pointer here because test analysis might need it after perBrowserTearDown
@@ -274,9 +254,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             // ignore
         }
         if (getTestLabels().contains("freshBrowserInstance")) {
-            return needsFreshBrowser = true;
-        }
-        if (isPerfTest()) {
             return needsFreshBrowser = true;
         }
         return needsFreshBrowser = false;
@@ -350,268 +327,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }
     }
 
-    // Perf: START
-
-    protected static final boolean RUN_PERF_TESTS = System.getProperty("runPerfTests") != null;
-
-    public enum PerfRunMode {
-        WARMUP, TIMELINE, PROFILE, AURASTATS
-    };
-
-    protected PerfRunMode perfRunMode;
-
-    public boolean isPerfTest() {
-        return RUN_PERF_TESTS && PerfUtil.hasPerfTestAnnotation(this);
-    }
-
-    /**
-     * Override to change
-     */
-    protected boolean runPerfWarmupRun() {
-        return true;
-    }
-
-    /**
-     * Override to change
-     */
-    protected int numPerfTimelineRuns() {
-        return 5;
-    }
-
-    /**
-     * Override to change
-     */
-    protected int numPerfProfileRuns() {
-        return PerfUtil.MEASURE_JSCPU_METRICTS ? 3 : 0;
-    }
-
-    /**
-     * Override to change
-     */
-    protected int numPerfAuraRuns() {
-        return 1; // metrics don't change from run to run
-    }
-
-    /**
-     * Adds capabilities that request WebDriver performance logs<br/>
-     * See https://sites.google.com/a/chromium.org/chromedriver/logging/performance-log
-     */
-    private void addPerfCapabilities(DesiredCapabilities capabilities) {
-        if (PerfUtil.hasPerfCmpTestAnnotation(this)) {
-        	// Do not reuse browser
-        	capabilities.setCapability(WebDriverProvider.REUSE_BROWSER_PROPERTY, false);
-            LoggingPreferences performance_prefs = new LoggingPreferences();
-            performance_prefs.enable(LogType.PERFORMANCE, Level.ALL);
-            capabilities.setCapability(CapabilityType.LOGGING_PREFS, performance_prefs);
-            Map<String, Object> prefs = new HashMap<>();
-            prefs.put("traceCategories", "disabled-by-default-devtools.timeline");
-            ChromeOptions options = new ChromeOptions();
-            options.setExperimentalOption("perfLoggingPrefs", prefs);
-            capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-        }
-    }
-
-    private void runPerfTests() throws Throwable {
-        int numPerfTimelineRuns = numPerfTimelineRuns();
-        int numPerfProfileRuns = numPerfProfileRuns();
-        int numPerfAuraRuns = numPerfAuraRuns();
-        PerfMetrics timelineMetrics = null;
-        PerfMetrics profileMetrics = null;
-        PerfMetrics auraMetrics = null;
-        int runNumber = 1;
-        List<File> runFiles = Lists.newArrayList();
-
-        if (runPerfWarmupRun()) {
-            perfRunMode = PerfRunMode.WARMUP;
-            // TODO: any metrics that should/could be measured for the first run
-            try {
-                setUp();
-                superRunTest();
-            } finally {
-                tearDown();
-            }
-        }
-
-        // runs to collect Dev Tools performance metrics
-        if (numPerfTimelineRuns > 0) {
-            perfRunMode = PerfRunMode.TIMELINE;
-            PerfRunsCollector runsCollector = new PerfRunsCollector();
-            for (int i = 0; i < numPerfTimelineRuns; i++) {
-                try {
-                    setUp();
-
-                    PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, perfRunMode);
-                    metricsCollector.startCollecting();
-
-                    superRunTest();
-
-                    PerfMetrics metrics = metricsCollector.stopCollecting();
-                    runsCollector.addRun(metrics);
-
-                    if (logger.isLoggable(Level.INFO)) {
-                        runFiles.add(PerfResultsUtil.writeDevToolsLog(metrics.getDevToolsLog(), getGoldFileName() + '_'
-                                + (i + 1),
-                                getAuraUITestingUtil().getUserAgent()));
-                        runFiles.add(PerfResultsUtil
-                                .writeGoldFile(metrics, getGoldFileName() + '_' + runNumber++, true));
-                    }
-                } finally {
-                    tearDown();
-                }
-            }
-            // use the median run for timeline metrics so individual metrics and dev tools logs match
-            timelineMetrics = runsCollector.getMedianRun();
-        }
-
-        // runs to collect JavaScript profiling metrics, run separately because affect overall metrics
-        if (numPerfProfileRuns > 0) {
-            perfRunMode = PerfRunMode.PROFILE;
-            PerfRunsCollector runsCollector = new PerfRunsCollector();
-            for (int i = 0; i < numPerfProfileRuns; i++) {
-                try {
-                    setUp();
-
-                    PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, perfRunMode);
-                    metricsCollector.startCollecting();
-
-                    superRunTest();
-
-                    PerfMetrics metrics = metricsCollector.stopCollecting();
-                    runsCollector.addRun(metrics);
-
-                    if (logger.isLoggable(Level.INFO)) {
-                        Map<String, ?> jsProfilerData = metrics.getJSProfilerData();
-                        if (jsProfilerData != null) {
-                            runFiles.add(PerfResultsUtil.writeJSProfilerData(jsProfilerData, getGoldFileName() + '_'
-                                    + (i + 1)));
-                        }
-                        Map<String, ?> heapSnapshot = metrics.getHeapSnapshot();
-                        if (heapSnapshot != null) {
-                            runFiles.add(PerfResultsUtil.writeHeapSnapshot(heapSnapshot, getGoldFileName() + '_'
-                                    + (i + 1)));
-                        }
-                        runFiles.add(PerfResultsUtil
-                                .writeGoldFile(metrics, getGoldFileName() + '_' + runNumber++, true));
-                    }
-                } finally {
-                    tearDown();
-                }
-            }
-            // use the median run for profile metrics so individual metrics and .cpuprofile match
-            profileMetrics = runsCollector.getMedianRun();
-        }
-
-        // runs to collect Aura stats metrics
-        if (numPerfAuraRuns > 0) {
-            perfRunMode = PerfRunMode.AURASTATS;
-            // collecting them in separate runs as they need STATS mode
-            PerfRunsCollector runsCollector = new PerfRunsCollector();
-            for (int i = 0; i < numPerfAuraRuns; i++) {
-                try {
-                    // TODO: set stats mode for framework tests
-                    setUp();
-
-                    PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, perfRunMode);
-                    metricsCollector.startCollecting();
-
-                    superRunTest();
-
-                    PerfMetrics metrics = metricsCollector.stopCollecting();
-                    runsCollector.addRun(metrics);
-                } finally {
-                    tearDown();
-                }
-            }
-            auraMetrics = runsCollector.getMedianMetrics();
-        }
-
-        perfRunMode = null;
-
-        // combine all metrics, log/write results, perform tests
-        PerfMetrics allMetrics = PerfMetrics.combine(timelineMetrics, profileMetrics, auraMetrics);
-        if (allMetrics != null) {
-            if (logger.isLoggable(Level.INFO)) {
-                logger.info("perf metrics for " + this + '\n' + allMetrics.toLongString());
-            }
-            List<JSONObject> devToolsLog = allMetrics.getDevToolsLog();
-            if (devToolsLog != null) {
-                PerfResultsUtil.writeDevToolsLog(devToolsLog, getGoldFileName(), getAuraUITestingUtil().getUserAgent());
-            }
-            Map<String, ?> jsProfilerData = allMetrics.getJSProfilerData();
-            if (jsProfilerData != null) {
-                PerfResultsUtil.writeJSProfilerData(jsProfilerData, getGoldFileName());
-            }
-            Map<String, ?> heapSnapshot = allMetrics.getHeapSnapshot();
-            if (heapSnapshot != null) {
-                PerfResultsUtil.writeHeapSnapshot(heapSnapshot, getGoldFileName());
-            }
-            PerfResultsUtil.writeGoldFile(allMetrics, getGoldFileName(), storeDetailsInGoldFile());
-
-            perfTearDown(allMetrics);
-            // delete individual run recordings of passing tests to save disk space
-            for (File file : runFiles) {
-                file.delete();
-                PerfResultsUtil.RESULTS_JSON.removeResultsFile(file);
-            }
-        }
-    }
-
-    /**
-     * Invoked after all perf metrics have been collected. Default behavior is to compare the measured metrics with the
-     * gold file ones.
-     */
-    protected void perfTearDown(PerfMetrics actual) throws Exception {
-        assertGoldMetrics(actual);
-    }
-
-    public final PerfWebDriverUtil getPerfWebDriverUtil() {
-        return perfWebDriverUtil;
-    }
-
-    public final List<RDPNotification> getRDPNotifications() {
-        return perfWebDriverUtil.getRDPNotifications();
-    }
-
-    public final Map<String, ?> takeHeapSnapshot() {
-        return perfWebDriverUtil.takeHeapSnapshot();
-    }
-
     @SuppressWarnings("unchecked")
     public final Map<String, Map<String, Map<String, List<Object>>>> getAuraStats() {
         return (Map<String, Map<String, Map<String, List<Object>>>>) getAuraUITestingUtil()
                 .getRawEval("return $A.PERFCORE.stats.get();");
-    }
-
-    /**
-     * Start JavaScript CPU profiler
-     */
-    public final void startProfile() {
-        perfWebDriverUtil.startProfile();
-    }
-
-    /**
-     * Stop JavaScript CPU profiler and return profile info
-     *
-     * See https://src.chromium.org/viewvc/chrome?revision=271803&view=revision
-     */
-    public final Map<String, ?> endProfile() {
-        return perfWebDriverUtil.endProfile();
-    }
-
-    /**
-     * Metrics/timeline is only captured between the perf start and end markers, override this method to specify
-     * different markers.
-     */
-    public String getPerfStartMarker() {
-        return "PERF:start";
-    }
-
-    /**
-     * Metrics/timeline is only captured between the perf start and end markers, override this method to specify
-     * different markers.
-     */
-    public String getPerfEndMarker() {
-        return "PERF:end";
     }
 
     public JSONArray getLastCollectedMetrics() {
@@ -699,12 +418,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         if (currentDriver == null) {
             description.append("\nTest failed before WebDriver was initialized");
         } else {
-
-            if (this instanceof PerfExecutorTestCase) {
-                JSONArray json = this.getLastCollectedMetrics();
-                description.append("\nPerfMetrics: " + json + ';');
-            }
-
             description
                     .append("\nWebDriver: " + currentDriver);
             description.append("\nJS state: ");
@@ -858,7 +571,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             }
 
             capabilities.setCapability(WebDriverProvider.REUSE_BROWSER_PROPERTY, !needsFreshBrowser());
-            addPerfCapabilities(capabilities);
 
             /*
              * Dimension windowSize = getWindowSize(); if (currentBrowserType == BrowserType.GOOGLECHROME) {
@@ -889,7 +601,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
             auraUITestingUtil = new AuraUITestingUtil(currentDriver);
             auraUITestingUtil.setTimeoutInSecs(Integer.parseInt(System.getProperty("webdriver.timeout", "30")));
-            perfWebDriverUtil = new PerfWebDriverUtil(currentDriver, auraUITestingUtil);
         }
         return currentDriver;
     }

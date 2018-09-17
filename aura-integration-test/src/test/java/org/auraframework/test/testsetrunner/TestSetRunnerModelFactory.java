@@ -15,25 +15,19 @@
  */
 package org.auraframework.test.testsetrunner;
 
-import javax.inject.Inject;
-
 import org.auraframework.annotations.Annotations.ServiceComponentModelFactory;
 import org.auraframework.ds.servicecomponent.ModelFactory;
 import org.auraframework.ds.servicecomponent.ModelInitializationException;
-import org.auraframework.service.ContextService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponentModelFactory
 public class TestSetRunnerModelFactory  implements ModelFactory<TestSetRunnerModel> {
-	@Inject
-	ContextService contextService;
-	
-	@Override
-	public TestSetRunnerModel modelInstance() throws ModelInitializationException {
-		try {
-			return new TestSetRunnerModel(contextService);
-		} catch (QuickFixException e) {
-			throw new ModelInitializationException(e.getMessage(), e);
-		}
-	}
+    @Override
+    public TestSetRunnerModel modelInstance() throws ModelInitializationException {
+        try {
+            return new TestSetRunnerModel();
+        } catch (QuickFixException e) {
+            throw new ModelInitializationException(e.getMessage(), e);
+        }
+    }
 }

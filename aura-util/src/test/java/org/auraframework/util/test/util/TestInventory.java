@@ -22,31 +22,26 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Vector;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.util.ServiceLocator;
+import org.auraframework.util.test.annotation.IntegrationTest;
+import org.auraframework.util.test.annotation.JSTest;
+import org.auraframework.util.test.annotation.WebDriverTest;
+
+import com.google.common.collect.Maps;
+
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.util.ServiceLocator;
-import org.auraframework.util.test.annotation.IntegrationTest;
-import org.auraframework.util.test.annotation.JSTest;
-import org.auraframework.util.test.annotation.PerfCmpTest;
-import org.auraframework.util.test.annotation.PerfCustomTest;
-import org.auraframework.util.test.annotation.PerfFrameworkTest;
-import org.auraframework.util.test.annotation.PerfTestSuite;
-import org.auraframework.util.test.annotation.WebDriverTest;
-
-import com.google.common.collect.Maps;
-
 public class TestInventory implements AuraServiceProvider {
     public final static String TEST_CLASS_SUFFIX = "Test";
     public static final EnumSet<Type> ALL_TESTS = EnumSet.allOf(Type.class);
-    public static final EnumSet<Type> PERF_TESTS = EnumSet.of(Type.PERFSUITE, Type.PERFCMP, Type.PERFFRAMEWORK, Type.PERFCUSTOM);
     public static final EnumSet<Type> FUNC_TESTS = EnumSet.of(Type.JSTEST, Type.WEBDRIVER, Type.INTEGRATION);
 
     public enum Type {
-        JSTEST, WEBDRIVER, INTEGRATION, IGNORED, PERFSUITE, PERFCMP, PERFFRAMEWORK, PERFCUSTOM;
+        JSTEST, WEBDRIVER, INTEGRATION, IGNORED
     }
 
     private URI rootUri;
@@ -111,15 +106,7 @@ public class TestInventory implements AuraServiceProvider {
 
     private Type getAnnotationType (Class<? extends Test> testClass) {
         Type target = null;
-        if (testClass.getAnnotation(PerfTestSuite.class) != null) {
-            target = Type.PERFSUITE;
-        } else if (testClass.getAnnotation(PerfCustomTest.class) != null) {
-            target = Type.PERFCUSTOM;
-        } else if (testClass.getAnnotation(PerfCmpTest.class) != null) {
-            target = Type.PERFCMP;
-        } else if (testClass.getAnnotation(PerfFrameworkTest.class) != null) {
-            target = Type.PERFFRAMEWORK;
-        } else if (testClass.getAnnotation(JSTest.class) != null) {
+        if (testClass.getAnnotation(JSTest.class) != null) {
             target = Type.JSTEST;
         } else if (testClass.getAnnotation(WebDriverTest.class) != null) {
             target = Type.WEBDRIVER;

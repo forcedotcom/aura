@@ -15,28 +15,27 @@
  */
 package org.auraframework.test.testsetrunner;
 
-import com.google.common.collect.Maps;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-import org.auraframework.integration.test.ComponentJSUITest.ComponentTestCase;
-import org.auraframework.system.AuraContext;
-import org.auraframework.test.perf.util.PerfExecutorTestCase;
-import org.auraframework.util.ServiceLocator;
-import org.auraframework.util.test.util.TestInventory;
-import org.auraframework.util.test.util.TestInventory.Type;
-
-import javax.annotation.concurrent.GuardedBy;
-import javax.annotation.concurrent.ThreadSafe;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+
+import javax.annotation.concurrent.GuardedBy;
+import javax.annotation.concurrent.ThreadSafe;
+
+import org.auraframework.instance.Model;
+import org.auraframework.integration.test.ComponentJSUITest.ComponentTestCase;
+import org.auraframework.system.AuraContext;
+import org.auraframework.util.ServiceLocator;
+import org.auraframework.util.test.util.TestInventory;
+import org.auraframework.util.test.util.TestInventory.Type;
+
+import com.google.common.collect.Maps;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * An encapsulation of all of the state held by the {@link TestSetRunnerModel}.
@@ -64,9 +63,6 @@ public class TestSetRunnerState {
         private static TestSetRunnerState FUNC_INSTANCE = new TestSetRunnerState(TestInventory.FUNC_TESTS);
     }
 
-    private static class PerfSingletonHolder {
-        private static TestSetRunnerState PERF_INSTANCE = new TestSetRunnerState(TestInventory.PERF_TESTS);
-    }
     /**
      * The inventory tracks all test cases available for execution.
      */
@@ -86,24 +82,8 @@ public class TestSetRunnerState {
     @GuardedBy("this")
     private SortedMap<String, Map<String, Object>> testsWithPropsMap = Maps.newTreeMap();
 
-    /**
-     * Return the type of Instance based on scope
-     * @return the singleton instance.
-     */
-    public static TestSetRunnerState getInstanceByScope (String scope) {
-    	if (scope != null && scope.equalsIgnoreCase("perf")) {
-			return TestSetRunnerState.getPerfInstance();
-		} else {
-			return TestSetRunnerState.getFuncInstance();
-		}
-    }
-    
     public static TestSetRunnerState getFuncInstance() {
         return FuncSingletonHolder.FUNC_INSTANCE;
-    }
-
-    public static TestSetRunnerState getPerfInstance() {
-        return PerfSingletonHolder.PERF_INSTANCE;
     }
 
     private TestSetRunnerState(EnumSet<TestInventory.Type> scope) {
@@ -179,21 +159,12 @@ public class TestSetRunnerState {
                 testWithProps.put("exception", "");
                 testWithProps.put("isHidden", "");
                 testWithProps.put("type", testCasesType.get(t.toString()).toString().toLowerCase());
-                testWithProps.put("isPerf", t instanceof PerfExecutorTestCase);
                 testWithProps.put("perfInfo", "");
 
                 String url = "";
                 if (t instanceof ComponentTestCase) {
                     url = ((ComponentTestCase) t).getAppUrl();
                 }
-
-                if (t instanceof PerfExecutorTestCase) {
-                	List<String> urls = ((PerfExecutorTestCase) t).generateUrl();
-                    if (urls.size() > 0) {
-                        url = urls.get(0);
-                    }
-                }
-
                 testWithProps.put("jsConsole", url);
                 testsWithPropsMap.put(t.toString(), testWithProps);
             }

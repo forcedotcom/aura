@@ -18,10 +18,15 @@ package org.auraframework.integration.test.components.ui.menu;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
-import org.auraframework.util.test.annotation.PerfTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
 /**
@@ -302,7 +307,6 @@ public class MenuUITest extends WebDriverTestCase {
         waitForFocusOnElement(expectedItemElement);
     }
 
-    @PerfTest
     @Test
     @ExcludeBrowsers({BrowserType.IE11})
     public void testCheckboxMenu() throws Exception {

@@ -24,7 +24,6 @@ import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.parser.handler.DependencyDefHandler;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
 /**
  * Parses JavaScript to extract labels and dependencies.

@@ -23,13 +23,12 @@ import java.util.Map;
 
 import javax.annotation.concurrent.ThreadSafe;
 
-import junit.framework.Test;
-
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.ds.servicecomponent.ModelInstance;
-import org.auraframework.service.ContextService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
+
+import junit.framework.Test;
 
 /**
  * This model exposes a view on the {@link TestSetRunnerState} for
@@ -39,16 +38,9 @@ import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 @ServiceComponentModelInstance
 @ThreadSafe
 public class TestSetRunnerModel implements ModelInstance {
-	private String scope;
-
-	
-	public TestSetRunnerModel(ContextService contextService) throws QuickFixException {
-		Object scope_param;
-		scope_param = contextService.getCurrentContext().getCurrentComponent().getAttributes().getValue("scope");
-		if(scope_param!=null) {
-			scope = scope_param.toString();
-		}
-	}
+    
+    public TestSetRunnerModel() throws QuickFixException {
+    }
 	
     /**
      * @return a sorted list of tests by their inventory key
@@ -65,15 +57,9 @@ public class TestSetRunnerModel implements ModelInstance {
         return testNames;
     }
     
-	private TestSetRunnerState getTestSetRunnerState() {
-		// Use container tests only when specified, otherwise return classic inventory
-		if (scope != null && scope.equalsIgnoreCase("perf")) {
-			return TestSetRunnerState.getPerfInstance();
-		} else {
-			return TestSetRunnerState.getFuncInstance();
-		}
-		
-	}
+    private TestSetRunnerState getTestSetRunnerState() {
+        return TestSetRunnerState.getFuncInstance();
+    }
 
     /**
      * @return the collection of test properties in the same order as

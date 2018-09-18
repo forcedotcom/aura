@@ -129,7 +129,7 @@ public class ModulesCompilerTest extends UnitTestCase {
     public void testPlatformLintingInJs() throws Exception {
         ModulesCompiler compiler = new ModulesCompilerNode(FACTORY, loggingService);
         String entry = "modules/errorInJs/errorInJs.js";
-        String sourceClass = "$A.createComponent('');";
+        String sourceClass = "console.log('error');";
 
         Map<String, String> sources = new HashMap<>();
         sources.put("modules/errorInJs/errorInJs.js", sourceClass);
@@ -139,9 +139,8 @@ public class ModulesCompilerTest extends UnitTestCase {
             fail("should report a syntax error");
         } catch (Exception e) {
             String message = Throwables.getRootCause(e).getMessage();
-            assertEquals("Invalid syntax encountered in the 'errorInJs.js' file of the 'modules:errorInJs' component: \n" +
-                    "Do not use $A in LWC code",
-                    message);
+            assertEquals(message, "Invalid syntax encountered in the 'errorInJs.js' file of the 'modules:errorInJs' component: \n" +
+                    "Unexpected console statement.");
         }
     }
 

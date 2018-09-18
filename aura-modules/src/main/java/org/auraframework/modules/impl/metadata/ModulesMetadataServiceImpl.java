@@ -20,7 +20,7 @@ import com.google.gson.JsonSyntaxException;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.factory.XMLParserBase;
-import org.auraframework.modules.impl.def.ModuleDefImpl.Builder;
+import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
 import org.auraframework.modules.impl.metadata.xml.ModuleMetadataXMLHandler;
 import org.auraframework.modules.impl.metadata.xml.ModuleMetadataXMLParserUtil;
 import org.auraframework.system.AuraContext.Access;

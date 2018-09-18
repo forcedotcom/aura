@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.modules.impl.services.instance;
+package org.auraframework.impl.instance;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.module.ModuleDef;
+import org.auraframework.impl.root.component.ModuleDefImpl;
 import org.auraframework.impl.root.component.ModuleImpl;
 import org.auraframework.instance.InstanceBuilder;
 import org.auraframework.instance.Module;
-import org.auraframework.modules.impl.def.ModuleDefImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import java.util.Map;

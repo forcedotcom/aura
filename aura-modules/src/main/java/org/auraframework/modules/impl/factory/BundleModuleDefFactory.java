@@ -179,8 +179,6 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setValidTags(this.validTags);
         builder.setSourceReferences(compilerData.compilerReport.metadata.references);
 
-        builder.setWireDecorations(compilerData.wireDecorations);
-
         BundleDocumentation bundleDoc = compilerData.compilerReport.documentation;
         if (bundleDoc != null) {
             Optional<String> description = bundleDoc.getClassDescription();

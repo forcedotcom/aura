@@ -17,11 +17,9 @@ package org.auraframework.modules.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 
-import com.google.common.collect.ImmutableMap;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.service.LoggingService;
@@ -48,30 +46,39 @@ public class ModulesCompilerTest extends UnitTestCase {
 
     @Test
     public void test() throws Exception {
-        String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8);
+        ModulesCompiler compiler = new ModulesCompilerNode(FACTORY, loggingService);
+        String entry = "modules/moduletest/moduletest.js";
+        String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/moduletest/moduletest.html"),
+                Charsets.UTF_8);
+        String sourceClass = Files.toString(getResourceFile("/testdata/modules/moduletest/moduletest.js"),
+                Charsets.UTF_8);
 
-        ModulesCompilerData compilerData = compileModule("modules/moduletest/moduletest");
+        Map<String, String> sources = new HashMap<>();
+        sources.put("modules/moduletest/moduletest.js", sourceClass);
+        sources.put("modules/moduletest/moduletest.html", sourceTemplate);
+
+        ModulesCompilerData compilerData = compiler.compile(entry, sources);
+        String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8);
 
         assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
         assertEquals("[lwc, x/test]", compilerData.bundleDependencies.toString());
     }
 
     @Test
-    public void testWireMetadata() throws Exception {
-        ModulesCompilerData compilerData = compileModule("modules/wireDecoratorTest/wireDecoratorTest");
-
-        Set<ModulesCompilerData.WireDecoration> wireDecorations = compilerData.wireDecorations;
-        assertEquals(1, wireDecorations.size());
-        ModulesCompilerData.WireDecoration wireDecorator = wireDecorations.iterator().next();
-        assertEquals("getRecord", wireDecorator.adapter.name);
-        assertEquals("x-record-api", wireDecorator.adapter.reference);
-        assertEquals(ImmutableMap.of("id", "recordId"), wireDecorator.params);
-    }
-
-    @Test
     public void testErrorInHtml() throws Exception {
+        ModulesCompiler compiler = new ModulesCompilerNode(FACTORY, loggingService);
+        String entry = "modules/errorInHtml/errorInHtml.js";
+        String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/errorInHtml/errorInHtml.html"),
+                Charsets.UTF_8);
+        String sourceClass = Files.toString(getResourceFile("/testdata/modules/errorInHtml/errorInHtml.js"),
+                Charsets.UTF_8);
+
+        Map<String, String> sources = new HashMap<>();
+        sources.put("modules/errorInHtml/errorInHtml.js", sourceClass);
+        sources.put("modules/errorInHtml/errorInHtml.html", sourceTemplate);
+
         try {
-            compileModule("modules/errorInHtml/errorInHtml");
+            compiler.compile(entry, sources);
             fail("should report a syntax error");
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,8 +90,19 @@ public class ModulesCompilerTest extends UnitTestCase {
 
     @Test
     public void testErrorInJs() throws Exception {
+        ModulesCompiler compiler = new ModulesCompilerNode(FACTORY, loggingService);
+        String entry = "modules/errorInJs/errorInJs.js";
+        String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/errorInJs/errorInJs.html"),
+                Charsets.UTF_8);
+        String sourceClass = Files.toString(getResourceFile("/testdata/modules/errorInJs/errorInJs.js"),
+                Charsets.UTF_8);
+
+        Map<String, String> sources = new HashMap<>();
+        sources.put("modules/errorInJs/errorInJs.js", sourceClass);
+        sources.put("modules/errorInJs/errorInJs.html", sourceTemplate);
+
         try {
-            compileModule("modules/errorInJs/errorInJs");
+            compiler.compile(entry, sources);
             fail("should report a syntax error");
         } catch (Exception e) {
             String message = Throwables.getRootCause(e).getMessage();
@@ -125,19 +143,6 @@ public class ModulesCompilerTest extends UnitTestCase {
                     "Do not use $A in LWC code",
                     message);
         }
-    }
-
-    private ModulesCompilerData compileModule(String modulePath) throws Exception {
-        ModulesCompiler compiler = new ModulesCompilerNode(FACTORY, loggingService);
-        String jsModule = modulePath + ".js";
-        String htmlModule = modulePath + ".html";
-        String sourceTemplate = Files.toString(getResourceFile("/testdata/" + htmlModule), Charsets.UTF_8);
-        String sourceClass = Files.toString(getResourceFile("/testdata/" + jsModule), Charsets.UTF_8);
-        Map<String, String> sources = new HashMap<>();
-        sources.put(jsModule, sourceClass);
-        sources.put(htmlModule, sourceTemplate);
-
-        return compiler.compile(jsModule, sources);
     }
 
 }

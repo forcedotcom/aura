@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.builder.LibraryDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDefRef;
@@ -166,7 +165,7 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
         throw new UnsupportedOperationException("LibraryDef cannot contain RequiredVersionDefs.");
     }
 
-    public static class Builder extends RootDefinitionImpl.Builder<LibraryDef> implements LibraryDefBuilder {
+    public static class Builder extends RootDefinitionImpl.Builder<LibraryDef> {
 
         private List<IncludeDefRef> includes;
 
@@ -183,7 +182,6 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
             return new LibraryDefImpl(this);
         }
 
-        @Override
         public List<IncludeDefRef> getIncludes() {
             return this.includes;
         }

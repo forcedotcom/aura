@@ -1068,15 +1068,6 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
     }
 };
 
-AuraComponentService.prototype.getDefinitionOfAnyType = function (descriptor) {
-    // this ensures we've checked any case insensitivity found
-    descriptor = this.getDescriptorFromConfig(descriptor);
-    // using getDef instead of getComponentDef to invoke Access Checks
-    // similarly for eventService getDef, for Access Checks
-    // Libraries don't have access checks?
-    return this.getDef(descriptor) || this.getLibrary(descriptor) || $A.eventService.getDef(descriptor);
-};
-
 AuraComponentService.prototype.hasCacheableDefinitionOfAnyType = function(descriptor) {
     var desc = this.getDescriptorFromConfig(descriptor);
     return  !!this.hasModuleDefinition(desc) ||
@@ -1457,7 +1448,7 @@ AuraComponentService.prototype.getDef = function(descriptor) {
             if($A.clientService.logAccessFailures){
                 $A.error(null,new $A.auraError(message));
             }
-            return undefined;
+            return null;
         }else{
             if($A.clientService.logAccessFailures){
                 $A.warning(message);

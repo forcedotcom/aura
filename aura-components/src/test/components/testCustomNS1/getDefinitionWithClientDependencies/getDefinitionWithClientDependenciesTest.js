@@ -14,7 +14,7 @@
                   var complete = false;
 
                   $A.getDefinition(descriptor, function(definition) {
-                      $A.test.assertUndefined(definition,"component definition requested is not undefined");
+                      $A.test.assertNull(definition,"component definition requested is not null");
                       complete = true;
                   });
                   this.waitForErrorModal(function() {
@@ -33,7 +33,7 @@
             var actionComplete = false;
 
            $A.getDefinition("e.testCustomNS2:applicationEventWithDefaultAccess", function(definition) {
-               $A.test.assertUndefined(definition,"application event definition requested is not undefined");
+               $A.test.assertNull(definition,"application event definition requested is not null");
                actionComplete = true;
            });
            this.waitForErrorModal(function() {
@@ -52,7 +52,7 @@
            var actionComplete = false;
 
           $A.getDefinition("e.testPrivilegedNS1:applicationEventWithPrivilegedAccess", function(definition) {
-              $A.test.assertUndefined(definition,"application event definition requested is not undefined");
+              $A.test.assertNull(definition,"application event definition requested is not null");
               actionComplete = true;
           });
           this.waitForErrorModal(function() {
@@ -71,7 +71,7 @@
            var actionComplete = false;
 
           $A.getDefinition("e.auratest:accessInternalEvent", function(definition) {
-              $A.test.assertUndefined(definition,"application event definition requested is not undefined");
+              $A.test.assertNull(definition,"application event definition requested is not null");
               actionComplete = true;
           });
           this.waitForErrorModal(function() {
@@ -92,7 +92,7 @@
                   var complete = false;
 
                   $A.getDefinition(descriptor, function(definition) {
-                      $A.test.assertUndefined(definition,"component definition requested is not undefined");
+                      $A.test.assertNull(definition,"component definition requested is not null");
                       complete = true;
                   });
                   this.waitForErrorModal(function() {

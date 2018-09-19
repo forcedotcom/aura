@@ -1451,18 +1451,10 @@ AuraInstance.prototype.getDefinition = function(descriptor, callback) {
     $A.assert($A.util.isString(descriptor), "'descriptor' must be an event or component descriptor such as 'prefix:name' or 'e.prefix:name'.");
     $A.assert($A.util.isFunction(callback), "'callback' must be a valid function.");
 
-    if (this.getContext().uriAddressableDefsEnabled) {
-        $A.getDefinitions([descriptor], function unpackDefinition(defs){
-            callback(defs[0]);
-        });
-        return;
-    }
-
     if(descriptor.indexOf("e.") !== -1) {
-        this.eventService.getDefinition(descriptor, callback);
-        return;
+        return this.eventService.getDefinition(descriptor, callback);
     }
-    this.componentService.getDefinition(descriptor, callback);
+    return this.componentService.getDefinition(descriptor, callback);
 };
 
 /**
@@ -1475,31 +1467,6 @@ AuraInstance.prototype.getDefinition = function(descriptor, callback) {
 AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
     $A.assert($A.util.isArray(descriptors), "'descriptors' must be an array of definition descriptors to retrieve.");
     $A.assert($A.util.isFunction(callback), "'callback' must be a valid function.");
-
-    if (this.getContext().uriAddressableDefsEnabled) {
-        var that = this;
-        var idx;
-        var descriptorMap = {};
-        for (idx=0; idx < descriptors.length; idx++) {
-            var desc = descriptors[idx];
-            if(desc) {
-                var eventIndex = desc.indexOf("e.");
-                if (eventIndex !== -1) {
-                    desc = desc.substr(eventIndex + 2);
-                    descriptors[idx] = desc;
-                }
-                descriptorMap[desc] = undefined;
-            }
-        }
-        this.componentService.loadComponentDefs(descriptorMap, $A.getCallback(function collectDefinitions(){
-            var definitions = [];
-            for (idx=0; idx < descriptors.length; idx++) {
-                definitions.push(that.componentService.getDefinitionOfAnyType(descriptors[idx]));
-            }
-            callback(definitions);
-        }));
-        return;
-    }
 
     var pendingMap = {};
     var returnDefinitions = [];

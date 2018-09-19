@@ -37,10 +37,6 @@
                 // Test ":host" functional form selector
                 var childActive = document.querySelector('moduletest-css-child.active');
                 $A.test.assertEquals('rgb(0, 128, 0)', window.getComputedStyle(childActive).backgroundColor);
-
-                // Test ":host-context" selector
-                var childDark = document.querySelector('.dark-theme > moduletest-css-child');
-                $A.test.assertEquals('rgb(255, 255, 255)', window.getComputedStyle(childDark).color);
             }
         ]
     },

@@ -1281,7 +1281,7 @@ AuraEventService.prototype.getDef = function(descriptor) {
             if($A.clientService.logAccessFailures){
                 $A.error(null,new $A.auraError(message));
            }
-            return null;
+            return undefined;
         } else {
             if($A.clientService.logAccessFailures){
                 $A.warning(message);

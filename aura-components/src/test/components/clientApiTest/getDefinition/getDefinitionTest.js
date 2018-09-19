@@ -69,12 +69,12 @@
         }
     },
 
-    testDefinitionIsNullForUnkownComponent:{
+    testDefinitionIsUndefinedForUnkownComponent:{
         test: function(){
             var actionComplete = false;
 
             $A.getDefinition("unknown:unknown", function(definition) {
-                $A.test.assertNull(definition);
+                $A.test.assertUndefined(definition);
                 actionComplete = true;
             });
 
@@ -136,7 +136,7 @@
             var actionComplete = false;
 
             $A.getDefinition("e.unknown:unknown", function(definition) {
-                $A.test.assertNull(definition);
+                $A.test.assertUndefined(definition);
                 actionComplete = true;
             });
 
@@ -151,7 +151,7 @@
             $A.test.addCleanup(function() {$A.test.setServerReachable(true);});
 
             $A.getDefinition("ui:inputCheckbox", function(definition) {
-                $A.test.assertNull(definition);
+                $A.test.assertUndefined(definition);
                 actionComplete = true;
             });
 
@@ -352,8 +352,8 @@
                     "unknown1:unknown1",
                     "unknown2:unknown2"
                 ], function(definitions) {
-                    $A.test.assertNull(definitions[0], "definitions[0] should be null.");
-                    $A.test.assertNull(definitions[1], "definitions[1] should be null.");
+                    $A.test.assertUndefined(definitions[0], "definitions[0] should be null.");
+                    $A.test.assertUndefined(definitions[1], "definitions[1] should be null.");
                     actionComplete = true;
                 });
 
@@ -377,8 +377,8 @@
                             definition.constructor.name);
                     $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());
 
-                    $A.test.assertNull(definitions[1], "definition[1] should be null.");
-                    $A.test.assertNull(definitions[2], "definition[2] should be null.");
+                    $A.test.assertUndefined(definitions[1], "definition[1] should be null.");
+                    $A.test.assertUndefined(definitions[2], "definition[2] should be null.");
                     actionComplete = true;
                 });
 

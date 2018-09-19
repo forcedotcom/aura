@@ -109,9 +109,10 @@
     },
 
     waitForSelectList: function(inputSelect, isOpen, cb) {
-        var selectListElm = inputSelect.find("options").getElement();
+        var that = this;
+        var selectList = inputSelect.find("options");
         $A.test.addWaitForWithFailureMessage(isOpen, function() {
-            return $A.util.hasClass(selectListElm, "visible");
+            return that.getAnchors(selectList).length > 0 && $A.util.hasClass(selectList.getElement(), "visible");
         }, "Expect inputSelect to be " + (isOpen ? "open" : "closed"), cb);
     },
 

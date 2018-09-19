@@ -4,7 +4,7 @@
 
         $A.getDefinition(descriptor, function(definition){
             // using null string for UI tests.
-            var name = definition===null? "null":definition.getDescriptor().getQualifiedName();
+            var name = !!definition? definition.getDescriptor().getQualifiedName() : "null";
             cmp.set("v.definitionNames", [name]);
             cmp.set("v.complete", true);
         });
@@ -12,9 +12,8 @@
 
     getComponentDefinitionWithoutAccess: function(cmp) {
         var descriptor = "auratest:accessInternalComponent";
-
         $A.getDefinition(descriptor, function(definition){
-            var name = definition===null? "null":definition.getDescriptor().getQualifiedName();
+            var name = !!definition? definition.getDescriptor().getQualifiedName() : "null";
             cmp.set("v.definitionNames", [name]);
             cmp.set("v.complete", true);
         });
@@ -31,7 +30,7 @@
 
             for(var i = 0, len = definitions.length; i < len; i++) {
                 definition = definitions[i];
-                name = definition===null? "null":definition.getDescriptor().getQualifiedName();
+                name = !!definition? definition.getDescriptor().getQualifiedName() : "null";
                 definitionNames.push(name);
             }
 

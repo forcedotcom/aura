@@ -99,12 +99,15 @@ ActionStorage.prototype.populateActionsFilter = function() {
     return this.getAll()["then"](function(items){
 
         var actionsStoredWithURIDefs = items[that.URI_DEFS_ENABLED_KEY];
+        var bootstrapEntry = items[AuraClientService.BOOTSTRAP_KEY];
         var uriEnabled = $A.getContext().uriAddressableDefsEnabled;
+        var allowedStorage_size = actionsStoredWithURIDefs === undefined? 0: 1;
+        allowedStorage_size += bootstrapEntry === undefined ? 0: 1;
         
         // actions stored with uri defs enabled are backwards compatible with it disabled.
         // actions stored with uri defs disabled are not compatible with uri defs enabled.
         if ((uriEnabled !== !!actionsStoredWithURIDefs) &&
-            (Object.keys(items).length > (actionsStoredWithURIDefs === undefined? 0: 1))) {
+            (Object.keys(items).length > allowedStorage_size) ) {
 
             $A.warning("Clearing actions db because uri addressable defs state was toggled");
             return that.clear()["then"](function(){

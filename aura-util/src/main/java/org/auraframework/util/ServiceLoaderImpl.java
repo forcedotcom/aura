@@ -21,6 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
@@ -37,7 +38,6 @@ import org.reflections.util.FilterBuilder;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Sets;
 
 /**
  * @since 0.0.233
@@ -101,9 +101,8 @@ public class ServiceLoaderImpl implements ServiceLoader {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> T get(Class<T> type, Set<Class<?>> classes, boolean primary, Predicate<? super Method> predicate) {
-        Set<Method> beanMethods = Sets.newHashSet();
+    private static <T> T get(Class<T> type, Set<Class<?>> classes, boolean primary, Predicate<? super Method> predicate) {
+        Set<Method> beanMethods = new HashSet<>();
         Predicate<Method> pred;
 
         pred = Predicates.and(predicate, ReflectionUtils.withReturnTypeAssignableTo(type));
@@ -127,6 +126,7 @@ public class ServiceLoaderImpl implements ServiceLoader {
         T ret = null;
         try {
             for (Method meth : beanMethods) {
+                @SuppressWarnings("unchecked")
                 T tmp = (T) meth.invoke(null);
                 if (tmp != null) {
                     if (ret != null) {
@@ -145,9 +145,9 @@ public class ServiceLoaderImpl implements ServiceLoader {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends AuraServiceProvider> Set<T> getAll(Class<T> type) {
-        Set<Method> beanMethods = Sets.newHashSet();
+        Set<Method> beanMethods = new HashSet<>();
 
-        Set<T> ret = Sets.newHashSet();
+        Set<T> ret = new HashSet<>();
 
         Predicate<Method> pred = Predicates.and(predicate, ReflectionUtils.withReturnTypeAssignableTo(type));
 

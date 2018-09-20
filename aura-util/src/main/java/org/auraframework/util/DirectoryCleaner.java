@@ -27,7 +27,7 @@ import java.util.Set;
 import com.google.common.collect.ImmutableSet;
 
 public class DirectoryCleaner implements FileVisitor<Path>, Runnable {
-    private Path path;
+    private final Path path;
 
     public DirectoryCleaner(Path path) {
         this.path = path;
@@ -37,8 +37,8 @@ public class DirectoryCleaner implements FileVisitor<Path>, Runnable {
     public void run() {
         try {
             Files.walkFileTree(path, this);
-        } catch (IOException ioe) {
-            // We try to handle iO exceptions lower down in the code, but if all else fails, it will pop up
+        } catch (IOException ignore) {
+            // We try to handle IO exceptions lower down in the code, but if all else fails, it will pop up
             // here. Not much we can do.
         }
     }
@@ -49,10 +49,10 @@ public class DirectoryCleaner implements FileVisitor<Path>, Runnable {
 
     private static final Set<PosixFilePermission> DIRECTORY_PERMISSIONS =
         new ImmutableSet.Builder<PosixFilePermission>()
-        .add(PosixFilePermission.OWNER_WRITE)
-        .add(PosixFilePermission.OWNER_READ)
-        .add(PosixFilePermission.OWNER_EXECUTE)
-        .build();
+            .add(PosixFilePermission.OWNER_WRITE)
+            .add(PosixFilePermission.OWNER_READ)
+            .add(PosixFilePermission.OWNER_EXECUTE)
+            .build();
 
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
@@ -95,4 +95,3 @@ public class DirectoryCleaner implements FileVisitor<Path>, Runnable {
         return FileVisitResult.CONTINUE;
     }
 }
-

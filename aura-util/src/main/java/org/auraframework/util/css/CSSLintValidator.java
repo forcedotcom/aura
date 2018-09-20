@@ -17,6 +17,7 @@ package org.auraframework.util.css;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +26,6 @@ import javax.script.Invocable;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.validation.RhinoBasedValidator;
 import org.auraframework.util.validation.ValidationError;
-
-import com.google.common.collect.Lists;
 
 /**
  * Validates .css using csslint
@@ -52,14 +51,15 @@ public final class CSSLintValidator extends RhinoBasedValidator {
      * @param disableRulesForAura disables csslint rules that generate bogus for aura .css files (see
      *            app/main/core/build/.csslintrc)
      */
-    public List<ValidationError> validate(String filename, String source, boolean disableRulesForAura) {
-        List<ValidationError> errors = Lists.newArrayList();
+    public List<ValidationError> validate(String filename, String source, Boolean disableRulesForAura) {
+        final List<ValidationError> errors;
         try {
             @SuppressWarnings("unchecked")
-            List<Map<String, ?>> lintErrors = (List<Map<String, ?>>) ((Invocable) engine).invokeFunction(tool
+            final List<Map<String, ?>> lintErrors = (List<Map<String, ?>>) ((Invocable) engine).invokeFunction(tool
                     + "Helper",
                     source, disableRulesForAura);
 
+            errors = new ArrayList<>(lintErrors.size());
             for (int i = 0; i < lintErrors.size(); i++) {
                 Map<String, ?> error = lintErrors.get(i);
                 errors.add(new ValidationError(tool, filename, error));
@@ -76,9 +76,9 @@ public final class CSSLintValidator extends RhinoBasedValidator {
     public static void main(String[] args) throws Exception {
         String filename = args[0];
         String source = IOUtil.readTextFile(new File(filename));
-        List<ValidationError> ret = new CSSLintValidator().validate(filename, source, true);
+        List<ValidationError> ret = new CSSLintValidator().validate(filename, source, Boolean.TRUE);
         for (ValidationError error : ret) {
-            System.out.println(error);
+            System.err.println(error);
         }
     }
 }

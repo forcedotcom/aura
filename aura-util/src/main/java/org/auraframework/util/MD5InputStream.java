@@ -68,7 +68,7 @@ public class MD5InputStream extends FilterInputStream {
     public void consumeAll() throws IOException {
         byte[] b = new byte[1024];
         while (read(b) != -1) {
+            // All of the logic happening in the looping condition and is used to read the entire file.
         }
     }
-
 }

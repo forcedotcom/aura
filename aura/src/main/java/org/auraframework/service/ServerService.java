@@ -15,7 +15,11 @@
  */
 package org.auraframework.service;
 
-import org.auraframework.Aura;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.SVGDef;
@@ -23,11 +27,6 @@ import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * <p>
@@ -37,7 +36,6 @@ import java.util.Set;
  * and should be expanded to include more of the support routines from the servlets.
  */
 public interface ServerService extends AuraService {
-
 
     enum HYDRATION_TYPE {
         none,

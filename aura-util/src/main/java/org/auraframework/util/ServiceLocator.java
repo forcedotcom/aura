@@ -15,7 +15,9 @@
  */
 package org.auraframework.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,20 +26,18 @@ import java.util.concurrent.ConcurrentMap;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Delegates and combines calls to all ServiceLoaders currently in the classpath
- *
  *
  * @since 0.0.233
  */
 public class ServiceLocator implements ServiceLoader {
 
-    private static ServiceLocator instance = createInstance();
+    private final static ServiceLocator instance = createInstance();
 
-    private List<ServiceLoader> loaders = Lists.newArrayList();
+    private List<ServiceLoader> loaders = new ArrayList<>(1);
 
     /**
      * Cache backing get(Class)
@@ -54,7 +54,7 @@ public class ServiceLocator implements ServiceLoader {
      */
     private final ConcurrentMap<Class<?>, Set<?>> setCache = new ConcurrentHashMap<>();
 
-    private static ThreadLocal<ServiceLoader> alternateServiceLocator = new ThreadLocal<>();
+    private final static ThreadLocal<ServiceLoader> alternateServiceLocator = new ThreadLocal<>();
 
     /**
      * If this is not called, then ServiceLoaderImpl is used as the only
@@ -71,7 +71,7 @@ public class ServiceLocator implements ServiceLoader {
      */
     public static void init(ServiceLoader... loaders) {
         synchronized (instance) {
-            instance.loaders = Lists.newArrayList(loaders);
+            instance.loaders = ImmutableList.copyOf(loaders);
             instance.instanceCache.clear();
             instance.namedInstanceCache.clear();
             instance.setCache.clear();
@@ -92,7 +92,7 @@ public class ServiceLocator implements ServiceLoader {
      */
     public static final ServiceLoader get() {
         ServiceLoader altInstance = alternateServiceLocator.get();
-        if(alternateServiceLocator.get() != null){
+        if (alternateServiceLocator.get() != null) {
             return altInstance;
         }
         return instance;
@@ -173,7 +173,7 @@ public class ServiceLocator implements ServiceLoader {
     }
 
     private Set<?> loadSet(Class<? extends AuraServiceProvider > key) {
-        Set<Object> ret = Sets.newHashSet();
+        Set<Object> ret = new HashSet<>();
         for (ServiceLoader loader : loaders) {
             Collection<?> val = loader.getAll(key);
             if (val != null) {
@@ -194,6 +194,5 @@ public class ServiceLocator implements ServiceLoader {
         public ServiceLocatorException(String reason) {
             super(reason);
         }
-
     }
 }

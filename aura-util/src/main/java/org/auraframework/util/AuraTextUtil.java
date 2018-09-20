@@ -38,7 +38,7 @@ import com.google.common.collect.ObjectArrays;
 /**
  * Collection of utility methods for manipulating or testing strings.
  */
-public class AuraTextUtil {
+public final class AuraTextUtil {
 
     private static final String[] JS_IN = new String[] { "\\", "'", "\n", "\r", "\"", "!--", "<", ">", "\u2028",
             "\u2029", "\u0000" };
@@ -107,9 +107,14 @@ public class AuraTextUtil {
 
     private static final Pattern ATTRIBUTE_NAME_PATTERN = Pattern.compile("^[a-zA-Z_].[-a-zA-Z0-9_]*$");
 
+    private AuraTextUtil() {
+        // Prevent developers from instantiating this class because it is all static methods.
+    }
+    
     // these are expensive, worth keeping in an LRU cache to help with traffic spikes
     private static final LoadingCache<String, String> ESCAPE_FOR_JAVASCRIPT_STRING_CACHE = CacheBuilder.newBuilder().maximumSize(32*1024).build(new CacheLoader<String, String>() {
 
+        @SuppressWarnings("synthetic-access")
         @Override
         public String load(String in) throws Exception {
             return TrieMatcher.replaceMultiple(in, JS_SEARCH_REPLACE);
@@ -118,6 +123,7 @@ public class AuraTextUtil {
 
     private static final LoadingCache<String, String> ESCAPE_FOR_JSON_STRING_CACHE = CacheBuilder.newBuilder().maximumSize(32*1024).build(new CacheLoader<String, String>() {
 
+        @SuppressWarnings("synthetic-access")
         @Override
         public String load(String in) throws Exception {
             return TrieMatcher.replaceMultiple(in, JSON_SEARCH_REPLACE);
@@ -140,28 +146,32 @@ public class AuraTextUtil {
     }
 
     /**
+     * @param array The array to convert
      * @param delim what delimiter to use in between array elements.
      * @param maxValues how many array elements to include. When less than 0, all values are included. If
-     *            <code>maxValues</code> is greater than the number of elements in <code>array</code>, then all elements
-     *            are included. If any elements are not included, <code>...</code> will be inserted after the last
-     *            element.
+     *            {@code maxValues} is greater than the number of elements in {@code array}, then all
+     *            elements are included. If any elements are not included, {@code ...} will be inserted after
+     *            the last element.
      * @param useBrackets add [] to outside of string iff true
      * @see #collectionToString(Iterable, String, String)
+     * @see #arrayToString(Object[], String, int, boolean, boolean)
      */
     public static String arrayToString(Object[] array, String delim, int maxValues, boolean useBrackets) {
         return arrayToString(array, delim, maxValues, useBrackets, true);
     }
 
     /**
+     * @param array The array to convert
      * @param delim what delimiter to use in between array elements.
      * @param maxValues how many array elements to include. When less than 0, all values are included. If
-     *            <code>maxValues</code> is greater than the number of elements in <code>array</code>, then all elements
-     *            are included. If any elements are not included and appendEllipsis is set, <code>...</code> will be
-     *            inserted after the last element.
+     *            {@code maxValues} is greater than the number of elements in {@code array}, then all
+     *            elements are included. If any elements are not included and appendEllipsis is set,
+     *            {@code ...} will be inserted after the last element.
      * @param useBrackets add [] to outside of string iff true
-     * @param appendEllipsis if set and, and any elements are not included, <code>...</code> will be inserted after the
-     *            last element.
+     * @param appendEllipsis if set and, and any elements are not included, {@code ...} will be inserted
+     *            after the last element.
      * @see #collectionToString(Iterable, String, String)
+     * @see #arrayToString(Object[], String, int, boolean)
      */
     public static String arrayToString(Object[] array, String delim, int maxValues, boolean useBrackets,
             boolean appendEllipsis) {
@@ -220,13 +230,14 @@ public class AuraTextUtil {
     }
 
     /**
-     * Properly escapes strings to be displayed in Javascript Strings. This means that backslashes and single quotes are
-     * escaped. Double quotes also since javascript string may use either single or double. And HTML comment start,
-     * because IE recognizes it even in a javascript string. It is escaped by embedding backslash in it, which JS will
-     * ignore, but breaks the pattern for the browser comment recognizer. <br>
+     * Properly escapes strings to be displayed in JavaScript Strings. This means that backslashes and single
+     * quotes are escaped. Double quotes also since JavaScript string may use either single or double. And
+     * HTML comment start, because IE recognizes it even in a JavaScript string. It is escaped by embedding
+     * backslash in it, which JS will ignore, but breaks the pattern for the browser comment recognizer.<br>
      * <br>
-     * The Javascript escaping methods are the only methods you should call outside of Element classes. Whenever you are
-     * passing Javascript into elements, you should escape any potentially dangerous portions of the script.
+     * The JavaScript escaping methods are the only methods you should call outside of Element classes.
+     * Whenever you are passing JavaScript into elements, you should escape any potentially dangerous
+     * portions of the script.
      */
     public static String escapeForJavascriptString(String in) {
         try {
@@ -250,8 +261,9 @@ public class AuraTextUtil {
     /**
      * Properly escapes string for JSON Function.
      *
-     * This ensures that a very few sequences are not present, the most important of which is the end comment string, as
-     * that causes severe breakage when used in a broken JSON string that is commented out by the error handling.
+     * This ensures that a very few sequences are not present, the most important of which is the end comment
+     * string, as that causes severe breakage when used in a broken JSON string that is commented out by the
+     * error handling.
      *
      * @param in the incoming (unsafe) string
      * @return a string with the sequences replaced appropriately
@@ -261,74 +273,82 @@ public class AuraTextUtil {
     }
 
     /**
-     * Splits the given string str using the given delimiter and returns the result as a string list. If str is null,
-     * then null is returned.<br>
+     * Splits the given string str using the given delimiter and returns the result as a string list. If str
+     * is {@code null}, then {@code null} is returned.<br>
      * <br>
-     * The returned string list is an ArrayList that is constructed using the 4 as the ArrayList's initial size. If you
-     * expect to have more than four elements more than just on the rare occasion, then please consider using another
-     * splitSimple overload that lets you pass in the expected size.<br>
+     * The returned string list is an {@link ArrayList} that is constructed using the 4 as the
+     * {@code ArrayList}'s initial size. If you expect to have more than four elements more than just on the
+     * rare occasion, then please consider using another {@code splitSimple} overload that lets you pass in
+     * the expected size.<br>
      * <br>
-     * This is more efficient than String.split or TextUtil.split because it does not use a regular expression.<br>
+     * This is more efficient than {@code String.split} or {@code TextUtil.split} because it does not use a
+     * regular expression.<br>
      * <br>
-     * <b>CAUTION:</b> The str and delimiter parameters are in an order that differs from other string splitting
-     * methods. Be absolutely sure that you get the str and delimiter parameter arguments correct. This may eventually
-     * be fixed with a refactoring.
+     * <b>CAUTION:</b> The str and delimiter parameters are in an order that differs from other string
+     * splitting methods. Be absolutely sure that you get the str and delimiter parameter arguments correct.
+     * This may eventually be fixed with a refactoring.
      *
      * @param delimiter The delimiter to split the string using
      * @param string The string to split
-     * @return String list or, if str was null, then null
-     * @deprecated use StringUtils.split(str, delimiter);
+     * @return String list or, if str was {@code null}, then {@code null}
+     * @deprecated use {@link StringUtils#split(String, String)}
      */
+    @Deprecated
     public static List<String> splitSimple(String delimiter, String string) {
         return checkForEmptyOrNull(string,
                 str -> Lists.newArrayList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter)));
     }
 
     /**
-     * Splits the given string str using the given delimiter and returns the result as a string list. If str is null,
-     * then null is returned.<br>
+     * Splits the given string str using the given delimiter and returns the result as a string list. If str
+     * is {@code null}, then {@code null} is returned.<br>
      * <br>
-     * The returned string list is an ArrayList that is constructed using the given expected size as the ArrayList's
-     * initial size. If you are not aware of the expected size, then use 0, which will cause this method to use a
-     * LinkedList instead of an ArrayList.<br>
+     * The returned string list is an {@link ArrayList} that is constructed using the given expected size as
+     * the {@code ArrayList}'s initial size. If you are not aware of the expected size, then use 0, which
+     * will cause this method to use a {@link LinkedList} instead of an {@code ArrayList}.<br>
      * <br>
-     * This is more efficient than String.split or TextUtil.split because it does not use a regular expression.<br>
+     * This is more efficient than {@code String.split} or {@code TextUtil.split} because it does not use a
+     * regular expression.<br>
      * <br>
-     * <b>CAUTION:</b> The str and delimiter parameters are in an order that differs from other string splitting
-     * methods. Be absolutely sure that you get the str and delimiter parameter arguments correct. This may eventually
-     * be fixed with a refactoring.
+     * <b>CAUTION:</b> The str and delimiter parameters are in an order that differs from other string
+     * splitting methods. Be absolutely sure that you get the str and delimiter parameter arguments correct.
+     * This may eventually be fixed with a refactoring.
      *
      * @param delimiter The delimiter to split the string using
      * @param str The string to split
-     * @param expectedSize The expected number of elements in the output list. If you don't know, or if it could be
-     *            arbitrarily large, and if you will only access the returned list sequentially with an iterator, then
-     *            use 0 to tell this method to use a LinkedList
+     * @param expectedSize The expected number of elements in the output list. If you don't know, or if it
+     *            could be arbitrarily large, and if you will only access the returned list sequentially with
+     *            an iterator, then use 0 to tell this method to use a {@code LinkedList}
      * @return String list or, if str was null, then null
-     * @deprecated use StringUtils.split(str, delimiter);
+     * @deprecated use {@link StringUtils#split(String, String)}
      */
+    @Deprecated
     public static List<String> splitSimple(String delimiter, String str, int expectedSize) {
         return splitSimple(delimiter, str);
     }
 
     /**
-     * @deprecated use StringUtils.split(str, delimiter, limitSize)
+     * @deprecated use {@link StringUtils#split(String, String, int)}
      * @param string
      * @param delimiter
      * @param limitSize
      * @return
      */
+    @Deprecated
     public static List<String> splitSimpleLimit(String string, String delimiter, int limitSize) {
         return checkForEmptyOrNull(string,
                 str -> Lists.newArrayList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter, limitSize)));
     }
 
     /**
-     * @deprecated use StringUtils.split(str, delimiter, limitSize) and map StringUtils.trim with a java lambda
+     * @deprecated use {@link StringUtils#split(String, String, int) and map {@link StringUtils#trim(String)}
+     *             with a java lambda
      * @param string
      * @param delimiter
      * @param limitSize
      * @return
      */
+    @Deprecated
     public static List<String> splitSimpleLimitAndTrim(String string, String delimiter, int limitSize) {
         return checkForEmptyOrNull(string,
                 str -> Lists.newArrayList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter, limitSize)).stream().map(StringUtils::trim).collect(Collectors.toList())
@@ -349,7 +369,7 @@ public class AuraTextUtil {
      * Makes the first letter of the input string upper case.
      */
     public static String initCap(String in) {
-        if (in == null || in.length() == 0 || Character.isUpperCase(in.charAt(0))) {
+        if (StringUtils.isEmpty(in) || Character.isUpperCase(in.charAt(0))) {
             return in;
         }
         if (in.length() == 1) {
@@ -361,8 +381,9 @@ public class AuraTextUtil {
     }
 
     /**
-     * Properly decode a URL according to the standard. This is a convenience method users don't have to catch this
-     * exception everywhere (the exception should never be thrown anyway), or worry about the encoding string.
+     * Properly decode a URL according to the standard. This is a convenience method users don't have to
+     * catch this exception everywhere (the exception should never be thrown anyway), or worry about the
+     * encoding string.
      *
      * @see URLDecoder#decode(java.lang.String, java.lang.String)
      */
@@ -379,8 +400,8 @@ public class AuraTextUtil {
     /**
      * Properly encode a URL according to the standard.
      *
-     * This is a convenience method users don't have to catch this exception everywhere (the exception should never be
-     * thrown anyway).
+     * This is a convenience method users don't have to catch this exception everywhere (the exception should
+     * never be thrown anyway).
      *
      * @see URLEncoder#encode(java.lang.String, java.lang.String)
      */
@@ -420,34 +441,37 @@ public class AuraTextUtil {
     }
 
     /**
-     * Splits the given string str using the given delimiter, trims each element, and returns the result as a string
-     * list. If str is null, then null is returned.<br>
+     * Splits the given string str using the given delimiter, trims each element, and returns the result as a
+     * string list. If str is {@code null}, then {@code null} is returned.<br>
      * <br>
-     * The returned string list is an ArrayList that is constructed using the given expected size as the ArrayList's
-     * initial size. If you are not aware of the expected size, then use 0, which will cause this method to use a
-     * LinkedList instead of an ArrayList.<br>
+     * The returned string list is an {@link ArrayList} that is constructed using the given expected size as
+     * the {@code ArrayList}'s initial size. If you are not aware of the expected size, then use 0, which
+     * will cause this method to use a {@link LinkedList} instead of an {@code ArrayList}.<br>
      * <br>
-     * This is more efficient than String.split or TextUtil.split because it does not use a regular expression.
+     * This is more efficient than {@code String.split} or {@code TextUtil.split} because it does not use a
+     * regular expression.
      *
-     * @deprecated use StringUtils.split and map StringUtils.trim with a stream / lambda
+     * @deprecated use {@code StringUtils.split} and map {@code StringUtils.trim} with a stream / lambda
      * @param string The string to split
      * @param delimiter The delimiter to split the string using
-     * @param expectedSize The expected number of elements in the output list. If you don't know, or if it could be
-     *            arbitrarily large, and if you will only access the returned list sequentially with an iterator, then
-     *            use 0 to tell this method to use a LinkedList
-     * @return String list or, if str was null, then null
+     * @param expectedSize The expected number of elements in the output list. If you don't know, or if it
+     *            could be arbitrarily large, and if you will only access the returned list sequentially with
+     *            an iterator, then use 0 to tell this method to use a {@code LinkedList}
+     * @return String list or, if str was {@code null}, then {@code null}
      */
+    @Deprecated
     public static List<String> splitSimpleAndTrim(String string, String delimiter, int expectedSize) {
         return checkForEmptyOrNull(string,
                 str -> Lists.newArrayList(StringUtils.splitByWholeSeparatorPreserveAllTokens(str, delimiter)).stream().map(StringUtils::trim).collect(Collectors.toList()));
     }
 
     /**
-     * Note, if you are going to search/replace for the same set of source and target many times, you can get a
-     * performance win by using the form of this call that takes a TrieMatcher instead.
+     * Note, if you are going to search/replace for the same set of source and target many times, you can get
+     * a performance win by using the form of this call that takes a {@link TrieMatcher} instead.
      *
-     * @return the replacement of all occurrences of src[i] with target[i] in s. Src and target are not regex's so this
-     *         uses simple searching with indexOf()
+     * @return the replacement of all occurrences of {@code src[i]} with {@code target[i]} in {@code s}.
+     *         {@code src} and {@code target} are not regex's so this uses simple searching with
+     *         {@code indexOf()}
      * @see TrieMatcher#replaceMultiple(String, TrieMatcher)
      * @see #replaceChar(String, char, CharSequence)
      * @see #replaceSimple(String, String[], String[])
@@ -495,7 +519,8 @@ public class AuraTextUtil {
     }
 
     /**
-     * @return the replacement of src with target in s, using simple string replacement
+     * @return the replacement of {@code src} with {@code target} in {@code s}, using simple string
+     *         replacement
      */
     public static String replaceSimple(String s, String src, String target) {
         assert src != null && src.length() > 0;
@@ -534,9 +559,9 @@ public class AuraTextUtil {
     /**
      * Escape given unescaped text to make it safe for HTML.
      *
-     * Note that this routine will only escape a string for use at the 'top' level of html. You MUST NOT use this for
-     * attributes, or inside a script tag, as in that case it does not escape a sufficient set of characters. This IS
-     * safe for escaping arbitrary text into UTF-8 encoded HTML.
+     * Note that this routine will only escape a string for use at the 'top' level of html. You MUST NOT use
+     * this for attributes, or inside a script tag, as in that case it does not escape a sufficient set of
+     * characters. This IS safe for escaping arbitrary text into UTF-8 encoded HTML.
      *
      * @param input the input text string.
      * @return escaped text
@@ -556,15 +581,14 @@ public class AuraTextUtil {
         if (includeHtmlTags) {
             // include replacing html tags, eg <br/> and <br> to \n
             return TrieMatcher.replaceMultiple(input, HTML_TO_TEXT);
-        } else {
-            // only replace escaped chars
-            return TrieMatcher.replaceMultiple(input, HTML_TO_TEXT_ESCAPED_ONLY);
         }
+        // only replace escaped chars
+        return TrieMatcher.replaceMultiple(input, HTML_TO_TEXT_ESCAPED_ONLY);
     }
 
     /**
-     * @return a delim-separated string from the contents of the given collection where the last separation is
-     *         <delim><lastDelim>, for lists like "apple, banana, and orange"
+     * @return a delim-separated string from the contents of the given collection where the last separation
+     *         is {@code <delim><lastDelim>}, for lists like "apple, banana, and orange".
      */
     public static String collectionToString(Iterable<?> c, String delim, String lastDelim) {
         return collectionToString(c, delim, lastDelim, null, null);
@@ -593,8 +617,8 @@ public class AuraTextUtil {
     }
 
     /**
-     * Attribute Name validation: This is done here since we want to validate attribute names entered in quick fix as
-     * well.
+     * Attribute Name validation: This is done here since we want to validate attribute names entered in
+     * quick fix as well.
      *
      * @param attributeName is the attribute name which is being validated
      * @return true if the name is valid and false if its invalid
@@ -605,20 +629,21 @@ public class AuraTextUtil {
     }
 
     /**
-     * Method Name validation: This is done here since we want to validate method names entered in quick fix as
-     * well.
+     * Method Name validation: This is done here since we want to validate method names entered in quick fix
+     * as well.
      *
      * @param methodName is the method name which is being validated
      * @return a : true if the name is valid and false if its invalid
      */
     public static boolean validateMethodName(String methodName) {
-        if(methodName==null){
+        if (methodName == null) {
             return false;
         }
-        methodName=methodName.toLowerCase();
-        for(String s: RESERVED_METHODS){
-            if(s.equals(methodName))
+        methodName = methodName.toLowerCase();
+        for (String s: RESERVED_METHODS) {
+            if (s.equals(methodName)) {
                 return false;
+            }
         }
         return true;
     }
@@ -628,7 +653,7 @@ public class AuraTextUtil {
      *
      * @param input the string to search for
      * @param collection the strings to search in
-     * @return true iff collection contains a string that equalsIgnoreCase input
+     * @return true iff collection contains a string that {@code equalsIgnoreCase} input
      */
     public static boolean containsIgnoreCase(String input, Iterable<String> collection) {
         if (collection != null) {
@@ -655,7 +680,8 @@ public class AuraTextUtil {
     }
 
     /**
-     * Checks whether input is valid js identifier: only letters, numbers, dollar and underscore (but can't start with number).
+     * Checks whether input is valid js identifier: only letters, numbers, dollar and underscore (but can't
+     * start with number).
      *
      * @param input String to match
      * @return true if identifier is valid
@@ -668,7 +694,8 @@ public class AuraTextUtil {
     }
 
     /**
-     * Checks whether input is valid XML identifier: letters, numbers, dot, dash and underscore (but must start with underscore or letter).
+     * Checks whether input is valid XML identifier: letters, numbers, dot, dash and underscore (but must
+     * start with underscore or letter).
      *
      * @param input String to match
      * @return true if identifier is valid
@@ -682,7 +709,7 @@ public class AuraTextUtil {
 
     public static class JSONEscapedFunctionStringBuilder implements Appendable {
 
-        private StringBuilder sb;
+        private final StringBuilder sb;
 
         public JSONEscapedFunctionStringBuilder() {
             sb = new StringBuilder();
@@ -696,7 +723,8 @@ public class AuraTextUtil {
             return sb;
         }
 
-        private String replace(String s) {
+        @SuppressWarnings("synthetic-access")
+        private static String replace(String s) {
             return TrieMatcher.replaceMultiple(s, JSON_FUNCTION_HYDRATION_SEARCH_REPLACE);
         }
 

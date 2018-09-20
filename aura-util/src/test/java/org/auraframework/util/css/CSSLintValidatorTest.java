@@ -15,6 +15,9 @@
  */
 package org.auraframework.util.css;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
 import java.io.File;
 import java.util.List;
 
@@ -28,6 +31,7 @@ import com.google.common.io.Files;
 
 public final class CSSLintValidatorTest extends UnitTestCase {
 
+    @SuppressWarnings("static-method")
     @Test
     public void testValidate() throws Exception {
         if (System.getProperty("java.version").startsWith("1.6")) {
@@ -36,7 +40,7 @@ public final class CSSLintValidatorTest extends UnitTestCase {
 
         CSSLintValidator validator = new CSSLintValidator();
         List<ValidationError> errors = validator.validate("input.css",
-                ".mybox {\n\tborder: 1px solid black;\n\tpadding: 5px;\n\twidth: 100px;}", false);
+                ".mybox {\n\tborder: 1px solid black;\n\tpadding: 5px;\n\twidth: 100px;}", FALSE);
         assertEquals(2, errors.size());
         ValidationError error = errors.get(0);
         assertEquals("input.css", error.getFilename());
@@ -50,7 +54,7 @@ public final class CSSLintValidatorTest extends UnitTestCase {
 
         // can rerun on the same validator
         errors = validator.validate("input2.css",
-                ".mybox {\n\tborder: 2px solid black;\n\tpadding: 5px;\n\twidth: 100px;}", false);
+                ".mybox {\n\tborder: 2px solid black;\n\tpadding: 5px;\n\twidth: 100px;}", FALSE);
         assertEquals(2, errors.size());
         assertEquals("input2.css", errors.get(0).getFilename());
     }
@@ -63,8 +67,8 @@ public final class CSSLintValidatorTest extends UnitTestCase {
 
         File cssFile = getResourceFile("/testdata/css/aura1.css");
         CSSLintValidator validator = new CSSLintValidator();
-        List<ValidationError> errors = validator.validate(cssFile.getName(), Files.toString(cssFile, Charsets.UTF_8),
-                true);
+        List<ValidationError> errors = validator.validate(cssFile.getName(), Files.asCharSource(cssFile, Charsets.UTF_8).read(),
+                TRUE);
         assertEquals(2, errors.size());
         assertEquals(
                 "aura1.css [line 7, column 7] csslint @ unqualified-attributes: Unqualified attribute selectors are known to be slow",

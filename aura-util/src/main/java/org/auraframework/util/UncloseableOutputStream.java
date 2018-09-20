@@ -18,19 +18,18 @@
 package org.auraframework.util;
 
 import java.io.FilterOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
  */
 public class UncloseableOutputStream extends FilterOutputStream {
 
-    public UncloseableOutputStream(OutputStream out) {
+    public UncloseableOutputStream(final OutputStream out) {
         super(out);
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
+        // Overridden so that the OutputStream is not closed even when this method is called.
     }
-
 }

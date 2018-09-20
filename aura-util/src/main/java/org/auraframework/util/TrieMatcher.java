@@ -20,9 +20,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * An immutable trie used for fast multiple string search and replace. It's set
@@ -85,8 +88,9 @@ public class TrieMatcher {
      *            for
      * @return the text with the search words swapped by the replacements
      */
+    @SuppressWarnings("null")
     public static final String replaceMultiple(String s, TrieMatcher trieMatcher) {
-        if (s == null || trieMatcher == null || s.length() == 0) {
+        if (StringUtils.isEmpty(s) || (trieMatcher == null)) {
             return s;
         }
 
@@ -103,15 +107,14 @@ public class TrieMatcher {
             if (match == null) {
                 if (!foundMatch) {
                     return s;
-                } else {
-                    // No more matches, so copy the rest and get gone
-                    dsb.append(s, pos, s.length());
-                    break;
                 }
+                // No more matches, so copy the rest and get gone
+                dsb.append(s, pos, length);
+                break;
             }
             foundMatch = true;
             if (dsb == null) {
-                dsb = new StringBuilder(s.length() + 16);
+                dsb = new StringBuilder(length + 16);
             }
 
             // Copy up to the match position
@@ -202,7 +205,7 @@ public class TrieMatcher {
             int len = s.length();
             minWordLen = Math.min(minWordLen, len);
             for (int i = 0; i < len; i++) {
-                int ch = s.charAt(i);
+                Integer ch = Integer.valueOf(s.charAt(i));
                 TrieData next = current.get(ch);
                 if (next == null) {
                     next = new TrieData(new HashMap<Integer, TrieData>(DEFAULT_CAPACITY));
@@ -238,7 +241,7 @@ public class TrieMatcher {
      * @return null if none are found.
      */
     public TrieMatch match(String s, int offset) {
-        if (s == null || s.length() == 0 || offset < 0) {
+        if (StringUtils.isEmpty(s) || (offset < 0)) {
             return null;
         }
 
@@ -260,7 +263,7 @@ public class TrieMatcher {
     }
 
     private TrieData begins(String s, int offset) {
-        if (s == null || s.length() == 0 || offset < 0) {
+        if (StringUtils.isEmpty(s) || (offset < 0)) {
             return null;
         }
         return contains(s, offset);
@@ -270,13 +273,14 @@ public class TrieMatcher {
      * @return null if not found
      */
     private TrieData contains(String s, int offset) {
-        HashMap<Integer, TrieData> current = this.root;
+        Map<Integer, TrieData> current = this.root;
         int len = s.length();
         LinkedList<TrieData> matches = null;
         TrieData firstMatch = null;
 
         for (int i = offset; i < len; i++) {
             int ch = s.charAt(i);
+            @SuppressWarnings("boxing")
             TrieData nextData = current.get(ch);
 
             if (nextData == null) {
@@ -316,5 +320,4 @@ public class TrieMatcher {
 
         return null;
     }
-
 }

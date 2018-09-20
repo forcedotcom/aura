@@ -24,11 +24,11 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * InputStream that limits the length of the stream to a construction-specified
- * value. Note that calls to close() on this InputStream do not close the
- * wrapped InputStream.<br>
+ * value. Note that calls to {@link #close()} on this {@link InputStream} do not close the
+ * wrapped {@code InputStream}.<br>
  * <br>
- * The main use case for this class is creating a child InputStream on a main
- * InputStream that can then be passed to an InputStream reader that fully
+ * The main use case for this class is creating a child {@code InputStream} on a main
+ * {@code InputStream} that can then be passed to an {@code InputStream} reader that fully
  * consumes it.
  */
 @NotThreadSafe
@@ -64,7 +64,7 @@ public class LimitedLengthInputStream extends InputStream {
      */
     public LimitedLengthInputStream(@Nonnull InputStream in, long length, @Nullable StreamFinishedListener listener)
             throws IOException {
-        if (in == null || length < 0) {
+        if ((in == null) || (length < 0)) {
             throw new IllegalArgumentException("in must not be null, and length must be >= 0");
         }
         this.in = in;
@@ -89,18 +89,17 @@ public class LimitedLengthInputStream extends InputStream {
         if (pos >= length) {
             endOfStreamReached();
             return -1;
-        } else {
-            final int byteRead = this.in.read();
-            if (byteRead >= 0) {
-                pos++;
-                if (pos >= length) {
-                    endOfStreamReached();
-                }
-            } else if (byteRead == -1) {
+        }
+        final int byteRead = this.in.read();
+        if (byteRead >= 0) {
+            pos++;
+            if (pos >= length) {
                 endOfStreamReached();
             }
-            return byteRead;
+        } else if (byteRead == -1) {
+            endOfStreamReached();
         }
+        return byteRead;
     }
 
     @Override
@@ -159,14 +158,12 @@ public class LimitedLengthInputStream extends InputStream {
     public int available() throws IOException {
         if (pos >= length) {
             return 0;
-        } else {
-            final long remaining = length - pos;
-            if (remaining <= Integer.MAX_VALUE) {
-                return Math.min((int) remaining, in.available());
-            } else {
-                return in.available();
-            }
         }
+        final long remaining = length - pos;
+        if (remaining <= Integer.MAX_VALUE) {
+            return Math.min((int) remaining, in.available());
+        }
+        return in.available();
     }
 
     @Override

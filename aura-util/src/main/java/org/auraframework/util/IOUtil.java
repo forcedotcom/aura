@@ -26,10 +26,14 @@ import java.io.Reader;
 import java.io.Writer;
 import java.security.SecureRandom;
 
-public class IOUtil {
+public final class IOUtil {
     private static volatile File topLevel = null;
     private static String defaultTempDir = null;
     private static boolean markedForDelete = false;
+    
+    private IOUtil() {
+        // Prevent developers from instantiating this class because it is all static methods.
+    }
 
     private static File makeTempDir(File base, String prefix) {
         int count = 0;
@@ -41,9 +45,9 @@ public class IOUtil {
             prefix = "aura";
         }
         sb.append(prefix);
-        sb.append("_");
+        sb.append('_');
         sb.append(Long.toString(time, 36));
-        sb.append("_");
+        sb.append('_');
         int len = sb.length();
         while (count < 1000) {
             sb.setLength(len);
@@ -119,15 +123,19 @@ public class IOUtil {
             while ((len = in.read(buf)) != -1) {
                 out.write(buf, 0, len);
             }
-            out.flush();
         } finally {
-            in.close();
+            try {
+                out.flush();
+            } finally {
+                in.close();
+            }
         }
     }
 
     public static String readTextFile(File f) throws IOException {
-        Reader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
-        return readText(br);
+        try (final Reader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"))) {
+            return readText(br);
+        }
     }
 
     public static String readText(Reader br) throws IOException {
@@ -197,7 +205,7 @@ public class IOUtil {
      * {@link DeleteFailedException} with the file we could not delete.
      *
      * @param file The file to recursively delete.
-     * @throws DeleteFailedException if the delete fails for any reason.
+     * @throws {@code DeleteFailedException} if the delete fails for any reason.
      */
     public static void delete(File file) throws DeleteFailedException {
         if (file == null || !file.exists()) {
@@ -211,7 +219,7 @@ public class IOUtil {
                 throw new DirectoryNotReadableException("Please fix permissions for " + file.getAbsolutePath(), file);
             }
             for (File f : files) {
-                IOUtil.delete(f);
+                delete(f);
             }
         }
         if (!file.delete()) {
@@ -219,12 +227,19 @@ public class IOUtil {
         }
     }
 
+    /**
+     * @param writer The {@link Writer} to close
+     * @deprecated Use <a href="https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html">try with resources</a> instead.
+     */
+    @Deprecated
     public static void close(Writer writer) {
         if (writer != null) {
             try {
                 writer.flush();
                 writer.close();
             } catch (IOException ignore) {
+                // We don't want to throw an exception since this is not important to the flow being handled
+                // by the application and there is nothing we can do with the error.
             }
         }
     }

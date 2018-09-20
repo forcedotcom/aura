@@ -15,11 +15,11 @@
  */
 package org.auraframework.util.adapter;
 
-import org.auraframework.annotations.Annotations.ServiceComponent;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import org.auraframework.annotations.Annotations.ServiceComponent;
 
 @ServiceComponent
 public class SourceControlAdapterImpl implements SourceControlAdapter {
@@ -41,29 +41,13 @@ public class SourceControlAdapterImpl implements SourceControlAdapter {
 
     @Override
     public boolean writeIfDifferent(Appendable newData, File file) throws IOException {
-        FileWriter writer = null;
-
         if (file.exists()) {
             file.delete();
         }
-        writer = new FileWriter(file);
-        try {
+        
+        try (final FileWriter writer = new FileWriter(file)) {
             writer.write(newData.toString());
-            writer.close();
-            // For the finally clause.
-            writer = null;
             return true;
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (Throwable t) {
-                    // The only case in which we will call close here is when
-                    // we have had an exception. In that case, we want to ignore
-                    // this exception, and let the previous one bubble up.
-                }
-            }
         }
     }
-
 }

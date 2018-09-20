@@ -593,12 +593,13 @@ public class JsonEncoder implements Json {
      */
     @Override
     public void writeString(Object value) throws IOException {
-        if (value == null) {
+        String toString = value != null? value.toString() : null;
+        if (toString == null) {
             cacheableOut.append("null");
             return;
         }
 
-        cacheableOut.append(JSONObject.quote(AuraTextUtil.escapeForJSONString(value.toString())));
+        cacheableOut.append(JSONObject.quote(AuraTextUtil.escapeForJSONString(toString)));
     }
 
     /**

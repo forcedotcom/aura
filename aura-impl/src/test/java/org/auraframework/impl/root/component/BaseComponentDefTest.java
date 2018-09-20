@@ -26,7 +26,6 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import org.auraframework.def.AttributeDef;
-import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseComponentDef.RenderType;
 import org.auraframework.def.ComponentDef;
@@ -35,7 +34,6 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
-import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.HelperDef;
@@ -54,7 +52,6 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
-import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
@@ -1823,15 +1820,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         HelperDef helperDef = definitionService.getDefinition(cmpDescriptor).getHelperDef();
         assertNotNull(helperDef);
         assertEquals(explicitHelperDescriptor, helperDef.getDescriptor());
-    }
-
-    private AttributeDefRef getBodyAttributeFromDef(T def) {
-        assertNotNull(def);
-        List<AttributeDefRef> facet = def.getFacets();
-        assertEquals(1, facet.size());
-        AttributeDefRef body = facet.get(0);
-        assertEquals("body", body.getName());
-        return body;
     }
 
     @SuppressWarnings("unchecked")

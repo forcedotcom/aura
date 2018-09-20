@@ -51,6 +51,7 @@ public class SecureAppendable implements Appendable {
      *
      */
     @Deprecated
+    @Override
     public SecureAppendable append(CharSequence csq) {
         this.content.append(null != csq ? csq.toString(): EMPTY);
         return this;
@@ -83,6 +84,7 @@ public class SecureAppendable implements Appendable {
      *
      */
     @Deprecated
+    @Override
     public SecureAppendable append(CharSequence csq, int start, int end)  {
         this.content.append(csq,start,end);
         return this;
@@ -100,6 +102,7 @@ public class SecureAppendable implements Appendable {
      *
      */
     @Deprecated
+    @Override
     public SecureAppendable append(char c)   {
         return this;
     }

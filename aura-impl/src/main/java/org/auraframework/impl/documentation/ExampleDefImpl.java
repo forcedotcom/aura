@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
-import org.auraframework.builder.ExampleDefBuilder;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ExampleDef;
@@ -87,7 +86,7 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
         }
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<ExampleDef> implements ExampleDefBuilder {
+    public static class Builder extends DefinitionImpl.BuilderImpl<ExampleDef> {
 
         private DefDescriptor<ComponentDef> ref;
         private String name;
@@ -105,20 +104,17 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
             return new ExampleDefImpl(this);
         }
 
-        @Override
-        public ExampleDefBuilder setRef(String qualifiedName) {
+        public Builder setRef(String qualifiedName) {
             this.ref = Aura.getDefinitionService().getDefDescriptor(qualifiedName, ComponentDef.class);
             return this;
         }
 
-        @Override
-        public ExampleDefBuilder setName(String name) {
+        public Builder setName(String name) {
             this.name = name;
             return this;
         }
 
-        @Override
-        public ExampleDefBuilder setLabel(String label) {
+        public Builder setLabel(String label) {
             this.label = label;
             return this;
         }

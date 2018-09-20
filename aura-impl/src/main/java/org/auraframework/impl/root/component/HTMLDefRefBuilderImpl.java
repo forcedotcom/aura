@@ -19,7 +19,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefRefBuilder;
-import org.auraframework.builder.HtmlDefRefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
@@ -37,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class HTMLDefRefBuilderImpl extends ComponentDefRefImpl.Builder implements HtmlDefRefBuilder  {
+public class HTMLDefRefBuilderImpl extends ComponentDefRefImpl.Builder {
 
     public static final DefDescriptor<ComponentDef> HTML_DESC = Aura.getDefinitionService().getDefDescriptor("aura:html",
         ComponentDef.class);
@@ -49,7 +48,6 @@ public class HTMLDefRefBuilderImpl extends ComponentDefRefImpl.Builder implement
         this.setComponentAttribute("HTMLAttributes", htmlAttributes);
     }
 
-    @Override
     public HTMLDefRefBuilderImpl setTag(String tag) {
         if (!tag.equalsIgnoreCase(HtmlTag.HTML_TAG)) {
             setComponentAttribute("tag", tag);
@@ -57,7 +55,6 @@ public class HTMLDefRefBuilderImpl extends ComponentDefRefImpl.Builder implement
         return this;
     }
 
-    @Override
     public HTMLDefRefBuilderImpl setComponentAttribute(String key, Object value) {
         AttributeDefRefImpl.Builder valueBuilder = new AttributeDefRefImpl.Builder();
         valueBuilder.setDescriptor(Aura.getDefinitionService().getDefDescriptor(key, AttributeDef.class));

@@ -17,7 +17,6 @@ package org.auraframework.impl.svg;
 
 import java.io.IOException;
 
-import org.auraframework.builder.SVGDefBuilder;
 import org.auraframework.def.SVGDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.system.TextSource;
@@ -57,7 +56,7 @@ public class SVGDefImpl extends DefinitionImpl<SVGDef> implements SVGDef {
         return this.contents;
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<SVGDef> implements SVGDefBuilder {
+    public static class Builder extends DefinitionImpl.BuilderImpl<SVGDef> {
         private String contents;
 
         public Builder() {
@@ -68,8 +67,7 @@ public class SVGDefImpl extends DefinitionImpl<SVGDef> implements SVGDef {
          * Fixme: we should probably take the contents instead of the source here, but then, we probably should
          * not simply be jamming contents on the def.
          */
-        @Override
-        public SVGDefBuilder setSource(TextSource<SVGDef> source) {
+        public Builder setSource(TextSource<SVGDef> source) {
             if (source != null) {
                 this.contents = source.getContents();
             }

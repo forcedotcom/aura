@@ -18,7 +18,6 @@ package org.auraframework.impl.documentation;
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.auraframework.builder.DescriptionDefBuilder;
 import org.auraframework.def.DescriptionDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -55,7 +54,7 @@ public class DescriptionDefImpl extends DefinitionImpl<DescriptionDef> implement
         // TODO Auto-generated method stub
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<DescriptionDef> implements DescriptionDefBuilder {
+    public static class Builder extends DefinitionImpl.BuilderImpl<DescriptionDef> {
 		private String name;
 
 		public Builder() {
@@ -70,8 +69,7 @@ public class DescriptionDefImpl extends DefinitionImpl<DescriptionDef> implement
             return new DescriptionDefImpl(this);
         }
         
-        @Override
-        public DescriptionDefBuilder setName(String name) {
+        public Builder setName(String name) {
             this.name = name;
             return this;
         }

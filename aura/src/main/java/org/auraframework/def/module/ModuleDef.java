@@ -16,10 +16,12 @@
 package org.auraframework.def.module;
 
 import java.util.List;
+import java.util.Collection;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.PlatformDef;
+import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.def.SVGDef;
 import org.lwc.reference.Reference;
 
@@ -98,4 +100,11 @@ public interface ModuleDef extends PlatformDef {
     DocumentationDef getAuraDocumentationDef();
 
     SVGDef getSVGDef();
+
+    /**
+     *  Returns a collection of metadata for @wire decorators used in the module.
+     *
+     */
+    Collection<ModulesCompilerData.WireDecoration> getWireDecorations();
+
 }

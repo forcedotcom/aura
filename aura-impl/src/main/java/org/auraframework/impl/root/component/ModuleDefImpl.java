@@ -40,6 +40,7 @@ import org.auraframework.impl.root.PlatformDefImpl;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraUnhandledException;
@@ -76,6 +77,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     private final DocumentationDef documentationDef;
     private final DocumentationDef auraDocumentationDef;
     private final SVGDef svgDef;
+    private final Collection<ModulesCompilerData.WireDecoration> wireDecorations;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
@@ -93,6 +95,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         this.metadataReferences = builder.metadataReferences;
         this.documentationDef = builder.documentationDef;
         this.auraDocumentationDef = builder.auraDocumentationDef;
+        this.wireDecorations = builder.wireDecorations;
         this.svgDef = builder.svgDef;
     }
 
@@ -145,6 +148,11 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     }
 
     @Override
+    public Collection<ModulesCompilerData.WireDecoration> getWireDecorations() {
+        return this.wireDecorations;
+    }
+
+    @Override
     public void serialize(Json json) throws IOException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         boolean compat = context.useCompatSource();
@@ -169,7 +177,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
                 json.writeMapEntry(ApplicationKey.APIVERSION, this.apiVersion);
             }
             if (this.requireLocker) {
-                json.writeMapEntry(ApplicationKey.REQUIRELOCKER, this.requireLocker);
+                json.writeMapEntry(ApplicationKey.REQUIRELOCKER, true);
             }
 
             Collection<AttributeDef> attributeDefs = this.getAttributeDefs().values();
@@ -335,6 +343,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private DocumentationDef documentationDef;
         private DocumentationDef auraDocumentationDef;
         private SVGDef svgDef;
+        private Collection<ModulesCompilerData.WireDecoration> wireDecorations;
 
         public Builder() {
             super(ModuleDef.class);
@@ -415,6 +424,10 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
 
         public void setAuraDocumentationDef(DocumentationDef documentationDef) {
             this.auraDocumentationDef = documentationDef;
+        }
+
+        public void setWireDecorations(Collection<ModulesCompilerData.WireDecoration> wireDecorations) {
+            this.wireDecorations = wireDecorations;
         }
 
         public void setSVGDef(SVGDef svgDef) {

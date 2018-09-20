@@ -15,6 +15,7 @@
  */
 package org.auraframework.modules;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,7 +59,7 @@ public final class ModulesCompilerData {
         this.compilerReport = report;
     }
 
-    public static final class WireDecoration {
+    public static final class WireDecoration implements Serializable {
         public final String type;
         public final String name;
         public final WireAdapter adapter;
@@ -79,7 +80,7 @@ public final class ModulesCompilerData {
         }
     }
 
-    public static final class WireAdapter {
+    public static final class WireAdapter implements Serializable {
         public final String name;
         public final String reference;
 

@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.root.component;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.auraframework.Aura;
@@ -23,14 +25,19 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.ContextService;
+import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.ByteArrayOutputStream;
+import java.io.NotSerializableException;
+import java.io.ObjectOutputStream;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -90,5 +97,28 @@ public class ModuleDefImplUnitTest {
 
         assertEquals("should not be more than 1 module dependency", 1, results.size());
         assertTrue("module dependency not found", results.contains(moduleDefDescriptor));
+    }
+
+    @Test
+    public void moduleDefWireDecoratorMetadataIsSerializable() throws Exception {
+        ModuleDefImpl.Builder moduleDefBuilder = new ModuleDefImpl.Builder();
+        moduleDefBuilder.setWireDecorations(ImmutableSet.of(
+            new ModulesCompilerData.WireDecoration("property", "userRecord",
+                new ModulesCompilerData.WireAdapter("getRecord", "record-service"),
+                ImmutableMap.of("Id", "$userId"),
+                ImmutableMap.of("FirstName",
+                    ImmutableMap.of("type", "string", "value", "John")))));
+
+        ModuleDef moduleDef = moduleDefBuilder.build();
+
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            objectOutputStream.writeObject(moduleDef);
+        } catch (NotSerializableException e) {
+            Assert.fail("ModuleDef should be serializable");
+        }
+
+
     }
 }

@@ -30,6 +30,7 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.LibraryDef;
+import org.auraframework.def.SVGDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDesignDef;
 import org.auraframework.def.module.impl.ModuleDesignDefImpl;
@@ -74,6 +75,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     private Set<String> validTags;
     private final DocumentationDef documentationDef;
     private final DocumentationDef auraDocumentationDef;
+    private final SVGDef svgDef;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
@@ -91,6 +93,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         this.metadataReferences = builder.metadataReferences;
         this.documentationDef = builder.documentationDef;
         this.auraDocumentationDef = builder.auraDocumentationDef;
+        this.svgDef = builder.svgDef;
     }
 
     @Override
@@ -134,6 +137,11 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     @Override
     public DocumentationDef getAuraDocumentationDef() {
         return this.auraDocumentationDef;
+    }
+
+    @Override
+    public SVGDef getSVGDef() {
+        return svgDef;
     }
 
     @Override
@@ -326,6 +334,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private ModuleDesignDefImpl.Builder designBuilder;
         private DocumentationDef documentationDef;
         private DocumentationDef auraDocumentationDef;
+        private SVGDef svgDef;
 
         public Builder() {
             super(ModuleDef.class);
@@ -399,13 +408,17 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         public void setSourceReferences(List<Reference> sourceReferences) {
             this.sourceReferences = sourceReferences;
         }
-        
+
         public void setDocumentationDef(DocumentationDef documentationDef) {
             this.documentationDef = documentationDef;
         }
-        
+
         public void setAuraDocumentationDef(DocumentationDef documentationDef) {
             this.auraDocumentationDef = documentationDef;
+        }
+
+        public void setSVGDef(SVGDef svgDef) {
+            this.svgDef = svgDef;
         }
 
         @Override

@@ -43,6 +43,7 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.MetaDef;
+import org.auraframework.def.SVGDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.impl.source.file.FileSource;
@@ -674,5 +675,39 @@ public class BundleModuleDefFactoryUnitTest {
         assertNotNull("could not find attribute with name 'prop2'", attr);
         assertTrue("attribute 'prop2' should have access global", attr.getAccess().isGlobal());
         assertEquals("attribute 'prop2' did not have expected description", "prop2 description", attr.getDescription());
+    }
+
+    @Test
+    public void testHandlesSVGInBundleSource() throws Exception {
+        DefDescriptor<ModuleDef> descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX,
+                "namespace", "cmp", ModuleDef.class);
+
+        DefDescriptor<SVGDef> svgDesc = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX,
+                "namespace", "cmp-cmp", SVGDef.class, descriptor);
+
+        BundleSource<ModuleDef> mockBundleSource = mockBundleSource(ImmutableMap.of(
+                descriptor, mockFile("cmp.js"),
+                svgDesc, mockFile("cmp.svg")));
+
+        ModulesCompilerService modulesCompilerService = mockModulesCompilerService();
+
+        CompilerService compilerService = mock(CompilerService.class);
+        SVGDef mockSvgDef = mock(SVGDef.class);
+
+        when(compilerService.compile(same(svgDesc), any(Source.class))).thenReturn(mockSvgDef);
+
+        BundleModuleDefFactory factory = new BundleModuleDefFactory();
+        factory.setModulesCompilerService(modulesCompilerService);
+        factory.setCompilerService(compilerService);
+
+        ModuleDef moduleDef = factory.getDefinition(descriptor, mockBundleSource);
+        SVGDef svgDef = moduleDef.getSVGDef();
+
+        assertNotNull("SVGDef should be set", svgDef);
+        assertSame("SVGDef did not match", mockSvgDef, svgDef);
+    }
+
+    public void testSVGParseError() throws Exception {
+
     }
 }

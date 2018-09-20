@@ -20,6 +20,7 @@ import java.util.List;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.PlatformDef;
+import org.auraframework.def.SVGDef;
 import org.lwc.reference.Reference;
 
 /**
@@ -81,18 +82,20 @@ public interface ModuleDef extends PlatformDef {
      * the standard prefix:name syntax. This will return that custom-element-name value.
      */
     String getCustomElementName();
-    
+
     /**
      * Gets the documentation represented by the markdown file within the bundle.
      * <p>
      * This is the long-form documentation for using this module within LWC. May be null.
      */
     DocumentationDef getDocumentationDef();
-    
+
     /**
      * Gets the documentation represented by the auradoc file within the bundle.
      * <p>
      * This is the long-form documentation for using this module within aura. May be null.
      */
     DocumentationDef getAuraDocumentationDef();
+
+    SVGDef getSVGDef();
 }

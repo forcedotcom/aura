@@ -35,6 +35,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.MetaDef;
+import org.auraframework.def.SVGDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.impl.DefinitionAccessImpl;
@@ -67,7 +68,6 @@ import org.lwc.classmember.ClassMember;
 import org.lwc.documentation.BundleDocumentation;
 
 import com.google.common.base.CaseFormat;
-import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
 
 /**
@@ -212,6 +212,17 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
 
         BundleDocumentation documentation = compilerData.compilerReport.documentation;
         processDocumentation(descriptor, builder, sourceMap, documentation);
+
+        // svg
+        DefDescriptor<SVGDef> svgDesc = getDefDescriptor(sourceMap, DefDescriptor.MARKUP_PREFIX, SVGDef.class);
+        if (svgDesc != null) {
+            Source<?> svgSource = sourceMap.get(svgDesc);
+            if (svgSource != null) {
+                @SuppressWarnings("unchecked")
+                SVGDef def = compilerService.compile(svgDesc, (Source<SVGDef>)svgSource);
+                builder.setSVGDef(def);
+            }
+        }
 
         return builder.build();
     }

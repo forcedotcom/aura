@@ -15,6 +15,8 @@
  */
 package org.auraframework.http;
 
+import java.util.Collection;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.auraframework.throwable.AuraRuntimeException;
@@ -44,13 +46,37 @@ public abstract class RequestParam<T> {
     public abstract T get(HttpServletRequest request, T theDefault);
 
     public static class InvalidParamException extends AuraRuntimeException {
-        /**
-         */
-        private static final long serialVersionUID = -4184060092142799781L;
-        private static final String message = "Invalid parameter value for %s";
 
-        public InvalidParamException(String name) {
-            super(String.format(message, name));
+        private static final long serialVersionUID = -4184060092142799781L;
+        private static final String message = "Invalid parameter value for ";
+        private static final String supportedValuesMessage = ". Allowed values are ";
+
+        /**
+         * @param name The name of the parameter
+         * @param supportedValues The supported values for the parameter
+         * @see #RequestParam(String)
+         */
+        public InvalidParamException(final String name, final Collection<?> supportedValues) {
+            super(generateMessage(name, supportedValues));
+        }
+        
+        /**
+         * @param name The name of the parameter
+         * @see #RequestParam(String, Collection)
+         */
+        public InvalidParamException(final String name) {
+            this(name, null);
+        }
+        
+        private static final String generateMessage(final String name, final Collection<?> supportedValues) {
+            final StringBuilder sb = new StringBuilder()
+                .append(message)
+                .append(name);
+            if ((supportedValues != null) && !supportedValues.isEmpty()) {
+                sb.append(supportedValuesMessage)
+                  .append(supportedValues);
+            }
+            return sb.toString();
         }
     }
 
@@ -160,8 +186,15 @@ public abstract class RequestParam<T> {
             this.clz = clz;
         }
 
-        @Override
-        public E get(HttpServletRequest request) {
+        /**
+         * @param request The request to retrieve the parameter value from.
+         * @param allowedValues The list of allowed values. Only used in the error message if the param
+         *        contains an unknown value.
+         * @return The {@link E} from the param.
+         * @see #get(HttpServletRequest)
+         * @see #get(HttpServletRequest, Enum)
+         */
+        public E get(final HttpServletRequest request, final Collection<E> allowedValues) {
             String ret = getRawValue(request);
             if (ret == null) {
                 return null;
@@ -170,12 +203,17 @@ public abstract class RequestParam<T> {
             try {
                 return Enum.valueOf(clz, ret);
             } catch (Throwable e) {
-                throw new InvalidParamException(name);
+                throw new InvalidParamException(name, allowedValues);
             }
+        }
+        
+        @Override
+        public E get(final HttpServletRequest request) {
+            return get(request, (Collection<E>)null);
         }
 
         @Override
-        public E get(HttpServletRequest request, E theDefault) {
+        public E get(final HttpServletRequest request, final E theDefault) {
             E ret = get(request);
             return ret == null ? theDefault : ret;
         }

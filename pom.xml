@@ -55,6 +55,7 @@
         <jetty.version>9.4.5.v20170502</jetty.version>
         <eslint.extra.arg>--no-color</eslint.extra.arg>
         <lwc.version>0.29.1</lwc.version>
+        <java.hamcrest.version>2.0.0.0</java.hamcrest.version>
     </properties>
     <repositories>
         <repository>
@@ -153,7 +154,12 @@
             <version>1.6.4</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>java-hamcrest</artifactId>
+            <version>${java.hamcrest.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -791,8 +797,8 @@
                     </configuration>
                 </plugin>
                 <plugin>
-	                <!--This plugin's configuration is used to store Eclipse m2e settings
-	                    only. It has no influence on the Maven build itself. -->
+                    <!--This plugin's configuration is used to store Eclipse m2e settings
+                        only. It has no influence on the Maven build itself. -->
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
                     <version>1.0.0</version>
@@ -894,11 +900,11 @@
                         </lifecycleMappingMetadata>
                     </configuration>
                 </plugin>
-	            <plugin>
-	                <groupId>org.apache.maven.plugins</groupId>
-	                <artifactId>maven-plugin-plugin</artifactId>
-	                <version>3.3</version>
-	            </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>3.3</version>
+                </plugin>
                 <plugin>
                     <groupId>com.github.phasebash</groupId>
                     <artifactId>jsdoc3-maven-plugin</artifactId>

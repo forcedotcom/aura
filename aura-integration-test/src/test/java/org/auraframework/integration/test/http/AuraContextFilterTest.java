@@ -18,8 +18,10 @@ package org.auraframework.integration.test.http;
 import static org.auraframework.system.AuraContext.Format.HTML;
 import static org.auraframework.system.AuraContext.Format.JSON;
 import static org.auraframework.system.AuraContext.Format.MANIFEST;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -27,6 +29,7 @@ import java.util.Vector;
 
 import javax.inject.Inject;
 import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -48,6 +51,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.google.common.collect.ImmutableList;
 
@@ -147,11 +151,11 @@ public class AuraContextFilterTest extends AuraTestCase {
     
     @Test
     public void testStartContextSetsFormatFromFormatRequestParam() throws Exception {
-    	// Arrange
-    	Format expected = MANIFEST;
+        // Arrange
+        Format expected = MANIFEST;
         Mockito.when(request.getParameter(AuraServlet.AURA_PREFIX + "format")).thenReturn("MANIFEST");
-    	
-    	// Act
+    
+        // Act
         AuraContext context = AuraPrivateAccessor.invoke(filter, "startContext", request, null, null);
         Format actual = context.getFormat(); 
         
@@ -161,11 +165,11 @@ public class AuraContextFilterTest extends AuraTestCase {
     
     @Test
     public void testStartContextSetsHTMLFormatForGETRequests() throws Exception {
-    	// Arrange
-    	Format expected = HTML;
+        // Arrange
+        Format expected = HTML;
         Mockito.when(request.getMethod()).thenReturn("GET");
-    	
-    	// Act
+
+        // Act
         AuraContext context = AuraPrivateAccessor.invoke(filter, "startContext", request, null, null);
         Format actual = context.getFormat(); 
         
@@ -175,11 +179,11 @@ public class AuraContextFilterTest extends AuraTestCase {
     
     @Test
     public void testStartContextSetsJSONFormatForPOSTRequests() throws Exception {
-    	// Arrange
-    	Format expected = JSON;
+        // Arrange
+        Format expected = JSON;
         Mockito.when(request.getMethod()).thenReturn("POST");
-    	
-    	// Act
+    
+        // Act
         AuraContext context = AuraPrivateAccessor.invoke(filter, "startContext", request, null, null);
         Format actual = context.getFormat(); 
         
@@ -189,12 +193,12 @@ public class AuraContextFilterTest extends AuraTestCase {
     
     @Test
     public void testStartContextSetsJSONFormatForActionGETRequests() throws Exception {
-    	// Arrange
-    	Format expected = JSON;
+        // Arrange
+        Format expected = JSON;
         Mockito.when(request.getParameter(AuraServlet.AURA_PREFIX + "isAction")).thenReturn("true");
         Mockito.when(request.getMethod()).thenReturn("GET");
-    	
-    	// Act
+
+        // Act
         AuraContext context = AuraPrivateAccessor.invoke(filter, "startContext", request, null, null);
         Format actual = context.getFormat(); 
         
@@ -204,28 +208,28 @@ public class AuraContextFilterTest extends AuraTestCase {
     
     @Test
     public void testDoFilterSetsLoggingServicePageURI() throws Exception {
-    	// Arrange
-    	String expected = "someURI";
+        // Arrange
+        String expected = "someURI";
         Mockito.when(request.getParameter(AuraServlet.AURA_PREFIX + "pageURI")).thenReturn("someURI");
         
         // Act
-    	filter.doFilter(request, response, filterChain);
-    	
-    	// Assert
-    	verify(loggingService).setValue(LoggingService.PAGE_URI, expected);
+        filter.doFilter(request, response, filterChain);
+        
+        // Assert
+        verify(loggingService).setValue(LoggingService.PAGE_URI, expected);
     }
     
     @Test
     public void testDoFilterSetsLoggingServicePageURIFromReferrerHeader() throws Exception {
-    	// Arrange
-    	String expected = "refererURI";
+        // Arrange
+        String expected = "refererURI";
         Mockito.when(request.getHeader("Referer")).thenReturn("refererURI");
         
         // Act
-    	filter.doFilter(request, response, filterChain);
-    	
-    	// Assert
-    	verify(loggingService).setValue(LoggingService.PAGE_URI, expected);
+        filter.doFilter(request, response, filterChain);
+    
+        // Assert
+        verify(loggingService).setValue(LoggingService.PAGE_URI, expected);
     }
     
     @Test
@@ -244,7 +248,7 @@ public class AuraContextFilterTest extends AuraTestCase {
     @Test
     public void testStartContextSetsActionPublicCacheKeyFromClient() throws Exception {
         // Arrange
-    	String expected = "someKey";
+        String expected = "someKey";
         Mockito.when(request.getParameter("aura.context")).thenReturn("{apck:'" + expected + "'}");
         
         // Act
@@ -253,5 +257,29 @@ public class AuraContextFilterTest extends AuraTestCase {
         
         // Assert
         assertEquals(expected, actual);
+    }
+
+    /**
+     * Tests the
+     * {@link AuraContextFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, FilterChain)}
+     * method with an invalid {@value AuraServlet#AURA_PREFIX}mode" coming from the request and makes sure
+     * the exception is handled properly.
+     * 
+     * @throws ServletException Can be thrown by the method under test
+     * @throws IOException Can be thrown by the method under test
+     */
+    @Test
+    public void testModeHandleInvalidParamException() throws ServletException, IOException {
+        // Arrange
+        Mockito.when(request.getParameter(eq(AuraContextFilter.mode.name))).thenReturn("HAX0RED");
+        final MockHttpServletResponse resp = new MockHttpServletResponse();
+        
+        // Act
+        filter.doFilter(request, resp, filterChain);
+        
+        // Assert
+        assertEquals("Expected error to be written to the response", "Invalid parameter value for aura.mode. Allowed values are [DEV, STATS, UTEST, FTEST, JSTEST, AUTOJSTEST, JSTESTDEBUG, AUTOJSTESTDEBUG, PTEST, CADENCE, PRODDEBUG, PROD, SELENIUM, SELENIUMDEBUG, VALIDATION]", resp.getContentAsString());
+        assertEquals("Unexpected status code", 400, resp.getStatus());
+        verify(loggingService).setValue(eq(LoggingService.STATUS), eq("400"));
     }
 }

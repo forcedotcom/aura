@@ -16,6 +16,7 @@
 package org.auraframework.http;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
 import org.auraframework.AuraDeprecated;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
@@ -59,6 +61,7 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 
 @SuppressWarnings("deprecation")
@@ -173,7 +176,7 @@ public class AuraContextFilter implements Filter {
             }
         } catch (InvalidParamException e) {
             HttpServletResponse response = (HttpServletResponse) res;
-            response.setStatus(500);
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
             @SuppressWarnings("resource")
             Appendable out = response.getWriter();
             out.append(e.getMessage());
@@ -333,29 +336,46 @@ public class AuraContextFilter implements Filter {
         return configMap;
     }
 
-    private static Mode getModeParam(HttpServletRequest request, Map<String, Object> configMap) {
+    /**
+     * Returns the aura mode from one of the following
+     * <ol>
+     *   <li>the request parameter "{@value AuraServlet#AURA_PREFIX}mode"</li>
+     *   <li>the "mode" key from the passed in {@code configMap}</li>
+     * </ol>
+     * 
+     * @param request The request to retrieve the mode from.
+     * @param configMap The config used to initialize aura for the current session.
+     * @param allowedModes The modes that are allowed for the request.
+     * @return The matching {@link Mode}
+     */
+    @VisibleForTesting
+    static final Mode getModeParam(final HttpServletRequest request, final Map<String, Object> configMap, final Collection<Mode> allowedModes) {
         // Get the passed in mode param.
         // Check the aura.mode param first then fall back to the mode value
         // embedded in the aura.context param
-        Mode m = mode.get(request);
-        if (m == null && configMap != null && configMap.containsKey("mode")) {
-            m = Mode.valueOf((String) configMap.get("mode"));
+        Mode m = mode.get(request, allowedModes);
+        if ((m == null) && (configMap != null) && configMap.containsKey("mode")) {
+            try {
+                m = Mode.valueOf((String) configMap.get("mode"));
+            } catch (Throwable e) {
+                throw new InvalidParamException(contextConfig.name + " -> mode", allowedModes);
+            }
         }
         return m;
     }
 
     protected Mode getModeParam(HttpServletRequest request) {
         Map<String, Object> configMap = getConfigMap(request);
-        return getModeParam(request, configMap);
+        return getModeParam(request, configMap, configAdapter.getAvailableModes());
     }
 
     protected Mode getMode(HttpServletRequest request, Map<String, Object> configMap) {
-        Mode m = getModeParam(request, configMap);
+        Set<Mode> allowedModes = configAdapter.getAvailableModes();
+        Mode m = getModeParam(request, configMap, allowedModes);
 
         if (m == null) {
             m = configAdapter.getDefaultMode();
         }
-        Set<Mode> allowedModes = configAdapter.getAvailableModes();
         boolean forceProdMode = !allowedModes.contains(m) && allowedModes.contains(Mode.PROD);
         if (forceProdMode) {
             m = Mode.PROD;

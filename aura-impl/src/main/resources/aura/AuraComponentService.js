@@ -997,7 +997,7 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
     if(isSingle){
         config=[config];
     }
-    var components=[];
+    var components = [];
     var overallStatus="SUCCESS";
     var statusList=[];
     var collected=0;
@@ -1010,6 +1010,27 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
         }
         if(++collected===config.length){
             callback.call(callbackScope, isSingle?components[0]:components, overallStatus, statusList);
+        }
+    }
+
+    if ($A.getContext().uriAddressableDefsEnabled) {
+        var descriptorMap = {};
+
+        for (var idx=0;idx<config.length;idx++) {
+            if (config[idx]) {
+                var cfg = this.getComponentConfigs(config[idx], attributeValueProvider);
+                var descriptor = cfg["descriptor"]["descriptor"] || cfg["descriptor"];
+                if (!cfg["definition"] && descriptor.indexOf("layout://") === -1) {
+                    descriptorMap[descriptor] = undefined;
+                }
+            }
+        }
+
+        if (Object.keys(descriptorMap).length > 0) {
+            this.loadComponentDefs(descriptorMap, $A.getCallback(function newComponentAsyncDefsLoaded(){
+                $A.componentService.newComponentAsync(callbackScope, callback, isSingle?config[0]:config, attributeValueProvider, localCreation, doForce, forceServer);
+            }));
+            return;
         }
     }
 
@@ -1068,6 +1089,15 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
     }
 };
 
+AuraComponentService.prototype.getDefinitionOfAnyType = function (descriptor) {
+    // this ensures we've checked any case insensitivity found
+    descriptor = this.getDescriptorFromConfig(descriptor);
+    // using getDef instead of getComponentDef to invoke Access Checks
+    // similarly for eventService getDef, for Access Checks
+    // Libraries don't have access checks?
+    return this.getDef(descriptor) || this.getLibrary(descriptor) || $A.eventService.getDef(descriptor);
+};
+
 AuraComponentService.prototype.hasCacheableDefinitionOfAnyType = function(descriptor) {
     var desc = this.getDescriptorFromConfig(descriptor);
     return  !!this.hasModuleDefinition(desc) ||
@@ -1081,6 +1111,10 @@ AuraComponentService.prototype.hasCacheableDefinitionOfAnyType = function(descri
 AuraComponentService.prototype.loadComponentDefs = function(descriptorMap, callback) {
     var missingDescriptorMap = {};
     for (var descriptor in descriptorMap) {
+        // if the descriptor is missing the protocol, assume it's supposed to be markup://
+        if (descriptor.indexOf("://") === -1) {
+            descriptor = "markup://" + descriptor;
+        }
         try {
             if (!this.hasCacheableDefinitionOfAnyType(descriptor)) {
                 missingDescriptorMap[descriptor] = descriptorMap[descriptor];
@@ -1448,7 +1482,7 @@ AuraComponentService.prototype.getDef = function(descriptor) {
             if($A.clientService.logAccessFailures){
                 $A.error(null,new $A.auraError(message));
             }
-            return null;
+            return undefined;
         }else{
             if($A.clientService.logAccessFailures){
                 $A.warning(message);

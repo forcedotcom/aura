@@ -373,9 +373,15 @@ InteropComponent.prototype.setGlobalAttribute = function (element, attrName, val
  * @export
  */
 InteropComponent.prototype.get = function (key) {
-    if(!$A.util.isString(key)) {
+    if (!$A.util.isString(key)) {
         var msg = "The provided key (" + key + ") is not a string and cannot be used to look up values for the current component.";
         throw new $A.auraError(msg);
+    }
+    
+    if (key === 'version') {
+        // handle special case for "act like" version which is not supported by LWC but used in Aura components
+        // See AuraClientService.getAccessVersion
+        return null;
     }
     
     key = $A.expressionService.normalize(key);

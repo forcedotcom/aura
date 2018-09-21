@@ -36,6 +36,7 @@ function InteropComponentDef(config) {
     this.interopClassName = this.descriptor.getNamespace() + "$" + this.descriptor.getName();
     this.minVersion       = config.minVersion;
     this.attributeDefs    = new AttributeDefSet(config.attributeDefs, this.descriptor.getNamespace());
+    this.requiredVersionDefs = new RequiredVersionDefSet(config[Json.ApplicationKey.REQUIREDVERSIONDEFS]);
     this.registerEventDefs= {};
 
     if (typeof this.interopClass === 'function') {

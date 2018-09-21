@@ -21,7 +21,6 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -106,29 +105,6 @@ public final class AuraTextUtil {
     private static final Pattern NCNAME_IDENTIFIER_PATTERN = Pattern.compile(NCNAME_IDENTIFIER_REGEX);
 
     private static final Pattern ATTRIBUTE_NAME_PATTERN = Pattern.compile("^[a-zA-Z_].[-a-zA-Z0-9_]*$");
-
-    private AuraTextUtil() {
-        // Prevent developers from instantiating this class because it is all static methods.
-    }
-    
-    // these are expensive, worth keeping in an LRU cache to help with traffic spikes
-    private static final LoadingCache<String, String> ESCAPE_FOR_JAVASCRIPT_STRING_CACHE = CacheBuilder.newBuilder().maximumSize(32*1024).build(new CacheLoader<String, String>() {
-
-        @SuppressWarnings("synthetic-access")
-        @Override
-        public String load(String in) throws Exception {
-            return TrieMatcher.replaceMultiple(in, JS_SEARCH_REPLACE);
-        }});
-
-
-    private static final LoadingCache<String, String> ESCAPE_FOR_JSON_STRING_CACHE = CacheBuilder.newBuilder().maximumSize(32*1024).build(new CacheLoader<String, String>() {
-
-        @SuppressWarnings("synthetic-access")
-        @Override
-        public String load(String in) throws Exception {
-            return TrieMatcher.replaceMultiple(in, JSON_SEARCH_REPLACE);
-        }});
-
 
     /**
      * Makes the first letter of the input string lower case.
@@ -240,22 +216,14 @@ public final class AuraTextUtil {
      * portions of the script.
      */
     public static String escapeForJavascriptString(String in) {
-        try {
-            return ESCAPE_FOR_JAVASCRIPT_STRING_CACHE.get(in);
-        } catch (ExecutionException x) {
-            throw new RuntimeException(x);
-        }
+        return TrieMatcher.replaceMultiple(in, JS_SEARCH_REPLACE);
     }
 
     /**
      * Properly escapes string for JSON.
      */
     public static String escapeForJSONString(String in) {
-        try {
-            return ESCAPE_FOR_JSON_STRING_CACHE.get(in);
-        } catch (ExecutionException x) {
-            throw new RuntimeException(x);
-        }
+        return TrieMatcher.replaceMultiple(in, JSON_SEARCH_REPLACE);
     }
 
     /**

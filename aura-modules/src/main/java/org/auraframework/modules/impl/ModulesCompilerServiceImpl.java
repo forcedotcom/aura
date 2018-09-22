@@ -15,6 +15,7 @@
  */
 package org.auraframework.modules.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -25,6 +26,7 @@ import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.tools.node.api.NodeLambdaFactory;
+import org.lwc.OutputConfig;
 import org.lwc.bundle.BundleType;
 
 @ServiceComponent
@@ -48,20 +50,26 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
 
     @Override
     public final ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
-        return compile(entry, sources, BundleType.internal, null);
+        return compile(entry, sources, BundleType.internal, null, null);
     }
 
     @Override
     public ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType) throws Exception {
-        return compile(entry, sources, bundleType, null);
+        return compile(entry, sources, bundleType, null, null);
     }
 
     @Override
     public final ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType, Map<String, String> namespaceMapping) throws Exception {
-        // need to create compiler lazily to avoid the core modularity enforcer
+        return compile(entry, sources, bundleType, namespaceMapping, null);
+    }
+    
+	@Override
+	public ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType,
+			Map<String, String> namespaceMapping, List<OutputConfig> configs) throws Exception {
+	    // need to create compiler lazily to avoid the core modularity enforcer
         compiler = getCompiler();
         long startNanos = System.nanoTime();
-        ModulesCompilerData data = compiler.compile(entry, sources, bundleType, namespaceMapping);
+        ModulesCompilerData data = compiler.compile(entry, sources, bundleType, namespaceMapping, configs);
         long elapsedMillis = (System.nanoTime() - startNanos) / 1000000;
         
         // TODO: keep the log bc it is consumed in splunk.

@@ -15,16 +15,19 @@
  */
 package org.auraframework.modules.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 
-import com.google.common.collect.ImmutableMap;
 import org.auraframework.def.module.ModuleDef.CodeType;
+import org.auraframework.modules.impl.ModulesCompilerUtil;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.service.LoggingService;
+import org.lwc.OutputConfig;
 import org.lwc.bundle.BundleType;
 import org.auraframework.tools.node.api.NodeLambdaFactory;
 import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
@@ -33,6 +36,8 @@ import org.junit.Test;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
 /**
@@ -126,8 +131,61 @@ public class ModulesCompilerTest extends UnitTestCase {
                     message);
         }
     }
+    
+    @Test
+    public void testCompileWithoutConfigs() throws Exception {
+        ModulesCompiler compiler = new ModulesCompilerNode(FACTORY, loggingService);
+        String entry = "modules/moduletest/moduletest.js";
+        String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/moduletest/moduletest.html"),
+                Charsets.UTF_8);
+        String sourceClass = Files.toString(getResourceFile("/testdata/modules/moduletest/moduletest.js"),
+                Charsets.UTF_8);
 
+        Map<String, String> sources = new HashMap<>();
+        sources.put("modules/moduletest/moduletest.js", sourceClass);
+        sources.put("modules/moduletest/moduletest.html", sourceTemplate);
+
+        ModulesCompilerData compilerData = compiler.compile(entry, sources, BundleType.platform, null);
+
+        //All configs should be generated when no configs are passed to the compiler
+        assertEquals(4, compilerData.compilerReport.results.size());
+        assertNotNull(compilerData.codes.get(CodeType.PROD));
+        assertNotNull(compilerData.codes.get(CodeType.PROD_COMPAT));
+        assertNotNull(compilerData.codes.get(CodeType.COMPAT));
+        assertNotNull(compilerData.codes.get(CodeType.DEV));
+    }
+    
+    @Test
+    public void testCompileWithEmptyConfigs() throws Exception {
+        ModulesCompilerData compilerData = compileModule("modules/moduletest/moduletest", new ArrayList<OutputConfig>());
+
+        //All configs should be generated when no configs are passed to the compiler
+        assertEquals(4, compilerData.compilerReport.results.size());
+        assertNotNull(compilerData.codes.get(CodeType.PROD));
+        assertNotNull(compilerData.codes.get(CodeType.PROD_COMPAT));
+        assertNotNull(compilerData.codes.get(CodeType.COMPAT));
+        assertNotNull(compilerData.codes.get(CodeType.DEV));
+    }
+    
+    @Test
+    public void testCompileWithOnlyDevConfig() throws Exception {
+
+        OutputConfig devConfig = ModulesCompilerUtil.createDevOutputConfig();
+        ModulesCompilerData compilerData = compileModule("modules/moduletest/moduletest", Lists.newArrayList(devConfig));
+        String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8);
+
+        assertEquals(1, compilerData.compilerReport.results.size());
+        assertNull(compilerData.codes.get(CodeType.PROD));
+        assertNull(compilerData.codes.get(CodeType.PROD_COMPAT));
+        assertNull(compilerData.codes.get(CodeType.COMPAT));
+        assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
+    }
+    
     private ModulesCompilerData compileModule(String modulePath) throws Exception {
+    	    return compileModule(modulePath, null);
+    }
+
+    private ModulesCompilerData compileModule(String modulePath, List<OutputConfig> configs) throws Exception {
         ModulesCompiler compiler = new ModulesCompilerNode(FACTORY, loggingService);
         String jsModule = modulePath + ".js";
         String htmlModule = modulePath + ".html";
@@ -137,7 +195,7 @@ public class ModulesCompilerTest extends UnitTestCase {
         sources.put(jsModule, sourceClass);
         sources.put(htmlModule, sourceTemplate);
 
-        return compiler.compile(jsModule, sources);
+        return compiler.compile(jsModule, sources, BundleType.internal, null, configs);
     }
 
 }

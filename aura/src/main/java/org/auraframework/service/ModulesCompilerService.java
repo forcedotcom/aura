@@ -15,9 +15,11 @@
  */
 package org.auraframework.service;
 
+import java.util.List;
 import java.util.Map;
 
 import org.auraframework.modules.ModulesCompilerData;
+import org.lwc.OutputConfig;
 import org.lwc.bundle.BundleType;
 
 /**
@@ -28,4 +30,5 @@ public interface ModulesCompilerService {
     ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception;
     ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType) throws Exception;
     ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType, Map<String, String> namespaceMapping) throws Exception;
+    ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType, Map<String, String> namespaceMapping, List<OutputConfig> configs) throws Exception;
 }

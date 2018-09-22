@@ -53,17 +53,23 @@ public final class ModulesCompilerNode implements ModulesCompiler {
 
     @Override
     public ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
-        return this.compile(entry, sources, BundleType.internal, null);
+        return this.compile(entry, sources, BundleType.internal, null, null);
     }
 
     @Override
     public ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType) throws Exception {
-        return this.compile(entry, sources, bundleType, null);
+        return this.compile(entry, sources, bundleType, null, null);
     }
 
     @Override
     public ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType, Map<String, String> namespaceMapping) throws Exception {
-        Path path = Paths.get(entry);
+        return this.compile(entry, sources, bundleType, namespaceMapping, null);
+    }
+
+	@Override
+	public ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType,
+			Map<String, String> namespaceMapping, List<OutputConfig> configs) throws Exception {
+		Path path = Paths.get(entry);
 
         // get name and namespace
         String name = FilenameUtils.removeExtension(path.getFileName().toString());
@@ -71,12 +77,14 @@ public final class ModulesCompilerNode implements ModulesCompiler {
         String namespace = (nameSpacePath != null) ? nameSpacePath.getFileName().toString() : "";
         Path relativeBundlePath = Paths.get(namespace + "/" + name);
 
-        ArrayList<OutputConfig> configs = new ArrayList<>();
-        configs.add(ModulesCompilerUtil.createDevOutputConfig());
-        configs.add(ModulesCompilerUtil.createProdOutputConfig());
-        configs.add(ModulesCompilerUtil.createProdCompatOutputConfig());
-        configs.add(ModulesCompilerUtil.createCompatOutputConfig());
-
+        //If no configs are passed, we add all configs
+        if(configs == null || configs.size() == 0) {
+            configs = new ArrayList<>();
+            configs.add(ModulesCompilerUtil.createDevOutputConfig());
+            configs.add(ModulesCompilerUtil.createProdOutputConfig());
+            configs.add(ModulesCompilerUtil.createProdCompatOutputConfig());
+            configs.add(ModulesCompilerUtil.createCompatOutputConfig());
+        }
 
         // normalize sources to exclude file path
         Map<String, String> normalizedSources = new HashMap<>();

@@ -15,14 +15,15 @@
  */
 package org.auraframework.http;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThat;
 
 import org.auraframework.http.RequestParam.InvalidParamException;
 import org.auraframework.system.AuraContext.Mode;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -34,7 +35,7 @@ public class RequestParamTest {
 
     /**
      * Test method for
-     * {@link InvalidParamException#InvalidParamException(java.lang.String, java.util.Collection)}.
+     * {@link InvalidParamException#InvalidParamException(String, java.util.Collection)}.
      */
     @SuppressWarnings("static-method")
     @Test
@@ -45,13 +46,13 @@ public class RequestParamTest {
         final InvalidParamException ipe = new InvalidParamException("aura.ora", ImmutableSet.of(Mode.DEV, Mode.PROD));
         
         // Assert
-        assertEquals("Expected a valid message form the exception", "Invalid parameter value for aura.ora. Allowed values are [DEV, PROD]", ipe.getMessage());
+        assertThat("Expected a valid message form the exception", ipe, hasProperty("message", equalTo("Invalid parameter value for aura.ora. Allowed values are [DEV, PROD]")));
     }
     
     /**
      * Test method for
-     * {@link InvalidParamException#InvalidParamException(java.lang.String, java.util.Collection)} with an
-     * empty {@link Collection} of supported values.
+     * {@link InvalidParamException#InvalidParamException(String, java.util.Collection)} with an
+     * empty {@link java.util.Collection} of supported values.
      */
     @SuppressWarnings("static-method")
     @Test
@@ -62,12 +63,12 @@ public class RequestParamTest {
         final InvalidParamException ipe = new InvalidParamException("aura.ora", ImmutableSet.of());
         
         // Assert
-        assertEquals("Expected a valid message form the exception", "Invalid parameter value for aura.ora", ipe.getMessage());
+        assertThat("Expected a valid message form the exception", ipe, hasProperty("message", equalTo("Invalid parameter value for aura.ora")));
     }
 
     /**
      * Test method for
-     * {@link InvalidParamException#InvalidParamException(java.lang.String)}.
+     * {@link InvalidParamException#InvalidParamException(String)}.
      */
     @SuppressWarnings("static-method")
     @Test
@@ -78,6 +79,24 @@ public class RequestParamTest {
         final InvalidParamException ipe = new InvalidParamException("aura.ora");
         
         // Assert
-        assertEquals("Expected a valid message form the exception", "Invalid parameter value for aura.ora", ipe.getMessage());
+        assertThat("Expected a valid message form the exception", ipe, hasProperty("message", equalTo("Invalid parameter value for aura.ora")));
+    }
+    
+    /**
+     * Test method for
+     * {@link InvalidParamException#InvalidParamException(String, Throwable)}.
+     */
+    @SuppressWarnings("static-method")
+    @Test
+    public final void testInvalidParamExceptionStringThrowable() {
+        // Arrange
+        final IllegalStateException cause = new IllegalStateException("State not so good.");
+        
+        // Act
+        final InvalidParamException ipe = new InvalidParamException("aura.ora", cause);
+        
+        // Assert
+        assertThat("Expected a valid message from the exception", ipe, hasProperty("message", equalTo("Invalid parameter value for aura.ora")));
+        assertThat("Expected an IllegalStateException with the correct message", ipe, hasProperty("cause", sameInstance(cause)));
     }
 }

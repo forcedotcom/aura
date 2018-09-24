@@ -282,4 +282,27 @@ public class AuraContextFilterTest extends AuraTestCase {
         assertEquals("Unexpected status code", 400, resp.getStatus());
         verify(loggingService).setValue(eq(LoggingService.STATUS), eq("400"));
     }
+
+    /**
+     * Tests the
+     * {@link AuraContextFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, FilterChain)}
+     * method with an invalid {@value AuraServlet#AURA_PREFIX}app" coming from the request and makes sure the
+     * exception is handled properly.
+     * 
+     * @throws ServletException Can be thrown by the method under test
+     * @throws IOException Can be thrown by the method under test
+     */
+    public void testAppHandleInvalidParamException() throws ServletException, IOException {
+        // Arrange
+        Mockito.when(request.getParameter(eq(AuraServlet.AURA_PREFIX + "app"))).thenReturn("one:one+eval(compile(for x in\nrange(1):\\\\n import time\\\\n time.sleep(20),a,single))+");
+        final MockHttpServletResponse resp = new MockHttpServletResponse();
+        
+        // Act
+        filter.doFilter(request, resp, filterChain);
+        
+        // Assert
+        assertEquals("Expected error to be written to the response", "Invalid parameter value for aura.app", resp.getContentAsString());
+        assertEquals("Unexpected status code", 400, resp.getStatus());
+        verify(loggingService).setValue(eq(LoggingService.STATUS), eq("400"));
+    }
 }

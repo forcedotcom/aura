@@ -56,6 +56,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
@@ -431,7 +432,21 @@ public class AuraContextFilter implements Filter {
         return false;
     }
 
-    private DefDescriptor<? extends BaseComponentDef> getAppParam(HttpServletRequest request, Map<String, Object> configMap) {
+    /**
+     * Retrieve the matching {@link ApplicationDef} from one of the following
+     * <ol>
+     *   <li>"{@value AuraServlet.AURA_PREFIX}app" request parameter</li>
+     *   <li>"app" key in the passed in {@code configMap} map</li>
+     * </ol>
+     * or if the {@code ApplicationDef} is not present,
+     * {@link ComponentDef} from the "cmp" key in the passed in {@code configMap} map.
+     * 
+     * @param request The request to get the param from
+     * @param configMap
+     * @return The matching {@link DefDescriptor} or {@code null} if the value was not found.
+     */
+    @VisibleForTesting
+    final DefDescriptor<? extends BaseComponentDef> getAppParam(final HttpServletRequest request, final Map<String, Object> configMap) {
         String appName = app.get(request, null);
         String cmpName = null;
 
@@ -441,10 +456,19 @@ public class AuraContextFilter implements Filter {
                 cmpName = (String) configMap.get("cmp");
             }
         }
-        if (appName != null) {
-            return definitionService.getDefDescriptor(appName, ApplicationDef.class);
-        } else if (cmpName != null) {
-            return definitionService.getDefDescriptor(cmpName, ComponentDef.class);
+        try {
+            if (appName != null) {
+                return definitionService.getDefDescriptor(appName, ApplicationDef.class);
+            } else if (cmpName != null) {
+                return definitionService.getDefDescriptor(cmpName, ComponentDef.class);
+            }
+        } catch (final AuraRuntimeException are) {
+            // We report it in the exception as "app.name" even though it may be "contextConfig.name -> app"
+            // because we don't want to initialize another variable to maintain where the value actually came
+            // from.
+            final InvalidParamException ipe = new InvalidParamException((appName == null) ? (contextConfig.name + " -> cmp") : app.name, are);
+            loggingService.warn(ipe.getMessage(), are);
+            throw ipe;
         }
         return null;
     }

@@ -65,7 +65,7 @@ public abstract class RequestParam<T> {
          * @see #RequestParam(String, Collection)
          */
         public InvalidParamException(final String name) {
-            this(name, null);
+            this(name, (Collection<?>)null);
         }
         
         private static final String generateMessage(final String name, final Collection<?> supportedValues) {
@@ -77,6 +77,17 @@ public abstract class RequestParam<T> {
                   .append(supportedValues);
             }
             return sb.toString();
+        }
+        
+        /**
+         * Initializes the message and the cause.
+         * 
+         * @param name The name of the invalid parameter
+         * @param cause The exception caused by the valid parameter value
+         * @see #RequestParam(String)
+         */
+        public InvalidParamException(final String name, final Throwable cause) {
+            super(generateMessage(name, null), cause);
         }
     }
 

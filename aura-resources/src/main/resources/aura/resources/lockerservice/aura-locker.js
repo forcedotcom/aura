@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-09-20
- * Version: 0.5.9
+ * Generated: 2018-09-24
+ * Version: 0.5.10
  */
 
 (function (exports) {
@@ -7890,6 +7890,10 @@ const HTML_MAX_BUF_SIZE = 32768;
 const WHITELISTED_MIME_TYPES = [
   'application/octet-stream',
   'application/json',
+  'application/zip',
+  'application/x-bzip',
+  'application/x-rar-compressed',
+  'application/x-tar',
   'video/',
   'audio/',
   'image/',
@@ -9431,8 +9435,7 @@ SecureLightningElementFactory.getWrappedLightningElement = function(LightningEle
       setRef(this, pseudoInstance, lockerKey);
       registerProxy(this);
     } else {
-      // TODO: Caridy - This trick leaks LightningElement into sandboxes, we will figure a better way.
-      return LightningElement;
+      return SecureLightningElement;
     }
   }
 
@@ -9569,14 +9572,13 @@ function SecureLWC(lwc, key) {
 
 // This is a whitelist from Kevin V, this has to be updated if any new wire adapters are introduced
 const internalLibs = [
-  'lightning-flexipage-service',
-  'lightning-ui-api-actions',
-  'lightning-ui-api-record',
-  'lightning-ui-api-record-ui',
-  'lightning-ui-api-object-info',
-  'lightning-ui-api-list-ui',
-  'lightning-ui-api-lookups',
-  'lightning-navigation'
+  'lightning/uiApiActions',
+  'lightning/uiApiRecord',
+  'lightning/uiApiRecordUi',
+  'lightning/uiApiObjectInfo',
+  'lightning/uiApiListUi',
+  'lightning/uiApiLookups',
+  'lightning/navigation'
 ];
 function isWhitelistedLib(libDesc) {
   return internalLibs.includes(libDesc);

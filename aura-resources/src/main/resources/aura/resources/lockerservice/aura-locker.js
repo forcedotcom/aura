@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-08-24
- * Version: 0.5.7
+ * Generated: 2018-09-20
+ * Version: 0.5.9
  */
 
 (function (exports) {
@@ -2670,6 +2670,11 @@ const metadata$2 = {
       value: DEFAULT,
       willValidate: DEFAULT
     },
+    HTMLSlotElement: {
+      assignedElements: FUNCTION,
+      assignedNodes: FUNCTION,
+      name: DEFAULT
+    },
     HTMLSourceElement: {
       media: DEFAULT,
       sizes: DEFAULT,
@@ -2780,6 +2785,7 @@ const metadata$2 = {
     },
     HTMLElement: {
       accessKey: DEFAULT,
+      assignedSlot: DEFAULT,
       blur: FUNCTION,
       click: FUNCTION,
       contentEditable: DEFAULT,
@@ -2862,6 +2868,7 @@ const metadata$2 = {
       onvolumechange: EVENT,
       onwaiting: EVENT,
       outerText: DEFAULT,
+      slot: DEFAULT,
       spellcheck: DEFAULT,
       style: DEFAULT,
       tabIndex: DEFAULT,
@@ -6422,6 +6429,8 @@ function getSupportedInterfaces(o) {
         interfaces.push('HTMLScriptElement');
       } else if (o instanceof HTMLSelectElement) {
         interfaces.push('HTMLSelectElement');
+      } else if (typeof HTMLSlotElement !== 'undefined' && o instanceof HTMLSlotElement) {
+        interfaces.push('HTMLSlotElement');
       } else if (o instanceof HTMLSourceElement) {
         interfaces.push('HTMLSourceElement');
       } else if (o instanceof HTMLTableCellElement) {
@@ -6897,388 +6906,6 @@ SecureObject.deepUnfilterMethodArguments = function(st, baseObject, members) {
  * limitations under the License.
  */
 
-const metadata$6 = {
-  prototypes: {
-    HTMLDocument: {
-      // Defined on Instance
-      location: DEFAULT,
-      // Defined on Proto
-      fgColor: DEFAULT,
-      linkColor: DEFAULT,
-      vlinkColor: DEFAULT,
-      alinkColor: DEFAULT,
-      bgColor: DEFAULT,
-      clear: FUNCTION,
-      captureEvents: FUNCTION,
-      releaseEvents: FUNCTION
-    },
-    Document: {
-      URL: DEFAULT,
-      activeElement: DEFAULT,
-      adoptNode: FUNCTION,
-      anchors: DEFAULT,
-      applets: DEFAULT,
-      body: DEFAULT,
-      caretRangeFromPoint: FUNCTION,
-      characterSet: DEFAULT,
-      charset: DEFAULT,
-      childElementCount: DEFAULT,
-      children: DEFAULT,
-      close: FUNCTION,
-      compatMode: DEFAULT,
-      contentType: DEFAULT,
-      cookie: DEFAULT,
-      createAttribute: FUNCTION,
-      createAttributeNS: FUNCTION,
-      createCDATASection: FUNCTION,
-      createComment: FUNCTION,
-      createDocumentFragment: FUNCTION,
-      createElement: FUNCTION,
-      createElementNS: FUNCTION,
-      createEvent: FUNCTION,
-      createExpression: FUNCTION,
-      createNSResolver: FUNCTION,
-      createNodeIterator: FUNCTION,
-      createProcessingInstruction: FUNCTION,
-      createRange: FUNCTION,
-      createTextNode: FUNCTION,
-      createTreeWalker: FUNCTION,
-      defaultView: DEFAULT,
-      designMode: DEFAULT,
-      dir: DEFAULT,
-      doctype: DEFAULT,
-      documentElement: DEFAULT,
-      documentURI: DEFAULT,
-      // SecureDocument does not allow setting domain property.
-      // "domain":                           DEFAULT,
-      elementFromPoint: FUNCTION,
-      elementsFromPoint: FUNCTION,
-      embeds: DEFAULT,
-      evaluate: FUNCTION,
-      execCommand: FUNCTION,
-      exitPointerLock: FUNCTION,
-      firstElementChild: DEFAULT,
-      fonts: DEFAULT,
-      forms: DEFAULT,
-      getElementById: FUNCTION,
-      getElementsByClassName: FUNCTION,
-      getElementsByName: FUNCTION,
-      getElementsByTagName: FUNCTION,
-      getElementsByTagNameNS: FUNCTION,
-      getSelection: FUNCTION,
-      hasFocus: FUNCTION,
-      head: DEFAULT,
-      hidden: DEFAULT,
-      images: DEFAULT,
-      implementation: DEFAULT,
-      importNode: FUNCTION,
-      inputEncoding: DEFAULT,
-      lastElementChild: DEFAULT,
-      lastModified: DEFAULT,
-      links: DEFAULT,
-      onabort: EVENT,
-      onautocomplete: EVENT,
-      onautocompleteerror: EVENT,
-      onbeforecopy: EVENT,
-      onbeforecut: EVENT,
-      onbeforepaste: EVENT,
-      onblur: EVENT,
-      oncancel: EVENT,
-      oncanplay: EVENT,
-      oncanplaythrough: EVENT,
-      onchange: EVENT,
-      onclick: EVENT,
-      onclose: EVENT,
-      oncontextmenu: EVENT,
-      oncopy: EVENT,
-      oncuechange: EVENT,
-      oncut: EVENT,
-      ondblclick: EVENT,
-      ondrag: EVENT,
-      ondragend: EVENT,
-      ondragenter: EVENT,
-      ondragleave: EVENT,
-      ondragover: EVENT,
-      ondragstart: EVENT,
-      ondrop: EVENT,
-      ondurationchange: EVENT,
-      onemptied: EVENT,
-      onended: EVENT,
-      onerror: EVENT,
-      onfocus: EVENT,
-      oninput: EVENT,
-      oninvalid: EVENT,
-      onkeydown: EVENT,
-      onkeypress: EVENT,
-      onkeyup: EVENT,
-      onload: EVENT,
-      onloadeddata: EVENT,
-      onloadedmetadata: EVENT,
-      onloadstart: EVENT,
-      onmousedown: EVENT,
-      onmouseenter: EVENT,
-      onmouseleave: EVENT,
-      onmousemove: EVENT,
-      onmouseout: EVENT,
-      onmouseover: EVENT,
-      onmouseup: EVENT,
-      onmousewheel: EVENT,
-      onpaste: EVENT,
-      onpause: EVENT,
-      onplay: EVENT,
-      onplaying: EVENT,
-      onpointerlockchange: EVENT,
-      onpointerlockerror: EVENT,
-      onprogress: EVENT,
-      onratechange: EVENT,
-      onreadystatechange: EVENT,
-      onreset: EVENT,
-      onresize: EVENT,
-      onscroll: EVENT,
-      onsearch: EVENT,
-      onseeked: EVENT,
-      onseeking: EVENT,
-      onselect: EVENT,
-      onselectionchange: EVENT,
-      onselectstart: EVENT,
-      onshow: EVENT,
-      onstalled: EVENT,
-      onsubmit: EVENT,
-      onsuspend: EVENT,
-      ontimeupdate: EVENT,
-      ontoggle: EVENT,
-      ontouchcancel: EVENT,
-      ontouchend: EVENT,
-      ontouchmove: EVENT,
-      ontouchstart: EVENT,
-      onvolumechange: EVENT,
-      onwaiting: EVENT,
-      onwebkitfullscreenchange: EVENT,
-      onwebkitfullscreenerror: EVENT,
-      onwheel: EVENT,
-      open: FUNCTION,
-      origin: DEFAULT,
-      plugins: DEFAULT,
-      pointerLockElement: DEFAULT,
-      preferredStylesheetSet: DEFAULT,
-      queryCommandEnabled: FUNCTION,
-      queryCommandIndeterm: FUNCTION,
-      queryCommandState: FUNCTION,
-      queryCommandSupported: FUNCTION,
-      queryCommandValue: FUNCTION,
-      querySelector: FUNCTION,
-      querySelectorAll: FUNCTION,
-      readyState: DEFAULT,
-      referrer: DEFAULT,
-      registerElement: FUNCTION,
-      rootElement: DEFAULT,
-      scripts: DEFAULT,
-      scrollingElement: DEFAULT,
-      selectedStylesheetSet: DEFAULT,
-      styleSheets: DEFAULT,
-      title: DEFAULT,
-      visibilityState: DEFAULT,
-      webkitCancelFullScreen: FUNCTION,
-      webkitCurrentFullScreenElement: DEFAULT,
-      webkitExitFullscreen: FUNCTION,
-      webkitFullscreenElement: DEFAULT,
-      webkitFullscreenEnabled: DEFAULT,
-      webkitHidden: DEFAULT,
-      webkitIsFullScreen: DEFAULT,
-      webkitVisibilityState: DEFAULT,
-      // Blocked on purpose because of security risk
-      // "write":                            FUNCTION,
-      // "writeln":                          FUNCTION,
-      xmlEncoding: DEFAULT,
-      xmlStandalone: DEFAULT,
-      xmlVersion: DEFAULT
-    },
-    Node: metadata$3,
-    EventTarget: metadata$4
-  }
-};
-
-function SecureHTMLDocument(doc, key) {
-  let o = getFromCache(doc, key);
-  if (o) {
-    return o;
-  }
-
-  // create prototype to allow instanceof checks against document
-  const prototype = function() {};
-  freeze(prototype);
-
-  o = create$1(prototype, {
-    toString: {
-      value: function() {
-        return `SecureHTMLDocument: ${doc}{ key: ${JSON.stringify(key)} }`;
-      }
-    },
-    createAttribute: {
-      value: function(name) {
-        const att = doc.createAttribute(name);
-        setKey(att, key);
-        return SecureElement(att, key);
-      }
-    },
-    createElement: {
-      value: function(tag) {
-        const el = doc.createElement(tag);
-        setKey(el, key);
-        return SecureElement(el, key);
-      }
-    },
-    createElementNS: {
-      value: function(namespace, tag) {
-        const el = doc.createElementNS(namespace, tag);
-        setKey(el, key);
-        return SecureElement(el, key);
-      }
-    },
-    createDocumentFragment: {
-      value: function() {
-        const el = doc.createDocumentFragment();
-        setKey(el, key);
-        return SecureElement(el, key);
-      }
-    },
-    createTextNode: {
-      value: function(text) {
-        const el = doc.createTextNode(text);
-        setKey(el, key);
-        return SecureElement(el, key);
-      }
-    },
-    createComment: {
-      value: function(data) {
-        const el = doc.createComment(data);
-        setKey(el, key);
-        return SecureElement(el, key);
-      }
-    },
-    domain: {
-      get: function() {
-        return doc.domain;
-      },
-      set: function() {
-        throw new Error('SecureHTMLDocument does not allow setting domain property.');
-      }
-    },
-    querySelector: {
-      value: function(selector) {
-        return SecureElement.secureQuerySelector(doc, key, selector);
-      }
-    }
-  });
-
-  addEventTargetMethods(o, doc, key);
-
-  defineProperties(o, {
-    cookie: {
-      get: function() {
-        return '';
-      }
-    },
-    implementation: {
-      enumerable: true,
-      value: doc['implementation']
-    }
-  });
-
-  SecureObject.addPrototypeMethodsAndProperties(metadata$6, o, doc, key);
-
-  setRef(o, doc, key);
-  addToCache(doc, o, key);
-  registerProxy(o);
-
-  return o;
-}
-
-SecureHTMLDocument.toString = function() {
-  return 'function SecureHTMLDocument() { [native code] }';
-};
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-function SecureDOMImplementation(implementation, key) {
-  let o = getFromCache(implementation, key);
-  if (o) {
-    return o;
-  }
-
-  o = create$1(null, {
-    toString: {
-      value: function() {
-        return `SecureDOMImplemenation: ${implementation} { key: ${JSON.stringify(key)} }`;
-      }
-    }
-  });
-
-  defineProperties(o, {
-    createDocument: {
-      value: function(...args) {
-        return implementation.createDocument(...args);
-      }
-    },
-    createDocumentType: {
-      value: function(...args) {
-        return implementation.createDocumentType(...args);
-      }
-    },
-    createHTMLDocument: {
-      enumerable: true,
-      writable: false,
-      value: function(title) {
-        title = String(title);
-        const html = implementation.createHTMLDocument(title);
-        trustChildNodes(o, html);
-        return SecureHTMLDocument(html, key);
-      }
-    },
-    hasFeature: {
-      value: function() {
-        return true;
-      }
-    }
-  });
-
-  setRef(o, implementation, key);
-  addToCache(implementation, o, key);
-  registerProxy(o);
-
-  return freeze(o);
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 const metadata$5 = {
   prototypes: {
     HTMLDocument: {
@@ -7585,7 +7212,7 @@ function SecureDocument(doc, key) {
     },
     implementation: {
       enumerable: true,
-      value: SecureDOMImplementation(doc.implementation, key)
+      value: doc.implementation // revert W-5404190
     }
   });
 
@@ -7600,311 +7227,6 @@ function SecureDocument(doc, key) {
 
 SecureDocument.toString = function() {
   return 'SecureDocument() { [native code] }';
-};
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-const metadata$7 = {
-  prototypes: {
-    HTMLDocument: {},
-    Document: {
-      URL: DEFAULT,
-      activeElement: DEFAULT,
-      adoptNode: FUNCTION,
-      anchors: DEFAULT,
-      applets: DEFAULT,
-      body: DEFAULT,
-      caretRangeFromPoint: FUNCTION,
-      characterSet: DEFAULT,
-      charset: DEFAULT,
-      childElementCount: DEFAULT,
-      children: DEFAULT,
-      close: FUNCTION,
-      compatMode: DEFAULT,
-      contentType: DEFAULT,
-      cookie: DEFAULT,
-      createAttribute: FUNCTION,
-      createAttributeNS: FUNCTION,
-      createCDATASection: FUNCTION,
-      createComment: FUNCTION,
-      createDocumentFragment: FUNCTION,
-      createElement: FUNCTION,
-      createElementNS: FUNCTION,
-      createEvent: FUNCTION,
-      createExpression: FUNCTION,
-      createNSResolver: FUNCTION,
-      createNodeIterator: FUNCTION,
-      createProcessingInstruction: FUNCTION,
-      createRange: FUNCTION,
-      createTextNode: FUNCTION,
-      createTreeWalker: FUNCTION,
-      defaultView: DEFAULT,
-      designMode: DEFAULT,
-      dir: DEFAULT,
-      doctype: DEFAULT,
-      documentElement: DEFAULT,
-      documentURI: DEFAULT,
-      // SecureDocument does not allow setting domain property.
-      // "domain":                           DEFAULT,
-      elementFromPoint: FUNCTION,
-      elementsFromPoint: FUNCTION,
-      embeds: DEFAULT,
-      evaluate: FUNCTION,
-      execCommand: FUNCTION,
-      exitPointerLock: FUNCTION,
-      firstElementChild: DEFAULT,
-      fonts: DEFAULT,
-      forms: DEFAULT,
-      getElementById: FUNCTION,
-      getElementsByClassName: FUNCTION,
-      getElementsByName: FUNCTION,
-      getElementsByTagName: FUNCTION,
-      getElementsByTagNameNS: FUNCTION,
-      getSelection: FUNCTION,
-      hasFocus: FUNCTION,
-      head: DEFAULT,
-      hidden: DEFAULT,
-      images: DEFAULT,
-      implementation: DEFAULT,
-      importNode: FUNCTION,
-      inputEncoding: DEFAULT,
-      lastElementChild: DEFAULT,
-      lastModified: DEFAULT,
-      links: DEFAULT,
-      onabort: EVENT,
-      onautocomplete: EVENT,
-      onautocompleteerror: EVENT,
-      onbeforecopy: EVENT,
-      onbeforecut: EVENT,
-      onbeforepaste: EVENT,
-      onblur: EVENT,
-      oncancel: EVENT,
-      oncanplay: EVENT,
-      oncanplaythrough: EVENT,
-      onchange: EVENT,
-      onclick: EVENT,
-      onclose: EVENT,
-      oncontextmenu: EVENT,
-      oncopy: EVENT,
-      oncuechange: EVENT,
-      oncut: EVENT,
-      ondblclick: EVENT,
-      ondrag: EVENT,
-      ondragend: EVENT,
-      ondragenter: EVENT,
-      ondragleave: EVENT,
-      ondragover: EVENT,
-      ondragstart: EVENT,
-      ondrop: EVENT,
-      ondurationchange: EVENT,
-      onemptied: EVENT,
-      onended: EVENT,
-      onerror: EVENT,
-      onfocus: EVENT,
-      oninput: EVENT,
-      oninvalid: EVENT,
-      onkeydown: EVENT,
-      onkeypress: EVENT,
-      onkeyup: EVENT,
-      onload: EVENT,
-      onloadeddata: EVENT,
-      onloadedmetadata: EVENT,
-      onloadstart: EVENT,
-      onmousedown: EVENT,
-      onmouseenter: EVENT,
-      onmouseleave: EVENT,
-      onmousemove: EVENT,
-      onmouseout: EVENT,
-      onmouseover: EVENT,
-      onmouseup: EVENT,
-      onmousewheel: EVENT,
-      onpaste: EVENT,
-      onpause: EVENT,
-      onplay: EVENT,
-      onplaying: EVENT,
-      onpointerlockchange: EVENT,
-      onpointerlockerror: EVENT,
-      onprogress: EVENT,
-      onratechange: EVENT,
-      onreadystatechange: EVENT,
-      onreset: EVENT,
-      onresize: EVENT,
-      onscroll: EVENT,
-      onsearch: EVENT,
-      onseeked: EVENT,
-      onseeking: EVENT,
-      onselect: EVENT,
-      onselectionchange: EVENT,
-      onselectstart: EVENT,
-      onshow: EVENT,
-      onstalled: EVENT,
-      onsubmit: EVENT,
-      onsuspend: EVENT,
-      ontimeupdate: EVENT,
-      ontoggle: EVENT,
-      ontouchcancel: EVENT,
-      ontouchend: EVENT,
-      ontouchmove: EVENT,
-      ontouchstart: EVENT,
-      onvolumechange: EVENT,
-      onwaiting: EVENT,
-      onwebkitfullscreenchange: EVENT,
-      onwebkitfullscreenerror: EVENT,
-      onwheel: EVENT,
-      open: FUNCTION,
-      origin: DEFAULT,
-      plugins: DEFAULT,
-      pointerLockElement: DEFAULT,
-      preferredStylesheetSet: DEFAULT,
-      queryCommandEnabled: FUNCTION,
-      queryCommandIndeterm: FUNCTION,
-      queryCommandState: FUNCTION,
-      queryCommandSupported: FUNCTION,
-      queryCommandValue: FUNCTION,
-      querySelector: FUNCTION,
-      querySelectorAll: FUNCTION,
-      readyState: DEFAULT,
-      referrer: DEFAULT,
-      registerElement: FUNCTION,
-      rootElement: DEFAULT,
-      scripts: DEFAULT,
-      scrollingElement: DEFAULT,
-      selectedStylesheetSet: DEFAULT,
-      styleSheets: DEFAULT,
-      title: DEFAULT,
-      visibilityState: DEFAULT,
-      webkitCancelFullScreen: FUNCTION,
-      webkitCurrentFullScreenElement: DEFAULT,
-      webkitExitFullscreen: FUNCTION,
-      webkitFullscreenElement: DEFAULT,
-      webkitFullscreenEnabled: DEFAULT,
-      webkitHidden: DEFAULT,
-      webkitIsFullScreen: DEFAULT,
-      webkitVisibilityState: DEFAULT,
-      // Blocked on purpose because of security risk
-      // "write":                            FUNCTION,
-      // "writeln":                          FUNCTION,
-      xmlEncoding: DEFAULT,
-      xmlStandalone: DEFAULT,
-      xmlVersion: DEFAULT
-    },
-    Node: metadata$3,
-    EventTarget: metadata$4
-  }
-};
-
-function SecureXMLDocument(doc, key) {
-  let o = getFromCache(doc, key);
-  if (o) {
-    return o;
-  }
-
-  // create prototype to allow instanceof checks against document
-  const prototype = function() {};
-  freeze(prototype);
-
-  o = create$1(prototype, {
-    toString: {
-      value: function() {
-        return `SecureXMLDocument: ${doc}{ key: ${JSON.stringify(key)} }`;
-      }
-    },
-    createAttribute: {
-      value: function(name) {
-        const att = doc.createAttribute(name);
-        setKey(att, key);
-        return SecureElement(att, key);
-      }
-    },
-    createElement: {
-      value: function(tag) {
-        const el = doc.createElement(tag);
-        setKey(el, key);
-        return SecureElement(el, key);
-      }
-    },
-    createElementNS: {
-      value: function(namespace, tag) {
-        const el = doc.createElementNS(namespace, tag);
-        setKey(el, key);
-        return SecureElement(el, key);
-      }
-    },
-    createDocumentFragment: {
-      value: function() {
-        const el = doc.createDocumentFragment();
-        setKey(el, key);
-        return SecureElement(el, key);
-      }
-    },
-    createTextNode: {
-      value: function(text) {
-        const el = doc.createTextNode(text);
-        setKey(el, key);
-        return SecureElement(el, key);
-      }
-    },
-    createComment: {
-      value: function(data) {
-        const el = doc.createComment(data);
-        setKey(el, key);
-        return SecureElement(el, key);
-      }
-    },
-    domain: {
-      get: function() {
-        return doc.domain;
-      },
-      set: function() {
-        throw new Error('SecureXMLDocument does not allow setting domain property.');
-      }
-    },
-    querySelector: {
-      value: function(selector) {
-        return SecureElement.secureQuerySelector(doc, key, selector);
-      }
-    }
-  });
-
-  addEventTargetMethods(o, doc, key);
-
-  defineProperties(o, {
-    cookie: {
-      get: function() {
-        return '';
-      }
-    },
-    implementation: {
-      enumerable: true,
-      value: doc['implementation']
-    }
-  });
-
-  SecureObject.addPrototypeMethodsAndProperties(metadata$7, o, doc, key);
-
-  setRef(o, doc, key);
-  addToCache(doc, o, key);
-  registerProxy(o);
-
-  return o;
-}
-
-SecureXMLDocument.toString = function() {
-  return 'function SecureXMLDocument() { [native code] }';
 };
 
 /*
@@ -8212,79 +7534,6 @@ function SecureXMLHttpRequest(key) {
     });
 
     setRef(o, xhr, key);
-
-    return freeze(o);
-  };
-}
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/**
- * A list of supported MIME types for SecureDOMParser.
- */
-const typeMap = {
-  'text/html': 'html',
-  'text/xml': 'xml',
-  'application/xml': 'xml',
-  'application/xhtml+xml': 'xml',
-  'image/svg+xml': 'xml'
-};
-
-function SecureDOMParser(key) {
-  // Create a new closure constructor for new DOMParser() that captures the key
-  return function() {
-    const parser = new DOMParser();
-
-    const o = create$1(null, {
-      toString: {
-        value: function() {
-          return `SecureDOMParser: ${parser} { key: ${JSON.stringify(key)} }`;
-        }
-      }
-    });
-
-    defineProperties(o, {
-      hasOwnProperty: SecureObject.createFilteredMethod(o, parser, 'hasOwnProperty'),
-      isPrototypeOf: SecureObject.createFilteredMethod(o, parser, 'isPrototypeOf'),
-      propertyIsEnumerable: SecureObject.createFilteredMethod(o, parser, 'propertyIsEnumerable'),
-      toLocaleString: SecureObject.createFilteredMethod(o, parser, 'toLocaleString'),
-      valueOf: SecureObject.createFilteredMethod(o, parser, 'valueOf'),
-      parseFromString: {
-        enumerable: true,
-        writable: false,
-        value: function(data, type) {
-          // protect from shapeshifting attacks
-          type = String(type);
-          if (typeMap[type] === 'xml') {
-            const xml = parser.parseFromString(data, type);
-            trustChildNodes(o, xml);
-            return SecureXMLDocument(xml, key);
-          }
-          if (typeMap[type] === 'html') {
-            const html = parser.parseFromString(data, type);
-            trustChildNodes(o, html);
-            return SecureHTMLDocument(html, key);
-          }
-          throw new error(`SecureDOMParser does not support type "${type}"`);
-        }
-      }
-    });
-
-    setRef(o, parser, key);
 
     return freeze(o);
   };
@@ -8892,7 +8141,7 @@ const metadata$$1 = {
       DOMError: FUNCTION,
       DOMException: FUNCTION,
       DOMImplementation: FUNCTION,
-      DOMParser: CTOR,
+      DOMParser: RAW,
       DOMStringList: FUNCTION,
       DOMStringMap: FUNCTION,
       DOMTokenList: FUNCTION,
@@ -8980,6 +8229,7 @@ const metadata$$1 = {
       HTMLScriptElement: RAW,
       HTMLSelectElement: RAW,
       HTMLShadowElement: RAW,
+      HTMLSlotElement: RAW,
       HTMLSourceElement: RAW,
       HTMLSpanElement: RAW,
       HTMLStyleElement: RAW,
@@ -9437,23 +8687,6 @@ function SecureWindow(sandbox, key) {
       enumerable: true,
       value: SecureDocument(win.document, key)
     },
-    DOMParser: {
-      enumerable: true,
-      writable: true, // this should be overwritable by RTC
-      value: SecureDOMParser(key)
-    },
-    Document: {
-      enumerable: true,
-      value: SecureDocument
-    },
-    HTMLDocument: {
-      enumerable: true,
-      value: SecureHTMLDocument
-    },
-    XMLDocument: {
-      enumerable: true,
-      value: SecureXMLDocument
-    },
     window: {
       enumerable: true,
       get: function() {
@@ -9797,7 +9030,7 @@ function SecureRTCPeerConnection(raw, key) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const metadata$9 = {
+const metadata$7 = {
   prototypes: {
     ShadowRoot: {
       childNodes: READ_ONLY_PROPERTY,
@@ -9906,7 +9139,7 @@ function getWrappedTemplatePrototype() {
   });
 
   // When the native ShadowRoot is used by LWC, then switch this over to SecureObject.addPrototypeMethodsAndPropertiesStateless
-  const prototypes = metadata$9['prototypes'];
+  const prototypes = metadata$7['prototypes'];
   const supportedInterfaces = ['ShadowRoot', 'ARIA'];
   supportedInterfaces.forEach(name => {
     const prototype = prototypes[name];

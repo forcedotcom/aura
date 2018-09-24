@@ -1,0 +1,6 @@
+<aura:component implements="aura:requireLocker">
+    <secureModuleTest:secureSlotComponentParent aura:id="secureSlotComponentParent"/>
+    <aura:method name="secureSlotTester">
+        <aura:attribute name="testCase" type="String"/>
+    </aura:method>
+</aura:component>

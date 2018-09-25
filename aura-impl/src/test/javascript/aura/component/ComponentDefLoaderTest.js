@@ -191,7 +191,7 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
             var expect = {"one":{"one":1}};
             Mocks.GetMocks(Object.Global(), defaultMockCopy)(function(){
                 var descriptors = {"one:one":1, "two:two":2};
-                actual = new Aura.Component.ComponentDefLoader().buildBundleComponentNamespace(Object.keys(descriptors), descriptors, {counter:0});
+                actual = new Aura.Component.ComponentDefLoader().buildBundleComponentNamespace(Object.keys(descriptors), descriptors, {counter:0})[ComponentDefLoader.RESTRICTED_KEY];
             });
             Assert.Equal(expect, actual);
         }
@@ -213,7 +213,7 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
                 defLoader.buildBundleComponentNamespace(Object.keys(descriptors), descriptors, {counter:0});
 
                 descriptors = {"two:two":2, "three:three": 3, "four:four": 4};
-                actual = defLoader.buildBundleComponentNamespace(Object.keys(descriptors), descriptors, {counter:0});
+                actual = defLoader.buildBundleComponentNamespace(Object.keys(descriptors), descriptors, {counter:0})[ComponentDefLoader.RESTRICTED_KEY];
             });
             Assert.Equal(expect, actual);
         }
@@ -238,11 +238,11 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
         [Fact]
         function shouldBuildOneBundleURI() {
             var actual;
-            var expect = 1;
+            var expect = ["/auraCmpDef?aura.app=markup://test_type&_ff=null&_l=true&_def=markup://test:thing&_uid=someUid"];
             mockAura(function () {
                 var defLoader = new Aura.Component.ComponentDefLoader();
                 var descriptorMap = {"test:thing": "someUid"};
-                actual = defLoader.buildBundleComponentUri(descriptorMap).length;
+                actual = defLoader.buildBundleComponentUri(descriptorMap);
             });
 
             Assert.Equal(expect, actual);
@@ -334,6 +334,28 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
             Assert.Equal(expect, actual);
         }
 
+        [Fact]
+        function shouldSplitCDNableDefsIntoSeparateURIFromNonCDNDefs() {
+            var actual;
+            var expect = [
+                "/auraCmpDef?aura.app=markup://test_type&_ff=null&_l=true&_def=markup://namespace1:name&_uid=uid2",
+                "cdnHost/auraCmpDef?aura.app=markup://test_type&_ff=null&_l=true&_def=markup://namespace0:name&_uid=uid1"
+            ];
+
+            var mock = Object.Clone(defaultMock);
+
+            mock["$A"]["clientService"]["isInternalNamespace"] = function(name) {
+                return name === "namespace0";
+            };
+
+            Mocks.GetMocks(Object.Global(), mock)(function () {
+                var defLoader = new Aura.Component.ComponentDefLoader();
+                var descriptorMap = {"namespace0:name":"uid1", "namespace1:name":"uid2"};
+                actual = defLoader.buildBundleComponentUri(descriptorMap);
+            });
+
+            Assert.Equal(expect, actual);
+        }
     }
 
     [Fixture]

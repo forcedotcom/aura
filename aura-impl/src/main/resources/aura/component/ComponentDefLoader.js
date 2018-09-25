@@ -34,6 +34,8 @@ ComponentDefLoader.UID_param = "_uid";
 ComponentDefLoader.UID_default = "LATEST";
 ComponentDefLoader.BASE_PATH = "/auraCmpDef?";
 ComponentDefLoader.MARKUP = "markup://";
+ComponentDefLoader.RESTRICTED_KEY = "restricted";
+ComponentDefLoader.UNRESTRICTED_KEY = "unrestricted";
 
 ComponentDefLoader.prototype.getContextParameters = function() {
     var params = $A.getContext().getURIComponentDefinitionsParameters();
@@ -66,7 +68,13 @@ ComponentDefLoader.prototype.buildBundleComponentNamespace = function(descriptor
         //Should we return an empty object here or raise an error?
         return {};
     }
+    var cdnAvailable = !!$A.getContext().cdnHost;
     var namespaceMap = {};
+    namespaceMap[ComponentDefLoader.RESTRICTED_KEY] = {};
+    if (cdnAvailable) {
+        namespaceMap[ComponentDefLoader.UNRESTRICTED_KEY] = {};
+    }
+
     for (var i=0; i < descriptors.length; i++) {
         if ($A.componentService.hasCacheableDefinitionOfAnyType(descriptors[i])) {
             continue;
@@ -80,11 +88,15 @@ ComponentDefLoader.prototype.buildBundleComponentNamespace = function(descriptor
         }
         this.requestedDescriptors[descriptors[i]] = [];
         var descriptor = new Aura.System.DefDescriptor(descriptors[i]);
-        if (!(descriptor.getNamespace() in namespaceMap)) {
-            namespaceMap[descriptor.getNamespace()] = {};
+        var namespace = descriptor.getNamespace();
+        var name = descriptor.getName();
+        var isRestrictedNamespace = !($A.clientService.isInternalNamespace(namespace) || $A.clientService.isPrivilegedNamespace(namespace));
+        var restrictedKey = (isRestrictedNamespace || !cdnAvailable) ? ComponentDefLoader.RESTRICTED_KEY : ComponentDefLoader.UNRESTRICTED_KEY;
+        if (!(namespace in namespaceMap[restrictedKey])) {
+            namespaceMap[restrictedKey][namespace] = {};
         }
-        if ($A.util.isUndefinedOrNull(namespaceMap[descriptor.getNamespace()][descriptor.getName()])) {
-            namespaceMap[descriptor.getNamespace()][descriptor.getName()] = descriptorMap[descriptors[i]];
+        if ($A.util.isUndefinedOrNull(namespaceMap[restrictedKey][namespace][name])) {
+            namespaceMap[restrictedKey][namespace][name] = descriptorMap[descriptors[i]];
         }
     }
 
@@ -107,18 +119,6 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
 
     var baseURI = ComponentDefLoader.BASE_PATH + this.getContextParameters();
 
-    var uri = "";
-    var uris = [];
-    var hasRestrictedNamespaces = false;
-    var numberOfDescriptorsInUid = 0;
-
-    var uid = "";
-    var unknownUID = false;
-    var namespaces = Object.keys(namespaceMap).sort();
-    if (namespaces.length === 0 && existingRequested.counter === 0) {
-        return uris;
-    }
-
     var maxLength;
     if ($A.util.isIE) {
         // URI length for IE needs to be below 2000 characters.
@@ -131,76 +131,102 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
         maxLength = 8000 - document.cookie.length - window.navigator.userAgent.length;
     }
 
-    for (var i=0; i<namespaces.length; i++) {
-        var isRestrictedNamespace = !($A.clientService.isInternalNamespace(namespaces[i]) || $A.clientService.isPrivilegedNamespace(namespaces[i]));
-        if (isRestrictedNamespace) {
-            hasRestrictedNamespaces = true;
-        }
-        var names = Object.keys(namespaceMap[namespaces[i]]).sort();
+    var uris = [];
 
-        if (namespaces.length === 1 && names.length ===1) {
-            uri = "&" + ComponentDefLoader.DESCRIPTOR_param + "=" + ComponentDefLoader.MARKUP + namespaces[i] + ":" + names[0];
-            if ($A.util.isString(namespaceMap[namespaces[i]][names[0]])) {
-                uid = namespaceMap[namespaces[i]][names[0]];
-                numberOfDescriptorsInUid++;
+    var restrictedKeys = [ComponentDefLoader.RESTRICTED_KEY, ComponentDefLoader.UNRESTRICTED_KEY];
+
+    for (var keyIdx=0; keyIdx < restrictedKeys.length; keyIdx++) {
+
+        var restrictedKey = restrictedKeys[keyIdx];
+        var uri = "";
+        var numberOfDescriptorsInUid = 0;
+
+        var uid = "";
+
+        var namespaceMapEntries = namespaceMap[restrictedKey];
+
+        if (!namespaceMapEntries) {
+            continue;
+        }
+
+        var namespaces = Object.keys(namespaceMapEntries).sort();
+        if (namespaces.length === 0) {
+            continue;
+        }
+
+        var hasRestrictedNamespaces = (restrictedKey === ComponentDefLoader.RESTRICTED_KEY);
+
+
+        for (var i = 0; i < namespaces.length; i++) {
+            var namespace = namespaces[i];
+            var name;
+            var names = Object.keys(namespaceMapEntries[namespace]).sort();
+
+            if (namespaces.length === 1 && names.length === 1) {
+                name = names[0];
+                uri = "&" + ComponentDefLoader.DESCRIPTOR_param + "=" + ComponentDefLoader.MARKUP + namespace + ":" + name;
+                if ($A.util.isString(namespaceMapEntries[namespace][name])) {
+                    uid = namespaceMapEntries[namespace][name];
+                    numberOfDescriptorsInUid++;
+                }
+                uris.push([uri, uid, hasRestrictedNamespaces, numberOfDescriptorsInUid]);
+                uri = "";
+                break;
             }
-            break;
-        }
 
-        var additionalURI = "&" + namespaces[i] + "=" + names.join(",");
-        if (additionalURI.length + uri.length > maxLength) {
-            if (additionalURI.length > maxLength) {
-                additionalURI = "&" + namespaces[i] + "=";
-                for (var name_idx=0; name_idx < names.length; name_idx++) {
-                    var name = names[name_idx];
-                    if (additionalURI.length + name.length + uri.length > maxLength) {
-                        uri += additionalURI;
-                        uris.push([uri, uid, hasRestrictedNamespaces, unknownUID]);
-                        if ($A.util.isString(namespaceMap[namespaces[i]][name])) {
-                            uid = namespaceMap[namespaces[i]][name];
-                            numberOfDescriptorsInUid++;
-                        } else {
-                            uid = "";
-                        }
-                        additionalURI =  "&" + namespaces[i] + "=" + name;
-                        uri = "";
-                        unknownUID = false;
-                        hasRestrictedNamespaces = isRestrictedNamespace;
-                    } else {
-                        additionalURI += (name_idx>0?",":"") + name;
-                        var additional_def_uid = namespaceMap[namespaces[i]][name];
-                        if ($A.util.isString(additional_def_uid)) {
-                            if (additional_def_uid.length === 0) {
-                                unknownUID = true;
+            var additionalURI = "&" + namespace + "=" + names.join(",");
+            if (additionalURI.length + uri.length > maxLength) {
+                if (additionalURI.length > maxLength) {
+                    additionalURI = "&" + namespace + "=";
+                    for (var name_idx = 0; name_idx < names.length; name_idx++) {
+                        name = names[name_idx];
+                        if (additionalURI.length + name.length + uri.length > maxLength) {
+                            uri += additionalURI;
+                            uris.push([uri, uid, hasRestrictedNamespaces, numberOfDescriptorsInUid]);
+                            numberOfDescriptorsInUid = 0;
+                            if ($A.util.isString(namespaceMapEntries[namespace][name])) {
+                                uid = namespaceMapEntries[namespace][name];
+                                numberOfDescriptorsInUid++;
+                            } else {
+                                uid = "";
                             }
-                            uid += additional_def_uid;
-                            numberOfDescriptorsInUid++;
+                            additionalURI = "&" + namespace + "=" + name;
+                            uri = "";
+                        } else {
+                            additionalURI += (name_idx > 0 ? "," : "") + name;
+                            var additional_def_uid = namespaceMapEntries[namespace][name];
+                            if ($A.util.isString(additional_def_uid)) {
+                                if (additional_def_uid.length === 0) {
+                                    numberOfDescriptorsInUid = -1000;
+                                }
+                                uid += additional_def_uid;
+                                numberOfDescriptorsInUid++;
+                            }
                         }
                     }
+                    uri = additionalURI;
+                    names.length = 0;
+                } else {
+                    uris.push([uri, uid, hasRestrictedNamespaces, numberOfDescriptorsInUid]);
+                    uid = "";
+                    uri = additionalURI;
+                    numberOfDescriptorsInUid = 0;
                 }
-                uri = additionalURI;
-                names.length = 0;
             } else {
-                uris.push([uri, uid, hasRestrictedNamespaces, unknownUID]);
-                uid = "";
-                uri = additionalURI;
-                unknownUID = false;
-                hasRestrictedNamespaces = isRestrictedNamespace;
+                uri += additionalURI;
             }
-        } else {
-            uri += additionalURI;
-        }
-        for (var j=0; j < names.length; j++) {
-            var def_uid = namespaceMap[namespaces[i]][names[j]];
-            if ($A.util.isString(def_uid)) {
-                uid += def_uid;
-                numberOfDescriptorsInUid++;
+            for (var j = 0; j < names.length; j++) {
+                var def_uid = namespaceMapEntries[namespace][names[j]];
+                if ($A.util.isString(def_uid)) {
+                    uid += def_uid;
+                    numberOfDescriptorsInUid++;
+                }
             }
         }
-    }
 
-    if (uri !== "") {
-        uris.push([uri, uid, hasRestrictedNamespaces]);
+        if (uri !== "") {
+            uris.push([uri, uid, hasRestrictedNamespaces, numberOfDescriptorsInUid]);
+        }
     }
 
     var processedURI = [];
@@ -209,7 +235,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     }
 
     for (var def=0; def<uris.length; def++) {
-        var finalURI = this.buildURIString(uris[def][0], uris[def][1], numberOfDescriptorsInUid);
+        var finalURI = this.buildURIString(uris[def][0], uris[def][1], uris[def][3]);
         var host = $A.clientService._host;
         if (!uris[def][2]) {
             host = $A.getContext().cdnHost || host;

@@ -31,15 +31,18 @@ import org.auraframework.instance.ComponentConfig;
 import org.auraframework.service.BuilderService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.collect.Lists;
 
 @ServiceComponentProvider
 public class BuilderComponentProvider implements ComponentConfigProvider {
     @Inject
+    @Lazy
     private DefinitionService definitionService;
 
     @Inject
+    @Lazy
     private BuilderService builderService;
 
     public static AtomicInteger counter = new AtomicInteger(1);

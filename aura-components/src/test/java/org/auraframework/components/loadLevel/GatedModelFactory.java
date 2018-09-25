@@ -22,18 +22,20 @@ import org.auraframework.ds.servicecomponent.ModelFactory;
 import org.auraframework.ds.servicecomponent.ModelInitializationException;
 import org.auraframework.service.ContextService;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponentModelFactory
 public class GatedModelFactory  implements ModelFactory<GatedModel> {
-	@Inject
-	ContextService contextService;
-	
-	@Override
-	public GatedModel modelInstance() throws ModelInitializationException {
-		try {
-			return new GatedModel(contextService);
-		} catch (QuickFixException | InterruptedException e) {
-			throw new ModelInitializationException(e.getMessage(), e);
-		}
-	}
+    @Inject
+    @Lazy
+    ContextService contextService;
+
+    @Override
+    public GatedModel modelInstance() throws ModelInitializationException {
+        try {
+            return new GatedModel(contextService);
+        } catch (QuickFixException | InterruptedException e) {
+            throw new ModelInitializationException(e.getMessage(), e);
+        }
+    }
 }

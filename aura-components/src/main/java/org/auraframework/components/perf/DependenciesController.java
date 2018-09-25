@@ -71,12 +71,15 @@ public class DependenciesController implements Controller {
     private static final Logger logger = Logger.getLogger(DependenciesController.class);
 
     @Inject
+    @Lazy
     private DefinitionService definitionService;
 
     @Inject
+    @Lazy
     AppJs appJs;
 
     @Inject
+    @Lazy
     ContextService contextService;
 
     @Inject

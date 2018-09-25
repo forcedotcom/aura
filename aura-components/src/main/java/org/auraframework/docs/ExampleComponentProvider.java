@@ -26,6 +26,7 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 /**
  *  Provide component def for the example component to render its output
@@ -34,19 +35,21 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 @ServiceComponentProvider
 public class ExampleComponentProvider implements ComponentDescriptorProvider {
 
-	@Inject
-	ContextService contextService;
-	
-	@Inject
-	DefinitionService definitionService;
-	
+    @Inject
+    @Lazy
+    ContextService contextService;
+
+    @Inject
+    @Lazy
+    DefinitionService definitionService;
+
     @Override
     public DefDescriptor<ComponentDef> provide() throws QuickFixException {
         BaseComponent<?, ?> component = contextService.getCurrentContext().getCurrentComponent();
         String realComponent = (String)component.getAttributes().getValue("def");
         if (realComponent != null) {
             DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(realComponent,
-                  ComponentDef.class);
+                    ComponentDef.class);
             return desc != null && definitionService.exists(desc) ? desc : null;
         }
         throw new AuraRuntimeException("Component " + realComponent + " not found");

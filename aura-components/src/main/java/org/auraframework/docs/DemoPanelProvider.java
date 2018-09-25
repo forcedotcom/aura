@@ -25,16 +25,19 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponentProvider
 public class DemoPanelProvider implements ComponentDescriptorProvider {
-	
-	@Inject
-	ContextService contextService;
-	
-	@Inject
-	DefinitionService definitionService;
-	
+
+    @Inject
+    @Lazy
+    ContextService contextService;
+
+    @Inject
+    @Lazy
+    DefinitionService definitionService;
+
     @Override
     public DefDescriptor<ComponentDef> provide() throws QuickFixException {
         BaseComponent<?, ?> c = contextService.getCurrentContext().getCurrentComponent();

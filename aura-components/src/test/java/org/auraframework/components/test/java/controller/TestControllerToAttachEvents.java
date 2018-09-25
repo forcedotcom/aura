@@ -15,6 +15,11 @@
  */
 package org.auraframework.components.test.java.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.EventDef;
@@ -24,18 +29,17 @@ import org.auraframework.instance.Event;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.Annotations.AuraEnabled;
-
-import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponent
 public class TestControllerToAttachEvents implements Controller {
 
     @Inject
+    @Lazy
     private InstanceService instanceService;
 
     @Inject
+    @Lazy
     private ContextService contextService;
 
     @AuraEnabled

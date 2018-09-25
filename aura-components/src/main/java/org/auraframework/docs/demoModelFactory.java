@@ -21,11 +21,13 @@ import org.auraframework.annotations.Annotations.ServiceComponentModelFactory;
 import org.auraframework.ds.servicecomponent.ModelFactory;
 import org.auraframework.ds.servicecomponent.ModelInitializationException;
 import org.auraframework.service.ContextService;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponentModelFactory
 public class demoModelFactory implements ModelFactory<demoModel> {
 
     @Inject
+    @Lazy
     private ContextService contextService;
 
     @Override

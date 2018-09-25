@@ -15,6 +15,11 @@
  */
 package org.auraframework.components.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.EventType;
 import org.auraframework.def.RegisterEventDef;
@@ -24,11 +29,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.AuraTestCase;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Automation for ui:input component.
@@ -49,6 +50,7 @@ public class InputComponentsTest extends AuraTestCase {
     }
     
     @Inject
+    @Lazy
     private DefinitionService definitionService;
 
     /**

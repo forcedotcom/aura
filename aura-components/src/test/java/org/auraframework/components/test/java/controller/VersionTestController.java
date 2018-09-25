@@ -26,11 +26,13 @@ import org.auraframework.service.ContextService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponent
 public class VersionTestController implements Controller {
 
     @Inject
+    @Lazy
     private ContextService contextService;
 
     @AuraEnabled

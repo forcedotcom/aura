@@ -23,16 +23,20 @@ import org.auraframework.ds.servicecomponent.ModelFactory;
 import org.auraframework.ds.servicecomponent.ModelInitializationException;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponentModelFactory
 public class TopicExampleModelFactory implements ModelFactory<TopicExampleModel> {
     @Inject
+    @Lazy
     ContextService contextService;
 
     @Inject
+    @Lazy
     DefinitionService definitionService;
     
     @Inject
+    @Lazy
     ConfigAdapter configAdapter;
 
     @Override

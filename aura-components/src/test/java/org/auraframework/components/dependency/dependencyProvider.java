@@ -28,6 +28,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * server side provider for if.cmp
@@ -36,9 +37,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 @Provider
 public class dependencyProvider implements ComponentDescriptorProvider {
     @Inject
+    @Lazy
     private ContextService contextService;
 
     @Inject
+    @Lazy
     private DefinitionService definitionService;
 
     @Override
@@ -50,5 +53,5 @@ public class dependencyProvider implements ComponentDescriptorProvider {
         String qualifiedName = (String)atts.getValue("qualifiedName");
 
         return definitionService.getDefDescriptor(qualifiedName, ComponentDef.class);
-   }
+    }
 }

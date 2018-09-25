@@ -34,11 +34,13 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponent
 public class JSTestController implements Controller {
 
     @Inject
+    @Lazy
     private DefinitionService definitionService;
     
     private TestSuiteDef getTestSuiteDef(String desc, String defType) throws DefinitionNotFoundException, QuickFixException {

@@ -15,6 +15,10 @@
  */
 package org.auraframework.components.test.java.controller;
 
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.impl.context.AuraContextImpl;
@@ -23,14 +27,13 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.AuraContext.GlobalValue;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
-
-import javax.inject.Inject;
-import java.util.Map;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponent
 public class ContextVPTestController implements Controller {
 
     @Inject
+    @Lazy
     private ContextService contextService;
 
     @AuraEnabled

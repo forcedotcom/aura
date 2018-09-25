@@ -36,6 +36,7 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -44,6 +45,7 @@ import com.google.common.collect.Maps;
 public class TestControllerLocalization implements Controller {
 
     @Inject
+    @Lazy
     private InstanceService instanceService;
 
     @AuraEnabled

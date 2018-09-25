@@ -38,6 +38,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.AuraTestCase;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -46,9 +47,11 @@ import com.google.common.collect.Sets;
  * Common tests for ui:output components
  */
 public class OutputComponentsTest extends AuraTestCase {
-	
-	@Inject
-	private DefinitionService definitionService;
+
+    @Inject
+    @Lazy
+    private DefinitionService definitionService;
+
     /**
      * Verify that all ui:output* components have a required "value" attribute.
      */

@@ -22,11 +22,13 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponentModelFactory;
 import org.auraframework.ds.servicecomponent.ModelFactory;
 import org.auraframework.ds.servicecomponent.ModelInitializationException;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponentModelFactory
 public class ApiContentsModelFactory  implements ModelFactory<ApiContentsModel> {
 
     @Inject
+    @Lazy
     ConfigAdapter configAdapter;
 
     @Override

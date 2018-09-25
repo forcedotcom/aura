@@ -22,18 +22,20 @@ import org.auraframework.ds.servicecomponent.ModelFactory;
 import org.auraframework.ds.servicecomponent.ModelInitializationException;
 import org.auraframework.service.ContextService;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponentModelFactory
 public class TestReinitializeModelFactory  implements ModelFactory<TestReinitializeModel> {
-	@Inject
-	ContextService contextService;
-	
-	@Override
-	public TestReinitializeModel modelInstance() throws ModelInitializationException {
-		try {
-			return new TestReinitializeModel(contextService);
-		} catch (QuickFixException e) {
-			throw new ModelInitializationException(e.getMessage(), e);
-		}
-	}
+    @Inject
+    @Lazy
+    ContextService contextService;
+
+    @Override
+    public TestReinitializeModel modelInstance() throws ModelInitializationException {
+        try {
+            return new TestReinitializeModel(contextService);
+        } catch (QuickFixException e) {
+            throw new ModelInitializationException(e.getMessage(), e);
+        }
+    }
 }

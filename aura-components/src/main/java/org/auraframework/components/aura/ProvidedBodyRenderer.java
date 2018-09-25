@@ -26,6 +26,7 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * server side renderer for components that have a templated body and provide
@@ -36,6 +37,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 @ServiceComponentRenderer
 public class ProvidedBodyRenderer implements Renderer {
     @Inject
+    @Lazy
     private RenderingService renderingService;
 
     @Override

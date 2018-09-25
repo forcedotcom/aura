@@ -23,14 +23,17 @@ import org.auraframework.annotations.Annotations.ServiceComponentModelFactory;
 import org.auraframework.ds.servicecomponent.ModelFactory;
 import org.auraframework.ds.servicecomponent.ModelInitializationException;
 import org.auraframework.service.ContextService;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponentModelFactory
 public class ApiTopicModelFactory implements ModelFactory<ApiTopicModel> {
 
     @Inject
+    @Lazy
     private ContextService contextService;
 
     @Inject
+    @Lazy
     private ConfigAdapter configAdapter;
 
     @PostConstruct

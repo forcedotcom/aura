@@ -21,11 +21,13 @@ import org.auraframework.annotations.Annotations.ServiceComponentModelFactory;
 import org.auraframework.ds.servicecomponent.ModelFactory;
 import org.auraframework.ds.servicecomponent.ModelInitializationException;
 import org.auraframework.service.DefinitionService;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponentModelFactory
 public class DocsTopicsModelFactory implements ModelFactory<DocsTopicsModel> {
 
     @Inject
+    @Lazy
     private DefinitionService definitionService;
 
     @Override

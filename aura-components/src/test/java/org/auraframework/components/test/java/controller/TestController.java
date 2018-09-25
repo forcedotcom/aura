@@ -35,6 +35,7 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -45,12 +46,15 @@ public class TestController implements GlobalController {
     private static final String NAME = "aura://TestController";
 
     @Inject
+    @Lazy
     private InstanceService instanceService;
 
     @Inject
+    @Lazy
     private ContextService contextService;
 
     @Inject
+    @Lazy
     private ServerErrorUtilAdapter serverErrorUtilAdapter;
 
     @Override

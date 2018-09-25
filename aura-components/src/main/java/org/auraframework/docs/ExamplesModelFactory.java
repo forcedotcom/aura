@@ -22,21 +22,24 @@ import org.auraframework.ds.servicecomponent.ModelFactory;
 import org.auraframework.ds.servicecomponent.ModelInitializationException;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponentModelFactory
 public class ExamplesModelFactory  implements ModelFactory<ExamplesModel> {
-	@Inject
-	ContextService contextService;
-	
-	@Inject
-	DefinitionService definitionService;
-	
-	@Override
-	public ExamplesModel modelInstance() throws ModelInitializationException {
-		try {
-			return new ExamplesModel(contextService, definitionService);
-		} catch (Exception e) {
-			throw new ModelInitializationException(e.getMessage(), e);
-		}
-	}
+    @Inject
+    @Lazy
+    ContextService contextService;
+
+    @Inject
+    @Lazy
+    DefinitionService definitionService;
+
+    @Override
+    public ExamplesModel modelInstance() throws ModelInitializationException {
+        try {
+            return new ExamplesModel(contextService, definitionService);
+        } catch (Exception e) {
+            throw new ModelInitializationException(e.getMessage(), e);
+        }
+    }
 }

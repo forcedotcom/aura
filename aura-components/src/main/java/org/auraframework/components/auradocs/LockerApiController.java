@@ -28,6 +28,7 @@ import org.auraframework.docs.ApiContentsModel;
 import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.system.Annotations.ActionGroup;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponent
 public class LockerApiController implements Controller {
@@ -71,6 +72,7 @@ public class LockerApiController implements Controller {
     }
 
     @Inject
+    @Lazy
     public void setConfigAdapter(ConfigAdapter configAdapter) {
         this.configAdapter = configAdapter;
     }

@@ -21,16 +21,17 @@ import org.auraframework.annotations.Annotations.ServiceComponentModelFactory;
 import org.auraframework.ds.servicecomponent.ModelFactory;
 import org.auraframework.ds.servicecomponent.ModelInitializationException;
 import org.auraframework.service.ContextService;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponentModelFactory
 public class TestJavaModelFactory  implements ModelFactory<TestJavaModel> {
-	
-	@Inject
-	ContextService contextService;
-	
-	
-	@Override
-	public TestJavaModel modelInstance() throws ModelInitializationException {
-		return new TestJavaModel(contextService);
-	}
+
+    @Inject
+    @Lazy
+    ContextService contextService;
+
+    @Override
+    public TestJavaModel modelInstance() throws ModelInitializationException {
+        return new TestJavaModel(contextService);
+    }
 }

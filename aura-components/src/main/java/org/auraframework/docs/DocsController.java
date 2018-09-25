@@ -32,6 +32,7 @@ import org.auraframework.system.Annotations.ActionGroup;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -40,12 +41,15 @@ import com.google.common.collect.Maps;
 public class DocsController implements Controller {
 
     @Inject
+    @Lazy
     private InstanceService instanceService;
     
     @Inject
+    @Lazy
     private DefinitionService definitionService;
     
     @Inject
+    @Lazy
     private ConfigAdapter configAdapter;
 
     @AuraEnabled

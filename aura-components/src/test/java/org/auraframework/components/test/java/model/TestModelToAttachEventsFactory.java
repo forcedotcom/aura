@@ -22,22 +22,25 @@ import org.auraframework.ds.servicecomponent.ModelFactory;
 import org.auraframework.ds.servicecomponent.ModelInitializationException;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.InstanceService;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponentModelFactory
 public class TestModelToAttachEventsFactory  implements ModelFactory<TestModelToAttachEvents> {
 
-	@Inject
-	ContextService contextService;
-	
-	@Inject
-	InstanceService instanceService;	
-	
-	@Override
-	public TestModelToAttachEvents modelInstance() throws ModelInitializationException {
-		try {
-			return new TestModelToAttachEvents(contextService, instanceService);
-		} catch (Exception e) {
-			throw new ModelInitializationException(e.getMessage(), e);
-		}
-	}
+    @Inject
+    @Lazy
+    ContextService contextService;
+
+    @Inject
+    @Lazy
+    InstanceService instanceService;	
+
+    @Override
+    public TestModelToAttachEvents modelInstance() throws ModelInitializationException {
+        try {
+            return new TestModelToAttachEvents(contextService, instanceService);
+        } catch (Exception e) {
+            throw new ModelInitializationException(e.getMessage(), e);
+        }
+    }
 }

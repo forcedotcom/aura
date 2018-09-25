@@ -26,15 +26,18 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 @Provider
 @ServiceComponentProvider
 public class TopicPanelProvider implements ComponentDescriptorProvider {
 
     @Inject
+    @Lazy
     private ContextService contextService;
 
     @Inject
+    @Lazy
     private DefinitionService definitionService;
 
     @Override

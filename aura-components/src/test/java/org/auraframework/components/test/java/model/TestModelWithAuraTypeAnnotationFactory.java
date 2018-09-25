@@ -21,15 +21,17 @@ import org.auraframework.annotations.Annotations.ServiceComponentModelFactory;
 import org.auraframework.ds.servicecomponent.ModelFactory;
 import org.auraframework.ds.servicecomponent.ModelInitializationException;
 import org.auraframework.service.InstanceService;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponentModelFactory
 public class TestModelWithAuraTypeAnnotationFactory  implements ModelFactory<TestModelWithAuraTypeAnnotation> {
-	
-	@Inject
-	InstanceService instanceService;
-	
-	@Override
-	public TestModelWithAuraTypeAnnotation modelInstance() throws ModelInitializationException {
-		return new TestModelWithAuraTypeAnnotation(instanceService);
-	}
+
+    @Inject
+    @Lazy
+    InstanceService instanceService;
+
+    @Override
+    public TestModelWithAuraTypeAnnotation modelInstance() throws ModelInitializationException {
+        return new TestModelWithAuraTypeAnnotation(instanceService);
+    }
 }

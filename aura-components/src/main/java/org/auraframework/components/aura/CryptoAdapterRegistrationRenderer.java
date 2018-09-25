@@ -17,15 +17,15 @@ package org.auraframework.components.aura;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
 
-import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import javax.inject.Inject;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Renders client side registration and key retrieval of CryptoAdapter for auraStorage:crypto
@@ -71,6 +71,7 @@ public class CryptoAdapterRegistrationRenderer implements Renderer {
     }
 
     @Inject
+    @Lazy
     public void setConfigAdapter(ConfigAdapter configAdapter) {
         this.configAdapter = configAdapter;
     }

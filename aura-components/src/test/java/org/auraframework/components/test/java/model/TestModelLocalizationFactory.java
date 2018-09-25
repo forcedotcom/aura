@@ -21,16 +21,17 @@ import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponentModelFactory;
 import org.auraframework.ds.servicecomponent.ModelFactory;
 import org.auraframework.ds.servicecomponent.ModelInitializationException;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponentModelFactory
 public class TestModelLocalizationFactory  implements ModelFactory<TestModelLocalization> {
-	
-	@Inject
-	LocalizationAdapter localizationAdapter;
-	
-	
-	@Override
-	public TestModelLocalization modelInstance() throws ModelInitializationException {
-		return new TestModelLocalization(localizationAdapter);
-	}
+
+    @Inject
+    @Lazy
+    LocalizationAdapter localizationAdapter;
+
+    @Override
+    public TestModelLocalization modelInstance() throws ModelInitializationException {
+        return new TestModelLocalization(localizationAdapter);
+    }
 }

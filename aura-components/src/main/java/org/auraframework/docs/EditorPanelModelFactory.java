@@ -23,21 +23,24 @@ import org.auraframework.ds.servicecomponent.ModelInitializationException;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 @ServiceComponentModelFactory
 public class EditorPanelModelFactory  implements ModelFactory<EditorPanelModel> {
-	@Inject
-	ContextService contextService;
-	
-	@Inject
-	DefinitionService definitionService;
-	
-	@Override
-	public EditorPanelModel modelInstance() throws ModelInitializationException {
-		try {
-			return new EditorPanelModel(contextService, definitionService);
-		} catch (QuickFixException e) {
-			throw new ModelInitializationException(e.getMessage(), e);
-		}
-	}
+    @Inject
+    @Lazy
+    ContextService contextService;
+
+    @Inject
+    @Lazy
+    DefinitionService definitionService;
+
+    @Override
+    public EditorPanelModel modelInstance() throws ModelInitializationException {
+        try {
+            return new EditorPanelModel(contextService, definitionService);
+        } catch (QuickFixException e) {
+            throw new ModelInitializationException(e.getMessage(), e);
+        }
+    }
 }

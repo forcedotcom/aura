@@ -15,20 +15,6 @@
  */
 package org.auraframework.components.test.java.controller;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.ds.servicecomponent.Controller;
-import org.auraframework.instance.Component;
-import org.auraframework.service.InstanceService;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.BackgroundAction;
-import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Location;
-import org.auraframework.throwable.*;
-import org.auraframework.util.date.DateOnly;
-import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -39,10 +25,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.inject.Inject;
+
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.instance.Component;
+import org.auraframework.service.InstanceService;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.BackgroundAction;
+import org.auraframework.system.Annotations.Key;
+import org.auraframework.system.Location;
+import org.auraframework.throwable.AuraHandledException;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.GenericEventException;
+import org.auraframework.util.date.DateOnly;
+import org.springframework.context.annotation.Lazy;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+
 @ServiceComponent
 public class JavaTestController implements Controller {
 
     @Inject
+    @Lazy
     private InstanceService instanceService;
 
     @AuraEnabled

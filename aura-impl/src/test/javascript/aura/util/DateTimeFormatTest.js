@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* global Test:false, Import:false, Mocks:false, Assert:false, Fact:false, Fixture:false */
 Function.RegisterNamespace("Test.Aura.Util");
 
 /**
@@ -30,9 +31,9 @@ Test.Aura.Util.DateTimeFormatTest = function() {
         "Aura": Aura,
         "AuraLocalizationService": function(){},
     })(function() {
-        [Import("aura-impl/src/main/resources/aura/AuraLocalizationService.js")]
+        [Import("aura-impl/src/main/resources/aura/AuraLocalizationService.js")];
         [Import("aura-impl/src/main/resources/aura/util/DateTimeFormat.js"),
-         Import("aura-impl/src/main/resources/aura/util/Locale.js")]
+         Import("aura-impl/src/main/resources/aura/util/Locale.js")];
     });
 
     [Fixture]
@@ -616,6 +617,5 @@ Test.Aura.Util.DateTimeFormatTest = function() {
 
             Assert.Equal(expected, actual);
         }
-
     }
-}
+};

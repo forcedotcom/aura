@@ -440,6 +440,16 @@ Aura.Utils.DateTimeFormat.prototype.formatNumberField = function(num, minDigits,
 };
 
 /**
+ * Determines if the format is for Gregorian calendar or not based on
+ * the localeName.
+ * 
+ * @private
+ */
+Aura.Utils.DateTimeFormat.prototype.isGregorianCalendar = function() {
+    return (this.localeName.indexOf("th") !== 0);
+};
+
+/**
  * Adding detailed formatting info to tokens which parsed out from format strings and date time format config.
  * The date time config is only used when Intl.DateTimeFormat.formatToParts() is supported.
  * @private
@@ -458,7 +468,7 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
             case "yyyy":
             case "YYYY": // leaked moment token
                 token["field"] = "year";
-                if (this.canUseConfig("year", "numeric")) {
+                if (this.canUseConfig("year", "numeric") && this.isGregorianCalendar()) {
                     config["year"] = "numeric";
                     token["useConfig"] = true;
                 }
@@ -469,7 +479,7 @@ Aura.Utils.DateTimeFormat.prototype.hydrateTokensAndConfig = function(tokens, co
             case "yy":
             case "YY": // leaked moment token
                 token["field"] = "year";
-                if (this.canUseConfig("year", "2-digit")) {
+                if (this.canUseConfig("year", "2-digit") && this.isGregorianCalendar()) {
                     config["year"] = "2-digit";
                     token["useConfig"] = true;
                 }

@@ -86,7 +86,7 @@
 			if($A.util.isString(dataTransfer)) {
 				dataTransfer = { "text/plain": dataTransfer};
 			}
-			
+			var eventDataTransferFaulty = false;
 			try {
 				event.dataTransfer.setData("aura/id", auraId);
 				for (var key in dataTransfer) {
@@ -94,8 +94,18 @@
 						event.dataTransfer.setData(key, dataTransfer[key]);
 					}
 				}
+				// Fallback strategy. Due to a bug in Edge
+				// https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/17787578/
+				// saving a key of different type overwrites the existing key in dataTransfer
+				if (event.dataTransfer.getData("aura/id") !== auraId) {
+					eventDataTransferFaulty = true;
+				}
 			} catch (e) {
-				// This is IE case
+				eventDataTransferFaulty = true;
+			}
+			
+			if (eventDataTransferFaulty) {
+				// This is IE or Edge case
 				dataTransfer["aura/id"] = auraId;
 				event.dataTransfer.setData("Text", JSON.stringify(dataTransfer));
 			}

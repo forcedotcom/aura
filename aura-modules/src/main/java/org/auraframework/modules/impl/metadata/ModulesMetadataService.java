@@ -15,7 +15,7 @@
  */
 package org.auraframework.modules.impl.metadata;
 
-import org.auraframework.modules.impl.def.ModuleDefImpl;
+import org.auraframework.impl.root.component.ModuleDefImpl;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 

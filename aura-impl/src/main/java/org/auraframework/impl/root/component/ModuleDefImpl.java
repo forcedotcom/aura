@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.modules.impl.def;
+package org.auraframework.impl.root.component;
 
 import java.io.IOException;
 import java.util.Collection;

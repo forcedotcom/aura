@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.modules.impl.source.file;
+package org.auraframework.impl.source.file;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -33,7 +33,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.modules.impl.source.file.ModuleDefFileBundleBuilder;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.Source;

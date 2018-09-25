@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.modules.impl.def;
+package org.auraframework.impl.root.component;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -24,7 +24,6 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.modules.impl.def.ModuleDefImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.service.DefinitionService;

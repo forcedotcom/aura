@@ -51,6 +51,7 @@ Aura.Utils.DateTimeFormat.prototype.format = function(date, utcOffset) {
         // Initiates the date time format when it gets called for the first time.
         if (this.dateTimeFormat === undefined) {
             this.dateTimeFormat = Intl["DateTimeFormat"](this.localeName, this.config);
+            this.resolvedOptions = this.dateTimeFormat["resolvedOptions"] && this.dateTimeFormat["resolvedOptions"]();
         }
         parts = this.dateTimeFormat["formatToParts"](date);
     }
@@ -66,9 +67,24 @@ Aura.Utils.DateTimeFormat.prototype.format = function(date, utcOffset) {
 
         if (token["literal"] === true) {
             dateTimeString += token["value"];
-        } else if (token["useConfig"] === true && parts) {
-            dateTimeString += $A.localizationService.findField(parts, token["field"]);
-        } else if (token["type"] === "number") {
+            continue;
+        }
+
+        if (token["useConfig"] === true && parts) {
+            var field = token["field"];
+            var option = this.resolvedOptions && this.resolvedOptions[field];
+            // Intl.DateTimeFormat may force some rules for specific locales, so some of configurations
+            // may not get respected. It needs to make sure it only uses what is set in the config.
+            if (option === this.config[field]) {
+                dateTimeString += $A.localizationService.findField(parts, field);
+                continue;
+            } else {
+                token["useConfig"] = false;
+                // If the configuration is not used, processing the field individually.
+            }
+        }
+
+        if (token["type"] === "number") {
             var value = this.getNumberFieldValue(token, date);
             dateTimeString += this.formatNumberField(value, (token["minDigits"] || 1), token["localized"]);
         } else if (token["type"] === "string") {

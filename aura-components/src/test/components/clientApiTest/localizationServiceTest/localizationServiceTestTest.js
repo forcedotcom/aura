@@ -66,6 +66,21 @@
 
             $A.test.assertEquals(expected, actual, "formatDateUTC() returns an unexpected date string");
         }
+    },
+
+    /**
+     * Special case for ja. Intl.DateTimeFormat does not respect 2-digit for hour.
+     */
+    testFormatTimeToLocalizedString: {
+        test: function(cmp) {
+            var expected = "03:02:03.000";
+            var date = new Date(2014, 2, 12, 3, 2, 3);
+            var format = "HH:mm:ss.SSS";
+
+            var actual = $A.localizationService.formatTime(date, format, "ja_JP");
+
+            $A.test.assertEquals(expected, actual, "formatDateTime() returns an unexpected date string");
+        }
     }
 
 })

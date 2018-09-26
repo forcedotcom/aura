@@ -156,13 +156,6 @@
         }
     },
 
-    testFile_WithScriptTagsBlocked: {
-        // window.File is not implemented correctly in iOS 9.2
-        test: function (cmp) {
-            cmp.testFile_WithScriptTagsBlocked();
-        }
-    },
-
     testMediaStreamBlocked: {
         test: function (cmp) {
             cmp.testMediaStreamBlocked();

@@ -202,23 +202,6 @@
         testUtils.assertEquals(expectedFileType, file.type);
     },
 
-    testFile_WithScriptTagsBlocked: function(cmp) {
-        var testUtils = cmp.get("v.testUtils");
-        var scripts = [
-            "<script>alert(window)</script>",
-            "<script  >alert(window)</script  >",
-            "<SCRIPT>alert(window)</SCRIPT>"
-        ];
-        scripts.forEach(function(script){
-            try {
-                var file = new File([script], 'test.html', {type:'text/html'});
-                testUtils.fail("Expect to block script tags while creating File:"+script);
-            } catch (e) {
-                testUtils.assertEquals("File creation failed: <script> tags are blocked", e.message);
-            }
-        });
-    },
-
     testModifyWindowLocation: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         window.location.href = '#view';

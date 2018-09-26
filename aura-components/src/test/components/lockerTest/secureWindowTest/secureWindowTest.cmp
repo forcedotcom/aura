@@ -41,7 +41,6 @@
     <aura:method name="testOpen_UrlRestrictionByPass" action="{!c.testOpen_UrlRestrictionByPass}"/>
     <aura:method name="testBlob" action="{!c.testBlob}"/>
     <aura:method name="testFile" action="{!c.testFile}"/>
-    <aura:method name="testFile_WithScriptTagsBlocked" action="{!c.testFile_WithScriptTagsBlocked}"/>
     <aura:method name="testModifyWindowLocation"/>
     <aura:method name="testMediaStreamBlocked"/>
     <aura:method name="testJavascriptPseudoScheme"/>

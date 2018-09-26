@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-09-24
- * Version: 0.5.10
+ * Generated: 2018-09-26
+ * Version: 0.5.11
  */
 
 (function (exports) {
@@ -92,37 +92,6 @@ const bind = uncurryThis(Function.prototype.bind);
 const slice = uncurryThis(Array.prototype.slice);
 
 
-/**
- * Converts ArrayBuffer to UTF-8 String
- * @param {ArrayBuffer} buf
- */
-function ab2str(buf) {
-  if (typeof TextDecoder !== 'undefined') {
-    const dec = new TextDecoder('utf-8');
-    return dec.decode(buf);
-  }
-
-  let str = '';
-  const abLen = buf.byteLength;
-  let offset = 0;
-  const CHUNK_SIZE = 2 ** 16;
-
-  do {
-    const len = Math.min(CHUNK_SIZE, abLen - offset);
-    const part = new Uint8Array(buf.slice(offset, offset + len));
-    str += String.fromCharCode.apply(null, part);
-    offset += len;
-  } while (offset < abLen);
-  return str;
-}
-
-/**
- * Converts String to ArrayBuffer
- * https://github.com/dfcreative/string-to-arraybuffer/blob/master/index.js
- * @param {String} str
- */
-
-
 function isObject(obj) {
   return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
 }
@@ -140,6 +109,22 @@ function getObjectLikeProto() {
   props.toString.configurable = true;
   const emptyProto = create$1(null, props);
   return emptyProto;
+}
+
+/**
+ * Prevent an adversary from using TOCTTOU (time-of-check-to-time-of-use) to
+ * skip some intermediate ancestors by stringify/propify the property name
+ * once, first.
+ */
+function asString(prop) {
+  if (typeof prop === 'symbol') {
+    return prop;
+  }
+  try {
+    return `${prop}`;
+  } catch (e) {
+    return '';
+  }
 }
 
 /**
@@ -408,6 +393,8 @@ const filteringProxy = newWeakMap();
 const secureFunction = newWeakMap();
 
 const secureBlobTypes = newWeakMap();
+const secureFilesTypes = newWeakMap();
+const secureMediaSource = newWeakMap();
 
 function getKey(thing) {
   return keychain.get(thing);
@@ -537,6 +524,24 @@ function isSecureBlob(st) {
 }
 
 
+
+function registerSecureFile(st, type) {
+  secureFilesTypes.set(st, type);
+}
+
+
+
+function isSecureFile(st) {
+  return secureFilesTypes.has(st);
+}
+
+function registerSecureMediaSource(st) {
+  secureMediaSource.set(st, true);
+}
+
+function isSecureMediaSource(st) {
+  return secureMediaSource.has(st);
+}
 
 function unwrap$1(from, st) {
   if (!st) {
@@ -3753,7 +3758,7 @@ function SecureElement(el, key) {
               `SecureElement.innerHTML cannot be used with ${raw.tagName} elements!`
             );
           }
-          raw.innerHTML = DOMPurify['sanitize'](value, domPurifyConfig);
+          raw.innerHTML = DOMPurify['sanitize'](asString(value), domPurifyConfig);
           trustChildNodes(this, raw);
         }
       };
@@ -3825,10 +3830,9 @@ function SecureElement(el, key) {
           // Setting outerHTML on an element removes it from the document tree.
           // It returns no handle to trust the new elements. Here we create the
           // elements in a fragment then insert them in their proper location.
-
           const frag = document
             .createRange()
-            .createContextualFragment(DOMPurify['sanitize'](value, domPurifyConfig));
+            .createContextualFragment(DOMPurify['sanitize'](asString(value), domPurifyConfig));
           trustChildNodes(this, frag);
           while (frag.childNodes.length > 0) {
             const node = frag.childNodes[0];
@@ -4142,7 +4146,7 @@ SecureElement.addStandardElementMethodAndPropertyOverrides = function(
           );
         }
 
-        raw.insertAdjacentHTML(position, DOMPurify['sanitize'](text, domPurifyConfig));
+        raw.insertAdjacentHTML(position, DOMPurify['sanitize'](asString(text), domPurifyConfig));
 
         trustChildNodes(this, parent || raw);
       }
@@ -7843,13 +7847,11 @@ function SecureURL(raw) {
   const SecureURLMethods = create$1(null, {
     createObjectURL: {
       value: function(object) {
-        if (Object.prototype.toString.call(object) === '[object Blob]') {
-          // do not use any Blob instance that Locker hasn't looked at prior to this
-          if (!isSecureBlob(object)) {
-            throw new error('Unrecognized object');
-          }
+        // only registered objects are allowed
+        if (!isSecureBlob(object) && !isSecureFile(object) && !isSecureMediaSource(object)) {
+          throw new TypeError('Unexpected identifier');
         }
-        // IMPORTANT: thisArg is the target of the proxy.
+
         return raw.createObjectURL(object);
       }
     },
@@ -7886,25 +7888,83 @@ function SecureURL(raw) {
 }
 
 const HTML_MAX_BUF_SIZE = 32768;
+const REGEX_VALID_MIME_TYPE = /^[a-z]+\/[a-z+-]+$/;
 
 const WHITELISTED_MIME_TYPES = [
   'application/octet-stream',
   'application/json',
-  'application/zip',
-  'application/x-bzip',
-  'application/x-rar-compressed',
-  'application/x-tar',
   'video/',
   'audio/',
   'image/',
   'font/',
   'text/plain',
-  'text/markdown'
+  'text/markdown',
+  'application/zip',
+  'application/x-bzip',
+  'application/x-rar-compressed',
+  'application/x-tar'
 ];
 
 const HTML_MIME_TYPES = ['text/html', 'image/svg+xml', 'text/xml'];
 
-const REGEX_VALID_MIME_TYPE = /^[a-z]+\/[a-z+-]+$/;
+/**
+ * Converts ArrayBuffer to UTF-8 String
+ * @param {ArrayBuffer} buf
+ */
+function ab2str(buf) {
+  if (typeof TextDecoder !== 'undefined') {
+    const dec = new TextDecoder('utf-8');
+    return dec.decode(buf);
+  }
+
+  let str = '';
+  const abLen = buf.byteLength;
+  let offset = 0;
+  const CHUNK_SIZE = 2 ** 16;
+
+  do {
+    const len = Math.min(CHUNK_SIZE, abLen - offset);
+    const part = new Uint8Array(buf.slice(offset, offset + len));
+    str += String.fromCharCode.apply(null, part);
+    offset += len;
+  } while (offset < abLen);
+  return str;
+}
+
+/**
+ * Converts String to ArrayBuffer
+ * https://github.com/dfcreative/string-to-arraybuffer/blob/master/index.js
+ * @param {String} str
+ */
+
+
+function sanitizeBitsArg(bits) {
+  // prevent array index accessor hijacking
+  return [].concat(bits);
+}
+
+function sanitizeOptionsArg(options = {}) {
+  // prevent property getters hijacking
+  // coerce everything to string
+  const type = asString(options.type).toLowerCase();
+
+  const opts = {};
+  if (type) {
+    opts.type = ['undefined', 'null'].includes(type) ? 'application/octet-stream' : type;
+  } else {
+    opts.type = 'application/octet-stream';
+  }
+
+  if (options.endings) {
+    opts.endings = asString(options.endings);
+  }
+
+  if (options.lastModified) {
+    opts.lastModified = asString(options.lastModified);
+  }
+
+  return opts;
+}
 
 function sanitizeHTMLParts(arr) {
   const out = [];
@@ -7974,25 +8034,8 @@ function canCreateFromHTML(blobParts) {
 }
 
 function SecureBlob(blobParts = [], options = {}) {
-  // prevent array index accessor hijacking
-  blobParts = [].concat(blobParts);
-
-  // prevent property getters hijacking
-  // coerce everything to string
-  const opts = {
-    type: String(options.type).toLowerCase(),
-    endings: String(options.endings)
-  };
-
-  if (opts.endings === 'undefined') {
-    // let default browser value take over
-    delete opts.endings;
-  }
-
-  if (opts.type === 'undefined') {
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types
-    opts.type = 'application/octet-stream';
-  }
+  blobParts = sanitizeBitsArg(blobParts);
+  const opts = sanitizeOptionsArg(options);
 
   if (HTML_MIME_TYPES.includes(opts.type)) {
     if (canCreateFromHTML(blobParts)) {
@@ -8020,8 +8063,50 @@ function SecureBlob(blobParts = [], options = {}) {
 
   throw new error('Unsupported MIME type.');
 }
-
 SecureBlob.prototype = Blob.prototype;
+
+function SecureFile(bits, name, options = {}) {
+  bits = sanitizeBitsArg(bits);
+  name = asString(name);
+  options = sanitizeOptionsArg(options);
+
+  if (HTML_MIME_TYPES.includes(options.type)) {
+    if (canCreateFromHTML(bits)) {
+      const instance = new File(sanitizeHTMLParts(bits), name, options);
+
+      // fix instanceof checks
+      instance.constructor = SecureFile;
+
+      registerSecureFile(instance, options.type);
+      return instance;
+    }
+    throw new error('Validation failed, cannot create File.');
+  }
+
+  if (isWhitelistedMIMEType(options.type)) {
+    // whitelisted MIME types do not need sanitization
+    const instance = new File(bits, name, options);
+
+    // fix instanceof checks
+    instance.constructor = SecureFile;
+
+    registerSecureFile(instance, options.type);
+    return instance;
+  }
+
+  throw new error('Unsupported MIME type.');
+}
+SecureFile.prototype = File.prototype;
+
+function SecureMediaSource(key) {
+  const st = SecureObject({}, key);
+  return function() {
+    const instance = new MediaSource();
+    const secureInstance = SecureObject.filterEverything(st, instance);
+    registerSecureMediaSource(secureInstance);
+    return secureInstance;
+  };
+}
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -8855,60 +8940,24 @@ function SecureWindow(sandbox, key) {
     });
   }
 
+  if ('File' in win) {
+    defineProperty(o, 'File', {
+      enumerable: true,
+      value: SecureFile
+    });
+  }
+
+  if ('MediaSource' in win) {
+    defineProperty(o, 'MediaSource', {
+      enumerable: true,
+      value: SecureMediaSource(key)
+    });
+  }
+
   if ('CustomEvent' in win) {
     defineProperty(o, 'CustomEvent', {
       enumerable: true,
       value: SecureCustomEventFactory(win['CustomEvent'], key)
-    });
-  }
-
-  if ('File' in win) {
-    let valueOverride;
-    defineProperty(o, 'File', {
-      get: function() {
-        return (
-          valueOverride ||
-          function() {
-            const cls = win['File'];
-            const args = Array.prototype.slice.call(arguments);
-            let result;
-
-            const scriptTagsRegex = /<script[\s\S]*?>[\s\S]*?<\/script[\s]*?>/gi;
-            if (scriptTagsRegex.test(args[0])) {
-              throw new error('File creation failed: <script> tags are blocked');
-            }
-            if (typeof cls === 'function') {
-              //  Function.prototype.bind.apply is being used to invoke the constructor and to pass all the arguments provided by the caller
-              // TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
-              result = new (Function.prototype.bind.apply(cls, [null].concat(args)))();
-            } else {
-              // For browsers that use a constructor that's not a function, invoke the constructor directly.
-              // For example, on Mobile Safari window["Blob"] returns an object called BlobConstructor
-              // Invoke constructor with specific arguments, handle up to 3 arguments(Blob accepts 2 param, File accepts 3 param)
-              switch (args.length) {
-                case 0:
-                  result = new cls();
-                  break;
-                case 1:
-                  result = new cls(args[0]);
-                  break;
-                case 2:
-                  result = new cls(args[0], args[1]);
-                  break;
-                case 3:
-                  result = new cls(args[0], args[1], args[2]);
-                  break;
-                default:
-                  break;
-              }
-            }
-            return result;
-          }
-        );
-      },
-      set: function(value) {
-        valueOverride = value;
-      }
     });
   }
 

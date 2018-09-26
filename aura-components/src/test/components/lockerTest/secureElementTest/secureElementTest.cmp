@@ -97,6 +97,9 @@
     <aura:method name="testSetAttributeNSXlinkHref"/>
     <aura:method name="testSetAttributeNodeXlinkHref"/>
     <aura:method name="testSetAttributeNodeNSXlinkHref"/>
+    <aura:method name="testInnerHtmlStringify"/>
+    <aura:method name="testOuterHtmlStringify"/>
+    <aura:method name="testInsertAdjacentHtmlStringify"/>
 
     <lockerTest:facet/>
 

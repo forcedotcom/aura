@@ -722,5 +722,23 @@
         test: function(cmp) {
             cmp.testSetAttributeNodeNSXlinkHref();
         }
+    },
+
+    testInnerHtmlStringify: {
+        test: function(cmp) {
+            cmp.testInnerHtmlStringify();
+        }
+    },
+
+    testOuterHtmlStringify: {
+        test: function(cmp) {
+            cmp.testOuterHtmlStringify();
+        }
+    },
+
+    testInsertAdjacentHtmlStringify: {
+        test: function(cmp) {
+            cmp.testInsertAdjacentHtmlStringify();
+        }
     }
 })

@@ -749,5 +749,61 @@
       testUtils.expectAuraWarning('SecureElement: [object HTMLImageElement]{ key: {"namespace":"lockerTest"} } does not allow getting/setting the xlink:href attribute, ignoring!');
 
       element.setAttributeNodeNS('https://www.w3.org/2000/svg', xlink);
+    },
+
+    testInnerHtmlStringify: function(cmp) {
+        var testUtils = cmp.get('v.testUtils');
+        var secureDIVElement = document.createElement('div');
+        secureDIVElement.innerHTML = {
+            toString: function() {
+                return {
+                    indexOf: function() {
+                        return -1;
+                    },
+                    toString: function() {
+                        return '<iframe srcdoc="<script></script>">';
+                    }
+                };
+            }
+        };
+        testUtils.assertEquals('', secureDIVElement.innerHTML, 'Expected SecureDIVElement to have no child elements.');
+    },
+
+    testOuterHtmlStringify: function(cmp) {
+        var testUtils = cmp.get('v.testUtils');
+        var secureDIVElementChild = document.createElement('div');
+        var secureDIVElementParent = document.createElement('div');
+        secureDIVElementParent.appendChild(secureDIVElementChild);
+        secureDIVElementChild.outerHTML = {
+            toString: function() {
+                return {
+                    indexOf: function() {
+                        return -1;
+                    },
+                    toString: function() {
+                        return '<iframe srcdoc="<script></script>">';
+                    }
+                };
+            }
+        };
+        testUtils.assertEquals('', secureDIVElementParent.innerHTML, 'Expected SecureDIVElementParent to have no child elements.');
+    },
+
+    testInsertAdjacentHtmlStringify: function(cmp) {
+        var testUtils = cmp.get('v.testUtils');
+        var secureDIVElement = document.createElement('div');
+        secureDIVElement.insertAdjacentHTML('afterbegin', {
+            toString: function() {
+                return {
+                indexOf: function() {
+                    return -1;
+                },
+                toString: function() {
+                    return '<iframe srcdoc="<script></script>">';
+                }
+                };
+            }
+        });
+        testUtils.assertEquals('', secureDIVElement.innerHTML, 'Expected SecureDIVElement to have no child elements.');
     }
 })

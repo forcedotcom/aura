@@ -1,5 +1,0 @@
-{
-  "requireLocker": "false",
-  "description": "lib which will not be lockerized!",
-  "expose": true
-}

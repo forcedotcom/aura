@@ -1,5 +1,0 @@
-  {
-    "requireLocker": false,
-    "description": "A non-lockerized LWC custom event",
-    "expose": true
-  }

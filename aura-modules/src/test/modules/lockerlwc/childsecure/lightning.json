@@ -1,4 +1,0 @@
-{
-    "requireLocker": "true",
-    "description": "A Lockerized LWC component used in parent to child tests"
-}

@@ -1,5 +1,0 @@
-{
-  "requireLocker": "true",
-  "description": "Module for performing Locker sanity checks",
-  "expose": true
-}

@@ -1,5 +1,0 @@
-{
-    "requireLocker": "true",
-    "description": "Lockerized lib module from secureOtherNamespace",
-    "expose": true
-}

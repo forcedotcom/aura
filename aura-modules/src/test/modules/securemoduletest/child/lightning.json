@@ -1,5 +1,0 @@
-{
-    "requireLocker": "true",
-    "description": "A module for performing parent to child tests",
-    "expose": true
-}

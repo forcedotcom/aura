@@ -239,6 +239,10 @@ public abstract class StyleTestCase extends AuraImplTestCase {
     public TokensSrcBuilder tokens() {
         return new TokensSrcBuilder();
     }
+    
+    public void enableCssVarTransform(boolean enabled) {
+        getMockConfigAdapter().setIsCssVarTransformEnabled(enabled);
+    } 
 
     public static final class TokensSrcBuilder implements CharSequence {
         private DefDescriptor<TokensDef> parent;

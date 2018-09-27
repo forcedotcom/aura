@@ -265,4 +265,10 @@ public interface ConfigAdapter extends AuraAdapter {
     String getCSPReportUri();
 
     boolean shadowDomEnabled();
+
+    /**
+     * Turns on token to CSS variable transformations.
+     * @return
+     */
+    boolean isCssVarTransformEnabled();
 }

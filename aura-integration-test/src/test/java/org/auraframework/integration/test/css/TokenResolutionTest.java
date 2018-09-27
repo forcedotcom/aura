@@ -496,4 +496,97 @@ public class TokenResolutionTest extends StyleTestCase {
 
         assertStyle(styleDef, expected);
     }
+
+    /**
+     * CSS Variable output tests.
+     * 
+     * */
+    
+    @Test
+    public void testCSSVar() throws Exception {
+        enableCssVarTransform(true);
+        addNsTokens(tokens().token("color", "red"));
+        String src = ".THIS {color: token(color);}";
+        assertStyle(addStyleDef(src), ".THIS {color:var(--lwc-color,red)}");
+    }
+    
+    @Test
+    public void testCSSVarShorthand() throws Exception {
+        enableCssVarTransform(true);
+        addNsTokens(tokens().token("big", "200px").token("small", "100px"));
+        String src = ".THIS {margin: t(big) t(small);}";
+        assertStyle(addStyleDef(src), ".THIS {margin:var(--lwc-big,200px) var(--lwc-small,100px)}");
+    }
+    
+    @Test 
+    public void testCSSVarConcat() throws Exception {
+        enableCssVarTransform(true);
+        addNsTokens(tokens().token("big", "200px").token("small", "100px"));
+        String src = ".THIS {margin: t('calc(' + big + ' - ' + small + ')')}";
+        assertStyle(addStyleDef(src), ".THIS {margin:calc(var(--lwc-big,200px) - var(--lwc-small,100px))}");
+    }
+    
+    @Test
+    public void testCSSVarMarginShortHand() throws Exception {
+        enableCssVarTransform(true);
+        addNsTokens(tokens().token("big", "200px").token("small", "100px"));
+        String src = ".THIS {margin: t(big + ' 0 ' + small + ' 0 ')}";
+        assertStyle(addStyleDef(src), ".THIS {margin:var(--lwc-big,200px) 0 var(--lwc-small,100px) 0}");
+    }
+    
+    @Test
+    public void testCSSVarSimpleNegate() throws Exception {
+        enableCssVarTransform(true);
+        addNsTokens(tokens().token("big", "200px"));
+        String src = ".THIS {margin: t('-' + big)}";
+        assertStyle(addStyleDef(src), ".THIS {margin:calc(-1 * var(--lwc-big,200px))}");
+    }
+    
+    @Test
+    public void testCSSVarInCalc() throws Exception {
+        enableCssVarTransform(true);
+        addNsTokens(tokens().token("big", "200px").token("small", "100px"));
+        String src = ".THIS {margin: t('calc(62px + ' + big + ' + (2 * ' + small+ '))')}";
+        assertStyle(addStyleDef(src), ".THIS {margin:calc(62px + var(--lwc-big,200px) + (2 * var(--lwc-small,100px)))}");
+    }
+    
+    @Test
+    public void testCSSVarInCalcWithNegative() throws Exception {
+        enableCssVarTransform(true);
+        addNsTokens(tokens().token("big", "200px").token("small", "100px"));
+        String src = ".THIS {margin: t('calc(-' + big + ' - ' + small + ' - 100% )')}";
+        assertStyle(addStyleDef(src), ".THIS {margin:calc(calc(-1 * var(--lwc-big,200px)) - var(--lwc-small,100px) - 100%)}");
+    }
+    
+    @Test
+    public void testCSSVarLinearGradient() throws Exception {
+        enableCssVarTransform(true);
+        addNsTokens(tokens().token("brandBackgroundPrimaryTransparent", "rgba(255, 0, 0, 0)").token("brandBackgroundPrimary", "red"));
+        String src = ".THIS {background: token('linear-gradient(to bottom, '+brandBackgroundPrimaryTransparent+' 60%, '+brandBackgroundPrimary+')')}";
+        assertStyle(addStyleDef(src), ".THIS {background:linear-gradient(to bottom, var(--lwc-brandBackgroundPrimaryTransparent,rgba(255, 0, 0, 0)) 60%, var(--lwc-brandBackgroundPrimary,red))}");
+    }
+    
+    @Test
+    public void testCSSVarUrl() throws Exception {
+        enableCssVarTransform(true);
+        addNsTokens(tokens().token("brandImage", "/path/to/image/logo.jpg"));
+        String src = ".THIS {background-image: token('url(' + brandImage + ')')}";
+        assertStyle(addStyleDef(src), ".THIS {background-image:var(--lwc-brandImage,url(/path/to/image/logo.jpg))}");
+    }
+    
+    @Test
+    public void testCSSVarUrlConcat() throws Exception {
+        enableCssVarTransform(true);
+        addNsTokens(tokens().token("brandImage", "/path/to/image/logo.jpg").token("baseUrl", "http://example.com"));
+        String src = ".THIS {background-image: token('url(' + baseUrl + brandImage + ')')}";
+        assertStyle(addStyleDef(src), ".THIS {background-image:url(http://example.com/path/to/image/logo.jpg)}");
+    }
+    
+    @Test
+    public void testCSSVarUrlStringConcat() throws Exception {
+        enableCssVarTransform(true);
+        addNsTokens(tokens().token("baseUrl", "http://example.com"));
+        String src = ".THIS {background-image: token('url(' + baseUrl + '/path/to/image/logo.jpg)')}";
+        assertStyle(addStyleDef(src), ".THIS {background-image:url(http://example.com/path/to/image/logo.jpg)}");
+    }
 }

@@ -283,7 +283,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     private TokenValueProvider setup(DefDescriptor<StyleDef> def) throws QuickFixException {
-        return new TokenValueProviderImpl(styleAdapter.getNamespaceDefaultDescriptor(def), null, ResolveStrategy.RESOLVE_NORMAL);
+        return new TokenValueProviderImpl(styleAdapter.getNamespaceDefaultDescriptor(def), null, ResolveStrategy.RESOLVE_NORMAL, false);
     }
 
     private TokenValueProvider setupOverride(DefDescriptor<TokensDef> override) throws QuickFixException {
@@ -301,6 +301,6 @@ public class TokenValueProviderImplTest extends StyleTestCase {
 
     private TokenValueProvider setupOverride(DefDescriptor<TokensDef> namespace, List<DefDescriptor<TokensDef>> overrides)
             throws QuickFixException {
-        return new TokenValueProviderImpl(namespace, new TokenCacheImpl(definitionService, overrides), ResolveStrategy.RESOLVE_NORMAL);
+        return new TokenValueProviderImpl(namespace, new TokenCacheImpl(definitionService, overrides), ResolveStrategy.RESOLVE_NORMAL, false);
     }
 }

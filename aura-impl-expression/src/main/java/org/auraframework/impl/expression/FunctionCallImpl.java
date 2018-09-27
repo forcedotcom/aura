@@ -87,6 +87,11 @@ public class FunctionCallImpl implements FunctionCall {
     public List<DefDescriptor<TypeDef>> getArgumentTypeDefs() {
         return null;
     }
+    
+    @Override
+    public List<Expression> getArguments() {
+        return this.args;
+    }
 
     @Override
     public void setByValue(boolean byValue) {

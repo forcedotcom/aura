@@ -26,4 +26,6 @@ import org.auraframework.def.TypeDef;
 public interface FunctionCall extends Expression {
 
     List<DefDescriptor<TypeDef>> getArgumentTypeDefs();
+    
+    List<Expression> getArguments();
 }

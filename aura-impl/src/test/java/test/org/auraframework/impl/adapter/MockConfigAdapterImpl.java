@@ -175,6 +175,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     private Boolean isLockerServiceEnabledGlobally;
     private Boolean isActionPublicCachingEnabled = null;
     private Boolean isBootstrapInliningEnabled = null;
+    private Boolean isCssVarTransformEnabled = null;
 
     public MockConfigAdapterImpl() {
         super();
@@ -192,6 +193,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         isLockerServiceEnabledGlobally = null;
         isActionPublicCachingEnabled = null;
         isBootstrapInliningEnabled = null;
+        isCssVarTransformEnabled = null;
     }
 
     @Override
@@ -427,4 +429,15 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     public boolean isBootstrapInliningEnabled() {
         return (isBootstrapInliningEnabled == null) ? super.isBootstrapInliningEnabled() : isBootstrapInliningEnabled;
     }
+
+    @Override
+    public void setIsCssVarTransformEnabled(boolean isCssVarTransformEnabled) {
+        this.isCssVarTransformEnabled = isCssVarTransformEnabled;
+    }
+
+    @Override
+    public boolean isCssVarTransformEnabled() {
+        return (isCssVarTransformEnabled == null) ? super.isCssVarTransformEnabled() : isCssVarTransformEnabled;
+    }
+
 }

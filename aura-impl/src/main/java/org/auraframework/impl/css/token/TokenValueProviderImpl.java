@@ -32,6 +32,7 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.AuraExpressionBuilder;
+import org.auraframework.impl.expression.functions.CssVariableHelper;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AuraValidationException;
@@ -51,6 +52,7 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
     private final TokenCache overrides;
     private final DefDescriptor<TokensDef> namespaceDefault;
     private final ResolveStrategy strategy;
+    private final boolean isCssVarTransformEnabled;
 
     /**
      * Creates a new {@link TokenValueProvider}.
@@ -59,12 +61,14 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
      * @param overrides The tokens that override the default token values. Null is ok.
      * @param strategy The indication of how token resolution is being handled (if in doubt about this, use
      *            {@link ResolveStrategy#RESOLVE_NORMAL}).
+     * @param isCssVarTransformEnabled Puts the token value provider into token to CSS variable transformation mode.
      */
-    public TokenValueProviderImpl(DefDescriptor<TokensDef> namespaceDefault, TokenCache overrides, ResolveStrategy strategy) {
+    public TokenValueProviderImpl(DefDescriptor<TokensDef> namespaceDefault, TokenCache overrides, ResolveStrategy strategy, boolean isCssVarTransformEnabled) {
         checkNotNull(namespaceDefault, "namespaceDefault cannot be null");
         this.overrides = overrides;
         this.namespaceDefault = namespaceDefault;
         this.strategy = strategy;
+        this.isCssVarTransformEnabled = isCssVarTransformEnabled;
     }
 
     /**
@@ -106,10 +110,17 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
 
         return value;
     }
-
+    
     @Override
     public Object getValue(String reference, Location location) throws QuickFixException {
-        return getExpression(reference, location).evaluate(this);
+        Expression exp = getExpression(reference, location);
+        // Scan expression for token references. 
+        if(isCssVarTransformEnabled) {
+            CssVariableHelper helper = new CssVariableHelper(location);
+            exp = helper.rewriteExpression(exp);
+        }
+        
+        return exp.evaluate(this);
     }
 
     @Override
@@ -195,4 +206,5 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
     public ResolveStrategy getResolveStrategy() {
         return strategy;
     }
+    
 }

@@ -51,4 +51,6 @@ public interface MockConfigAdapter extends ConfigAdapter, MockBean {
     void setActionPublicCachingEnabled(boolean enabled);
 
     void setIsBootstrapInliningEnabled(boolean isBootstrapInliningEnabled);
+
+    void setIsCssVarTransformEnabled(boolean isCssVarTransformEnabled);
 }

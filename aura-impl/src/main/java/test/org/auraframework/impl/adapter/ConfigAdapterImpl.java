@@ -891,4 +891,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public boolean shadowDomEnabled() {
         return false;
     }
+
+    @Override
+    public boolean isCssVarTransformEnabled() { 
+        return false; 
+    }
 }

@@ -15,7 +15,9 @@
  */
 package org.auraframework.http;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.assertThat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,8 +57,8 @@ public class AuraServletUnitTest {
                 Matchers.eq(Boolean.FALSE), Matchers.same(context), Matchers.same(request), Matchers.same(response),
                 Matchers.eq(Boolean.FALSE));
         // The exception should be handled to avoid blowing up in the face of the user.
-        assertEquals(AuraHandledException.class, exceptionCaptor.getValue().getClass());
+        assertThat(exceptionCaptor.getValue(), instanceOf(AuraHandledException.class));
         // The text is part of our API, because it hits customers.
-        assertEquals("Invalid request, post must use JSON", exceptionCaptor.getValue().getMessage());
+        assertThat(exceptionCaptor.getValue().getMessage(), equalTo("Invalid request, post must use JSON"));
     }
 }

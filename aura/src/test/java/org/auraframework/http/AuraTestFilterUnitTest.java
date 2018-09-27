@@ -15,6 +15,10 @@
  */
 package org.auraframework.http;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertThat;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -42,10 +46,12 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Lists;
 
@@ -165,9 +171,9 @@ public class AuraTestFilterUnitTest {
         filter.doFilter(request, response, chain);
 
         String responseString = writer.toString();
-        Assert.assertEquals(true, responseString.startsWith(renderedTargetComponent));
+        assertThat(responseString, startsWith(renderedTargetComponent));
         responseString = responseString.substring(renderedTargetComponent.length());
-        Assert.assertEquals(true, responseString.contains("<script src='/aura?aura.tag=namespace%3Aname&aura.deftype=APPLICATION&aura.mode=AUTOJSTEST&aura.format=JS&aura.access=AUTHENTICATED&aura.jstestrun=someTest"));
+        assertThat(responseString, containsString("<script src='/aura?aura.tag=namespace%3Aname&aura.deftype=APPLICATION&aura.mode=AUTOJSTEST&aura.format=JS&aura.access=AUTHENTICATED&aura.jstestrun=someTest"));
     }
 
     @Test

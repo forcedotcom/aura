@@ -15,6 +15,14 @@
  */
 package org.auraframework.test.instance;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThat;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -75,13 +83,13 @@ public class AbstractActionImplTest {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
 
-        Assert.assertEquals("id should be initialized to null", null, test.getId());
+        assertThat("id should be initialized to null", test.getId(), nullValue());
         test.setId("a");
-        Assert.assertEquals("setId should work the first time.", "a", test.getId());
+        assertThat("setId should work the first time.", test.getId(), equalTo("a"));
         test.setId("b");
-        Assert.assertEquals("setId should work a second time.", "b", test.getId());
+        assertThat("setId should work a second time.", test.getId(), equalTo("b"));
         test.setId(null);
-        Assert.assertEquals("setId should work a third time.", null, test.getId());
+        assertThat("setId should work a third time.", test.getId(), nullValue());
     }
 
     private Action getActionWithId(String id) {
@@ -91,32 +99,36 @@ public class AbstractActionImplTest {
         return test;
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testActions() {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
 
         List<Action> actions = test.getActions();
-        Assert.assertNotNull("Actions should never be null", actions);
-        Assert.assertEquals("Actions should empty", 0, actions.size());
+        assertThat("Actions should empty", actions, empty());
 
         List<Action> newActions = Lists.newArrayList(getActionWithId("a"), getActionWithId("b"));
         test.add(newActions);
         actions = test.getActions();
-        Assert.assertNotNull("Actions should never be null", actions);
-        Assert.assertEquals("Actions should be length 2", 2, actions.size());
-        Assert.assertEquals("Action 'a' should be first", "a", actions.get(0).getId());
-        Assert.assertEquals("Action 'b' should be first", "b", actions.get(1).getId());
+        assertThat("Incorrect actions returned", actions,
+            contains(
+                hasProperty("id", equalTo("a")),
+                hasProperty("id", equalTo("b"))
+            )
+        );
 
         newActions = Lists.newArrayList(getActionWithId("c"), getActionWithId("d"));
         test.add(newActions);
         actions = test.getActions();
-        Assert.assertNotNull("Actions should never be null", actions);
-        Assert.assertEquals("Actions should be length 4", 4, actions.size());
-        Assert.assertEquals("Action 'a' should be first", "a", actions.get(0).getId());
-        Assert.assertEquals("Action 'b' should be first", "b", actions.get(1).getId());
-        Assert.assertEquals("Action 'c' should be first", "c", actions.get(2).getId());
-        Assert.assertEquals("Action 'd' should be first", "d", actions.get(3).getId());
+        assertThat("Incorrect actions returned", actions,
+            contains(
+                hasProperty("id", equalTo("a")),
+                hasProperty("id", equalTo("b")),
+                hasProperty("id", equalTo("c")),
+                hasProperty("id", equalTo("d"))
+            )
+        );
     }
 
     @Test
@@ -134,11 +146,11 @@ public class AbstractActionImplTest {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
 
-        Assert.assertEquals("isStorable should be initialized to false", false, test.isStorable());
+        assertThat("isStorable should be initialized to false", test.isStorable(), equalTo(false));
         test.setStorable();
-        Assert.assertEquals("isStorable should change on setStorable", true, test.isStorable());
+        assertThat("isStorable should change on setStorable", test.isStorable(), equalTo(true));
         test.setStorable();
-        Assert.assertEquals("isStorable should not change on second setStorable", true, test.isStorable());
+        assertThat("isStorable should not change on second setStorable", test.isStorable(), equalTo(true));
     }
 
     @Test
@@ -174,7 +186,7 @@ public class AbstractActionImplTest {
         Action test = new MyAction(null, def, params);
         LoggingContext.KeyValueLogger logger = Mockito.mock(LoggingContext.KeyValueLogger.class);
 
-        Assert.assertSame("params should be initialized", params, test.getParams());
+        assertThat("params should be initialized", test.getParams(), sameInstance(params));
 
         params.put("a", "b");
         test.logParams(logger);

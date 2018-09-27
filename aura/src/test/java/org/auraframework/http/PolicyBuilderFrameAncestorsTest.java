@@ -15,50 +15,62 @@
  */
 package org.auraframework.http;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
 public class PolicyBuilderFrameAncestorsTest {
-	@Test
-	public void testFrameAncestorsAreUnique() {
-		String csp = new CSP.PolicyBuilder()
-			.frame_ancestor(CSP.SELF, CSP.SELF)
-			.build();
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testFrameAncestorsAreUnique() {
+        String csp = new CSP.PolicyBuilder()
+            .frame_ancestor(CSP.SELF, CSP.SELF)
+            .build();
 
-		for (String directive : csp.split(";")) {
-			String[] parts = directive.split(" ");
-			if (parts.length >= 1) {
-				if (CSP.Directive.FRAME_ANCESTOR.toString().equals(parts[0])) {
-					assertEquals("incorrect number of frame-ancestors", 2, parts.length);
-					assertEquals("frame-ancestor is incorrect", CSP.SELF, parts[1]);
-					return;
-				}
-			}
-		}
-		fail("frame-ancestors directive not present");
-	}
+        for (String directive : csp.split(";")) {
+            String[] parts = directive.split(" ");
+            if (parts.length >= 1) {
+                if (CSP.Directive.FRAME_ANCESTOR.toString().equals(parts[0])) {
+                    assertThat("frame-ancestor is incorrect", parts,
+                        arrayContaining(
+                            equalTo(CSP.Directive.FRAME_ANCESTOR.toString()),
+                            equalTo(CSP.SELF)
+                        )
+                    );
+                    return;
+                }
+            }
+        }
+        fail("frame-ancestors directive not present");
+    }
 
-	@Test
-	public void testMultipleFrameAncestors() {
-		String csp = new CSP.PolicyBuilder()
-				.frame_ancestor(CSP.SELF, "https://www.example.com", "https://www.also.com")
-				.build();
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testMultipleFrameAncestors() {
+        String csp = new CSP.PolicyBuilder()
+            .frame_ancestor(CSP.SELF, "https://www.example.com", "https://www.also.com")
+            .build();
 
-			for (String directive : csp.split(";")) {
-				String[] parts = directive.split(" ");
-				if (parts.length >= 1) {
-					if (CSP.Directive.FRAME_ANCESTOR.toString().equals(parts[0])) {
-						assertEquals("incorrect number of frame-ancestors", 4, parts.length);
-						// verify order is maintained
-						assertEquals("frame-ancestor 0 is incorrect", CSP.SELF, parts[1]);
-						assertEquals("frame-ancestor 1 is incorrect", "https://www.example.com", parts[2]);
-						assertEquals("frame-ancestor 2 is incorrect", "https://www.also.com", parts[3]);
-						return;
-					}
-				}
-			}
-			fail("frame-ancestors directive not present");
-	}
+        for (String directive : csp.split(";")) {
+            String[] parts = directive.split(" ");
+            if (parts.length >= 1) {
+                if (CSP.Directive.FRAME_ANCESTOR.toString().equals(parts[0])) {
+                    // verify order is maintained
+                    assertThat("frame-ancestor is incorrect", parts,
+                        arrayContaining(
+                            equalTo(CSP.Directive.FRAME_ANCESTOR.toString()),
+                            equalTo(CSP.SELF),
+                            equalTo("https://www.example.com"),
+                            equalTo("https://www.also.com")
+                        )
+                    );
+                    return;
+                }
+            }
+        }
+        fail("frame-ancestors directive not present");
+    }
 }

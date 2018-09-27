@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-09-26
- * Version: 0.5.11
+ * Generated: 2018-09-27
+ * Version: 0.5.12
  */
 
 (function (exports) {
@@ -4778,17 +4778,20 @@ function init(options) {
   realmRec.unsafeGlobal = options.unsafeGlobal;
   realmRec.unsafeEval = options.unsafeGlobal.eval;
   realmRec.unsafeFunction = options.unsafeGlobal.Function;
-  realmRec.notFrozenIntrinsicNames = options.notFrozenIntrinsicNames;
 
-  const intrinsics = getIntrinsics(realmRec);
+  if (realmRec.shouldFreeze) {
+    realmRec.notFrozenIntrinsicNames = options.notFrozenIntrinsicNames;
 
-  const eagerFreezeIntrinsics = assign({}, intrinsics);
-  if (isArray(realmRec.notFrozenIntrinsicNames)) {
-    realmRec.notFrozenIntrinsicNames.forEach(name => delete eagerFreezeIntrinsics[name]);
+    const intrinsics = getIntrinsics(realmRec);
+
+    const eagerFreezeIntrinsics = assign({}, intrinsics);
+    if (isArray(realmRec.notFrozenIntrinsicNames)) {
+      realmRec.notFrozenIntrinsicNames.forEach(name => delete eagerFreezeIntrinsics[name]);
+    }
+
+    realmRec.intrinsics = intrinsics;
+    realmRec.eagerFreezeIntrinsics = eagerFreezeIntrinsics;
   }
-
-  realmRec.intrinsics = intrinsics;
-  realmRec.eagerFreezeIntrinsics = eagerFreezeIntrinsics;
 
   // None of these values can change after initialization.
   freeze(realmRec);

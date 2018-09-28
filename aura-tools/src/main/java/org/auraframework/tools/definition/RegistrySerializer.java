@@ -298,9 +298,10 @@ public class RegistrySerializer {
         }
         descriptors = master.find(root_nsf);
         for (DefDescriptor<?> desc : descriptors) {
-            logger.debug("ENTRY: " + desc + "@" + desc.getDefType().toString());
             try {
+                long startNanos = System.nanoTime();
                 Definition def = master.getDef(desc);
+                logger.debug("ENTRY: " + desc + "@" + desc.getDefType().toString() + " in " + (System.nanoTime() - startNanos)/1000000 + " ms");
                 if (def == null) {
                     logger.error("Unable to find " + desc + "@" + desc.getDefType());
                     error = true;

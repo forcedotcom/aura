@@ -1,5 +1,0 @@
-{
-  "requireLocker": "true",
-  "description": "Child module for testing secure HTMLSlotElement.",
-  "expose": true
-}

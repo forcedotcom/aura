@@ -278,6 +278,34 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     }
 
     @Test
+    public void testGetSvgResourceFromModule() throws Exception {
+        String requestContext = getSimpleContext(Format.SVG, false);
+        String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/moduleTest:hasSvg/resources.svg";
+
+        HttpGet get = obtainGetMethod(url);
+        HttpResponse httpResponse = perform(get);
+        int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
+        get.releaseConnection();
+
+        assertEquals(HttpStatus.SC_OK, statusCode);
+        assertNotNull(response);
+        assertTrue("SVG source was not found in the response.", response.contains("SVG"));
+
+        url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/moduleTest:noSvg/resources.svg";
+
+        get = obtainGetMethod(url);
+        httpResponse = perform(get);
+        statusCode = getStatusCode(httpResponse);
+        response = getResponseBody(httpResponse);
+        get.releaseConnection();
+
+        assertEquals(HttpStatus.SC_OK, statusCode);
+        assertNotNull(response);
+        assertTrue("SVG source should not have been returned.", response.isEmpty());
+    }
+
+    @Test
     public void testInlineJSNoCacheHeaders() throws Exception {
         String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, false)) + "/inline.js?jwt=" + getMockConfigAdapter().generateJwtToken();
 

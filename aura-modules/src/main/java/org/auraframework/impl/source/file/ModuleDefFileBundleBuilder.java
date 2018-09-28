@@ -24,6 +24,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.SVGDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -170,6 +171,11 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
             if (descriptor == null && fileDir.equals("__docs__") && fileName.endsWith(".auradoc")) {
                 descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, namespace, descriptorName, DocumentationDef.class, moduleDescriptor);
                 format = Format.XML;
+            }
+
+            if (descriptor == null && base.getCanonicalPath().equals(baseDir) && fileName.endsWith(".svg")) {
+                descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, namespace, moduleDescriptor.getName(), SVGDef.class);
+                format = Format.SVG;
             }
 
             if (descriptor != null) {

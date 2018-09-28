@@ -15,23 +15,44 @@
  */
 package org.auraframework.impl.java.type.converter;
 
+import java.util.Date;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.java.type.LocalizedConverter;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
-import org.auraframework.util.type.converter.StringToDateConverter;
-import org.springframework.context.annotation.Lazy;
 
-import java.util.Date;
-
-@Lazy
 @ServiceComponent
-public class LocalizedStringToDateConverter extends StringToDateConverter implements LocalizedConverter<String, Date> {
+public class LocalizedStringToDateConverter implements LocalizedConverter<String, Date> {
 
     @Override
     public Date convert(String value, AuraLocale locale) {
         DateService dateService = DateServiceImpl.get();
         return dateService.getGenericISO8601Converter().parse(value, locale.getTimeZone());
+    }
+
+    @Override
+    public Date convert(String value) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+        DateService dateService = DateServiceImpl.get();
+        return dateService.getGenericISO8601Converter().parse(value);
+    }
+
+    @Override
+    public Class<String> getFrom() {
+        return String.class;
+    }
+
+    @Override
+    public Class<Date> getTo() {
+        return Date.class;
+    }
+
+    @Override
+    public Class<?>[] getToParameters() {
+        return null;
     }
 }

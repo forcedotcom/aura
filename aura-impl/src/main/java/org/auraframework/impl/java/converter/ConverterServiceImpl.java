@@ -15,11 +15,12 @@
  */
 package org.auraframework.impl.java.converter;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.auraframework.adapter.LocalizationAdapter;
@@ -30,88 +31,54 @@ import org.auraframework.service.LoggingService;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.type.ConversionException;
 import org.auraframework.util.type.Converter;
-import org.auraframework.util.type.ConverterInitError;
 import org.auraframework.util.type.MultiConverter;
-import org.auraframework.util.type.MultiConverterInitError;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.collect.Maps;
 
 @ServiceComponent
-public final class ConverterServiceImpl implements ConverterService {
-
-    /**
-     * Converts from one type to a collection of types. So not Array to List, but Array of Strings to a Collection of Strings.
-     * We use autowired(require=false) since we don't actually have any of these in Aura, but consumers of Aura may. @Inject does not have an optional parameter.
-     */
-    @Autowired(required = false)
-    private MultiConverter<?>[] multiConverters;
-
+public final class ConverterServiceImpl implements ConverterService, ApplicationContextAware {
     /**
      * Generic converters from one value to another.
      */
-    @Inject
-    private Converter<?, ?>[] converters;
+    private List<Converter<?, ?>> converters;
 
-    @Inject
     private LoggingService loggingService;
 
-    @Inject
     private LocalizationAdapter localizationAdapter;
 
-    private final Map<String, Map<String, LocalizedConverter<?, ?>>> localizedConverterMap = Maps.newHashMap();
-    private final Map<String, Map<String, Map<String, LocalizedConverter<?, ?>>>> localizedParameterizedConverters = Maps.newHashMap();
+    private ApplicationContext applicationContext;
 
-    private final Map<String, Map<String, Converter<?, ?>>> converterMap = Maps.newHashMap();
-    private final Map<String, Map<String, Map<String, Converter<?, ?>>>> parameterizedConverters = Maps.newHashMap();
-    private final Map<String, Map<String, MultiConverter<?>>> multiConverterMap = Maps.newHashMap();
+    private boolean initialized;
 
+    private Map<String, Map<String, Converter<?, ?>>> converterMap;
+    private Map<String, Map<String, Map<String, Converter<?, ?>>>> parameterizedConverters;
+    private Map<String, Map<String, MultiConverter<?>>> multiConverterMap;
+
+    /**
+     * FIXME: once the test passes, remove this in favor of permanent enforcement.
+     */
+    private final boolean enforce;
 
     public ConverterServiceImpl() {
+        this.enforce = false;
     }
 
-    @PostConstruct
-    void init() {
-        buildMapOfConverters();
+    public ConverterServiceImpl(boolean enforce) {
+        this.enforce = true;
     }
 
     @Override
     public <F, T> T convert(F value, Class<T> to) {
-        return convert(value, to, null, true);
+        return convert(value, to, null, true, null);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <F, T> T convert(F value, Class<T> to, String of, boolean trim) {
-
-        if (value == null) {
-            return null;
-        }
-
-        if (trim && value instanceof String) {
-            value = (F) ((String) value).trim();
-        }
-
-        Class<F> from = (Class<F>) value.getClass();
-        if (of == null && to.isAssignableFrom(from)) {
-            return (T) value;
-        }
-
-        Converter<F, T> converter = getConverter(from, to, of);
-        if (converter != null) {
-            return converter.convert(value);
-        }
-
-        MultiConverter<T> multiConverter = null;
-        if (of == null) {
-            multiConverter = getMultiConverter(from, to);
-        }
-
-        if (multiConverter == null) {
-            throw new ConversionException(String.format("No Converter or MultiConverter found for %s to %s<%s>", from, to, of));
-        }
-
-        return multiConverter.convert(to, value);
+        return convert(value, to, of, trim, null);
     }
 
     /**
@@ -134,33 +101,53 @@ public final class ConverterServiceImpl implements ConverterService {
      * @param trim   Should the result be trimmed if the value is a string?
      * @param locale We should use the localized converts and the specified local to convert the value. If you specify null, we use the non localized converters.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public <F, T> T convert(F value, Class<T> to, String of, boolean trim, AuraLocale locale) {
         if (value == null) {
             return null;
         }
-        if (locale == null) {
-            return convert(value, to, of, trim);
-        }
 
-        // if no localized version exists, use the standard convert utility
-        final Class<F> from = (Class<F>) value.getClass();
-        final LocalizedConverter<F, T> converter = getLocalizedConverter(from, to, of);
-        if (converter == null) {
-            return convert(value, to, of, trim);
-        }
-
-        // otherwise try the localized steps
         if (trim && value instanceof String) {
-            value = (F) ((String) value).trim();
+            @SuppressWarnings("unchecked")
+            F trimmed = (F) ((String) value).trim();
+            value = trimmed;
         }
 
-        if (to.isAssignableFrom(from)) {
-            return (T) value;
+        @SuppressWarnings("unchecked")
+        final Class<F> from = (Class<F>) value.getClass();
+        if (of == null && to.isAssignableFrom(from)) {
+            @SuppressWarnings("unchecked")
+            T result = (T) value;
+            return result;
+        }
+        if (locale != null) {
+            LocalizedConverter<F, T> converter = getLocalizedConverter(from, to, of);
+            if (converter != null) {
+                return converter.convert(value, locale);
+            }
         }
 
-        return converter.convert(value, locale);
+        Converter<F, T> converter = getConverter(from, to, of);
+        if (converter != null) {
+            return converter.convert(value);
+        }
+
+        MultiConverter<T> multiConverter = null;
+        if (of == null) {
+            multiConverter = getMultiConverter(from, to);
+        }
+
+        if (multiConverter == null) {
+            String message;
+            if (of == null) {
+                message = String.format("No converter found for %s to %s", from, to);
+            } else {
+                message = String.format("No converter found for %s to %s<%s>", from, to, of);
+            }
+            throw new ConversionException(message);
+        }
+
+        return multiConverter.convert(to, value);
     }
 
     /**
@@ -175,49 +162,46 @@ public final class ConverterServiceImpl implements ConverterService {
      * @param trim Should the result be trimmed if the value is a string?
      * @param hasLocale We should use the localized converts and the specified local to convert the value. If you
      *            specify null, we use the non localized converters.
+     * @deprecated Use convert with AuraLocale
      */
     @Override
+    @Deprecated
     public <F, T> T convert(F value, Class<T> to, String of, boolean trim, boolean hasLocale) {
-        return hasLocale ? convert(value, to, of, trim, localizationAdapter.getAuraLocale()) : convert(value, to, of,
-                trim);
+        if (hasLocale) {
+            return convert(value, to, of, trim, localizationAdapter.getAuraLocale());
+        } else {
+            return convert(value, to, of, trim, null);
+        }
     }
 
-    @SuppressWarnings("unchecked")
     private <F, T> LocalizedConverter<F, T> getLocalizedConverter(Class<F> from, Class<T> to, String of) {
-        if (of == null) {
-            Map<String, LocalizedConverter<?, ?>> map = localizedConverterMap.get(from.getName());
-            if (map != null) {
-                return (LocalizedConverter<F, T>) map.get(to.getName());
-            }
-        } else {
-            Map<String, Map<String, LocalizedConverter<?, ?>>> converters = localizedParameterizedConverters.get(from
-                    .getName());
-            if (converters != null) {
-                Map<String, LocalizedConverter<?, ?>> paramConverters = converters.get(to.getName());
-                if (paramConverters != null) {
-                    return (LocalizedConverter<F, T>) paramConverters.get(of);
-                }
-            }
+        Converter<F,T> converter = getConverter(from, to, of);
+        if (converter instanceof LocalizedConverter) {
+            return (LocalizedConverter<F,T>)converter;
         }
-        // Don't panic yet - if no LocalizedConverter is found, we can still use
-        // the non-localized version.
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     private <F, T> Converter<F, T> getConverter(Class<F> from, Class<T> to, String of) {
+        if (!initialized) {
+            buildMapOfConverters();
+        }
         String className = getAssignableHashMapClassName(from);
         if (of == null) {
             Map<String, Converter<?, ?>> map = converterMap.get(className);
             if (map != null) {
-                return (Converter<F, T>) map.get(to.getName());
+                @SuppressWarnings("unchecked")
+                Converter<F,T> result = (Converter<F, T>) map.get(to.getName());
+                return result;
             }
         } else {
-            Map<String, Map<String, Converter<?, ?>>> converters = parameterizedConverters.get(className);
-            if (converters != null) {
-                Map<String, Converter<?, ?>> paramConverters = converters.get(to.getName());
+            Map<String, Map<String, Converter<?, ?>>> parameterized = parameterizedConverters.get(className);
+            if (parameterized != null) {
+                Map<String, Converter<?, ?>> paramConverters = parameterized.get(to.getName());
                 if (paramConverters != null) {
-                    return (Converter<F, T>) paramConverters.get(of);
+                    @SuppressWarnings("unchecked")
+                    Converter<F,T> result = (Converter<F, T>) paramConverters.get(of);
+                    return result;
                 }
             }
         }
@@ -226,6 +210,9 @@ public final class ConverterServiceImpl implements ConverterService {
 
     @SuppressWarnings("unchecked")
     private <T> MultiConverter<T> getMultiConverter(Class<?> from, Class<T> to) {
+        if (!initialized) {
+            buildMapOfConverters();
+        }
         String className = getAssignableHashMapClassName(from);
         Map<String, MultiConverter<?>> map = multiConverterMap.get(className);
         if (map != null) {
@@ -251,113 +238,88 @@ public final class ConverterServiceImpl implements ConverterService {
         return className;
     }
 
-    private void buildMapOfConverters() {
+    private synchronized void buildMapOfConverters() {
+        if (initialized) {
+            return;
+        }
+        Map<String, Map<String, Converter<?, ?>>> converterBuilding = Maps.newHashMap();
+        Map<String, Map<String, Map<String, Converter<?, ?>>>> parameterizedBuilding = Maps.newHashMap();
+        Map<String, Map<String, MultiConverter<?>>> multiConverterBuilding = Maps.newHashMap();
+        StringBuilder sb = new StringBuilder();
+
         for (Converter<?, ?> converter : converters) {
-            // Handled earlier.
-            if (converter instanceof LocalizedConverter) {
-                try {
-                    String from = converter.getFrom().getName();
-                    String to = converter.getTo().getName();
-                    Class<?>[] toParams = converter.getToParameters();
-
-                    Map<String, LocalizedConverter<?, ?>> toMap = localizedConverterMap.get(from);
-                    if (toMap == null) {
-                        toMap = Maps.newHashMap();
-                        localizedConverterMap.put(from, toMap);
-                    }
-
-                    if (toParams == null) {
-
-                        if (toMap.containsKey(to)) {
-                            loggingService.warn("Duplicate LocalizedConverter not registered: " + converter);
-                        } else {
-                            toMap.put(to, (LocalizedConverter<?, ?>) converter);
-                        }
-
-                    } else {
-
-                        Map<String, Map<String, LocalizedConverter<?, ?>>> paramToMap = localizedParameterizedConverters.get(from);
-                        if (paramToMap == null) {
-                            paramToMap = Maps.newHashMap();
-                            localizedParameterizedConverters.put(from, paramToMap);
-                        }
-
-                        StringBuilder toParamNamesBuilder = new StringBuilder();
-                        for (Class<?> clz : toParams) {
-                            if (toParamNamesBuilder.length() > 0) {
-                                toParamNamesBuilder.append(',');
-                            }
-                            toParamNamesBuilder.append(clz.getSimpleName());
-                        }
-                        String toParamNames = toParamNamesBuilder.toString();
-
-                        Map<String, LocalizedConverter<?, ?>> paramMap = paramToMap.get(to);
-                        if (paramMap == null) {
-                            paramMap = Maps.newHashMap();
-                            paramToMap.put(to, paramMap);
-                        }
-
-                        if (paramMap.containsKey(toParamNames)) {
-                            loggingService.warn("Duplicate LocalizedConverter not registered: " + converter);
-                        } else {
-                            paramMap.put(toParamNames, (LocalizedConverter<?, ?>) converter);
-                        }
-                    }
-
-                } catch (Exception e) {
-                    loggingService.error("Invalid LocalizedConverter not registered: " + converter, e);
-                }
+            Class<?> fromClass = converter.getFrom();
+            Class<?> toClass = converter.getTo();
+            if (fromClass == null || toClass == null) {
+                sb.append("\tInvalid converter not registered : ");
+                sb.append(converter.getClass().getName());
+                sb.append("\n");
             } else {
-                Class<?> fromClass = converter.getFrom();
-                Class<?> toClass = converter.getTo();
-                if (fromClass == null || toClass == null) {
-                    System.err.println("Invalid converter not registered : " + converter);
+                String from = fromClass.getName();
+                String to = toClass.getName();
+                Class<?>[] toParams = converter.getToParameters();
+                StringBuilder toParamNames = new StringBuilder();
+                if (toParams != null) {
+                    for (Class<?> clz : toParams) {
+                        if (toParamNames.length() > 0) {
+                            toParamNames.append(',');
+                        }
+                        toParamNames.append(clz.getSimpleName());
+                    }
+                }
+
+                Map<String, Converter<?, ?>> toMap = converterBuilding.get(from);
+                Map<String, Map<String, Converter<?, ?>>> paramToMap = parameterizedBuilding.get(from);
+                if (toMap == null) {
+                    toMap = Maps.newHashMap();
+                    converterBuilding.put(from, toMap);
+                }
+                if (paramToMap == null) {
+                    paramToMap = Maps.newHashMap();
+                    parameterizedBuilding.put(from, paramToMap);
+                }
+
+                if (toParams != null) {
+                    Map<String, Converter<?, ?>> paramMap = paramToMap.get(to);
+                    if (paramMap == null) {
+                        paramMap = Maps.newHashMap();
+                        paramToMap.put(to, paramMap);
+                    }
+                    if (paramMap.containsKey(toParamNames.toString())) {
+                        sb.append("\tMore than one converter registered for ");
+                        sb.append(from);
+                        sb.append(" to ");
+                        sb.append(to);
+                        sb.append("<");
+                        sb.append(toParamNames);
+                        sb.append(">. Found ");
+                        sb.append(paramMap.get(toParamNames.toString()).getClass().getName());
+                        sb.append(" and ");
+                        sb.append(converter.getClass().getName());
+                        sb.append("\n");
+                    }
+                    paramMap.put(toParamNames.toString(), converter);
                 } else {
-                    String from = fromClass.getName();
-                    String to = toClass.getName();
-                    Class<?>[] toParams = converter.getToParameters();
-                    StringBuilder toParamNames = new StringBuilder();
-                    if (toParams != null) {
-                        for (Class<?> clz : toParams) {
-                            if (toParamNames.length() > 0) {
-                                toParamNames.append(',');
-                            }
-                            toParamNames.append(clz.getSimpleName());
-                        }
+                    if (toMap.containsKey(to)) {
+                        sb.append("\tMore than one converter registered for ");
+                        sb.append(from);
+                        sb.append(" to ");
+                        sb.append(to);
+                        sb.append(". Found ");
+                        sb.append(toMap.get(to).getClass().getName());
+                        sb.append(" and ");
+                        sb.append(converter.getClass().getName());
+                        sb.append("\n");
                     }
-
-                    Map<String, Converter<?, ?>> toMap = converterMap.get(from);
-                    Map<String, Map<String, Converter<?, ?>>> paramToMap = parameterizedConverters.get(from);
-                    if (toMap == null) {
-                        toMap = Maps.newHashMap();
-                        converterMap.put(from, toMap);
-                    }
-                    if (paramToMap == null) {
-                        paramToMap = Maps.newHashMap();
-                        parameterizedConverters.put(from, paramToMap);
-                    }
-
-                    if (toParams != null) {
-                        Map<String, Converter<?, ?>> paramMap = paramToMap.get(to);
-                        if (paramMap == null) {
-                            paramMap = Maps.newHashMap();
-                            paramToMap.put(to, paramMap);
-                        }
-                        if (paramMap.containsKey(toParamNames.toString())) {
-                            converter = new ConverterInitError<>(String.format(
-                                    "More than one converter registered for %s to %s<%s>.  Using %s.", from, to,
-                                    toParamNames.toString(), paramMap.get(toParamNames.toString())));
-                        }
-                        paramMap.put(toParamNames.toString(), converter);
-                    } else {
-                        if (toMap.containsKey(to)) {
-                            converter = new ConverterInitError<>(String.format(
-                                    "More than one converter registered for %s to %s.  Using %s.", from, to, toMap.get(to)));
-                        }
-                        toMap.put(to, converter);
-                    }
+                    toMap.put(to, converter);
                 }
             }
+        }
+        // This hack is to avoid the problem of Lazy+required=false not working.
+        @SuppressWarnings("rawtypes")
+        Collection<MultiConverter> multiConverters = null;
+        if (applicationContext != null) {
+            multiConverters = applicationContext.getBeansOfType(MultiConverter.class).values();
         }
 
         if (multiConverters != null) {
@@ -366,27 +328,46 @@ public final class ConverterServiceImpl implements ConverterService {
                 Set<Class<?>> toClasses = multiConverter.getTo();
 
                 if (fromClass == null || toClasses == null) {
-                    System.err.println("Invalid multiconverter not registered : " + multiConverter);
+                    sb.append("\tInvalid multiconverter not registered : ");
+                    sb.append(multiConverter.getClass().getName());
+                    sb.append("\n");
                 } else {
                     String from = fromClass.getName();
 
-                    Map<String, MultiConverter<?>> toMap = multiConverterMap.get(from);
+                    Map<String, MultiConverter<?>> toMap = multiConverterBuilding.get(from);
                     if (toMap == null) {
                         toMap = Maps.newHashMap();
-                        multiConverterMap.put(from, toMap);
+                        multiConverterBuilding.put(from, toMap);
                     }
 
                     for (Class<?> toClass : toClasses) {
-                        final String to = toClass.getName();
+                        String to = toClass.getName();
                         if (toMap.containsKey(to)) {
-                            multiConverter = new MultiConverterInitError(String.format(
-                                    "More than one multiconverter registered for %s to %s.", from, to));
+                            sb.append("\tMore than one multiconverter registered for ");
+                            sb.append(from);
+                            sb.append(" to ");
+                            sb.append(to);
+                            sb.append(". Found ");
+                            sb.append(toMap.get(to).getClass().getName());
+                            sb.append(" and ");
+                            sb.append(multiConverter.getClass().getName());
+                            sb.append("\n");
                         }
                         toMap.put(to, multiConverter);
                     }
                 }
             }
         }
+        if (sb.length() > 0) {
+            loggingService.error(sb.toString());
+            if (enforce) {
+                throw new RuntimeException("Conversion errors found:\n"+sb.toString());
+            }
+        }
+        converterMap = converterBuilding;
+        parameterizedConverters = parameterizedBuilding;
+        multiConverterMap = multiConverterBuilding;
+        initialized = true;
     }
 
     @Override
@@ -404,4 +385,35 @@ public final class ConverterServiceImpl implements ConverterService {
         return getConverter(from, to, of) != null || (of == null && getMultiConverter(from, to) != null);
     }
 
+    /**
+     * @param converters the converters to set
+     */
+    @Inject
+    @Lazy
+    public void setConverters(List<Converter<?, ?>> converters) {
+        this.converters = converters;
+    }
+
+    /**
+     * @param loggingService the loggingService to set
+     */
+    @Inject
+    @Lazy
+    public void setLoggingService(LoggingService loggingService) {
+        this.loggingService = loggingService;
+    }
+
+    /**
+     * @param localizationAdapter the localizationAdapter to set
+     */
+    @Inject
+    @Lazy
+    public void setLocalizationAdapter(LocalizationAdapter localizationAdapter) {
+        this.localizationAdapter = localizationAdapter;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 }

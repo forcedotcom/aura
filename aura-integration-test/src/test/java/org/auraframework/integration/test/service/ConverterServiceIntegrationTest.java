@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.java.converter;
+package org.auraframework.integration.test.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -27,19 +27,17 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.impl.java.converter.ConverterServiceImpl;
 import org.auraframework.impl.util.AuraLocaleImpl;
+import org.auraframework.integration.test.util.IntegrationTestCase;
 import org.auraframework.service.ConverterService;
+import org.auraframework.service.LoggingService;
 import org.auraframework.util.date.AuraDateUtil;
-import org.auraframework.util.test.util.UnitTestCase;
-import org.auraframework.util.type.ConversionException;
-import org.auraframework.util.type.CustomAbstractType;
-import org.auraframework.util.type.CustomChildType;
-import org.auraframework.util.type.CustomConcreteType1;
-import org.auraframework.util.type.CustomConcreteType2;
-import org.auraframework.util.type.CustomDupType;
-import org.auraframework.util.type.CustomPairType;
-import org.auraframework.util.type.CustomParentType;
+import org.auraframework.util.type.Converter;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.collect.Maps;
 
@@ -47,10 +45,28 @@ import com.google.common.collect.Maps;
  * Verify implementation of JavaLocalizedconverterService used to convert data from a
  * given type to a desired type using a Locale.
  */
-public class ConverterServiceImplTest extends UnitTestCase {
+public class ConverterServiceIntegrationTest extends IntegrationTestCase {
 
     @Inject
-    ConverterService converterService;
+    @Lazy
+    private ConverterService converterService;
+
+    @Inject
+    @Lazy
+    private List<Converter<?,?>> converters;
+
+    @Test
+    public void testForBadConverters() throws Exception {
+        ConverterServiceImpl testService = new ConverterServiceImpl(true);
+        testService.setConverters(converters);
+        testService.setLocalizationAdapter(Mockito.mock(LocalizationAdapter.class));
+        testService.setLoggingService(Mockito.mock(LoggingService.class));
+        testService.setApplicationContext(applicationContext);
+        // The real test is that this should not fail.
+        Integer i = testService.convert("1", Integer.class);
+        assertNotNull(i);
+        assertEquals(1, i.intValue());
+    }
 
     /**
      * Verify initialization of converters for Localized Strings and numbers.
@@ -140,135 +156,10 @@ public class ConverterServiceImplTest extends UnitTestCase {
 
     @Test
     public void testStringToIntWithDecimal() {
-        Integer expected = 123;
+        Integer expected = Integer.valueOf(123);
 
         Integer actual = converterService.convert("123.456", Integer.class, new AuraLocaleImpl());
         assertEquals(expected, actual);
-    }
-
-
-    /**
-     * Verify conversion of String to Custom data type using custom converters.
-     */
-    @Test
-    public void testRegisteringTypeConverter() {
-
-        // 1. Convert from String to a custom type
-        assertTrue("Failed to register custom converter",
-                converterService.hasConverter(String.class, CustomPairType.class, null));
-        // W-1295664 Null pointer exception here
-        assertFalse("Converter registration is not commutative.",
-                converterService.hasConverter(CustomPairType.class, String.class, null));
-        assertFalse("Registered a fictatious converter.",
-                converterService.hasConverter(Integer.class, CustomPairType.class, null));
-        CustomPairType result = converterService.convert("HouseNo$300", CustomPairType.class);
-        assertNotNull(result);
-        assertEquals("Custom type converter failed to convert string value.", "HouseNo", result.getStrMember());
-        assertEquals("Custom type converter failed to convert string value.", 300, result.getIntMember());
-
-        // 2. Convert from String to an array of custom type converters
-        assertTrue("Failed to register a custom array converter.",
-                converterService.hasConverter(String.class, CustomPairType[].class, null));
-        assertFalse("Registered a fictatious converter.",
-                converterService.hasConverter(Integer.class, CustomPairType[].class, null));
-        CustomPairType[] arrayOfValues = converterService.convert("[lat$12890,long$5467]", CustomPairType[].class);
-        assertNotNull(arrayOfValues);
-        assertEquals("Custom array type converter failed to convert.", 2, arrayOfValues.length);
-        assertEquals("Custom array type converter failed to convert.", new CustomPairType("lat", 12890),
-                arrayOfValues[0]);
-        assertEquals("Custom array type converter failed to convert.", new CustomPairType("long", 5467),
-                arrayOfValues[1]);
-    }
-
-    /**
-     * Verify conversion of custom converters that handle multiple output types.
-     */
-    @Test
-    public void testRegisteringMulticonverters() {
-
-        // 1. Try to convert from String to subclasses of CustomAbstractType.
-        assertTrue("Failed to register custom multi converter",
-                converterService.hasConverter(String.class, CustomConcreteType1.class, null));
-        assertTrue("Failed to register custom multi converter",
-                converterService.hasConverter(String.class, CustomConcreteType2.class, null));
-
-        CustomAbstractType result = converterService.convert("blah:52", CustomConcreteType1.class);
-        assertNotNull(result);
-        assertEquals("Custom multi converter failed to convert string value.", "blah", result.getStrValue());
-        assertEquals("Custom multi converter failed to convert string value.", 52, result.getIntValue());
-
-        result = converterService.convert("zebra zebra:73", CustomConcreteType2.class);
-        assertNotNull(result);
-        assertEquals("Custom multi converter failed to convert string value.", "zebra zebra", result.getStrValue());
-        assertEquals("Custom multi converter failed to convert string value.", -146, result.getIntValue());
-    }
-
-    /**
-     * W-1295660 This is a big hole. Anybody can override the converters we have
-     * written and screw up the system. Or may be this is acceptable. Currently
-     * we use the last converter to be encountered while going through classes
-     * in classpath.
-     */
-    @Test
-    public void testRegisteringDuplicateTypeConverters() {
-        assertTrue("Failed to register custom converter",
-                converterService.hasConverter(String.class, CustomDupType.class, null));
-        try {
-            converterService.convert("foobar", CustomDupType.class);
-            fail("expected ConversionException due to duplicate registration");
-        } catch (ConversionException e) {
-            // expected
-        }
-    }
-
-    /**
-     * Verify that value of assignable types don't need a special converter.
-     */
-    @Test
-    public void testImplicitConversionThroughInheritance() {
-        // 1. Upcasting value object
-        CustomChildType obj = new CustomChildType();
-        assertFalse("Should not have found a converter as there are none registered for this conversion",
-                converterService.hasConverter(CustomChildType.class, CustomParentType.class, null));
-        CustomParentType newObj = converterService.convert(obj, CustomParentType.class);
-        assertNotNull(newObj);
-        // Make sure conversion up the inheritance hierarchy did not go through
-        // any special procedure
-        assertTrue("Converting a value object of child type to parent failed.", newObj == obj);
-
-        // 2. Downcasting value object
-        assertFalse("Should not have found a converter as there are none registered for this conversion",
-                converterService.hasConverter(CustomParentType.class, CustomChildType.class, null));
-
-        CustomParentType pObj = new CustomParentType();
-        try {
-            converterService.convert(pObj, CustomChildType.class);
-            fail("Should have thrown conversion exception due to missing converter");
-        } catch (ConversionException e) {
-            // expected
-        }
-    }
-
-    /**
-     * Verify that converterService doesn't barf because of bad converters. Enable
-     * converter registration in TestTypeConvertersConfig.java
-     */
-    @Test
-    public void testHandlingNulls() {
-        assertFalse(converterService.hasConverter(CustomPairType.class, String.class, null));
-    }
-
-    @Test
-    public void testParameterizedConverter() {
-        assertTrue("Failed to locate parameterized converter.",
-                converterService.hasConverter(String.class, CustomPairType.class, "String,Integer"));
-        assertFalse("Should not have found a converter for this parameter.",
-                converterService.hasConverter(String.class, CustomPairType.class, "String"));
-        assertFalse("Should not have found a converter for this parameter.",
-                converterService.hasConverter(String.class, CustomPairType.class, ""));
-        // Will use the non parameterized converter
-        assertTrue("Using null for parameter should have resulted in usage of default converter.",
-                converterService.hasConverter(String.class, CustomPairType.class, null));
     }
 
 
@@ -524,7 +415,7 @@ public class ConverterServiceImplTest extends UnitTestCase {
 
         c4 = Calendar.getInstance();
         String s4 =  "2018-08-23T23:33:53.404Z";
-        c4.setTimeInMillis(AuraDateUtil.isoToLong(s4));
+        c4.setTimeInMillis(AuraDateUtil.isoToLong(s4).longValue());
         runPassPairs(Calendar.class, new Object[] { "1234", c1, "-1234", c2, "12345678901234", c3, s4, c4}, false);
     }
 

@@ -21,18 +21,36 @@ import org.auraframework.util.AuraLocale;
 import org.auraframework.util.date.DateOnly;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
-import org.auraframework.util.type.converter.DateOnlyToStringConverter;
-import org.springframework.context.annotation.Lazy;
 
-@Lazy
 @ServiceComponent
-public class LocalizedDateOnlyToStringConverter extends DateOnlyToStringConverter implements
-        LocalizedConverter<DateOnly, String> {
-
+public class LocalizedDateOnlyToStringConverter implements LocalizedConverter<DateOnly, String> {
     @Override
     public String convert(DateOnly value, AuraLocale locale) {
         DateService dateService = DateServiceImpl.get();
         return dateService.getDateTimeISO8601Converter().format(value, locale.getTimeZone());
     }
 
+    @Override
+    public String convert(DateOnly value) {
+        if (value == null) {
+            return null;
+        }
+        DateService dateService = DateServiceImpl.get();
+        return dateService.getDateISO8601Converter().format(value);
+    }
+
+    @Override
+    public Class<DateOnly> getFrom() {
+        return DateOnly.class;
+    }
+
+    @Override
+    public Class<String> getTo() {
+        return String.class;
+    }
+
+    @Override
+    public Class<?>[] getToParameters() {
+        return null;
+    }
 }

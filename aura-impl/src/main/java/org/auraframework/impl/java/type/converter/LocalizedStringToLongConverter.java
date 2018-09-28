@@ -15,28 +15,29 @@
  */
 package org.auraframework.impl.java.type.converter;
 
+import java.util.Locale;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.java.type.LocalizedConverter;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.util.AuraLocale;
-import org.auraframework.util.type.converter.StringToLongConverter;
 import org.springframework.context.annotation.Lazy;
-
-import javax.inject.Inject;
-import java.util.Locale;
 
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
  */
-@Lazy
 @ServiceComponent
-public class LocalizedStringToLongConverter extends StringToLongConverter implements LocalizedConverter<String, Long> {
+public class LocalizedStringToLongConverter implements LocalizedConverter<String, Long> {
 
     @Inject
+    @Lazy
     LocalizationAdapter localizationAdapter;
 
     @Inject
+    @Lazy
     LocalizationService localizationService;
 
     @Override
@@ -54,8 +55,44 @@ public class LocalizedStringToLongConverter extends StringToLongConverter implem
             Locale loc = locale.getNumberLocale();
             return new Long(localizationService.parseLong(value, loc));
         } catch (Exception e) {
-            return super.convert(value);
+            return convert(value);
         }
     }
 
+    @Override
+    public Long convert(String value) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+        try {
+            return Long.valueOf(value);
+        } catch (NumberFormatException ex) {
+            // Possible decimal value
+            return convertAsDouble(value);
+        }
+    }
+
+    private Long convertAsDouble(String value) {
+        try {
+            return Double.valueOf(value).longValue();
+        } catch (Exception ex) {
+            // fail gracefully, we don't want to bubble an exception here
+            return null;
+        }
+    }
+
+    @Override
+    public Class<String> getFrom() {
+        return String.class;
+    }
+
+    @Override
+    public Class<Long> getTo() {
+        return Long.class;
+    }
+
+    @Override
+    public Class<?>[] getToParameters() {
+        return null;
+    }
 }

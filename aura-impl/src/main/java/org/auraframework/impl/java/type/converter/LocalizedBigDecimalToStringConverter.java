@@ -15,30 +15,30 @@
  */
 package org.auraframework.impl.java.type.converter;
 
+import java.math.BigDecimal;
+import java.util.Locale;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.java.type.LocalizedConverter;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.util.AuraLocale;
-import org.auraframework.util.type.converter.BigDecimalToStringConverter;
 import org.springframework.context.annotation.Lazy;
-
-import javax.inject.Inject;
-import java.math.BigDecimal;
-import java.util.Locale;
 
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
  */
-@Lazy
 @ServiceComponent
-public class LocalizedBigDecimalToStringConverter extends BigDecimalToStringConverter implements
-        LocalizedConverter<BigDecimal, String> {
+public class LocalizedBigDecimalToStringConverter implements LocalizedConverter<BigDecimal, String> {
 
     @Inject
+    @Lazy
     LocalizationAdapter localizationAdapter;
 
     @Inject
+    @Lazy
     LocalizationService localizationService;
 
     @Override
@@ -56,8 +56,30 @@ public class LocalizedBigDecimalToStringConverter extends BigDecimalToStringConv
             Locale loc = locale.getNumberLocale();
             return localizationService.formatNumber(value, loc);
         } catch (Exception e) {
-            return super.convert(value);
+            return convert(value);
         }
     }
 
+    @Override
+    public String convert(BigDecimal value) {
+        if (value == null) {
+            return null;
+        }
+        return value.toPlainString();
+    }
+
+    @Override
+    public Class<BigDecimal> getFrom() {
+        return BigDecimal.class;
+    }
+
+    @Override
+    public Class<String> getTo() {
+        return String.class;
+    }
+
+    @Override
+    public Class<?>[] getToParameters() {
+        return null;
+    }
 }

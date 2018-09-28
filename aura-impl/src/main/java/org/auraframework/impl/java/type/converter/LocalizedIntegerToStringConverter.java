@@ -15,29 +15,29 @@
  */
 package org.auraframework.impl.java.type.converter;
 
+import java.util.Locale;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.java.type.LocalizedConverter;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.util.AuraLocale;
-import org.auraframework.util.type.converter.IntegerToStringConverter;
 import org.springframework.context.annotation.Lazy;
-
-import javax.inject.Inject;
-import java.util.Locale;
 
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
  */
-@Lazy
 @ServiceComponent
-public class LocalizedIntegerToStringConverter extends IntegerToStringConverter implements
-        LocalizedConverter<Integer, String> {
+public class LocalizedIntegerToStringConverter implements LocalizedConverter<Integer, String> {
 
     @Inject
+    @Lazy
     LocalizationAdapter localizationAdapter;
 
     @Inject
+    @Lazy
     LocalizationService localizationService;
 
     @Override
@@ -55,8 +55,28 @@ public class LocalizedIntegerToStringConverter extends IntegerToStringConverter 
             Locale loc = locale.getNumberLocale();
             return localizationService.formatNumber(value, loc);
         } catch (Exception e) {
-            return super.convert(value);
+            return convert(value);
         }
     }
 
+
+    @Override
+    public String convert(Integer value) {
+        return value.toString();
+    }
+
+    @Override
+    public Class<Integer> getFrom() {
+        return Integer.class;
+    }
+
+    @Override
+    public Class<String> getTo() {
+        return String.class;
+    }
+
+    @Override
+    public Class<?>[] getToParameters() {
+        return null;
+    }
 }

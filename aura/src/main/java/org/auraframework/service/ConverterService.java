@@ -19,14 +19,66 @@ import org.auraframework.util.AuraLocale;
 
 public interface ConverterService {
 
+    /**
+     * Convert from a value to a given class.
+     *
+     * @param value the value to convert
+     * @param to the class that is desired
+     * @return the converted value, null if the input is null.
+     * @throws ConversionException if there is no converter
+     */
     <F, T> T convert(F value, Class<T> to);
 
+    /**
+     * Convert from a value to a given class.
+     *
+     * @param value the value to convert
+     * @param to the class that is desired
+     * @param locale the locale for conversion, used if there is a localized converter.
+     * @return the converted value, null if the input is null.
+     * @throws ConversionException if there is no converter
+     */
     <F, T> T convert(F value, Class<T> to, AuraLocale locale);
 
+    /**
+     * Convert from a value to a given class.
+     *
+     * @param value the value to convert
+     * @param to the class that is desired
+     * @param of the string version of the parameters to the class.
+     * @param trim if true and the value is a string, trim it.
+     * @param locale the locale for conversion, used if there is a localized converter.
+     * @return the converted value, null if the input is null.
+     * @throws ConversionException if there is no converter
+     */
     <F, T> T convert(F value, Class<T> to, String of, boolean trim);
 
+    /**
+     * Convert from a value to a given class.
+     *
+     * @param value the value to convert
+     * @param to the class that is desired
+     * @param of the string version of the parameters to the class.
+     * @param trim if true and the value is a string, trim it.
+     * @param locale the locale for conversion, used if there is a localized converter.
+     * @return the converted value, null if the input is null.
+     * @throws ConversionException if there is no converter
+     */
     <F, T> T convert(F value, Class<T> to, String of, boolean trim, AuraLocale locale);
 
+    /**
+     * Convert from a value to a given class.
+     *
+     * @param value the value to convert
+     * @param to the class that is desired
+     * @param of the string version of the parameters to the class.
+     * @param trim if true and the value is a string, trim it.
+     * @param hasLocale if true, get the local from the localization service
+     * @return the converted value, null if the input is null.
+     * @throws ConversionException if there is no converter
+     * @deprecated use the version with AuraLocale instead
+     */
+    @Deprecated
     <F, T> T convert(F value, Class<T> to, String of, boolean trim, boolean hasLocale);
 
     /* Mostly for testing? */

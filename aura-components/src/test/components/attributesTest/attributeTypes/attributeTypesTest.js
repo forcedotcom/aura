@@ -143,18 +143,6 @@
         }
     },
 
-    testCustomTypeDefault:{
-        test:function(cmp){
-            var customAttrValue = cmp.get('v.pairAttr');
-            $A.test.assertNotNull(customAttrValue);
-            //Verify the type and value of attribute value
-            $A.test.assertEquals(300, customAttrValue.intMember,
-                    "Failed to construct attribute value of custom type.");
-            $A.test.assertEquals("HouseNo", customAttrValue.strMember,
-                    "Failed to construct String attribute value of custom type.");
-        }
-    },
-    
     testSetBodyAsNonArray: {
         test: function(cmp) {
             var body = "text";

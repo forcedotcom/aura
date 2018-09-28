@@ -15,26 +15,47 @@
  */
 package org.auraframework.impl.java.type.converter;
 
+import java.util.Date;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.java.type.LocalizedConverter;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.date.DateOnly;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
-import org.auraframework.util.type.converter.StringToDateOnlyConverter;
-import org.springframework.context.annotation.Lazy;
 
-import java.util.Date;
-
-@Lazy
 @ServiceComponent
-public class LocalizedStringToDateOnlyConverter extends StringToDateOnlyConverter implements
-        LocalizedConverter<String, DateOnly> {
+public class LocalizedStringToDateOnlyConverter implements LocalizedConverter<String, DateOnly> {
 
     @Override
     public DateOnly convert(String value, AuraLocale locale) {
         DateService dateService = DateServiceImpl.get();
         Date d = dateService.getDateISO8601Converter().parse(value, locale.getTimeZone());
         return new DateOnly(d.getTime());
+    }
+
+    @Override
+    public DateOnly convert(String value) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+        DateService dateService = DateServiceImpl.get();
+        Date d = dateService.getGenericISO8601Converter().parse(value);
+        return d == null ? null : new DateOnly(d.getTime());
+    }
+
+    @Override
+    public Class<String> getFrom() {
+        return String.class;
+    }
+
+    @Override
+    public Class<DateOnly> getTo() {
+        return DateOnly.class;
+    }
+
+    @Override
+    public Class<?>[] getToParameters() {
+        return null;
     }
 }

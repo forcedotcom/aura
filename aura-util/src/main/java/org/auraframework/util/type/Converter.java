@@ -15,8 +15,6 @@
  */
 package org.auraframework.util.type;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-
 /**
  * The Converter interface is a type converter that converts a value from one Java type 
  * to another Java type. You can implement this interface to provide a custom converter 
@@ -25,7 +23,7 @@ import org.auraframework.ds.serviceloader.AuraServiceProvider;
  * 
  * NOTE: Standard types are automatically converted and don't require custom converters.
  **/
-public interface Converter<F, T> extends AuraServiceProvider {
+public interface Converter<F, T> {
 
     /**
      * Converts the specified value from its original Java type F to the target 

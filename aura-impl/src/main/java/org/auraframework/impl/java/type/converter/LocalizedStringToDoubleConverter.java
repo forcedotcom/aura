@@ -15,29 +15,28 @@
  */
 package org.auraframework.impl.java.type.converter;
 
+import java.util.Locale;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.java.type.LocalizedConverter;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.util.AuraLocale;
-import org.auraframework.util.type.converter.StringToDoubleConverter;
 import org.springframework.context.annotation.Lazy;
 
-import javax.inject.Inject;
-import java.util.Locale;
-
 /**
- * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
  */
-@Lazy
 @ServiceComponent
-public class LocalizedStringToDoubleConverter extends StringToDoubleConverter implements
-        LocalizedConverter<String, Double> {
+public class LocalizedStringToDoubleConverter implements LocalizedConverter<String, Double> {
 
     @Inject
+    @Lazy
     LocalizationAdapter localizationAdapter;
 
     @Inject
+    @Lazy
     LocalizationService localizationService;
 
     @Override
@@ -55,8 +54,36 @@ public class LocalizedStringToDoubleConverter extends StringToDoubleConverter im
             Locale loc = locale.getNumberLocale();
             return new Double(localizationService.parseDouble(value, loc));
         } catch (Exception e) {
-            return super.convert(value);
+            return convert(value);
         }
     }
 
+    @Override
+    public Double convert(String value) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+
+        try {
+            return Double.valueOf(value);
+        } catch (NumberFormatException ex){
+            // fail gracefully, we don't want to bubble an exception here
+            return null;
+        }
+    }
+
+    @Override
+    public Class<String> getFrom() {
+        return String.class;
+    }
+
+    @Override
+    public Class<Double> getTo() {
+        return Double.class;
+    }
+
+    @Override
+    public Class<?>[] getToParameters() {
+        return null;
+    }
 }

@@ -154,15 +154,14 @@
             <version>1.6.4</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>java-hamcrest</artifactId>
-            <version>${java.hamcrest.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>java-hamcrest</artifactId>
+                <version>${java.hamcrest.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.lwc</groupId>
                 <artifactId>lwc</artifactId>

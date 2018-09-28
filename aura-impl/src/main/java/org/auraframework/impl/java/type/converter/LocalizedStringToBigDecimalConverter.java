@@ -15,30 +15,30 @@
  */
 package org.auraframework.impl.java.type.converter;
 
+import java.math.BigDecimal;
+import java.util.Locale;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.java.type.LocalizedConverter;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.util.AuraLocale;
-import org.auraframework.util.type.converter.StringToBigDecimalConverter;
 import org.springframework.context.annotation.Lazy;
-
-import javax.inject.Inject;
-import java.math.BigDecimal;
-import java.util.Locale;
 
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
  */
-@Lazy
 @ServiceComponent
-public class LocalizedStringToBigDecimalConverter extends StringToBigDecimalConverter implements
-        LocalizedConverter<String, BigDecimal> {
+public class LocalizedStringToBigDecimalConverter implements LocalizedConverter<String, BigDecimal> {
 
     @Inject
+    @Lazy
     LocalizationAdapter localizationAdapter;
 
     @Inject
+    @Lazy
     LocalizationService localizationService;
 
 
@@ -57,8 +57,37 @@ public class LocalizedStringToBigDecimalConverter extends StringToBigDecimalConv
             Locale loc = locale.getNumberLocale();
             return localizationService.parseBigDecimal(value, loc);
         } catch (Exception e) {
-            return super.convert(value);
+            return convert(value);
         }
     }
 
+    @Override
+    public BigDecimal convert(String value) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+
+        try {
+            return new BigDecimal(value);
+        }
+        catch (NumberFormatException ex) {
+            // fail gracefully, we don't want to bubble an exception here
+            return null;
+        }
+    }
+
+    @Override
+    public Class<String> getFrom() {
+        return String.class;
+    }
+
+    @Override
+    public Class<BigDecimal> getTo() {
+        return BigDecimal.class;
+    }
+
+    @Override
+    public Class<?>[] getToParameters() {
+        return null;
+    }
 }

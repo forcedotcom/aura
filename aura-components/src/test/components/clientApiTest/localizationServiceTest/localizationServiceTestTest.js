@@ -15,9 +15,8 @@
  */
 
 /**
- * Most test cases for format*() APIs are covered by xUnit.
- * xUnit only supports locale en-US, so component tests are testing
- * for localized string.
+ * Most test cases for format*() APIs are covered by xUnit. xUnit only supports
+ * locale en-US, so component tests are testing for localized string.
  */
 ({ // eslint-disable-line no-unused-expressions
     /**
@@ -66,17 +65,17 @@
 
             $A.test.assertEquals(expected, actual, "formatDate() returns an unexpected date string");
         }, function testyyyyWithTh() {
-            var expected = "มี.ค. 12, 2014 3:02:03 ก่อนเที่ยง";
+            var expected = "มี.ค. 12, 2014 03:02:03";
             var date = new Date(2014, 2, 12, 3, 2, 3);
-            var format = "MMM dd, yyyy h:mm:ss A";
+            var format = "MMM dd, yyyy kk:mm:ss";
 
             var actual = $A.localizationService.formatDate(date, format, "th");
 
             $A.test.assertEquals(expected, actual, "formatDate() for the 'th' locale and format with yyyy returns an unexpected date string");
         }, function testyyWithTh() {
-            var expected = "มี.ค. 12, 14 3:02:03 ก่อนเที่ยง";
+            var expected = "มี.ค. 12, 14 03:02:03";
             var date = new Date(2014, 2, 12, 3, 2, 3);
-            var format = "MMM dd, yy h:mm:ss A";
+            var format = "MMM dd, yy kk:mm:ss";
 
             var actual = $A.localizationService.formatDate(date, format, "th");
 
@@ -98,17 +97,17 @@
 
             $A.test.assertEquals(expected, actual, "formatDateUTC() for the 'fr_FR' returns an unexpected date string");
         }, function testyyyyWithTh() {
-            var expected = "มี.ค. 12, 2014 3:22:30 ก่อนเที่ยง";
+            var expected = "มี.ค. 12, 2014 03:22:30";
             var date = new Date(Date.UTC(2014, 2, 12, 3, 22, 30));
-            var format = "MMM dd, yyyy h:mm:ss A";
+            var format = "MMM dd, yyyy kk:mm:ss";
 
             var actual = $A.localizationService.formatDateUTC(date, format, "th");
 
             $A.test.assertEquals(expected, actual, "formatDateUTC() for the 'th' locale and format with yyyy returns an unexpected date string");
         }, function testyyWithTh() {
-            var expected = "มี.ค. 12, 14 3:22:30 ก่อนเที่ยง";
+            var expected = "มี.ค. 12, 14 03:22:30";
             var date = new Date(Date.UTC(2014, 2, 12, 3, 22, 30));
-            var format = "MMM dd, yy h:mm:ss A";
+            var format = "MMM dd, yy kk:mm:ss";
 
             var actual = $A.localizationService.formatDateUTC(date, format, "th");
 
@@ -130,17 +129,17 @@
 
             $A.test.assertEquals(expected, actual, "formatDateTime() returns an unexpected date string");
         }, function testyyyyWithTh() {
-            var expected = "มี.ค. 12, 2014 3:02:03 ก่อนเที่ยง";
+            var expected = "มี.ค. 12, 2014 03:02:03";
             var date = new Date(2014, 2, 12, 3, 2, 3);
-            var format = "MMM dd, yyyy h:mm:ss A";
+            var format = "MMM dd, yyyy kk:mm:ss";
 
             var actual = $A.localizationService.formatDateTime(date, format, "th");
 
             $A.test.assertEquals(expected, actual, "formatDateTime() for the 'th' locale and format with yyyy returns an unexpected date string");
         }, function testyyWithTh() {
-            var expected = "มี.ค. 12, 14 3:02:03 ก่อนเที่ยง";
+            var expected = "มี.ค. 12, 14 03:02:03";
             var date = new Date(2014, 2, 12, 3, 2, 3);
-            var format = "MMM dd, yy h:mm:ss A";
+            var format = "MMM dd, yy kk:mm:ss";
 
             var actual = $A.localizationService.formatDateTime(date, format, "th");
 
@@ -162,17 +161,17 @@
 
             $A.test.assertEquals(expected, actual, "formatDateTimeUTC() for the 'fr_FR' returns an unexpected date string");
         }, function testyyyyWithTh() {
-            var expected = "มี.ค. 12, 2014 3:22:30 ก่อนเที่ยง";
+            var expected = "มี.ค. 12, 2014 03:22:30";
             var date = new Date(Date.UTC(2014, 2, 12, 3, 22, 30));
-            var format = "MMM dd, yyyy h:mm:ss A";
+            var format = "MMM dd, yyyy kk:mm:ss";
 
             var actual = $A.localizationService.formatDateTimeUTC(date, format, "th");
 
             $A.test.assertEquals(expected, actual, "formatDateTimeUTC() for the 'th' locale and format with yyyy returns an unexpected date string");
         }, function testyyWithTh() {
-            var expected = "มี.ค. 12, 14 3:22:30 ก่อนเที่ยง";
+            var expected = "มี.ค. 12, 14 03:22:30";
             var date = new Date(Date.UTC(2014, 2, 12, 3, 22, 30));
-            var format = "MMM dd, yy h:mm:ss A";
+            var format = "MMM dd, yy kk:mm:ss";
 
             var actual = $A.localizationService.formatDateTimeUTC(date, format, "th");
 
@@ -194,17 +193,17 @@
 
             $A.test.assertEquals(expected, actual, "formatTime() returns an unexpected date string");
         }, function testyyyyWithTh() {
-            var expected = "มี.ค. 12, 2014 3:02:03 ก่อนเที่ยง";
+            var expected = "มี.ค. 12, 2014 03:02:03";
             var date = new Date(2014, 2, 12, 3, 2, 3);
-            var format = "MMM dd, yyyy h:mm:ss A";
+            var format = "MMM dd, yyyy kk:mm:ss";
 
             var actual = $A.localizationService.formatTime(date, format, "th");
 
             $A.test.assertEquals(expected, actual, "formatTime() for the 'th' locale and format with yyyy returns an unexpected date string");
         }, function testyyWithTh() {
-            var expected = "มี.ค. 12, 14 3:02:03 ก่อนเที่ยง";
+            var expected = "มี.ค. 12, 14 03:02:03";
             var date = new Date(2014, 2, 12, 3, 2, 3);
-            var format = "MMM dd, yy h:mm:ss A";
+            var format = "MMM dd, yy kk:mm:ss";
 
             var actual = $A.localizationService.formatTime(date, format, "th");
 
@@ -238,17 +237,17 @@
 
             $A.test.assertEquals(expected, actual, "formatTimeUTC() for the 'fr_FR' returns an unexpected date string");
         }, function testyyyyWithTh() {
-            var expected = "มี.ค. 12, 2014 3:22:30 ก่อนเที่ยง";
+            var expected = "มี.ค. 12, 2014 03:22:30";
             var date = new Date(Date.UTC(2014, 2, 12, 3, 22, 30));
-            var format = "MMM dd, yyyy h:mm:ss A";
+            var format = "MMM dd, yyyy kk:mm:ss";
 
             var actual = $A.localizationService.formatTimeUTC(date, format, "th");
 
             $A.test.assertEquals(expected, actual, "formatTimeUTC() for the 'th' locale and format with yyyy returns an unexpected date string");
         }, function testyyWithTh() {
-            var expected = "มี.ค. 12, 14 3:22:30 ก่อนเที่ยง";
+            var expected = "มี.ค. 12, 14 03:22:30";
             var date = new Date(Date.UTC(2014, 2, 12, 3, 22, 30));
-            var format = "MMM dd, yy h:mm:ss A";
+            var format = "MMM dd, yy kk:mm:ss";
 
             var actual = $A.localizationService.formatTimeUTC(date, format, "th");
 

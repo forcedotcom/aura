@@ -37,6 +37,8 @@ ComponentDefLoader.MARKUP = "markup://";
 ComponentDefLoader.RESTRICTED_KEY = "restricted";
 ComponentDefLoader.UNRESTRICTED_KEY = "unrestricted";
 
+ComponentDefLoader.UNKNOWN_ERROR_MESSAGE_PREFIX = "An unknown error occurred attempting to fetch definitions at: ";
+
 ComponentDefLoader.prototype.getContextParameters = function() {
     var params = $A.getContext().getURIComponentDefinitionsParameters();
     var returnQueryString = "";
@@ -380,7 +382,10 @@ ComponentDefLoader.prototype.generateScriptTag = function(uri) {
             function () {
                 var error = that.getError(uri);
                 if (error === undefined) {
-                    reject("An unknown error occurred attempting to fetch definitions at: " + uri);
+                    // if we had an onerror, but didn't get an error message
+                    // we assume there's a network issue and we are potentially offline
+                    $A.clientService.setConnected(false);
+                    reject(ComponentDefLoader.UNKNOWN_ERROR_MESSAGE_PREFIX + uri);
                 } else {
                     reject(error);
                 }

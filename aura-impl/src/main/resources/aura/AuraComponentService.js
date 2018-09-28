@@ -1986,7 +1986,12 @@ AuraComponentService.prototype.createComponentPrivAsync = function (config, call
                     "infiniteLoopProtection:" + descriptor);
             }
             if (err) {
-                callback(null, "ERROR", err.message?err.message:err);
+                var errMsg = err.message?err.message:err;
+                var errState = "ERROR";
+                if ($A.util.isString(errMsg) && errMsg.indexOf(Aura.Component.ComponentDefLoader.UNKNOWN_ERROR_MESSAGE_PREFIX) === 0) {
+                    errState = "INCOMPLETE";
+                }
+                callback(null, errState, errMsg);
             } else {
                 // need to call recursively into this method just in case the new definition needs to be created on the server
                 try {

@@ -26,9 +26,11 @@ define('modules/moduletest', ['x/test', 'lwc'], function (_xTest, lwc) {
 
     class Test extends lwc.LightningElement {
       constructor(...args) {
-        var _temp;
-
-        return _temp = super(...args), this.stringQuote = 'str"ing', this.stringDoubleQuote = "str'ing", this.stringBacktick = `key=${"test tick"}`, this.VALID_NAME_RE = /^([a-zA-Z]\w*):([a-zA-Z]\w*)$/, _temp;
+        super(...args);
+        this.stringQuote = 'str"ing';
+        this.stringDoubleQuote = "str'ing";
+        this.stringBacktick = `key=${"test tick"}`;
+        this.VALID_NAME_RE = /^([a-zA-Z]\w*):([a-zA-Z]\w*)$/;
       }
 
       render() {

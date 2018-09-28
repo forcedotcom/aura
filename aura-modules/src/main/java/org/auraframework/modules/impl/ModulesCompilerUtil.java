@@ -55,6 +55,7 @@ import org.lwc.decorator.DecoratorTarget;
 import org.lwc.decorator.DecoratorTargetAdapter;
 import org.lwc.metadata.ReportMetadata;
 import org.lwc.reference.Reference;
+import org.lwc.reference.ReferenceType;
 
 public final class ModulesCompilerUtil {
 
@@ -274,7 +275,7 @@ public final class ModulesCompilerUtil {
         Set<String> bundleLabels = new HashSet<>();
 
         for (Reference reference : references) {
-            String dep = reference.id;
+            String dep = getDependencyName(reference);
             String type = reference.type.name();
 
             if (type.equals("label")) {
@@ -300,6 +301,11 @@ public final class ModulesCompilerUtil {
         }
 
         return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels, publicProperties, wireDecorations, report);
+    }
+
+    public static String getDependencyName(Reference reference) {
+        String depName = (reference.namespacedId != null) ? reference.namespacedId : reference.id;
+        return reference.type.equals(ReferenceType.component) ? convertKebabCaseToCamelCase(depName) : depName;
     }
 
     public static boolean isDev(OutputConfig config) {
@@ -354,4 +360,26 @@ public final class ModulesCompilerUtil {
         return new OutputConfig(true, false, null, proxyConfig);
     }
 
+    public static String convertKebabCaseToCamelCase(String name) {
+        char [] chars = name.toCharArray();
+        StringBuffer sb = new StringBuffer();
+
+        boolean nsFound = false;
+        boolean upper = false;
+
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] == '-') {
+                if (!nsFound) {
+                    nsFound = true;
+                    sb.append('/');
+                } else {
+                    upper = true;
+                }
+            } else {
+                sb.append(upper ? Character.toUpperCase(chars[i]) : chars[i]);
+                upper = false;
+            }
+        }
+        return sb.toString();
+    }
 }

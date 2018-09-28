@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.system;
 
+import java.util.EnumSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,6 +26,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.auraframework.def.BundleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -32,10 +35,14 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.PlatformDef;
 import org.auraframework.service.CompilerService;
+
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.BundleSourceLoader;
+import org.auraframework.system.BundleSourceOption;
+import org.auraframework.system.CompileOptions;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Source;
+
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.GlobMatcher;
 
@@ -172,7 +179,18 @@ public class BundleAwareDefRegistry implements DefRegistry {
                 try {
                     DefDescriptor<BundleDef> canonical = holder.descriptor;
                     BundleSource<BundleDef> source = getSource(holder);
-                    holder.def = compilerService.compile(canonical, source);
+
+                    // check if compilation should be invoked with namespace aliasing
+                    HashMap<String, String> namespaceMapping = null;
+                    String namespace = source.getDescriptor().getNamespace();
+
+                    if (namespace != null && !namespace.equals("c")) {
+                        namespaceMapping = Maps.newHashMap(ImmutableMap.of("c", namespace));
+                    }
+
+                    CompileOptions compileOptions = new CompileOptions(EnumSet.noneOf(BundleSourceOption.class), namespaceMapping);
+                    holder.def = compilerService.compile(canonical, source, compileOptions);
+
                 } catch (QuickFixException qfe) {
                     holder.qfe = qfe;
                 }

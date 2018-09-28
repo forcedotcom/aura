@@ -18,6 +18,10 @@
 <aura:component isTemplate="true" extensible="true" extends="aura:template">
     <aura:set attribute="title" value="Aura Bootstrap"/>
     <aura:set attribute="auraPreInitBlock">
-        <script>console.log('test');</script>
+        <script>
+            console.log('test');
+            var jsx = function jsx() {}
+            window.jsx = jsx; 
+        </script>
     </aura:set>
 </aura:component>

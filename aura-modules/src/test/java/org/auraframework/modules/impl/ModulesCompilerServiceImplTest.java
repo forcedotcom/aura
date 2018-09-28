@@ -31,6 +31,7 @@ import org.junit.Test;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
+import org.lwc.bundle.BundleType;
 
 public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
     
@@ -55,7 +56,30 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
         String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8);
 
         assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
-        assertEquals("[lwc, x/test]", compilerData.bundleDependencies.toString());
+    }
+
+    @Test
+    public void testCompileNamespaceMapping() throws Exception {
+        String entry = "modules/nsmoduletest/nsmoduletest.js";
+        String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/nsmoduletest/nsmoduletest.html"),
+                Charsets.UTF_8);
+        String sourceClass = Files.toString(getResourceFile("/testdata/modules/nsmoduletest/nsmoduletest.js"),
+                Charsets.UTF_8);
+        String sourceCSS = Files.toString(getResourceFile("/testdata/modules/nsmoduletest/nsmoduletest.css"),
+                Charsets.UTF_8);
+
+        Map<String, String> sources = new HashMap<>();
+        sources.put("modules/nsmoduletest/nsmoduletest.js", sourceClass);
+        sources.put("modules/nsmoduletest/nsmoduletest.html", sourceTemplate);
+        sources.put("modules/nsmoduletest/nsmoduletest.css", sourceCSS);
+
+        Map<String, String> namespaceMapping = new HashMap<>();
+        namespaceMapping.put("c", "ns");
+        ModulesCompilerData compilerData = modulesCompilerService.compile(entry, sources, BundleType.internal, namespaceMapping);
+        String expected = Files.toString(getResourceFile("/testdata/modules/nsmoduletest/nsexpected.js"), Charsets.UTF_8);
+
+        assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
+        assertEquals("[some-module, lwc, ns/bar, x/foo, ns/utils]", compilerData.bundleDependencies.toString());
     }
     
     @Test

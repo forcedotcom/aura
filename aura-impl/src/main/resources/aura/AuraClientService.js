@@ -161,7 +161,10 @@ function AuraClientService (util) {
     this.lastSendTime = Date.now();
 
     this.moduleServices = {};
-    this.moduleScopedImports = { "salesforce": this.defaultSalesforceImportResolver };
+    this.moduleScopedImports = {
+        "salesforce": this.defaultSalesforceImportResolver,
+        "babel": this.babelHelpersResolver
+    };
     this.cssVars = {}; // To support custom variables in IE11 we need to serialized them to the client
     this.moduleScopedImportsCache = {};
 
@@ -2256,6 +2259,25 @@ AuraClientService.prototype.defaultSalesforceImportResolver = function(fullImpor
 
         default: 
             return undefined;
+    }
+};
+
+/**
+ * Default resolver for the @babel-helpers for COMPAT mode.
+ *
+ * @param {String} fullImport The entire path of the module being imported
+ * @memberOf AuraClientService
+ * @private
+ */
+AuraClientService.prototype.babelHelpersResolver = function(fullImport) {
+    var parts = fullImport.split('/');
+    var helperName = parts.pop();
+    var type = parts.pop();
+
+    if (type === 'helpers') {
+        return Aura["compat"]["babelHelpers"][helperName];
+    } else if (helperName === "regenerator") {
+        return Aura["compat"]["regenerator"];
     }
 };
 

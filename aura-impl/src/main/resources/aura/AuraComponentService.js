@@ -84,8 +84,6 @@ AuraComponentService.prototype.get = function(globalId) {
 };
 
 AuraComponentService.prototype.initCoreModules = function () {
-    var compat = window["Aura"] && window["Aura"]["compat"];
-    var babelHelpers = compat && compat["babelHelpers"];
     var ProxyObject = window["Proxy"] || {};
     this.addModule("markup://lwc", "lwc", [], null, this.moduleEngine);
     this.addModule("markup://engine", "engine", [], null, this.moduleEngine); // @dval: legacy -> Remove me in 218
@@ -102,18 +100,6 @@ AuraComponentService.prototype.initCoreModules = function () {
         var moduleName = proxyPrefix + helper;
         this.addModule("markup://" + moduleName, moduleName, [], null, ProxyObject[helper]);
     }.bind(this));
-
-    // Register compat modules
-    if (babelHelpers) {
-        var babelHelpersPrefix = "babel-compat/helpers/";
-        Object.keys(babelHelpers).forEach(function (helper) {
-            var moduleName = babelHelpersPrefix + helper;
-            this.addModule("markup://" + moduleName, moduleName, [], null, babelHelpers[helper]);
-        }.bind(this));
-
-        // Regenerator (for transpiling async stuff)
-        this.addModule("markup://babel-compat/regeneratorRuntime", "babel-compat/regenerator", [], null, compat["regenerator"]);
-    }
 };
 
 /**
@@ -177,6 +163,7 @@ AuraComponentService.prototype.getDescriptorFromConfig = function(descriptorConf
             "getDescriptorFromConfig.descriptorCasingMap");
         return this.descriptorCasingMap[descriptor];
     }
+
     return descriptor;
 };
 

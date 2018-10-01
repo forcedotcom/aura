@@ -1,20 +1,6 @@
-<!--
-
-    Copyright (C) 2013 salesforce.com, inc.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-            http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
--->
-<aura:application template="lockerApiTest:template">
-    <lockerApiTest:indexContent/>
+<aura:application>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <ui:message title="Whoops! Trail closed!" severity="error" closable="false">
+        You’ve accessed an old version of the Locker API Viewer. We’ve improved the tool and moved it to a new location. We think you’ll love the new <a href="https://developer.salesforce.com/docs/component-library/tools/locker-service-viewer">Locker API Viewer</a>. Please update your bookmarks or favorites. We’ll put you on the new trail (that is, redirect you to the new page) automatically in 10 seconds.
+    </ui:message>
 </aura:application>

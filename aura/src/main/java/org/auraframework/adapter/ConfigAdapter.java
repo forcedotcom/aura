@@ -70,19 +70,13 @@ public interface ConfigAdapter extends AuraAdapter {
      *
      * @return a String, may be null
      */
-    String getSessionCacheKey();
+    String getSessionCacheKey(Mode mode);
 
     /**
      * Returns reset css file url
      * @return URL to reset css file
      */
     String getResetCssURL();
-
-    /**
-     * Returns URL of GET request for encryption key
-     * @return URL for encryption key
-     */
-    String getEncryptionKeyURL(Boolean jsFormat);
 
     /**
      * Returns the encryption key for the Crypto Adapter. The key must be a

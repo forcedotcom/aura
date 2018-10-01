@@ -393,17 +393,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     /**
-     * Returns default aura url for encryption key
-     */
-    @Override
-    public String getEncryptionKeyURL(Boolean jsFormat) {
-        AuraContext context = contextService.getCurrentContext();
-        String encodedContext = context.getEncodedURL(AuraContext.EncodingStyle.Normal);
-        String contextPath = context.getContextPath();
-        return String.format("%s/l/%s/app.encryptionkey" + (jsFormat ? ".js" : ""), contextPath, encodedContext);
-    }
-
-    /**
      * Returns default aura encryption key. Key needs to be either 16 or 32 characters in length for AES
      * @return default aura key
      */
@@ -486,7 +475,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             } catch (IOException e) {
                 props = null;
                 auraVersionString = "development";
-                buildTimestamp = System.currentTimeMillis();
+                buildTimestamp = Long.valueOf(System.currentTimeMillis());
             }
             if (auraVersionString == null || auraVersionString.isEmpty()) {
                 throw new AuraError("Unable to read build version from version.prop file");
@@ -504,8 +493,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             } catch (IOException e) {
                 // ignore
             }
-            validateCss = StringUtils.isBlank(validateCssString)
-                    || Boolean.parseBoolean(validateCssString.trim());
+            validateCss = Boolean.valueOf(StringUtils.isBlank(validateCssString)
+                    || Boolean.parseBoolean(validateCssString.trim()));
         }
     }
 
@@ -572,7 +561,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         if (validateCss == null) {
             loadConfig();
         }
-        return validateCss;
+        return validateCss.booleanValue();
     }
 
     @Override
@@ -811,7 +800,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
-    public String getSessionCacheKey() {
+    public String getSessionCacheKey(Mode mode) {
         // return a static session key here, to ensure we always cache unless overriden.
         return "aura.sessionCacheKey";
     }

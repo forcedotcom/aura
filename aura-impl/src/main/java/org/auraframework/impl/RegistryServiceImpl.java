@@ -289,7 +289,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                 if (fileMonitor != null) {
                     Long creationTime = null;
                     if (staticRegs != null && staticRegs.length > 0) {
-                        creationTime = staticRegs[0].getCreationTime();
+                        creationTime = Long.valueOf(staticRegs[0].getCreationTime());
                     }
                     fileMonitor.addDirectory(canonical, creationTime);
                 }
@@ -392,7 +392,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         }
 
         // build cachekey
-        String sessionCacheKey = configAdapter.getSessionCacheKey();
+        String sessionCacheKey = configAdapter.getSessionCacheKey(mode);
         if (sessionCacheKey == null) {
 
             // if session cache key is null, it means that we're not caching this.

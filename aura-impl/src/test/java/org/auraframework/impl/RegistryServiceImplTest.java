@@ -124,7 +124,7 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
 
         // set the config adapter to return null session key.
         ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-        when(mockConfigAdapter.getSessionCacheKey()).thenReturn(null);
+        when(mockConfigAdapter.getSessionCacheKey(Mockito.any())).thenReturn(null);
         rs.setConfigAdapter(mockConfigAdapter);
 
         // set the caching service to return a mocked cache.
@@ -168,7 +168,7 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
 
         // set the config adapter to return the session key.
         ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-        when(mockConfigAdapter.getSessionCacheKey()).thenReturn(sessionCacheKey);
+        when(mockConfigAdapter.getSessionCacheKey(Mockito.any())).thenReturn(sessionCacheKey);
         rs.setConfigAdapter(mockConfigAdapter);
 
         // use real, spied cache service.
@@ -214,7 +214,7 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
 
         // set the config adapter to return the session key.
         ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-        when(mockConfigAdapter.getSessionCacheKey()).thenReturn(sessionCacheKey1);
+        when(mockConfigAdapter.getSessionCacheKey(Mockito.any())).thenReturn(sessionCacheKey1);
         rs.setConfigAdapter(mockConfigAdapter);
 
         // use real, spied cache service.
@@ -232,7 +232,7 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
         RegistrySet registrySet1 = rsSpy.getDefaultRegistrySet(mode, access);
 
         // change session cache key.
-        when(mockConfigAdapter.getSessionCacheKey()).thenReturn(sessionCacheKey2);
+        when(mockConfigAdapter.getSessionCacheKey(Mockito.any())).thenReturn(sessionCacheKey2);
         RegistrySet registrySet2 = rsSpy.getDefaultRegistrySet(mode, access);
 
         // sanity check. Not needed.
@@ -268,7 +268,7 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
 
         // set the config adapter to return the session key.
         ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-        when(mockConfigAdapter.getSessionCacheKey()).thenReturn(sessionCacheKey);
+        when(mockConfigAdapter.getSessionCacheKey(Mockito.any())).thenReturn(sessionCacheKey);
         rs.setConfigAdapter(mockConfigAdapter);
 
         // use real, spied cache service.
@@ -337,7 +337,7 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
 
         // set the config adapter to return "hello world!" session key.
         ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-        when(mockConfigAdapter.getSessionCacheKey()).thenReturn(sessionCacheKey);
+        when(mockConfigAdapter.getSessionCacheKey(Mockito.any())).thenReturn(sessionCacheKey);
         rs.setConfigAdapter(mockConfigAdapter);
 
         // use real caching service
@@ -376,7 +376,7 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
 
         // set the config adapter to return "hello world!" session key.
         ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-        when(mockConfigAdapter.getSessionCacheKey()).thenReturn(sessionCacheKey);
+        when(mockConfigAdapter.getSessionCacheKey(Mockito.any())).thenReturn(sessionCacheKey);
         rs.setConfigAdapter(mockConfigAdapter);
 
         // use real caching service
@@ -401,7 +401,7 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
 
         // set the config adapter to return the session key.
         ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-        when(mockConfigAdapter.getSessionCacheKey()).thenReturn(sessionCacheKey);
+        when(mockConfigAdapter.getSessionCacheKey(Mockito.any())).thenReturn(sessionCacheKey);
         rs.setConfigAdapter(mockConfigAdapter);
 
         // set the caching service to return a mocked cache.

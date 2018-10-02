@@ -39,7 +39,6 @@ import org.junit.Test;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 
 public class TokensDefImplTest extends StyleTestCase {
 

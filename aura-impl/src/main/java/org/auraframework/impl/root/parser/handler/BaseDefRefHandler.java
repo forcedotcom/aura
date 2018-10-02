@@ -36,7 +36,6 @@ import org.auraframework.impl.root.DefinitionReferenceImpl.Builder;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**

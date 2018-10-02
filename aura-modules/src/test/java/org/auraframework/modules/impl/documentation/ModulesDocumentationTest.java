@@ -26,7 +26,6 @@ import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.MetaDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
 import org.junit.Test;
 

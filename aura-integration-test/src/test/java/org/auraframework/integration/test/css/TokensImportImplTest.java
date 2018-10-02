@@ -32,8 +32,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser.Format;
 import org.junit.Test;
 
-import com.google.common.collect.Sets;
-
 public class TokensImportImplTest extends StyleTestCase {
     @Inject
     DefinitionService definitionService;

@@ -15,7 +15,10 @@
  */
 package org.auraframework.integration.test.css;
 
-import com.google.common.collect.Table;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.auraframework.css.FlavorOverrideLocation;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -29,9 +32,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
-import javax.inject.Inject;
-import java.util.HashSet;
-import java.util.Set;
+import com.google.common.collect.Table;
 
 public class FlavorIncludeDefImplTest extends StyleTestCase {
 

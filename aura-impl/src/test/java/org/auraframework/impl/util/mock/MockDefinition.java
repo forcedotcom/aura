@@ -16,7 +16,6 @@
 package org.auraframework.impl.util.mock;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;

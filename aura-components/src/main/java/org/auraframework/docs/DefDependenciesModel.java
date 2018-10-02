@@ -38,7 +38,6 @@ import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  */

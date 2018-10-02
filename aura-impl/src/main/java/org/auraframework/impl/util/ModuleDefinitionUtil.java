@@ -15,14 +15,12 @@
  */
 package org.auraframework.impl.util;
 
-import com.google.common.base.CaseFormat;
+import javax.annotation.Nonnull;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
-
-import javax.annotation.Nonnull;
 
 /**
  * Module definition utils

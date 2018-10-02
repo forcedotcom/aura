@@ -27,7 +27,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.root.component.ComponentDefImpl;
-import org.auraframework.impl.root.parser.handler.ComponentDefHandler.TemplateCallback;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;

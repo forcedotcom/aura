@@ -15,24 +15,24 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.factory.XMLParserBase;
+import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.junit.Test;
-
-import javax.inject.Inject;
-import javax.xml.stream.XMLStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ComponentDefRefHandlerTest extends AuraImplTestCase {
     @Inject

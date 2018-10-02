@@ -33,8 +33,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.collect.Sets;
-
 public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     @Inject
     DefinitionService definitionService;

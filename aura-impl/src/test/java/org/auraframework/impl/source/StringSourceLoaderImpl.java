@@ -15,10 +15,18 @@
  */
 package org.auraframework.impl.source;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
@@ -47,24 +55,16 @@ import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.BundleSource;
-import org.auraframework.system.BundleSourceOption;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.util.FileMonitor;
 
-import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * This source loader allows tests to load and unload source from strings.

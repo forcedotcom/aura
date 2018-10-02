@@ -19,10 +19,10 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.any;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.doReturn;
 
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -52,8 +52,6 @@ import org.mockito.Mockito;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import com.google.common.collect.Maps;
 
 public class ManifestTest extends AuraImplTestCase {
 

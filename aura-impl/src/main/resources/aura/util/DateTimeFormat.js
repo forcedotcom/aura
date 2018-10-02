@@ -668,7 +668,6 @@ Aura.Utils.DateTimeFormat.Token;
  * @returns {Date} A date for the given datetime string, null if datetime string represents an invalid date.
  */
 Aura.Utils.DateTimeFormat.prototype.parse = function(dateTimeString, strictParsing, isUTC) {
-    // the values in config should be all numbers
     var config = {};
 
     for (var i = 0; i < this.tokens.length && dateTimeString.length > 0; i++) {
@@ -697,8 +696,15 @@ Aura.Utils.DateTimeFormat.prototype.parse = function(dateTimeString, strictParsi
             parsedString = value;
         } else {
             var pattern = this.getRegExpPattern(value, strictParsing);
+            if (!pattern) {
+                return null;
+            }
             var match = dateTimeString.match(pattern);
             if (match) {
+                // for strict parsing, the matching should always be the start of the string
+                if (strictParsing && match["index"] !== 0) {
+                    return null;
+                }
                 parsedString = match[0];
                 switch (token["field"]) {
                     case "offset":
@@ -706,14 +712,22 @@ Aura.Utils.DateTimeFormat.prototype.parse = function(dateTimeString, strictParsi
                         break;
                     case "month":
                         // Note: 1-12 means Jan - Dec in config
-                        config["month"] = this.locale.parseMonth(parsedString, token["style"] || this.config["month"]) + 1;
+                        if (token["type"] === "number") {
+                            config["month"] = parseInt(parsedString, 10);
+                        } else {
+                            config["month"] = this.locale.parseMonth(parsedString, token["style"]) + 1;
+                        }
                         break;
                     case "dayperiod":
                         config["isPM"] = this.locale.isPM(parsedString);
                         break;
                     case "weekday":
                         // for verification
-                        config["weekday"] = this.locale.parseWeekday(parsedString, token["style"] || this.config["weekday"]);
+                        if (token["type"] === "number") {
+                            config["weekday"] = parseInt(parsedString, 10);
+                        } else {
+                            config["weekday"] = this.locale.parseWeekday(parsedString, token["style"]);
+                        }
                         break;
                     case "hour":
                         // Grouped pattern, Hmm, Hmmss, hmm, ...
@@ -925,6 +939,7 @@ Aura.Utils.DateTimeFormat.prototype.formatNumberField = function(num, minDigits,
  * @param {!number} offsetInMinute
  * @param {boolean=} delimiter
  * @return {!string} formatted offset.
+ *
  * @private
  */
 Aura.Utils.DateTimeFormat.prototype.formatOffset = function(offsetInMinute, delimiter) {

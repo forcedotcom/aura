@@ -618,4 +618,157 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             Assert.Equal(expected, actual);
         }
     }
-};
+
+    [Fixture]
+    function parse() {
+
+        var mockAura = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                localizationService: new Aura.Services.AuraLocalizationService()
+            },
+            "Aura": Aura
+        });
+
+        [Fact]
+        function ParsesDateTimeStringWithMeridiem() {
+            // Arrange
+            // needs to create the expected due to local zone offset
+            var expected = new Date(2014, 8, 23, 16, 30).toISOString();
+            var format = "MMM dd, yyyy h:mm:ss A";
+            var actual;
+
+            // Act
+            mockAura(function() {
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                actual = dateTimeFormat.parse("Sep 23, 2014 4:30:00 PM");
+            });
+
+            // Assert
+            Assert.Equal(expected, actual.toISOString());
+        }
+
+        [Fact]
+        function Parses24HourDateTimeString() {
+            // Arrange
+            var expected = new Date(2014, 8, 23, 0, 30).toISOString();
+            var format = "MMM dd, yyyy H:mm:ss";
+            var actual;
+
+            // Act
+            mockAura(function() {
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                actual = dateTimeFormat.parse("Sep 23, 2014 00:30:00");
+            });
+
+            // Assert
+            Assert.Equal(expected, actual.toISOString());
+        }
+
+        [Fact]
+        function ParsesTimeWithoutDelimiter() {
+            // Arrange
+            var expected = new Date(2014, 8, 23, 16, 30, 45).toISOString();
+            var format = "MMM dd, yyyy hmmss A";
+            var actual;
+
+            // Act
+            mockAura(function() {
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                actual = dateTimeFormat.parse("Sep 23, 2014 43045 PM");
+            });
+
+            // Assert
+            Assert.Equal(expected, actual.toISOString());
+        }
+
+        [Fact]
+        function ParsesDateTimeStringWithWeekdays() {
+            // Arrange
+            var expected = new Date(2014, 8, 23, 12, 30).toISOString();
+            var format = "EEEE, MMM dd, yyyy H:mm:ss A";
+            var actual;
+
+            // Act
+            mockAura(function() {
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                actual = dateTimeFormat.parse("Tuesday, Sep 23, 2014 12:30:00 PM");
+            });
+
+            // Assert
+            Assert.Equal(expected, actual.toISOString());
+        }
+
+        [Fact]
+        function ParsesDateTimeStringWithMillisecond() {
+            // Arrange
+            var expected = "2014-09-23T12:35:45.345Z";
+            var format = "yyyy-MM-ddTHH:mm:ss.SSSZ";
+            var actual;
+
+            // Act
+            mockAura(function() {
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                actual = dateTimeFormat.parse(expected);
+            });
+
+            // Assert
+            Assert.Equal(expected, actual.toISOString());
+        }
+
+        [Fact]
+        function ParsesInvalidDate() {
+            // Arrange
+            var format = "MMM dd, yyyy h:mm:ss A";
+            var actual;
+
+            // Act
+            mockAura(function() {
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                actual = dateTimeFormat.parse("Sep 88, 2014 1:30:00");
+            });
+
+            // Assert
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        function ParsesInvalidTime() {
+            // Arrange
+            var format = "MMM dd, yyyy h:mm:ss A";
+            var actual;
+
+            // Act
+            mockAura(function() {
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                actual = dateTimeFormat.parse("Sep 23, 2014 88:30:00");
+            });
+
+            // Assert
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        function ParsesMissingOneDigitHourInStrictMode() {
+            // Arrange
+            var format = "MMM dd, yyyy HH:mm:ss";
+            var actual;
+
+            // Act
+            mockAura(function() {
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                actual = dateTimeFormat.parse("Sep 23, 2014 1:30:00", true);
+            });
+
+            // Assert
+            Assert.Null(actual);
+        }
+    }
+}

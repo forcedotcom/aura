@@ -100,6 +100,18 @@ function AuraLocalizationService() {
         /(\d\d)(\d\d)/,
         /(\d\d)/
     ];
+
+    this.UNSIGNED_NUMBER  = /\d+/;  // 0 - infinte
+    this.DIGIT1 = /\d/; // 0 - 9
+    this.DIGIT2 = /\d\d/; // 00 - 99
+    this.DIGIT3 = /\d{3}/; // 000 - 999
+    this.DIGIT4 = /\d{4}/; // 0000 - 9999
+    this.DIGIT1_2 = /\d{1,2}/; // 0 - 99
+    this.DIGIT1_3 = /\d{1,3}/; // 0 - 999
+    this.DIGIT1_4 = /\d{1,4}/; // 0 - 9999
+
+    this.HOUR_MIN = /(\d{1,2})(\d\d)/; // hmm
+    this.HOUR_MIN_SEC = /(\d{1,2})(\d\d)(\d\d)/; // hmmss
 }
 
 /**
@@ -1095,7 +1107,12 @@ AuraLocalizationService.prototype.parseDateTime = function(dateTimeString, parse
     var value = strictParsing ? this.getStrictModeDateTimeString(dateTimeString) : dateTimeString;
     var mDate = this.moment(value, format, this.getAvailableMomentLocale(langLocale), strictParsing);
     if (!mDate || !mDate["isValid"]()) {
-        return null;
+        // TODO: remove moment dependency and enable DateTimeForamt.parse()
+        // langLocale will be fallback to default locale if the locale does not have moment data on the client,
+        // so we should use the original locale here.
+        langLocale = (typeof locale === "string") ? locale : $A.get("$Locale.langLocale");
+        var dateTimeFormat = this.createDateTimeFormat(parseFormat, langLocale);
+        return dateTimeFormat.parse(dateTimeString, strictParsing);
     }
 
     return mDate["toDate"]();
@@ -1161,7 +1178,7 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, pa
 
     var langLocale = locale;
     // recommended signature
-    if (typeof locale === 'boolean') {
+    if (typeof locale === "boolean") {
         strictParsing = locale;
         langLocale = $A.get("$Locale.langLocale");
     } else if (locale !== undefined || strictParsing !== undefined) {
@@ -1185,7 +1202,12 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, pa
     var value = strictParsing ? this.getStrictModeDateTimeString(dateTimeString) : dateTimeString;
     var mDate = this.moment["utc"](value, format, this.getAvailableMomentLocale(langLocale), strictParsing);
     if (!mDate || !mDate["isValid"]()) {
-        return null;
+        // TODO: remove moment dependency and enable DateTimeForamt.parse()
+        // langLocale will be fallback to default locale if the locale does not have moment data on the client,
+        // so we should use the original locale here.
+        langLocale = (typeof locale === "string") ? locale : $A.get("$Locale.langLocale");
+        var dateTimeFormat = this.createDateTimeFormat(parseFormat, langLocale);
+        return dateTimeFormat.parse(dateTimeString, strictParsing, true);
     }
 
     return mDate["toDate"]();

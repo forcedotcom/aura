@@ -65,6 +65,36 @@ ComponentDefLoader.prototype.processRequested = function() {
     }
 };
 
+ComponentDefLoader.prototype.rejectPendingRequestedDescriptor = function(descriptor, error_message) {
+    if (this.requestedDescriptors[descriptor]) {
+        for (var j=0; j < this.requestedDescriptors[descriptor].length; j++) {
+            this.requestedDescriptors[descriptor][j].error(error_message);
+        }
+        delete this.requestedDescriptors[descriptor];
+    }
+};
+
+ComponentDefLoader.prototype.rejectPendingRequested = function(uri, error_message) {
+    // get the descriptors from the URI
+    // don't care about the '?' because the first parameters are never descriptors
+    // even if we create a bad descriptor here, it won't matter because it then won't exist in the requestedDescriptors map
+    var parameters = uri.split("&");
+    for (var p=0; p < parameters.length; p++) {
+        var parts = parameters[p].split("=");
+        if (parts.length === 2) {
+            var paramName = parts[0];
+            if (paramName === ComponentDefLoader.DESCRIPTOR_param) {
+                this.rejectPendingRequestedDescriptor(parts[1], error_message);
+            } else if (paramName[0] !== "_") {
+                var names = parts[1].split(",");
+                for (var n=0; n < names.length; n++) {
+                    this.rejectPendingRequestedDescriptor(ComponentDefLoader.MARKUP + paramName + ":" + names[n], error_message);
+                }
+            }
+        }
+    }
+};
+
 ComponentDefLoader.prototype.buildBundleComponentNamespace = function(descriptors, descriptorMap, existingRequested) {
     if (!$A.util.isArray(descriptors)) {
         //Should we return an empty object here or raise an error?
@@ -114,6 +144,9 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
             if (this.counter <= 0) {
                 this.resolve();
             }
+        },
+        error: function(msg) {
+            this.reject(msg);
         }
     };
 
@@ -233,7 +266,10 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
 
     var processedURI = [];
     if (existingRequested.counter > 0) {
-        processedURI.push(new Promise(function(resolve){ existingRequested.resolve = resolve; }));
+        processedURI.push(new Promise(function(resolve, reject){
+            existingRequested.resolve = resolve;
+            existingRequested.reject = reject;
+        }));
     }
 
     for (var def=0; def<uris.length; def++) {
@@ -385,10 +421,10 @@ ComponentDefLoader.prototype.generateScriptTag = function(uri) {
                     // if we had an onerror, but didn't get an error message
                     // we assume there's a network issue and we are potentially offline
                     $A.clientService.setConnected(false);
-                    reject(ComponentDefLoader.UNKNOWN_ERROR_MESSAGE_PREFIX + uri);
-                } else {
-                    reject(error);
+                    error = ComponentDefLoader.UNKNOWN_ERROR_MESSAGE_PREFIX + uri;
                 }
+                reject(error);
+                that.rejectPendingRequested(uri);
             }
         );
     });

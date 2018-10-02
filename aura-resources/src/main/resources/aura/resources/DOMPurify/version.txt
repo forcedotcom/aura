@@ -1,9 +1,0 @@
-Using a patched version of 0.8.3 from https://github.com/esalman-sfdc/DOMPurify/tree/patch-0.8.3-cache-configs
-
-This was done to ensure that DomPurify doesn't re-process configs (as it is showing up in profiler as a costly operation)
-when called multiple times with the same config object.
-
-It was decided to apply the patch to '0.8.3' to reduce regression risk.
-
-There is a similar pull request in progress at https://github.com/cure53/DOMPurify/pull/201
-Once that is accepted, we could switch aura to using that approach and update DomPurify version earlier in the upcoming release

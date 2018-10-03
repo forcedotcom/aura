@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-09-27
- * Version: 0.5.12
+ * Generated: 2018-10-03
+ * Version: 0.5.13
  */
 
 (function (exports) {
@@ -112,16 +112,11 @@ function getObjectLikeProto() {
 }
 
 /**
- * Prevent an adversary from using TOCTTOU (time-of-check-to-time-of-use) to
- * skip some intermediate ancestors by stringify/propify the property name
- * once, first.
+ * Prevent shape-shifting by stringifying HTML markup!
  */
-function asString(prop) {
-  if (typeof prop === 'symbol') {
-    return prop;
-  }
+function asString(html) {
   try {
-    return `${prop}`;
+    return `${html}`;
   } catch (e) {
     return '';
   }
@@ -337,6 +332,12 @@ function isDOMElementOrNode(el) {
   } catch (e) {
     return false;
   }
+}
+
+function sanitizeHTML(html) {
+  const template = document.createElement('template');
+  template.innerHTML = html;
+  return DOMPurify.sanitize(template.content, domPurifyConfig);
 }
 
 /*
@@ -3758,7 +3759,7 @@ function SecureElement(el, key) {
               `SecureElement.innerHTML cannot be used with ${raw.tagName} elements!`
             );
           }
-          raw.innerHTML = DOMPurify['sanitize'](asString(value), domPurifyConfig);
+          raw.innerHTML = sanitizeHTML(asString(value));
           trustChildNodes(this, raw);
         }
       };
@@ -3830,12 +3831,12 @@ function SecureElement(el, key) {
           // Setting outerHTML on an element removes it from the document tree.
           // It returns no handle to trust the new elements. Here we create the
           // elements in a fragment then insert them in their proper location.
-          const frag = document
-            .createRange()
-            .createContextualFragment(DOMPurify['sanitize'](asString(value), domPurifyConfig));
-          trustChildNodes(this, frag);
-          while (frag.childNodes.length > 0) {
-            const node = frag.childNodes[0];
+          const template = document.createElement('template');
+          template.innerHTML = sanitizeHTML(asString(value));
+          const content = template.content;
+          trustChildNodes(this, content);
+          while (content.childNodes.length > 0) {
+            const node = content.childNodes[0];
             parent.insertBefore(node, raw);
           }
           parent.removeChild(raw);
@@ -4146,7 +4147,7 @@ SecureElement.addStandardElementMethodAndPropertyOverrides = function(
           );
         }
 
-        raw.insertAdjacentHTML(position, DOMPurify['sanitize'](asString(text), domPurifyConfig));
+        raw.insertAdjacentHTML(position, sanitizeHTML(asString(text)));
 
         trustChildNodes(this, parent || raw);
       }

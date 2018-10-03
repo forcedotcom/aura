@@ -40,6 +40,8 @@ public interface TokenValueProvider extends ValueProvider {
      */
     Object getValue(String expression, Location location) throws QuickFixException;
 
+    Object getValue(String expression, Location location, boolean injectCssVarSyntax) throws QuickFixException;
+
     /**
      * Extracts the set of token names referenced in the given string expression.
      *

@@ -589,4 +589,12 @@ public class TokenResolutionTest extends StyleTestCase {
         String src = ".THIS {background-image: token('url(' + baseUrl + '/path/to/image/logo.jpg)')}";
         assertStyle(addStyleDef(src), ".THIS {background-image:url(http://example.com/path/to/image/logo.jpg)}");
     }
+    
+    @Test
+    public void testCssVarTransformLiteralNumber() throws Exception {
+        enableCssVarTransform(true);
+        addNsTokens(tokens().token("small", "100px"));
+        String src = ".THIS {margin: token('calc(' + 0 + ' + ' + small + ')')}";
+        assertStyle(addStyleDef(src), ".THIS {margin:calc(0 + var(--lwc-small,100px))}");
+    }
 }

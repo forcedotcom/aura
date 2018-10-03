@@ -113,13 +113,18 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
     
     @Override
     public Object getValue(String reference, Location location) throws QuickFixException {
+        return getValue(reference, location, false);
+    }
+    
+    @Override
+    public Object getValue(String reference, Location location, boolean injectCssVarSyntax) throws QuickFixException {
         Expression exp = getExpression(reference, location);
         // Scan expression for token references. 
-        if(isCssVarTransformEnabled) {
+        if(isCssVarTransformEnabled && injectCssVarSyntax) {
             CssVariableHelper helper = new CssVariableHelper(location);
             exp = helper.rewriteExpression(exp);
         }
-        
+
         return exp.evaluate(this);
     }
 

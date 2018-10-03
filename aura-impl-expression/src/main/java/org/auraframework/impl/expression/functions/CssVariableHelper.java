@@ -276,24 +276,40 @@ public class CssVariableHelper {
     }
 
     private static boolean isEndOfFunction(Expression expression) {
-        return isLiteral(expression) &&
-               ((String)((Literal)expression).getValue()).trim().startsWith(CLOSE_PAREN);
+        if(isLiteral(expression)) {
+            String value = getStringLiteralValue((Literal) expression);
+            return value != null && value.trim().startsWith(CLOSE_PAREN);
+        }
+        return false;
     }
 
     private static boolean isBeginningOfUrl(Expression expression) {
-        return expression.getExpressionType() == ExpressionType.LITERAL && 
-               ((String)((Literal)expression).getValue()).trim().endsWith(CSS_URL);
+        if(isLiteral(expression)) {
+            String value = getStringLiteralValue((Literal) expression);
+            return value != null && value.trim().endsWith(CSS_URL);
+        }
+        return false;
     }
     
     private boolean isBeginningOfNegativeConcat(Expression expression, Stack<Expression> processing) {
-        return !processing.isEmpty() &&
-               isLiteral(expression) &&
-               ((String) ((Literal)expression).getValue()).endsWith("-");
+        if(!processing.isEmpty() && isLiteral(expression)) {
+            String value = getStringLiteralValue((Literal) expression);
+            return value != null && value.endsWith("-");
+        }
+        return false;
     }
 
     private Literal stripLastNegative(Literal expression) {
         String value = (String) expression.getValue();
         return new LiteralImpl(value.substring(0, value.length() - 1), location);
+    }
+    
+    private static String getStringLiteralValue(Literal expression) {
+        Object value = expression.getValue();
+        if(value instanceof String) {
+            return (String)value;
+        }
+        return null;
     }
     
 }

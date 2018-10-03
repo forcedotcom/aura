@@ -102,7 +102,7 @@ public final class TokenFunctionPlugin implements Plugin {
                 broadcaster.broadcast(new TokenFunction(raw.line(), raw.column(), NORMAL, expression));
             } else {
                 Location location = new Location(null, raw.line(), raw.column(), -1);
-                String evaluated = provider.getValue(expression, location).toString();
+                String evaluated = provider.getValue(expression, location, true).toString();
                 if (evaluated.isEmpty()) {
                     broadcaster.broadcast(new EmptyTerm(expression));
                 } else {

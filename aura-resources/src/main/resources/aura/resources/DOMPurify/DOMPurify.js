@@ -288,6 +288,11 @@ function createDOMPurify() {
    */
   // eslint-disable-next-line complexity
   var _parseConfig = function _parseConfig(cfg) {
+    /* Do not reprocess cfg if it has already been processed */
+    if (CONFIG && CONFIG === cfg) {
+      return;
+    }
+
     /* Shield configuration object from tampering */
     if (!cfg || (typeof cfg === 'undefined' ? 'undefined' : _typeof(cfg)) !== 'object') {
       cfg = {};

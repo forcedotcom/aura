@@ -22,7 +22,7 @@
  */
 function AuraComponentService() {
     // Def registries
-    this.moduleEngine           = Aura["LWC"] || /* legacy */ Aura["Engine"];
+    this.moduleEngine           = Aura["Engine"];
     this.wireService            = Aura["WireService"];
 
     // remove globals

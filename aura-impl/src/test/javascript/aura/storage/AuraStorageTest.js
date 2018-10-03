@@ -119,6 +119,11 @@ Test.Aura.Storage.AuraStorageTest = function() {
             "$A": {
                 util: {
                     format: function() {}
+                },
+                metricsService : {
+                    registerCacheStats : function(name){
+                        return {};
+                    }
                 }
             },
             "AuraStorage": Aura.Storage.AuraStorage
@@ -173,6 +178,11 @@ Test.Aura.Storage.AuraStorageTest = function() {
             "$A": {
                 util: {
                     format: function() {}
+                },
+                metricsService : {
+                    registerCacheStats : function(name){
+                        return {};
+                    }
                 }
             },
             "AuraStorage": {}
@@ -202,6 +212,11 @@ Test.Aura.Storage.AuraStorageTest = function() {
             "$A": {
                 util: {
                     format: function() {}
+                },
+                metricsService: {
+                    registerCacheStats: function(name){
+                        return {};
+                    }
                 }
             },
             "AuraStorage": {}
@@ -230,7 +245,12 @@ Test.Aura.Storage.AuraStorageTest = function() {
             "$A": {
                 util: {
                     format: function() {}
-                }
+                },
+                metricsService: {
+                    registerCacheStats: function(name){
+                        return {};
+                    }
+                },
             },
             "AuraStorage": {}
         });
@@ -264,7 +284,12 @@ Test.Aura.Storage.AuraStorageTest = function() {
             "$A": {
                 util: {
                     format: function() {}
-                }
+                },
+                metricsService: {
+                    registerCacheStats: function(name){
+                        return {};
+                    }
+                },
             },
             "AuraStorage": {}
         });
@@ -301,7 +326,14 @@ Test.Aura.Storage.AuraStorageTest = function() {
                         return typeof obj === 'string';
                     }
                 },
-                metricsService: {},
+                metricsService: {
+                    registerCacheStats: function(name){
+                        return {
+                            "logHits": function(n){},
+                            "logMisses": function(n){}
+                        };
+                    }
+                },
                 assert: function(condition, message){
                     if (!condition) {
                         throw new Error(message);
@@ -386,7 +418,6 @@ Test.Aura.Storage.AuraStorageTest = function() {
             mockA(function() {
                 var target = new Aura.Storage.AuraStorage(config);
                 target.keyPrefix = "";
-
                 target.get("key").then(function(value) {
                     actual = value;
                 });
@@ -451,7 +482,13 @@ Test.Aura.Storage.AuraStorageTest = function() {
                         return typeof obj === 'boolean';
                     }
                 },
-                metricsService: {},
+                metricsService: {
+                    registerCacheStats: function(name){
+                        return {
+                            "logHits": function(n){},
+                            "logMisses": function(n){}
+                        };
+                    }},
                 assert: function(condition, message){
                     if (!condition) {
                         throw new Error(message);
@@ -756,7 +793,6 @@ Test.Aura.Storage.AuraStorageTest = function() {
                 $A.metricsService.transaction = function(ns, name, config) {
                     metricConfig = config;
                 };
-
                 target.getAll();
             });
 
@@ -797,6 +833,9 @@ Test.Aura.Storage.AuraStorageTest = function() {
                     }
                 },
                 metricsService: {
+                    registerCacheStats: function(name){
+                        return {};
+                    },
                     transaction: function() {}
                 },
                 assert: function() {}
@@ -1202,6 +1241,9 @@ Test.Aura.Storage.AuraStorageTest = function() {
                     }
                 },
                 metricsService: {
+                    registerCacheStats: function(name){
+                        return {};
+                    },
                     transaction: function() {}
                 },
                 assert: function() {}
@@ -1403,6 +1445,9 @@ Test.Aura.Storage.AuraStorageTest = function() {
                     }
                 },
                 metricsService: {
+                    registerCacheStats: function(name){
+                        return {};
+                    },
                     transaction: function() {}
                 },
                 assert: function() {}

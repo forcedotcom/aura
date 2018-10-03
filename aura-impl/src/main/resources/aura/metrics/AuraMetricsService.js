@@ -28,6 +28,7 @@ Aura.Services.MetricsService = function MetricsService() {
     this.pluginInstances           = {};
     this.beaconProviders           = {};
     this.transactions              = {};
+    this.cacheStats                = {};
     this.doneBootstrap             = false;
     this.pluginsInitialized        = false;
     this.clearCompleteTransactions = true; // In PTEST Mode this is set to false (see initialize method)
@@ -59,6 +60,8 @@ Aura.Services.MetricsService.WARM_ESTIMATE = 'WARM_ESTIMATE';
 Aura.Services.MetricsService.COLD_ESTIMATE = 'COLD_ESTIMATE';
 Aura.Services.MetricsService.UNKNOWN       = 'UNKNOWN';
 Aura.Services.MetricsService.WARM_SIZE     = 3000;
+Aura.Services.MetricsService.HITS          = 'hits';
+Aura.Services.MetricsService.MISSES          = 'misses';
 
 /**
  * Initialize function
@@ -412,7 +415,7 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
         }
         // 2. execute any beacon middleware
         if (beacon && beacon["middleware"]) {
-            beacon["middleware"](parsedTransaction);
+            beacon["middleware"](parsedTransaction, this.resetAllCacheStats.bind(this));
         }
         // 3. Notify all the global transactionEnd handlers
         if (this.globalHandlers["transactionEnd"].length) {
@@ -1054,3 +1057,93 @@ Aura.Services.MetricsService.prototype.wasResourceFetchedFromServer = function (
         }
     }
 };
+
+/**
+ * Registers an object to track caches stats for given name.
+ * @param {name} Name of the Cache
+ * @export
+*/
+Aura.Services.MetricsService.prototype.registerCacheStats = function(name){
+    if (name in this.cacheStats){
+        throw Error('Cache name : ' + name + ' is already registered to track cache stats');
+    }
+    this.cacheStats[name] = this.initCacheStats(name);
+    var that = this;
+    return {
+        "logHits": function(count){
+            that.updateCacheStats(name, Aura.Services.MetricsService.HITS, count);
+        },
+        "logMisses": function(count){
+            that.updateCacheStats(name, Aura.Services.MetricsService.MISSES, count);
+        },
+        "unRegister": function(){
+            delete that.cacheStats[name];
+        }
+    };
+};
+
+/**
+ * Returns current snapshot of aggregated cache stats after filtering empty stats. 
+ * Intented to be called at end of a page transaction to log summary.
+ * 
+ * @export
+*/
+Aura.Services.MetricsService.prototype.getAllCacheStats = function(){
+    var self = this;
+    var filteredStats = {};
+    Object.keys(this.cacheStats).forEach(function (key) {
+        
+        var stats = self.cacheStats[key];
+        if (stats[Aura.Services.MetricsService.HITS] > 0 || stats[Aura.Services.MetricsService.MISSES] > 0) {
+            filteredStats[key] = $A.util.apply({}, stats);
+        }
+    });
+    return filteredStats;
+};
+
+/**
+ * Resets all cache stats to zero. Intented be called at begining of a new page transactions.
+ * It's a internal only method and should not be exported.
+ * 
+*/
+Aura.Services.MetricsService.prototype.resetAllCacheStats = function(){
+    var self = this;
+    Object.keys(this.cacheStats).forEach(function (key) {
+        self.initCacheStats(key);
+    });
+    
+};
+
+/**
+ * Init cache stats to zero. It's a internal only method and should not be exported.
+*/
+Aura.Services.MetricsService.prototype.initCacheStats = function(key){
+    var stats = this.cacheStats[key] || {};
+    stats[Aura.Services.MetricsService.HITS] = 0;
+    stats[Aura.Services.MetricsService.MISSES] = 0;
+    return stats;
+};
+
+/**
+ * Checks if given key is found in cacheStats map.
+*/
+Aura.Services.MetricsService.prototype.checkCacheKey = function(key){
+    var stats = this.cacheStats[key];
+    if (!stats){
+        throw Error('Cache name : ' + name + ' is not registered or unregistered');
+    }
+    return stats;
+};
+
+/**
+ * Increments given statName with given cacheName in cacheStats map by given count value.
+*/
+Aura.Services.MetricsService.prototype.updateCacheStats = function(cacheName, statName, count){
+    var stats = this.checkCacheKey(cacheName);
+    if (typeof count === "number"){
+        stats[statName]+= count;
+    }else {
+        stats[statName]++;
+    }
+};
+

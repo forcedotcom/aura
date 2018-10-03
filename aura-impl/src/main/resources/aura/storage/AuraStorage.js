@@ -42,6 +42,8 @@ var AuraStorage = function AuraStorage(config) {
 
     // extract values this class uses
     this.name = config["name"];
+    this.cacheStats = $A.metricsService.registerCacheStats('AuraStorage_' + this.name);
+    
     this.maxSize = config["maxSize"];
     this.expiration = config["expiration"] * 1000;
     this.autoRefreshInterval = config["autoRefreshInterval"] * 1000;
@@ -349,27 +351,33 @@ AuraStorage.prototype.getAllInternal = function(keys, includeExpired, resolve, r
     var that = this;
 
     // helper function to log cache hits & misses
-    function logHitsAndMisses(storageResults) {
-        var hit = [], miss = [];
-        var key;
-        for (var j = 0; j < keys.length; j++) {
-            key = keys[j];
-            if (storageResults.hasOwnProperty(key)) {
-                hit.push(key);
-            } else {
-                miss.push(key);
+    function logHitsAndMisses(storageResults, hitsCount) {
+        that.cacheStats["logHits"](hitsCount);
+        that.cacheStats["logMisses"](keys.length - hitsCount);
+
+        if (that.debugLogging){
+            var hit = [], miss = [];
+            var key;
+            for (var j = 0; j < keys.length; j++) {
+                key = keys[j];
+                if (storageResults.hasOwnProperty(key)) {
+                    hit.push(key);
+                } else {
+                    miss.push(key);
+                }
             }
-        }
-        if (hit.length > 0) {
-            that.log(that.LOG_LEVEL.INFO, "getAll() - HIT on key(s): " + hit.join(", "));
-        }
-        if (miss.length > 0) {
-            that.log(that.LOG_LEVEL.INFO, "getAll() - MISS on key(s): " + miss.join(", "));
+            if (hit.length > 0) {
+                that.log(that.LOG_LEVEL.INFO, "getAll() - HIT on key(s): " + hit.join(", "));
+            }
+            if (miss.length > 0) {
+                that.log(that.LOG_LEVEL.INFO, "getAll() - MISS on key(s): " + miss.join(", "));
+            }
         }
     }
 
     var prefixedKeys;
-    if (Array.isArray(keys) && keys.length > 0) {
+    var isKeysPresent = Array.isArray(keys) && keys.length > 0;
+    if (isKeysPresent) {
         prefixedKeys = [];
         for (var i = 0; i < keys.length; i++) {
             prefixedKeys.push(this.keyPrefix + keys[i]);
@@ -381,24 +389,25 @@ AuraStorage.prototype.getAllInternal = function(keys, includeExpired, resolve, r
         ["then"](
             function(items) {
                 that.operationsInFlight -= 1;
-
                 var now = new Date().getTime();
                 var results = {};
                 var item;
                 var key;
+                var hitsCount = 0;
                 for (var k in items) {
                     item = items[k];
                     if (k.indexOf(that.keyPrefix) === 0 && (includeExpired || now < item["expires"])) {
+                        hitsCount++;
                         key = k.substring(that.keyPrefix.length);
                         results[key] = item["value"];
                     }
                     // wrong isolationKey/version or item is expired so ignore the entry
                     // TODO - capture entries to be removed async
                 }
-
+                
                 // explicit logging check because this is costly
-                if (that.debugLogging && Array.isArray(keys) && keys.length > 0) {
-                    logHitsAndMisses(results);
+                if (isKeysPresent) {
+                    logHitsAndMisses(results, hitsCount);
                 }
 
                 return results;
@@ -803,6 +812,8 @@ AuraStorage.prototype.deleteStorage = function() {
 };
 
 AuraStorage.prototype.deleteStorageInternal = function(resolve, reject) {
+    this.cacheStats["unRegister"]();
+
     if (!this.adapter.deleteStorage) {
         resolve();
         return;

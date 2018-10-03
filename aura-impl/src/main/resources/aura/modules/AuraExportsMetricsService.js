@@ -51,5 +51,8 @@ Aura.ExportsMetricsService = {
                 }
             }
         });
-    }
+    },
+    "registerCacheStats": function (name) {
+        return $A.metricsService.registerCacheStats(name);
+     }
 };

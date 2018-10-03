@@ -56,6 +56,7 @@ import org.auraframework.service.ServerService;
 import org.auraframework.service.ServerService.HYDRATION_TYPE;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -103,7 +104,11 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     
             try {
                 if (requestedDescriptors.size() == 0) {
-                    throw new InvalidDefinitionException("Descriptor required", null);
+                    String query = request.getQueryString();
+                    if (StringUtils.isBlank(query)) {
+                        query = "¿vacuo?"; // intentionally not a valid descriptor format
+                    }
+                    throw new InvalidDefinitionException("Descriptor required", new Location(query, 0));
                 }
     
                 updateContext(request);
@@ -211,22 +216,29 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 @SuppressWarnings("resource")
                 PrintWriter out = response.getWriter();
     
-                String loaderErrorString = request.getQueryString().split("&" + componentUIDParam.name)[0];
-                loaderErrorString = loaderErrorString.substring(loaderErrorString.lastIndexOf("&_") + 2);
-                int nextAnd = loaderErrorString.indexOf("&");
-                if (nextAnd < 0) {
-                    if (loaderErrorString.startsWith("def=")) {
-                        nextAnd = 4;
-                    } else {
-                        nextAnd = 0;
+                if (request.getQueryString() != null) {
+                    String loaderErrorString = request.getQueryString().split("&" + componentUIDParam.name)[0];
+
+                    if (StringUtils.isNotBlank(loaderErrorString) && loaderErrorString.contains("&_")) {
+                        loaderErrorString = loaderErrorString.substring(loaderErrorString.lastIndexOf("&_") + 2);
+                        int nextAnd = loaderErrorString.indexOf("&");
+                        if (nextAnd < 0) {
+                            if (loaderErrorString.startsWith("def=")) {
+                                nextAnd = 4;
+                            } else {
+                                nextAnd = 0;
+                            }
+                        }
+                        loaderErrorString = loaderErrorString.substring(nextAnd);
+                        loaderErrorString = loaderErrorString.replaceAll("[^&=_,:/a-zA-Z0-9-]+","");
                     }
+
+                    out.append(String.format("if(!Aura.componentDefLoaderError['%s']){Aura.componentDefLoaderError['%s'] = []} Aura.componentDefLoaderError['%s'].push(/*", loaderErrorString, loaderErrorString, loaderErrorString));
+                    servletUtilAdapter.handleServletException(e, false, context, request, response, true);
+                    out.append(");\n");
+                } else {
+                    servletUtilAdapter.handleServletException(e, false, context, request, response, true);
                 }
-                loaderErrorString = loaderErrorString.substring(nextAnd);
-                loaderErrorString = loaderErrorString.replaceAll("[^&=_,:/a-zA-Z0-9-]+","");
-    
-                out.append(String.format("if(!Aura.componentDefLoaderError['%s']){Aura.componentDefLoaderError['%s'] = []} Aura.componentDefLoaderError['%s'].push(/*", loaderErrorString, loaderErrorString, loaderErrorString));
-                servletUtilAdapter.handleServletException(e, false, context, request, response, true);
-                out.append(");\n");
                 servletUtilAdapter.setNoCache(response);
                 response.setStatus(HttpStatus.SC_OK);
             } finally {

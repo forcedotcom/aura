@@ -1,6 +1,6 @@
-import { processData, getData } from "securemoduletest/nonLockerizedLib";
-import { LightningElement, api } from "lwc";
-import * as testUtils from "securemoduletest/testUtil";
+import { processData, getData } from 'securemoduletest/nonLockerizedLib';
+import { LightningElement, api } from 'lwc';
+import * as testUtils from 'securemoduletest/testUtil';
 
 export default class TestSecureImports extends LightningElement {
     get data() {

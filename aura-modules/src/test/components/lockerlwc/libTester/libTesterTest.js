@@ -43,5 +43,17 @@
         test: function (cmp) {
             cmp.find('test-unsecure-imports').testReturnValueFromUnsecureLibToUnSecureCmp();
         }
+    },
+
+    testSameNamespaceLib: {
+        test: function(cmp) {
+            cmp.find('test-secure-imports').testSameNamespaceLib();
+        }
+    },
+
+    testClassImportFromSameNamespace: {
+        test: function(cmp) {
+            cmp.find('test-secure-imports').testClassImportFromSameNamespace();
+        }
     }
 })

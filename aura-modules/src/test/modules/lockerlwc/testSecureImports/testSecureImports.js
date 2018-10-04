@@ -1,6 +1,8 @@
-import { processData, getData } from "securemoduletest/nonLockerizedLib";
-import { LightningElement, api } from "lwc";
-import * as testUtils from "securemoduletest/testUtil";
+import { processData, getData } from 'securemoduletest/nonLockerizedLib';
+import { LightningElement, api } from 'lwc';
+import * as testUtils from 'securemoduletest/testUtil';
+import * as sameNamespaceUtil from 'lockerlwc/sameNamespaceUtil';
+import * as sameNamespaceUnsecureUtil from 'lockerlwc/sameNamespaceUnsecureUtil';
 
 export default class TestSecureImports extends LightningElement {
     get data() {
@@ -38,6 +40,27 @@ export default class TestSecureImports extends LightningElement {
     testReturnValueFromUnsecureLibToSecureCmp() {
         const returnValue = getData();
         assertReturnedDataIsWrapped(returnValue);
+    }
+
+    @api
+    testSameNamespaceLib() {
+        testUtils.assertTrue(
+            sameNamespaceUtil.toString().indexOf('SecureLib') === -1,
+            'Expect same namespace lockerized lib to be not wrapped in SecureLib'
+        );
+        testUtils.assertTrue(
+            sameNamespaceUnsecureUtil.toString().indexOf('SecureLib') === 0,
+            'Expect same namespace non-lockerized lib to be wrapped in SecureLib'
+        );
+    }
+
+    @api
+    testClassImportFromSameNamespace() {
+        testUtils.assertDefined(sameNamespaceUtil.Dog);
+        const instance = new sameNamespaceUtil.Dog();
+        testUtils.assertDefined(instance, 'Failed to instantiate new instance of an imported class');
+        testUtils.assertEquals('Dog', instance.name);
+        testUtils.assertEquals('woof', instance.bark().sound); // mixin
     }
 }
 

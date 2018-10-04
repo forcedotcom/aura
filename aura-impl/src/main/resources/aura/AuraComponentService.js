@@ -847,7 +847,7 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
     var isInternalNamespace = $A.clientService.isInternalNamespace(namespace);
     if (entry.definition && $A.util.isFunction(entry.definition)) {
         // Decide whether the module should be lockerized or not
-        if ((!isInternalNamespace || (isInternalNamespace && entry[Json.ApplicationKey.REQUIRELOCKER]))) {
+        if (!isInternalNamespace || entry[Json.ApplicationKey.REQUIRELOCKER]) {
             // Eval the definition in a restricted scope
             entry.definition = $A.lockerService.createForModule(entry.definition.toString(), defDescriptor);
 
@@ -867,15 +867,32 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
                 if (typeof deps[i] !== 'function' && depName !== "engine" && depName !== "lwc" && depName[0] !== '@' && depName !== "exports") {
                     var depDefDescriptor = new DefDescriptor(this.moduleNameToDescriptorLookup[depName]);
                     var depNamespace = depDefDescriptor.getNamespace();
-                    var depIsInternalNamespace = $A.clientService.isInternalNamespace(depNamespace);
-                    var isLockerizedDep = !depIsInternalNamespace || (depIsInternalNamespace && this.moduleDefRegistry[depName][Json.ApplicationKey.REQUIRELOCKER]);
-                    var wrappedLibDependency = $A.lockerService.wrapLib(
-                        deps[i],
-                        $A.lockerService.getKeyForNamespace(namespace),
-                        isLockerizedDep,
-                        entry.dependencies[i]
-                    );
-                    deps.splice(i, 1, wrappedLibDependency);
+                    var isInternalNamespaceDep = $A.clientService.isInternalNamespace(depNamespace);
+
+                    // Dependency is an internal namespace dependency("lightning", test namespaces etc)
+                    if (isInternalNamespaceDep) {
+                        // Indicate if the dependency is lockerized or not.
+                        var isLockerizedDep = this.moduleDefRegistry[depName][Json.ApplicationKey.REQUIRELOCKER];
+                        // If dependency is from same namespace and the dependency is lockerized, wrapping is not required
+                        var skipWrapping = (depNamespace === namespace) && isLockerizedDep;
+                        if (!skipWrapping) {
+                            var wrappedInternalLib = $A.lockerService.wrapLib(
+                                deps[i],
+                                $A.lockerService.getKeyForNamespace(namespace),
+                                isLockerizedDep,
+                                entry.dependencies[i]
+                            );
+                            deps.splice(i, 1, wrappedInternalLib);
+                        }
+                    } else if (depNamespace !== namespace) { // Dependency is from a custom namespace, wrap only cross namespace dependency
+                        var wrappedLib = $A.lockerService.wrapLib(
+                            deps[i],
+                            $A.lockerService.getKeyForNamespace(namespace),
+                            true,
+                            entry.dependencies[i]
+                        );
+                        deps.splice(i, 1, wrappedLib);
+                    }
                 }
             }
         }

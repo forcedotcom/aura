@@ -80,10 +80,10 @@ public final class ModulesCompilerNode implements ModulesCompiler {
         //If no configs are passed, we add all configs
         if(configs == null || configs.size() == 0) {
             configs = new ArrayList<>();
-            configs.add(ModulesCompilerUtil.createDevOutputConfig());
-            configs.add(ModulesCompilerUtil.createProdOutputConfig());
-            configs.add(ModulesCompilerUtil.createProdCompatOutputConfig());
-            configs.add(ModulesCompilerUtil.createCompatOutputConfig());
+            configs.add(ModulesCompilerUtil.createDevOutputConfig(bundleType));
+            configs.add(ModulesCompilerUtil.createProdOutputConfig(bundleType));
+            configs.add(ModulesCompilerUtil.createProdCompatOutputConfig(bundleType));
+            configs.add(ModulesCompilerUtil.createCompatOutputConfig(bundleType));
         }
 
         // normalize sources to exclude file path

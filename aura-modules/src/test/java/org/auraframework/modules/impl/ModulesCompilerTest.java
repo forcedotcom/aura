@@ -221,7 +221,7 @@ public class ModulesCompilerTest extends UnitTestCase {
     @Test
     public void testCompileWithOnlyDevConfig() throws Exception {
 
-        OutputConfig devConfig = ModulesCompilerUtil.createDevOutputConfig();
+        OutputConfig devConfig = ModulesCompilerUtil.createDevOutputConfig(BundleType.internal);
         ModulesCompilerData compilerData = compileModule("modules/moduletest/moduletest", Lists.newArrayList(devConfig));
         String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8);
 
@@ -232,21 +232,64 @@ public class ModulesCompilerTest extends UnitTestCase {
         assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
     }
 
+    @Test
+    public void testCompileInternalShouldReplaceNodeEnv() throws Exception {
+        OutputConfig devConfig = ModulesCompilerUtil.createDevOutputConfig(BundleType.internal);
+        OutputConfig prodConfig = ModulesCompilerUtil.createProdOutputConfig(BundleType.internal);
+        ModulesCompilerData compilerData = compileModule("modules/nodeEnv/nodeEnv", Lists.newArrayList(devConfig, prodConfig));
+
+        String devCode = compilerData.codes.get(CodeType.DEV);
+        System.out.println(devCode);
+        assertTrue(
+                "Prod console should be stripped",
+                devCode.contains("I am in dev") && !devCode.contains("I am in prod")
+        );
+
+        String prodCode = compilerData.codes.get(CodeType.PROD);
+        System.out.println(prodCode);
+        assertTrue(
+                "Dev console should be stripped",
+                !prodCode.contains("I am in dev") && prodCode.contains("I am in prod")
+        );
+    }
+
+    @Test
+    public void testCompilePlatformShouldIgnoreNodeEnv() throws Exception {
+        OutputConfig devConfig = ModulesCompilerUtil.createDevOutputConfig(BundleType.platform);
+        OutputConfig prodConfig = ModulesCompilerUtil.createProdOutputConfig(BundleType.platform);
+        ModulesCompilerData compilerData = compileModule("modules/nodeEnv/nodeEnv", Lists.newArrayList(devConfig, prodConfig));
+
+        String devCode = compilerData.codes.get(CodeType.DEV);
+        System.out.println(devCode);
+        assertTrue(
+                "Console should not be stripped in dev",
+                devCode.contains("I am in dev") && devCode.contains("I am in prod")
+        );
+
+        String prodCode = compilerData.codes.get(CodeType.PROD);
+        assertTrue(
+                "Console should not be stripped in prod",
+                prodCode.contains("I am in dev") && prodCode.contains("I am in prod")
+        );
+    }
+
     private ModulesCompilerData compileModule(String modulePath) throws Exception {
             return compileModule(modulePath, null);
     }
 
     private ModulesCompilerData compileModule(String modulePath, List<OutputConfig> configs) throws Exception {
         ModulesCompiler compiler = new ModulesCompilerNode(FACTORY, loggingService);
-        String jsModule = modulePath + ".js";
-        String htmlModule = modulePath + ".html";
-        String sourceTemplate = Files.toString(getResourceFile("/testdata/" + htmlModule), Charsets.UTF_8);
-        String sourceClass = Files.toString(getResourceFile("/testdata/" + jsModule), Charsets.UTF_8);
+
         Map<String, String> sources = new HashMap<>();
-        sources.put(jsModule, sourceClass);
-        sources.put(htmlModule, sourceTemplate);
+
+        String htmlModule = modulePath + ".html";
+        String htmlSource = Files.toString(getResourceFile("/testdata/" + htmlModule), Charsets.UTF_8);
+        sources.put(htmlModule, htmlSource);
+
+        String jsModule = modulePath + ".js";
+        String jsSource = Files.toString(getResourceFile("/testdata/" + jsModule), Charsets.UTF_8);
+        sources.put(jsModule, jsSource);
 
         return compiler.compile(jsModule, sources, BundleType.internal, null, configs);
     }
-
 }

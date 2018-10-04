@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import org.lwc.CompilerReport;
 import org.lwc.OutputConfig;
 import org.lwc.bundle.BundleResult;
+import org.lwc.bundle.BundleType;
 import org.lwc.classmember.ClassMember;
 import org.lwc.classmember.MemberType;
 import org.lwc.decorator.Decorator;
@@ -226,18 +227,15 @@ public final class ModulesCompilerUtil {
 
 
     // this is open-source to platform compiler output conversion
-    public static ModulesCompilerData parsePlatformCompilerOutput(CompilerReport report) {
+    public static ModulesCompilerData parsePlatformCompilerOutput(CompilerReport report) throws Exception {
         // TODO: figure out better strategy to pass diagnostics, perhaps add diagnostics to ModulesCompilerData
         // TODO: alternative it to detect failure and throw with a list of diagnostics
 
         // loop over config objects and create bundles
         Map<CodeType, String> codeMap = new EnumMap<>(CodeType.class);
 
-        //JSONObject metadata = report.getJSONObject("metadata");
         ReportMetadata metadata = report.metadata;
-
         List<Reference> references = metadata.references;
-
         List<BundleResult> results = report.results;
 
         for (BundleResult bundle : results) {
@@ -253,9 +251,7 @@ public final class ModulesCompilerUtil {
             } else if (isProdCompat(config)) {
                 codeMap.put(CodeType.PROD_COMPAT, code);
             } else {
-                // this should never happen
-                //throw new Exception("Unable to map bundle config to a mode: " + config);
-                return null;
+                throw new Exception("Unable to map bundle config to a mode: " + config);
             }
         }
 
@@ -297,61 +293,63 @@ public final class ModulesCompilerUtil {
     }
 
     public static boolean isDev(OutputConfig config) {
-        return config.minify == false
-                && config.compat == false
-                && config.env.get("NODE_ENV").equals("development");
+        return !config.minify && !config.compat;
     }
 
     public static boolean isProd(OutputConfig config) {
-        return config.minify == true
-                && config.compat == false
-                && config.env.get("NODE_ENV").equals("production");
+        return config.minify && !config.compat;
     }
 
     public static boolean isCompat(OutputConfig config) {
-        return config.minify == false
-                && config.compat == true
-                && config.env.get("NODE_ENV").equals("development");
+        return !config.minify && config.compat;
     }
 
     public static boolean isProdCompat(OutputConfig config) {
-        return config.minify == true
-                && config.compat == true
-                && config.env.get("NODE_ENV").equals("production");
+        return config.minify && config.compat;
     }
 
-    public static OutputConfig createDevOutputConfig() {
+    public static OutputConfig createDevOutputConfig(BundleType bundleType) {
         Map<String, String> env = new HashMap<>();
-        env.put("NODE_ENV", "development");
+        if (bundleType != BundleType.platform) {
+            env.put("NODE_ENV", "development");
+        }
 
         return new OutputConfig(false, false, env, null);
-
     }
-    public static OutputConfig createProdOutputConfig() {
-        Map<String, String> env = new HashMap<>();
-        env.put("NODE_ENV", "production");
 
-        return new OutputConfig(false, true, env, null);
-    }
-    public static OutputConfig createProdCompatOutputConfig() {
+    public static OutputConfig createCompatOutputConfig(BundleType bundleType) {
         Map<String, String> env = new HashMap<>();
-        env.put("NODE_ENV", "production");
-
-        Map<String, Object> proxyMap = new HashMap<>();
-        proxyMap.put("independent", "proxy-compat");
-        Optional<Map<String, Object>> proxyConfig = Optional.of(proxyMap);
-
-        return new OutputConfig(true, true, env, proxyConfig);
-    }
-    public static OutputConfig createCompatOutputConfig() {
-        Map<String, String> env = new HashMap<>();
-        env.put("NODE_ENV", "development");
+        if (bundleType != BundleType.platform) {
+            env.put("NODE_ENV", "development");
+        }
 
         Map<String, Object> proxyMap = new HashMap<>();
         proxyMap.put("independent", "proxy-compat");
         Optional<Map<String, Object>> proxyConfig = Optional.of(proxyMap);
 
         return new OutputConfig(true, false, env, proxyConfig);
+    }
+
+    public static OutputConfig createProdOutputConfig(BundleType bundleType) {
+        Map<String, String> env = new HashMap<>();
+        if (bundleType != BundleType.platform) {
+            env.put("NODE_ENV", "production");
+        }
+
+        return new OutputConfig(false, true, env, null);
+    }
+
+    public static OutputConfig createProdCompatOutputConfig(BundleType bundleType) {
+        Map<String, String> env = new HashMap<>();
+        if (bundleType != BundleType.platform) {
+            env.put("NODE_ENV", "production");
+        }
+
+        Map<String, Object> proxyMap = new HashMap<>();
+        proxyMap.put("independent", "proxy-compat");
+        Optional<Map<String, Object>> proxyConfig = Optional.of(proxyMap);
+
+        return new OutputConfig(true, true, env, proxyConfig);
     }
 
     public static String convertKebabCaseToCamelCase(String name) {

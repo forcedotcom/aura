@@ -16,6 +16,7 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
@@ -26,11 +27,11 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.DocumentationDefBuilder;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DescriptionDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ExampleDef;
 import org.auraframework.def.MetaDef;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
+import org.auraframework.pojo.Description;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -82,10 +83,9 @@ public class DocumentationDefHandler extends FileTagHandler<DocumentationDef> {
         String tag = getTagName();
 
         if (DescriptionDefHandler.TAG.equalsIgnoreCase(tag)) {
-            DescriptionDef desc = new DescriptionDefHandler<DocumentationDef>(this, xmlReader, source,
-                    isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter).getElement();
-            String name = desc.getName();
-            builder.addDescription(name, desc);
+            Description desc = new DescriptionDefHandler(this, 
+                    xmlReader, source).getElement();
+            builder.addDescription(desc.getName(), desc);
 
         } else if (ExampleDefHandler.TAG.equalsIgnoreCase(tag)) {
             ExampleDef ex = new ExampleDefHandler(this, xmlReader, source, isInInternalNamespace, definitionService,

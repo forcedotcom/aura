@@ -143,7 +143,6 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         TOKEN_DESCRIPTOR_PROVIDER(TokenDescriptorProviderDef.class), //
         TOKEN_MAP_PROVIDER(TokenMapProviderDef.class), //
         DOCUMENTATION(DocumentationDef.class), //
-        DESCRIPTION(DescriptionDef.class), //
         EXAMPLE(ExampleDef.class), //
         META(MetaDef.class), //
         TESTSUITE(TestSuiteDef.class), //

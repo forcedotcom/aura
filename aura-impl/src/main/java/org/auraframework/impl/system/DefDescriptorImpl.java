@@ -126,7 +126,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 break;
             // subtypes
             case ACTION:
-            case DESCRIPTION:
                 throw new AuraRuntimeException(
                         String.format("%s descriptor must be a subdef: %s", defType.name(), qualifiedName));
             case ATTRIBUTE:

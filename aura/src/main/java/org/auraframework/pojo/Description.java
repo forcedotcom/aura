@@ -13,9 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
+package org.auraframework.pojo;
 
-public interface DescriptionDef extends Definition {
-    @Override
-    DefDescriptor<DescriptionDef> getDescriptor();
+import java.io.Serializable;
+
+/**
+ * aura:description 
+ * Holds aura:documentation description name and body
+ */
+public class Description implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    private final String name;
+    private final String body;
+    
+    public Description(String name, String body) {
+        this.name = name;
+        this.body = body;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getBody() {
+        return body;
+    }
+    
+    public String toString() {
+        return this.body;
+    }
 }

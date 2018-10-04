@@ -101,7 +101,7 @@ public class DocumentationDefTest extends AuraImplTestCase {
         RootDefinition c = (RootDefinition) definitionService.getDefinition(qualifiedName, defType);
         DocumentationDef docDef = c.getDocumentationDef();
         assertNotNull("DocumentationDef not found!", docDef);
-        assertEquals("Number DescriptionDefs don't match the expected value!", noOfDescs, docDef.getDescriptionDefs().size());
+        assertEquals("Number DescriptionDefs don't match the expected value!", noOfDescs, docDef.getDescriptions().size());
     }
     
     @Test
@@ -116,6 +116,22 @@ public class DocumentationDefTest extends AuraImplTestCase {
         
         int expected = 1;
         int actual = def.getMetaDefsAsMap().size();
+        
+        assertEquals("Did not get expected number of meta defs", expected, actual);
+    }
+    
+    @Test
+    public void testGetDescription() throws Exception {
+        String docDefSource = "<aura:documentation>" +
+                "<aura:description>random description</aura:description>" +
+                "<aura:meta name='foo' value='bar' />" + 
+                "</aura:documentation>";
+
+        DefDescriptor<DocumentationDef> dd = addSourceAutoCleanup(DocumentationDef.class, docDefSource);
+        DocumentationDef def = definitionService.getDefinition(dd);              
+        
+        int expected = 1;
+        int actual = def.getDescriptionsAsMap().size();
         
         assertEquals("Did not get expected number of meta defs", expected, actual);
     }

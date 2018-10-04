@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.builder.DocumentationDefBuilder;
-import org.auraframework.def.DescriptionDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ExampleDef;
 import org.auraframework.def.MetaDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.pojo.Description;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -38,37 +38,30 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
 
     private static final long serialVersionUID = 7808842576422413967L;
 
-    private final Map<String, DescriptionDef> descriptionDefs;
+    private final Map<String, Description> descriptions;
     private final Map<String, ExampleDef> exampleDefs;
     private final Map<String, MetaDef> metaDefs;
 
     protected DocumentationDefImpl(Builder builder) {
         super(builder);
 
-        this.descriptionDefs = AuraUtil.immutableMap(builder.descriptionMap);
+        this.descriptions = AuraUtil.immutableMap(builder.descriptionMap);
         this.exampleDefs = AuraUtil.immutableMap(builder.exampleMap);
         this.metaDefs = AuraUtil.immutableMap(builder.metaMap);
     }
 
     @Override
-    public List<DescriptionDef> getDescriptionDefs() {
-        return Lists.newArrayList(descriptionDefs.values());
-    }
-
-    @Override
-    public Map<String, DescriptionDef> getDescriptionDefsAsMap() {
-        return descriptionDefs;
-    }
-
-    @Override
-    public List<String> getDescriptions(){
-        ArrayList<String> ret = new ArrayList<>();
-
-        for (DescriptionDef descDef : descriptionDefs.values()) {
-            ret.add(descDef.getDescription());
+    public List<String> getDescriptions() {
+        ArrayList<String> ret = new ArrayList<String>();
+        for (Description d : descriptions.values()) {
+            ret.add(d.getBody());
         }
-
         return ret;
+    }
+
+    @Override
+    public Map<String, Description> getDescriptionsAsMap() {
+        return descriptions;
     }
 
     @Override
@@ -95,7 +88,7 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
 
-        if (descriptionDefs.isEmpty()) {
+        if (descriptions.isEmpty()) {
             throw new InvalidDefinitionException("<aura:documentation> must contain at least one <aura:description>", getLocation());
         }
         
@@ -109,7 +102,7 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
             super(DocumentationDef.class);
         }
 
-        private final LinkedHashMap<String, DescriptionDef> descriptionMap = new LinkedHashMap<>();
+        private final LinkedHashMap<String, Description> descriptionMap = new LinkedHashMap<>();
         private final LinkedHashMap<String, ExampleDef> exampleMap = new LinkedHashMap<>();
         private final LinkedHashMap<String, MetaDef> metaMap = new LinkedHashMap<>();
 
@@ -121,9 +114,8 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
             return new DocumentationDefImpl(this);
         }
 
-        @Override
-        public DocumentationDefBuilder addDescription(String id, DescriptionDef description) {
-            this.descriptionMap.put(id, description);
+        public DocumentationDefBuilder addDescription(String id, Description desc) {
+            this.descriptionMap.put(id, desc);
             return this;
         }
 
@@ -137,6 +129,6 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
         public DocumentationDefBuilder addMeta(String id, MetaDef metaDef) {
             this.metaMap.put(id, metaDef);
             return this;
-        }       
+        }
     }
 }

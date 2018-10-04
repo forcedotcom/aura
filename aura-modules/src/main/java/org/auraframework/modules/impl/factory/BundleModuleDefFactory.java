@@ -39,7 +39,6 @@ import org.auraframework.def.SVGDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.impl.DefinitionAccessImpl;
-import org.auraframework.impl.documentation.DescriptionDefImpl;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.MetaDefImpl;
@@ -49,6 +48,7 @@ import org.auraframework.impl.service.CompilerServiceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.modules.impl.metadata.ModulesMetadataService;
+import org.auraframework.pojo.Description;
 import org.auraframework.service.CompilerService;
 import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.system.AuraContext;
@@ -282,12 +282,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             DocumentationDefImpl.Builder docDefBuilder = new DocumentationDefImpl.Builder();
 
             docDefBuilder.setDescriptor(getDefDescriptor(sourceMap, ModuleDef.MARKDOWN_PREFIX, DocumentationDef.class));
-
-            DescriptionDefImpl.Builder descriptionBuilder = new DescriptionDefImpl.Builder();
-            descriptionBuilder.setName("main"); // only one description so arbitrary name is ok
-            descriptionBuilder.setDescription(documentation.getHtml().get());
-            DescriptionDefImpl description = descriptionBuilder.build();
-            docDefBuilder.addDescription(description.getName(), description);
+            docDefBuilder.addDescription("main", new Description("main", documentation.getHtml().get()));
 
             for (Entry<String, Object> entry : documentation.getMetadata().entrySet()) {
                 MetaDefImpl.Builder metaBuilder = new MetaDefImpl.Builder();

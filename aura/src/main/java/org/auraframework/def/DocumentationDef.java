@@ -18,32 +18,33 @@ package org.auraframework.def;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.pojo.Description;
+
 /**
  */
 public interface DocumentationDef extends Definition {
     @Override
     DefDescriptor<DocumentationDef> getDescriptor();
-    
-    List<DescriptionDef> getDescriptionDefs();
-    
+
     /**
      * @return map from DescriptionDef name to DescriptionDef
-     */            
-    Map<String, DescriptionDef> getDescriptionDefsAsMap();
-    
+     */
+    Map<String, Description> getDescriptionsAsMap();
+
     /**
-     * Convenience method 
-     * @return list of description strings from this DocumentationDef's DescriptionDefs
+     * Convenience method
+     *
+     * @return list of description from this DocumentationDef
      */
     List<String> getDescriptions();
-    
+
     List<ExampleDef> getExampleDefs();
-    
+
     /**
      * @return map from ExampleDef name to ExampleDef
      */
     Map<String, ExampleDef> getExampleDefsAsMap();
-    
+
     /**
      * Gets the {@link MetaDef} within this documentation.
      */

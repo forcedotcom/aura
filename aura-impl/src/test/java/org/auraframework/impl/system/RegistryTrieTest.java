@@ -478,7 +478,7 @@ public class RegistryTrieTest extends AuraTestCase {
     @Test
     public void testGetRegistriesMatchesDefTypes() {
         MockRegistry reg1 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("markup");
-        MockRegistry reg2 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("js").setDefTypes(DefType.DOCUMENTATION, DefType.DESCRIPTION);
+        MockRegistry reg2 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("js").setDefTypes(DefType.DOCUMENTATION);
         MockRegistry reg3 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("js").setDefTypes(DefType.COMPONENT);
         MockRegistry reg4 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("js").setDefTypes(DefType.LIBRARY);
         MockRegistry reg5 = new MockRegistry().setNamespaces("other").setPrefixes("js");

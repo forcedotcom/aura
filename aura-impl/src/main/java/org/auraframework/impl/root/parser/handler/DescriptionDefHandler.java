@@ -15,39 +15,34 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.DefinitionParserAdapter;
-import org.auraframework.def.DescriptionDef;
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.impl.documentation.DescriptionDefImpl;
-import org.auraframework.impl.system.SubDefDescriptorImpl;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.system.TextSource;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.util.Set;
 
-public class DescriptionDefHandler<P> extends ParentedTagHandler<DescriptionDefImpl, DocumentationDef> {
+import org.auraframework.pojo.Description;
+import org.auraframework.system.TextSource;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.ImmutableSet;
+
+public class DescriptionDefHandler extends BaseXMLElementHandler {
 
     public static final String TAG = "aura:description";
 
     private static final String ATTRIBUTE_NAME = "name";
-    
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME);
+    private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME);
 
+    private DocumentationDefHandler parenthandler;
+
+    private String name;
     private final StringBuilder body = new StringBuilder();
-    private final DescriptionDefImpl.Builder builder = new DescriptionDefImpl.Builder();
 
-    public DescriptionDefHandler(DocumentationDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                                 boolean isInInternalNamespace, DefinitionService definitionService,
-                                 ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
-        builder.setAccess(getAccess(isInInternalNamespace));
+    public DescriptionDefHandler(DocumentationDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source) {
+        super(xmlReader, source);
+        this.parenthandler = parentHandler;
     }
-
+    
     @Override
     public Set<String> getAllowedAttributes() {
         return ALLOWED_ATTRIBUTES;
@@ -55,23 +50,25 @@ public class DescriptionDefHandler<P> extends ParentedTagHandler<DescriptionDefI
 
     @Override
     protected void readAttributes() {
-    	String name = getAttributeValue(ATTRIBUTE_NAME);
-    	if (name == null) {
+        String name = getAttributeValue(ATTRIBUTE_NAME);
+        if (name == null) {
             name = ((DocumentationDefHandler)getParentHandler()).getNextId();
-    	}
-        builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, getParentHandler().defDescriptor, DescriptionDef.class));
-        builder.setName(name);
-        builder.setLocation(getLocation());
+        }
+        this.name = name;
+    }
+
+    private DocumentationDefHandler getParentHandler() {
+        return this.parenthandler;
     }
 
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
-    	body.append(handleHTML());
+        this.body.append(handleHTML());
     }
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
-        body.append(handleHTMLText());
+        this.body.append(handleHTMLText());
     }
 
     @Override
@@ -79,13 +76,8 @@ public class DescriptionDefHandler<P> extends ParentedTagHandler<DescriptionDefI
         return TAG;
     }
 
-    @Override
-    protected void finishDefinition() throws QuickFixException {
-        builder.setDescription(body.toString());
-    }
-
-    @Override
-    protected DescriptionDefImpl createDefinition() throws QuickFixException {
-        return builder.build();
+    public Description getElement() throws QuickFixException, XMLStreamException {
+        readElement();
+        return new Description(this.name, this.body.toString());
     }
 }

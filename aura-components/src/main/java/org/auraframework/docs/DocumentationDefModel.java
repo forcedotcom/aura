@@ -24,30 +24,30 @@ import org.auraframework.util.json.JsonSerializable;
 
 public class DocumentationDefModel implements JsonSerializable {
 
-	private final DocumentationDef docDef;
+    private final DocumentationDef docDef;
 
-	DocumentationDefModel(DocumentationDef docDef) {
-		this.docDef = docDef;
-	}
+    DocumentationDefModel(DocumentationDef docDef) {
+        this.docDef = docDef;
+    }
 
-	public String getDescriptor() {
-		return this.docDef.getDescriptor().getQualifiedName();
-	}
-	
-	public List<String> getDescriptions() {
-		return this.docDef.getDescriptions();
-	}
-	
-	public boolean getHasExamples() {
-		return !this.docDef.getExampleDefs().isEmpty();
-	}
+    public String getDescriptor() {
+        return this.docDef.getDescriptor().getQualifiedName();
+    }
 
-	@Override
-	public void serialize(Json json) throws IOException {
-		json.writeMapBegin();
-		json.writeMapEntry("descriptor", getDescriptor());
-		json.writeMapEntry("descriptions", getDescriptions());
-		json.writeMapEntry("hasExamples", getHasExamples());
-		json.writeMapEnd();
-	}
+    public List<String> getDescriptions() {
+        return this.docDef.getDescriptions();
+    }
+
+    public boolean getHasExamples() {
+        return !this.docDef.getExampleDefs().isEmpty();
+    }
+
+    @Override
+    public void serialize(Json json) throws IOException {
+        json.writeMapBegin();
+        json.writeMapEntry("descriptor", getDescriptor());
+        json.writeMapEntry("descriptions", getDescriptions());
+        json.writeMapEntry("hasExamples", getHasExamples());
+        json.writeMapEnd();
+    }
 }

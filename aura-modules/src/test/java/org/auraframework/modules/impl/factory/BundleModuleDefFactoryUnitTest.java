@@ -491,17 +491,19 @@ public class BundleModuleDefFactoryUnitTest {
         meta.put("number", new Integer(1));
         meta.put("boolean", new Boolean(false));
         meta.put("list", Lists.newArrayList("one", "two", "three"));
-        BundleDocumentation bundleDocumentation = new BundleDocumentation(null, "<p>hello world!</p>", meta);
+        String html = "<p>hello world!</p>";
+        BundleDocumentation bundleDocumentation = new BundleDocumentation(null, html, meta);
 
         ModulesCompilerService modulesCompilerService = mockModulesCompilerService(bundleDocumentation);
 
         BundleModuleDefFactory factory = new BundleModuleDefFactory();
-        factory.setModulesCompilerService(modulesCompilerService);
-
+        factory.setModulesCompilerService(modulesCompilerService); 
         ModuleDef moduleDef = factory.getDefinition(descriptor, mockBundleSource);
+       
         DocumentationDef documentationDef = moduleDef.getDocumentationDef();
-
         assertNotNull("documentation def should be set", documentationDef);
+        assertNotNull("description should be set", documentationDef.getDescriptionsAsMap());
+        assertEquals(html, documentationDef.getDescriptionsAsMap().get("main").toString());
 
         Map<String, MetaDef> metaDefsMap = documentationDef.getMetaDefsAsMap();
 

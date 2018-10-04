@@ -15,19 +15,20 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import org.auraframework.def.DescriptionDef;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ExampleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.factory.DocumentationXMLParser;
 import org.auraframework.impl.source.StringSource;
+import org.auraframework.pojo.Description;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
-
-import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
 
 public class DocumentationDefHandlerTest extends AuraImplTestCase {
     @Inject
@@ -36,16 +37,28 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
     @Test
     public void testDocDefWithDescription() throws Exception {
         String description = "testing <code>DocumentationDef</code> &lt;ui:inputText/&gt;";
+        String description2 = "more testing <code>DocumentationDef</code> &lt;ui:inputText/&gt;";
         String name = "sample Description";
-        String docDefSource = "<aura:documentation><aura:description name='" + name + "'>" + description + "</aura:description></aura:documentation>";
+        String name2 = "sample Description 2";
+        String docDefSource = 
+                "<aura:documentation>" +
+                "<aura:example name='foo' ref='bar' label='baz'>foo-bar</aura:example>" +
+                "<aura:description name='" + name + "'>" + description + "</aura:description>" + 
+                "<aura:description name='" + name2 + "'>" + description2 + "</aura:description>" + 
+                "</aura:documentation>";
 
         DocumentationDef dd = parse(docDefSource);
         dd.validateDefinition();
 
-        List<DescriptionDef> descDefs = dd.getDescriptionDefs();
-        assertEquals(1, descDefs.size());
-        assertEquals(name, descDefs.get(0).getName());
-        assertEquals(description, descDefs.get(0).getDescription());
+        List<String> descs = dd.getDescriptions();
+        assertEquals(2, descs.size());
+        assertEquals(description, descs.get(0));
+        assertEquals(description2, descs.get(1));
+
+        Map<String,Description> descMap = dd.getDescriptionsAsMap();
+        assertEquals(2, descMap.size());
+        assertEquals(description, descMap.get(name).getBody());
+        assertEquals(description2, descMap.get(name2).getBody());
     }
 
     @Test
@@ -62,9 +75,8 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
         List<String> descs = dd.getDescriptions();
         assertEquals(2, descs.size());
 
-        for (String d : descriptions) {
-            assertTrue(descs.contains(d));
-        }
+        assertTrue(descs.get(0).contains(descriptions[0]));
+        assertTrue(descs.get(1).contains(descriptions[1]));
     }
 
     @Test
@@ -76,11 +88,11 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
                 "</aura:documentation>";
 
         DocumentationDef dd = parse(docDefSource);
-        List<DescriptionDef> descDefs = dd.getDescriptionDefs();
+        Map<String,Description> desc = dd.getDescriptionsAsMap();
 
         //for now we overwrite descriptions if they have same name
         dd.validateDefinition();
-        assertEquals(1, descDefs.size());
+        assertEquals(1, desc.size());
 
         /* We want to make this a validation error in future
         QuickFixException expected = null;

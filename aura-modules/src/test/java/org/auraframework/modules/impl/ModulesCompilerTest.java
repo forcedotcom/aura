@@ -131,7 +131,6 @@ public class ModulesCompilerTest extends UnitTestCase {
             compileModule("modules/errorInHtml/errorInHtml");
             fail("should report a syntax error");
         } catch (Exception e) {
-            e.printStackTrace();
             String message = Throwables.getRootCause(e).getMessage();
             assertTrue(message, message.contains(
                     "Invalid HTML syntax: non-void-html-element-start-tag-with-trailing-solidus. For more information, please visit https://html.spec.whatwg.org/multipage/parsing.html#parse-error-non-void-html-element-start-tag-with-trailing-solidus"));
@@ -183,7 +182,7 @@ public class ModulesCompilerTest extends UnitTestCase {
                     message);
         }
     }
-    
+
     @Test
     public void testCompileWithoutConfigs() throws Exception {
         ModulesCompiler compiler = new ModulesCompilerNode(FACTORY, loggingService);
@@ -206,7 +205,7 @@ public class ModulesCompilerTest extends UnitTestCase {
         assertNotNull(compilerData.codes.get(CodeType.COMPAT));
         assertNotNull(compilerData.codes.get(CodeType.DEV));
     }
-    
+
     @Test
     public void testCompileWithEmptyConfigs() throws Exception {
         ModulesCompilerData compilerData = compileModule("modules/moduletest/moduletest", new ArrayList<OutputConfig>());
@@ -218,7 +217,7 @@ public class ModulesCompilerTest extends UnitTestCase {
         assertNotNull(compilerData.codes.get(CodeType.COMPAT));
         assertNotNull(compilerData.codes.get(CodeType.DEV));
     }
-    
+
     @Test
     public void testCompileWithOnlyDevConfig() throws Exception {
 
@@ -232,9 +231,9 @@ public class ModulesCompilerTest extends UnitTestCase {
         assertNull(compilerData.codes.get(CodeType.COMPAT));
         assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
     }
-    
+
     private ModulesCompilerData compileModule(String modulePath) throws Exception {
-    	    return compileModule(modulePath, null);
+            return compileModule(modulePath, null);
     }
 
     private ModulesCompilerData compileModule(String modulePath, List<OutputConfig> configs) throws Exception {

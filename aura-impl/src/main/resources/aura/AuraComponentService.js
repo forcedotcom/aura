@@ -83,6 +83,10 @@ AuraComponentService.prototype.get = function(globalId) {
     return this.indexes.globalId[globalId];
 };
 
+AuraComponentService.prototype.isComponentConstructor = function(Ctor) {
+    return typeof Ctor === 'function' && this.moduleEngine["isComponentConstructor"](Ctor);
+};
+
 AuraComponentService.prototype.initCoreModules = function () {
     var ProxyObject = window["Proxy"] || {};
     this.addModule("markup://lwc", "lwc", [], null, this.moduleEngine);

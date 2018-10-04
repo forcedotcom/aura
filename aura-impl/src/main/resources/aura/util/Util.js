@@ -1733,6 +1733,26 @@ Aura.Utils.Util.prototype.getElementAttributeValue = function(element,attributeN
 };
 
 /**
+* @description Attempts to set focus on 'target'.
+* @param {HTMLElement|Component} target The DOM element or Component to which to send focus.
+* @export
+*/
+Aura.Utils.Util.prototype.setFocus=function(target){
+    if(this.isComponent(target)){
+        if(!target.focus){
+            target=target.getElement();
+        }
+    }
+    if(target&&target.focus){
+        try{
+            target.focus();
+        }catch(e){
+            // Fail quietly
+        }
+    }
+};
+
+/**
  *
  * @description Returns a custom data attribute value from a DOM element.
  * For more information on custom data attributes, see http://html5doctor.com/html5-custom-data-attributes/

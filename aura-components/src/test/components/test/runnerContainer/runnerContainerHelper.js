@@ -159,7 +159,7 @@
 
         //select all visible tests
         selectAll.addEventListener('change', $A.getCallback(function(){
-            self.toggleSelection(cmp, selectAll, dom);
+            self.toggleSelection(cmp, selectAll.checked, dom);
         }));
 
 
@@ -318,9 +318,9 @@
         $A.util.setDataAttribute(button, 'selected', selected);
         button.firstChild.checked = selected;
     },
-    toggleSelection: function (cmp, select_all_checkbox, dom) {
+    toggleSelection: function (cmp, select, dom) {
         var filtered   = dom.querySelectorAll('li:not([data-visible="hidden"]) input[type="checkbox"]'),
-            isSelectedAll = select_all_checkbox.checked,
+            isSelectedAll = !!select,
             input,
             i;
 
@@ -360,6 +360,10 @@
         return true;//all matched
     },
     filterTests: function (cmp, dom, query, logicOps, isCaseSensitive, testTypesArray) {
+        // Clear out previous selections
+        this.toggleSelection(cmp,false,dom);
+        cmp.find("toggle_select_all").getElement().checked=false;
+
         var children  = dom.querySelectorAll(".list-test-item"),
             calcOperator = logicOps === 'AND' ? this.calcAndOperators : this.calcOrOperators,
             hasAtLeastOneVisible = false,
@@ -463,6 +467,9 @@
             //update current count
             this.updateTestCountStat(cmp, hashVisibleTestCount);
         }
+
+        this.toggleSelection(cmp,!!query,dom);
+        cmp.find("toggle_select_all").getElement().checked=!!query;
     },
     _getLiFromInput: function (input) {
         return input.parentElement.parentElement.parentElement;

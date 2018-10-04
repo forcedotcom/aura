@@ -16,8 +16,11 @@
 
 -->
 <aura:component 
-    model="java://org.auraframework.test.testsetrunner.TestSetRunnerModel" 
-    controller="java://org.auraframework.test.testsetrunner.TestSetRunnerController">
+	model="java://org.auraframework.test.testsetrunner.TestSetRunnerModel" 
+	controller="java://org.auraframework.test.testsetrunner.TestSetRunnerController">
+	
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+	<aura:handler name="render" value="{!this}" action="{!c.render}"/>
 
     <aura:attribute name="scope" type="String" />
     <aura:attribute name="keyword" type="String" />
@@ -34,7 +37,7 @@
                     <option>AND</option>
                     <option selected="selected">OR</option>
                 </select>
-                <input class="search" type="text" placeholder="Type to filter tests (multiple searches: keyword1, keyword2)" value="{!v.keyword}" />
+                <input aura:id="filterInput" class="search" type="text" placeholder="Type to filter tests (multiple searches: keyword1, keyword2)" value="{!v.keyword}" />
                 <button class="run" title="Run Selected Tests">
                     <span>Run!</span>
                 </button>
@@ -65,7 +68,7 @@
         </div>
         <div class="container_header_row">
             <div class="chk">
-                <input type="checkbox" id="toggle_select_all" title="Select all visible tests"/>
+                <input type="checkbox" aura:id="toggle_select_all" id="toggle_select_all" title="Select all visible tests"/>
             </div>
             <div class="test_type">Type</div>
             <div class="test_name">Test Name</div>

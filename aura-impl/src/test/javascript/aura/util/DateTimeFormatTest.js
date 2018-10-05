@@ -22,26 +22,41 @@ Function.RegisterNamespace("Test.Aura.Util");
 [Fixture]
 Test.Aura.Util.DateTimeFormatTest = function() {
     var Aura = {
-        Utils: { Util: {} },
-        Services: {},
+        Utils: {
+            SecureFilters: {},
+            Util: {}
+        },
+        Services: {}
     };
 
     // Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
     Mocks.GetMocks(Object.Global(), {
         "Aura": Aura,
         "AuraLocalizationService": function(){},
+        "navigator": {
+            "userAgent": ""
+        },
+        "window": {}
     })(function() {
         [Import("aura-impl/src/main/resources/aura/AuraLocalizationService.js")];
         [Import("aura-impl/src/main/resources/aura/util/DateTimeFormat.js"),
-         Import("aura-impl/src/main/resources/aura/util/Locale.js")];
+         Import("aura-impl/src/main/resources/aura/util/Locale.js"),
+         Import("aura-impl/src/main/resources/aura/util/Util.js")];
     });
 
     [Fixture]
     function format() {
-
         var mockAura = Mocks.GetMocks(Object.Global(), {
             "$A": {
-                localizationService: new Aura.Services.AuraLocalizationService()
+                assert: function (condition, assertMessage) {
+                    if (!condition) {
+                        throw new Error(assertMessage);
+                    }
+                },
+                localizationService: new Aura.Services.AuraLocalizationService(),
+                util: {
+                    isUndefinedOrNull: Aura.Utils.Util.prototype.isUndefinedOrNull
+                }
             },
             "Aura": Aura
         });
@@ -422,7 +437,6 @@ Test.Aura.Util.DateTimeFormatTest = function() {
         }
     }
 
-
     [Fixture]
     function formatWithoutFormatToPartsSupport() {
 
@@ -433,7 +447,15 @@ Test.Aura.Util.DateTimeFormatTest = function() {
 
         var mockAura = Mocks.GetMocks(Object.Global(), {
             "$A": {
-                "localizationService": localizationService
+                assert: function (condition, assertMessage) {
+                    if (!condition) {
+                        throw new Error(assertMessage);
+                    }
+                },
+                "localizationService": localizationService,
+                util: {
+                    isUndefinedOrNull: Aura.Utils.Util.prototype.isUndefinedOrNull
+                }
             },
             "Aura": Aura
         });
@@ -624,7 +646,15 @@ Test.Aura.Util.DateTimeFormatTest = function() {
 
         var mockAura = Mocks.GetMocks(Object.Global(), {
             "$A": {
-                localizationService: new Aura.Services.AuraLocalizationService()
+                assert: function (condition, assertMessage) {
+                    if (!condition) {
+                        throw new Error(assertMessage);
+                    }
+                },
+                localizationService: new Aura.Services.AuraLocalizationService(),
+                util: {
+                    isUndefinedOrNull: Aura.Utils.Util.prototype.isUndefinedOrNull
+                }
             },
             "Aura": Aura
         });
@@ -769,6 +799,65 @@ Test.Aura.Util.DateTimeFormatTest = function() {
 
             // Assert
             Assert.Null(actual);
+        }
+    }
+    
+    [Fixture]
+    function constructor() {
+
+        var mockAura = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                assert: function (condition, assertMessage) {
+                    if (!condition) {
+                        throw new Error(assertMessage);
+                    }
+                },
+                localizationService: new Aura.Services.AuraLocalizationService(),
+                util: {
+                    isUndefinedOrNull: Aura.Utils.Util.prototype.isUndefinedOrNull
+                }
+            },
+            "Aura": Aura
+        });
+
+        [Fact, Data({format: null},
+                    {format: undefined})]
+        function NullFormat(data) {
+            // Arrange
+            var expected = "[Assertion failed] - 'formatString' argument is required; it must not be null or undefined";
+            var actual;
+
+            // Act
+            mockAura(function() {
+                try {
+                    new Aura.Utils.DateTimeFormat(data.format, new Aura.Utils.Locale("en-US"));
+                } catch(e) {
+                    actual = e.message;
+                }
+            });
+            
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact, Data({locale: null},
+                    {locale: undefined})]
+        function NullLocale(data) {
+            // Arrange
+            var expected = "[Assertion failed] - 'locale' argument is required; it must not be null or undefined";
+            var actual;
+
+            // Act
+            mockAura(function() {
+                try {
+                    new Aura.Utils.DateTimeFormat("MMM dd, yyyy h:mm:ss a", data.locale);
+                } catch(e) {
+                    actual = e.message;
+                }
+            });
+            
+            // Assert
+            Assert.Equal(expected, actual);
         }
     }
 }

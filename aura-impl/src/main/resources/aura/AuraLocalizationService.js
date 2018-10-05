@@ -1107,6 +1107,9 @@ AuraLocalizationService.prototype.parseDateTime = function(dateTimeString, parse
     var value = strictParsing ? this.getStrictModeDateTimeString(dateTimeString) : dateTimeString;
     var mDate = this.moment(value, format, this.getAvailableMomentLocale(langLocale), strictParsing);
     if (!mDate || !mDate["isValid"]()) {
+        if ($A.util.isUndefinedOrNull(parseFormat)) {
+            return null;
+        }
         // TODO: remove moment dependency and enable DateTimeForamt.parse()
         // langLocale will be fallback to default locale if the locale does not have moment data on the client,
         // so we should use the original locale here.
@@ -1202,6 +1205,9 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, pa
     var value = strictParsing ? this.getStrictModeDateTimeString(dateTimeString) : dateTimeString;
     var mDate = this.moment["utc"](value, format, this.getAvailableMomentLocale(langLocale), strictParsing);
     if (!mDate || !mDate["isValid"]()) {
+        if($A.util.isUndefinedOrNull(parseFormat)) {
+            return null;
+        }
         // TODO: remove moment dependency and enable DateTimeForamt.parse()
         // langLocale will be fallback to default locale if the locale does not have moment data on the client,
         // so we should use the original locale here.

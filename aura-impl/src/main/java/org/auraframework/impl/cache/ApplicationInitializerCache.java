@@ -15,25 +15,90 @@
  */
 package org.auraframework.impl.cache;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.auraframework.annotations.Annotations.AppInitializer;
 import org.auraframework.instance.ApplicationInitializer;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
+import com.google.common.collect.ImmutableMap;
 
 @Lazy
 @Component
 @Scope(BeanDefinition.SCOPE_SINGLETON)
-public class ApplicationInitializerCache {
-    private static final ConcurrentHashMap<String, Map<String, ApplicationInitializer>> initializerMap = new ConcurrentHashMap<>();
+public class ApplicationInitializerCache implements ApplicationContextAware {
+    private ApplicationContext applicationContext;
 
-    public Map<String, ApplicationInitializer> get(String applicationName, Supplier<Map<String, ApplicationInitializer>> loader) {
-        Map<String, ApplicationInitializer> result = initializerMap.computeIfAbsent(applicationName, k -> loader.get());
+    private volatile boolean initialized;
 
-        return result;
+    private Map<String, Map<String, ApplicationInitializer>> initializerMap = null;
+
+    private final Map<String, ApplicationInitializer> EMPTY_MAP =
+        new ImmutableMap.Builder<String, ApplicationInitializer>().build();
+        
+    private void setupInitializerMap() {
+        if (initialized) {
+            return;
+        }
+        synchronized (this) {
+            if (initialized) {
+                return;
+            }
+            Map<String, Map<String, ApplicationInitializer>> building = new HashMap<>();
+            initializerMap = building;
+            Map<String, ApplicationInitializer> appMap;
+            Map<String, ApplicationInitializer> initializers;
+
+            initializers = applicationContext.getBeansOfType(ApplicationInitializer.class);
+            if (initializers != null) {
+                for (ApplicationInitializer initializer : initializers.values()) {
+                    AppInitializer annotation;
+
+                    annotation = AnnotationUtils.findAnnotation(initializer.getClass(), AppInitializer.class);
+                    if (annotation == null) {
+                        // Whoops. What should we do.
+                        continue;
+                    }
+                    for (String app : annotation.applications()) {
+                        appMap = building.get(app);
+                        if (appMap == null) {
+                            appMap = new HashMap<>();
+                            building.put(app, appMap);
+                        }
+                        appMap.put(annotation.name(), initializer);
+                    }
+                }
+            }
+            initializerMap = building;
+            initialized = true;
+        }
+    }
+
+    public Map<String, ApplicationInitializer> getInitializers(String applicationName) {
+        setupInitializerMap();
+        Map<String, ApplicationInitializer> value = initializerMap.get(applicationName);
+        if (value != null) {
+            return value;
+        }
+        return EMPTY_MAP;
+    }
+
+    public List<String> getApplicationList() {
+        setupInitializerMap();
+        return new ArrayList<>(initializerMap.keySet());
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 }

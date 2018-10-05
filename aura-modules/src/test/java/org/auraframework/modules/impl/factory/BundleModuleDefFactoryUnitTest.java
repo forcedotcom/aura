@@ -15,10 +15,29 @@
  */
 package org.auraframework.modules.impl.factory;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.same;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
@@ -60,28 +79,10 @@ import org.lwc.metadata.ReportMetadata;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.same;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -121,13 +122,13 @@ public class BundleModuleDefFactoryUnitTest {
 
     private ModulesCompilerService mockModulesCompilerService() throws Exception {
         CompilerReport compilerReport = new CompilerReport(true, "version", new ArrayList<>(), new ArrayList<>(),
-                new ReportMetadata(), null);
+                new ReportMetadata(null, null, null), null);
         return mockModulesCompilerService(compilerReport);
     }
 
     private ModulesCompilerService mockModulesCompilerService(BundleDocumentation bundleDocumentation) throws Exception {
         CompilerReport compilerReport = new CompilerReport(true, "version", new ArrayList<>(), new ArrayList<>(),
-                new ReportMetadata(), bundleDocumentation);
+                new ReportMetadata(null, null, null), bundleDocumentation);
         return mockModulesCompilerService(compilerReport);
     }
 
@@ -591,7 +592,7 @@ public class BundleModuleDefFactoryUnitTest {
 
         Diagnostic diagnostic = new Diagnostic(DiagnosticLevel.FATAL, "Unable to parse front matter", Optional.empty(), Optional.empty());
         CompilerReport compilerReport = new CompilerReport(false, "version", Lists.newArrayList(diagnostic),
-                new ArrayList<>(), new ReportMetadata(), null);
+                new ArrayList<>(), new ReportMetadata(null, null, null), null);
         ModulesCompilerService modulesCompilerService = mockModulesCompilerService(compilerReport);
 
         // current compiler behavior throws runtime exception when there is a compiler error
@@ -642,7 +643,7 @@ public class BundleModuleDefFactoryUnitTest {
                 "version",
                 new ArrayList<>(),
                 new ArrayList<>(),
-                new ReportMetadata(),
+                new ReportMetadata(null, null, null),
                 null);
 
         ModulesCompilerData compilerData = new ModulesCompilerData(mockCodeMap(),

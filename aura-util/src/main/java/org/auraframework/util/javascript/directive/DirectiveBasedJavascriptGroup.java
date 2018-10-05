@@ -320,47 +320,54 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
             compatHelpersMinSource = getSource("lwc/proxy-compat/compat.min.js");
         }  catch (MalformedURLException e) {}
 
-        String header = "\"undefined\"===typeof Aura&&(Aura={});";
+        String iifeBegin = "\"undefined\"===typeof Aura&&(Aura={});(function getModuleGlobals(window){\n";
+        String iifeEnd = "}).call(Aura, window);\n";
         if (engineSource != null && wireSource != null) {
-            this.engine = header
+            this.engine = iifeBegin
                     + engineSource
-                    + wireSource;
+                    + wireSource
+                    + iifeEnd;
         }
 
         if (engineMinSource != null && wireMinSource != null) {
-            this.engineMin = header
+            this.engineMin = iifeBegin
                     + engineMinSource
-                    + wireMinSource;
+                    + wireMinSource
+                    + iifeEnd;
         }
 
         if (compatHelpersSource != null && engineCompatSource != null && wireCompatSource != null) {
             this.engineCompat = compatHelpersSource
                     + "\n"
-                    + header
+                    + iifeBegin
                     + engineCompatSource
-                    + wireCompatSource;
+                    + wireCompatSource
+                    + iifeEnd;
         }
 
         if (compatHelpersMinSource != null && engineCompatMinSource != null && wireCompatMinSource != null) {
             this.engineCompatMin = compatHelpersMinSource
                     + "\n"
-                    + header
+                    + iifeBegin
                     + engineCompatMinSource
-                    + wireCompatMinSource;
+                    + wireCompatMinSource
+                    + iifeEnd;
         }
 
         if (engineProdDebugSource != null && wireProdDebugSource != null) {
-            this.engineProdDebug = header
+            this.engineProdDebug = iifeBegin
                     + engineProdDebugSource
-                    + wireProdDebugSource;
+                    + wireProdDebugSource
+                    + iifeEnd;
         }
 
         if (compatHelpersSource != null && engineCompatProdDebugSource != null && wireCompatProdDebugSource != null) {
             this.engineCompatProdDebug = compatHelpersSource
                     + "\n"
-                    + header
+                    + iifeBegin
                     + engineCompatProdDebugSource
-                    + wireCompatProdDebugSource;
+                    + wireCompatProdDebugSource
+                    + iifeEnd;
         }
     }
 

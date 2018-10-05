@@ -32,8 +32,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.lwc.decorator.DecoratorParameterValue;
-import org.lwc.decorator.DecoratorParameterValueType;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -109,7 +107,7 @@ public class ModuleDefImplUnitTest {
                 new ModulesCompilerData.WireAdapter("getRecord", "record-service"),
                 ImmutableMap.of("Id", "$userId"),
                 ImmutableMap.of("FirstName",
-                    new DecoratorParameterValue(DecoratorParameterValueType.STRING, "John")))));
+                    ImmutableMap.of("type", "string", "value", "John")))));
 
         ModuleDef moduleDef = moduleDefBuilder.build();
 

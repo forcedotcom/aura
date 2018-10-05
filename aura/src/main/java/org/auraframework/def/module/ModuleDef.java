@@ -15,16 +15,15 @@
  */
 package org.auraframework.def.module;
 
+import java.util.List;
+import java.util.Collection;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.PlatformDef;
-import org.auraframework.def.SVGDef;
 import org.auraframework.modules.ModulesCompilerData;
+import org.auraframework.def.SVGDef;
 import org.lwc.reference.Reference;
-import org.lwc.template.TemplateModuleDependencies;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Module Definition
@@ -107,11 +106,5 @@ public interface ModuleDef extends PlatformDef {
      *
      */
     Collection<ModulesCompilerData.WireDecoration> getWireDecorations();
-
-    /**
-     *  Returns a list of templates and the modules used in them along with their parameters.
-     *
-     */
-    List<TemplateModuleDependencies> getExperimentalTemplateModuleDependencies();
 
 }

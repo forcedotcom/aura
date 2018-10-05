@@ -7,14 +7,13 @@ export default class Foo extends LightningElement {
         super();
         this.items = [
             {
-                id: "k1",
                 label: 'item1',
                 items: [
-                    { id: "k1.1", label: 'item1.1', items: [] },
-                    { id: "k1.2", label: 'item1.2', items: [] }
+                    { label: 'item1.1', items: [] },
+                    { label: 'item1.2', items: [] }
                 ]
             },
-            { id: "k2", label: 'item2', items: [] }
+            { label: 'item2', items: [] }
         ];
     }
 }

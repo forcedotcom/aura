@@ -26,7 +26,6 @@ function InteropComponent(config) {
     this.containerComponentId = config["containerComponentId"];
     this.componentDef = cmpDef;
     this.interopClass = cmpDef.interopClass;
-    this.interopCtor = cmpDef.interopCtor;
     this.interopDef = cmpDef.interopDef;
     this._customElement = null;
 
@@ -378,13 +377,13 @@ InteropComponent.prototype.get = function (key) {
         var msg = "The provided key (" + key + ") is not a string and cannot be used to look up values for the current component.";
         throw new $A.auraError(msg);
     }
-
+    
     if (key === 'version') {
         // handle special case for "act like" version which is not supported by LWC but used in Aura components
         // See AuraClientService.getAccessVersion
         return null;
     }
-
+    
     key = $A.expressionService.normalize(key);
     var path = key.split('.');
     path.shift(); // remove provider
@@ -505,7 +504,7 @@ InteropComponent.prototype.setupInteropInstance = function () {
     // W-4708703 This cache needs to be init/reset whenever we setup an interop instance
     this.currentClassMap = {};
 
-    var Ctor = this.interopCtor;
+    var Ctor = this.interopClass;
     var element = $A.componentService.moduleEngine['createElement'](this.componentDef.elementName, { 'is': Ctor, 'fallback': shadowDomFallback });
     var cmp = this;
     element.__customElement = 1;
@@ -553,7 +552,7 @@ InteropComponent.prototype.setupInteropInstance = function () {
 
 /**
  * Allow users to toggle Shadow DOM enablement via a URI param for local testing.
- *
+ * 
  * For example, loading the following would enable Shadow DOM: localhost:9090/foo/bar.cmp?aura.shadowDom=1
  */
 InteropComponent.prototype.isShadowDomUriFlagSet = function() {
@@ -587,7 +586,7 @@ InteropComponent.prototype.swapInteropElement = function (currentElement, newEle
     this.updateContainerElement(this.getContainer(), currentElement, newElement);
 
     // only for components, not libraries
-    if (this.componentDef.hasElementConstructor()) {
+    if (typeof this.interopClass === 'function') {
         var cmp = this;
         var lwcCmp = this.getElement();
 

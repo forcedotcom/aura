@@ -15,14 +15,13 @@
  */
 package org.auraframework.modules;
 
-import org.auraframework.def.module.ModuleDef.CodeType;
-import org.lwc.CompilerReport;
-import org.lwc.classmember.ClassMember;
-import org.lwc.decorator.DecoratorParameterValue;
-
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
+
+import org.auraframework.def.module.ModuleDef.CodeType;
+import org.lwc.CompilerReport;
+import org.lwc.classmember.ClassMember;
 
 /**
  * POJO with the data ModulesCompilerService generates
@@ -65,14 +64,14 @@ public final class ModulesCompilerData {
         public final String name;
         public final WireAdapter adapter;
         public final Map<String, String> params;
-        public final Map<String, DecoratorParameterValue> staticFields;
+        public final Map<String, Object> staticFields;
 
         public WireDecoration(
                 String type,
                 String name,
                 WireAdapter adapter,
                 Map<String, String> params,
-                Map<String, DecoratorParameterValue> staticFields) {
+                Map<String, Object> staticFields) {
             this.type = type;
             this.name = name;
             this.adapter = adapter;
@@ -90,5 +89,4 @@ public final class ModulesCompilerData {
             this.reference = reference;
         }
     }
-
 }

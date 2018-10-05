@@ -1,1 +1,1 @@
-export { perfStart, perfEnd, mark, markStart, markEnd, time, interaction, registerCacheStats } from "aura-instrumentation";
+export * from "aura-instrumentation";

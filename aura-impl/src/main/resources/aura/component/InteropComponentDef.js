@@ -37,20 +37,13 @@ function InteropComponentDef(config) {
     this.minVersion       = config.minVersion;
     this.attributeDefs    = new AttributeDefSet(config.attributeDefs, this.descriptor.getNamespace());
     this.requiredVersionDefs = new RequiredVersionDefSet(config[Json.ApplicationKey.REQUIREDVERSIONDEFS]);
-    this.registerEventDefs = {};
+    this.registerEventDefs= {};
 
-    // An Interop Ctor can be found directly (if it has only a default export) or via default if it has more than one exported name.
-    var Ctor = this.interopClass["default"] || this.interopClass;
-    this.interopCtor = $A.componentService.isComponentConstructor(Ctor) && Ctor;
-
-    if (this.interopCtor) {
-        this.interopDef = $A.componentService.moduleEngine['getComponentDef'](this.interopCtor);
+    if (typeof this.interopClass === 'function') {
+        this.interopDef = $A.componentService.moduleEngine['getComponentDef'](this.interopClass);
         this.setupPropAttrMap(this.interopClass['interopMap'], this.interopDef['props']);
     }
 }
-InteropComponentDef.prototype.hasElementConstructor = function () {
-    return !!this.interopCtor;
-};
 
 /**
  * This method cant be initialized @construnction time because we dont have this.interopDef["props"] (window["Engine"]['getComponentDef'](interopClass)) for libraries
@@ -164,7 +157,7 @@ InteropComponentDef.prototype.DOM_PROPS_TO_AURA_ATTRS = Object.keys(
 }, {});
 
 InteropComponentDef.prototype.hasInit = function() {
-
+   
 };
 
 /**

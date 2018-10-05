@@ -241,8 +241,17 @@ HtmlComponent.prototype["renderer"] = {
 
         var element = document.createElement(tag);
 
+        if ($A.util.isIE && HTMLAttributes && HTMLAttributes["type"]) {
+            // IE needs to have the 'type' set first for radio / checkbox inputs
+            // otherwise any values set on them are wiped after the type is set
+            helper.createHtmlAttribute(component, element, "type", HTMLAttributes["type"]);
+        }
+
         for ( var attribute in HTMLAttributes) {
-            helper.createHtmlAttribute(component, element, attribute, HTMLAttributes[attribute]);
+            if (!$A.util.isIE || attribute !== "type") {
+                helper.createHtmlAttribute(component, element, attribute, HTMLAttributes[attribute]);
+            }
+
         }
         
         $A.util.setDataAttribute(element, $A.componentService.renderedBy, component.globalId);

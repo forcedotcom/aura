@@ -35,5 +35,9 @@
 
     changeHandlerBoolean:function(cmp,event,helper){
         cmp.set("v.myValueBoolean",event.source.get("v.value"));
+    },
+
+    onRadioClick : function(cmp, event, helper) {
+        cmp.onRadioHtmlValue = event.source.getElement().value;
     }
 })

@@ -37,6 +37,8 @@
     <ui:inputRadio aura:id="booleanNope" change="{!c.changeHandlerBoolean}" name="myValueBooleanGroup" text="false" value="{!!v.myValueBoolean}"
                                    label="Nope (Boolean)" labelPosition="right"/>
 
+    <ui:inputRadio aura:id="radioHtml" text="myRadioValue" click="{!c.onRadioClick}" />
+
     myValueString: {!v.myValueString}<br/>
     myValueBoolean: {!v.myValueBoolean}<br/>
  </aura:component>

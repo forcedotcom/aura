@@ -65,6 +65,17 @@
         ]
     },
 
+    testHTMLElementRadioValueEvent: {
+        test: [
+            function (cmp) {
+                $A.test.clickOrTouch(cmp.find("radioHtml").getElement());
+                $A.test.addWaitFor("myRadioValue", function(){
+                    return cmp.onRadioHtmlValue;
+                }, function(){});
+            }
+        ]
+    },
+
     /**
      * Get value for cmp attribute
      */

@@ -42,7 +42,7 @@ public class DescriptionDefHandler extends BaseXMLElementHandler {
         super(xmlReader, source);
         this.parenthandler = parentHandler;
     }
-    
+
     @Override
     public Set<String> getAllowedAttributes() {
         return ALLOWED_ATTRIBUTES;
@@ -52,7 +52,7 @@ public class DescriptionDefHandler extends BaseXMLElementHandler {
     protected void readAttributes() {
         String name = getAttributeValue(ATTRIBUTE_NAME);
         if (name == null) {
-            name = ((DocumentationDefHandler)getParentHandler()).getNextId();
+            name = getParentHandler().getNextId();
         }
         this.name = name;
     }

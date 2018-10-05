@@ -114,6 +114,7 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
             return new DocumentationDefImpl(this);
         }
 
+        @Override
         public DocumentationDefBuilder addDescription(String id, Description desc) {
             this.descriptionMap.put(id, desc);
             return this;

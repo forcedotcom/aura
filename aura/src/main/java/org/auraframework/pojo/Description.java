@@ -40,6 +40,7 @@ public class Description implements Serializable {
         return body;
     }
     
+    @Override
     public String toString() {
         return this.body;
     }

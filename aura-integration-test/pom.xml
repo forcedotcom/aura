@@ -128,11 +128,6 @@
             <artifactId>ios-client</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>java-hamcrest</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <properties>
         <chromedriver.version>2.37</chromedriver.version>

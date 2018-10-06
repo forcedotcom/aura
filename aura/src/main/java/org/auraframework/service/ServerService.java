@@ -35,7 +35,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * Instances of all AuraServices should be retrieved from {@link Aura} </p> Note that this service is rather incomplete
  * and should be expanded to include more of the support routines from the servlets.
  */
-public interface ServerService {
+public interface ServerService extends AuraService {
 
     enum HYDRATION_TYPE {
         none,

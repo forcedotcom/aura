@@ -18,7 +18,9 @@ package org.auraframework.impl;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,7 @@ import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.annotations.Annotations.ServiceComponentApplicationInitializer;
 import org.auraframework.cache.Cache;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.ApplicationDef;
@@ -95,31 +98,24 @@ import com.google.common.collect.Sets;
 public class ServerServiceImpl implements ServerService {
 
     @Inject
-    @Lazy
     private LoggingService loggingService;
 
     @Inject
-    @Lazy
     private MetricsService metricsService;
 
     @Inject
-    @Lazy
     private ConfigAdapter configAdapter;
 
     @Inject
-    @Lazy
     private ContextService contextService;
 
     @Inject
-    @Lazy
     private ExceptionAdapter exceptionAdapter;
 
     @Inject
-    @Lazy
     private CachingService cachingService;
 
     @Inject
-    @Lazy
     private DefinitionService definitionService;
 
     @Inject
@@ -127,19 +123,18 @@ public class ServerServiceImpl implements ServerService {
     private ServletUtilAdapter servletUtilAdapter;
 
     @Inject
-    @Lazy
     private InstanceService instanceService;
 
     @Inject
-    @Lazy
     private BootstrapUtil bootstrapUtil;
 
     @Inject
-    @Lazy
     protected CSPInliningService cspInliningService;
 
     @Inject
-    @Lazy
+    java.util.Optional<List<ApplicationInitializer>> initializers;
+
+    @Inject
     private ApplicationInitializerCache applicationInitializerCache;
 
     private ManifestUtil manifestUtil;
@@ -148,6 +143,8 @@ public class ServerServiceImpl implements ServerService {
     public void createManifestUtil() {
         manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
     }
+
+    private static final long serialVersionUID = -2779745160285710414L;
 
     public static final int AURA_SERIALIZATION_VERSION = 1;
 
@@ -277,14 +274,13 @@ public class ServerServiceImpl implements ServerService {
 
     private int run(List<Action> actions, JsonEncoder json, int idx) throws IOException {
         AuraContext context = contextService.getCurrentContext();
-        int counter = idx;
         for (Action action : actions) {
             StringBuffer actionAndParams = new StringBuffer(action.getDescriptor().getQualifiedName());
             KeyValueLogger logger = loggingService.getKeyValueLogger(actionAndParams);
             if (logger != null) {
                 action.logParams(logger);
             }
-            String aap = String.valueOf(++counter)+"$"+actionAndParams.toString();
+            String aap = String.valueOf(++idx)+"$"+actionAndParams.toString();
             loggingService.startAction(aap, action);
             setupCallingDefinition(action, context);
             Action oldAction = context.setCurrentAction(action);
@@ -319,10 +315,10 @@ public class ServerServiceImpl implements ServerService {
             // Recursively process any additional actions created by the
             // action
             if (additionalActions != null && !additionalActions.isEmpty()) {
-                counter = run(additionalActions, json, counter);
+                idx = run(additionalActions, json, idx);
             }
         }
-        return counter;
+        return idx;
     }
 
     @Override
@@ -598,10 +594,8 @@ public class ServerServiceImpl implements ServerService {
         return sb.toString();
     }
 
-    @SuppressWarnings("rawtypes")
-    private void writeDefinitionStringToBuilder(Class defType, Set<DefDescriptor<?>> dependencies,
-                                                TempFilter extraFilter, AuraContext context, StringBuilder sb,
-                                                String prefix, Set<String> serverSideDescriptor) {
+    private void writeDefinitionStringToBuilder(Class defType, Set<DefDescriptor<?>> dependencies, TempFilter extraFilter,
+                                                AuraContext context, StringBuilder sb, String prefix, Set<String> serverSideDescriptor) {
         @SuppressWarnings("unchecked")
         Collection<Definition> definitions = filterAndLoad(defType, dependencies, extraFilter);
         writeDefinitionStringToBuilder(definitions, context, sb, prefix, serverSideDescriptor);
@@ -818,18 +812,35 @@ public class ServerServiceImpl implements ServerService {
 
     @Override
     public String serializeInitializers(AuraContext context) throws IOException {
-        Map<String, ApplicationInitializer> appInitializers;
-        String appName = context.getApplicationDescriptor().getDescriptorName();
-        appInitializers = applicationInitializerCache.getInitializers(appName);
         JsonSerializationContext serializationContext = context.getJsonSerializationContext();
-        StringBuilder sb = new StringBuilder();
-        JsonEncoder json = new JsonEncoder(sb, serializationContext);
+        StringWriter writer = new StringWriter();
+        JsonEncoder json = JsonEncoder.createJsonStream(writer, serializationContext);
         json.writeMapBegin();
+
+        Map<String, ApplicationInitializer> appInitializers = applicationInitializerCache.get(context.getApplicationDescriptor().getDescriptorName(), () -> {
+            Map<String, ApplicationInitializer> result = new HashMap<>();
+            if (initializers.isPresent()) {
+                for (ApplicationInitializer initializer : initializers.get()) {
+                    ServiceComponentApplicationInitializer annotation = initializer.getClass().getAnnotation(ServiceComponentApplicationInitializer.class);
+                    if (Arrays.stream(annotation.applications()).anyMatch(context.getApplicationDescriptor().getDescriptorName()::equals)) {
+                        result.put(annotation.name(), initializer);
+                    }
+                }
+            }
+
+            return result;
+        });
+
         for (Map.Entry<String, ApplicationInitializer> entry : appInitializers.entrySet()) {
             json.writeMapEntry(entry.getKey(), entry.getValue().provideConfiguration());
         }
+
         json.writeMapEnd();
-        return sb.toString();
+        writer.flush();
+        writer.close();
+
+        return writer.toString();
+
     }
 
     @Override

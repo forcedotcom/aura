@@ -677,7 +677,13 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
     // Always comes back as a function to execute, which defines the component classes.
     var componentClassDef = config["componentClass"] || config["componentDef"][Json.ApplicationKey.COMPONENTCLASS];
     if(componentClassDef && !this.hasComponentClass(desc)) {
-        componentClassDef = $A.util.globalEval(componentClassDef, $A.clientService.getSourceMapsUrl(desc));
+        try {
+            componentClassDef = $A.util.globalEval(componentClassDef, $A.clientService.getSourceMapsUrl(desc));
+        } catch (e) {
+            var e1 = new AuraError(e);
+            e1.setComponent(desc);
+            throw e1;
+        }
         componentClassDef();
     }
 
@@ -686,10 +692,18 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
         this.createFromSavedComponentConfigs(desc);
     }
 
-    var classConstructor = this.getComponentClass(desc, def);
+    var classConstructor;
+    try {
+        classConstructor = this.getComponentClass(desc, def);
+    } catch (e) {
+        var e2 = new AuraError(e);
+        e2.setComponent(desc);
+        throw e2;
+    }
     if (!classConstructor) {
         throw new $A.auraError("Component class not found: " + desc, null, $A.severity.QUIET);
     }
+
     return new classConstructor(config, localCreation);
 };
 

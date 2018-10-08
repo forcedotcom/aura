@@ -9,4 +9,8 @@
         <version>0.6000-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+
+    <properties>
+        <aura.home>${basedir}/..</aura.home>
+    </properties>
 </project>

@@ -9,6 +9,10 @@
 
     <artifactId>aura-spring</artifactId>
 
+    <properties>
+        <aura.home>${basedir}/..</aura.home>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>

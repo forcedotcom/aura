@@ -15,30 +15,34 @@
  */
 package org.auraframework.util.javascript.directive;
 
+import java.nio.file.Files;
+import org.auraframework.util.IOUtil;
+import org.auraframework.util.javascript.CommonJavascriptGroupImpl;
+import org.auraframework.util.javascript.SourcemapWriter;
+import org.auraframework.util.javascript.builder.EngineJavascriptBuilder;
+import org.auraframework.util.javascript.builder.EnvJavascriptBuilder;
+import org.auraframework.util.javascript.builder.ExternalLibJavascriptBuilder;
+import org.auraframework.util.javascript.builder.FrameworkJavascriptBuilder;
+import org.auraframework.util.javascript.builder.JavascriptBuilder;
+import org.auraframework.util.javascript.builder.JavascriptResource;
+import org.auraframework.util.javascript.builder.LockerJavascriptBuilder;
+import org.auraframework.util.resource.ResourceLoader;
+import org.auraframework.util.text.Hash;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.concurrent.CountDownLatch;
-
-import org.auraframework.util.IOUtil;
-import org.auraframework.util.javascript.CommonJavascriptGroupImpl;
-import org.auraframework.util.javascript.JavascriptWriter;
-import org.auraframework.util.resource.ResourceLoader;
-import org.auraframework.util.text.Hash;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 
 /**
  * Javascript group that contains directives for parsing instructions or metadata or other fun stuff. It starts from one
@@ -111,27 +115,12 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     private CountDownLatch counter;
     private Map<String, Throwable> errors;
 
-    private String librariesContent = "";
-    private String librariesContentMin = "";
-    private String compatLibrariesContent = "";
-    private String compatLibrariesContentMin = "";
-
-    private String locker = "";
-    private String lockerMin = "";
-    private String lockerCompat = "";
-    private String lockerCompatMin = "";
-
-    private String engine = "";
-    private String engineMin = "";
-    private String engineCompat= "";
-    private String engineCompatMin = "";
-    private String engineProdDebug = "";
-    private String engineCompatProdDebug = "";
-
     // used during parsing, should be clear for storing in memory
     private DirectiveParser parser;
 
     protected ResourceLoader resourceLoader = null;
+    protected List<JavascriptBuilder> javascriptBuilders;
+
 
     public DirectiveBasedJavascriptGroup(String name, File root, String start) throws IOException {
         this(name, root, start, DirectiveTypes.DEFAULT_TYPES, EnumSet.of(JavascriptGeneratorMode.DEVELOPMENT,
@@ -145,7 +134,22 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         this.directiveTypes = directiveTypes;
         this.modes = modes;
         this.startFile = addFile(start);
+        this.resourceLoader = new ResourceLoader(LIB_CACHE_TEMP_DIR, true);
 
+        /**
+         * aura_*.js is built from 5 separate bundled resources depending on the mode it will be running
+         * 1. Test mode global snippet
+         * 2. lwc framework source
+         * 3. locker source
+         * 4. Aura framework source
+         * 5. External libraries such as moment, DOMPurify,...
+         */
+        javascriptBuilders = new ArrayList<>();
+        javascriptBuilders.add(new EnvJavascriptBuilder());
+        javascriptBuilders.add(new EngineJavascriptBuilder(resourceLoader));
+        javascriptBuilders.add(new LockerJavascriptBuilder(resourceLoader));
+        javascriptBuilders.add(new FrameworkJavascriptBuilder());
+        javascriptBuilders.add(new ExternalLibJavascriptBuilder(resourceLoader));
     }
 
     public List<DirectiveType<?>> getDirectiveTypes() {
@@ -192,192 +196,10 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     }
 
     private void fetchIncludedSources() throws MalformedURLException {
-        List<String> libraries = new ArrayList<>();
-        libraries.add("aura/resources/moment/moment");
-        libraries.add("aura/resources/DOMPurify/DOMPurify");
-
-        StringJoiner libs = new StringJoiner("\n");
-        StringJoiner libsMin = new StringJoiner("\n");
-
-        libraries.forEach( (path) -> {
-            String source = null;
-            String minSource = null;
-            try {
-                source = getSource(path + ".js");
-                minSource = getSource(path +".min.js");
-            } catch (MalformedURLException e) {}
-            if (source != null) {
-                libs.add(source);
-            }
-            if (minSource != null) {
-                libsMin.add(minSource);
-            }
-        });
-
-        if (libs.length() != 0) {
-            this.librariesContent = "\nAura.externalLibraries = function() {\n" + libs.toString() + "\n};";
-        }
-        if (libsMin.length() != 0) {
-            this.librariesContentMin = "\nAura.externalLibraries = function() {\n" + libsMin.toString() + "\n};";
-        }
-
-        List<String> compatLibraries = new ArrayList<>();
-        compatLibraries.add("aura/resources/IntlTimeZonePolyfill/IntlTimeZonePolyfill");
-        compatLibraries.forEach( (path) -> {
-            String source = null;
-            String minSource = null;
-            try {
-                source = getSource(path + ".js");
-                minSource = getSource(path +".min.js");
-            } catch (MalformedURLException e) {}
-            if (source != null) {
-                source = "try {\n" + source + "\n} catch (e) {}\n";
-                libs.add(source);
-            }
-            if (minSource != null) {
-                minSource = "try {\n" + minSource + "\n} catch (e) {}\n";
-                libsMin.add(minSource);
-            }
-        });
-        if (libs.length() != 0) {
-            this.compatLibrariesContent = "\nAura.externalLibraries = function() {\n" + libs.toString() + "\n};";
-        }
-        if (libsMin.length() != 0) {
-            this.compatLibrariesContentMin = "\nAura.externalLibraries = function() {\n" + libsMin.toString() + "\n};";
-        }
-
-        // Locker
-        String lockerSource = null;
-        String lockerMinSource = null;
-        String lockerDisabledSource = null;
-        String lockerDisabledMinSource = null;
-        try {
-            lockerSource = getSource("aura/resources/lockerservice/aura-locker.js");
-            lockerMinSource = getSource("aura/resources/lockerservice/aura-locker.min.js");
-
-            lockerDisabledSource = getSource("aura/resources/lockerservice/aura-locker-disabled.js");
-            lockerDisabledMinSource = getSource("aura/resources/lockerservice/aura-locker-disabled.min.js");
-        }  catch (MalformedURLException e) {}
-
-        // We always include locker disabled, and don't include locker in compat mode.  
-        if (lockerSource != null && lockerDisabledSource != null) {
-            locker =
-              "try {\n" + lockerSource + "\n} catch (e) {}\n" +
-              "try {\n" + lockerDisabledSource + "\n} catch (e) {}\n";
-        }
-        if (lockerMinSource != null && lockerDisabledMinSource != null) {
-            lockerMin =
-              "try {\n" + lockerMinSource + "\n} catch (e) {}\n" +
-              "try {\n" + lockerDisabledMinSource + "\n} catch (e) {}\n";
-        }
-        if (lockerDisabledSource != null) {
-            lockerCompat =
-              "try {\n" + lockerDisabledSource + "\n} catch (e) {}\n";
-        }
-        if (lockerDisabledMinSource != null) {
-            lockerCompatMin =
-              "try {\n" + lockerDisabledMinSource + "\n} catch (e) {}\n";
-        }
-
-        // Engine
-        String engineSource = null;
-        String engineMinSource = null;
-        String engineCompatSource = null;
-        String engineCompatMinSource = null;
-        String engineProdDebugSource = null;
-        String engineCompatProdDebugSource = null;
-        // Wire
-        String wireSource = null;
-        String wireMinSource = null;
-        String wireCompatSource = null;
-        String wireCompatMinSource = null;
-        String wireProdDebugSource = null;
-        String wireCompatProdDebugSource = null;
-        // Compat Helper
-        String compatHelpersSource = null;
-        String compatHelpersMinSource = null;
-
-        try {
-            engineSource = getSource("lwc/engine/es2017/engine.js");
-            engineMinSource = getSource("lwc/engine/es2017/engine.min.js");
-
-            engineCompatSource = getSource("lwc/engine/es5/engine.js");
-            engineCompatMinSource = getSource("lwc/engine/es5/engine.min.js");
-
-            engineProdDebugSource = getSource("lwc/engine/es2017/engine_debug.js");
-            engineCompatProdDebugSource = getSource("lwc/engine/es5/engine_debug.js");
-
-            wireSource = getSource("lwc/wire-service/es2017/wire.js");
-            wireMinSource = getSource("lwc/wire-service/es2017/wire.min.js");
-
-            wireCompatSource = getSource("lwc/wire-service/es5/wire.js");
-            wireCompatMinSource = getSource("lwc/wire-service/es5/wire.min.js");
-  
-            wireProdDebugSource = getSource("lwc/wire-service/es2017/wire_debug.js");
-            wireCompatProdDebugSource = getSource("lwc/wire-service/es5/wire_debug.js");
-
-            compatHelpersSource = getSource("lwc/proxy-compat/compat.js");
-            compatHelpersMinSource = getSource("lwc/proxy-compat/compat.min.js");
-        }  catch (MalformedURLException e) {}
-
-        String header = "\"undefined\"===typeof Aura&&(Aura={});";
-        if (engineSource != null && wireSource != null) {
-            this.engine = header
-                    + engineSource
-                    + wireSource;
-        }
-
-        if (engineMinSource != null && wireMinSource != null) {
-            this.engineMin = header
-                    + engineMinSource
-                    + wireMinSource;
-        }
-
-        if (compatHelpersSource != null && engineCompatSource != null && wireCompatSource != null) {
-            this.engineCompat = compatHelpersSource
-                    + "\n"
-                    + header
-                    + engineCompatSource
-                    + wireCompatSource;
-        }
-
-        if (compatHelpersMinSource != null && engineCompatMinSource != null && wireCompatMinSource != null) {
-            this.engineCompatMin = compatHelpersMinSource
-                    + "\n"
-                    + header
-                    + engineCompatMinSource
-                    + wireCompatMinSource;
-        }
-
-        if (engineProdDebugSource != null && wireProdDebugSource != null) {
-            this.engineProdDebug = header
-                    + engineProdDebugSource
-                    + wireProdDebugSource;
-        }
-
-        if (compatHelpersSource != null && engineCompatProdDebugSource != null && wireCompatProdDebugSource != null) {
-            this.engineCompatProdDebug = compatHelpersSource
-                    + "\n"
-                    + header
-                    + engineCompatProdDebugSource
-                    + wireCompatProdDebugSource;
-        }
-    }
-
-    public String getSource(String path) throws MalformedURLException {
-        if (this.resourceLoader == null) {
-            this.resourceLoader = new ResourceLoader(LIB_CACHE_TEMP_DIR, true);
-        }
-
-        URL lib = this.resourceLoader.getResource(path);
-        String source = null;
-        if (lib != null) {
-            try {
-                source = Resources.toString(lib, Charsets.UTF_8);
-            } catch (IOException ignored) { }
-        }
-        return source;
-    }
+         for (JavascriptBuilder builder : this.javascriptBuilders) {
+             builder.fetchResources();
+         }
+     }
 
     protected void generateForMode(File destRoot, final JavascriptGeneratorMode mode) throws IOException {
         final File modeJs = new File(destRoot, getName() + "_" + mode.getSuffix() + ".js");
@@ -395,7 +217,15 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         for (File file : filesToWrite) {
             if (file.exists()) {
                 if (file.lastModified() < getLastMod() || !mode.allowedInProduction()) {
+                    File sourcemapFile = SourcemapWriter.getSourcemapFile(file);
+                    File sourceContentFile = SourcemapWriter.getSourcContentFile(file);
                     file.delete();
+                    if(sourcemapFile.exists()) {
+                        sourcemapFile.delete();
+                    }
+                    if(sourceContentFile.exists()) {
+                        sourceContentFile.delete();
+                    }
                 } else {
                     // its up to date already, skip
                     counter.countDown();
@@ -408,58 +238,71 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
         Runnable writeMode = () -> {
             try {
-                Writer writer = null;
-                JavascriptWriter jsWriter = mode.getJavascriptWriter();
-                boolean minified = jsWriter == JavascriptWriter.CLOSURE_AURA_PROD;
+                Writer sourceContentWriter = null; // aura_*.map.js (if the mode supports sourcemap)
+                SourcemapWriter sourcemapWriter = null; // aura_*.js.map (if the mode supports sourcemap)
 
-                StringWriter stringWriter = new StringWriter();
-                jsWriter.compress(everything, stringWriter, modeJs.getName());
-                String compressed = stringWriter.toString();
+                //There are two files generated for each mode(aura_[mode].js and aura_[mode]_compat.js)
+                for (File outputFile : filesToWrite) {
+                    if (writtenFiles.contains(outputFile)) continue;
 
-                // strip out spaces and comments for external libraries
-                JavascriptWriter libsJsWriter = JavascriptWriter.CLOSURE_WHITESPACE_ONLY;
+                    File sourcemapFile = null;
+                    File sourceContentFile = null;
+                    String outputFileName = outputFile.getName();
+                    boolean isCompat = outputFileName.contains(COMPAT_SUFFIX);
 
-                for (File output : filesToWrite) {
-                    if (writtenFiles.contains(output)) continue;
+                    try (Writer outputWriter = new FileWriter(outputFile)) {
 
-                    boolean isProdDebug = mode == JavascriptGeneratorMode.PRODUCTIONDEBUG;
-                    boolean isCompat = output.getName().contains(COMPAT_SUFFIX);
+                        for(JavascriptBuilder builder : this.javascriptBuilders) {
+                            JavascriptResource resource = builder.build(mode, isCompat, everything, outputFileName);
 
-                    try {
-                        writer = new FileWriter(output);
+                            String sourcemap;
+                            // generate source content and sourcemap only if the "mode" have an associated sourcemap.
+                            if((sourcemap = resource.getSourcemap()) != null) {
+                                if(sourcemapFile == null) {
+                                    sourcemapFile = SourcemapWriter.getSourcemapFile(outputFile);
+                                    sourceContentFile = SourcemapWriter.getSourcContentFile(outputFile);
 
-                        if (mode != JavascriptGeneratorMode.DOC) {
-                            if (mode.isTestingMode()) {
-                                writer.append("typeof process === 'undefined' ? (process = { env: { NODE_ENV: 'test' } }) : process.env ? process.env.NODE_ENV = 'test' : process.env = { NODE_ENV: 'test' } ").append("\n");
+                                    sourcemapWriter = new SourcemapWriter(sourcemapFile);
+                                    sourceContentWriter = new FileWriter(sourceContentFile);
+                                }
+
+                                outputWriter.flush();
+                                long lineCount = Files.lines(outputFile.toPath()).count();
+                                // +1 - closure compiler wraps compressed output in an anonymous function which adds an extra line to the minified output.
+                                sourcemapWriter.writeSection(outputFileName, lineCount + 1, 0, sourcemap);
+
+                                String inputContent;
+                                if((inputContent = resource.getInput()) != null) {
+                                    sourceContentWriter.append(inputContent).append("\n");
+                                }
                             }
-                            // jsdoc errors when parsing engine.js
-                            String eng = minified ?
-                                    (isCompat ? engineCompatMin : mode == JavascriptGeneratorMode.AUTOTESTING ? engine : engineMin) :
-                                    (isCompat ? ( isProdDebug ? engineCompatProdDebug : engineCompat) : ( isProdDebug ? engineProdDebug : engine));
-                            writer.append(eng).append("\n");
 
-                            // jsdoc errors when parsing aura-locker.js
-                            String ls = minified ?
-                                  (isCompat ? lockerCompatMin : lockerMin) :
-                                  (isCompat ? lockerCompat : locker);
-                            writer.append(ls).append("\n");
+                            // do this after writing sourcemap so that the offset line-count would be calculated before writing this output.
+                            String outputContent;
+                            if((outputContent = resource.getOutput()) != null) {
+                                outputWriter.append(outputContent).append("\n");
+                            }
                         }
 
-                        writer.append(compressed).append("\n");
-
-                        // external libraries
-                        String libs = minified ? 
-                                (isCompat ? this.compatLibrariesContentMin : this.librariesContentMin) :
-                                (isCompat ? this.compatLibrariesContent : librariesContent);
-                        StringWriter libsWriter = new StringWriter();
-                        libsJsWriter.compress(libs, libsWriter, output.getName());
-                        writer.append(libsWriter.toString()).append("\n");
+                        if(sourcemapFile != null) {
+                            outputWriter.append(String.format(SourcemapWriter.SOURCEMAP_COMMENT, this.getLastMod(), sourcemapFile.getName()));
+                        }
 
                     } finally {
-                        if (writer != null) {
-                            writer.close();
+                        if(sourcemapWriter != null) {
+                            sourcemapWriter.close();
                         }
-                        output.setReadOnly();
+                        if(sourceContentWriter != null) {
+                            sourceContentWriter.close();
+                        }
+
+                        outputFile.setReadOnly();
+                        if(sourceContentFile != null) {
+                            sourceContentFile.setReadOnly();
+                        }
+                        if(sourcemapFile != null) {
+                            sourcemapFile.setReadOnly();
+                        }
                         counter.countDown();
                     }
                 }

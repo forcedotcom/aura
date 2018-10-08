@@ -22,9 +22,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.auraframework.util.javascript.builder.EngineJavascriptBuilder;
+import org.auraframework.util.javascript.builder.FrameworkJavascriptBuilder;
+import org.auraframework.util.javascript.builder.JavascriptBuilder;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Ignore;
@@ -121,17 +125,23 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
                         mode));
 
         jg = Mockito.spy(jg);
+        Mockito.when(jg.getLastMod()).thenReturn(1234567890L);
+
 
         String mockEngineCompat = "var mock='engine compat';console.log(mock);\n";
         String mockWireCompat = "var mock='wire compat';console.log(mock);\n";
 
         // mock out getSource for engine to test compat
-        Mockito.when(jg.getSource("lwc/engine/es5/engine.js")).thenReturn(mockEngineCompat);
-        Mockito.when(jg.getSource("lwc/engine/es5/engine.min.js")).thenReturn(mockEngineCompat);
-        Mockito.when(jg.getSource("lwc/wire-service/es5/wire.js")).thenReturn(mockWireCompat);
-        Mockito.when(jg.getSource("lwc/wire-service/es5/wire.min.js")).thenReturn(mockWireCompat);
-        Mockito.when(jg.getSource("lwc/proxy-compat/compat.js")).thenReturn("");
-        Mockito.when(jg.getSource("lwc/proxy-compat/compat.min.js")).thenReturn("");
+        JavascriptBuilder builder = Mockito.spy(new EngineJavascriptBuilder(jg.resourceLoader));
+        Mockito.when(builder.getSource("lwc/engine/es5/engine.js")).thenReturn(mockEngineCompat);
+        Mockito.when(builder.getSource("lwc/engine/es5/engine.min.js")).thenReturn(mockEngineCompat);
+        Mockito.when(builder.getSource("lwc/wire-service/es5/wire.js")).thenReturn(mockWireCompat);
+        Mockito.when(builder.getSource("lwc/wire-service/es5/wire.min.js")).thenReturn(mockWireCompat);
+        Mockito.when(builder.getSource("lwc/proxy-compat/compat.js")).thenReturn("");
+        Mockito.when(builder.getSource("lwc/proxy-compat/compat.min.js")).thenReturn("");
+        jg.javascriptBuilders = new ArrayList<>();
+        jg.javascriptBuilders.add(builder);
+        jg.javascriptBuilders.add(new FrameworkJavascriptBuilder());
 
         File dir = getResourceFile("/testdata/javascript/generated/");
 

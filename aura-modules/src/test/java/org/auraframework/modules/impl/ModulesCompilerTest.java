@@ -15,30 +15,37 @@
  */
 package org.auraframework.modules.impl;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
+import org.auraframework.def.module.ModuleDef.CodeType;
+import org.auraframework.modules.ModulesCompilerData;
+import org.auraframework.service.LoggingService;
+import org.auraframework.tools.node.api.NodeLambdaFactory;
+import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
+import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Assert;
+import org.junit.Test;
+import org.lwc.OutputConfig;
+import org.lwc.bundle.BundleType;
+import org.lwc.decorator.DecoratorParameterValue;
+import org.lwc.template.TemplateModuleDependencies;
+import org.lwc.template.TemplateModuleDependency;
+
+import javax.inject.Inject;
+import java.io.ByteArrayOutputStream;
+import java.io.NotSerializableException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.inject.Inject;
-
-import org.auraframework.def.module.ModuleDef.CodeType;
-import org.auraframework.modules.impl.ModulesCompilerUtil;
-import org.auraframework.modules.ModulesCompilerData;
-import org.auraframework.service.LoggingService;
-import org.lwc.OutputConfig;
-import org.lwc.bundle.BundleType;
-import org.auraframework.tools.node.api.NodeLambdaFactory;
-import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
-import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Test;
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 
 /**
  * Tests for the ModulesCompiler implementations
@@ -71,18 +78,51 @@ public class ModulesCompilerTest extends UnitTestCase {
         assertEquals("getRecord", wireDecorator.adapter.name);
         assertEquals("x-record-api", wireDecorator.adapter.reference);
         assertEquals(ImmutableMap.of("id", "recordId"), wireDecorator.params);
+        Map<String, DecoratorParameterValue> staticFields = wireDecorator.staticFields;
+        assertEquals(true, staticFields.get("bool").value);
+        assertEquals("Hello", staticFields.get("text").value);
+        assertEquals(123, staticFields.get("number").value);
+        assertEquals(ImmutableList.of("One", "Two"), staticFields.get("array").value);
     }
 
     @Test
-    public void testErrorInHtml() throws Exception {
+    public void testTemplateDependenciesMetadata() throws Exception {
+        ModulesCompilerData compilerData = compileModule("modules/templateDependenciesTest/templateDependenciesTest");
+
+        List<TemplateModuleDependencies> templateModuleDependencies =
+            compilerData.compilerReport.metadata.experimentalTemplateModuleDependencies;
+
+        // There's only one template
+        assertEquals(1, templateModuleDependencies.size());
+        // There are three modules used
+        List<TemplateModuleDependency> moduleDependencies = templateModuleDependencies.get(0).moduleDependencies;
+        assertEquals(3, moduleDependencies.size());
+
+        assertEquals("x/innerContact", moduleDependencies.get(0).moduleName);
+        assertEquals(ImmutableSet.of("contactId", "actionable"), moduleDependencies.get(0).properties.keySet());
+
+        assertEquals("x/contact", moduleDependencies.get(1).moduleName);
+        assertEquals(ImmutableSet.of("mode", "contactId"), moduleDependencies.get(1).properties.keySet());
+
+        assertEquals("x/footer", moduleDependencies.get(2).moduleName);
+        assertEquals(Collections.emptySet(), moduleDependencies.get(2).properties.keySet());
+    }
+
+    @Test
+    public void testTemplateDependenciesMetadataSerializable() throws Exception {
+        ModulesCompilerData compilerData = compileModule("modules/templateDependenciesTest/templateDependenciesTest");
+
+        List<TemplateModuleDependencies> templateModuleDependencies =
+            compilerData.compilerReport.metadata.experimentalTemplateModuleDependencies;
+
         try {
-            compileModule("modules/errorInHtml/errorInHtml");
-            fail("should report a syntax error");
-        } catch (Exception e) {
-            String message = Throwables.getRootCause(e).getMessage();
-            assertTrue(message, message.contains(
-                    "Invalid HTML syntax: non-void-html-element-start-tag-with-trailing-solidus. For more information, please visit https://html.spec.whatwg.org/multipage/parsing.html#parse-error-non-void-html-element-start-tag-with-trailing-solidus"));
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            objectOutputStream.writeObject(templateModuleDependencies);
+        } catch (NotSerializableException e) {
+            Assert.fail("Template Module Dependencies should be serializable");
         }
+
     }
 
     @Test
@@ -169,7 +209,7 @@ public class ModulesCompilerTest extends UnitTestCase {
     @Test
     public void testCompileWithOnlyDevConfig() throws Exception {
 
-        OutputConfig devConfig = ModulesCompilerUtil.createDevOutputConfig();
+        OutputConfig devConfig = ModulesCompilerUtil.createDevOutputConfig(BundleType.internal);
         ModulesCompilerData compilerData = compileModule("modules/moduletest/moduletest", Lists.newArrayList(devConfig));
         String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8);
 
@@ -180,21 +220,64 @@ public class ModulesCompilerTest extends UnitTestCase {
         assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
     }
 
+    @Test
+    public void testCompileInternalShouldReplaceNodeEnv() throws Exception {
+        OutputConfig devConfig = ModulesCompilerUtil.createDevOutputConfig(BundleType.internal);
+        OutputConfig prodConfig = ModulesCompilerUtil.createProdOutputConfig(BundleType.internal);
+        ModulesCompilerData compilerData = compileModule("modules/nodeEnv/nodeEnv", Lists.newArrayList(devConfig, prodConfig));
+
+        String devCode = compilerData.codes.get(CodeType.DEV);
+        System.out.println(devCode);
+        assertTrue(
+                "Prod console should be stripped",
+                devCode.contains("I am in dev") && !devCode.contains("I am in prod")
+        );
+
+        String prodCode = compilerData.codes.get(CodeType.PROD);
+        System.out.println(prodCode);
+        assertTrue(
+                "Dev console should be stripped",
+                !prodCode.contains("I am in dev") && prodCode.contains("I am in prod")
+        );
+    }
+
+    @Test
+    public void testCompilePlatformShouldIgnoreNodeEnv() throws Exception {
+        OutputConfig devConfig = ModulesCompilerUtil.createDevOutputConfig(BundleType.platform);
+        OutputConfig prodConfig = ModulesCompilerUtil.createProdOutputConfig(BundleType.platform);
+        ModulesCompilerData compilerData = compileModule("modules/nodeEnv/nodeEnv", Lists.newArrayList(devConfig, prodConfig));
+
+        String devCode = compilerData.codes.get(CodeType.DEV);
+        System.out.println(devCode);
+        assertTrue(
+                "Console should not be stripped in dev",
+                devCode.contains("I am in dev") && devCode.contains("I am in prod")
+        );
+
+        String prodCode = compilerData.codes.get(CodeType.PROD);
+        assertTrue(
+                "Console should not be stripped in prod",
+                prodCode.contains("I am in dev") && prodCode.contains("I am in prod")
+        );
+    }
+
     private ModulesCompilerData compileModule(String modulePath) throws Exception {
             return compileModule(modulePath, null);
     }
 
     private ModulesCompilerData compileModule(String modulePath, List<OutputConfig> configs) throws Exception {
         ModulesCompiler compiler = new ModulesCompilerNode(FACTORY, loggingService);
-        String jsModule = modulePath + ".js";
-        String htmlModule = modulePath + ".html";
-        String sourceTemplate = Files.toString(getResourceFile("/testdata/" + htmlModule), Charsets.UTF_8);
-        String sourceClass = Files.toString(getResourceFile("/testdata/" + jsModule), Charsets.UTF_8);
+
         Map<String, String> sources = new HashMap<>();
-        sources.put(jsModule, sourceClass);
-        sources.put(htmlModule, sourceTemplate);
+
+        String htmlModule = modulePath + ".html";
+        String htmlSource = Files.toString(getResourceFile("/testdata/" + htmlModule), Charsets.UTF_8);
+        sources.put(htmlModule, htmlSource);
+
+        String jsModule = modulePath + ".js";
+        String jsSource = Files.toString(getResourceFile("/testdata/" + jsModule), Charsets.UTF_8);
+        sources.put(jsModule, jsSource);
 
         return compiler.compile(jsModule, sources, BundleType.internal, null, configs);
     }
-
 }

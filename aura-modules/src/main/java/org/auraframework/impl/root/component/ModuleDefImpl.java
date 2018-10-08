@@ -15,14 +15,7 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
@@ -51,8 +44,15 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Json.ApplicationKey;
 import org.auraframework.validation.ReferenceValidationContext;
 import org.lwc.reference.Reference;
+import org.lwc.template.TemplateModuleDependencies;
 
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * ModuleDef holds compiled code and serializes for client
@@ -78,6 +78,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     private final DocumentationDef auraDocumentationDef;
     private final SVGDef svgDef;
     private final Collection<ModulesCompilerData.WireDecoration> wireDecorations;
+    private List<TemplateModuleDependencies> experimentalTemplateModuleDependencies;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
@@ -97,6 +98,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         this.auraDocumentationDef = builder.auraDocumentationDef;
         this.wireDecorations = builder.wireDecorations;
         this.svgDef = builder.svgDef;
+        this.experimentalTemplateModuleDependencies = builder.experimentalTemplateModuleDependencies;
     }
 
     @Override
@@ -150,6 +152,11 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     @Override
     public Collection<ModulesCompilerData.WireDecoration> getWireDecorations() {
         return this.wireDecorations;
+    }
+
+    @Override
+    public List<TemplateModuleDependencies> getExperimentalTemplateModuleDependencies() {
+        return experimentalTemplateModuleDependencies;
     }
 
     @Override
@@ -344,6 +351,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private DocumentationDef auraDocumentationDef;
         private SVGDef svgDef;
         private Collection<ModulesCompilerData.WireDecoration> wireDecorations;
+        private List<TemplateModuleDependencies> experimentalTemplateModuleDependencies;
 
         public Builder() {
             super(ModuleDef.class);
@@ -412,6 +420,10 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
 
         public void setMetadataReferences(List<Reference> references) {
             this.metadataReferences = references;
+        }
+
+        public void setExperimentalTemplateModuleDependencies(List<TemplateModuleDependencies> dependencies) {
+            this.experimentalTemplateModuleDependencies = dependencies;
         }
 
         public void setSourceReferences(List<Reference> sourceReferences) {

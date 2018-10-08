@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-10-03
- * Version: 0.5.13
+ * Generated: 2018-10-07
+ * Version: 0.5.14
  */
 
 (function (exports) {
@@ -9579,19 +9579,14 @@ function SecureLWC(lwc, key) {
     return o;
   }
 
-  assert$1.invariant(
-    lwc['LightningElement'] === lwc['Element'],
-    'Element should be an alias for LightningElement '
-  );
-  const secureLWCElement = SecureLightningElementFactory(lwc['LightningElement'], key);
   o = create$1(null, {
     LightningElement: {
       enumerable: true,
-      value: secureLWCElement
+      value: SecureLightningElementFactory(lwc['LightningElement'], key)
     },
-    Element: {
+    registerTemplate: {
       enumerable: true,
-      value: secureLWCElement
+      value: lwc['registerTemplate'] // passthrough since this can't be called by any component
     },
     toString: {
       value: function() {

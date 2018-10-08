@@ -15,23 +15,6 @@
  */
 package org.auraframework.modules.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Supplier;
-
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.modules.ModulesCompilerData.WireAdapter;
@@ -48,14 +31,32 @@ import org.json.JSONObject;
 import org.lwc.CompilerReport;
 import org.lwc.OutputConfig;
 import org.lwc.bundle.BundleResult;
+import org.lwc.bundle.BundleType;
 import org.lwc.classmember.ClassMember;
 import org.lwc.classmember.MemberType;
 import org.lwc.decorator.Decorator;
+import org.lwc.decorator.DecoratorParameterValue;
 import org.lwc.decorator.DecoratorTarget;
 import org.lwc.decorator.DecoratorTargetAdapter;
 import org.lwc.metadata.ReportMetadata;
 import org.lwc.reference.Reference;
 import org.lwc.reference.ReferenceType;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
 
 public final class ModulesCompilerUtil {
 
@@ -204,19 +205,7 @@ public final class ModulesCompilerUtil {
                     }
                 }
 
-                Map<String, Object> staticDescription = wo.staticDescription;
-
-                Map<String, Object> staticFieldsMap = new HashMap<>();
-                if (staticDescription != null) {
-                    Iterator<?> keys = staticDescription.keySet().iterator();
-                    while (keys.hasNext()) {
-                        String key = (String)keys.next();
-                        Object staticFieldValue = staticDescription.get(key);
-                        if (staticFieldValue != null) {
-                            staticFieldsMap.put(key, staticFieldValue);
-                        }
-                    }
-                }
+                Map<String, DecoratorParameterValue> staticDescription = wo.staticDescription;
 
                 wireDecorations.add(
                         new WireDecoration(
@@ -224,7 +213,7 @@ public final class ModulesCompilerUtil {
                                 wo.name,
                                 new WireAdapter(adapter.name, adapter.reference),
                                 paramsMap,
-                                staticFieldsMap)
+                                staticDescription)
                 );
             } catch (JSONException e) {
                 // ignore
@@ -238,18 +227,15 @@ public final class ModulesCompilerUtil {
 
 
     // this is open-source to platform compiler output conversion
-    public static ModulesCompilerData parsePlatformCompilerOutput(CompilerReport report) {
-        // TODO: figure out better strategy to pass diagnostics, perhpas add diagnostics to ModulesCompilerData
+    public static ModulesCompilerData parsePlatformCompilerOutput(CompilerReport report) throws Exception {
+        // TODO: figure out better strategy to pass diagnostics, perhaps add diagnostics to ModulesCompilerData
         // TODO: alternative it to detect failure and throw with a list of diagnostics
 
         // loop over config objects and create bundles
         Map<CodeType, String> codeMap = new EnumMap<>(CodeType.class);
 
-        //JSONObject metadata = report.getJSONObject("metadata");
         ReportMetadata metadata = report.metadata;
-
         List<Reference> references = metadata.references;
-
         List<BundleResult> results = report.results;
 
         for (BundleResult bundle : results) {
@@ -265,9 +251,7 @@ public final class ModulesCompilerUtil {
             } else if (isProdCompat(config)) {
                 codeMap.put(CodeType.PROD_COMPAT, code);
             } else {
-                // this should never happen
-                //throw new Exception("Unable to map bundle config to a mode: " + config);
-                return null;
+                throw new Exception("Unable to map bundle config to a mode: " + config);
             }
         }
 
@@ -309,42 +293,57 @@ public final class ModulesCompilerUtil {
     }
 
     public static boolean isDev(OutputConfig config) {
-        return config.minify == false
-                && config.compat == false
-                && config.env.get("NODE_ENV").equals("development");
+        return !config.minify && !config.compat;
     }
 
     public static boolean isProd(OutputConfig config) {
-        return config.minify == true
-                && config.compat == false
-                && config.env.get("NODE_ENV").equals("production");
+        return config.minify && !config.compat;
     }
 
     public static boolean isCompat(OutputConfig config) {
-        return config.minify == false
-                && config.compat == true
-                && config.env.get("NODE_ENV").equals("development");
+        return !config.minify && config.compat;
     }
 
     public static boolean isProdCompat(OutputConfig config) {
-        return config.minify == true
-                && config.compat == true
-                && config.env.get("NODE_ENV").equals("production");
+        return config.minify && config.compat;
     }
 
-    public static OutputConfig createDevOutputConfig() {
-        return new OutputConfig(false, false, null, null);
-
-    }
-    public static OutputConfig createProdOutputConfig() {
+    public static OutputConfig createDevOutputConfig(BundleType bundleType) {
         Map<String, String> env = new HashMap<>();
-        env.put("NODE_ENV", "production");
+        if (bundleType != BundleType.platform) {
+            env.put("NODE_ENV", "development");
+        }
+
+        return new OutputConfig(false, false, env, null);
+    }
+
+    public static OutputConfig createCompatOutputConfig(BundleType bundleType) {
+        Map<String, String> env = new HashMap<>();
+        if (bundleType != BundleType.platform) {
+            env.put("NODE_ENV", "development");
+        }
+
+        Map<String, Object> proxyMap = new HashMap<>();
+        proxyMap.put("independent", "proxy-compat");
+        Optional<Map<String, Object>> proxyConfig = Optional.of(proxyMap);
+
+        return new OutputConfig(true, false, env, proxyConfig);
+    }
+
+    public static OutputConfig createProdOutputConfig(BundleType bundleType) {
+        Map<String, String> env = new HashMap<>();
+        if (bundleType != BundleType.platform) {
+            env.put("NODE_ENV", "production");
+        }
 
         return new OutputConfig(false, true, env, null);
     }
-    public static OutputConfig createProdCompatOutputConfig() {
+
+    public static OutputConfig createProdCompatOutputConfig(BundleType bundleType) {
         Map<String, String> env = new HashMap<>();
-        env.put("NODE_ENV", "production");
+        if (bundleType != BundleType.platform) {
+            env.put("NODE_ENV", "production");
+        }
 
         Map<String, Object> proxyMap = new HashMap<>();
         proxyMap.put("independent", "proxy-compat");
@@ -352,34 +351,26 @@ public final class ModulesCompilerUtil {
 
         return new OutputConfig(true, true, env, proxyConfig);
     }
-    public static OutputConfig createCompatOutputConfig() {
-        Map<String, Object> proxyMap = new HashMap<>();
-        proxyMap.put("independent", "proxy-compat");
-        Optional<Map<String, Object>> proxyConfig = Optional.of(proxyMap);
-
-        return new OutputConfig(true, false, null, proxyConfig);
-    }
 
     public static String convertKebabCaseToCamelCase(String name) {
-        char [] chars = name.toCharArray();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         boolean nsFound = false;
         boolean upper = false;
 
-        for (int i = 0; i < chars.length; i++) {
-            if (chars[i] == '-') {
+        for (char aChar : name.toCharArray()) {
+            if (aChar == '-') {
                 if (!nsFound) {
                     nsFound = true;
-                    sb.append('/');
+                    result.append('/');
                 } else {
                     upper = true;
                 }
             } else {
-                sb.append(upper ? Character.toUpperCase(chars[i]) : chars[i]);
+                result.append(upper ? Character.toUpperCase(aChar) : aChar);
                 upper = false;
             }
         }
-        return sb.toString();
+        return result.toString();
     }
 }

@@ -1,8 +1,6 @@
 
-"undefined"===typeof Aura&&(Aura={});(function getModuleGlobals(window){
-var mock='engine compat';console.log(mock);
+"undefined"===typeof Aura&&(Aura={});var mock='engine compat';console.log(mock);
 var mock='wire compat';console.log(mock);
-}).call(Aura, window);
 
 
 new function() {

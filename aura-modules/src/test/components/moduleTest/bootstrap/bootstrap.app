@@ -106,4 +106,8 @@
         <moduleTest:recursive />
     </div>
 
+    <div class="x">
+        <moduleTest:multiEntryModuleImport />
+    </div>
+
 </aura:application>

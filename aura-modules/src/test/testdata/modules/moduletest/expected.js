@@ -13,6 +13,8 @@ define('modules/moduletest', ['x/test', 'lwc'], function (_xTest, lwc) {
       }, [api_dynamic($cmp.test)])];
     }
 
+    var _tmpl = lwc.registerTemplate(tmpl);
+
     if (style) {
         tmpl.hostToken = 'modules-moduletest_moduletest-host';
         tmpl.shadowToken = 'modules-moduletest_moduletest';
@@ -34,7 +36,7 @@ define('modules/moduletest', ['x/test', 'lwc'], function (_xTest, lwc) {
       }
 
       render() {
-        return tmpl;
+        return _tmpl;
       }
 
     }

@@ -22,6 +22,8 @@ x-foo[${token}],[is="x-foo"][${token}] {
       }, [])];
     }
 
+    var _tmpl = lwc.registerTemplate(tmpl);
+
     if (style) {
         tmpl.hostToken = 'modules-nsmoduletest_nsmoduletest-host';
         tmpl.shadowToken = 'modules-nsmoduletest_nsmoduletest';
@@ -35,7 +37,7 @@ x-foo[${token}],[is="x-foo"][${token}] {
 
     class Test extends lwc.LightningElement {
       render() {
-        return tmpl;
+        return _tmpl;
       }
 
     }

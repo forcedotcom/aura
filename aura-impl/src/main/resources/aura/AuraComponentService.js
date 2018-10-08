@@ -22,7 +22,7 @@
  */
 function AuraComponentService() {
     // Def registries
-    this.moduleEngine           = Aura["LWC"] || /* legacy */ Aura["Engine"];
+    this.moduleEngine           = Aura["Engine"];
     this.wireService            = Aura["WireService"];
 
     // remove globals
@@ -81,6 +81,10 @@ function AuraComponentService() {
 AuraComponentService.prototype.get = function(globalId) {
     // $A.deprecated("AuraComponentService.get is no longer supported.","Use '$A.getComponent();'.", "AuraComponentService.get");
     return this.indexes.globalId[globalId];
+};
+
+AuraComponentService.prototype.isComponentConstructor = function(Ctor) {
+    return typeof Ctor === 'function' && this.moduleEngine["isComponentConstructor"](Ctor);
 };
 
 AuraComponentService.prototype.initCoreModules = function () {

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-10-08
- * Version: 0.5.15
+ * Generated: 2018-10-09
+ * Version: 0.5.16
  */
 
 (function (exports) {
@@ -122,6 +122,399 @@ function asString(html) {
   }
 }
 
+function asString$1(arg) {
+  try {
+    return `${arg}`;
+  } catch (e) {
+    return '';
+  }
+}
+
+// SVG TAGS
+// taken from DOMPurifier source code
+// maintain a map for quick O(1) lookups of tags
+const svgTagsMap = {
+  svg: true,
+  a: true,
+  altglyph: true,
+  altglyphdef: true,
+  altglyphitem: true,
+  animatecolor: true,
+  animatemotion: true,
+  animatetransform: true,
+  audio: true,
+  canvas: true,
+  circle: true,
+  clippath: true,
+  defs: true,
+  desc: true,
+  ellipse: true,
+  filter: true,
+  font: true,
+  g: true,
+  glyph: true,
+  glyphref: true,
+  hkern: true,
+  image: true,
+  line: true,
+  lineargradient: true,
+  marker: true,
+  mask: true,
+  mpath: true,
+  path: true,
+  pattern: true,
+  polygon: true,
+  polyline: true,
+  radialgradient: true,
+  rect: true,
+  stop: true,
+  switch: true,
+  symbol: true,
+  text: true,
+  textpath: true,
+  title: true,
+  tref: true,
+  tspan: true,
+  video: true,
+  view: true,
+  vkern: true,
+  use: true
+};
+
+// create Array<String> of tags for DOMPurify config
+const svgTags = Object.keys(svgTagsMap);
+
+// HTML TAGS SECTION
+// must be kept in sync with https://git.soma.salesforce.com/aura/aura/blob/master/aura-impl/src/main/resources/aura/component/HtmlComponent.js
+const htmlTagsMap = {
+  a: true,
+  abbr: true,
+  acronym: true,
+  address: true,
+  area: true,
+  article: true,
+  aside: true,
+  audio: true,
+  b: true,
+  bdi: true,
+  bdo: true,
+  big: true,
+  blockquote: true,
+  body: true,
+  br: true,
+  button: true,
+  caption: true,
+  canvas: true,
+  center: true,
+  cite: true,
+  code: true,
+  col: true,
+  colgroup: true,
+  command: true,
+  datalist: true,
+  dd: true,
+  del: true,
+  details: true,
+  dfn: true,
+  dir: true,
+  div: true,
+  dl: true,
+  dt: true,
+  em: true,
+  fieldset: true,
+  figure: true,
+  figcaption: true,
+  footer: true,
+  form: true,
+  h1: true,
+  h2: true,
+  h3: true,
+  h4: true,
+  h5: true,
+  h6: true,
+  head: true,
+  header: true,
+  hgroup: true,
+  hr: true,
+  i: true,
+  iframe: true,
+  img: true,
+  input: true,
+  ins: true,
+  keygen: true,
+  kbd: true,
+  label: true,
+  legend: true,
+  li: true,
+  map: true,
+  mark: true,
+  menu: true,
+  meter: true,
+  nav: true,
+  ol: true,
+  optgroup: true,
+  option: true,
+  output: true,
+  p: true,
+  pre: true,
+  progress: true,
+  q: true,
+  rp: true,
+  rt: true,
+  ruby: true,
+  s: true,
+  samp: true,
+  section: true,
+  select: true,
+  small: true,
+  source: true,
+  span: true,
+  strike: true,
+  strong: true,
+  sub: true,
+  summary: true,
+  sup: true,
+  table: true,
+  tbody: true,
+  td: true,
+  textarea: true,
+  tfoot: true,
+  th: true,
+  thead: true,
+  time: true,
+  tr: true,
+  track: true,
+  tt: true,
+  u: true,
+  ul: true,
+  var: true,
+  video: true,
+  wbr: true
+};
+const htmlTags = Object.keys(htmlTagsMap);
+
+// ATTRIBUTES
+const attrs = [
+  'aria-activedescendant',
+  'aria-atomic',
+  'aria-autocomplete',
+  'aria-busy',
+  'aria-checked',
+  'aria-controls',
+  'aria-describedby',
+  'aria-disabled',
+  'aria-readonly',
+  'aria-dropeffect',
+  'aria-expanded',
+  'aria-flowto',
+  'aria-grabbed',
+  'aria-haspopup',
+  'aria-hidden',
+  'aria-disabled',
+  'aria-invalid',
+  'aria-label',
+  'aria-labelledby',
+  'aria-level',
+  'aria-live',
+  'aria-multiline',
+  'aria-multiselectable',
+  'aria-orientation',
+  'aria-owns',
+  'aria-posinset',
+  'aria-pressed',
+  'aria-readonly',
+  'aria-relevant',
+  'aria-required',
+  'aria-selected',
+  'aria-setsize',
+  'aria-sort',
+  'aria-valuemax',
+  'aria-valuemin',
+  'aria-valuenow',
+  'aria-valuetext',
+  'role',
+  'target'
+];
+
+// define sanitizers functions
+// these functions should be PURE
+
+// sanitize a str representing an href SVG attribute value
+function sanitizeHrefAttribute(str) {
+  if (str.startsWith('#')) {
+    return asString$1(str);
+  }
+  return '';
+}
+
+function uponSanitizeAttribute(node, data) {
+  const nodeName = node.nodeName.toUpperCase();
+  if (nodeName === 'USE' && ['href', 'xlink:href'].includes(data.attrName)) {
+    data.attrValue = sanitizeHrefAttribute(data.attrValue);
+  }
+  return data;
+}
+
+// Detect global object. Magically references a jsdom instance created in the bundled version
+// JSDom and DOMPurify are packaged only in the bundled version of locker-sanitize
+// eslint-disable-next-line
+const global = typeof window !== 'undefined' ? window : jsdom.window;
+
+// floating element used for purification of strings
+// create a dummy floating element that stores text if document is not found
+const floating = global.document.createElement('template');
+
+// cache DOMPurify instances to avoid reparsing configs
+// improves performance of DOMPurify.sanitize for repeated usage with same config
+const instances = new WeakMap();
+
+// DOMPurify preset configurations
+// configuration objects are also used as keys in the WeakMap to retrieve a DOMPurify instance
+
+// precompile a list of all whitelisted tags
+const allTags = Array.from(new Set([].concat(svgTags).concat(htmlTags)));
+
+// use only SVG tags, sanitizer attempts in place sanitization
+const RETURN_NODE_SVG_INPLACE = {
+  ALLOWED_TAGS: svgTags,
+  ADD_ATTR: attrs,
+  IN_PLACE: true,
+  hooks: {
+    uponSanitizeAttribute
+  }
+};
+
+// use only svg tags, sanitizer returns a document fragment
+const RETURN_NODE_SVG_NEWNODE = {
+  ALLOWED_TAGS: svgTags,
+  ADD_ATTR: attrs,
+  RETURN_DOM_FRAGMENT: true,
+  RETURN_DOM_IMPORT: true,
+  hooks: {
+    uponSanitizeAttribute
+  }
+};
+
+// generic, sanitizer returns string
+const RETURN_STRING_ALL = {
+  ALLOWED_TAGS: allTags,
+  ADD_ATTR: attrs,
+  hooks: {
+    uponSanitizeAttribute
+  }
+};
+
+// generic, sanitizer attempts in place sanitization
+const RETURN_NODE_ALL_INPLACE = {
+  ALLOWED_TAGS: allTags,
+  ADD_ATTR: attrs,
+  IN_PLACE: true,
+  hooks: {
+    uponSanitizeAttribute
+  }
+};
+
+// generic, sanitizer returns a document fragment
+const RETURN_NODE_ALL_NEWNODE = {
+  ALLOWED_TAGS: allTags,
+  ADD_ATTR: attrs,
+  RETURN_DOM_FRAGMENT: true,
+  RETURN_DOM_IMPORT: true,
+  hooks: {
+    uponSanitizeAttribute
+  }
+};
+
+/**
+ * use global DOMPurify if provided as global
+ *  defaults to package depedency otherwise
+ */
+function getSanitizerForConfig(config) {
+  let sanitizer = instances.get(config);
+  if (sanitizer) {
+    return sanitizer;
+  }
+
+  if (typeof DOMPurify !== 'undefined') {
+    sanitizer = new DOMPurify(global);
+  } else {
+    throw new Error('Missing dependency on DOMPurify');
+  }
+
+  sanitizer.setConfig(config);
+  if (config.hooks) {
+    Object.keys(config.hooks).forEach(key => {
+      sanitizer.addHook(key, config.hooks[key]);
+    });
+  }
+  instances.set(config, sanitizer);
+  return sanitizer;
+}
+
+/**
+ * Sanitize a node with strict SVG rules
+ * @param {Node} node
+ */
+function sanitizeSvgElement(node) {
+  let sanitizer = getSanitizerForConfig(RETURN_NODE_SVG_INPLACE);
+  try {
+    return sanitizer.sanitize(node);
+  } catch (e) {
+    sanitizer = getSanitizerForConfig(RETURN_NODE_SVG_NEWNODE);
+  }
+  return sanitizer.sanitize(node);
+}
+
+/**
+ * Sanitize a node with generic rules
+ * @param {Node} node
+ */
+function sanitizeElement(node) {
+  let sanitizer = getSanitizerForConfig(RETURN_NODE_ALL_INPLACE);
+  try {
+    return sanitizer.sanitize(node);
+  } catch (e) {
+    sanitizer = getSanitizerForConfig(RETURN_NODE_ALL_NEWNODE);
+  }
+  return sanitizer.sanitize(node);
+}
+
+/**
+ * Sanitize a string with strict SVG rules
+ * @param {String} input
+ */
+
+
+/**
+ * Will sanitize a string.
+ * If passed a configuration object it will use that to cache the new DOMPurify instance
+ * Defaults to internal generic configuration otherwise
+ *
+ * @param {String} input
+ * @param {Object} cfg - DOMPurify compatible configuration object
+ */
+function sanitize(input, cfg) {
+  floating.innerHTML = asString$1(input);
+  cfg = cfg || RETURN_STRING_ALL;
+  const sanitizer = getSanitizerForConfig(cfg);
+  return sanitizer.sanitize(floating.content);
+}
+
+/**
+ * Utility to validate if an SVG tag is whitelisted
+ * @param {String} tag
+ * @returns {boolean}
+ */
+function isAllowedSvgTag(tag) {
+  return !!svgTagsMap[tag];
+}
+
+/**
+ * Utility to validate if an HTML tag is whitelisted
+ * @param {String} tag
+ * @returns {boolean}
+ */
+
 /**
  * Sanitizes a URL string . Will prevent:
  * - usage of UTF-8 control characters. Update BLACKLIST constant to support more
@@ -166,52 +559,6 @@ const FUNCTION_RAW_ARGS = { type: 'function', rawArguments: true };
 const CTOR = { type: '@ctor' };
 const RAW = { type: '@raw' };
 const READ_ONLY_PROPERTY = { writable: false };
-
-const domPurifyConfig = {
-  // Allow SVG <use> element
-  ADD_TAGS: ['use'],
-  ADD_ATTR: [
-    'aria-activedescendant',
-    'aria-atomic',
-    'aria-autocomplete',
-    'aria-busy',
-    'aria-checked',
-    'aria-controls',
-    'aria-describedby',
-    'aria-disabled',
-    'aria-readonly',
-    'aria-dropeffect',
-    'aria-expanded',
-    'aria-flowto',
-    'aria-grabbed',
-    'aria-haspopup',
-    'aria-hidden',
-    'aria-disabled',
-    'aria-invalid',
-    'aria-label',
-    'aria-labelledby',
-    'aria-level',
-    'aria-live',
-    'aria-multiline',
-    'aria-multiselectable',
-    'aria-orientation',
-    'aria-owns',
-    'aria-posinset',
-    'aria-pressed',
-    'aria-readonly',
-    'aria-relevant',
-    'aria-required',
-    'aria-selected',
-    'aria-setsize',
-    'aria-sort',
-    'aria-valuemax',
-    'aria-valuemin',
-    'aria-valuenow',
-    'aria-valuetext',
-    'role',
-    'target'
-  ]
-};
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -332,12 +679,6 @@ function isDOMElementOrNode(el) {
   } catch (e) {
     return false;
   }
-}
-
-function sanitizeHTML(html) {
-  const template = document.createElement('template');
-  template.innerHTML = html;
-  return DOMPurify.sanitize(template.content, domPurifyConfig);
 }
 
 /*
@@ -3738,7 +4079,7 @@ function SecureElement(el, key) {
               `SecureElement.innerHTML cannot be used with ${raw.tagName} elements!`
             );
           }
-          raw.innerHTML = sanitizeHTML(asString(value));
+          raw.innerHTML = sanitize(value);
           trustChildNodes(this, raw);
         }
       };
@@ -3811,7 +4152,7 @@ function SecureElement(el, key) {
           // It returns no handle to trust the new elements. Here we create the
           // elements in a fragment then insert them in their proper location.
           const template = document.createElement('template');
-          template.innerHTML = sanitizeHTML(asString(value));
+          template.innerHTML = sanitize(value);
           const content = template.content;
           trustChildNodes(this, content);
           while (content.childNodes.length > 0) {
@@ -4126,7 +4467,7 @@ SecureElement.addStandardElementMethodAndPropertyOverrides = function(
           );
         }
 
-        raw.insertAdjacentHTML(position, sanitizeHTML(asString(text)));
+        raw.insertAdjacentHTML(position, sanitize(text));
 
         trustChildNodes(this, parent || raw);
       }
@@ -4297,7 +4638,7 @@ function freezeIntrinsicsDeprecated(realmRec) {
 }
 
 // locking down the environment
-function sanitize(realmRec) {
+function sanitize$1(realmRec) {
   if (sanitized.has(realmRec)) {
     return;
   }
@@ -4341,7 +4682,7 @@ const keyToSandbox = new Map();
 
 function createSandbox(key, realmRec) {
   // Lazy sanitize the execution environment.
-  sanitize(realmRec);
+  sanitize$1(realmRec);
 
   const sandbox = { realmRec };
 
@@ -7976,7 +8317,7 @@ function sanitizeHTMLParts(arr) {
     if (typeof entry !== 'string') {
       entry = ab2str(entry);
     }
-    entry = DOMPurify.sanitize(entry, domPurifyConfig);
+    entry = sanitize(entry);
     out.push(entry);
     i += 1;
   } while (i < arr.length);
@@ -10665,5 +11006,9 @@ exports.wrapComponent = wrapComponent;
 exports.wrapComponentEvent = wrapComponentEvent;
 exports.wrapLWC = wrapLWC;
 exports.wrapLib = wrapLib;
+exports.sanitize = sanitize;
+exports.isAllowedSvgTag = isAllowedSvgTag;
+exports.sanitizeSvgElement = sanitizeSvgElement;
+exports.sanitizeElement = sanitizeElement;
 
 }((this.AuraLocker = this.AuraLocker || {})));

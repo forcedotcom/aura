@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-10-08
- * Version: 0.5.15
+ * Generated: 2018-10-09
+ * Version: 0.5.16
  */
 
 (function (exports) {
@@ -126,6 +126,11 @@ function wrapLib(lib, key, requireLocker, desc) {
   return lib;
 }
 
+function sanitize(dirty, cfg) {}
+function isAllowedSvgTag(tag) {}
+function sanitizeSvgElement(node) {}
+function sanitizeElement(node) {}
+
 exports.create = create;
 exports.createForClass = createForClass;
 exports.createForDef = createForDef;
@@ -144,5 +149,9 @@ exports.wrapComponent = wrapComponent;
 exports.wrapComponentEvent = wrapComponentEvent;
 exports.wrapLWC = wrapLWC;
 exports.wrapLib = wrapLib;
+exports.sanitize = sanitize;
+exports.isAllowedSvgTag = isAllowedSvgTag;
+exports.sanitizeSvgElement = sanitizeSvgElement;
+exports.sanitizeElement = sanitizeElement;
 
 }((this.AuraLockerDisabled = this.AuraLockerDisabled || {})));

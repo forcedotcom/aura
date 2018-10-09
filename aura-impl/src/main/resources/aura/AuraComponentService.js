@@ -680,7 +680,7 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
         try {
             componentClassDef = $A.util.globalEval(componentClassDef, $A.clientService.getSourceMapsUrl(desc));
         } catch (e) {
-            var e1 = new AuraError(e);
+            var e1 = new $A.auraError("error in eval of componentClass definition", e);
             e1.setComponent(desc);
             throw e1;
         }
@@ -696,7 +696,7 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
     try {
         classConstructor = this.getComponentClass(desc, def);
     } catch (e) {
-        var e2 = new AuraError(e);
+        var e2 = new $A.auraError("failure when getting component class definition", e);
         e2.setComponent(desc);
         throw e2;
     }

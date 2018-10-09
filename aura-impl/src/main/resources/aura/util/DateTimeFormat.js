@@ -953,7 +953,7 @@ Aura.Utils.DateTimeFormat.prototype.formatOffset = function(offsetInMinute, deli
         offsetString = "+";
     }
 
-    offsetString += this.formatNumberField(offsetInMinute / 60, 2);
+    offsetString += this.formatNumberField(Math.floor(offsetInMinute / 60), 2);
     if (delimiter === true) {
         offsetString += ":";
     }

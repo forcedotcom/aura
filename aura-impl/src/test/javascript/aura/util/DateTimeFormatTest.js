@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/* global Test:false, Import:false, Mocks:false, Assert:false, Fact:false, Fixture:false */
+/* global Fixture:false, Test:false, Mocks:false, Import:false, Fact:false, Assert:false, Data:false */
 Function.RegisterNamespace("Test.Aura.Util");
 
 /**
@@ -76,16 +76,26 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [Fact]
-        function FormatsDateTimeWithOffset() {
+        [Fact, Data({offset: -420, expected: "2014-10-23T04:30:45-07:00"},  // -7 hours
+                    {offset: 420,  expected: "2014-10-23T04:30:45+07:00"},  // 7 hours
+                    {offset: 90,   expected: "2014-10-23T04:30:45+01:30"},  // 1.5 hours
+                    {offset: -90,  expected: "2014-10-23T04:30:45-01:30"},  // -1.5 hours
+                    {offset: 75,   expected: "2014-10-23T04:30:45+01:15"},  // 1.25 hours
+                    {offset: -75,  expected: "2014-10-23T04:30:45-01:15"},  // -1.25 hours
+                    {offset: 105,  expected: "2014-10-23T04:30:45+01:45"},  // 1.45 hours
+                    {offset: -105, expected: "2014-10-23T04:30:45-01:45"},  // -1.45 hours
+                    {offset: 30,   expected: "2014-10-23T04:30:45+00:30"},  // 0.5 hours
+                    {offset: -30,  expected: "2014-10-23T04:30:45-00:30"},  // -0.5 hours
+                    {offset: 0,    expected: "2014-10-23T04:30:45+00:00"})] // 0 hours
+        function FormatsDateTimeWithOffset(data) {
             var date = new Date(2014, 9, 23, 16, 30, 45);
-            var expected = "2014-10-23T04:30:45-07:00";
+            var expected = data.expected;
             var actual;
 
             mockAura(function() {
                 var locale = new Aura.Utils.Locale("en-US");
                 var dateTimeFormat = new Aura.Utils.DateTimeFormat("yyyy-MM-ddThh:mm:ssZ", locale);
-                actual = dateTimeFormat.format(date, -420);
+                actual = dateTimeFormat.format(date, data.offset);
             });
 
             Assert.Equal(expected, actual);
@@ -490,18 +500,28 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [Fact]
-        function FormatsDateTimeWithOffset() {
+        [Fact, Data({offset: -420, expected: "2014-10-23T04:30:45-07:00"},  // -7 hours
+                    {offset: 420,  expected: "2014-10-23T04:30:45+07:00"},  // 7 hours
+                    {offset: 90,   expected: "2014-10-23T04:30:45+01:30"},  // 1.5 hours
+                    {offset: -90,  expected: "2014-10-23T04:30:45-01:30"},  // -1.5 hours
+                    {offset: 75,   expected: "2014-10-23T04:30:45+01:15"},  // 1.25 hours
+                    {offset: -75,  expected: "2014-10-23T04:30:45-01:15"},  // -1.25 hours
+                    {offset: 105,  expected: "2014-10-23T04:30:45+01:45"},  // 1.45 hours
+                    {offset: -105, expected: "2014-10-23T04:30:45-01:45"},  // -1.45 hours
+                    {offset: 30,   expected: "2014-10-23T04:30:45+00:30"},  // 0.5 hours
+                    {offset: -30,  expected: "2014-10-23T04:30:45-00:30"},  // -0.5 hours
+                    {offset: 0,    expected: "2014-10-23T04:30:45+00:00"})] // 0 hours
+        function FormatsDateTimeWithOffset(data) {
             var date = new Date(2014, 9, 23, 16, 30, 45);
-            var expected = "2014-10-23T04:30:45-07:00";
+            var expected = data.expected;
             var actual;
-
+    
             mockAura(function() {
                 var locale = new Aura.Utils.Locale("en-US");
                 var dateTimeFormat = new Aura.Utils.DateTimeFormat("yyyy-MM-ddThh:mm:ssZ", locale);
-                actual = dateTimeFormat.format(date, -420);
+                actual = dateTimeFormat.format(date, data.offset);
             });
-
+    
             Assert.Equal(expected, actual);
         }
 
@@ -664,13 +684,12 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             // Arrange
             // needs to create the expected due to local zone offset
             var expected = new Date(2014, 8, 23, 16, 30).toISOString();
-            var format = "MMM dd, yyyy h:mm:ss A";
             var actual;
 
             // Act
             mockAura(function() {
                 var locale = new Aura.Utils.Locale("en-US");
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy h:mm:ss A", locale);
                 actual = dateTimeFormat.parse("Sep 23, 2014 4:30:00 PM");
             });
 
@@ -682,13 +701,12 @@ Test.Aura.Util.DateTimeFormatTest = function() {
         function Parses24HourDateTimeString() {
             // Arrange
             var expected = new Date(2014, 8, 23, 0, 30).toISOString();
-            var format = "MMM dd, yyyy H:mm:ss";
             var actual;
 
             // Act
             mockAura(function() {
                 var locale = new Aura.Utils.Locale("en-US");
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy H:mm:ss", locale);
                 actual = dateTimeFormat.parse("Sep 23, 2014 00:30:00");
             });
 
@@ -700,13 +718,12 @@ Test.Aura.Util.DateTimeFormatTest = function() {
         function ParsesTimeWithoutDelimiter() {
             // Arrange
             var expected = new Date(2014, 8, 23, 16, 30, 45).toISOString();
-            var format = "MMM dd, yyyy hmmss A";
             var actual;
 
             // Act
             mockAura(function() {
                 var locale = new Aura.Utils.Locale("en-US");
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy hmmss A", locale);
                 actual = dateTimeFormat.parse("Sep 23, 2014 43045 PM");
             });
 
@@ -718,13 +735,12 @@ Test.Aura.Util.DateTimeFormatTest = function() {
         function ParsesDateTimeStringWithWeekdays() {
             // Arrange
             var expected = new Date(2014, 8, 23, 12, 30).toISOString();
-            var format = "EEEE, MMM dd, yyyy H:mm:ss A";
             var actual;
 
             // Act
             mockAura(function() {
                 var locale = new Aura.Utils.Locale("en-US");
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("EEEE, MMM dd, yyyy H:mm:ss A", locale);
                 actual = dateTimeFormat.parse("Tuesday, Sep 23, 2014 12:30:00 PM");
             });
 
@@ -736,13 +752,12 @@ Test.Aura.Util.DateTimeFormatTest = function() {
         function ParsesDateTimeStringWithMillisecond() {
             // Arrange
             var expected = "2014-09-23T12:35:45.345Z";
-            var format = "yyyy-MM-ddTHH:mm:ss.SSSZ";
             var actual;
 
             // Act
             mockAura(function() {
                 var locale = new Aura.Utils.Locale("en-US");
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("yyyy-MM-ddTHH:mm:ss.SSSZ", locale);
                 actual = dateTimeFormat.parse(expected);
             });
 
@@ -753,13 +768,12 @@ Test.Aura.Util.DateTimeFormatTest = function() {
         [Fact]
         function ParsesInvalidDate() {
             // Arrange
-            var format = "MMM dd, yyyy h:mm:ss A";
             var actual;
 
             // Act
             mockAura(function() {
                 var locale = new Aura.Utils.Locale("en-US");
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy h:mm:ss A", locale);
                 actual = dateTimeFormat.parse("Sep 88, 2014 1:30:00");
             });
 
@@ -770,13 +784,12 @@ Test.Aura.Util.DateTimeFormatTest = function() {
         [Fact]
         function ParsesInvalidTime() {
             // Arrange
-            var format = "MMM dd, yyyy h:mm:ss A";
             var actual;
 
             // Act
             mockAura(function() {
                 var locale = new Aura.Utils.Locale("en-US");
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy h:mm:ss A", locale);
                 actual = dateTimeFormat.parse("Sep 23, 2014 88:30:00");
             });
 
@@ -787,13 +800,12 @@ Test.Aura.Util.DateTimeFormatTest = function() {
         [Fact]
         function ParsesMissingOneDigitHourInStrictMode() {
             // Arrange
-            var format = "MMM dd, yyyy HH:mm:ss";
             var actual;
 
             // Act
             mockAura(function() {
                 var locale = new Aura.Utils.Locale("en-US");
-                var dateTimeFormat = new Aura.Utils.DateTimeFormat(format, locale);
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("MMM dd, yyyy HH:mm:ss", locale);
                 actual = dateTimeFormat.parse("Sep 23, 2014 1:30:00", true);
             });
 
@@ -830,8 +842,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             // Act
             mockAura(function() {
                 try {
-                    new Aura.Utils.DateTimeFormat(data.format, new Aura.Utils.Locale("en-US"));
-                } catch(e) {
+                    new Aura.Utils.DateTimeFormat(data.format, new Aura.Utils.Locale("en-US")); // eslint-disable-line no-new
+                } catch (e) {
                     actual = e.message;
                 }
             });
@@ -850,8 +862,8 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             // Act
             mockAura(function() {
                 try {
-                    new Aura.Utils.DateTimeFormat("MMM dd, yyyy h:mm:ss a", data.locale);
-                } catch(e) {
+                    new Aura.Utils.DateTimeFormat("MMM dd, yyyy h:mm:ss a", data.locale); // eslint-disable-line no-new
+                } catch (e) {
                     actual = e.message;
                 }
             });
@@ -860,4 +872,4 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             Assert.Equal(expected, actual);
         }
     }
-}
+};

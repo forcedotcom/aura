@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-10-07
- * Version: 0.5.14
+ * Generated: 2018-10-08
+ * Version: 0.5.15
  */
 
 (function (exports) {
@@ -356,46 +356,23 @@ function sanitizeHTML(html) {
  * limitations under the License.
  */
 
-let substituteMapForWeakMap = false;
-
-if (typeof WeakMap !== 'undefined' && typeof Proxy !== 'undefined') {
-  // Test for the Edge weakmap with proxies bug https://github.com/Microsoft/ChakraCore/issues/1662
-  const map = new WeakMap();
-  const proxyAsKey = new Proxy({}, {});
-  map.set(proxyAsKey, true);
-  substituteMapForWeakMap = map.get(proxyAsKey) !== true;
-}
-
-// TODO: RJ probably move this out to utils
-function newWeakMap() {
-  return typeof WeakMap !== 'undefined'
-    ? !substituteMapForWeakMap ? new WeakMap() : new Map()
-    : {
-        /* WeakMap dummy polyfill */
-        get: function() {
-          return undefined;
-        },
-        set: function() {}
-      };
-}
-
 // Keyed objects can only have one owner. We prevent "null" and "undefined"
 // keys by guarding all set operations.
-const keychain = newWeakMap();
+const keychain = new WeakMap();
 // Map to store <key> to <Weakmap of <raw> to <Secure> pairs>, this is the primary cache
 const rawToSecurePrimaryCacheByKey = new Map();
 // Map to store <key> to <Map of <raw> to <Secure> pairs>, will be used for raw objects that cannot be stored in a WeakMap, this is the secondary cache
 const rawToSecureSecondaryCacheByKey = new Map();
-const secureToRaw = newWeakMap();
-const opaqueSecure = newWeakMap();
-const objectToKeyedData = newWeakMap();
-const secureProxy = newWeakMap();
-const filteringProxy = newWeakMap();
-const secureFunction = newWeakMap();
+const secureToRaw = new WeakMap();
+const opaqueSecure = new WeakMap();
+const objectToKeyedData = new WeakMap();
+const secureProxy = new WeakMap();
+const filteringProxy = new WeakMap();
+const secureFunction = new WeakMap();
 
-const secureBlobTypes = newWeakMap();
-const secureFilesTypes = newWeakMap();
-const secureMediaSource = newWeakMap();
+const secureBlobTypes = new WeakMap();
+const secureFilesTypes = new WeakMap();
+const secureMediaSource = new WeakMap();
 
 function getKey(thing) {
   return keychain.get(thing);
@@ -485,7 +462,7 @@ function getData(object, key) {
 function setData(object, key, data) {
   let keyedData = objectToKeyedData.get(object);
   if (!keyedData) {
-    keyedData = newWeakMap();
+    keyedData = new WeakMap();
     objectToKeyedData.set(object, keyedData);
   }
 
@@ -624,6 +601,16 @@ function getFromCache(raw, key) {
   return undefined;
 }
 
+function getRaw$1(so) {
+  const raw = getRef(so, getKey(so));
+
+  if (!raw) {
+    throw new Error('Blocked attempt to invoke secure method with altered this!');
+  }
+
+  return raw;
+}
+
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
@@ -723,7 +710,7 @@ function SecureCanvasRenderingContext2D(ctx, key) {
     }
   });
 
-  SecureObject.addPrototypeMethodsAndProperties(metadata$1, o, ctx, key);
+  addPrototypeMethodsAndProperties(metadata$1, o, ctx, key);
 
   setRef(o, ctx, key);
   addToCache(ctx, o, key);
@@ -1621,49 +1608,45 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
       }
 
       const replacedAttr = orignalSetAttributeNode.call(this, raw);
-      return SecureObject.filterEverything(this, replacedAttr);
+      return filterEverything(this, replacedAttr);
     }
   };
 
-  elementOverrides['attributes'] = SecureObject.createFilteredPropertyStateless(
-    'attributes',
-    prototype,
-    {
-      writable: false,
-      afterGetCallback: function(attributes) {
-        if (!attributes) {
-          return attributes;
-        }
-        // Secure attributes
-        const secureAttributes = [];
-        const raw = SecureObject.getRaw(this);
-        for (let i = 0; i < attributes.length; i++) {
-          const attribute = attributes[i];
-
-          // Only add supported attributes
-          if (SecureElement.isValidAttributeName(raw, attribute.name, prototype)) {
-            let attributeName = attribute.name;
-            if (attribute.name === 'src') {
-              continue;
-            }
-            if (attribute.name === 'data-locker-src') {
-              attributeName = 'src';
-            }
-
-            if (attribute.name === 'data-locker-href') {
-              attributeName = 'href';
-            }
-
-            secureAttributes.push({
-              name: attributeName,
-              value: SecureObject.filterEverything(this, attribute.value)
-            });
-          }
-        }
-        return secureAttributes;
+  elementOverrides['attributes'] = createFilteredPropertyStateless('attributes', prototype, {
+    writable: false,
+    afterGetCallback: function(attributes) {
+      if (!attributes) {
+        return attributes;
       }
+      // Secure attributes
+      const secureAttributes = [];
+      const raw = getRaw$1(this);
+      for (let i = 0; i < attributes.length; i++) {
+        const attribute = attributes[i];
+
+        // Only add supported attributes
+        if (SecureElement.isValidAttributeName(raw, attribute.name, prototype)) {
+          let attributeName = attribute.name;
+          if (attribute.name === 'src') {
+            continue;
+          }
+          if (attribute.name === 'data-locker-src') {
+            attributeName = 'src';
+          }
+
+          if (attribute.name === 'data-locker-href') {
+            attributeName = 'href';
+          }
+
+          secureAttributes.push({
+            name: attributeName,
+            value: filterEverything(this, attribute.value)
+          });
+        }
+      }
+      return secureAttributes;
     }
-  );
+  });
 };
 
 SecureScriptElement.run = function(st) {
@@ -1675,7 +1658,7 @@ SecureScriptElement.run = function(st) {
     return;
   }
 
-  const el = SecureObject.getRaw(st);
+  const el = getRaw$1(st);
   document.head.appendChild(el);
 
   if (href && !(el instanceof SVGScriptElement)) {
@@ -1733,11 +1716,11 @@ const SecureIFrameElement = {
     defineProperties(prototype, {
       // Standard HTMLElement methods
       // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
-      blur: SecureObject.createFilteredMethodStateless('blur', prototype),
-      focus: SecureObject.createFilteredMethodStateless('focus', prototype),
+      blur: createFilteredMethodStateless('blur', prototype),
+      focus: createFilteredMethodStateless('focus', prototype),
       contentWindow: {
         get: function() {
-          const raw = SecureObject.getRaw(this);
+          const raw = getRaw$1(this);
           return raw.contentWindow
             ? SecureIFrameElement.SecureIFrameContentWindow(raw.contentWindow, getKey(this))
             : raw.contentWindow;
@@ -1746,7 +1729,7 @@ const SecureIFrameElement = {
       // Reason: [W-4437391] Cure53 Report SF-04-004: Window access via encoded path segments.
       src: {
         get: function() {
-          const raw = SecureObject.getRaw(this);
+          const raw = getRaw$1(this);
           return raw.src;
         },
         set: function(url) {
@@ -1757,7 +1740,7 @@ const SecureIFrameElement = {
                 'SecureIframeElement.src supports http://, https:// schemes and relative urls.'
               );
             } else {
-              const raw = SecureObject.getRaw(this);
+              const raw = getRaw$1(this);
               raw.src = urlString;
             }
           }
@@ -1769,7 +1752,7 @@ const SecureIFrameElement = {
     // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
     // Note: Ignoring 'contentDocument', 'sandbox' and 'srcdoc' from the list above.
     ['height', 'width', 'name'].forEach(name =>
-      defineProperty(prototype, name, SecureObject.createFilteredPropertyStateless(name, prototype))
+      defineProperty(prototype, name, createFilteredPropertyStateless(name, prototype))
     );
   },
 
@@ -1788,7 +1771,7 @@ const SecureIFrameElement = {
     });
 
     defineProperties(sicw, {
-      postMessage: SecureObject.createFilteredMethod(sicw, w, 'postMessage', { rawArguments: true })
+      postMessage: createFilteredMethod(sicw, w, 'postMessage', { rawArguments: true })
     });
 
     setRef(sicw, w, key);
@@ -1923,7 +1906,7 @@ function getWrappedEvent(e, key) {
       `Received a wrapped event(key: ${getKey(e)}) from a different locker(key: ${key})`
     );
     // If the browser is calling your listener, then you have access to the event
-    e = SecureObject.getRaw(e);
+    e = getRaw$1(e);
   }
   return SecureDOMEvent(e, key);
 }
@@ -1985,7 +1968,7 @@ function createAddEventListenerDescriptor(st, el, key) {
 function addEventTargetMethods(st, raw, key) {
   defineProperties(st, {
     addEventListener: createAddEventListenerDescriptor(st, raw, key),
-    dispatchEvent: SecureObject.createFilteredMethod(st, raw, 'dispatchEvent', {
+    dispatchEvent: createFilteredMethod(st, raw, 'dispatchEvent', {
       rawArguments: true
     }),
 
@@ -2014,7 +1997,7 @@ function createAddEventListenerDescriptorStateless() {
       }
 
       const so = this;
-      const el = SecureObject.getRaw(so);
+      const el = getRaw$1(so);
       const key = getKey(so);
 
       const sListener = getSecureListener(so, listener, key);
@@ -2026,7 +2009,7 @@ function createAddEventListenerDescriptorStateless() {
 function createEventTargetMethodsStateless(config, prototype) {
   config['addEventListener'] = createAddEventListenerDescriptorStateless(prototype);
 
-  config['dispatchEvent'] = SecureObject.createFilteredMethodStateless('dispatchEvent', prototype, {
+  config['dispatchEvent'] = createFilteredMethodStateless('dispatchEvent', prototype, {
     rawArguments: true
   });
 
@@ -2035,7 +2018,7 @@ function createEventTargetMethodsStateless(config, prototype) {
   // was actually wired up originally
   config['removeEventListener'] = {
     value: function(type, listener, options) {
-      const raw = SecureObject.getRaw(this);
+      const raw = getRaw$1(this);
       const sCallback = getFromCache(listener, getKey(this));
       raw.removeEventListener(type, sCallback, options);
     }
@@ -2099,7 +2082,7 @@ function customElementHook$1(el, prototype, tagNameSpecificConfig) {
   const methodOptions = {
     unfilterEverything: function(args) {
       const st = this;
-      return SecureObject.deepUnfilterMethodArguments(st, [], args);
+      return deepUnfilterMethodArguments(st, [], args);
     }
   };
   const namesToDescriptorMap = getCustomElementPropertyDescriptors(lwcUnwrap(el));
@@ -2114,14 +2097,10 @@ function customElementHook$1(el, prototype, tagNameSpecificConfig) {
         originalDescriptor.hasOwnProperty('value') &&
         typeof originalDescriptor.value === 'function'
       ) {
-        tagNameSpecificConfig[prop] = SecureObject.createFilteredMethodStateless(
-          prop,
-          prototype,
-          methodOptions
-        );
+        tagNameSpecificConfig[prop] = createFilteredMethodStateless(prop, prototype, methodOptions);
       } else {
         // Everything else has a wrapped getter/setter
-        tagNameSpecificConfig[prop] = SecureObject.createFilteredPropertyStateless(
+        tagNameSpecificConfig[prop] = createFilteredPropertyStateless(
           prop,
           prototype,
           methodOptions
@@ -2160,7 +2139,7 @@ function isAnLWCNode(node) {
  * limitations under the License.
  */
 
-const proxyMap = newWeakMap();
+const proxyMap = new WeakMap();
 function addProxy(proxy, raw) {
   proxyMap.set(proxy, raw);
 }
@@ -3649,12 +3628,12 @@ function SecureElement(el, key) {
           configurable: descriptor.configurable,
           enumerable: true,
           get: function() {
-            const rawEl = SecureObject.getRaw(this);
-            return SecureObject.filterEverything(this, rawEl[prop]);
+            const rawEl = getRaw$1(this);
+            return filterEverything(this, rawEl[prop]);
           },
           set: function(value) {
-            const rawEl = SecureObject.getRaw(this);
-            rawEl[prop] = SecureObject.filterEverything(this, value);
+            const rawEl = getRaw$1(this);
+            rawEl[prop] = filterEverything(this, value);
           }
         });
       }
@@ -3673,7 +3652,7 @@ function SecureElement(el, key) {
     defineProperties(prototype, {
       toString: {
         value: function() {
-          const e = SecureObject.getRaw(this);
+          const e = getRaw$1(this);
           return `SecureElement: ${e}{ key: ${JSON.stringify(getKey(this))} }`;
         }
       }
@@ -3686,7 +3665,7 @@ function SecureElement(el, key) {
       SecureIFrameElement.addMethodsAndProperties(prototype);
     }
 
-    const tagNameSpecificConfig = SecureObject.addPrototypeMethodsAndPropertiesStateless(
+    const tagNameSpecificConfig = addPrototypeMethodsAndPropertiesStateless(
       metadata$2,
       prototypicalInstance,
       prototype
@@ -3694,7 +3673,7 @@ function SecureElement(el, key) {
 
     // Conditionally add things that not all Node types support
     if ('attributes' in el) {
-      tagNameSpecificConfig['attributes'] = SecureObject.createFilteredPropertyStateless(
+      tagNameSpecificConfig['attributes'] = createFilteredPropertyStateless(
         'attributes',
         prototype,
         {
@@ -3704,7 +3683,7 @@ function SecureElement(el, key) {
               return attributes;
             }
 
-            return SecureObject.createProxyForNamedNodeMap(
+            return createProxyForNamedNodeMap(
               attributes,
               key,
               prototype,
@@ -3726,13 +3705,13 @@ function SecureElement(el, key) {
            *
            * https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#Differences_from_innerText
            */
-          const rawEl = SecureObject.getRaw(this);
+          const rawEl = getRaw$1(this);
           const filtered = cloneFiltered(rawEl, o);
           const ret = filtered.innerText;
           return ret;
         },
         set: function(value) {
-          const raw = SecureObject.getRaw(this);
+          const raw = getRaw$1(this);
           if (SecureElement.isSharedElement(raw)) {
             throw new error(
               `SecureElement.innerText cannot be used with ${raw.tagName} elements!`
@@ -3749,10 +3728,10 @@ function SecureElement(el, key) {
     if ('innerHTML' in el) {
       tagNameSpecificConfig['innerHTML'] = {
         get: function() {
-          return cloneFiltered(SecureObject.getRaw(this), o).innerHTML;
+          return cloneFiltered(getRaw$1(this), o).innerHTML;
         },
         set: function(value) {
-          const raw = SecureObject.getRaw(this);
+          const raw = getRaw$1(this);
           // Do not allow innerHTML on shared elements (body/head)
           if (SecureElement.isSharedElement(raw)) {
             throw new error(
@@ -3770,7 +3749,7 @@ function SecureElement(el, key) {
     if (tagName === 'LINK' && 'rel' in el) {
       tagNameSpecificConfig['rel'] = {
         get: function() {
-          const raw = SecureObject.getRaw(this);
+          const raw = getRaw$1(this);
           return raw.rel;
         },
         set: function(value) {
@@ -3780,7 +3759,7 @@ function SecureElement(el, key) {
               "SecureLinkElement does not allow setting 'rel' property to 'import' value."
             );
           } else {
-            const raw = SecureObject.getRaw(this);
+            const raw = getRaw$1(this);
             raw.rel = value;
           }
         }
@@ -3791,7 +3770,7 @@ function SecureElement(el, key) {
     if (tagName === '#text' && 'splitText' in el) {
       tagNameSpecificConfig['splitText'] = {
         value: function(index) {
-          const raw = SecureObject.getRaw(this);
+          const raw = getRaw$1(this);
           const newNode = raw.splitText(index);
 
           const fromKey = getKey(raw);
@@ -3806,10 +3785,10 @@ function SecureElement(el, key) {
     if ('outerHTML' in el) {
       tagNameSpecificConfig['outerHTML'] = {
         get: function() {
-          return cloneFiltered(SecureObject.getRaw(this), o).outerHTML;
+          return cloneFiltered(getRaw$1(this), o).outerHTML;
         },
         set: function(value) {
-          const raw = SecureObject.getRaw(this);
+          const raw = getRaw$1(this);
           // Do not allow on shared elements (body/head)
           if (SecureElement.isSharedElement(raw)) {
             throw new error(
@@ -3848,7 +3827,7 @@ function SecureElement(el, key) {
     if (tagName === '#text' && 'splitText' in el) {
       tagNameSpecificConfig['splitText'] = {
         value: function(index) {
-          const raw = SecureObject.getRaw(this);
+          const raw = getRaw$1(this);
           const newNode = raw.splitText(index);
 
           const fromKey = getKey(raw);
@@ -3876,7 +3855,7 @@ function SecureElement(el, key) {
             return undefined;
           }
 
-          const raw = SecureObject.getRaw(this);
+          const raw = getRaw$1(this);
           const tbodyExists = !!getFirstTBody(raw);
           const newRow = raw.insertRow(index);
           trust$1(this, newRow);
@@ -3995,7 +3974,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
       writable: true,
       value: function(child) {
         if (!runIfRunnable(child)) {
-          const e = SecureObject.getRaw(this);
+          const e = getRaw$1(this);
           e.appendChild(getRef(child, getKey(this), true));
         }
 
@@ -4007,7 +3986,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
       writable: true,
       value: function(newChild, oldChild) {
         if (!runIfRunnable(newChild)) {
-          const e = SecureObject.getRaw(this);
+          const e = getRaw$1(this);
           const k = getKey(this);
           e.replaceChild(getRef(newChild, k, true), getRef(oldChild, k, true));
         }
@@ -4020,7 +3999,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
       writable: true,
       value: function(newNode, referenceNode) {
         if (!runIfRunnable(newNode)) {
-          const e = SecureObject.getRaw(this);
+          const e = getRaw$1(this);
           const k = getKey(this);
           e.insertBefore(
             getRef(newNode, k, true),
@@ -4032,7 +4011,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
       }
     },
 
-    removeChild: SecureObject.createFilteredMethodStateless('removeChild', prototype, {
+    removeChild: createFilteredMethodStateless('removeChild', prototype, {
       rawArguments: true,
       beforeCallback: function(child) {
         // Verify that the passed in child is not opaque!
@@ -4060,7 +4039,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
           }
         }
 
-        const e = SecureObject.getRaw(this);
+        const e = getRaw$1(this);
         const root = e.cloneNode(deep);
 
         // Maintain the same ownership in the cloned subtree
@@ -4072,10 +4051,10 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
 
     textContent: {
       get: function() {
-        return cloneFiltered(SecureObject.getRaw(this), this).textContent;
+        return cloneFiltered(getRaw$1(this), this).textContent;
       },
       set: function(value) {
-        const raw = SecureObject.getRaw(this);
+        const raw = getRaw$1(this);
         if (SecureElement.isSharedElement(raw)) {
           throw new error(
             `SecureElement.textContent cannot be used with ${raw.tagName} elements!`
@@ -4091,7 +4070,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
     hasChildNodes: {
       value: function() {
         const { isAnLWCNode: isAnLWCNode$$1 } = lwcHelpers;
-        const raw = SecureObject.getRaw(this);
+        const raw = getRaw$1(this);
         // If this is a shared element, delegate the call to the shared element, no need to check for access
         if (SecureElement.isSharedElement(raw) || isAnLWCNode$$1(raw)) {
           return raw.hasChildNodes();
@@ -4117,7 +4096,7 @@ SecureElement.addStandardElementMethodAndPropertyOverrides = function(
     querySelector: {
       writable: true,
       value: function(selector) {
-        const raw = SecureObject.getRaw(this);
+        const raw = getRaw$1(this);
         return SecureElement.secureQuerySelector(raw, getKey(this), selector);
       }
     },
@@ -4125,7 +4104,7 @@ SecureElement.addStandardElementMethodAndPropertyOverrides = function(
     insertAdjacentHTML: {
       writable: true,
       value: function(position, text) {
-        const raw = SecureObject.getRaw(this);
+        const raw = getRaw$1(this);
 
         // Do not allow insertAdjacentHTML on shared elements (body/head)
         if (SecureElement.isSharedElement(raw)) {
@@ -4263,7 +4242,7 @@ SecureElement.createAttributeAccessMethodConfig = function(
   return {
     writable: true,
     value: function() {
-      const raw = SecureObject.getRaw(this);
+      const raw = getRaw$1(this);
       let args = slice(arguments);
 
       let name = args[namespaced ? 1 : 0];
@@ -4280,7 +4259,7 @@ SecureElement.createAttributeAccessMethodConfig = function(
         args[1] = SecureElement.validateURLScheme(args[1]);
       } */
 
-      args = SecureObject.filterArguments(this, args, { rawArguments: true });
+      args = filterArguments(this, args, { rawArguments: true });
       const ret = raw[methodName].apply(raw, args);
       return ret instanceof Node ? SecureElement(ret, key) : ret;
     }
@@ -4870,10 +4849,10 @@ function SecureDOMEvent(event, key) {
   const DOMEventSecureDescriptors = {
     // Events properties that are DOM Elements were compiled from
     // https://developer.mozilla.org/en-US/docs/Web/Events
-    target: SecureObject.createFilteredProperty(o, event, 'target', SKIP_OPAQUE_ASCENDING),
-    currentTarget: SecureObject.createFilteredProperty(o, event, 'currentTarget'),
+    target: createFilteredProperty(o, event, 'target', SKIP_OPAQUE_ASCENDING),
+    currentTarget: createFilteredProperty(o, event, 'currentTarget'),
 
-    initEvent: SecureObject.createFilteredMethod(o, event, 'initEvent'),
+    initEvent: createFilteredMethod(o, event, 'initEvent'),
     // Touch Events are special on their own:
     // https://developer.mozilla.org/en-US/docs/Web/API/Touch
     touches: SecureDOMEvent.filterTouchesDescriptor(o, event, 'touches'),
@@ -4891,12 +4870,12 @@ function SecureDOMEvent(event, key) {
   };
 
   ['preventDefault', 'stopImmediatePropagation', 'stopPropagation'].forEach(method =>
-    SecureObject.addMethodIfSupported(o, event, method)
+    addMethodIfSupported(o, event, method)
   );
 
   // non-standard properties and aliases
   ['relatedTarget', 'srcElement', 'explicitOriginalTarget', 'originalTarget'].forEach(property =>
-    SecureObject.addPropertyIfSupported(o, event, property)
+    addPropertyIfSupported(o, event, property)
   );
 
   // For MessageEvent, special handling if the message is from a cross origin iframe
@@ -4928,7 +4907,7 @@ function SecureDOMEvent(event, key) {
       defineProperty(
         o,
         name,
-        DOMEventSecureDescriptors[name] || SecureObject.createFilteredProperty(o, event, name)
+        DOMEventSecureDescriptors[name] || createFilteredProperty(o, event, name)
       );
     }
   }
@@ -4977,7 +4956,7 @@ SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
               // all props in a touch object are readonly by spec:
               // https://developer.mozilla.org/en-US/docs/Web/API/Touch
               get: function() {
-                return SecureObject.filterEverything(se, touch[p]);
+                return filterEverything(se, touch[p]);
               }
             }),
           {}
@@ -5005,6 +4984,8 @@ SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/* eslint-disable no-use-before-define */
 
 let filterTypeHook$1;
 function registerFilterTypeHook(hook) {
@@ -5046,32 +5027,10 @@ const defaultSecureObjectKey = {
   defaultSecureObjectKey: true
 };
 
-SecureObject.getRaw = function getRaw(so) {
-  const raw = getRef(so, getKey(so));
+// TODO:W-5505277 Move filters to LockerFilter
+// TODO:W-5505278 Move add/create to LockerFactory
 
-  if (!raw) {
-    throw new Error('Blocked attempt to invoke secure method with altered this!');
-  }
-
-  return raw;
-};
-
-/**
- * Filter the given raw object with the accessors key and provide a filtered view.
- * Best used when the type of "raw" is not known
- * @param st Represents the accessor who is trying to access "raw"
- * @param raw The raw object that we are trying to filter
- * @param options
- * @returns {*}
- */
-SecureObject.filterEverything = function(st, raw, options) {
-  if (!raw) {
-    // ignoring falsy, nully references.
-    return raw;
-  }
-
-  const t = typeof raw;
-
+function filterFunction(st, raw, options) {
   const key = getKey(st);
   const cached = getFromCache(raw, key);
   if (cached) {
@@ -5090,139 +5049,188 @@ SecureObject.filterEverything = function(st, raw, options) {
     // Locker where the function was originally defined.
     return belongsToLocker || isSecureFunction(raw)
       ? raw
-      : SecureObject.filterEverything(st, getRef(raw, rawKey), options);
+      : filterEverything(st, getRef(raw, rawKey), options);
+  }
+
+  // wrapping functions to guarantee that they run in system mode but their
+  // returned value complies with user-mode.
+  const swallowed = function SecureFunction() {
+    // special unfiltering logic to unwrap Proxies passed back to origin.
+    // this could potentially be folded into filterArguments with an option set if needed.
+    const filteredArgs = [];
+    for (let i = 0; i < arguments.length; i++) {
+      let arg = arguments[i];
+      if (isFilteringProxy(arg)) {
+        const unfilteredProxy = getRef(arg, getKey(arg));
+        const unfilteredKey = getKey(unfilteredProxy);
+        arg = unfilteredKey === getKey(raw) ? unfilteredProxy : filterEverything(st, arg);
+      } else {
+        arg = filterEverything(st, arg);
+      }
+      filteredArgs[i] = arg;
+    }
+
+    let self = filterEverything(st, this);
+    if (isFilteringProxy(self) && getKey(self) === getKey(st)) {
+      self = getRef(self, key);
+    }
+
+    const fnReturnedValue = raw.apply(self, filteredArgs);
+
+    return filterEverything(st, fnReturnedValue, options);
+  };
+
+  setRef(swallowed, raw, key);
+
+  if (!rawKey) {
+    setKey(raw, defaultKey);
+  }
+
+  addToCache(raw, swallowed, key);
+  registerProxy(swallowed);
+  registerSecureFunction(swallowed);
+
+  return swallowed;
+}
+
+function filterObject(st, raw, options) {
+  const key = getKey(st);
+  const cached = getFromCache(raw, key);
+  if (cached) {
+    return cached;
+  }
+
+  // Handle already proxied things
+  const rawKey = getKey(raw);
+  const belongsToLocker = rawKey === key;
+  const defaultKey = options && options.defaultKey ? options.defaultKey : defaultSecureObjectKey;
+
+  if (isProxy(raw)) {
+    // - If !belongsToLocker then this is a jump from one locker to another - we just need to unwrap and then reproxy based on the target locker's perspective
+    // otherwise just return the proxy (do not proxy a proxy).
+    // - Bypass unwrapping and refiltering for SecureFunction so arguments and 'this' are filtered against the
+    // Locker where the function was originally defined.
+    return belongsToLocker || isSecureFunction(raw)
+      ? raw
+      : filterEverything(st, getRef(raw, rawKey), options);
   }
 
   let swallowed;
   let mutated = false;
-  if (t === 'function') {
-    // wrapping functions to guarantee that they run in system mode but their
-    // returned value complies with user-mode.
-    swallowed = function SecureFunction() {
-      // special unfiltering logic to unwrap Proxies passed back to origin.
-      // this could potentially be folded into filterArguments with an option set if needed.
-      const filteredArgs = [];
-      for (let i = 0; i < arguments.length; i++) {
-        let arg = arguments[i];
-        if (isFilteringProxy(arg)) {
-          const unfilteredProxy = getRef(arg, getKey(arg));
-          const unfilteredKey = getKey(unfilteredProxy);
-          arg =
-            unfilteredKey === getKey(raw)
-              ? unfilteredProxy
-              : SecureObject.filterEverything(st, arg);
-        } else {
-          arg = SecureObject.filterEverything(st, arg);
-        }
-        filteredArgs[i] = arg;
+
+  if (raw === window) {
+    return getEnv$1(key);
+  } else if (raw === document) {
+    return getEnv$1(key).document;
+  } else if (raw === window.location) {
+    return getEnv$1(key).location;
+  }
+
+  const isNodeList = raw && (raw instanceof NodeList || raw instanceof HTMLCollection);
+  if (isArray(raw)) {
+    if (!belongsToLocker) {
+      if (!rawKey) {
+        // Array that was created in this locker or system mode but not yet keyed - key it now
+        setKey(raw, defaultKey);
+        return filterEverything(st, raw, options);
       }
-
-      let self = SecureObject.filterEverything(st, this);
-      if (isFilteringProxy(self) && getKey(self) === getKey(st)) {
-        self = getRef(self, key);
-      }
-
-      const fnReturnedValue = raw.apply(self, filteredArgs);
-
-      return SecureObject.filterEverything(st, fnReturnedValue, options);
-    };
-
-    mutated = true;
+      swallowed = createProxyForArrayObjects(raw, key);
+      setRef(swallowed, raw, key);
+      addToCache(raw, swallowed, key);
+      mutated = true;
+    }
+  } else if (isNodeList) {
+    swallowed = createProxyForArrayLikeObjects(raw, key);
     setRef(swallowed, raw, key);
-
-    if (!rawKey) {
-      setKey(raw, defaultKey);
+    mutated = true;
+  } else {
+    assert(key, 'A secure object should always have a key.');
+    if (filterTypeHook$1) {
+      swallowed = filterTypeHook$1(raw, key, belongsToLocker);
     }
+    if (swallowed) {
+      mutated = raw !== swallowed;
+    } else if (isDOMElementOrNode(raw)) {
+      if (belongsToLocker || SecureElement.isSharedElement(raw)) {
+        swallowed = SecureElement(raw, key);
+      } else if (!options) {
+        swallowed = SecureObject(raw, key);
+      } else if (raw instanceof Attr && !rawKey) {
+        setKey(raw, defaultKey);
+        return filterEverything(st, raw, options);
+      } else {
+        swallowed = options.defaultValue;
+        addToCache(raw, swallowed, key);
+      }
+      mutated = true;
+    } else if (raw instanceof Event) {
+      swallowed = SecureDOMEvent(raw, key);
+      mutated = true;
+    } else if (typeof raw['Window'] === 'function' && raw instanceof raw['Window']) {
+      // Cross realm window instances (window.open() and iframe.contentWindow)
+      swallowed = SecureIFrameElement.SecureIFrameContentWindow(raw, key);
+      // TODO: Move these properties into SecureIFrameContentWindow class
+      // so every instance gets the properties
+      addMethodIfSupported(swallowed, raw, 'close');
+      addMethodIfSupported(swallowed, raw, 'focus');
+      addPropertyIfSupported(swallowed, raw, 'opener');
+      addPropertyIfSupported(swallowed, raw, 'closed', { writable: false });
 
-    addToCache(raw, swallowed, key);
-    registerProxy(swallowed);
-    registerSecureFunction(swallowed);
-  } else if (t === 'object') {
-    if (raw === window) {
-      return getEnv$1(key);
-    } else if (raw === document) {
-      return getEnv$1(key).document;
-    } else if (raw === window.location) {
-      return getEnv$1(key).location;
-    }
-
-    const isNodeList = raw && (raw instanceof NodeList || raw instanceof HTMLCollection);
-    if (isArray(raw)) {
+      mutated = true;
+    } else if (raw instanceof CanvasRenderingContext2D) {
+      swallowed = SecureCanvasRenderingContext2D(raw, key);
+      mutated = true;
+    } else if (isUnfilteredType(raw, key)) {
+      // return raw for unfiltered types
+      mutated = false;
+    } else {
       if (!belongsToLocker) {
         if (!rawKey) {
-          // Array that was created in this locker or system mode but not yet keyed - key it now
+          // Object that was created in this locker or in system mode and not yet keyed - key it now
           setKey(raw, defaultKey);
-          return SecureObject.filterEverything(st, raw, options);
+          return filterEverything(st, raw, options);
         }
-        swallowed = SecureObject.createProxyForArrayObjects(raw, key);
-        setRef(swallowed, raw, key);
+        swallowed = createFilteringProxy(raw, key);
         addToCache(raw, swallowed, key);
         mutated = true;
-      }
-    } else if (isNodeList) {
-      swallowed = SecureObject.createProxyForArrayLikeObjects(raw, key);
-      setRef(swallowed, raw, key);
-      mutated = true;
-    } else {
-      assert(key, 'A secure object should always have a key.');
-      if (filterTypeHook$1) {
-        swallowed = filterTypeHook$1(raw, key, belongsToLocker);
-      }
-      if (swallowed) {
-        mutated = raw !== swallowed;
-      } else if (isDOMElementOrNode(raw)) {
-        if (belongsToLocker || SecureElement.isSharedElement(raw)) {
-          swallowed = SecureElement(raw, key);
-        } else if (!options) {
-          swallowed = SecureObject(raw, key);
-        } else if (raw instanceof Attr && !rawKey) {
-          setKey(raw, defaultKey);
-          return SecureObject.filterEverything(st, raw, options);
-        } else {
-          swallowed = options.defaultValue;
-          addToCache(raw, swallowed, key);
-        }
-        mutated = true;
-      } else if (raw instanceof Event) {
-        swallowed = SecureDOMEvent(raw, key);
-        mutated = true;
-      } else if (typeof raw['Window'] === 'function' && raw instanceof raw['Window']) {
-        // Cross realm window instances (window.open() and iframe.contentWindow)
-        swallowed = SecureIFrameElement.SecureIFrameContentWindow(raw, key);
-        // TODO: Move these properties into SecureIFrameContentWindow class
-        // so every instance gets the properties
-        SecureObject.addMethodIfSupported(swallowed, raw, 'close');
-        SecureObject.addMethodIfSupported(swallowed, raw, 'focus');
-        SecureObject.addPropertyIfSupported(swallowed, raw, 'opener');
-        SecureObject.addPropertyIfSupported(swallowed, raw, 'closed', { writable: false });
-
-        mutated = true;
-      } else if (raw instanceof CanvasRenderingContext2D) {
-        swallowed = SecureCanvasRenderingContext2D(raw, key);
-        mutated = true;
-      } else if (SecureObject.isUnfilteredType(raw, key)) {
-        // return raw for unfiltered types
-        mutated = false;
-      } else {
-        if (!belongsToLocker) {
-          if (!rawKey) {
-            // Object that was created in this locker or in system mode and not yet keyed - key it now
-            setKey(raw, defaultKey);
-            return SecureObject.filterEverything(st, raw, options);
-          }
-          swallowed = SecureObject.createFilteringProxy(raw, key);
-          addToCache(raw, swallowed, key);
-          mutated = true;
-        }
       }
     }
   }
 
   return mutated ? swallowed : raw;
-};
+}
 
-SecureObject.filterArguments = function(st, args, options) {
-  function getRaw(v) {
+/**
+ * Filter the given raw object with the accessors key and provide a filtered view.
+ * Best used when the type of "raw" is not known
+ * @param st Represents the accessor who is trying to access "raw"
+ * @param raw The raw object that we are trying to filter
+ * @param options
+ * @returns {*}
+ */
+function filterEverything(st, raw, options) {
+  if (raw === undefined || raw === null) {
+    return raw;
+  }
+  // This detection of primitives is performant, even with the apparent string creation.
+  // Benchmarks show that Object(raw) !== raw is 10x slower.
+  switch (typeof raw) {
+    case 'boolean':
+    case 'number':
+    case 'string':
+    case 'symbol':
+      return raw;
+    case 'function':
+      return filterFunction(st, raw, options);
+    case 'object':
+      return filterObject(st, raw, options);
+    default:
+      throw new TypeError(`type not supported ${raw}`);
+  }
+}
+
+function filterArguments(st, args, options) {
+  function getRaw$$1(v) {
     if (isProxy(v)) {
       const key = getKey(v);
       const ref = getRef(v, key);
@@ -5235,7 +5243,7 @@ SecureObject.filterArguments = function(st, args, options) {
   function getRawArray(v) {
     const result = [];
     for (let i = 0; i < v.length; i++) {
-      result.push(getRaw(v[i]));
+      result.push(getRaw$$1(v[i]));
     }
     return result;
   }
@@ -5254,15 +5262,15 @@ SecureObject.filterArguments = function(st, args, options) {
     const value = args[n];
     if (value) {
       if (rawArguments && typeof value === 'object') {
-        args[n] = isArray(value) ? getRawArray(value) : getRaw(value);
+        args[n] = isArray(value) ? getRawArray(value) : getRaw$$1(value);
       } else {
-        args[n] = SecureObject.filterEverything(st, value, options);
+        args[n] = filterEverything(st, value, options);
       }
     }
   }
 
   return args;
-};
+}
 
 function convertSymbol(property) {
   // Symbols have to be handled in some browsers
@@ -5294,13 +5302,13 @@ const filteringProxyHandler = (function() {
       return value;
     }
 
-    return SecureObject.filterEverything(target, value);
+    return filterEverything(target, value);
   };
 
   FilteringProxyHandler.prototype['set'] = function(target, property, value) {
     const raw = getRef(target, getKey(target));
 
-    const filteredValue = value ? SecureObject.filterEverything(target, value) : value;
+    const filteredValue = value ? filterEverything(target, value) : value;
 
     raw[property] = filteredValue;
 
@@ -5355,7 +5363,7 @@ const filteringProxyHandler = (function() {
     if (rawDescriptor) {
       // Always filter the descriptor value.
       if (rawDescriptor.hasOwnProperty('value')) {
-        rawDescriptor.value = SecureObject.filterEverything(target, rawDescriptor.value);
+        rawDescriptor.value = filterEverything(target, rawDescriptor.value);
       }
 
       // Always remove from the surrogate (and redefine if necessary).
@@ -5389,7 +5397,7 @@ const filteringProxyHandler = (function() {
   return freeze(new FilteringProxyHandler());
 })();
 
-SecureObject.createFilteringProxy = function(raw, key) {
+function createFilteringProxy(raw, key) {
   // Use a direct proxy on raw to a proxy on {} to avoid the Proxy invariants for non-writable, non-configurable properties
   const surrogate = create$1(Object.getPrototypeOf(raw));
   setRef(surrogate, raw, key);
@@ -5411,7 +5419,7 @@ SecureObject.createFilteringProxy = function(raw, key) {
   registerFilteringProxy(swallowed);
 
   return swallowed;
-};
+}
 
 // We cache 1 array like thing proxy per key
 const KEY_TO_ARRAY_LIKE_THING_HANDLER = typeof Map !== 'undefined' ? new Map() : undefined;
@@ -5432,7 +5440,7 @@ function getArrayLikeThingProxyHandler(key) {
   function getFromFiltered(so, filtered, index) {
     // Numeric indexing into array
     const value = filtered[index];
-    return value ? SecureObject.filterEverything(so, value) : value;
+    return value ? filterEverything(so, value) : value;
   }
 
   let handler = KEY_TO_ARRAY_LIKE_THING_HANDLER.get(key);
@@ -5460,7 +5468,7 @@ function getArrayLikeThingProxyHandler(key) {
             case 'namedItem':
               ret = function(name) {
                 const value = raw.namedItem(name);
-                return value ? SecureObject.filterEverything(handler, value) : value;
+                return value ? filterEverything(handler, value) : value;
               };
               break;
 
@@ -5484,7 +5492,7 @@ function getArrayLikeThingProxyHandler(key) {
                       const value = filtered[nextIndex];
                       nextIndex++;
                       return {
-                        value: value ? SecureObject.filterEverything(handler, value) : value,
+                        value: value ? filterEverything(handler, value) : value,
                         done: false
                       };
                     }
@@ -5520,7 +5528,7 @@ function getArrayLikeThingProxyHandler(key) {
   return handler;
 }
 
-SecureObject.createProxyForArrayLikeObjects = function(raw, key) {
+function createProxyForArrayLikeObjects(raw, key) {
   const surrogate = create$1(Object.getPrototypeOf(raw));
   setRef(surrogate, raw, key);
 
@@ -5529,7 +5537,7 @@ SecureObject.createProxyForArrayLikeObjects = function(raw, key) {
   registerProxy(proxy);
 
   return proxy;
-};
+}
 
 // We cache 1 array proxy per key
 const KEY_TO_ARRAY_HANLDER = typeof Map !== 'undefined' ? new Map() : undefined;
@@ -5546,7 +5554,7 @@ function getFilteredArray(st, raw, key) {
     ) {
       validEntry = true;
     } else {
-      const filteredValue = SecureObject.filterEverything(st, value, { defaultKey: key });
+      const filteredValue = filterEverything(st, value, { defaultKey: key });
       if (filteredValue && !isOpaque(filteredValue)) {
         validEntry = true;
       }
@@ -5564,14 +5572,14 @@ function getArrayProxyHandler(key) {
   function getFromFiltered(so, filtered, index) {
     // Numeric indexing into array
     const value = filtered[index] ? filtered[index]['rawValue'] : filtered[index];
-    return value ? SecureObject.filterEverything(so, value) : value;
+    return value ? filterEverything(so, value) : value;
   }
   function getFilteredValues(so, filtered) {
     // Gather values from the filtered array
     const ret = [];
     filtered.forEach(item => {
       const value = item['rawValue'];
-      ret.push(value ? SecureObject.filterEverything(so, value) : value);
+      ret.push(value ? filterEverything(so, value) : value);
     });
     return ret;
   }
@@ -5649,7 +5657,7 @@ function getArrayProxyHandler(key) {
                   return filtered.length;
                 }
                 for (let i = 0; i < arguments.length; i++) {
-                  raw.push(SecureObject.filterEverything(handler, arguments[i]));
+                  raw.push(filterEverything(handler, arguments[i]));
                 }
                 return filtered.length + arguments.length;
               };
@@ -5676,7 +5684,7 @@ function getArrayProxyHandler(key) {
             case 'sort':
               ret = function(compareFunction) {
                 if (arguments.length > 0) {
-                  raw.sort(SecureObject.filterEverything(handler, compareFunction));
+                  raw.sort(filterEverything(handler, compareFunction));
                 } else {
                   raw.sort();
                 }
@@ -5719,7 +5727,7 @@ function getArrayProxyHandler(key) {
                 const newItems = [];
                 if (arguments.length > 2) {
                   for (let j = 2; j < arguments.length; j++) {
-                    newItems.push(SecureObject.filterEverything(handler, arguments[j]));
+                    newItems.push(filterEverything(handler, arguments[j]));
                   }
                 }
                 if (newItems.length > 0) {
@@ -5735,7 +5743,7 @@ function getArrayProxyHandler(key) {
                 }
                 const newItems = [];
                 for (let i = 0; i < arguments.length; i++) {
-                  newItems.push(SecureObject.filterEverything(handler, arguments[i]));
+                  newItems.push(filterEverything(handler, arguments[i]));
                 }
                 raw.splice.apply(raw, [0, 0].concat(newItems));
                 return filtered.length + newItems.length;
@@ -5761,7 +5769,7 @@ function getArrayProxyHandler(key) {
             case 'some':
               ret = function() {
                 if (arguments.length > 0) {
-                  const secureCallback = SecureObject.filterEverything(handler, arguments[0]);
+                  const secureCallback = filterEverything(handler, arguments[0]);
                   arguments[0] = secureCallback;
                 }
                 const filteredValues = getFilteredValues(handler, filtered);
@@ -5783,7 +5791,7 @@ function getArrayProxyHandler(key) {
                       const value = filtered[nextIndex]['rawValue'];
                       nextIndex++;
                       return {
-                        value: value ? SecureObject.filterEverything(handler, value) : value,
+                        value: value ? filterEverything(handler, value) : value,
                         done: false
                       };
                     }
@@ -5798,7 +5806,7 @@ function getArrayProxyHandler(key) {
             default:
               if (raw[property]) {
                 // If trying to use array like an associative array
-                ret = SecureObject.filterEverything(handler, raw[property]);
+                ret = filterEverything(handler, raw[property]);
               } else {
                 warn(`Unsupported ${raw} method: ${property}. Returning undefined`);
                 return undefined;
@@ -5820,7 +5828,7 @@ function getArrayProxyHandler(key) {
           const filtered = getFilteredArray(handler, raw, key);
           // If we are replacing existing index
           if (filtered[property]) {
-            raw[filtered[property]['rawIndex']] = SecureObject.filterEverything(handler, value);
+            raw[filtered[property]['rawIndex']] = filterEverything(handler, value);
             return true;
           }
           // Adding values at a random numerical index greater than length
@@ -5840,7 +5848,7 @@ function getArrayProxyHandler(key) {
           return true;
         }
         // Trying to use it like an associative array
-        raw[property] = SecureObject.filterEverything(handler, value);
+        raw[property] = filterEverything(handler, value);
         return true;
       },
       has: function(target, property) {
@@ -5892,10 +5900,10 @@ function getArrayProxyHandler(key) {
   return handler;
 }
 
-SecureObject.createProxyForArrayObjects = function(raw, key) {
+function createProxyForArrayObjects(raw, key) {
   if (!isArray(raw)) {
-    warn('Illegal usage of SecureObject.createProxyForArrayObjects');
-    return SecureObject.createFilteringProxy(raw, key);
+    warn('Illegal usage of createProxyForArrayObjects');
+    return createFilteringProxy(raw, key);
   }
   // Not using a surrogate for array Proxy because we want to support for..in style of looping on arrays
   // Having a fake surrogate does not allow for correct looping. Mitigating this risk by handling all traps for Proxy.
@@ -5904,7 +5912,7 @@ SecureObject.createProxyForArrayObjects = function(raw, key) {
   registerProxy(proxy);
 
   return proxy;
-};
+}
 
 const KEY_TO_NAMED_NODE_MAP_HANLDER = typeof Map !== 'undefined' ? new Map() : undefined;
 
@@ -5924,7 +5932,7 @@ function getFilteredNamedNodeMap(raw, key, prototype, caseInsensitiveAttributes)
 function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) {
   function getFromFiltered(so, filtered, index) {
     const value = filtered[index];
-    return value ? SecureObject.filterEverything(so, value, { defaultKey: key }) : value;
+    return value ? filterEverything(so, value, { defaultKey: key }) : value;
   }
 
   let handler = KEY_TO_NAMED_NODE_MAP_HANLDER.get(key);
@@ -5951,7 +5959,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
               ret = function(name) {
                 for (const val in filtered) {
                   if (name === filtered[val].name) {
-                    return SecureObject.filterEverything(handler, filtered[val], {
+                    return filterEverything(handler, filtered[val], {
                       defaultKey: key
                     });
                   }
@@ -5980,7 +5988,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
                 if (isProxy(attribute)) {
                   attribute = getRef(attribute, key);
                 }
-                return SecureObject.filterEverything(handler, raw['setNamedItem'](attribute), {
+                return filterEverything(handler, raw['setNamedItem'](attribute), {
                   defaultKey: key
                 });
               };
@@ -6000,7 +6008,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
                   );
                   return undefined;
                 }
-                return SecureObject.filterEverything(handler, raw['removeNamedItem'](name), {
+                return filterEverything(handler, raw['removeNamedItem'](name), {
                   defaultKey: key
                 });
               };
@@ -6012,7 +6020,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
                     namespace === filtered[val].namespaceURI &&
                     localName === filtered[val].localName
                   ) {
-                    return SecureObject.filterEverything(handler, filtered[val], {
+                    return filterEverything(handler, filtered[val], {
                       defaultKey: key
                     });
                   }
@@ -6039,7 +6047,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
                 if (isProxy(attribute)) {
                   attribute = getRef(attribute, key);
                 }
-                return SecureObject.filterEverything(handler, raw['setNamedItemNS'](attribute), {
+                return filterEverything(handler, raw['setNamedItemNS'](attribute), {
                   defaultKey: key
                 });
               };
@@ -6059,11 +6067,9 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
                   );
                   return undefined;
                 }
-                return SecureObject.filterEverything(
-                  handler,
-                  raw['removeNamedItemNS'](namespace, localName),
-                  { defaultKey: key }
-                );
+                return filterEverything(handler, raw['removeNamedItemNS'](namespace, localName), {
+                  defaultKey: key
+                });
               };
               break;
             case 'toString':
@@ -6086,7 +6092,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
                       const value = filtered[nextIndex];
                       nextIndex++;
                       return {
-                        value: value ? SecureObject.filterEverything(handler, value) : value,
+                        value: value ? filterEverything(handler, value) : value,
                         done: false
                       };
                     }
@@ -6128,7 +6134,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
   return handler;
 }
 
-SecureObject.createProxyForNamedNodeMap = function(raw, key, prototype, caseInsensitiveAttributes) {
+function createProxyForNamedNodeMap(raw, key, prototype, caseInsensitiveAttributes) {
   const surrogate = create$1(Object.getPrototypeOf(raw));
   setRef(surrogate, raw, key);
 
@@ -6140,9 +6146,9 @@ SecureObject.createProxyForNamedNodeMap = function(raw, key, prototype, caseInse
   registerProxy(proxy);
 
   return proxy;
-};
+}
 
-SecureObject.createFilteredConstructor = function(st, raw, propName, factory, key, options) {
+function createFilteredConstructor(st, raw, propName, factory, key, options) {
   if (!factory || !key) {
     warn('No Factory or key provided.');
     return undefined;
@@ -6162,9 +6168,9 @@ SecureObject.createFilteredConstructor = function(st, raw, propName, factory, ke
     writable: true,
     value: factory(raw[propName], key)
   };
-};
+}
 
-SecureObject.createFilteredMethod = function(st, raw, methodName, options) {
+function createFilteredMethod(st, raw, methodName, options) {
   // Do not expose properties that the raw object does not actually support
   if (!(methodName in raw)) {
     if (options && options.ignoreNonexisting) {
@@ -6177,21 +6183,21 @@ SecureObject.createFilteredMethod = function(st, raw, methodName, options) {
     enumerable: true,
     writable: true,
     value: function() {
-      const filteredArgs = SecureObject.filterArguments(st, arguments, options);
+      const filteredArgs = filterArguments(st, arguments, options);
       let fnReturnedValue = raw[methodName](...filteredArgs);
 
       if (options && options.afterCallback) {
         fnReturnedValue = options.afterCallback(fnReturnedValue);
       }
 
-      return SecureObject.filterEverything(st, fnReturnedValue, options);
+      return filterEverything(st, fnReturnedValue, options);
     }
   };
-};
+}
 
-SecureObject.createFilteredMethodStateless = function(methodName, prototype, options) {
+function createFilteredMethodStateless(methodName, prototype, options) {
   if (!prototype) {
-    throw new Error('SecureObject.createFilteredMethodStateless() called without prototype');
+    throw new Error('createFilteredMethodStateless() called without prototype');
   }
 
   return {
@@ -6199,9 +6205,9 @@ SecureObject.createFilteredMethodStateless = function(methodName, prototype, opt
     writable: true,
     value: function() {
       const st = this;
-      const raw = SecureObject.getRaw(st);
+      const raw = getRaw$1(st);
 
-      const filteredArgs = SecureObject.filterArguments(st, arguments, options);
+      const filteredArgs = filterArguments(st, arguments, options);
       let fnReturnedValue = raw[methodName].apply(raw, filteredArgs);
 
       if (options) {
@@ -6214,12 +6220,12 @@ SecureObject.createFilteredMethodStateless = function(methodName, prototype, opt
         }
       }
 
-      return SecureObject.filterEverything(st, fnReturnedValue, options);
+      return filterEverything(st, fnReturnedValue, options);
     }
   };
-};
+}
 
-SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
+function createFilteredProperty(st, raw, propertyName, options) {
   // Do not expose properties that the raw object does not actually support.
   if (!(propertyName in raw)) {
     if (options && options.ignoreNonexisting) {
@@ -6255,7 +6261,7 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
       // The caller wants to handle the property value
       return options.afterGetCallback(value);
     }
-    return SecureObject.filterEverything(st, value, options);
+    return filterEverything(st, value, options);
   };
 
   if (!options || options.writable !== false) {
@@ -6264,7 +6270,7 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
         value = options.beforeSetCallback(value);
       }
 
-      raw[propertyName] = SecureObject.filterEverything(st, value);
+      raw[propertyName] = filterEverything(st, value);
 
       if (options && options.afterSetCallback) {
         options.afterSetCallback();
@@ -6273,11 +6279,11 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
   }
 
   return descriptor;
-};
+}
 
-SecureObject.createFilteredPropertyStateless = function(propertyName, prototype, options) {
+function createFilteredPropertyStateless(propertyName, prototype, options) {
   if (!prototype) {
-    throw new Error('SecureObject.createFilteredPropertyStateless() called without prototype');
+    throw new Error('createFilteredPropertyStateless() called without prototype');
   }
 
   const descriptor = {
@@ -6286,7 +6292,7 @@ SecureObject.createFilteredPropertyStateless = function(propertyName, prototype,
 
   descriptor.get = function() {
     const st = this;
-    const raw = SecureObject.getRaw(st);
+    const raw = getRaw$1(st);
 
     let value = raw[propertyName];
 
@@ -6311,7 +6317,7 @@ SecureObject.createFilteredPropertyStateless = function(propertyName, prototype,
       // The caller wants to handle the property value
       return options.afterGetCallback.call(st, value);
     }
-    return SecureObject.filterEverything(st, value, options);
+    return filterEverything(st, value, options);
   };
 
   if (!options || options.writable !== false) {
@@ -6324,7 +6330,7 @@ SecureObject.createFilteredPropertyStateless = function(propertyName, prototype,
         value = options.beforeSetCallback.call(st, value);
       }
 
-      raw[propertyName] = SecureObject.filterEverything(st, value);
+      raw[propertyName] = filterEverything(st, value);
 
       if (options && options.afterSetCallback) {
         options.afterSetCallback.call(st);
@@ -6333,9 +6339,9 @@ SecureObject.createFilteredPropertyStateless = function(propertyName, prototype,
   }
 
   return descriptor;
-};
+}
 
-SecureObject.addIfSupported = function(behavior, st, element, name, options) {
+function addIfSupported(behavior, st, element, name, options) {
   options = options || {};
   options.ignoreNonexisting = true;
 
@@ -6343,15 +6349,15 @@ SecureObject.addIfSupported = function(behavior, st, element, name, options) {
   if (prop) {
     defineProperty(st, name, prop);
   }
-};
+}
 
-SecureObject.addPropertyIfSupported = function(st, raw, name, options) {
-  SecureObject.addIfSupported(SecureObject.createFilteredProperty, st, raw, name, options);
-};
+function addPropertyIfSupported(st, raw, name, options) {
+  addIfSupported(createFilteredProperty, st, raw, name, options);
+}
 
-SecureObject.addMethodIfSupported = function(st, raw, name, options) {
-  SecureObject.addIfSupported(SecureObject.createFilteredMethod, st, raw, name, options);
-};
+function addMethodIfSupported(st, raw, name, options) {
+  addIfSupported(createFilteredMethod, st, raw, name, options);
+}
 
 // Return the set of interfaces supported by the object in order of most specific to least specific
 function getSupportedInterfaces(o) {
@@ -6582,7 +6588,7 @@ function getSupportedInterfaces(o) {
   return interfaces;
 }
 
-SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, key) {
+function addPrototypeMethodsAndProperties(metadata$$1, so, raw, key) {
   let prototype;
 
   function worker(name) {
@@ -6597,7 +6603,7 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, k
       };
 
       if (item.type === 'function') {
-        SecureObject.addMethodIfSupported(so, raw, name, options);
+        addMethodIfSupported(so, raw, name, options);
       } else if (item.type === '@raw') {
         defineProperty(so, name, {
           // Does not currently secure proxy the actual class
@@ -6631,7 +6637,7 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, k
                 }
                 trust$1(so, result);
 
-                return SecureObject.filterEverything(so, result);
+                return filterEverything(so, result);
               }
             );
           },
@@ -6642,7 +6648,7 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, k
       } else if (item.type === '@event') {
         defineProperty(so, name, {
           get: function() {
-            return SecureObject.filterEverything(so, raw[name]);
+            return filterEverything(so, raw[name]);
           },
 
           set: function(callback) {
@@ -6655,7 +6661,7 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, k
         });
       } else {
         // Properties
-        const descriptor = SecureObject.createFilteredProperty(so, raw, name, options);
+        const descriptor = createFilteredProperty(so, raw, name, options);
         if (descriptor) {
           defineProperty(so, name, descriptor);
         }
@@ -6670,7 +6676,7 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata$$1, so, raw, k
     prototype = prototypes[name];
     Object.keys(prototype).forEach(worker);
   });
-};
+}
 
 // Closure factory
 function addPrototypeMethodsAndPropertiesStatelessHelper(
@@ -6694,11 +6700,7 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
     };
 
     if (item.type === 'function') {
-      descriptor = SecureObject.createFilteredMethodStateless(
-        name,
-        prototypeForValidation,
-        options
-      );
+      descriptor = createFilteredMethodStateless(name, prototypeForValidation, options);
     } else if (item.type === '@raw') {
       descriptor = {
         // Does not currently secure proxy the actual class
@@ -6706,7 +6708,7 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
           if (valueOverride) {
             return valueOverride;
           }
-          const raw = SecureObject.getRaw(this);
+          const raw = getRaw$1(this);
           return raw[name];
         },
         set: function(value) {
@@ -6720,7 +6722,7 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
           function() {
             return function() {
               const so = this;
-              const raw = SecureObject.getRaw(so);
+              const raw = getRaw$1(so);
               const cls = raw[name];
 
               // TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
@@ -6731,7 +6733,7 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
               const result = new ctor();
               trust$1(so, result);
 
-              return SecureObject.filterEverything(so, result);
+              return filterEverything(so, result);
             };
           },
         set: function(value) {
@@ -6741,11 +6743,11 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
     } else if (item.type === '@event') {
       descriptor = {
         get: function() {
-          return SecureObject.filterEverything(this, SecureObject.getRaw(this)[name]);
+          return filterEverything(this, getRaw$1(this)[name]);
         },
 
         set: function(callback) {
-          const raw = SecureObject.getRaw(this);
+          const raw = getRaw$1(this);
 
           // Insure that we pick up the current proxy for the raw object
           let key = getKey(raw);
@@ -6766,11 +6768,7 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
       };
     } else {
       // Properties
-      descriptor = SecureObject.createFilteredPropertyStateless(
-        name,
-        prototypeForValidation,
-        options
-      );
+      descriptor = createFilteredPropertyStateless(name, prototypeForValidation, options);
     }
   }
 
@@ -6779,12 +6777,12 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
   }
 }
 
-SecureObject.addPrototypeMethodsAndPropertiesStateless = function(
+function addPrototypeMethodsAndPropertiesStateless(
   metadata$$1,
   prototypicalInstance,
   prototypeForValidation
 ) {
-  const rawPrototypicalInstance = SecureObject.getRaw(prototypicalInstance);
+  const rawPrototypicalInstance = getRaw$1(prototypicalInstance);
   let prototype;
   const config = {};
 
@@ -6806,7 +6804,7 @@ SecureObject.addPrototypeMethodsAndPropertiesStateless = function(
   });
 
   return config;
-};
+}
 
 function getUnfilteredTypes() {
   const ret = [];
@@ -6836,7 +6834,7 @@ function getUnfilteredTypes() {
 }
 const unfilteredTypes = getUnfilteredTypes();
 
-SecureObject.isUnfilteredType = function(raw, key) {
+function isUnfilteredType(raw, key) {
   for (let n = 0; n < unfilteredTypes.length; n++) {
     if (raw instanceof unfilteredTypes[n]) {
       return true;
@@ -6853,9 +6851,9 @@ SecureObject.isUnfilteredType = function(raw, key) {
   }
 
   return false;
-};
+}
 
-SecureObject.addUnfilteredPropertyIfSupported = function(st, raw, name) {
+function addUnfilteredPropertyIfSupported(st, raw, name) {
   if (raw[name]) {
     const config = {
       enumerable: true,
@@ -6864,21 +6862,21 @@ SecureObject.addUnfilteredPropertyIfSupported = function(st, raw, name) {
     };
     defineProperty(st, name, config);
   }
-};
+}
 
 /**
  * Traverse all entries in the baseObject to unwrap any secure wrappers and wrap any functions as
  * SecureFunction. This ensures any non-Lockerized handlers of the event do not choke on the secure
  * wrappers, but any callbacks back into the original Locker have their arguments properly filtered.
  */
-SecureObject.deepUnfilterMethodArguments = function(st, baseObject, members) {
+function deepUnfilterMethodArguments(st, baseObject, members) {
   let value;
   for (const property in members) {
     value = members[property];
     if (isArray(value)) {
-      value = SecureObject.deepUnfilterMethodArguments(st, [], value);
+      value = deepUnfilterMethodArguments(st, [], value);
     } else if (isPlainObject(value)) {
-      value = SecureObject.deepUnfilterMethodArguments(st, {}, value);
+      value = deepUnfilterMethodArguments(st, {}, value);
     } else if (typeof value !== 'function') {
       if (value) {
         const key = getKey(value);
@@ -6888,15 +6886,15 @@ SecureObject.deepUnfilterMethodArguments = function(st, baseObject, members) {
       }
       // If value is a plain object, we need to deep unfilter
       if (isPlainObject(value)) {
-        value = SecureObject.deepUnfilterMethodArguments(st, {}, value);
+        value = deepUnfilterMethodArguments(st, {}, value);
       }
     } else {
-      value = SecureObject.filterEverything(st, value, { defaultKey: getKey(st) });
+      value = filterEverything(st, value, { defaultKey: getKey(st) });
     }
     baseObject[property] = value;
   }
   return baseObject;
-};
+}
 
 /*
  * Copyright (C) 2013 salesforce.com, inc.
@@ -7224,7 +7222,7 @@ function SecureDocument(doc, key) {
     }
   });
 
-  SecureObject.addPrototypeMethodsAndProperties(metadata$5, o, doc, key);
+  addPrototypeMethodsAndProperties(metadata$5, o, doc, key);
 
   setRef(o, doc, key);
   addToCache(doc, o, key);
@@ -7337,7 +7335,7 @@ function SecureLocation(loc, key) {
   });
 
   ['pathname', 'search', 'hash', 'username', 'password', 'origin', 'port'].forEach(property =>
-    SecureObject.addPropertyIfSupported(o, loc, property)
+    addPropertyIfSupported(o, loc, property)
   );
 
   ['replace', 'assign'].forEach(method => {
@@ -7358,7 +7356,7 @@ function SecureLocation(loc, key) {
     });
   });
 
-  SecureObject.addMethodIfSupported(o, loc, 'reload');
+  addMethodIfSupported(o, loc, 'reload');
 
   setRef(o, loc, key);
   addToCache(loc, o, key);
@@ -7413,7 +7411,7 @@ function SecureNavigator(navigator, key) {
     'platform',
     'product',
     'userAgent'
-  ].forEach(name => SecureObject.addPropertyIfSupported(o, navigator, name));
+  ].forEach(name => addPropertyIfSupported(o, navigator, name));
 
   if (addPropertiesHook$1) {
     addPropertiesHook$1(o, navigator, key);
@@ -7472,9 +7470,9 @@ function SecureXMLHttpRequest(key) {
       'HEADERS_RECEIVED',
       'LOADING',
       'DONE'
-    ].forEach(name => SecureObject.addPropertyIfSupported(o, xhr, name));
+    ].forEach(name => addPropertyIfSupported(o, xhr, name));
 
-    SecureObject.addPropertyIfSupported(o, xhr, 'responseXML', {
+    addPropertyIfSupported(o, xhr, 'responseXML', {
       afterGetCallback: function(value) {
         return value;
       }
@@ -7501,7 +7499,7 @@ function SecureXMLHttpRequest(key) {
     );
 
     defineProperties(o, {
-      abort: SecureObject.createFilteredMethod(o, xhr, 'abort'),
+      abort: createFilteredMethod(o, xhr, 'abort'),
 
       addEventListener: createAddEventListenerDescriptor(o, xhr, key),
 
@@ -7531,14 +7529,14 @@ function SecureXMLHttpRequest(key) {
         }
       },
 
-      send: SecureObject.createFilteredMethod(o, xhr, 'send'),
+      send: createFilteredMethod(o, xhr, 'send'),
 
-      getAllResponseHeaders: SecureObject.createFilteredMethod(o, xhr, 'getAllResponseHeaders'),
-      getResponseHeader: SecureObject.createFilteredMethod(o, xhr, 'getResponseHeader'),
+      getAllResponseHeaders: createFilteredMethod(o, xhr, 'getAllResponseHeaders'),
+      getResponseHeader: createFilteredMethod(o, xhr, 'getResponseHeader'),
 
-      setRequestHeader: SecureObject.createFilteredMethod(o, xhr, 'setRequestHeader'),
+      setRequestHeader: createFilteredMethod(o, xhr, 'setRequestHeader'),
 
-      overrideMimeType: SecureObject.createFilteredMethod(o, xhr, 'overrideMimeType')
+      overrideMimeType: createFilteredMethod(o, xhr, 'overrideMimeType')
     });
 
     setRef(o, xhr, key);
@@ -7569,7 +7567,7 @@ function SecureMutationObserver(key) {
 
     records.forEach(record => {
       if (hasAccess(st, record.target)) {
-        filtered.push(SecureObject.filterEverything(st, record));
+        filtered.push(filterEverything(st, record));
       }
     });
 
@@ -7594,8 +7592,8 @@ function SecureMutationObserver(key) {
         }
       },
 
-      observe: SecureObject.createFilteredMethod(o, observer, 'observe', { rawArguments: true }),
-      disconnect: SecureObject.createFilteredMethod(o, observer, 'disconnect'),
+      observe: createFilteredMethod(o, observer, 'observe', { rawArguments: true }),
+      disconnect: createFilteredMethod(o, observer, 'disconnect'),
 
       takeRecords: {
         writable: true,
@@ -7660,7 +7658,7 @@ function SecureNotification(key) {
       'renotify',
       'sound',
       'sticky'
-    ].forEach(name => SecureObject.addPropertyIfSupported(o, notification, name));
+    ].forEach(name => addPropertyIfSupported(o, notification, name));
 
     // Event handlers
     ['onclick', 'onerror'].forEach(name =>
@@ -7674,7 +7672,7 @@ function SecureNotification(key) {
     );
 
     defineProperties(o, {
-      close: SecureObject.createFilteredMethod(o, notification, 'close')
+      close: createFilteredMethod(o, notification, 'close')
     });
 
     addEventTargetMethods(o, notification, key);
@@ -8106,7 +8104,7 @@ function SecureMediaSource(key) {
   const st = SecureObject({}, key);
   return function() {
     const instance = new MediaSource();
-    const secureInstance = SecureObject.filterEverything(st, instance);
+    const secureInstance = filterEverything(st, instance);
     registerSecureMediaSource(secureInstance);
     return secureInstance;
   };
@@ -8140,7 +8138,7 @@ function SecureCustomEventFactory(CustomEventCtor, key) {
     assert$1.invariant(args.length > 0, 'Cannot invoke CustomEvent constructor without a name');
 
     // Because the event is being constructed, the sandbox will be used as the accessor
-    const filteredArguments = SecureObject.deepUnfilterMethodArguments(getEnv$1(key), [], args);
+    const filteredArguments = deepUnfilterMethodArguments(getEnv$1(key), [], args);
     const event = new CustomEventCtor(...filteredArguments);
     return SecureDOMEvent(event, key);
   };
@@ -8832,15 +8830,13 @@ function SecureWindow(sandbox, key) {
     }
   });
 
-  SecureObject.addMethodIfSupported(o, win, 'getComputedStyle', {
+  addMethodIfSupported(o, win, 'getComputedStyle', {
     rawArguments: true
   });
 
-  ['outerHeight', 'outerWidth'].forEach(name => SecureObject.addPropertyIfSupported(o, win, name));
+  ['outerHeight', 'outerWidth'].forEach(name => addPropertyIfSupported(o, win, name));
 
-  ['scroll', 'scrollBy', 'scrollTo'].forEach(name =>
-    SecureObject.addMethodIfSupported(o, win, name)
-  );
+  ['scroll', 'scrollBy', 'scrollTo'].forEach(name => addMethodIfSupported(o, win, name));
 
   defineProperty(o, 'open', {
     enumerable: true,
@@ -8852,9 +8848,9 @@ function SecureWindow(sandbox, key) {
       }
 
       if (confirmLocationChange(win.location.href, href)) {
-        const filteredArgs = SecureObject.filterArguments(o, [href, ...args]);
+        const filteredArgs = filterArguments(o, [href, ...args]);
         const res = win.open(...filteredArgs);
-        return SecureObject.filterEverything(o, res);
+        return filterEverything(o, res);
       }
       // window.open spec expects a null return value if the operation fails
       return null;
@@ -8982,7 +8978,7 @@ function SecureWindow(sandbox, key) {
     addPropertiesHook(o, win, key);
   }
 
-  SecureObject.addPrototypeMethodsAndProperties(metadata$$1, o, win, key);
+  addPrototypeMethodsAndProperties(metadata$$1, o, win, key);
 
   setRef(o, win, key);
   addToCache(win, o, key);
@@ -9048,12 +9044,12 @@ function SecureRTCPeerConnection(raw, key) {
         enumerable: true,
         writable: true,
         value: function() {
-          const filteredArgs = SecureObject.filterArguments(o, arguments, options);
+          const filteredArgs = filterArguments(o, arguments, options);
           let fnReturnedValue = originalDispatchEvent.apply(rtc, filteredArgs);
           if (options && options.afterCallback) {
             fnReturnedValue = options.afterCallback(fnReturnedValue);
           }
-          return SecureObject.filterEverything(o, fnReturnedValue, options);
+          return filterEverything(o, fnReturnedValue, options);
         }
       },
       removeEventListener: {
@@ -9160,22 +9156,22 @@ function getWrappedTemplatePrototype() {
   const wrappedTemplatePrototype = create$1(getObjectLikeProto(), {
     toString: {
       value: function() {
-        const template = SecureObject.getRaw(this);
+        const template = getRaw$1(this);
         return `SecureTemplate: ${template}{ key: ${JSON.stringify(getKey(this))} }`;
       }
     },
     querySelector: {
       value: function(selector) {
-        const template = SecureObject.getRaw(this);
+        const template = getRaw$1(this);
         const node = template.querySelector(selector);
-        return SecureObject.filterEverything(this, node);
+        return filterEverything(this, node);
       }
     },
     querySelectorAll: {
       value: function(selector) {
-        const template = SecureObject.getRaw(this);
+        const template = getRaw$1(this);
         const rawNodeList = template.querySelectorAll(selector);
-        return SecureObject.filterEverything(this, rawNodeList);
+        return filterEverything(this, rawNodeList);
       }
     }
   });
@@ -9188,14 +9184,14 @@ function getWrappedTemplatePrototype() {
     removeEventListener: {
       writable: true,
       value: function(type, listener, options) {
-        const raw = SecureObject.getRaw(this);
+        const raw = getRaw$1(this);
         const sCallback = getFromCache(listener, getKey(this));
         raw.removeEventListener(type, sCallback, options);
       }
     }
   });
 
-  // When the native ShadowRoot is used by LWC, then switch this over to SecureObject.addPrototypeMethodsAndPropertiesStateless
+  // When the native ShadowRoot is used by LWC, then switch this over to addPrototypeMethodsAndPropertiesStateless
   const prototypes = metadata$7['prototypes'];
   const supportedInterfaces = ['ShadowRoot', 'ARIA'];
   supportedInterfaces.forEach(name => {
@@ -9205,11 +9201,7 @@ function getWrappedTemplatePrototype() {
         defineProperty(
           wrappedTemplatePrototype,
           property,
-          SecureObject.createFilteredPropertyStateless(
-            property,
-            wrappedTemplatePrototype,
-            prototype[property]
-          )
+          createFilteredPropertyStateless(property, wrappedTemplatePrototype, prototype[property])
         );
       }
     }
@@ -9260,8 +9252,68 @@ function SecureTemplate(template, key) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const GlobalAndAriaProperties = [
-  // global properties
+/**
+ * this should return a secure value
+ * @param {*} cmp component instance who is accessing the value
+ * @param {*} rawValue unwrapped value
+ */
+function getFilteredValue(cmp, rawValue) {
+  return filterEverything(cmp, rawValue);
+}
+
+/**
+ * this should return an unwrapped value
+ * @param {*} cmp component
+ * @param {*} filteredValue wrapped value
+ */
+function getUnwrappedValue(cmp, filteredValue) {
+  if (filteredValue) {
+    if (isArray(filteredValue)) {
+      return deepUnfilterMethodArguments(cmp, [], filteredValue);
+    } else if (isPlainObject(filteredValue)) {
+      return deepUnfilterMethodArguments(cmp, {}, filteredValue);
+    } else if (getKey(filteredValue)) {
+      return unwrap$1(cmp, filteredValue);
+    }
+  }
+  return filteredValue;
+}
+
+const LightningElementPropDescriptorMap = {};
+function getRawPropertyDescriptor(LightningElementPrototype, propName) {
+  let descriptor = LightningElementPropDescriptorMap[propName];
+  if (descriptor) {
+    return descriptor;
+  }
+  descriptor = LightningElementPropDescriptorMap[propName] = getOwnPropertyDescriptor(
+    LightningElementPrototype,
+    propName
+  );
+  return descriptor;
+}
+
+// Hooks to be used by LWC
+function generateInstanceHooks(st) {
+  return {
+    callHook: function(cmp, fn, args) {
+      if (isArray(args)) {
+        args = args.map(rawValue => getFilteredValue(st, rawValue));
+      }
+      const filteredResult = fn.apply(st, args);
+      return getUnwrappedValue(st, filteredResult);
+    },
+    setHook: function(cmp, prop, rawValue) {
+      st[prop] = getFilteredValue(st, rawValue);
+    },
+    getHook: function(cmp, prop) {
+      return getUnwrappedValue(st, st[prop]);
+    }
+  };
+}
+// End of hooks
+
+const lwcElementProtoPropNames = [
+  // Global Properties:
   'dir',
   'id',
   'accessKey',
@@ -9270,7 +9322,7 @@ const GlobalAndAriaProperties = [
   'hidden',
   'draggable',
   'tabIndex',
-  // Aria attributes
+  // ARIA Attributes:
   'ariaAutoComplete',
   'ariaChecked',
   'ariaCurrent',
@@ -9316,100 +9368,49 @@ const GlobalAndAriaProperties = [
   'ariaRowCount',
   'ariaRowIndex',
   'ariaRowSpan',
-  'role'
+  'role',
+  // Lightning component properties
+  'accessKeyLabel',
+  'addEventListener',
+  'classList',
+  'className',
+  'contentEditable',
+  'contextMenu',
+  'dataset',
+  'dispatchEvent',
+  'dropzone',
+  'getAttribute',
+  'getAttributeNS',
+  'getBoundingClientRect',
+  'isContentEditable',
+  'itemScope',
+  'itemType',
+  'itemId',
+  'itemRef',
+  'itemProp',
+  'itemValue',
+  'offsetHeight',
+  'offsetLeft',
+  'offsetParent',
+  'offsetTop',
+  'offsetWidth',
+  'properties',
+  'querySelector',
+  'querySelectorAll',
+  'removeAttributeNS',
+  'removeAttribute',
+  'removeEventListener',
+  'root',
+  'setAttribute',
+  'setAttributeNS',
+  'shadowRoot',
+  'slot',
+  'spellcheck',
+  'style',
+  'template',
+  'toString',
+  'translate'
 ];
-
-/**
- * this should return a secure value
- * @param {*} cmp component instance who is accessing the value
- * @param {*} rawValue unwrapped value
- */
-function getFilteredValue(cmp, rawValue) {
-  return SecureObject.filterEverything(cmp, rawValue);
-}
-
-/**
- * this should return an unwrapped value
- * @param {*} cmp component
- * @param {*} filteredValue wrapped value
- */
-function getUnwrappedValue(cmp, filteredValue) {
-  if (filteredValue) {
-    if (isArray(filteredValue)) {
-      return SecureObject.deepUnfilterMethodArguments(cmp, [], filteredValue);
-    } else if (isPlainObject(filteredValue)) {
-      return SecureObject.deepUnfilterMethodArguments(cmp, {}, filteredValue);
-    } else if (getKey(filteredValue)) {
-      return unwrap$1(cmp, filteredValue);
-    }
-  }
-  return filteredValue;
-}
-
-const LightningElementPropDescriptorMap = {};
-function getRawPropertyDescriptor(LightningElementPrototype, propName) {
-  let descriptor = LightningElementPropDescriptorMap[propName];
-  if (descriptor) {
-    return descriptor;
-  }
-  descriptor = LightningElementPropDescriptorMap[propName] = getOwnPropertyDescriptor(
-    LightningElementPrototype,
-    propName
-  );
-  return descriptor;
-}
-
-/**
- * Creates a wrapped property descriptor on properties that are lazily defined on LightningElement
- * @param {*} LightningElementPrototype Prototype of the base LightningElement class from LWC
- * @param {string} propName
- */
-function createWrappedPropertyDescriptorStateless(LightningElementPrototype, propName) {
-  return {
-    enumerable: true,
-    get() {
-      const { get } = getRawPropertyDescriptor(LightningElementPrototype, propName);
-      assert$1.invariant(
-        get,
-        'Refering to an unsupported property of the LightningElement base class'
-      );
-      if (!get) {
-        return undefined;
-      }
-      const rawValue = get.call(this);
-      return getFilteredValue(this, rawValue);
-    },
-
-    set(filteredValue) {
-      const { set } = getRawPropertyDescriptor(LightningElementPrototype, propName);
-      if (set) {
-        set.call(this, getUnwrappedValue(this, filteredValue));
-      }
-    }
-  };
-}
-
-// Hooks to be used by LWC
-function generateInstanceHooks(st) {
-  return {
-    callHook: function(cmp, fn, args) {
-      if (isArray(args)) {
-        args = args.map(rawValue => getFilteredValue(st, rawValue));
-      }
-      const filteredResult = fn.apply(st, args);
-      return getUnwrappedValue(st, filteredResult);
-    },
-    setHook: function(cmp, prop, rawValue) {
-      st[prop] = getFilteredValue(st, rawValue);
-    },
-    getHook: function(cmp, prop) {
-      return getUnwrappedValue(st, st[prop]);
-    }
-  };
-}
-// End of hooks
-
-let lwcElementProtoPropNames;
 
 function SecureLightningElementFactory(LightningElement, key) {
   let o = getFromCache(LightningElement, key);
@@ -9428,7 +9429,7 @@ SecureLightningElementFactory.getWrappedLightningElement = function(LightningEle
   function getWrappedDescriptor(rawDescriptor) {
     const { value, get, set, enumerable, configurable, writable } = rawDescriptor;
     function wrappedMethod() {
-      const args = SecureObject.filterArguments(this, arguments, { rawArguments: true });
+      const args = filterArguments(this, arguments, { rawArguments: true });
       const rawResult = value.apply(this, args);
       return getFilteredValue(this, rawResult);
     }
@@ -9532,21 +9533,11 @@ SecureLightningElementFactory.getWrappedLightningElement = function(LightningEle
     }
   });
 
-  GlobalAndAriaProperties.forEach(propName => {
-    const wrappedDescriptor = createWrappedPropertyDescriptorStateless(LElementPrototype, propName);
-    defineProperty(SecureLElementPrototype, propName, wrappedDescriptor);
-  });
-
-  // Fetch the properties on LightningElement.prototype and cache them
-  if (!lwcElementProtoPropNames) {
-    lwcElementProtoPropNames = getOwnPropertyNames(LElementPrototype);
-    lwcElementProtoPropNames.splice(lwcElementProtoPropNames.indexOf('constructor'), 1);
-  }
-
-  // Remaining properties
-  // TOOD: RJ/JF Revisit whether we should whitelist instead of all properties
   lwcElementProtoPropNames.forEach(propName => {
-    if (!SecureLElementPrototype.hasOwnProperty(propName)) {
+    if (
+      !SecureLElementPrototype.hasOwnProperty(propName) &&
+      LElementPrototype.hasOwnProperty(propName)
+    ) {
       const originalDescriptor = getRawPropertyDescriptor(LElementPrototype, propName);
       const wrappedDescriptor = getWrappedDescriptor(originalDescriptor);
       defineProperty(SecureLElementPrototype, propName, wrappedDescriptor);
@@ -9661,7 +9652,7 @@ function SecureLib(lib, key, requireLocker, desc) {
     defaultKey: key,
     unfilterEverything: !requireLocker
       ? function(args) {
-          return SecureObject.deepUnfilterMethodArguments(o, [], args);
+          return deepUnfilterMethodArguments(o, [], args);
         }
       : undefined
   };
@@ -9671,7 +9662,7 @@ function SecureLib(lib, key, requireLocker, desc) {
       // only Platform events created in non-lockerized libs will be caught by this condition
       // TODO: add support for importing lockerized libs that expose events
       if (lib[property].prototype instanceof Event) {
-        const secureEventCtorDescriptor = SecureObject.createFilteredConstructor(
+        const secureEventCtorDescriptor = createFilteredConstructor(
           o,
           lib,
           property,
@@ -9680,10 +9671,10 @@ function SecureLib(lib, key, requireLocker, desc) {
         );
         Object.defineProperty(o, property, secureEventCtorDescriptor);
       } else {
-        SecureObject.addMethodIfSupported(o, lib, property, methodOptions);
+        addMethodIfSupported(o, lib, property, methodOptions);
       }
     } else {
-      SecureObject.addPropertyIfSupported(o, lib, property);
+      addPropertyIfSupported(o, lib, property);
     }
   });
 
@@ -9779,9 +9770,9 @@ function SecureAura(AuraInstance, key) {
         const fnReturnedValue = AuraInstance.createComponent(
           type,
           filteredArgs,
-          SecureObject.filterEverything(o, callback)
+          filterEverything(o, callback)
         );
-        return SecureObject.filterEverything(o, fnReturnedValue);
+        return filterEverything(o, fnReturnedValue);
       }
     },
 
@@ -9804,24 +9795,20 @@ function SecureAura(AuraInstance, key) {
         }
         const fnReturnedValue = AuraInstance.createComponents(
           filteredComponents,
-          SecureObject.filterEverything(o, callback)
+          filterEverything(o, callback)
         );
-        return SecureObject.filterEverything(o, fnReturnedValue);
+        return filterEverything(o, fnReturnedValue);
       }
     }
   });
 
   // SecureAura methods and properties
   ['enqueueAction'].forEach(name =>
-    defineProperty(
-      o,
-      name,
-      SecureObject.createFilteredMethod(o, AuraInstance, name, { rawArguments: true })
-    )
+    defineProperty(o, name, createFilteredMethod(o, AuraInstance, name, { rawArguments: true }))
   );
 
   ['get', 'getComponent', 'getReference', 'getRoot', 'log', 'reportError', 'warning'].forEach(
-    name => defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name))
+    name => defineProperty(o, name, createFilteredMethod(o, AuraInstance, name))
   );
 
   setRef(o, AuraInstance, key);
@@ -9829,14 +9816,14 @@ function SecureAura(AuraInstance, key) {
 
   // SecureUtil: creating a proxy for $A.util
   ['getBooleanValue', 'isArray', 'isObject', 'isUndefined', 'isUndefinedOrNull'].forEach(name =>
-    defineProperty(su, name, SecureObject.createFilteredMethod(su, AuraInstance['util'], name))
+    defineProperty(su, name, createFilteredMethod(su, AuraInstance['util'], name))
   );
   // These methods in Util deal with raw objects like components, so mark them as such
   ['addClass', 'hasClass', 'removeClass', 'toggleClass', 'isEmpty'].forEach(name =>
     defineProperty(
       su,
       name,
-      SecureObject.createFilteredMethod(su, AuraInstance['util'], name, { rawArguments: true })
+      createFilteredMethod(su, AuraInstance['util'], name, { rawArguments: true })
     )
   );
 
@@ -9894,11 +9881,7 @@ function SecureAura(AuraInstance, key) {
     'UTCToWallTime',
     'WallTimeToUTC'
   ].forEach(name =>
-    defineProperty(
-      sls,
-      name,
-      SecureObject.createFilteredMethod(sls, AuraInstance['localizationService'], name)
-    )
+    defineProperty(sls, name, createFilteredMethod(sls, AuraInstance['localizationService'], name))
   );
 
   setRef(sls, AuraInstance['localizationService'], key);
@@ -9941,22 +9924,22 @@ function SecureAuraAction(action, key) {
   });
 
   defineProperties(o, {
-    getName: SecureObject.createFilteredMethod(o, action, 'getName'),
-    setCallback: SecureObject.createFilteredMethod(o, action, 'setCallback', { defaultKey: key }),
-    setParams: SecureObject.createFilteredMethod(o, action, 'setParams', { defaultKey: key }),
-    setParam: SecureObject.createFilteredMethod(o, action, 'setParam', { defaultKey: key }),
-    getParams: SecureObject.createFilteredMethod(o, action, 'getParams'),
-    getParam: SecureObject.createFilteredMethod(o, action, 'getParam'),
-    getCallback: SecureObject.createFilteredMethod(o, action, 'getCallback'),
-    getState: SecureObject.createFilteredMethod(o, action, 'getState'),
-    getReturnValue: SecureObject.createFilteredMethod(o, action, 'getReturnValue', {
+    getName: createFilteredMethod(o, action, 'getName'),
+    setCallback: createFilteredMethod(o, action, 'setCallback', { defaultKey: key }),
+    setParams: createFilteredMethod(o, action, 'setParams', { defaultKey: key }),
+    setParam: createFilteredMethod(o, action, 'setParam', { defaultKey: key }),
+    getParams: createFilteredMethod(o, action, 'getParams'),
+    getParam: createFilteredMethod(o, action, 'getParam'),
+    getCallback: createFilteredMethod(o, action, 'getCallback'),
+    getState: createFilteredMethod(o, action, 'getState'),
+    getReturnValue: createFilteredMethod(o, action, 'getReturnValue', {
       defaultKey: key
     }),
-    getError: SecureObject.createFilteredMethod(o, action, 'getError'),
-    isBackground: SecureObject.createFilteredMethod(o, action, 'isBackground'),
-    setBackground: SecureObject.createFilteredMethod(o, action, 'setBackground'),
-    setAbortable: SecureObject.createFilteredMethod(o, action, 'setAbortable'),
-    setStorable: SecureObject.createFilteredMethod(o, action, 'setStorable')
+    getError: createFilteredMethod(o, action, 'getError'),
+    isBackground: createFilteredMethod(o, action, 'isBackground'),
+    setBackground: createFilteredMethod(o, action, 'setBackground'),
+    setAbortable: createFilteredMethod(o, action, 'setAbortable'),
+    setStorable: createFilteredMethod(o, action, 'setStorable')
   });
 
   setRef(o, action, key);
@@ -9993,14 +9976,14 @@ function SecureAuraEvent(event, key) {
    * SecureFunction. This ensures any non-Lockerized handlers of the event do not choke on the secure
    * wrappers, but any callbacks back into the original Locker have their arguments properly filtered.
    */
-  function deepUnfilterMethodArguments(baseObject, members) {
+  function deepUnfilterMethodArguments$$1(baseObject, members) {
     let value;
     for (const property in members) {
       value = members[property];
       if (isArray(value)) {
-        value = deepUnfilterMethodArguments([], value);
+        value = deepUnfilterMethodArguments$$1([], value);
       } else if (isPlainObject(value)) {
-        value = deepUnfilterMethodArguments({}, value);
+        value = deepUnfilterMethodArguments$$1({}, value);
       } else if (typeof value !== 'function') {
         if (value) {
           const key = getKey(value);
@@ -10010,10 +9993,10 @@ function SecureAuraEvent(event, key) {
         }
         // If value is a plain object, we need to deep unfilter
         if (isPlainObject(value)) {
-          value = deepUnfilterMethodArguments({}, value);
+          value = deepUnfilterMethodArguments$$1({}, value);
         }
       } else {
-        value = SecureObject.filterEverything(o, value, { defaultKey: key });
+        value = filterEverything(o, value, { defaultKey: key });
       }
       baseObject[property] = value;
     }
@@ -10030,7 +10013,7 @@ function SecureAuraEvent(event, key) {
       writable: true,
       enumerable: true,
       value: function(config) {
-        const unfiltered = deepUnfilterMethodArguments({}, config);
+        const unfiltered = deepUnfilterMethodArguments$$1({}, config);
         event['setParams'](unfiltered);
         return o;
       }
@@ -10039,7 +10022,7 @@ function SecureAuraEvent(event, key) {
       writable: true,
       enumerable: true,
       value: function(property, value) {
-        const unfiltered = deepUnfilterMethodArguments({}, { value: value }).value;
+        const unfiltered = deepUnfilterMethodArguments$$1({}, { value: value }).value;
         event['setParam'](property, unfiltered);
       }
     }
@@ -10059,7 +10042,7 @@ function SecureAuraEvent(event, key) {
     'stopPropagation',
     'getType',
     'getEventType'
-  ].forEach(name => defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name)));
+  ].forEach(name => defineProperty(o, name, createFilteredMethod(o, event, name)));
 
   setRef(o, event, key);
   addToCache(event, o, key);
@@ -10136,7 +10119,7 @@ function SecureAuraComponent(component, key) {
         if (path[0] === 'c') {
           return SecureAuraAction(value, key);
         }
-        return SecureObject.filterEverything(o, value);
+        return filterEverything(o, value);
       }
     },
     getEvent: {
@@ -10159,47 +10142,47 @@ function SecureAuraComponent(component, key) {
 
   defineProperties(o, {
     // these four super* methods are exposed as a temporary solution until we figure how to re-arrange the render flow
-    superRender: SecureObject.createFilteredMethod(o, component, 'superRender'),
-    superAfterRender: SecureObject.createFilteredMethod(o, component, 'superAfterRender'),
-    superRerender: SecureObject.createFilteredMethod(o, component, 'superRerender'),
-    superUnrender: SecureObject.createFilteredMethod(o, component, 'superUnrender'),
+    superRender: createFilteredMethod(o, component, 'superRender'),
+    superAfterRender: createFilteredMethod(o, component, 'superAfterRender'),
+    superRerender: createFilteredMethod(o, component, 'superRerender'),
+    superUnrender: createFilteredMethod(o, component, 'superUnrender'),
 
     // component @platform methods
-    isValid: SecureObject.createFilteredMethod(o, component, 'isValid'),
-    isInstanceOf: SecureObject.createFilteredMethod(o, component, 'isInstanceOf'),
-    addEventHandler: SecureObject.createFilteredMethod(o, component, 'addEventHandler', {
+    isValid: createFilteredMethod(o, component, 'isValid'),
+    isInstanceOf: createFilteredMethod(o, component, 'isInstanceOf'),
+    addEventHandler: createFilteredMethod(o, component, 'addEventHandler', {
       rawArguments: true
     }),
-    addHandler: SecureObject.createFilteredMethod(o, component, 'addHandler'),
-    addValueHandler: SecureObject.createFilteredMethod(o, component, 'addValueHandler'),
-    addValueProvider: SecureObject.createFilteredMethod(o, component, 'addValueProvider'),
-    destroy: SecureObject.createFilteredMethod(o, component, 'destroy'),
-    isRendered: SecureObject.createFilteredMethod(o, component, 'isRendered'),
-    getGlobalId: SecureObject.createFilteredMethod(o, component, 'getGlobalId'),
-    getLocalId: SecureObject.createFilteredMethod(o, component, 'getLocalId'),
-    getSuper: SecureObject.createFilteredMethod(o, component, 'getSuper'),
-    getReference: SecureObject.createFilteredMethod(o, component, 'getReference'),
-    getVersion: SecureObject.createFilteredMethod(o, component, 'getVersion'),
-    clearReference: SecureObject.createFilteredMethod(o, component, 'clearReference'),
-    autoDestroy: SecureObject.createFilteredMethod(o, component, 'autoDestroy'),
-    isConcrete: SecureObject.createFilteredMethod(o, component, 'isConcrete'),
-    getConcreteComponent: SecureObject.createFilteredMethod(o, component, 'getConcreteComponent'),
-    find: SecureObject.createFilteredMethod(o, component, 'find'),
-    set: SecureObject.createFilteredMethod(o, component, 'set', {
+    addHandler: createFilteredMethod(o, component, 'addHandler'),
+    addValueHandler: createFilteredMethod(o, component, 'addValueHandler'),
+    addValueProvider: createFilteredMethod(o, component, 'addValueProvider'),
+    destroy: createFilteredMethod(o, component, 'destroy'),
+    isRendered: createFilteredMethod(o, component, 'isRendered'),
+    getGlobalId: createFilteredMethod(o, component, 'getGlobalId'),
+    getLocalId: createFilteredMethod(o, component, 'getLocalId'),
+    getSuper: createFilteredMethod(o, component, 'getSuper'),
+    getReference: createFilteredMethod(o, component, 'getReference'),
+    getVersion: createFilteredMethod(o, component, 'getVersion'),
+    clearReference: createFilteredMethod(o, component, 'clearReference'),
+    autoDestroy: createFilteredMethod(o, component, 'autoDestroy'),
+    isConcrete: createFilteredMethod(o, component, 'isConcrete'),
+    getConcreteComponent: createFilteredMethod(o, component, 'getConcreteComponent'),
+    find: createFilteredMethod(o, component, 'find'),
+    set: createFilteredMethod(o, component, 'set', {
       defaultKey: key,
       rawArguments: true
     }),
-    getElement: SecureObject.createFilteredMethod(o, component, 'getElement'),
-    getElements: SecureObject.createFilteredMethod(o, component, 'getElements'),
-    getName: SecureObject.createFilteredMethod(o, component, 'getName'),
-    getType: SecureObject.createFilteredMethod(o, component, 'getType'),
-    removeEventHandler: SecureObject.createFilteredMethod(o, component, 'removeEventHandler')
+    getElement: createFilteredMethod(o, component, 'getElement'),
+    getElements: createFilteredMethod(o, component, 'getElements'),
+    getName: createFilteredMethod(o, component, 'getName'),
+    getType: createFilteredMethod(o, component, 'getType'),
+    removeEventHandler: createFilteredMethod(o, component, 'removeEventHandler')
   });
 
   // The shape of the component depends on the methods exposed in the definitions:
   const methodsNames = getPublicMethodNames(component);
   if (methodsNames && methodsNames.length) {
-    methodsNames.forEach(methodName => SecureObject.addMethodIfSupported(o, component, methodName));
+    methodsNames.forEach(methodName => addMethodIfSupported(o, component, methodName));
   }
 
   setRef(o, component, key);
@@ -10239,16 +10222,16 @@ function SecureAuraComponentRef(component, key) {
     }
   });
   defineProperties(o, {
-    addValueHandler: SecureObject.createFilteredMethod(o, component, 'addValueHandler'),
-    addValueProvider: SecureObject.createFilteredMethod(o, component, 'addValueProvider'),
-    destroy: SecureObject.createFilteredMethod(o, component, 'destroy'),
-    getGlobalId: SecureObject.createFilteredMethod(o, component, 'getGlobalId'),
-    getLocalId: SecureObject.createFilteredMethod(o, component, 'getLocalId'),
-    getEvent: SecureObject.createFilteredMethod(o, component, 'getEvent'),
-    isInstanceOf: SecureObject.createFilteredMethod(o, component, 'isInstanceOf'),
-    isRendered: SecureObject.createFilteredMethod(o, component, 'isRendered'),
-    isValid: SecureObject.createFilteredMethod(o, component, 'isValid'),
-    set: SecureObject.createFilteredMethod(o, component, 'set', {
+    addValueHandler: createFilteredMethod(o, component, 'addValueHandler'),
+    addValueProvider: createFilteredMethod(o, component, 'addValueProvider'),
+    destroy: createFilteredMethod(o, component, 'destroy'),
+    getGlobalId: createFilteredMethod(o, component, 'getGlobalId'),
+    getLocalId: createFilteredMethod(o, component, 'getLocalId'),
+    getEvent: createFilteredMethod(o, component, 'getEvent'),
+    isInstanceOf: createFilteredMethod(o, component, 'isInstanceOf'),
+    isRendered: createFilteredMethod(o, component, 'isRendered'),
+    isValid: createFilteredMethod(o, component, 'isValid'),
+    set: createFilteredMethod(o, component, 'set', {
       defaultKey: key,
       rawArguments: true
     }),
@@ -10265,7 +10248,7 @@ function SecureAuraComponentRef(component, key) {
           throw new SyntaxError(`Invalid key ${name}`);
         }
 
-        return SecureObject.filterEverything(o, component['get'](name));
+        return filterEverything(o, component['get'](name));
       }
     }
   });
@@ -10275,14 +10258,14 @@ function SecureAuraComponentRef(component, key) {
    * SecureFunction. This ensures any non-Lockerized handlers of the event do not choke on the secure
    * wrappers, but any callbacks back into the original Locker have their arguments properly filtered.
    */
-  function deepUnfilterMethodArguments(baseObject, members) {
+  function deepUnfilterMethodArguments$$1(baseObject, members) {
     let value;
     for (const property in members) {
       value = members[property];
       if (isArray(value)) {
-        value = deepUnfilterMethodArguments([], value);
+        value = deepUnfilterMethodArguments$$1([], value);
       } else if (isPlainObject(value)) {
-        value = deepUnfilterMethodArguments({}, value);
+        value = deepUnfilterMethodArguments$$1({}, value);
       } else if (typeof value !== 'function') {
         if (value) {
           const key = getKey(value);
@@ -10292,10 +10275,10 @@ function SecureAuraComponentRef(component, key) {
         }
         // If value is a plain object, we need to deep unfilter
         if (isPlainObject(value)) {
-          value = deepUnfilterMethodArguments({}, value);
+          value = deepUnfilterMethodArguments$$1({}, value);
         }
       } else {
-        value = SecureObject.filterEverything(o, value, { defaultKey: key });
+        value = filterEverything(o, value, { defaultKey: key });
       }
       baseObject[property] = value;
     }
@@ -10309,19 +10292,19 @@ function SecureAuraComponentRef(component, key) {
     const methodOptions = {
       unfilterEverything: !requireLocker(component)
         ? function(args) {
-            return deepUnfilterMethodArguments([], args);
+            return deepUnfilterMethodArguments$$1([], args);
           }
         : undefined
     };
 
     methodsNames.forEach(methodName =>
-      SecureObject.addMethodIfSupported(o, component, methodName, methodOptions)
+      addMethodIfSupported(o, component, methodName, methodOptions)
     );
   }
 
   // DCHASMAN TODO Workaround for ui:button redefining addHandler using aura:method!!!
   if (!('addHandler' in o)) {
-    SecureObject.addMethodIfSupported(o, component, 'addHandler', { rawArguments: true });
+    addMethodIfSupported(o, component, 'addHandler', { rawArguments: true });
   }
 
   setRef(o, component, key);
@@ -10454,7 +10437,7 @@ function windowAddPropertiesHook(st, raw, key) {
 
   // Salesforce API entry points (first phase) - W-3046191 is tracking adding a publish() API
   // enhancement where we will move these to their respective javascript/container architectures
-  ['Sfdc', 'sforce'].forEach(name => SecureObject.addPropertyIfSupported(st, raw, name));
+  ['Sfdc', 'sforce'].forEach(name => addPropertyIfSupported(st, raw, name));
 
   // Add RTC related api only to specific namespaces
   const namespace = key['namespace'];
@@ -10467,10 +10450,10 @@ function windowAddPropertiesHook(st, raw, key) {
         });
       }
     });
-    SecureObject.addUnfilteredPropertyIfSupported(st, raw, 'MediaStream');
+    addUnfilteredPropertyIfSupported(st, raw, 'MediaStream');
     // DOMParser and document.implementation is not currently supported in Locker due to W-4437359
     // enable only for RTC namespace until a better solution arises.
-    SecureObject.addUnfilteredPropertyIfSupported(st, raw, 'DOMParser');
+    addUnfilteredPropertyIfSupported(st, raw, 'DOMParser');
   }
 }
 
@@ -10478,7 +10461,7 @@ function navigatorAddPropertiesHook(st, raw, key) {
   const namespace = key['namespace'];
   if (namespace === 'runtime_rtc_spark' || namespace === 'runtime_rtc') {
     ['mediaDevices', 'mozGetUserMedia', 'webkitGetUserMedia'].forEach(name => {
-      SecureObject.addUnfilteredPropertyIfSupported(st, raw, name);
+      addUnfilteredPropertyIfSupported(st, raw, name);
     });
   }
 }
@@ -10571,7 +10554,7 @@ function getEnvForSecureObject(st) {
   return getEnv$1(key);
 }
 
-function getRaw(value) {
+function getRaw$$1(value) {
   if (value) {
     const key = getKey(value);
     if (key) {
@@ -10671,7 +10654,7 @@ exports.createForDef = createForDef;
 exports.createForModule = createForModule;
 exports.getEnv = getEnv$$1;
 exports.getEnvForSecureObject = getEnvForSecureObject;
-exports.getRaw = getRaw;
+exports.getRaw = getRaw$$1;
 exports.initialize = initialize;
 exports.isEnabled = isEnabled;
 exports.instanceOf = instanceOf;

@@ -26,7 +26,6 @@ import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -73,6 +72,9 @@ import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.FileMonitor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -84,7 +86,7 @@ import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
 @ServiceComponent
-public class RegistryServiceImpl implements RegistryService, SourceListener {
+public class RegistryServiceImpl implements RegistryService, SourceListener, ApplicationContextAware {
     private FileMonitor fileMonitor;
 
     private DefinitionService definitionService;
@@ -98,18 +100,19 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     @Inject
     private CompilerService compilerService;
 
-    @Inject
-    private Optional<Collection<RegistryAdapter>> adaptersInject;
-
-    @Inject
-    private Collection<FileBundleSourceBuilder> builders;
+    private ApplicationContext applicationContext;
 
     private Collection<RegistryAdapter> adapters;
+
+    @Inject
+    @Lazy
+    private Collection<FileBundleSourceBuilder> builders;
 
     private CachingService cachingService;
 
     @Inject
-    private Optional<List<ComponentLocationAdapter>> locationAdapters;
+    @Lazy
+    private List<ComponentLocationAdapter> locationAdapters;
 
     private AuraGlobalControllerDefRegistry globalControllerDefRegistry;
 
@@ -174,11 +177,6 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     public void init() {
         if (fileMonitor != null) {
             fileMonitor.subscribeToChangeNotification(this);
-        }
-        if (adaptersInject.isPresent()) {
-            adapters = adaptersInject.get();
-        } else if (adapters == null) {
-            adapters = new ArrayList<>();
         }
     }
 
@@ -282,7 +280,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
 
                         loggingService.info(String.format("Merged multiple .registries files. "
                                 + "This can be avoided by updating your pom.xml file: %s, %s, %s, (%s defs)",
-                                mergedNs, mergedTypes, mergedPrefixes, mergedDefs.size()));
+                                mergedNs, mergedTypes, mergedPrefixes, Integer.valueOf(mergedDefs.size())));
                         DefRegistry merged = new StaticDefRegistryImpl(mergedTypes, mergedPrefixes, mergedNs, mergedDefs);
                         byNamespace.put(namespace, merged);
                     } else {
@@ -435,7 +433,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
      *            if non-null get only the location adapters that match the filter
      */
     private List<DefRegistry> getCLARegistries(Predicate<ComponentLocationAdapter> filterIn) {
-        Collection<ComponentLocationAdapter> markupLocations = locationAdapters.orElse(null);
+        Collection<ComponentLocationAdapter> markupLocations = locationAdapters;
         List<DefRegistry> regBuild = new ArrayList<>();
 
         regBuild.add(AuraStaticTypeDefRegistry.INSTANCE);
@@ -512,6 +510,16 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     @Override
     public RegistrySet buildRegistrySet(Mode mode, Authentication access, Predicate<ComponentLocationAdapter> filterIn) {
         List<DefRegistry> registries = getCLARegistries(filterIn);
+        if (adapters == null) {
+            synchronized (this) {
+                if (adapters == null) {
+                    adapters = applicationContext.getBeansOfType(RegistryAdapter.class).values();
+                    if (adapters == null) {
+                        adapters = new ArrayList<>();
+                    }
+                }
+            }
+        }
         for (RegistryAdapter adapter : adapters) {
             DefRegistry[] provided = adapter.getRegistries(mode, access, null);
             if (registries != null && provided != null) {
@@ -604,16 +612,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         this.compilerService = compilerService;
     }
 
-    public Collection<RegistryAdapter> getAdapters() {
-        return adapters;
-    }
-
-    public void setAdapters(Collection<RegistryAdapter> adapters) {
-        this.adapters = adapters;
-    }
-
     public void setLocationAdapters(List<ComponentLocationAdapter> locationAdapters) {
-        this.locationAdapters = Optional.of(locationAdapters);
+        this.locationAdapters = locationAdapters;
     }
 
     @Inject
@@ -634,5 +634,10 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     @Inject
     public void setCachingService(CachingService cachingService) {
         this.cachingService = cachingService;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 }

@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -61,8 +60,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.springframework.context.ApplicationContext;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -115,6 +114,7 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
     @Test
     public void testDefaultWithProviders() {
         RegistryServiceImpl rs = new RegistryServiceImpl();
+        ApplicationContext appContext = Mockito.mock(ApplicationContext.class);
         DefRegistry reg = Mockito.mock(DefRegistry.class);
         RegistryAdapter mockAdapter = Mockito.mock(RegistryAdapter.class);
         Mockito.when(reg.getNamespaces()).thenReturn(Sets.newHashSet("*"));
@@ -122,8 +122,11 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
         Mockito.when(reg.getDefTypes()).thenReturn(Sets.newHashSet(DefType.COMPONENT));
         Mockito.when(mockAdapter.getRegistries(null, null, null)).thenReturn(new DefRegistry[] { reg });
 
-        List<RegistryAdapter> adapters = Lists.newArrayList(mockAdapter);
-        rs.setAdapters(adapters);
+        Map<String,RegistryAdapter> map = new HashMap<>();
+        map.put("name", mockAdapter);
+        Mockito.doReturn(map).when(appContext).getBeansOfType(RegistryAdapter.class);
+        rs.setApplicationContext(appContext);
+
         rs.setLocationAdapters(Lists.newArrayList());
         rs.setAuraGlobalControllerDefRegistry(new AuraGlobalControllerDefRegistry());
 
@@ -461,7 +464,7 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
 
     private RegistryServiceImpl newInstanceForTest() {
         RegistryServiceImpl registryService = new RegistryServiceImpl();
-        registryService.setAdapters(ImmutableList.of());
+        registryService.setApplicationContext(Mockito.mock(ApplicationContext.class));
 
         AuraGlobalControllerDefRegistry mockGlobalControllerReg = mock(AuraGlobalControllerDefRegistry.class);
         when(mockGlobalControllerReg.getDefTypes()).thenReturn(ImmutableSet.of(DefType.CONTROLLER));

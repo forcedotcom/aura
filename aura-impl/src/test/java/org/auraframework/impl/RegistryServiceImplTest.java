@@ -17,6 +17,7 @@ package org.auraframework.impl;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -25,27 +26,44 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
+import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.cache.Cache;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.RegistryTrie;
 import org.auraframework.service.CachingService;
+import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.RegistrySet;
 import org.auraframework.system.RegistrySet.RegistrySetKey;
+import org.auraframework.util.FileMonitor;
+import org.auraframework.util.IOUtil;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -428,5 +446,138 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
 
         // and that the registry was built.
         verify(rsSpy, times(1)).buildDefaultRegistrySet(eq(mode), eq(access));
+    }
+
+    private File makeFile(File parent, String namespace, String name, String extension, String contents) throws Exception {
+        File namespaceDirectory = new File(parent, namespace);
+        File bundleDirectory = new File(namespaceDirectory, name);
+        bundleDirectory.mkdirs();
+        File file = new File(bundleDirectory, name + extension);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(contents.getBytes("UTF-8"));
+        }
+        return file;
+    }
+
+    private RegistryServiceImpl newInstanceForTest() {
+        RegistryServiceImpl registryService = new RegistryServiceImpl();
+        registryService.setAdapters(ImmutableList.of());
+
+        AuraGlobalControllerDefRegistry mockGlobalControllerReg = mock(AuraGlobalControllerDefRegistry.class);
+        when(mockGlobalControllerReg.getDefTypes()).thenReturn(ImmutableSet.of(DefType.CONTROLLER));
+        registryService.setAuraGlobalControllerDefRegistry(mockGlobalControllerReg);
+
+        Map<String, String> internalNamespaces = new HashMap<>();
+        ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
+        registryService.setConfigAdapter(mockConfigAdapter);
+
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                // mirror logic in ConfigAdapterImpl
+                String namespace = (String)invocation.getArguments()[0];
+                if(namespace != null && !namespace.isEmpty()){
+                    internalNamespaces.put(namespace.toLowerCase(), namespace);
+                }
+                return null;
+            }
+        }).when(mockConfigAdapter).addInternalNamespace(any(String.class));
+
+        when(mockConfigAdapter.isInternalNamespace(any(String.class))).thenAnswer(new Answer<Boolean>() {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                String namespace = (String)invocation.getArguments()[0];
+                return namespace != null && internalNamespaces.containsKey(namespace.toLowerCase());
+            }
+        });
+
+        when(mockConfigAdapter.getInternalNamespacesMap()).thenReturn(internalNamespaces);
+
+        return registryService;
+    }
+
+    @Test
+    public void testCLARegistration() throws Exception {
+        RegistryServiceImpl registryService = newInstanceForTest();
+
+        File dir1 = new File(IOUtil.newTempDir(getClass().getSimpleName()));
+        makeFile(dir1, "namespace", "component", ".cmp", "<aura:component/>");
+
+        File dir2 = new File(IOUtil.newTempDir(getClass().getSimpleName()));
+        makeFile(dir2, "otherNamespace", "component", ".cmp", "<aura:component/>");
+
+        File dir3 = new File(IOUtil.newTempDir(getClass().getSimpleName()));
+        makeFile(dir3, "otherNamespace", "module", ".js", "export default class Foo{}");
+
+        ComponentLocationAdapter cla1 = new ComponentLocationAdapter.Impl(dir1, null, null, null);
+        ComponentLocationAdapter cla2 = new ComponentLocationAdapter.Impl(dir2, null, dir3, null);
+        registryService.setLocationAdapters(Lists.newArrayList(cla1, cla2));
+
+        RegistrySet set = registryService.buildRegistrySet(Mode.DEV, Authentication.UNAUTHENTICATED, null);
+
+        DefDescriptor<?> desc1 = new DefDescriptorImpl<>("markup", "namespace", "component", ComponentDef.class);
+        DefRegistry regA = set.getRegistryFor(desc1);
+        assertNotNull("did not find registry for namespace:component", regA);
+
+        DefDescriptor<?> desc2 = new DefDescriptorImpl<>("markup", "otherNamespace", "component", ComponentDef.class);
+        DefRegistry regB = set.getRegistryFor(desc2);
+        assertNotNull("did not find registry for otherNamespace:component", regB);
+
+        DefDescriptor<?> desc3 = new DefDescriptorImpl<>("markup", "otherNamespace", "module", ModuleDef.class);
+        DefRegistry regC = set.getRegistryFor(desc3);
+        assertNotNull("did not find registry for otherNamespace:module", regC);
+
+        assertEquals("expected registries to be the same for same namespace", regB, regC);
+    }
+
+    @Test
+    public void testCLASourceDoesntExist() throws Exception {
+        RegistryServiceImpl registryService = newInstanceForTest();
+
+        File dir1 = new File(IOUtil.newTempDir(getClass().getSimpleName()));
+        makeFile(dir1, "namespace", "component", ".cmp", "<aura:component/>");
+
+        File dir2 = new File("i_dont_exist");
+
+        ComponentLocationAdapter cla1 = new ComponentLocationAdapter.Impl(dir1, null, null, null);
+        ComponentLocationAdapter cla2 = new ComponentLocationAdapter.Impl(dir2, null, null, null);
+        registryService.setLocationAdapters(Lists.newArrayList(cla1, cla2));
+
+        LoggingService mockLoggingService = mock(LoggingService.class);
+        registryService.setLoggingService(mockLoggingService);
+
+        RegistrySet set = registryService.buildRegistrySet(Mode.DEV, Authentication.UNAUTHENTICATED, null);
+
+        ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
+        verify(mockLoggingService).warn(message.capture());
+
+        String value = message.getValue();
+        assertTrue(value.contains("Unable to find/read components source dir 'i_dont_exist'"));
+
+        DefDescriptor<?> desc = new DefDescriptorImpl<>("markup", "namespace", "component", ComponentDef.class);
+        DefRegistry reg = set.getRegistryFor(desc);
+        assertNotNull("did not find registry for namespace:component", reg);
+    }
+
+    @Test
+    public void testAddsDirsToFileMonitor() throws Exception {
+        RegistryServiceImpl registryService = newInstanceForTest();
+
+        FileMonitor monitor = mock(FileMonitor.class);
+        registryService.setFileMonitor(monitor);
+
+        File dir1 = new File(IOUtil.newTempDir(getClass().getSimpleName()));
+        makeFile(dir1, "namespace", "component", ".cmp", "<aura:component/>");
+
+        File dir2 = new File(IOUtil.newTempDir(getClass().getSimpleName()));
+        makeFile(dir2, "otherNamespace", "module", ".js", "export default class Foo{}");
+
+        ComponentLocationAdapter cla = new ComponentLocationAdapter.Impl(dir1, null, dir2, null);
+        registryService.setLocationAdapters(Lists.newArrayList(cla));
+
+        registryService.buildRegistrySet(Mode.DEV, Authentication.UNAUTHENTICATED, null);
+
+        verify(monitor, Mockito.times(1)).addDirectory(eq(dir1.getCanonicalPath()), any(Long.class));
+        verify(monitor, Mockito.times(1)).addDirectory(eq(dir2.getCanonicalPath()), any(Long.class));
     }
 }

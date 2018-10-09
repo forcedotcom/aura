@@ -21,17 +21,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BundleDef;
 import org.auraframework.def.DefDescriptor;
@@ -41,14 +42,15 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.RegistryService;
-import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.BundleSource;
+import org.auraframework.system.DefRegistry;
+import org.auraframework.system.RegistrySet;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
@@ -66,8 +68,9 @@ public class RegistrySerializer {
     /**
      * An exception during serialization.
      */
-    @SuppressWarnings("serial")
-    public class RegistrySerializerException extends Exception {
+    public static final class RegistrySerializerException extends Exception {
+        private static final long serialVersionUID = -3672164920700940831L;
+
         private RegistrySerializerException(String message, Throwable cause) {
             super(message, cause);
         }
@@ -152,14 +155,14 @@ public class RegistrySerializer {
         public void debug(Throwable cause) {
         }
     };
-    
+
     @Nonnull
     private final DefaultLogger DEFAULT_LOGGER = new DefaultLogger();
 
     /**
-     * componentDirectory: The base directory for components.
+     * sourceDirectories: The base directory/directories for components.
      */
-    private final File componentDirectory;
+    private final List<File> sourceDirectories;
 
     /**
      * outputDirectory: The directory in which to put out the .registries file.
@@ -188,10 +191,8 @@ public class RegistrySerializer {
     @Nonnull
     private final ContextService contextService;
 
-    private boolean modulesEnabled;
-
     /**
-     * A flag for an error occuring.
+     * A flag for an error occurring.
      */
     private boolean error = false;
 
@@ -205,16 +206,15 @@ public class RegistrySerializer {
      * @param excluded a set of excluded namespaces.
      */
     public RegistrySerializer(@Nonnull RegistryService registryService, @Nonnull ConfigAdapter configAdapter,
-            @Nonnull File componentDirectory, @Nonnull File outputDirectory,
+            @Nonnull List<File> sourceDirectories, @Nonnull File outputDirectory,
             @Nonnull String[] excluded, @CheckForNull RegistrySerializerLogger logger,
-            @Nonnull ContextService contextService, boolean modulesEnabled) {
+            @Nonnull ContextService contextService) {
         this.registryService = registryService;
         this.configAdapter = configAdapter;
-        this.componentDirectory = componentDirectory;
+        this.sourceDirectories = sourceDirectories;
         this.outputDirectory = outputDirectory;
         this.contextService = contextService;
         this.excluded = excluded;
-        this.modulesEnabled = modulesEnabled;
         if (logger == null) {
             logger = DEFAULT_LOGGER;
         }
@@ -228,7 +228,7 @@ public class RegistrySerializer {
      * @throws RegistrySerializerException if there is an error.
      */
     public void write(@Nonnull OutputStream out, DefRegistry master) throws RegistrySerializerException {
-        List<DefRegistry> regs = Lists.newArrayList();
+        List<DefRegistry> regs = new ArrayList<>();
 
         Set<String> namespaces = master.getNamespaces();
         if (excluded != null) {
@@ -272,11 +272,12 @@ public class RegistrySerializer {
      * @param namespace the namespace for which we want to retrieve a static registry.
      */
     private DefRegistry getRegistry(@Nonnull DefRegistry master, @Nonnull String namespace) {
-        Set<String> prefixes = Sets.newHashSet();
-        Set<DefType> types = Sets.newHashSet();
+        Set<String> prefixes = new HashSet<>();
+        Set<DefType> types = new HashSet<>();
         Set<DefDescriptor<?>> descriptors;
-        Map<DefDescriptor<?>, Definition> filtered = Maps.newHashMap();
+        Map<DefDescriptor<?>, Definition> filtered = new HashMap<>();
 
+        // TODO remove once namespace casing is fixed W-5451217
         String existingNamespace = configAdapter.getInternalNamespacesMap().get(namespace.toLowerCase());
         if (existingNamespace != null) {
             // modules will have lower cased namespace folder
@@ -286,16 +287,12 @@ public class RegistrySerializer {
             configAdapter.addInternalNamespace(namespace);
         }
         Set<String> namespaces = Sets.newHashSet(namespace);
+
         //
         // Fetch all matching descriptors for our 'root' definitions.
         //
         logger.debug("******************************************* "+namespace+" ******************************");
-        DescriptorFilter root_nsf;
-        if (modulesEnabled) {
-            root_nsf = new DescriptorFilter(namespace, Lists.newArrayList(DefType.MODULE));
-        } else {
-            root_nsf = new DescriptorFilter(namespace, Lists.newArrayList(BundleSource.bundleDefTypes));
-        }
+        DescriptorFilter root_nsf = new DescriptorFilter(namespace, Lists.newArrayList(BundleSource.bundleDefTypes));
         descriptors = master.find(root_nsf);
         for (DefDescriptor<?> desc : descriptors) {
             try {
@@ -333,87 +330,67 @@ public class RegistrySerializer {
         return new StaticDefRegistryImpl(types, prefixes, namespaces, filtered.values());
     }
 
-    public static final String ERR_ARGS_REQUIRED = "Component and Output Directory are both required";
-
     public void execute() throws RegistrySerializerException, IOException {
-        if (componentDirectory == null || outputDirectory == null) {
-            throw new RegistrySerializerException(ERR_ARGS_REQUIRED);
+        if(sourceDirectories == null || sourceDirectories.isEmpty()) {
+            throw new RegistrySerializerException("Component source directory is required");
         }
-        // Basic check... does the file exist?
-        if (!componentDirectory.exists() || !componentDirectory.isDirectory()) {
-            throw new RegistrySerializerException("Component directory is not a directory: "+componentDirectory);
+        for (File sourceDirectory : sourceDirectories) {
+            if (!sourceDirectory.exists() || !sourceDirectory.isDirectory()) {
+                throw new RegistrySerializerException("Component directory is not a directory: " + sourceDirectory);
+            }
+            if (!sourceDirectory.canRead()) {
+                throw new RegistrySerializerException("Unable to read/write " + sourceDirectory);
+            }
         }
-        if (!componentDirectory.canRead()) {
-            throw new RegistrySerializerException("Unable to read/write "+componentDirectory);
+
+        if (outputDirectory == null) {
+            throw new RegistrySerializerException("Output Directory is required");
         }
         if (!outputDirectory.exists()) {
             outputDirectory.mkdirs();
         }
         if (!outputDirectory.isDirectory()) {
-            throw new RegistrySerializerException("Output directory is not a directory: "+outputDirectory);
+            throw new RegistrySerializerException("Output directory is not a directory: " + outputDirectory);
         }
         if (!outputDirectory.canWrite()) {
-            throw new RegistrySerializerException("Output directory is not writable: "+outputDirectory);
+            throw new RegistrySerializerException("Output directory is not writable: " + outputDirectory);
         }
         File outputFile = new File(outputDirectory, ".registries");
         if (outputFile.exists()) {
             boolean deleted = outputFile.delete();
             if (!deleted && outputFile.exists()) {
-                throw new RegistrySerializerException("Unable to delete and create a new file: "+outputFile);
+                throw new RegistrySerializerException("Unable to delete and create a new file: " + outputFile);
             }
         }
         try {
             outputFile.createNewFile();
         } catch (IOException ioe) {
-            throw new RegistrySerializerException("Unable to create "+outputFile);
+            throw new RegistrySerializerException("Unable to create " + outputFile);
         }
 
         FileOutputStream out;
         try {
             out = new FileOutputStream(outputFile);
         } catch (FileNotFoundException fnfe) {
-            throw new RegistrySerializerException("Unable to create "+outputFile, fnfe);
+            throw new RegistrySerializerException("Unable to create " + outputFile, fnfe);
         }
         try {
-            DefRegistry master;
-            RegistrySet registries;
-            if (modulesEnabled) {
-                String parentProjectPath = componentDirectory.getParentFile().getCanonicalPath();
-                // skip namespaces not in the current project (BUTC module-enforcer will fail otherwise)
-                Predicate<ComponentLocationAdapter> filterIn = new Predicate<ComponentLocationAdapter>() {
-                    @Override
-                    public boolean test(ComponentLocationAdapter adapter) {
-                        try {
-                            File componentSourceDir = adapter.getComponentSourceDir();
-                            if (componentSourceDir != null && !componentSourceDir.getCanonicalPath().startsWith(parentProjectPath)) {
-                                logger.info("skipping: " + componentSourceDir.getCanonicalPath());
-                                return false;
-                            }
-                            return true;
-                        } catch (IOException x) {
-                            logger.error(x);
-                            return false;
-                        }
-                    }
-                };
-                // must get all component locations within current maven module first to register namespaces
-                registries = registryService.buildRegistrySet(Mode.DEV, null, filterIn);
+            // TODO remove once all downstream projects are updated to compile both components and modules together W-5432127 W-5480526
+            if (sourceDirectories.size() == 1 && sourceDirectories.get(0).getPath().contains("modules")) {
+                File modulesSourceDir = sourceDirectories.get(0);
                 // need to add components namespaces to perform correct namespace case conversion for module namespaces
-                File auraComponentsDirectory = new File (componentDirectory.getParentFile(), "components");
+                File auraComponentsDirectory = new File(modulesSourceDir.getParentFile(), "components");
                 if (auraComponentsDirectory.exists()) {
-                    for (String namespace: registryService.getRegistry(auraComponentsDirectory).getNamespaces()) {
+                    for (String namespace: registryService.getRegistry(Lists.newArrayList(auraComponentsDirectory)).getNamespaces()) {
                         configAdapter.addInternalNamespace(namespace);
                     }
                 }
-                // modules will use existing internal namespaces for conversion
-                master = registryService.getModulesRegistry(componentDirectory);
-            } else {
-                master = registryService.getRegistry(componentDirectory);
-                registries = registryService.getRegistrySet(master);
             }
 
-            contextService.startBasicContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, registries);
+            DefRegistry master = registryService.getRegistry(sourceDirectories);
+            RegistrySet registries = registryService.getRegistrySet(master);
 
+            contextService.startBasicContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, registries);
             try {
                 write(out, master);
             } finally {
@@ -436,8 +413,8 @@ public class RegistrySerializer {
      *
      * @return The componentDirectory.
      */
-    public File getComponentDirectory() {
-        return this.componentDirectory;
+    public List<File> getSourceDirectories() {
+        return this.sourceDirectories;
     }
 
     /**

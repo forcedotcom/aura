@@ -57,7 +57,7 @@ public class RegistryTrie implements RegistrySet {
             for (DefType defType : reg.getDefTypes()) {
                 Map<String, PrefixNode> dtn = this.root.get(defType);
                 if (dtn == null) {
-                    dtn = new HashMap<String, PrefixNode>(8);
+                    dtn = new HashMap<>(8);
                     this.root.put(defType, dtn);
                 }
                 for (String p : reg.getPrefixes()) {

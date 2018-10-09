@@ -28,6 +28,6 @@ public class AuraComponentsNegativeTestComponentLocationAdapter extends Componen
 
     public AuraComponentsNegativeTestComponentLocationAdapter() {
         super(Paths.get(AuraUtil.getAuraHome(), "aura-components", "src", "test", "negativeComponents").toFile(),
-                null, "components_aura_components_test_negative");
+                "components_aura_components_test_negative", null, null);
     }
 }

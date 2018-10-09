@@ -19,137 +19,56 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.SourceLoader;
 
+/**
+ * Registers component and module source locations.
+ */
 public interface ComponentLocationAdapter extends AuraAdapter {
+    /**
+     * The 'components' directory containing component sources.
+     */
     File getComponentSourceDir();
 
+    /**
+     * The path to the resource on the classpath containing component sources and pre-compiled registries.
+     */
     String getComponentSourcePackage();
 
-    String getComponentSourcePackageAlways(); // TODO rename or consolidate
+    /**
+     * The 'modules' directory containing module sources.
+     */
+    File getModuleSourceDir();
 
-    default File getModuleSourceDir() { return null; };
+    /**
+     * The path to the resource on the classpath containing modules sources and pre-compiled registries.
+     */
+    String getModuleSourcePackage();
 
-    default String getModuleSourcePackage() { return null; };
-
-    default String getModuleSourcePackageAlways() {return null; }; // TODO rename or consolidate
-
+    /**
+     * Used by StringComponentLocationAdapter. TODO remove.
+     */
     Set<SourceLoader> getSourceLoaders();
 
-    @Deprecated
-    default DefType type() { return DefType.COMPONENT; }; // TODO delete
-
+    /** Default implementation for ComponentLocationAdapter */
     class Impl implements ComponentLocationAdapter {
         private final File componentSourceDir;
         private final String componentSourcePackage;
-        private final String componentPackageAlways;
         private final File moduleSourceDir;
         private final String moduleSourcePackage;
-        private final String modulePackageAlways;
         private final Set<SourceLoader> loaders = new HashSet<>();
 
-        // TODO componentSourceDir should be nullable
-        // TODO consolidate constructors
-        // TODO delete javaGeneratedSourceDir params
-
+        @Deprecated
         public Impl(File componentSourceDir) {
-            this(componentSourceDir, null);
+            this(componentSourceDir, null, null, null);
         }
-
-        @Deprecated
-        public Impl(File componentSourceDir, File javaGeneratedSourceDir) {
-            this(componentSourceDir, javaGeneratedSourceDir, null);
-        }
-
-        @Deprecated
-        public Impl(File componentSourceDir, File javaGeneratedSourceDir, String componentSourcePackage) {
-            if (type() == DefType.MODULE) { // yucky for now, but subclasses should only reference enum value
-                this.modulePackageAlways = componentSourcePackage;
-                if ((componentSourceDir != null && componentSourceDir.exists()) || componentSourcePackage == null) {
-                    this.moduleSourceDir = componentSourceDir;
-                    this.moduleSourcePackage = null;
-                } else {
-                    this.moduleSourcePackage = componentSourcePackage;
-                    this.moduleSourceDir = null;
-                }
-                this.componentSourceDir = null;
-                this.componentSourcePackage = null;
-                this.componentPackageAlways = null;
-            } else {
-                this.componentPackageAlways = componentSourcePackage;
-                if ((componentSourceDir != null && componentSourceDir.exists()) || componentSourcePackage == null) {
-                    this.componentSourceDir = componentSourceDir;
-                    this.componentSourcePackage = null;
-                } else {
-                    this.componentSourcePackage = componentSourcePackage;
-                    this.componentSourceDir = null;
-                }
-                this.moduleSourceDir = null;
-                this.moduleSourcePackage = null;
-                this.modulePackageAlways = null;
-            }
-        }
-
-        @Deprecated
-        public Impl(String componentSourcePackage) {
-            if (componentSourcePackage != null && !componentSourcePackage.isEmpty()) {
-                if (type() == DefType.MODULE) {
-                    this.moduleSourcePackage = componentSourcePackage;
-                    this.modulePackageAlways = componentSourcePackage;
-                    this.componentSourcePackage = null;
-                    this.componentPackageAlways = null;
-                } else {
-                    this.componentSourcePackage = componentSourcePackage;
-                    this.componentPackageAlways = componentSourcePackage;
-                    this.moduleSourcePackage = null;
-                    this.modulePackageAlways = null;
-                }
-                this.componentSourceDir = null;
-                this.moduleSourceDir = null;
-            } else {
-                throw new IllegalArgumentException("componentSourcePackage is null or empty: " + componentSourcePackage);
-            }
-        }
-
-        @Deprecated
-        public Impl(SourceLoader loader) {
-            if (loader != null) {
-                loaders.add(loader);
-            }
-            this.componentSourceDir = null;
-            this.componentSourcePackage = null;
-            this.componentPackageAlways = null;
-            this.moduleSourceDir = null;
-            this.moduleSourcePackage = null;
-            this.modulePackageAlways = null;
-        }
-
-        // final constructors
-        // 1) String componentSourceDir (most consumers in core use this version currently)
-        // 2) File componentSourceDir, String componentSourcePackage, File moduleSourceDir, String moduleSourcePackage
 
         public Impl(File componentSourceDir, String componentSourcePackage,
-                    File moduleSourceDir, String moduleSourcePackage) {
-            // TODO don't really like handling the logic this way
-            if ((componentSourceDir != null && componentSourceDir.exists()) || componentSourcePackage == null) {
-                this.componentSourceDir = componentSourceDir;
-                this.componentSourcePackage = null;
-            } else {
-                this.componentSourcePackage = componentSourcePackage;
-                this.componentSourceDir = null;
-            }
-
-            if ((moduleSourceDir != null && moduleSourceDir.exists()) || moduleSourcePackage == null) {
-                this.moduleSourceDir = moduleSourceDir;
-                this.moduleSourcePackage = null;
-            } else {
-                this.moduleSourcePackage = moduleSourcePackage;
-                this.moduleSourceDir = null;
-            }
-
-            this.componentPackageAlways = componentSourcePackage;
-            this.modulePackageAlways = moduleSourcePackage;
+                File moduleSourceDir, String moduleSourcePackage) {
+            this.componentSourceDir = componentSourceDir;
+            this.componentSourcePackage = componentSourcePackage;
+            this.moduleSourceDir = moduleSourceDir;
+            this.moduleSourcePackage = moduleSourcePackage;
         }
 
         @Override
@@ -163,11 +82,6 @@ public interface ComponentLocationAdapter extends AuraAdapter {
         }
 
         @Override
-        public String getComponentSourcePackageAlways() {
-            return componentPackageAlways;
-        }
-
-        @Override
         public File getModuleSourceDir() {
             return moduleSourceDir;
         }
@@ -178,26 +92,8 @@ public interface ComponentLocationAdapter extends AuraAdapter {
         }
 
         @Override
-        public String getModuleSourcePackageAlways() {
-            return modulePackageAlways;
-        }
-
-        @Override
         public Set<SourceLoader> getSourceLoaders() {
             return loaders;
-        }
-
-        /**
-         * Distinguish between Aura component and modules locations.
-         * Module require separate registry that handles its own def type to allow
-         * coexistence of components and modules of the same name
-         *
-         * @return DEFAULT DefType.COMPONENT for Aura components
-         */
-        @Override
-        @Deprecated
-        public DefType type() {
-            return DefType.COMPONENT;
         }
 
         @Override
@@ -212,6 +108,18 @@ public interface ComponentLocationAdapter extends AuraAdapter {
             sb.append(", CSP=");
             if (componentSourcePackage != null) {
                 sb.append(componentSourcePackage);
+            } else {
+                sb.append("null");
+            }
+            sb.append("MSD=");
+            if (moduleSourceDir != null) {
+                sb.append(moduleSourceDir.getPath());
+            } else {
+                sb.append("null");
+            }
+            sb.append(", MSP=");
+            if (moduleSourcePackage != null) {
+                sb.append(moduleSourcePackage);
             } else {
                 sb.append("null");
             }

@@ -28,6 +28,6 @@ public class AuraComponentsTestComponentLocationAdapter extends ComponentLocatio
 
     public AuraComponentsTestComponentLocationAdapter() {
         super(Paths.get(AuraUtil.getAuraHome(), "aura-components", "src", "test", "components").toFile(),
-                null, "components_aura_components_test");
+                "components_aura_components_test", null, null);
     }
 }

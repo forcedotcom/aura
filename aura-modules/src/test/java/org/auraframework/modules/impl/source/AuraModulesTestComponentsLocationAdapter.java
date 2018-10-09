@@ -26,6 +26,9 @@ import org.springframework.context.annotation.Lazy;
 @ServiceComponent
 public class AuraModulesTestComponentsLocationAdapter extends ComponentLocationAdapter.Impl {
     public AuraModulesTestComponentsLocationAdapter() {
-        super(AuraModulesFiles.MODULES_TEST_COMPONENTS_DIR.asFile(), null, "components_aura_modules_test");
+        super(AuraModulesFiles.MODULES_TEST_COMPONENTS_DIR.asFile(),
+                "components_aura_modules_test",
+                AuraModulesFiles.MODULES_TEST_MODULES_DIR.asFile(),
+                "modules_aura_modules_test");
     }
 }

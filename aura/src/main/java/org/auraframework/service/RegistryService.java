@@ -17,6 +17,7 @@ package org.auraframework.service;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Predicate;
 
 import org.auraframework.adapter.ComponentLocationAdapter;
@@ -54,7 +55,7 @@ public interface RegistryService {
     RegistrySet buildRegistrySet(Mode mode, Authentication access, Predicate<ComponentLocationAdapter> filterIn);
 
     /**
-     * Get a registry set based on a single directory.
+     * Get a registry set based on one or more source directories.
      *
      * This is intended for use in compiling modes where we want to limit our registry set to just
      * the local namespaces.
@@ -62,9 +63,7 @@ public interface RegistryService {
      * @param directory the directory to scan.
      * @return a Registry
      */
-    DefRegistry getRegistry(File directory);
-
-    DefRegistry getModulesRegistry(File directory); // remove?
+    DefRegistry getRegistry(List<File> directories);
 
     /**
      * Get a registry set based on a single registry.

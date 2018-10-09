@@ -40,7 +40,6 @@
         <ui:button aura:id="t3" class="button-set3" label="Set v.test3" buttonTitle="x" press="{!c.updateTest3}" />
 
         <div>
-            <module:marker></module:marker>
             <moduleTest:testCss></moduleTest:testCss>
             <moduleTest:schemaTest></moduleTest:schemaTest>
             <moduleTest:schemaLabel></moduleTest:schemaLabel>

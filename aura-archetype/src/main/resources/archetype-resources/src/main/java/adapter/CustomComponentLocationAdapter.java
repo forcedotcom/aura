@@ -12,6 +12,8 @@ import java.io.File;
 public class CustomComponentLocationAdapter extends ComponentLocationAdapter.Impl {
     public CustomComponentLocationAdapter() {
         super(new File(System.getProperty("custom.home"), "src/main/components"),
-                null, "custom-components");
+                "custom-components",
+                new File(System.getProperty("custom.home"), "src/main/modules"),
+                "custom-modules");
     }
 }

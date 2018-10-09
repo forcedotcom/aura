@@ -29,9 +29,12 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.PlatformDef;
+import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 /**
@@ -64,6 +67,11 @@ public class StaticDefRegistryImpl extends DefRegistryImpl {
     @SuppressWarnings("unchecked")
     public <D extends Definition> D getDef(DefDescriptor<D> descriptor) {
         return (D)defs.get(descriptor);
+    }
+
+    // TODO remove once no longer needed in RegistryServiceImpl W-5432127 W-5480526
+    public Map<DefDescriptor<?>, Definition> getDefs() {
+        return ImmutableMap.copyOf(defs);
     }
 
     public void setSourceLoader(SourceLoader sourceLoader) {
@@ -112,7 +120,7 @@ public class StaticDefRegistryImpl extends DefRegistryImpl {
     public boolean isCacheable() {
         return true;
     }
-    
+
     @Override
     public boolean isStatic() {
         return true;

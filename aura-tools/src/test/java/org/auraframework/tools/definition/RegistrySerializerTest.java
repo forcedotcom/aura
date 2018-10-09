@@ -17,8 +17,6 @@ package org.auraframework.tools.definition;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -32,9 +30,12 @@ import org.auraframework.util.IOUtil;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-
+/**
+ * TODO: these tests are kind of wack...
+ */
 public class RegistrySerializerTest extends UnitTestCase {
     @Inject
     private RegistryService registryService;
@@ -55,10 +56,14 @@ public class RegistrySerializerTest extends UnitTestCase {
         }
     }
 
-    private File createLoaderContents() throws Exception {
-        File tmpDir = new File(IOUtil.newTempDir("registrySerializerTest"));
+    private File createComponentSources() throws Exception {
+        return createComponentSources("test");
+    }
 
-        File testNamespace = new File(tmpDir, "test");
+    private File createComponentSources(String namespace) throws Exception {
+        File tmpDir = new File(IOUtil.newTempDir(getClass().getSimpleName()));
+
+        File testNamespace = new File(tmpDir, namespace);
 
         makeFile(testNamespace, "parent", ".cmp", "<aura:component />");
         makeFile(testNamespace, "anevent", ".evt", "<aura:event type='APPLICATION' />");
@@ -68,23 +73,27 @@ public class RegistrySerializerTest extends UnitTestCase {
     }
 
     @Test
-    public void testNullOutput() throws Exception {
-        RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter, null,
-                createLoaderContents(), null, null, contextService, false);
+    public void testNullOutputDir() throws Exception {
+        List<File> sources = Lists.newArrayList(createComponentSources());
+        File ouputDir = null;
+
+        RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
+               sources, ouputDir, null, null, contextService);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {
-            assertEquals(mee.getMessage(), RegistrySerializer.ERR_ARGS_REQUIRED);
+            assertEquals(mee.getMessage(), "Output Directory is required");
         }
     }
 
     @Test
-    public void testComponentDirIsFile() throws Exception {
+    public void testSourceDirIsFile() throws Exception {
         File dir = new File(IOUtil.newTempDir("componentDirIsFile"));
         File file = new File(dir, "foo");
         file.createNewFile();
+
         RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
-                file, createLoaderContents(), null, null, contextService, false);
+                ImmutableList.of(file), null, null, null, contextService);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {
@@ -95,9 +104,14 @@ public class RegistrySerializerTest extends UnitTestCase {
 
     @Test
     public void testOutputDirIsFile() throws Exception {
-        Path path = Files.createTempFile("badOutput", "foo");
+        List<File> sources = Lists.newArrayList(createComponentSources());
+
+        File dir = new File(IOUtil.newTempDir("outputDirIsFile"));
+        File file = new File(dir, "foo");
+        file.createNewFile();
+
         RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
-                createLoaderContents(), path.toFile(), null, null, contextService, false);
+                sources, file, null, null, contextService);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {
@@ -109,9 +123,9 @@ public class RegistrySerializerTest extends UnitTestCase {
     @Test
     public void testOutputValid() throws Exception {
         TestLogger logger = new TestLogger();
-        File compPath = createLoaderContents();
+        File compPath = createComponentSources();
         RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
-                compPath, compPath, null, logger, contextService, false);
+                ImmutableList.of(compPath), compPath, null, logger, contextService);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {
@@ -125,11 +139,11 @@ public class RegistrySerializerTest extends UnitTestCase {
     @Test
     public void testOutputInvalid() throws Exception {
         TestLogger logger = new TestLogger();
-        File compPath = createLoaderContents();
-        makeFile(new File(compPath, "testFail"), "broken", ".cmp", 
+        File compPath = createComponentSources();
+        makeFile(new File(compPath, "testFail"), "broken", ".cmp",
                 "<aura;component><aura:IDontExistReallyReally /></aura:component>");
         RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
-                compPath, compPath, null, logger, contextService, false);
+                ImmutableList.of(compPath), compPath, null, logger, contextService);
         RegistrySerializerException expected = null;
 
         try {
@@ -141,6 +155,27 @@ public class RegistrySerializerTest extends UnitTestCase {
         assertEquals("one or more errors occurred during compile", expected.getMessage());
         System.out.println(logger.getErrorLogEntries());
         assertEquals("There should be one error", 1, logger.getErrorLogEntries().size());
+    }
+
+     @Test
+    public void testMultipleSourceDirs() throws Exception {
+        TestLogger logger = new TestLogger();
+
+        File sourceDir1 = createComponentSources("foo");
+        File sourceDir2 = createComponentSources("bar");
+
+        List<File> sources = Lists.newArrayList(sourceDir1, sourceDir2);
+
+        RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
+                sources, sourceDir1, null, logger, contextService);
+        try {
+            rs.execute();
+        } catch (RegistrySerializerException mee) {
+            // Whoops.
+            System.out.println(logger.getLogEntries());
+            fail("Got exception "+mee.getMessage());
+        }
+        assertEquals("Error logs should be empty", 0, logger.getErrorLogEntries().size());
     }
 
     public enum LoggerLevel { ERROR, WARN, INFO, DEBUG};

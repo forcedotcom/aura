@@ -42,7 +42,9 @@ public interface BundleSource<D extends Definition> extends Source<D> {
     Map<DefDescriptor<?>,Source<?>> getBundledParts();
 
     // This is temporary while we create bundles.
-    Set<DefType> bundleDefTypes = new ImmutableSet.Builder<DefType>()
-        .add(DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT,
-                DefType.INTERFACE, DefType.LIBRARY, DefType.TOKENS, DefType.FLAVOR_BUNDLE).build();
+    Set<DefType> bundleDefTypes = new ImmutableSet.Builder<DefType>().add(
+            DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT,
+            DefType.INTERFACE, DefType.LIBRARY, DefType.TOKENS,
+            DefType.FLAVOR_BUNDLE, DefType.MODULE)
+            .build();
 }

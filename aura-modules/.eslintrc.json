@@ -13,6 +13,7 @@
                         "no-unused-vars" : [ "**/src/main/modules/module/marker/marker.js",
                             "**/src/test/modules/**/*.js",
                             "**/src/test/schemas/**/*.js" ],
+                        "lwc/no-compat-create": [ "**/aura-modules/src/test/modules/moduletest/auraInteropWrapper/auraInteropWrapper.js"],
                         "lwc/no-compat" : [ "**/aura-modules/src/test/modules/moduletest/importCmp/importCmp.js" ],
                         "lwc/no-compat-execute" : [ "**/aura-modules/src/test/modules/moduletest/exports/exports.js" ],
                         "lwc/no-compat-module-storage" : [ "**/aura-modules/src/test/modules/moduletest/importCmp/importCmp.js" ],

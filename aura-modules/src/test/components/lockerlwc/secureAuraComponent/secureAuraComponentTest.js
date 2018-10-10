@@ -87,21 +87,21 @@
             return cmp.testSecureLWC2SecureLWCCustomEvent();
         }
     },
-    testSecureLWC2SecureLWCDomEvent: {
-        test: function (cmp) {
-            return cmp.testSecureLWC2SecureLWCDomEvent();
-        }
-    },
+    // testSecureLWC2SecureLWCDomEvent: {
+    //     test: function (cmp) {
+    //         return cmp.testSecureLWC2SecureLWCDomEvent();
+    //     }
+    // },
     testSecureLWC2UnsecureLWCCustomEvent: {
         test: function (cmp) {
             return cmp.testSecureLWC2UnsecureLWCCustomEvent()
         }
     },
-    testSecureLWC2UnsecureLWCDOMEvent: {
-        test: function (cmp) {
-            cmp.testSecureLWC2UnsecureLWCDOMEvent();
-        }
-    },
+    // testSecureLWC2UnsecureLWCDOMEvent: {
+    //     test: function (cmp) {
+    //         cmp.testSecureLWC2UnsecureLWCDOMEvent();
+    //     }
+    // },
     testSecureLWC2SecureLWCCustomEventCrossNamespace: {
         test: function (cmp) {
             return cmp.testSecureLWC2SecureLWCCustomEventCrossNamespace();

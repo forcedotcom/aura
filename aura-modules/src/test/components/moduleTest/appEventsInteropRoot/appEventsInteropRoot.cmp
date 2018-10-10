@@ -1,0 +1,20 @@
+<aura:component implements="test:testAppEventPhasesHasLogId">
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" phase="capture"/>
+    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" phase="bubble"/>
+    <aura:import library="test:testAppEventPhasesLibrary" property="lib" />
+
+    <aura:attribute name="logId" type="String" default="Root" />
+    <aura:attribute name="slot" type="Aura.Component[]" />
+    <section>
+        <section style="border: 1px solid black; padding: 10px">
+            Root
+            <div aura:id="container">
+                {!v.slot} <!-- appEventsnterppContainer goes here (to test async behaviour) -->
+            </div>
+        </section>
+        <div class="logContainer">
+            <auraTest:logPanel aura:id="logPanel"/>
+        </div>
+    </section>
+</aura:component>

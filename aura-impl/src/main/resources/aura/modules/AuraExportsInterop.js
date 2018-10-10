@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+var INTEROP_FIND_OWNER = "aurainteropfindowner";
 Aura.ExportsModule = {
     "dispatchGlobalEvent": function (eventName, eventParams) {
         $A.clientService.setCurrentAccess($A.getRoot());
@@ -32,7 +34,8 @@ Aura.ExportsModule = {
      * @param {Object} params parameters to pass to the controller.
      * @return {Promise} promise that resolves when the action completes.
      */
-    "executeGlobalController": function (endpoint, params) {
+    "executeGlobalController": function (endpoint, params, options) {
+        var hotspot = options && options.hotspot;
         var controllerName = 'c.aura://' + endpoint;
         var action = $A.get(controllerName);
 
@@ -57,7 +60,15 @@ Aura.ExportsModule = {
                 resolve(response.getReturnValue());
             });
 
-            $A.run(function() { $A.enqueueAction(action); });
+            $A.run(function() {
+                if (hotspot) {
+                    $A.executeHotspot(function() {
+                        $A.enqueueAction(action);
+                    });
+                } else {
+                    $A.enqueueAction(action);
+                }
+            });
         });
     },
 
@@ -77,6 +88,10 @@ Aura.ExportsModule = {
     "sanitizeDOM": function (dirty, config) {
         return $A.util.sanitizeDOM(dirty, config);
     },
+
+    // -- Interop lifecycle methods --
+    "INTEROP_FIND_OWNER": INTEROP_FIND_OWNER,
+
     "createComponent" : function (componentName, attributes, callback) {
         $A.clientService.setCurrentAccess($A.getRoot());
         try {
@@ -86,5 +101,21 @@ Aura.ExportsModule = {
         } finally {
             $A.clientService.releaseCurrentAccess();
         }
+    },
+    "renderComponent": function (cmp, element) {
+        var interopCreateEvent = new CustomEvent(INTEROP_FIND_OWNER, {
+            "composed": true,
+            "bubbles": true,
+            "cancelable": false,
+            "detail": {
+                "claimOwnership": function (owner) {
+                    cmp.setAttributeValueProvider(owner);
+                }
+            }
+        });
+
+        element.dispatchEvent(interopCreateEvent);
+        $A.render(cmp, element);
+        $A.afterRender(cmp);
     }
 };

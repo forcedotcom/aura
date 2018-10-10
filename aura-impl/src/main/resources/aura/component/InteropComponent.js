@@ -481,6 +481,14 @@ InteropComponent.prototype.attachOnChangeToElement = function (element) {
     element.addEventListener('change', getWrappedInteropEventListener(handleInteropChange, element));
 };
 
+InteropComponent.prototype.attachInteropEvents = function (cmp, element) {
+    var findOwnerName = Aura.ExportsModule["INTEROP_FIND_OWNER"];
+    element.addEventListener(findOwnerName, function (event) {
+        event.stopPropagation();
+        event["detail"]["claimOwnership"](cmp);
+    });
+};
+
 /**
  * Render method for Interop components
  * In order to match the lifecycles in Aura and Interop, we need to create a dummy element
@@ -510,6 +518,7 @@ InteropComponent.prototype.setupInteropInstance = function () {
     var cmp = this;
     element.__customElement = 1;
     this.attachOnChangeToElement(element);
+    this.attachInteropEvents(cmp, element);
 
     Object.keys(this.attributes).forEach(function (attrName) {
         var value = cmp.get('v.' + attrName);
@@ -797,14 +806,6 @@ InteropComponent.prototype.getConcreteComponent = function(){
  */
 InteropComponent.prototype.isConcrete = function() {
     return true;
-};
-
-/**
- * @public
- * @export
- */
-InteropComponent.prototype.getEventDispatcher = function(){
-    this.raiseInvalidInteropApi('getEventDispatcher', arguments);
 };
 
 /**

@@ -16,5 +16,6 @@
 
 -->
 <aura:component implements="test:testAppEventPhasesHasLogId">
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <ui:button aura:id="button" press="{!c.fireEvent}" label="{!v.logId + ' Emitter'}"/> {#globalId}
 </aura:component>

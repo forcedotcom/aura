@@ -214,35 +214,35 @@
         }
     },
 
-    testSecureLWC2SecureLWCDomEvent: {
-        test: function (cmp) {
-            var module = cmp.find('parentSecure').getElement();
-            return module.testSecureLWC2SecureLWCDomEvent();
-        }
-    },
+    // testSecureLWC2SecureLWCDomEvent: {
+    //     test: function (cmp) {
+    //         var module = cmp.find('parentSecure').getElement();
+    //         return module.testSecureLWC2SecureLWCDomEvent();
+    //     }
+    // },
     testSecureLWC2UnsecureLWCCustomEvent: {
         test: function (cmp) {
             var module = cmp.find('parentSecure').getElement();
             return module.testSecureLWC2UnsecureLWCCustomEvent();
         }
     },
-    testSecureLWC2UnsecureLWCDOMEvent: {
-        test: function (cmp) {
-            var module = cmp.find('parentSecure').getElement();
-            var triggered = false;
-            module.testSecureLWC2UnsecureLWCDOMEvent(function () {
-                triggered = true;
-            });
+    // testSecureLWC2UnsecureLWCDOMEvent: {
+    //     test: function (cmp) {
+    //         var module = cmp.find('parentSecure').getElement();
+    //         var triggered = false;
+    //         module.testSecureLWC2UnsecureLWCDOMEvent(function () {
+    //             triggered = true;
+    //         });
 
-            $A.test.addWaitForWithFailureMessage(
-                true,
-                function () {
-                    return triggered;
-                },
-                'Event handler was not triggered by the LWC component'
-            );
-        }
-    },
+    //         $A.test.addWaitForWithFailureMessage(
+    //             true,
+    //             function () {
+    //                 return triggered;
+    //             },
+    //             'Event handler was not triggered by the LWC component'
+    //         );
+    //     }
+    // },
     testSecureLWC2SecureLWCCustomEventCrossNamespace: {
         test: function (cmp) {
             var module = cmp.find('parentSecure').getElement();

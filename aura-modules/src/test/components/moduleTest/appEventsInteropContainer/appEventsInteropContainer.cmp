@@ -1,0 +1,14 @@
+<aura:component implements="test:testAppEventPhasesHasLogId">
+    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" phase="capture"/>
+    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" phase="bubble"/>
+    <aura:import library="test:testAppEventPhasesLibrary" property="lib" />
+
+    <aura:attribute name="logId" type="String" default="Container" />
+
+    <section style="border: 1px solid black; padding: 10px">
+        Interop Container
+        <div>
+            <moduleTest:appEventsInteropWrapper/>
+        </div>
+    </section>
+</aura:component>

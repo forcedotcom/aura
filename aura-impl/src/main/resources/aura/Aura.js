@@ -234,7 +234,7 @@ function noop() {}
 
 //-- Module Exports ----------------------------------------------------------
 // #include aura.modules.AuraExportsServiceApi
-// #include aura.modules.AuraExportsCompat
+// #include aura.modules.AuraExportsInterop
 // #include aura.modules.AuraExportsStorage
 // #include aura.modules.AuraExportsLogger
 // #include aura.modules.AuraExportsAssert

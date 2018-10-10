@@ -76,7 +76,6 @@ import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraExecutionException;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil.JSONEscapedFunctionStringBuilder;
 import org.auraframework.util.javascript.Literal;
@@ -407,27 +406,12 @@ public class ServerServiceImpl implements ServerService {
 
         DefDescriptor<? extends BaseComponentDef> appDesc = context.getLoadingApplicationDescriptor();
 
-        final SVGDef svgDef;
-        final String uid;
-
-        // FIXME revert this once registries are combined
-        DefDescriptor<ModuleDef> moduleDesc = definitionService.getDefDescriptor(svg, DefDescriptor.MARKUP_PREFIX, ModuleDef.class);
-        if (definitionService.exists(moduleDesc)) {
-            ModuleDef moduleDef = definitionService.getDefinition(moduleDesc);
-            svgDef = moduleDef.getSVGDef();
-            if (svgDef == null) {
-                throw new DefinitionNotFoundException(svg);
-            }
-            definitionService.assertAccess(appDesc, svgDef);
-            uid = definitionService.getUid(null, moduleDesc);
-        } else {
-            svgDef = definitionService.getDefinition(svg);
-            // verify the app has access to the svg
-            definitionService.assertAccess(appDesc, svgDef);
-            uid = definitionService.getUid(null, svg);
-        }
+        // verify the app has access to the svg
+        final SVGDef svgDef = definitionService.getDefinition(svg);
+        definitionService.assertAccess(appDesc, svgDef);
 
         // svg uid
+        final String uid = definitionService.getUid(null, svg);
         keyBuilder.append(uid);
 
         final String key = keyBuilder.toString();

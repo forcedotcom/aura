@@ -25,12 +25,10 @@ import org.apache.http.HttpHeaders;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.SVGDef;
-import org.auraframework.def.module.ModuleDef;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
@@ -52,20 +50,8 @@ public class ResourceSvg extends AuraResourceImpl {
             if ((fqn == null) || fqn.isEmpty()) {
                 fqn = context.getApplicationDescriptor().getQualifiedName();
             }
-
-            DefDescriptor<SVGDef> svgDesc = definitionService.getDefDescriptor(fqn, SVGDef.class);
-            SVGDef def;
-
-            // FIXME: should be temporary until registries are combined
-            DefDescriptor<ModuleDef> moduleDesc = definitionService.getDefDescriptor(fqn, ModuleDef.class);
-            if (definitionService.exists(moduleDesc)) {
-                def = definitionService.getDefinition(moduleDesc).getSVGDef();
-                if (def == null) {
-                    throw new DefinitionNotFoundException(svgDesc);
-                }
-            } else {
-                def = definitionService.getDefinition(svgDesc);
-            }
+            DefDescriptor<SVGDef> svg = definitionService.getDefDescriptor(fqn, SVGDef.class);
+            SVGDef def = definitionService.getDefinition(svg);
 
             //Get the original etag if exists
             String etag = request.getHeader(HttpHeaders.IF_NONE_MATCH);
@@ -84,7 +70,7 @@ public class ResourceSvg extends AuraResourceImpl {
             }
             //finally add the etag to the header and write the image
             response.setHeader(HttpHeaders.ETAG, hash);
-            serverService.writeAppSvg(svgDesc, response.getWriter());
+            serverService.writeAppSvg(svg, response.getWriter());
         } catch (QuickFixException qfe) {
             servletUtilAdapter.handleServletException(qfe, true, context, request, response, false);
         }

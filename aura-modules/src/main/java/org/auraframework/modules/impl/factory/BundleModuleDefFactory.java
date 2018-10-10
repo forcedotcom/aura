@@ -147,6 +147,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         });
 
         ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
+        Map<DefDescriptor<?>, Definition> defMap = new HashMap<>();
 
         builder.setDescriptor(descriptor);
         builder.setTagName(descriptor.getDescriptorName());
@@ -225,9 +226,11 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                 @SuppressWarnings("unchecked")
                 SVGDef def = compilerService.compile(svgDesc, (Source<SVGDef>)svgSource);
                 builder.setSVGDef(def);
+                defMap.put(svgDesc, def);
             }
         }
 
+        builder.setBundledDefs(defMap);
         return builder.build();
     }
 

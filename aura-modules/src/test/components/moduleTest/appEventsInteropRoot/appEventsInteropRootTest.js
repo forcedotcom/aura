@@ -20,6 +20,7 @@
     },
     testInteropAppEventsSyncBetweenLWCandAura: {
         test : function(cmp) {
+            var finished = false;
             setTimeout($A.getCallback(function () {
                 var logger = cmp.find('logPanel');
                 var sources = cmp.sources; // cmp.sources on this root is populated via: testAppEventPhasesEmitterController init method
@@ -40,11 +41,17 @@
                 logger.clear();
 
                 this.assertsLogs(auraEventLogs, interopEventLogs);
+                finished = true;
             }.bind(this)), 10);
+
+            $A.test.addWaitFor(true, function() {
+                return finished;
+            });
         }
     },
     testInteropAppEventsAsyncBetweenLWCandAura: {
         test : function(cmp) {
+            var finished = false;
             setTimeout($A.getCallback(function () {
                 var logger = cmp.find('logPanel');
                 var sources = cmp.sources; // cmp.sources on this root is populated via: testAppEventPhasesEmitterController init method
@@ -65,7 +72,12 @@
                 logger.clear();
 
                 this.assertsLogs(auraEventLogs, interopAsyncEventLogs);
+                finished = true;
             }.bind(this)), 10);
+
+            $A.test.addWaitFor(true, function() {
+                return finished;
+            });
         }
     }
 })

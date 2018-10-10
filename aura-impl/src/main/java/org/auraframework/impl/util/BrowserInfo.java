@@ -47,8 +47,11 @@ import static org.auraframework.impl.util.UserAgent.OTHER_WEBKIT;
 import static org.auraframework.impl.util.UserAgent.SAFARI;
 import static org.auraframework.impl.util.UserAgent.VERSIONED_CUTOFF;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.impl.util.UserAgent.UA;
+
 
 // user-agent parser to provide browser information
 public class BrowserInfo {
@@ -629,5 +632,15 @@ public class BrowserInfo {
         // default
         return FormFactor.DESKTOP;
     }
+    
+    /** 
+     * @param userAgent
+     * @return true if request is from MobileSDK apps
+     */
+
+	public boolean isMobileSDK(String userAgent) {
+		Optional<MobileSDK> mobileSDK = MobileSDKParser.parse(userAgent);
+		return mobileSDK.isPresent();
+	}
 
 }

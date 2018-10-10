@@ -49,6 +49,8 @@ public class CSPInliningBrowserRule implements CSPInliningRule {
         isSupported |= bi.isBrowser(UserAgent.FIREFOX, 31, true);
         isSupported |= bi.isBrowser(UserAgent.SAFARI, 10, true); //covers mobile and desktop
         isSupported |= bi.isBrowser(UserAgent.OPERA, 23, true);
+        isSupported |= bi.isMobileSDK(userAgent);
+
 
         if (!isSupported){
             criteria.setMode(UNSUPPORTED);

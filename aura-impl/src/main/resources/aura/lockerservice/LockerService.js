@@ -128,6 +128,8 @@ function LockerService() {
                 "warn": warn,
                 "error": $A.auraError,
                 "unwrap": $A.componentService.moduleEngine && $A.componentService.moduleEngine["unwrap"],
+                "getComponentDef": $A.componentService.moduleEngine && $A.componentService.moduleEngine["getComponentDef"],
+                "getComponentConstructor": $A.componentService.moduleEngine && $A.componentService.moduleEngine["getComponentConstructor"],
                 "severity": $A.severity
             };
 

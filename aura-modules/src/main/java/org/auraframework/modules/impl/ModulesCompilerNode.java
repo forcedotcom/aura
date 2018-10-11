@@ -51,20 +51,6 @@ public final class ModulesCompilerNode implements ModulesCompiler {
         compiler = new LwcCompiler(factory);
     }
 
-    @Override
-    public ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
-        return this.compile(entry, sources, BundleType.internal, null, null);
-    }
-
-    @Override
-    public ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType) throws Exception {
-        return this.compile(entry, sources, bundleType, null, null);
-    }
-
-    @Override
-    public ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType, Map<String, String> namespaceMapping) throws Exception {
-        return this.compile(entry, sources, bundleType, namespaceMapping, null);
-    }
 
 	@Override
 	public ModulesCompilerData compile(String entry, Map<String, String> sources, BundleType bundleType,
@@ -76,15 +62,6 @@ public final class ModulesCompilerNode implements ModulesCompiler {
         Path nameSpacePath = path.getParent().getParent();
         String namespace = (nameSpacePath != null) ? nameSpacePath.getFileName().toString() : "";
         Path relativeBundlePath = Paths.get(namespace + "/" + name);
-
-        //If no configs are passed, we add all configs
-        if(configs == null || configs.size() == 0) {
-            configs = new ArrayList<>();
-            configs.add(ModulesCompilerUtil.createDevOutputConfig(bundleType));
-            configs.add(ModulesCompilerUtil.createProdOutputConfig(bundleType));
-            configs.add(ModulesCompilerUtil.createProdCompatOutputConfig(bundleType));
-            configs.add(ModulesCompilerUtil.createCompatOutputConfig(bundleType));
-        }
 
         // normalize sources to exclude file path
         Map<String, String> normalizedSources = new HashMap<>();

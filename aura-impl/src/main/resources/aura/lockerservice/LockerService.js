@@ -127,9 +127,11 @@ function LockerService() {
                 "isFrozenRealm": isFrozenRealm,
                 "warn": warn,
                 "error": $A.auraError,
+                // TODO: Remove 'unwrap' after changes on LockerService-Core side!
                 "unwrap": $A.componentService.moduleEngine && $A.componentService.moduleEngine["unwrap"],
-                "getComponentDef": $A.componentService.moduleEngine && $A.componentService.moduleEngine["getComponentDef"],
-                "getComponentConstructor": $A.componentService.moduleEngine && $A.componentService.moduleEngine["getComponentConstructor"],
+                "lwcUnwrap": $A.componentService.moduleEngine && $A.componentService.moduleEngine["unwrap"],
+                "lwcGetComponentDef": $A.componentService.moduleEngine && $A.componentService.moduleEngine["getComponentDef"],
+                "lwcGetComponentConstructor": $A.componentService.moduleEngine && $A.componentService.moduleEngine["getComponentConstructor"],
                 "severity": $A.severity
             };
 

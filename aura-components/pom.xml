@@ -160,12 +160,6 @@
                                         <exclude>**/.gitignore</exclude>
                                     </excludes>
                                 </resource>
-                                <resource>
-                                    <directory>target/src-gen/main/components</directory>
-                                    <includes>
-                                        <include>.index</include>
-                                    </includes>
-                                </resource>
                             </resources>
                             <outputDirectory>${project.build.outputDirectory}/${component.dir}</outputDirectory>
                         </configuration>
@@ -186,12 +180,6 @@
                                     <excludes>
                                         <exclude>**/.gitignore</exclude>
                                     </excludes>
-                                </resource>
-                                <resource>
-                                    <directory>target/src-gen/test/components</directory>
-                                    <includes>
-                                        <include>.index</include>
-                                    </includes>
                                 </resource>
                             </resources>
                             <outputDirectory>${project.build.testOutputDirectory}/${component.test.dir}</outputDirectory>
@@ -217,75 +205,6 @@
                             </resources>
                             <outputDirectory>${project.build.testOutputDirectory}/${component.negativetest.dir}</outputDirectory>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>index-components</id>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <target>
-                                <path id="definitions">
-                                    <fileset dir="src/main/components">
-                                        <include name="**/*.app" />
-                                        <include name="**/*.auradoc" />
-                                        <include name="**/*.cmp" />
-                                        <include name="**/*.css" />
-                                        <include name="**/*.design" />
-                                        <include name="**/*.evt" />
-                                        <include name="**/*.flavors" />
-                                        <include name="**/*.intf" />
-                                        <include name="**/*.js" />
-                                        <include name="**/*.lib" />
-                                        <include name="**/*.svg" />
-                                        <include name="**/*.tokens" />
-                                    </fileset>
-                                </path>
-                                <pathconvert property="definitionList" refid="definitions" pathsep=",">
-                                    <!-- Allow either slash (Windows actually uses both) -->
-                                    <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
-                                </pathconvert>
-                                <echo file="target/src-gen/main/components/.index">${definitionList}</echo>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>index-test-components</id>
-                        <phase>generate-test-resources</phase>
-                        <configuration>
-                            <target>
-                                <path id="definitions">
-                                    <fileset dir="src/test/components">
-                                        <include name="**/*.app" />
-                                        <include name="**/*.auradoc" />
-                                        <include name="**/*.cmp" />
-                                        <include name="**/*.css" />
-                                        <include name="**/*.design" />
-                                        <include name="**/*.evt" />
-                                        <include name="**/*.flavors" />
-                                        <include name="**/*.intf" />
-                                        <include name="**/*.js" />
-                                        <include name="**/*.lib" />
-                                        <include name="**/*.svg" />
-                                        <include name="**/*.tokens" />
-                                    </fileset>
-                                </path>
-                                <pathconvert property="definitionList" refid="definitions" pathsep=",">
-                                    <!-- Allow either slashes (Windows actually uses both) -->
-                                    <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
-                                </pathconvert>
-                                <echo file="target/src-gen/test/components/.index">${definitionList}</echo>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>

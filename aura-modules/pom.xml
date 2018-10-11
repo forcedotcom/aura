@@ -11,11 +11,8 @@
 
     <properties>
         <aura.home>${basedir}/..</aura.home>
-        <module.dir>modules_aura_modules</module.dir>
-        <component.dir>components_aura_modules</component.dir>
         <module.test.dir>modules_aura_modules_test</module.test.dir>
         <component.test.dir>components_aura_modules_test</component.test.dir>
-        <component.compile.phase>process-classes</component.compile.phase>
         <component.test.compile.phase>process-test-classes</component.test.compile.phase>
     </properties>
 
@@ -118,25 +115,6 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>compile-components</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <phase>${component.compile.phase}</phase>
-                        <configuration>
-                            <executable>${java.home}/bin/java</executable>
-                            <classpathScope>runtime</classpathScope>
-                            <arguments>
-                                <argument>-Daura.home=${basedir}/..</argument>
-                                <argument>-classpath</argument>
-                                <classpath />
-                                <argument>org.auraframework.tools.definition.AuraCompiler</argument>
-                                <argument>${basedir}/src/main/components,${basedir}/src/main/modules</argument>
-                                <argument>${project.build.outputDirectory}/${component.dir}</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>compile-test-components</id>
                         <goals>
                             <goal>exec</goal>
@@ -162,60 +140,6 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-modules</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/modules</directory>
-                                    <includes>
-                                        <include>**/*</include>
-                                    </includes>
-                                    <excludes>
-                                        <exclude>**/.gitignore</exclude>
-                                    </excludes>
-                                </resource>
-                                <resource>
-                                    <directory>target/src-gen/main/modules</directory>
-                                    <includes>
-                                        <include>.index</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                            <outputDirectory>${project.build.outputDirectory}/${module.dir}</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-components</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/components</directory>
-                                    <includes>
-                                        <include>**/*</include>
-                                    </includes>
-                                    <excludes>
-                                        <exclude>**/.gitignore</exclude>
-                                    </excludes>
-                                </resource>
-                                <resource>
-                                    <directory>target/src-gen/main/components</directory>
-                                    <includes>
-                                        <include>.index</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                            <outputDirectory>${project.build.outputDirectory}/${component.dir}</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>copy-test-modules</id>
                         <phase>process-test-resources</phase>
                         <goals>
@@ -231,12 +155,6 @@
                                     <excludes>
                                         <exclude>**/.gitignore</exclude>
                                     </excludes>
-                                </resource>
-                                <resource>
-                                    <directory>target/src-gen/test/modules</directory>
-                                    <includes>
-                                        <include>.index</include>
-                                    </includes>
                                 </resource>
                             </resources>
                             <outputDirectory>${project.build.testOutputDirectory}/${module.test.dir}</outputDirectory>
@@ -259,129 +177,9 @@
                                         <exclude>**/.gitignore</exclude>
                                     </excludes>
                                 </resource>
-                                <resource>
-                                    <directory>target/src-gen/test/components</directory>
-                                    <includes>
-                                        <include>.index</include>
-                                    </includes>
-                                </resource>
                             </resources>
                             <outputDirectory>${project.build.testOutputDirectory}/${component.test.dir}</outputDirectory>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <!-- generate .index file with modules in the jar (same logic as aura-components/pom.xml) -->
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>index-modules</id>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <target>
-                                <path id="definitions">
-                                    <fileset dir="src/main/modules">
-                                        <include name="**/*.html" />
-                                        <include name="**/*.js" />
-                                    </fileset>
-                                </path>
-                                <pathconvert property="definitionList" refid="definitions" pathsep=",">
-                                    <!-- Allow either slash (Windows actually uses both) -->
-                                    <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
-                                </pathconvert>
-                                <echo file="target/src-gen/main/modules/.index">${definitionList}</echo>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>index-components</id>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <target>
-                                <path id="definitions">
-                                    <fileset dir="src/main/components">
-                                        <include name="**/*.app" />
-                                        <include name="**/*.auradoc" />
-                                        <include name="**/*.cmp" />
-                                        <include name="**/*.css" />
-                                        <include name="**/*.design" />
-                                        <include name="**/*.evt" />
-                                        <include name="**/*.flavors" />
-                                        <include name="**/*.intf" />
-                                        <include name="**/*.js" />
-                                        <include name="**/*.lib" />
-                                        <include name="**/*.svg" />
-                                        <include name="**/*.tokens" />
-                                    </fileset>
-                                </path>
-                                <pathconvert property="definitionList" refid="definitions" pathsep=",">
-                                    <!-- Allow either slash (Windows actually uses both) -->
-                                    <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
-                                </pathconvert>
-                                <echo file="target/src-gen/main/components/.index">${definitionList}</echo>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>index-test-modules</id>
-                        <phase>generate-test-resources</phase>
-                        <configuration>
-                            <target>
-                                <path id="definitions">
-                                    <fileset dir="src/test/modules">
-                                        <include name="**/*.html" />
-                                        <include name="**/*.js" />
-                                    </fileset>
-                                </path>
-                                <pathconvert property="definitionList" refid="definitions" pathsep=",">
-                                    <!-- Allow either slash (Windows actually uses both) -->
-                                    <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
-                                </pathconvert>
-                                <echo file="target/src-gen/test/modules/.index">${definitionList}</echo>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>index-test-components</id>
-                        <phase>generate-test-resources</phase>
-                        <configuration>
-                            <target>
-                                <path id="definitions">
-                                    <fileset dir="src/test/components">
-                                        <include name="**/*.app" />
-                                        <include name="**/*.auradoc" />
-                                        <include name="**/*.cmp" />
-                                        <include name="**/*.css" />
-                                        <include name="**/*.design" />
-                                        <include name="**/*.evt" />
-                                        <include name="**/*.flavors" />
-                                        <include name="**/*.intf" />
-                                        <include name="**/*.js" />
-                                        <include name="**/*.lib" />
-                                        <include name="**/*.svg" />
-                                        <include name="**/*.tokens" />
-                                    </fileset>
-                                </path>
-                                <pathconvert property="definitionList" refid="definitions" pathsep=",">
-                                    <!-- Allow either slashes (Windows actually uses both) -->
-                                    <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
-                                </pathconvert>
-                                <echo file="target/src-gen/test/components/.index">${definitionList}</echo>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>

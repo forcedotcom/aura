@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-10-09
- * Version: 0.5.16
+ * Generated: 2018-10-10
+ * Version: 0.5.17
  */
 
 (function (exports) {
@@ -705,11 +705,12 @@ const rawToSecurePrimaryCacheByKey = new Map();
 // Map to store <key> to <Map of <raw> to <Secure> pairs>, will be used for raw objects that cannot be stored in a WeakMap, this is the secondary cache
 const rawToSecureSecondaryCacheByKey = new Map();
 const secureToRaw = new WeakMap();
-const opaqueSecure = new WeakMap();
 const objectToKeyedData = new WeakMap();
-const secureProxy = new WeakMap();
-const filteringProxy = new WeakMap();
-const secureFunction = new WeakMap();
+
+const opaqueSecure = new WeakSet();
+const secureProxy = new WeakSet();
+const filteringProxy = new WeakSet();
+const secureFunction = new WeakSet();
 
 const secureBlobTypes = new WeakMap();
 const secureFilesTypes = new WeakMap();
@@ -720,7 +721,7 @@ function getKey(thing) {
 }
 
 function isOpaque(st) {
-  return opaqueSecure.get(st) === true;
+  return opaqueSecure.has(st);
 }
 
 function setKey(thing, key) {
@@ -769,7 +770,7 @@ function verifyAccess(from, to, skipOpaque) {
 
 function getRef(st, key, skipOpaque) {
   const toKey = keychain.get(st);
-  if (toKey !== key || (skipOpaque && opaqueSecure.get(st))) {
+  if (toKey !== key || (skipOpaque && opaqueSecure.has(st))) {
     throw new Error(
       `Access denied: ${JSON.stringify({
         from: key,
@@ -791,7 +792,7 @@ function setRef(st, raw, key, isOpaque) {
   setKey(st, key);
   secureToRaw.set(st, raw);
   if (isOpaque) {
-    opaqueSecure.set(st, true);
+    opaqueSecure.add(st);
   }
 }
 
@@ -810,28 +811,28 @@ function setData(object, key, data) {
   keyedData.set(key, data);
 }
 
-function isProxy(st) {
-  return secureProxy.get(st) === true;
+function registerProxy(st) {
+  secureProxy.add(st);
 }
 
-function registerProxy(st) {
-  secureProxy.set(st, true);
+function isProxy(st) {
+  return secureProxy.has(st);
 }
 
 function registerFilteringProxy(st) {
-  filteringProxy.set(st, true);
+  filteringProxy.add(st);
 }
 
 function isFilteringProxy(st) {
-  return filteringProxy.get(st) === true;
+  return filteringProxy.has(st);
 }
 
 function registerSecureFunction(st) {
-  secureFunction.set(st, true);
+  secureFunction.add(st);
 }
 
 function isSecureFunction(st) {
-  return secureFunction.get(st) === true;
+  return secureFunction.has(st);
 }
 
 function registerSecureBlob(st, type) {
@@ -942,14 +943,29 @@ function getFromCache(raw, key) {
   return undefined;
 }
 
-function getRaw$1(so) {
+function getRawThis(so) {
   const raw = getRef(so, getKey(so));
-
   if (!raw) {
     throw new Error('Blocked attempt to invoke secure method with altered this!');
   }
-
   return raw;
+}
+
+function getRaw$1(value) {
+  if (isProxy(value)) {
+    const key = getKey(value);
+    const ref = getRef(value, key);
+    value = ref;
+  }
+  return value;
+}
+
+function getRawArray(arr) {
+  const result = [];
+  for (let i = 0; i < arr.length; i++) {
+    result.push(getRaw$1(arr[i]));
+  }
+  return result;
 }
 
 /*
@@ -1961,7 +1977,7 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
       }
       // Secure attributes
       const secureAttributes = [];
-      const raw = getRaw$1(this);
+      const raw = getRawThis(this);
       for (let i = 0; i < attributes.length; i++) {
         const attribute = attributes[i];
 
@@ -1999,7 +2015,8 @@ SecureScriptElement.run = function(st) {
     return;
   }
 
-  const el = getRaw$1(st);
+  // TODO:JS Revisit if right call
+  const el = getRawThis(st);
   document.head.appendChild(el);
 
   if (href && !(el instanceof SVGScriptElement)) {
@@ -2061,7 +2078,7 @@ const SecureIFrameElement = {
       focus: createFilteredMethodStateless('focus', prototype),
       contentWindow: {
         get: function() {
-          const raw = getRaw$1(this);
+          const raw = getRawThis(this);
           return raw.contentWindow
             ? SecureIFrameElement.SecureIFrameContentWindow(raw.contentWindow, getKey(this))
             : raw.contentWindow;
@@ -2070,7 +2087,7 @@ const SecureIFrameElement = {
       // Reason: [W-4437391] Cure53 Report SF-04-004: Window access via encoded path segments.
       src: {
         get: function() {
-          const raw = getRaw$1(this);
+          const raw = getRawThis(this);
           return raw.src;
         },
         set: function(url) {
@@ -2081,7 +2098,7 @@ const SecureIFrameElement = {
                 'SecureIframeElement.src supports http://, https:// schemes and relative urls.'
               );
             } else {
-              const raw = getRaw$1(this);
+              const raw = getRawThis(this);
               raw.src = urlString;
             }
           }
@@ -2247,7 +2264,7 @@ function getWrappedEvent(e, key) {
       `Received a wrapped event(key: ${getKey(e)}) from a different locker(key: ${key})`
     );
     // If the browser is calling your listener, then you have access to the event
-    e = getRaw$1(e);
+    e = getRawThis(e);
   }
   return SecureDOMEvent(e, key);
 }
@@ -2338,7 +2355,7 @@ function createAddEventListenerDescriptorStateless() {
       }
 
       const so = this;
-      const el = getRaw$1(so);
+      const el = getRawThis(so);
       const key = getKey(so);
 
       const sListener = getSecureListener(so, listener, key);
@@ -2359,7 +2376,7 @@ function createEventTargetMethodsStateless(config, prototype) {
   // was actually wired up originally
   config['removeEventListener'] = {
     value: function(type, listener, options) {
-      const raw = getRaw$1(this);
+      const raw = getRawThis(this);
       const sCallback = getFromCache(listener, getKey(this));
       raw.removeEventListener(type, sCallback, options);
     }
@@ -3969,11 +3986,11 @@ function SecureElement(el, key) {
           configurable: descriptor.configurable,
           enumerable: true,
           get: function() {
-            const rawEl = getRaw$1(this);
+            const rawEl = getRawThis(this);
             return filterEverything(this, rawEl[prop]);
           },
           set: function(value) {
-            const rawEl = getRaw$1(this);
+            const rawEl = getRawThis(this);
             rawEl[prop] = filterEverything(this, value);
           }
         });
@@ -3993,7 +4010,7 @@ function SecureElement(el, key) {
     defineProperties(prototype, {
       toString: {
         value: function() {
-          const e = getRaw$1(this);
+          const e = getRawThis(this);
           return `SecureElement: ${e}{ key: ${JSON.stringify(getKey(this))} }`;
         }
       }
@@ -4046,13 +4063,13 @@ function SecureElement(el, key) {
            *
            * https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#Differences_from_innerText
            */
-          const rawEl = getRaw$1(this);
+          const rawEl = getRawThis(this);
           const filtered = cloneFiltered(rawEl, o);
           const ret = filtered.innerText;
           return ret;
         },
         set: function(value) {
-          const raw = getRaw$1(this);
+          const raw = getRawThis(this);
           if (SecureElement.isSharedElement(raw)) {
             throw new error(
               `SecureElement.innerText cannot be used with ${raw.tagName} elements!`
@@ -4069,10 +4086,10 @@ function SecureElement(el, key) {
     if ('innerHTML' in el) {
       tagNameSpecificConfig['innerHTML'] = {
         get: function() {
-          return cloneFiltered(getRaw$1(this), o).innerHTML;
+          return cloneFiltered(getRawThis(this), o).innerHTML;
         },
         set: function(value) {
-          const raw = getRaw$1(this);
+          const raw = getRawThis(this);
           // Do not allow innerHTML on shared elements (body/head)
           if (SecureElement.isSharedElement(raw)) {
             throw new error(
@@ -4090,7 +4107,7 @@ function SecureElement(el, key) {
     if (tagName === 'LINK' && 'rel' in el) {
       tagNameSpecificConfig['rel'] = {
         get: function() {
-          const raw = getRaw$1(this);
+          const raw = getRawThis(this);
           return raw.rel;
         },
         set: function(value) {
@@ -4100,7 +4117,7 @@ function SecureElement(el, key) {
               "SecureLinkElement does not allow setting 'rel' property to 'import' value."
             );
           } else {
-            const raw = getRaw$1(this);
+            const raw = getRawThis(this);
             raw.rel = value;
           }
         }
@@ -4111,7 +4128,7 @@ function SecureElement(el, key) {
     if (tagName === '#text' && 'splitText' in el) {
       tagNameSpecificConfig['splitText'] = {
         value: function(index) {
-          const raw = getRaw$1(this);
+          const raw = getRawThis(this);
           const newNode = raw.splitText(index);
 
           const fromKey = getKey(raw);
@@ -4126,10 +4143,10 @@ function SecureElement(el, key) {
     if ('outerHTML' in el) {
       tagNameSpecificConfig['outerHTML'] = {
         get: function() {
-          return cloneFiltered(getRaw$1(this), o).outerHTML;
+          return cloneFiltered(getRawThis(this), o).outerHTML;
         },
         set: function(value) {
-          const raw = getRaw$1(this);
+          const raw = getRawThis(this);
           // Do not allow on shared elements (body/head)
           if (SecureElement.isSharedElement(raw)) {
             throw new error(
@@ -4168,7 +4185,7 @@ function SecureElement(el, key) {
     if (tagName === '#text' && 'splitText' in el) {
       tagNameSpecificConfig['splitText'] = {
         value: function(index) {
-          const raw = getRaw$1(this);
+          const raw = getRawThis(this);
           const newNode = raw.splitText(index);
 
           const fromKey = getKey(raw);
@@ -4196,7 +4213,7 @@ function SecureElement(el, key) {
             return undefined;
           }
 
-          const raw = getRaw$1(this);
+          const raw = getRawThis(this);
           const tbodyExists = !!getFirstTBody(raw);
           const newRow = raw.insertRow(index);
           trust$1(this, newRow);
@@ -4315,7 +4332,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
       writable: true,
       value: function(child) {
         if (!runIfRunnable(child)) {
-          const e = getRaw$1(this);
+          const e = getRawThis(this);
           e.appendChild(getRef(child, getKey(this), true));
         }
 
@@ -4327,7 +4344,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
       writable: true,
       value: function(newChild, oldChild) {
         if (!runIfRunnable(newChild)) {
-          const e = getRaw$1(this);
+          const e = getRawThis(this);
           const k = getKey(this);
           e.replaceChild(getRef(newChild, k, true), getRef(oldChild, k, true));
         }
@@ -4340,7 +4357,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
       writable: true,
       value: function(newNode, referenceNode) {
         if (!runIfRunnable(newNode)) {
-          const e = getRaw$1(this);
+          const e = getRawThis(this);
           const k = getKey(this);
           e.insertBefore(
             getRef(newNode, k, true),
@@ -4380,7 +4397,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
           }
         }
 
-        const e = getRaw$1(this);
+        const e = getRawThis(this);
         const root = e.cloneNode(deep);
 
         // Maintain the same ownership in the cloned subtree
@@ -4392,10 +4409,10 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
 
     textContent: {
       get: function() {
-        return cloneFiltered(getRaw$1(this), this).textContent;
+        return cloneFiltered(getRawThis(this), this).textContent;
       },
       set: function(value) {
-        const raw = getRaw$1(this);
+        const raw = getRawThis(this);
         if (SecureElement.isSharedElement(raw)) {
           throw new error(
             `SecureElement.textContent cannot be used with ${raw.tagName} elements!`
@@ -4411,7 +4428,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
     hasChildNodes: {
       value: function() {
         const { isAnLWCNode: isAnLWCNode$$1 } = lwcHelpers;
-        const raw = getRaw$1(this);
+        const raw = getRawThis(this);
         // If this is a shared element, delegate the call to the shared element, no need to check for access
         if (SecureElement.isSharedElement(raw) || isAnLWCNode$$1(raw)) {
           return raw.hasChildNodes();
@@ -4437,7 +4454,7 @@ SecureElement.addStandardElementMethodAndPropertyOverrides = function(
     querySelector: {
       writable: true,
       value: function(selector) {
-        const raw = getRaw$1(this);
+        const raw = getRawThis(this);
         return SecureElement.secureQuerySelector(raw, getKey(this), selector);
       }
     },
@@ -4445,7 +4462,7 @@ SecureElement.addStandardElementMethodAndPropertyOverrides = function(
     insertAdjacentHTML: {
       writable: true,
       value: function(position, text) {
-        const raw = getRaw$1(this);
+        const raw = getRawThis(this);
 
         // Do not allow insertAdjacentHTML on shared elements (body/head)
         if (SecureElement.isSharedElement(raw)) {
@@ -4583,7 +4600,7 @@ SecureElement.createAttributeAccessMethodConfig = function(
   return {
     writable: true,
     value: function() {
-      const raw = getRaw$1(this);
+      const raw = getRawThis(this);
       let args = slice(arguments);
 
       let name = args[namespaced ? 1 : 0];
@@ -5571,24 +5588,6 @@ function filterEverything(st, raw, options) {
 }
 
 function filterArguments(st, args, options) {
-  function getRaw$$1(v) {
-    if (isProxy(v)) {
-      const key = getKey(v);
-      const ref = getRef(v, key);
-      v = ref;
-    }
-
-    return v;
-  }
-
-  function getRawArray(v) {
-    const result = [];
-    for (let i = 0; i < v.length; i++) {
-      result.push(getRaw$$1(v[i]));
-    }
-    return result;
-  }
-
   args = slice(args);
 
   if (options && options.beforeCallback) {
@@ -5603,7 +5602,7 @@ function filterArguments(st, args, options) {
     const value = args[n];
     if (value) {
       if (rawArguments && typeof value === 'object') {
-        args[n] = isArray(value) ? getRawArray(value) : getRaw$$1(value);
+        args[n] = isArray(value) ? getRawArray(value) : getRaw$1(value);
       } else {
         args[n] = filterEverything(st, value, options);
       }
@@ -5628,10 +5627,8 @@ function convertSymbol(property) {
 
 const unfilteredConstructors = [Object, Array];
 
-const filteringProxyHandler = (function() {
-  function FilteringProxyHandler() {}
-
-  FilteringProxyHandler.prototype['get'] = function(target, property) {
+const filteringProxyHandler = freeze({
+  get(target, property) {
     const raw = getRef(target, getKey(target));
     const value = raw[property];
 
@@ -5644,9 +5641,9 @@ const filteringProxyHandler = (function() {
     }
 
     return filterEverything(target, value);
-  };
+  },
 
-  FilteringProxyHandler.prototype['set'] = function(target, property, value) {
+  set(target, property, value) {
     const raw = getRef(target, getKey(target));
 
     const filteredValue = value ? filterEverything(target, value) : value;
@@ -5654,44 +5651,44 @@ const filteringProxyHandler = (function() {
     raw[property] = filteredValue;
 
     return true;
-  };
+  },
 
   // These are all direct pass through methods to preserve the shape etc of the delegate
 
-  FilteringProxyHandler.prototype['getPrototypeOf'] = function(target) {
+  getPrototypeOf(target) {
     const raw = getRef(target, getKey(target));
     return Object.getPrototypeOf(raw);
-  };
+  },
 
-  FilteringProxyHandler.prototype['setPrototypeOf'] = function(target, prototype) {
+  setPrototypeOf(target, prototype) {
     const raw = getRef(target, getKey(target));
     return Object.setPrototypeOf(raw, prototype);
-  };
+  },
 
-  FilteringProxyHandler.prototype['has'] = function(target, property) {
+  has(target, property) {
     const raw = getRef(target, getKey(target));
     return property in raw;
-  };
+  },
 
-  FilteringProxyHandler.prototype['defineProperty'] = function(target, property, descriptor) {
+  defineProperty(target, property, descriptor) {
     const raw = getRef(target, getKey(target));
     defineProperty(raw, property, descriptor);
     return true;
-  };
+  },
 
-  FilteringProxyHandler.prototype['deleteProperty'] = function(target, property) {
+  deleteProperty(target, property) {
     const raw = getRef(target, getKey(target));
     delete target[property];
     delete raw[property];
     return true;
-  };
+  },
 
-  FilteringProxyHandler.prototype['ownKeys'] = function(target) {
+  ownKeys(target) {
     const raw = getRef(target, getKey(target));
     return Object.keys(raw);
-  };
+  },
 
-  FilteringProxyHandler.prototype['getOwnPropertyDescriptor'] = function(target, property) {
+  getOwnPropertyDescriptor(target, property) {
     // If the property is non-writable and non-configurable, there is nothing to do.
     const targetDescriptor = getOwnPropertyDescriptor(target, property);
     if (targetDescriptor && !targetDescriptor.configurable && !targetDescriptor.writable) {
@@ -5723,20 +5720,18 @@ const filteringProxyHandler = (function() {
     }
 
     return rawDescriptor;
-  };
+  },
 
-  FilteringProxyHandler.prototype['isExtensible'] = function(target) {
+  isExtensible(target) {
     const raw = getRef(target, getKey(target));
     return Object.isExtensible(raw);
-  };
+  },
 
-  FilteringProxyHandler.prototype['preventExtensions'] = function(target) {
+  preventExtensions(target) {
     const raw = getRef(target, getKey(target));
     return Object.preventExtensions(raw);
-  };
-
-  return freeze(new FilteringProxyHandler());
-})();
+  }
+});
 
 function createFilteringProxy(raw, key) {
   // Use a direct proxy on raw to a proxy on {} to avoid the Proxy invariants for non-writable, non-configurable properties
@@ -6546,7 +6541,7 @@ function createFilteredMethodStateless(methodName, prototype, options) {
     writable: true,
     value: function() {
       const st = this;
-      const raw = getRaw$1(st);
+      const raw = getRawThis(st);
 
       const filteredArgs = filterArguments(st, arguments, options);
       let fnReturnedValue = raw[methodName].apply(raw, filteredArgs);
@@ -6633,7 +6628,7 @@ function createFilteredPropertyStateless(propertyName, prototype, options) {
 
   descriptor.get = function() {
     const st = this;
-    const raw = getRaw$1(st);
+    const raw = getRawThis(st);
 
     let value = raw[propertyName];
 
@@ -7049,7 +7044,7 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
           if (valueOverride) {
             return valueOverride;
           }
-          const raw = getRaw$1(this);
+          const raw = getRawThis(this);
           return raw[name];
         },
         set: function(value) {
@@ -7063,7 +7058,7 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
           function() {
             return function() {
               const so = this;
-              const raw = getRaw$1(so);
+              const raw = getRawThis(so);
               const cls = raw[name];
 
               // TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
@@ -7084,11 +7079,11 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
     } else if (item.type === '@event') {
       descriptor = {
         get: function() {
-          return filterEverything(this, getRaw$1(this)[name]);
+          return filterEverything(this, getRawThis(this)[name]);
         },
 
         set: function(callback) {
-          const raw = getRaw$1(this);
+          const raw = getRawThis(this);
 
           // Insure that we pick up the current proxy for the raw object
           let key = getKey(raw);
@@ -7123,7 +7118,7 @@ function addPrototypeMethodsAndPropertiesStateless(
   prototypicalInstance,
   prototypeForValidation
 ) {
-  const rawPrototypicalInstance = getRaw$1(prototypicalInstance);
+  const rawPrototypicalInstance = getRawThis(prototypicalInstance);
   let prototype;
   const config = {};
 
@@ -9497,20 +9492,20 @@ function getWrappedTemplatePrototype() {
   const wrappedTemplatePrototype = create$1(getObjectLikeProto(), {
     toString: {
       value: function() {
-        const template = getRaw$1(this);
+        const template = getRawThis(this);
         return `SecureTemplate: ${template}{ key: ${JSON.stringify(getKey(this))} }`;
       }
     },
     querySelector: {
       value: function(selector) {
-        const template = getRaw$1(this);
+        const template = getRawThis(this);
         const node = template.querySelector(selector);
         return filterEverything(this, node);
       }
     },
     querySelectorAll: {
       value: function(selector) {
-        const template = getRaw$1(this);
+        const template = getRawThis(this);
         const rawNodeList = template.querySelectorAll(selector);
         return filterEverything(this, rawNodeList);
       }
@@ -9525,7 +9520,7 @@ function getWrappedTemplatePrototype() {
     removeEventListener: {
       writable: true,
       value: function(type, listener, options) {
-        const raw = getRaw$1(this);
+        const raw = getRawThis(this);
         const sCallback = getFromCache(listener, getKey(this));
         raw.removeEventListener(type, sCallback, options);
       }

@@ -33,7 +33,12 @@
 
         if (action === 'destroyPanel' && intf === 'ui:destroyPanel') {
             event.stopPropagation();
-            helper.destroyPanel(cmp, event.getParam('payload'));
+            // W-5194732 panelManage2 may receive ui:notify which should send to panel.
+            // Skip, If config doesn't provide panelInstance.
+            var config = event.getParam('payload');
+            if (config && config.panelInstance != null) {
+                helper.destroyPanel(cmp, config);
+            }            
         } else if (action === 'beforeShow' && intf === 'ui:panel') {
             helper.beforeShow(cmp, event.getParam('payload'));
         } else {

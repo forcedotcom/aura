@@ -33,7 +33,7 @@ public abstract class DefFactoryImpl<D extends Definition> implements DefFactory
 
     @Override
     public boolean exists(DefDescriptor<D> descriptor) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Checking exists on type: " + this.getClass().getCanonicalName() + ". For descriptor: " + descriptor.getQualifiedName());
     }
 
     @Override
@@ -43,12 +43,12 @@ public abstract class DefFactoryImpl<D extends Definition> implements DefFactory
 
     @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Attempting to find on type: " + this.getClass().getCanonicalName() + ". For matcher: " + matcher.toString());
     }
 
     @Override
     public Source<D> getSource(DefDescriptor<D> descriptor) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Attempting to getSource on type: " + this.getClass().getCanonicalName() + ". For descriptor: " + descriptor.getQualifiedName());
     }
 
     @Override

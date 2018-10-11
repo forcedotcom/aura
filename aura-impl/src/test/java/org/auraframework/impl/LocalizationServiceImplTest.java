@@ -15,21 +15,19 @@
  */
 package org.auraframework.impl;
 
-import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.time.format.DateTimeParseException;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
-import org.auraframework.impl.service.testdata.LocalizationServiceTestData;
+import javax.inject.Inject;
+
 import org.auraframework.service.LocalizationService;
 import org.auraframework.test.util.AuraTestCase;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
 import com.ibm.icu.text.NumberFormat;
@@ -45,93 +43,90 @@ public class LocalizationServiceImplTest extends AuraTestCase {
     /**
      * Tests to verify Date parser across different Locale
      */
-    @UnAdaptableTest("Date format on SFDC handles differently than standalone Aura, need to investigate")
     @Test
     public void testDateTimeParserChangeLocale() throws Exception {
-        // API: parseDate(String Date, Locale locale, TimeZone timeZone, int
-        // DateStyle)
+        // API: parseDate(String Date, Locale locale, TimeZone timeZone, int dateStyle)
         // Locale: English -> German
         {
             String expectedDE = "Dienstag, 31. Dezember 2222";
             String inputEN = "Tuesday, December 31, 2222";
-            Date dateEN = localizationService.parseDate(inputEN, Locale.ENGLISH, TimeZone.getTimeZone("PST"),
-                    DateFormat.FULL);
-            String actualEN = localizationService.formatDate(dateEN, Locale.GERMAN, TimeZone.getTimeZone("CEST"),
-                    DateFormat.FULL);
+            Date dateEN = localizationService.parseDate(inputEN, Locale.ENGLISH, TimeZone.getTimeZone("PST"), DateFormat.FULL);
+            String actualEN = localizationService.formatDate(dateEN, Locale.GERMAN, DateFormat.FULL, TimeZone.getTimeZone("CEST"));
 
             assertEquals("Failed to convert date from English to German locale", expectedDE, actualEN);
         }
         // Locale: English -> Simplified Chinese
         {
-            String expectedZH = DateFormat.getDateInstance(1, Locale.SIMPLIFIED_CHINESE).format(
-                    new Date(16730265600000L));
+            String expectedZH = "2500年2月28日";
             String inputEN = "February 28, 2500";
-            Date dateEN = localizationService.parseDate(inputEN, Locale.ENGLISH, TimeZone.getTimeZone("PST"),
-                    DateFormat.LONG);
-            String actualZH = localizationService.formatDate(dateEN, Locale.SIMPLIFIED_CHINESE,
-                    TimeZone.getTimeZone("PST"), DateFormat.LONG);
+            Date dateEN = localizationService.parseDate(inputEN, Locale.ENGLISH, TimeZone.getTimeZone("PST"), DateFormat.LONG);
+            String actualZH = localizationService.formatDate(dateEN, Locale.SIMPLIFIED_CHINESE, DateFormat.LONG, TimeZone.getTimeZone("PST"));
             assertEquals("Failed to convert date from English to Simplified Chinese locale", expectedZH, actualZH);
         }
         // Locale: English -> Arabic
         {
-            String expectedSA = DateFormat.getDateInstance(DateFormat.FULL, new Locale("ar", "SA")).format(
-                    new Date(1298880000000L));
+            String expectedSA = "الاثنين، ٢٥ ربيع الأول ١٤٣٢ هـ";
             String inputEN = "Monday, February 28, 2011";
-            Date dateEN = localizationService.parseDate(inputEN, Locale.ENGLISH, TimeZone.getTimeZone("PST"),
-                    DateFormat.FULL);
-            String actualSA = localizationService.formatDate(dateEN, new Locale("ar", "SA"),
-                    TimeZone.getTimeZone("PST"), DateFormat.FULL);
+            Date dateEN = localizationService.parseDate(inputEN, Locale.ENGLISH, TimeZone.getTimeZone("PST"), DateFormat.FULL);
+            String actualSA = localizationService.formatDate(dateEN, new Locale("ar", "SA"), DateFormat.FULL, TimeZone.getTimeZone("PST"));
             assertEquals("Failed to convert date from English to Arabic locale", expectedSA, actualSA);
         }
     }
 
     @Test
-    public void testDateTimeParserBorderCases() {
-        for (String dt : LocalizationServiceTestData.PASS_DATE_STRINGS) {
-            try {
-                localizationService.parseDate(dt, Locale.ENGLISH, TimeZone.getTimeZone("PST"), DateFormat.LONG);
-            } catch (Exception e) {
-                fail("Failed to parse valid date \'" + dt + "\', error: " + e);
-            }
+    public void testDateTimeParser() {
+        String dateString = "January 1, 2000";
+        Locale locale = Locale.ENGLISH;
+        TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
+        Calendar calendar = Calendar.getInstance(timeZone, locale);
+        calendar.clear();
+        calendar.set(2000, 0, 1);
+        Date expected = calendar.getTime();
+
+        Date actual = localizationService.parseDate(dateString, locale, timeZone, DateFormat.LONG);
+        assertEquals("Found expected parsed date.", expected, actual);
+    }
+
+    @Test
+    public void testDateTimeParserForLeapYear() {
+        String dateString = "February 29, 2008";
+        Locale locale = Locale.ENGLISH;
+        TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
+        Calendar calendar = Calendar.getInstance(timeZone, locale);
+        calendar.clear();
+        calendar.set(2008, 1, 29);
+        Date expected = calendar.getTime();
+
+        Date actual = localizationService.parseDate(dateString, locale, timeZone, DateFormat.LONG);
+        assertEquals("Found expected parsed date.", expected, actual);
+    }
+
+    @Test
+    public void testDateTimeParserExceptionsForInvalidMediumDateString() {
+        String invalidMediumDateString = "2012/01/40";
+        try {
+            localizationService.parseDate(invalidMediumDateString, Locale.ENGLISH, TimeZone.getTimeZone("PST"), DateFormat.MEDIUM);
+            fail("No Exception thrown when trying to parse \'" + invalidMediumDateString + "\' into Date");
+        } catch (Exception e) {
+            String expectedMessage = String.format("\'%s\' could not be parsed", invalidMediumDateString);
+            checkExceptionContains(e, DateTimeParseException.class, expectedMessage);
         }
     }
 
-    // TODO(W-1482880): Change how Exceptions are handled after bug is fixed. We
-    // should just be catching the Exception
-    // type we expect and letting the others be thrown. This will either be
-    // ParseExceptions from AuraNumberFormat.parse(...) or
-    // IllegalArgumentExceptions from DateServiceImpl.getDateTimeStyleConverter(...)
-    // or DateServiceImpl.JodaDateConverter.parse(...)
-    // same thing apply to any call of LocalizationService.parseDate(...), parseTime(...),
-    // parseDateTime(...), formatDate(...), formatTime(...), formatDateTime(...)
-    //TODO: W-2603913
-    @UnAdaptableTest("Date format on SFDC handles differently than standalone Aura, need to investigate")
     @Test
-    public void testDateTimeParserExceptions() throws IllegalArgumentException {
-        // Test invalid date strings in format DateFormat.MEDIUM
-        {
-            for (String dt : LocalizationServiceTestData.FAIL_DATE_STRINGS_MEDIUM_FORMAT) {
-                try {
-                    localizationService.parseDate(dt, Locale.ENGLISH, TimeZone.getTimeZone("PST"), DateFormat.MEDIUM);
-                    fail("No Exception thrown when trying to parse \'" + dt + "\' into Date");
-                } catch (Exception e) {
-                    // Expected
-                }
-            }
+    public void testDateTimeParserExceptionsForInvalidShortDateString() {
+        String invalidShortDateString = "January 4, 2012";
+        try {
+            localizationService.parseDate(invalidShortDateString, Locale.ENGLISH, TimeZone.getTimeZone("PST"), DateFormat.SHORT);
+            fail("No Exception thrown when trying to parse \'" + invalidShortDateString + "\' into Date");
+        } catch (Exception e) {
+            String expectedMessage = String.format("\'%s\' could not be parsed", invalidShortDateString);
+            checkExceptionContains(e, DateTimeParseException.class, expectedMessage);
         }
+    }
 
-        // Test invalid date strings in format DateFormat.SHORT
-        {
-            for (String dt : LocalizationServiceTestData.FAIL_DATE_STRINGS_SHORT_FORMAT) {
-                try {
-                    localizationService.parseDate(dt, Locale.ENGLISH, TimeZone.getTimeZone("PST"), DateFormat.SHORT);
-                    fail("No Exception thrown when trying to parse \'" + dt + "\' into Date");
-                } catch (Exception e) {
-                    // Expected
-                }
-            }
-        }
-
+    @Test
+    public void testDateTimeParserExceptions() {
         // Test date in English to parser with German locale
         {
             String EN_DATE_STRING = "Tuesday, December 31, 2222";
@@ -169,20 +164,15 @@ public class LocalizationServiceImplTest extends AuraTestCase {
         }
     }
 
-    // TODO(W-1482880): same as testDateTimeParserExceptions()
     @Test
     public void testParseTimeParserExceptions() throws ParseException {
-        // Test invalid time strings
-        {
-            for (String t : LocalizationServiceTestData.FAIL_TIME_STRINGS) {
-                try {
-                    localizationService.parseTime(t, Locale.ENGLISH, TimeZone.getTimeZone("PST"), DateFormat.FULL);
-                    fail("No Exception thrown when trying to parse \'" + t + "\' into Time");
-                } catch (Exception e) {
-                    // Expected
-                    assertTrue("# Incorrect exception type!", ((e instanceof DateTimeParseException)));
-                }
-            }
+        String invalidTimeString = "xx:xx:0x PM";
+        try {
+            localizationService.parseDate(invalidTimeString, Locale.ENGLISH, TimeZone.getTimeZone("PST"), DateFormat.SHORT);
+            fail("No Exception thrown when trying to parse \'" + invalidTimeString + "\' into Date");
+        } catch (Exception e) {
+            String expectedMessage = String.format("\'%s\' could not be parsed", invalidTimeString);
+            checkExceptionContains(e, DateTimeParseException.class, expectedMessage);
         }
     }
 
@@ -370,17 +360,13 @@ public class LocalizationServiceImplTest extends AuraTestCase {
 
     @Test
     public void testPercentParserExceptions() throws ParseException {
-        // Test invalid Percent strings
-        {
-            for (String per : LocalizationServiceTestData.FAIL_PERCENT_STRINGS) {
-                try {
-                    localizationService.parsePercent(per, Locale.FRENCH);
-                    fail("No Exception thrown when trying to parse \'" + per + "\' into Percentage");
-                } catch (Exception e) {
-                    // Expected error from AuraNumberformat.parse(...)
-                    checkExceptionFull(e, ParseException.class, getErrorMsg(per));
-                }
-            }
+        String invalidPercentString = "%f";
+        try {
+            localizationService.parsePercent(invalidPercentString, Locale.FRENCH);
+            fail("No Exception thrown when trying to parse \'" + invalidPercentString + "\' into Percentage");
+        } catch (Exception e) {
+            String expectedMessage = "Unparseable number: \"" + invalidPercentString + "\"";
+            checkExceptionFull(e, ParseException.class, expectedMessage);
         }
     }
 
@@ -388,14 +374,13 @@ public class LocalizationServiceImplTest extends AuraTestCase {
     public void testCurrencyParserExceptions() throws ParseException {
         // Test invalid Currency strings
         {
-            for (String curr : LocalizationServiceTestData.FAIL_CURRENCY_STRINGS) {
-                try {
-                    localizationService.parseCurrency(curr, Locale.US);
-                    fail("No Exception thrown when trying to parse \'" + curr + "\' into Currency");
-                } catch (Exception e) {
-                    // Expected error from AuraNumberformat.parse(...)
-                    checkExceptionFull(e, ParseException.class, getErrorMsg(curr));
-                }
+            String currencyJPY = "￥9,990.00";
+            try {
+                localizationService.parseCurrency(currencyJPY, Locale.US);
+                fail("No Exception thrown when trying to parse \'" + currencyJPY + "\' into Currency");
+            } catch (Exception e) {
+                String expectedMessage = "Unparseable number: \"" + currencyJPY + "\"";
+                checkExceptionFull(e, ParseException.class, expectedMessage);
             }
         }
 
@@ -406,8 +391,8 @@ public class LocalizationServiceImplTest extends AuraTestCase {
                 localizationService.parseCurrency(inputCN, Locale.UK);
                 fail("# Exception not thrown for currency:" + inputCN);
             } catch (Exception e) {
-                // Expected error from AuraNumberformat.parse(...)
-                checkExceptionFull(e, ParseException.class, getErrorMsg(inputCN));
+                String expectedMessage = "Unparseable number: \"" + inputCN + "\"";
+                checkExceptionFull(e, ParseException.class, expectedMessage);
             }
         }
 
@@ -418,149 +403,58 @@ public class LocalizationServiceImplTest extends AuraTestCase {
                 localizationService.parseCurrency(inputCN, new Locale("pt", "BR"));
                 fail("# Exception not thrown for currency:" + inputCN);
             } catch (Exception e) {
-                // Expected error from AuraNumberformat.parse(...)
-                checkExceptionFull(e, ParseException.class, getErrorMsg(inputCN));
+                String expectedMessage = "Unparseable number: \"" + inputCN + "\"";
+                checkExceptionFull(e, ParseException.class, expectedMessage);
             }
         }
     }
 
     @Test
     public void testIntParserExceptions() throws ParseException {
-        // Test invalid Int strings
-        {
-            for (String num : LocalizationServiceTestData.FAIL_INT_STRINGS) {
-                try {
-                    localizationService.parseInt(num);
-                    fail("No Exception thrown when trying to parse \'" + num + "\' into int");
-                } catch (Exception e) {
-                    // Expected error from AuraNumberformat.parse(...)
-                    checkExceptionFull(e, ParseException.class, getErrorMsg(num));
-                }
-            }
+        String overflowNumberString = "987654321987654321";
+        try {
+            localizationService.parseInt(overflowNumberString);
+            fail("No Exception thrown when trying to parse \'" + overflowNumberString + "\' into int");
+        } catch (Exception e) {
+            String expectedMessage = "Unparseable number: \"" + overflowNumberString + "\"";
+            checkExceptionFull(e, ParseException.class, expectedMessage);
         }
     }
 
     @Test
     public void testLongParserExceptions() throws ParseException {
-        // Test invalid Long strings
-        {
-            for (String num : LocalizationServiceTestData.FAIL_LONG_STRINGS) {
-                try {
-                    localizationService.parseLong(num);
-                    fail("No Exception thrown when trying to parse \'" + num + "\' into long");
-                } catch (Exception e) {
-                    // Expected error from AuraNumberformat.parse(...)
-                    checkExceptionFull(e, ParseException.class, getErrorMsg(num));
-                }
-            }
+        String overflowNumberString = "987654321987654321987654321987654321987654321987654321";
+        try {
+            localizationService.parseLong(overflowNumberString);
+            fail("No Exception thrown when trying to parse \'" + overflowNumberString + "\' into long");
+        } catch (Exception e) {
+            String expectedMessage = "Unparseable number: \"" + overflowNumberString + "\"";
+            checkExceptionFull(e, ParseException.class, expectedMessage);
         }
     }
 
     @Test
     public void testFloatParserExceptions() throws ParseException {
-        // Test invalid Float strings
-        {
-            for (String num : LocalizationServiceTestData.FAIL_FLOAT_STRINGS) {
-                try {
-                    localizationService.parseFloat(num);
-                    fail("No Exception thrown when trying to parse \'" + num + "\' into float");
-                } catch (Exception e) {
-                    // Expected error from AuraNumberformat.parse(...)
-                    checkExceptionFull(e, ParseException.class, getErrorMsg(num));
-                }
-            }
+        String invalidFloatString = "F";
+        try {
+            localizationService.parseFloat(invalidFloatString);
+            fail("No Exception thrown when trying to parse \'" + invalidFloatString + "\' into float");
+        } catch (Exception e) {
+            String expectedMessage = "Unparseable number: \"" + invalidFloatString + "\"";
+            checkExceptionFull(e, ParseException.class, expectedMessage);
         }
     }
 
     @Test
     public void testDoubleParserExceptions() throws ParseException {
-        // Test invalid Double strings
-        {
-            for (String num : LocalizationServiceTestData.FAIL_DOUBLE_STRINGS) {
-                try {
-                    localizationService.parseDouble(num);
-                    fail("No Exception thrown when trying to parse \'" + num + "\' into double");
-                } catch (Exception e) {
-                    // Expected error from AuraNumberformat.parse(...)
-                    checkExceptionFull(e, ParseException.class, getErrorMsg(num));
-                }
-            }
+        String overflowNumberString = "917976931348623157000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        try {
+            localizationService.parseDouble(overflowNumberString);
+            fail("No Exception thrown when trying to parse \'" + overflowNumberString + "\' into double");
+        } catch (Exception e) {
+            String expectedMessage = "Unparseable number: \"" + overflowNumberString + "\"";
+            checkExceptionFull(e, ParseException.class, expectedMessage);
         }
     }
 
-    /**
-     * Test decimal parsing with delimiters in incorrect places.
-     */
-    @Test
-    public void testBigNumberParsing() {
-        Map<Locale, String[]> testNumbers = new HashMap<>();
-        Map<Locale, String[]> testNumbersExpected = new HashMap<>();
-
-        testNumbers.put(Locale.ENGLISH, new String[] { "1,23", "12,34", "1,23.45", "1,23,45.67", "1,234" });
-        testNumbersExpected.put(Locale.ENGLISH, new String[] { "123", "1234", "123.45", "12345.67", "1234" });
-
-
-        testNumbers.put(Locale.FRANCE, new String[] { "1.23", "12.34", "1.23,45", "1.23.45,67", "1.234" });
-        testNumbersExpected.put(Locale.FRANCE, new String[] { "123", "1234", "123.45", "12345.67", "1234" });
-
-        doBigNumberParsingTest(testNumbers, testNumbersExpected, false);
-    }
-
-    /**
-     * Test decimal parsing with delimiters and passing the strict flag. Should get exceptions thrown because
-     * delimiters are in the wrong place.
-     */
-    @Test
-    public void testStrictBigNumberParsing() {
-        Map<Locale, String[]> testNumbers = new HashMap<>();
-
-        testNumbers.put(Locale.ENGLISH, new String[] { "1,23", "12,34", "1,23.45", "1,23,45.67" });
-        testNumbers.put(Locale.FRANCE, new String[] { "1.23", "12.34", "1.23,45", "1.23.45,67", });
-
-        // expect errors to be thrown.
-        doBigNumberParsingTest(testNumbers, null, true);
-    }
-
-    private void doBigNumberParsingTest(Map<Locale, String[]> testNumbers,
-            Map<Locale, String[]> testNumbersExpected, boolean isStrict) {
-        LocalizationServiceImpl ls = new LocalizationServiceImpl();
-        String[] testNums = {};
-        String[] testNumsExpected = {};
-
-        for (Locale locale : testNumbers.keySet()) {
-            testNums = testNumbers.get(locale);
-            if (testNumbersExpected != null) {
-                testNumsExpected = testNumbersExpected.get(locale);
-            } else {
-                testNumsExpected = new String[testNums.length];
-            }
-
-            for (int i=0; i<testNums.length; i++) {
-                String num = testNums[i];
-                String expected = testNumsExpected[i];
-
-                try {
-                    String actual = ls.parseBigDecimal(num, locale, isStrict).toString();
-                    if (isStrict) {
-                        fail("Should have gotten an exception for: " + locale + " - " + num + " - " + isStrict);
-                    } else {
-                        assertEquals("Number is not formated correctly for " + locale, expected, actual);
-                    }
-                } catch (Exception e) {
-                    if (isStrict) {
-                        checkExceptionFull(e, ParseException.class, getErrorMsg(num));
-                    } else {
-                        fail("Should NOT have gotten an exception for: " + locale + " - " + num + " - " + isStrict);
-                    }
-                }
-            }
-        }
-    }
-
-    /*
-     * return error message we are expecting, throw by parse() in AuraNumberFormat.java
-     */
-    public String getErrorMsg(String num) {
-        return "Unparseable number: \""+num+"\"";
-    }
 }

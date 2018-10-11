@@ -414,8 +414,8 @@ public class ConverterServiceIntegrationTest extends IntegrationTestCase {
         c3.setTimeInMillis(12345678901234L);
 
         c4 = Calendar.getInstance();
-        String s4 =  "2018-08-23T23:33:53.404Z";
-        c4.setTimeInMillis(AuraDateUtil.isoToLong(s4).longValue());
+        String s4 = "2018-08-23T23:33:53.404Z";
+        c4.setTime(AuraDateUtil.isoToDate(s4));
         runPassPairs(Calendar.class, new Object[] { "1234", c1, "-1234", c2, "12345678901234", c3, s4, c4}, false);
     }
 

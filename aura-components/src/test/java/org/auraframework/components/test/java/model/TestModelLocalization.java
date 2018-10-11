@@ -32,7 +32,6 @@ import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.components.ui.InputOption;
 import org.auraframework.ds.servicecomponent.ModelInstance;
-import org.auraframework.impl.service.testdata.LocalizationServiceTestData;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.date.DateOnly;
@@ -450,7 +449,7 @@ public class TestModelLocalization implements ModelInstance {
 
         for (int i = 0; i < dates.length; i++) {
             Calendar c = Calendar.getInstance();
-            c.setTime(LocalizationServiceTestData.DATES[i]);
+            c.setTime(dates[i]);
             times.add(c);
         }
 

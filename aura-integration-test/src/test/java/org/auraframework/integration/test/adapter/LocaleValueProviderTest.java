@@ -207,9 +207,6 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
         localeProperties.put(LocaleValueProvider.DECIMAL, ",");
         localeProperties.put(LocaleValueProvider.NUMBER_FORMAT, "#,##0.###");
         localeProperties.put(LocaleValueProvider.PERCENT_FORMAT, "#,##0%");
-        localeProperties.put(LocaleValueProvider.DATE_FORMAT, "dd MMM yyyy");
-        localeProperties.put(LocaleValueProvider.TIME_FORMAT, "h:mm:ss a");
-        localeProperties.put(LocaleValueProvider.DATETIME_FORMAT, "dd MMM yyyy h:mm:ss a");
         localeProperties.put(LocaleValueProvider.LANGUAGE_LOCALE, "en_ZA");
         localeProperties.put(LocaleValueProvider.ZERO_DIGIT, "0");
         return;
@@ -223,9 +220,6 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
         localeProperties.put(LocaleValueProvider.DECIMAL, ",");
         localeProperties.put(LocaleValueProvider.NUMBER_FORMAT, "#,##0.###");
         localeProperties.put(LocaleValueProvider.PERCENT_FORMAT, "#,##0 %");
-        localeProperties.put(LocaleValueProvider.DATE_FORMAT, "d MMM yyyy");
-        localeProperties.put(LocaleValueProvider.TIME_FORMAT, "HH:mm:ss");
-        localeProperties.put(LocaleValueProvider.DATETIME_FORMAT, "d MMM yyyy HH:mm:ss");
         localeProperties.put(LocaleValueProvider.LANGUAGE_LOCALE, "fr_FR");
         localeProperties.put(LocaleValueProvider.ZERO_DIGIT, "0");
         return;
@@ -239,9 +233,6 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
          localeProperties.put(LocaleValueProvider.DECIMAL, ".");
          localeProperties.put(LocaleValueProvider.NUMBER_FORMAT, "#,##0.###");
          localeProperties.put(LocaleValueProvider.PERCENT_FORMAT, "#,##0%");
-         localeProperties.put(LocaleValueProvider.DATE_FORMAT, "MMM d, yyyy");
-         localeProperties.put(LocaleValueProvider.TIME_FORMAT, "h:mm:ss a");
-         localeProperties.put(LocaleValueProvider.DATETIME_FORMAT, "MMM d, yyyy h:mm:ss a");
          localeProperties.put(LocaleValueProvider.LANGUAGE_LOCALE, "en_US");
          localeProperties.put(LocaleValueProvider.ZERO_DIGIT, "0");
         return;
@@ -255,9 +246,6 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
         localeProperties.put(LocaleValueProvider.DECIMAL, ".");
         localeProperties.put(LocaleValueProvider.NUMBER_FORMAT, "#,##0.###");
         localeProperties.put(LocaleValueProvider.PERCENT_FORMAT, "#,##0%");
-        localeProperties.put(LocaleValueProvider.DATE_FORMAT, "d-MMM-yyyy");
-        localeProperties.put(LocaleValueProvider.TIME_FORMAT, "h:mm:ss a");
-        localeProperties.put(LocaleValueProvider.DATETIME_FORMAT, "d-MMM-yyyy h:mm:ss a");
         localeProperties.put(LocaleValueProvider.LANGUAGE_LOCALE, "en_CA");
         localeProperties.put(LocaleValueProvider.ZERO_DIGIT, "0");
         localeProperties.put(LocaleValueProvider.CURRENCY_CODE, "CAD");

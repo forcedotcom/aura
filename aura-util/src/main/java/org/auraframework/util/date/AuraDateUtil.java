@@ -19,11 +19,8 @@ import java.util.Date;
 
 public class AuraDateUtil {
 
-    public static Long isoToLong(String isoDateString) {
-        Date date = isoToDate(isoDateString);
-        return (date != null) ? date.getTime() : null;
-    }
 
+    // TODO: Moving this to LocalizationSerivceImpl
     public static Date isoToDate(String isoDateString) {
         if (isoDateString == null || isoDateString.isEmpty()) {
             return null;

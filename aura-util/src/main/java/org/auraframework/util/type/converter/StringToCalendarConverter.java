@@ -21,6 +21,7 @@ import org.auraframework.util.type.Converter;
 import org.springframework.context.annotation.Lazy;
 
 import java.util.Calendar;
+import java.util.Date;
 
 
 /**
@@ -35,18 +36,20 @@ public class StringToCalendarConverter implements Converter<String, Calendar> {
         if (value == null || value.isEmpty()) {
             return null;
         }
-        Long milliseconds;
+
+        Calendar calendar = Calendar.getInstance();
         try {
-            milliseconds = Long.valueOf(value);
+            long milliseconds = Long.valueOf(value);
+            calendar.setTimeInMillis(milliseconds);
         } catch (NumberFormatException nfe) {
-            milliseconds = AuraDateUtil.isoToLong(value);
+            Date date = AuraDateUtil.isoToDate(value);
+            if (date == null) {
+                return null;
+            }
+            calendar.setTime(date);
         }
-        Calendar cal = null;
-        if(milliseconds != null) {
-            cal = Calendar.getInstance();
-            cal.setTimeInMillis(milliseconds);
-        }
-        return cal;
+
+        return calendar;
     }
 
     @Override

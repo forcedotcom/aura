@@ -53,7 +53,7 @@ public class LocalizedIntegerToStringConverter implements LocalizedConverter<Int
 
         try {
             Locale loc = locale.getNumberLocale();
-            return localizationService.formatNumber(value, loc);
+            return localizationService.formatNumber(value.intValue(), loc);
         } catch (Exception e) {
             return convert(value);
         }

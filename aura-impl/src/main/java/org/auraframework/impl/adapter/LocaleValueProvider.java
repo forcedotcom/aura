@@ -71,7 +71,6 @@ public class LocaleValueProvider implements GlobalValueProvider {
 
     public static final String DATETIME_FORMAT = "datetimeFormat";
     public static final String SHORT_DATETIME_FORMAT = "shortDatetimeFormat";
-    public static final String LONG_DATETIME_FORMAT = "longDatetimeFormat";
 
     public static final String TIME_FORMAT = "timeFormat";
     public static final String SHORT_TIME_FORMAT = "shortTimeFormat";
@@ -123,7 +122,6 @@ public class LocaleValueProvider implements GlobalValueProvider {
         builder.put(LONG_DATE_FORMAT, localizationService.getLongDateFormatPattern());
         builder.put(DATETIME_FORMAT, localizationService.getMediumDateTimeFormatPattern());
         builder.put(SHORT_DATETIME_FORMAT, localizationService.getShortDateTimeFormatPattern());
-        builder.put(LONG_DATETIME_FORMAT, localizationService.getLongDateTimeFormatPattern());
         builder.put(TIME_FORMAT, localizationService.getMediumTimeFormatPattern());
         builder.put(SHORT_TIME_FORMAT, localizationService.getShortTimeFormatPattern());
 

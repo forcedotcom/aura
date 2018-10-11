@@ -16,11 +16,10 @@
 package org.auraframework.impl;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
+import java.util.Currency;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -31,13 +30,14 @@ import org.auraframework.service.LocalizationService;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import com.ibm.icu.text.DateFormat;
 import com.ibm.icu.text.DecimalFormat;
 import com.ibm.icu.text.DecimalFormatSymbols;
 import com.ibm.icu.text.NumberFormat;
-import com.ibm.icu.util.Currency;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.ibm.icu.text.SimpleDateFormat;
 
 /**
  * Default implementation for the Localization Service
@@ -48,6 +48,7 @@ public class LocalizationServiceImpl implements LocalizationService {
 
     protected LocalizationAdapter localizationAdapter;
 
+    // Remove it!!!
     // make pluggable in the future?
     private final DateService dateService = DateServiceImpl.get();
 
@@ -58,198 +59,90 @@ public class LocalizationServiceImpl implements LocalizationService {
 
     @Override
     public String formatDate(Date date) {
-        return formatDate(date, null, null, DateFormat.DEFAULT);
+        return formatDate(date, null, DateFormat.DEFAULT, null);
     }
 
     @Override
-    public String formatDate(Date date, int dateStyle) {
-        return formatDate(date, null, null, dateStyle);
-    }
-
-    @Override
-    public String formatDate(Date date, Locale locale) {
-        return formatDate(date, locale, null, DateFormat.DEFAULT);
+    public String formatDate(Date date, Locale locale, int dateStyle) {
+        return formatDate(date, locale, DateFormat.DEFAULT, null);
 
     }
 
     @Override
-    public String formatDate(Date date, Locale locale, TimeZone timeZone) {
-        return formatDate(date, locale, timeZone, DateFormat.DEFAULT);
-    }
-
-    @Override
-    public String formatDate(Date date, Locale locale, TimeZone timeZone, int dateStyle) {
+    public String formatDate(Date date, Locale locale, int dateStyle, TimeZone timeZone) {
         if (date == null) {
             return null;
         }
-        AuraLocale loc = this.localizationAdapter.getAuraLocale();
+
+        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
         if (locale == null) {
-            locale = loc.getDateLocale();
+            locale = auraLocale.getDateLocale();
         }
         if (timeZone == null) {
-            timeZone = loc.getTimeZone();
+            timeZone = auraLocale.getTimeZone();
         }
-        return dateService.getDateStyleConverter(locale, dateStyle).format(date, timeZone);
-    }
 
-    @Override
-    public String formatDate(Calendar cal) {
-        return formatDate(cal, DateFormat.DEFAULT);
-    }
-
-    @Override
-    public String formatDate(Calendar cal, int dateStyle) {
-        if (cal == null) {
-            return null;
-        }
-        return formatDate(cal.getTime(), null, cal.getTimeZone(), dateStyle);
+        DateFormat dateFormat = DateFormat.getDateInstance(dateStyle, locale);
+        dateFormat.setTimeZone(com.ibm.icu.util.TimeZone.getTimeZone(timeZone.getID()));
+        return dateFormat.format(date);
+        //return dateService.getDateStyleConverter(locale, dateStyle).format(date, timeZone);
     }
 
     @Override
     public String formatTime(Date time) {
-        return formatTime(time, null, null, DateFormat.DEFAULT);
+        return formatTime(time, null, DateFormat.DEFAULT, null);
     }
 
     @Override
-    public String formatTime(Date time, int timeStyle) {
-        return formatTime(time, null, null, timeStyle);
+    public String formatTime(Date time, Locale locale, int timeStyle) {
+        return formatTime(time, locale, DateFormat.DEFAULT, null);
     }
 
     @Override
-    public String formatTime(Date time, Locale locale) {
-        return formatTime(time, locale, null, DateFormat.DEFAULT);
-    }
-
-    @Override
-    public String formatTime(Date time, Locale locale, TimeZone timeZone) {
-        return formatTime(time, locale, timeZone, DateFormat.DEFAULT);
-    }
-
-    @Override
-    public String formatTime(Date time, Locale locale, TimeZone timeZone, int timeStyle) {
-        if (time == null) {
-            return null;
-        }
-        AuraLocale loc = this.localizationAdapter.getAuraLocale();
+    public String formatTime(Date time, Locale locale, int timeStyle, TimeZone timeZone) {
+        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
         if (locale == null) {
-            locale = loc.getDateLocale();
+            locale = auraLocale.getDateLocale();
         }
         if (timeZone == null) {
-            timeZone = loc.getTimeZone();
+            timeZone = auraLocale.getTimeZone();
         }
-        return dateService.getTimeStyleConverter(locale, timeStyle).format(time, timeZone);
-    }
 
-    @Override
-    public String formatTime(Calendar cal) {
-        return formatTime(cal, DateFormat.DEFAULT);
-    }
-
-    @Override
-    public String formatTime(Calendar cal, int timeStyle) {
-        if (cal == null) {
-            return null;
-        }
-        return formatTime(cal.getTime(), null, cal.getTimeZone(), timeStyle);
+        DateFormat timeFormat = DateFormat.getTimeInstance(timeStyle, locale);
+        timeFormat.setTimeZone(com.ibm.icu.util.TimeZone.getTimeZone(timeZone.getID()));
+        return timeFormat.format(time);
+        // return dateService.getTimeStyleConverter(locale, timeStyle).format(time, timeZone);
     }
 
     @Override
     public String formatDateTime(Date dateTime) {
-        return formatDateTime(dateTime, null, null, DateFormat.DEFAULT, DateFormat.DEFAULT);
+        return formatDateTime(dateTime, null, DateFormat.DEFAULT, DateFormat.DEFAULT, null);
     }
 
     @Override
-    public String formatDateTime(Date dateTime, int dateStyle, int timeStyle) {
-        return formatDateTime(dateTime, null, null, dateStyle, timeStyle);
+    public String formatDateTime(Date dateTime, Locale locale, int dateStyle, int timeStyle) {
+        return formatDateTime(dateTime, null, dateStyle, timeStyle, null);
     }
 
     @Override
-    public String formatDateTime(Date dateTime, Locale locale) {
-        return formatDateTime(dateTime, locale, null, DateFormat.DEFAULT, DateFormat.DEFAULT);
-    }
-
-    @Override
-    public String formatDateTime(Date dateTime, Locale locale, TimeZone timeZone) {
-        return formatDateTime(dateTime, locale, timeZone, DateFormat.DEFAULT, DateFormat.DEFAULT);
-    }
-
-    @Override
-    public String formatDateTime(Date dateTime, Locale locale, TimeZone timeZone, int dateStyle, int timeStyle) {
-        if (dateTime == null) {
-            return null;
-        }
-        AuraLocale loc = this.localizationAdapter.getAuraLocale();
+    public String formatDateTime(Date dateTime, Locale locale, int dateStyle, int timeStyle, TimeZone timeZone) {
+        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
         if (locale == null) {
-            locale = loc.getDateLocale();
+            locale = auraLocale.getDateLocale();
         }
         if (timeZone == null) {
-            timeZone = loc.getTimeZone();
+            timeZone = auraLocale.getTimeZone();
         }
-        return dateService.getDateTimeStyleConverter(locale, dateStyle, timeStyle).format(dateTime, timeZone);
-    }
 
-    @Override
-    public String formatDateTime(Date date, Locale locale, TimeZone timeZone, String format) {
-        if (date == null) {
-            return null;
-        }
-        AuraLocale loc = this.localizationAdapter.getAuraLocale();
-        if (locale == null) {
-            locale = loc.getDateLocale();
-        }
-        if (timeZone == null) {
-            timeZone = loc.getTimeZone();
-        }
-        return dateService.getPatternConverter(locale, format).format(date, timeZone);
-
-    }
-
-    @Override
-    public String formatDateTime(Calendar cal) {
-        return formatDateTime(cal, DateFormat.DEFAULT, DateFormat.DEFAULT);
-    }
-
-    @Override
-    public String formatDateTime(Calendar cal, int dateStyle, int timeStyle) {
-        if (cal == null) {
-            return null;
-        }
-        return formatDateTime(cal.getTime(), null, cal.getTimeZone(), dateStyle, timeStyle);
+        DateFormat timeFormat = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
+        timeFormat.setTimeZone(com.ibm.icu.util.TimeZone.getTimeZone(timeZone.getID()));
+        return timeFormat.format(dateTime);
+        //return dateService.getDateTimeStyleConverter(locale, dateStyle, timeStyle).format(dateTime, timeZone);
     }
 
     @Override
     public String formatNumber(int number) {
         return formatNumber(number, null);
-    }
-
-    @Override
-    public String formatNumber(long number) {
-        return formatNumber(number, null);
-    }
-
-    @Override
-    public String formatNumber(double number) {
-        return formatNumber(number, null);
-    }
-
-    @Override
-    public String formatNumber(Integer number) {
-        return formatNumber(number, null);
-    }
-
-    @Override
-    public String formatNumber(Long number) {
-        return formatNumber(number, null);
-    }
-
-    @Override
-    public String formatNumber(Double number) {
-        return formatNumber(number, null);
-    }
-
-    @Override
-    public String formatNumber(double number, int minFractionDigits, int maxFractionDigits) {
-        return formatNumber(number, null, minFractionDigits, maxFractionDigits);
     }
 
     @Override
@@ -262,12 +155,22 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
+    public String formatNumber(long number) {
+        return formatNumber(number, null);
+    }
+
+    @Override
     public String formatNumber(long number, Locale locale) {
         if (locale == null) {
             locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
         }
-        NumberFormat nf = NumberFormat.getNumberInstance(locale);
-        return nf.format(number);
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+        return numberFormat.format(number);
+    }
+
+    @Override
+    public String formatNumber(double number) {
+        return formatNumber(number, null);
     }
 
     @Override
@@ -280,31 +183,35 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public String formatNumber(Integer number, Locale locale) {
-        if (number == null) {
-            return null;
+    public String formatNumber(double number, Locale locale, int minFractionDigits, int maxFractionDigits) {
+        if (locale == null) {
+            locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
         }
-        return formatNumber(number.intValue(), locale);
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+        numberFormat.setMinimumFractionDigits(minFractionDigits);
+        numberFormat.setMaximumFractionDigits(maxFractionDigits);
+        return numberFormat.format(number);
     }
 
     @Override
-    public String formatNumber(Long number, Locale locale) {
-        if (number == null) {
-            return null;
-        }
-        return formatNumber(number.longValue(), locale);
+    public String formatNumber(BigDecimal number) {
+        return formatNumber(number, null);
     }
 
     @Override
-    public String formatNumber(Double number, Locale locale) {
+    public String formatNumber(BigDecimal number, Locale locale) {
         if (number == null) {
             return null;
         }
-        return formatNumber(number.doubleValue(), locale);
+        if (locale == null) {
+            locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
+        }
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+        return numberFormat.format(number);
     }
 
     @Override
-    public String formatNumber(Double number, Locale locale, int minFractionDigits, int maxFractionDigits) {
+    public String formatNumber(BigDecimal number, Locale locale, int minFractionDigits, int maxFractionDigits) {
         if (number == null) {
             return null;
         }
@@ -318,13 +225,40 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public String formatPercent(double percent) {
-        return formatPercent(percent, null);
+    public String formatNumber(Number number) {
+        return formatNumber(number, null);
     }
 
     @Override
-    public String formatPercent(double percent, int minFractionDigits, int maxFractionDigits) {
-        return formatPercent(percent, null, minFractionDigits, maxFractionDigits);
+    public String formatNumber(Number number, Locale locale) {
+        if (number == null) {
+            return null;
+        }
+        if (locale == null) {
+            locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
+        }
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+        return numberFormat.format(number);
+    }
+
+    @Override
+    public String formatNumber(Number number, Locale locale, int minFractionDigits, int maxFractionDigits) {
+        if (number == null) {
+            return null;
+        }
+        if (locale == null) {
+            locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
+        }
+
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+        numberFormat.setMinimumFractionDigits(minFractionDigits);
+        numberFormat.setMaximumFractionDigits(maxFractionDigits);
+        return numberFormat.format(number);
+    }
+
+    @Override
+    public String formatPercent(double percent) {
+        return formatPercent(percent, null);
     }
 
     @Override
@@ -332,8 +266,8 @@ public class LocalizationServiceImpl implements LocalizationService {
         if (locale == null) {
             locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
         }
-        NumberFormat nf = NumberFormat.getPercentInstance(locale);
-        return nf.format(percent);
+        NumberFormat percentFormat = NumberFormat.getPercentInstance(locale);
+        return percentFormat.format(percent);
     }
 
     @Override
@@ -341,10 +275,10 @@ public class LocalizationServiceImpl implements LocalizationService {
         if (locale == null) {
             locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
         }
-        NumberFormat nf = NumberFormat.getPercentInstance(locale);
-        nf.setMinimumFractionDigits(minFractionDigits);
-        nf.setMaximumFractionDigits(maxFractionDigits);
-        return nf.format(percent);
+        NumberFormat percentFormat = NumberFormat.getPercentInstance(locale);
+        percentFormat.setMinimumFractionDigits(minFractionDigits);
+        percentFormat.setMaximumFractionDigits(maxFractionDigits);
+        return percentFormat.format(percent);
     }
 
     @Override
@@ -353,17 +287,13 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public String formatCurrency(double currency, int minFractionDigits, int maxFractionDigits) {
-        return formatCurrency(currency, null, minFractionDigits, maxFractionDigits);
-    }
-
-    @Override
     public String formatCurrency(double currency, Locale locale) {
         if (locale == null) {
             locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
         }
-        DecimalFormat df = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
-        return df.format(currency);
+
+        DecimalFormat currencyFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
+        return currencyFormat.format(currency);
     }
 
     @Override
@@ -372,21 +302,21 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public String formatCurrency(double value, Locale locale, int minFractionDigits, int maxFractionDigits,
-                                 Currency currency) {
+    public String formatCurrency(double value, Locale locale, int minFractionDigits, int maxFractionDigits, Currency currency) {
         if (locale == null) {
             locale = this.localizationAdapter.getAuraLocale().getCurrencyLocale();
         }
+
         if (currency == null) {
             currency = Currency.getInstance(locale);
         }
-        DecimalFormat df = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
+        DecimalFormat currencyFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
         // setCurrency will set fraction digits based on locale so that statement needs to happen before if we
         // want to set fraction digits ourselves
-        df.setCurrency(currency);
-        df.setMinimumFractionDigits(minFractionDigits);
-        df.setMaximumFractionDigits(maxFractionDigits);
-        return df.format(value);
+        currencyFormat.setCurrency(com.ibm.icu.util.Currency.fromJavaCurrency(currency));
+        currencyFormat.setMinimumFractionDigits(minFractionDigits);
+        currencyFormat.setMaximumFractionDigits(maxFractionDigits);
+        return currencyFormat.format(value);
     }
 
     @Override
@@ -395,18 +325,14 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public String formatCurrency(BigDecimal currency, int minFractionDigits, int maxFractionDigits) {
-        return formatCurrency(currency, null, minFractionDigits, maxFractionDigits);
-    }
-
-    @Override
     public String formatCurrency(BigDecimal currency, Locale locale) {
         if (locale == null) {
             locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
         }
-        DecimalFormat df = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
-        df.setParseBigDecimal(true);
-        return df.format(currency);
+
+        DecimalFormat currencyFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
+        currencyFormat.setParseBigDecimal(true);
+        return currencyFormat.format(currency);
     }
 
     @Override
@@ -415,20 +341,20 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public String formatCurrency(BigDecimal value, Locale locale, int minFractionDigits, int maxFractionDigits,
-                                 Currency currency) {
+    public String formatCurrency(BigDecimal value, Locale locale, int minFractionDigits, int maxFractionDigits, Currency currency) {
         if (locale == null) {
             locale = this.localizationAdapter.getAuraLocale().getCurrencyLocale();
         }
         if (currency == null) {
             currency = Currency.getInstance(locale);
         }
-        DecimalFormat df = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
-        df.setParseBigDecimal(true);
-        df.setCurrency(currency);
-        df.setMinimumFractionDigits(minFractionDigits);
-        df.setMaximumFractionDigits(maxFractionDigits);
-        return df.format(value);
+
+        DecimalFormat currencyFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
+        currencyFormat.setParseBigDecimal(true);
+        currencyFormat.setCurrency(com.ibm.icu.util.Currency.fromJavaCurrency(currency));
+        currencyFormat.setMinimumFractionDigits(minFractionDigits);
+        currencyFormat.setMaximumFractionDigits(maxFractionDigits);
+        return currencyFormat.format(value);
     }
 
     @Override
@@ -725,42 +651,6 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public String formatNumber(BigDecimal number) {
-        return formatNumber(number, null);
-    }
-
-    @Override
-    public String formatNumber(BigDecimal number, int minFractionDigits, int maxFractionDigits) {
-        return formatNumber(number, null, minFractionDigits, maxFractionDigits);
-    }
-
-    @Override
-    public String formatNumber(BigDecimal number, Locale locale) {
-        if (number == null) {
-            return null;
-        }
-        if (locale == null) {
-            locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
-        }
-        NumberFormat nf = NumberFormat.getNumberInstance(locale);
-        return nf.format(number);
-    }
-
-    @Override
-    public String formatNumber(BigDecimal number, Locale locale, int minFractionDigits, int maxFractionDigits) {
-        if (number == null) {
-            return null;
-        }
-        if (locale == null) {
-            locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
-        }
-        NumberFormat nf = NumberFormat.getNumberInstance(locale);
-        nf.setMinimumFractionDigits(minFractionDigits);
-        nf.setMaximumFractionDigits(maxFractionDigits);
-        return nf.format(number);
-    }
-
-    @Override
     public BigDecimal parseBigDecimal(String number) throws ParseException {
         return parseBigDecimal(number, null);
     }
@@ -788,38 +678,6 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public String formatNumber(Number number) {
-        return formatNumber(number, null);
-    }
-
-    @Override
-    public String formatNumber(Number number, Locale locale) {
-        if (number == null) {
-            return null;
-        }
-        if (locale == null) {
-            locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
-        }
-        NumberFormat nf = NumberFormat.getNumberInstance(locale);
-        return nf.format(number);
-    }
-
-    @Override
-    public String formatNumber(Number number, Locale locale, int minFractionDigits, int maxFractionDigits) {
-        if (number == null) {
-            return null;
-        }
-        if (locale == null) {
-            locale = this.localizationAdapter.getAuraLocale().getNumberLocale();
-        }
-
-        NumberFormat nf = NumberFormat.getNumberInstance(locale);
-        nf.setMinimumFractionDigits(minFractionDigits);
-        nf.setMaximumFractionDigits(maxFractionDigits);
-        return nf.format(number);
-    }
-
-    @Override
     public String getShortDateFormatPattern() {
         return this.getDateFormatPattern(DateFormat.SHORT);
     }
@@ -842,11 +700,6 @@ public class LocalizationServiceImpl implements LocalizationService {
     @Override
     public String getMediumDateTimeFormatPattern() {
         return this.getDateTimeFormatPattern(DateFormat.MEDIUM);
-    }
-
-    @Override
-    public String getLongDateTimeFormatPattern() {
-        return this.getDateTimeFormatPattern(DateFormat.LONG);
     }
 
     @Override
@@ -898,8 +751,8 @@ public class LocalizationServiceImpl implements LocalizationService {
     @Override
     public String getCurrencyCode() {
         DecimalFormatSymbols cdfs = getDecimalFormatSymbolsForCurrency();
-        Currency cur = cdfs.getCurrency();
-        return cur != null ? cur.getCurrencyCode() : "";
+        com.ibm.icu.util.Currency currency = cdfs.getCurrency();
+        return currency != null ? currency.getCurrencyCode() : "";
     }
 
     @Override

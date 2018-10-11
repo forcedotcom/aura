@@ -30,10 +30,10 @@ public class ModuleDesignDefImpl implements ModuleDesignDef {
     private String description;
     private TagConfigs tagConfigs;
 
-    private ModuleDesignDefImpl(ModuleDesignDefImpl.Builder builder) {
-        label = builder.label;
-        description = builder.description;
-        tagConfigs = builder.tagConfigs;
+    ModuleDesignDefImpl(ModuleDesignDefImpl.Builder builder) {
+        label = builder.getLabel();
+        description = builder.getDescription();
+        tagConfigs = builder.getTagConfigs();
     }
 
     @Override
@@ -87,6 +87,14 @@ public class ModuleDesignDefImpl implements ModuleDesignDef {
 
         public TagConfigs getTagConfigs() {
             return this.tagConfigs;
+        }
+        
+        String getLabel() {
+            return label;
+        }
+        
+        String getDescription() {
+            return description;
         }
 
         public ModuleDesignDefImpl build() {

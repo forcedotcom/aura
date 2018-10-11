@@ -29,8 +29,7 @@ public interface ComponentDefRefArray {
 	 */
 	List<DefinitionReference> getList();
 	
-	List<Instance> newInstance(BaseComponent<?, ?> fallbackValueProvider) throws QuickFixException;
+	List<Instance<? extends Definition>> newInstance(BaseComponent<?, ?> fallbackValueProvider) throws QuickFixException;
 	
-	List<Instance> newInstance(BaseComponent<?, ?> fallbackValueProvider, Map<String, Object> extraProviders) throws QuickFixException;
-	
+	List<Instance<? extends Definition>> newInstance(BaseComponent<?, ?> fallbackValueProvider, Map<String, Object> extraProviders) throws QuickFixException;
 }

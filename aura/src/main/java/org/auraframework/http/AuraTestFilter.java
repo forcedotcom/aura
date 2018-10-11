@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -78,7 +79,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 
 /**
  * Supports test framework functionality, primarily for jstest mocks.
@@ -93,35 +93,34 @@ public class AuraTestFilter {
             + "?aura.tag=%s%%3A%s&aura.deftype=%s&aura.mode=%s&aura.format=%s&aura.access=%s&aura.jstestrun=%s";
     private static final String NO_RUN = "_NONE";
 
-    private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
+    private static final StringParam CONTEXT_CONFIG = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
 
     // "test" is the key used to reference the current TestContext, and is not specific to jstests.
-    private static final StringParam testContextKey = new StringParam(AuraServlet.AURA_PREFIX + "test", 0, false);
+    private static final StringParam TEST_CONTEXT_KEY = new StringParam(AuraServlet.AURA_PREFIX + "test", 0, false);
 
     // "jstestrun" is used by this filter to identify the jstest to execute.
     // If the param is empty, it will fall back to loading auratest:jstest.
-    private static final StringParam jstestToRun = new StringParam(AuraServlet.AURA_PREFIX + "jstestrun", 0, false);
-    private static final Pattern jstestToRunPattern = Pattern.compile("(?<=\\b" + Pattern.quote(jstestToRun.name) + "=)\\w*");
+    private static final StringParam JSTEST_TO_RUN = new StringParam(AuraServlet.AURA_PREFIX + "jstestrun", 0, false);
 
     // "jstest" is a shortcut to load auratest:jstest.
-    private static final StringParam jstestAppFlag = new StringParam(AuraServlet.AURA_PREFIX + "jstest", 0, false);
+    private static final StringParam JSTEST_APP_FLAG = new StringParam(AuraServlet.AURA_PREFIX + "jstest", 0, false);
 
     // "testReset" is a signal to reset any mocks associated with the current TestContext, used primarily on the initial
     // request of a test to clean up in case a prior test did not clean up.
-    private static final BooleanParam testReset = new BooleanParam(AuraServlet.AURA_PREFIX + "testReset", false);
+    private static final BooleanParam TEST_RESET = new BooleanParam(AuraServlet.AURA_PREFIX + "testReset", false);
 
     // "testTimeout" sets the timeout for a test
-    private static final IntegerParam testTimeout = new IntegerParam(AuraServlet.AURA_PREFIX + "testTimeout", false);
+    private static final IntegerParam TEST_TIMEOUT = new IntegerParam(AuraServlet.AURA_PREFIX + "testTimeout", false);
 
-    private static final Pattern bodyEndTagPattern = Pattern.compile("(?is).*(</body\\s*>).*");
-    private static final Pattern htmlEndTagPattern = Pattern.compile("(?is).*(</html\\s*>).*");
-    // private static final Pattern headTagPattern = Pattern.compile("(?is).*(<\\s*head[^>]*>).*");
-    // private static final Pattern bodyTagPattern = Pattern.compile("(?is).*(<\\s*body[^>]*>).*");
+    private static final Pattern BODY_END_TAG_PATTERN = Pattern.compile("(?is).*(</body\\s*>).*");
+    private static final Pattern HTML_END_TAG_PATTERN = Pattern.compile("(?is).*(</html\\s*>).*");
+    // private static final Pattern HEAD_TAG_PATTERN  = Pattern.compile("(?is).*(<\\s*head[^>]*>).*");
+    // private static final Pattern BODY_TAG_PATTERN  = Pattern.compile("(?is).*(<\\s*body[^>]*>).*");
 
-    private final List<HttpFilter> testCaseFilters = Collections.synchronizedList(Lists.newArrayList());
+    private final List<HttpFilter> testCaseFilters = Collections.synchronizedList(new ArrayList<>());
 
     // TODO: DELETE this once all existing tests have been updated to have attributes.
-    private boolean ENABLE_FREEFORM_TESTS = Boolean.parseBoolean(System.getProperty("aura.jstest.free"));
+    private static final boolean ENABLE_FREEFORM_TESTS = Boolean.parseBoolean(System.getProperty("aura.jstest.free"));
 
     private TestContextAdapter testContextAdapter;
     private ContextService contextService;
@@ -177,7 +176,7 @@ public class AuraTestFilter {
             return;
         }
 
-        if (testCaseFilters != null && !testCaseFilters.isEmpty()) {
+        if ((testCaseFilters != null) && !testCaseFilters.isEmpty()) {
             final AtomicBoolean handled = new AtomicBoolean(false);
 
             for (HttpFilter filter : testCaseFilters) {
@@ -203,8 +202,8 @@ public class AuraTestFilter {
         HttpServletResponse response = (HttpServletResponse)res;
         TestContext testContext = getTestContext(request);
         @SuppressWarnings("boxing")
-        boolean doResetTest = testReset.get(request, false);
-        if (testContext != null && doResetTest) {
+        boolean doResetTest = TEST_RESET.get(request, false);
+        if ((testContext != null) && doResetTest) {
             testContext.getLocalDefs().clear();
         }
         // Check for requests to execute a JSTest, i.e. initial component GETs with particular parameters.
@@ -218,9 +217,9 @@ public class AuraTestFilter {
                     targetDescriptor = definitionService.getDefDescriptor(descriptor, ComponentDef.class);
                     testToRun = request.getParameter("testName");
                 } else {
-                    testToRun = jstestToRun.get(request);
+                    testToRun = JSTEST_TO_RUN.get(request);
                 }
-                if (testToRun != null && !testToRun.isEmpty() && !NO_RUN.equals(testToRun)) {
+                if (StringUtils.isNotEmpty(testToRun) && !NO_RUN.equals(testToRun)) {
                     AuraContext context = contextService.getCurrentContext();
                     Format format = context.getFormat();
                     switch (format) {
@@ -259,7 +258,7 @@ public class AuraTestFilter {
                                 // There was an error in the original response, so just write the response out.
                                 response.getWriter().write(capturedResponse);
                             } else {
-                                Integer timeout = testTimeout.get(request, DEFAULT_JSTEST_TIMEOUT);
+                                Integer timeout = TEST_TIMEOUT.get(request, DEFAULT_JSTEST_TIMEOUT);
                                 String testTag = buildJsTestScriptTag(targetDescriptor, testToRun, timeout, capturedResponse);
                                 injectScriptTags(response.getWriter(), capturedResponse, testTag);
                             }
@@ -269,7 +268,7 @@ public class AuraTestFilter {
                         servletUtilAdapter.setNoCache(response);
                         response.setContentType(servletUtilAdapter.getContentType(Format.JS));
                         response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
-                        Integer timeout = testTimeout.get(request, DEFAULT_JSTEST_TIMEOUT);
+                        Integer timeout = TEST_TIMEOUT.get(request, DEFAULT_JSTEST_TIMEOUT);
                         writeJsTestScript(response.getWriter(), targetDescriptor, testToRun, timeout);
                         return;
                     default:
@@ -288,7 +287,7 @@ public class AuraTestFilter {
                 // ?aura.jstest - run all tests
                 // ?aura.jstest=XXX - run single test
                 // TODO: delete JSTEST mode
-                String jstestAppRequest = jstestAppFlag.get(request);
+                String jstestAppRequest = JSTEST_APP_FLAG.get(request);
                 Mode mode = AuraContextFilter.mode.get(request, Mode.PROD);
                 if ((mode == Mode.JSTEST) || (mode == Mode.JSTESTDEBUG) || (jstestAppRequest != null)) {
 
@@ -323,12 +322,11 @@ public class AuraTestFilter {
             // The test context adapter may not always get cleared,
             // so release all test contexts for the request without explicit test context
             testContextAdapter.clear();
+        } else if (!contextService.isEstablished()) {
+            loggingService.error("AuraTestFilter.innerFilter(): Aura context is not established! New context will NOT be created.");
+            chain.doFilter(request, response);
+            return;
         } else {
-            if (!contextService.isEstablished()) {
-                loggingService.error("AuraTestFilter.innerFilter(): Aura context is not established! New context will NOT be created.");
-                chain.doFilter(request, response);
-                return;
-            }
             AuraContext context = contextService.getCurrentContext();
 
             // Reset mocks if requested, or for the initial GET.
@@ -358,7 +356,7 @@ public class AuraTestFilter {
     @SuppressWarnings("unchecked")
     private static Map<String, Object> getConfigMap(HttpServletRequest request) {
         Map<String, Object> configMap = null;
-        String config = contextConfig.get(request);
+        String config = CONTEXT_CONFIG.get(request);
         if (!StringUtils.isBlank(config)) {
             if (config.startsWith(AuraTextUtil.urlencode("{"))) {
                 // Decode encoded context json. Serialized AuraContext json always starts with "{"
@@ -374,7 +372,7 @@ public class AuraTestFilter {
 
         // Config takes precedence over param because the value is not expected to change during a test and it
         // is less likely to have been modified unintentionally when from the config.
-        final String key = (configMap != null) ? (String) configMap.get("test") : testContextKey.get(request);
+        final String key = (configMap != null) ? (String) configMap.get("test") : TEST_CONTEXT_KEY.get(request);
         if (key == null) {
             return null;
         }
@@ -452,7 +450,7 @@ public class AuraTestFilter {
         if (targetAttributes != null) {
             // The test has attributes specified, so request for the target component with the test's attributes.
             String hash = "";
-            List<NameValuePair> newParams = Lists.newArrayList();
+            List<NameValuePair> newParams = new ArrayList<>();
             for (Entry<String, Object> entry : targetAttributes.entrySet()) {
                 String key = entry.getKey();
                 String value;
@@ -507,24 +505,38 @@ public class AuraTestFilter {
         return createURI(newDescriptor.getNamespace(), newDescriptor.getName(),
                 newDescriptor.getDefType(), null, Format.HTML, Authentication.AUTHENTICATED.name(), NO_RUN, null);
     }
+    
+    private static final class JsTestCapturingResponseWrapper extends CapturingResponseWrapper {
+        
+        @SuppressWarnings("synthetic-access")
+        private static final Pattern JSTEST_TO_RUN_PATTERN = Pattern.compile("(?<=\\b" + Pattern.quote(JSTEST_TO_RUN.name) + "=)\\w*");
+        
+        private final String testName;
+        
+        JsTestCapturingResponseWrapper(final HttpServletResponse res, final String testName) {
+            super(res);
+            this.testName = testName;
+        }
+        
+        @SuppressWarnings("synthetic-access")
+        @Override
+        public void sendRedirect(String location) throws IOException{
+            // If the response is redirected after this filter, we want to
+            // handle the redirect, so we need to set the jstestrun
+            // parameter to make sure we can see it on the next request.
+            Matcher test = JSTEST_TO_RUN_PATTERN.matcher(location);
+            if (test.find()) {
+                location = test.replaceAll(testName);
+            } else {
+                location = location + ((location.indexOf('?') < 0) ? '?' : '&') + JSTEST_TO_RUN.name + '=' + testName;
+            }
+            super.sendRedirect(location);
+        }
+    }
 
     private static String captureResponse(ServletRequest req, ServletResponse res, String testName, String uri) throws ServletException,
             IOException {
-        CapturingResponseWrapper responseWrapper = new CapturingResponseWrapper((HttpServletResponse) res){
-            @Override
-            public void sendRedirect(String location) throws IOException{
-                // If the response is redirected after this filter, we want to
-                // handle the redirect, so we need to set the jstestrun
-                // parameter to make sure we can see it on the next request.
-                Matcher test = jstestToRunPattern.matcher(location);
-                if (test.find()) {
-                    location = test.replaceAll(testName);
-                } else {
-                    location = location + ((location.indexOf('?') < 0) ? '?' : '&') + jstestToRun.name + '=' + testName;
-                }
-                super.sendRedirect(location);
-            }
-        };
+        CapturingResponseWrapper responseWrapper = new JsTestCapturingResponseWrapper((HttpServletResponse)res, testName);
         RequestDispatcher dispatcher = req.getRequestDispatcher(uri);
         if (dispatcher == null) {
             return null;
@@ -568,12 +580,12 @@ public class AuraTestFilter {
     private static void injectScriptTags(Appendable out, String originalResponse, String tags) throws IOException {
         // Look for closing body or html tag and insert before that, otherwise just append to the original.
         // TODO: Inject at top, after Test.js can compile and run separately from Aura.js.
-        Matcher bodyMatcher = bodyEndTagPattern.matcher(originalResponse);
+        Matcher bodyMatcher = BODY_END_TAG_PATTERN.matcher(originalResponse);
         int insertionPoint = originalResponse.length();
         if (bodyMatcher.matches()) {
             insertionPoint = bodyMatcher.start(1);
         } else {
-            Matcher htmlMatcher = htmlEndTagPattern.matcher(originalResponse);
+            Matcher htmlMatcher = HTML_END_TAG_PATTERN.matcher(originalResponse);
             if (htmlMatcher.matches()) {
                 insertionPoint = htmlMatcher.start(1);
             }
@@ -663,7 +675,7 @@ public class AuraTestFilter {
                 }
             }
 
-            if (name != null) {
+            if ((name != null) && (type != null)) {
                 return definitionService.getDefDescriptor(
                         String.format("%s:%s", namespace, name), type.getPrimaryInterface());
             }
@@ -674,16 +686,16 @@ public class AuraTestFilter {
     }
 
     public void addFilter(HttpFilter filter) {
-        synchronized (testCaseFilters) {
-            if (filter != null) {
+        if (filter != null) {
+            synchronized (testCaseFilters) {
                 testCaseFilters.add(0, filter);
             }
         }
     }
     
     public synchronized void removeFilter(HttpFilter filter) {
-        synchronized (testCaseFilters) {
-            if (filter != null) {
+        if (filter != null) {
+            synchronized (testCaseFilters) {
                 testCaseFilters.remove(filter);
             }
         }

@@ -15,9 +15,13 @@
  */
 package org.auraframework.impl.root.component;
 
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDefRefArray;
+import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Instance;
@@ -27,9 +31,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
 
 /**
  * An instance of an array of ComponentDefRefs along with the value provider they should be evaluated against.
@@ -51,14 +53,14 @@ public class ComponentDefRefArrayImpl implements JsonSerializable, ComponentDefR
     }
 
     @Override
-    public List<Instance> newInstance(BaseComponent<?, ?> fallbackValueProvider) throws QuickFixException {
+    public List<Instance<? extends Definition>> newInstance(BaseComponent<?, ?> fallbackValueProvider) throws QuickFixException {
         return newInstance(fallbackValueProvider, null);
     }
 
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<Instance> newInstance(BaseComponent<?, ?> fallbackValueProvider, Map<String, Object> extraProviders) throws QuickFixException {
-        List<Instance> components = Lists.newArrayListWithExpectedSize(drs.size());
+    public List<Instance<? extends Definition>> newInstance(BaseComponent<?, ?> fallbackValueProvider, Map<String, Object> extraProviders) throws QuickFixException {
+        List<Instance<? extends Definition>> components = Lists.newArrayListWithExpectedSize(drs.size());
         BaseComponent<?, ?> valueProvider = this.vp != null ? this.vp : fallbackValueProvider;
         InstanceService instanceService = Aura.getInstanceService();
         

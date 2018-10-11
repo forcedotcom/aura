@@ -125,7 +125,7 @@ public interface ComponentLocationAdapter extends AuraAdapter {
             }
             sb.append(", Loaders=");
             sb.append(loaders.toString());
-            sb.append(")");
+            sb.append(')');
             return sb.toString();
         }
     }

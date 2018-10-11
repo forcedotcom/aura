@@ -46,7 +46,7 @@ public interface PlatformDef extends BundleDef {
     /**
      * Get the set of tags for this def.
      */
-    default Set<String> getTags() { return Collections.emptySet(); };
+    default Set<String> getTags() { return Collections.emptySet(); }
 
     /**
      * Supported minimum version

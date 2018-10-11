@@ -30,18 +30,30 @@ public abstract class GenericXmlValidator implements GenericXmlAdapter {
     private final String tag;
     private final Map<String, GenericXmlValidator> childValidators;
 
-    public GenericXmlValidator(String tag) {
-        this(tag, Collections.emptySet());
+    private GenericXmlValidator(String tag, Map<String, GenericXmlValidator> childValidators) {
+        this.tag = tag;
+        this.childValidators = childValidators;
     }
-
+    
     /**
      * Validator constructor
+     * 
      * @param tag The xml tag this validator validates
      * @param childValidators List of validators that handle direct children of this element
+     * @see #GenericXmlValidator(String)
      */
     public GenericXmlValidator(String tag, Set<GenericXmlValidator> childValidators) {
-        this.tag = tag;
-        this.childValidators = childValidators.stream().collect(Collectors.toMap(GenericXmlValidator::getTag, v -> v));
+        this(tag, childValidators.stream().collect(Collectors.toMap(GenericXmlValidator::getTag, v -> v)));
+    }
+    
+    /**
+     * Validator constructor
+     * 
+     * @param tag The xml tag this validator validates
+     * @see #GenericXmlValidator(String, Set)
+     */
+    public GenericXmlValidator(String tag) {
+        this(tag, Collections.emptyMap());
     }
 
     /**

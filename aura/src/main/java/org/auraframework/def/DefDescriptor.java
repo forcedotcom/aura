@@ -16,6 +16,10 @@
 
 package org.auraframework.def;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignDef;
@@ -26,9 +30,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.collect.Maps;
 
 /**
  * A descriptor "handle" for a definition. For applications which care about sorting, such as generating a unique hash
@@ -163,25 +165,26 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 
         private final Class<? extends Definition> clz;
         private final boolean definesBundle;
-        DefType(Class<? extends Definition> clz) {
-            this(clz, false);
-        }
 
-        DefType(Class<? extends Definition> clz, boolean definesBundle) {
+        private DefType(Class<? extends Definition> clz, boolean definesBundle) {
             this.clz = clz;
             this.definesBundle = definesBundle;
             mapDefType(clz, this);
         }
 
+        private DefType(Class<? extends Definition> clz) {
+            this(clz, false);
+        }
+
         private static void mapDefType(Class<? extends Definition> clz, DefType defType) {
             if (defTypeMap == null) {
-                defTypeMap = new HashMap<>();
+                defTypeMap = Maps.newHashMapWithExpectedSize(40);
             }
 
             defTypeMap.put(clz, defType);
         }
 
-        public static boolean hasDefType(Class<?> primaryInterface) {
+        public static boolean hasDefType(Class<? extends Definition> primaryInterface) {
             return defTypeMap.containsKey(primaryInterface);
         }
 
@@ -210,14 +213,10 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         }
     }
 
-    final class DescriptorKey {
+    final static class DescriptorKey {
         private final String name;
         private final Class<? extends Definition> clazz;
         private final DefDescriptor<? extends Definition> bundle;
-
-        public DescriptorKey(String name, Class<? extends Definition> clazz) {
-            this(name, clazz, null);
-        }
 
         public DescriptorKey(String name, Class<? extends Definition> clazz, DefDescriptor<? extends Definition> bundle) {
             // FIXME: this case flattening would remove the extra copies of
@@ -228,10 +227,14 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
             this.clazz = clazz;
             this.bundle = bundle;
         }
+        
+        public DescriptorKey(String name, Class<? extends Definition> clazz) {
+            this(name, clazz, null);
+        }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder().append(name).append(clazz).append(bundle).build();
+            return new HashCodeBuilder().append(name).append(clazz).append(bundle).toHashCode();
         }
 
         @Override

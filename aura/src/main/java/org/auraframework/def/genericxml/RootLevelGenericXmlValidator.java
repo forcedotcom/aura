@@ -16,24 +16,24 @@
 
 package org.auraframework.def.genericxml;
 
-import org.auraframework.adapter.AuraAdapter;
-
-import java.util.Collections;
 import java.util.Set;
 
+import org.auraframework.adapter.AuraAdapter;
+
 /**
- * Extend this class to allow @GenericXmlCapableDef to parse a tag setup by the implementor
+ * Extend this class to allow {@link GenericXmlCapableDef} to parse a tag setup by the implementor.
  */
 public abstract class RootLevelGenericXmlValidator extends GenericXmlValidator implements AuraAdapter {
     private final Class<? extends GenericXmlCapableDef> parentTag;
 
-    public RootLevelGenericXmlValidator(String tag, Class<? extends GenericXmlCapableDef> parentDef) {
-        this(tag, Collections.emptySet(), parentDef);
-    }
-
     public RootLevelGenericXmlValidator(String tag, Set<GenericXmlValidator> childValidators,
-                                        Class<? extends GenericXmlCapableDef> parentDef) {
+            Class<? extends GenericXmlCapableDef> parentDef) {
         super(tag, childValidators);
+        this.parentTag = parentDef;
+    }
+    
+    public RootLevelGenericXmlValidator(String tag, Class<? extends GenericXmlCapableDef> parentDef) {
+        super(tag);
         this.parentTag = parentDef;
     }
 

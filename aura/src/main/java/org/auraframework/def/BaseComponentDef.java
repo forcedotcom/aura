@@ -145,7 +145,7 @@ public interface BaseComponentDef extends RootDefinition {
 
     public static enum RenderType {
         SERVER, CLIENT, AUTO
-    };
+    }
 
     RenderType getRender();
 

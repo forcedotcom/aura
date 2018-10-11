@@ -23,7 +23,7 @@ public interface MethodDef extends RootDefinition {
 
     public static enum SerializeToType {
         SERVER, BOTH, NONE, INVALID
-    };
+    }
 
     String getAction();
 

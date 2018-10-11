@@ -26,7 +26,7 @@ public interface AttributeDef extends Definition, ParentedDef {
 
     enum SerializeToType {
         SERVER, BOTH, NONE, INVALID
-    };
+    }
 
     /**
      * @return The default value to be used for instances of this AttributeDef

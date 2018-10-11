@@ -33,9 +33,9 @@ import org.auraframework.service.IntegrationService;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.service.LoggingService;
 
-
 /**
  * Entry point for accessing Aura services
+ * @deprecated USE INJECTION INSTEAD
  */
 @ServiceComponent
 @Deprecated
@@ -53,59 +53,71 @@ public class Aura implements AuraDeprecated {
     private static LocalizationAdapter localizationAdapter;
     private static CSPInliningService cspInliningService;
 
+    @SuppressWarnings("static-method")
     @Inject
     public void setCspScriptService(CSPInliningService service){ cspInliningService = service;}
 
+    @SuppressWarnings("static-method")
     @Inject
     public void setLocalizationAdapter(LocalizationAdapter adapter) {
         localizationAdapter = adapter;
     }
     
+    @SuppressWarnings("static-method")
     @Inject
     public void setContextService(ContextService service) {
         contextService = service;
     }
 
+    @SuppressWarnings("static-method")
     @Inject
     public void setConfigAdapter(ConfigAdapter adapter) {
         configAdapter = adapter;
     }
 
+    @SuppressWarnings("static-method")
     @Inject
     public void setLoggingService(LoggingService service) {
         loggingService = service;
     }
 
+    @SuppressWarnings("static-method")
     @Inject
     public void setDefinitionService(DefinitionService service) {
         definitionService = service;
     }
 
+    @SuppressWarnings("static-method")
     @Inject
     public void setInstanceService(InstanceService service) {
         instanceService = service;
     }
 
+    @SuppressWarnings("static-method")
     @Inject
     public void setStyleAdapter(StyleAdapter adapter) {
         styleAdapter = adapter;
     }
 
+    @SuppressWarnings("static-method")
     @Inject
     public void setIntegrationService(IntegrationService service) {
         integrationService = service;
     }
 
+    @SuppressWarnings("static-method")
     @Inject
     public void setConverterService(ConverterService service) {
         converterService = service;
     }
 
+    @SuppressWarnings("static-method")
     @Inject
     public void setBuilderService(BuilderService service) {
         builderService = service;
     }
 
+    @SuppressWarnings("static-method")
     @Inject
     public void setLocalizationService(LocalizationService service) {
         localizationService = service;
@@ -113,6 +125,7 @@ public class Aura implements AuraDeprecated {
 
     /**
      * Do not use!!! Use injection.
+     * @deprecated USE INJECTION INSTEAD
      */
     // Used by: Lots
     @Deprecated
@@ -122,6 +135,7 @@ public class Aura implements AuraDeprecated {
 
     /**
      * Get the Definition Service: for loading, finding or interacting with a {@link Definition}
+     * @deprecated USE INJECTION INSTEAD
      */
     // Used by: Lots
     @Deprecated
@@ -131,6 +145,7 @@ public class Aura implements AuraDeprecated {
 
     /**
      * Get the Logging Service: Provides Aura with a top-level Logging handler from the host environments
+     * @deprecated USE INJECTION INSTEAD
      */
     // Used by: ApexAuraComponent, BaseComponentImpl, SFDCAuraContextFilter, CoreLightningComponentFacadeImpl, JavaModel, ServiceComponentModel, RecordValueProvider, and more...
     @Deprecated
@@ -140,6 +155,7 @@ public class Aura implements AuraDeprecated {
 
     /**
      * Get the Instance Service: for constructing an {@link Instance} of a {@link Definition}
+     * @deprecated USE INJECTION INSTEAD
      */
     // Used by: A few places, mostly tests.
     @Deprecated
@@ -149,6 +165,7 @@ public class Aura implements AuraDeprecated {
 
     /**
      * Get the Config Adapter: Provides Aura with configuration from the host environment
+     * @deprecated USE INJECTION INSTEAD
      */
     // Used by: Everybody
     @Deprecated
@@ -158,6 +175,7 @@ public class Aura implements AuraDeprecated {
 
     /**
      * Get the Style Adapter: Used to provide CSS/Style specific functionality.
+     * @deprecated USE INJECTION INSTEAD
      */
     // Used by StyleContextImpl, Tokens, FlavoredStyleParser, StyleParser, ParserConfiguration, AbstractStyleDef
     @Deprecated
@@ -167,6 +185,7 @@ public class Aura implements AuraDeprecated {
 
     /**
      * Gets the Integration Service: Service that makes integrating into other containers easy.
+     * @deprecated USE INJECTION INSTEAD
      */
     // Used in AuraElement, AuraServicesImpl (not used after that), ImportWizardAuraIntegrationServlet, and AuraIntegrationHolder
     @Deprecated
@@ -175,26 +194,34 @@ public class Aura implements AuraDeprecated {
     }
 
     // Used in BaseComponentImpl and JavaTypeDef
+    /**
+     * @deprecated USE INJECTION INSTEAD
+     */
     @Deprecated
     public static ConverterService getConverterService() {
         return converterService;
     }
 
     // Used in many places in sfdc
+    /**
+     * @deprecated USE INJECTION INSTEAD
+     */
     @Deprecated
     public static BuilderService getBuilderService() {
         return builderService;
     }
 
     // Used in many places in sfdc
+    /**
+     * @deprecated USE INJECTION INSTEAD
+     */
     @Deprecated
     public static LocalizationService getLocalizationService() {
         return localizationService;
     }
 
     /**
-     * USE INJECTION INSTEAD
-     * @return
+     * @deprecated USE INJECTION INSTEAD
      */
     @Deprecated
     public static LocalizationAdapter getLocalizationAdapter() {
@@ -202,9 +229,8 @@ public class Aura implements AuraDeprecated {
     }
 
     /**
-     * USE INJECTION INSTEAD
      * @return the csp inline service
-     *
+     * @deprecated USE INJECTION INSTEAD
      */
     // Used by: SFDCContentSecurityPolicy
     @Deprecated

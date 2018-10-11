@@ -16,7 +16,7 @@
 package org.auraframework.def;
 
 import java.io.Serializable;
-
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -123,12 +123,13 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
     /**
      * parse a list of def types.
      */
-    public static Collection<DefType> parseDefTypes(String typeStr) {
+    public static final Collection<DefType> parseDefTypes(String typeStr) {
         if ("*".equals(typeStr)) {
             return null;
-        } else if (typeStr != null) {
+        }
+        if (typeStr != null) {
             List<String> types = AuraTextUtil.splitSimpleAndTrim(typeStr, ",", 0);
-            List<DefType> accum = Lists.newArrayList();
+            List<DefType> accum = new ArrayList<>(types.size());
 
             for (String t : types) {
                 try {
@@ -138,9 +139,8 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
                 }
             }
             return Collections.unmodifiableList(accum);
-        } else {
-            return componentType;
         }
+        return componentType;
     }
 
     public DescriptorFilter(String matcher, String typeStr) {

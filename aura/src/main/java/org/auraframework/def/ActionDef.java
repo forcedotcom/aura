@@ -51,9 +51,9 @@ public interface ActionDef extends Definition {
     /**
      * Is this action meant to default to a cacheable action.
      * 
-     * @return true if this action should be cacheable (i.e. memoizeable or storable)
+     * @return {@code true} if this action should be cacheable (i.e. memoizeable or storable)
      */
-    default boolean isCacheable() { return false; };
+    default boolean isCacheable() { return false; }
 
     /**
      * Basic type system stuff

@@ -55,17 +55,6 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
      * Creates a default policy.
      *
      * @param inline whether to allow inline script and style. It's better not to, but legacy is what legacy is.
-     * @deprecated use injection to get csp inlining service
-     */
-    @Deprecated
-    public DefaultContentSecurityPolicy(boolean inline) {
-        this(inline, Aura.getCspInliningService(), Aura.getConfigAdapter());
-    }
-
-    /**
-     * Creates a default policy.
-     *
-     * @param inline whether to allow inline script and style. It's better not to, but legacy is what legacy is.
      * @param scriptService inline csp service
      * @param auraConfigAdapter static reference to config adapter
      */
@@ -73,6 +62,17 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         nonCspInlineEnabled = inline;
         cspInliningService = scriptService;
         configAdapter = auraConfigAdapter;
+    }
+    
+    /**
+     * Creates a default policy.
+     *
+     * @param inline whether to allow inline script and style. It's better not to, but legacy is what legacy is.
+     * @deprecated use injection to get csp inlining service
+     */
+    @Deprecated
+    public DefaultContentSecurityPolicy(boolean inline) {
+        this(inline, Aura.getCspInliningService(), Aura.getConfigAdapter());
     }
 
     /**
@@ -100,7 +100,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         List<String> list = new ArrayList<>(nonCspInlineEnabled ? 4 : 3);
         list.add(null); // Same origin allowed
 
-        if (!nonCspInlineEnabled && cspInliningService != null){
+        if (!nonCspInlineEnabled && cspInliningService != null) {
             list.addAll(cspInliningService.getCurrentScriptDirectives());
         }
 

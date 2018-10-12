@@ -23,6 +23,12 @@
     display: none;
 }
 
+/* Fix for W-5134885 on IE11*/
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .THIS .modal-body {
+        transform: translate(0px);
+    }
+}
 /* ===== ANIMATION AND TRANSFORMS ======= */
 .THIS .transitioning {
     transition: transform .3s linear, opacity .2s linear;

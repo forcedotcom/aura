@@ -206,12 +206,13 @@
 
     mask: function(cmp) {
         var useTransition = $A.util.getBooleanValue(cmp.get('v.useTransition'));
-        var mask = this._findContainedComponent(cmp, 'modal-glass').getElement();
-        
-        if ($A.util.isUndefinedOrNull(this.global._originalOverflowStyle)) {
-            var style = window.getComputedStyle(document.body, '') || document.body.style;
-            var overflowStyle = style && style.overflow ? style.overflow : document.body.style.overflow;
-            this.global._originalOverflowStyle = overflowStyle;
+        var mask = this._findContainedComponent(cmp, 'modal-glass').getElement();        
+        var body = document.body || document.querySelector("body");
+
+        // W-5460710 unknown issue cause document body could be null or not an Element
+        if ($A.util.isUndefinedOrNull(this.global._originalOverflowStyle) && body && body instanceof Element) { 
+            var style = window.getComputedStyle(body, '') || body.style;
+            this.global._originalOverflowStyle = style["overflow"];
             // prevent scrolling of the body when modals are open
             document.body.style.overflow = 'hidden';
         }

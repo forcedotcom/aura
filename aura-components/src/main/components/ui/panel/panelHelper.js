@@ -247,7 +247,6 @@
                 requestAnimationFrame($A.getCallback(function() {
                     self._showPanel(cmp, panelEl, conf);
                 }));
-
             }));
         } else {
             this._showPanel(cmp, panelEl, conf);
@@ -354,6 +353,11 @@
     },
 
     position: function(cmp, referenceEl, callback) {
+        if (!referenceEl) {
+            callback && callback();
+            return;
+        }
+
         var config = this._buildConfig(cmp, referenceEl);
 
         this._buildClassList(cmp, config);
@@ -431,6 +435,11 @@
     },
 
     _createConstraints: function (cmp, config) {
+        if(!cmp.isValid()) {
+            return;
+        }
+        var panelEl = cmp.getElement();
+
         cmp.constraints = [];
 
         cmp.constraints.push(this._createRelationship({
@@ -441,11 +450,10 @@
             enable:         true,
             pad:            config.pad,
             padTop:         config.padTop
-        }));
-
+        }));        
         cmp.constraints.push(this._createRelationship({
-            element:    cmp.getElement(),
-            target:     config.boundingElement,
+            element:    panelEl,
+            target:     config.boundingElement || window,
             type:       'bounding box',
             enable:     true,
             pad:        config.boundingBoxPad
@@ -464,7 +472,7 @@
             if(config.direction === 'east') {
                 cmp.constraints.push(this._createRelationship({
                     element: config.pointer,
-                    target:cmp.getElement(),
+                    target: panelEl,
                     align: 'right center',
                     targetAlign: 'left center',
                     enable: true,
@@ -475,7 +483,7 @@
             if(config.direction === 'west') {
                 cmp.constraints.push(this._createRelationship({
                     element: config.pointer,
-                    target: cmp.getElement(),
+                    target: panelEl,
                     align: 'left center',
                     targetAlign: 'right center',
                     enable: true,
@@ -485,8 +493,8 @@
 
             cmp.constraints.push(this._createRelationship({
                 element: config.pointer,
-                target: cmp.getElement(),
-                type:'bounding box',
+                target: panelEl,
+                type: 'bounding box',
                 enable: true,
                 boxDirections: config.bbDirections,
                 pad: config.boxDirectionPad

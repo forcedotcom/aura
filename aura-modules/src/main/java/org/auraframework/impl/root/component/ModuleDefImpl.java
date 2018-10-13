@@ -59,7 +59,7 @@ import java.util.Set;
  */
 public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleDef {
 
-    private static final long serialVersionUID = -7973449123070386535L;
+    private static final long serialVersionUID = -7133749123070386535L;
 
     private String path;
     private final Set<String> moduleDependencies;
@@ -133,7 +133,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     public String getCustomElementName() {
         return this.customElementName;
     }
-    
+
     @Override
     public DocumentationDef getDocumentationDef() {
         return this.documentationDef;
@@ -368,7 +368,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         public void setModuleDependencies(Set<String> dependencies) {
             this.moduleDependencies = dependencies;
         }
-        
+
         public void setModuleName(String moduleName) {
         	this.moduleName = moduleName;
         }
@@ -386,7 +386,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
                 this.labelReferences.add(new PropertyReferenceImpl(label, location));
             }
         }
-        
+
         public String getCustomElementName() {
         	return this.customElementName;
         }

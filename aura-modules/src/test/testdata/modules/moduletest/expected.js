@@ -1,7 +1,5 @@
 define('modules/moduletest', ['x/test', 'lwc'], function (_xTest, lwc) {
 
-    const style = undefined;
-
     function tmpl($api, $cmp, $slotset, $ctx) {
       const {
         d: api_dynamic,
@@ -14,17 +12,6 @@ define('modules/moduletest', ['x/test', 'lwc'], function (_xTest, lwc) {
     }
 
     var _tmpl = lwc.registerTemplate(tmpl);
-
-    if (style) {
-        tmpl.hostToken = 'modules-moduletest_moduletest-host';
-        tmpl.shadowToken = 'modules-moduletest_moduletest';
-
-        const style$$1 = document.createElement('style');
-        style$$1.type = 'text/css';
-        style$$1.dataset.token = 'modules-moduletest_moduletest';
-        style$$1.textContent = style('modules-moduletest_moduletest');
-        document.head.appendChild(style$$1);
-    }
 
     class Test extends lwc.LightningElement {
       constructor(...args) {

@@ -194,6 +194,34 @@ IndexedDBAdapter.prototype.initializeInternal = function(version, transactionTim
     };
 };
 
+/**
+ * Returns a promise for the transaction
+ */
+IndexedDBAdapter.prototype.getTransaction = function(mode) {
+    var that = this;
+    return new Promise(function (resolve, reject) {
+        try {
+            var transaction = that.db.transaction([that.tableName], mode);
+            resolve(transaction);
+        } catch(e) {
+            if (e.message && e.message.indexOf("closing") !== -1) {
+                // the db is closing, for potentially an 'upgrade' reason.
+                // try to reinitialize, but only once, we don't want infinite loops
+                that.ready = undefined;
+                that.initialize().then(function(){
+                    try {
+                        resolve(that.db.transaction([that.tableName], mode));
+                    } catch (e2) {
+                        reject(e2);
+                    }
+                }, reject);
+            } else {
+                reject(e);
+            }
+        }
+    });
+};
+
 
 /**
  * Returns adapter size.
@@ -358,6 +386,7 @@ IndexedDBAdapter.prototype.initializeComplete = function(ready, errorMessage, tr
 
     delete this.initializePromiseResolve;
     delete this.initializePromiseReject;
+    delete this.initializePromise;
 };
 
 /**
@@ -388,50 +417,52 @@ IndexedDBAdapter.prototype.cleanseKeys = function(keys) {
  */
 IndexedDBAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
     var transactionTimer = this.thresholdMetricTimer("performance:storage-indexeddb-getItems-read-transaction");
-    var transaction = this.db.transaction([this.tableName], "readonly");
-    var objectStore = transaction.objectStore(this.tableName);
     var that = this;
+    this.getTransaction("readonly").then(function(transaction){
+        var objectStore = transaction.objectStore(that.tableName);
 
-    var results = {};
-    var collected = 0;
+        var results = {};
+        var collected = 0;
 
-    function collector(event) {
-        var stored = event.target.result || {};
-        var key = stored["key"];
-        var item = stored["item"];
+        function collector(event) {
+            var stored = event.target.result || {};
+            var key = stored["key"];
+            var item = stored["item"];
 
-        if (key) {
-            results[key] = item;
+            if (key) {
+                results[key] = item;
+            }
+            collected++;
+            if (collected === keys.length) {
+                transactionTimer.end({
+                    "keys"      : that.cleanseKeys(keys),
+                    "collected" : collected
+                });
+                resolve(results);
+                return;
+            }
         }
-        collected++;
-        if (collected === keys.length) {
-            transactionTimer.end({
-                "keys"      : that.cleanseKeys(keys),
-                "collected" : collected
-            });
-            resolve(results);
-            return;
+
+        transaction.onabort = function() {
+            var message = "getItemsInternal(): transaction aborted for keys [" + keys + "]: " + transaction.error;
+            that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+            reject(new Error("IndexedDBAdapter." + message));
+        };
+        transaction.onerror = function() {
+            var message = "getItemsInternal(): transaction error for keys [" + keys + "]: " + transaction.error;
+            that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+            reject(new Error("IndexedDBAdapter." + message));
+        };
+
+        var objectStoreRequest;
+        for (var i = 0; i < keys.length; i++) {
+            // TODO W-2531907 skip items with the wrong keyprefix when
+            // AuraClientService#loadTokenFromStorage doesn't use a keyprefix-less entry
+            objectStoreRequest = objectStore.get(keys[i]);
+            objectStoreRequest.onsuccess = collector;
         }
-    }
+    }, reject);
 
-    transaction.onabort = function() {
-        var message = "getItemsInternal(): transaction aborted for keys [" + keys + "]: " + transaction.error;
-        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-        reject(new Error("IndexedDBAdapter." + message));
-    };
-    transaction.onerror = function() {
-        var message = "getItemsInternal(): transaction error for keys [" + keys + "]: " + transaction.error;
-        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-        reject(new Error("IndexedDBAdapter." + message));
-    };
-
-    var objectStoreRequest;
-    for (var i = 0; i < keys.length; i++) {
-        // TODO W-2531907 skip items with the wrong keyprefix when
-        // AuraClientService#loadTokenFromStorage doesn't use a keyprefix-less entry
-        objectStoreRequest = objectStore.get(keys[i]);
-        objectStoreRequest.onsuccess = collector;
-    }
 };
 
 /**
@@ -443,47 +474,48 @@ IndexedDBAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
  */
 IndexedDBAdapter.prototype.walkInternal = function(resolve, reject, sendResult) {
     var transactionTimer = this.thresholdMetricTimer("performance:storage-indexeddb-walkInternal-read-transaction");
-    var transaction = this.db.transaction([this.tableName], "readonly");
-    var objectStore = transaction.objectStore(this.tableName);
-    var cursor = objectStore.openCursor();
-    var result = {};
-    var count = 0;
-    var size = 0;
     var that = this;
+    this.getTransaction("readonly").then(function(transaction) {
+        var objectStore = transaction.objectStore(that.tableName);
+        var cursor = objectStore.openCursor();
+        var result = {};
+        var count = 0;
+        var size = 0;
 
-    cursor.onsuccess = function(event) {
-        var icursor = event.target.result;
-        if (icursor) {
-            var stored = icursor.value;
-            if (stored) {
-                size += stored["size"];
-                count += 1;
-                if (sendResult && stored["key"].indexOf(that.keyPrefix) === 0) {
-                    result[stored["key"]] = stored["item"];
+        cursor.onsuccess = function (event) {
+            var icursor = event.target.result;
+            if (icursor) {
+                var stored = icursor.value;
+                if (stored) {
+                    size += stored["size"];
+                    count += 1;
+                    if (sendResult && stored["key"].indexOf(that.keyPrefix) === 0) {
+                        result[stored["key"]] = stored["item"];
+                    }
+                }
+                icursor["continue"]();
+            } else {
+                transactionTimer.end({'count': count, 'size': size});
+                that.refreshSize(size, count);
+
+                // async sweep
+                if (that.sizeGuess > that.limitSweepHigh) {
+                    that.expireCache(0);
+                }
+                if (sendResult) {
+                    resolve(result);
+                } else {
+                    resolve(that.sizeGuess);
                 }
             }
-            icursor["continue"]();
-        } else {
-            transactionTimer.end({'count':count, 'size':size});
-            that.refreshSize(size, count);
-
-            // async sweep
-            if (that.sizeGuess > that.limitSweepHigh) {
-                that.expireCache(0);
-            }
-            if (sendResult) {
-                resolve(result);
-            } else {
-                resolve(that.sizeGuess);
-            }
-        }
-    };
-    cursor.onerror = function(event) {
-        reject(new Error("IndexedDBAdapter.walkInternal: Transaction failed: "+event.error));
-    };
-    cursor.onabort = function(event) {
-        reject(new Error("IndexedDBAdapter.walkInternal: Transaction aborted: "+event.error));
-    };
+        };
+        cursor.onerror = function (event) {
+            reject(new Error("IndexedDBAdapter.walkInternal: Transaction failed: " + event.error));
+        };
+        cursor.onabort = function (event) {
+            reject(new Error("IndexedDBAdapter.walkInternal: Transaction aborted: " + event.error));
+        };
+    }, reject);
 };
 
 
@@ -512,39 +544,54 @@ IndexedDBAdapter.prototype.setItems = function(tuples) {
             that.expireCache(sizes);
         }
         var transactionTimer = that.thresholdMetricTimer("performance:storage-indexeddb-setItems-write-transaction");
-        var transaction = that.db.transaction([that.tableName], "readwrite");
-        var objectStore = transaction.objectStore(that.tableName);
+        return that.getTransaction("readwrite").then(function(transaction) {
+            var objectStore = transaction.objectStore(that.tableName);
 
-        var collected = 0;
-        function collector() {
-            collected++;
-            if (collected === tuples.length) {
-                transactionTimer.end({'collected':collected, 'storables': storables.length, 'first_key': that.cleanseKeys(tuples[0])[0]});
-                // transaction is done so update size then resolve.
-                that.updateSize(sizes/2, sizes/2);
-                resolve();
-                return;
+            var collected = 0;
+
+            function collector() {
+                collected++;
+                if (collected === tuples.length) {
+                    transactionTimer.end({
+                        'collected': collected,
+                        'storables': storables.length,
+                        'first_key': that.cleanseKeys(tuples[0])[0]
+                    });
+                    // transaction is done so update size then resolve.
+                    that.updateSize(sizes / 2, sizes / 2);
+                    resolve();
+                    return;
+                }
             }
-        }
 
-        transaction.onabort = function() {
-            var keys = tuples.map(function(tuple) { return tuple[0]; });
-            var message = "setItemsInternal(): transaction aborted for keys [" + keys + "]: " + transaction.error;
-            that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-            reject(new Error("IndexedDBAdapter." + message));
-        };
-        transaction.onerror = function() {
-            var keys = tuples.map(function(tuple) { return tuple[0]; });
-            var message = "setItemsInternal(): transaction error for keys [" + keys + "]: " + transaction.error;
-            that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-            reject(new Error("IndexedDBAdapter." + message));
-        };
+            transaction.onabort = function () {
+                var keys = tuples.map(function (tuple) {
+                    return tuple[0];
+                });
+                var message = "setItemsInternal(): transaction aborted for keys [" + keys + "]: " + transaction.error;
+                that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+                reject(new Error("IndexedDBAdapter." + message));
+            };
+            transaction.onerror = function () {
+                var keys = tuples.map(function (tuple) {
+                    return tuple[0];
+                });
+                var message = "setItemsInternal(): transaction error for keys [" + keys + "]: " + transaction.error;
+                that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+                reject(new Error("IndexedDBAdapter." + message));
+            };
 
-        var objectStoreRequest;
-        for (i = 0; i < storables.length; i++) {
-            objectStoreRequest = objectStore.put(storables[i]);
-            objectStoreRequest.onsuccess = collector;
-        }
+            var objectStoreRequest;
+            for (i = 0; i < storables.length; i++) {
+                try {
+                    objectStoreRequest = objectStore.put(storables[i]);
+                    objectStoreRequest.onsuccess = collector;
+                } catch (e) {
+                    reject(e);
+                    return;
+                }
+            }
+        }, reject);
     });
 };
 
@@ -559,39 +606,46 @@ IndexedDBAdapter.prototype.removeItems = function(keys) {
     var that = this;
     return new Promise(function(resolve, reject) {
         var transactionTimer = that.thresholdMetricTimer("performance:storage-indexeddb-removeItems-write-transaction");
-        var transaction = that.db.transaction([that.tableName], "readwrite");
-        var objectStore = transaction.objectStore(that.tableName);
+        return that.getTransaction("readwrite").then(function(transaction) {
+            var objectStore = transaction.objectStore(that.tableName);
 
-        var sizeAvg = that.sizeAvg; // capture current sizeAvg
+            var sizeAvg = that.sizeAvg; // capture current sizeAvg
 
-        var collected = 0;
-        function collector() {
-            collected++;
-            if (collected === keys.length) {
-                transactionTimer.end({'collected':collected, 'keys': that.cleanseKeys(keys)});
-                // transaction is done so update size then resolve
-                that.updateSize(-sizeAvg, sizeAvg);
-                resolve();
-                return;
+            var collected = 0;
+
+            function collector() {
+                collected++;
+                if (collected === keys.length) {
+                    transactionTimer.end({'collected': collected, 'keys': that.cleanseKeys(keys)});
+                    // transaction is done so update size then resolve
+                    that.updateSize(-sizeAvg, sizeAvg);
+                    resolve();
+                    return;
+                }
             }
-        }
 
-        transaction.onabort = function() {
-            var message = "removeItemsInternal(): transaction aborted for keys [" + keys + "]: " + transaction.error;
-            that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-            reject(new Error("IndexedDBAdapter."+message));
-        };
-        transaction.onerror = function() {
-            var message = "removeItemsInternal(): transaction error for keys [" + keys + "]: " + transaction.error;
-            that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-            reject(new Error("IndexedDBAdapter."+message));
-        };
+            transaction.onabort = function () {
+                var message = "removeItemsInternal(): transaction aborted for keys [" + keys + "]: " + transaction.error;
+                that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+                reject(new Error("IndexedDBAdapter." + message));
+            };
+            transaction.onerror = function () {
+                var message = "removeItemsInternal(): transaction error for keys [" + keys + "]: " + transaction.error;
+                that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+                reject(new Error("IndexedDBAdapter." + message));
+            };
 
-        var objectStoreRequest;
-        for (var i = 0; i < keys.length; i++) {
-            objectStoreRequest = objectStore["delete"](keys[i]);
-            objectStoreRequest.onsuccess = collector;
-        }
+            var objectStoreRequest;
+            for (var i = 0; i < keys.length; i++) {
+                try {
+                    objectStoreRequest = objectStore["delete"](keys[i]);
+                    objectStoreRequest.onsuccess = collector;
+                } catch (e) {
+                    reject(e);
+                    return;
+                }
+            }
+        }, reject);
     });
 };
 
@@ -605,22 +659,28 @@ IndexedDBAdapter.prototype.clear = function() {
     var that = this;
     return new Promise(function(resolve, reject) {
         var transactionTimer = that.thresholdMetricTimer("performance:storage-indexeddb-clear-write-transaction");
-        var transaction = that.db.transaction([that.tableName], "readwrite");
-        var objectStore = transaction.objectStore(that.tableName);
+        return that.getTransaction("readwrite").then(function(transaction) {
+            var objectStore = transaction.objectStore(that.tableName);
 
-        objectStore.clear();
-        that.setSize(0, 0);
+            try {
+                objectStore.clear();
+            } catch (e) {
+                reject(e);
+                return;
+            }
+            that.setSize(0, 0);
 
-        transaction.onabort = function() {
-            reject(new Error("IndexedDBAdapter.clear(): Transaction aborted: " + transaction.error));
-        };
-        transaction.oncomplete = function() {
-            transactionTimer.end({});
-            resolve();
-        };
-        transaction.onerror = function() {
-            reject(new Error("IndexedDBAdapter.clear(): Transaction failed: " + transaction.error));
-        };
+            transaction.onabort = function () {
+                reject(new Error("IndexedDBAdapter.clear(): Transaction aborted: " + transaction.error));
+            };
+            transaction.oncomplete = function () {
+                transactionTimer.end({});
+                resolve();
+            };
+            transaction.onerror = function () {
+                reject(new Error("IndexedDBAdapter.clear(): Transaction failed: " + transaction.error));
+            };
+        }, reject);
     });
 };
 
@@ -656,26 +716,25 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
                             "$AuraClientService.bootstrap$"]; /* AuraClientService.js */
 
     this.lastSweep = now;
-    try {
-        var transactionTimer = this.thresholdMetricTimer("performance:storage-indexeddb-expireCache-read-transaction");
-        var transaction = this.db.transaction([this.tableName], "readonly");
-        var objectStore = transaction.objectStore(this.tableName);
+    var transactionTimer = this.thresholdMetricTimer("performance:storage-indexeddb-expireCache-read-transaction");
+    var that = this;
+    this.getTransaction("readonly").then(function(transaction) {
+        var objectStore = transaction.objectStore(that.tableName);
         var index = objectStore.index("expires");
         var cursor = index.openCursor();
         var count = 0;
         var size = 0;
         var expiredSize = 0;
-        var expireDate = now + this.expiresFudge;
-        var that = this;
+        var expireDate = now + that.expiresFudge;
         var removeSize = requestedSize || 0;
         var keysToDelete = [];
 
         // if we are above the low water mark, sweep down to it.
-        if (this.sizeGuess > this.limitSweepLow) {
-            removeSize += this.sizeGuess-this.limitSweepLow;
+        if (that.sizeGuess > that.limitSweepLow) {
+            removeSize += that.sizeGuess - that.limitSweepLow;
         }
-        this.log(IndexedDBAdapter.LOG_LEVEL.INFO, "expireCache(): sweeping to remove "+removeSize);
-        cursor.onsuccess = function(event) {
+        that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "expireCache(): sweeping to remove " + removeSize);
+        cursor.onsuccess = function (event) {
             var icursor = event.target.result;
             if (icursor) {
                 var stored = icursor.value;
@@ -698,7 +757,7 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
                     }
 
                     if (shouldEvict) {
-                        that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "expireCache(): sweep removing "+icursor.primaryKey);
+                        that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "expireCache(): sweep removing " + icursor.primaryKey);
                         keysToDelete.push(icursor.primaryKey);
                         expiredSize += stored["size"];
                     } else {
@@ -708,7 +767,7 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
                 }
                 icursor["continue"]();
             } else {
-                transactionTimer.end({'size':size, 'count':count});
+                transactionTimer.end({'size': size, 'count': count});
                 that.refreshSize(size, count);
 
                 if (keysToDelete.length > 0) {
@@ -724,19 +783,17 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
                 }
             }
         };
-        cursor.onerror = function(event) {
+        cursor.onerror = function (event) {
             if (reject) {
-                reject(new Error("IndexedDBAdapter.getAll: Transaction failed: "+event.error));
+                reject(new Error("IndexedDBAdapter.getAll: Transaction failed: " + event.error));
             }
         };
-        cursor.onabort = function(event) {
+        cursor.onabort = function (event) {
             if (reject) {
-                reject(new Error("IndexedDBAdapter.getAll: Transaction aborted: "+event.error));
+                reject(new Error("IndexedDBAdapter.getAll: Transaction aborted: " + event.error));
             }
         };
-    } catch (e) {
-        throw e;
-    }
+    }, reject);
 };
 
 

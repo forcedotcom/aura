@@ -711,5 +711,29 @@
                     });
             }
         ]
+    },
+
+    testClosedDBIsReinitialized: {
+        test: [
+            function createStorage(cmp) {
+                var storageName = "reinitializedTestDB";
+                cmp._storage = $A.storageService.initStorage({
+                    name: storageName,
+                    maxSize: 400,
+                    expiration: 1,
+                    debugLogging: true
+                });
+                $A.test.addCleanup(function(){ this.deleteStorage(storageName); }.bind(this));
+            },
+            function setValueThenCloseStorage(cmp) {
+                return cmp._storage.set("testkey", "x")
+                    .then(function(){
+                        return cmp._storage.adapter.db.close(); })
+            },
+            function closedDBIsReinitialized(cmp) {
+                return cmp._storage.get("testkey")
+                    .then(function(value) { $A.test.assertEquals("x", value, "Should have been able to store an item, close the db and then retrieve it"); });
+            }
+        ]
     }
 })

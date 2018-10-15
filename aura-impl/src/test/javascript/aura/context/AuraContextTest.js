@@ -263,4 +263,74 @@ Test.Aura.Context.AuraContextTest = function() {
             Assert.Equal(expected, actual);
         }
     }
+
+
+
+    [Fixture]
+    function saveDefinitionsToRegistry() {
+
+        [Fact]
+        function savesLibraryDefs() {
+            var stub = Stubs.GetMethod();
+
+            withMocks([mock$A(), mockAura(), mockJson()], function() {
+                $A.componentService = { saveLibraryConfig: stub };
+
+                var context = new Aura.Context.AuraContext({});
+                context.saveDefinitionsToRegistry({
+                    libraryDefs: [{descriptor: "foo:lib1"}, {descriptor: "foo:lib2"}]
+                });
+            });
+
+            Assert.Equal(2, stub.Calls.length);
+        }
+
+        [Fact]
+        function savesComponentDefs() {
+            var stub = Stubs.GetMethod();
+
+            withMocks([mock$A(), mockAura(), mockJson()], function() {
+                $A.componentService = { saveComponentConfig: stub };
+
+                var context = new Aura.Context.AuraContext({});
+                context.saveDefinitionsToRegistry({
+                    componentDefs: [{descriptor: "foo:cmp1"}, {descriptor: "foo:cmp2"}]
+                });
+            });
+
+            Assert.Equal(2, stub.Calls.length);
+        }
+
+        [Fact]
+        function savesEventDefs() {
+            var stub = Stubs.GetMethod();
+
+            withMocks([mock$A(), mockAura(), mockJson()], function() {
+                $A.eventService = { saveEventConfig: stub };
+
+                var context = new Aura.Context.AuraContext({});
+                context.saveDefinitionsToRegistry({
+                    eventDefs: [{descriptor: "foo:evt1"}, {descriptor: "foo:evt2"}]
+                });
+            });
+
+            Assert.Equal(2, stub.Calls.length);
+        }
+
+        [Fact]
+        function savesModuleDefs() {
+            var stub = Stubs.GetMethod();
+
+            withMocks([mock$A(), mockAura(), mockJson()], function() {
+                $A.componentService = { initModuleDefs: stub };
+
+                var context = new Aura.Context.AuraContext({});
+                context.saveDefinitionsToRegistry({
+                    moduleDefs: [{descriptor: "foo:module1"}, {descriptor: "foo:module2"}]
+                });
+            });
+
+            Assert.Equal(1, stub.Calls.length);
+        }
+    }
 }

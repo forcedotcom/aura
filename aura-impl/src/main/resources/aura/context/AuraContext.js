@@ -86,35 +86,13 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     var that = this;
 
     this.initGlobalValueProviders(config["globalValueProviders"], function(gvps) {
-            var i, defs;
-
             // Don't ask.... You just kinda have to love this....
             that.globalValueProviders = gvps;
             that.contextGlobals = that.globalValueProviders.getValueProvider("Global");
             // Careful now, the def is null, this fake action sets up our paths.
             that.currentAction = new Action(null, ""+that.num, null, null, false, null, false);
 
-            if(config["libraryDefs"]) {
-                defs = config["libraryDefs"];
-                for (i = 0; i < defs.length; i++) {
-                    $A.componentService.saveLibraryConfig(defs[i]);
-                }
-            }
-
-            if (config["componentDefs"]) {
-                defs = config["componentDefs"];
-                for (i = 0; i < defs.length; i++) {
-                    if (defs[i]["descriptor"]) {
-                        $A.componentService.saveComponentConfig(defs[i]);
-                    }
-                }
-            }
-            if (config["eventDefs"]) {
-                defs = config["eventDefs"];
-                for (i = 0; i < defs.length; i++) {
-                    $A.eventService.saveEventConfig(defs[i]);
-                }
-            }
+            that.saveDefinitionsToRegistry(config);
             that.joinComponentConfigs(config["components"], that.currentAction.getId());
 
             if (initCallback) {
@@ -254,8 +232,6 @@ Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic, in
  * @export
  */
 Aura.Context.AuraContext.prototype.merge = function(otherContext, allowMissmatch) {
-    var i, defs;
-
     if (!allowMissmatch) {
 
         if ($A.util.isUndefinedOrNull(this.fwuid)) {
@@ -272,34 +248,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext, allowMissmatch
     try {
         this.globalValueProviders.merge(otherContext["globalValueProviders"]);
     } finally {
-        if (otherContext["libraryDefs"]) {
-            defs = otherContext["libraryDefs"];
-            for (i = 0; i < defs.length; i++) {
-                $A.componentService.saveLibraryConfig(defs[i]);
-            }
-        }
-
-        if (otherContext["componentDefs"]) {
-            defs = otherContext["componentDefs"];
-            for (i = 0; i < defs.length; i++) {
-                // there are occasions when defs are just references (descriptor name)
-                if (defs[i]["descriptor"]) {
-                    $A.componentService.saveComponentConfig(defs[i]);
-                }
-            }
-        }
-
-        if (otherContext["eventDefs"]) {
-            defs = otherContext["eventDefs"];
-            for (i = 0; i < defs.length; i++) {
-                $A.eventService.saveEventConfig(defs[i]);
-            }
-        }
-
-        if (otherContext["moduleDefs"]) {
-            $A.componentService.initModuleDefs(otherContext["moduleDefs"]);
-        }
-
+        this.saveDefinitionsToRegistry(otherContext);
         this.joinComponentConfigs(otherContext["components"], ""+this.getNum());
         this.joinLoaded(otherContext["loaded"], allowMissmatch);
     }
@@ -421,6 +370,43 @@ Aura.Context.AuraContext.prototype.getComponentConfig = function(creationPath) {
 Aura.Context.AuraContext.prototype.removeComponentConfig = function(creationPath) {
     if(creationPath in this.componentConfigs) {
         delete this.componentConfigs[creationPath];
+    }
+};
+
+/**
+ * @param {Object} config the context from the server.
+ * @private
+ */
+Aura.Context.AuraContext.prototype.saveDefinitionsToRegistry = function(config) {
+    var i;
+    var libraryDefs = config["libraryDefs"];
+    var componentDefs = config["componentDefs"];
+    var eventDefs = config["eventDefs"];
+    var moduleDefs = config["moduleDefs"];
+
+    if (libraryDefs) {
+        for (i = 0; i < libraryDefs.length; i++) {
+            $A.componentService.saveLibraryConfig(libraryDefs[i]);
+        }
+    }
+
+    if (componentDefs) {
+        for (i = 0; i < componentDefs.length; i++) {
+            // there are occasions when componentDefs are just references (descriptor name)
+            if (componentDefs[i]["descriptor"]) {
+                $A.componentService.saveComponentConfig(componentDefs[i]);
+            }
+        }
+    }
+
+    if (eventDefs) {
+        for (i = 0; i < eventDefs.length; i++) {
+            $A.eventService.saveEventConfig(eventDefs[i]);
+        }
+    }
+
+    if (moduleDefs) {
+        $A.componentService.initModuleDefs(moduleDefs);
     }
 };
 

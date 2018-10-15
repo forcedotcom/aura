@@ -61,4 +61,10 @@ public interface ApplicationDef extends BaseComponentDef {
      */
     @Deprecated
     DefDescriptor<FlavorsDef> getFlavorOverrides() throws QuickFixException;
+
+    /**
+     * Gets the requiredMinimumVersion defined on the application
+     * @return {@link String}
+     */
+    Double getRequiredMinimumVersion();
 }

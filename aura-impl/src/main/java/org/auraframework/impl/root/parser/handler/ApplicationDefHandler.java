@@ -57,6 +57,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_TOKEN_OVERRIDES = "tokens";
     private static final String ATTRIBUTE_FLAVOR_OVERRIDES = "flavorOverrides";
     private static final String ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION = "bootstrapPublicCacheExpiration";
+    private static final String ATTRIBUTE_REQUIRED_MINIMUM_VERSION = "requiredMinimumVersion";
 
     private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_APPCACHE_ENABLED, ATTRIBUTE_ADDITIONAL_APPCACHE_URLS)
@@ -65,7 +66,8 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     private static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
             ATTRIBUTE_PRELOAD, ATTRIBUTE_TRACK, ATTRIBUTE_LOCATION_CHANGE_EVENT,
-            ATTRIBUTE_TOKEN_OVERRIDES, ATTRIBUTE_SERVICES, ATTRIBUTE_FLAVOR_OVERRIDES, ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION)
+            ATTRIBUTE_TOKEN_OVERRIDES, ATTRIBUTE_SERVICES, ATTRIBUTE_FLAVOR_OVERRIDES, ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION,
+            ATTRIBUTE_REQUIRED_MINIMUM_VERSION)
             .addAll(ALLOWED_ATTRIBUTES)
             .addAll(BaseComponentDefHandler.INTERNAL_ALLOWED_ATTRIBUTES)
             .build();
@@ -178,6 +180,11 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         String bootstrapPublicCacheExpiration = getAttributeValue(ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION);
         if (!StringUtils.isBlank(bootstrapPublicCacheExpiration)) {
             builder.bootstrapPublicCacheExpiration = bootstrapPublicCacheExpiration;
+        }
+
+        String requiredMinimumVersion = getAttributeValue(ATTRIBUTE_REQUIRED_MINIMUM_VERSION);
+        if(!StringUtils.isBlank(requiredMinimumVersion)) {
+            builder.requiredMinimumVersion = Double.parseDouble(requiredMinimumVersion);
         }
     }
 

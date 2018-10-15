@@ -39,6 +39,7 @@ public class ApplicationDefImplUnitTest extends
     DefinitionAccess access;
     Boolean isAppcacheEnabled;
     String additionalAppCacheURLs;
+    Double requiredMinimumVersion;
 
     public ApplicationDefImplUnitTest() {
         descriptorName = "application";
@@ -56,6 +57,7 @@ public class ApplicationDefImplUnitTest extends
         builder.setAccess(this.access);
         builder.isAppcacheEnabled = this.isAppcacheEnabled;
         builder.additionalAppCacheURLs = this.additionalAppCacheURLs;
+        builder.requiredMinimumVersion = this.requiredMinimumVersion;
         return super.buildDefinition(builder);
     }
 

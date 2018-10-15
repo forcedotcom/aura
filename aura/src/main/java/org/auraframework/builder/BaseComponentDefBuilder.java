@@ -17,23 +17,8 @@ package org.auraframework.builder;
 
 import java.util.Collection;
 
-import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.*;
 import org.auraframework.def.BaseComponentDef.RenderType;
-import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.FlavoredStyleDef;
-import org.auraframework.def.HelperDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.LibraryDefRef;
-import org.auraframework.def.LocatorDef;
-import org.auraframework.def.ModelDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RendererDef;
-import org.auraframework.def.SVGDef;
-import org.auraframework.def.StyleDef;
 import org.auraframework.def.design.DesignDef;
 
 /**
@@ -80,6 +65,8 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
      * @param helperDef the helper descriptor to add.
      */
     BaseComponentDefBuilder<T> addHelperDescriptor(DefDescriptor<HelperDef> helperDef);
+
+    BaseComponentDefBuilder<T> addAttributeDefinition(DefDescriptor<AttributeDef> defDescriptor, AttributeDef attributeDef);
 
     BaseComponentDefBuilder<T> setRenderType(RenderType renderType);
 

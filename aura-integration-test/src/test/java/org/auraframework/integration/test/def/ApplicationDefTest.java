@@ -208,4 +208,71 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         ApplicationDef appdef = definitionService.getDefinition(desc);
         assertEquals(Integer.valueOf(60), appdef.getBootstrapPublicCacheExpiration());
     }
+
+    /**
+     * App's requiredMinimumVersion will be null if attribute not specified
+     */
+    @Test
+    public void testRequiredMinimumVersionNotSpecifiedDefaultsToNull() throws QuickFixException {
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, "<aura:application />");
+        ApplicationDef appdef = definitionService.getDefinition(desc);
+        assertNull(appdef.getRequiredMinimumVersion());
+    }
+
+    /**
+     * App's requiredMinimumVersion attribute value overrides value from aura:application
+     */
+    @Test
+    public void testRequiredMinimumVersionOverridesDefault() throws Exception {
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseTag, "requiredMinimumVersion='41.0'", ""));
+        ApplicationDef appdef = definitionService.getDefinition(desc);
+        assertEquals(41.0, appdef.getRequiredMinimumVersion());
+    }
+
+    /**
+     * App will inherit requiredMinimumVersion='41.0' from aura:application if attribute not specified
+     */
+    @Test
+    public void testRequiredMinimumVersionInherited() throws Exception {
+        DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseTag, "requiredMinimumVersion='41.0' extensible='true'", ""));
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseTag, String.format("extends='%s'", parentDesc.getQualifiedName()), ""));
+        ApplicationDef appdef = definitionService.getDefinition(desc);
+        assertEquals(41.0, appdef.getRequiredMinimumVersion());
+    }
+
+    /**
+     * App's requiredMinimumVersion attribute value overrides value from parent app
+     */
+    @Test
+    public void testRequiredMinimumVersionOverridesExtends() throws Exception {
+        DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseTag, "requiredMinimumVersion='41.0' extensible='true'", ""));
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, String.format(baseTag,
+                String.format("extends='%s' requiredMinimumVersion='42.0'", parentDesc.getQualifiedName()), ""));
+        ApplicationDef appdef = definitionService.getDefinition(desc);
+        assertEquals(42.0, appdef.getRequiredMinimumVersion());
+    }
+
+    /**
+     * App's requiredMinimumVersion attribute value is empty
+     */
+    public void testRequiredMinimumVersionEmpty() throws Exception {
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application requiredMinimumVersion=''/>");
+        ApplicationDef appdef = definitionService.getDefinition(desc);
+        assertNull(appdef.getRequiredMinimumVersion());
+    }
+
+    /**
+     * App's requiredMinimumVersion attribute value is invalid
+     */
+    @Test(expected = InvalidDefinitionException.class)
+    public void testRequiredMinimumVersionInvalid() throws Exception {
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application requiredMinimumVersion='number'/>");
+        definitionService.getDefinition(desc);
+    }
 }

@@ -74,6 +74,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private final Set<DefDescriptor<ModuleDef>> moduleServices;
     private FlavorsDef flavorOverrides;
     private final DefDescriptor<FlavorsDef> externalFlavorOverrides;
+    private Double requiredMinimumVersion;
 
     public static final DefDescriptor<ApplicationDef> PROTOTYPE_APPLICATION = new DefDescriptorImpl<>(
             "markup", "aura", "application", ApplicationDef.class);
@@ -90,6 +91,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.flavorOverrides = builder.flavorOverrides;
         this.externalFlavorOverrides = builder.externalFlavorOverrides;
         this.moduleServices = builder.services;
+        this.requiredMinimumVersion = builder.requiredMinimumVersion;
     }
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef>implements ApplicationDefBuilder {
@@ -98,6 +100,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public Boolean isAppcacheEnabled;
         public String additionalAppCacheURLs;
         public String bootstrapPublicCacheExpiration;
+        public Double requiredMinimumVersion;
+
         private List<DefDescriptor<TokensDef>> tokenOverrides;
         private FlavorsDef flavorOverrides;
         private DefDescriptor<FlavorsDef> externalFlavorOverrides;
@@ -211,7 +215,12 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         }
         return null;
     }
-    
+
+    @Override
+    public Double getRequiredMinimumVersion() {
+        return requiredMinimumVersion;
+    }
+
     @Override
     public List<DefDescriptor<?>> getBundle() {
         List<DefDescriptor<?>> ret = super.getBundle();
@@ -384,6 +393,9 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         }
         if (externalFlavorOverrides != null && flavorOverrides == null) {
             flavorOverrides = externalFlavorOverrides.getDef();
+        }
+        if(requiredMinimumVersion == null && getExtendsDescriptor() != null) {
+            requiredMinimumVersion = getExtendsDescriptor().getDef().getRequiredMinimumVersion();
         }
     }
 

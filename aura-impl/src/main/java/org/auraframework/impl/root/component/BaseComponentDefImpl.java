@@ -1447,6 +1447,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         private boolean minifyEnabled;
 
         @Override
+        public Builder<T> addAttributeDefinition(DefDescriptor<AttributeDef> defDescriptor, AttributeDef attributeDef) {
+            super.addAttributeDef(defDescriptor, attributeDef);
+            return this;
+        }
+
+        @Override
         public Builder<T> setFacet(String key, Object value) {
             if (facets == null) {
                 facets = Lists.newArrayList();

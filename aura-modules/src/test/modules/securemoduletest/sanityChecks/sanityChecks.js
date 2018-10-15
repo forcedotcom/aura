@@ -56,7 +56,7 @@ export default class SanityChecks extends LightningElement {
 
     @api
     testAppendDynamicallyCreatedDivToMarkup() {
-        const contentEl = this.root.querySelector("#content");
+        const contentEl = this.template.querySelector("#content");
         let div = document.createElement("div");
         div.id = "myId";
         div.className = "fancypants";

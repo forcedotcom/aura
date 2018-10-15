@@ -15,7 +15,10 @@
  */
 package org.auraframework.impl.service;
 
+import static org.mockito.Mockito.mock;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -67,13 +70,12 @@ import org.mockito.MockitoAnnotations;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
  * DefinitionService "almost" unit tests.
  *
- * We still use AuraContextImpl here, which we probably should mock out...
+ * We still use {@link AuraContextImpl} here, which we probably should mock out...
  */
 public class DefinitionServiceImplUnitTest {
 
@@ -131,8 +133,7 @@ public class DefinitionServiceImplUnitTest {
     
     private AuraContext setupContext(DefinitionService service, Mode mode, Authentication access) {
         GlobalValueProvider labels = Mockito.mock(GlobalValueProvider.class);
-        Map<String, GlobalValueProvider> gvps = Maps.newHashMap();
-        gvps.put(AuraValueProviderType.LABEL.getPrefix(), labels);
+        Map<String, GlobalValueProvider> gvps = Collections.singletonMap(AuraValueProviderType.LABEL.getPrefix(), labels);
         AuraContext context = new AuraContextImpl(mode, registries,
                 null /* defaultPrefixes */,
                 Format.JSON, access,
@@ -480,7 +481,7 @@ public class DefinitionServiceImplUnitTest {
     }
 
     @Test
-    public void testSourceWithNoRegistry() throws Exception {
+    public void testSourceWithNoRegistry() {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
         setupContext(definitionService);
         DefDescriptor<Definition> descriptor1 = getMockDescriptor();
@@ -489,7 +490,7 @@ public class DefinitionServiceImplUnitTest {
 
 //Set<DefDescriptor<?>> find(DescriptorFilter matcher);
     @Test
-    public void testFindCallsRegistryWithWildcard() throws Exception {
+    public void testFindCallsRegistryWithWildcard() {
         String namespace = getUniqueNamespace();
         DefinitionService definitionService = createDefinitionServiceWithMocks();
         setupContext(definitionService, Mode.DEV, Authentication.AUTHENTICATED);
@@ -509,10 +510,10 @@ public class DefinitionServiceImplUnitTest {
     }
 
     @Test
-    public void testFindCallsRegistryWithNamespace() throws Exception {
+    public void testFindCallsRegistryWithNamespace() {
         String namespace = getUniqueNamespace();
         DefinitionService definitionService = createDefinitionServiceWithMocks();
-        Set<DefDescriptor<?>> expectedCacheValue = Sets.newHashSet();
+        Set<DefDescriptor<?>> expectedCacheValue = Collections.emptySet();
         setupContext(definitionService, Mode.DEV, Authentication.AUTHENTICATED);
         DescriptorFilter filter = new DescriptorFilter("*://"+namespace+":*");
         registries.addFilterFor(filter, registry1);
@@ -530,9 +531,9 @@ public class DefinitionServiceImplUnitTest {
     }
 
     @Test
-    public void testFindCallsRegistryWithNamespaceAndCachesWhenCacheable() throws Exception {
+    public void testFindCallsRegistryWithNamespaceAndCachesWhenCacheable() {
         String namespace = getUniqueNamespace();
-        Set<DefDescriptor<?>> expectedCacheValue = Sets.newHashSet();
+        Set<DefDescriptor<?>> expectedCacheValue = Collections.emptySet();
         DefinitionService definitionService = createDefinitionServiceWithMocks();
         setupContext(definitionService, Mode.DEV, Authentication.AUTHENTICATED);
         DescriptorFilter filter = new DescriptorFilter("*://"+namespace+":*");
@@ -554,7 +555,7 @@ public class DefinitionServiceImplUnitTest {
     }
 
     @Test
-    public void testFindCallsRegistryWithNamespaceMismatchCase() throws Exception {
+    public void testFindCallsRegistryWithNamespaceMismatchCase() {
         String namespace = getUniqueNamespace();
         String namespaceMismatch = namespace.toUpperCase();
         DefinitionService definitionService = createDefinitionServiceWithMocks();
@@ -564,7 +565,7 @@ public class DefinitionServiceImplUnitTest {
         // registry must have 'hasFind()', and must have a namespace that matches.
         Mockito.when(registry1.hasFind()).thenReturn(true);
         Mockito.when(registry1.getNamespaces()).thenReturn(Sets.newHashSet(namespace));
-        Mockito.when(registry1.find(Matchers.any())).thenReturn(Sets.newHashSet());
+        Mockito.when(registry1.find(Matchers.any())).thenReturn(Collections.emptySet());
         definitionService.find(filter);
         Mockito.verify(registry1, Mockito.times(1)).find(filter);
 
@@ -575,10 +576,10 @@ public class DefinitionServiceImplUnitTest {
     }
 
     @Test
-    public void testFindCallsRegistryWithNamespaceMismatchCaseAndCaches() throws Exception {
+    public void testFindCallsRegistryWithNamespaceMismatchCaseAndCaches() {
         String namespace = getUniqueNamespace();
         String namespaceMismatch = namespace.toUpperCase();
-        Set<DefDescriptor<?>> expectedCacheValue = Sets.newHashSet();
+        Set<DefDescriptor<?>> expectedCacheValue = Collections.emptySet();
         DefinitionService definitionService = createDefinitionServiceWithMocks();
         setupContext(definitionService, Mode.DEV, Authentication.AUTHENTICATED);
         DescriptorFilter filter = new DescriptorFilter("*://"+namespaceMismatch+":*");
@@ -600,7 +601,7 @@ public class DefinitionServiceImplUnitTest {
     }
 
     @Test
-    public void testFindCallsRegistryWithNamespaceForTestCase() throws Exception {
+    public void testFindCallsRegistryWithNamespaceForTestCase() {
         String namespace = getUniqueNamespace();
         DefinitionService definitionService = createDefinitionServiceWithMocks();
         setupContext(definitionService, Mode.DEV, Authentication.AUTHENTICATED);
@@ -609,7 +610,7 @@ public class DefinitionServiceImplUnitTest {
         // registry must have 'hasFind()', and must have a namespace that matches.
         Mockito.when(registry1.hasFind()).thenReturn(true);
         Mockito.when(registry1.getNamespaces()).thenReturn(Sets.newHashSet(namespace));
-        Mockito.when(registry1.find(Matchers.any())).thenReturn(Sets.newHashSet());
+        Mockito.when(registry1.find(Matchers.any())).thenReturn(Collections.emptySet());
         definitionService.find(filter);
         Mockito.verify(registry1, Mockito.times(1)).find(filter);
 
@@ -636,7 +637,7 @@ public class DefinitionServiceImplUnitTest {
     }
     
     @Test
-    public void testHasAccessWithDefNoAccessDeclaration() throws QuickFixException {
+    public void testHasAccessWithDefNoAccessDeclaration() {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
         setupContext(definitionService, Mode.DEV, Authentication.AUTHENTICATED);
         DefDescriptor<Definition> descriptor = getMockDescriptor();
@@ -690,14 +691,14 @@ public class DefinitionServiceImplUnitTest {
     public void testGetClientLibraries() {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
         
-        Map<DefDescriptor<? extends Definition>, Definition> dependencies = Maps.newHashMap();
+        Map<DefDescriptor<? extends Definition>, Definition> dependencies = Collections.emptyMap();
         List<ClientLibraryDef> clientLibraries = new ArrayList<>();
         DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries, false, null);
         AuraContext context = new AuraContextImpl(Mode.DEV, registries,
                 null /* defaultPrefixes */,
                 Format.JSON, Authentication.AUTHENTICATED,
                 null /* jsonContext */,
-                null /* globalProviders */,
+                Collections.singletonMap("mock", mock(GlobalValueProvider.class)) /* globalProviders */,
                 configAdapter,
                 definitionService,
                 null /* testContextAdapter */);
@@ -722,14 +723,14 @@ public class DefinitionServiceImplUnitTest {
     public void testGetDependencies() {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
         
-        Map<DefDescriptor<? extends Definition>, Definition> dependencies = Maps.newHashMap();
+        Map<DefDescriptor<? extends Definition>, Definition> dependencies = Collections.emptyMap();
         List<ClientLibraryDef> clientLibraries = new ArrayList<>();
         DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries, false, null);
         AuraContext context = new AuraContextImpl(Mode.DEV, registries,
                 null /* defaultPrefixes */,
                 Format.JSON, Authentication.AUTHENTICATED,
                 null /* jsonContext */,
-                null /* globalProviders */,
+                Collections.singletonMap("mock", mock(GlobalValueProvider.class)) /* globalProviders */,
                 configAdapter,
                 definitionService,
                 null /* testContextAdapter */);
@@ -777,9 +778,9 @@ public class DefinitionServiceImplUnitTest {
     }
     
     @Test
-    public void testLabelsCacheisUsedForApplications() throws Exception {
+    public void testLabelsCacheisUsedForApplications() {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
-        Map<DefDescriptor<? extends Definition>, Definition> dependencies = Maps.newHashMap();
+        Map<DefDescriptor<? extends Definition>, Definition> dependencies = Collections.emptyMap();
         List<ClientLibraryDef> clientLibraries = new ArrayList<>();
         Map<String,Set<PropertyReference>> globalReferencesMap = new HashMap<>();
         Set<PropertyReference> mockSet = new HashSet<>();
@@ -789,7 +790,7 @@ public class DefinitionServiceImplUnitTest {
                 null /* defaultPrefixes */,
                 Format.JSON, Authentication.AUTHENTICATED,
                 null /* jsonContext */,
-                null /* globalProviders */,
+                Collections.singletonMap("mock", mock(GlobalValueProvider.class)) /* globalProviders */,
                 configAdapter,
                 definitionService,
                 null /* testContextAdapter */);
@@ -802,7 +803,7 @@ public class DefinitionServiceImplUnitTest {
     @Test
     public void testLabelsCacheisBuiltforComponents() throws Exception {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
-        Map<DefDescriptor<? extends Definition>, Definition> dependencies = Maps.newHashMap();
+        Map<DefDescriptor<? extends Definition>, Definition> dependencies = Collections.emptyMap();
         List<ClientLibraryDef> clientLibraries = new ArrayList<>();
         DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries, false, null);
         String name = "test_"+ counter.getAndIncrement();

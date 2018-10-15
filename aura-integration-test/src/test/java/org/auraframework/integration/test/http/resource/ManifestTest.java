@@ -46,6 +46,9 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -106,8 +109,8 @@ public class ManifestTest extends AuraImplTestCase {
         String appMarkup = String.format(baseApplicationTag, "useAppcache='true'", "");
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, appMarkup);
 
-        AuraContext context = contextService.startContext(AuraContext.Mode.PROD,
-                AuraContext.Format.MANIFEST, AuraContext.Authentication.AUTHENTICATED, appDesc);
+        AuraContext context = contextService.startContext(Mode.PROD,
+                Format.MANIFEST, Authentication.AUTHENTICATED, appDesc);
 
         ConfigAdapter spyConfigAdapter = spy(configAdapter);
         doThrow(new RuntimeException()).when(spyConfigAdapter).getResetCssURL();
@@ -142,8 +145,8 @@ public class ManifestTest extends AuraImplTestCase {
         String appMarkup = String.format(baseApplicationTag, appAttributes, "");
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, appMarkup);
 
-        AuraContext context = contextService.startContext(AuraContext.Mode.PROD,
-                AuraContext.Format.MANIFEST, AuraContext.Authentication.AUTHENTICATED, appDesc);
+        AuraContext context = contextService.startContext(Mode.PROD,
+                Format.MANIFEST, Authentication.AUTHENTICATED, appDesc);
         String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
@@ -177,8 +180,8 @@ public class ManifestTest extends AuraImplTestCase {
             contextService.endContext();
         }
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("appCache:testApp", ApplicationDef.class);
-        AuraContext context = contextService.startContext(AuraContext.Mode.PROD, AuraContext.Format.MANIFEST,
-                AuraContext.Authentication.AUTHENTICATED, appDesc);
+        AuraContext context = contextService.startContext(Mode.PROD, Format.MANIFEST,
+                Authentication.AUTHENTICATED, appDesc);
         context.setApplicationDescriptor(appDesc);
         String expectedContextName = "/cool";
         context.setContextPath(expectedContextName);
@@ -218,8 +221,8 @@ public class ManifestTest extends AuraImplTestCase {
             contextService.endContext();
         }
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("appCache:testApp", ApplicationDef.class);
-        AuraContext context = contextService.startContext(AuraContext.Mode.PROD,
-                AuraContext.Format.MANIFEST, AuraContext.Authentication.AUTHENTICATED, appDesc);
+        AuraContext context = contextService.startContext(Mode.PROD,
+                Format.MANIFEST, Authentication.AUTHENTICATED, appDesc);
         String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
@@ -257,8 +260,8 @@ public class ManifestTest extends AuraImplTestCase {
             contextService.endContext();
         }
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("appCache:testApp", ApplicationDef.class);
-        AuraContext context = contextService.startContext(AuraContext.Mode.PROD, AuraContext.Format.MANIFEST,
-                AuraContext.Authentication.AUTHENTICATED, appDesc);
+        AuraContext context = contextService.startContext(Mode.PROD, Format.MANIFEST,
+                Authentication.AUTHENTICATED, appDesc);
         context.setApplicationDescriptor(appDesc);
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
@@ -292,8 +295,8 @@ public class ManifestTest extends AuraImplTestCase {
             contextService.endContext();
         }
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("appCache:testApp", ApplicationDef.class);
-        AuraContext context = contextService.startContext(AuraContext.Mode.PROD, AuraContext.Format.MANIFEST,
-                AuraContext.Authentication.AUTHENTICATED, appDesc);
+        AuraContext context = contextService.startContext(Mode.PROD, Format.MANIFEST,
+                Authentication.AUTHENTICATED, appDesc);
         context.setApplicationDescriptor(appDesc);
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();

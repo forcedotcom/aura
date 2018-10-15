@@ -198,7 +198,7 @@ public class AuraContextFilter implements Filter {
         }
     }
 
-    @SuppressWarnings({ "boxing", "unused" })
+    @SuppressWarnings("unused")
     protected AuraContext startContext(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
 
@@ -217,7 +217,7 @@ public class AuraContextFilter implements Filter {
         if (f == null) {
             if (AuraComponentDefinitionServlet.URI_DEFINITIONS_PATH.equals(request.getServletPath())) {
                 f = Format.JSON;
-            } else if ("GET".equals(request.getMethod()) && !isActionParam.get(request, false)) {
+            } else if ("GET".equals(request.getMethod()) && !isActionParam.get(request, Boolean.FALSE).booleanValue()) {
                 f = Format.HTML;
             } else {
                 f = Format.JSON;
@@ -498,7 +498,7 @@ public class AuraContextFilter implements Filter {
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         processInjection(filterConfig);
         if (testFilter != null) {
             testFilter.init(filterConfig);

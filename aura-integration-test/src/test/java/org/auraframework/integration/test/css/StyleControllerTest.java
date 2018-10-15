@@ -15,14 +15,16 @@
  */
 package org.auraframework.integration.test.css;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokensDef;
-import org.auraframework.impl.controller.StyleController;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
@@ -33,9 +35,8 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.junit.Test;
 
-import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 /**
  * Basic tests for {@link StyleController}.

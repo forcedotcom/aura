@@ -137,12 +137,13 @@ public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLoc
     public AuraLocale getAuraLocale() {
         // use requested locales from context
         // check for nulls - this happens when AuraContextFilter has not been run
-        AuraContext context = contextService.getCurrentContext();
-        if (context != null) {
-            List<Locale> locales = context.getRequestedLocales();
-            if (locales != null && !locales.isEmpty()) {
-                return new AuraLocaleImpl(locales.get(0));
-            }
+        final AuraContext context = contextService.getCurrentContext();
+        if (context == null) {
+        	throw new IllegalStateException("The AuraContext needs to be initialized before you can retreive the current locale.");
+        }
+        final List<Locale> locales = context.getRequestedLocales();
+        if (locales != null && !locales.isEmpty()) {
+            return new AuraLocaleImpl(locales.get(0));
         }
 
         // none available create a default locale

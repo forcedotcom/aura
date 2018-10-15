@@ -74,18 +74,21 @@ public class LocalizationServiceImpl implements LocalizationService {
             return null;
         }
 
-        AuraLocale auraLocale = this.localizationAdapter.getAuraLocale();
+        AuraLocale auraLocale = null;
         if (locale == null) {
+            auraLocale = this.localizationAdapter.getAuraLocale();
             locale = auraLocale.getDateLocale();
         }
         if (timeZone == null) {
+            if (auraLocale == null) {
+                auraLocale = this.localizationAdapter.getAuraLocale();
+            }
             timeZone = auraLocale.getTimeZone();
         }
 
         DateFormat dateFormat = DateFormat.getDateInstance(dateStyle, locale);
         dateFormat.setTimeZone(com.ibm.icu.util.TimeZone.getTimeZone(timeZone.getID()));
         return dateFormat.format(date);
-        //return dateService.getDateStyleConverter(locale, dateStyle).format(date, timeZone);
     }
 
     @Override
@@ -382,11 +385,15 @@ public class LocalizationServiceImpl implements LocalizationService {
         if (date == null) {
             return null;
         }
-        AuraLocale loc = this.localizationAdapter.getAuraLocale();
+        AuraLocale loc = null;
         if (locale == null) {
+            loc = this.localizationAdapter.getAuraLocale();
             locale = loc.getDateLocale();
         }
         if (timeZone == null) {
+            if(loc == null) {
+                loc = this.localizationAdapter.getAuraLocale();
+            }
             timeZone = loc.getTimeZone();
         }
         return dateService.getDateStyleConverter(locale, dateStyle).parse(date, timeZone);

@@ -187,7 +187,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
 
     @Test
     @Ignore("See note in impl java file")
-    public void testValidatesReferenceNotFlavorable() throws Exception {
+    public void testValidatesReferenceNotFlavorable() {
         ReferenceValidationContext validationContext = new ReferenceValidationContextImpl(Maps.newHashMap());
         try {
             DefDescriptor<ComponentDef> cmp = addComponentDef();

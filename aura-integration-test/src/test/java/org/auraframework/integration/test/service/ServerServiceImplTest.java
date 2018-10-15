@@ -32,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
+
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -65,6 +66,7 @@ import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.validation.ReferenceValidationContext;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -96,7 +98,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         }
 
         @Override
-        public void validateDefinition() throws QuickFixException {
+        public void validateDefinition() {
         }
 
         @Override
@@ -109,7 +111,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         }
 
         @Override
-        public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        public void validateReferences(ReferenceValidationContext validationContext) {
         }
 
         @Override
@@ -257,7 +259,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
             value.put("action", res);
             json.writeValue(value);
         }
-    };
+    }
 
     private static class ShareCmpAction extends ActionDelegate {
 
@@ -357,21 +359,22 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Check that our EmptyAction is properly serialized.
+     * Check that our {@link EmptyAction} is properly serialized.
      *
      * This does a positive and negative test, ensuring that we only serialize what we should.
      */
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> validateEmptyActionSerialization(String serialized, Set<String> ignore,
+    private static Map<String, Object> validateEmptyActionSerialization(String serialized, Set<String> ignore,
             List<String> actionNameList) {
         int actionNumber = actionNameList.size();
         Set<String> extras = Sets.newHashSet();
+        @SuppressWarnings("unchecked")
         Map<String, Object> json = (Map<String, Object>) new JsonReader().read(serialized);
-        List<Object> actions = (List<Object>) json.get("actions");
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> actions = (List<Map<String, Object>>) json.get("actions");
         assertTrue(actions != null);
         assertTrue("expected " + actionNumber + " action, but get " + actions.size(), actions.size() == actionNumber);
         for (int i = 0; i < actionNumber; i++) {
-            Map<String, Object> action = (Map<String, Object>) actions.get(i);
+            Map<String, Object> action = actions.get(i);
             assertEquals("didn't get expecting action on i:" + i,
                     actionNameList.get(i), action.get("action"));
         }
@@ -494,7 +497,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = definitionService
                 .getDefDescriptor("preloadTest:test_SimpleApplication", ApplicationDef.class);
         AuraContext context = contextService
-                .startContext(Mode.DEV, AuraContext.Format.CSS, AuraContext.Authentication.AUTHENTICATED, appDesc);
+                .startContext(Mode.DEV, Format.CSS, Authentication.AUTHENTICATED, appDesc);
         final String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
 
@@ -529,8 +532,8 @@ public class ServerServiceImplTest extends AuraImplTestCase {
                 .getDefDescriptor("setAttributesTest:child", ComponentDef.class);
         DefDescriptor<ComponentDef> child2 = definitionService
                 .getDefDescriptor("setAttributesTest:anotherChild", ComponentDef.class);
-        contextService.startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
-                AuraContext.Authentication.AUTHENTICATED, appDesc);
+        contextService.startContext(Mode.DEV, Format.CSS,
+                Authentication.AUTHENTICATED, appDesc);
 
         Set<DefDescriptor<?>> writable = Sets.newLinkedHashSet();
 
@@ -559,8 +562,8 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     public void testPreloadCSSDependencies() throws Exception {
         DefDescriptor<ComponentDef> appDesc = definitionService
                 .getDefDescriptor("clientApiTest:cssStyleTest", ComponentDef.class);
-        AuraContext context = contextService.startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
-                AuraContext.Authentication.AUTHENTICATED, appDesc);
+        AuraContext context = contextService.startContext(Mode.DEV, Format.CSS,
+                Authentication.AUTHENTICATED, appDesc);
         final String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
 
@@ -584,7 +587,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = definitionService
                 .getDefDescriptor("appCache:withpreload", ApplicationDef.class);
         AuraContext context = contextService
-                .startContext(Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
+                .startContext(Mode.DEV, Format.JS, Authentication.AUTHENTICATED, appDesc);
         final String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
 
@@ -617,7 +620,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = definitionService
                 .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);
         AuraContext context = contextService
-                .startContext(Mode.UTEST, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, cmpDesc);
+                .startContext(Mode.UTEST, Format.JS, Authentication.AUTHENTICATED, cmpDesc);
         final String uid = definitionService.getUid(null, cmpDesc);
         context.addLoaded(cmpDesc, uid);
         Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
@@ -649,7 +652,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = definitionService
                 .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);
         AuraContext context = contextService
-                .startContext(Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, cmpDesc);
+                .startContext(Mode.DEV, Format.JS, Authentication.AUTHENTICATED, cmpDesc);
 
         // get defs with LockerService enabled
         getMockConfigAdapter().setIsProduction(false);
@@ -674,8 +677,8 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = definitionService
                 .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);
         AuraContext context = contextService
-                .startContext(Mode.PROD, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, cmpDesc);
-
+                .startContext(Mode.PROD, Format.JS, Authentication.AUTHENTICATED, cmpDesc);
+        
         // get defs with LockerService enabled
         getMockConfigAdapter().setIsProduction(true);
         StringWriter output = new StringWriter();
@@ -692,8 +695,8 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     public void testPreloadJSDependencies() throws Exception {
         DefDescriptor<ComponentDef> appDesc = definitionService
                 .getDefDescriptor("clientApiTest:cssStyleTest", ComponentDef.class);
-        AuraContext context = contextService.startContext(AuraContext.Mode.DEV, AuraContext.Format.JS,
-                AuraContext.Authentication.AUTHENTICATED, appDesc);
+        AuraContext context = contextService.startContext(Mode.DEV, Format.JS,
+                Authentication.AUTHENTICATED, appDesc);
         final String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
 
@@ -735,7 +738,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         }
         source.append("</aura:application>");
 
-        getDefinitionsOutput(source.toString(), AuraContext.Mode.UTEST);
+        getDefinitionsOutput(source.toString(), Mode.UTEST);
 //        assertFalse(
 //                "There are syntax errors preventing compression of application javascript",
 //                js.contains("There are errors preventing this file from being minimized!"));
@@ -749,7 +752,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     //     Object componentClass = null;
     //     Boolean found = false;
     //     String js = getDefinitionsOutput(
-    //             "<aura:application></aura:application>", AuraContext.Mode.DEV);
+    //             "<aura:application></aura:application>", Mode.DEV);
 
     //     assertTrue("aura:html component class not included in app js",
     //             js.contains("addComponentClass(\"markup://aura:html"));
@@ -781,7 +784,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     @Test
     public void testTemplatesNotIncludedInAppJS() throws Exception {
         String source = "<aura:application template=\"auradocs:template\"></aura:application>";
-        String js = getDefinitionsOutput(source.toString(), AuraContext.Mode.PROD);
+        String js = getDefinitionsOutput(source.toString(), Mode.PROD);
 
         assertFalse("auradocs:template or its base aura:template was present in app.js",
                     js.contains(":template"));
@@ -797,24 +800,25 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     public void testThrowsOriginalIOExceptionFromRun() throws Exception {
         String exceptionMessage = "Test exception";
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
-        Writer writer = mock(Writer.class);
-        when(writer.append('{')).thenThrow(new IOException(exceptionMessage));
-        Message message = new Message(new ArrayList<Action>());
-        try {
-            serverService.run(message, contextService.getCurrentContext(), writer, null);
-            fail("Exception should be thrown from method run().");
-        } catch(IOException e) {
-            assertEquals(exceptionMessage, e.getMessage());
+        try (final Writer writer = mock(Writer.class)) {
+            when(writer.append('{')).thenThrow(new IOException(exceptionMessage));
+            Message message = new Message(new ArrayList<Action>());
+            try {
+                serverService.run(message, contextService.getCurrentContext(), writer, null);
+                fail("Exception should be thrown from method run().");
+            } catch(IOException e) {
+                assertEquals(exceptionMessage, e.getMessage());
+            }
         }
     }
 
-    private String getDefinitionsOutput(String source, AuraContext.Mode mode)
+    private String getDefinitionsOutput(String source, Mode mode)
             throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
                 ApplicationDef.class, source);
         AuraContext context = contextService.startContext(mode,
-                AuraContext.Format.JS,
-                AuraContext.Authentication.AUTHENTICATED, appDesc);
+                Format.JS,
+                Authentication.AUTHENTICATED, appDesc);
         final String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
         Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);

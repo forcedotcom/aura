@@ -142,7 +142,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
 
     /** verify tokens descriptor ref is validated */
     @Test
-    public void testInvalidTokensRef() throws QuickFixException {
+    public void testInvalidTokensRef() {
         String src = String.format("<aura:application tokens=\"%s\"/>", "wall:maria");
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
 
@@ -155,7 +155,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     }
 
     @Test
-    public void testValidateDefinitionValidateJsCode() throws Exception {
+    public void testValidateDefinitionValidateJsCode() {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
                 ApplicationDef.class, "<aura:application></aura:application>");
         DefDescriptor<ControllerDef> controllerDesc = definitionService.getDefDescriptor(appDesc,

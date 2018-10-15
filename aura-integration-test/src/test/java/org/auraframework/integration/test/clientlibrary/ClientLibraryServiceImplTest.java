@@ -208,7 +208,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
      * Each library name has to have its own aura:clientLibrary tag.
      */
     @Test
-    public void testCommaSeparatedStringInNameWillNotResolve() throws Exception {
+    public void testCommaSeparatedStringInNameWillNotResolve() {
         ClientLibraryService tmpService = new ClientLibraryServiceImpl();
         ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("MyLib, MyLib2", ClientLibraryDef.Type.JS,
                 null, null, null);
@@ -227,7 +227,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         return urls;
     }
 
-    private ClientLibraryResolver getResolver(String name, Type type) {
+    private static ClientLibraryResolver getResolver(String name, Type type) {
         return ClientLibraryResolverRegistryImpl.INSTANCE.get(name, type);
     }
 }

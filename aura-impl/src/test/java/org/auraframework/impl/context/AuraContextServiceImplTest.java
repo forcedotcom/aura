@@ -15,6 +15,11 @@
  */
 package org.auraframework.impl.context;
 
+import java.util.Collections;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.ContextAdapter;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.GlobalValueProvider;
@@ -27,15 +32,9 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import javax.inject.Inject;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ContextService.class, AuraContextServiceImpl.class})
@@ -52,21 +51,17 @@ public class AuraContextServiceImplTest extends AuraImplTestCase {
         assertTrue(contextService instanceof AuraContextServiceImpl);
     }
     
-    /*
-     * Verify we can start Aura Context with globalValueProviders passed in
-     * public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access,
-                                    Map<String, GlobalValueProvider> globalValueProviders,
-                                    DefDescriptor<? extends BaseComponentDef> appDesc)
+    /**
+     * Verify we can start Aura Context with {@code globalValueProviders} passed in to
+     * {@link AuraContextImpl#AuraContextImpl(Mode, org.auraframework.system.RegistrySet, Map, Format, Authentication, org.auraframework.util.json.JsonSerializationContext, Map, org.auraframework.adapter.ConfigAdapter, org.auraframework.service.DefinitionService, org.auraframework.test.TestContextAdapter)}
      */
     @Test
-    public void testStartLiteContext() throws Exception {
-    	Map<String, GlobalValueProvider> emptyGVP = new HashMap<>();
+    public void testStartLiteContext() {
+    	Map<String, GlobalValueProvider> emptyGVP = Collections.emptyMap();
     	ContextService contextServiceMocked = PowerMockito.spy(contextService);
     	contextServiceMocked.startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, emptyGVP, null);
     	assertTrue(contextServiceMocked.isEstablished());
     	assertNotNull(contextServiceMocked.getCurrentContext());
-    	
-    	PowerMockito.verifyPrivate(contextServiceMocked, Mockito.never()).invoke("getGlobalProviders");
     	
     	contextServiceMocked.endContext();
     }
@@ -83,7 +78,7 @@ public class AuraContextServiceImplTest extends AuraImplTestCase {
         assertFalse(contextAdapter.isEstablished());
     }
 
-    private void unregisterGlobal(String name) {
+    final static void unregisterGlobal(String name) {
         try {
             Map<String, GlobalValue> values = AuraPrivateAccessor.get(AuraContextImpl.class, "allowedGlobalValues");
             values.remove(name);

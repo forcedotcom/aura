@@ -33,7 +33,7 @@ import org.junit.Test;
 
 public class TokensImportDefHandlerTest extends StyleTestCase {
     @Inject
-    DefinitionService definitionService;
+    private DefinitionService definitionService;
 
     @Inject
     private DefinitionParserAdapter definitionParserAdapter;
@@ -62,7 +62,7 @@ public class TokensImportDefHandlerTest extends StyleTestCase {
     }
 
     @Test
-    public void testInvalidChild() throws Exception {
+    public void testInvalidChild() {
         try {
             source("<aura:import name='test:tokens'><ui:button></aura:import>");
             fail("Should have thrown an exception");

@@ -27,6 +27,9 @@ import java.util.TimeZone;
 import javax.inject.Inject;
 
 import org.auraframework.service.LocalizationService;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.AuraTestCase;
 import org.junit.Test;
 
@@ -39,6 +42,13 @@ public class LocalizationServiceImplTest extends AuraTestCase {
 
     @Inject
     public LocalizationService localizationService;
+    
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+
+        contextService.startContext(Mode.FTEST, Format.JSON, Authentication.AUTHENTICATED);
+    }
 
     /**
      * Tests to verify Date parser across different Locale
@@ -227,89 +237,87 @@ public class LocalizationServiceImplTest extends AuraTestCase {
     }
 
     @Test
-    public void testParsersWithEmptyString() throws ParseException {
-        {
-            try {
-                localizationService.parseCurrency("");
-                fail("parseCurrency(\"\") did not throw an exception");
-            } catch (Exception e) {
-                checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
-            }
+    public void testParsersWithEmptyString() {
+        try {
+            localizationService.parseCurrency("");
+            fail("parseCurrency(\"\") did not throw an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
+        }
 
-            try {
-                localizationService.parseDateTimeToCalendar("", null, null, -1, -1);
-                fail("parseDateTimeToCalendar(\"\", null, null, -1, -1) did not throw an exception");
-            } catch (Exception e) {
-                // TODO(W-1482880): same as testDateTimeParserExceptions()
-                checkExceptionContains(e, IllegalArgumentException.class, "Both date style and time style cannot be none");
-            }
+        try {
+            localizationService.parseDateTimeToCalendar("", null, null, -1, -1);
+            fail("parseDateTimeToCalendar(\"\", null, null, -1, -1) did not throw an exception");
+        } catch (Exception e) {
+            // TODO(W-1482880): same as testDateTimeParserExceptions()
+            checkExceptionContains(e, IllegalArgumentException.class, "Both date style and time style cannot be none");
+        }
 
-            try {
-                localizationService.parseDateTime("");
-                fail("parseDateTime(\"\") did not throw an exception");
-            } catch (Exception e) {
-                // TODO(W-1482880): same as testDateTimeParserExceptions()
-                checkExceptionContains(e, DateTimeParseException.class, "Text '' could not be parsed at index 0");
-            }
+        try {
+            localizationService.parseDateTime("");
+            fail("parseDateTime(\"\") did not throw an exception");
+        } catch (Exception e) {
+            // TODO(W-1482880): same as testDateTimeParserExceptions()
+            checkExceptionContains(e, DateTimeParseException.class, "Text '' could not be parsed at index 0");
+        }
 
-            try {
-                localizationService.parseTimeToCalendar("", null, null, -1);
-                fail("parseTimeToCalendar(\"\", null, null, -1) did not throw an exception");
-            } catch (Exception e) {
-                // TODO(W-1482880): same as testDateTimeParserExceptions()
-                checkExceptionContains(e, IllegalArgumentException.class, "Both date style and time style cannot be none");
-            }
+        try {
+            localizationService.parseTimeToCalendar("", null, null, -1);
+            fail("parseTimeToCalendar(\"\", null, null, -1) did not throw an exception");
+        } catch (Exception e) {
+            // TODO(W-1482880): same as testDateTimeParserExceptions()
+            checkExceptionContains(e, IllegalArgumentException.class, "Both date style and time style cannot be none");
+        }
 
-            try {
-                localizationService.parseTime("");
-                fail("parseTime(\"\") did not throw an exception");
-            } catch (Exception e) {
-                // TODO(W-1482880): same as testDateTimeParserExceptions()
-                checkExceptionContains(e, DateTimeParseException.class, "Text '' could not be parsed at index 0");
-            }
+        try {
+            localizationService.parseTime("");
+            fail("parseTime(\"\") did not throw an exception");
+        } catch (Exception e) {
+            // TODO(W-1482880): same as testDateTimeParserExceptions()
+            checkExceptionContains(e, DateTimeParseException.class, "Text '' could not be parsed at index 0");
+        }
 
-            try {
-                localizationService.parseDate("");
-                fail("parseDate(\"\") did not throw an exception");
-            } catch (Exception e) {
-                // TODO(W-1482880): same as testDateTimeParserExceptions()
-                checkExceptionContains(e, DateTimeParseException.class, "Text '' could not be parsed at index 0");
-            }
+        try {
+            localizationService.parseDate("");
+            fail("parseDate(\"\") did not throw an exception");
+        } catch (Exception e) {
+            // TODO(W-1482880): same as testDateTimeParserExceptions()
+            checkExceptionContains(e, DateTimeParseException.class, "Text '' could not be parsed at index 0");
+        }
 
-            try {
-                localizationService.parseInt("");
-                fail("parseInt(\"\") did not throw an exception");
-            } catch (Exception e) {
-                checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
-            }
+        try {
+            localizationService.parseInt("");
+            fail("parseInt(\"\") did not throw an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
+        }
 
-            try {
-                localizationService.parseLong("");
-                fail("parseLong(\"\") did not throw an exception");
-            } catch (Exception e) {
-                checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
-            }
+        try {
+            localizationService.parseLong("");
+            fail("parseLong(\"\") did not throw an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
+        }
 
-            try {
-                localizationService.parseFloat("");
-                fail("parseFloat(\"\") did not throw an exception");
-            } catch (Exception e) {
-                checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
-            }
+        try {
+            localizationService.parseFloat("");
+            fail("parseFloat(\"\") did not throw an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
+        }
 
-            try {
-                localizationService.parseDouble("");
-                fail("parseDouble(\"\") did not throw an exception");
-            } catch (Exception e) {
-                checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
-            }
+        try {
+            localizationService.parseDouble("");
+            fail("parseDouble(\"\") did not throw an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
+        }
 
-            try {
-                localizationService.parsePercent("");
-                fail("parsePercent(\"\") did not throw an exception");
-            } catch (Exception e) {
-                checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
-            }
+        try {
+            localizationService.parsePercent("");
+            fail("parsePercent(\"\") did not throw an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
         }
     }
 
@@ -371,7 +379,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
     }
 
     @Test
-    public void testCurrencyParserExceptions() throws ParseException {
+    public void testCurrencyParserExceptions() {
         // Test invalid Currency strings
         {
             String currencyJPY = "￥9,990.00";
@@ -456,5 +464,4 @@ public class LocalizationServiceImplTest extends AuraTestCase {
             checkExceptionFull(e, ParseException.class, expectedMessage);
         }
     }
-
 }

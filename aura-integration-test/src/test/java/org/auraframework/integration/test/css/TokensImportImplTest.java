@@ -34,7 +34,7 @@ import org.junit.Test;
 
 public class TokensImportImplTest extends StyleTestCase {
     @Inject
-    DefinitionService definitionService;
+    private DefinitionService definitionService;
 
     @Inject
     private DefinitionParserAdapter definitionParserAdapter;

@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.context;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -45,6 +49,7 @@ import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.GlobalValueProviderFactory;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.CSPInliningService.InlineScriptMode;
 import org.auraframework.service.DefinitionService;
@@ -71,9 +76,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 public class AuraContextImpl implements AuraContext {
     // JBUCH: TEMPORARY FLAG FOR 202 CRUC. REMOVE IN 204.
@@ -103,7 +105,7 @@ public class AuraContextImpl implements AuraContext {
 
     private final Format format;
 
-    private final Map<String, GlobalValueProvider> globalProviders;
+    private Map<String, GlobalValueProvider> globalProviders;
 
     private final Map<DefDescriptor<?>, String> loaded = Maps.newLinkedHashMap();
     private final Map<DefDescriptor<?>, String> clientLoaded = Maps.newLinkedHashMap();
@@ -158,12 +160,19 @@ public class AuraContextImpl implements AuraContext {
     private RegistrySet registries;
 
     private final Set<String> restrictedNamespaces = new HashSet<>();
+    
+    private final GlobalValueProviderFactory globalValueProviderFactory;
 
-    public AuraContextImpl(Mode mode, RegistrySet registries, Map<DefType, String> defaultPrefixes,
-            Format format, Authentication access, JsonSerializationContext jsonContext,
-            Map<String, GlobalValueProvider> globalProviders,
-            ConfigAdapter configAdapter, DefinitionService definitionService,
-            TestContextAdapter testContextAdapter) {
+    private AuraContextImpl(final Mode mode, final RegistrySet registries, final Map<DefType, String> defaultPrefixes,
+            final Format format, final Authentication access, final JsonSerializationContext jsonContext,
+            final Map<String, GlobalValueProvider> globalProviders, final ConfigAdapter configAdapter,
+            final DefinitionService definitionService, final TestContextAdapter testContextAdapter,
+            final GlobalValueProviderFactory globalValueProviderFactory) {
+        
+        if ((globalProviders == null) && (globalValueProviderFactory == null)) {
+            throw new IllegalArgumentException("If globalProviders is null then the globalValueProviderFactory parameter needs to populated (non-null).");
+        }
+        
         this.mode = mode;
         this.registries = registries;
         this.defaultPrefixes = defaultPrefixes;
@@ -177,6 +186,51 @@ public class AuraContextImpl implements AuraContext {
         this.globalValues = new HashMap<>();
         this.localStore = new AuraLocalStoreImpl();
         this.clientClassesLoaded = new HashMap<>();
+        this.globalValueProviderFactory = globalValueProviderFactory;
+    }
+    
+    /**
+     * @param mode The aura mode
+     * @param registries The set of regestries
+     * @param defaultPrefixes the default prefixes
+     * @param format the format of the request data
+     * @param access The context's access level
+     * @param jsonContext The json context
+     * @param globalProviders The list of global value providers.
+     * @param configAdapter The adapter bean for setting up the config
+     * @param definitionService The service bean for getting definitions
+     * @param testContextAdapter The bean for getting the test context.
+     * @see #AuraContextImpl(org.auraframework.system.AuraContext.Mode, RegistrySet, Map, org.auraframework.system.AuraContext.Format, org.auraframework.system.AuraContext.Authentication, JsonSerializationContext, ConfigAdapter, DefinitionService, TestContextAdapter, GlobalValueProviderAdapter, List)
+     */
+    public AuraContextImpl(final Mode mode, final RegistrySet registries, final Map<DefType, String> defaultPrefixes,
+            final Format format, final Authentication access, final JsonSerializationContext jsonContext,
+            final Map<String, GlobalValueProvider> globalProviders, final ConfigAdapter configAdapter,
+            final DefinitionService definitionService, final TestContextAdapter testContextAdapter) {
+        this(mode, registries, defaultPrefixes, format, access, jsonContext, globalProviders, configAdapter, definitionService, testContextAdapter, null);
+    }
+    
+    /**
+     * Use this constructor if you need to lazy load the population of the global value providers (GVP).
+     * 
+     * @param mode The aura mode
+     * @param registries The set of registries
+     * @param defaultPrefixes the default prefixes
+     * @param format the format of the request data
+     * @param access The context's access level
+     * @param jsonContext The json context
+     * @param configAdapter The adapter bean for setting up the config
+     * @param definitionService The service bean for getting definitions
+     * @param testContextAdapter The bean for getting the test context.
+     * @param globalValueProviderFactory The factory bean used to retrieve the {@link GlobalValueProvider}s applicable
+     *        for the current request/context.
+     * @see #AuraContextImpl(org.auraframework.system.AuraContext.Mode, RegistrySet, Map, org.auraframework.system.AuraContext.Format, org.auraframework.system.AuraContext.Authentication, JsonSerializationContext, Map, ConfigAdapter, DefinitionService, TestContextAdapter)
+     */
+    public AuraContextImpl(final Mode mode, final RegistrySet registries, final Map<DefType, String> defaultPrefixes,
+            final Format format, final Authentication access, final JsonSerializationContext jsonContext,
+            final ConfigAdapter configAdapter, final DefinitionService definitionService,
+            final TestContextAdapter testContextAdapter,
+            final GlobalValueProviderFactory globalValueProviderFactory) {
+        this(mode, registries, defaultPrefixes, format, access, jsonContext, null, configAdapter, definitionService, testContextAdapter, globalValueProviderFactory);
     }
 
     @Override
@@ -359,10 +413,13 @@ public class AuraContextImpl implements AuraContext {
     public Format getFormat() {
         return format;
     }
-
+    
     @Override
     public Map<String, GlobalValueProvider> getGlobalProviders() {
-        return globalProviders;
+        if(this.globalProviders == null) {
+            this.globalProviders = globalValueProviderFactory.getGlobalProviders();
+        }
+        return this.globalProviders;
     }
 
     @Override
@@ -433,8 +490,9 @@ public class AuraContextImpl implements AuraContext {
         // applications intact. Since components are only legal for dev mode, this shouldn't
         // affect much. In fact, most use cases, this.appDesc will be null.
         //
-        if ((appDesc != null && appDesc.getDefType().equals(DefType.APPLICATION)) || this.appDesc == null
-                || !this.appDesc.getDefType().equals(DefType.APPLICATION)) {
+        if (((appDesc != null) && DefType.APPLICATION.equals(appDesc.getDefType()))
+                || (this.appDesc == null)
+                || !DefType.APPLICATION.equals(this.appDesc.getDefType())) {
             this.appDesc = appDesc;
         }
     }
@@ -572,12 +630,11 @@ public class AuraContextImpl implements AuraContext {
     public InstanceStack getInstanceStack() {
         if (currentAction != null) {
             return currentAction.getInstanceStack();
-        } else {
-            if (fakeInstanceStack == null) {
-                fakeInstanceStack = new InstanceStack();
-            }
-            return fakeInstanceStack;
         }
+        if (fakeInstanceStack == null) {
+            fakeInstanceStack = new InstanceStack();
+        }
+        return fakeInstanceStack;
     }
 
     private static class SBKeyValueLogger implements KeyValueLogger {
@@ -596,7 +653,7 @@ public class AuraContextImpl implements AuraContext {
             sb.append(value);
             comma = ",";
         }
-    };
+    }
 
     @Override
     public void registerComponent(BaseComponent<?, ?> component) {
@@ -756,13 +813,13 @@ public class AuraContextImpl implements AuraContext {
         return (allowedGlobalValues.containsKey(approvedName));
     }
 
-    static ImmutableMap<String, AuraContext.GlobalValue> getAllowedGlobals() {
+    static final ImmutableMap<String, AuraContext.GlobalValue> getAllowedGlobals() {
         Map<String, AuraContext.GlobalValue> result = new HashMap<>();
         result.putAll(allowedGlobalValues); // add registered defaults
         return (ImmutableMap<String, GlobalValue>) AuraUtil.immutableMap(result);
     }
 
-    static void registerGlobal(String approvedName, boolean publicallyWritable, Object defaultValue) {
+    static final void registerGlobal(String approvedName, boolean publicallyWritable, Object defaultValue) {
         if (approvedName == null || !AuraTextUtil.isValidJsIdentifier(approvedName)) {
             throw new AuraRuntimeException(
                     String.format(

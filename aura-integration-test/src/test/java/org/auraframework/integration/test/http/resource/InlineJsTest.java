@@ -43,6 +43,9 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -119,7 +122,7 @@ public class InlineJsTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, appMarkup);
 
         AuraContext context = contextService.startContext(
-                AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
+                Mode.DEV, Format.JS, Authentication.AUTHENTICATED, appDesc);
         context.setRequestedLocales(Arrays.asList(Locale.US));
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
@@ -150,7 +153,7 @@ public class InlineJsTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, appMarkup);
 
         AuraContext context = contextService.startContext(
-                AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
+                Mode.DEV, Format.JS, Authentication.AUTHENTICATED, appDesc);
         // momentJs locale data is written into inline if locale is not en_US
         context.setRequestedLocales(Arrays.asList(Locale.US));
 
@@ -191,7 +194,7 @@ public class InlineJsTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, appMarkup);
 
         AuraContext context = contextService.startContext(
-                AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
+                Mode.DEV, Format.JS, Authentication.AUTHENTICATED, appDesc);
         context.setRequestedLocales(Arrays.asList(Locale.US));
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
@@ -224,7 +227,7 @@ public class InlineJsTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, appMarkup);
 
         AuraContext context = contextService.startContext(
-                AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
+                Mode.DEV, Format.JS, Authentication.AUTHENTICATED, appDesc);
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
@@ -254,7 +257,7 @@ public class InlineJsTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, appMarkup);
 
         AuraContext context = contextService.startContext(
-                AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
+                Mode.DEV, Format.JS, Authentication.AUTHENTICATED, appDesc);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
         mockRequest.addHeader(HttpHeaders.USER_AGENT, CHROME58_MAC10_UA);
@@ -276,8 +279,8 @@ public class InlineJsTest extends AuraImplTestCase {
         // Arrange
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application></aura:application>");
-        AuraContext context = contextService.startContext(AuraContext.Mode.PROD, AuraContext.Format.MANIFEST,
-                AuraContext.Authentication.AUTHENTICATED, appDesc);
+        AuraContext context = contextService.startContext(Mode.PROD, Format.MANIFEST,
+                Authentication.AUTHENTICATED, appDesc);
         context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
         HttpServletRequest request = mock(HttpServletRequest.class);
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -309,7 +312,7 @@ public class InlineJsTest extends AuraImplTestCase {
 //        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, appMarkup);
 //
 //        AuraContext context = contextService.startContext(
-//                AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
+//                Mode.DEV, Format.JS, Authentication.AUTHENTICATED, appDesc);
 //        context.setRequestedLocales(Arrays.asList(Locale.US));
 //
 //        MockHttpServletRequest mockRequest = new MockHttpServletRequest();

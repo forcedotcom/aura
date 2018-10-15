@@ -417,7 +417,7 @@ public class TokensDefImplTest extends StyleTestCase {
 
     /** errors when extends refers to nonexistent def */
     @Test
-    public void testValidatesBadExtendsRef() throws Exception {
+    public void testValidatesBadExtendsRef() {
         try {
             String src = "<aura:tokens extends=\"test:idontexist\"></aura:tokens>";
             definitionService.getDefinition(addSeparateTokens(src));
@@ -429,7 +429,7 @@ public class TokensDefImplTest extends StyleTestCase {
 
     /** cannot extend itself */
     @Test
-    public void testCantExtendItself() throws Exception {
+    public void testCantExtendItself() {
         DefDescriptor<TokensDef> extendsSelf = addSourceAutoCleanup(TokensDef.class, "");
         StringSource<?> source = (StringSource<?>) getAuraTestingUtil().getSource(extendsSelf);
         String contents = "<aura:tokens extends='%s'> </aura:tokens>";
@@ -468,7 +468,7 @@ public class TokensDefImplTest extends StyleTestCase {
 
     /** error thrown if extending and importing the same def */
     @Test
-    public void testExtendAndImportSameDef() throws Exception {
+    public void testExtendAndImportSameDef() {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens());
         try {
             definitionService.getDefinition(addSeparateTokens(tokens().parent(parent).imported(parent)));
@@ -479,7 +479,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     @Test
-    public void testCantImportTokensWithExtends() throws Exception {
+    public void testCantImportTokensWithExtends() {
         DefDescriptor<TokensDef> parent = addSeparateTokens("<aura:tokens/>");
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().parent(parent));
 
@@ -492,7 +492,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     @Test
-    public void testCantImportTokensWithProvider() throws Exception {
+    public void testCantImportTokensWithProvider() {
         DefDescriptor<TokensDef> withProvider = addSeparateTokens(tokens().descriptorProvider(
                 TestTokenDescriptorProvider.REF));
 
@@ -506,7 +506,7 @@ public class TokensDefImplTest extends StyleTestCase {
 
     /** the cross reference must be inherited or declared */
     @Test
-    public void testInvalidCrossRef() throws Exception {
+    public void testInvalidCrossRef() {
         try {
             definitionService.getDefinition(addSeparateTokens("<aura:tokens><aura:token name='one' value='{!notthere}'/></aura:tokens>"));
             fail("Expected to catch an exception.");
@@ -539,7 +539,7 @@ public class TokensDefImplTest extends StyleTestCase {
 
     /** test imported tokens cross refs namespace-default token */
     @Test
-    public void testImportCrossRefNamespaceDefault() throws Exception {
+    public void testImportCrossRefNamespaceDefault() {
         addNsTokens(tokens().token("color", "red"));
 
         // this can't work, because the imported tokens might get imported into a different namespace, and that
@@ -611,7 +611,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     @Test
-    public void testErrorsIfProviderHasTokens() throws Exception {
+    public void testErrorsIfProviderHasTokens() {
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF).token("color", "red")))
                     .getConcreteDescriptor();
@@ -622,7 +622,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     @Test
-    public void testErrorsIfProviderHasImports() throws Exception {
+    public void testErrorsIfProviderHasImports() {
         DefDescriptor<TokensDef> import1 = addSeparateTokens(tokens().token("imported", "imported"));
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF).imported(import1)))
@@ -634,7 +634,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     @Test
-    public void testErrorsIfProviderHasExtends() throws Exception {
+    public void testErrorsIfProviderHasExtends() {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("parent", "parent"));
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF).parent(parent)))
@@ -646,7 +646,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     @Test
-    public void testErrorsIfProviderIsNsDefault() throws Exception {
+    public void testErrorsIfProviderIsNsDefault() {
         try {
         	definitionService.getDefinition(addNsTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF))).
             getConcreteDescriptor();
@@ -679,7 +679,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     @Test
-    public void testErrorsIfMapProviderHasTokens() throws Exception {
+    public void testErrorsIfMapProviderHasTokens() {
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().mapProvider(TestTokenMapProvider.REF).token("color", "red")));
             fail("Expected to catch an exception.");
@@ -689,7 +689,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     @Test
-    public void testErrorsIfMapProviderHasImports() throws Exception {
+    public void testErrorsIfMapProviderHasImports() {
         DefDescriptor<TokensDef> import1 = addSeparateTokens(tokens().token("imported", "imported"));
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().mapProvider(TestTokenMapProvider.REF).imported(import1)));
@@ -700,7 +700,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     @Test
-    public void testErrorsIfMapProviderHasExtends() throws Exception {
+    public void testErrorsIfMapProviderHasExtends() {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("parent", "parent"));
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().mapProvider(TestTokenMapProvider.REF).parent(parent)));
@@ -711,7 +711,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     @Test
-    public void testErrorsIfMapProviderIsNsDefault() throws Exception {
+    public void testErrorsIfMapProviderIsNsDefault() {
         try {
         	definitionService.getDefinition(addNsTokens(tokens().mapProvider(TestTokenMapProvider.REF)));
             fail("Expected to catch an exception.");

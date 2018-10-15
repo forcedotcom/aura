@@ -15,9 +15,11 @@
  */
 package org.auraframework.impl.context;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.ContextAdapter;
-import org.auraframework.adapter.GlobalValueProviderAdapter;
 import org.auraframework.adapter.PrefixDefaultsAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
@@ -38,20 +40,11 @@ import org.auraframework.util.json.BasicJsonSerializationContext;
 import org.auraframework.util.json.JsonSerializerFactory;
 import org.springframework.context.annotation.Lazy;
 
-import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
 
 @Lazy
 @ServiceComponent
 public class AuraContextServiceImpl implements ContextService {
-
-    @Inject
-    private GlobalValueProviderAdapter primaryGlobalValueProviderAdapter;
-
-    @Inject
-    private List<GlobalValueProviderAdapter> globalValueProviderAdapters;
 
     @Inject
     private LoggingService loggingService;
@@ -91,7 +84,7 @@ public class AuraContextServiceImpl implements ContextService {
     @Override
     public AuraContext startContext(Mode mode, Format format, Authentication access,
             DefDescriptor<? extends BaseComponentDef> appDesc) {
-        return startContext(mode, format, access, getGlobalProviders(), appDesc);
+        return startContext(mode, format, access, null, appDesc);
     }
 
     /**
@@ -153,27 +146,6 @@ public class AuraContextServiceImpl implements ContextService {
     @Override
     public void popSystemContext() {
         contextAdapter.popSystemContext();
-    }
-
-    protected Map<String, GlobalValueProvider> getGlobalProviders() {
-
-        // load any @Primary GlobalValueProviderAdapter first, to give it's
-        // implementations precedence
-        Map<String, GlobalValueProvider> instances = new HashMap<>();
-        for (GlobalValueProvider g : primaryGlobalValueProviderAdapter.createValueProviders()) {
-            instances.put(g.getValueProviderKey().getPrefix(), g);
-        }
-        for (GlobalValueProviderAdapter factory : globalValueProviderAdapters) {
-            if (!factory.equals(primaryGlobalValueProviderAdapter)) {
-                for (GlobalValueProvider g : factory.createValueProviders()) {
-                    if (!instances.containsKey(g.getValueProviderKey().getPrefix())) {
-                        instances.put(g.getValueProviderKey().getPrefix(), g);
-                    }
-                }
-            }
-        }
-
-        return instances;
     }
 
     @Override

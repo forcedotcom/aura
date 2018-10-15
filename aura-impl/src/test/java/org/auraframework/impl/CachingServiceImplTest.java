@@ -42,6 +42,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import javax.inject.Inject;
+
+import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
@@ -80,45 +82,46 @@ public class CachingServiceImplTest extends AuraImplTestCase {
     private LoggingAdapter loggingAdapter;
 
     @Test
-    public void testNotifyDependentSourceChange_LogsErrorIfWriteLockLocked() {
+    public void testNotifyDependentSourceChange_LogsErrorIfWriteLockLocked() throws IOException {
         // capture logger output
-        StringWriter writer = new StringWriter();
-        Logger logger = Logger.getLogger(CachingServiceImpl.class);
-        logger.addAppender(new WriterAppender(new SimpleLayout(), writer));
-        List<LoggingEvent> events = Lists.newLinkedList();
-        logger.addAppender(new Log4jCaptureAppender(events));
-
-        // grab the lock
-        CachingServiceImpl cachingService = new CachingServiceImpl();
-        cachingService.setLoggingAdapter(loggingAdapter);
-        cachingService.initializeCaches();
-        Lock lock = cachingService.getReadLock();
-        try {
-            lock.lock();
-
-            // try to notify
-            cachingService.notifyDependentSourceChange(null, null, null);
-            long start = System.nanoTime();
-            do {
-                if (!events.isEmpty()) {
-                    assertEquals("Unexpected number of events", 1,
-                            events.size());
-                    LoggingEvent event = events.get(0);
-                    assertEquals("Unexpected logging level", Level.ERROR,
-                            event.getLevel());
-                    assertEquals(
-                            "Couldn't acquire cache clear lock in a reasonable time.  Cache may be stale until next clear.",
-                            event.getMessage());
-                    return;
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                }
-            } while (System.nanoTime() - start < 10000000000L); // 10 secs from now
-            fail("Timed out waiting for error event due to unobtainable lock");
-        } finally {
-            lock.unlock();
+        try (final StringWriter writer = new StringWriter()) {
+            Logger logger = Logger.getLogger(CachingServiceImpl.class);
+            logger.addAppender(new WriterAppender(new SimpleLayout(), writer));
+            List<LoggingEvent> events = Lists.newLinkedList();
+            logger.addAppender(new Log4jCaptureAppender(events));
+    
+            // grab the lock
+            CachingServiceImpl cachingService = new CachingServiceImpl();
+            cachingService.setLoggingAdapter(loggingAdapter);
+            cachingService.initializeCaches();
+            Lock lock = cachingService.getReadLock();
+            try {
+                lock.lock();
+    
+                // try to notify
+                cachingService.notifyDependentSourceChange(null, null, null);
+                long start = System.nanoTime();
+                do {
+                    if (!events.isEmpty()) {
+                        assertEquals("Unexpected number of events", 1,
+                                events.size());
+                        LoggingEvent event = events.get(0);
+                        assertEquals("Unexpected logging level", Level.ERROR,
+                                event.getLevel());
+                        assertEquals(
+                                "Couldn't acquire cache clear lock in a reasonable time.  Cache may be stale until next clear.",
+                                event.getMessage());
+                        return;
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                } while (System.nanoTime() - start < 10000000000L); // 10 secs from now
+                fail("Timed out waiting for error event due to unobtainable lock");
+            } finally {
+                lock.unlock();
+            }
         }
     }
 
@@ -156,7 +159,7 @@ public class CachingServiceImplTest extends AuraImplTestCase {
         cachingService.notifyDependentSourceChange(listeners, event, filePath);
     }
 
-    private <K, V> void testNotifyDependentSourceChange_InvalidatesSomeCachedValues(
+    private static <K, V> void testNotifyDependentSourceChange_InvalidatesSomeCachedValues(
             CachingService cachingService, Cache<K, V> cache,
             Function<K, V> valGenerator, Set<K> keys, DefDescriptor<?> source,
             Set<K> invalidatedKeys) {
@@ -186,7 +189,7 @@ public class CachingServiceImplTest extends AuraImplTestCase {
         }
     }
 
-    private <K, V> void testNotifyDependentSourceChange_InvalidatesAllCachedValues(
+    private static <K, V> void testNotifyDependentSourceChange_InvalidatesAllCachedValues(
             CachingService cachingService, Cache<K, V> cache,
             Function<K, V> valGenerator, Set<K> keys) {
         testNotifyDependentSourceChange_InvalidatesSomeCachedValues(cachingService,
@@ -259,7 +262,7 @@ public class CachingServiceImplTest extends AuraImplTestCase {
                 cachingService.getDefsCache(), mockDefinitionFunction, keys);
     }
 
-    private Set<DefDescriptor<?>> createDescriptors(DefDescriptor<?> baseDesc) {
+    private static Set<DefDescriptor<?>> createDescriptors(DefDescriptor<?> baseDesc) {
         Set<DefDescriptor<?>> res = Sets.newHashSet();
         for (DefType defType : DefType.values()) {
             // just use markup for these dummy descriptors
@@ -269,7 +272,7 @@ public class CachingServiceImplTest extends AuraImplTestCase {
         return res;
     }
 
-    private <V> void testNotifyDependentSourceChange_InvalidatesSome(
+    private static <V> void testNotifyDependentSourceChange_InvalidatesSome(
             CachingService cachingService, Cache<DefDescriptor<?>, V> cache,
             Function<DefDescriptor<?>, V> valGenerator,
             Set<DefDescriptor<?>> baseDds, DefDescriptor<?> source,

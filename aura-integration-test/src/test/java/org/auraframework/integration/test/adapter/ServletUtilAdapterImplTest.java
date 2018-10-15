@@ -36,11 +36,12 @@ public class ServletUtilAdapterImplTest extends AuraImplTestCase {
 
     @Inject
     private ConfigAdapter configAdapter;
+
     /**
      * check manifest URL when context has no preloads.
      */
     @Test
-    public void testGetManifestUrlWithoutPreloads() throws Exception {
+    public void testGetManifestUrlWithoutPreloads() {
         if (contextService.isEstablished()) {
             contextService.endContext();
         }
@@ -64,7 +65,7 @@ public class ServletUtilAdapterImplTest extends AuraImplTestCase {
      */
     @ThreadHostileTest("preload sensitive")
     @Test
-    public void testGetManifestUrlWithPreloads() throws Exception {
+    public void testGetManifestUrlWithPreloads() {
         if (contextService.isEstablished()) {
             contextService.endContext();
         }

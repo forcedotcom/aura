@@ -117,5 +117,5 @@ public interface ContextService extends AuraService {
      */
     void registerGlobal(String approvedName, boolean publicallyWritable, Object defaultValue);
     
-    ImmutableMap<String, AuraContext.GlobalValue> getAllowedGlobals(); 
+    ImmutableMap<String, AuraContext.GlobalValue> getAllowedGlobals();
 }

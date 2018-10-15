@@ -179,22 +179,22 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         }
     }
 
-    private void assertInclude(IncludeDefRef include, String name, String importList, String export) {
-      assertEquals("Unexpected name for include", name, include.getName());
-      assertEquals("Unexpected export for " + name, export, include.getExport());
+    private static void assertInclude(IncludeDefRef include, String name, String importList, String export) {
+        assertEquals("Unexpected name for include", name, include.getName());
+        assertEquals("Unexpected export for " + name, export, include.getExport());
 
-      List<DefDescriptor<IncludeDef>> actualImports = include.getImports();
-      if (actualImports == null) {
-          assertNull("Unexpected imports for " + name, importList);
-      } else {
-         String actualList = String.join(",",
-                 Lists.transform(actualImports, new Function<DefDescriptor<IncludeDef>, String>() {
-                     @Override
-                     public String apply(DefDescriptor<IncludeDef> input) {
-                         return input.getName();
-                     }
-                 }));
-         assertEquals(importList, actualList);
-      }
-  }
+        List<DefDescriptor<IncludeDef>> actualImports = include.getImports();
+        if (actualImports == null) {
+            assertNull("Unexpected imports for " + name, importList);
+        } else {
+            String actualList = String.join(",",
+                    Lists.transform(actualImports, new Function<DefDescriptor<IncludeDef>, String>() {
+                        @Override
+                        public String apply(DefDescriptor<IncludeDef> input) {
+                            return input.getName();
+                        }
+                    }));
+            assertEquals(importList, actualList);
+        }
+    }
 }

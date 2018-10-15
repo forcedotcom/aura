@@ -15,8 +15,13 @@
  */
 package org.auraframework.impl.css;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.inject.Inject;
+
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.ComponentDef;
@@ -35,11 +40,8 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import javax.inject.Inject;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 /**
  * for testing stuff that needs StyleDef, TokenDef sources.

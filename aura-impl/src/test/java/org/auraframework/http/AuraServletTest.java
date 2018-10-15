@@ -81,6 +81,8 @@ public class AuraServletTest extends UnitTestCase {
     private AuraServlet servlet;
 
     private AnnotationConfigApplicationContext appContext;
+    
+    private GenericWebApplicationContext gwac;
 
     @Mock
     private ServletUtilAdapter servletUtilAdapter;
@@ -98,7 +100,7 @@ public class AuraServletTest extends UnitTestCase {
 
         appContext = new AnnotationConfigApplicationContext(AuraConfiguration.class, ConfigAdapterImpl.class);
         DefaultListableBeanFactory dlbf = new DefaultListableBeanFactory(appContext.getBeanFactory());
-        GenericWebApplicationContext gwac = new GenericWebApplicationContext(dlbf);
+        gwac = new GenericWebApplicationContext(dlbf);
         servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, gwac);
         gwac.setServletContext(servletContext);
         gwac.refresh();
@@ -118,6 +120,7 @@ public class AuraServletTest extends UnitTestCase {
     public void tearDown() throws Exception {
         contextService.endContext();
         appContext.close();
+        gwac.close();
         super.tearDown();
     }
 
@@ -177,7 +180,7 @@ public class AuraServletTest extends UnitTestCase {
         return auracontext;
     }
 
-    private void assertSingleHeader(MockHttpServletResponse response, String name, String value) {
+    private static void assertSingleHeader(MockHttpServletResponse response, String name, String value) {
         List<String> headers = response.getHeaders(name);
         assertEquals(String.format("Unexpected number of '%s' headers", name), 1, headers.size());
         assertEquals(String.format("Unexpected value for '%s' header", name), value, headers.get(0));
@@ -270,8 +273,8 @@ public class AuraServletTest extends UnitTestCase {
         assertSame("should get expected exception", expected, actual);
     }
 
-    /*
-     * This test verify that we do definitionService.updateLoaded before message read, 
+    /**
+     * This test verify that we do {@link DefinitionService#updateLoaded(DefDescriptor)} before message read, 
      * when action from client arrives, if the client is running out-dated code, we will throw COOS to force it reload, 
      * before the fix we always do de-serialization first, it could give us QFE, which leads to tons of Gack every release) 
      * automation for W-3360478.
@@ -557,7 +560,7 @@ public class AuraServletTest extends UnitTestCase {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
         Mockito.when(servletUtilAdapter.isValidDefType(Matchers.any(), Matchers.any())).thenReturn(false); // trigger 404
-                                                                                                         // below
+                                                                                                           // below
 
         MockHttpServletRequest request = getBaseAuraRequest();
         request.addParameter("nocache", (String)null);
@@ -658,7 +661,7 @@ public class AuraServletTest extends UnitTestCase {
     @Test
     public void testDoGetForPubliclyCacheableAction() throws Exception {
         // Arrange
-    	AuraContext context = startContext();
+        AuraContext context = startContext();
 
         MockHttpServletRequest request = getBaseAuraRequest();
         request.setParameter("aura.token", "token");

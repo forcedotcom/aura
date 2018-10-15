@@ -216,6 +216,7 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         
     }
 
+    @SuppressWarnings("unused")
     @Override
     protected void setupValidateReferences() throws Exception {
         this.interfaces = Sets.newHashSet();

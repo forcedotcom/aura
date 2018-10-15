@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.service;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +44,7 @@ import org.auraframework.impl.system.DefFactoryImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.CachingService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -85,7 +85,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testDefDescriptorForActionWithNoName() throws Exception {
+    public void testDefDescriptorForActionWithNoName() {
         AuraRuntimeException expected = null;
         try {
             definitionService.getDefDescriptor(null, ActionDef.class);
@@ -268,7 +268,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     public void testGetDefinitionThrowsExceptionWhenComponentUsesInvalidHelperDescriptor() {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         DefDescriptor<ComponentDef> cmpDescriptor = getAuraTestingUtil().createStringSourceDescriptor(null, ComponentDef.class, null);
-		DefDescriptor<HelperDef> helperDescriptor = getAuraTestingUtil().getBundlePartDescriptor(HelperDef.class, cmpDescriptor);
+        DefDescriptor<HelperDef> helperDescriptor = getAuraTestingUtil().getBundlePartDescriptor(HelperDef.class, cmpDescriptor);
 
         addSourceAutoCleanup(helperDescriptor, "({})");
         // using colon (:) as separator
@@ -308,7 +308,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             String errorMessage = String.format("No HELPER named js://%s.%s found",
                     cmpWithoutHelperDescriptor.getNamespace(), cmpWithoutHelperDescriptor.getName());
         this.checkExceptionContains(expected, DefinitionNotFoundException.class, errorMessage);
-        }
+    }
     
     @Test
     public void testGetDefinition_DefDescriptor_assertAccess() throws QuickFixException {
@@ -343,7 +343,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testFindNonExistingComponentByFilter() throws Exception {
+    public void testFindNonExistingComponentByFilter() {
         contextService.startContext(Mode.DEV, Format.HTML, Authentication.UNAUTHENTICATED);
 
         Set<DefDescriptor<?>> set = definitionService.find(new DescriptorFilter("markup://notExists:blah", DefType.COMPONENT));
@@ -828,7 +828,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Test find() using a constant Descriptor Filter.
      */
     @Test
-    public void testFindWithConstantFilter() throws Exception {
+    public void testFindWithConstantFilter() {
         contextService.startContext(Mode.DEV, Format.HTML, Authentication.UNAUTHENTICATED);
 
         String qualifiedName = String.format("markup://%s", DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT);
@@ -841,7 +841,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Test find() using a Descriptor Filter with given DefType.
      */
     @Test
-    public void testFindByFilterWithDefType() throws Exception {
+    public void testFindByFilterWithDefType() {
         contextService.startContext(Mode.DEV, Format.HTML, Authentication.UNAUTHENTICATED);
 
         assertEquals("find() fails with wildcard as namespace", 1,
@@ -859,7 +859,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Test find() using regex's and look in different DefRegistry's for results.
      */
     @Test
-    public void testFindRegex() throws Exception {
+    public void testFindRegex() {
         contextService.startContext(Mode.DEV, Format.HTML, Authentication.UNAUTHENTICATED);
 
         String baseContents = "<aura:application></aura:application>";
@@ -940,7 +940,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         // Find CSS
         DefDescriptor<ApplicationDef> appWithCss = getAuraTestingUtil().createStringSourceDescriptor(null,
                 ApplicationDef.class, null);
-		DefDescriptor<StyleDef> CSSdesc = getAuraTestingUtil().getBundlePartDescriptor(StyleDef.class, appWithCss);
+        DefDescriptor<StyleDef> CSSdesc = getAuraTestingUtil().getBundlePartDescriptor(StyleDef.class, appWithCss);
         addSourceAutoCleanup(appWithCss, baseContents);
         addSourceAutoCleanup(CSSdesc, ".THIS { background: blue }");
 
@@ -1004,7 +1004,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testFindByTagsIntegrationTestStringSource() throws Exception {
+    public void testFindByTagsIntegrationTestStringSource() {
         DefDescriptor<?> ifc = addSourceAutoCleanup(InterfaceDef.class, "<aura:interface />");
         DefDescriptor<?> cmp = addSourceAutoCleanup(ComponentDef.class,
                 String.format("<aura:component implements=\"%s\" />", ifc.getDescriptorName()));
@@ -1015,7 +1015,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testFindByTagsIntegrationTestStringSourceLimitedNamespaceNotFound() throws Exception {
+    public void testFindByTagsIntegrationTestStringSourceLimitedNamespaceNotFound() {
         DefDescriptor<?> ifc = addSourceAutoCleanup(InterfaceDef.class, "<aura:interface />");
         addSourceAutoCleanup(ComponentDef.class,
                 String.format("<aura:component implements=\"%s\" />", ifc.getDescriptorName()));
@@ -1026,7 +1026,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testFindByTagsIntegrationTestStringSourceLimitedNamespaceFound() throws Exception {
+    public void testFindByTagsIntegrationTestStringSourceLimitedNamespaceFound() {
         DefDescriptor<?> ifc = addSourceAutoCleanup(InterfaceDef.class, "<aura:interface />");
         DefDescriptor<?> cmp = addSourceAutoCleanup(ComponentDef.class,
                 String.format("<aura:component implements=\"%s\" />", ifc.getDescriptorName()));
@@ -1051,7 +1051,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             aura-components/src/main/components/aura/html/html.cmp
     */
     @Test
-    public void testFindByTagsIntegrationTestFileBased() throws Exception {
+    public void testFindByTagsIntegrationTestFileBased() {
         contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
         Set<DefDescriptor<?>> values = definitionService.findByTags(null, Sets.newHashSet("aura:rootComponent"));
         assertTrue("Should several components back", values.size() >= 2);
@@ -1095,7 +1095,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         public static class TestTypeDefFactory extends DefFactoryImpl<TypeDef> {
 
             @Override
-            public TypeDef getDef(DefDescriptor<TypeDef> descriptor) throws QuickFixException {
+            public TypeDef getDef(DefDescriptor<TypeDef> descriptor) {
                 return new TestTypeDef(descriptor, null);
             }
         }
@@ -1108,7 +1108,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             }
 
             @Override
-            public void serialize(Json json) throws IOException {
+            public void serialize(Json json) {
             }
 
             @Override
@@ -1137,10 +1137,12 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
 
             @Override
             public Set<DefDescriptor<?>> getDependencySet() {
-                Set<DefDescriptor<?>> dependencies = Sets.newLinkedHashSet();
-                dependencies.add(Aura.getDefinitionService().getDefDescriptor("test://foo.barA", TypeDef.class));
-                dependencies.add(Aura.getDefinitionService().getDefDescriptor("test://foo.barB", TypeDef.class));
-                dependencies.add(Aura.getDefinitionService().getDefDescriptor("test://foo.barC", TypeDef.class));
+                final DefinitionService service = Aura.getDefinitionService();
+                Set<DefDescriptor<?>> dependencies = ImmutableSet.of(
+                    service.getDefDescriptor("test://foo.barA", TypeDef.class),
+                    service.getDefDescriptor("test://foo.barB", TypeDef.class),
+                    service.getDefDescriptor("test://foo.barC", TypeDef.class)
+                );
                 return dependencies;
             }
         }

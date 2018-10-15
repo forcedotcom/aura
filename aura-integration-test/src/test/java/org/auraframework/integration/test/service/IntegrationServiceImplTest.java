@@ -404,7 +404,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         }
     }
 
-    private void assertException(Integration obj, String tag, Map<String, Object> attributes, String localId,
+    private static void assertException(Integration obj, String tag, Map<String, Object> attributes, String localId,
             String locatorDomId, Appendable out) throws Exception {
         try {
             obj.injectComponentHtml(tag, attributes, localId, locatorDomId, out);

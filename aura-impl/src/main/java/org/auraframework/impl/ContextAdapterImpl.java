@@ -17,8 +17,6 @@ package org.auraframework.impl;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.antlr.misc.MutableInteger;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContextAdapter;
@@ -28,6 +26,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.context.AuraContextImpl;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.GlobalValueProviderFactory;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
@@ -38,34 +37,49 @@ import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  */
 @ServiceComponent
 public class ContextAdapterImpl implements ContextAdapter {
-    @Inject
-    private ConfigAdapter configAdapter;
 
-    @Inject
-    private DefinitionService definitionService;
+    private final ConfigAdapter configAdapter;
+    private final DefinitionService definitionService;
+    private final GlobalValueProviderFactory globalValueProviderFactory;
     
     @Autowired(required=false)
     private TestContextAdapter testContextAdapter;
-
-    private static ThreadLocal<AuraContext> currentContext = new ThreadLocal<>();
+   
+    private final static ThreadLocal<AuraContext> currentContext = new ThreadLocal<>();
     
-    private static ThreadLocal<AuraContext> systemContext = new ThreadLocal<>();
+    private final static ThreadLocal<AuraContext> systemContext = new ThreadLocal<>();
 
-    private static ThreadLocal<MutableInteger> systemDepth = new ThreadLocal<>();
+    private final static ThreadLocal<MutableInteger> systemDepth = new ThreadLocal<>();
 
+    @Autowired
+    @Lazy
+    public ContextAdapterImpl(final ConfigAdapter configAdapter, final DefinitionService definitionService, final GlobalValueProviderFactory globalValueProviderFactory) {
+        this.configAdapter = configAdapter;
+        this.definitionService = definitionService;
+        this.globalValueProviderFactory = globalValueProviderFactory;
+    }
+    
     @Override
     public AuraContext establish(Mode mode, RegistrySet registries,
                                  Map<DefType, String> defaultPrefixes, Format format, Authentication access,
                                  JsonSerializationContext jsonContext,
                                  Map<String, GlobalValueProvider> globalProviders,
                                  DefDescriptor<? extends BaseComponentDef> appDesc) {
-        AuraContext context = new AuraContextImpl(mode, registries, defaultPrefixes, format, access, jsonContext,
-                globalProviders, configAdapter, definitionService, testContextAdapter);
+        
+        final AuraContext context;
+        if ((globalProviders == null) || globalProviders.isEmpty()) {
+            context = new AuraContextImpl(mode, registries, defaultPrefixes, format, access, jsonContext, configAdapter,
+                    definitionService, testContextAdapter, globalValueProviderFactory);
+        } else {
+            context = new AuraContextImpl(mode, registries, defaultPrefixes, format, access, jsonContext,
+                    globalProviders, configAdapter, definitionService, testContextAdapter);
+        }
         currentContext.set(context);
         context.setApplicationDescriptor(appDesc);
         

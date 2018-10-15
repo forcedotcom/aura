@@ -198,7 +198,7 @@ extends AuraTestCase {
     }
 
     @Test
-    public void testValidateDefinitionNullDescriptor() throws Exception {
+    public void testValidateDefinitionNullDescriptor() {
         this.descriptor = null;
         try {
             buildDefinition().validateDefinition();

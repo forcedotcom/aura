@@ -15,9 +15,9 @@
  */
 package org.auraframework.integration.test.css;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Map;
+
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
@@ -30,8 +30,9 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 /**
  * Unit tests for resolving token function values in CSS files.
@@ -131,7 +132,7 @@ public class TokenResolutionTest extends StyleTestCase {
 
     /** errors when the def does not exist */
     @Test
-    public void testNonexistentDef() throws Exception {
+    public void testNonexistentDef() {
         try {
             definitionService.getDefinition(addStyleDef(".THIS{color: token(color)")).getCode();
             fail("expected exception");
@@ -141,7 +142,7 @@ public class TokenResolutionTest extends StyleTestCase {
 
     /** errors when the token does not exist */
     @Test
-    public void testNonexistentToken() throws Exception {
+    public void testNonexistentToken() {
         addNsTokens(tokens().token("color", "red"));
         try {
             definitionService.getDefinition(addStyleDef(".THIS{color: token(dolor)")).getCode();
@@ -203,7 +204,7 @@ public class TokenResolutionTest extends StyleTestCase {
 
     /** token in media query has error */
     @Test
-    public void testInMediaQueryHasError() throws Exception {
+    public void testInMediaQueryHasError() {
         addNsTokens(tokens().token("normal", "screen (max-width: 999px)"));
 
         String src = "@media token(normal) {\n" +
@@ -220,7 +221,7 @@ public class TokenResolutionTest extends StyleTestCase {
 
     /** token in media query cannot evaluate to an empty string */
     @Test
-    public void testInMediaQueryEvalsToEmpty() throws Exception {
+    public void testInMediaQueryEvalsToEmpty() {
         addNsTokens(tokens().token("normal", ""));
 
         String src = "@media token(normal) {\n" +
@@ -380,7 +381,7 @@ public class TokenResolutionTest extends StyleTestCase {
     @Provider
     public static final class Provider1 implements TokenDescriptorProvider {
         @Override
-        public DefDescriptor<TokensDef> provide() throws QuickFixException {
+        public DefDescriptor<TokensDef> provide() {
             return Aura.getDefinitionService().getDefDescriptor("tokenProviderTest:tokenResolutionProvider", TokensDef.class);
         }
     }
@@ -402,7 +403,7 @@ public class TokenResolutionTest extends StyleTestCase {
     @Provider
     public static final class Provider2 implements TokenMapProvider {
         @Override
-        public Map<String, String> provide() throws QuickFixException {
+        public Map<String, String> provide() {
             return ImmutableMap.of("color", "green");
         }
     }
@@ -423,7 +424,7 @@ public class TokenResolutionTest extends StyleTestCase {
     @Provider
     public static final class TokenComboTestProvider implements TokenDescriptorProvider {
         @Override
-        public DefDescriptor<TokensDef> provide() throws QuickFixException {
+        public DefDescriptor<TokensDef> provide() {
             return Aura.getDefinitionService().getDefDescriptor("tokenProviderTest:tokenComboTest", TokensDef.class);
         }
     }
@@ -431,7 +432,7 @@ public class TokenResolutionTest extends StyleTestCase {
     @Provider
     public static final class TokenComboTestP1 implements TokenMapProvider {
         @Override
-        public Map<String, String> provide() throws QuickFixException {
+        public Map<String, String> provide() {
             return ImmutableMap.of("font", "trebuchet", "margin", "20px");
         }
     }
@@ -439,7 +440,7 @@ public class TokenResolutionTest extends StyleTestCase {
     @Provider
     public static final class TokenComboTestP2 implements TokenMapProvider {
         @Override
-        public Map<String, String> provide() throws QuickFixException {
+        public Map<String, String> provide() {
             return ImmutableMap.of("font", "georgia");
         }
     }

@@ -15,6 +15,11 @@
  */
 package org.auraframework.integration.test.http;
 
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.HttpHeaders;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
@@ -25,6 +30,8 @@ import org.auraframework.service.CachingService;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.SourceListener;
 import org.auraframework.test.util.AuraTestCase;
@@ -37,10 +44,6 @@ import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 /**
  * Simple (non-integration) test case for {@link AuraResourceServlet}, most useful for exercising hard-to-reach error
@@ -63,15 +66,15 @@ public class AuraResourceServletTest extends AuraTestCase {
         private static final long serialVersionUID = 411181168049748986L;
     }
 
-    private AuraResourceServlet getAuraResourceServlet() throws Exception {
+    private static AuraResourceServlet getAuraResourceServlet() throws Exception {
         AuraResourceServlet servlet = new AuraResourceServlet();
         applicationContext.getAutowireCapableBeanFactory().autowireBean(servlet);
         return servlet;
     }
 
-    private String getKey(String uid, DefDescriptor<?> descriptor, String key) {
+    private static String getKey(String uid, DefDescriptor<?> descriptor, String key) {
         return String.format("%s@%s@%s", uid, descriptor.getQualifiedName().toLowerCase(), key);
-        }
+    }
 
     /**
      * Verify cache of SVG definitions is cleared on source change in DEV mode.
@@ -83,7 +86,7 @@ public class AuraResourceServletTest extends AuraTestCase {
     public void testSvgCacheClearedOnSourceChange() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("appCache:withpreload", ApplicationDef.class);
         AuraContext context = contextService
-                .startContext(Mode.DEV, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
+                .startContext(Mode.DEV, Format.SVG, Authentication.AUTHENTICATED, appDesc);
 
         DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
         final String uid = definitionService.getUid(null, svgDesc);
@@ -121,7 +124,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         DefDescriptor<ApplicationDef> appDesc =
                 definitionService.getDefDescriptor("markup://appCache:withpreload", ApplicationDef.class);
         AuraContext context = contextService.startContext(
-                Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
+                Mode.PROD, Format.SVG, Authentication.AUTHENTICATED, appDesc);
 
         DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
         String etag = "\"" + definitionService.getDefinition(svgDesc).getOwnHash() + "\"";
@@ -160,7 +163,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         DefDescriptor<ApplicationDef> appDesc =
                 definitionService.getDefDescriptor("markup://appCache:withpreload", ApplicationDef.class);
         AuraContext context = contextService.startContext(
-                Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
+                Mode.PROD, Format.SVG, Authentication.AUTHENTICATED, appDesc);
 
         //First we will go to the server with no etag. This will give us the etag to use for next step
         MockHttpServletRequest mockRequest = new MockHttpServletRequest(null, "resources.svg");
@@ -204,7 +207,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         DefDescriptor<ApplicationDef> appDesc =
                 definitionService.getDefDescriptor("markup://appCache:withpreload", ApplicationDef.class);
         AuraContext context = contextService.startContext(
-                Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
+                Mode.PROD, Format.SVG, Authentication.AUTHENTICATED, appDesc);
 
         DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
         String uid = definitionService.getUid(null, svgDesc);

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-10-12
- * Version: 0.5.18
+ * Generated: 2018-10-15
+ * Version: 0.5.19
  */
 
 (function (exports) {
@@ -2399,34 +2399,21 @@ function createEventTargetMethodsStateless(config, prototype) {
  * limitations under the License.
  */
 let lwcUnwrap = value => value;
+let lwcGetComponentDef = () => undefined;
+let lwcGetComponentConstructor = () => undefined;
 
 function registerLWCAPI(api) {
-  if (api && api.unwrap) {
-    lwcUnwrap = api.unwrap;
+  if (api) {
+    if (api.lwcUnwrap) {
+      lwcUnwrap = api.lwcUnwrap;
+    }
+    if (api.lwcGetComponentDef) {
+      lwcGetComponentDef = api.lwcGetComponentDef;
+    }
+    if (api.lwcGetComponentConstructor) {
+      lwcGetComponentConstructor = api.lwcGetComponentConstructor;
+    }
   }
-}
-
-/**
- * Get the api shape of a custom element
- *
- * <element>.__proto__ => instanceof superElmProto + public property descriptors
- * <element>.__proto__.__proto__ => superElmProto which is an instance of BaseCustomElementProto
- * <element>.proto__.__proto__.__proto__ => superElmProto aka globalElmProto, instance of BaseCustomElementProto
- * <element>.proto__.__proto__.__proto__.__proto__ => BaseCustomElementProto aka HTMLElement(native class), has constructor property
- *
- * @param {*} elm
- * @return {Object} Map of property to descriptor
- */
-function getCustomElementPropertyDescriptors(elm) {
-  const namesToDescriptorMap = {};
-  // Escape hatch to detect when we have reached the native HTMLElement definition
-  if (elm.hasOwnProperty('constructor') === true) {
-    return namesToDescriptorMap;
-  }
-  getOwnPropertyNames(elm).forEach(propName => {
-    namesToDescriptorMap[propName] = getOwnPropertyDescriptor(elm, propName);
-  });
-  return assign(getCustomElementPropertyDescriptors(getPrototypeOf(elm)), namesToDescriptorMap);
 }
 
 /**
@@ -2443,29 +2430,38 @@ function customElementHook$1(el, prototype, tagNameSpecificConfig) {
       return deepUnfilterMethodArguments(st, [], args);
     }
   };
-  const namesToDescriptorMap = getCustomElementPropertyDescriptors(lwcUnwrap(el));
-  keys(namesToDescriptorMap).forEach(prop => {
-    const originalDescriptor = namesToDescriptorMap[prop];
-    if (
-      !getOwnPropertyDescriptor(prototype, prop) &&
-      !getOwnPropertyDescriptor(tagNameSpecificConfig, prop)
-    ) {
-      // Wrap functions with a filtered method
-      if (
-        originalDescriptor.hasOwnProperty('value') &&
-        typeof originalDescriptor.value === 'function'
-      ) {
-        tagNameSpecificConfig[prop] = createFilteredMethodStateless(prop, prototype, methodOptions);
-      } else {
-        // Everything else has a wrapped getter/setter
-        tagNameSpecificConfig[prop] = createFilteredPropertyStateless(
-          prop,
-          prototype,
-          methodOptions
-        );
-      }
+  const elComponentConstructor = lwcGetComponentConstructor(el);
+  if (elComponentConstructor) {
+    const elComponentDescriptors = lwcGetComponentDef(elComponentConstructor).descriptors;
+    if (elComponentDescriptors) {
+      keys(elComponentDescriptors).forEach(prop => {
+        const originalDescriptor = elComponentDescriptors[prop];
+        if (
+          !getOwnPropertyDescriptor(prototype, prop) &&
+          !getOwnPropertyDescriptor(tagNameSpecificConfig, prop)
+        ) {
+          // Wrap functions with a filtered method
+          if (
+            originalDescriptor.hasOwnProperty('value') &&
+            typeof originalDescriptor.value === 'function'
+          ) {
+            tagNameSpecificConfig[prop] = createFilteredMethodStateless(
+              prop,
+              prototype,
+              methodOptions
+            );
+          } else {
+            // Everything else has a wrapped getter/setter
+            tagNameSpecificConfig[prop] = createFilteredPropertyStateless(
+              prop,
+              prototype,
+              methodOptions
+            );
+          }
+        }
+      });
     }
-  });
+  }
 }
 
 /**
@@ -9947,13 +9943,12 @@ function SecureLWC(lwc, key) {
 
 // This is a whitelist from Kevin V, this has to be updated if any new wire adapters are introduced
 const internalLibs = [
-  'lightning/uiApiActions',
-  'lightning/uiApiRecord',
-  'lightning/uiApiRecordUi',
-  'lightning/uiApiObjectInfo',
-  'lightning/uiApiListUi',
-  'lightning/uiApiLookups',
-  'lightning/navigation'
+  'lightning/navigation',
+  'lightning/uiActionsApi',
+  'lightning/uiListApi',
+  'lightning/uiLookupsApi',
+  'lightning/uiObjectInfoApi',
+  'lightning/uiRecordApi'
 ];
 function isWhitelistedLib(libDesc) {
   return internalLibs.includes(libDesc);

@@ -114,4 +114,12 @@ public interface ModuleDef extends PlatformDef {
      */
     List<TemplateModuleDependencies> getExperimentalTemplateModuleDependencies();
 
+
+    /**
+     * Gets the examples represented by a collection of modules under the
+     * "__examples__" folder of the bundle.
+     *
+     */
+    List<ModuleExample> getExamples();
+
 }

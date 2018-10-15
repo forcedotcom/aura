@@ -26,6 +26,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.module.ModuleDef;
+import org.auraframework.def.module.ModuleExample;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
@@ -185,7 +186,18 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
     }
 
     private String createDescriptorName(File file, String baseFilePath, String descriptorName) throws IOException {
+        // Note: this method is invoked from processBundle, which is invoked on
+        // recursively on every sub directory within a module. Examples use the file
+        // name as the descriptor name; so here the parent is checked to see if it
+        // matches the convention of "__examples__" as the container directory of all
+        // the examples.
         String path = file.getCanonicalPath();
+        File parent = file.getParentFile();
+        File grand = parent != null ? parent.getParentFile() : null;
+        if (grand != null && grand.getName().equals(ModuleExample.EXAMPLES_DIRNAME)) {
+            path = path.substring(baseFilePath.length(), path.length());
+            return path;
+        }
         path = path.substring(baseFilePath.length(), path.lastIndexOf("."));
         path = StringUtils.replace(path, File.separator, "-");
         return descriptorName + path;
@@ -198,7 +210,7 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
     /** ignore files not needed for modules ie tests, snapshots, etc */
     private boolean shouldProcessDirectory(File file) {
         String name = file.getName();
-        return !name.startsWith("__") || name.equals("__docs__");
+        return !name.startsWith("__") || name.equals("__docs__") || name.equals(ModuleExample.EXAMPLES_DIRNAME);
     }
 
     @Inject

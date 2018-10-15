@@ -26,10 +26,12 @@ import org.auraframework.def.LibraryDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDesignDef;
+import org.auraframework.def.module.ModuleExample;
 import org.auraframework.def.module.impl.ModuleDesignDefImpl;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.PlatformDefImpl;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
@@ -61,44 +63,46 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
 
     private static final long serialVersionUID = -7133749123070386535L;
 
-    private String path;
+    private final String path;
     private final Set<String> moduleDependencies;
     private final String moduleName;
     private final String customElementName;
     private Set<DefDescriptor<?>> dependencies = null;
-    private Map<CodeType, String> codes;
+    private final Map<CodeType, String> codes;
     private final Set<PropertyReference> labelReferences;
-    private Double minVersion;
-    private List<Reference> sourceReferences;
-    private List<Reference> metadataReferences;
-    private Boolean requireLocker;
-    private ModuleDesignDef moduleDesignDef;
-    private Set<String> validTags;
+    private final Double minVersion;
+    private final List<Reference> sourceReferences;
+    private final List<Reference> metadataReferences;
+    private final Boolean requireLocker;
+    private final ModuleDesignDef moduleDesignDef;
+    private final Set<String> validTags;
     private final DocumentationDef documentationDef;
     private final DocumentationDef auraDocumentationDef;
     private final SVGDef svgDef;
     private final Collection<ModulesCompilerData.WireDecoration> wireDecorations;
     private List<TemplateModuleDependencies> experimentalTemplateModuleDependencies;
+    private final List<ModuleExample> examples;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
         this.path = builder.path;
-        this.codes = builder.codes;
-        this.moduleDependencies = builder.moduleDependencies;
+        this.codes = AuraUtil.immutableMap(builder.codes);
+        this.moduleDependencies = AuraUtil.immutableSet(builder.moduleDependencies);
         this.moduleName = builder.moduleName;
         this.customElementName = builder.customElementName;
-        this.labelReferences = builder.labelReferences;
+        this.labelReferences = AuraUtil.immutableSet(builder.labelReferences);
         this.minVersion = builder.minVersion;
         this.requireLocker = builder.requireLocker;
         this.moduleDesignDef = builder.moduleDesignDef;
-        this.validTags = builder.validTags;
-        this.sourceReferences = builder.sourceReferences;
-        this.metadataReferences = builder.metadataReferences;
+        this.validTags = AuraUtil.immutableSet(builder.validTags);
+        this.sourceReferences = AuraUtil.immutableList(builder.sourceReferences);
+        this.metadataReferences = AuraUtil.immutableList(builder.metadataReferences);
         this.documentationDef = builder.documentationDef;
         this.auraDocumentationDef = builder.auraDocumentationDef;
         this.wireDecorations = builder.wireDecorations;
         this.svgDef = builder.svgDef;
         this.experimentalTemplateModuleDependencies = builder.experimentalTemplateModuleDependencies;
+        this.examples = AuraUtil.immutableList(builder.examples);
     }
 
     @Override
@@ -157,6 +161,11 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     @Override
     public List<TemplateModuleDependencies> getExperimentalTemplateModuleDependencies() {
         return experimentalTemplateModuleDependencies;
+    }
+
+    @Override
+    public List<ModuleExample> getExamples() {
+        return examples;
     }
 
     @Override
@@ -353,6 +362,8 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private Collection<ModulesCompilerData.WireDecoration> wireDecorations;
         private List<TemplateModuleDependencies> experimentalTemplateModuleDependencies;
 
+        private List<ModuleExample> examples;
+        
         public Builder() {
             super(ModuleDef.class);
         }
@@ -361,6 +372,9 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
             this.codes = codes;
         }
 
+        public void setExamples(List<ModuleExample> examples) {
+            this.examples = examples;
+        }
         public void setPath(String path) {
             this.path = path;
         }

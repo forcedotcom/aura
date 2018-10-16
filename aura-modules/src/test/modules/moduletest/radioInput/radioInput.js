@@ -13,7 +13,7 @@ export default class RadioInput extends LightningElement {
     }
 
     handleChange() {
-        this._checked = this.root.querySelector('input').checked;
+        this._checked = this.template.querySelector('input').checked;
         const detail = {
             checked: this._checked
         };

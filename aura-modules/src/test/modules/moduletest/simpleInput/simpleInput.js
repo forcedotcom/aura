@@ -3,11 +3,11 @@ import { LightningElement, api } from "lwc";
 export default class SimpleInput extends LightningElement {
     @api
     get value() {
-        return this.root.querySelector('input').value;
+        return this.template.querySelector('input').value;
     }
 
     set value(value) {
-        this.root.querySelector('input').value = value;
+        this.template.querySelector('input').value = value;
     }
 
     @api
@@ -17,7 +17,7 @@ export default class SimpleInput extends LightningElement {
 
     @api
     get inputValidity() {
-        return this.root.querySelector('input').validity;
+        return this.template.querySelector('input').validity;
     }
 }
 

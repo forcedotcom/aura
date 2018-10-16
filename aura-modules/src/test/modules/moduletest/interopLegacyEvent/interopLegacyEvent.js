@@ -4,7 +4,7 @@ export default class InteropLegacyEvent extends LightningElement {
     @api
     triggerEvent() {
         // a bug in Chrome prevents us from using focus() here. Fixed in Chome 67.
-        this.root.querySelector('.trigger-click').click();
+        this.template.querySelector('.trigger-click').click();
     }
 
     handleButtonClick(event) {

@@ -7,7 +7,7 @@ define('modules/moduletest', ['x/test', 'lwc'], function (_xTest, lwc) {
       } = $api;
 
       return [api_custom_element("x-test", _xTest, {
-        key: 1
+        key: 2
       }, [api_dynamic($cmp.test)])];
     }
 

@@ -1,26 +1,26 @@
 <template>
-    <div id="title">SecureDOMEvent test</div>
-    <button id="buttonInMarkup" onclick={handleClick}>Button in markup</button>
+    <div class="title">SecureDOMEvent test</div>
+    <button class="buttonInMarkup" onclick={handleClick}>Button in markup</button>
 
     <template for:each={accounts} for:item="account">
-        <button key={account.id} onclick={handleClick} id="buttonInIteration">Button inside for:each</button>
+        <button key={account.id} onclick={handleClick} class="buttonInIteration">Button inside for:each</button>
     </template>
 
     <p if:true={boolVar}>
-        <button onclick={handleClick} id="buttonInIf">Button inside aura:if</button>
+        <button onclick={handleClick} class="buttonInIf">Button inside aura:if</button>
     </p>
 
 
     <template for:each={accounts} for:item="account">
         <p key={account.id} if:true={boolVar}>
-            <button onclick={handleClick} id="buttonInNestedIteration">Button inside aura:iteration and aura:if</button>
+            <button onclick={handleClick} class="buttonInNestedIteration">Button inside aura:iteration and aura:if</button>
         </p>
     </template>
 
-    <securemoduletest-child id="childModule">
+    <securemoduletest-child class="childModule">
     </securemoduletest-child>
 
     <securemoduletest-slot-author>
-        <button onclick={handleClick} id="buttonInFacet">Button inside slot</button>
+        <button onclick={handleClick} class="buttonInFacet">Button inside slot</button>
     </securemoduletest-slot-author>
 </template>

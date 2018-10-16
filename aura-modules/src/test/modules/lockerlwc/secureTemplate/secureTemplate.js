@@ -12,25 +12,25 @@ export default class SecureTemplateTester extends LightningElement {
         testUtils.assertEquals(true, childNodes[i] instanceof Node);
       }
 
-      testUtils.assertTrue(childNodes[0].id === 'div-in-parent');
-      testUtils.assertTrue(childNodes[1].id === 'span-in-parent');
-      testUtils.assertTrue(childNodes[2].id === 'parentsecure');
+      testUtils.assertTrue(childNodes[0].className === 'div-in-parent');
+      testUtils.assertTrue(childNodes[1].className === 'span-in-parent');
+      testUtils.assertTrue(childNodes[2].className === 'parentsecure');
     }
 
     @api
     testQuerySelector() {
-        const result = this.template.querySelector('#div-in-parent');
+        const result = this.template.querySelector('.div-in-parent');
         testUtils.assertDefined(result);
-        assertNodeDetail(result, {tagName: 'DIV', id: 'div-in-parent'});
+        assertNodeDetail(result, {tagName: 'DIV', className: 'div-in-parent'});
     }
 
     @api
     testQuerySelectorAll() {
         const childNodes = this.template.querySelectorAll('*');
         testUtils.assertEquals(3, childNodes.length);
-        assertNodeDetail(childNodes[0], {tagName: 'DIV', id: 'div-in-parent'});
-        assertNodeDetail(childNodes[1], {tagName: 'SPAN', id: 'span-in-parent'});
-        assertNodeDetail(childNodes[2], {tagName: 'LOCKERLWC-PARENTSECURE', id: 'parentsecure'});
+        assertNodeDetail(childNodes[0], {tagName: 'DIV', className: 'div-in-parent'});
+        assertNodeDetail(childNodes[1], {tagName: 'SPAN', className: 'span-in-parent'});
+        assertNodeDetail(childNodes[2], {tagName: 'LOCKERLWC-PARENTSECURE', className: 'parentsecure'});
     }
 }
 

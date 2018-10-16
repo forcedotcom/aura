@@ -1,10 +1,10 @@
 ({
     selector: {
-        removeBtn : '#remove-btn',
-        removeWithCallbackBtn : '#remove-with-callback-btn',
-        onClickWithCallbackBtn : '#onclick-with-callback-btn',
-        removePrevented : '#remove-prevented',
-        evtWithDetails : '#onclick-dispatch-evt-with-details-btn'
+        removeBtn : '.remove-btn',
+        removeWithCallbackBtn : '.remove-with-callback-btn',
+        onClickWithCallbackBtn : '.onclick-with-callback-btn',
+        removePrevented : '.remove-prevented',
+        evtWithDetails : '.onclick-dispatch-evt-with-details-btn'
     },
     assertMethodThrowError: function (cmp, method) {
         var interopCmp = cmp.find('errorTest');

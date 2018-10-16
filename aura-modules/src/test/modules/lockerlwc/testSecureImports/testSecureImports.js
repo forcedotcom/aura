@@ -17,7 +17,7 @@ export default class TestSecureImports extends LightningElement {
             string: 'foobar',
             number: 1,
             boolean: true,
-            domElement: this.template.querySelector('#div-in-secure-cmp'),
+            domElement: this.template.querySelector('.div-in-secure-cmp'),
             win: window,
             doc: document,
             body: document.body,

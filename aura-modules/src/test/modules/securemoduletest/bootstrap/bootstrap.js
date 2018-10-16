@@ -8,7 +8,7 @@ export default class Bootstrap extends LightningElement {
         testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
          + " return SecureWindow in interop component");
         windowIsSecureInLocalFunc();
-        const simpleCmp = this.template.querySelector("#securemoduletest-simple-cmp");
+        const simpleCmp = this.template.querySelector(".securemoduletest-simple-cmp");
         return simpleCmp.testWindowIsSecure() && simpleLib.testWindowIsSecure();
     }
 
@@ -19,7 +19,7 @@ export default class Bootstrap extends LightningElement {
         // It was a conscious decision to not block $A on window for the sake of performance
         // testUtils.assertUndefined(window.$A);
         dollarAuraNotAccessibleInLocalFunc();
-        const simpleCmp = this.template.querySelector("#securemoduletest-simple-cmp");
+        const simpleCmp = this.template.querySelector(".securemoduletest-simple-cmp");
         return simpleCmp.testDollarAuraNotAccessibleInModules() && simpleLib.testDollarAuraNotAccessibleInModules();
     }
 
@@ -30,7 +30,7 @@ export default class Bootstrap extends LightningElement {
         testUtil.assertDefined(LightningElement, "SecureLWC is preventing access to LightningElement in interop component");
         testUtil.assertUndefined(createElement, "SecureLWC is leaking properties in interop component");
         engineIsSecureInLocalFunc();
-        const simpleCmp = this.template.querySelector("#securemoduletest-simple-cmp");
+        const simpleCmp = this.template.querySelector(".securemoduletest-simple-cmp");
         return simpleCmp.testLWCIsSecure() && simpleLib.testLWCIsSecure();
     }
 

@@ -6,7 +6,7 @@ export default class SecureSlotComponent extends LightningElement {
 
     @api
     testNamedSlot() {
-        let secureSlotElement = this.template.querySelector('#named-slot');
+        let secureSlotElement = this.template.querySelector('.named-slot');
         let secureSlotElementName = secureSlotElement.name;
         let secureSlotElementAssignedNodes = secureSlotElement.assignedNodes();
         let secureSlotElementAssignedElements = secureSlotElement.assignedElements();
@@ -27,7 +27,7 @@ export default class SecureSlotComponent extends LightningElement {
 
     @api
     testDefaultSlot() {
-        let secureSlotElement = this.template.querySelector('#default-slot');
+        let secureSlotElement = this.template.querySelector('.default-slot');
         let secureSlotElementName = secureSlotElement.name;
         let secureSlotElementAssignedNodes = secureSlotElement.assignedNodes();
         let secureSlotElementAssignedElements = secureSlotElement.assignedElements();

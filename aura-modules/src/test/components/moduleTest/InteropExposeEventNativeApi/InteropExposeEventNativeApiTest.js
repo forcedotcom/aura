@@ -1,7 +1,7 @@
 ({
     selector: {
-        removeBtn : '#remove-btn',
-        triggerClickBtn : '#trigger-click',
+        removeBtn : '.remove-btn',
+        triggerClickBtn : '.trigger-click',
     },
     testInteropRemoveEventNativeProps: {
         browsers : [ 'GOOGLECHROME' ],
@@ -48,7 +48,7 @@
             function (cmp) {
                 var receivedEvent = cmp.get('v.focusEvt');
                 $A.test.assertTruthy(receivedEvent.target, 'Interop should expose native event API (target)');
-                $A.test.assertEquals(receivedEvent.target.getAttribute('id'), 'trigger-click', 'The id of the target element should be trigger-click');
+                $A.test.assertTruthy(receivedEvent.target.classList.contains('trigger-click'), 'The target element should have the trigger-click class');
                 $A.test.assertTruthy(receivedEvent.currentTarget, 'Interop should expose native event API (currentTarget)');
             }
         ]

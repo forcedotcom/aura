@@ -56,13 +56,13 @@ export default class SanityChecks extends LightningElement {
 
     @api
     testAppendDynamicallyCreatedDivToMarkup() {
-        const contentEl = this.template.querySelector("#content");
+        const contentEl = this.root.querySelector(".content");
         let div = document.createElement("div");
         div.id = "myId";
         div.className = "fancypants";
         contentEl.appendChild(div);
 
-        div = this.template.querySelector("#content");
+        div = this.template.querySelector(".content");
         const appendedDiv = div.childNodes[0];
         testUtil.assertEquals("myId", appendedDiv.id);
         testUtil.assertEquals("fancypants", appendedDiv.className);
@@ -75,7 +75,7 @@ export default class SanityChecks extends LightningElement {
         // Public method invoked on internal library
         helper.testContextInModuleInternalLib();
         // Public method invoked on facet
-        const simpleCmp = this.template.querySelector("#securemoduletest-simple-cmp");
+        const simpleCmp = this.template.querySelector(".securemoduletest-simple-cmp");
         simpleCmp.testContextInPublicMethod();
     }
 
@@ -143,7 +143,7 @@ export default class SanityChecks extends LightningElement {
     @api
     testSecureElementPrototypeCounterMeasures() {
         // Try to access the internal prototype of a SecureElement
-        const el = this.template.querySelector("#content");
+        const el = this.template.querySelector(".content");
         const prototype = Object.getPrototypeOf(el);
         testUtil.assertTrue(prototype === HTMLDivElement.prototype); // Will start failing once W-4184609 or W-4180046 or W-4274468 is fixed
     }

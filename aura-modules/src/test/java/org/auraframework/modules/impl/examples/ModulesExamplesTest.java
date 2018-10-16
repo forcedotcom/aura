@@ -50,9 +50,9 @@ public class ModulesExamplesTest extends AuraImplTestCase {
         String html = "<template>\n" + "    <!-- This is an example -->\n"
                 + "    <moduletest-examples-doc></moduletest-examples-doc>\n"
                 + "    <!-- this should output 'hello', imported from library -->\n"
-                + "    <div id=\"hello\">{text}</div>\n"
+                + "    <div class=\"hello\">{text}</div>\n"
                 + "    <!--  this should include another example, and it should render example1 -->\n"
-                + "    <e-example1></e-example1>\n" + "</template>";
+                + "    <e-example1></e-example1>\n" + "</template>\n";
 
         ModuleExample example2 = examples.get(0);
         ModuleExampleFile exampleHtml = getFile(example2.getContents(),".html");

@@ -19,7 +19,7 @@ export default class ParentSecure extends LightningElement {
             string: 'foobar',
             number: 1,
             boolean: true,
-            domElement: this.template.querySelector('#parent-secure'),
+            domElement: this.template.querySelector('.parent-secure'),
             win: window,
             doc: document,
             body: document.body,
@@ -175,7 +175,7 @@ export default class ParentSecure extends LightningElement {
     }
 
     @api testTemplateQuerySelectorReturnsSecureElement() {
-        const el = this.template.querySelector('#parent-secure');
+        const el = this.template.querySelector('.parent-secure');
         this.assertIsSecureElement(el);
     }
 
@@ -341,7 +341,7 @@ export default class ParentSecure extends LightningElement {
 
     @api testPlatformEventsOnChildCrossNamespace(objDone) {
         const child = this.template.querySelector('securemoduletest-child');
-        child.dispatchEvent(new LockerLWCEvent(this.getCustomEventData(objDone, true)));        
+        child.dispatchEvent(new LockerLWCEvent(this.getCustomEventData(objDone, true)));
     }
 
 

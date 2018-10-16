@@ -1,8 +1,8 @@
 ({
     selector: {
-        format : '#format',
-        message : '#message',
-        changeValuesBtn: '#change-values'
+        format : '.format',
+        message : '.message',
+        changeValuesBtn: '.change-values'
     },
     assertDisplayedValue: function (cmp, selector, expected, msg) {
         var element = cmp.find('simple').getElement().querySelector(selector);
@@ -76,7 +76,7 @@
                 });
                 $A.test.addWaitFor(true, function() { return createdCmp !== undefined; }, function() {
                     $A.test.assertEquals("some-message", createdCmp.attributes.message, "Did not set mapped attribute via $A.createComponent");
-                    $A.test.assertUndefined(createdCmp.attributes.format, 
+                    $A.test.assertUndefined(createdCmp.attributes.format,
                             "Should not be able to set pre-mapped attribute (attempting to set format, which has been mapped to 'style')");
                 });
             }

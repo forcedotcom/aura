@@ -4,7 +4,7 @@
     selector: {
         literal: '.m-literal span',
         expression: '.m-expr span',
-        changeValuesBtn: '#change-values'
+        changeValuesBtn: '.change-values'
     },
 
     testFalsy: {

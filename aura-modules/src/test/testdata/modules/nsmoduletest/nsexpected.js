@@ -22,9 +22,9 @@ x-foo${shadowSelector},[is="x-foo"]${shadowSelector} {
       } = $api;
 
       return [api_custom_element("c-bar", _cBar, {
-        key: 1
-      }, []), api_custom_element("x-foo", _xFoo, {
         key: 2
+      }, []), api_custom_element("x-foo", _xFoo, {
+        key: 3
       }, [])];
     }
 

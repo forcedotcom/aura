@@ -9,16 +9,16 @@ export default class Child extends LightningElement {
                     foo: 'bar'
                 },
                 array: [1],
-                domElement: this.template.querySelector('#p-securemoduletest-child'),
+                domElement: this.template.querySelector('.p-securemoduletest-child'),
                 sharedObjects: {
-                    window, 
-                    document, 
-                    body: document.body, 
+                    window,
+                    document,
+                    body: document.body,
                     head: document.head
                 }
         }
     }
-    
+
     @api
     testInitEventOnElementOfChildModule() {
         let domEvent;

@@ -16,7 +16,7 @@ export default class ParentUnsecure extends LightningElement {
             string: 'foobar',
             number: 1,
             boolean: true,
-            domElement: this.template.querySelector('#parent-unsecure'),
+            domElement: this.template.querySelector('.parent-unsecure'),
             win: window,
             doc: document,
             body: document.body,
@@ -177,8 +177,8 @@ export default class ParentUnsecure extends LightningElement {
         testUtils.assertEqualsValue({foo: 'bar'}, object, 'Mismatch in object parameter');
         testUtils.assertEqualsValue([1], array, 'Mismatch in array parameter');
         testUtils.assertEquals(
-            '[object HTMLDivElement]', 
-            domElement.toString(), 
+            '[object HTMLDivElement]',
+            domElement.toString(),
             'Mismatch in domElement parameter'
         );
 

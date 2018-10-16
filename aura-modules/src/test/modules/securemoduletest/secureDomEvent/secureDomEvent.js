@@ -9,7 +9,7 @@ export default class SecureDOMEventClazz extends LightningElement {
     @api
     testClickEvent() {
         let domEvent;
-        const element = this.template.querySelector("#title");
+        const element = this.template.querySelector(".title");
         element.addEventListener("click", (e) => {
             domEvent = e;
         });
@@ -83,7 +83,7 @@ export default class SecureDOMEventClazz extends LightningElement {
     @api
     testEventView() {
         let domEvent;
-        const element = this.template.querySelector("#title");
+        const element = this.template.querySelector(".title");
         element.addEventListener("click", (e) => {
             domEvent = e;
         });
@@ -94,30 +94,30 @@ export default class SecureDOMEventClazz extends LightningElement {
 
     @api
     testEventTargetOfHtmlElementHandler() {
-        const buttonInMarkup = this.template.querySelector("#buttonInMarkup");
+        const buttonInMarkup = this.template.querySelector(".buttonInMarkup");
         buttonInMarkup.click();
         this.assertClickHandlerCalled();
 
-        const buttonInIteration = this.template.querySelector("#buttonInIteration");
+        const buttonInIteration = this.template.querySelector(".buttonInIteration");
         buttonInIteration.click();
         this.assertClickHandlerCalled();
 
-        const buttonInIf = this.template.querySelector("#buttonInIf");
+        const buttonInIf = this.template.querySelector(".buttonInIf");
         buttonInIf.click();
         this.assertClickHandlerCalled();
 
-        const buttonInNestedIteration = this.template.querySelector("#buttonInNestedIteration");
+        const buttonInNestedIteration = this.template.querySelector(".buttonInNestedIteration");
         buttonInNestedIteration.click();
         this.assertClickHandlerCalled();
 
-        const buttonInFacet = this.template.querySelector("#buttonInFacet");
+        const buttonInFacet = this.template.querySelector(".buttonInFacet");
         buttonInFacet.click();
         this.assertClickHandlerCalled();
     }
 
     @api
     testInitEventOnElementOfChildModule() {
-        const child = this.template.querySelector("#childModule");
+        const child = this.template.querySelector(".childModule");
         child.testInitEventOnElementOfChildModule();
     }
 

@@ -5,8 +5,8 @@
             <li class="m-literal">Literal: <span>{literal}</span></li>
             <li class="m-bound">Bound: <span>{bound}</span> </li>
             <li class="m-unbound">Unbound: <span>{unbound}</span></li>
-            <li class="m-expr">Expression: <span>{expression}</span></li>  
-            <li class="m-nested">Nested: <span>{nested}</span></li>  
+            <li class="m-expr">Expression: <span>{expression}</span></li>
+            <li class="m-nested">Nested: <span>{nested}</span></li>
         </ul>
 
         <p><button onclick={handleFireAction}>FireCallbackAction</button></p>
@@ -15,7 +15,7 @@
 
         <moduletest-text-cmp text="dependency"></moduletest-text-cmp>
         <span class="date-container">{date}</span>
-        <input id="change-values" type="button" onclick={handleClick} value="change values" />
+        <input class="change-values" type="button" onclick={handleClick} value="change values" />
 
         <span class="null-test">
             <template if:true={hasValue}>{valueText}</template>

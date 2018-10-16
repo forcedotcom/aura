@@ -38,6 +38,8 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.system.AuraContext;
 import org.auraframework.util.AuraLocale;
 
+import com.google.common.collect.Maps;
+
 @ServiceComponent
 public class LocaleDataJsAppender implements InlineJSAppender{
 
@@ -104,33 +106,38 @@ public class LocaleDataJsAppender implements InlineJSAppender{
     }
 
     private Map<String, String> readLocaleData() {
-        String localeDataPath = "aura/resources/moment/locales.js";
+        final String localeDataPath = "aura/resources/moment/locales.js";
 
-        ClassLoader loader = LocaleDataJsAppender.class.getClassLoader();
-        Map<String, String> localeData = new HashMap<>();
-        try (InputStream is = loader.getResourceAsStream(localeDataPath)) {
+        final ClassLoader loader = LocaleDataJsAppender.class.getClassLoader();
+        Map<String, String> localeData;
+        try (final InputStream is = loader.getResourceAsStream(localeDataPath)) {
             if (is == null) {
                 throw new IOException("Locale file doesn't exist: " + localeDataPath);
             }
 
-            Reader reader = new InputStreamReader(is);
-            String content = IOUtils.toString(reader);
+            final String content;
+            try (final Reader reader = new InputStreamReader(is)) {
+                content = IOUtils.toString(reader);
+            }
+            
             // parse out all locale's code
-            String[] blocks = content.split("(//! moment.js locale configuration)|(moment.locale\\(\\'en\\'\\);)");
-
+            final String[] blocks = content.split("(//! moment.js locale configuration)|(moment.locale\\(\\'en\\'\\);)");
+            final Pattern pattern = Pattern.compile("//! locale.*\\[([\\w-]*)\\]");
+            
             // ignore the first and the last code block
+            localeData = Maps.newHashMapWithExpectedSize(blocks.length - 2);
             for (int i = 1; i < blocks.length - 1; i++) {
-                String block = blocks[i];
+                final String block = blocks[i];
                 // parse out the locale id from comment
-                Pattern pattern = Pattern.compile("//! locale.*\\[([\\w-]*)\\]");
-                Matcher matcher = pattern.matcher(block);
+                final Matcher matcher = pattern.matcher(block);
                 if (matcher.find()) {
-                    String locale = matcher.group(1).trim();
+                    final String locale = matcher.group(1).trim();
                     localeData.put(locale, block);
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             exceptionAdapter.handleException(e);
+            localeData = Collections.emptyMap();
         }
 
         return Collections.unmodifiableMap(localeData);

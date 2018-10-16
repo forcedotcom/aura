@@ -15,15 +15,24 @@
  */
 package org.auraframework.integration.test.http.resource;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.http.resource.LocaleDataJsAppender;
 import org.auraframework.impl.AuraImplTestCase;
 import org.junit.Test;
 
-import javax.inject.Inject;
-
+/**
+ * Test for the {@link LocaleDataJsAppender} class.
+ */
 public class LocaleDataJsAppenderTest extends AuraImplTestCase {
+    
+    private final static int EXPECTED_NUMBER_OF_LOCALES = 109;
 
     @Inject
     private LocalizationAdapter localizationAdapter;
@@ -42,12 +51,12 @@ public class LocaleDataJsAppenderTest extends AuraImplTestCase {
 
     /**
      * Verify all moment locale data are correctly parsed into map.
-     * For current version of moment, it has 108 locales.
+     * For current version of moment, it has {@value #EXPECTED_NUMBER_OF_LOCALES} locales.
      */
     @Test
     public void testInitializeLoadsAllMomentLocaleData() {
         LocaleDataJsAppender appender = getInlineJs();
-        assertEquals(108, appender.getMomentLocales().size());
+        assertThat(appender.getMomentLocales(), hasSize(EXPECTED_NUMBER_OF_LOCALES));
     }
 
     /**
@@ -63,7 +72,7 @@ public class LocaleDataJsAppenderTest extends AuraImplTestCase {
         String actual = appender.getMomentLocale("no_NO");
 
         String expected = "nb";
-        assertEquals(expected, actual);
+        assertThat(actual, equalTo(expected));
     }
 
     @Test
@@ -72,7 +81,7 @@ public class LocaleDataJsAppenderTest extends AuraImplTestCase {
         String actual = appender.getMomentLocale("in_ID");
 
         String expected = "id";
-        assertEquals(expected, actual);
+        assertThat(actual, equalTo(expected));
     }
 
     @Test
@@ -81,6 +90,6 @@ public class LocaleDataJsAppenderTest extends AuraImplTestCase {
         String actual = appender.getMomentLocale("iw_IL");
 
         String expected = "he";
-        assertEquals(expected, actual);
+        assertThat(actual, equalTo(expected));
     }
 }

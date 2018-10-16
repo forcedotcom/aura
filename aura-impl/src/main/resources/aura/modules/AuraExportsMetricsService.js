@@ -17,6 +17,7 @@
 var LTNG = "ltng";
 var PERF = "performance";
 var INTERACTION = "interaction";
+var ERROR = "error";
 var USER = "user";
 var CLICK = "click";
 
@@ -54,5 +55,14 @@ Aura.ExportsMetricsService = {
     },
     "registerCacheStats": function (name) {
         return $A.metricsService.registerCacheStats(name);
-     }
+     },
+     "error": function (attributes, eventSource, eventType) {
+        return $A.metricsService.transaction(LTNG, ERROR, {
+            "context": {
+                "attributes": attributes,
+                "eventSource" : eventSource || ERROR,
+                "eventType"   : eventType || ERROR
+            }
+        });
+    }
 };

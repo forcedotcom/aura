@@ -58,11 +58,6 @@ public interface ComponentLocationAdapter extends AuraAdapter {
         private final String moduleSourcePackage;
         private final Set<SourceLoader> loaders = new HashSet<>();
 
-        @Deprecated
-        public Impl(File componentSourceDir) {
-            this(componentSourceDir, null, null, null);
-        }
-
         public Impl(File componentSourceDir, String componentSourcePackage,
                 File moduleSourceDir, String moduleSourcePackage) {
             this.componentSourceDir = componentSourceDir;

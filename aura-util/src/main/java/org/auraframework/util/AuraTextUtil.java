@@ -52,7 +52,7 @@ public final class AuraTextUtil {
     private static final String[] JSON_FUNCTION_OUT = new String[] { "\n", "", "\\u002A/" };
     private static final TrieMatcher JSON_FUNCTION_HYDRATION_SEARCH_REPLACE = TrieMatcher.compile(JSON_FUNCTION_IN, JSON_FUNCTION_OUT);
 
-    private static final String[] RESERVED_METHODS = new String[]{
+    private static final String[] RESERVED_METHODS = new String[] {
             "auraType","getDef","getRendering",
             "index","deIndex","find",
             "getGlobalId","getLocalId",

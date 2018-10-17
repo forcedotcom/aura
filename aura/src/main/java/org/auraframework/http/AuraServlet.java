@@ -61,8 +61,8 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Message;
-import org.auraframework.throwable.AuraRequestInputException;
 import org.auraframework.throwable.AuraHandledException;
+import org.auraframework.throwable.AuraRequestInputException;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.SystemErrorException;
@@ -232,59 +232,84 @@ public class AuraServlet extends AuraBaseServlet {
         } catch(final ClassCastException cce) {
             throw new AuraRequestInputException(cce, input, "Data in a request must be a map of name-value pairs in JSON format");
         }
+
         if (message == null) {
             return null;
         }
         List<Map<String, ?>> actions = message.get("actions");
         final List<Action> actionList;
         if (actions != null) {
-                actionList = new ArrayList<>(actions.size());
-            for (Map<String, ?> action : actions) {
-                Map<String, ?> map = action;
-
-                // FIXME: ints are getting translated into BigDecimals here.
-                Map<String, Object> params = (Map<String, Object>) map.get("params");
-                String qualifiedName = (String)map.get("descriptor");
-                if (qualifiedName == null) {
-                    // this should never happen, we should not get an empty descriptor.
-                    // If we do, just ignore it, and continue;
-                    continue;
-                }
-                final ActionDef def;
+            actionList = new ArrayList<>();
+            for (final Object actionObject : actions) {
+                final Map<String, ?> actionMap;
                 try {
-                    def = definitionService.getDefinition(qualifiedName, ActionDef.class);
-                } catch (QuickFixException qfe) {
-                    // If this fails, it means either we have incompatible versions, or the client
-                    // has been compromised, or the data is just messed up. In that case just drop
-                    // it on the floor and continue.
-                    continue;
+                    actionMap = (Map<String, ?>)actionObject;
+                } catch(final ClassCastException cce) {
+                    throw new AuraRequestInputException(cce, String.valueOf(actionObject), "Action must be in an object format.");
                 }
-                final Action instance;
-                try {
+                if (actionMap != null) {
+                    final String qualifiedName;
+                    try {
+                        qualifiedName = (String)actionMap.get("descriptor");
+                    } catch(final ClassCastException cce) {
+                        throw new AuraRequestInputException(cce, String.valueOf(actionMap.get("descriptor")), "Action descriptor must be in a valid component format.");
+                    }
+                    if (qualifiedName == null) {
+                        // this should never happen, we should not get an empty descriptor.
+                        // If we do, just ignore it, and continue;
+                        continue;
+                    }
+                    ActionDef def;
+                    try {
+                        def = definitionService.getDefinition(qualifiedName, ActionDef.class);
+                    } catch (final QuickFixException qfe) {
+                        // If this fails, it means either we have incompatible versions, or the client
+                        // has been compromised, or the data is just messed up. In that case just drop
+                        // it on the floor and continue.
+                        continue;
+                    } catch (final AuraRuntimeException are) {
+                        throw new AuraRequestInputException(are, qualifiedName, "Action descriptor must be in a valid component format.");
+                    }
+                    Action instance;
+                    // FIXME: ints are getting translated into BigDecimals here.
+                    final Map<String, Object> params = (Map<String, Object>) actionMap.get("params");
+                    
+                    // instanceService.getInstance can throw a QFE. Don't ignore this. In this case, we have
+                    // a broken server. It should never really happen in production, but it will likely occur
+                    // during development. In that case we'd rather break and let someone figure the breakage
+                    // out. Note that this is the _only_ place we can throw a QFE.
                     instance = (Action) instanceService.getInstance(def, params);
-                } catch (QuickFixException qfe) {
-                    // Don't ignore this. In this case, we have a broken server. It should never really
-                    // happen in production, but it will likely occur during development. In that case
-                    // we'd rather break and let someone figure the breakage out. Note that this is the
-                    // _only_ place we can throw a QFE.
-                    throw qfe;
+                    try {
+                        instance.setId((String) actionMap.get("id"));
+                    } catch(final ClassCastException cce) {
+                        throw new AuraRequestInputException(cce, String.valueOf(actionMap.get("id")), "Action id must be in a String format.");
+                    }
+                    final String cd;
+                    try {
+                        cd = (String) actionMap.get("callingDescriptor");
+                    } catch(final ClassCastException cce) {
+                        throw new AuraRequestInputException(cce, String.valueOf(actionMap.get("callingDescriptor")), "Action callingDescriptor must be in a String format.");
+                    }
+                    if (cd != null && !"UNKNOWN".equals(cd)) {
+                        DefDescriptor<? extends BaseComponentDef> callingDescriptor = definitionService.getDefDescriptor(cd, ComponentDef.class);
+                        instance.setCallingDescriptor(callingDescriptor);
+                    }
+                    final String v;
+                    try {
+                        v = (String) actionMap.get("version");
+                    } catch(final ClassCastException cce) {
+                        throw new AuraRequestInputException(cce, String.valueOf(actionMap.get("version")), "Action version must be in a String format.");
+                    }
+                    if (v != null) {
+                        instance.setCallerVersion(v);
+                    }
+    
+                    if (actionMap.get("storable") != null) {
+                        instance.setStorable();
+                    }
+    
+                    actionList.add(instance);
                 }
-                instance.setId((String) map.get("id"));
-                String cd = (String) map.get("callingDescriptor");
-                if (cd != null && !cd.equals("UNKNOWN")) {
-                    DefDescriptor<? extends BaseComponentDef> callingDescriptor = definitionService.getDefDescriptor(cd, ComponentDef.class);
-                    instance.setCallingDescriptor(callingDescriptor);
-                }
-                String v = (String) map.get("version");
-                if (v != null) {
-                    instance.setCallerVersion(v);
-                }
-
-                if (map.get("storable") != null) {
-                    instance.setStorable();
-                }
-
-                actionList.add(instance);
             }
         } else {
             actionList = Collections.emptyList();
@@ -649,7 +674,7 @@ public class AuraServlet extends AuraBaseServlet {
             }
         } catch (final InvalidParamException | MissingParamException | JsonParseException ipe) {
             servletUtilAdapter.handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
-        } catch(final AuraRequestInputException arie) {
+        } catch (final AuraRequestInputException arie) {
             servletUtilAdapter.handleServletException(arie, false, context, request, response, false);
         } catch (final Exception e) {
             servletUtilAdapter.handleServletException(e, false, context, request, response, written);

@@ -15,6 +15,11 @@
  */
 package org.auraframework.http;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThat;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,6 +47,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraRequestInputException;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -760,5 +766,155 @@ public class AuraServletTest extends UnitTestCase {
 
         // Assert
         Mockito.verify(servletUtilAdapter).setNoCache(response);
+    }
+    
+    @Test
+    public void testReadMessageInvalidDefinitionFormat() throws QuickFixException {
+
+        // Arrange
+        final AuraRuntimeException are = new AuraRuntimeException("Do not pass go. Do not collect $200.");
+        Mockito.when(definitionService.getDefinition(Matchers.anyString(), Matchers.any())).thenThrow(are);
+        
+        try {
+            // Act
+            originalServlet.readMessage("{\"actions\":[{\"id\":\"2;a\",\"descriptor\":\"aura://ComponentController   /ACTION$getComponent\",\"callingDescriptor\":\"UNKNOWN\",\"params\":{\"name\":\"markup://test:runnerContainer\",\"attributes\":{}}}]}");
+            fail("Expected an AuraRequestInputException.");
+        } catch(final AuraRequestInputException arie) {
+            // Assert
+            assertThat("Message does not match", arie.getMessage(), equalTo("[AuraClientInputException from server] Unexpected request input. Expected input format: \"Action descriptor must be in a valid component format.\"."));
+            assertThat("InvalidInput does not match", arie.getInvalidInput(), equalTo("aura://ComponentController   /ACTION$getComponent"));
+            assertThat("Cause does not match", arie.getCause(), sameInstance(are));
+        }
+    }
+    
+    @Test
+    public void testReadMessageInvalidDefinitionFormatBlank() throws QuickFixException {
+
+        // Arrange
+        final AuraRuntimeException are = new AuraRuntimeException("Do not pass go. Do not collect $200.");
+        Mockito.when(definitionService.getDefinition(Matchers.anyString(), Matchers.any())).thenThrow(are);
+        
+        try {
+            // Act
+            originalServlet.readMessage("{\"actions\":[{\"id\":\"2;a\",\"descriptor\":\"\",\"callingDescriptor\":\"UNKNOWN\",\"params\":{\"name\":\"markup://test:runnerContainer\",\"attributes\":{}}}]}");
+            fail("Expected an AuraRequestInputException.");
+        } catch(final AuraRequestInputException arie) {
+            // Assert
+            assertThat("Message does not match", arie.getMessage(), equalTo("[AuraClientInputException from server] Unexpected request input. Expected input format: \"Action descriptor must be in a valid component format.\"."));
+            assertThat("InvalidInput does not match", arie.getInvalidInput(), equalTo(""));
+            assertThat("Cause does not match", arie.getCause(), sameInstance(are));
+        }
+    }
+    
+    @Test
+    public void testReadMessageDefinitionFormatNull() throws QuickFixException {
+
+        // Arrange
+        
+        // Act
+        final Message message = originalServlet.readMessage("{\"actions\":[{\"id\":\"2;a\",\"descriptor\":null,\"callingDescriptor\":\"UNKNOWN\",\"params\":{\"name\":\"markup://test:runnerContainer\",\"attributes\":{}}}]}");
+        
+        // Assert
+        assertThat("The List of actions should be empty.", Boolean.valueOf(message.getActions().isEmpty()), equalTo(Boolean.TRUE));
+        Mockito.verifyZeroInteractions(definitionService);
+    }
+    
+    @Test
+    public void testReadMessageActionNotMap() throws QuickFixException {
+
+        // Arrange
+        
+        try {
+            // Act
+            originalServlet.readMessage("{\"actions\":[\"jackson\"]}");
+            fail("Expected an AuraRequestInputException.");
+        } catch(final AuraRequestInputException arie) {
+            // Assert
+            assertThat("Message does not match", arie.getMessage(), equalTo("[AuraClientInputException from server] Unexpected request input. Expected input format: \"Action must be in an object format.\"."));
+            assertThat("InvalidInput does not match", arie.getInvalidInput(), equalTo("jackson"));
+            assertThat("Cause does not match", arie.getCause(), instanceOf(ClassCastException.class));
+        }
+    }
+    
+    @Test
+    public void testReadMessageActionNull() throws QuickFixException {
+        // Arrange
+        
+        // Act
+        final Message message = originalServlet.readMessage("{\"actions\":[null]}");
+        
+        // Assert
+        assertThat("The List of actions should be empty.", Boolean.valueOf(message.getActions().isEmpty()), equalTo(Boolean.TRUE));
+        Mockito.verifyZeroInteractions(definitionService);
+    }
+    
+    @Test
+    public void testReadMessageActionDescriptorNotString() throws QuickFixException {
+
+        // Arrange
+        
+        try {
+            // Act
+            originalServlet.readMessage("{\"actions\":[{\"id\":\"2;a\",\"descriptor\":1,\"callingDescriptor\":\"UNKNOWN\",\"params\":{\"name\":\"markup://test:runnerContainer\",\"attributes\":{}}}]}");
+            fail("Expected an AuraRequestInputException");
+        } catch(final AuraRequestInputException arie) {
+            // Assert
+            assertThat("Message does not match", arie.getMessage(), equalTo("[AuraClientInputException from server] Unexpected request input. Expected input format: \"Action descriptor must be in a valid component format.\"."));
+            assertThat("InvalidInput does not match", arie.getInvalidInput(), equalTo("1"));
+            assertThat("Cause does not match", arie.getCause(), instanceOf(ClassCastException.class));
+        }
+    }
+    
+    @Test
+    public void testReadMessageActionIdNotString() throws QuickFixException {
+
+        // Arrange
+        
+        try {
+            // Act
+            originalServlet.readMessage("{\"actions\":[{\"id\":1,\"descriptor\":\"aura://ComponentController/ACTION$getComponent\",\"callingDescriptor\":\"UNKNOWN\",\"params\":{\"name\":\"markup://test:runnerContainer\",\"attributes\":{}}}]}");
+            fail("Expected an AuraRequestInputException");
+        } catch(final AuraRequestInputException arie) {
+            // Assert
+            assertThat("Message does not match", arie.getMessage(), equalTo("[AuraClientInputException from server] Unexpected request input. Expected input format: \"Action id must be in a String format.\"."));
+            assertThat("InvalidInput does not match", arie.getInvalidInput(), equalTo("1"));
+            assertThat("Cause does not match", arie.getCause(), instanceOf(ClassCastException.class));
+        }
+    }
+
+    @Test
+    public void testReadMessageActionCallingDescriptorNotString() throws QuickFixException {
+
+        // Arrange
+        Mockito.when(instanceService.getInstance(Matchers.any(ActionDef.class), Matchers.anyMapOf(String.class, Object.class))).thenReturn(Mockito.mock(Action.class));
+        
+        try {
+            // Act
+            originalServlet.readMessage("{\"actions\":[{\"id\":\"2;a\",\"descriptor\":\"aura://ComponentController/ACTION$getComponent\",\"callingDescriptor\":1,\"params\":{\"name\":\"markup://test:runnerContainer\",\"attributes\":{}}}]}");
+            fail("Expected an AuraRequestInputException");
+        } catch(final AuraRequestInputException arie) {
+            // Assert
+            assertThat("Message does not match", arie.getMessage(), equalTo("[AuraClientInputException from server] Unexpected request input. Expected input format: \"Action callingDescriptor must be in a String format.\"."));
+            assertThat("InvalidInput does not match", arie.getInvalidInput(), equalTo("1"));
+            assertThat("Cause does not match", arie.getCause(), instanceOf(ClassCastException.class));
+        }
+    }
+
+    @Test
+    public void testReadMessageActionVersionNotString() throws QuickFixException {
+
+        // Arrange
+        Mockito.when(instanceService.getInstance(Matchers.any(ActionDef.class), Matchers.anyMapOf(String.class, Object.class))).thenReturn(Mockito.mock(Action.class));
+        
+        try {
+            // Act
+            originalServlet.readMessage("{\"actions\":[{\"id\":\"2;a\",\"descriptor\":\"aura://ComponentController/ACTION$getComponent\",\"callingDescriptor\":\"UNKNOWN\",\"version\":1,\"params\":{\"name\":\"markup://test:runnerContainer\",\"attributes\":{}}}]}");
+            fail("Expected an AuraRequestInputException");
+        } catch(final AuraRequestInputException arie) {
+            // Assert
+            assertThat("Message does not match", arie.getMessage(), equalTo("[AuraClientInputException from server] Unexpected request input. Expected input format: \"Action version must be in a String format.\"."));
+            assertThat("InvalidInput does not match", arie.getInvalidInput(), equalTo("1"));
+            assertThat("Cause does not match", arie.getCause(), instanceOf(ClassCastException.class));
+        }
     }
 }

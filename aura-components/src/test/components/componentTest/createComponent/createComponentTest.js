@@ -459,5 +459,31 @@
                 return typeof cmp.find(targetId) !== "undefined";
             });
         }
+    },
+
+    testCreateScriptTagNotAllowed: {
+        test: [
+            function directTagName(cmp) {
+                try {
+                    $A.createComponent("script", {"src": "/auraFW/resources/codemirror/lib/codemirror.js"}, function (cmp) {
+                        $A.test.assertUndefined(cmp, "script component should not have been created using direct tag name");
+                    });
+                } catch (e) {
+                    $A.test.assertEquals("The HTML tag 'script' is not allowed outside of an application or template markup.", e.message, "Expected error with message that script was not allowed");
+                }
+            },
+            function indirectTagName(cmp){
+                try {
+                    $A.createComponent("aura:html", {
+                        "tag": "script",
+                        "HTMLATTRIBUTES": {"src": "/auraFW/resources/codemirror/lib/codemirror.js"}
+                    }, function (cmp) {
+                        $A.test.assertUndefined(cmp, "script component should not have been created using indirect tag name");
+                    });
+                } catch (e) {
+                    $A.test.assertEquals("The HTML tag 'script' is not allowed outside of an application or template markup.", e.message, "Expected error with message that script was not allowed");
+                }
+            }
+        ]
     }
 })

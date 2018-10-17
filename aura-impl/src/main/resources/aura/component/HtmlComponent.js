@@ -157,7 +157,12 @@ function HtmlComponent(config, localCreation) {
     if (!$A.util.isUndefinedOrNull(tag)) {
         this.componentDef.getHelper().validateTagName(tag);
     }
+    if (tag === "script" && $A.root) {
+        throw new Error(HtmlComponent.SCRIPT_ERROR_MESSAGE);
+    }
 }
+
+HtmlComponent.SCRIPT_ERROR_MESSAGE = "The HTML tag 'script' is not allowed outside of an application or template markup.";
 
 HtmlComponent.prototype = Object.create(Component.prototype);
 
@@ -236,6 +241,9 @@ HtmlComponent.prototype["renderer"] = {
             throw new Error("Undefined tag attribute for " + component.getGlobalId());
         }
         helper.validateTagName(tag);
+        if (tag === "script" && $A.root) {
+            throw new Error(HtmlComponent.SCRIPT_ERROR_MESSAGE);
+        }
 
         var HTMLAttributes = component.attributeSet.getValue("HTMLAttributes");
 

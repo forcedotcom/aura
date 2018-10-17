@@ -15,8 +15,9 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:application>
     <aura:attribute name="handledEvent" type="Boolean" default="false"/>
     <aura:attribute name="reference" type="String"/>
     <div aura:id="createdComponents">{!v.body}</div>
-</aura:component>
+    <script src="/auraFW/resources/codemirror/lib/codemirror.js"></script>
+</aura:application>

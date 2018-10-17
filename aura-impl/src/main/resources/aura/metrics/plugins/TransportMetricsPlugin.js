@@ -116,10 +116,17 @@ TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, ac
     var config = Array.prototype.shift.apply(arguments);
     var auraXHR = arguments[0];
     var options = arguments[3] || {};
+    // capture the time at which the xhr send is actually called
+    // don't trigger a mark. if the XHR isn't succcessful, we don't track it
+    // and so we don't want orphan markStart marks. Not capturing the correct starttime can
+    // result in negative values for xhrDelay
+    var sendTime = this.metricsService.time();
     var ret = config["fn"].apply(config["scope"], arguments);
 
     if (ret) {
         var startMark = this.metricsService["markStart"](TransportMetricsPlugin.NAME, 'request');
+        // since the xhr actually went out when the original send funciton is called
+        startMark["ts"] = sendTime;
         var actionDefs = [];
         for (var id in auraXHR.actions) {
             if (auraXHR.actions.hasOwnProperty(id)) {

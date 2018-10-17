@@ -829,4 +829,11 @@ public interface AuraContext {
      * Get the current mode for inline scripts.
      */
     public InlineScriptMode getInlineScriptMode();
+
+    /**
+     * Whether Definitions(cmp, event, lib, module,...) be serialized inline on the context instead of via uri addressable defs.
+     * @param serializeDefinitions
+     */
+    void setSerializeDefinitions(boolean serializeDefinitions);
+    boolean isSerializingDefinitions();
 }

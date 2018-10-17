@@ -829,6 +829,8 @@ public class ServerServiceImpl implements ServerService {
 
         if (configAdapter.isBootstrapInliningEnabled() &&
                (context.getFormat() == AuraContext.Format.JS || cspInliningService.getInlineMode() != CSPInliningService.InlineScriptMode.UNSUPPORTED)) {
+            // ensure definitions are serialized inline on the context and not via uri addressable defs.
+            context.setSerializeDefinitions(true);
             // ensure app dependencies are excluded from context serialization
             try {
                 DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();

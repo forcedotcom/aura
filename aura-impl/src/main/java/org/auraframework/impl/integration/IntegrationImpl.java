@@ -251,13 +251,8 @@ public class IntegrationImpl implements Integration {
                         // need to serialize the definitions on the context here, but not using 'preloading'
                         // because preloading excludes css, but these need to have the css included since they
                         // won't show up in app.css
-                        Boolean uriDefsEnabled = context.getUriDefsEnabled();
-                        context.setUriDefsEnabled(false);
-                        try {
-                            JsonEncoder.serialize(messageMap, init, context.getJsonSerializationContext());
-                        } finally {
-                            context.setUriDefsEnabled(uriDefsEnabled);
-                        }
+                        context.setSerializeDefinitions(true);
+                        JsonEncoder.serialize(messageMap, init, context.getJsonSerializationContext());
                         init.append(";\n");
 
                         if (!actionEventHandlers.isEmpty()) {

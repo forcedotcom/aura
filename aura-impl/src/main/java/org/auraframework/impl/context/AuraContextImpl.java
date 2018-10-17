@@ -160,8 +160,10 @@ public class AuraContextImpl implements AuraContext {
     private RegistrySet registries;
 
     private final Set<String> restrictedNamespaces = new HashSet<>();
-    
+
     private final GlobalValueProviderFactory globalValueProviderFactory;
+
+    private boolean serializeDefinitions = false;
 
     private AuraContextImpl(final Mode mode, final RegistrySet registries, final Map<DefType, String> defaultPrefixes,
             final Format format, final Authentication access, final JsonSerializationContext jsonContext,
@@ -172,7 +174,7 @@ public class AuraContextImpl implements AuraContext {
         if ((globalProviders == null) && (globalValueProviderFactory == null)) {
             throw new IllegalArgumentException("If globalProviders is null then the globalValueProviderFactory parameter needs to populated (non-null).");
         }
-        
+
         this.mode = mode;
         this.registries = registries;
         this.defaultPrefixes = defaultPrefixes;
@@ -1110,5 +1112,15 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public InlineScriptMode getInlineScriptMode() {
         return inlineScriptMode;
+    }
+
+    @Override
+    public void setSerializeDefinitions(boolean serializeDefinitions) {
+        this.serializeDefinitions = serializeDefinitions;
+    }
+
+    @Override
+    public boolean isSerializingDefinitions() {
+        return serializeDefinitions;
     }
 }

@@ -166,7 +166,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             List<Definition> componentDefs = Lists.newArrayList();
             List<Definition> moduleDefs = Lists.newArrayList();
             
-            if (uriEnabled && !ctx.isPreloading()) {
+            if (uriEnabled && !ctx.isPreloading() && !ctx.isSerializingDefinitions()) {
                 if (!defMap.isEmpty()) {
                     json.writeMapKey("descriptorUids");
                     json.writeMapBegin();

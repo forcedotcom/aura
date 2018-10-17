@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-10-15
- * Version: 0.5.19
+ * Generated: 2018-10-16
+ * Version: 0.5.20
  */
 
 (function (exports) {
@@ -5621,7 +5621,8 @@ function convertSymbol(property) {
   return property;
 }
 
-const unfilteredConstructors = [Object, Array];
+// TODO W-5529670: expand list of safe constructors to base JS language
+const whitelistedConstructors = new Set([Object, Array]);
 
 const filteringProxyHandler = freeze({
   get(target, property) {
@@ -5632,7 +5633,7 @@ const filteringProxyHandler = freeze({
       return value;
     }
 
-    if (property === 'constructor' && unfilteredConstructors.includes(value)) {
+    if (property === 'constructor' && whitelistedConstructors.has(value)) {
       return value;
     }
 
@@ -5952,7 +5953,7 @@ function getArrayProxyHandler(key) {
         const filtered = getFilteredArray(handler, raw, key);
         let ret;
 
-        if (property === 'constructor' && unfilteredConstructors.includes(raw[property])) {
+        if (property === 'constructor' && whitelistedConstructors.has(raw[property])) {
           return raw[property];
         }
 
@@ -9732,11 +9733,11 @@ const lwcElementProtoPropNames = [
   'removeAttributeNS',
   'removeAttribute',
   'removeEventListener',
-  'root',
+  // 'root', (Deprecated, previous name for template)
   'setAttribute',
   'setAttributeNS',
-  'shadowRoot',
-  'slot',
+  // 'shadowRoot', (TODO W-5527917)
+  // 'slot', (experimental property, not supported by all browsers https://developer.mozilla.org/en-US/docs/Web/API/Element/slot, LWC throws error on access)
   'spellcheck',
   'style',
   'template',
@@ -9907,10 +9908,17 @@ function SecureLWC(lwc, key) {
       enumerable: true,
       value: SecureLightningElementFactory(lwc['LightningElement'], key)
     },
+    readonly: {
+      enumerable: true,
+      value: obj => lwc['readonly'](obj)
+    },
+    // *** EXCEPTION: 'registerTemplate' is not a secure method and cannot be exposed to the user.
+    //                By extension, SecureLWC also cannot be exposed to the user.
     registerTemplate: {
       enumerable: true,
-      value: lwc['registerTemplate'] // passthrough since this can't be called by any component
+      value: lwc['registerTemplate']
     },
+    // ***
     toString: {
       value: function() {
         return `SecureLWC: ${lwc}{ key: ${JSON.stringify(key)} }`;

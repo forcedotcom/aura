@@ -21,13 +21,18 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.ExampleDef;
+import org.auraframework.def.MetaDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.factory.DocumentationXMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.pojo.Description;
+import org.auraframework.pojo.Example;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import org.hamcrest.Matchers;
+
+import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 public class DocumentationDefHandlerTest extends AuraImplTestCase {
@@ -40,11 +45,11 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
         String description2 = "more testing <code>DocumentationDef</code> &lt;ui:inputText/&gt;";
         String name = "sample Description";
         String name2 = "sample Description 2";
-        String docDefSource = 
+        String docDefSource =
                 "<aura:documentation>" +
                 "<aura:example name='foo' ref='bar' label='baz'>foo-bar</aura:example>" +
-                "<aura:description name='" + name + "'>" + description + "</aura:description>" + 
-                "<aura:description name='" + name2 + "'>" + description2 + "</aura:description>" + 
+                "<aura:description name='" + name + "'>" + description + "</aura:description>" +
+                "<aura:description name='" + name2 + "'>" + description2 + "</aura:description>" +
                 "</aura:documentation>";
 
         DocumentationDef dd = parse(docDefSource);
@@ -162,20 +167,24 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
         String exampleLabel = "my Label";
         String exampleRef = "hello:world";
         String exampleDesc = "example description";
-        String example = "<aura:example name='" + exampleName + "' ref='" + exampleRef + "' label='" + exampleLabel + "'>" + exampleDesc + "</aura:example>";
+        String example =
+                "<aura:example name='" + exampleName +
+                "' ref='" + exampleRef +
+                "' label='" + exampleLabel +
+                "'>" + exampleDesc +
+                "</aura:example>";
         String docDefSource = "<aura:documentation><aura:description>" + description + "</aura:description>" + example + "</aura:documentation>";
 
         DocumentationDef dd = parse(docDefSource);
         dd.validateDefinition();
 
-        List<ExampleDef> descDefs = dd.getExampleDefs();
+        List<Example> descDefs = dd.getExamples();
         assertEquals(1, descDefs.size());
-        ExampleDef ed = descDefs.get(0);
+        Example ed = descDefs.get(0);
         assertEquals(exampleLabel, ed.getLabel());
         assertEquals(exampleName, ed.getName());
-        assertEquals(exampleRef, ed.getRef().getNamespace() + ":" + ed.getRef().getName());
+        assertEquals(exampleRef, ed.getRef());
         assertEquals(exampleDesc, ed.getDescription());
-
     }
 
     @Test
@@ -188,7 +197,7 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
                 "</aura:documentation>";
 
         DocumentationDef dd = parse(docDefSource);
-        List<ExampleDef> exDefs = dd.getExampleDefs();
+        List<Example> exDefs = dd.getExamples();
 
         //for now we overwrite examples if they have same name
         dd.validateDefinition();
@@ -220,31 +229,30 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
         DocumentationDef dd = parse(docDefSource);
         dd.validateDefinition();
 
-        Map<String, ExampleDef> exDefs = dd.getExampleDefsAsMap();
+        Map<String, Example> exDefs = dd.getExamplesAsMap();
         assertEquals(2, exDefs.size());
 
         for (String d : examples) {
-            ExampleDef ex = exDefs.get(d);
+            Example ex = exDefs.get(d);
             assertNotNull(ex);
             assertEquals(d, ex.getLabel());
             assertEquals(d, ex.getDescription());
         }
 
     }
-    
+
     @Test
     public void testParsesMetaDefs() throws Exception {
         String docDefSource = "<aura:documentation>"
                 + "<aura:meta name='name1' value='value1'/>"
                 + "<aura:meta name='name2' value='value2'/>"
                 + "</aura:documentation>";
-        
+
         DocumentationDef dd = parse(docDefSource);
-        
-        int expected = 2;
-        int actual = dd.getMetaDefsAsMap().size();
-        
-        assertEquals("Did not add expected number of aura:meta defs", expected, actual);            
+
+        assertThat("Did not add expected number of aura:meta defs",
+                   dd.getMetaDefsAsMap(),
+                   Matchers.aMapWithSize(2));
     }
 
     private DocumentationDef parse(String markup) throws QuickFixException {

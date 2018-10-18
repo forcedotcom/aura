@@ -16,13 +16,13 @@
 package org.auraframework.builder;
 
 import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.ExampleDef;
 import org.auraframework.def.MetaDef;
 import org.auraframework.pojo.Description;
+import org.auraframework.pojo.Example;
 
 public interface DocumentationDefBuilder extends DefBuilder<DocumentationDef,DocumentationDef> {
 
     DocumentationDefBuilder addDescription(String id, Description description);
-    DocumentationDefBuilder addExample(String id, ExampleDef example);
+    DocumentationDefBuilder addExample(String id, Example example);
     DocumentationDefBuilder addMeta(String id, MetaDef metaDef);
 }

@@ -16,7 +16,6 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
@@ -28,10 +27,10 @@ import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.DocumentationDefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.ExampleDef;
 import org.auraframework.def.MetaDef;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
 import org.auraframework.pojo.Description;
+import org.auraframework.pojo.Example;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -83,15 +82,12 @@ public class DocumentationDefHandler extends FileTagHandler<DocumentationDef> {
         String tag = getTagName();
 
         if (DescriptionDefHandler.TAG.equalsIgnoreCase(tag)) {
-            Description desc = new DescriptionDefHandler(this, 
-                    xmlReader, source).getElement();
+            Description desc = new DescriptionDefHandler(this, xmlReader, source).getElement();
             builder.addDescription(desc.getName(), desc);
 
         } else if (ExampleDefHandler.TAG.equalsIgnoreCase(tag)) {
-            ExampleDef ex = new ExampleDefHandler(this, xmlReader, source, isInInternalNamespace, definitionService,
-                    configAdapter, definitionParserAdapter).getElement();
-            String name = ex.getName();
-            builder.addExample(name, ex);
+            Example ex = new ExampleDefHandler(this, xmlReader, source).getElement();
+            builder.addExample(ex.getName(), ex);
 
         } else if (MetaDefHandler.TAG.equalsIgnoreCase(tag)) {
             MetaDef meta = new MetaDefHandler(this, xmlReader, source, isInInternalNamespace, definitionService,

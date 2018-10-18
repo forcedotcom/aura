@@ -530,7 +530,6 @@ public class AuraTestingUtil {
             .put(DefType.FLAVORED_STYLE, "css")
 
             .put(DefType.DOCUMENTATION, "markup")
-            .put(DefType.EXAMPLE, "markup")
 
             .put(DefType.SVG, "svg")
             .build();
@@ -561,7 +560,6 @@ public class AuraTestingUtil {
             .put(DefType.FLAVORED_STYLE, Parser.Format.CSS)
 
             .put(DefType.DOCUMENTATION, Parser.Format.XML)
-            .put(DefType.EXAMPLE, Parser.Format.XML)
 
             .put(DefType.SVG, Parser.Format.SVG)
             .build();

@@ -39,7 +39,7 @@ public class DocumentationDefModel implements JsonSerializable {
     }
 
     public boolean getHasExamples() {
-        return !this.docDef.getExampleDefs().isEmpty();
+        return !this.docDef.getExamples().isEmpty();
     }
 
     @Override

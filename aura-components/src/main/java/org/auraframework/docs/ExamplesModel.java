@@ -27,8 +27,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.ExampleDef;
 import org.auraframework.ds.servicecomponent.ModelInstance;
+import org.auraframework.pojo.Example;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
@@ -57,14 +57,14 @@ public class ExamplesModel implements ModelInstance {
                         try {
                             DocumentationDef docDef = (DocumentationDef) definitionService.getDefinition(descriptor);
 
-                            Collection<ExampleDef> exampleDefs = docDef.getExampleDefs();
+                            Collection<Example> exampleDescs = docDef.getExamples();
 
-                            for (ExampleDef example : exampleDefs) {
+                            for (Example example : exampleDescs) {
                                 m = new TreeMap<>();
 
                                 m.put("label", example.getLabel());
                                 m.put("description", example.getDescription());
-                                m.put("ref", example.getRef().getDescriptorName());
+                                m.put("ref", example.getRef());
 
                                 examples.add(m);
                             }

@@ -23,11 +23,11 @@ import java.util.Map;
 
 import org.auraframework.builder.DocumentationDefBuilder;
 import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.ExampleDef;
 import org.auraframework.def.MetaDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.pojo.Description;
+import org.auraframework.pojo.Example;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -39,14 +39,14 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
     private static final long serialVersionUID = 7808842576422413967L;
 
     private final Map<String, Description> descriptions;
-    private final Map<String, ExampleDef> exampleDefs;
+    private final Map<String, Example> examples;
     private final Map<String, MetaDef> metaDefs;
 
     protected DocumentationDefImpl(Builder builder) {
         super(builder);
 
         this.descriptions = AuraUtil.immutableMap(builder.descriptionMap);
-        this.exampleDefs = AuraUtil.immutableMap(builder.exampleMap);
+        this.examples = AuraUtil.immutableMap(builder.exampleMap);
         this.metaDefs = AuraUtil.immutableMap(builder.metaMap);
     }
 
@@ -65,15 +65,15 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
     }
 
     @Override
-    public List<ExampleDef> getExampleDefs() {
-        return Lists.newArrayList(exampleDefs.values());
+    public List<Example> getExamples() {
+        return Lists.newArrayList(examples.values());
     }
 
     @Override
-    public Map<String, ExampleDef> getExampleDefsAsMap() {
-        return exampleDefs;
+    public Map<String, Example> getExamplesAsMap() {
+        return examples;
     }
-       
+
     @Override
     public Map<String, MetaDef> getMetaDefsAsMap() {
         return metaDefs;
@@ -91,7 +91,7 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
         if (descriptions.isEmpty()) {
             throw new InvalidDefinitionException("<aura:documentation> must contain at least one <aura:description>", getLocation());
         }
-        
+
         for (MetaDef metaDef : metaDefs.values()) {
             metaDef.validateDefinition();
         }
@@ -103,7 +103,7 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
         }
 
         private final LinkedHashMap<String, Description> descriptionMap = new LinkedHashMap<>();
-        private final LinkedHashMap<String, ExampleDef> exampleMap = new LinkedHashMap<>();
+        private final LinkedHashMap<String, Example> exampleMap = new LinkedHashMap<>();
         private final LinkedHashMap<String, MetaDef> metaMap = new LinkedHashMap<>();
 
         /**
@@ -121,8 +121,8 @@ public class DocumentationDefImpl extends DefinitionImpl<DocumentationDef> imple
         }
 
         @Override
-        public DocumentationDefBuilder addExample(String id, ExampleDef example) {
-            this.exampleMap.put(id, example);
+        public DocumentationDefBuilder addExample(String id, Example ex) {
+            this.exampleMap.put(id, ex);
             return this;
         }
 

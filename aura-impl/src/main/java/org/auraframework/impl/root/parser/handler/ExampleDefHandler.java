@@ -21,19 +21,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.DefinitionParserAdapter;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.ExampleDef;
-import org.auraframework.impl.documentation.ExampleDefImpl;
-import org.auraframework.service.DefinitionService;
+import org.auraframework.pojo.Example;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableSet;
 
-public class ExampleDefHandler extends ParentedTagHandler<ExampleDefImpl, DocumentationDef> {
+public class ExampleDefHandler extends BaseXMLElementHandler {
 
     public static final String TAG = "aura:example";
 
@@ -45,19 +39,13 @@ public class ExampleDefHandler extends ParentedTagHandler<ExampleDefImpl, Docume
             ATTRIBUTE_LABEL);
 
     private final StringBuilder body = new StringBuilder();
+    
+    private String ref;
+    private String name;
+    private String label;
 
-    private final ExampleDefImpl.Builder builder = new ExampleDefImpl.Builder();
-
-    public ExampleDefHandler(DocumentationDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                             boolean isInInternalNamespace, DefinitionService definitionService,
-                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
-
-        builder.setLocation(getLocation());
-        builder.setAccess(getAccess(isInInternalNamespace));
-        if (source != null) {
-            builder.setOwnHash(source.getHash());
-        }
+    public ExampleDefHandler(DocumentationDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source) {
+        super(xmlReader, source);
     }
 
     @Override
@@ -71,23 +59,19 @@ public class ExampleDefHandler extends ParentedTagHandler<ExampleDefImpl, Docume
         if (StringUtils.isBlank(ref)) {
             error("Attribute '%s' is required on <%s>", ATTRIBUTE_REF, TAG);
         }
-        builder.setRef(ref);
+        this.ref = ref;
 
         String name = getAttributeValue(ATTRIBUTE_NAME);
         if (StringUtils.isBlank(name)) {
             error("Attribute '%s' is required on <%s>", ATTRIBUTE_NAME, TAG);
         }
-        builder.setName(name);
+        this.name = name;
 
         String label = getAttributeValue(ATTRIBUTE_LABEL);
         if (StringUtils.isBlank(label)) {
             error("Attribute '%s' is required on <%s>", ATTRIBUTE_LABEL, TAG);
         }
-        builder.setLabel(label);
-
-        DefDescriptor<DocumentationDef> parentDesc = getParentHandler().getDefDescriptor();
-        String exampleName = String.format("%s_%s", parentDesc.getDescriptorName(), name);
-        builder.setDescriptor(definitionService.getDefDescriptor(exampleName, ExampleDef.class));
+        this.label = label;
     }
 
     @Override
@@ -105,13 +89,8 @@ public class ExampleDefHandler extends ParentedTagHandler<ExampleDefImpl, Docume
         return TAG;
     }
 
-    @Override
-    protected void finishDefinition() throws QuickFixException {
-        builder.setDescription(body.toString());
-    }
-
-    @Override
-    protected ExampleDefImpl createDefinition() throws QuickFixException {
-        return builder.build();
+    public Example getElement() throws QuickFixException, XMLStreamException {
+        readElement();
+        return new Example(this.name, this.label, ref, this.body.toString());
     }
 }

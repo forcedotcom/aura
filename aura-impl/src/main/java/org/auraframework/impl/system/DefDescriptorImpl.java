@@ -149,7 +149,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case EVENT:
             case LIBRARY:
             case DOCUMENTATION:
-            case EXAMPLE:
             case META:
             case TOKENS:
             case DESIGN:
@@ -334,11 +333,11 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
      * THIS METHOD IS DEPRECATED. USE Use definitionService.getDefinition(descriptor); on the consumption side.
      */
     @Override
-    @Deprecated 
+    @Deprecated
     public T getDef() throws QuickFixException {
         return Aura.getDefinitionService().getDefinition(this);
     }
-    
+
     public static <E extends Definition> DefDescriptor<E> getAssociateDescriptor(DefDescriptor<?> desc,
             Class<E> defClass, String newPrefix) {
         if (desc == null) {

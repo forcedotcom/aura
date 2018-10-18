@@ -16,6 +16,9 @@
 
 package org.auraframework.integration.test.documentation;
 
+import java.util.List;
+import java.util.Map;
+
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -71,7 +74,8 @@ public class DocumentationDefTest extends AuraImplTestCase {
                 "</aura:documentation>";
 
         DefDescriptor<DocumentationDef> dd= addSourceAutoCleanup(DocumentationDef.class, docDefSource);
-        ComponentDef cd = definitionService.getDefinition(definitionService.getDefinition(dd).getExampleDefs().get(0).getRef());
+
+        ComponentDef cd = definitionService.getDefinition(definitionService.getDefinition(dd).getExamples().get(0).getRef(), ComponentDef.class);
         assertEquals("Unable to get to the ComponentDef referenced in example!", exampleCmp, cd.getDescriptor().getNamespace()+":"+cd.getName());
     }
 
@@ -85,10 +89,10 @@ public class DocumentationDefTest extends AuraImplTestCase {
                 "<aura:example name='example' ref='foo:bar1' label='label1'>random example</aura:example>" +
                 "</aura:documentation>";
 
-        DefDescriptor<DocumentationDef> dd= addSourceAutoCleanup(DocumentationDef.class, docDefSource);
+        DefDescriptor<DocumentationDef> dd = addSourceAutoCleanup(DocumentationDef.class, docDefSource);
 
         try{
-            definitionService.getDefinition(definitionService.getDefinition(dd).getExampleDefs().get(0).getRef());
+            definitionService.getDefinition(definitionService.getDefinition(dd).getExamples().get(0).getRef(), ComponentDef.class);
             fail("Should have thrown DefinitionNotFoundException");
         }
         catch(DefinitionNotFoundException e){

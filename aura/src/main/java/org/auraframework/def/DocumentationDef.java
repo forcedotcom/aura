@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.pojo.Description;
+import org.auraframework.pojo.Example;
 
 /**
  */
@@ -38,12 +39,12 @@ public interface DocumentationDef extends Definition {
      */
     List<String> getDescriptions();
 
-    List<ExampleDef> getExampleDefs();
+    List<Example> getExamples();
 
     /**
-     * @return map from ExampleDef name to ExampleDef
+     * @return map from Example name to ExampleDef
      */
-    Map<String, ExampleDef> getExampleDefsAsMap();
+    Map<String, Example> getExamplesAsMap();
 
     /**
      * Gets the {@link MetaDef} within this documentation.

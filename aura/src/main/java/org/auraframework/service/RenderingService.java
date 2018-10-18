@@ -24,12 +24,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * <p>
  * Service for rendering a {@link Component} or {@link Application} instances.
- * </p>
- * <p>
- * Instances of all AuraServices should be retrieved from {@link Aura}
- * </p>
  */
-public interface RenderingService extends AuraService {
+public interface RenderingService {
 
     /**
      * Renders a {@link Component} or {@link Application} server-side. Will fail

@@ -22,11 +22,8 @@ import org.auraframework.util.json.Json;
  * <p>
  * Service for contacting other Aura servers
  * </p>
- * <p>
- * Instances of all AuraServices should be retrieved from {@link org.auraframework.Aura}
- * </p>
  */
-public interface MetricsService extends AuraService {
-	void serializeMetrics (Json json);
-	void serializeMetricsSummary (Json json);
+public interface MetricsService {
+    void serializeMetrics (Json json);
+    void serializeMetricsSummary (Json json);
 }

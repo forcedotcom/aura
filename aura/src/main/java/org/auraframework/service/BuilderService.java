@@ -37,11 +37,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * <p>
  * Service for constructing your own {@link Definition}.
  * </p>
- * <p>
- * Instances of all AuraServices should be retrieved from {@link Aura}
- * </p>
  */
-public interface BuilderService extends AuraService {
+public interface BuilderService {
 
     /**
      * Retrieves a Builder suitable for defining an {@link ApplicationDef}.

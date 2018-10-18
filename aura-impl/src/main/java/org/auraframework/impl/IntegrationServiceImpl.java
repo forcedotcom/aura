@@ -35,8 +35,6 @@ import javax.inject.Inject;
 
 @ServiceComponent
 public class IntegrationServiceImpl implements IntegrationService {
-    private static final long serialVersionUID = -2650728458106333787L;
-
     // Needed to run action
     private InstanceService instanceService;
     private DefinitionService definitionService;

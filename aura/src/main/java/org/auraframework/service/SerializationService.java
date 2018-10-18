@@ -29,11 +29,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * Service for serializing things into format specified in the current
  * {@link AuraContext}
  * </p>
- * <p>
- * Instances of all AuraServices should be retrieved from {@link Aura}
- * </p>
  */
-public interface SerializationService extends AuraService {
+public interface SerializationService {
 
     /**
      * Serialize value to the format of the current {@link AuraContext} and

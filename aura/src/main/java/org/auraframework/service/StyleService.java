@@ -24,12 +24,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Service for working with CSS styles.
- * <p>
- * Instances of all AuraServices should be retrieved from {@link Aura}.
  */
-public interface StyleService extends AuraService {
-	String applyTokens(DefDescriptor<TokensDef> tokens) throws QuickFixException;
-	
+public interface StyleService {
+    String applyTokens(DefDescriptor<TokensDef> tokens) throws QuickFixException;
+    
     /**
      * Apply a single {@link TokensDef} to a single {@link StyleDef}.
      * <p>

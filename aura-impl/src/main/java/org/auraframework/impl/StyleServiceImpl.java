@@ -63,8 +63,6 @@ import com.salesforce.omakase.util.Args;
 
 @ServiceComponent
 public class StyleServiceImpl implements StyleService {
-    private static final long serialVersionUID = 6191198613596129606L;
-
     @Inject
     private StyleAdapter styleAdapter;
 

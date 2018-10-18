@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl;
 
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -102,8 +101,6 @@ import com.google.common.collect.Sets;
  */
 @ServiceComponent
 public class DefinitionServiceImpl implements DefinitionService {
-    private static final long serialVersionUID = -2488984746420077688L;
-
     protected ContextService contextService;
 
     private CachingService cachingService;

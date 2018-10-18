@@ -29,11 +29,8 @@ import java.util.Map;
  * <p>
  * Service for constructing an {@link Instance} of a {@link Definition}
  * </p>
- * <p>
- * Instances of all AuraServices should be retrieved from {@link org.auraframework.Aura}
- * </p>
  */
-public interface InstanceService extends AuraService {
+public interface InstanceService {
 
     /**
      * Get the an Instance of the Definition associated with the descriptor

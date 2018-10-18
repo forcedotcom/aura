@@ -27,8 +27,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * An Integration defines the scope of creating a set of component injection scripts
  * </p>
  */
-public interface IntegrationService extends AuraService {
-	public static String NO_DEFAULT_PRELOADS_INTERFACE = "aura:noDefaultPreloads";
+public interface IntegrationService {
+    public static String NO_DEFAULT_PRELOADS_INTERFACE = "aura:noDefaultPreloads";
 	
     /**
      * Create an Integration object that represents a set of components that

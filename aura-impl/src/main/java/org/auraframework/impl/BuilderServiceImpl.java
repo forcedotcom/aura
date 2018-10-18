@@ -37,8 +37,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
 public class BuilderServiceImpl implements BuilderService {
-    private static final long serialVersionUID = 5092951086123399013L;
-
     @Override
     public ApplicationDefBuilder getApplicationDefBuilder() {
         return new ApplicationDefImpl.Builder();

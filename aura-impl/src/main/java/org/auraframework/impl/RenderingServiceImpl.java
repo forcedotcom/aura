@@ -48,10 +48,6 @@ public class RenderingServiceImpl implements RenderingService {
     @Inject
     DefinitionService definitionService;
     
-    /**
-     */
-    private static final long serialVersionUID = 1663840391180454913L;
-
     @Override
     public void render(BaseComponent<?, ?> component, RenderContext rc) throws QuickFixException, IOException {
         contextService.assertEstablished();

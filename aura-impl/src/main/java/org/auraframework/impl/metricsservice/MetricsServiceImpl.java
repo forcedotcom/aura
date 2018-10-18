@@ -31,11 +31,6 @@ public class MetricsServiceImpl implements MetricsService {
 
     private LoggingService loggingService;
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 2207073608997955461L;
-
     @Override
     public void serializeMetrics(Json json) {
         try {

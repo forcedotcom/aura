@@ -47,7 +47,6 @@ import java.util.Map;
  */
 @ServiceComponent
 public class InstanceServiceImpl implements InstanceService {
-
     @Inject
     private ContextService contextService;
 
@@ -58,11 +57,6 @@ public class InstanceServiceImpl implements InstanceService {
     private List<InstanceBuilder<?, ?>> builders;
 
     private Map<Class<?>, InstanceBuilder<?, ?>> builderMap = Maps.newHashMap();
-
-    /**
-     */
-    private static final long serialVersionUID = -2650728458106333787L;
-
 
     @PostConstruct
     private void setupBuilders() {

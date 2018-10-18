@@ -35,12 +35,8 @@ import com.google.common.base.Optional;
  * <p>
  * Service for constructing an instance of a Cache
  * </p>
- * <p>
- * A Cache provides techniques to quickly set and retrieve objects in a key-based collection
- * </p>
  */
-public interface CachingService extends AuraService {
-
+public interface CachingService {
 
     /**
      * Provided a builder object that can create a cache with key K and type T

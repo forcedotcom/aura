@@ -34,11 +34,8 @@ import com.google.common.collect.ImmutableMap;
  * Service for creating or interacting with a {@link AuraContext} A AuraContext
  * must be started before working using any other service.
  * </p>
- * <p>
- * Instances of all AuraServices should be retrieved from {@link Aura}
- * </p>
  */
-public interface ContextService extends AuraService {
+public interface ContextService {
 
     /**
      * Start a AuraContext with the given Mode, Format, and Access

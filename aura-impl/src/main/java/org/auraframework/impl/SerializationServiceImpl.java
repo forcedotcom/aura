@@ -39,8 +39,6 @@ import java.util.concurrent.ExecutionException;
 
 @ServiceComponent
 public class SerializationServiceImpl implements SerializationService {
-    private static final long serialVersionUID = 1658556277689777526L;
-
     @Inject
     private ContextService contextService;
 

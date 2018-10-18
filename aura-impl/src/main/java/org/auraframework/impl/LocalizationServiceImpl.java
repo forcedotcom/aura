@@ -52,11 +52,6 @@ public class LocalizationServiceImpl implements LocalizationService {
     // make pluggable in the future?
     private final DateService dateService = DateServiceImpl.get();
 
-    /**
-     * Used for Serialization to ensure class consistency.
-     */
-    private static final long serialVersionUID = 9203705220037034653L;
-
     @Override
     public String formatDate(Date date) {
         return formatDate(date, null, DateFormat.DEFAULT, null);

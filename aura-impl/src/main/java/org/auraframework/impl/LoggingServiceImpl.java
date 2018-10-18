@@ -33,8 +33,6 @@ import java.util.Map;
 @ServiceComponent
 public class LoggingServiceImpl implements LoggingService {
 
-    private static final long serialVersionUID = -6025038810583975257L;
-
     private LoggingAdapter loggingAdapter;
 
     @Override

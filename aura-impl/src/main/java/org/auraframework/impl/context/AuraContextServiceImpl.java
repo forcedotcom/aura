@@ -61,8 +61,6 @@ public class AuraContextServiceImpl implements ContextService {
     @Inject
     private RegistryService registryService;
     
-    private static final long serialVersionUID = 2204785781318401371L;
-
     @Override
     public AuraContext getCurrentContext() {
         return contextAdapter.getCurrentContext();

@@ -28,7 +28,7 @@ import java.util.TimeZone;
  * This interface provides a service for formatting and parsing date time and numbers.
  * It also has the methods to provide localized format patterns.
  */
-public interface LocalizationService extends AuraService {
+public interface LocalizationService {
 
     /**
      * Format a Date into localized date string with the default locale, time zone,

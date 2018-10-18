@@ -43,7 +43,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  *
  * This service should be injected.
  */
-public interface DefinitionService extends AuraService {
+public interface DefinitionService {
 
     /**
      * <p>

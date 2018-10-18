@@ -32,8 +32,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * <p>
  * Service for responding to requests from a Aura Client.
  * </p>
- * Instances of all AuraServices should be retrieved from {@link Aura} </p> Note that this service is rather incomplete
- * and should be expanded to include more of the support routines from the servlets.
  */
 public interface ServerService {
 

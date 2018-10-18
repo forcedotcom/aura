@@ -28,11 +28,8 @@ import org.auraframework.util.json.Json;
  * <p>
  * Service for interacting with a {@link LoggingContext}
  * </p>
- * <p>
- * Instances of all AuraServices should be retrieved from {@link Aura}
- * </p>
  */
-public interface LoggingService extends AuraService {
+public interface LoggingService {
 
     public static final String CMP_COUNT = "cmpCount";
     public static final String DEF_COUNT = "defCount";

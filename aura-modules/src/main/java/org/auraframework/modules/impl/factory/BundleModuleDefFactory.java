@@ -34,19 +34,10 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import com.google.common.base.CaseFormat;
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Ordering;
-
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.MetaDef;
@@ -55,8 +46,8 @@ import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.def.module.ModuleExample;
 import org.auraframework.def.module.ModuleExampleFile;
-import org.auraframework.def.module.impl.ModuleExampleImpl;
 import org.auraframework.def.module.impl.ModuleExampleFileImpl;
+import org.auraframework.def.module.impl.ModuleExampleImpl;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
 import org.auraframework.impl.root.AttributeDefImpl;
@@ -79,12 +70,22 @@ import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 import org.lwc.bundle.BundleType;
 import org.lwc.classmember.ClassMember;
 import org.lwc.documentation.BundleDocumentation;
+
+import com.google.common.base.CaseFormat;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Ordering;
 
 /**
  * Provides ModuleDef implementation
@@ -238,18 +239,8 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         BundleDocumentation documentation = compilerData.compilerReport.documentation;
         processDocumentation(descriptor, builder, sourceMap, documentation);
 
-        // svg
-        DefDescriptor<SVGDef> svgDesc = getDefDescriptor(sourceMap, DefDescriptor.MARKUP_PREFIX, SVGDef.class);
-        if (svgDesc != null) {
-            Source<?> svgSource = sourceMap.get(svgDesc);
-            if (svgSource != null) {
-                @SuppressWarnings("unchecked")
-                SVGDef def = compilerService.compile(svgDesc, (Source<SVGDef>)svgSource);
-                builder.setSVGDef(def);
-                defMap.put(svgDesc, def);
-            }
-        }
-
+        processSvg(descriptor, builder, sourceMap, defMap);
+        
         builder.setBundledDefs(defMap);
         try {
             // __examples__
@@ -259,9 +250,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         }
         return builder.build();
     }
-
-   
-
+    
     /**
      * Process xml metadata
      *
@@ -546,6 +535,29 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                     .append("}");
         }
         return processedCode.toString();
+    }
+    
+    public void processSvg(DefDescriptor<ModuleDef> descriptor, Builder builder,
+            Map<DefDescriptor<?>, Source<?>> sourceMap, Map<DefDescriptor<?>, Definition> defMap) throws QuickFixException {
+        
+        DefDescriptor<SVGDef> svgDesc = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX,
+                descriptor.getNamespace(), descriptor.getName(), SVGDef.class);       
+        Source<?> svgSource = sourceMap.get(svgDesc);
+        
+        if (svgSource != null) {
+            @SuppressWarnings("unchecked")
+            SVGDef def = compilerService.compile(svgDesc, (Source<SVGDef>)svgSource);
+            builder.setSVGDef(def);
+            defMap.put(svgDesc, def);
+        }
+        
+        for (Entry<DefDescriptor<?>, Source<?>> entry : sourceMap.entrySet()) {
+            if (entry.getKey().getDefType() == DefType.SVG && !entry.getKey().equals(svgDesc)) {
+                throw new AuraRuntimeException(String.format(
+                        "Unexpected SVG file '%s'. Only one SVG file is allowed and it must have the same name as the bundle",
+                        entry.getValue().getSystemId()));
+            }
+        }
     }
 
     /**

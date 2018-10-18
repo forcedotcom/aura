@@ -17,7 +17,10 @@ package org.auraframework.impl.source.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
@@ -35,10 +38,9 @@ import org.auraframework.system.BundleSource;
 import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.AuraRuntimeException;
 
-import com.google.common.collect.Maps;
-
-import javax.inject.Inject;
+import com.google.common.io.Files;
 
 @ServiceComponent
 public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
@@ -72,6 +74,7 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
         // also check for cmp/app bundles that has stray js with the same name
         return (baseHtml.exists() || baseJs.exists()) && !baseCmp.exists() && !baseApp.exists() && !baseLib.exists();
     }
+    
     /**
      * Processes module bundle and creates BundleSource of all files.
      * .js or .html (if .js doesn't exist) of the same name is associated with ModuleDef descriptor
@@ -81,13 +84,12 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
      */
     @Override
     public BundleSource<?> buildBundle(File base) {
-
         String filename = base.getName();
         String fileNamespace = base.getParentFile().getName();
         String descriptor = ModuleDefinitionUtil.convertToAuraDescriptor(fileNamespace, filename, configAdapter);
 
         DefDescriptor<ModuleDef> modDesc = definitionService.getDefDescriptor(descriptor, ModuleDef.class);
-        Map<DefDescriptor<?>, Source<?>> sourceMap = Maps.newHashMap();
+        Map<DefDescriptor<?>, Source<?>> sourceMap = new HashMap<>();
 
         try {
             File baseJs = getFileFromBase(base, ".js");
@@ -111,12 +113,16 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
         return new BundleSourceImpl<>(modDesc, sourceMap);
     }
 
-    private void processBundle(File base, Map<DefDescriptor<?>, Source<?>> sourceMap,
+    private void processBundle(File dir, Map<DefDescriptor<?>, Source<?>> sourceMap,
                                DefDescriptor<ModuleDef> moduleDescriptor, String moduleDescriptorFilePath,
                                String namespace)
             throws IOException {
+        
+        int lastSeparator = moduleDescriptorFilePath.lastIndexOf(File.separator);
+        String baseDirPath = moduleDescriptorFilePath.substring(0, lastSeparator);
+        String bundleName = moduleDescriptor.getName();
 
-        for (File file : base.listFiles()) {
+        for (File file : dir.listFiles()) {
             if (file.isDirectory()) {
                 if (shouldProcessDirectory(file)) {
                     processBundle(file, sourceMap, moduleDescriptor, moduleDescriptorFilePath, namespace);
@@ -129,63 +135,68 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
                 // to the current file
                 continue;
             }
+            
+            String fileName = file.getName();
+            String fileNameLC = fileName.toLowerCase();
+            String parentDir = dir.getName();
+            String bundleNameSuffix = fileName.startsWith(bundleName) ? fileName.substring(bundleName.length()) : "";
 
+            String name = createNameForDescriptor(file, baseDirPath, bundleName);
             DefDescriptor<?> descriptor = null;
-            Format format = null;
-
-            int lastSeparator = moduleDescriptorFilePath.lastIndexOf(File.separator);
-            String baseDir = moduleDescriptorFilePath.substring(0, lastSeparator);
-            String descriptorName = createDescriptorName(file, baseDir, moduleDescriptor.getName());
-            String fileName = file.getName().toLowerCase();
-            String fileDir = base.getName();
-
-            if (fileName.endsWith(".html")) {
-                descriptor = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, namespace, descriptorName, ModuleDef.class, moduleDescriptor);
+            Format format = null;                    
+            
+            if (fileNameLC.endsWith(".html")) {
+                descriptor = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, namespace, name, ModuleDef.class, moduleDescriptor);
                 format = Format.XML;
             }
-            if (descriptor == null && fileName.endsWith(".js")) {
-                descriptor = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, namespace, descriptorName, ModuleDef.class, moduleDescriptor);
+            if (descriptor == null && fileNameLC.endsWith(".js")) {
+                descriptor = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, namespace, name, ModuleDef.class, moduleDescriptor);
                 format = Format.JS;
             }
-            if (descriptor == null && fileName.endsWith(".css")) {
-                descriptor = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, namespace, descriptorName, ModuleDef.class, moduleDescriptor);
+            if (descriptor == null && fileNameLC.endsWith(".css")) {
+                descriptor = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, namespace, name, ModuleDef.class, moduleDescriptor);
                 format = Format.CSS;
             }
             // Handle json metadata source. Must be specific named file
-            if (descriptor == null && fileName.equals(ModuleDef.META_FILE_BASENAME + ".json")) {
-                descriptor = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, namespace, descriptorName, ModuleDef.class, moduleDescriptor);
+            if (descriptor == null && fileNameLC.equals(ModuleDef.META_FILE_BASENAME + ".json")) {
+                descriptor = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, namespace, name, ModuleDef.class, moduleDescriptor);
                 format = Format.JS;
             }
 
             // Handle xml metadata source.
-            if (descriptor == null && fileName.endsWith("meta.xml")) {
-                String xmlName = moduleDescriptor.getName() + "-" + ModuleDef.META_XML_NAME;
+            if (descriptor == null && fileNameLC.endsWith("meta.xml")) {
+                String xmlName = bundleName + "-" + ModuleDef.META_XML_NAME;
                 descriptor = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, namespace, xmlName, ModuleDef.class, moduleDescriptor);
                 format = Format.XML;
             }
 
-            if (descriptor == null && fileDir.equals("__docs__") && fileName.endsWith(".md")) {
-                descriptor = new DefDescriptorImpl<>(ModuleDef.MARKDOWN_PREFIX, namespace, descriptorName, DocumentationDef.class, moduleDescriptor);
+            if (descriptor == null && parentDir.equals("__docs__") && bundleNameSuffix.equals(".md")) {
+                descriptor = new DefDescriptorImpl<>(ModuleDef.MARKDOWN_PREFIX, namespace, name, DocumentationDef.class, moduleDescriptor);
                 format = Format.MD;
             }
 
-            if (descriptor == null && fileDir.equals("__docs__") && fileName.endsWith(".auradoc")) {
-                descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, namespace, descriptorName, DocumentationDef.class, moduleDescriptor);
+            if (descriptor == null && parentDir.equals("__docs__") && bundleNameSuffix.equals(".auradoc")) {
+                descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, namespace, name, DocumentationDef.class, moduleDescriptor);
                 format = Format.XML;
             }
 
-            if (descriptor == null && base.getCanonicalPath().equals(baseDir) && fileName.endsWith(".svg")) {
-                descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, namespace, moduleDescriptor.getName(), SVGDef.class);
+            // svg: there should only be one svg def, in the base folder and same name as the module
+            if (descriptor == null && bundleNameSuffix.equals(".svg") && dir.getCanonicalPath().equals(baseDirPath)) {
+                descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, namespace, bundleName, SVGDef.class);
                 format = Format.SVG;
             }
 
             if (descriptor != null) {
                 sourceMap.put(descriptor, new FileSource<>(descriptor, file, format));
+            } else if (shouldErrorForUnknownFile(file)) {
+                throw new AuraRuntimeException(String.format("Unexpected file '%s' in module bundle %s. "
+                        + "If this file is allowed then check that it is not misnamed or in the wrong location",
+                        file, moduleDescriptor.getDescriptorName()));
             }
         }
     }
 
-    private String createDescriptorName(File file, String baseFilePath, String descriptorName) throws IOException {
+    private String createNameForDescriptor(File file, String baseFilePath, String moduleDescriptorName) throws IOException {
         // Note: this method is invoked from processBundle, which is invoked on
         // recursively on every sub directory within a module. Examples use the file
         // name as the descriptor name; so here the parent is checked to see if it
@@ -200,7 +211,7 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
         }
         path = path.substring(baseFilePath.length(), path.lastIndexOf("."));
         path = StringUtils.replace(path, File.separator, "-");
-        return descriptorName + path;
+        return moduleDescriptorName + path;
     }
 
     private File getFileFromBase(File base, String extension) {
@@ -212,7 +223,14 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
         String name = file.getName();
         return !name.startsWith("__") || name.equals("__docs__") || name.equals(ModuleExample.EXAMPLES_DIRNAME);
     }
-
+    
+    /** if an exception should be thrown for an unexpected/unknown file in the bundle */
+    private boolean shouldErrorForUnknownFile(File file) {
+        String fileName = file.getName();
+        String ext = Files.getFileExtension(fileName).toLowerCase();
+        return ext.equals("svg");
+    }
+    
     @Inject
     public void setConfigAdapter(ConfigAdapter configAdapter) {
         this.configAdapter = configAdapter;

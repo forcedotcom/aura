@@ -15,10 +15,30 @@
  */
 package org.auraframework.modules.impl.factory;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
@@ -45,6 +65,7 @@ import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.validation.ReferenceValidationContext;
 import org.junit.Test;
@@ -60,28 +81,10 @@ import org.lwc.metadata.ReportMetadata;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.same;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -684,7 +687,7 @@ public class BundleModuleDefFactoryUnitTest {
                 "namespace", "cmp", ModuleDef.class);
 
         DefDescriptor<SVGDef> svgDesc = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX,
-                "namespace", "cmp-cmp", SVGDef.class, descriptor);
+                "namespace", "cmp", SVGDef.class);
 
         BundleSource<ModuleDef> mockBundleSource = mockBundleSource(ImmutableMap.of(
                 descriptor, mockFile("cmp.js"),
@@ -695,7 +698,7 @@ public class BundleModuleDefFactoryUnitTest {
         CompilerService compilerService = mock(CompilerService.class);
         SVGDef mockSvgDef = mock(SVGDef.class);
 
-        when(compilerService.compile(same(svgDesc), any(Source.class))).thenReturn(mockSvgDef);
+        when(compilerService.compile(eq(svgDesc), any(Source.class))).thenReturn(mockSvgDef);
 
         BundleModuleDefFactory factory = new BundleModuleDefFactory();
         factory.setModulesCompilerService(modulesCompilerService);
@@ -707,8 +710,73 @@ public class BundleModuleDefFactoryUnitTest {
         assertNotNull("SVGDef should be set", svgDef);
         assertSame("SVGDef did not match", mockSvgDef, svgDef);
     }
+    
+    @Test
+    public void testErrorsIfMultipleSvgs() throws Exception {
+        DefDescriptor<ModuleDef> descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX,
+                "namespace", "cmp", ModuleDef.class);
 
-    public void testSVGParseError() throws Exception {
+        DefDescriptor<SVGDef> svgDesc = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX,
+                "namespace", "cmp", SVGDef.class);
+        DefDescriptor<SVGDef> svgDesc2 = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX,
+                "namespace", "cmp2", SVGDef.class);
+        
+        BundleSource<ModuleDef> mockBundleSource = mockBundleSource(ImmutableMap.of(
+                descriptor, mockFile("cmp.js"),
+                svgDesc, mockFile("cmp.svg"),
+                svgDesc2, mockFile("cmp2.svg")));
 
+        ModulesCompilerService modulesCompilerService = mockModulesCompilerService();
+
+        CompilerService compilerService = mock(CompilerService.class);
+        SVGDef mockSvgDef = mock(SVGDef.class);
+
+        when(compilerService.compile(eq(svgDesc), any(Source.class))).thenReturn(mockSvgDef);
+
+        BundleModuleDefFactory factory = new BundleModuleDefFactory();
+        factory.setModulesCompilerService(modulesCompilerService);
+        factory.setCompilerService(compilerService);
+
+        try {
+            factory.getDefinition(descriptor, mockBundleSource);
+            fail("expected to get exception");
+        } catch (AuraRuntimeException e) {
+            String message = e.getMessage();
+            assertTrue("Did not get expected error message", message.contains("Unexpected SVG file"));
+            assertTrue("Error message did not reference expected file", message.contains("cmp2.svg"));
+        }
+    }
+    
+    @Test
+    public void testErrorsIfMisnamedSvg() throws Exception {
+        DefDescriptor<ModuleDef> descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX,
+                "namespace", "cmp", ModuleDef.class);
+
+        DefDescriptor<SVGDef> svgDesc = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX,
+                "namespace", "cmpp", SVGDef.class);
+        
+        BundleSource<ModuleDef> mockBundleSource = mockBundleSource(ImmutableMap.of(
+                descriptor, mockFile("cmp.js"),
+                svgDesc, mockFile("cmpp.svg")));
+
+        ModulesCompilerService modulesCompilerService = mockModulesCompilerService();
+
+        CompilerService compilerService = mock(CompilerService.class);
+        SVGDef mockSvgDef = mock(SVGDef.class);
+
+        when(compilerService.compile(eq(svgDesc), any(Source.class))).thenReturn(mockSvgDef);
+
+        BundleModuleDefFactory factory = new BundleModuleDefFactory();
+        factory.setModulesCompilerService(modulesCompilerService);
+        factory.setCompilerService(compilerService);
+
+        try {
+            factory.getDefinition(descriptor, mockBundleSource);
+            fail("expected to get exception");
+        } catch (AuraRuntimeException e) {
+            String message = e.getMessage();
+            assertTrue("Did not get expected error message", message.contains("Unexpected SVG file"));
+            assertTrue("Error message did not reference expected file", message.contains("cmpp.svg"));
+        }
     }
 }

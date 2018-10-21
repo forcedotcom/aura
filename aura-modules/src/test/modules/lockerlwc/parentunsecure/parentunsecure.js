@@ -213,8 +213,8 @@ export default class ParentUnsecure extends LightningElement {
     }
 
     connectedCallback() {
-        this.template.addEventListener('customEvent', this.assertCustomEvent);
-        this.template.addEventListener('click', this.assertDOMEvent.bind(this));
-        this.template.addEventListener('secureAura', this.assertInteropEvent);
+        this.addEventListener('customEvent', this.assertCustomEvent);
+        this.addEventListener('click', this.assertDOMEvent.bind(this));
+        this.addEventListener('secureAura', this.assertInteropEvent);
     }
 }

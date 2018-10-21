@@ -5,7 +5,7 @@
         test: [
             function(cmp) {
                 $A.test.expectAuraError("Uncaught Error: boom!");
-                $A.test.clickOrTouch(cmp.find("main").getElement().querySelector('.boom'));
+                $A.test.clickOrTouch(cmp.find("main").getElement().shadowRoot.querySelector('.boom'));
             },
             function(cmp) {
                 var actualComponent = cmp['_auraError']['component'];

@@ -184,7 +184,7 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
         } catch (Exception e) {
             String message = Throwables.getRootCause(e).getMessage();
             // since linting is disabled for inernal bundle types, the compiler will throw instead of producing diagnostic
-            assertEquals(message.contains("bad result: { SyntaxError: Unexpected token, expected { (2:4)"), true);
+            assertEquals(message.contains("Unexpected token, expected { (2:4)"), true);
         }
     }
 

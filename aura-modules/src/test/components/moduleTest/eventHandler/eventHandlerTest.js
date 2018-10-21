@@ -9,7 +9,7 @@
         test: [
             function (cmp) {
                 var element = cmp.getElement();
-                var button = element.querySelector(this.selector.somethingButton);
+                var button = element.shadowRoot.querySelector(this.selector.somethingButton);
 
                 button.click();
             },
@@ -17,7 +17,7 @@
                 var expectedSomethingName = 'salesforce.com';
                 var actualSomethingName = cmp.get('v.somethingName');
                 var errorMsg = 'Data within event.detail must be accessible via getParam';
-                
+
                 $A.test.assertEquals(expectedSomethingName, actualSomethingName, errorMsg);
             }
         ]
@@ -27,7 +27,7 @@
         test: [
             function (cmp) {
                 var element = cmp.getElement();
-                var button = element.querySelector(this.selector.changeTrigger);
+                var button = element.shadowRoot.querySelector(this.selector.changeTrigger);
 
                 button.click();
             },
@@ -58,7 +58,7 @@
             },
             function (cmp) {
                 var element = cmp.getElement();
-                var button = element.querySelector(this.selector.valueChangeButton);
+                var button = element.shadowRoot.querySelector(this.selector.valueChangeButton);
                 button.click();
             },
             function (cmp) {

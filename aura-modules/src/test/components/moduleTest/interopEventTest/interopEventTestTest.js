@@ -8,7 +8,7 @@
     },
     assertMethodThrowError: function (cmp, method) {
         var interopCmp = cmp.find('errorTest');
-        var removeBtn = interopCmp.getElement().querySelector(this.selector.removeBtn);
+        var removeBtn = interopCmp.getElement().shadowRoot.querySelector(this.selector.removeBtn);
 
         removeBtn.click();
         var expectedMessage = 'Interop event tried calling function [' + method + '] with arguments [arg1,arg2,arg3], InteropComponent: markup://moduleTest:interopEvent [';
@@ -34,7 +34,7 @@
         test: [
             function (cmp) {
                 var interopCmp = cmp.find('paramTests');
-                var removeBtn = interopCmp.getElement().querySelector(this.selector.removeBtn);
+                var removeBtn = interopCmp.getElement().shadowRoot.querySelector(this.selector.removeBtn);
 
                 removeBtn.click();
                 var expectedIds = [113];
@@ -83,7 +83,7 @@
         test: [
             function (cmp) {
                 var interopCmp = cmp.find('paramTests');
-                var removeBtn = interopCmp.getElement().querySelector(this.selector.onClickWithCallbackBtn);
+                var removeBtn = interopCmp.getElement().shadowRoot.querySelector(this.selector.onClickWithCallbackBtn);
 
                 removeBtn.click();
 
@@ -99,7 +99,7 @@
         test: [
             function (cmp) {
                 var interopCmp = cmp.find('paramTests');
-                var removeBtn = interopCmp.getElement().querySelector(this.selector.removeWithCallbackBtn);
+                var removeBtn = interopCmp.getElement().shadowRoot.querySelector(this.selector.removeWithCallbackBtn);
 
                 removeBtn.click();
 
@@ -112,13 +112,13 @@
         test: [
             function (cmp) {
                 var interopCmp = cmp.find('simple');
-                var removeBtn = interopCmp.getElement().querySelector(this.selector.removeBtn);
+                var removeBtn = interopCmp.getElement().shadowRoot.querySelector(this.selector.removeBtn);
 
                 removeBtn.click();
             },
             function (cmp) {
                 var interopCmp = cmp.find('simple');
-                var removePrevented = interopCmp.getElement().querySelector(this.selector.removePrevented).innerText;
+                var removePrevented = interopCmp.getElement().shadowRoot.querySelector(this.selector.removePrevented).innerText;
                 $A.test.assertEquals('true', removePrevented, 'it should prevent default of custom event fired on LWC and prevented in aura land.');
             },
             function (cmp) {
@@ -138,7 +138,7 @@
                 }
                 cmp.set('v.value', cmp._valueObject);
 				var interopCmp = cmp.find('eventWithDetails');
-				var triggerEvtBtn = interopCmp.getElement().querySelector(this.selector.evtWithDetails);
+				var triggerEvtBtn = interopCmp.getElement().shadowRoot.querySelector(this.selector.evtWithDetails);
 
 				triggerEvtBtn.click();
 			},
@@ -161,7 +161,7 @@
 				}
 				cmp.set('v.value', cmp._valueObject);
 				var interopCmp = cmp.find('eventWithDetailsAsProxy');
-				var triggerEvtBtn = interopCmp.getElement().querySelector(this.selector.evtWithDetails);
+				var triggerEvtBtn = interopCmp.getElement().shadowRoot.querySelector(this.selector.evtWithDetails);
 
 				triggerEvtBtn.click();
 			},

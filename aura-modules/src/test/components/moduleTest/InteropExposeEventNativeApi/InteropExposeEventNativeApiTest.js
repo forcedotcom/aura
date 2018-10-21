@@ -8,7 +8,7 @@
         test: [
             function (cmp) {
                 var interopCmp = cmp.find('cmptest');
-                var removeBtn = interopCmp.getElement().querySelector(this.selector.removeBtn);
+                var removeBtn = interopCmp.getElement().shadowRoot.querySelector(this.selector.removeBtn);
 
                 removeBtn.click();
                 var receivedEvent = cmp.get('v.evt');
@@ -26,7 +26,7 @@
         test: [
             function (cmp) {
                 var interopCmp = cmp.find('legacy');
-                var removeBtn = interopCmp.getElement().querySelector(this.selector.triggerClickBtn);
+                var removeBtn = interopCmp.getElement().shadowRoot.querySelector(this.selector.triggerClickBtn);
 
                 removeBtn.click();
                 interopCmp.get('v.validity');

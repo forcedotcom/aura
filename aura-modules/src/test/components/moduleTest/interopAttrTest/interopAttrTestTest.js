@@ -13,8 +13,9 @@
                 var expected = 'false';
                 var element = cmp
                     .getElement()
+                    .shadowRoot
                     .querySelector(this.selector.literal);
-                return new Promise(function(resolve, reject) {
+                return new Promise(function(resolve) {
                     var actual = element.textContent;
                     $A.test.assertEquals(actual, expected, 'Wrong literal');
                     resolve();
@@ -29,8 +30,9 @@
                 var expected = 'Renderer';
                 var element = cmp
                     .getElement()
+                    .shadowRoot
                     .querySelector(this.selector.expression);
-                return new Promise(function(resolve, reject) {
+                return new Promise(function(resolve) {
                     var actual = element.textContent;
                     $A.test.assertEquals(actual, expected, 'Wrong expression result');
                     resolve();
@@ -84,13 +86,14 @@
             function updateProps(cmp) {
                 var list = cmp.find('list');
 
-                cmp.set('v.items', [{ label: 'item1', id: 1 }, { label: 'item2', id: 2 }]);
+                cmp.set('v.items', [{ label: 'item1', id: "1" }, { label: 'item2', id: "2" }]);
 
                 $A.test.assertEquals(
                     list.get('v.items').length,
                     2,
                     'Wrong number of items on InteropComponent'
                 );
+                
                 $A.test.assertEquals(
                     list.getElement().items.length,
                     2,
@@ -101,6 +104,7 @@
                 var itemElement = cmp
                     .find('list')
                     .getElement()
+                    .shadowRoot
                     .querySelectorAll('li');
 
                 $A.test.assertEquals(
@@ -154,6 +158,7 @@
                 var itemElement = cmp
                     .find('list-without-items')
                     .getElement()
+                    .shadowRoot
                     .querySelectorAll('li');
 
                 $A.test.assertEquals(
@@ -177,7 +182,7 @@
         test: [
             function (cmp) {
                 var interopCmp = cmp.find('main');
-                interopCmp.getElement().querySelector(this.selector.changeValuesBtn).click();
+                interopCmp.getElement().shadowRoot.querySelector(this.selector.changeValuesBtn).click();
 
                 $A.test.assertEquals('modified-accessor-value', interopCmp.get('v.myAccessor'), 'should be able to read accessor modified value');
             }
@@ -189,7 +194,7 @@
                 $A.test.assertEquals('accessor-test-value', cmp.get('v.accessorValue'), 'accessor value should be reflected on the PRV.');
 
                 var interopCmp = cmp.find('main');
-                interopCmp.getElement().querySelector(this.selector.changeValuesBtn).click();
+                interopCmp.getElement().shadowRoot.querySelector(this.selector.changeValuesBtn).click();
 
                 $A.test.assertEquals('modified-accessor-value', cmp.get('v.accessorValue'), 'should be able to read accessor modified value from the bound template');
             }
@@ -202,7 +207,7 @@
                 $A.test.assertEquals('accessor-test-value', interopCmp.get('v.myAccessor'), 'accessor should ignore passed primitive value.');
 
                 var interopCmp = cmp.find('accessor-primitive-value');
-                interopCmp.getElement().querySelector(this.selector.changeValuesBtn).click();
+                interopCmp.getElement().shadowRoot.querySelector(this.selector.changeValuesBtn).click();
 
                 $A.test.assertEquals('modified-accessor-value', interopCmp.get('v.myAccessor'), 'should be able to read accessor modified value');
             }
@@ -225,6 +230,7 @@
         return cmp
             .find('nullTest')
             .getElement()
+            .shadowRoot
             .querySelector('.null-test')
             .innerText;
     },
@@ -307,7 +313,7 @@
                 var detail = {
                     value: 'foo'
                 };
-                target.getElement().querySelector('input').dispatchEvent(
+                target.getElement().shadowRoot.querySelector('input').dispatchEvent(
                     new CustomEvent('change', {
                         composed: true,
                         bubbles: true,
@@ -341,7 +347,7 @@
                 var detail = {
                     value: 'bar'
                 };
-                target.getElement().querySelector('input').dispatchEvent(
+                target.getElement().shadowRoot.querySelector('input').dispatchEvent(
                     new CustomEvent('change', {
                         composed: true,
                         bubbles: true,
@@ -360,7 +366,7 @@
                 var target = cmp.find('inputRadio');
 
                 target.set('v.checked', false);
-                target.getElement().querySelector('input').click();
+                target.getElement().shadowRoot.querySelector('input').click();
 
                 $A.test.assertTrue(cmp.get('v.radioChecked'));
             }

@@ -127,13 +127,19 @@ function LockerService() {
                 "isFrozenRealm": isFrozenRealm,
                 "warn": warn,
                 "error": $A.auraError,
-                // TODO: Remove 'unwrap' after changes on LockerService-Core side!
-                "unwrap": $A.componentService.moduleEngine && $A.componentService.moduleEngine["unwrap"],
-                "lwcUnwrap": $A.componentService.moduleEngine && $A.componentService.moduleEngine["unwrap"],
-                "lwcGetComponentDef": $A.componentService.moduleEngine && $A.componentService.moduleEngine["getComponentDef"],
-                "lwcGetComponentConstructor": $A.componentService.moduleEngine && $A.componentService.moduleEngine["getComponentConstructor"],
                 "severity": $A.severity
             };
+            if ($A.componentService.moduleEngine) {
+                var lwcApi = {
+                    // TODO: Remove 'unwrap' after changes on LockerService-Core side!
+                    "unwrap": $A.componentService.moduleEngine["unwrap"],
+                    "lwcIsNodeFromTemplate": $A.componentService.moduleEngine["isNodeFromTemplate"],
+                    "lwcUnwrap": $A.componentService.moduleEngine["unwrap"],
+                    "lwcGetComponentDef": $A.componentService.moduleEngine["getComponentDef"],
+                    "lwcGetComponentConstructor": $A.componentService.moduleEngine["getComponentConstructor"]
+                };
+                Object.assign(api, lwcApi);
+            }
 
             var lib = window["AuraLocker"];
             selectLib(lib);

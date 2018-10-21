@@ -9,13 +9,13 @@
         test: [
             function (cmp) {
                 var expected = -1;
-                var actual = cmp.getElement().querySelector('.foo').tabIndex;
+                var actual = cmp.getElement().shadowRoot.querySelector('.foo').tabIndex;
                 var message = '"tabindex" attribute value set on interop component should propagate to LWC component as "tabIndex"';
                 $A.test.assertEquals(expected, actual, message);
             },
             function (cmp) {
                 var expected = true;
-                var actual = cmp.getElement().querySelector('.foo').readOnly;
+                var actual = cmp.getElement().shadowRoot.querySelector('.foo').readOnly;
                 var message = '"readonly" attribute value set on interop component should propagate to LWC component as "readOnly"';
                 $A.test.assertEquals(expected, actual, message);
             }
@@ -29,7 +29,7 @@
         test: [
             function (cmp) {
                 var expected = 'foo';
-                var actual = cmp.getElement().querySelector('.foo').getAttribute('aria-describedby');
+                var actual = cmp.getElement().shadowRoot.querySelector('.foo').getAttribute('aria-describedby');
                 var message = '"ariaDescribedBy" attribute value set on interop component should propagate to LWC component as "ariaDescribedBy"';
                 $A.test.assertEquals(expected, actual, message);
             }
@@ -44,7 +44,7 @@
         test: [
             function (cmp) {
                 var expected = 'foo';
-                var actual = cmp.getElement().querySelector('.foo').getAttribute('aria-labelledby');
+                var actual = cmp.getElement().shadowRoot.querySelector('.foo').getAttribute('aria-labelledby');
                 var message = 'Incorrectly cased "ariaLabelledby" ("ariaLabelledBy" is standards-compliant) attribute value set on interop component should propagate to LWC component as "ariaLabelledby"';
                 $A.test.assertEquals(expected, actual, message);
             }

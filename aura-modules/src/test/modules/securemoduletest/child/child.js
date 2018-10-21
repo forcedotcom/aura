@@ -170,8 +170,8 @@ export default class Child extends LightningElement {
     }
 
     connectedCallback() {
-        this.template.addEventListener('customEvent', this.assertTestAuraLWCCustomEventOnHostElement);
-        this.template.addEventListener(LockerLWCEventName, this.assertPlatformEventPayload);
+        this.addEventListener('customEvent', this.assertTestAuraLWCCustomEventOnHostElement);
+        this.addEventListener(LockerLWCEventName, this.assertPlatformEventPayload);
     }
 }
 

@@ -14,29 +14,382 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-10-16
- * Version: 0.5.20
+ * Generated: 2018-10-21
+ * Version: 0.5.21
  */
 
 (function (exports) {
 'use strict';
 
-/* eslint-disable no-unused-vars, prefer-template */
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+function asString(arg) {
+  try {
+    return '' + arg;
+  } catch (e) {
+    return '';
+  }
+}
+
+// SVG TAGS
+// taken from DOMPurifier source code
+// maintain a map for quick O(1) lookups of tags
+var svgTagsMap = {
+  svg: true,
+  a: true,
+  altglyph: true,
+  altglyphdef: true,
+  altglyphitem: true,
+  animatecolor: true,
+  animatemotion: true,
+  animatetransform: true,
+  audio: true,
+  canvas: true,
+  circle: true,
+  clippath: true,
+  defs: true,
+  desc: true,
+  ellipse: true,
+  filter: true,
+  font: true,
+  g: true,
+  glyph: true,
+  glyphref: true,
+  hkern: true,
+  image: true,
+  line: true,
+  lineargradient: true,
+  marker: true,
+  mask: true,
+  mpath: true,
+  path: true,
+  pattern: true,
+  polygon: true,
+  polyline: true,
+  radialgradient: true,
+  rect: true,
+  stop: true,
+  switch: true,
+  symbol: true,
+  text: true,
+  textpath: true,
+  title: true,
+  tref: true,
+  tspan: true,
+  video: true,
+  view: true,
+  vkern: true,
+  use: true
+};
+
+// create Array<String> of tags for DOMPurify config
+var svgTags = Object.keys(svgTagsMap);
+
+// HTML TAGS SECTION
+// must be kept in sync with https://git.soma.salesforce.com/aura/aura/blob/master/aura-impl/src/main/resources/aura/component/HtmlComponent.js
+var htmlTagsMap = {
+  a: true,
+  abbr: true,
+  acronym: true,
+  address: true,
+  area: true,
+  article: true,
+  aside: true,
+  audio: true,
+  b: true,
+  bdi: true,
+  bdo: true,
+  big: true,
+  blockquote: true,
+  body: true,
+  br: true,
+  button: true,
+  caption: true,
+  canvas: true,
+  center: true,
+  cite: true,
+  code: true,
+  col: true,
+  colgroup: true,
+  command: true,
+  datalist: true,
+  dd: true,
+  del: true,
+  details: true,
+  dfn: true,
+  dir: true,
+  div: true,
+  dl: true,
+  dt: true,
+  em: true,
+  fieldset: true,
+  figure: true,
+  figcaption: true,
+  footer: true,
+  form: true,
+  h1: true,
+  h2: true,
+  h3: true,
+  h4: true,
+  h5: true,
+  h6: true,
+  head: true,
+  header: true,
+  hgroup: true,
+  hr: true,
+  i: true,
+  iframe: true,
+  img: true,
+  input: true,
+  ins: true,
+  keygen: true,
+  kbd: true,
+  label: true,
+  legend: true,
+  li: true,
+  map: true,
+  mark: true,
+  menu: true,
+  meter: true,
+  nav: true,
+  ol: true,
+  optgroup: true,
+  option: true,
+  output: true,
+  p: true,
+  pre: true,
+  progress: true,
+  q: true,
+  rp: true,
+  rt: true,
+  ruby: true,
+  s: true,
+  samp: true,
+  section: true,
+  select: true,
+  small: true,
+  source: true,
+  span: true,
+  strike: true,
+  strong: true,
+  sub: true,
+  summary: true,
+  sup: true,
+  table: true,
+  tbody: true,
+  td: true,
+  textarea: true,
+  tfoot: true,
+  th: true,
+  thead: true,
+  time: true,
+  tr: true,
+  track: true,
+  tt: true,
+  u: true,
+  ul: true,
+  var: true,
+  video: true,
+  wbr: true
+};
+var htmlTags = Object.keys(htmlTagsMap);
+
+// ATTRIBUTES
+var attrs = ['aria-activedescendant', 'aria-atomic', 'aria-autocomplete', 'aria-busy', 'aria-checked', 'aria-controls', 'aria-describedby', 'aria-disabled', 'aria-readonly', 'aria-dropeffect', 'aria-expanded', 'aria-flowto', 'aria-grabbed', 'aria-haspopup', 'aria-hidden', 'aria-disabled', 'aria-invalid', 'aria-label', 'aria-labelledby', 'aria-level', 'aria-live', 'aria-multiline', 'aria-multiselectable', 'aria-orientation', 'aria-owns', 'aria-posinset', 'aria-pressed', 'aria-readonly', 'aria-relevant', 'aria-required', 'aria-selected', 'aria-setsize', 'aria-sort', 'aria-valuemax', 'aria-valuemin', 'aria-valuenow', 'aria-valuetext', 'role', 'target'];
+
+// define sanitizers functions
+// these functions should be PURE
+
+// sanitize a str representing an href SVG attribute value
+function sanitizeHrefAttribute(str) {
+  if (str.startsWith('#')) {
+    return asString(str);
+  }
+  return '';
+}
+
+function uponSanitizeAttribute(node, data) {
+  var nodeName = node.nodeName.toUpperCase();
+  if (nodeName === 'USE' && ['href', 'xlink:href'].includes(data.attrName)) {
+    data.attrValue = sanitizeHrefAttribute(data.attrValue);
+  }
+  return data;
+}
+
+// Detect global object. Magically references a jsdom instance created in the bundled version
+// JSDom and DOMPurify are packaged only in the bundled version of locker-sanitize
+// eslint-disable-next-line
+var root = typeof window !== 'undefined' ? window : jsdom.window;
+
+// floating element used for purification of strings
+// create a dummy floating element that stores text if document is not found
+var floating = root.document.createElement('template');
+
+// cache DOMPurify instances to avoid reparsing configs
+// improves performance of DOMPurify.sanitize for repeated usage with same config
+var instances = new WeakMap();
+
+// DOMPurify preset configurations
+// configuration objects are also used as keys in the WeakMap to retrieve a DOMPurify instance
+
+// precompile a list of all whitelisted tags
+var allTags = Array.from(new Set([].concat(svgTags).concat(htmlTags)));
+
+// use only SVG tags, sanitizer attempts in place sanitization
+var RETURN_NODE_SVG_INPLACE = {
+  ALLOWED_TAGS: svgTags,
+  ADD_ATTR: attrs,
+  IN_PLACE: true,
+  hooks: {
+    uponSanitizeAttribute: uponSanitizeAttribute
+  }
+};
+
+// use only svg tags, sanitizer returns a document fragment
+var RETURN_NODE_SVG_NEWNODE = {
+  ALLOWED_TAGS: svgTags,
+  ADD_ATTR: attrs,
+  RETURN_DOM_FRAGMENT: true,
+  RETURN_DOM_IMPORT: true,
+  hooks: {
+    uponSanitizeAttribute: uponSanitizeAttribute
+  }
+};
+
+// generic, sanitizer returns string
+var RETURN_STRING_ALL = {
+  ALLOWED_TAGS: allTags,
+  ADD_ATTR: attrs,
+  hooks: {
+    uponSanitizeAttribute: uponSanitizeAttribute
+  }
+};
+
+// generic, sanitizer attempts in place sanitization
+var RETURN_NODE_ALL_INPLACE = {
+  ALLOWED_TAGS: allTags,
+  ADD_ATTR: attrs,
+  IN_PLACE: true,
+  hooks: {
+    uponSanitizeAttribute: uponSanitizeAttribute
+  }
+};
+
+// generic, sanitizer returns a document fragment
+var RETURN_NODE_ALL_NEWNODE = {
+  ALLOWED_TAGS: allTags,
+  ADD_ATTR: attrs,
+  RETURN_DOM_FRAGMENT: true,
+  RETURN_DOM_IMPORT: true,
+  hooks: {
+    uponSanitizeAttribute: uponSanitizeAttribute
+  }
+};
+
+/**
+ * use global DOMPurify if provided as global
+ *  defaults to package depedency otherwise
  */
+function getSanitizerForConfig(config) {
+  var sanitizer = instances.get(config);
+  if (sanitizer) {
+    return sanitizer;
+  }
+
+  if (typeof DOMPurify !== 'undefined') {
+    sanitizer = new DOMPurify(root);
+  } else {
+    throw new Error('Missing dependency on DOMPurify');
+  }
+
+  sanitizer.setConfig(config);
+  if (config.hooks) {
+    Object.keys(config.hooks).forEach(function (key) {
+      sanitizer.addHook(key, config.hooks[key]);
+    });
+  }
+  instances.set(config, sanitizer);
+  return sanitizer;
+}
+
+/**
+ * Sanitize a node with strict SVG rules
+ * @param {Node} node
+ */
+function sanitizeSvgElement(node) {
+  var sanitizer = getSanitizerForConfig(RETURN_NODE_SVG_INPLACE);
+  try {
+    return sanitizer.sanitize(node);
+  } catch (e) {
+    sanitizer = getSanitizerForConfig(RETURN_NODE_SVG_NEWNODE);
+  }
+  return sanitizer.sanitize(node);
+}
+
+/**
+ * Sanitize a node with generic rules
+ * @param {Node} node
+ */
+function sanitizeElement(node) {
+  var sanitizer = getSanitizerForConfig(RETURN_NODE_ALL_INPLACE);
+  try {
+    return sanitizer.sanitize(node);
+  } catch (e) {
+    sanitizer = getSanitizerForConfig(RETURN_NODE_ALL_NEWNODE);
+  }
+  return sanitizer.sanitize(node);
+}
+
+/**
+ * Sanitize a string with strict SVG rules
+ * @param {String} input
+ */
+
+
+/**
+ * Will sanitize a string.
+ * If passed a configuration object it will use that to cache the new DOMPurify instance
+ * Defaults to internal generic configuration otherwise
+ *
+ * @param {String} input
+ * @param {Object} cfg - DOMPurify compatible configuration object
+ */
+function sanitize(input, cfg) {
+  floating.innerHTML = asString(input);
+  cfg = cfg || RETURN_STRING_ALL;
+  var sanitizer = getSanitizerForConfig(cfg);
+  return sanitizer.sanitize(floating.content);
+}
+
+/**
+ * Utility to validate if an SVG tag is whitelisted
+ * @param {String} tag
+ * @returns {boolean}
+ */
+function isAllowedSvgTag(tag) {
+  return !!svgTagsMap[tag];
+}
+
+/**
+ * Utility to validate if an HTML tag is whitelisted
+ * @param {String} tag
+ * @returns {boolean}
+ */
+
+/**
+ * Sanitizes a URL string . Will prevent:
+ * - usage of UTF-8 control characters. Update BLACKLIST constant to support more
+ * - usage of \n, \t in url strings
+ * @param {String} urlString
+ * @returns {String}
+ */
+
+
+/**
+ * Sanitizes for a DOM element. Typical use would be when wanting to sanitize for
+ * an href or src attribute of an element or window.open
+ * @param {*} url
+ */
+
+/* eslint-disable no-unused-vars, prefer-template */
 
 // This is a mock for non-compliant browsers, in particular for IE11.
 
@@ -125,11 +478,6 @@ function wrapLWC(lwc, key) {
 function wrapLib(lib, key, requireLocker, desc) {
   return lib;
 }
-
-function sanitize(dirty, cfg) {}
-function isAllowedSvgTag(tag) {}
-function sanitizeSvgElement(node) {}
-function sanitizeElement(node) {}
 
 exports.create = create;
 exports.createForClass = createForClass;

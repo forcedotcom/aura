@@ -1,11 +1,11 @@
 define('modules/nsmoduletest', ['@salesforce/css/customProperties', 'ns/bar', 'x/foo', 'lwc', 'ns/utils', 'some-module'], function (customProperties, _cBar, _xFoo, lwc, utils, someModule) {
 
     function factory(hostSelector, shadowSelector) {
-        return `c-bar${shadowSelector},[is="c-bar"]${shadowSelector} {
+        return `c-bar${shadowSelector} {
     color: red;
 }
 
-x-foo${shadowSelector},[is="x-foo"]${shadowSelector} {
+x-foo${shadowSelector} {
     color: black;
 }`;
     }

@@ -5,7 +5,7 @@
         changeValuesBtn: '.change-values'
     },
     assertDisplayedValue: function (cmp, selector, expected, msg) {
-        var element = cmp.find('simple').getElement().querySelector(selector);
+        var element = cmp.find('simple').getElement().shadowRoot.querySelector(selector);
         var actual = element.innerText;
         $A.test.assertEquals(expected, actual, msg);
     },
@@ -53,7 +53,7 @@
         },
         test: [
             function (cmp) {
-                var changeValuesBtn = cmp.find('simple').getElement().querySelector(this.selector.changeValuesBtn);
+                var changeValuesBtn = cmp.find('simple').getElement().shadowRoot.querySelector(this.selector.changeValuesBtn);
                 changeValuesBtn.click();
             },
             function (cmp) {

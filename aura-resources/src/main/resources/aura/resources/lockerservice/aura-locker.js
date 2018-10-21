@@ -14,28 +14,12 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-10-16
- * Version: 0.5.20
+ * Generated: 2018-10-21
+ * Version: 0.5.21
  */
 
 (function (exports) {
 'use strict';
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 // Declare shorthand functions. Sharing these declarations accross modules
 // improves both consitency and minification. Unused declarations are dropped
@@ -50,18 +34,17 @@ const {
   freeze,
   defineProperty,
   deleteProperty,
-  getPrototypeOf,
   getOwnPropertyDescriptor,
   getOwnPropertyDescriptors,
   getOwnPropertyNames,
   getOwnPropertySymbols,
   isFrozen,
-  keys,
+  keys: ObjectKeys,
   seal,
   setPrototypeOf
 } = Object;
 
-const { apply, has, ownKeys } = Reflect;
+const { apply, has, getPrototypeOf, isExtensible, ownKeys, preventExtensions } = Reflect;
 
 /**
  * Currying is the process of transforming a function that takes multiple
@@ -86,11 +69,12 @@ const { apply, has, ownKeys } = Reflect;
  */
 const uncurryThis = fn => (thisArg, ...args) => apply(fn, thisArg, args);
 
-const toString = uncurryThis(Object.prototype.toString);
-const hasOwnProperty = uncurryThis(Object.prototype.hasOwnProperty);
-const bind = uncurryThis(Function.prototype.bind);
-const slice = uncurryThis(Array.prototype.slice);
+const ObjectToString = uncurryThis(Object.prototype.toString);
+const ObjectHasOwnProperty = uncurryThis(Object.prototype.hasOwnProperty);
+const FunctionBind = uncurryThis(Function.prototype.bind);
 
+const ArrayMap = uncurryThis(Array.prototype.map);
+const ArraySlice = uncurryThis(Array.prototype.slice);
 
 function isObject(obj) {
   return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
@@ -358,11 +342,11 @@ function uponSanitizeAttribute(node, data) {
 // Detect global object. Magically references a jsdom instance created in the bundled version
 // JSDom and DOMPurify are packaged only in the bundled version of locker-sanitize
 // eslint-disable-next-line
-const global = typeof window !== 'undefined' ? window : jsdom.window;
+const root = typeof window !== 'undefined' ? window : jsdom.window;
 
 // floating element used for purification of strings
 // create a dummy floating element that stores text if document is not found
-const floating = global.document.createElement('template');
+const floating = root.document.createElement('template');
 
 // cache DOMPurify instances to avoid reparsing configs
 // improves performance of DOMPurify.sanitize for repeated usage with same config
@@ -436,7 +420,7 @@ function getSanitizerForConfig(config) {
   }
 
   if (typeof DOMPurify !== 'undefined') {
-    sanitizer = new DOMPurify(global);
+    sanitizer = new DOMPurify(root);
   } else {
     throw new Error('Missing dependency on DOMPurify');
   }
@@ -560,21 +544,6 @@ const CTOR = { type: '@ctor' };
 const RAW = { type: '@raw' };
 const READ_ONLY_PROPERTY = { writable: false };
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 function assert(condition) {
   if (!condition) {
     throw new Error();
@@ -585,7 +554,7 @@ function assert(condition) {
 // rely on the more expensive operation.
 
 function isObjectObject(value) {
-  return typeof value === 'object' && value !== null && toString(value) === '[object Object]';
+  return typeof value === 'object' && value !== null && ObjectToString(value) === '[object Object]';
 }
 
 // https://github.com/jonschlinkert/is-plain-object
@@ -645,22 +614,6 @@ function isValidURLScheme(url) {
  * @return {Boolean}
  */
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 function isCustomElement(el) {
   return el.tagName && el.tagName.indexOf('-') > 0;
 }
@@ -680,22 +633,6 @@ function isDOMElementOrNode(el) {
     return false;
   }
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 // Keyed objects can only have one owner. We prevent "null" and "undefined"
 // keys by guarding all set operations.
@@ -968,22 +905,6 @@ function getRawArray(arr) {
   return result;
 }
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 const metadata$1 = {
   prototypes: {
     CanvasRenderingContext2D: {
@@ -1076,21 +997,6 @@ function SecureCanvasRenderingContext2D(ctx, key) {
   return o;
 }
 
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 /**
  * Get all intrinsics:
  *
@@ -1399,22 +1305,6 @@ function getIntrinsics(realmRec) {
   };
 }
 
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 // Adapted from SES/Caja
 // Copyright (C) 2011 Google Inc.
 // https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
@@ -1505,22 +1395,6 @@ function deepFreeze(node) {
   commit();
 }
 
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 /**
  * This whilelist represents properties of the global object
  * which, by definition, do not provide authority or access to globals.
@@ -1596,21 +1470,6 @@ const stdlib = [
   'Intl'
 ];
 
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 let evalEvaluatorFactory;
 
 // Remove when SecureWindow is refactored to use sandbox
@@ -1795,22 +1654,6 @@ function createFunctionEvaluator(sandbox) {
   return evaluator;
 }
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 let warn = typeof console !== 'undefined' ? console.warn : function() {}; // eslint-disable-line no-console
 let error = Error;
 let severity = {
@@ -1826,22 +1669,6 @@ function registerReportAPI(api) {
     severity = api.severity;
   }
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 function SecureScriptElement() {}
 
@@ -2025,9 +1852,9 @@ SecureScriptElement.run = function(st) {
 
   // Get source using XHR and secure it using
   const xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function() {
+  xhr.onload = function() {
     const key = getKey(st);
-    if (xhr.readyState === 4 && xhr.status === 200) {
+    if (xhr.status === 200) {
       const code = xhr.responseText;
       try {
         evaluate(code, key, scriptUrl);
@@ -2052,22 +1879,6 @@ SecureScriptElement.run = function(st) {
 
   xhr.send();
 };
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 const SecureIFrameElement = {
   addMethodsAndProperties: function(prototype) {
@@ -2140,22 +1951,6 @@ const SecureIFrameElement = {
   }
 };
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 const metadata$3 = {
   ATTRIBUTE_NODE: DEFAULT,
   CDATA_SECTION_NODE: DEFAULT,
@@ -2225,22 +2020,6 @@ const assert$1 = {
     throw new Error(message);
   }
 };
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 const metadata$4 = {
   addEventListener: FUNCTION,
@@ -2383,24 +2162,10 @@ function createEventTargetMethodsStateless(config, prototype) {
   };
 }
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 let lwcUnwrap = value => value;
 let lwcGetComponentDef = () => undefined;
 let lwcGetComponentConstructor = () => undefined;
+let lwcIsNodeFromTemplate = () => false;
 
 function registerLWCAPI(api) {
   if (api) {
@@ -2412,6 +2177,9 @@ function registerLWCAPI(api) {
     }
     if (api.lwcGetComponentConstructor) {
       lwcGetComponentConstructor = api.lwcGetComponentConstructor;
+    }
+    if (api.lwcIsNodeFromTemplate) {
+      lwcIsNodeFromTemplate = api.lwcIsNodeFromTemplate;
     }
   }
 }
@@ -2432,33 +2200,24 @@ function customElementHook$1(el, prototype, tagNameSpecificConfig) {
   };
   const elComponentConstructor = lwcGetComponentConstructor(el);
   if (elComponentConstructor) {
-    const elComponentDescriptors = lwcGetComponentDef(elComponentConstructor).descriptors;
-    if (elComponentDescriptors) {
-      keys(elComponentDescriptors).forEach(prop => {
-        const originalDescriptor = elComponentDescriptors[prop];
-        if (
-          !getOwnPropertyDescriptor(prototype, prop) &&
-          !getOwnPropertyDescriptor(tagNameSpecificConfig, prop)
-        ) {
-          // Wrap functions with a filtered method
-          if (
-            originalDescriptor.hasOwnProperty('value') &&
-            typeof originalDescriptor.value === 'function'
-          ) {
-            tagNameSpecificConfig[prop] = createFilteredMethodStateless(
-              prop,
-              prototype,
-              methodOptions
-            );
-          } else {
-            // Everything else has a wrapped getter/setter
-            tagNameSpecificConfig[prop] = createFilteredPropertyStateless(
-              prop,
-              prototype,
-              methodOptions
-            );
-          }
-        }
+    const elComponentMethods = lwcGetComponentDef(elComponentConstructor).methods;
+    if (elComponentMethods) {
+      ObjectKeys(elComponentMethods).forEach(method => {
+        tagNameSpecificConfig[method] = createFilteredMethodStateless(
+          method,
+          prototype,
+          methodOptions
+        );
+      });
+    }
+    const elComponentProps = lwcGetComponentDef(elComponentConstructor).props;
+    if (elComponentProps) {
+      ObjectKeys(elComponentProps).forEach(prop => {
+        tagNameSpecificConfig[prop] = createFilteredPropertyStateless(
+          prop,
+          prototype,
+          methodOptions
+        );
       });
     }
   }
@@ -2466,32 +2225,19 @@ function customElementHook$1(el, prototype, tagNameSpecificConfig) {
 
 /**
  * Was node created by lwc?
+ * Will return true for all nodes in an LWC component's template and shadowRoot nodes of LWC components
  * @param {Node} node node to check
  */
 function isAnLWCNode(node) {
   assert$1.invariant(node, 'Checking an undefined value to be node');
-  // This is a workaround for now, we have requested LWC for an api to get this information (W-5143776)
-  if (node !== lwcUnwrap(node)) {
+  if (
+    lwcIsNodeFromTemplate(node) ||
+    (ShadowRoot && node instanceof ShadowRoot && lwcIsNodeFromTemplate(node.host))
+  ) {
     return true;
   }
   return false;
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 const proxyMap = new WeakMap();
 function addProxy(proxy, raw) {
@@ -2526,22 +2272,6 @@ if (typeof window !== 'undefined') {
   window.devtoolsFormatters = window.devtoolsFormatters || [];
   window.devtoolsFormatters.push(lsProxyFormatter);
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 let customElementHook$$1;
 function registerCustomElementHook(hook) {
@@ -3792,7 +3522,7 @@ const KEY_TO_PROTOTYPES = typeof Map !== 'undefined' ? new Map() : undefined;
 function propertyIsSupported(target, property) {
   // If the SecureElement prototype does not have the property directly on it then this
   // is an attempt to get a property that we do not support
-  return Object.getPrototypeOf(target).hasOwnProperty(property);
+  return ObjectHasOwnProperty(getPrototypeOf(target), property);
 }
 
 function SecureElement(el, key) {
@@ -3844,7 +3574,7 @@ function SecureElement(el, key) {
 
   let prototypeInfo = prototypes.get(tagName);
   if (!prototypeInfo) {
-    const basePrototype = Object.getPrototypeOf(el);
+    const basePrototype = getPrototypeOf(el);
 
     const expandoCapturingHandler = {
       get: function(target, property) {
@@ -3915,11 +3645,11 @@ function SecureElement(el, key) {
       ownKeys: function(target) {
         const raw = getRef(target, key);
         const data = getData(raw, key);
-        let keys$$1 = Object.keys(raw);
+        let keys = ObjectKeys(raw);
         if (data) {
-          keys$$1 = keys$$1.concat(Object.keys(data));
+          keys = keys.concat(ObjectKeys(data));
         }
-        return keys$$1;
+        return keys;
       },
 
       getOwnPropertyDescriptor: function(target, property) {
@@ -4237,7 +3967,7 @@ function SecureElement(el, key) {
     defineProperties(prototype, tagNameSpecificConfig);
 
     // Build case insensitive index for attribute validation
-    Object.keys(prototype).forEach(k => {
+    ObjectKeys(prototype).forEach(k => {
       const lower = k.toLowerCase();
       if (lower !== k) {
         caseInsensitiveAttributes[lower] = true;
@@ -4597,7 +4327,7 @@ SecureElement.createAttributeAccessMethodConfig = function(
     writable: true,
     value: function() {
       const raw = getRawThis(this);
-      let args = slice(arguments);
+      let args = ArraySlice(arguments);
 
       let name = args[namespaced ? 1 : 0];
       if (nameProp) {
@@ -4676,21 +4406,6 @@ function sanitize$1(realmRec) {
   sanitized.add(realmRec);
 }
 
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 const keyToSandbox = new Map();
 
 function createSandbox(key, realmRec) {
@@ -4741,25 +4456,9 @@ function installPolyfills(realmRec) {
 
   // https://github.com/tc39/proposal-observable/blob/master/src/Observable.js
   if (!g.Symbol['observable']) {
-    Object.defineProperty(g.Symbol, 'observable', { value: g.Symbol('observable') });
+    defineProperty(g.Symbol, 'observable', { value: g.Symbol('observable') });
   }
 }
-
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 // TODO: This repair will make it out as its own independent shim since
 // it's required for confinement but not part of the Realm specifications.
@@ -4838,22 +4537,6 @@ function repairAccessors(realmRec) {
   });
 }
 
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 // Adapted from SES/Caja
 // Copyright (C) 2011 Google Inc.
 // https://github.com/google/caja/blob/master/src/com/google/caja/ses/startSES.js
@@ -4915,22 +4598,6 @@ function repairFunctions(realmRec) {
   repairFunction(realmRec, 'AsyncFunction', 'async function');
   repairFunction(realmRec, 'AsyncGeneratorFunction', 'async function*');
 }
-
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 /**
  * For a special set of properties (defined below), it ensures that the
@@ -4995,7 +4662,7 @@ function beMutable(obj, prop, desc) {
         const name = obj.constructor.name;
         throw new TypeError(`Cannot assign to read only property '${prop}' of object '${name}'`);
       }
-      if (hasOwnProperty(this, prop)) {
+      if (ObjectHasOwnProperty(this, prop)) {
         this[prop] = newValue;
       } else {
         defineProperty(this, prop, {
@@ -5077,21 +4744,6 @@ function repairDataProperties(realmRec) {
   ].forEach(proto => beMutableProperty(proto, 'message'));
 }
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 const realmRec = {};
 let isInitialized = false;
 
@@ -5168,22 +4820,6 @@ function evaluate(src, key, sourceURL) {
     throw new error(e.message || 'Evaluation error', e, severity.QUIET);
   }
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 function SecureDOMEvent(event, key) {
   assert$1.invariant(event, 'Wrapping an undefined event is prohibited.');
@@ -5288,23 +4924,20 @@ SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
         return touches;
       }
       // touches, of type ToucheList does not implement "map"
-      return Array.prototype.map.call(touches, touch => {
+      return ArrayMap(touches, touch => {
         // touches is normally a big big collection of touch objects,
         // we do not want to pre-process them all, just create the getters
         // and process the accessor on the spot. e.g.:
         // https://developer.mozilla.org/en-US/docs/Web/Events/touchstart
-        let keys$$1 = [];
+        let keys = [];
         let touchShape = touch;
         // Walk up the prototype chain and gather all properties
         do {
-          keys$$1 = keys$$1.concat(Object.keys(touchShape));
-        } while (
-          (touchShape = Object.getPrototypeOf(touchShape)) &&
-          touchShape !== Object.prototype
-        );
+          keys = keys.concat(ObjectKeys(touchShape));
+        } while ((touchShape = getPrototypeOf(touchShape)) && touchShape !== Object.prototype);
 
         // Create a stub object with all the properties
-        return keys$$1.reduce(
+        return keys.reduce(
           (o, p) =>
             defineProperty(o, p, {
               // all props in a touch object are readonly by spec:
@@ -5323,22 +4956,6 @@ SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
   };
 };
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 /* eslint-disable no-use-before-define */
 
 let filterTypeHook$1;
@@ -5352,7 +4969,7 @@ function registerIsUnfilteredTypeHook(hook) {
 const lwcHelpers = { isAnLWCNode: () => false };
 function registerLWCHelpers(helpers) {
   if (helpers) {
-    Object.assign(lwcHelpers, helpers);
+    assign(lwcHelpers, helpers);
   }
 }
 
@@ -5584,7 +5201,7 @@ function filterEverything(st, raw, options) {
 }
 
 function filterArguments(st, args, options) {
-  args = slice(args);
+  args = ArraySlice(args);
 
   if (options && options.beforeCallback) {
     options.beforeCallback.apply(st, args);
@@ -5622,7 +5239,7 @@ function convertSymbol(property) {
 }
 
 // TODO W-5529670: expand list of safe constructors to base JS language
-const whitelistedConstructors = new Set([Object, Array]);
+const whitelistedConstructors = [Object, Array];
 
 const filteringProxyHandler = freeze({
   get(target, property) {
@@ -5633,7 +5250,7 @@ const filteringProxyHandler = freeze({
       return value;
     }
 
-    if (property === 'constructor' && whitelistedConstructors.has(value)) {
+    if (property === 'constructor' && whitelistedConstructors.includes(value)) {
       return value;
     }
 
@@ -5654,12 +5271,12 @@ const filteringProxyHandler = freeze({
 
   getPrototypeOf(target) {
     const raw = getRef(target, getKey(target));
-    return Object.getPrototypeOf(raw);
+    return getPrototypeOf(raw);
   },
 
   setPrototypeOf(target, prototype) {
     const raw = getRef(target, getKey(target));
-    return Object.setPrototypeOf(raw, prototype);
+    return setPrototypeOf(raw, prototype);
   },
 
   has(target, property) {
@@ -5682,7 +5299,7 @@ const filteringProxyHandler = freeze({
 
   ownKeys(target) {
     const raw = getRef(target, getKey(target));
-    return Object.keys(raw);
+    return ObjectKeys(raw);
   },
 
   getOwnPropertyDescriptor(target, property) {
@@ -5721,18 +5338,18 @@ const filteringProxyHandler = freeze({
 
   isExtensible(target) {
     const raw = getRef(target, getKey(target));
-    return Object.isExtensible(raw);
+    return isExtensible(raw);
   },
 
   preventExtensions(target) {
     const raw = getRef(target, getKey(target));
-    return Object.preventExtensions(raw);
+    return preventExtensions(raw);
   }
 });
 
 function createFilteringProxy(raw, key) {
   // Use a direct proxy on raw to a proxy on {} to avoid the Proxy invariants for non-writable, non-configurable properties
-  const surrogate = create$1(Object.getPrototypeOf(raw));
+  const surrogate = create$1(getPrototypeOf(raw));
   setRef(surrogate, raw, key);
 
   const rawKey = getKey(raw);
@@ -5862,7 +5479,7 @@ function getArrayLikeThingProxyHandler(key) {
 }
 
 function createProxyForArrayLikeObjects(raw, key) {
-  const surrogate = create$1(Object.getPrototypeOf(raw));
+  const surrogate = create$1(getPrototypeOf(raw));
   setRef(surrogate, raw, key);
 
   const proxy = new Proxy(surrogate, getArrayLikeThingProxyHandler(key));
@@ -5920,16 +5537,16 @@ function getArrayProxyHandler(key) {
   if (!handler) {
     handler = {
       getPrototypeOf: function(target) {
-        return Object.getPrototypeOf(target);
+        return getPrototypeOf(target);
       },
       setPrototypeOf: function(target, newProto) {
-        return Object.setPrototypeOf(target, newProto);
+        return setPrototypeOf(target, newProto);
       },
       isExtensible: function(target) {
-        return Object.isExtensible(target);
+        return isExtensible(target);
       },
       preventExtensions: function(target) {
-        Object.preventExtensions(target);
+        preventExtensions(target);
         return getFromCache(target, key);
       },
       getOwnPropertyDescriptor: function(target, property) {
@@ -5953,7 +5570,7 @@ function getArrayProxyHandler(key) {
         const filtered = getFilteredArray(handler, raw, key);
         let ret;
 
-        if (property === 'constructor' && whitelistedConstructors.has(raw[property])) {
+        if (property === 'constructor' && whitelistedConstructors.includes(raw[property])) {
           return raw[property];
         }
 
@@ -6281,7 +5898,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
         if (Number.isNaN(Number(property))) {
           switch (property) {
             case 'length':
-              ret = Object.keys(filtered).length;
+              ret = ObjectKeys(filtered).length;
               break;
             case 'item':
               ret = function(index) {
@@ -6468,7 +6085,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
 }
 
 function createProxyForNamedNodeMap(raw, key, prototype, caseInsensitiveAttributes) {
-  const surrogate = create$1(Object.getPrototypeOf(raw));
+  const surrogate = create$1(getPrototypeOf(raw));
   setRef(surrogate, raw, key);
 
   const proxy = new Proxy(
@@ -6954,7 +6571,7 @@ function addPrototypeMethodsAndProperties(metadata$$1, so, raw, key) {
               valueOverride ||
               function() {
                 const cls = raw[name];
-                const args = Array.prototype.slice.call(arguments);
+                const args = ArraySlice(arguments);
                 let result;
 
                 if (typeof cls === 'function') {
@@ -7007,7 +6624,7 @@ function addPrototypeMethodsAndProperties(metadata$$1, so, raw, key) {
   const prototypes = metadata$$1['prototypes'];
   supportedInterfaces.forEach(name => {
     prototype = prototypes[name];
-    Object.keys(prototype).forEach(worker);
+    ObjectKeys(prototype).forEach(worker);
   });
 }
 
@@ -7059,10 +6676,7 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
               const cls = raw[name];
 
               // TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
-              const ctor = Function.prototype.bind.apply(
-                cls,
-                [null].concat(Array.prototype.slice.call(arguments))
-              );
+              const ctor = Function.prototype.bind.apply(cls, [null].concat(ArraySlice(arguments)));
               const result = new ctor();
               trust$1(so, result);
 
@@ -7228,22 +6842,6 @@ function deepUnfilterMethodArguments(st, baseObject, members) {
   }
   return baseObject;
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 const metadata$5 = {
   prototypes: {
@@ -7568,22 +7166,6 @@ SecureDocument.toString = function() {
   return 'SecureDocument() { [native code] }';
 };
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 function getSupportedSchemesErrorMessage(method, object) {
   return `${object}.${method} supports http://, https:// schemes and relative urls.`;
 }
@@ -7698,22 +7280,6 @@ function SecureLocation(loc, key) {
   return o;
 }
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 let addPropertiesHook$1;
 function registerAddPropertiesHook$1(hook) {
   addPropertiesHook$1 = hook;
@@ -7756,22 +7322,6 @@ function SecureNavigator(navigator, key) {
 
   return o;
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 function SecureXMLHttpRequest(key) {
   // Create a new closure constructor for new XHMLHttpRequest() syntax support that captures the key
@@ -7878,22 +7428,6 @@ function SecureXMLHttpRequest(key) {
   };
 }
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 function SecureMutationObserver(key) {
   function filterRecords(st, records) {
     const filtered = [];
@@ -7941,22 +7475,6 @@ function SecureMutationObserver(key) {
     return freeze(o);
   };
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 function SecureNotification(key) {
   // Create a new closure constructor for new Notification() syntax support that captures the key
@@ -8015,22 +7533,6 @@ function SecureNotification(key) {
     return freeze(o);
   };
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 function SecureStorage(storage, type, key) {
   let o = getFromCache(storage, key);
@@ -8093,7 +7595,7 @@ function SecureStorage(storage, type, key) {
 
     length: {
       get: function() {
-        return Object.keys(nameToSynthetic).length;
+        return ObjectKeys(nameToSynthetic).length;
       }
     },
 
@@ -8123,13 +7625,13 @@ function SecureStorage(storage, type, key) {
 
     key: {
       value: function(index) {
-        return Object.keys(nameToSynthetic)[index];
+        return ObjectKeys(nameToSynthetic)[index];
       }
     },
 
     clear: {
       value: function() {
-        Object.keys(nameToSynthetic).forEach(name => {
+        ObjectKeys(nameToSynthetic).forEach(name => {
           const syntheticKey = getSynthetic(name);
           storage.removeItem(syntheticKey);
         });
@@ -8147,22 +7649,6 @@ function SecureStorage(storage, type, key) {
 
   return o;
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 // For URL, we only need to tame one static method. That method is on the
 // window.URL primordial and disappears from instances of URL. We only create
@@ -8192,7 +7678,7 @@ function SecureURL(raw) {
     },
     toString: {
       value: function() {
-        return `SecureURL: ${Object.prototype.toString.call(raw)}`;
+        return `SecureURL: ${ObjectToString(raw)}`;
       }
     }
   });
@@ -8208,7 +7694,7 @@ function SecureURL(raw) {
         return undefined;
       }
       // Properties not found the object are not static.
-      if (Object.keys(target).indexOf(name) < 0) {
+      if (ObjectKeys(target).indexOf(name) < 0) {
         return desc.value;
       }
       // Prevent static methods from executing in the context of the proxy.
@@ -8443,21 +7929,6 @@ function SecureMediaSource(key) {
   };
 }
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 function SecureCustomEventFactory(CustomEventCtor, key) {
   assert$1.invariant(CustomEventCtor !== undefined, 'CustomEvent constructor is undefined');
   assert$1.invariant(key !== undefined, 'key is undefined');
@@ -8480,22 +7951,6 @@ function SecureCustomEventFactory(CustomEventCtor, key) {
   setRef(SecureCustomEvent, CustomEventCtor, key);
   return SecureCustomEvent;
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 let addPropertiesHook;
 function registerAddPropertiesHook$$1(hook) {
@@ -9133,13 +8588,13 @@ function SecureWindow(sandbox, key) {
     setTimeout: {
       enumerable: true,
       value: function(callback) {
-        return setTimeout.apply(win, [bind(callback, o)].concat(slice(arguments, 1)));
+        return setTimeout.apply(win, [FunctionBind(callback, o)].concat(ArraySlice(arguments, 1)));
       }
     },
     setInterval: {
       enumerable: true,
       value: function(callback) {
-        return setInterval.apply(win, [bind(callback, o)].concat(slice(arguments, 1)));
+        return setInterval.apply(win, [FunctionBind(callback, o)].concat(ArraySlice(arguments, 1)));
       }
     },
     location: {
@@ -9210,7 +8665,7 @@ function SecureWindow(sandbox, key) {
         return (
           formDataValueOverride ||
           function() {
-            const args = slice(arguments);
+            const args = ArraySlice(arguments);
             // make sure we have access to any <form> passed in to constructor
             let form;
             if (args.length > 0) {
@@ -9320,22 +8775,6 @@ function SecureWindow(sandbox, key) {
   return o;
 }
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 function SecureRTCPeerConnection(raw, key) {
   const SecureConstructor = function(configuration) {
     const rtc = new raw(configuration);
@@ -9401,21 +8840,6 @@ function SecureRTCPeerConnection(raw, key) {
 
 // TODO: unused
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 const metadata$7 = {
   prototypes: {
     ShadowRoot: {
@@ -9570,21 +8994,6 @@ function SecureTemplate(template, key) {
   return o;
 }
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 /**
  * this should return a secure value
  * @param {*} cmp component instance who is accessing the value
@@ -9882,21 +9291,6 @@ SecureLightningElementFactory.getWrappedLightningElement = function(LightningEle
   return SecureLightningElement;
 };
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 function SecureLWC(lwc, key) {
   let o = getFromCache(lwc, key);
   if (o) {
@@ -9932,22 +9326,6 @@ function SecureLWC(lwc, key) {
 
   return o;
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 // This is a whitelist from Kevin V, this has to be updated if any new wire adapters are introduced
 const internalLibs = [
@@ -9996,7 +9374,7 @@ function SecureLib(lib, key, requireLocker, desc) {
       : undefined
   };
 
-  keys(lib).forEach(property => {
+  ObjectKeys(lib).forEach(property => {
     if (typeof lib[property] === 'function') {
       // only Platform events created in non-lockerized libs will be caught by this condition
       // TODO: add support for importing lockerized libs that expose events
@@ -10008,7 +9386,7 @@ function SecureLib(lib, key, requireLocker, desc) {
           SecureCustomEventFactory,
           key
         );
-        Object.defineProperty(o, property, secureEventCtorDescriptor);
+        defineProperty(o, property, secureEventCtorDescriptor);
       } else {
         addMethodIfSupported(o, lib, property, methodOptions);
       }
@@ -10023,22 +9401,6 @@ function SecureLib(lib, key, requireLocker, desc) {
 
   return seal(o);
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 function SecureAura(AuraInstance, key) {
   let o = getFromCache(AuraInstance, key);
@@ -10232,22 +9594,6 @@ function SecureAura(AuraInstance, key) {
   return o;
 }
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 function SecureAuraAction(action, key) {
   let o = getFromCache(action, key);
   if (o) {
@@ -10287,22 +9633,6 @@ function SecureAuraAction(action, key) {
 
   return seal(o);
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 function SecureAuraEvent(event, key) {
   let o = getFromCache(event, key);
@@ -10390,22 +9720,6 @@ function SecureAuraEvent(event, key) {
   return seal(o);
 }
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 let getPublicMethodNames;
 let requireLocker;
 
@@ -10415,22 +9729,6 @@ function registerAuraAPI(api) {
     requireLocker = api.requireLocker;
   }
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 function SecureAuraComponent(component, key) {
   let o = getFromCache(component, key);
@@ -10530,22 +9828,6 @@ function SecureAuraComponent(component, key) {
 
   return o;
 }
-
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 function SecureAuraComponentRef(component, key) {
   let o = getFromCache(component, key);
@@ -10653,22 +9935,6 @@ function SecureAuraComponentRef(component, key) {
   return seal(o);
 }
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 function SecureAuraPropertyReferenceValue(prv, key) {
   let o = getFromCache(prv, key);
   if (o) {
@@ -10690,22 +9956,6 @@ function SecureAuraPropertyReferenceValue(prv, key) {
   return seal(o);
 }
 
-/*
- * Copyright (C) 2013 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 let AuraAction;
 let AuraComponent;
 let AuraEvent;
@@ -10719,22 +9969,6 @@ function registerAuraTypes(types) {
     AuraPropertyReferenceValue = types.PropertyReferenceValue;
   }
 }
-
-/*
- * Copyright (C) 2017 salesforce.com, inc.
- *
- * Licensed under the Apache License, Version 2.0 (the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 // AuraLocker is a facade for Locker. Its role is to:
 // - implement methods not present on Locker (extends API).

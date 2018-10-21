@@ -92,11 +92,34 @@ Aura.ExportsModule = {
     // -- Interop lifecycle methods --
     "INTEROP_FIND_OWNER": INTEROP_FIND_OWNER,
 
-    "createComponent" : function (componentName, attributes, callback) {
+    "createComponent" : function (componentName, attributes, callback, hotspot) {
         $A.clientService.setCurrentAccess($A.getRoot());
         try {
             $A.run(function() {
-                $A.createComponent(componentName, attributes, $A.getCallback(callback));
+                 if (hotspot) {
+                    $A.executeHotspot(function() {
+                        $A.createComponent(componentName, attributes, $A.getCallback(callback));
+                    });
+                } else {
+                    $A.createComponent(componentName, attributes, $A.getCallback(callback));
+                }
+            });
+        } finally {
+            $A.clientService.releaseCurrentAccess();
+        }
+    },
+
+    "getDefinition": function (definition, callback, hotspot) {
+        $A.clientService.setCurrentAccess($A.getRoot());
+        try {
+            $A.run(function() {
+                if (hotspot) {
+                    $A.executeHotspot(function() {
+                        $A.getDefinition(definition, $A.getCallback(callback));
+                    });
+                } else {
+                    $A.getDefinition(definition, $A.getCallback(callback));
+                }
             });
         } finally {
             $A.clientService.releaseCurrentAccess();

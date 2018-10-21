@@ -6,7 +6,7 @@
         test: [
             function (cmp) {
                 var element = cmp.getElement();
-                var button = element.querySelector(this.selector.button);
+                var button = element.shadowRoot.querySelector(this.selector.button);
                 var expected = false;
                 var actual = button.disabled;
                 var errorMsg = 'The disabled prop value must be the default defined in the module class since the value ' +

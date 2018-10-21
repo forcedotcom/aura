@@ -67,9 +67,9 @@ export default class ChildSecure extends LightningElement {
     }
 
     connectedCallback() {
-        this.template.addEventListener('customEvent', this.assertCustomEvent.bind(this));
-        this.template.addEventListener('click', this.assertDOMEvent.bind(this));
-        this.template.addEventListener(LockerLWCEventName, this.assertPlatformEventData);
+        this.addEventListener('customEvent', this.assertCustomEvent.bind(this));
+        this.addEventListener('click', this.assertDOMEvent.bind(this));
+        this.addEventListener(LockerLWCEventName, this.assertPlatformEventData);
     }
 
     @api assertParamsInPublicMethod(data) {

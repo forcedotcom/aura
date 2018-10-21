@@ -239,9 +239,7 @@
 
         // Try to access the internal prototype of a SecureElement
         var el = cmp.find("content").getElement();
-        var prototype = Object.getPrototypeOf(el);
-        // Will start failing once W-4184609 or W-4180046 or W-4274468 is fixed
-        testUtils.assertTrue(prototype === HTMLDivElement.prototype);
+        testUtils.assertTrue(el instanceof HTMLDivElement);
     },
 
     // this should only be run on browsers where Locker is not supported

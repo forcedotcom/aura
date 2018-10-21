@@ -144,8 +144,7 @@ export default class SanityChecks extends LightningElement {
     testSecureElementPrototypeCounterMeasures() {
         // Try to access the internal prototype of a SecureElement
         const el = this.template.querySelector(".content");
-        const prototype = Object.getPrototypeOf(el);
-        testUtil.assertTrue(prototype === HTMLDivElement.prototype); // Will start failing once W-4184609 or W-4180046 or W-4274468 is fixed
+        testUtil.assertTrue(el instanceof HTMLDivElement);
     }
     @api
     testInstanceOf() {

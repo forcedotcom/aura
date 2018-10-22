@@ -72,7 +72,7 @@
     },
 
     testUrlEndingWithEscapedQuotation:{
-        attributes:{value : '&quot;https://www.salesforce.com&quot;&amp; ....some literature about the company.'},
+        attributes:{value : '&quot;https://www.salesforce.com&quot; ....some literature about the company.'},
         test:function(cmp){
             var span = cmp.find('span');
             //Make sure a span tag is used for outputTextArea. Failure might mean breaking styling of third party app

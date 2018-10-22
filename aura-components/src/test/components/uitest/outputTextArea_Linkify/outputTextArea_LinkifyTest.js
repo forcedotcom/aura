@@ -163,6 +163,61 @@
         ]
     },
 
+    testLinksWithLinksAsParameters: {
+        attributes: {
+            textValue: "Customer Question: To view the details of RoadLoans lead104593871 , go to https://login.example.com/idp/startSSO.ping?PartnerSpId=federation.santanderconsumerusa.com:saml2&TargetResource=https://dealer.example.com;"
+        },
+        test: [
+            function (cmp) {
+                this.assertLinksPresent(cmp, 'https://login.example.com/idp/startSSO.ping?PartnerSpId=federation.santanderconsumerusa.com:saml2&amp;TargetResource=https://dealer.example.com');
+            }
+        ]
+    },
+
+    testURLWithSymbolsAndNumbersInParams: {
+        attributes: {
+            textValue: "Open Maps here https://www.google.ca/maps/@43.472082,-80.5426668,18z?hl=en adasda and folllow"
+        },
+        test: [
+            function (cmp) {
+                this.assertLinksPresent(cmp, 'https://www.google.ca/maps/@43.472082,-80.5426668,18z?hl=en');
+            }
+        ]
+    },
+
+    testLinkWithinDoubleQuotes: {
+        attributes: {
+            textValue: "This link is \"https://example.com\" inside double quotes"
+        },
+        test: [
+            function (cmp) {
+                this.assertLinksPresent(cmp, 'https://example.com');
+            }
+        ]
+    },
+
+    testLinkWithinSingleQuotes: {
+        attributes: {
+            textValue: "This link is 'https://example.com' inside double quotes"
+        },
+        test: [
+            function (cmp) {
+                this.assertLinksPresent(cmp, 'https://example.com');
+            }
+        ]
+    },
+
+    testLinkEndingWithEscapedQuotation: {
+        attributes: {
+            textValue: 'This is some &quot;https://www.salesforce.com&quot; - the company.'
+        },
+        test: [
+            function (cmp) {
+                this.assertLinksPresent(cmp, 'https://www.salesforce.com');
+            }
+        ]
+    },
+
     assertLinksPresent: function(cmp, hrefText, checkValue) {
         $A.test.addWaitForWithFailureMessage(true,
             function() {

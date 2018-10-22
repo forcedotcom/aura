@@ -120,5 +120,59 @@
                 });
             }
         ]
+    },
+
+    testUnsafeScriptInjection: {
+        attributes : { value: "safe<script type='text/javascript'>alert('woo')</script>" },
+        test: function(component) {
+                var expected = "safe";
+                var cmp = component.find("value");
+
+                var outputVal = $A.util.getText(cmp.getElement());
+                $A.test.assertEquals(expected, outputVal);
+            }
+    },
+
+    testUnsafeStyleInjection: {
+        attributes : { value: "safe<style type='text/css'>body {color: 'red'} </style>" },
+        test: function(component) {
+                var expected = "safe";
+                var cmp = component.find("value");
+
+                var outputVal = $A.util.getText(cmp.getElement());
+                $A.test.assertEquals(expected, outputVal);
+            }
+    },
+
+    testUnsafeLinkInjection: {
+        attributes : { value: "safe<link href='/some.css' rel='stylesheet' type='text/css'>" },
+        test: function(component) {
+                var cmp = component.find("value");
+
+                var outputVal = cmp.getElement().parentNode.innerHTML;
+                $A.test.assertTrue(outputVal.indexOf("link") === -1, "output should not have contained a link: " + outputVal);
+            }
+    },
+
+    testUnsafeMetaInjection: {
+        attributes : { value: "safe<meta name='description' content='blah'>" },
+        test: function(component) {
+                var expected = "safe";
+                var cmp = component.find("value");
+
+                var outputVal = $A.util.getText(cmp.getElement());
+                $A.test.assertEquals(expected, outputVal);
+            }
+    },
+
+    testUnsafeEncodedScriptInjection: {
+        attributes : { value: "safe&lt;script type='text/javascript'&gt;alert('woo')&lt;/script&gt;" },
+        test: function(component) {
+                var expected = "safe<script type='text/javascript'>alert('woo')</script>";
+                var cmp = component.find("value");
+
+                var outputVal = $A.util.getText(cmp.getElement());
+                $A.test.assertEquals(expected, outputVal);
+            }
     }
 })

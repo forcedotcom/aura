@@ -15,16 +15,19 @@
  */
 package org.auraframework.util.javascript.builder;
 
-import com.google.common.io.Files;
-import org.auraframework.util.javascript.JavascriptWriter;
-import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.List;
+
+import org.auraframework.util.javascript.JavascriptProcessingError;
+import org.auraframework.util.javascript.JavascriptWriter;
+import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
+
+import com.google.common.io.Files;
 
 public class FrameworkJavascriptBuilder extends JavascriptBuilder {
-
+    
     public FrameworkJavascriptBuilder() {
         super(null);
     }
@@ -35,11 +38,13 @@ public class FrameworkJavascriptBuilder extends JavascriptBuilder {
 
         StringWriter compressedSourceWriter = new StringWriter();
         if (mode == JavascriptGeneratorMode.PRODUCTION) {
-            StringWriter sourcemapSectionWriter = new StringWriter();
+            try (StringWriter sourcemapSectionWriter = new StringWriter()) {
 
-            jsWriter.compress(new StringReader(inputContent), compressedSourceWriter, sourcemapSectionWriter, Files.getNameWithoutExtension(outputFileName) + ".map.js", null);
-
-            return new JavascriptResource(inputContent, compressedSourceWriter.toString(), sourcemapSectionWriter.toString());
+                final List<JavascriptProcessingError> errors = jsWriter.compress(new StringReader(inputContent), compressedSourceWriter, sourcemapSectionWriter, Files.getNameWithoutExtension(outputFileName) + ".map.js", null);
+                proccessBuildErrorsAndWarnings(errors);
+    
+                return new JavascriptResource(inputContent, compressedSourceWriter.toString(), sourcemapSectionWriter.toString());
+            }
         } else {
             jsWriter.compress(inputContent, compressedSourceWriter, outputFileName);
             return new JavascriptResource(null, compressedSourceWriter.toString(), null);

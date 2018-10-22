@@ -15,7 +15,21 @@
  */
 package org.auraframework.util.javascript.directive;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+
+import org.apache.log4j.Logger;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.javascript.CommonJavascriptGroupImpl;
 import org.auraframework.util.javascript.SourcemapWriter;
@@ -29,26 +43,14 @@ import org.auraframework.util.javascript.builder.LockerJavascriptBuilder;
 import org.auraframework.util.resource.ResourceLoader;
 import org.auraframework.util.text.Hash;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-
 /**
  * Javascript group that contains directives for parsing instructions or metadata or other fun stuff. It starts from one
  * file which should include the others.
  */
 public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
+    
+    private static final Logger LOGGER = Logger.getLogger(DirectiveBasedJavascriptGroup.class.getName());
+    
     /**
      * We spawn multiple threads to go the per-mode generation, and throw this to indicate at least one failure. When
      * printed, this exception will have a "caused by" stack trace for the first error, but its message will identify
@@ -228,6 +230,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                     }
                 } else {
                     // its up to date already, skip
+                    LOGGER.info("File up-to-date and does not need to be compiled: " + file.getName());
                     counter.countDown();
                     writtenFiles.add(file);
                     if (++writtenCount == 2) return; else continue;
@@ -287,7 +290,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                         if(sourcemapFile != null) {
                             outputWriter.append(String.format(SourcemapWriter.SOURCEMAP_COMMENT, this.getLastMod(), sourcemapFile.getName()));
                         }
-
+                        LOGGER.info("File is changed and is compiled: " + outputFile.getName());
                     } finally {
                         if(sourcemapWriter != null) {
                             sourcemapWriter.close();

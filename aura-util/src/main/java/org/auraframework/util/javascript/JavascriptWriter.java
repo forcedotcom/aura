@@ -23,6 +23,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -322,11 +323,11 @@ public enum JavascriptWriter {
 
             // errors and warnings
             for (JSError e : compiler.getErrors()) {
-                JavascriptProcessingError.makeError(msgs, manager.getErrorMessage(), e.lineNumber, e.getCharno(),
+                JavascriptProcessingError.makeError(msgs, manager.getErrorMessage(e.sourceName, e.getLineNumber(), e.getCharno()), e.getLineNumber(), e.getCharno(),
                         in.getName(), null);
             }
             for (JSError e : compiler.getWarnings()) {
-                JavascriptProcessingError.makeWarning(msgs, manager.getErrorMessage(), e.lineNumber, e.getCharno(),
+                JavascriptProcessingError.makeWarning(msgs, manager.getErrorMessage(e.sourceName, e.getLineNumber(), e.getCharno()), e.getLineNumber(), e.getCharno(),
                         in.getName(), null);
             }
         } catch (Exception e) {
@@ -371,31 +372,33 @@ public enum JavascriptWriter {
         }
     }
 
-   public  class CustomErrorManager extends BasicErrorManager {
+   public static class CustomErrorManager extends BasicErrorManager {
         private final MessageFormatter formatter;
-        private String errorMessage;
+        private final Map<String, String> errorMessages = new HashMap<>();
         private String errorSummary;
 
         public CustomErrorManager(MessageFormatter formatter) {
             this.formatter = formatter;
         }
 
-        public String getErrorMessage() {
-            return errorMessage;
+        public String getErrorMessage(final String sourceName, final int lineNumber, final int charNumber) {
+            return errorMessages.get(buildMessageKey(sourceName, lineNumber, charNumber));
         }
 
         public String getErrorSummary() {
             return errorSummary;
+        }
+        
+        private static String buildMessageKey(final String sourceName, final int lineNumber, final int charNumber) {
+            return sourceName + ':' + lineNumber + ':' + charNumber;
         }
 
         @Override
         public void println(CheckLevel level, JSError error) {
             switch (level) {
             case ERROR:
-                errorMessage = error.format(level, formatter);
-                break;
             case WARNING:
-                errorMessage = error.format(level, formatter);
+                errorMessages.put(buildMessageKey(error.sourceName, error.getLineNumber(), error.getCharno()), error.format(level, formatter));
                 break;
             case OFF:
                 break;

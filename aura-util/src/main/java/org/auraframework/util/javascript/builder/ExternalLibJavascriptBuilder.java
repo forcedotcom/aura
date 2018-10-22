@@ -15,6 +15,7 @@
  */
 package org.auraframework.util.javascript.builder;
 
+import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptWriter;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 import org.auraframework.util.resource.ResourceLoader;
@@ -46,10 +47,12 @@ public class ExternalLibJavascriptBuilder extends JavascriptBuilder {
 
         // strip out spaces and comments for external libraries
         JavascriptWriter libsJsWriter = JavascriptWriter.CLOSURE_WHITESPACE_ONLY;
-        StringWriter libsWriter = new StringWriter();
-        libsJsWriter.compress(libs, libsWriter, outputFileName);
-
-        return new JavascriptResource(null, libsWriter.toString(), null);
+        try (StringWriter libsWriter = new StringWriter()) {
+            final List<JavascriptProcessingError> errors = libsJsWriter.compress(libs, libsWriter, outputFileName);
+            proccessBuildErrorsAndWarnings(errors);
+    
+            return new JavascriptResource(null, libsWriter.toString(), null);
+        }
     }
 
     @Override

@@ -15,16 +15,23 @@
  */
 package org.auraframework.util.javascript.builder;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
-import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
-import org.auraframework.util.resource.ResourceLoader;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.auraframework.util.javascript.JavascriptProcessingError;
+import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
+import org.auraframework.util.resource.ResourceLoader;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 
 public abstract class JavascriptBuilder {
+    
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
+    
     protected ResourceLoader resourceLoader;
 
     public JavascriptBuilder(ResourceLoader resourceLoader) {
@@ -48,4 +55,25 @@ public abstract class JavascriptBuilder {
     }
 
     public abstract JavascriptResource build(JavascriptGeneratorMode mode, boolean isCompat, String inputContent, String outputFileName) throws IOException;
+    
+    /**
+     * Takes the passe in errors/warnings and logs them to the logger.
+     * 
+     * @param errors The errors/warnings to process
+     */
+    protected void proccessBuildErrorsAndWarnings(final List<JavascriptProcessingError> errors) {
+        errors.stream().forEach(error -> {
+            switch(error.getLevel()) {
+                case Warning:
+                    logger.warn(error.toString());
+                    break;
+                case Error:
+                    logger.error(error.toString());
+                    break;
+                default:
+                    logger.info(error.toString());
+                    break;
+            }
+        });
+    }
 }

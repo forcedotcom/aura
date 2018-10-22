@@ -27,10 +27,10 @@ import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.DocumentationDefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.MetaDef;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
 import org.auraframework.pojo.Description;
 import org.auraframework.pojo.Example;
+import org.auraframework.pojo.Meta;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -82,7 +82,8 @@ public class DocumentationDefHandler extends FileTagHandler<DocumentationDef> {
         String tag = getTagName();
 
         if (DescriptionDefHandler.TAG.equalsIgnoreCase(tag)) {
-            Description desc = new DescriptionDefHandler(this, xmlReader, source).getElement();
+            Description desc = new DescriptionDefHandler(this,
+                    xmlReader, source).getElement();
             builder.addDescription(desc.getName(), desc);
 
         } else if (ExampleDefHandler.TAG.equalsIgnoreCase(tag)) {
@@ -90,8 +91,7 @@ public class DocumentationDefHandler extends FileTagHandler<DocumentationDef> {
             builder.addExample(ex.getName(), ex);
 
         } else if (MetaDefHandler.TAG.equalsIgnoreCase(tag)) {
-            MetaDef meta = new MetaDefHandler(this, xmlReader, source, isInInternalNamespace, definitionService,
-                    configAdapter, definitionParserAdapter).getElement();
+            Meta meta = new MetaDefHandler(this, xmlReader, source).getElement();
             builder.addMeta(meta.getName(), meta);
         } else {
             throw new XMLStreamException(String.format("<%s> cannot contain tag %s", getHandledTag(), tag));

@@ -16,7 +16,6 @@
 
 package org.auraframework.integration.test.documentation;
 
-import java.util.List;
 import java.util.Map;
 
 import org.auraframework.def.ApplicationDef;
@@ -29,6 +28,7 @@ import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.pojo.Meta;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -107,54 +107,56 @@ public class DocumentationDefTest extends AuraImplTestCase {
         assertNotNull("DocumentationDef not found!", docDef);
         assertEquals("Number DescriptionDefs don't match the expected value!", noOfDescs, docDef.getDescriptions().size());
     }
-    
+
     @Test
     public void testGetMetaDefs() throws Exception {
         String docDefSource = "<aura:documentation>" +
                 "<aura:description>random description</aura:description>" +
-                "<aura:meta name='foo' value='bar' />" + 
+                "<aura:meta name='foo' value='bar' />" +
                 "</aura:documentation>";
 
         DefDescriptor<DocumentationDef> dd = addSourceAutoCleanup(DocumentationDef.class, docDefSource);
-        DocumentationDef def = definitionService.getDefinition(dd);              
-        
+        DocumentationDef def = definitionService.getDefinition(dd);
+
         int expected = 1;
-        int actual = def.getMetaDefsAsMap().size();
-        
+        Map<String,Meta> metas = def.getMetasAsMap();
+        int actual = metas.size();
+
         assertEquals("Did not get expected number of meta defs", expected, actual);
+        assertEquals("Did not get expected meta tag", "bar", metas.get("foo").getEscapedValue());
     }
-    
+
     @Test
     public void testGetDescription() throws Exception {
         String docDefSource = "<aura:documentation>" +
                 "<aura:description>random description</aura:description>" +
-                "<aura:meta name='foo' value='bar' />" + 
+                "<aura:meta name='foo' value='bar' />" +
                 "</aura:documentation>";
 
         DefDescriptor<DocumentationDef> dd = addSourceAutoCleanup(DocumentationDef.class, docDefSource);
-        DocumentationDef def = definitionService.getDefinition(dd);              
-        
+        DocumentationDef def = definitionService.getDefinition(dd);
+
         int expected = 1;
         int actual = def.getDescriptionsAsMap().size();
-        
+
         assertEquals("Did not get expected number of meta defs", expected, actual);
     }
-    
+
     @Test
     public void testValidatesMetaDefs() throws Exception {
         String docDefSource = "<aura:documentation>" +
                 "<aura:description>random description</aura:description>" +
-                "<aura:meta />" + 
+                "<aura:meta />" +
                 "</aura:documentation>";
 
         DefDescriptor<DocumentationDef> dd = addSourceAutoCleanup(DocumentationDef.class, docDefSource);
-        
+
         try {
             definitionService.getDefinition(dd);
             fail("expected to get exception");
         } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "descriptor");
-        }  
+            checkExceptionStart(e, InvalidDefinitionException.class, "Invalid name");
+        }
     }
-   
+
 }

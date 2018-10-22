@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.auraframework.pojo.Description;
 import org.auraframework.pojo.Example;
+import org.auraframework.pojo.Meta;
 
 /**
  */
@@ -47,7 +48,7 @@ public interface DocumentationDef extends Definition {
     Map<String, Example> getExamplesAsMap();
 
     /**
-     * Gets the {@link MetaDef} within this documentation.
+     * Gets the {@link Meta} within this documentation.
      */
-    Map<String, MetaDef> getMetaDefsAsMap();
+    Map<String, Meta> getMetasAsMap();
 }

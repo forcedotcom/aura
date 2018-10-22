@@ -145,7 +145,6 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         TOKEN_DESCRIPTOR_PROVIDER(TokenDescriptorProviderDef.class), //
         TOKEN_MAP_PROVIDER(TokenMapProviderDef.class), //
         DOCUMENTATION(DocumentationDef.class), //
-        META(MetaDef.class), //
         TESTSUITE(TestSuiteDef.class), //
         TESTCASE(TestCaseDef.class), //
         PROVIDER(ProviderDef.class), //
@@ -226,7 +225,7 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
             this.clazz = clazz;
             this.bundle = bundle;
         }
-        
+
         public DescriptorKey(String name, Class<? extends Definition> clazz) {
             this(name, clazz, null);
         }

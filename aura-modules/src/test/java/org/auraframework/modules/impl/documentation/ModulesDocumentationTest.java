@@ -23,9 +23,9 @@ import javax.inject.Inject;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.MetaDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.pojo.Meta;
 import org.auraframework.service.DefinitionService;
 import org.junit.Test;
 
@@ -75,7 +75,7 @@ public class ModulesDocumentationTest extends AuraImplTestCase {
         DocumentationDef documentationDef = definition.getDocumentationDef();
         assertNotNull("documentation def should NOT be null", documentationDef);
 
-        Map<String, MetaDef> metaDefs = documentationDef.getMetaDefsAsMap();
+        Map<String, Meta> metaDefs = documentationDef.getMetasAsMap();
 
         int expectedSize = 6;
         int actualSize = metaDefs.size();

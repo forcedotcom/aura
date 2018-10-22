@@ -20,12 +20,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.DefinitionParserAdapter;
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.MetaDef;
-import org.auraframework.impl.root.MetaDefImpl;
-import org.auraframework.service.DefinitionService;
+import org.auraframework.pojo.Meta;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -33,9 +28,9 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Parses <aura:meta> tags into MetaDefImpl
+ * Parses <aura:meta> tags
  */
-public class MetaDefHandler extends ParentedTagHandler<MetaDefImpl, DocumentationDef> {
+public class MetaDefHandler extends BaseXMLElementHandler {
 
     public static final String TAG = "aura:meta";
 
@@ -44,13 +39,11 @@ public class MetaDefHandler extends ParentedTagHandler<MetaDefImpl, Documentatio
     private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(ATTRIBUTE_NAME,
             ATTRIBUTE_VALUE).addAll(RootTagHandler.ALLOWED_ATTRIBUTES).build();
 
-    private final MetaDefImpl.Builder builder = new MetaDefImpl.Builder();
+    private String name;
+    private String value;
 
-    public MetaDefHandler(DocumentationDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                          boolean isInInternalNamespace, DefinitionService definitionService,
-                          ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter,
-                definitionParserAdapter);
+    public MetaDefHandler(DocumentationDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source) {
+        super(xmlReader, source);
     }
 
     @Override
@@ -77,20 +70,14 @@ public class MetaDefHandler extends ParentedTagHandler<MetaDefImpl, Documentatio
 
     @Override
     protected void readAttributes() throws InvalidAccessValueException {
-        String name = getAttributeValue(ATTRIBUTE_NAME);
-        builder.setDescriptor(definitionService.getDefDescriptor(name, MetaDef.class));
-        
-        String value = getAttributeValue(ATTRIBUTE_VALUE);
-        builder.setValue(value);
+        this.name = getAttributeValue(ATTRIBUTE_NAME);
+        this.value = getAttributeValue(ATTRIBUTE_VALUE);
     }
 
-    @Override
-    protected void finishDefinition() throws QuickFixException {
-        builder.setLocation(getLocation());
-    }
-
-    @Override
-    protected MetaDefImpl createDefinition() throws QuickFixException {
-        return builder.build();
+    public Meta getElement() throws QuickFixException, XMLStreamException {
+        readElement();
+        Meta meta = new Meta(this.name, this.value, this.startLocation);
+        meta.validate();
+        return meta;
     }
 }

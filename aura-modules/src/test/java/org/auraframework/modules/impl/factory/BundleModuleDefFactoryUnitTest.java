@@ -43,7 +43,6 @@ import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.MetaDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
@@ -59,6 +58,7 @@ import org.auraframework.modules.impl.metadata.xml.MinApiVersionElementHandler;
 import org.auraframework.modules.impl.metadata.xml.ModuleMetadataXMLHandler;
 import org.auraframework.modules.impl.metadata.xml.RequireLockerElementHandler;
 import org.auraframework.modules.impl.metadata.xml.TagsElementHandler;
+import org.auraframework.pojo.Meta;
 import org.auraframework.service.CompilerService;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.ModulesCompilerService;
@@ -441,7 +441,7 @@ public class BundleModuleDefFactoryUnitTest {
         DefDescriptor<DocumentationDef> actualDesc = moduleDef.getDocumentationDef().getDescriptor();
         assertEquals("documentation def did not have expected descriptor", expectedDesc, actualDesc);
 
-        assertTrue("did not expect any meta values", documentationDef.getMetaDefsAsMap().isEmpty());
+        assertTrue("did not expect any meta values", documentationDef.getMetasAsMap().isEmpty());
         assertNull("did not expect to find auradoc documentation def", moduleDef.getAuraDocumentationDef());
     }
 
@@ -508,7 +508,7 @@ public class BundleModuleDefFactoryUnitTest {
         assertNotNull("description should be set", documentationDef.getDescriptionsAsMap());
         assertEquals(html, documentationDef.getDescriptionsAsMap().get("main").toString());
 
-        Map<String, MetaDef> metaDefsMap = documentationDef.getMetaDefsAsMap();
+        Map<String, Meta> metaDefsMap = documentationDef.getMetasAsMap();
 
         String expected = "string";
         String actual = metaDefsMap.get("string").getEscapedValue();

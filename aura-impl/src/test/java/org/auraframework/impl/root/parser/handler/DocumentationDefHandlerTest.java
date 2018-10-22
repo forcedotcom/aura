@@ -21,12 +21,12 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.MetaDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.factory.DocumentationXMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.pojo.Description;
 import org.auraframework.pojo.Example;
+import org.auraframework.pojo.Meta;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -249,10 +249,13 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
                 + "</aura:documentation>";
 
         DocumentationDef dd = parse(docDefSource);
+        Map<String,Meta> metas = dd.getMetasAsMap();
 
         assertThat("Did not add expected number of aura:meta defs",
-                   dd.getMetaDefsAsMap(),
+                   dd.getMetasAsMap(),
                    Matchers.aMapWithSize(2));
+        assertEquals("Did not get expected meta tag", "value1", metas.get("name1").getEscapedValue());
+        assertNotSame("Did not get expected meta tag", "value2", metas.get("name2").getEscapedValue());
     }
 
     private DocumentationDef parse(String markup) throws QuickFixException {

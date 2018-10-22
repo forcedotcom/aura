@@ -15,9 +15,8 @@
  */
 package org.auraframework.integration.test.documentation;
 
-import org.auraframework.def.MetaDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.MetaDefImpl;
+import org.auraframework.pojo.Meta;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
@@ -25,7 +24,7 @@ public class MetaDefImplTest extends AuraImplTestCase {
 
     @Test
     public void testGetName() throws Exception {
-        MetaDef def = buildDef("foo", "bar");
+        Meta def = buildDef("foo", "bar");
         
         String expected = "foo";
         String actual = def.getName();
@@ -35,7 +34,7 @@ public class MetaDefImplTest extends AuraImplTestCase {
 
     @Test
     public void testGetValue() throws Exception {
-        MetaDef def = buildDef("foo", "bar");
+        Meta def = buildDef("foo", "bar");
 
         String expected = "bar";
         String actual = def.getEscapedValue();
@@ -45,7 +44,7 @@ public class MetaDefImplTest extends AuraImplTestCase {
     
     @Test
     public void testGetEscapedValue() throws Exception {
-        MetaDef def = buildDef("foo", "foo&foo");
+        Meta def = buildDef("foo", "foo&foo");
 
         String expected = "foo&amp;foo";
         String actual = def.getEscapedValue();
@@ -57,7 +56,7 @@ public class MetaDefImplTest extends AuraImplTestCase {
     @Test
     public void validatesName() throws Exception {
         try {
-            buildDef("1", "bar").validateDefinition();  
+            buildDef("1", "bar").validate();  
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "Invalid name");
@@ -67,17 +66,14 @@ public class MetaDefImplTest extends AuraImplTestCase {
     @Test
     public void validatesValueIsSet() throws Exception {
         try {
-            buildDef("foo", null).validateDefinition();  
+            buildDef("foo", null).validate();  
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "Missing value");
         }
     }
 
-    private MetaDef buildDef(String name, String value) throws Exception {
-        MetaDefImpl.Builder builder = new MetaDefImpl.Builder();
-        builder.setDescriptor(definitionService.getDefDescriptor(name, MetaDef.class));
-        builder.setValue(value);
-        return builder.build();
+    private Meta buildDef(String name, String value) throws Exception {
+        return new Meta(name, value, null);
     }
 }

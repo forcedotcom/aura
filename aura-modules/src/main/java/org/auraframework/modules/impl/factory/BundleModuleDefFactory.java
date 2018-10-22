@@ -40,7 +40,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.MetaDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
@@ -51,7 +50,6 @@ import org.auraframework.def.module.impl.ModuleExampleImpl;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
 import org.auraframework.impl.root.AttributeDefImpl;
-import org.auraframework.impl.root.MetaDefImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
 import org.auraframework.impl.service.CompilerServiceImpl;
@@ -59,6 +57,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.modules.impl.metadata.ModulesMetadataService;
 import org.auraframework.pojo.Description;
+import org.auraframework.pojo.Meta;
 import org.auraframework.service.CompilerService;
 import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.system.AuraContext;
@@ -305,18 +304,18 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             docDefBuilder.addDescription("main", new Description("main", documentation.getHtml().get()));
 
             for (Entry<String, Object> entry : documentation.getMetadata().entrySet()) {
-                MetaDefImpl.Builder metaBuilder = new MetaDefImpl.Builder();
-                metaBuilder.setDescriptor(new DefDescriptorImpl<>(null, null, entry.getKey(), MetaDef.class));
                 Object value = entry.getValue();
+                String metaVal;
                 if (value instanceof Iterable) {
-                    metaBuilder.setValue(Joiner.on(",").join((Iterable<?>)value));
+                    metaVal = Joiner.on(",").join((Iterable<?>)value);
                 } else if (value instanceof Map) {
-                    metaBuilder.setValue(Joiner.on(",").withKeyValueSeparator("=").join((Map<?, ?>)value));
+                    metaVal = Joiner.on(",").withKeyValueSeparator("=").join((Map<?, ?>)value);
                 } else {
-                    metaBuilder.setValue(value.toString());
+                    metaVal = value.toString();
                 }
-                MetaDefImpl metaDef = metaBuilder.build();
-                docDefBuilder.addMeta(metaDef.getName(), metaDef);
+                Meta meta = new Meta(entry.getKey(), metaVal, 
+                        new Location(descriptor.getNamespace() + "/" + descriptor.getName(), -1));
+                docDefBuilder.addMeta(entry.getKey(), meta);
             }
 
             builder.setDocumentationDef(docDefBuilder.build());

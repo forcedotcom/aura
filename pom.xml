@@ -54,7 +54,7 @@
         <spring.version>4.3.6.RELEASE</spring.version>
         <jetty.version>9.4.5.v20170502</jetty.version>
         <eslint.extra.arg>--no-color</eslint.extra.arg>
-        <lwc.version>0.30.0</lwc.version>
+        <lwc.version>0.30.1</lwc.version>
         <java.hamcrest.version>2.0.0.0</java.hamcrest.version>
     </properties>
     <repositories>

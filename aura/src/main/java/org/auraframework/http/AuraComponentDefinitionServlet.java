@@ -152,6 +152,9 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                     // in non prod modes, we want to use hydration in order to make it easier for developers to debug
                     hydrationType = HYDRATION_TYPE.all;
                 }
+
+                // explicitly invoke the need to have a style context now, rather than later during serialization
+                context.getStyleContext();
     
                 serverService.writeDefinitions(descriptors.keySet(), responseStringWriter, false, 0, hydrationType, false);
     
@@ -321,15 +324,20 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
 
         for (String requestedDefDescriptor: requestedDescriptors) {
             Exception trackedException = null;
+            boolean found = false;
             for (Class<? extends Definition> defType : DESCRIPTOR_DEF_TYPES) {
                 try {
                     DefDescriptor<? extends Definition> defDescriptor = definitionService.getDefDescriptor(requestedDefDescriptor, defType);
-                    String uid = definitionService.getUid(null, defDescriptor);
-                    descriptors.put(defDescriptor, uid);
-                    trackedException = null;
-                    break;
+                    if (definitionService.exists(defDescriptor)) {
+                        String uid = definitionService.getUid(null, defDescriptor);
+                        descriptors.put(defDescriptor, uid);
+                        trackedException = null;
+                        found = true;
+                        break;
+                    }
                 } catch (Exception e) {
                     if (defType == ComponentDef.class) {
+                        // the ComponentDef exception takes precedence, if there was one.
                         trackedException = e;
                     } else if (trackedException == null) {
                         trackedException = e;
@@ -338,6 +346,10 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
             }
             if (trackedException != null) {
                 throw trackedException;
+            }
+            if (!found) {
+                // downstream consumers expect the 'Component' def descriptor not found exception to be raised
+                definitionService.getUid(null, definitionService.getDefDescriptor(requestedDefDescriptor, ComponentDef.class));
             }
         }
 

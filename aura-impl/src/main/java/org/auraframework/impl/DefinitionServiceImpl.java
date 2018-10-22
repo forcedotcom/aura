@@ -1052,8 +1052,8 @@ public class DefinitionServiceImpl implements DefinitionService {
 
         linker = new AuraLinker(descriptor, defsCache,
                 cachingService.getDefDescriptorByNameCache(),
-                loggingService, configAdapter, accessChecker, context.getAuraLocalStore(),
-                context.getAccessCheckCache(), context.getRegistries());
+                loggingService, configAdapter, accessChecker, context.getAuraLocalStore(), context.getAccessCheckCache(),
+                context.getRegistries(), context.getJsonSerializationContext());
 
         threadLinker.set(linker);
         try {
@@ -1105,6 +1105,10 @@ public class DefinitionServiceImpl implements DefinitionService {
             //
             DependencyEntry de = getDE(uid, descriptor);
             if (de != null) {
+                if (linker.getShouldCacheDependencies()) {
+                    // put unqualified descriptor key for dependency
+                    cachingService.getDepsCache().put(makeNonUidGlobalKey(descriptor), de);
+                }
                 return de;
             }
             Map<DefDescriptor<? extends Definition>, Definition> deps = Maps.newLinkedHashMap();
@@ -1217,7 +1221,8 @@ public class DefinitionServiceImpl implements DefinitionService {
         AuraLinker linker = new AuraLinker(null, defsCache,
                 cachingService.getDefDescriptorByNameCache(),
                 loggingService, configAdapter, accessChecker, context.getAuraLocalStore(),
-                context.getAccessCheckCache(), context.getRegistries());
+                context.getAccessCheckCache(), context.getRegistries(),
+                context.getJsonSerializationContext());
         linker.addMap(globalControllerDefRegistry.getAll());
         long startTime = System.currentTimeMillis();
         long incremental;

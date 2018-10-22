@@ -5,8 +5,8 @@
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]]
   ],
-  "cc":"$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:application\"\n  }\n};\n});\n",
   "lc":{
     "descriptor":"markup://aura:locationChange"
-  }
+  },
+  "cc":"$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:application\"\n  }\n};\n});\n"
 }

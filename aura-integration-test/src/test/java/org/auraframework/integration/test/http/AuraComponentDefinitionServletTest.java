@@ -112,6 +112,7 @@ public class AuraComponentDefinitionServletTest {
         Mockito.when(defDescriptorMock.getQualifiedName()).thenReturn("def:qualifiedName");
         Mockito.when(definitionService.getDefDescriptor(Matchers.eq("def"), Matchers.any())).thenReturn(defDescriptorMock);
         Mockito.when(definitionService.getUid(null, defDescriptorMock)).thenReturn("DIFFERENT_UID");
+        Mockito.when(definitionService.exists(defDescriptorMock)).thenReturn(true);
         Mockito.when(configAdapter.isSecureRequest(request)).thenReturn(true);
         Mockito.when(response.getWriter()).thenReturn(Mockito.mock(PrintWriter.class));
         Mockito.when(request.getHeader("Host")).thenReturn("example.host");
@@ -135,6 +136,7 @@ public class AuraComponentDefinitionServletTest {
         Mockito.when(defDescriptorMock.getQualifiedName()).thenReturn("def:qualifiedName");
         Mockito.when(definitionService.getDefDescriptor(Matchers.eq("def"), Matchers.any())).thenReturn(defDescriptorMock);
         Mockito.when(definitionService.getUid(null, defDescriptorMock)).thenReturn("UID");
+        Mockito.when(definitionService.exists(defDescriptorMock)).thenReturn(true);
         Mockito.when(configAdapter.isSecureRequest(request)).thenReturn(true);
         Mockito.when(response.getWriter()).thenReturn(Mockito.mock(PrintWriter.class));
         Mockito.when(request.getHeader("Host")).thenReturn("example.host");

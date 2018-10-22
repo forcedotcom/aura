@@ -15,13 +15,13 @@
  */
 package org.auraframework.impl.linker;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
@@ -33,7 +33,7 @@ import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DescriptorKey;
 import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
+import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraLocalStore;
@@ -43,6 +43,8 @@ import org.auraframework.system.RegistrySet;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.base.Optional;
@@ -64,6 +66,7 @@ public class AuraLinker {
     private final LoggingService loggingService;
     private final AuraLocalStore localStore;
     private final ConfigAdapter configAdapter;
+    private final JsonSerializationContext jsonSerializationContext;
     private final Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
     private final Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> descriptorCache;
     private final Map<String, String> accessCheckCache;
@@ -83,26 +86,30 @@ public class AuraLinker {
      */
     private boolean shouldCacheDependencies;
 
-    public AuraLinker(DefDescriptor<? extends Definition> topLevel,
-            Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache,
-            Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> descriptorCache,
-            LoggingService loggingService, ConfigAdapter configAdapter,
-            AccessChecker accessChecker, AuraLocalStore localStore,
-            Map<String, String> accessCheckCache,
-            RegistrySet registrySet) {
+    private boolean serializingLinkedDefinition = false;
 
-        this.defsCache = defsCache;
-        this.registries = registrySet;
-        this.accessCheckCache = accessCheckCache;
+    public AuraLinker(DefDescriptor<? extends Definition> topLevel,
+                      Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache,
+                      Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> descriptorCache,
+                      LoggingService loggingService, ConfigAdapter configAdapter,
+                      AccessChecker accessChecker, AuraLocalStore localStore,
+                      Map<String, String> accessCheckCache,
+                      RegistrySet registrySet, JsonSerializationContext jsonSerializationContext) {
+
         this.clientLibs = Lists.newArrayList();
-        this.topLevel = topLevel;
         this.level = 0;
         this.shouldCacheDependencies = true;
+
+        this.topLevel = topLevel;
+        this.defsCache = defsCache;
         this.descriptorCache = descriptorCache;
         this.loggingService = loggingService;
         this.configAdapter = configAdapter;
         this.accessChecker = accessChecker;
         this.localStore = localStore;
+        this.accessCheckCache = accessCheckCache;
+        this.registries = registrySet;
+        this.jsonSerializationContext = jsonSerializationContext;
     }
 
     public DefDescriptor<?> getTopLevel() {
@@ -290,6 +297,7 @@ public class AuraLinker {
     private <D extends Definition> D getHelper(@Nonnull DefDescriptor<D> descriptor,
             @Nonnull Set<DefDescriptor<?>> stack, @CheckForNull Definition parent) throws QuickFixException {
         loggingService.incrementNum(LoggingService.DEF_VISIT_COUNT);
+        boolean createdLinkedDefinition = !linked.containsKey(descriptor);
         LinkingDefinition<D> linkingDef = getLinkingDef(descriptor);
         try {
             if (stack.contains(descriptor)) {
@@ -342,6 +350,11 @@ public class AuraLinker {
                 level -= 1;
                 stack.remove(descriptor);
             }
+        } catch (QuickFixException qfe) {
+            if (createdLinkedDefinition) {
+                linked.remove(descriptor);
+            }
+            throw qfe;
         } finally {
             if (parent != null && linkingDef.def != null) {
                 accessChecker.assertAccess(parent.getDescriptor(), linkingDef.def, accessCheckCache);
@@ -399,6 +412,22 @@ public class AuraLinker {
                 localStore.addDefinition(linkingDef.descriptor, linkingDef.def);
                 if (linkingDef.built) {
                     if (linkingDef.cacheable) { // false for non-internal namespaces, or non-cacheable registries
+                        if (linkingDef.def instanceof BaseComponentDefImpl){
+                            serializingLinkedDefinition = true;
+                            boolean previousSerializationState = jsonSerializationContext.isSerializing();
+                            jsonSerializationContext.setSerializing(true);
+                            try {
+                                JsonEncoder json = new JsonEncoder(new StringBuilder(), false);
+                                json.writeMapBegin();
+                                ((BaseComponentDefImpl) linkingDef.def).serializeCacheableEntries(json);
+                            } catch (IOException io) {
+                                // ignored, StringBuilder shouldn't ever throw an IO exception when writing to it
+                                // if it does, then, we don't care either way and we'll serialize again later anyways
+                            } finally {
+                                serializingLinkedDefinition = false;
+                                jsonSerializationContext.setSerializing(previousSerializationState);
+                            }
+                        }
                         defsCache.put(linkingDef.descriptor, Optional.of(linkingDef.def));
                     }
                     linkingDef.def.markValid();
@@ -563,7 +592,9 @@ public class AuraLinker {
         LinkingDefinition<D> cd = (LinkingDefinition<D>) linked.get(descriptor);
         if (cd == null) {
             cd = new LinkingDefinition<>(descriptor);
-            linked.put(descriptor, cd);
+            if (!serializingLinkedDefinition) {
+                linked.put(descriptor, cd);
+            }
         }
         return cd;
     }

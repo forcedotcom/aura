@@ -31,14 +31,14 @@ import org.auraframework.instance.ValueProvider;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializers.NoneSerializer;
+import org.auraframework.util.json.JsonSerializable;
 
 import com.google.common.collect.Sets;
 
 /**
  * function calling expression
  */
-public class FunctionCallImpl implements FunctionCall {
+public class FunctionCallImpl implements FunctionCall, JsonSerializable {
 
     /**
      */
@@ -108,30 +108,25 @@ public class FunctionCallImpl implements FunctionCall {
         }
     }
 
-    public static final Serializer SERIALIZER = new Serializer();
+    @Override
+    public void serialize(Json json) throws IOException {
 
-    private static class Serializer extends NoneSerializer<FunctionCallImpl> {
+        StringBuilder out = new StringBuilder();
+        out.append("function(cmp,fn){return ");
+        this.compile(out);
+        out.append(";}");
 
-        @Override
-        public void serialize(Json json, FunctionCallImpl value) throws IOException {
+        // Use a set to remove duplicate properties
+        Set<PropertyReference> propRefs = Sets.newHashSetWithExpectedSize(2);
+        this.gatherPropertyReferences(propRefs);
 
-            StringBuilder out = new StringBuilder();
-            out.append("function(cmp, fn) { return ");
-            value.compile(out);
-            out.append("; }");
+        json.writeMapBegin();
+        json.writeMapEntry("exprType", this.getExpressionType());
+        json.writeMapKey("code");
+        json.writeString(out.toString());
+        json.writeMapEntry("args", propRefs);
+        json.writeMapEntry("byValue", this.byValue);
 
-            // Use a set to remove duplicate properties
-            Set<PropertyReference> propRefs = Sets.newHashSetWithExpectedSize(2);
-            value.gatherPropertyReferences(propRefs);
-
-            json.writeMapBegin();
-            json.writeMapEntry("exprType", value.getExpressionType());
-            json.writeMapKey("code");
-            json.writeString(out.toString());
-            json.writeMapEntry("args", propRefs);
-            json.writeMapEntry("byValue", value.byValue);
-
-            json.writeMapEnd();
-        }
+        json.writeMapEnd();
     }
 }

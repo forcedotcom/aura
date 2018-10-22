@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.expression;
 
+import java.io.IOException;
+import java.util.Set;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.ExpressionType;
@@ -25,16 +28,13 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializers.NoneSerializer;
+import org.auraframework.util.json.JsonSerializable;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.Set;
 
 /**
  * a literal number, string, boolean, or null
  */
-public class LiteralImpl implements Literal {
+public class LiteralImpl implements Literal, JsonSerializable {
 
     /**
      */
@@ -99,12 +99,8 @@ public class LiteralImpl implements Literal {
         // literals are always by value
     }
 
-    public static final Serializer SERIALIZER = new Serializer();
-
-    private static class Serializer extends NoneSerializer<LiteralImpl> {
-        @Override
-        public void serialize(Json json, LiteralImpl value) throws IOException {
-            json.writeValue(value.getValue());
-        }
+    @Override
+    public void serialize(Json json) throws IOException {
+        json.writeValue(this.getValue());
     }
 }

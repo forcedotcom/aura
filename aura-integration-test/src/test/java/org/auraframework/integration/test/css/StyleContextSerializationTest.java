@@ -15,8 +15,11 @@
  */
 package org.auraframework.integration.test.css;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import javax.inject.Inject;
+
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -35,10 +38,8 @@ import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 import org.springframework.context.annotation.Lazy;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Sets;
 
 /**
  * Comprehensive functional tests for serialization of app.css urls.
@@ -128,6 +129,8 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
         AuraContext ctx = contextService.getCurrentContext();
         String url = null;
 
+        // invoke compilation first
+        servletUtilAdapter.getScripts(ctx, true, false, null);
         for (String style : servletUtilAdapter.getStyles(ctx)) {
             if (style.endsWith("app.css")) {
                 url = style;

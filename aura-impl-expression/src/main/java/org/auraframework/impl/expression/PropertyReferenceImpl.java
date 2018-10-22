@@ -32,14 +32,14 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializers.NoneSerializer;
+import org.auraframework.util.json.JsonSerializable;
 
 import com.google.common.collect.ImmutableList;
 
 /**
  * an expression in aura
  */
-public class PropertyReferenceImpl implements PropertyReference {
+public class PropertyReferenceImpl implements PropertyReference, JsonSerializable {
 
     private static final long serialVersionUID = -6332112591620619082L;
 
@@ -188,19 +188,15 @@ public class PropertyReferenceImpl implements PropertyReference {
         return stringValue.hashCode();
     }
 
-    public static final Serializer SERIALIZER = new Serializer();
-
-    private static class Serializer extends NoneSerializer<PropertyReferenceImpl> {
-        @Override
-        public void serialize(Json json, PropertyReferenceImpl value) throws IOException {
-            json.writeMapBegin();
-            json.writeMapEntry("exprType", value.getExpressionType());
-            json.writeMapEntry("byValue", value.byValue);
-            if(value.target!=null){
-                json.writeMapEntry("target", value.target.getDescriptorName());
-            }
-            json.writeMapEntry("path", AuraTextUtil.collectionToString(value.pieces, ".", null));
-            json.writeMapEnd();
+    @Override
+    public void serialize(Json json) throws IOException {
+        json.writeMapBegin();
+        json.writeMapEntry("exprType", this.getExpressionType());
+        json.writeMapEntry("byValue", this.byValue);
+        if(this.target!=null){
+            json.writeMapEntry("target", this.target.getDescriptorName());
         }
+        json.writeMapEntry("path", AuraTextUtil.collectionToString(this.pieces, ".", null));
+        json.writeMapEnd();
     }
 }

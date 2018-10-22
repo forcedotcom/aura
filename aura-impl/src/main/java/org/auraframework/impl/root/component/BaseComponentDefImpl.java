@@ -99,6 +99,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     public static final DefDescriptor<InterfaceDef> ROOT_MARKER = new DefDescriptorImpl<>(
             "markup", "aura", "rootComponent", InterfaceDef.class);
 
+    private static final String AURA_COMPONENT_DESCRIPTOR = "markup://aura:component";
+
     private final boolean isAbstract;
     private final boolean isExtensible;
     private final boolean isTemplate;
@@ -155,7 +157,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     private transient Boolean localDeps = null;
     private transient QuickFixException componentBuildError;
-    protected transient Map<String,String> serializedJSON;
+    private Map<String,String> serializedJSON;
     protected final static String SERIALIZED_JSON_NO_FORMATTING_KEY = "no-format";
 
     private static <X extends Definition> DefDescriptor<X> getFirst(List<DefDescriptor<X>> list) {
@@ -385,18 +387,15 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             localDeps = Boolean.TRUE;
             return;
         }
-
         if (clientRendererDef == null && rendererDescriptor != null) {
             localDeps = Boolean.TRUE;
             return;
         }
 
-
         if (clientProviderDef == null && providerDescriptors != null && providerDescriptors.size() > 0) {
             localDeps = Boolean.TRUE;
             return;
         }
-
         // Walk the super component tree applying slightly different dependency rules.
         // For super defs, we only check for renderer or model dependencies.
         // This should die, somehow.
@@ -489,7 +488,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             // GO - This is a bit of a hack. We should probably have a better way of telling.
             //
             if (isTemplate() && !parentDef.isTemplate()
-                    && !extendsDescriptor.getQualifiedName().equals("markup://aura:component")) {
+                    && !AURA_COMPONENT_DESCRIPTOR.equals(extendsDescriptor.getQualifiedName())) {
                 throw new InvalidDefinitionException(String.format(
                         "Template %s cannot extend non-template %s", getDescriptor(),
                         extendsDescriptor), getLocation());
@@ -1042,7 +1041,118 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             }
         }
     }
-    
+
+    public void serializeCacheableEntries(Json json) throws IOException, QuickFixException {
+
+        String indent = SERIALIZED_JSON_NO_FORMATTING_KEY;
+        if (json.getSerializationContext().format()) {
+            indent = json.getIndent();
+        }
+
+        if (serializedJSON != null && serializedJSON.containsKey(indent) && StringUtils.isNotEmpty(serializedJSON.get(indent))) {
+            if (!serializedJSON.get(indent).startsWith(",")) {
+                json.writeComma();
+            }
+            json.writeLiteral(serializedJSON.get(indent));
+            return;
+        }
+
+        json.startCapturing();
+        ControllerDef controllerDef = getControllerDef();
+        if (controllerDef != null && hasServerAction(controllerDef)) {
+            json.writeMapEntry(ApplicationKey.CONTROLLERDEF, controllerDef);
+        }
+
+        json.writeMapEntry(ApplicationKey.MODELDEF, getModelDef());
+
+        if (getSuperDef() != null && !AURA_COMPONENT_DESCRIPTOR.equals(getSuperDef().getDescriptor().getQualifiedName())) {
+            json.writeMapEntry(ApplicationKey.SUPERDEF, getSuperDef().getDescriptor());
+        }
+
+        Collection<AttributeDef> attributeDefs = getAttributeDefs().values();
+        if (!attributeDefs.isEmpty()) {
+            json.writeMapEntry(ApplicationKey.ATTRIBUTEDEFS, attributeDefs);
+        }
+
+        Collection<MethodDef> methodDefs = getMethodDefs().values();
+        if (!methodDefs.isEmpty()) {
+            json.writeMapEntry(ApplicationKey.METHODDEFS, methodDefs);
+        }
+
+        Collection<RequiredVersionDef> requiredVersionDefs = getRequiredVersionDefs().values();
+        if (requiredVersionDefs != null && !requiredVersionDefs.isEmpty()) {
+            json.writeMapEntry(ApplicationKey.REQUIREDVERSIONDEFS, requiredVersionDefs);
+        }
+
+        Set<DefDescriptor<InterfaceDef>> allInterfaces = getAllInterfaces();
+        if (allInterfaces != null && !allInterfaces.isEmpty()) {
+            json.writeMapEntry(ApplicationKey.INTERFACES, allInterfaces);
+        }
+
+        Collection<RegisterEventDef> regevents = getRegisterEventDefs().values();
+        if (!regevents.isEmpty()) {
+            json.writeMapEntry(ApplicationKey.REGISTEREVENTDEFS, regevents);
+        }
+
+        Collection<EventHandlerDef> handlers = getHandlerDefs();
+        if (!handlers.isEmpty()) {
+            json.writeMapEntry(ApplicationKey.HANDLERDEFS, handlers);
+        }
+
+        Map<String, LocatorDef> locatorDefs = getLocators();
+        if (locatorDefs!=null && !locatorDefs.isEmpty()) {
+            json.writeMapEntry(ApplicationKey.LOCATORDEFS, locatorDefs);
+        }
+
+        if (!facets.isEmpty()) {
+            json.writeMapEntry(ApplicationKey.FACETS, facets);
+        }
+
+        boolean local = hasLocalDependencies();
+
+        if (local) {
+            json.writeMapEntry(ApplicationKey.HASSERVERDEPENDENCIES, true);
+        }
+
+        if (isAbstract) {
+            json.writeMapEntry(ApplicationKey.ABSTRACT, isAbstract);
+        }
+
+        if (subDefs != null) {
+            json.writeMapEntry(ApplicationKey.SUBDEFS, subDefs.values());
+        }
+
+        String defaultFlavorToSerialize = getDefaultFlavorOrImplicit();
+        if (defaultFlavorToSerialize != null) {
+            json.writeMapEntry(ApplicationKey.DEFAULTFLAVOR, defaultFlavorToSerialize);
+        }
+
+        if (hasFlavorableChild) {
+            json.writeMapEntry(ApplicationKey.FLAVORABLECHILD, true);
+        }
+
+        if (dynamicallyFlavorable) {
+            json.writeMapEntry(ApplicationKey.DYNAMICALLYFLAVORABLE, dynamicallyFlavorable);
+        }
+
+        if(this.minVersion != null) {
+            json.writeMapEntry(ApplicationKey.MINVERSION, this.minVersion);
+        }
+
+        if (serializedJSON == null) {
+            synchronized (this) {
+                if (serializedJSON == null) {
+                    serializedJSON = new HashMap<>();
+                }
+            }
+        }
+        serializedJSON.put(indent, StringUtils.trim(json.stopCapturing()));
+    }
+
+    protected void serializeVolatileEntries(Json json) throws IOException {
+        serializeStyles(json);
+    }
+
     /**
      * Serialize this component to json. The output will include all of the attributes, events, and handlers inherited.
      * It doesn't yet include inherited ComponentDefRefs, but maybe it should.
@@ -1063,104 +1173,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 json.writeValue(getAccess());
                 json.writeMapEntry(ApplicationKey.DESCRIPTOR, descriptor);
 
-                serializeStyles(json);
+                serializeVolatileEntries(json);
                 
-                json.startCapturing();
-                ControllerDef controllerDef = getControllerDef();
-                if (controllerDef != null && hasServerAction(controllerDef)) {
-                    json.writeMapEntry(ApplicationKey.CONTROLLERDEF, controllerDef);
-                }
-                
-                json.writeMapEntry(ApplicationKey.MODELDEF, getModelDef());
-
-                if (getSuperDef() != null && !getSuperDef().getDescriptor().getQualifiedName().equals("markup://aura:component")) {
-                    json.writeMapEntry(ApplicationKey.SUPERDEF, getSuperDef().getDescriptor());
-                }
-
-                Collection<AttributeDef> attributeDefs = getAttributeDefs().values();
-                if (!attributeDefs.isEmpty()) {
-                    json.writeMapEntry(ApplicationKey.ATTRIBUTEDEFS, attributeDefs);
-                }
-
-                Collection<MethodDef> methodDefs = getMethodDefs().values();
-                if (!methodDefs.isEmpty()) {
-                    json.writeMapEntry(ApplicationKey.METHODDEFS, methodDefs);
-                }
-
-                Collection<RequiredVersionDef> requiredVersionDefs = getRequiredVersionDefs().values();
-                if (requiredVersionDefs != null && !requiredVersionDefs.isEmpty()) {
-                    json.writeMapEntry(ApplicationKey.REQUIREDVERSIONDEFS, requiredVersionDefs);
-                }
-
-                Set<DefDescriptor<InterfaceDef>> allInterfaces = getAllInterfaces();
-                if (allInterfaces != null && !allInterfaces.isEmpty()) {
-                    json.writeMapEntry(ApplicationKey.INTERFACES, allInterfaces);
-                }
-
-                Collection<RegisterEventDef> regevents = getRegisterEventDefs().values();
-                if (!regevents.isEmpty()) {
-                    json.writeMapEntry(ApplicationKey.REGISTEREVENTDEFS, regevents);
-                }
-
-                Collection<EventHandlerDef> handlers = getHandlerDefs();
-                if (!handlers.isEmpty()) {
-                    json.writeMapEntry(ApplicationKey.HANDLERDEFS, handlers);
-                }
-
-                Map<String, LocatorDef> locatorDefs = getLocators();
-                if (locatorDefs!=null && !locatorDefs.isEmpty()) {
-                    json.writeMapEntry(ApplicationKey.LOCATORDEFS, locatorDefs);
-                }
-
-                if (!facets.isEmpty()) {
-                    json.writeMapEntry(ApplicationKey.FACETS, facets);
-                }
-
-                boolean local = hasLocalDependencies();
-
-                if (local) {
-                    json.writeMapEntry(ApplicationKey.HASSERVERDEPENDENCIES, true);
-                }
-
-                if (isAbstract) {
-                    json.writeMapEntry(ApplicationKey.ABSTRACT, isAbstract);
-                }
-
-                if (subDefs != null) {
-                    json.writeMapEntry(ApplicationKey.SUBDEFS, subDefs.values());
-                }
-
-                String defaultFlavorToSerialize = getDefaultFlavorOrImplicit();
-                if (defaultFlavorToSerialize != null) {
-                    json.writeMapEntry(ApplicationKey.DEFAULTFLAVOR, defaultFlavorToSerialize);
-                }
-
-                if (hasFlavorableChild) {
-                    json.writeMapEntry(ApplicationKey.FLAVORABLECHILD, true);
-                }
-
-                if (dynamicallyFlavorable) {
-                    json.writeMapEntry(ApplicationKey.DYNAMICALLYFLAVORABLE, dynamicallyFlavorable);
-                }
-
-                if(this.minVersion != null) {
-                    json.writeMapEntry(ApplicationKey.MINVERSION, this.minVersion);
-                }
+                serializeCacheableEntries(json);
 
                 serializeFields(json);
-                if (serializedJSON == null) {
-                    synchronized (this) {
-                        if (serializedJSON == null) {
-                            serializedJSON = new HashMap<>();
-                        }
-                    }
-                }
-                String indent = SERIALIZED_JSON_NO_FORMATTING_KEY;
-                if (json.getSerializationContext().format()) {
-                    indent = json.getIndent();
-                }
-                serializedJSON.put(indent, json.stopCapturing());
-                
+
                 serializeContextDependencies(context, json);
                 
                 json.writeMapEnd();

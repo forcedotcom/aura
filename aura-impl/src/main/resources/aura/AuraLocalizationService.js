@@ -21,21 +21,31 @@
  * @platform
  */
 function AuraLocalizationService() {
+    /** @type {?NumberFormat} */
     this.numberFormat = undefined;
+    /** @type {?NumberFormat} */
     this.percentFormat = undefined;
+    /** @type {?NumberFormat} */
     this.currencyFormat = undefined;
     // moment.js must be loaded before we can use date/time related APIs
 
+    /** @const {!string} */
     this.ZERO = "0";
 
+    /**
+     * @const
+     * @enum {!string}
+     */
     this.momentLanguages = {
         "iw": "he", // Hebrew
         "in": "id", // Indonesian
         "no": "nb"  // Norwegian
     };
+    /** @dict */
     this.momentLocaleCache = {};
 
     // needs to hardcode some locales which are not identified by browers
+    /** @dict */
     this.intlLocaleCache = {
         "no_NO": "nb",
         "tl_PH": "fil",
@@ -44,19 +54,32 @@ function AuraLocalizationService() {
         "sh_CS": "hr"
     };
 
+    /** @dict */
     this.timeZoneFormatCache = {};
 
+    /** @dict */
     this.dateTimeFormatCache = {};
+    /** @dict */
     this.localeCache = {};
 
+    /**
+     * @const
+     */
     this.cache = {
+        /** @dict */
         format : {},
+        /** @dict */
         strictModeFormat : {}
     };
 
+    /** @dict */
     this.dateTimeUnitAlias = {};
 
     // common time zones which are not supported by Intl API
+    /**
+     * @const
+     * @enum {!string}
+     */
     this.timeZoneMap = {
         "US/Alaska": "America/Anchorage",
         "US/Aleutian": "America/Adak",
@@ -74,23 +97,28 @@ function AuraLocalizationService() {
     };
 
     // [dateString, delimiter, timeString, offsetString]
+    /** @const {!RegExp} */
     this.ISO_REGEX = /^\s*((?:\d{4})-(?:\d\d-\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:\.\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+    /** @const {!RegExp} */
     this.ISO_REGEX_NO_DASH = /^\s*((?:\d{4})(?:\d\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:\.\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
     // hh:mm, hh:mm:ss, hh:mm:ss.SSS, hh:mmZ, hh:mm:ssZ, hh:mm:ss.SSSZ
+    /** @const {!RegExp} */
     this.ISO_TIME_REGEX = /^\s*(\d\d:\d\d(?::\d\d(?:\.\d+)?)?)((?:[\+\-]\d\d(?::?\d\d)?)|(?:\s*Z))?$/;
     // month/day/year, hour:minute
+    /** @const {!RegExp} */
     this.EN_US_DATETIME_PATTERN = /(\d{1,2})\/(\d{1,2})\/(\d{4})\D+(\d{1,2}):(\d{1,2})/;
-
+    /** @const {!RegExp} */
     this.ISO_OFFSET_PATTERN = /(Z)|([+-]\d\d):?(\d\d)/;
 
     // The order matters
+    /** @const {!Array<!RegExp>} */
     this.ISO_DATE_PATTERNS = [
         /(\d{4})-(\d\d)-(\d\d)/,
         /(\d{4})-(\d\d)/,
         /(\d{4})(\d\d)(\d\d)/,
         /(\d{4})/
     ];
-
+    /** @const {!Array<!RegExp>} */
     this.ISO_TIME_PATTERNS = [
         /(\d\d):(\d\d):(\d\d)\.(\d+)/,
         /(\d\d):(\d\d):(\d\d)/,
@@ -100,24 +128,33 @@ function AuraLocalizationService() {
         /(\d\d)(\d\d)/,
         /(\d\d)/
     ];
-
+    /** @const {!RegExp} */
     this.UNSIGNED_NUMBER  = /\d+/;  // 0 - infinte
+    /** @const {!RegExp} */
     this.DIGIT1 = /\d/; // 0 - 9
+    /** @const {!RegExp} */
     this.DIGIT2 = /\d\d/; // 00 - 99
+    /** @const {!RegExp} */
     this.DIGIT3 = /\d{3}/; // 000 - 999
+    /** @const {!RegExp} */
     this.DIGIT4 = /\d{4}/; // 0000 - 9999
+    /** @const {!RegExp} */
     this.DIGIT1_2 = /\d{1,2}/; // 0 - 99
+    /** @const {!RegExp} */
     this.DIGIT1_3 = /\d{1,3}/; // 0 - 999
+    /** @const {!RegExp} */
     this.DIGIT1_4 = /\d{1,4}/; // 0 - 9999
 
+    /** @const {!RegExp} */
     this.HOUR_MIN = /(\d{1,2})(\d\d)/; // hmm
+    /** @const {!RegExp} */
     this.HOUR_MIN_SEC = /(\d{1,2})(\d\d)(\d\d)/; // hmmss
 }
 
 /**
  * Formats a number with the default number format.
- * @param {Number} number - The number to be formatted.
- * @return {Number} The formatted number
+ * @param {number} number - The number to be formatted.
+ * @return {number} The formatted number
  * @memberOf AuraLocalizationService
  * @example
  * var num = 10000;
@@ -133,8 +170,8 @@ AuraLocalizationService.prototype.formatNumber = function(number) {
 
 /**
  * Returns a formatted percentage number based on the default percentage format.
- * @param {Number} number - The number to be formatted.
- * @return {Number} The formatted percentage
+ * @param {number} number - The number to be formatted.
+ * @return {number} The formatted percentage
  * @memberOf AuraLocalizationService
  * @example
  * var num = 0.54;
@@ -150,8 +187,8 @@ AuraLocalizationService.prototype.formatPercent = function(number) {
 
 /**
  * Returns a currency number based on the default currency format.
- * @param {Number} number - The currency number to be formatted.
- * @return {Number} The formatted currency
+ * @param {number} number - The currency number to be formatted.
+ * @return {number} The formatted currency
  * @memberOf AuraLocalizationService
  * @example
  * var curr = 123.45;
@@ -168,9 +205,9 @@ AuraLocalizationService.prototype.formatCurrency = function(number) {
 
 /**
  * Returns a NumberFormat object.
- * @param {String} format - The number format. <code>format=".00"</code> displays the number followed by two decimal places.
- * @param {String} symbols
- * @return {Number} The number format
+ * @param {string} format - The number format. <code>format=".00"</code> displays the number followed by two decimal places.
+ * @param {string} symbols
+ * @return {number} The number format
  * @memberOf AuraLocalizationService
  * @example
  * var f = $A.get("$Locale.numberFormat");
@@ -189,7 +226,7 @@ AuraLocalizationService.prototype.getNumberFormat = function(format, symbols) {
 
 /**
  * Returns the default NumberFormat object.
- * @return {Number} The number format returned by <code>$Locale.numberFormat</code>.
+ * @return {number} The number format returned by <code>$Locale.numberFormat</code>.
  * @memberOf AuraLocalizationService
  * @example
  * // Returns 20,000.123
@@ -208,7 +245,7 @@ AuraLocalizationService.prototype.getDefaultNumberFormat = function() {
 
 /**
  * Returns the default percentage format.
- * @return {Number} The percentage format returned by <code>$Locale.percentFormat</code>.
+ * @return {number} The percentage format returned by <code>$Locale.percentFormat</code>.
  * @memberOf AuraLocalizationService
  * @example
  * // Returns 20%
@@ -226,7 +263,7 @@ AuraLocalizationService.prototype.getDefaultPercentFormat = function() {
 
 /**
  * Returns the default currency format.
- * @return {Number} The currency format returned by <code>$Locale.currencyFormat</code>.
+ * @return {number} The currency format returned by <code>$Locale.currencyFormat</code>.
  * @memberOf AuraLocalizationService
  * @example
  * // Returns $20,000.00
@@ -245,8 +282,8 @@ AuraLocalizationService.prototype.getDefaultCurrencyFormat = function() {
 /**
  * Displays a length of time.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @param {Boolean} withSuffix - If true, returns value with the suffix
- * @return {String} a String of a length of time
+ * @param {boolean} withSuffix - If true, returns value with the suffix
+ * @return {string} a String of a length of time
  * @memberOf AuraLocalizationService
  * @public
  * @example
@@ -267,7 +304,7 @@ AuraLocalizationService.prototype.displayDuration = function(duration, withSuffi
 /**
  * Displays a length of time in days.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The length of time in days.
+ * @return {number} The length of time in days.
  * @memberOf AuraLocalizationService
  * @public
  * @example
@@ -288,7 +325,7 @@ AuraLocalizationService.prototype.displayDurationInDays = function(duration) {
 /**
  * Displays a length of time in hours.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The length of time in hours.
+ * @return {number} The length of time in hours.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(2, 'day');
@@ -309,7 +346,7 @@ AuraLocalizationService.prototype.displayDurationInHours = function(duration) {
 /**
  * Displays a length of time in milliseconds.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The length of time in milliseconds.
+ * @return {number} The length of time in milliseconds.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(1, 'hour');
@@ -330,7 +367,7 @@ AuraLocalizationService.prototype.displayDurationInMilliseconds = function(durat
 /**
  * Displays a length of time in minutes.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The length of time in minutes.
+ * @return {number} The length of time in minutes.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(1, 'hour');
@@ -351,7 +388,7 @@ AuraLocalizationService.prototype.displayDurationInMinutes = function(duration) 
 /**
  * Displays a length of time in months.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The length of time in months.
+ * @return {number} The length of time in months.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(60, 'day');
@@ -372,7 +409,7 @@ AuraLocalizationService.prototype.displayDurationInMonths = function(duration) {
 /**
  * Displays a length of time in seconds.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The length of time in seconds.
+ * @return {number} The length of time in seconds.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(60, 'minutes');
@@ -393,7 +430,7 @@ AuraLocalizationService.prototype.displayDurationInSeconds = function(duration) 
 /**
  * Displays a length of time in years.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The length of time in years.
+ * @return {number} The length of time in years.
  * @memberOf AuraLocalizationService
  * example
  * var dur = $A.localizationService.duration(6, 'month');
@@ -413,8 +450,8 @@ AuraLocalizationService.prototype.displayDurationInYears = function(duration) {
 
 /**
  * Creates an object representing a length of time.
- * @param {Number} num - The length of time in a given unit
- * @param {String} unit - A datetime unit. The default is milliseconds. Options: years, months, weeks, days, hours, minutes, seconds, milliseconds
+ * @param {number} num - The length of time in a given unit
+ * @param {string} unit - A datetime unit. The default is milliseconds. Options: years, months, weeks, days, hours, minutes, seconds, milliseconds
  * @return {Object} A duration object
  * @memberOf AuraLocalizationService
  * @example
@@ -429,16 +466,16 @@ AuraLocalizationService.prototype.duration = function(num, unit) {
 
 /**
  * Formats a date.
- * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {String} [formatString] - (optional) A string containing tokens to format the given date. For example, "yyyy-MM-dd" formats 15th January, 2017 as "2017-01-15".
+ * @param {string} [formatString] - (optional) A string containing tokens to format the given date. For example, "yyyy-MM-dd" formats 15th January, 2017 as "2017-01-15".
  *   The default format string comes from the $Locale value provider.
  *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {String} [locale] - (optional) A locale to format the given date.
+ * @param {string} [locale] - (optional) A locale to format the given date.
  *   The default value is from $Locale.langLocale.
  *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
  *   It falls back to the value in $Locale.langLocale if using unavailable locale.
- * @return {String} A formatted and localized date string.
+ * @return {string} A formatted and localized date string.
  *
  * @memberOf AuraLocalizationService
  * @example
@@ -466,16 +503,16 @@ AuraLocalizationService.prototype.formatDate = function(date, formatString, loca
 
 /**
  * Formats a time.
- * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {String} [formatString] - (optional) A string containing tokens to format the given date.
+ * @param {string} [formatString] - (optional) A string containing tokens to format the given date.
  *   The default format string comes from the $Locale value provider.
  *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {String} [locale] - (optional) A locale to format the given date.
+ * @param {string} [locale] - (optional) A locale to format the given date.
  *   The default value is from $Locale.langLocale.
  *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
  *   It falls back to the value in $Locale.langLocale if using unavailable locale.
- * @return {String} A formatted and localized time string.
+ * @return {string} A formatted and localized time string.
  *
  * @memberOf AuraLocalizationService
  * @example
@@ -503,16 +540,16 @@ AuraLocalizationService.prototype.formatTime = function(date, formatString, loca
 
 /**
  * Formats a datetime.
- * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {String} [formatString] - (optional) A string containing tokens to format the given date.
+ * @param {string} [formatString] - (optional) A string containing tokens to format the given date.
  *   The default format string comes from the $Locale value provider.
  *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {String} [locale] - (optional) A locale to format the given date.
+ * @param {string} [locale] - (optional) A locale to format the given date.
  *   The default value is from $Locale.langLocale.
  *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
  *   It falls back to the value in $Locale.langLocale if using unavailable locale.
- * @return {String} A formatted and localized date time string.
+ * @return {string} A formatted and localized date time string.
  *
  * @memberOf AuraLocalizationService
  * @example
@@ -531,18 +568,17 @@ AuraLocalizationService.prototype.formatDateTime = function(date, formatString, 
                 null, "AuraLocalizationService.formatDateTime(moment)");
 
         date = date["toDate"]();
-    }
-    else if (typeof date === "string") {
+    } else if (typeof date === "string") {
 
-        if (!this.isISO8601DateTimeString(date)) {
+        if (this.isISO8601DateTimeString(date)) {
+            date = this.parseDateTimeISO8601(date);
+        } else {
             $A.warning("LocalizationService.parseDateTimeISO8601: The provided datetime string is not in ISO8601 format. " +
                     "It will be parsed by native Date(), which may have different results across browsers and versions. " + date);
 
             date = new Date(date);
             // Date parsing includes browser timezone offset. For formatting, we need to respect the numbers in the string.
             date.setTime(date.getTime() + date.getTimezoneOffset() * 6e4); // 60 * 1000
-        } else {
-            date = this.parseDateTimeISO8601(date);
         }
     } else {
         date = this.normalizeDateTimeInput(date);
@@ -566,16 +602,16 @@ AuraLocalizationService.prototype.formatDateTime = function(date, formatString, 
 
 /**
  * Formats a date in UTC.
- * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {String} [formatString] - (optional) A string containing tokens to format the given date. For example, "yyyy-MM-dd" formats 15th January, 2017 as "2017-01-15".
+ * @param {string} [formatString] - (optional) A string containing tokens to format the given date. For example, "yyyy-MM-dd" formats 15th January, 2017 as "2017-01-15".
  *   The default format string comes from the $Locale value provider.
  *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {String} [locale] - (optional) A locale to format the given date.
+ * @param {string} [locale] - (optional) A locale to format the given date.
  *   The default value is from $Locale.langLocale.
  *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
  *   It falls back to the value in $Locale.langLocale if using unavailable locale.
- * @return {String} A formatted and localized date string.
+ * @return {string} A formatted and localized date string.
  *
  * @memberOf AuraLocalizationService
  * @example
@@ -603,16 +639,16 @@ AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, l
 
 /**
  * Formats a time in UTC.
- * * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {String} [formatString] - (optional) A string containing tokens to format the given date.
+ * @param {string} [formatString] - (optional) A string containing tokens to format the given date.
  *   The default format string comes from the $Locale value provider.
  *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {String} [locale] - (optional) A locale to format the given date.
+ * @param {string} [locale] - (optional) A locale to format the given date.
  *   The default value is from $Locale.langLocale.
  *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
  *   It falls back to the value in $Locale.langLocale if using unavailable locale.
- * @return {String} A formatted and localized time string.
+ * @return {string} A formatted and localized time string.
  *
  * @memberOf AuraLocalizationService
  * @example
@@ -640,16 +676,16 @@ AuraLocalizationService.prototype.formatTimeUTC = function(date, formatString, l
 
 /**
  * Formats a datetime in UTC.
-  * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+  * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {String} [formatString] - (optional) A string containing tokens to format the given date.
+ * @param {string} [formatString] - (optional) A string containing tokens to format the given date.
  *   The default format string comes from the $Locale value provider.
  *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {String} [locale] - (optional) A locale to format the given date.
+ * @param {string} [locale] - (optional) A locale to format the given date.
  *   The default value is from $Locale.langLocale.
  *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
  *   It falls back to the value in $Locale.langLocale if using unavailable locale.
- * @return {String} A formatted and localized date time string.
+ * @return {string} A formatted and localized date time string.
  *
  * @example
  * var date = new Date();
@@ -665,8 +701,7 @@ AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatStrin
                 null, "AuraLocalizationService.formatDateTimeUTC(moment)");
 
         date = date["toDate"]();
-    }
-    else if (typeof date === "string") {
+    } else if (typeof date === "string") {
         var config = this.parseISOStringToConfig(date);
         if (config === null) {
             return "Invalid Date";
@@ -705,7 +740,7 @@ AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatStrin
 /**
  * Gets the number of days in a duration.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The number of days in duration.
+ * @return {number} The number of days in duration.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(48, 'hour');
@@ -726,7 +761,7 @@ AuraLocalizationService.prototype.getDaysInDuration = function(duration) {
 /**
  * Gets the number of hours in a duration.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The number of hours in duration.
+ * @return {number} The number of hours in duration.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(60, 'minute');
@@ -747,7 +782,7 @@ AuraLocalizationService.prototype.getHoursInDuration = function(duration) {
 /**
  * Gets the number of milliseconds in a duration.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The number of milliseconds in duration.
+ * @return {number} The number of milliseconds in duration.
  * @memberOf AuraLocalizationService
  * @public
  * @export
@@ -764,7 +799,7 @@ AuraLocalizationService.prototype.getMillisecondsInDuration = function(duration)
 /**
  * Gets the number of minutes in a duration.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The number of minutes in duration.
+ * @return {number} The number of minutes in duration.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(60, 'second');
@@ -785,7 +820,7 @@ AuraLocalizationService.prototype.getMinutesInDuration = function(duration) {
 /**
  * Gets the number of months in a duration.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The number of months in duration.
+ * @return {number} The number of months in duration.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(70, 'day');
@@ -806,7 +841,7 @@ AuraLocalizationService.prototype.getMonthsInDuration = function(duration) {
 /**
  * Gets the number of seconds in a duration.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The number of seconds in duration.
+ * @return {number} The number of seconds in duration.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(3000, 'millisecond');
@@ -827,7 +862,7 @@ AuraLocalizationService.prototype.getSecondsInDuration = function(duration) {
 /**
  * Gets the number of years in a duration.
  * @param {Duration} duration - The duration object returned by $A.localizationService.duration
- * @return {Number} The number of years in duration.
+ * @return {number} The number of years in duration.
  * @memberOf AuraLocalizationService
  * @example
  * var dur = $A.localizationService.duration(24, 'month');
@@ -864,9 +899,8 @@ AuraLocalizationService.prototype.getLocalizedDateTimeLabels = function() {
 
 /**
  * Get today's date based on a time zone.
- * @param {String} timezone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
- * @param {Function} callback - A function to be called after the "today" value is obtained
- * @return {String} the ISO8601 date string (yyyy-MM-dd).
+ * @param {string} timezone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
+ * @param {!function(!string)} callback - A function to be called after the "today" value is obtained
  * @memberOf AuraLocalizationService
  * @public
  * @export
@@ -879,9 +913,9 @@ AuraLocalizationService.prototype.getToday = function(timezone, callback) {
 
 /**
  * Get the date's date string based on a time zone.
- * @param {String} timeZone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
- * @param {Date} date - A Date object
- * @param {Function} callback - A function to be called after the date string is obtained
+ * @param {string} timeZone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
+ * @param {!Date} date - A Date object
+ * @param {!function(!string)} callback - A function to be called after the date string is obtained
  * @memberOf AuraLocalizationService
  * @example
  * var timezone = $A.get("$Locale.timezone");
@@ -899,7 +933,8 @@ AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timeZo
     $A.assert(typeof callback === "function", "AuraLocalizationService.getDateStringBasedOnTimezone(): 'callback' must be a function.");
 
     if (!this.isValidDateObject(date)) {
-        return callback("Invalid Date");
+        callback("Invalid Date");
+        return;
     }
 
     timeZone = this.normalizeTimeZone(timeZone);
@@ -912,12 +947,13 @@ AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timeZo
 
 /**
  * A utility function to check if a datetime pattern string uses a 24-hour or period (12 hour with am/pm) time view.
- * @param {String} pattern - datetime pattern string
- * @return {Boolean} Returns true if it uses period time view.
+ * @param {string} pattern - datetime pattern string
+ * @return {boolean} Returns true if it uses period time view.
  * @memberOf AuraLocalizationService
  * @public
  * @export
  * @platform
+ * @deprecated
  */
 AuraLocalizationService.prototype.isPeriodTimeView = function(pattern) {
     $A.deprecated("$A.localizationService.isPeriodTimeView(): The method is no longer supported by framework, and will be removed in an upcoming release.",
@@ -943,10 +979,10 @@ AuraLocalizationService.prototype.isPeriodTimeView = function(pattern) {
 
 /**
  * Checks if date1 is after date2.
- * @param {String|Number|Date} date1 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String|Number|Date} date2 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String} unit - A datetime unit. The default is millisecond. Options: year, month, week, day, hour, minute, second, millisecond.
- * @return {Boolean} Returns true if date1 is after date2, or false otherwise.
+ * @param {string|number|Date} date1 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string|number|Date} date2 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string} unit - A datetime unit. The default is millisecond. Options: year, month, week, day, hour, minute, second, millisecond.
+ * @return {boolean} Returns true if date1 is after date2, or false otherwise.
  * @memberOf AuraLocalizationService
  * @example
  * var date = new Date();
@@ -976,10 +1012,10 @@ AuraLocalizationService.prototype.isAfter = function(date1, date2, unit) {
 
 /**
  * Checks if date1 is before date2.
- * @param {String|Number|Date} date1 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String|Number|Date} date2 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String} unit - A datetime unit. The default is millisecond. Options: year, month, week, day, hour, minute, second, millisecond.
- * @return {Boolean} Returns true if date1 is before date2, or false otherwise.
+ * @param {string|number|Date} date1 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string|number|Date} date2 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string} unit - A datetime unit. The default is millisecond. Options: year, month, week, day, hour, minute, second, millisecond.
+ * @return {boolean} Returns true if date1 is before date2, or false otherwise.
  * @memberOf AuraLocalizationService
  * @example
  * var date = new Date();
@@ -1009,10 +1045,10 @@ AuraLocalizationService.prototype.isBefore = function(date1, date2, unit) {
 
 /**
  * Checks if date1 is the same as date2.
- * @param {String|Number|Date} date1 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String|Number|Date} date2 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String} unit - A datetime unit. The default is millisecond. Options: year, month, week, day, hour, minute, second, millisecond.
- * @return {Boolean} Returns true if date1 is the same as date2, or false otherwise.
+ * @param {string|number|Date} date1 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string|number|Date} date2 - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string} unit - A datetime unit. The default is millisecond. Options: year, month, week, day, hour, minute, second, millisecond.
+ * @return {boolean} Returns true if date1 is the same as date2, or false otherwise.
  * @memberOf AuraLocalizationService
  * @example
  * var date = new Date();
@@ -1043,11 +1079,11 @@ AuraLocalizationService.prototype.isSame = function(date1, date2, unit) {
 
 /**
  * Checks if a date is between two other dates (fromDate and toDate), where the match is inclusive.
- * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String|Number|Date} fromDate - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String|Number|Date} toDate - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String} unit - A datetime unit. The default is millisecond. Options: year, month, week, day, hour, minute, second, millisecond.
- * @return {Boolean} Returns true if date is between fromDate and toDate, or false otherwise.
+ * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string|number|Date} fromDate - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string|number|Date} toDate - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string} unit - A datetime unit. The default is millisecond. Options: year, month, week, day, hour, minute, second, millisecond.
+ * @return {boolean} Returns true if date is between fromDate and toDate, or false otherwise.
  * @memberOf AuraLocalizationService
  * @example
  * $A.localizationService.isBetween("2017-03-07","March 7, 2017", "12/1/2017")
@@ -1066,10 +1102,10 @@ AuraLocalizationService.prototype.isBetween = function(date, fromDate, toDate, u
 
 /**
  * Parses a string to a JavaScript Date.
- * @param {String} dateTimeString - The datetime string to be parsed.
- * @param {String} parseFormat - A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
- * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
- * @param {Boolean} [strictParsing] - (optional) Set to true to turn off forgiving parsing and use strict validation.
+ * @param {string} dateTimeString - The datetime string to be parsed.
+ * @param {string} parseFormat - A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
+ * @param {string|boolean=} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
+ * @param {boolean=} [strictParsing] - (optional) Set to true to turn off forgiving parsing and use strict validation.
  * @return {Date} A JavaScript Date object, or null if dateTimeString is invalid
  * @memberOf AuraLocalizationService
  * @public
@@ -1123,7 +1159,7 @@ AuraLocalizationService.prototype.parseDateTime = function(dateTimeString, parse
 
 /**
  * Parses a date time string in an ISO-8601 format.
- * @param {String} dateTimeString - The datetime string in an ISO-8601 format.
+ * @param {string} dateTimeString - The datetime string in an ISO-8601 format.
  * @return {Date} A JavaScript Date object, or null if dateTimeString is invalid.
  * @memberOf AuraLocalizationService
  * @public
@@ -1136,12 +1172,7 @@ AuraLocalizationService.prototype.parseDateTimeISO8601 = function(dateTimeString
     }
 
     var date = null;
-    if (!this.isISO8601DateTimeString(dateTimeString)) {
-        $A.warning("LocalizationService.parseDateTimeISO8601: The provided datetime string is not in ISO8601 format. " +
-                "It will be parsed by native Date(), which may have different results across browsers and versions. " + dateTimeString);
-
-        date = new Date(dateTimeString);
-    } else {
+    if (this.isISO8601DateTimeString(dateTimeString)) {
         var config = this.parseISOStringToConfig(dateTimeString);
         if (config === null) {
             return null;
@@ -1153,17 +1184,22 @@ AuraLocalizationService.prototype.parseDateTimeISO8601 = function(dateTimeString
         } else {
             date = new Date(config["year"], config["month"] - 1, config["day"], config["hour"], config["minute"], config["second"], config["millisecond"]);
         }
+    } else {
+        $A.warning("LocalizationService.parseDateTimeISO8601: The provided datetime string is not in ISO8601 format. " +
+                "It will be parsed by native Date(), which may have different results across browsers and versions. " + dateTimeString);
+
+        date = new Date(dateTimeString);
     }
 
-    return this.isValidDateObject(date)? date : null;
+    return this.isValidDateObject(date) ? date : null;
 };
 
 /**
  * Parses a string to a JavaScript Date in UTC.
- * @param {String} dateTimeString - The datetime string to be parsed
- * @param {String} parseFormat - A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
- * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
- * @param {Boolean} [strictParsing] - (optional) Set to true to turn off forgiving parsing and use strict validation.
+ * @param {string} dateTimeString - The datetime string to be parsed
+ * @param {string} parseFormat - A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
+ * @param {string|boolean=} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
+ * @param {boolean=} [strictParsing] - (optional) Set to true to turn off forgiving parsing and use strict validation.
  * @return {Date} A JavaScript Date object, or null if dateTimeString is invalid
  * @memberOf AuraLocalizationService
  * @example
@@ -1221,8 +1257,8 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, pa
 
 /**
  * Get a date which is the start of a unit of time for the given date.
- * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String} unit - A datetime unit. Options: year, month, week, day, hour, minute or second.
+ * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {?string} unit - A datetime unit. Options: year, month, week, day, hour, minute or second.
  * @return {Date} A JavaScript Date object. It returns a parsed Date if unit is not provided.
  * @memberOf AuraLocalizationService
  * @example
@@ -1276,8 +1312,8 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
 
 /**
  * Get a date which is the end of a unit of time for the given date.
- * @param {String|Number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- * @param {String} unit - A datetime unit. Options: year, month, week, day, hour, minute or second.
+ * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {?string} unit - A datetime unit. Options: year, month, week, day, hour, minute or second.
  * @return {Date} A JavaScript Date object. It returns a parsed Date if unit is not provided.
  * @memberOf AuraLocalizationService
  * @example
@@ -1296,21 +1332,22 @@ AuraLocalizationService.prototype.endOf = function(date, unit) {
         return normalizedDate;
     }
 
-    this.addSubtract(normalizedDate, 1, unit);
-    this.addSubtract(normalizedDate, 1, "millisecond", true);
+    this.addSubtract(/** @type {!Date} */ (normalizedDate), 1, unit, false);
+    this.addSubtract(/** @type {!Date} */ (normalizedDate), 1, "millisecond", true);
     return normalizedDate;
 };
 
 /**
  * Get a date time string in simplified extended ISO format.
- * @param {Date} date - a Date object
- * @return {String} An ISO8601 string to represent passed in Date object.
+ * @template T
+ * @param {Date|T} date - should be a Date object, but could be anything
+ * @return {string|T} An ISO8601 string to represent passed in Date object. If the date is not valid then the date argument will be returned.
  * @memberOf AuraLocalizationService
  * @example
  * var date = new Date();
  * // Returns "2015-10-09T20:47:17.590Z"
  * $A.localizationService.toISOString(date);
- * @deprecated
+ * @deprecated Use Date.toISOString() instead
  * @public
  * @export
  * @platform
@@ -1319,13 +1356,13 @@ AuraLocalizationService.prototype.toISOString = function(date) {
     $A.deprecated("$A.localizationService.toISOString(): The method is no longer supported by framework, and will be removed in an upcoming release.",
             "Use native method Date.toISOString() instead", "AuraLocalizationService.toISOString");
 
-    return this.isValidDateObject(date)? date.toISOString() : date;
+    return this.isValidDateObject(date) ? date.toISOString() : date;
 };
 
 /**
  * Translate the localized digit string to a string with Arabic digits if there is any.
- * @param {String} input - a string with localized digits.
- * @return {String} a string with Arabic digits.
+ * @param {string} input - a string with localized digits.
+ * @return {string} a string with Arabic digits.
  * @memberOf AuraLocalizationService
  * @public
  * @export
@@ -1376,8 +1413,8 @@ AuraLocalizationService.prototype.translateFromOtherCalendar = function(date) {
 
 /**
  * Translate the input string to a string with localized digits (different from Arabic) if there is any.
- * @param {String} input - a string with Arabic digits.
- * @return {String} a string with localized digits.
+ * @param {string} input - a string with Arabic digits.
+ * @return {string} a string with localized digits.
  * @memberOf AuraLocalizationService
  * @public
  * @export
@@ -1427,9 +1464,9 @@ AuraLocalizationService.prototype.translateToOtherCalendar = function(date) {
 
 /**
  * Converts a datetime from UTC to a specified timezone.
- * @param {Date} date - A JavaScript Date object
- * @param {String} timezone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
- * @param {Function} callback - A function to be called after the conversion is done
+ * @param {!Date} date - A JavaScript Date object
+ * @param {string} timezone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
+ * @param {!function(!Date)} callback - A function to be called after the conversion is done
  * @memberOf AuraLocalizationService
  * @example
  * // Provides locale information
@@ -1471,9 +1508,9 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
 
 /**
  * Converts a datetime from a specified timezone to UTC.
- * @param {Date} date - A JavaScript Date object
- * @param {String} timezone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
- * @param {Function} callback - A function to be called after the conversion is done
+ * @param {!Date} date - A JavaScript Date object
+ * @param {string} timezone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
+ * @param {!function(!Date)} callback - A function to be called after the conversion is done
  * @memberOf AuraLocalizationService
  * @example
  * $A.localizationService.WallTimeToUTC(date, timezone, function(utc) {
@@ -1545,6 +1582,11 @@ AuraLocalizationService.prototype.init = function() {
     this.setupDateTimeUnitAlias();
 };
 
+/**
+ * @param {?string=} timeZone
+ * @return {!string}
+ * @private
+ */
 AuraLocalizationService.prototype.normalizeTimeZone = function(timeZone) {
     var normalizedTimeZone = timeZone;
     if (!timeZone) {
@@ -1594,6 +1636,12 @@ AuraLocalizationService.prototype.normalizeTimeZone = function(timeZone) {
     return "UTC";
 };
 
+/**
+ * @param {!Date} date
+ * @param {!string} timeZone
+ * @returns {!{config: !{year: !number, month: !number, day: !number, hour: !number, minute: !number}, offset: !number, timestamp: !number, timeZone: !string}} datetime data for the given zone
+ * @private
+ */
 AuraLocalizationService.prototype.createDateTimeData = function(date, timeZone) {
     var config = {
         "year": date.getUTCFullYear(),
@@ -1617,8 +1665,9 @@ AuraLocalizationService.prototype.createDateTimeData = function(date, timeZone) 
 /**
  * Convert datatime data created by createDateTimeData() to different time zone.
  *
- * @returns {Object} datetime data for the given zone
- *
+ * @param {!{config: !{year: !number, month: !number, day: !number, hour: !number, minute: !number}, offset: !number, timestamp: !number, timeZone: !string}} data
+ * @param {!string} timeZone
+ * @returns {!{config: !{year: !number, month: !number, day: !number, hour: !number, minute: !number}, offset:!number , timestamp: !number, timeZone: !string}} datetime data for the given zone
  * @private
  */
 AuraLocalizationService.prototype.setDataToZone = function(data, timeZone) {
@@ -1646,7 +1695,10 @@ AuraLocalizationService.prototype.setDataToZone = function(data, timeZone) {
 };
 
 /**
- * @returns {Array} a tuple which contains timestamp and offset
+ * @param {!{year: !number, month: !number, day: !number, hour: !number, minute: !number}} config
+ * @param {!string} timeZone
+ * @returns {!Array<!number, !number>} a tuple which contains timestamp and offset
+ * @private
  */
 AuraLocalizationService.prototype.getZoneInfo = function(config, timeZone) {
     var nowOffset = this.zoneOffset(Date.now(), timeZone);
@@ -1675,7 +1727,10 @@ AuraLocalizationService.prototype.getZoneInfo = function(config, timeZone) {
 /**
  * Get the time zone offset during the given timestamp.
  *
- * @returns {Number} offset in minute
+ * @param {!number} timestamp
+ * @param {!string} timeZone
+ * @returns {!number} offset in minute
+ * @private
  */
 AuraLocalizationService.prototype.zoneOffset = function(timestamp, timeZone) {
     if (timeZone === "UTC") {
@@ -1696,23 +1751,25 @@ AuraLocalizationService.prototype.zoneOffset = function(timestamp, timeZone) {
  * Formats a Date object to the en-US date time string.
  *
  * This method assumes the browser supports Intl API with time zone data.
+ * @param {!Date} date
+ * @param {!string} timeZone
+ * @returns {!string}
  * @private
  */
 AuraLocalizationService.prototype.formatDateToEnUSString = function(date, timeZone) {
 
     var timeZoneFormat = this.createEnUSDateTimeFormat(timeZone);
-    var dateString = this.format(timeZoneFormat, date);
+    var dateString = timeZoneFormat ? this.format(timeZoneFormat, date) : null;
 
     // If something wrong with the native funtion, using local time as fallback
-    return dateString !== null? dateString : this.formatDateTime(date, "MM/dd/yyyy, hh:mm");
+    return (dateString !== null) ? dateString : this.formatDateTime(date, "MM/dd/yyyy, hh:mm");
 };
 
 /**
  * Parse a datetime string in en-US format, "month/day/year, hour:minute", to a timestamp in millisecond in UTC
  *
- * @param {string} dateTimeString - a datetime string in en-US format, "month/day/year, hour:minute"
- * @returns {Number} timestamp in millisecond
- *
+ * @param {!string} dateTimeString - a datetime string in en-US format, "month/day/year, hour:minute"
+ * @returns {?number} timestamp in millisecond
  * @private
  */
 AuraLocalizationService.prototype.parseEnUSDateTimeString = function(dateTimeString) {
@@ -1722,7 +1779,7 @@ AuraLocalizationService.prototype.parseEnUSDateTimeString = function(dateTimeStr
     }
 
     // month param is between 0 and 11
-    return Date.UTC(match[3], match[1] - 1, match[2], match[4], match[5]);
+    return Date.UTC(parseInt(match[3], 10), parseInt(match[1], 10) - 1, parseInt(match[2], 10), parseInt(match[4], 10), parseInt(match[5], 10));
 };
 
 /**
@@ -1731,6 +1788,9 @@ AuraLocalizationService.prototype.parseEnUSDateTimeString = function(dateTimeStr
  * The caller should always validate the values. If it returns null, it means there was something wrong
  * with the native function.
  *
+ * @param {!Intl.DateTimeFormat} dateTimeFormat
+ * @param {!Date} date
+ * @returns {?string}
  * @private
  */
 AuraLocalizationService.prototype.format = function(dateTimeFormat, date) {
@@ -1740,7 +1800,7 @@ AuraLocalizationService.prototype.format = function(dateTimeFormat, date) {
 
     try {
         // IE11 adds LTR / RTL mark in the formatted date time string
-        return dateTimeFormat["format"](date).replace(/[\u200E\u200F]/g,'');
+        return dateTimeFormat["format"](date).replace(/[\u200E\u200F]/g, '');
     } catch (e) {
         // The error should never happen here. The callers validate the arguments.
         // This is only for IE11 profiler. Intl API time zone polyfill gets messed up
@@ -1752,6 +1812,11 @@ AuraLocalizationService.prototype.format = function(dateTimeFormat, date) {
     }
 };
 
+/**
+ * @param {!string} timeZone
+ * @returns {?Intl.DateTimeFormat}
+ * @private
+ */
 AuraLocalizationService.prototype.createEnUSDateTimeFormat = function(timeZone) {
     var timeZoneFormat = this.timeZoneFormatCache[timeZone];
     if (timeZoneFormat !== undefined) {
@@ -1779,6 +1844,12 @@ AuraLocalizationService.prototype.createEnUSDateTimeFormat = function(timeZone) 
     return timeZoneFormat;
 };
 
+/**
+ * @param {!string} formatString
+ * @param {!string} localeName
+ * @returns {?Intl.DateTimeFormat}
+ * @private
+ */
 AuraLocalizationService.prototype.createDateTimeFormat = function(formatString, localeName) {
     localeName = this.normalizeToIntlLocale(localeName);
 
@@ -1812,6 +1883,8 @@ AuraLocalizationService.prototype.createLocale = function(localeName) {
  * has available data on the client. If the given locale doesn't have any available
  * corresponding locale, it falls back to 'en'.
  *
+ * @param {?string} locale
+ * @returns {?string}
  * @private
  */
 AuraLocalizationService.prototype.normalizeToMomentLocale = function(locale) {
@@ -1850,10 +1923,12 @@ AuraLocalizationService.prototype.normalizeToMomentLocale = function(locale) {
 /**
  * Convert locale string into moment-js locale format.
  *
+ * @param {?string} locale
+ * @returns {?string}
  * @private
  */
 AuraLocalizationService.prototype.normalizeLocale = function(locale) {
-    return locale? locale.toLowerCase().replace("_", "-") : locale;
+    return locale ? locale.toLowerCase().replace("_", "-") : locale;
 };
 
 /**
@@ -1861,14 +1936,13 @@ AuraLocalizationService.prototype.normalizeLocale = function(locale) {
  *
  * This function assumes all available locales are added to cache during init().
  *
- * @param {String} locale - a Java locale
- * @return {String} corresponding momnet locale string, or 'en' if Java locale doesn't exists in cache.
- *
+ * @param {?string} locale - a Java locale
+ * @return {!string} corresponding momnet locale string, or 'en' if Java locale doesn't exists in cache.
  * @private
  */
 AuraLocalizationService.prototype.getAvailableMomentLocale = function(locale) {
     var momentLocale = this.momentLocaleCache[locale];
-    return momentLocale? momentLocale : "en";
+    return momentLocale ? momentLocale : "en";
 };
 
 /**
@@ -1876,9 +1950,8 @@ AuraLocalizationService.prototype.getAvailableMomentLocale = function(locale) {
  *
  * This function assumes all available locales are added to cache during init().
  *
- * @param {String} locale - a Java locale
- * @return {Boolean} true if locale is available, false otherwise
- *
+ * @param {?string} locale - a Java locale
+ * @return {!boolean} true if locale is available, false otherwise
  * @private
  */
 AuraLocalizationService.prototype.isAvailableLocale = function(locale) {
@@ -1902,13 +1975,24 @@ AuraLocalizationService.prototype.isAvailableLocale = function(locale) {
     }
 };
 
+/**
+ * @param {!Date} date
+ * @param {!string} formatString
+ * @param {!string} locale
+ * @param {!boolean} isUTCDate
+ * @returns {!string}
+ * @private
+ */
 AuraLocalizationService.prototype.formatDateTimeToString = function(date, formatString, locale, isUTCDate) {
     var dateTimeFormat = this.createDateTimeFormat(formatString, locale);
 
-    var utcOffset = (isUTCDate === true)? 0 : (date.getTimezoneOffset() * -1);
+    var utcOffset = (isUTCDate === true) ? 0 : (date.getTimezoneOffset() * -1);
     return dateTimeFormat.format(date, utcOffset);
 };
 
+/**
+ * @returns {!boolean}
+ */
 AuraLocalizationService.prototype.canFormatToParts = function() {
     if (this.supportFormatToParts === undefined) {
         var dateTimeFormat = new Intl["DateTimeFormat"]();
@@ -1921,7 +2005,7 @@ AuraLocalizationService.prototype.canFormatToParts = function() {
             } catch (e) {
                 // Mobile browser does not support formatToParts very well. Needs to do real
                 // call for checking support.
-                $A.log("The browser does not support Intl.DateTimeFormat.formatToParts" , e);
+                $A.log("The browser does not support Intl.DateTimeFormat.formatToParts", e);
                 this.supportFormatToParts = false;
             }
         }
@@ -1931,11 +2015,15 @@ AuraLocalizationService.prototype.canFormatToParts = function() {
     return this.supportFormatToParts;
 };
 
+/**
+ * @param {!string} locale
+ * @returns {!string}
+ */
 AuraLocalizationService.prototype.normalizeToIntlLocale = function(locale) {
 
     var intlLocale = this.intlLocaleCache[locale];
     if (intlLocale === undefined) {
-        intlLocale = locale.split("_").join("-").replace("-EURO", "");
+        intlLocale = locale.replace("_", "-").replace("-EURO", "");
 
         var supported = Intl["DateTimeFormat"]["supportedLocalesOf"](intlLocale);
         if (supported.length === 0) {
@@ -1952,9 +2040,13 @@ AuraLocalizationService.prototype.normalizeToIntlLocale = function(locale) {
 };
 
 /**
- * Get the localied value string for the given field from a date.
+ * Get the localized value string for the given field from a date.
  * It can be used only if Intl.DateTimeFormat.formatToParts() is supported.
- * @private
+ * 
+ * @param {!Date} date
+ * @param {!Intl.DateTimeFormat} dateTimeFormat
+ * @param {!string} field
+ * @returns {!string}
  */
 AuraLocalizationService.prototype.getLocalizedDateTimeField = function(date, dateTimeFormat, field) {
     var parts = dateTimeFormat["formatToParts"](date);
@@ -1963,7 +2055,10 @@ AuraLocalizationService.prototype.getLocalizedDateTimeField = function(date, dat
 
 /**
  * Get the value of a filed from the parts which is returned from Intl.DateTimeFormat.formatToParts().
- * @private
+ * 
+ * @param {!Array<!{type: !string, value: !string}>} parts
+ * @param {!string} type
+ * @returns {?string}
  */
 AuraLocalizationService.prototype.findField = function(parts, type) {
     for (var i = 0; i < parts.length; i++) {
@@ -1979,6 +2074,8 @@ AuraLocalizationService.prototype.findField = function(parts, type) {
 /**
  * Normalize a Java format string to make it compatible with moment.js
  *
+ * @param {?string} format
+ * @returns {?string}
  * @private
  */
 AuraLocalizationService.prototype.getNormalizedFormat = function(format) {
@@ -2000,6 +2097,8 @@ AuraLocalizationService.prototype.getNormalizedFormat = function(format) {
 /**
  * Modifying the format so that moment's strict parsing doesn't break on minor deviations
  *
+ * @param {?string} format
+ * @returns {?string}
  * @private
  */
 AuraLocalizationService.prototype.getStrictModeFormat = function(format) {
@@ -2027,6 +2126,8 @@ AuraLocalizationService.prototype.getStrictModeFormat = function(format) {
 /**
  * Modifying the date time string so that moment's strict parsing doesn't break on minor deviations
  *
+ * @param {?string} dateTimeString
+ * @returns {?string}
  * @private
  */
 AuraLocalizationService.prototype.getStrictModeDateTimeString = function(dateTimeString) {
@@ -2039,11 +2140,10 @@ AuraLocalizationService.prototype.getStrictModeDateTimeString = function(dateTim
 /**
  * Mutates the original date object by adding or subtract time.
  *
- * @param {Date} date - The Date object to mutated
- * @param {Number} num - The number of unit to add or to subtract
- * @param {String} unit - A normalized datetime unit, options: year, month, week, day, hour, minute or second
- * @param {Boolean} isSubtract - Set true if it is a subtract
- *
+ * @param {!Date} date - The Date object to mutated
+ * @param {!number} num - The number of unit to add or to subtract
+ * @param {!string} unit - A normalized datetime unit, options: year, month, week, day, hour, minute or second
+ * @param {!boolean} isSubtract - Set true if it is a subtract
  * @private
  */
 AuraLocalizationService.prototype.addSubtract = function(date, num, unit, isSubtract) {
@@ -2080,9 +2180,9 @@ AuraLocalizationService.prototype.addSubtract = function(date, num, unit, isSubt
 
 /**
  * Converts datetime input into a Date object. If datetime is a Date object, it returns the original input.
- * @param {String|Number|Date} datetime - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object
- * @returns {Date} A Date object which represents the provided datetime, an invalid Date if the given datetime is not a supported type
- *
+ * 
+ * @param {?string|number|Date} datetime - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object
+ * @returns {!Date} A Date object which represents the provided datetime, an invalid Date if the given datetime is not a supported type
  * @private
  */
 AuraLocalizationService.prototype.normalizeDateTimeInput = function(datetime) {
@@ -2097,18 +2197,24 @@ AuraLocalizationService.prototype.normalizeDateTimeInput = function(datetime) {
         return new Date(NaN);
     }
 
-    return datetime;
+    return /** @type {!Date} */ (datetime);
 };
 
 /**
  * Get the quarter number of the given date, 1 - 4.
- * @param {Date} date
- * @returns {number}
+ * 
+ * @param {!Date} date
+ * @returns {!number}
+ * @private
  */
 AuraLocalizationService.prototype.quarterInYear = function(date) {
     return Math.floor(date.getMonth() / 3) + 1;
 };
 
+/**
+ * @param {!Date} date
+ * @returns {!number}
+ */
 AuraLocalizationService.prototype.weekInYear = function(date) {
     var nonLeapLadder = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
     var leapLadder = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
@@ -2129,6 +2235,11 @@ AuraLocalizationService.prototype.weekInYear = function(date) {
     return weekNumber;
 };
 
+/**
+ * @param {!number} year
+ * @returns {!boolean}
+ * @private
+ */
 AuraLocalizationService.prototype.isLeapYear = function(year) {
     return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
 };
@@ -2136,8 +2247,8 @@ AuraLocalizationService.prototype.isLeapYear = function(year) {
 /**
  * Parse offset string into minutes
  *
- * @param {String} offsetString
- * @returns {Number} the offset in minutes, null if offset is invalid
+ * @param {string} offsetString
+ * @returns {?number} the offset in minutes, null if offset is invalid
  */
 AuraLocalizationService.prototype.parseOffset = function(offsetString) {
     var tokens = this.ISO_OFFSET_PATTERN.exec(offsetString);
@@ -2156,10 +2267,15 @@ AuraLocalizationService.prototype.parseOffset = function(offsetString) {
     }
 };
 
+/**
+ * @param {!string} dateTimeString
+ * @returns {?{year: !number, month: !number, day: !number, hour: !number, minute: !number, second: !number, millisecond: !number, utcOffset: (number|undefined)}} The date parsed into parts.
+ * @private
+ */
 AuraLocalizationService.prototype.parseISOStringToConfig = function(dateTimeString) {
     var i, tokens;
     // date string
-    var year, month, day;
+    var year = 0, month = 0, day = 0;
     var timeOnly = false;
 
     var match = this.ISO_REGEX.exec(dateTimeString) || this.ISO_REGEX_NO_DASH.exec(dateTimeString);
@@ -2215,7 +2331,7 @@ AuraLocalizationService.prototype.parseISOStringToConfig = function(dateTimeStri
     }
 
     var utcOffset = undefined;
-    var offsetString = timeOnly === false? match[4] : match[2];
+    var offsetString = timeOnly === false ? match[4] : match[2];
     if (offsetString !== undefined) {
         utcOffset = this.parseOffset(offsetString);
         if (utcOffset === null) {
@@ -2235,6 +2351,12 @@ AuraLocalizationService.prototype.parseISOStringToConfig = function(dateTimeStri
     };
 };
 
+/**
+ * @param {!number} year
+ * @param {!number} month
+ * @returns {!number}
+ * @private
+ */
 AuraLocalizationService.prototype.daysInMonth = function (year, month) {
     switch (month) {
         case 2:
@@ -2246,39 +2368,73 @@ AuraLocalizationService.prototype.daysInMonth = function (year, month) {
     }
 };
 
+/**
+ * @param {number} year
+ * @param {number} month
+ * @param {number} day
+ * @return {!boolean}
+ * @private
+ */
 AuraLocalizationService.prototype.isValidDate = function(year, month, day) {
     return month >= 1 && month <= 13 && day >= 1 && day <= this.daysInMonth(year, month);
 };
 
+/**
+ * @param {!number} hour
+ * @param {!number} minute
+ * @param {!number} second
+ * @param {!number} millisecond
+ * @return {!boolean}
+ */
 AuraLocalizationService.prototype.isValidTime = function(hour, minute, second, millisecond) {
-    return ((hour >=0 && hour < 24) || (hour === 24 && minute === minute === second === millisecond === 0)) &&
+    return ((hour >=0 && hour < 24) || ((hour === 24) && (minute === 0) && (second === 0) && (millisecond === 0))) &&
            minute >= 0 && minute < 60 &&
            second >= 0 && second < 60 &&
            millisecond >= 0 && millisecond <= 999;
 };
 
+/**
+ * @param {!number} offsetInMinute
+ * @return {!boolean}
+ * @private
+ */
 AuraLocalizationService.prototype.isValidOffset = function(offsetInMinute) {
     // UTC-12 to UTC+14
     return offsetInMinute >= -720 && offsetInMinute <= 840;
 };
 
+/**
+ * @param {!string} dateTimeString
+ * @return {!boolean}
+ * @private
+ */
 AuraLocalizationService.prototype.isISO8601DateTimeString = function(dateTimeString) {
     return this.ISO_REGEX.test(dateTimeString) || this.ISO_REGEX_NO_DASH.test(dateTimeString) ||
             this.ISO_TIME_REGEX.test(dateTimeString);
 };
 
+/**
+ * @param {*} unit
+ * @returns {?string}
+ */
 AuraLocalizationService.prototype.normalizeDateTimeUnit = function(unit) {
     return $A.util.isString(unit) ? this.dateTimeUnitAlias[unit] || this.dateTimeUnitAlias[unit.toLowerCase()] || null : null;
 };
 
 /**
  * Adds a datetime unit's aliases (lowercase, lowercase plural, shorthand) to unit alias map.
+ * @param {!string} unit
+ * @param {!string} short
+ * @private 
  */
 AuraLocalizationService.prototype.addDateTimeUnitAlias = function(unit, short) {
     var lowerCase = unit.toLowerCase();
     this.dateTimeUnitAlias[lowerCase] = this.dateTimeUnitAlias[lowerCase + 's'] = this.dateTimeUnitAlias[short] = unit;
 };
 
+/**
+ * @private
+ */
 AuraLocalizationService.prototype.setupDateTimeUnitAlias = function() {
     this.addDateTimeUnitAlias("year", "y");
     this.addDateTimeUnitAlias("month", "M");
@@ -2290,10 +2446,19 @@ AuraLocalizationService.prototype.setupDateTimeUnitAlias = function() {
     this.addDateTimeUnitAlias("millisecond", "ms");
 };
 
+/**
+ * @param {?Date|*} date
+ * @returns {!boolean} true if it is a valid Date object.
+ * @private
+ */
 AuraLocalizationService.prototype.isValidDateObject = function(date) {
     return (date instanceof Date) && !isNaN(date.getTime());
 };
 
+/**
+ * @param {*} duration
+ * @returns {!boolean} true if it is an Aura.Utils.Duration
+ */
 AuraLocalizationService.prototype.isValidDuration = function(duration) {
     return duration instanceof Aura.Utils.Duration;
 };

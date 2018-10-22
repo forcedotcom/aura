@@ -26,7 +26,7 @@
                 this.readyState = this.response.readyState;
                 this.status = this.response.status;
                 this.responseText = this.response.responseText;
-                this.onreadystatechange();
+                this.onload();
             }
         });
         StubXMLHttpRequest.DONE = 4;
@@ -58,8 +58,7 @@
         }
     },
 
-    // TODO Re-enable when XHR.onload is used instead.
-    _testScriptURL: {
+    testScriptURL: {
         test: function(cmp) {
             this.mock({
                 readyState:4, status: 200,

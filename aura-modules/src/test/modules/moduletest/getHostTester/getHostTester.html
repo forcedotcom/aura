@@ -1,0 +1,19 @@
+<template>
+    <h1>Testing getHost() util</h1>
+    <section id="holder">
+        <div id="nestedDiv"></div>
+    </section>
+    <section id="text">
+        just text
+    </section>
+    <template for:each={animals} for:item="animal">
+        <li key={animal}>{animal}</li>
+    </template>
+
+    <section>
+        <moduletest-slot-receiver>
+            <p id="slotContent">Assgined slot content from parent</p>
+        </moduletest-slot-receiver>
+    </section>
+
+</template>

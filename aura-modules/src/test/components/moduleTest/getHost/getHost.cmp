@@ -1,0 +1,6 @@
+<aura:component>
+    <!-- getHost() is an internal API in locker. This will be used to find the host of any given element.
+        The tests in this component guard locker against any change to LWC's behavior affecting the getHost() logic
+     -->
+    <moduletest:getHostTester aura:id="tester"/>
+</aura:component>

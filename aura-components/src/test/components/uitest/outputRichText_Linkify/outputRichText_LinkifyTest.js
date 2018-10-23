@@ -363,6 +363,17 @@
         ]
     },
 
+    testLinksWithoutHTTPDoNotAddHTTP: {
+        attributes: {
+            textValue: 'This is some @abc.com the company.'
+        },
+        test: [
+            function (cmp) {
+                this.assertLinkText(cmp, 'abc.com');
+            }
+        ]
+    },
+
     assertLinksPresent: function(cmp, hrefText, checkValue) {
         $A.test.addWaitForWithFailureMessage(true,
             function() {
@@ -376,6 +387,16 @@
                     $A.test.assertEquals(textValue, cmp.get("v.textValue"));
                 }
             }
+        )
+    },
+
+    assertLinkText: function(cmp, expectedText) {
+        $A.test.addWaitForWithFailureMessage(
+            true,
+            function() {
+                var link = cmp.find("richTextComp").getElement().querySelector("a");
+                return link && expectedText === link.innerText;
+            }, 'The generated link does not match the expected link'
         )
     },
 

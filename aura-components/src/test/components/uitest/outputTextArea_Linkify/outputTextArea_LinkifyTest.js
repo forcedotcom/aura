@@ -218,6 +218,17 @@
         ]
     },
 
+    testLinksWithoutHTTPDoNotAddHTTP: {
+        attributes: {
+            textValue: 'This is some @abc.com the company.'
+        },
+        test: [
+            function (cmp) {
+                this.assertTextNotPresent(cmp, '>http://abc.com<');
+            }
+        ]
+    },
+
     assertLinksPresent: function(cmp, hrefText, checkValue) {
         $A.test.addWaitForWithFailureMessage(true,
             function() {

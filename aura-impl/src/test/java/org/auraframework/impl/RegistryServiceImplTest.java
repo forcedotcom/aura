@@ -470,10 +470,10 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
         when(mockGlobalControllerReg.getDefTypes()).thenReturn(ImmutableSet.of(DefType.CONTROLLER));
         registryService.setAuraGlobalControllerDefRegistry(mockGlobalControllerReg);
 
+        // remove when namespace casing is fixed W-5451217
         Map<String, String> internalNamespaces = new HashMap<>();
         ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
         registryService.setConfigAdapter(mockConfigAdapter);
-
         doAnswer(new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
@@ -485,7 +485,6 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
                 return null;
             }
         }).when(mockConfigAdapter).addInternalNamespace(any(String.class));
-
         when(mockConfigAdapter.isInternalNamespace(any(String.class))).thenAnswer(new Answer<Boolean>() {
             @Override
             public Boolean answer(InvocationOnMock invocation) throws Throwable {
@@ -493,7 +492,6 @@ public class RegistryServiceImplTest extends AuraImplTestCase {
                 return namespace != null && internalNamespaces.containsKey(namespace.toLowerCase());
             }
         });
-
         when(mockConfigAdapter.getInternalNamespacesMap()).thenReturn(internalNamespaces);
 
         return registryService;

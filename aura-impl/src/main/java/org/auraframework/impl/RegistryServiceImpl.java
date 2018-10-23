@@ -187,15 +187,23 @@ public class RegistryServiceImpl implements RegistryService, SourceListener, App
         List<DefRegistry> moduleRegistries = null;
 
         String cmpPackage = location.getComponentSourcePackage();
-        if (cmpPackage != null) {
-            componentRegistries = getStaticRegistries(classLoader, cmpPackage);
-        }
-
         String modulePackage = location.getModuleSourcePackage();
-        if (modulePackage != null) {
-            moduleRegistries = getStaticRegistries(classLoader, modulePackage);
-        }
 
+        try {           
+            if (cmpPackage != null) {
+                componentRegistries = getStaticRegistries(classLoader, cmpPackage);
+            }
+
+            if (modulePackage != null) {
+                moduleRegistries = getStaticRegistries(classLoader, modulePackage);
+            }
+        } catch (Exception e) {
+            // Do not fail here, just act as if we don't have a registries file.
+            componentRegistries = null;
+            moduleRegistries = null;
+            loggingService.warn(e.getMessage(), e);
+        }
+                       
         if (componentRegistries != null && moduleRegistries != null) {
             // FIXME:The goal is to have just one .registries file coming from one package
             // location. Currently core precompiles components and modules separately, for
@@ -225,11 +233,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener, App
                 return l;
             }
         } catch (Exception e) {
-            // Do not fail here, just act as if we don't have a registries file.
-            // You'd have to create a bad registries file...
-            loggingService.warn(String.format("Unable to read registries file for '%s'", pkg), e);
+            throw new AuraRuntimeException(String.format("Unable to read registries file for '%s'", pkg), e);
         }
-        return null;
     }
 
     // temporary compat with projects that still compile components and modules separately W-5432127 W-5480526

@@ -15,19 +15,21 @@
  */
 package org.auraframework.impl.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.EnumSet;
 
 import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.system.Client.Type;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
-public class TemplateUtilTest extends UnitTestCase {
+public class TemplateUtilTest {
 
     private EnumSet<Type> LEGACY_IE = EnumSet.of(Type.IE9, Type.IE8, Type.IE7, Type.IE6);
 

@@ -15,15 +15,16 @@
  */
 package org.auraframework.util.validation;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Map;
 
 import org.auraframework.util.javascript.JavascriptProcessingError.Level;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
-public final class ValidationErrorTest extends UnitTestCase {
+public class ValidationErrorTest {
 
     @Test
     public void testJsonSerialization() {

@@ -15,17 +15,19 @@
  */
 package org.auraframework.impl.expression.parser;
 
-import com.google.common.collect.Lists;
-import org.auraframework.impl.expression.AuraImplExpressionTestCase;
+import java.util.Collection;
+import java.util.List;
+
+import org.auraframework.impl.expression.AuraExpressionBuilder;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import java.util.Collection;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * Shotgun tests for special chars. Tokens shouldn't contain these chars. Remaining special chars have their own tests
@@ -33,7 +35,7 @@ import java.util.List;
  */
 @UnAdaptableTest
 @RunWith(Parameterized.class)
-public class ExpressionParserSpecialCharactersTest extends AuraImplExpressionTestCase {
+public class ExpressionParserSpecialCharactersTest extends UnitTestCase {
     private static final String validChars = "oO0_";
     private static final char[] otherChars = "`=[]',~@#^&{}|:\"天".toCharArray();
     private static final String[] errorMsgStartsWith = { "unexpected token: '`'",
@@ -121,7 +123,7 @@ public class ExpressionParserSpecialCharactersTest extends AuraImplExpressionTes
     @Test
     public void test() throws Exception {
         try {
-            buildExpression(expression);
+            AuraExpressionBuilder.INSTANCE.buildExpression(expression, null);
             fail("No execption thrown for <" + expression + ">. Expected InvalidExpressionException");
         } catch (InvalidExpressionException e) {
             assertTrue("Unexpected error message trying to parse <" + expression + ">. Expected to start with: "

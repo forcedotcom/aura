@@ -15,13 +15,18 @@
  */
 package org.auraframework.impl.visitor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.system.Location;
-import org.auraframework.util.test.util.UnitTestCase;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -29,7 +34,7 @@ import com.google.common.collect.Lists;
 /**
  * A visitor class to extract labels from a set of definitions.
  */
-public class UsageMapTest extends UnitTestCase {
+public class UsageMapTest {
     @Test
     public void testAddOneEntry() throws Exception {
         String key = "key";
@@ -37,7 +42,7 @@ public class UsageMapTest extends UnitTestCase {
         UsageMap<String> underTest = new UsageMap<>();
         underTest.add(key, location1);
         Set<Map.Entry<String, Set<Location>>> entrySet = underTest.entrySet();
-        assertEquals(1, entrySet.size());
+        assertThat("Should have one entry", entrySet, Matchers.iterableWithSize(1));
         assertEquals(key, entrySet.iterator().next().getKey());
         assertEquals(1, entrySet.iterator().next().getValue().size());
         assertTrue(entrySet.iterator().next().getValue().contains(location1));

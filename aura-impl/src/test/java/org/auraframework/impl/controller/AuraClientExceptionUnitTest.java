@@ -15,17 +15,18 @@
  */
 package org.auraframework.impl.controller;
 
+import static org.junit.Assert.assertEquals;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 /**
  * Unit tests for AuraClientException
  */
-public class AuraClientExceptionUnitTest extends UnitTestCase {
+public class AuraClientExceptionUnitTest {
 
     @Test
     public void testCreateAuraClientExceptionWithQualifiedName() {

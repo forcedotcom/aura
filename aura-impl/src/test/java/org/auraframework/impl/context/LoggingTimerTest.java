@@ -15,13 +15,15 @@
  */
 package org.auraframework.impl.context;
 
-import org.auraframework.impl.context.LoggingContextImpl.Timer;
-import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
 
-public class LoggingTimerTest extends UnitTestCase {
+import org.auraframework.impl.context.LoggingContextImpl.Timer;
+import org.junit.Test;
+
+public class LoggingTimerTest {
 
     @Test
     public void testTimer() throws Exception {

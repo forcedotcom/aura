@@ -15,21 +15,23 @@
  */
 package org.auraframework.impl.expression;
 
-import com.google.common.collect.ImmutableList;
-import org.auraframework.expression.Expression;
-import org.auraframework.expression.ExpressionType;
-import org.auraframework.expression.PropertyReference;
-import org.auraframework.instance.ValueProvider;
-import org.auraframework.system.Location;
-import org.junit.Test;
-
-import java.math.BigDecimal;
-
 import static org.auraframework.impl.expression.functions.BooleanFunctions.AND;
 import static org.auraframework.impl.expression.functions.BooleanFunctions.NOT;
 import static org.auraframework.impl.expression.functions.BooleanFunctions.OR;
 import static org.auraframework.impl.expression.functions.MathFunctions.SUBTRACT;
 import static org.auraframework.impl.expression.functions.MultiFunctions.ADD;
+
+import java.math.BigDecimal;
+
+import org.auraframework.expression.Expression;
+import org.auraframework.expression.ExpressionType;
+import org.auraframework.expression.PropertyReference;
+import org.auraframework.instance.ValueProvider;
+import org.auraframework.system.Location;
+import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Tests of expression evaluation
@@ -37,7 +39,7 @@ import static org.auraframework.impl.expression.functions.MultiFunctions.ADD;
  * @hierarchy Aura.Runtime.Expression.Server.Evaluation
  * @userStory a07B0000000EdAC
  */
-public class ExpressionTest extends AuraImplExpressionTestCase {
+public class ExpressionTest extends UnitTestCase {
 
     private static final Location l = new Location("test", -1);
     private static final PropertyReference i314 = new PropertyReferenceImpl("i314", l);
@@ -89,7 +91,7 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
                 new FunctionCallImpl(OR, ImmutableList.<Expression> of(new LiteralImpl(false, l), new FunctionCallImpl(
                         NOT, ImmutableList.<Expression> of(new LiteralImpl(true, l)), l)), l)), l);
         o = e.evaluate(values);
-        assertFalse("Expected boolean expression to be false", o);
+        assertEquals("Expected boolean expression to be false", Boolean.FALSE, o);
     }
 
     @Test
@@ -170,7 +172,7 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
 
     private void verifyEvaluateResult(String expression, ExpressionType type, ValueProvider vp, Object result)
             throws Exception {
-        Expression e = buildExpression(expression);
+        Expression e = AuraExpressionBuilder.INSTANCE.buildExpression(expression, null);
         assertEquals("Unexpected expression type when parsing <" + expression + ">", type, e.getExpressionType());
         assertEquals("Unexpected evaluation of <" + expression + ">", result, e.evaluate(vp));
     }

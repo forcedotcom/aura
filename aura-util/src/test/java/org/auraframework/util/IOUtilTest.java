@@ -15,15 +15,19 @@
  */
 package org.auraframework.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 
 import org.auraframework.util.IOUtil.DeleteFailedException;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
 import com.google.common.io.Files;
 
-public class IOUtilTest extends UnitTestCase {
+public class IOUtilTest  {
     @Test
     public void testDelete() throws Exception {
         File testFolder = null;

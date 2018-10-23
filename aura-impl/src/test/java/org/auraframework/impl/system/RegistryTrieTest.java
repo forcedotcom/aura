@@ -15,8 +15,20 @@
  */
 package org.auraframework.impl.system;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -27,18 +39,16 @@ import org.auraframework.def.InterfaceDef;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Source;
-import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import javax.inject.Inject;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
-public class RegistryTrieTest extends AuraTestCase {
+public class RegistryTrieTest {
     class MockRegistry implements DefRegistry {
         private static final long serialVersionUID = 1707712096451860232L;
 
@@ -158,26 +168,30 @@ public class RegistryTrieTest extends AuraTestCase {
                 DefType.COMPONENT);
         MockRegistry reg2 = new MockRegistry().setNamespaces("testNamespace", "anotherNamespace")
                 .setDefTypes(DefType.COMPONENT);
+        AuraError expected = null;
         try {
             new RegistryTrie(Lists.newArrayList(reg1, reg2));
-            fail("No error thrown for duplicate registries");
         } catch (AuraError t) {
-            assertExceptionMessageStartsWith(t, AuraError.class,
-                    "Duplicate DefType/Prefix/Namespace combination claimed by 2 DefRegistries : ");
+            expected = t;
         }
+        assertNotNull("No error thrown for duplicate registries", expected);
+        assertThat(expected.getMessage(),
+                Matchers.startsWith("Duplicate DefType/Prefix/Namespace combination claimed by 2 DefRegistries : "));
     }
 
     @Test
     public void testInitWithDuplicateRegistriesBasedOnNamespaceCaseInsensitivity() {
         MockRegistry reg1 = new MockRegistry().setNamespaces("testNamespace");
         MockRegistry reg2 = new MockRegistry().setNamespaces("TESTNAMESPACE");
+        AuraError expected = null;
         try {
             new RegistryTrie(Lists.newArrayList(reg1, reg2));
-            fail("No error thrown for duplicate registries");
         } catch (AuraError t) {
-            assertExceptionMessageStartsWith(t, AuraError.class,
-                    "Duplicate DefType/Prefix/Namespace combination claimed by 2 DefRegistries : {[COMPONENT]/[markup]/[testNamespace]} and {[COMPONENT]/[markup]/[TESTNAMESPACE]}");
+            expected = t;
         }
+        assertNotNull("No error thrown for duplicate registries", expected);
+        assertThat(expected.getMessage(),
+                Matchers.startsWith("Duplicate DefType/Prefix/Namespace combination claimed by 2 DefRegistries : {[COMPONENT]/[markup]/[testNamespace]} and {[COMPONENT]/[markup]/[TESTNAMESPACE]}"));
     }
 
     @Test
@@ -185,13 +199,15 @@ public class RegistryTrieTest extends AuraTestCase {
     public void testInitWithDuplicateRegistriesBasedOnPrefixCaseInsensitivity() {
         MockRegistry reg1 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("markup");
         MockRegistry reg2 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("MARKUP");
+        AuraError expected = null;
         try {
             new RegistryTrie(Lists.newArrayList(reg1, reg2));
-            fail("No error thrown for duplicate registries");
         } catch (AuraError t) {
-            assertExceptionMessageStartsWith(t, AuraError.class,
-                    "Duplicate DefType/Prefix/Namespace combination claimed by 2 DefRegistries : {[COMPONENT]/[markup]/[testNamespace]} and {[COMPONENT]/[MARKUP]/[testNamespace]}");
+            expected = t;
         }
+        assertNotNull("No error thrown for duplicate registries", expected);
+        assertThat(expected.getMessage(),
+                Matchers.startsWith("Duplicate DefType/Prefix/Namespace combination claimed by 2 DefRegistries : {[COMPONENT]/[markup]/[testNamespace]} and {[COMPONENT]/[MARKUP]/[testNamespace]}"));
     }
 
     @Test

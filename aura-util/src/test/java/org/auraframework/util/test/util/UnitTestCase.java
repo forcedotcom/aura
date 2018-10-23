@@ -62,7 +62,10 @@ import configuration.TestConfig;
 import junit.framework.TestCase;
 
 /**
- * Base class for all aura tests.
+ * DO NOT USE!!!! This should not exist.
+ *
+ * If you have a unit test, it should extend nothing. Integration and WebDriver tests should extend the appropriate
+ * class.
  */
 @RunWith(AuraUnitTestRunner.class)
 @TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class})

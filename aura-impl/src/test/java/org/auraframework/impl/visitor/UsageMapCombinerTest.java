@@ -15,11 +15,15 @@
  */
 package org.auraframework.impl.visitor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.system.Location;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
@@ -27,7 +31,7 @@ import com.google.common.collect.Maps;
 /**
  * A visitor class to extract labels from a set of definitions.
  */
-public class UsageMapCombinerTest extends UnitTestCase {
+public class UsageMapCombinerTest {
     @Test
     public void testDoubleNull() {
         UsageMap<String> result = new UsageMapCombiner<String>().apply(null, null);

@@ -15,15 +15,6 @@
  */
 package org.auraframework.impl.expression.functions;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import org.auraframework.impl.expression.AuraImplExpressionTestCase;
-import org.junit.Test;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import static org.auraframework.impl.expression.functions.BooleanFunctions.AND;
 import static org.auraframework.impl.expression.functions.BooleanFunctions.NOT;
 import static org.auraframework.impl.expression.functions.BooleanFunctions.OR;
@@ -44,11 +35,21 @@ import static org.auraframework.impl.expression.functions.MultiFunctions.NOTEQUA
 import static org.auraframework.impl.expression.functions.UtilFunctions.EMPTY;
 import static org.auraframework.impl.expression.functions.UtilFunctions.FORMAT;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 /**
  * Basic tests of functions
  *
  */
-public class FunctionsTest extends AuraImplExpressionTestCase {
+public class FunctionsTest extends UnitTestCase {
     private Object evaluate(Function f, Object... args) {
         return f.evaluate(Lists.newArrayList(args));
     }

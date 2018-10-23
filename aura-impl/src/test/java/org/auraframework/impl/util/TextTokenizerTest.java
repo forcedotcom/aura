@@ -15,6 +15,11 @@
  */
 package org.auraframework.impl.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -28,12 +33,11 @@ import org.auraframework.impl.util.TextTokenizer.Token;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-public class TextTokenizerTest extends UnitTestCase {
+public class TextTokenizerTest {
     @Test
     public void testUnwrap() {
         assertEquals("ab.cab", TextTokenizer.unwrap("{!ab.cab}"));

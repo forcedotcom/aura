@@ -204,7 +204,13 @@ IndexedDBAdapter.prototype.getTransaction = function(mode) {
             var transaction = that.db.transaction([that.tableName], mode);
             resolve(transaction);
         } catch(e) {
-            if (e.message && e.message.indexOf("closing") !== -1) {
+            if (e.message && (
+                // Chrome
+                e.message.indexOf("The database connection is closing") !== -1
+                // Firefox
+                || e.message.indexOf("A mutation operation was attempted on a database that did not allow mutations") !== -1
+                // IE
+                || e.message.indexOf("InvalidStateError") !== -1)) {
                 // the db is closing, for potentially an 'upgrade' reason.
                 // try to reinitialize, but only once, we don't want infinite loops
                 that.ready = undefined;

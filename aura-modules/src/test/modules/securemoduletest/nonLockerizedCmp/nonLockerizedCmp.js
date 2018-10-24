@@ -1,4 +1,4 @@
-import { LightningElement, createElement, toString, track, api } from "lwc";
+import { LightningElement, createElement, track, api } from "lwc";
 import * as testUtil from "securemoduletest/testUtil";
 
 export default class Simple extends LightningElement {
@@ -18,7 +18,6 @@ export default class Simple extends LightningElement {
     testLWCIsUnsecure() {
         // Verify that createElement can be accessed
         testUtil.assertDefined(createElement, "Expected to have access to all properties of engine");
-        testUtil.assertTrue(toString().indexOf("SecureLWC") === -1, "Expected to not see SecureLWC");
         return true;
     }
 }

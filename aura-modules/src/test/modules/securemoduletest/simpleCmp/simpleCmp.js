@@ -1,4 +1,4 @@
-import { LightningElement, createElement, toString, api } from "lwc";
+import { LightningElement, createElement, api } from "lwc";
 import * as testUtil from "securemoduletest/testUtil";
 import simpleCmpHtml from "./simpleCmp.html";
 
@@ -38,8 +38,6 @@ export default class Simple extends LightningElement {
 
     @api
     testLWCIsSecure() {
-        testUtil.assertStartsWith("SecureLWC", toString(), "Expected engine to return" +
-            "SecureLWC in module");
         testUtil.assertDefined(LightningElement, "SecureLWC is preventing access to LightningElement in module");
         testUtil.assertUndefined(createElement, "SecureLWC is leaking properties in module");
         return true;

@@ -98,12 +98,6 @@
         }
     },
 
-    testLWCIsSecureInInternalLib: {
-        test: function(cmp) {
-            cmp.sanityChecksTester("testLWCIsSecureInInternalLib");
-        }
-    },
-
     testSecureWrappersInRenderer: {
         attributes: {
             testRenderer: true

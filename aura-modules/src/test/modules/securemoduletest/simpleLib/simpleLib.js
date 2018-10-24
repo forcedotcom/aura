@@ -1,5 +1,4 @@
 import * as testUtil from "securemoduletest/testUtil";
-import { toString } from "lwc";
 
 export function testWindowIsSecure() {
     testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
@@ -14,13 +13,6 @@ export function testDollarAuraNotAccessibleInModules() {
     return true;
 }
 
-export function testLWCIsSecure() {
-    testUtil.assertStartsWith("SecureLWC", toString(), "Expected engine to return" +
-        "SecureLWC in library");
-    engineIsSecureInLocalFunc();
-    return true;
-}
-
 export function addition(a, b) {
     return a + b;
 }
@@ -28,11 +20,6 @@ export function addition(a, b) {
 function windowIsSecureInLocalFunc() {
     testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
         + " return SecureWindow in local functions of library module");
-}
-
-function engineIsSecureInLocalFunc() {
-    testUtil.assertStartsWith("SecureLWC", toString(), "Expected engine to return" +
-        "SecureLWC in local functions of library module");
 }
 
 function dollarAuraNotAccessibleInLocalFunc() {

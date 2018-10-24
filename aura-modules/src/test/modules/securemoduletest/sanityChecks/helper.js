@@ -1,5 +1,4 @@
 import * as testUtil from "securemoduletest/testUtil";
-import { toString } from "lwc";
 
 export function testCanAccessDocumentBodyFromInternalLib() {
     verifySharedSecureElement("body");
@@ -16,11 +15,6 @@ export function testWindowIsSecureInInternalLib() {
 
 export function testDollarAuraNotAccessibleInInternalLib() {
     testUtil.assertEquals("undefined", typeof $A, "Expected $A to be not accessible in internal library"); // eslint-disable-line lwc/no-aura
-}
-
-export function testLWCIsSecureInInternalLib() {
-    testUtil.assertStartsWith("SecureLWC", toString(), "Expected engine to return" +
-        "SecureLWC in internal library");
 }
 
 export function testDocumentIsSecureInInternalLib() {

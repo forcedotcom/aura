@@ -39,11 +39,6 @@ export default class SanityChecks extends LightningElement {
     }
 
     @api
-    testLWCIsSecureInInternalLib() {
-        helper.testLWCIsSecureInInternalLib();
-    }
-
-    @api
     testDocumentIsSecure() {
         testUtil.assertStartsWith("SecureDocument", document.toString(), "Expected document to"
             + " return SecureDocument in module");

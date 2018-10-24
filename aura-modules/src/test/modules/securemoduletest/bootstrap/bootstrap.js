@@ -1,4 +1,4 @@
-import { LightningElement, createElement, toString, api } from 'lwc';
+import { LightningElement, createElement, api } from 'lwc';
 import * as testUtil from "securemoduletest/testUtil";
 import * as simpleLib from "securemoduletest/simpleLib";
 
@@ -25,13 +25,10 @@ export default class Bootstrap extends LightningElement {
 
     @api
     testLWCIsSecure() {
-        testUtil.assertStartsWith("SecureLWC", toString(), "Expected engine to return" +
-            "SecureLWC in interop component");
         testUtil.assertDefined(LightningElement, "SecureLWC is preventing access to LightningElement in interop component");
         testUtil.assertUndefined(createElement, "SecureLWC is leaking properties in interop component");
-        engineIsSecureInLocalFunc();
         const simpleCmp = this.template.querySelector(".securemoduletest-simple-cmp");
-        return simpleCmp.testLWCIsSecure() && simpleLib.testLWCIsSecure();
+        return simpleCmp.testLWCIsSecure();
     }
 
     @api
@@ -52,11 +49,6 @@ export default class Bootstrap extends LightningElement {
 function windowIsSecureInLocalFunc() {
     testUtil.assertStartsWith("SecureWindow", window.toString(), "Expected window to"
         + " return SecureWindow in local functions");
-}
-
-function engineIsSecureInLocalFunc() {
-    testUtil.assertStartsWith("SecureLWC", toString(), "Expected engine to return" +
-        "SecureLWC in local functions");
 }
 
 function dollarAuraNotAccessibleInLocalFunc() {

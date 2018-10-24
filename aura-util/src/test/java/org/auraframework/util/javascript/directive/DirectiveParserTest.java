@@ -64,7 +64,7 @@ public class DirectiveParserTest extends UnitTestCase {
             dp.parseFile();
             fail("Passing an END directive should have thrown an exception");
         } catch (RuntimeException e) {
-            assertTrue("The Javascript Processor failed for some unkown reason",
+            assertTrue("The Javascript Processor failed for some unknown reason",
                     e.getMessage().equals("cannot create a directive with the reserved label \"end\""));
         }
     }
@@ -84,8 +84,8 @@ public class DirectiveParserTest extends UnitTestCase {
             dp.parseFile();
             fail("Passing an directives with duplicate labels should have failed");
         } catch (RuntimeException e) {
-            assertTrue("The Javascript Processor failed for some unkown reason",
-                    e.getMessage().startsWith("Mutliple directives registered for label"));
+            assertTrue("The Javascript Processor failed for some unknown reason",
+                    e.getMessage().startsWith("Multiple directives registered for label"));
         }
     }
 

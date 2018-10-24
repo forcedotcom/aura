@@ -401,10 +401,10 @@ public class ExpressionParserTest extends UnitTestCase {
                 "The child picked up the teddy bear in one hand", e.evaluate(null));
 
         e = AuraExpressionBuilder.INSTANCE.buildExpression("notequals(add(' and grasped a', ' pick axe in the other.'), '\"Wait!\" screamed the bear.')", null);
-        assertEquals("Error in evaluating nested operators as funtion calls", Boolean.TRUE, e.evaluate(null));
+        assertEquals("Error in evaluating nested operators as function calls", Boolean.TRUE, e.evaluate(null));
 
         e = AuraExpressionBuilder.INSTANCE.buildExpression("if(equals(true, greaterthan(-2, -52)), add('The child hesitated, ', '\"I cannot stuff you without making a hole to stuff into.\"'), ' The bear squinted and noodled on this for a minute.')", null);
-        assertEquals("Error in evaluating nested operators as funtion calls",
+        assertEquals("Error in evaluating nested operators as function calls",
                 "The child hesitated, \"I cannot stuff you without making a hole to stuff into.\"", e.evaluate(null));
     }
 
@@ -553,7 +553,7 @@ public class ExpressionParserTest extends UnitTestCase {
     private void verifyInvalidExpressionException(String expression, String msgStartsWith) throws Exception {
         try {
             AuraExpressionBuilder.INSTANCE.buildExpression(expression, null);
-            fail("No execption thrown for <" + expression + ">. Expected InvalidExpressionException");
+            fail("No exception thrown for <" + expression + ">. Expected InvalidExpressionException");
         } catch (InvalidExpressionException e) {
             assertTrue("Unexpected error message trying to parse <" + expression + ">. Expected to start with: "
                     + msgStartsWith + ". But got: " + e.getMessage(), e.getMessage().startsWith(msgStartsWith));

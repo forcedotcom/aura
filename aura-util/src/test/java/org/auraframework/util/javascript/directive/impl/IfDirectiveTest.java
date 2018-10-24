@@ -39,7 +39,7 @@ public class IfDirectiveTest extends UnitTestCase {
     @Test
     public void testIfDirectiveBasicInitialization() throws Exception {
         IfDirectiveType directiveTypeObj = new IfDirectiveType();
-        assertTrue("If Directive type should be labled as 'if'", directiveTypeObj.getLabel().equals("if"));
+        assertTrue("If Directive type should be labelled as 'if'", directiveTypeObj.getLabel().equals("if"));
         Directive directiveObj = directiveTypeObj.constructDirective(4, "");
         assertTrue("If directive is a multiline directive", directiveObj.isMultiline());
         String content = "Write anything you want and this will just throw is back. But it should throw back the exact same thing";

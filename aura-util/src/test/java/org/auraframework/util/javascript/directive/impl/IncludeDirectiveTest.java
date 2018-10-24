@@ -40,7 +40,7 @@ public class IncludeDirectiveTest extends UnitTestCase {
     @Test
     public void testIncludeDirectiveBasicInitialization() throws Exception {
         IncludeDirectiveType directiveTypeObj = new IncludeDirectiveType();
-        assertTrue("Include Directive type should be labled as 'include'", directiveTypeObj.getLabel()
+        assertTrue("Include Directive type should be labelled as 'include'", directiveTypeObj.getLabel()
                 .equals("include"));
         Directive directiveObj = directiveTypeObj.constructDirective(4, "");
         assertFalse("Include directive is a multiline directive", directiveObj.isMultiline());

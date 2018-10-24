@@ -632,7 +632,7 @@ public class AuraTestingUtil {
      *
      * Preferably use the version without the name.
      *
-     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/priveleged/custom
+     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/privileged/custom
      * @param namespace the name
      * @param defClass the class of the source.
      * @param prefixOverride the prefix override
@@ -652,7 +652,7 @@ public class AuraTestingUtil {
      *
      * Preferably use the version without the name.
      *
-     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/priveleged/custom
+     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/privileged/custom
      * @param namespace the name
      * @param defClass the class of the source.
      * @param contents the contents for the source.
@@ -675,7 +675,7 @@ public class AuraTestingUtil {
      *
      * Preferably use the version without the name.
      *
-     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/priveleged/custom
+     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/privileged/custom
      * @param namespace the name
      * @param defClass the class of the source.
      * @param contents the contents for the source.
@@ -691,7 +691,7 @@ public class AuraTestingUtil {
      * This is intended for unit testing, or submodule testing. The source provided here is not registered
      * anywhere and cannot be looked up by aura. This means that it can only be used for sub-unit testing.
      *
-     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/priveleged/custom
+     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/privileged/custom
      * @param defClass the class of the source.
      * @param contents the contents for the source.
      */
@@ -706,7 +706,7 @@ public class AuraTestingUtil {
      * This is intended for unit testing, or submodule testing. The source provided here is not registered
      * anywhere and cannot be looked up by aura. This means that it can only be used for sub-unit testing.
      *
-     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/priveleged/custom
+     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/privileged/custom
      * @param defClass the class of the source.
      * @param contents the contents for the source.
      * @param bundle the bundle for the descriptor.

@@ -63,7 +63,7 @@ public class DirectiveParser {
         for (DirectiveType<?> type : getDirectiveTypes()) {
             String label = type.getLabel();
             if (byString.containsKey(label)) {
-                throw new RuntimeException(String.format("Mutliple directives registered for label %s", label));
+                throw new RuntimeException(String.format("Multiple directives registered for label %s", label));
             }
             byString.put(label, type);
         }

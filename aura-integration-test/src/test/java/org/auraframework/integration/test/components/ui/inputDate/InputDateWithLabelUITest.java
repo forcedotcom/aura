@@ -257,7 +257,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         assertEquals("Page down id not find the correct date", fmt, result.trim());
     }
 
-    // Testing functionallity of tab, starting from the InputBox to the today button
+    // Testing functionality of tab, starting from the InputBox to the today button
     // Do Not run with Safari. Safari does not handle tabs normally
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })

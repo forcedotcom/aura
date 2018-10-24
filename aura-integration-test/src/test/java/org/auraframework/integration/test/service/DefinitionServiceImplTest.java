@@ -883,7 +883,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 definitionService.find(new DescriptorFilter(String.format("markup://string:house%s*", nonce))).size());
         assertEquals("find() fails with wildcard at beginning of name", 2,
                 definitionService.find(new DescriptorFilter(String.format("markup://string:*%sparty*", nonce))).size());
-        assertEquals("find() should not find nonexistent name with preceeding wildcard", 0,
+        assertEquals("find() should not find nonexistent name with preceding wildcard", 0,
                 definitionService.find(new DescriptorFilter("markup://string:*notherecaptain")).size());
 
         // Test wildcards with specified constant type
@@ -914,7 +914,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 definitionService.find(
                         new DescriptorFilter(String.format("markup://string:*%sparty*", nonce), DefType.APPLICATION))
                         .size());
-        assertEquals("find() should not find nonexistent name with preceeding wildcard", 0,
+        assertEquals("find() should not find nonexistent name with preceding wildcard", 0,
                 definitionService.find(new DescriptorFilter("markup://string:*notherecaptain", DefType.APPLICATION))
                         .size());
 

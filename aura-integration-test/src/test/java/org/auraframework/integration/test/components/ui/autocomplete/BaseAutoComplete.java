@@ -165,7 +165,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     }
 
     /**
-     * Autocomplete list with no data renderes correctly.
+     * Autocomplete list with no data renders correctly.
      */
     // TODO: W-2406307: remaining Halo test failure
     public void _testAutoCompleteWithZeroItems() throws Exception {

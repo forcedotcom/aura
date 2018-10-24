@@ -91,7 +91,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * check if requried links are in manifest content, also make sure excludeLinks are NOT in manifest content.
+     * check if required links are in manifest content, also make sure excludeLinks are NOT in manifest content.
      * @param manifestContent
      * @param requiredLinks
      * @param excludedLinks could be null

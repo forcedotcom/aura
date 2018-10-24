@@ -279,7 +279,7 @@ public abstract class UnitTestCase extends TestCase {
         String fileName = IOUtil.getDefaultTempDir() + File.separator + resourceName;
         File tempFile = new File(fileName);
 
-        // if it didn't exist on classpath, then return ref to non-existant file
+        // if it didn't exist on classpath, then return ref to non-existent file
         if (url == null) {
             return tempFile;
         }

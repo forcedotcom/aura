@@ -366,7 +366,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("ALLOW-FROM www.itrustu.com/frame", headers[0].getValue());
     }
 
-    // 3.if we set ancestor resources with protocal like url, we set ALLOWALL for X-FRAME-OPTIONS
+    // 3.if we set ancestor resources with protocol like url, we set ALLOWALL for X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     @Test
     public void testSpecialCspProtocolAncestor() throws Exception {

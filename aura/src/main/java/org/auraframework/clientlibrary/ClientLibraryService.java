@@ -58,7 +58,7 @@ public interface ClientLibraryService extends AuraServiceProvider {
     Set<String> getPrefetchUrls(AuraContext context, ClientLibraryDef.Type type) throws QuickFixException;
 
     /**
-     * get resolver registery
+     * Gets resolver registry
      * @return resolver registry
      */
     ClientLibraryResolverRegistry getResolverRegistry();

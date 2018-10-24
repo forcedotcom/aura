@@ -184,7 +184,7 @@ public interface DefinitionService {
      * For a component to be returned here, it must implement the PlatformDef interface
      * and have one of the tags passed in.
      *
-     * @param namespace a set of namespaces by which to filter the search, null means do not filter.
+     * @param namespaces a set of namespaces by which to filter the search, null means do not filter.
      * @param tags the set of requested tags (any tag suffices)
      * @return the set of descriptors for defs that match.
      */
@@ -268,8 +268,8 @@ public interface DefinitionService {
      *
      * This is really about wether we expect the definition to change. If not, we can cache based on
      * descriptor rather than uid, and we can expect those to be 'permanent'. If the entry is not
-     * cacheable, the UID should still give us the ability to cache, but we must be carefull about permanence,
-     * as the defintion may be dynamic.
+     * cacheable, the UID should still give us the ability to cache, but we must be careful about permanence,
+     * as the definition may be dynamic.
      */
     boolean isDependencySetCacheable(String uid);
 
@@ -351,7 +351,7 @@ public interface DefinitionService {
      * The use case for this set of methods is when you want to update a set of definitions, and
      * you need to validate the new definitions together as a set, and check them against the
      * previous set of definitions. In the case of using some sort of database to save the defs,
-     * this will allow both the old and new definitions to be held simultaniously, and allow
+     * this will allow both the old and new definitions to be held simultaneously, and allow
      * the caller to control which set is currently in use.
      *
      * @param registrySet the registry set for which we need a context.

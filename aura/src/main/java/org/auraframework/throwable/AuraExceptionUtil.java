@@ -101,7 +101,7 @@ public final class AuraExceptionUtil {
      * 
      * This routine will attempt to unwrap any Aura exception nested inside
      * other exceptions. It is intended to handle things like Memoization or
-     * Excecution exceptions, surfacing the underlying Aura exception. Note that
+     * Execution exceptions, surfacing the underlying Aura exception. Note that
      * this can hide the actual exception chain.
      * 
      * @param t a Throwable to check.

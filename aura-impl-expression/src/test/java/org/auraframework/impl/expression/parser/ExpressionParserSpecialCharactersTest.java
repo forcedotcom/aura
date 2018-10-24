@@ -124,7 +124,7 @@ public class ExpressionParserSpecialCharactersTest extends UnitTestCase {
     public void test() throws Exception {
         try {
             AuraExpressionBuilder.INSTANCE.buildExpression(expression, null);
-            fail("No execption thrown for <" + expression + ">. Expected InvalidExpressionException");
+            fail("No exception thrown for <" + expression + ">. Expected InvalidExpressionException");
         } catch (InvalidExpressionException e) {
             assertTrue("Unexpected error message trying to parse <" + expression + ">. Expected to start with: "
                     + msgStartsWith + ". But got: " + e.getMessage(), e.getMessage().startsWith(msgStartsWith));

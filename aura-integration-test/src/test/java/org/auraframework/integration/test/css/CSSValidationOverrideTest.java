@@ -72,7 +72,7 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
     @Test
     public void testOverrideCSSValidation() throws Exception {
         getMockConfigAdapter().setValidateCss(false);
-        assertFalse("Expected CSS validation to be overriden.", configAdapter.validateCss());
+        assertFalse("Expected CSS validation to be overridden.", configAdapter.validateCss());
         TextSource<StyleDef> source = getInvalidStyleSource();
         StyleParser sp = new StyleParser.WithValidation();
         applicationContext.getAutowireCapableBeanFactory().autowireBean(sp);

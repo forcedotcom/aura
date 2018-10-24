@@ -36,7 +36,7 @@ import com.google.common.cache.RemovalNotification;
  */
 public class CacheEvictionListenerImpl<K, T> implements RemovalListener<K, T> {
 
-    /** A name for the cache being listened to, to clarifiy in logs which one evicted */
+    /** A name for the cache being listened to, to clarify in logs which one evicted */
     private final String name;
 
     private final LoggingAdapter loggingAdapter;

@@ -66,7 +66,7 @@ public abstract class BaseJavascriptClass implements Serializable {
         public abstract BaseJavascriptClass build() throws QuickFixException;
 
         /**
-         * Return true is the class has JS code. Instances should implement it to avoid unecessary extra calls to the
+         * Return true is the class has JS code. Instances should implement it to avoid unnecessary extra calls to the
          * compiler.
          *
          * @return true if class needs to be compiled.

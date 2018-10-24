@@ -199,7 +199,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         try {
             integration.injectComponentHtml(cmp.getDescriptorName(), attributes, "", "", out, async);
         } catch (Exception unexpected) {
-            fail("Exception occured when injecting component with attribute values. Exception:"
+            fail("Exception occurred when injecting component with attribute values. Exception:"
                     + unexpected.getMessage());
         }
     }

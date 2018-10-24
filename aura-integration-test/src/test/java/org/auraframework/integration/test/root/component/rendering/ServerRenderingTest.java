@@ -54,7 +54,7 @@ public class ServerRenderingTest extends AuraImplTestCase {
     }
 
     /**
-     * Verifies function call values with expressions spanning mutliple levels of inheritance work appropriately.
+     * Verifies function call values with expressions spanning multiple levels of inheritance work appropriately.
 	 * 1. Create a base component with an attribute default value.
 	 * 2. Create a component that extends the base component.
 	 * 3. In that concrete, create a function call value that references attributes in both the base and concrete.

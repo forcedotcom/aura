@@ -62,7 +62,7 @@ public interface BaseComponent<D extends BaseComponentDef, I extends BaseCompone
     D getComponentDef() throws QuickFixException;
     
     /**
-     * The concrete is the most specific of definitions in a component heirarchy. 
+     * The concrete is the most specific of definitions in a component hierarchy.
      * 
      * @return
      */

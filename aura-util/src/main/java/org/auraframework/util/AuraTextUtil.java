@@ -459,7 +459,7 @@ public final class AuraTextUtil {
             boolean matched = false;
             for (int i = 0; i < src.length; i++) {
                 if (s.startsWith(src[i], pos) && src[i].length() > 0) {
-                    // we found a matching pattern - append the acculumation
+                    // we found a matching pattern - append the accumulation
                     // plus the replacement
                     sb.append(s.substring(lastMatch, pos)).append(target[i]);
                     pos += src[i].length();

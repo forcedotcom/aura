@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
     /**
-     * Postive test case.
+     * Positive test case.
      */
     @Test
     public void testUsageOfComponentDefRefArray() throws Exception {

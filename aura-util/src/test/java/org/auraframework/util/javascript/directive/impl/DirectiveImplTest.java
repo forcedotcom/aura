@@ -99,7 +99,7 @@ public class DirectiveImplTest extends UnitTestCase {
          * ,d.getModes().equals(EnumSet.allOf(JavascriptGeneratorMode.class)));
          */
         /**
-         * TODO: Non existant mode should be checked Non existant mode
+         * TODO: Non existent mode should be checked Non existent mode
          * java.lang.IllegalArgumentException: No enum const class
          * lib.javascript.directive.JavascriptGeneratorMode.blah d = new
          * TestDirective(4,sample[4]); assertTrue(
@@ -172,7 +172,7 @@ public class DirectiveImplTest extends UnitTestCase {
                 d.getModes().equals(EnumSet.allOf(JavascriptGeneratorMode.class)));
 
         /**
-         * TODO: W-749502 Non existant mode should be checked Non existant mode
+         * TODO: W-749502 Non existent mode should be checked Non existent mode
          * java.lang.IllegalArgumentException: No enum const class
          * lib.javascript.directive.JavascriptGeneratorMode.blah d = new
          * TestDirective(4, sample[4]); assertTrue(

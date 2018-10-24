@@ -356,7 +356,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
     /*
      * This test is to verify 3 layers of components, when attribute changes, each get to rebuild its model correctly. a
      * main component with ParentContainer component in its markup, the ParentContainer has ParentCmp in its markup bug
-     * filed W-2107437 : funny thing if we accidently include a component itself in its markup, we will end up with
+     * filed W-2107437 : funny thing if we accidentally include a component itself in its markup, we will end up with
      * infinity loop then out of memory.
      */
     public void runTestNestedCmp(Boolean testModelWithCount, String model) throws Exception {

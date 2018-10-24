@@ -89,7 +89,7 @@ public class DialogUITest extends WebDriverTestCase {
      * Dialog box, it changes from dialog modal medium uiDialog slideUp -> dialog modal medium uiDialog-> dialog hidden
      * modal medium uiDialog (this is the state that we want to make sure to grab)
      *
-     * @param selectorToFindCmp way to find componenet (ex: "div[class*='dialog']")
+     * @param selectorToFindCmp way to find component (ex: "div[class*='dialog']")
      * @param attr components attribute that we want to find
      * @param itemAttrShouldContain Keyword that we are looking for in the attribute
      * @param useBangOperator Whether we want to use the bang operator or not

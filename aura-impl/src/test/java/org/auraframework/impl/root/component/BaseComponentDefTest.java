@@ -1019,7 +1019,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         Collection<EventHandlerDef> handlerDefs = def.getHandlerDefs();
         assertEquals("Wrong number of handlers", 2, handlerDefs.size());
         for (EventHandlerDef handlerDef : handlerDefs) {
-            assertTrue("Wrong handlers added to definiton", handlerDef.toString().equals("markup://aura:doneWaiting")
+            assertTrue("Wrong handlers added to definition", handlerDef.toString().equals("markup://aura:doneWaiting")
                     || handlerDef.toString().equals("markup://aura:doneRendering"));
         }
     }

@@ -434,7 +434,7 @@ public class FunctionsTest extends UnitTestCase {
         assertEquals(Boolean.TRUE, evaluate(NOTEQUALS, Boolean.FALSE, Boolean.TRUE));
     }
 
-    //skip: value from modle only apply to JS side
+    //skip: value from model only apply to JS side
     //<expressionTest:test expression="{!notequals(false, m.booleanTrue)}" exprText="notequals(false, m.booleanTrue)" expected="true"/>
     //<expressionTest:test expression="{!m.booleanFalse ne false}" exprText="m.booleanFalse ne false" expected="false"/>
 

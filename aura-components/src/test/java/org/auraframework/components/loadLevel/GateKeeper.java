@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 import org.auraframework.throwable.AuraRuntimeException;
 
 /**
- * A 'gatekeeper' to controll and maintain gating between the client and server.
+ * A 'gatekeeper' to control and maintain gating between the client and server.
  *
  * This is a helper class used by GatedModel, GatedModelController, and AuraStorage tests.
  *

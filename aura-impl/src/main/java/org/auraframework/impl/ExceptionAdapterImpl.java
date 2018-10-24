@@ -52,7 +52,7 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
     public Throwable handleException(Throwable th) {
         if(th instanceof AuraResourceException) {
             AuraResourceException resourceException = ((AuraResourceException)th);
-            String message = String.format("An exception occured while creating Aura resource '%s', Status Code: %s.",
+            String message = String.format("An exception occurred while creating Aura resource '%s', Status Code: %s.",
                     resourceException.getResourceName(), resourceException.getStatusCode());
             log.warn(message, resourceException);
             return th;

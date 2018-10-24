@@ -139,7 +139,7 @@ public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLoc
         // check for nulls - this happens when AuraContextFilter has not been run
         final AuraContext context = contextService.getCurrentContext();
         if (context == null) {
-        	throw new IllegalStateException("The AuraContext needs to be initialized before you can retreive the current locale.");
+        	throw new IllegalStateException("The AuraContext needs to be initialized before you can retrieve the current locale.");
         }
         final List<Locale> locales = context.getRequestedLocales();
         if (locales != null && !locales.isEmpty()) {

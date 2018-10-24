@@ -167,7 +167,7 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
     public void testComparingLibraryDefsDifferentTypes() throws Exception{
         ClientLibraryDef sameNameButDifferentType1 = getElement("<aura:clientLibrary name='MyLib' type='CSS'/>");
         ClientLibraryDef sameNameButDifferentType2 = getElement("<aura:clientLibrary name='MyLib' type='JS'/>");
-        assertFalse("Same library with diffrent types should not be considered duplicates",
+        assertFalse("Same library with different types should not be considered duplicates",
                 sameNameButDifferentType1.equals(sameNameButDifferentType2));
     }
 

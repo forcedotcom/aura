@@ -103,7 +103,7 @@ public interface BaseXmlElement extends Serializable {
     Location getLocation();
 
     /**
-     * @return the access permisions for this definition.
+     * @return the access permissions for this definition.
      */
     DefinitionAccess getAccess();
 

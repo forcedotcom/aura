@@ -250,7 +250,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         // Create the new loaded array.
         // loaded = server + (client - server) @ DELETED.
 
-        // Step 1: Start with client defintion set
+        // Step 1: Start with client definition set
         Set<DefDescriptor<?>> currentLoaded = new HashSet<>();
         currentLoaded.addAll(ctx.getClientLoaded().keySet());
 

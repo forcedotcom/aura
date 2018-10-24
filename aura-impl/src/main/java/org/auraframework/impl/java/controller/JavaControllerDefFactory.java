@@ -178,7 +178,7 @@ public class JavaControllerDefFactory implements DefinitionFactory<JavaSourceImp
      * 
      * Note that this function will not look at any method that is not public.
      * If we want to check for @AuraEnabled methods that are marked non-public
-     * we would need to walk every method in the heirarchy, checking for that
+     * we would need to walk every method in the hierarchy, checking for that
      * case. It would really just be for validation.
      * 
      * @param controllerClass the class that contains our action functions.

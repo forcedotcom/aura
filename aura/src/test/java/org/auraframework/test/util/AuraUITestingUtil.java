@@ -397,7 +397,7 @@ public class AuraUITestingUtil {
             Assert.assertEquals("Wrapped javsascript execution expects an array of exactly 3 elements", 3,
                     wrapResult.size());
             Object exception = wrapResult.get(2);
-            Assert.assertNull("Following JS Exception occured while evaluating provided script:\n" + exception + "\n"
+            Assert.assertNull("Following JS Exception occurred while evaluating provided script:\n" + exception + "\n"
                     + "Arguments: (" + Arrays.toString(args) + ")\n" + "Script:\n" + javascript + "\n", exception);
             String errors = (String) wrapResult.get(1);
             assertJsTestErrors(errors);

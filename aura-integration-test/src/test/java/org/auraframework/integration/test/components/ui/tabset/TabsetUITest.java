@@ -214,7 +214,7 @@ public class TabsetUITest extends WebDriverTestCase {
         // Verify correct element is focused (verified with with the class that we are expecting the element to contain)
         String activeElementClass = (String) getAuraUITestingUtil()
                 .getEval("return $A.test.getActiveElement().getAttribute('class')");
-        assertTrue("Focus is not on ther correct element", activeElementClass.contains(itemToVerifyAgainst));
+        assertTrue("Focus is not on the correct element", activeElementClass.contains(itemToVerifyAgainst));
     }
 
     /**
@@ -387,7 +387,7 @@ public class TabsetUITest extends WebDriverTestCase {
 
         // Verify anchor is focused on
         String activeElementText = getAuraUITestingUtil().getActiveElementText();
-        assertTrue("Focus is not on ther correct element", activeElementText.contains("Close"));
+        assertTrue("Focus is not on the correct element", activeElementText.contains("Close"));
 
         // Move from anchor to next item (inputTextBox)
         element = findDomElement(By.xpath(createXPath(1) + "/a"));

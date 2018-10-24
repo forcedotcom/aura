@@ -608,7 +608,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
     public void testReadFunction() throws Exception {
         String func = "{key:function (arg1, arg2) {   " + "var str = \"\\\"\"; " + "var func = function(){ "
                 + "var foo = {};" + "var str = \"{\";" + "}; " +
-                // missing closing paranthesis for outer function
+                // missing closing parenthesis for outer function
                 "}";
         try {
             this.parseAndRetrieve(func);
@@ -618,7 +618,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
         }
         func = "{key:function (arg1, arg2) {" + "var str = \"\\\"\"; " + "var str2 = '\\'vads\\nadf' "
                 + "var foo = {\n}; " + "var func = function(){ " + "var foo = {};" + "var str = \"{\";" +
-                // Missing closing paranthesis for inner function body
+                // Missing closing parenthesis for inner function body
                 "}" + "}";
         try {
             this.parseAndRetrieve(func);

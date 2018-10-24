@@ -71,7 +71,7 @@ public interface ServletUtilAdapter extends AuraAdapter {
     boolean actionServletPostPre(HttpServletRequest request, HttpServletResponse response) throws IOException;
 
     /**
-     * Handle a servlet execption as well as we can.
+     * Handle a servlet exception as well as we can.
      *
      * @param t the exception thrown.
      * @param quickfix are we in the middle of writing a quickfix.

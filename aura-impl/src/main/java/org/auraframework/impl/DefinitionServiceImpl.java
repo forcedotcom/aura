@@ -813,7 +813,7 @@ public class DefinitionServiceImpl implements DefinitionService {
      * Failing to do so will give incorrect results (null).
      *
      * This uses some trickery to try to be efficient, including using a dual keyed local cache to avoid looking up
-     * values more than once even in the absense of remembered context.
+     * values more than once even in the absence of remembered context.
      *
      * Note: there is no guarantee that the definitions have been fetched from cache here, so there is a very subtle
      * race condition.

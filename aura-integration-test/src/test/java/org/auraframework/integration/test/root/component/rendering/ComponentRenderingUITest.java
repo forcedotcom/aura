@@ -127,7 +127,7 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
                 getText(By.cssSelector("body")).contains("salesforce.com, inc, All rights reserved"));
         assertTrue("Using java renderer failed", isElementPresent(By.xpath("//a[@href='http://www.salesforce.com']")));
         // Verify that the remote renderer for test_JavaRndr_Impl is not used
-        assertFalse("Server renderered component's dont use their remote renderer.",
+        assertFalse("Server rendered component's dont use their remote renderer.",
                 isElementPresent(By.xpath("//div[contains(@class,'javascriptRenderer')]")));
 
     }
@@ -136,7 +136,7 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
      * Verify forcing interactive components to be rendered serverside does not
      * blow up aura. Test Cases:
      * <ol>
-     * <li>Components/Application that should ideally be renderered client side
+     * <li>Components/Application that should ideally be rendered client side
      * can be rendered server side by using the render='server' specification.
      * This will not blow up the page. It will just be unusable.</li>
      * <li>Specifying preload on the component has no significance.</li>

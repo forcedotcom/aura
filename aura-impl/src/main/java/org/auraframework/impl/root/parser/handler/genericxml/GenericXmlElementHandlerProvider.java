@@ -58,7 +58,7 @@ public class GenericXmlElementHandlerProvider {
     /**
      * Returns if there exists a handler to handle the tag
      *
-     * @param currentDefinition the current Defintion before entering the next element.
+     * @param currentDefinition the current Definition before entering the next element.
      * @param tag              the next element being parsed
      * @return whether a handler exists to handle the tag.
      */

@@ -801,7 +801,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public String getSessionCacheKey(Mode mode) {
-        // return a static session key here, to ensure we always cache unless overriden.
+        // return a static session key here, to ensure we always cache unless overridden.
         return "aura.sessionCacheKey";
     }
 

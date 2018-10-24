@@ -382,6 +382,7 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
                 "pageStartTime" : this.pageStartTime,
                 "marks"         : {},
                 "context"       : transactionCfg["context"] || {},
+                "owner"         : transaction["owner"],
                 "unixTS"        : !Aura.Services.MetricsService.PERFTIME // If the browser does not support performance API, all transactions will be Unix Timestamps
             };
 
@@ -636,7 +637,8 @@ Aura.Services.MetricsService.prototype.createTransaction = function (ns, name, c
             "id"            : id,
             "offsets"       : {},
             "ts"            : Math.round(this.time() * 100) / 100,
-            "config"        : config || {}
+            "config"        : config || {},
+            "owner"        :  $A.clientService.currentAccess ? $A.clientService.currentAccess.type : null
         },
         offsets = transaction["offsets"];
 
@@ -717,7 +719,8 @@ Aura.Services.MetricsService.prototype.createMarkNode = function (ns, name, even
         "name"    : name,
         "phase"   : eventType,
         "ts"      : Aura.Services.MetricsService.TIMER(),
-        "context" : context
+        "context" : context,
+        "owner"   : !this.pluginInstances[ns] && $A.clientService.currentAccess ? $A.clientService.currentAccess.type : null
     };
 };
 

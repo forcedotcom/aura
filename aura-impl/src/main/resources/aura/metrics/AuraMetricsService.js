@@ -33,6 +33,8 @@ Aura.Services.MetricsService = function MetricsService() {
     this.pluginsInitialized        = false;
     this.clearCompleteTransactions = true; // In PTEST Mode this is set to false (see initialize method)
     this.shouldLogBootstrap         = true;
+
+    this.configurePerformanceAPILogging();
     
     // Public constants used for flagging page transactions
     this["PAGE_IN_DOM"] = "PageInDOM";
@@ -75,6 +77,32 @@ Aura.Services.MetricsService.prototype.initialize = function () {
     this.transactionStart('aura','bootstrap');
     this.initializePlugins();
     window.addEventListener('load', this.emitBootstrapTransaction.bind(this));
+};
+
+/**
+ * Initialize function
+ *@private
+**/
+Aura.Services.MetricsService.prototype.configurePerformanceAPILogging = function () {
+    var windowPerformance = window.performance || {};
+    var noop = function() {};
+    this.performance = {
+        mark         : (windowPerformance["mark"]          || noop).bind(windowPerformance),
+        measure      : (windowPerformance["measure"]       || noop).bind(windowPerformance),
+        clearMeasures: (windowPerformance["clearMeasures"] || noop).bind(windowPerformance),
+        clearMarks   : (windowPerformance["clearMarks"]    || noop).bind(windowPerformance) 
+    };
+    
+    // override mark & measure so that we can listen to these calls in real time
+    // and log corresponding marks at the right time so that they correctly show
+    // up in any open transaction
+    // 
+    // PerformanceObserver batches events and is delayed by a macrotask. This can be 100s of milliseconds
+    // We need to be able to insert the marks into the right open transactions so that we can correlate
+    // any perf mark/measure activity into the relevant metrics service transactions
+    //  
+    windowPerformance["mark"] = this.performanceMarkOverride.bind(this);
+    windowPerformance["measure"] = this.performanceMeasureOverride.bind(this);
 };
 
 /**
@@ -373,7 +401,11 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
         beacon         = this.beaconProviders[ns] || this.beaconProviders[Aura.Services.MetricsService.DEFAULT];
 
     postProcess = typeof config === 'function' ? config : postProcess || transactionCfg["postProcess"];
-
+    if (transaction) {
+        this.performance.measure(id, id);
+        this.performance.clearMeasures(id);
+        this.performance.clearMarks(id);
+    }
     if (transaction && (beacon || postProcess || !this.clearCompleteTransactions)) {
         var parsedTransaction = {
                 "id"            : id,
@@ -647,6 +679,7 @@ Aura.Services.MetricsService.prototype.createTransaction = function (ns, name, c
     }
 
     this.transactions[id] = transaction;
+    this.performance.mark(id);
     return id;
 };
 
@@ -681,7 +714,6 @@ Aura.Services.MetricsService.prototype.markStart = function (ns, name, context) 
     var mark        = this.createMarkNode(ns, name, Aura.Services.MetricsService.START, context),
         nsCollector = this.collector[ns],
         collector   = nsCollector ? nsCollector : (this.collector[ns] = []);
-
     collector.push(mark);
     return mark;
 };
@@ -714,6 +746,13 @@ Aura.Services.MetricsService.prototype.markEnd = function (ns, name, context) {
 **/
 Aura.Services.MetricsService.prototype.createMarkNode = function (ns, name, eventType, options) {
     var context = options ? (options["context"] || options) : null;
+    var logPerfMarks = ns !== Aura.Services.MetricsService.DEFAULT;
+    if (logPerfMarks) {
+        var id = ns + ":" + name + "|" + eventType;
+        this.performance.mark(id);
+        this.performance.clearMarks(id);
+    }
+
     return {
         "ns"      : ns,
         "name"    : name,
@@ -1150,3 +1189,37 @@ Aura.Services.MetricsService.prototype.updateCacheStats = function(cacheName, st
     }
 };
 
+/**
+ * Override for performance.mark
+ * 
+ * Logs metrics service markStart into the default namespace
+*/
+Aura.Services.MetricsService.prototype.performanceMarkOverride = function(name) {
+    var ret = this.performance.mark.apply(undefined, arguments);
+    this.markStart(name);
+    return ret;
+};
+
+/**
+ * Override for performance.measure
+ * 
+ * Logs metrics service markEnd with same name as startMark into the default namespace
+*/
+Aura.Services.MetricsService.prototype.performanceMeasureOverride = function(name, startMark, endMark) {
+    var ret = this.performance.measure.apply(undefined, arguments);
+    if (endMark !== undefined) {
+        // There is no corresponding metrics service mark that can be logged if there is an 
+        // endmark defined. They endMark and startMark could be very far away from when measure
+        // is called
+        return ret;
+    }
+    if (startMark === undefined) {
+        // https://w3c.github.io/user-timing/#dom-performance-measure
+        // if startMark is omitted, startime is 0. which is like calling mark
+        this.mark(name);
+        return ret;
+    }
+    // there is a startmark and measure is called to effectively end the mark
+    this.markEnd(startMark, undefined, {"measure": name});
+    return ret;
+};

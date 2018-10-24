@@ -125,7 +125,7 @@ TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, ac
 
     if (ret) {
         var startMark = this.metricsService["markStart"](TransportMetricsPlugin.NAME, 'request');
-        // since the xhr actually went out when the original send funciton is called
+        // since the xhr actually went out when the original send function is called
         startMark["ts"] = sendTime;
         var actionDefs = [];
         for (var id in auraXHR.actions) {

@@ -18,11 +18,12 @@ Function.RegisterNamespace("Test.Aura.Metrics");
 Test.Aura.Metrics.AuraMetricsServiceTest=function(){
     var Aura = {Services: {}};
 
-    Mocks.GetMocks(Object.Global(), {
+    var globalMock = Mocks.GetMocks(Object.Global(), {
         "window" : {},
         Aura: Aura
-    })
-    (function () {
+    });
+
+    globalMock(function () {
         [Import("aura-impl/src/main/resources/aura/metrics/AuraMetricsService.js")]
     });
 
@@ -30,7 +31,10 @@ Test.Aura.Metrics.AuraMetricsServiceTest=function(){
     function Instrument() {
         [Fact]
         function RetainsParameterAsArrayInBeforeHook() {
-            var target = new Aura.Services.MetricsService();
+            var target;
+            globalMock(function() {
+                target = new Aura.Services.MetricsService();
+            });
             target.markStart = function(){};
             target.markEnd = function(){};
             var beforeHookParam;
@@ -50,7 +54,10 @@ Test.Aura.Metrics.AuraMetricsServiceTest=function(){
 
         [Fact]
         function RetainsParameterAsArrayInAfterHook() {
-            var target = new Aura.Services.MetricsService();
+            var target;
+            globalMock(function() {
+                target = new Aura.Services.MetricsService();
+            });
             target.markStart = function(){};
             target.markEnd = function(){};
             var afterHookParam;
@@ -70,7 +77,10 @@ Test.Aura.Metrics.AuraMetricsServiceTest=function(){
 
         [Fact]
         function RetainsParameterAsArrayInOriginalFunction() {
-            var target = new Aura.Services.MetricsService();
+            var target;
+            globalMock(function() {
+                target = new Aura.Services.MetricsService();
+            });
             target.markStart = function(){};
             target.markEnd = function(){};
             var originalFuncParam;
@@ -96,7 +106,10 @@ Test.Aura.Metrics.AuraMetricsServiceTest=function(){
             var expected = {
                     initialize: function(){}
             }
-            var target = new Aura.Services.MetricsService();
+            var target;
+            globalMock(function() {
+                target = new Aura.Services.MetricsService();
+            });
             target.pluginsInitialized = true; // emulate post-initialization scenario
 
             target.registerPlugin({
@@ -116,7 +129,10 @@ Test.Aura.Metrics.AuraMetricsServiceTest=function(){
         function SummarizeResourcePerfInfoIncludesInitiatorType() {
             var expected = "SCRIPT";
 
-            var target = new Aura.Services.MetricsService();
+            var target;
+            globalMock(function() {
+                target = new Aura.Services.MetricsService();
+            });
             var actual = target.summarizeResourcePerfInfo({
                 "initiatorType": expected
             }).initiatorType;

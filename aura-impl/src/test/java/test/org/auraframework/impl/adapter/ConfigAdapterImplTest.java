@@ -15,12 +15,6 @@
  */
 package test.org.auraframework.impl.adapter;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -29,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
-
 import javax.inject.Inject;
 
 import org.auraframework.adapter.ConfigAdapter;
@@ -49,6 +42,12 @@ import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.text.Hash;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for ConfigAdapterImpl.
@@ -114,10 +113,6 @@ public class ConfigAdapterImplTest extends UnitTestCase {
      */
     @Test
     public void testRegenerateHandlesErrors() throws Exception {
-        // The real case should work, of course:
-        configAdapter.regenerateAuraJS();
-        assertTrue("Framework nonce should not be empty", configAdapter.getAuraFrameworkNonce().length() > 0);
-
         // But an error case should fail, and not be swallowed.
         final AuraJavascriptGroup mockJsGroup = mock(AuraJavascriptGroup.class);
 

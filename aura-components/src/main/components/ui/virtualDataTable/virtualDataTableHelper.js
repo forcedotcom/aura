@@ -476,11 +476,14 @@
     },
     
     fireRenderEvent: function(cmp, type, index) {
-        cmp.getEvent("gridAction").setParams({
-            action: type,
-            index: index,
-            payload: {}
-        }).fire();
+        var evt = cmp.getEvent("gridAction");
+        if (evt) {
+            evt.setParams({
+                action: type,
+                index: index,
+                payload: {}
+            }).fire();
+        }
     },
     
     /*

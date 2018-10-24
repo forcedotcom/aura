@@ -633,9 +633,12 @@
      */
     hasResizerHandles : function(cmp) {
         // TODO: Use getHandles from the resizer instead of grabbing the elements ourselves
-        var handles = cmp.getElement().querySelectorAll("thead .slds-resizable").length;
-        var headers = cmp.get("v.headerColumns").length;
-        return handles === headers;
+        if (cmp.isValid() && cmp.isRendered()) { //adding a null check
+            var handles = cmp.getElement().querySelectorAll("thead .slds-resizable").length;
+            var headers = cmp.get("v.headerColumns").length;
+            return handles === headers;
+        }
+        return false;
     },
     
     destroyTemplates: function (cmp) {

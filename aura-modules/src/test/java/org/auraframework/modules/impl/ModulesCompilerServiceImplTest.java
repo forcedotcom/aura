@@ -46,6 +46,7 @@ import org.junit.Assert;
 import org.lwc.OutputConfig;
 import org.lwc.bundle.BundleType;
 import org.lwc.decorator.DecoratorParameterValue;
+import org.lwc.metadata.ModuleExport;
 import org.lwc.template.TemplateModuleDependencies;
 import org.lwc.template.TemplateModuleDependency;
 
@@ -172,6 +173,40 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
             objectOutputStream.writeObject(templateModuleDependencies);
         } catch (NotSerializableException e) {
             Assert.fail("Template Module Dependencies should be serializable");
+        }
+
+    }
+
+    @Test
+    public void testModuleExportsMetadata() throws Exception {
+        ModulesCompilerData compilerData = compileModule("modules/moduleExportTest/moduleExportTest");
+
+        List<ModuleExport> exports = compilerData.compilerReport.metadata.exports;
+
+        // There are two exports, one a constant, the other the default class
+        assertEquals(2, exports.size());
+        ModuleExport namedModuleExport = exports.get(0);
+        assertEquals("", namedModuleExport.source);
+        assertEquals(ModuleExport.ExportType.ExportNamedDeclaration, namedModuleExport.type);
+        assertEquals("EXPORTED_CONSTANT", namedModuleExport.value);
+        ModuleExport defaultModuleExport = exports.get(1);
+        assertEquals("", defaultModuleExport.source);
+        assertEquals(ModuleExport.ExportType.ExportDefaultDeclaration, defaultModuleExport.type);
+        assertEquals("", defaultModuleExport.value);
+    }
+
+    @Test
+    public void testModuleExportsMetadataSerializable() throws Exception {
+        ModulesCompilerData compilerData = compileModule("modules/moduleExportTest/moduleExportTest");
+
+        List<ModuleExport> exports = compilerData.compilerReport.metadata.exports;
+
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            objectOutputStream.writeObject(exports);
+        } catch (NotSerializableException e) {
+            Assert.fail("Module Exports should be serializable");
         }
 
     }

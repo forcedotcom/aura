@@ -45,6 +45,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Json.ApplicationKey;
 import org.auraframework.validation.ReferenceValidationContext;
+import org.lwc.metadata.ModuleExport;
 import org.lwc.reference.Reference;
 import org.lwc.template.TemplateModuleDependencies;
 
@@ -80,7 +81,8 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     private final DocumentationDef auraDocumentationDef;
     private final SVGDef svgDef;
     private final Collection<ModulesCompilerData.WireDecoration> wireDecorations;
-    private List<TemplateModuleDependencies> experimentalTemplateModuleDependencies;
+    private final List<TemplateModuleDependencies> experimentalTemplateModuleDependencies;
+    private final List<ModuleExport> exports;
     private final List<ModuleExample> examples;
 
     private ModuleDefImpl(Builder builder) {
@@ -102,6 +104,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         this.wireDecorations = builder.wireDecorations;
         this.svgDef = builder.svgDef;
         this.experimentalTemplateModuleDependencies = builder.experimentalTemplateModuleDependencies;
+        this.exports = builder.exports;
         this.examples = AuraUtil.immutableList(builder.examples);
     }
 
@@ -161,6 +164,11 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     @Override
     public List<TemplateModuleDependencies> getExperimentalTemplateModuleDependencies() {
         return experimentalTemplateModuleDependencies;
+    }
+
+    @Override
+    public List<ModuleExport> getExports() {
+        return this.exports;
     }
 
     @Override
@@ -361,6 +369,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private SVGDef svgDef;
         private Collection<ModulesCompilerData.WireDecoration> wireDecorations;
         private List<TemplateModuleDependencies> experimentalTemplateModuleDependencies;
+        private List<ModuleExport> exports;
 
         private List<ModuleExample> examples;
         
@@ -438,6 +447,10 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
 
         public void setExperimentalTemplateModuleDependencies(List<TemplateModuleDependencies> dependencies) {
             this.experimentalTemplateModuleDependencies = dependencies;
+        }
+
+        public void setExports(List<ModuleExport> exports) {
+            this.exports = exports;
         }
 
         public void setSourceReferences(List<Reference> sourceReferences) {

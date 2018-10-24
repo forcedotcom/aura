@@ -202,6 +202,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setWireDecorations(compilerData.wireDecorations);
         builder.setExperimentalTemplateModuleDependencies(
             compilerData.compilerReport.metadata.experimentalTemplateModuleDependencies);
+        builder.setExports(compilerData.compilerReport.metadata.exports);
 
         BundleDocumentation bundleDoc = compilerData.compilerReport.documentation;
         if (bundleDoc != null) {

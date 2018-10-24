@@ -20,6 +20,7 @@ import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.PlatformDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.modules.ModulesCompilerData;
+import org.lwc.metadata.ModuleExport;
 import org.lwc.reference.Reference;
 import org.lwc.template.TemplateModuleDependencies;
 
@@ -121,5 +122,11 @@ public interface ModuleDef extends PlatformDef {
      *
      */
     List<ModuleExample> getExamples();
+
+    /**
+     *  Returns a list of module's export metadata.
+     *
+     */
+    List<ModuleExport> getExports();
 
 }

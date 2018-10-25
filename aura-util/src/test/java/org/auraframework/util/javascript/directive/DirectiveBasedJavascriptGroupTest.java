@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.auraframework.util.javascript.SourcemapWriter;
 import org.auraframework.util.javascript.builder.EngineJavascriptBuilder;
 import org.auraframework.util.javascript.builder.FrameworkJavascriptBuilder;
 import org.auraframework.util.javascript.builder.JavascriptBuilder;
@@ -184,6 +185,14 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
             } finally {
                 if (fileToCheck.exists()) {
                     fileToCheck.delete();
+                }
+                File sourceContentFile = SourcemapWriter.getSourcContentFile(fileToCheck);
+                if(sourceContentFile.exists()) {
+                    sourceContentFile.delete();
+                }
+                File sourcemapFile = SourcemapWriter.getSourcemapFile(fileToCheck);
+                if(sourcemapFile.exists()) {
+                    sourcemapFile.delete();
                 }
             }
         }

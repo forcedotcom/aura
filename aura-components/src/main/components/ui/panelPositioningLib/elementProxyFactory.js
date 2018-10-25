@@ -38,8 +38,19 @@ function lib(elementProxy, utils, win) { //eslint-disable-line no-unused-vars
         }
     }
 
-    function getReferenceCount(proxy) {
-        var id = proxy.id;
+    var proxyCounter = 0;
+    function assignNodeKey(node) {
+        var key = "aura-pos-lib-" + proxyCounter++;
+        node.setAttribute("data-proxy-id", key);
+        return key;
+    }
+
+    function getNodeKey(node) {
+        return node && node.getAttribute("data-proxy-id");
+    }
+
+    function getReferenceCount(el) {
+        var id = getNodeKey(el);
         if (!id || !proxyCache[id]) {
             return 0;
         } else {
@@ -47,21 +58,20 @@ function lib(elementProxy, utils, win) { //eslint-disable-line no-unused-vars
         }
     }
 
-
     function release(prx) {
-        var proxy = proxyCache[prx.id];
+        var proxy = proxyCache[prx.key];
         if(proxy) {
             --proxy.refCount;
         }
         if(proxy && proxy.refCount <= 0 ) {
-            delete proxyCache[prx.id];
+            delete proxyCache[prx.key];
         }
         // if there is no proxy in the cache 
         // this is a no-op
     }
-
+    
     function elementProxyFactory(el) {
-        var key, newProxy;
+        var key, newProxy, id;
 
         if(utils.isWindow(el)) {
             key = 'window';
@@ -69,18 +79,24 @@ function lib(elementProxy, utils, win) { //eslint-disable-line no-unused-vars
             // 1 - Node.ELEMENT_NODE, 11 - Node.DOCUMENT_FRAGMENT_NODE
             $A.assert(el && el.nodeType && (el.nodeType !== 1 || el.nodeType !== 11), "Element Proxy requires an element");
 
+            key = getNodeKey(el);
+            if (!key) {
+                key = assignNodeKey(el);
+            }
+
             if(!el.id) {
                 var cmp = w.$A.getComponent(el);
                 el.id = cmp ? cmp.getGlobalId() : "window";
             }
-            key = el.id;
+            id = el.id;
         }
 
         if(proxyCache[key]) {
             proxyCache[key].refCount++;
             return proxyCache[key].el;
         } else {
-            newProxy = new ElementProxy(el, key);
+            newProxy = new ElementProxy(el, id);
+            newProxy.key = key;
             newProxy.setReleaseCallback(release, newProxy);
 
             proxyCache[key] = {

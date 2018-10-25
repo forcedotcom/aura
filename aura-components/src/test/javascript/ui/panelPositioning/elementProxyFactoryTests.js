@@ -48,12 +48,22 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 		}
 	};
 
+	function createElement(attrs) {
+		attrs.getAttribute = function(name) {
+			return this[name];
+		};
+		
+		attrs.setAttribute = function(name, value) {
+			this[name] = value;
+		}
+		return attrs;
+	}
 	
 	var callback = function (path, fn) {fn();};
 	[ImportJson("aura-components/src/main/components/ui/panelPositioningLib/elementProxyFactory.js", function(path, result) {
 
-		var ElementProxy = function(el) {
-			this.id = el.id;
+		var ElementProxy = function(el, key) {
+			this.id = key;
 			proxyCount++;
 		};
 
@@ -67,7 +77,7 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 		};
 
 		ElementProxy.prototype.bake = function() {
-			bakedMap[this.id] = true;
+			bakedMap[this.key] = true;
 		};
 
 		ElementProxy.prototype.release = function() {
@@ -105,7 +115,10 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 
 		[Fact]
 		function getElementReturnsProxy() {
-			var el = {id:'foo', nodeType: 1};
+			var el = createElement({
+				id:'foo',
+				nodeType: 1,
+			});
 			var prox;
 			mockAura(function() {
 				prox = proxyFactory.getElement(el);
@@ -116,7 +129,9 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 		[Fact]
 		function returnsSameElementForId() {
 			proxyFactory.resetFactory();
-			var el = {id:'foo', nodeType: 1};
+			var el =  createElement({
+				id:'foo', nodeType: 1,
+			});
 			proxyCount = 0;
 
 			mockAura(function() {
@@ -155,7 +170,9 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 		[Fact]
 		function exceptionForOnNonElement() {
 			proxyFactory.resetFactory();
-			var el = {id:1};
+			var el = createElement({
+				id:1,
+			});
 			var prox, actual;
 			proxyCount = 0;
 			
@@ -181,23 +198,23 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 		[Fact]
 		function bakeOne() {
 			proxyFactory.resetFactory();
-			var el = {id:'foo1', nodeType: 1};
+			var el = createElement({id:'foo1', nodeType: 1});
 			var prox;
 			mockAura(function() {
 				prox = proxyFactory.getElement(el);
 				proxyFactory.bakeOff();
 			});
 			
-			Assert.True(bakedMap.foo1);
+			Assert.True(bakedMap[el.getAttribute("data-proxy-id")]);
 		}
 
 		[Fact]
 		function bakeMany() {
 			bakedMap = {};
 			proxyFactory.resetFactory();
-			var el = {id:'foo1', nodeType: 1};
-			var el2 = {id:'foo2', nodeType: 1};
-			var el3 = {id:'foo3', nodeType: 1};
+			var el = createElement({id:'foo1', nodeType: 1});
+			var el2 = createElement({id:'foo2', nodeType: 1});
+			var el3 = createElement({id:'foo3', nodeType: 1});
 			var prox;
 			
 			mockAura(function() {
@@ -207,7 +224,7 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 				proxyFactory.bakeOff();
 			});
 			
-			Assert.True(bakedMap.foo1 && bakedMap.foo2 && bakedMap.foo3);
+			Assert.True(bakedMap[el.getAttribute("data-proxy-id")] && bakedMap[el2.getAttribute("data-proxy-id")] && bakedMap[el3.getAttribute("data-proxy-id")]);
 		}
 
 	}
@@ -218,7 +235,7 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 		[Fact]
 		function countInc() {
 			proxyFactory.resetFactory();
-			var el = {id:'bas', nodeType: 1};
+			var el = createElement({id:'bas', nodeType: 1});
 			var prox, prox2, actual;
 
 			mockAura(function() {
@@ -228,14 +245,13 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 			})
 			
 			var expected = 2;
-
 			Assert.Equal(expected, actual);
 		}
 
 		[Fact]
 		function eviction() {
 			proxyFactory.resetFactory();
-			var el = {id:'bas', nodeType: 1};
+			var el = createElement({id:'bas', nodeType: 1});
 			var prox, prox2, actual;
 
 			mockAura(function() {
@@ -245,16 +261,9 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 				prox2.release();
 				actual = proxyFactory.getReferenceCount(el);
 			});
-
 			
-
 			var expected = 0;
-
 			Assert.Equal(0, proxyFactory.getReferenceCount(el));
-
 		}
-
 	}
-
-
 };

@@ -193,8 +193,16 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
       }
     }
   }
-  function getReferenceCount(proxy) {
-    var id = proxy.id;
+  function assignNodeKey(node) {
+    var key = "aura-pos-lib-" + proxyCounter++;
+    node.setAttribute("data-proxy-id", key);
+    return key
+  }
+  function getNodeKey(node) {
+    return node && node.getAttribute("data-proxy-id")
+  }
+  function getReferenceCount(el) {
+    var id = getNodeKey(el);
     if(!id || !proxyCache[id]) {
       return 0
     }else {
@@ -202,32 +210,38 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
     }
   }
   function release(prx) {
-    var proxy = proxyCache[prx.id];
+    var proxy = proxyCache[prx.key];
     if(proxy) {
       --proxy.refCount
     }
     if(proxy && proxy.refCount <= 0) {
-      delete proxyCache[prx.id]
+      delete proxyCache[prx.key]
     }
   }
   function elementProxyFactory(el) {
     var key;
     var newProxy;
+    var id;
     if(utils.isWindow(el)) {
       key = "window"
     }else {
       $A.assert(el && el.nodeType && (el.nodeType !== 1 || el.nodeType !== 11), "Element Proxy requires an element");
+      key = getNodeKey(el);
+      if(!key) {
+        key = assignNodeKey(el)
+      }
       if(!el.id) {
         var cmp = w.$A.getComponent(el);
         el.id = cmp ? cmp.getGlobalId() : "window"
       }
-      key = el.id
+      id = el.id
     }
     if(proxyCache[key]) {
       proxyCache[key].refCount++;
       return proxyCache[key].el
     }else {
-      newProxy = new ElementProxy(el, key);
+      newProxy = new ElementProxy(el, id);
+      newProxy.key = key;
       newProxy.setReleaseCallback(release, newProxy);
       proxyCache[key] = {el:newProxy, refCount:1}
     }
@@ -240,6 +254,7 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
   var w = win || window;
   var ElementProxy = elementProxy.ElementProxy;
   var proxyCache = {};
+  var proxyCounter = 0;
   return{_proxyCache:proxyCache, getReferenceCount:getReferenceCount, getElement:elementProxyFactory, bakeOff:bakeOff, resetFactory:reset, release:release}
 }
 

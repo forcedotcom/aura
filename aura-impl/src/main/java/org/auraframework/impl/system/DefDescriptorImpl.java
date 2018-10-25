@@ -33,7 +33,10 @@ import org.auraframework.util.json.Json;
 /**
  */
 public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T> {
-    private static final long serialVersionUID = 3030118554156737974L;
+    // Beware, here be dragons!
+    // Any change to DefType (below) necessitates a serialVersionUID update 
+    private static final long serialVersionUID = 4887575216081546450L;
+
     private final DefDescriptor<?> bundle;
     protected final String namespace;
     protected final String name;
@@ -95,6 +98,8 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         String name = null;
         String nameParameters = null;
 
+        // Beware, here be dragons!
+        // Any change to DefType necessitates a serialVersionUID update 
         switch (defType) {
             case CONTROLLER:
             case TESTSUITE:

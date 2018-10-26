@@ -209,7 +209,8 @@ TransportMetricsPlugin.prototype.postProcess = function (transportMarks) {
     var procesedMarks = [];
     var queue = {};
     for (var i = 0; i < transportMarks.length; i++) {
-        var id = transportMarks[i]["context"] && transportMarks[i]["context"]["auraXHRId"];
+        var id = transportMarks[i]["context"] && 
+                    (transportMarks[i]["context"]["auraXHRId"] || transportMarks[i]["context"]["defLoaderId"]);
         if (id === undefined) {
             continue;
         }
@@ -219,9 +220,9 @@ TransportMetricsPlugin.prototype.postProcess = function (transportMarks) {
         } else if (phase === 'end' && queue[id]){
             var mark = $A.util.apply({}, queue[id], true, true);
             var duration = parseInt(transportMarks[i]["ts"] - mark["ts"]);
-            mark["context"]  = $A.util.apply(mark["context"], transportMarks[i]["context"]);
+            mark["context"]  = $A.util.apply(mark["context"] || {}, transportMarks[i]["context"]);
             mark["duration"] = duration;
-            mark["context"]["xhrDelay"] = duration - mark["context"]["xhrDuration"];
+            mark["context"]["xhrDelay"] = duration - (mark["context"]["xhrDuration"] || mark["context"]["duration"]);
             mark["phase"]    = 'processed';
             procesedMarks.push(mark);
             delete queue[id];

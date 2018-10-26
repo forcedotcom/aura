@@ -22,6 +22,7 @@ function ComponentDefLoader() {
     this.pending = null;
     this.loading = 0;
     this.counter = 0;
+    this.scriptTagCounter = 0;
     this.requestedDescriptors = {};
     this.lastContextParameterName;
 }
@@ -38,6 +39,9 @@ ComponentDefLoader.RESTRICTED_KEY = "restricted";
 ComponentDefLoader.UNRESTRICTED_KEY = "unrestricted";
 
 ComponentDefLoader.UNKNOWN_ERROR_MESSAGE_PREFIX = "An unknown error occurred attempting to fetch definitions at: ";
+
+ComponentDefLoader.MARK_NS = "transport";
+ComponentDefLoader.MARK_NAME = "request";
 
 ComponentDefLoader.prototype.getContextParameters = function() {
     var params = $A.getContext().getURIComponentDefinitionsParameters();
@@ -74,24 +78,33 @@ ComponentDefLoader.prototype.rejectPendingRequestedDescriptor = function(descrip
     }
 };
 
-ComponentDefLoader.prototype.rejectPendingRequested = function(uri, error_message) {
+ComponentDefLoader.prototype.getDescriptorsFromURI = function (uri) {
     // get the descriptors from the URI
     // don't care about the '?' because the first parameters are never descriptors
     // even if we create a bad descriptor here, it won't matter because it then won't exist in the requestedDescriptors map
     var parameters = uri.split("&");
+    var results = [];
     for (var p=0; p < parameters.length; p++) {
         var parts = parameters[p].split("=");
         if (parts.length === 2) {
             var paramName = parts[0];
             if (paramName === ComponentDefLoader.DESCRIPTOR_param) {
-                this.rejectPendingRequestedDescriptor(parts[1], error_message);
+                results.push(parts[1]);
             } else if (paramName[0] !== "_") {
                 var names = parts[1].split(",");
                 for (var n=0; n < names.length; n++) {
-                    this.rejectPendingRequestedDescriptor(ComponentDefLoader.MARKUP + paramName + ":" + names[n], error_message);
+                    results.push(ComponentDefLoader.MARKUP + paramName + ":" + names[n]);
                 }
             }
         }
+    }
+    return results;
+};
+
+ComponentDefLoader.prototype.rejectPendingRequested = function(uri, error_message) {
+    var descriptors = this.getDescriptorsFromURI(uri);
+    for (var i = 0; i < descriptors.length; i++) {
+        this.rejectPendingRequestedDescriptor(descriptors[i], error_message);
     }
 };
 
@@ -377,10 +390,20 @@ ComponentDefLoader.prototype.getError = function (uri) {
 };
 
 ComponentDefLoader.prototype.createScriptElement = function(uri, onload, onerror) {
+    var that = this;
+    var counter = this.scriptTagCounter++;
+    var startMark = $A.metricsService.markStart(ComponentDefLoader.MARK_NS, ComponentDefLoader.MARK_NAME, { "defLoaderId": counter });
+
     var script = document.createElement("script");
     script["type"] = "text/javascript";
     script["src"] = uri;
     script["onload"] = function() {
+        var endMark = $A.metricsService.markEnd(ComponentDefLoader.MARK_NS, ComponentDefLoader.MARK_NAME);
+        var endMarkContext = $A.metricsService.findAndSummarizeResourcePerfInfo(uri, startMark["ts"], endMark["ts"]) || {};
+        endMarkContext["defLoaderId"] = counter;
+        delete endMarkContext["name"];
+        endMarkContext["defs"] = that.getDescriptorsFromURI(uri).slice(1,10); // only log first 10 descriptors fetched
+        endMark["context"] = endMarkContext;
         onload();
         script["onload"] = script["onerror"] = undefined;
         document.body.removeChild(script);

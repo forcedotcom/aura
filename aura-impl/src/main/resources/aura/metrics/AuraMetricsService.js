@@ -899,6 +899,13 @@ Aura.Services.MetricsService.prototype.registerBeacon = function (beacon) {
  * @export
 */
 Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) {
+    var serverTiming = r["serverTiming"];
+    if (serverTiming && $A.util.isArray(serverTiming)) {
+        var totalTiming = serverTiming.filter(function (t) {
+            return t.name.toLowerCase() === "total";
+        })[0];
+        var serverTime = totalTiming && totalTiming["duration"];
+    }
     return {
         "name"            : r.name,
         "initiatorType"   : r.initiatorType,
@@ -908,6 +915,7 @@ Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) 
         "requestStart"    : parseInt(r.requestStart, 10),
         "dns"             : parseInt(r.domainLookupEnd - r.domainLookupStart, 10),
         "tcp"             : parseInt(r.connectEnd - r.connectStart, 10),
+        "redirect"        : parseInt(r.redirectEnd - r.redirectStart, 10),
         "ttfb"            : parseInt(r.responseStart - r.startTime, 10),
         "transfer"        : parseInt(r.responseEnd - r.responseStart, 10),
         // Note that these additional properties will need to be set using explicit strings
@@ -915,8 +923,31 @@ Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) 
         // https://github.com/google/closure-compiler/blob/v20130411/externs/w3c_navigation_timing.js
         "transferSize"    : r["transferSize"] || 0,
         "encodedBodySize" : r["encodedBodySize"] || 0,
-        "decodedBodySize" : r["decodedBodySize"] || 0
+        "decodedBodySize" : r["decodedBodySize"] || 0,
+        "serverTime"      : serverTime
     };
+};
+
+/**
+ * Finds a matching entry with a similar uri and between startTime and endTime
+ * in the PerformanceResourceTiming buffer
+ * @param {string} uri
+ * @param {number} startTime
+ * @param {number} endTime
+ * @export
+*/
+Aura.Services.MetricsService.prototype.findAndSummarizeResourcePerfInfo = function (uri, startTime, endTime) {
+    if (window.performance && window.performance.getEntriesByType) {
+        var allResources = window.performance.getEntriesByType("resource");
+        var r = allResources.filter(function (res) {
+            return res.name.indexOf(uri) !== -1 && 
+                   res.startTime >= startTime && res.responseEnd <= endTime; 
+        })[0];
+        
+    } 
+    if (r) {
+        return this.summarizeResourcePerfInfo(r);
+    }
 };
 
 /**

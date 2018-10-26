@@ -228,6 +228,19 @@ IndexedDBAdapter.prototype.getTransaction = function(mode) {
     });
 };
 
+/**
+ * gets the objectStore for the transaction, retries the transaction if there's a failure
+ */
+IndexedDBAdapter.prototype.getObjectStore = function() {
+    try {
+        return this.transaction.objectStore(this.tableName);
+    } catch (e) {
+        // firefox 59 does not mix promises and indexeddb transactions, so we have to re-create the transaction
+        this.transaction = this.db.transaction([this.tableName], this.transaction["mode"]);
+        return this.transaction.objectStore(this.tableName);
+    }
+};
+
 
 /**
  * Returns adapter size.
@@ -425,7 +438,8 @@ IndexedDBAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
     var transactionTimer = this.thresholdMetricTimer("performance:storage-indexeddb-getItems-read-transaction");
     var that = this;
     this.getTransaction("readonly").then(function(transaction){
-        var objectStore = transaction.objectStore(that.tableName);
+        that.transaction = transaction;
+        var objectStore = that.getObjectStore();
 
         var results = {};
         var collected = 0;
@@ -482,7 +496,8 @@ IndexedDBAdapter.prototype.walkInternal = function(resolve, reject, sendResult) 
     var transactionTimer = this.thresholdMetricTimer("performance:storage-indexeddb-walkInternal-read-transaction");
     var that = this;
     this.getTransaction("readonly").then(function(transaction) {
-        var objectStore = transaction.objectStore(that.tableName);
+        that.transaction = transaction;
+        var objectStore = that.getObjectStore();
         var cursor = objectStore.openCursor();
         var result = {};
         var count = 0;
@@ -551,7 +566,8 @@ IndexedDBAdapter.prototype.setItems = function(tuples) {
         }
         var transactionTimer = that.thresholdMetricTimer("performance:storage-indexeddb-setItems-write-transaction");
         return that.getTransaction("readwrite").then(function(transaction) {
-            var objectStore = transaction.objectStore(that.tableName);
+            that.transaction = transaction;
+            var objectStore = that.getObjectStore();
 
             var collected = 0;
 
@@ -613,7 +629,8 @@ IndexedDBAdapter.prototype.removeItems = function(keys) {
     return new Promise(function(resolve, reject) {
         var transactionTimer = that.thresholdMetricTimer("performance:storage-indexeddb-removeItems-write-transaction");
         return that.getTransaction("readwrite").then(function(transaction) {
-            var objectStore = transaction.objectStore(that.tableName);
+            that.transaction = transaction;
+            var objectStore = that.getObjectStore();
 
             var sizeAvg = that.sizeAvg; // capture current sizeAvg
 
@@ -666,7 +683,8 @@ IndexedDBAdapter.prototype.clear = function() {
     return new Promise(function(resolve, reject) {
         var transactionTimer = that.thresholdMetricTimer("performance:storage-indexeddb-clear-write-transaction");
         return that.getTransaction("readwrite").then(function(transaction) {
-            var objectStore = transaction.objectStore(that.tableName);
+            that.transaction = transaction;
+            var objectStore = that.getObjectStore();
 
             try {
                 objectStore.clear();
@@ -725,7 +743,8 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
     var transactionTimer = this.thresholdMetricTimer("performance:storage-indexeddb-expireCache-read-transaction");
     var that = this;
     this.getTransaction("readonly").then(function(transaction) {
-        var objectStore = transaction.objectStore(that.tableName);
+        that.transaction = transaction;
+        var objectStore = that.getObjectStore();
         var index = objectStore.index("expires");
         var cursor = index.openCursor();
         var count = 0;

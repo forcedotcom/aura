@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-10-21
- * Version: 0.5.21
+ * Generated: 2018-10-25
+ * Version: 0.5.22
  */
 
 (function (exports) {
@@ -33,7 +33,6 @@ const {
   defineProperties,
   freeze,
   defineProperty,
-  deleteProperty,
   getOwnPropertyDescriptor,
   getOwnPropertyDescriptors,
   getOwnPropertyNames,
@@ -44,7 +43,15 @@ const {
   setPrototypeOf
 } = Object;
 
-const { apply, has, getPrototypeOf, isExtensible, ownKeys, preventExtensions } = Reflect;
+const {
+  apply,
+  deleteProperty,
+  has,
+  getPrototypeOf,
+  isExtensible,
+  ownKeys,
+  preventExtensions
+} = Reflect;
 
 /**
  * Currying is the process of transforming a function that takes multiple
@@ -903,6 +910,29 @@ function getRawArray(arr) {
     result.push(getRaw$1(arr[i]));
   }
   return result;
+}
+
+/* eslint-disable no-use-before-define */
+
+function SecureObject(thing, key) {
+  let o = getFromCache(thing, key);
+  if (o) {
+    return o;
+  }
+
+  o = create$1(null, {
+    toString: {
+      value: function() {
+        return `SecureObject: ${thing}{ key: ${JSON.stringify(key)} }`;
+      }
+    }
+  });
+
+  setRef(o, thing, key, true);
+  addToCache(thing, o, key);
+  registerProxy(o);
+
+  return seal(o);
 }
 
 const metadata$1 = {
@@ -2234,6 +2264,20 @@ function isAnLWCNode(node) {
     lwcIsNodeFromTemplate(node) ||
     (ShadowRoot && node instanceof ShadowRoot && lwcIsNodeFromTemplate(node.host))
   ) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Is an LWC Data proxy
+ * Note: Looks similar to isAnLWCNode() above, but that function is going to change after
+ * LWC removes traverse-membrane.
+ * @param {*} value
+ */
+function isDataProxy(value) {
+  assert$1.invariant(value, 'Checking an undefined value to be data proxy');
+  if (value !== lwcUnwrap(value)) {
     return true;
   }
   return false;
@@ -4962,6 +5006,10 @@ let filterTypeHook$1;
 function registerFilterTypeHook(hook) {
   filterTypeHook$1 = hook;
 }
+let deepUnfilteringTypeHook$1;
+function registerDeepUnfilteringTypeHook(hook) {
+  deepUnfilteringTypeHook$1 = hook;
+}
 let isUnfilteredTypeHook$1;
 function registerIsUnfilteredTypeHook(hook) {
   isUnfilteredTypeHook$1 = hook;
@@ -4973,27 +5021,6 @@ function registerLWCHelpers(helpers) {
   }
 }
 
-function SecureObject(thing, key) {
-  let o = getFromCache(thing, key);
-  if (o) {
-    return o;
-  }
-
-  o = create$1(null, {
-    toString: {
-      value: function() {
-        return `SecureObject: ${thing}{ key: ${JSON.stringify(key)} }`;
-      }
-    }
-  });
-
-  setRef(o, thing, key, true);
-  addToCache(thing, o, key);
-  registerProxy(o);
-
-  return seal(o);
-}
-
 const defaultSecureObjectKey = {
   defaultSecureObjectKey: true
 };
@@ -5001,8 +5028,7 @@ const defaultSecureObjectKey = {
 // TODO:W-5505277 Move filters to LockerFilter
 // TODO:W-5505278 Move add/create to LockerFactory
 
-function filterFunction(st, raw, options) {
-  const key = getKey(st);
+function filterFunction(key, raw, options) {
   const cached = getFromCache(raw, key);
   if (cached) {
     return cached;
@@ -5020,12 +5046,14 @@ function filterFunction(st, raw, options) {
     // Locker where the function was originally defined.
     return belongsToLocker || isSecureFunction(raw)
       ? raw
-      : filterEverything(st, getRef(raw, rawKey), options);
+      : filter(key, getRef(raw, rawKey), options);
   }
 
   // wrapping functions to guarantee that they run in system mode but their
   // returned value complies with user-mode.
   const swallowed = function SecureFunction() {
+    // TODO: rawKey could be undefined when SecureFunction is created.
+    const rawKey = getKey(raw);
     // special unfiltering logic to unwrap Proxies passed back to origin.
     // this could potentially be folded into filterArguments with an option set if needed.
     const filteredArgs = [];
@@ -5034,21 +5062,21 @@ function filterFunction(st, raw, options) {
       if (isFilteringProxy(arg)) {
         const unfilteredProxy = getRef(arg, getKey(arg));
         const unfilteredKey = getKey(unfilteredProxy);
-        arg = unfilteredKey === getKey(raw) ? unfilteredProxy : filterEverything(st, arg);
+        arg = unfilteredKey === rawKey ? unfilteredProxy : filter(key, arg);
       } else {
-        arg = filterEverything(st, arg);
+        arg = filter(key, arg);
       }
       filteredArgs[i] = arg;
     }
 
-    let self = filterEverything(st, this);
-    if (isFilteringProxy(self) && getKey(self) === getKey(st)) {
+    let self = filter(key, this);
+    if (isFilteringProxy(self) && getKey(self) === key) {
       self = getRef(self, key);
     }
 
     const fnReturnedValue = raw.apply(self, filteredArgs);
 
-    return filterEverything(st, fnReturnedValue, options);
+    return filter(key, fnReturnedValue, options);
   };
 
   setRef(swallowed, raw, key);
@@ -5064,8 +5092,7 @@ function filterFunction(st, raw, options) {
   return swallowed;
 }
 
-function filterObject(st, raw, options) {
-  const key = getKey(st);
+function filterObject(key, raw, options) {
   const cached = getFromCache(raw, key);
   if (cached) {
     return cached;
@@ -5083,7 +5110,7 @@ function filterObject(st, raw, options) {
     // Locker where the function was originally defined.
     return belongsToLocker || isSecureFunction(raw)
       ? raw
-      : filterEverything(st, getRef(raw, rawKey), options);
+      : filter(key, getRef(raw, rawKey), options);
   }
 
   let swallowed;
@@ -5103,7 +5130,7 @@ function filterObject(st, raw, options) {
       if (!rawKey) {
         // Array that was created in this locker or system mode but not yet keyed - key it now
         setKey(raw, defaultKey);
-        return filterEverything(st, raw, options);
+        return filter(key, raw, options);
       }
       swallowed = createProxyForArrayObjects(raw, key);
       setRef(swallowed, raw, key);
@@ -5128,7 +5155,7 @@ function filterObject(st, raw, options) {
         swallowed = SecureObject(raw, key);
       } else if (raw instanceof Attr && !rawKey) {
         setKey(raw, defaultKey);
-        return filterEverything(st, raw, options);
+        return filter(key, raw, options);
       } else {
         swallowed = options.defaultValue;
         addToCache(raw, swallowed, key);
@@ -5159,7 +5186,7 @@ function filterObject(st, raw, options) {
         if (!rawKey) {
           // Object that was created in this locker or in system mode and not yet keyed - key it now
           setKey(raw, defaultKey);
-          return filterEverything(st, raw, options);
+          return filter(key, raw, options);
         }
         swallowed = createFilteringProxy(raw, key);
         addToCache(raw, swallowed, key);
@@ -5172,12 +5199,7 @@ function filterObject(st, raw, options) {
 }
 
 /**
- * Filter the given raw object with the accessors key and provide a filtered view.
- * Best used when the type of "raw" is not known
- * @param st Represents the accessor who is trying to access "raw"
- * @param raw The raw object that we are trying to filter
- * @param options
- * @returns {*}
+ * @deprecated Use filter() instead.
  */
 function filterEverything(st, raw, options) {
   if (raw === undefined || raw === null) {
@@ -5192,9 +5214,38 @@ function filterEverything(st, raw, options) {
     case 'symbol':
       return raw;
     case 'function':
-      return filterFunction(st, raw, options);
+      return filterFunction(getKey(st), raw, options);
     case 'object':
-      return filterObject(st, raw, options);
+      return filterObject(getKey(st), raw, options);
+    default:
+      throw new TypeError(`type not supported ${raw}`);
+  }
+}
+
+/**
+ * Filter the given raw object with the accessors key and provide a filtered view.
+ * Best used when the type of "raw" is not known
+ * @param st Represents the accessor who is trying to access "raw"
+ * @param raw The raw object that we are trying to filter
+ * @param options
+ * @returns {*}
+ */
+function filter(key, raw, options) {
+  if (raw === undefined || raw === null) {
+    return raw;
+  }
+  // This detection of primitives is performant, even with the apparent string creation.
+  // Benchmarks show that Object(raw) !== raw is 10x slower.
+  switch (typeof raw) {
+    case 'boolean':
+    case 'number':
+    case 'string':
+    case 'symbol':
+      return raw;
+    case 'function':
+      return filterFunction(key, raw, options);
+    case 'object':
+      return filterObject(key, raw, options);
     default:
       throw new TypeError(`type not supported ${raw}`);
   }
@@ -6761,7 +6812,6 @@ function getUnfilteredTypes() {
     'CSSStyleDeclaration',
     'TimeRanges',
     'Date',
-    'Promise',
     'MessagePort',
     'MessageChannel',
     'MessageEvent',
@@ -6818,27 +6868,35 @@ function addUnfilteredPropertyIfSupported(st, raw, name) {
  */
 function deepUnfilterMethodArguments(st, baseObject, members) {
   let value;
+  let rawValue;
   for (const property in members) {
     value = members[property];
-    if (isArray(value)) {
-      value = deepUnfilterMethodArguments(st, [], value);
-    } else if (isPlainObject(value)) {
-      value = deepUnfilterMethodArguments(st, {}, value);
-    } else if (typeof value !== 'function') {
-      if (value) {
-        const key = getKey(value);
-        if (key) {
-          value = getRef(value, key) || value;
-        }
-      }
-      // If value is a plain object, we need to deep unfilter
-      if (isPlainObject(value)) {
-        value = deepUnfilterMethodArguments(st, {}, value);
-      }
-    } else {
-      value = filterEverything(st, value, { defaultKey: getKey(st) });
+    if (deepUnfilteringTypeHook$1) {
+      rawValue = deepUnfilteringTypeHook$1(st, value);
     }
-    baseObject[property] = value;
+    // If the hooks failed to unfilter the value, do the deep copy, unwrapping one item at a time
+    if (rawValue === value) {
+      if (isArray(value)) {
+        rawValue = deepUnfilterMethodArguments(st, [], value);
+      } else if (isPlainObject(value)) {
+        rawValue = deepUnfilterMethodArguments(st, {}, value);
+      } else if (typeof value !== 'function') {
+        if (value) {
+          const key = getKey(value);
+          if (key) {
+            rawValue = getRef(value, key) || value;
+          }
+        }
+        // If value is a plain object, we need to deep unfilter
+        if (isPlainObject(value)) {
+          rawValue = deepUnfilterMethodArguments(st, {}, value);
+        }
+      } else {
+        // For everything else we are not sure how to provide raw access, filter the value
+        rawValue = filterEverything(st, value, { defaultKey: getKey(st) });
+      }
+    }
+    baseObject[property] = rawValue;
   }
   return baseObject;
 }
@@ -9402,6 +9460,324 @@ function SecureLib(lib, key, requireLocker, desc) {
   return seal(o);
 }
 
+/**
+ * Unwrap a value to allow raw access in system mode
+ * This method returns:
+ *  a. an unfiltering proxy if the indexed value is a plain object or array
+ *  b. an unwrapped value if the value represents a secure wrapped object
+ *  c. a SecureFunction is the value represents a function
+ *  d. Everything else will be filtered
+ */
+function unwrapValue(st, value) {
+  if (!value) {
+    return value;
+  }
+  let unfilteredValue;
+  if (isArray(value) || isPlainObject(value)) {
+    // If an object or array is nested inside a data proxy, they will need to be rewrapped
+    // FilteringProxy and ArrayProxy is covered by this check
+    unfilteredValue = getUnfilteringDataProxy(st, value);
+  } else if (typeof value === 'function') {
+    // Functions cannot be unwrapped, they will be converted to a SecureFunction
+    const secureFunction = filterEverything(st, value);
+    // Return a wrapper function to system mode.
+    unfilteredValue = function(...args) {
+      // When system mode invokes the wrapper function, locker will invoke the secure function
+      // This ensures arguments from system mode are filtered, return value is unwrapped and
+      // sent back to system mode
+      return unwrapValue(st, secureFunction.call(st, ...args));
+    };
+  } else if (isProxy(value)) {
+    // If value is a wrapped object, use st's key to unwrap the value.
+    unfilteredValue = unwrap$1(st, value);
+  } else {
+    // Protect anything else that we don't know about
+    unfilteredValue = filterEverything(st, value);
+  }
+  return unfilteredValue;
+}
+
+/**
+ * An unwrapDescriptor will be give to system mode
+ * Any access of value will need to be unwrapped
+ * Any mutation of value will need to be filtered
+ * @param {*} st secure thing that owns the descriptor
+ * @param {*} descriptor
+ */
+function getUnwrapDescriptor(st, descriptor) {
+  if (!descriptor) {
+    return descriptor;
+  }
+  // If data descriptor
+  if ('value' in descriptor) {
+    const { value } = descriptor;
+
+    if (typeof value === 'function') {
+      descriptor.value = function(...args) {
+        return unwrapValue(st, value.call(st, filterArguments(st, args)));
+      };
+    } else {
+      descriptor.value = unwrapValue(st, value);
+    }
+  } else {
+    const { get, set } = descriptor;
+    // accessor descriptor
+    if (get) {
+      descriptor.get = function() {
+        return unwrapValue(st, get.call(st));
+      };
+    }
+    if (set) {
+      descriptor.set = function(newValue) {
+        return set.call(st, filterEverything(st, newValue));
+      };
+    }
+  }
+  return descriptor;
+}
+
+/**
+ * Class to handle the unfiltering of any read/write operations on an array
+ * Behavior:
+ *  1. Reading values by index will provide:
+ *    a. an unfiltering proxy if the indexed value is a plain object or array
+ *    b. an unwrapped value if the value represents a secure wrapped object
+ *    c. a SecureFunction is the value represents a function
+ *    d. Everything else will be filtered
+ *  2. Settings value by index will filter the provided value with the real target's key
+ *    and set the filtered value on the real target
+ *  3. Accessing descriptor will result in a unwrapping descriptor
+ *  4. Setting a prototype of the value is not allowed
+ *
+ * Caveat: A shadow target is required to adhere to proxy invariants. The shadow target prevents
+ * from leaking prototype information of the real target. One common scenario is when a target has
+ * a non-configurable property descriptor, the getOwnPropertyDescriptor() has the return the original
+ * descriptor of the target. In such a case, not using a shadowTarget will result is leaking the
+ * descriptor locker wants to protect.
+ */
+/* eslint-disable  class-methods-use-this */
+class UnfilteringProxyHandlerForArray {
+  constructor(target) {
+    this.target = target;
+  }
+  get(shadowTarget, property) {
+    const target = this.target;
+    property = convertSymbol(property);
+    const value = target[property];
+
+    const coercedProperty = Number(property);
+    // If the property is 0 or a positive integer
+    if (
+      !Number.isNaN(coercedProperty) &&
+      Number.isInteger(coercedProperty) &&
+      coercedProperty >= 0
+    ) {
+      return unwrapValue(target, value);
+    }
+    return target[property];
+  }
+  set(shadowTarget, property, value) {
+    const target = this.target;
+    target[property] = filterEverything(target, value);
+    return true;
+  }
+  deleteProperty(shadowTarget, property) {
+    deleteProperty(this.target, property);
+    return true;
+  }
+  has(shadowTarget, property) {
+    return property in this.target;
+  }
+  ownKeys() {
+    return ownKeys(this.target);
+  }
+  isExtensible() {
+    return isExtensible(this.target);
+  }
+  setPrototypeOf() {
+    throw new error('System mode should not attempt to change prototype of data proxy');
+  }
+  getPrototypeOf() {
+    return getPrototypeOf(this.target);
+  }
+  getOwnPropertyDescriptor(shadowTarget, property) {
+    // If it is a non-configurable descriptor and its already defined on the shadowTarget
+    const shadowTargetDescriptor = getOwnPropertyDescriptor(shadowTarget, property);
+    if (shadowTargetDescriptor && !shadowTargetDescriptor.configurable) {
+      return shadowTargetDescriptor;
+    }
+
+    const target = this.target;
+    const originalDescriptor = getOwnPropertyDescriptor(target, property);
+    if (!originalDescriptor) {
+      return originalDescriptor;
+    }
+    if (property === 'length') {
+      return originalDescriptor;
+    }
+    // Wrap the descriptor
+    const unwrapDescriptor = getUnwrapDescriptor(target, originalDescriptor);
+    // To adhere to proxy invariants, if the original descriptor is non-configurable,
+    // define a non-configurable unwrap descriptor on the shadow target
+    if (!originalDescriptor.configurable) {
+      defineProperty(shadowTarget, property, unwrapDescriptor);
+    }
+    return unwrapDescriptor;
+  }
+  preventExtensions() {
+    return preventExtensions(this.target);
+  }
+  defineProperty(shadowTarget, key, descriptor) {
+    return defineProperty(this.target, key, descriptor);
+  }
+}
+/* eslint-enable  class-methods-use-this */
+
+/**
+ * Class to handle the unfiltering of any read/write operations on a plain old javascript object(pojo)
+ * Behavior:
+ *  1. Accessing object property value will provide:
+ *    a. an unfiltering proxy if the value is a plain object or array
+ *    b. an unwrapped value if the value represents a secure wrapped object
+ *    c. a SecureFunction is the value represents a function
+ *    d. Everything else will be filtered
+ *  2. Settings value for a property will
+ *    a. filter the provided value with the real target's key
+ *    b. set the filtered value on the real target
+ *  3. Accessing descriptor will result in a unwrapping descriptor
+ *  4. Setting a prototype of the value is not allowed
+ *
+ * Caveat: A shadow target is required to adhere to proxy invariants. The shadow target prevents
+ * from leaking prototype information of the real target. One common scenario is when a target has
+ * a non-configurable property descriptor, the getOwnPropertyDescriptor() has the return the original
+ * descriptor of the target. In such a case, not using a shadowTarget will result is leaking the
+ * descriptor locker wants to protect.
+ */
+/* eslint-disable  class-methods-use-this */
+class UnfilteringProxyHandlerForObject {
+  constructor(target) {
+    this.target = target;
+  }
+  get(shadowTarget, property) {
+    const target = this.target;
+    const value = target[property];
+    return unwrapValue(target, value);
+  }
+  set(shadowTarget, property, value) {
+    const target = this.target;
+    target[property] = filterEverything(target, value);
+    return true;
+  }
+  deleteProperty(shadowTarget, property) {
+    deleteProperty(this.target, property);
+    return true;
+  }
+  has(shadowTarget, property) {
+    return property in this.target;
+  }
+  ownKeys() {
+    return ownKeys(this.target);
+  }
+  isExtensible() {
+    return isExtensible(this.target);
+  }
+  setPrototypeOf() {
+    throw new error('System mode should not attempt to change prototype of data proxy');
+  }
+  getPrototypeOf() {
+    return getPrototypeOf(this.target);
+  }
+  getOwnPropertyDescriptor(shadowTarget, property) {
+    // If it is a non-configurable descriptor and its already defined on the shadowTarget
+    const shadowTargetDescriptor = getOwnPropertyDescriptor(shadowTarget, property);
+    if (shadowTargetDescriptor && !shadowTargetDescriptor.configurable) {
+      return shadowTargetDescriptor;
+    }
+
+    const target = this.target;
+    const originalDescriptor = getOwnPropertyDescriptor(target, property);
+    if (!originalDescriptor) {
+      return originalDescriptor;
+    }
+    // Wrap the descriptor
+    const unwrapDescriptor = getUnwrapDescriptor(target, originalDescriptor);
+    // To adhere to proxy invariants
+    if (!originalDescriptor.configurable) {
+      defineProperty(shadowTarget, property, unwrapDescriptor);
+    }
+    return unwrapDescriptor;
+  }
+  preventExtensions() {
+    return preventExtensions(this.target);
+  }
+  defineProperty(shadowTarget, key, descriptor) {
+    return defineProperty(this.target, key, descriptor);
+  }
+}
+/* eslint-enable  class-methods-use-this */
+
+const cachedUnfilteringProxy = new WeakMap();
+const proxyToValueMap = new WeakMap();
+
+function registerUnfilteringDataProxy(proxy, value) {
+  proxyToValueMap.set(proxy, value);
+}
+
+function isUnfilteringDataProxy(proxy) {
+  return proxyToValueMap.has(proxy);
+}
+
+function getDataProxy(proxy) {
+  return proxyToValueMap.get(proxy);
+}
+
+/**
+ * Provide a unfiltering proxy for a value that can be used in system mode
+ * The value originates from a sandbox owned by the secure thing
+ * @param {*} st secure thing that wants to send value to system mode
+ * @param {*} value value being unwrapped
+ */
+function getUnfilteringDataProxy(st, value) {
+  if (!value) {
+    return value;
+  }
+  const key = getKey(st);
+  assert$1.invariant(key, 'Trying to unfilter a value without a secure owner');
+
+  // Handle only plain objects or arrays that were created by the secure thing
+  if (!isArray(value) && !isPlainObject(value)) {
+    // Throw in non-production mode
+    assert$1.fail('Attempting to unfilter a value that is neither an array nor a plain object');
+    // Do nothing in production mode
+    return value;
+  }
+
+  let unfilteringProxy = cachedUnfilteringProxy.get(value);
+  if (unfilteringProxy) {
+    return unfilteringProxy;
+  }
+
+  if (!getKey(value)) {
+    // If value has not already been keyed, propagate the key to the value
+    setKey(value, key);
+  }
+
+  // Use a shadow target to avoid breaking proxy invariants
+  const shadowTarget = isArray(value) ? [] : {};
+
+  unfilteringProxy = new Proxy(
+    shadowTarget,
+    isArray(value)
+      ? new UnfilteringProxyHandlerForArray(value)
+      : new UnfilteringProxyHandlerForObject(value)
+  );
+  // Key the unfilteringProxy to the secure thing's namespace
+  setKey(unfilteringProxy, key);
+  cachedUnfilteringProxy.set(value, unfilteringProxy);
+  registerUnfilteringDataProxy(unfilteringProxy, value);
+  return unfilteringProxy;
+}
+
 function SecureAura(AuraInstance, key) {
   let o = getFromCache(AuraInstance, key);
   if (o) {
@@ -9990,8 +10366,32 @@ function filterTypeHook(raw, key, belongsToLocker) {
     // DOM elements create by lwc are not subjected to access checks
     // They will be wrapped using the key of the accessor and directly passed down
     return SecureElement(raw, key);
+  } else if (belongsToLocker && isUnfilteringDataProxy(raw)) {
+    // If value holds a data proxy that belongs to this locker, give access to the real data proxy, no need to filter
+    return getDataProxy(raw);
   }
   return null;
+}
+
+/**
+ * Custom unfiltering logic for values that need special handling to be usable in system mode
+ * @param {*} st Secure thing that owns the value
+ * @param {*} value value being unfiltered for system mode access
+ */
+function deepUnfilteringTypeHook(st, value) {
+  if (!value) {
+    return value;
+  }
+  if (isDataProxy(value)) {
+    // If value is a wrapper over unfiltering data proxy, unwrap it
+    if (isProxy(value)) {
+      // If value is a wrapped object, use st's key to unwrap the value.
+      return unwrap$1(st, value);
+    }
+    // preserve the proxy behavior, wrap with an unfiltering proxy
+    return getUnfilteringDataProxy(st, value);
+  }
+  return value;
 }
 
 function isUnfilteredTypeHook(raw, key) {
@@ -10155,6 +10555,7 @@ function initialize(types, api) {
   registerReportAPI(api);
   registerLWCAPI(api);
   registerFilterTypeHook(filterTypeHook);
+  registerDeepUnfilteringTypeHook(deepUnfilteringTypeHook);
   registerIsUnfilteredTypeHook(isUnfilteredTypeHook);
   registerLWCHelpers({ isAnLWCNode: isAnLWCNode });
   registerAddPropertiesHook$$1(windowAddPropertiesHook);

@@ -1,0 +1,8 @@
+<template>
+    <p>cross namespace Secure Child</p>
+    <p if:true={valueFromParent}>Value from parent {valueFromParent.title}</p>
+    <section>
+        <securemoduletest-grand-child-receives-data id='grand-child'>
+        </securemoduletest-grand-child-receives-data>
+    </section>
+</template>

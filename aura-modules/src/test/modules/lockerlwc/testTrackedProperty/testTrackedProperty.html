@@ -1,0 +1,22 @@
+<template>
+    <section>
+        <p>Display tracked data within owner component</p>
+        <span id="literal">{title}</span><br/>
+        <span id="object_prop">{state.title}</span><br/>
+        <span id="nested_prop">{state.headings.item1}</span><br/>
+        <button onclick={modify}>Click to modify value of tracked properties</button><br/>
+        <button onclick={reassign}>Click to reassign values of tracked properties</button>
+    </section>
+
+    <section>
+        <p>Send tracked data to child component</p>
+        <section>
+            <securemoduletest-child-receives-tracked-data id="crossNamespaceSecureChild">
+            </securemoduletest-child-receives-tracked-data>
+        </section>
+        <section>
+            <moduletest-child-receives-tracked-data id="unsecureChild">
+            </moduletest-child-receives-tracked-data>
+        </section>
+    </section>
+</template>

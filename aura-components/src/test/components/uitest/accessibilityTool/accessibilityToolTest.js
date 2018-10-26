@@ -34,7 +34,7 @@
                 caseToRender: 'testNoActiveSliderAriaHiddenCorrect'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should return 1 errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should return 1 erroneous string. output: \n");
             }
         },
 
@@ -43,7 +43,7 @@
                 caseToRender: 'testActiveSliderAriaHiddenIncorrect'
             },
             test: function (cmp) {
-                this.runTest(1, "Unexpected return from CheckAccessibility, should return 1 errornous string. output: \n");
+                this.runTest(1, "Unexpected return from CheckAccessibility, should return 1 erroneous string. output: \n");
             }
         },
         testActiveSliderAriaHiddenIncorrect : {
@@ -51,7 +51,7 @@
                 caseToRender: 'testActivePanelSliderAriaHiddenCorrect'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should return 1 errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should return 1 erroneous string. output: \n");
             }
         },
 
@@ -60,7 +60,7 @@
                 caseToRender: 'testTopPanelHidden'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
 
@@ -69,7 +69,7 @@
                 caseToRender: 'testActiveTopPanelAriaHiddenIsTrue'
             },
             test: function (cmp) {
-                this.runTest(1, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(1, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
 
@@ -78,7 +78,7 @@
                 caseToRender: 'testBasePanelAriaHiddenIsFalse'
             },
             test: function (cmp) {
-                this.runTest(1, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(1, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
 
@@ -87,7 +87,7 @@
                 caseToRender: 'testNoActiveTopPanelAriaHiddenOk'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
 
@@ -96,7 +96,7 @@
                 caseToRender: 'testNoActiveTopPanelBasePanelAriaHiddenIsTrue'
             },
             test: function (cmp) {
-                this.runTest(1, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(1, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
 
@@ -105,7 +105,7 @@
                 caseToRender: 'testNoActiveTopPanelAriaHiddenNotExists'
             },
             test: function (cmp) {
-                this.runTest(1, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(1, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
 
@@ -438,7 +438,7 @@
                     $A.test.assertAccessible();
                 } catch (err) {
                     actual = err.message.trim().split("\n\n").length;
-                    $A.test.assertEquals(expected, actual, "Unexpected return from assertAccessilbe, expected: " + expected + " actual: " + actual);
+                    $A.test.assertEquals(expected, actual, "Unexpected return from assertAccessible, expected: " + expected + " actual: " + actual);
 
                 }
             }

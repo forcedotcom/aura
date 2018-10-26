@@ -304,7 +304,7 @@ var AuraDevToolService = function() {
         output : function(cmp) {
             return cmp.toJSON();
         },
-        accessbilityAide:{
+        accessibilityAide:{
 
             /**
              * @param array       - the array that we are going add elements to
@@ -406,7 +406,7 @@ var AuraDevToolService = function() {
                   var elmntAtrib = "";
                   var errorArray = [];
 
-                  var accessAideFuncs = aura.devToolService.accessbilityAide;
+                  var accessAideFuncs = aura.devToolService.accessibilityAide;
                   for(var i = 0; i< uls.length; i++){
                       ul = uls[i];
                       elmntAtrib = $A.util.getElementAttributeValue(ul ,"class");
@@ -511,7 +511,7 @@ var AuraDevToolService = function() {
              * @param   imgErrorMsg                - Default error message telling user why they should set alt tag
              */
             findAllImgTags:function (allImgTags, imgErrorMsg){
-        	 var accessAideFuncs = aura.devToolService.accessbilityAide;
+        	 var accessAideFuncs = aura.devToolService.accessibilityAide;
 
         	 var data_aura_rendered_by = "";
         	 var errorArray = [];
@@ -613,7 +613,7 @@ var AuraDevToolService = function() {
             	var dict = {};
             	var inputID = null;
                 var label = null;
-            	var accessAideFuncs = aura.devToolService.accessbilityAide;
+            	var accessAideFuncs = aura.devToolService.accessibilityAide;
 
             	 for(var i = 0; i < lbls.length; i++){
             		 label = lbls[i];
@@ -672,7 +672,7 @@ var AuraDevToolService = function() {
                 var inputTag   = null;
                 var type       = null;
                 var inputTypes = "hidden button submit reset";
-                var accessAideFuncs = aura.devToolService.accessbilityAide;
+                var accessAideFuncs = aura.devToolService.accessibilityAide;
 
                 var lblDict = accessAideFuncs.getDictFromTags(lbls, "for");
 
@@ -805,7 +805,7 @@ var AuraDevToolService = function() {
                  var nodeName = "";
                  var elm = null;
                  var errStr = tagError+"\n";
-                 var accessAideFuncs = aura.devToolService.accessbilityAide;
+                 var accessAideFuncs = aura.devToolService.accessibilityAide;
 
                  for(var i = 0; i<len; i++){
                  	elm = errArray[i];
@@ -858,7 +858,7 @@ var AuraDevToolService = function() {
                 var errArray = [];
                 var anchor = null;
                 var text = "";
-                var accessAideFuncs = $A.devToolService.accessbilityAide;
+                var accessAideFuncs = $A.devToolService.accessibilityAide;
 
                 for(var index = 0; index<anchors.length; index++){
                     anchor = anchors[index];
@@ -883,7 +883,7 @@ var AuraDevToolService = function() {
                  var rcName = "";
                  var dict = {};
                  var tmpArray = [];
-                 var accessAideFuncs = aura.devToolService.accessbilityAide;
+                 var accessAideFuncs = aura.devToolService.accessibilityAide;
 
                  for(var i =0; i<inputTags.length; i++){
                     inputTag = inputTags[i];
@@ -1119,7 +1119,7 @@ var AuraDevToolService = function() {
             	    var imgError = "[A11Y_DOM_01] All image tags require the presence of the alt attribute.\n  More info http://sfdc.co/a11y_dom_01";
 
             	    var allImgTags = domElem.getElementsByTagName("img");
-           		    return aura.devToolService.accessbilityAide.findAllImgTags(allImgTags, imgError);
+           		    return aura.devToolService.accessibilityAide.findAllImgTags(allImgTags, imgError);
             	}
             },
 
@@ -1131,7 +1131,7 @@ var AuraDevToolService = function() {
                 "tag"  : "A11Y_DOM_02",
                 "func" : function(domElem) {
                      var inputLabelMsg   = "[A11Y_DOM_02] An input was found without an associated label. All inputs must be identified by a label.\n  More info http://sfdc.co/a11y_dom_02";
-                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var accessAideFuncs = aura.devToolService.accessibilityAide;
                      var inputTextTags   = domElem.getElementsByTagName('input');
                      var textAreaTags    = domElem.getElementsByTagName('textarea');
                      var selectTags      = domElem.getElementsByTagName('select');
@@ -1154,7 +1154,7 @@ var AuraDevToolService = function() {
                 "func" : function(domElem){
                     var buttonLabelErrorMsg = "[A11Y_DOM_03] Buttons must have non-empty text labels.\n  More info http://sfdc.co/a11y_dom_03";
                     var errorArray = [];
-                    var accessAideFuncs = aura.devToolService.accessbilityAide;
+                    var accessAideFuncs = aura.devToolService.accessibilityAide;
                     var buttonTags = domElem.getElementsByTagName('button');
 
                     errorArray = errorArray.concat(accessAideFuncs.buttonLabelAide(buttonTags));
@@ -1170,7 +1170,7 @@ var AuraDevToolService = function() {
         	    "tag"  : "A11Y_DOM_04",
         	    "func" :  function(domElem){
                     var anchorErrMsg = "[A11Y_DOM_04] Links must have non-empty text content.\n  More info http://sfdc.co/a11y_dom_04";
-                    var accessAideFuncs = $A.devToolService.accessbilityAide;
+                    var accessAideFuncs = $A.devToolService.accessibilityAide;
                     var anchors = domElem.getElementsByTagName("a");
                     return accessAideFuncs.formatOutput(anchorErrMsg, accessAideFuncs.checkAnchorHasInnerText(anchors));
                 }
@@ -1184,7 +1184,7 @@ var AuraDevToolService = function() {
           	    "tag" : "A11Y_DOM_06",
           	    "func" : function(domElem){
                      var iFrameTitleMsg = "[A11Y_DOM_06] Each frame and iframe element must have a non-empty title attribute.\n  More info http://sfdc.co/a11y_dom_06";
-                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var accessAideFuncs = aura.devToolService.accessibilityAide;
                      var iframes = domElem.getElementsByTagName("iframe");
 
                      /**THIS CODE BLOCK SHOULD BE REMOVED AFTER PARTIAL CODE RUNNING**/
@@ -1217,7 +1217,7 @@ var AuraDevToolService = function() {
         	    "tag"  : "A11Y_DOM_07",
         	    "func" : function(domElem){
                      var hdErrMsg = "[A11Y_DOM_07] The head section must have a non-empty title element.\n  More info http://sfdc.co/a11y_dom_07";
-                     var accessAideFuncs = $A.devToolService.accessbilityAide;
+                     var accessAideFuncs = $A.devToolService.accessibilityAide;
                      var hd = domElem.getElementsByTagName("head")[0];
 
                      if($A.util.isEmpty(hd)){
@@ -1235,7 +1235,7 @@ var AuraDevToolService = function() {
                 "tag"  : "A11Y_DOM_08",
                 "func" : function(domElem){
                      var tableErrorMsg = "[A11Y_DOM_08] Data table cells must be associated with data table headers.\n  More info http://sfdc.co/a11y_dom_08";
-                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var accessAideFuncs = aura.devToolService.accessibilityAide;
                      var tables = domElem.getElementsByTagName("table");
                      return accessAideFuncs.formatOutput(tableErrorMsg, accessAideFuncs.checkTables(tables, tableErrorMsg));
                  }
@@ -1248,18 +1248,18 @@ var AuraDevToolService = function() {
             checkFieldsetsAreCorrect : {
                 "tag"  : "A11Y_DOM_09",
                 "func" : function(domElem){
-                     var fieldsetLegnedMsg = "[A11Y_DOM_09] Fieldset must have a legend element.\n  More info http://sfdc.co/a11y_dom_09";
-                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var fieldsetLegendMsg = "[A11Y_DOM_09] Fieldset must have a legend element.\n  More info http://sfdc.co/a11y_dom_09";
+                     var accessAideFuncs = aura.devToolService.accessibilityAide;
                      var fieldSets = domElem.getElementsByTagName('fieldset');
                      var legends = "";
                      var errorArray = [];
-                     var fieldSetSytle  = "";
+                     var fieldSetStyle  = "";
 
                      for(var i=0; i<fieldSets.length; i++){
                          legends = fieldSets[i].getElementsByTagName('legend');
-                         fieldSetSytle = fieldSets[i].style.display;
+                         fieldSetStyle = fieldSets[i].style.display;
 
-                         if(!$A.util.isUndefinedOrNull(fieldSetSytle) && fieldSetSytle === "none"){
+                         if(!$A.util.isUndefinedOrNull(fieldSetStyle) && fieldSetStyle === "none"){
                              continue;
                          }
 
@@ -1268,7 +1268,7 @@ var AuraDevToolService = function() {
                          }
                       }
 
-                     return accessAideFuncs.formatOutput(fieldsetLegnedMsg, errorArray);
+                     return accessAideFuncs.formatOutput(fieldsetLegendMsg, errorArray);
                   }
             },
 
@@ -1279,8 +1279,8 @@ var AuraDevToolService = function() {
             checkRadioGrouping : {
                 "tag"  : "A11Y_DOM_10",
                 "func" : function(domElem){
-                     var radioButtonFieldSetMsg = "[A11Y_DOM_10] Headings should be properly nested.\n  More info http://sfdc.co/a11y_dom_10";
-                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var radioButtonFieldSetMsg = "[A11Y_DOM_10] Related radio buttons or checkboxes must be grouped with a fieldset.\n  More info http://sfdc.co/a11y_dom_10";
+                     var accessAideFuncs = aura.devToolService.accessibilityAide;
                      var inputTags = domElem.getElementsByTagName('input');
 
                      return accessAideFuncs.formatOutput(radioButtonFieldSetMsg, accessAideFuncs.radioButtonAide(inputTags));
@@ -1296,7 +1296,7 @@ var AuraDevToolService = function() {
                 "func" : function(domElem){
                      var headerErrMsg = "[A11Y_DOM_11] Headings should be properly nested.\n  More info http://sfdc.co/a11y_dom_11";
                      var errArray = [];
-                     var accessAideFuncs = $A.devToolService.accessbilityAide;
+                     var accessAideFuncs = $A.devToolService.accessibilityAide;
                      var hdrs1 = domElem.getElementsByTagName("h1");
                      var hdrs2 = domElem.getElementsByTagName("h2");
                      var hdrs3 = domElem.getElementsByTagName("h3");
@@ -1320,7 +1320,7 @@ var AuraDevToolService = function() {
             checkTopLevelPanels : {
                 "tag"  : "A11Y_DOM_12",
                 "func" : function (domElem){
-                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var accessAideFuncs = aura.devToolService.accessibilityAide;
                      var errorMsg = "[A11Y_DOM_12] Base and top panels should have proper aria-hidden properties.\n  More info http://sfdc.co/a11y_dom_12";
 
                      var modalOverlay = "div.uiPanelDialog";
@@ -1349,7 +1349,7 @@ var AuraDevToolService = function() {
             checkInputdefaultErrorLinkage : {
                 "tag"  : "A11Y_DOM_13",
                 "func" : function (domElem){
-                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var accessAideFuncs = aura.devToolService.accessibilityAide;
                      var inputErrorMsg = "[A11Y_DOM_13] Aria-describedby must be used to associate error message with input control.\n  More info http://sfdc.co/a11y_dom_13";
                      var errorArray = accessAideFuncs.inputDefaultErrorAide(domElem.getElementsByTagName("ul"), domElem.getElementsByTagName("input"), domElem.getElementsByTagName("select"), domElem.getElementsByTagName("textarea"));
                      return accessAideFuncs.formatOutput(inputErrorMsg, errorArray);
@@ -1364,7 +1364,7 @@ var AuraDevToolService = function() {
             	"tag"  : "A11Y_DOM_14",
             	"func" : function(domElem) {
             		var dupeButtonTextErrorMsg = "[A11Y_DOM_14] Button must not have duplicate values.\n  More info http://sfdc.co/a11y_dom_14";
-            		var accessAideFuncs = aura.devToolService.accessbilityAide;
+            		var accessAideFuncs = aura.devToolService.accessibilityAide;
             		var buttonTags = domElem.getElementsByTagName('button');
             		var errorArray = accessAideFuncs.buttonDuplicateTextAide(buttonTags);
             		return accessAideFuncs.formatOutput(dupeButtonTextErrorMsg, errorArray);
@@ -1379,7 +1379,7 @@ var AuraDevToolService = function() {
 	        	"tag"  : "A11Y_DOM_15",
 	        	"func" : function(domElem) {
 	        		var orphanLabelErrorMsg = "[A11Y_DOM_15] A label was found without an associated input. Labels should only be used to identify inputs.\n More Info: http://sfdc.co/a11y_dom_15";
-	        		var accessAideFuncs = aura.devToolService.accessbilityAide;
+	        		var accessAideFuncs = aura.devToolService.accessibilityAide;
 	        		var labels = domElem.getElementsByTagName("LABEL");
 	        		var errorArray = accessAideFuncs.matchLabelToInput(labels);
 	        		return accessAideFuncs.formatOutput(orphanLabelErrorMsg, errorArray);

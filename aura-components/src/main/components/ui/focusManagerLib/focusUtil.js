@@ -30,6 +30,13 @@ function lib() { //eslint-disable-line no-unused-vars
         }
 
         var result = false;
+
+        var isDocumentFragment = el.nodeType === 11;
+        if (isDocumentFragment) {
+            var isShadowRoot = !!el.host;
+            return isShadowRoot ? isElementHidden(el.host) : false;
+        }
+
         var style = window.getComputedStyle(el) || el.style;
         if (style.visibility === 'hidden' || style.display === 'none') {
             result = true;

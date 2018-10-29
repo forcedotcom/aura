@@ -901,7 +901,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         }
 
         [Fact]
-        function UsesDateFormatInLocaleProviderAsDefaultFormat(){
+        function UsesDateFormatInLocaleProviderAsDefaultFormat() {
             // Arrange
             var targetService = createTargetService();
 
@@ -1372,7 +1372,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
 
             var mockAura = Mocks.GetMock(Object.Global(), "$A", {
                 get: function(key) {
-                    if (key === "$Locale.datetimeFormat") {
+                    if (key === "$Locale.timeFormat") {
                         return expected;
                     }
                 }
@@ -1439,7 +1439,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
 
             var mockAura = Mocks.GetMock(Object.Global(), "$A", {
                 get: function(key) {
-                    if (key === "$Locale.datetimeFormat") {
+                    if (key === "$Locale.timeFormat") {
                         return expected;
                     }
                 }

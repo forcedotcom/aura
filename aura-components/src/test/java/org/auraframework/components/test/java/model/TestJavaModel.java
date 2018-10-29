@@ -287,12 +287,6 @@ public class TestJavaModel implements ModelInstance {
     }
 
     @AuraEnabled
-    public Long getTimestamp() {
-        Date d = new Date(1095957000000L);
-        return d.getTime();
-    }
-
-    @AuraEnabled
     public Calendar getCalendar() {
         // jdk8: set default timezone instead of jvm (local) timezone
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));

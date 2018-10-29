@@ -466,12 +466,12 @@ AuraLocalizationService.prototype.duration = function(num, unit) {
 
 /**
  * Formats a date.
- * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string|number|Date} date - A datetime string in ISO8601 format (if no timezone then browser timezone offset assumed), or a timestamp in milliseconds, or a Date object.
  *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {string} [formatString] - (optional) A string containing tokens to format the given date. For example, "yyyy-MM-dd" formats 15th January, 2017 as "2017-01-15".
+ * @param {?string=} [formatString] - (optional) A string containing tokens to format the given date. For example, "yyyy-MM-dd" formats 15th January, 2017 as "2017-01-15".
  *   The default format string comes from the $Locale value provider.
  *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {string} [locale] - (optional) A locale to format the given date.
+ * @param {?string=} [locale] - (optional) A locale to format the given date.
  *   The default value is from $Locale.langLocale.
  *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
  *   It falls back to the value in $Locale.langLocale if using unavailable locale.
@@ -494,21 +494,17 @@ AuraLocalizationService.prototype.formatDate = function(date, formatString, loca
         date = date["toDate"]();
     }
 
-    if (!formatString) {
-        formatString = $A.get("$Locale.dateFormat");
-    }
-
-    return this.formatDateTime(date, formatString, locale);
+    return this.formatDateTimeInternal(date, (formatString || $A.get("$Locale.dateFormat")), locale);
 };
 
 /**
  * Formats a time.
- * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string|number|Date} date - A datetime string in ISO8601 format (if no timezone then browser timezone offset assumed), or a timestamp in milliseconds, or a Date object.
  *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {string} [formatString] - (optional) A string containing tokens to format the given date.
+ * @param {?string=} [formatString] - (optional) A string containing tokens to format the given date.
  *   The default format string comes from the $Locale value provider.
  *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {string} [locale] - (optional) A locale to format the given date.
+ * @param {?string=} [locale] - (optional) A locale to format the given date.
  *   The default value is from $Locale.langLocale.
  *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
  *   It falls back to the value in $Locale.langLocale if using unavailable locale.
@@ -531,21 +527,38 @@ AuraLocalizationService.prototype.formatTime = function(date, formatString, loca
         date = date["toDate"]();
     }
 
-    if (!formatString) {
-        formatString = $A.get("$Locale.timeFormat");
+    return this.formatDateTimeInternal(date, (formatString || $A.get("$Locale.timeFormat")), locale);
+};
+
+/**
+ * @private
+ */
+AuraLocalizationService.prototype.formatDateTimeInternal = function(date, formatString, locale) {
+    if (typeof date === "string") {
+        date = this.parseDateTimeISO8601(date);
+    } else {
+        date = this.normalizeDateTimeInput(date);
     }
 
-    return this.formatDateTime(date, formatString, locale);
+    if (!this.isValidDateObject(date)) {
+        return "Invalid Date";
+    }
+
+    if (!locale) {
+        locale = $A.get("$Locale.langLocale");
+    }
+
+    return this.formatDateTimeToString(date, formatString, locale, false);
 };
 
 /**
  * Formats a datetime.
- * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ * @param {string|number|Date} date - A datetime string in ISO8601 format (if no timezone then browser timezone offset assumed), or a timestamp in milliseconds, or a Date object.
  *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {string} [formatString] - (optional) A string containing tokens to format the given date.
+ * @param {?string=} [formatString] - (optional) A string containing tokens to format the given date.
  *   The default format string comes from the $Locale value provider.
  *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {string} [locale] - (optional) A locale to format the given date.
+ * @param {?string=} [locale] - (optional) A locale to format the given date.
  *   The default value is from $Locale.langLocale.
  *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
  *   It falls back to the value in $Locale.langLocale if using unavailable locale.
@@ -568,46 +581,19 @@ AuraLocalizationService.prototype.formatDateTime = function(date, formatString, 
                 null, "AuraLocalizationService.formatDateTime(moment)");
 
         date = date["toDate"]();
-    } else if (typeof date === "string") {
-
-        if (this.isISO8601DateTimeString(date)) {
-            date = this.parseDateTimeISO8601(date);
-        } else {
-            $A.warning("LocalizationService.parseDateTimeISO8601: The provided datetime string is not in ISO8601 format. " +
-                    "It will be parsed by native Date(), which may have different results across browsers and versions. " + date);
-
-            date = new Date(date);
-            // Date parsing includes browser timezone offset. For formatting, we need to respect the numbers in the string.
-            date.setTime(date.getTime() + date.getTimezoneOffset() * 6e4); // 60 * 1000
-        }
-    } else {
-        date = this.normalizeDateTimeInput(date);
     }
-
-    if (!this.isValidDateObject(date)) {
-        return "Invalid Date";
-    }
-
-    // default format
-    if (!formatString) {
-        formatString = $A.get("$Locale.datetimeFormat");
-    }
-
-    if (!locale) {
-        locale = $A.get("$Locale.langLocale");
-    }
-
-    return this.formatDateTimeToString(date, formatString, locale, false);
+    
+    return this.formatDateTimeInternal(date, (formatString || $A.get("$Locale.datetimeFormat")), locale);
 };
 
 /**
  * Formats a date in UTC.
  * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {string} [formatString] - (optional) A string containing tokens to format the given date. For example, "yyyy-MM-dd" formats 15th January, 2017 as "2017-01-15".
+ * @param {?string=} [formatString] - (optional) A string containing tokens to format the given date. For example, "yyyy-MM-dd" formats 15th January, 2017 as "2017-01-15".
  *   The default format string comes from the $Locale value provider.
  *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {string} [locale] - (optional) A locale to format the given date.
+ * @param {?string=} [locale] - (optional) A locale to format the given date.
  *   The default value is from $Locale.langLocale.
  *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
  *   It falls back to the value in $Locale.langLocale if using unavailable locale.
@@ -630,21 +616,17 @@ AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, l
         date = date["toDate"]();
     }
 
-    if (!formatString) {
-        formatString = $A.get("$Locale.dateFormat");
-    }
-
-    return this.formatDateTimeUTC(date, formatString, locale);
+    return this.formatDateTimeUTCInternal(date, (formatString || $A.get("$Locale.dateFormat")), locale);
 };
 
 /**
  * Formats a time in UTC.
  * * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
  *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {string} [formatString] - (optional) A string containing tokens to format the given date.
+ * @param {?string=} [formatString] - (optional) A string containing tokens to format the given date.
  *   The default format string comes from the $Locale value provider.
  *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {string} [locale] - (optional) A locale to format the given date.
+ * @param {?string=} [locale] - (optional) A locale to format the given date.
  *   The default value is from $Locale.langLocale.
  *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
  *   It falls back to the value in $Locale.langLocale if using unavailable locale.
@@ -667,41 +649,14 @@ AuraLocalizationService.prototype.formatTimeUTC = function(date, formatString, l
         date = date["toDate"]();
     }
 
-    if (!formatString) {
-        formatString = $A.get("$Locale.timeFormat");
-    }
-
-    return this.formatDateTimeUTC(date, formatString, locale);
+    return this.formatDateTimeUTCInternal(date, (formatString || $A.get("$Locale.timeFormat")), locale);
 };
 
 /**
- * Formats a datetime in UTC.
-  * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
- *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
- * @param {string} [formatString] - (optional) A string containing tokens to format the given date.
- *   The default format string comes from the $Locale value provider.
- *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
- * @param {string} [locale] - (optional) A locale to format the given date.
- *   The default value is from $Locale.langLocale.
- *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
- *   It falls back to the value in $Locale.langLocale if using unavailable locale.
- * @return {string} A formatted and localized date time string.
- *
- * @example
- * var date = new Date();
- * // Returns datetime in UTC in the format "Oct 9, 2015 4:00:00 PM"
- * $A.localizationService.formatDateTimeUTC(date);
- * @public
- * @export
- * @platform
+ * @private
  */
-AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatString, locale) {
-    if (this.moment["isMoment"](date)) {
-        $A.deprecated("$A.localizationService.formatDateTimeUTC: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
-                null, "AuraLocalizationService.formatDateTimeUTC(moment)");
-
-        date = date["toDate"]();
-    } else if (typeof date === "string") {
+AuraLocalizationService.prototype.formatDateTimeUTCInternal = function(date, formatString, locale) {
+    if (typeof date === "string") {
         var config = this.parseISOStringToConfig(date);
         if (config === null) {
             return "Invalid Date";
@@ -721,20 +676,48 @@ AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatStrin
         date = this.normalizeDateTimeInput(date);
         date = new Date(date.getTime() + date.getTimezoneOffset() * 6e4);
     }
-
+    
     if (!this.isValidDateObject(date)) {
         return "Invalid Date";
     }
-
-    if (!formatString) {
-        formatString = $A.get("$Locale.datetimeFormat");
-    }
-
+    
     if (!locale) {
         locale = $A.get("$Locale.langLocale");
     }
-
+    
     return this.formatDateTimeToString(date, formatString, locale, true);
+};
+
+/**
+ * Formats a datetime in UTC.
+  * @param {string|number|Date} date - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object.
+ *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
+ * @param {?string=} [formatString] - (optional) A string containing tokens to format the given date.
+ *   The default format string comes from the $Locale value provider.
+ *   For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
+ * @param {?string=} [locale] - (optional) A locale to format the given date.
+ *   The default value is from $Locale.langLocale.
+ *   It is strongly recommended to use the locale value from Locale Value Provider ($Locale).
+ *   It falls back to the value in $Locale.langLocale if using unavailable locale.
+ * @return {string} A formatted and localized date time string.
+ *
+ * @example
+ * var date = new Date();
+ * // Returns datetime in UTC in the format "Oct 9, 2015 4:00:00 PM"
+ * $A.localizationService.formatDateTimeUTC(date);
+ * @public
+ * @export
+ * @platform
+ */
+AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatString, locale) {
+    if (this.moment["isMoment"](date)) {
+        $A.deprecated("$A.localizationService.formatDateTimeUTC: 'date' is required to be an ISO 8601 string, or a number, or a Date object. A moment object for the date parameter is not supported.",
+                null, "AuraLocalizationService.formatDateTimeUTC(moment)");
+
+        date = date["toDate"]();
+    }
+
+    return this.formatDateTimeUTCInternal(date, formatString || $A.get("$Locale.datetimeFormat"), locale);
 };
 
 /**
@@ -1159,8 +1142,8 @@ AuraLocalizationService.prototype.parseDateTime = function(dateTimeString, parse
 
 /**
  * Parses a date time string in an ISO-8601 format.
- * @param {string} dateTimeString - The datetime string in an ISO-8601 format.
- * @return {Date} A JavaScript Date object, or null if dateTimeString is invalid.
+ * @param {?string} dateTimeString - The datetime string in an ISO-8601 format.
+ * @return {?Date} A JavaScript Date object, or null if dateTimeString is invalid.
  * @memberOf AuraLocalizationService
  * @public
  * @export
@@ -1241,7 +1224,7 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, pa
     var value = strictParsing ? this.getStrictModeDateTimeString(dateTimeString) : dateTimeString;
     var mDate = this.moment["utc"](value, format, this.getAvailableMomentLocale(langLocale), strictParsing);
     if (!mDate || !mDate["isValid"]()) {
-        if($A.util.isUndefinedOrNull(parseFormat)) {
+        if ($A.util.isUndefinedOrNull(parseFormat)) {
             return null;
         }
         // TODO: remove moment dependency and enable DateTimeForamt.parse()

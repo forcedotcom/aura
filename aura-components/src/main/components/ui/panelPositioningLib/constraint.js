@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 function lib() { //eslint-disable-line no-unused-vars
-      var transformFunctions = {
+    var transformFunctions = {
         center: function(inp, targetBox) {
             return Math.floor(inp + 0.5 * targetBox.width); 
         },
@@ -199,27 +199,22 @@ function lib() { //eslint-disable-line no-unused-vars
      * update the values from the DOM
      */
     Constraint.prototype.updateValues = function() {
-        if(!this._disabled) {
-            
-            this._targetElement.refresh();
-            
-            this._pendingBox = this._exp(this._targetElement, this._el);
-            
+        if(!this._disabled) {            
+            this._targetElement.refresh();            
+            this._pendingBox = this._exp(this._targetElement, this._el);            
         }
     };
 
     /**
      * Compute the new position
      */
-    Constraint.prototype.reposition = function() {
-        
+    Constraint.prototype.reposition = function() {        
         var el = this._el;
         if(!this._disabled) {
             for(var val in this._pendingBox) {
                 el.set(val, this._pendingBox[val]);
             }
         }
-        
     };
 
     /**
@@ -231,7 +226,6 @@ function lib() { //eslint-disable-line no-unused-vars
         this._disabled = true;
         this.destroyed = true;
     };
-
 
     return {
         Constraint: Constraint

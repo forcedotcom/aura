@@ -16,12 +16,11 @@
 
 function lib(elementProxy, utils, win) { //eslint-disable-line no-unused-vars
     'use strict';
-    var w = win || window; // window injected for testing
-    
-    var ElementProxy = elementProxy.ElementProxy;
-    
+    var w = win || window; // window injected for testing    
+    var ElementProxy = elementProxy.ElementProxy;    
     var proxyCache = {};
-
+    var proxyCounter = 0;
+    
     function releaseOrphanProxies () {
         for(var proxy in proxyCache) {
             if(!proxyCache[proxy].el.checkNodeIsInDom()) {
@@ -38,7 +37,7 @@ function lib(elementProxy, utils, win) { //eslint-disable-line no-unused-vars
         }
     }
 
-    var proxyCounter = 0;
+    
     function assignNodeKey(node) {
         var key = "aura-pos-lib-" + proxyCounter++;
         node.setAttribute("data-proxy-id", key);

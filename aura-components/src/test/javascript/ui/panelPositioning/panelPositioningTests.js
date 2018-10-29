@@ -55,6 +55,13 @@ Test.Components.Ui.PanelPositioning.panelPositioningTest=function(){
 		},
 		isWindow: function () {
 			return false;
+		},
+		getParentNode: function(el) {
+			return el.parentNode && el.parentNode.host || el.parentNode;
+		},
+		getPositionTarget: function(element) {
+			return element.tagName === 'TEXTAREA' ?
+                this.getParentNode(element) : element;
 		}
 	};
 

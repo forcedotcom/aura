@@ -16,20 +16,27 @@
 
 function lib(utils, w) { //eslint-disable-line no-unused-vars
     'use strict';
-     w || (w = window);
+    w = w || window;
 
-     function isInDom(el) {
+
+    function isInDom(el) {
         if (el === w) {
             return true;
         }
-        if(el.parentNode && el.parentNode.tagName && el.parentNode.tagName.toUpperCase() === 'BODY'){
+        var parentNode = utils.getParentNode(el);
+        if (
+            parentNode && 
+            parentNode.tagName && 
+            parentNode.tagName.toUpperCase() === 'BODY'
+        ) {
             return true;
-        } else if(el.parentNode) {
-            return isInDom(el.parentNode);
-        } else {
-            return false;
-        }
-     }
+        } 
+        
+        if(parentNode) {
+            return isInDom(parentNode);
+        } 
+        return false;
+    }
 
     /**
      * Get the position of an element relative

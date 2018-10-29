@@ -32,7 +32,6 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
 
     var repositionCallbacks = [];
 
-
     var directionMap = {
         vert: {
             top: 'top',
@@ -51,13 +50,11 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
         return obj.nodeType && (obj.nodeType === 1 || obj.nodeType === 11);
     }
 
-
     function dispatchRepositionCallbacks() {
         while (repositionCallbacks.length > 0) {
             repositionCallbacks.shift()();
         }
     }
-
 
     function reposition(callback) {
         var toSplice = [];
@@ -147,8 +144,6 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
     }
 
     return {
-
-
         /**
          * Create a positioning relationship
          * @param  {Object} config
@@ -191,8 +186,7 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
             var scrollableParent = utils.getScrollableParent(
                 // W-4180706 trigger panel inside text area, then textarea could set overflow-y to auto.
                 // Avoid text area to be used as scrollable parent.
-                config.target.tagName === "TEXTAREA" ? config.target.parentNode : config.target, 
-                w);
+                utils.getPositionTarget(config.target), w);
 
             // This observer and the test for scrolling children 
             // is so that if a panel contains a scrol we do not 
@@ -319,5 +313,4 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
          */
         reposition: reposition
     };
-
 }

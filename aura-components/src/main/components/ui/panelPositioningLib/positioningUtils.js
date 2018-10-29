@@ -15,7 +15,23 @@
  */
 
 function lib() { //eslint-disable-line no-unused-vars
-	'use strict';
+    'use strict';
+    
+    function isShadowRoot(node) {
+        return node && node.nodeType === 11; // document fragment means shadowRoot
+    }
+
+    function getParentNode(elem) {
+        var parent = elem.parentNode;
+        return isShadowRoot(parent) ? parent.host : parent;
+    }
+
+    function getPositionTarget(element) {
+        // W-4180706 trigger panel inside text area, then textarea could set overflow-y to auto.
+        // Avoid text area to be used as scrollable parent.
+        return element.tagName === 'TEXTAREA' ?
+                getParentNode(element) : element;
+    }
 
 	function getScrollableParent(elem, stopEl) {
         // document.body is not necessarily a body tag, because of the (very rare) 
@@ -45,7 +61,7 @@ function lib() { //eslint-disable-line no-unused-vars
             return elem;
         }
 
-        return getScrollableParent(elem.parentNode);
+        return getScrollableParent(getParentNode(elem));
 	}
 
     function isWindow(elem) {
@@ -53,7 +69,10 @@ function lib() { //eslint-disable-line no-unused-vars
     }
 
 	return {
+        getPositionTarget: getPositionTarget,
 		getScrollableParent: getScrollableParent,
-        isWindow: isWindow
+        isWindow: isWindow,
+        isShadowRoot: isShadowRoot,
+        getParentNode: getParentNode
 	};
 }

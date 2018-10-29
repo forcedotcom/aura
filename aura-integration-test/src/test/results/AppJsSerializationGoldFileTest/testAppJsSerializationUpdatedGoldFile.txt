@@ -1,5 +1,15 @@
 "undefined"===typeof Aura&&(Aura={});Aura.bootstrap||(Aura.bootstrap={});Aura.frameworkJsReady||(Aura.ApplicationDefs={cmpExporter:{},libExporter:{}},$A={componentService:{addComponent:function(a,b){Aura.ApplicationDefs.cmpExporter[a]=b},addLibraryExporter:function(a,b){Aura.ApplicationDefs.libExporter[a]=b},initEventDefs:function(a){Aura.ApplicationDefs.eventDefs=a},initLibraryDefs:function(a){Aura.ApplicationDefs.libraryDefs=a},initControllerDefs:function(a){Aura.ApplicationDefs.controllerDefs=a},initModuleDefs:function(a){Aura.ApplicationDefs.moduleDefs=a}}});
 $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningUtils", (function (){/*$A.componentService.addLibraryInclude("js://ui.panelPositioningLib.positioningUtils",[],function lib() {
+  function isShadowRoot(node) {
+    return node && node.nodeType === 11
+  }
+  function getParentNode(elem) {
+    var parent = elem.parentNode;
+    return isShadowRoot(parent) ? parent.host : parent
+  }
+  function getPositionTarget(element) {
+    return element.tagName === "TEXTAREA" ? getParentNode(element) : element
+  }
   function getScrollableParent(elem, stopEl) {
     if(!elem || elem === stopEl || elem === document.body) {
       return null
@@ -16,12 +26,12 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
     if(overflow === "auto" || overflow === "scroll") {
       return elem
     }
-    return getScrollableParent(elem.parentNode)
+    return getScrollableParent(getParentNode(elem))
   }
   function isWindow(elem) {
     return elem.toString() === "[object Window]"
   }
-  return{getScrollableParent:getScrollableParent, isWindow:isWindow}
+  return{getPositionTarget:getPositionTarget, getScrollableParent:getScrollableParent, isWindow:isWindow, isShadowRoot:isShadowRoot, getParentNode:getParentNode}
 }
 
 );
@@ -30,15 +40,14 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
     if(el === w) {
       return true
     }
-    if(el.parentNode && el.parentNode.tagName && el.parentNode.tagName.toUpperCase() === "BODY") {
+    var parentNode = utils.getParentNode(el);
+    if(parentNode && parentNode.tagName && parentNode.tagName.toUpperCase() === "BODY") {
       return true
-    }else {
-      if(el.parentNode) {
-        return isInDom(el.parentNode)
-      }else {
-        return false
-      }
     }
+    if(parentNode) {
+      return isInDom(parentNode)
+    }
+    return false
   }
   function computeAbsPos(target) {
     var val2;
@@ -76,7 +85,7 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
     }
     this.refresh()
   }
-  w || (w = window);
+  w = w || window;
   ElementProxy.prototype.setReleaseCallback = function(cb, scope) {
     var scopeObj = scope || this;
     this._releaseCb = cb.bind(scopeObj)
@@ -486,7 +495,7 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
     var observer;
     var proxyWheelEvents = true;
     var domHandle = config.element;
-    var scrollableParent = utils.getScrollableParent(config.target.tagName === "TEXTAREA" ? config.target.parentNode : config.target, w);
+    var scrollableParent = utils.getScrollableParent(utils.getPositionTarget(config.target), w);
     if(w.MutationObserver) {
       var scrollableChildren = domHandle.querySelectorAll('[data-scoped-scroll\x3d"true"]');
       observer = new MutationObserver(function() {

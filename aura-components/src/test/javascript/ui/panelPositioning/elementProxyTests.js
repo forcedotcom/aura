@@ -42,6 +42,19 @@ Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 		// the mock object 
 		isWindow: function (el) {
 			return !!el.innerWidth;
+		},
+
+		isShadowRoot: function(el) {
+			return el && typeof el.parentNode.host === "object"
+		},
+
+		getParentNode: function(el) {
+			return el.parentNode && el.parentNode.host || el.parentNode;
+		},
+
+		getPositionTarget: function(element) {
+			return element.tagName === 'TEXTAREA' ?
+                this.getParentNode(element) : element;
 		}
 	};
 

@@ -2286,7 +2286,12 @@ Aura.Utils.Util.prototype.contains = function(container, element) {
         if (element === container) {
             return true;
         }
-        element = element.parentNode;
+        if (element.nodeType === 11) { // Check if we have a shadow root (same node type as document fragment)
+            // if we have a shadow root, use host instead of parentNode
+            element = element.host;
+        } else {
+            element = element.parentNode;
+        }
     }
 
     return false;

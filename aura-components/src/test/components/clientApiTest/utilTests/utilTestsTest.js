@@ -148,5 +148,22 @@
             var actual = $A.util.contains(divElement, svgElementInstance);
             $A.test.assertTrue(actual);
         }
+    },
+    testContainsForHTMLElement: {
+        test: function() {
+            var divElement = document.createElement("div");
+            var span = document.createElement('span');
+            divElement.appendChild(span);
+            var actual = $A.util.contains(divElement, span);
+            $A.test.assertTrue(actual);
+        }
+    },
+    testContainsForUnnestedElement: {
+        test: function() {
+            var divElement = document.createElement("div");
+            var span = document.createElement('span');
+            var actual = $A.util.contains(divElement, span);
+            $A.test.assertFalse(actual);
+        }
     }
 })

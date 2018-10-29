@@ -42,6 +42,10 @@ function LockerService() {
         service.wrapComponentEvent    = lib["wrapComponentEvent"];
         service.wrapLWC               = lib["wrapLWC"];
         service.wrapLib               = lib["wrapLib"];
+        service.sanitize              = lib["sanitize"];
+        service.isAllowedSvgTag       = lib["isAllowedSvgTag"];
+        service.sanitizeSvgElement    = lib["sanitizeSvgElement"];
+        service.sanitizeElement       = lib["sanitizeElement"];
 
         // API for file-based components (will not be obfuscated by Closure Compiler).
 

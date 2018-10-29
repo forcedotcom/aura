@@ -475,7 +475,7 @@ var AuraDevToolService = function() {
              * @returns boolean   - Signifies whether or not the tag we want was found or not (found: true, else: false)
              */
             checkParentMatchesTag : function(tag, parentTag){
-                 while(tag.tagName !== null && tag.tagName !== "BODY"){
+                 while($A.util.isString(tag.tagName) && tag.tagName !== "BODY"){
                       if(tag.tagName.toUpperCase() === parentTag){
                           return true;
                       }
@@ -763,7 +763,7 @@ var AuraDevToolService = function() {
                 var cmpName = "";
 
                 //Keep going up until we hit the either the BODY or HTML tag
-                while(!$A.util.isUndefinedOrNull(tag) && tag.tagName.toLowerCase() !== "body" && tag.tagName.toLowerCase() !== "html"){
+                while(!$A.util.isUndefinedOrNull(tag) && $A.util.isString(tag.tagName) && tag.tagName.toLowerCase() !== "body" && tag.tagName.toLowerCase() !== "html"){
                     var data_aura_rendered_by = $A.util.getElementAttributeValue(tag, "data-aura-rendered-by");
 
                     //Make sure it has a rendered by value

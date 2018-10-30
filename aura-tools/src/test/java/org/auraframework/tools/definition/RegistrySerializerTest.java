@@ -61,7 +61,7 @@ public class RegistrySerializerTest extends UnitTestCase {
     }
 
     private File createComponentSources(String namespace) throws Exception {
-        File tmpDir = new File(IOUtil.newTempDir(getClass().getSimpleName()));
+        File tmpDir = new File(IOUtil.newTempDir(getClass().getSimpleName() + "_components"));
 
         File testNamespace = new File(tmpDir, namespace);
 

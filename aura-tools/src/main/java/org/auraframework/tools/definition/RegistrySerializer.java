@@ -39,6 +39,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.impl.source.file.FileSourceLocationImpl;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.RegistryService;
@@ -47,6 +48,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.FileSourceLocation;
 import org.auraframework.system.RegistrySet;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -63,6 +65,9 @@ import com.google.common.collect.Sets;
  * one per namespace, that contain all of the defs that are in the namespaces.
  */
 public class RegistrySerializer {
+    private static final String COMPONENTS_DIR = "components";
+    private static final String MODULES_DIR = "modules";
+
     private static final Log log = LogFactory.getLog(RegistrySerializer.class);
 
     /**
@@ -334,12 +339,22 @@ public class RegistrySerializer {
         if(sourceDirectories == null || sourceDirectories.isEmpty()) {
             throw new RegistrySerializerException("Component source directory is required");
         }
+
+        List<FileSourceLocation> sourceLocations = new ArrayList<>();
+
         for (File sourceDirectory : sourceDirectories) {
             if (!sourceDirectory.exists() || !sourceDirectory.isDirectory()) {
                 throw new RegistrySerializerException("Component directory is not a directory: " + sourceDirectory);
             }
             if (!sourceDirectory.canRead()) {
                 throw new RegistrySerializerException("Unable to read/write " + sourceDirectory);
+            }
+            if (sourceDirectory.getName().contains(MODULES_DIR)) {
+                sourceLocations.add(FileSourceLocationImpl.modules(sourceDirectory));
+            } else if (sourceDirectory.getName().contains(COMPONENTS_DIR)) {
+                sourceLocations.add(FileSourceLocationImpl.components(sourceDirectory));
+            } else {
+                throw new RegistrySerializerException("Unknown source directory type");
             }
         }
 
@@ -376,18 +391,19 @@ public class RegistrySerializer {
         }
         try {
             // TODO remove once all downstream projects are updated to compile both components and modules together W-5432127 W-5480526
-            if (sourceDirectories.size() == 1 && sourceDirectories.get(0).getPath().contains("modules")) {
+            if (sourceDirectories.size() == 1 && sourceDirectories.get(0).getPath().contains(MODULES_DIR)) {
                 File modulesSourceDir = sourceDirectories.get(0);
                 // need to add components namespaces to perform correct namespace case conversion for module namespaces
-                File auraComponentsDirectory = new File(modulesSourceDir.getParentFile(), "components");
+                File auraComponentsDirectory = new File(modulesSourceDir.getParentFile(), COMPONENTS_DIR);
                 if (auraComponentsDirectory.exists()) {
-                    for (String namespace: registryService.getRegistry(Lists.newArrayList(auraComponentsDirectory)).getNamespaces()) {
+                    FileSourceLocation auraComponentsLocation = FileSourceLocationImpl.components(auraComponentsDirectory);
+                    for (String namespace: registryService.getRegistry(Lists.newArrayList(auraComponentsLocation)).getNamespaces()) {
                         configAdapter.addInternalNamespace(namespace);
                     }
                 }
             }
 
-            DefRegistry master = registryService.getRegistry(sourceDirectories);
+            DefRegistry master = registryService.getRegistry(sourceLocations);
             RegistrySet registries = registryService.getRegistrySet(master);
 
             contextService.startBasicContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, registries);

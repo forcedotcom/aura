@@ -38,6 +38,7 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.BundleSourceLoader;
 import org.auraframework.system.FileBundleSourceBuilder;
+import org.auraframework.system.FileSourceLocation;
 import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -57,7 +58,7 @@ import com.google.common.collect.ImmutableSet;
 public class FileBundleSourceLoader implements BundleSourceLoader, InternalNamespaceSourceLoader {
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
     private final Set<FileBundleSourceBuilder> builders;
-    private final Set<File> sourceDirectories;
+    private final List<FileSourceLocation> sourceLocations;
     private Map<String, FileEntry> fileMap;
     private Set<String> namespaces;
 
@@ -65,13 +66,15 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
      * Contains data for a bundle in a namespace.
      */
     private static final class FileEntry {
+        public final FileSourceLocation sourceLocation;
         public final File bundleDirectory;
         public final String namespace;
         public final String name;
         public final String qualified;
         public BundleSource<?> source;
 
-        public FileEntry(File bundleDirectory, String namespace, String name) {
+        public FileEntry(FileSourceLocation sourceLocation, File bundleDirectory, String namespace, String name) {
+            this.sourceLocation = sourceLocation;
             this.bundleDirectory = bundleDirectory;
             this.namespace = namespace;
             this.name = name;
@@ -93,46 +96,43 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
      * @param builders
      *            The builders for file bundles.
      */
-    public FileBundleSourceLoader(ResourceLoader resourceLoader, String componentPackage, String modulePackage,
-            Collection<FileBundleSourceBuilder> builders) {
+    public FileBundleSourceLoader(ResourceLoader resourceLoader, String componentPackage,
+            String modulePackage, Collection<FileBundleSourceBuilder> builders) {
         this(copyResourcesToDir(resourceLoader, componentPackage, modulePackage), builders);
     }
 
     /**
      * Processes sources from the file system.
      *
-     * @param sourceDirectories
+     * @param sourceLocations
      *            The list of source directories containing namespace directories. There may be
      *            multiple directories when there are both component and module sources (i.e.,
      *            xyz/components and xyz/modules).
      * @param builders
      *            The builders for file bundles.
      */
-    public FileBundleSourceLoader(List<File> sourceDirectories, Collection<FileBundleSourceBuilder> builders) {
-        checkNotNull(sourceDirectories, "sourceDirectories cannot be null");
+    public FileBundleSourceLoader(List<FileSourceLocation> sourceLocations, Collection<FileBundleSourceBuilder> builders) {
+        checkNotNull(sourceLocations, "sourceLocations cannot be null");
+        ImmutableList.Builder<FileSourceLocation> sourcesBuilder = ImmutableList.builder();
+        for (FileSourceLocation sourceLocation : sourceLocations) {
+            if (sourceLocation == null) {
+                throw new AuraRuntimeException("Source locations cannot be null");
+            }
 
-        ImmutableSet.Builder<File> sourcesBuilder = ImmutableSet.builder();
-        for (File directory : sourceDirectories) {
+            File directory = sourceLocation.getSourceDirectory();
             if (directory == null) {
                 throw new AuraRuntimeException("Source directories cannot be null");
             }
-
             if (!directory.exists() || !directory.isDirectory()) {
-                throw new AuraRuntimeException(String.format("Source directory '%s' does not exist or is not a directory",
+                throw new AuraRuntimeException(String.format(
+                        "Source directory '%s' does not exist or is not a directory",
                         directory.getAbsolutePath()));
             }
 
-            try {
-                sourcesBuilder.add(directory.getCanonicalFile());
-            } catch (IOException ioe) {
-                throw new AuraRuntimeException(String.format("IOException accessing base directory %s",
-                        directory.getAbsolutePath()), ioe);
-            }
+            sourcesBuilder.add(sourceLocation);
         }
-        this.sourceDirectories = sourcesBuilder.build();
-
+        this.sourceLocations = sourcesBuilder.build();
         this.builders = builders == null ? ImmutableSet.of() : ImmutableSet.copyOf(builders);
-
         updateFileMap();
     }
 
@@ -141,7 +141,8 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
         Set<String> namespacesCheck = new HashSet<>();
         Map<String, FileEntry> map = new ConcurrentHashMap<>();
 
-        for (File directory : sourceDirectories) {
+        for (FileSourceLocation sourceLocation : sourceLocations) {
+            File directory = sourceLocation.getSourceDirectory();
             for (File namespace : directory.listFiles()) {
                 if (namespace.isDirectory()) {
                     String namespaceName = namespace.getName();
@@ -152,7 +153,7 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
                     }
 
                     for (File file : namespace.listFiles()) {
-                        FileEntry entry = new FileEntry(file, namespaceName, file.getName());
+                        FileEntry entry = new FileEntry(sourceLocation, file, namespaceName, file.getName());
                         String key = entry.qualified.toLowerCase();
                         if (!map.containsKey(key)) {
                             map.put(key, entry);
@@ -280,6 +281,11 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
         }
         for (FileBundleSourceBuilder builder : builders) {
             if (builder.isBundleMatch(entry.bundleDirectory)) {
+                if (!builder.isAllowedSourceLocation(entry.sourceLocation)) {
+                    throw new AuraRuntimeException(String.format(
+                            "Bundles of this type are not allowed in this directory: %s",
+                            entry.bundleDirectory.getPath()));
+                }
                 entry.source = builder.buildBundle(entry.bundleDirectory);
                 return entry.source;
             }
@@ -321,13 +327,13 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
     public String toString() {
         StringBuilder sb = new StringBuilder(getClass().getSimpleName() + 32);
         sb.append("[");
-        sb.append(Joiner.on(", ").join(sourceDirectories));
+        sb.append(Joiner.on(", ").join(sourceLocations));
         sb.append("]");
         return sb.toString();
     }
 
-    Set<File> getSourceDirectories() {
-        return sourceDirectories;
+    List<FileSourceLocation> getSourceLocations() {
+        return sourceLocations;
     }
 
     /* TODO should just be one package/return one folder */
@@ -336,82 +342,94 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
      *
      * @return base folder of copied resources from jar
      */
-    private static List<File> copyResourcesToDir(ResourceLoader resourceLoader, String... basePackages) {
+    private static List<FileSourceLocation> copyResourcesToDir(ResourceLoader resourceLoader,
+            String componentPackage, String modulePackage) {
+
         checkNotNull(resourceLoader, "resourceLoader cannot be null");
 
-        ImmutableList.Builder<File> builder = ImmutableList.builder();
+        ImmutableList.Builder<FileSourceLocation> builder = ImmutableList.builder();
 
-        try {
-            PathMatchingResourcePatternResolver p = new PathMatchingResourcePatternResolver(resourceLoader);
-            for (String basePackage : basePackages) {
-                File directory = new File(IOUtil.newTempDir("resources"));
+        if (componentPackage != null && !componentPackage.isEmpty()) {
+            File dir = copyResourcesToDir(resourceLoader, componentPackage);
+            builder.add(FileSourceLocationImpl.components(dir));
+        }
 
-                Resource[] res = p.getResources("classpath*:/" + basePackage + "/**/*.*");
-                for (Resource r : res) {
-                    //
-                    // TOTAL HACK: Move this to getAllDescriptors later.
-                    //
-                    /**
-                     * r.getURL().toString(); and then tokenizing it on "/" and looking for
-                     * basePackage name is hacky. It depends on the location of the jar file on
-                     * the file system. Changing this to use relative paths for files within
-                     * jar files to remove the above mentioned vulnerability.
-                     */
-                    String filename;
-                    try {
-                        URLConnection conn = r.getURL().openConnection();
-                        if (conn instanceof JarURLConnection) {
-                            filename = ((JarURLConnection)conn).getEntryName();
-                        } else {
-                            filename = r.getURL().toString();
-                        }
-                    } catch (Exception e) {
-                        filename = r.getURL().toString();
-                    }
-                    List<String> names = Splitter.on('/').splitToList(filename);
-
-                    int namesSize = names.size();
-                    int packagePosition = names.indexOf(basePackage);
-
-                    if (namesSize < 3 || packagePosition == -1 || namesSize - 1 < packagePosition + 3) {
-                        // ensure resource has at least namespace folder, bundle folder, bundle
-                        // file
-                        continue;
-                    }
-
-                    String ns = names.get(packagePosition + 1);
-                    File nsDir = new File(directory, ns);
-                    if (!nsDir.exists()) {
-                        nsDir.mkdir();
-                    }
-
-                    File parent = nsDir;
-                    for (int i = packagePosition + 2; i < namesSize - 1; i++) {
-                        // create nested folders
-                        String folder = names.get(i);
-                        File dir = new File(parent, folder);
-                        if (!dir.exists()) {
-                            dir.mkdir();
-                        }
-                        parent = dir;
-                    }
-
-                    String file = names.get(namesSize - 1);
-                    File target = new File(parent, file);
-                    try (
-                            InputStream resourceStream = r.getInputStream();
-                            FileOutputStream targetStream = new FileOutputStream(target)
-                    // automatically calls close() after code block
-                    ) {
-                        IOUtil.copyStream(resourceStream, targetStream);
-                    }
-                }
-                builder.add(directory);
-            }
-        } catch (IOException x) {
-            throw new AuraRuntimeException(x);
+        if (modulePackage != null && !modulePackage.isEmpty()) {
+            File dir = copyResourcesToDir(resourceLoader, modulePackage);
+            builder.add(FileSourceLocationImpl.modules(dir));
         }
 
         return builder.build();
+    }
+
+    private static File copyResourcesToDir(ResourceLoader resourceLoader, String basePackage) {
+        try {
+            PathMatchingResourcePatternResolver p = new PathMatchingResourcePatternResolver(resourceLoader);
+            File directory = new File(IOUtil.newTempDir("resources"));
+
+            Resource[] res = p.getResources("classpath*:/" + basePackage + "/**/*.*");
+            for (Resource r : res) {
+                //
+                // TOTAL HACK: Move this to getAllDescriptors later.
+                //
+                /**
+                 * r.getURL().toString(); and then tokenizing it on "/" and looking for
+                 * basePackage name is hacky. It depends on the location of the jar file on
+                 * the file system. Changing this to use relative paths for files within
+                 * jar files to remove the above mentioned vulnerability.
+                 */
+                String filename;
+                try {
+                    URLConnection conn = r.getURL().openConnection();
+                    if (conn instanceof JarURLConnection) {
+                        filename = ((JarURLConnection)conn).getEntryName();
+                    } else {
+                        filename = r.getURL().toString();
+                    }
+                } catch (Exception e) {
+                    filename = r.getURL().toString();
+                }
+                List<String> names = Splitter.on('/').splitToList(filename);
+
+                int namesSize = names.size();
+                int packagePosition = names.indexOf(basePackage);
+
+                if (namesSize < 3 || packagePosition == -1 || namesSize - 1 < packagePosition + 3) {
+                    // ensure resource has at least namespace folder, bundle folder, bundle
+                    // file
+                    continue;
+                }
+
+                String ns = names.get(packagePosition + 1);
+                File nsDir = new File(directory, ns);
+                if (!nsDir.exists()) {
+                    nsDir.mkdir();
+                }
+
+                File parent = nsDir;
+                for (int i = packagePosition + 2; i < namesSize - 1; i++) {
+                    // create nested folders
+                    String folder = names.get(i);
+                    File dir = new File(parent, folder);
+                    if (!dir.exists()) {
+                        dir.mkdir();
+                    }
+                    parent = dir;
+                }
+
+                String file = names.get(namesSize - 1);
+                File target = new File(parent, file);
+                try (
+                        InputStream resourceStream = r.getInputStream();
+                        FileOutputStream targetStream = new FileOutputStream(target)
+                // automatically calls close() after code block
+                ) {
+                    IOUtil.copyStream(resourceStream, targetStream);
+                }
+            }
+            return directory;
+        } catch (IOException x) {
+            throw new AuraRuntimeException(x);
+        }
     }
 }

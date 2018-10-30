@@ -41,6 +41,10 @@ public interface FileBundleSourceBuilder {
         return null;
     }
 
+    default boolean isAllowedSourceLocation(FileSourceLocation sourceLocation) {
+        return sourceLocation.isComponentSource();
+    };
+
     /**
      * Build a bundle from a source directory.
      *

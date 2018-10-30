@@ -15,7 +15,6 @@
  */
 package org.auraframework.service;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
@@ -24,6 +23,7 @@ import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.FileSourceLocation;
 import org.auraframework.system.RegistrySet;
 
 /**
@@ -63,7 +63,7 @@ public interface RegistryService {
      * @param directory the directory to scan.
      * @return a Registry
      */
-    DefRegistry getRegistry(List<File> directories);
+    DefRegistry getRegistry(List<FileSourceLocation> sourceLocations);
 
     /**
      * Get a registry set based on a single registry.

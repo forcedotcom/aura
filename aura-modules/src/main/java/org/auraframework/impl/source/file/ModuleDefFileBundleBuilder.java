@@ -36,6 +36,7 @@ import org.auraframework.impl.util.ModuleDefinitionUtil;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.FileBundleSourceBuilder;
+import org.auraframework.system.FileSourceLocation;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -74,7 +75,12 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
         // also check for cmp/app bundles that has stray js with the same name
         return (baseHtml.exists() || baseJs.exists()) && !baseCmp.exists() && !baseApp.exists() && !baseLib.exists();
     }
-    
+
+    @Override
+    public boolean isAllowedSourceLocation(FileSourceLocation sourceLocation) {
+        return sourceLocation.isModuleSource();
+    }
+
     /**
      * Processes module bundle and creates BundleSource of all files.
      * .js or .html (if .js doesn't exist) of the same name is associated with ModuleDef descriptor

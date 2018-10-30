@@ -41,12 +41,13 @@ import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
 import org.auraframework.impl.java.JavaSourceLoader;
 import org.auraframework.impl.source.file.FileBundleSourceLoader;
+import org.auraframework.impl.source.file.FileSourceLocationImpl;
 import org.auraframework.impl.system.BundleAwareDefRegistry;
 import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.impl.system.NonCachingDefRegistryImpl;
@@ -65,6 +66,7 @@ import org.auraframework.system.BundleSource;
 import org.auraframework.system.BundleSourceLoader;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.FileBundleSourceBuilder;
+import org.auraframework.system.FileSourceLocation;
 import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.RegistrySet;
 import org.auraframework.system.RegistrySet.RegistrySetKey;
@@ -189,7 +191,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener, App
         String cmpPackage = location.getComponentSourcePackage();
         String modulePackage = location.getModuleSourcePackage();
 
-        try {           
+        try {
             if (cmpPackage != null) {
                 componentRegistries = getStaticRegistries(classLoader, cmpPackage);
             }
@@ -203,7 +205,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener, App
             moduleRegistries = null;
             loggingService.warn(e.getMessage(), e);
         }
-                       
+
         if (componentRegistries != null && moduleRegistries != null) {
             // FIXME:The goal is to have just one .registries file coming from one package
             // location. Currently core precompiles components and modules separately, for
@@ -330,14 +332,14 @@ public class RegistryServiceImpl implements RegistryService, SourceListener, App
         }
     }
 
-    private List<File> getValidSourceDirectories(ComponentLocationAdapter location) {
+    private List<FileSourceLocation> getValidSourceLocations(ComponentLocationAdapter location) {
         // FIXME: MUST be in this order for now (cmp, then module), because of namespace casing issues: W-5451217
-        ImmutableList.Builder<File> builder = ImmutableList.builder();
+        ImmutableList.Builder<FileSourceLocation> builder = ImmutableList.builder();
         File componentSource = location.getComponentSourceDir();
         if (componentSource != null) {
             if (componentSource.exists() && componentSource.canRead()
                     && componentSource.canExecute() && componentSource.isDirectory()) {
-                builder.add(componentSource);
+                builder.add(FileSourceLocationImpl.components(componentSource));
             } else {
                 // consumers can check file.exists() and pass null when false to avoid this msg
                 loggingService.warn(String.format("Unable to find/read components source dir '%s' from '%s', ignored",
@@ -349,7 +351,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener, App
         if (moduleSource != null) {
             if (moduleSource.exists() && moduleSource.canRead()
                     && moduleSource.canExecute() && moduleSource.isDirectory()) {
-                builder.add(moduleSource);
+                builder.add(FileSourceLocationImpl.modules(moduleSource));
             } else {
                 loggingService.warn(String.format("Unable to find/read modules source dir '%s' from '%s', ignored",
                         moduleSource, location.getClass()));
@@ -358,21 +360,21 @@ public class RegistryServiceImpl implements RegistryService, SourceListener, App
         return builder.build();
     }
 
-    private SourceLocationInfo createSourceLocationInfo(ComponentLocationAdapter location) {
+    private SourceLocationInfo createSourceLocationInfo(ComponentLocationAdapter locationAdapter) {
         List<String> canonicalSourcePaths = ImmutableList.of();
-        List<File> sourceDirectories = getValidSourceDirectories(location);
-        String componentPackage = location.getComponentSourcePackage();
-        String modulePackage = location.getModuleSourcePackage();
+        List<FileSourceLocation> sourceLocations = getValidSourceLocations(locationAdapter);
+        String componentPackage = locationAdapter.getComponentSourcePackage();
+        String modulePackage = locationAdapter.getModuleSourcePackage();
 
         BundleSourceLoader markupLoader = null;
         List<DefRegistry> markupRegistries = new ArrayList<>();
-        List<DefRegistry> staticRegistries = getStaticRegistries(location);
+        List<DefRegistry> staticRegistries = getStaticRegistries(locationAdapter);
 
-        if (!sourceDirectories.isEmpty()) {
+        if (!sourceLocations.isEmpty()) {
             try {
                 ImmutableList.Builder<String> canonicalBuilder = ImmutableList.builder();
-                for (File sourceDirectory : sourceDirectories) {
-                    canonicalBuilder.add(sourceDirectory.getCanonicalPath());
+                for (FileSourceLocation sourceLocation : sourceLocations) {
+                    canonicalBuilder.add(sourceLocation.getSourceDirectory().getCanonicalPath());
                 }
                 canonicalSourcePaths = canonicalBuilder.build();
             } catch (IOException ioe) {
@@ -389,7 +391,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener, App
                 }
             }
 
-            markupLoader = new FileBundleSourceLoader(sourceDirectories, builders);
+            markupLoader = new FileBundleSourceLoader(sourceLocations, builders);
             markInternalNamespaces(markupLoader); // MUST be before creation of below registry because of ns casing, until W-5451217
             markupRegistries.add(new BundleAwareDefRegistry(markupLoader,
                     MARKUP_PREFIXES, ALL_MARKUP_DEFTYPES, compilerService, true));
@@ -400,7 +402,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener, App
             markupRegistries.add(new BundleAwareDefRegistry(markupLoader,
                     MARKUP_PREFIXES, ALL_MARKUP_DEFTYPES, compilerService, true));
         } else {
-            Set<SourceLoader> loaders = location.getSourceLoaders();
+            Set<SourceLoader> loaders = locationAdapter.getSourceLoaders();
             if (!loaders.isEmpty()) {
                 for (SourceLoader loader : loaders) {
                     markupRegistries.add(new PassThroughDefRegistry(loader,
@@ -550,8 +552,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener, App
     }
 
     @Override
-    public DefRegistry getRegistry(List<File> directories) {
-        FileBundleSourceLoader loader = new FileBundleSourceLoader(directories, builders);
+    public DefRegistry getRegistry(List<FileSourceLocation> sourceLocations) {
+        FileBundleSourceLoader loader = new FileBundleSourceLoader(sourceLocations, builders);
         markInternalNamespaces(loader); // because of ns casing, can remove after W-5451217
         return new CompilingDefRegistry(
                 loader,

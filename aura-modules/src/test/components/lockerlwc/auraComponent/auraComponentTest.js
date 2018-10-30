@@ -195,6 +195,29 @@
             )
         }
     },
+    testSLWC2AuraApiPropValueIsReadOnly: {
+        test: function(cmp) {
+            var expectedErrorMessage = 'Invalid mutation: Cannot set "object" on "[object Object]". "[object Object]" is read-only.';
+            var module = cmp.find('parentSecure').getElement();
+            var propValue = module.testAura2SLWCApiProp;
+            $A.test.assertTrue(typeof propValue === 'object');
+            $A.test.assertEquals('bar', propValue.object.foo);
+            $A.test.assertEquals('foo', propValue.object.bar.baz);
+            try {
+                propValue.object = {};
+                $A.test.fail('Api property value should be readonly');
+            }catch (e) {
+                $A.test.contains(expectedErrorMessage, e.message);
+            }
+            try {
+                // Modify inner values
+                propValue.object.foo = 'barred';
+                $A.test.fail('Api property value should be readonly');
+            }catch(e) {
+                $A.test.contains(expectedErrorMessage, e.message);
+            }
+        }
+    },
     testTemplateQuerySelectorReturnsSecureElement: {
         test: function (cmp, event, helper) {
             var module = cmp.find('parentSecure').getElement();
@@ -335,6 +358,12 @@
                 'CustomEvent handler on child unsecured LWC component was not triggered'
             );
         }
+    },
+    // Test an unsecure parent accessing the api property value of a secure child
+    testUnsecureLWCParent2SLWCApiPropIsReadOnly: {
+        test: function(cmp) {
+            var module = cmp.find('parentUnsecure').getElement();
+            module.testUnsecureLWCParent2SLWCApiPropIsReadOnly();
+        }
     }
-
 })

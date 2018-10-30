@@ -101,6 +101,13 @@ export default class Child extends LightningElement {
         data.func();
     }
 
+    @api
+    apiProp =  {
+        object: {
+            foo: 'bar'
+        }
+    };
+
     assertTestAuraLWCCustomEventOnHostElement(ev) {
         testUtil.assertEquals(
             'SecureDOMEvent: [object CustomEvent]{ key: {"namespace":"secureModuleTest"} }',

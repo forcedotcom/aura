@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-10-25
- * Version: 0.5.22
+ * Generated: 2018-10-30
+ * Version: 0.5.23
  */
 
 (function (exports) {
@@ -640,6 +640,59 @@ function isDOMElementOrNode(el) {
     return false;
   }
 }
+
+function isSharedElement(el) {
+  return el === document.body || el === document.head || el === document.documentElement;
+}
+
+function isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes) {
+  if (typeof name !== 'string') {
+    return false;
+  }
+
+  const lcName = name.toLowerCase();
+  const tagName = raw.tagName && raw.tagName.toUpperCase();
+
+  // Reason: [W-4210397] Locker does not allow setting custom HTTP headers.
+  if (tagName === 'META' && lcName === 'http-equiv') {
+    return false;
+  }
+
+  // Always allow names with the form a-b.* (e.g. data-foo, x-foo, ng-repeat, etc)
+  if (name.indexOf('-') >= 0) {
+    return true;
+  }
+
+  if (name in caseInsensitiveAttributes) {
+    return true;
+  }
+
+  if (raw instanceof SVGElement) {
+    return true;
+  }
+
+  if (name in prototype) {
+    return true;
+  }
+
+  // Special case Label element's 'for' attribute. It called 'htmlFor' on prototype but
+  // needs to be addressable as 'for' via accessors like .attributes/getAttribute()/setAtribute()
+  if (tagName === 'LABEL' && lcName === 'for') {
+    return true;
+  }
+
+  // Special case Meta element's custom 'property' attribute. It used by the Open Graph protocol.
+  if (tagName === 'META' && lcName === 'property') {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Is the given node a shadowRoot?
+ * @param {Node} node
+ */
 
 // Keyed objects can only have one owner. We prevent "null" and "undefined"
 // keys by guarding all set operations.
@@ -1839,7 +1892,7 @@ SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
         const attribute = attributes[i];
 
         // Only add supported attributes
-        if (SecureElement.isValidAttributeName(raw, attribute.name, prototype)) {
+        if (isValidAttributeName(raw, attribute.name, prototype)) {
           let attributeName = attribute.name;
           if (attribute.name === 'src') {
             continue;
@@ -2282,6 +2335,13 @@ function isDataProxy(value) {
   }
   return false;
 }
+
+/**
+ * Can the given node be accessed with this key
+ * @param {Object} key locker key of the thing trying to access the node
+ * @param {Node} node
+ * @return Boolean
+ */
 
 const proxyMap = new WeakMap();
 function addProxy(proxy, raw) {
@@ -3840,7 +3900,7 @@ function SecureElement(el, key) {
         },
         set: function(value) {
           const raw = getRawThis(this);
-          if (SecureElement.isSharedElement(raw)) {
+          if (isSharedElement(raw)) {
             throw new error(
               `SecureElement.innerText cannot be used with ${raw.tagName} elements!`
             );
@@ -3861,7 +3921,7 @@ function SecureElement(el, key) {
         set: function(value) {
           const raw = getRawThis(this);
           // Do not allow innerHTML on shared elements (body/head)
-          if (SecureElement.isSharedElement(raw)) {
+          if (isSharedElement(raw)) {
             throw new error(
               `SecureElement.innerHTML cannot be used with ${raw.tagName} elements!`
             );
@@ -3918,7 +3978,7 @@ function SecureElement(el, key) {
         set: function(value) {
           const raw = getRawThis(this);
           // Do not allow on shared elements (body/head)
-          if (SecureElement.isSharedElement(raw)) {
+          if (isSharedElement(raw)) {
             throw new error(
               `SecureElement.outerHTML cannot be used with ${raw.tagName} elements!`
             );
@@ -4052,50 +4112,6 @@ function SecureElement(el, key) {
   return o;
 }
 
-SecureElement.isValidAttributeName = function(raw, name, prototype, caseInsensitiveAttributes) {
-  if (typeof name !== 'string') {
-    return false;
-  }
-
-  const lcName = name.toLowerCase();
-  const tagName = raw.tagName && raw.tagName.toUpperCase();
-
-  // Reason: [W-4210397] Locker does not allow setting custom HTTP headers.
-  if (tagName === 'META' && lcName === 'http-equiv') {
-    return false;
-  }
-
-  // Always allow names with the form a-b.* (e.g. data-foo, x-foo, ng-repeat, etc)
-  if (name.indexOf('-') >= 0) {
-    return true;
-  }
-
-  if (name in caseInsensitiveAttributes) {
-    return true;
-  }
-
-  if (raw instanceof SVGElement) {
-    return true;
-  }
-
-  if (name in prototype) {
-    return true;
-  }
-
-  // Special case Label element's 'for' attribute. It called 'htmlFor' on prototype but
-  // needs to be addressable as 'for' via accessors like .attributes/getAttribute()/setAtribute()
-  if (tagName === 'LABEL' && lcName === 'for') {
-    return true;
-  }
-
-  // Special case Meta element's custom 'property' attribute. It used by the Open Graph protocol.
-  if (tagName === 'META' && lcName === 'property') {
-    return true;
-  }
-
-  return false;
-};
-
 SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
   defineProperties(prototype, {
     appendChild: {
@@ -4183,7 +4199,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
       },
       set: function(value) {
         const raw = getRawThis(this);
-        if (SecureElement.isSharedElement(raw)) {
+        if (isSharedElement(raw)) {
           throw new error(
             `SecureElement.textContent cannot be used with ${raw.tagName} elements!`
           );
@@ -4200,7 +4216,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
         const { isAnLWCNode: isAnLWCNode$$1 } = lwcHelpers;
         const raw = getRawThis(this);
         // If this is a shared element, delegate the call to the shared element, no need to check for access
-        if (SecureElement.isSharedElement(raw) || isAnLWCNode$$1(raw)) {
+        if (isSharedElement(raw) || isAnLWCNode$$1(raw)) {
           return raw.hasChildNodes();
         }
         const childNodes = raw.childNodes;
@@ -4235,7 +4251,7 @@ SecureElement.addStandardElementMethodAndPropertyOverrides = function(
         const raw = getRawThis(this);
 
         // Do not allow insertAdjacentHTML on shared elements (body/head)
-        if (SecureElement.isSharedElement(raw)) {
+        if (isSharedElement(raw)) {
           throw new error(
             `SecureElement.insertAdjacentHTML cannot be used with ${raw.tagName} elements!`
           );
@@ -4377,7 +4393,7 @@ SecureElement.createAttributeAccessMethodConfig = function(
       if (nameProp) {
         name = name[nameProp];
       }
-      if (!SecureElement.isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes)) {
+      if (!isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes)) {
         warn(`${this} does not allow getting/setting the ${name} attribute, ignoring!`);
         return invalidAttributeReturnValue;
       }
@@ -4394,17 +4410,13 @@ SecureElement.createAttributeAccessMethodConfig = function(
   };
 };
 
-SecureElement.isSharedElement = function(el) {
-  return el === document.body || el === document.head || el === document.documentElement;
-};
-
 SecureElement.secureQuerySelector = function(el, key, selector) {
   const rawAll = el.querySelectorAll(selector);
   const { isAnLWCNode: isAnLWCNode$$1 } = lwcHelpers;
   for (let n = 0; n < rawAll.length; n++) {
     const raw = rawAll[n];
     const rawKey = getKey(raw);
-    if (rawKey === key || SecureElement.isSharedElement(raw) || isAnLWCNode$$1(raw)) {
+    if (rawKey === key || isSharedElement(raw) || isAnLWCNode$$1(raw)) {
       return SecureElement(raw, key);
     }
   }
@@ -5025,7 +5037,6 @@ const defaultSecureObjectKey = {
   defaultSecureObjectKey: true
 };
 
-// TODO:W-5505277 Move filters to LockerFilter
 // TODO:W-5505278 Move add/create to LockerFactory
 
 function filterFunction(key, raw, options) {
@@ -5149,7 +5160,7 @@ function filterObject(key, raw, options) {
     if (swallowed) {
       mutated = raw !== swallowed;
     } else if (isDOMElementOrNode(raw)) {
-      if (belongsToLocker || SecureElement.isSharedElement(raw)) {
+      if (belongsToLocker || isSharedElement(raw)) {
         swallowed = SecureElement(raw, key);
       } else if (!options) {
         swallowed = SecureObject(raw, key);
@@ -5199,6 +5210,19 @@ function filterObject(key, raw, options) {
 }
 
 /**
+ * List of unfiltered objects.
+ */
+// TODO: W-5529670 augment the list of unfiltered types for performance.
+const whitelistedObjects = [
+  // Function, // unsafe
+  Object,
+  Array,
+  Function.prototype,
+  Object.prototype,
+  Array.prototype
+];
+
+/**
  * @deprecated Use filter() instead.
  */
 function filterEverything(st, raw, options) {
@@ -5214,8 +5238,14 @@ function filterEverything(st, raw, options) {
     case 'symbol':
       return raw;
     case 'function':
+      if (whitelistedObjects.includes(raw)) {
+        return raw;
+      }
       return filterFunction(getKey(st), raw, options);
     case 'object':
+      if (whitelistedObjects.includes(raw)) {
+        return raw;
+      }
       return filterObject(getKey(st), raw, options);
     default:
       throw new TypeError(`type not supported ${raw}`);
@@ -5243,8 +5273,14 @@ function filter(key, raw, options) {
     case 'symbol':
       return raw;
     case 'function':
+      if (whitelistedObjects.includes(raw)) {
+        return raw;
+      }
       return filterFunction(key, raw, options);
     case 'object':
+      if (whitelistedObjects.includes(raw)) {
+        return raw;
+      }
       return filterObject(key, raw, options);
     default:
       throw new TypeError(`type not supported ${raw}`);
@@ -5430,7 +5466,7 @@ function getFilteredArrayLikeThings(raw, key) {
 
   for (let n = 0; n < raw.length; n++) {
     const value = raw[n];
-    if (getKey(value) === key || SecureElement.isSharedElement(value)) {
+    if (getKey(value) === key || isSharedElement(value)) {
       filtered.push(value);
     }
   }
@@ -5922,7 +5958,7 @@ function getFilteredNamedNodeMap(raw, key, prototype, caseInsensitiveAttributes)
 
   for (let n = 0, i = 0; n < raw.length; n++) {
     const value = raw[n];
-    if (SecureElement.isValidAttributeName(raw, value.name, prototype, caseInsensitiveAttributes)) {
+    if (isValidAttributeName(raw, value.name, prototype, caseInsensitiveAttributes)) {
       filtered[i++] = value;
     }
   }
@@ -5971,12 +6007,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
             case 'setNamedItem':
               ret = function(attribute) {
                 if (
-                  !SecureElement.isValidAttributeName(
-                    raw,
-                    attribute.name,
-                    prototype,
-                    caseInsensitiveAttributes
-                  )
+                  !isValidAttributeName(raw, attribute.name, prototype, caseInsensitiveAttributes)
                 ) {
                   warn(
                     `${this} does not allow getting/setting the ${attribute.name.toLowerCase()} attribute, ignoring!`
@@ -5996,14 +6027,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
               break;
             case 'removeNamedItem':
               ret = function(name) {
-                if (
-                  !SecureElement.isValidAttributeName(
-                    raw,
-                    name,
-                    prototype,
-                    caseInsensitiveAttributes
-                  )
-                ) {
+                if (!isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes)) {
                   warn(
                     `${this} does not allow removing the ${name.toLowerCase()} attribute, ignoring!`
                   );
@@ -6032,12 +6056,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
             case 'setNamedItemNS':
               ret = function(attribute) {
                 if (
-                  !SecureElement.isValidAttributeName(
-                    raw,
-                    attribute.name,
-                    prototype,
-                    caseInsensitiveAttributes
-                  )
+                  !isValidAttributeName(raw, attribute.name, prototype, caseInsensitiveAttributes)
                 ) {
                   warn(
                     `${this} does not allow getting/setting the ${attribute.name.toLowerCase()} attribute, ignoring!`
@@ -6055,14 +6074,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
               break;
             case 'removeNamedItemNS':
               ret = function(namespace, localName) {
-                if (
-                  !SecureElement.isValidAttributeName(
-                    raw,
-                    localName,
-                    prototype,
-                    caseInsensitiveAttributes
-                  )
-                ) {
+                if (!isValidAttributeName(raw, localName, prototype, caseInsensitiveAttributes)) {
                   warn(
                     `${this} does not allow removing the ${localName.toLowerCase()} attribute, ignoring!`
                   );
@@ -6251,7 +6263,7 @@ function createFilteredProperty(st, raw, propertyName, options) {
       const accesorProperty = options.propertyName || propertyName;
       while (value) {
         const hasAccess$$1 = hasAccess(st, value);
-        if (hasAccess$$1 || SecureElement.isSharedElement(value) || isAnLWCNode(value)) {
+        if (hasAccess$$1 || isSharedElement(value) || isAnLWCNode(value)) {
           break;
         }
         value = value[accesorProperty];
@@ -6751,7 +6763,7 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(
           let key = getKey(raw);
           // Shared elements like <body> and <head> are not tied to specific namespaces.
           // Every namespace has a secure wrapper for these elements
-          if (!key && SecureElement.isSharedElement(raw)) {
+          if (!key && isSharedElement(raw)) {
             // Obtain the key of the secure wrapper
             key = getKey(this);
           }
@@ -8076,7 +8088,7 @@ const metadata$$1 = {
       Crypto: FUNCTION,
       CryptoKey: FUNCTION,
       DOMError: FUNCTION,
-      DOMException: FUNCTION,
+      DOMException: CTOR,
       DOMImplementation: FUNCTION,
       DOMParser: RAW,
       DOMStringList: FUNCTION,
@@ -9053,414 +9065,6 @@ function SecureTemplate(template, key) {
 }
 
 /**
- * this should return a secure value
- * @param {*} cmp component instance who is accessing the value
- * @param {*} rawValue unwrapped value
- */
-function getFilteredValue(cmp, rawValue) {
-  return filterEverything(cmp, rawValue);
-}
-
-/**
- * this should return an unwrapped value
- * @param {*} cmp component
- * @param {*} filteredValue wrapped value
- */
-function getUnwrappedValue(cmp, filteredValue) {
-  if (filteredValue) {
-    if (isArray(filteredValue)) {
-      return deepUnfilterMethodArguments(cmp, [], filteredValue);
-    } else if (isPlainObject(filteredValue)) {
-      return deepUnfilterMethodArguments(cmp, {}, filteredValue);
-    } else if (getKey(filteredValue)) {
-      return unwrap$1(cmp, filteredValue);
-    }
-  }
-  return filteredValue;
-}
-
-const LightningElementPropDescriptorMap = {};
-function getRawPropertyDescriptor(LightningElementPrototype, propName) {
-  let descriptor = LightningElementPropDescriptorMap[propName];
-  if (descriptor) {
-    return descriptor;
-  }
-  descriptor = LightningElementPropDescriptorMap[propName] = getOwnPropertyDescriptor(
-    LightningElementPrototype,
-    propName
-  );
-  return descriptor;
-}
-
-// Hooks to be used by LWC
-function generateInstanceHooks(st) {
-  return {
-    callHook: function(cmp, fn, args) {
-      if (isArray(args)) {
-        args = args.map(rawValue => getFilteredValue(st, rawValue));
-      }
-      const filteredResult = fn.apply(st, args);
-      return getUnwrappedValue(st, filteredResult);
-    },
-    setHook: function(cmp, prop, rawValue) {
-      st[prop] = getFilteredValue(st, rawValue);
-    },
-    getHook: function(cmp, prop) {
-      return getUnwrappedValue(st, st[prop]);
-    }
-  };
-}
-// End of hooks
-
-const lwcElementProtoPropNames = [
-  // Global Properties:
-  'dir',
-  'id',
-  'accessKey',
-  'title',
-  'lang',
-  'hidden',
-  'draggable',
-  'tabIndex',
-  // ARIA Attributes:
-  'ariaAutoComplete',
-  'ariaChecked',
-  'ariaCurrent',
-  'ariaDisabled',
-  'ariaExpanded',
-  'ariaHasPopUp',
-  'ariaHidden',
-  'ariaInvalid',
-  'ariaLabel',
-  'ariaLevel',
-  'ariaMultiLine',
-  'ariaMultiSelectable',
-  'ariaOrientation',
-  'ariaPressed',
-  'ariaReadOnly',
-  'ariaRequired',
-  'ariaSelected',
-  'ariaSort',
-  'ariaValueMax',
-  'ariaValueMin',
-  'ariaValueNow',
-  'ariaValueText',
-  'ariaLive',
-  'ariaRelevant',
-  'ariaAtomic',
-  'ariaBusy',
-  'ariaActiveDescendant',
-  'ariaControls',
-  'ariaDescribedBy',
-  'ariaFlowTo',
-  'ariaLabelledBy',
-  'ariaOwns',
-  'ariaPosInSet',
-  'ariaSetSize',
-  'ariaColCount',
-  'ariaColIndex',
-  'ariaDetails',
-  'ariaErrorMessage',
-  'ariaKeyShortcuts',
-  'ariaModal',
-  'ariaPlaceholder',
-  'ariaRoleDescription',
-  'ariaRowCount',
-  'ariaRowIndex',
-  'ariaRowSpan',
-  'role',
-  // Lightning component properties
-  'accessKeyLabel',
-  'addEventListener',
-  'classList',
-  'className',
-  'contentEditable',
-  'contextMenu',
-  'dataset',
-  'dispatchEvent',
-  'dropzone',
-  'getAttribute',
-  'getAttributeNS',
-  'getBoundingClientRect',
-  'isContentEditable',
-  'itemScope',
-  'itemType',
-  'itemId',
-  'itemRef',
-  'itemProp',
-  'itemValue',
-  'offsetHeight',
-  'offsetLeft',
-  'offsetParent',
-  'offsetTop',
-  'offsetWidth',
-  'properties',
-  'querySelector',
-  'querySelectorAll',
-  'removeAttributeNS',
-  'removeAttribute',
-  'removeEventListener',
-  // 'root', (Deprecated, previous name for template)
-  'setAttribute',
-  'setAttributeNS',
-  // 'shadowRoot', (TODO W-5527917)
-  // 'slot', (experimental property, not supported by all browsers https://developer.mozilla.org/en-US/docs/Web/API/Element/slot, LWC throws error on access)
-  'spellcheck',
-  'style',
-  'template',
-  'toString',
-  'translate'
-];
-
-function SecureLightningElementFactory(LightningElement, key) {
-  let o = getFromCache(LightningElement, key);
-  if (o) {
-    return o;
-  }
-  o = SecureLightningElementFactory.getWrappedLightningElement(LightningElement, key);
-
-  setRef(o, LightningElement, key);
-  addToCache(LightningElement, o, key);
-  freeze(o);
-  return o;
-}
-
-SecureLightningElementFactory.getWrappedLightningElement = function(LightningElement, lockerKey) {
-  function getWrappedDescriptor(rawDescriptor) {
-    const { value, get, set, enumerable, configurable, writable } = rawDescriptor;
-    function wrappedMethod() {
-      const args = filterArguments(this, arguments, { rawArguments: true });
-      const rawResult = value.apply(this, args);
-      return getFilteredValue(this, rawResult);
-    }
-    if (rawDescriptor.hasOwnProperty('value')) {
-      // Wrap if value is a function
-      if (typeof value === 'function') {
-        return {
-          value: wrappedMethod,
-          enumerable,
-          writable,
-          configurable
-        };
-      }
-      // else return a getter descriptor for static values
-      return {
-        get() {
-          return getFilteredValue(this, value);
-        },
-        writable,
-        enumerable,
-        configurable
-      };
-    }
-    // getter and setter
-    return {
-      get() {
-        return getFilteredValue(this, get.call(this));
-      },
-      set(filteredValue) {
-        if (set) {
-          set.call(this, getUnwrappedValue(this, filteredValue));
-        }
-      },
-      enumerable,
-      configurable
-    };
-  }
-
-  function SecureLightningElement() {
-    if (this instanceof SecureLightningElement) {
-      LightningElement.prototype.constructor.call(this, generateInstanceHooks(this));
-
-      /**
-       *  `this` represents the user mode instance. No need to wrap this object or protect it
-       * `pseudoInstance` is used as an instance we are trying to protect.
-       * If this instance ever crosses from one locker to another, a filtering proxy will be placed
-       * around this and there is no risk of leaking.
-       */
-      const pseudoInstance = create$1(null, {
-        toString: {
-          value: function() {
-            return LightningElement.prototype.toString.call(this);
-          }
-        }
-      });
-      freeze(pseudoInstance);
-      setRef(this, pseudoInstance, lockerKey);
-      registerProxy(this);
-    } else {
-      return SecureLightningElement;
-    }
-  }
-
-  // eslint-disable-next-line no-underscore-dangle
-  SecureLightningElement.__circular__ = true;
-  const SecureLElementPrototype = (SecureLightningElement.prototype = getObjectLikeProto());
-  const LElementPrototype = LightningElement.prototype;
-
-  // Special properties
-  defineProperties(SecureLElementPrototype, {
-    toString: {
-      value: function() {
-        return `SecureLightningElement ${LElementPrototype.toString.call(
-          this
-        )}{ key: ${JSON.stringify(lockerKey)} }`;
-      }
-    },
-    template: {
-      enumerable: true,
-      get: function() {
-        const { get } = getRawPropertyDescriptor(LElementPrototype, 'template');
-        const rawValue = get.call(this);
-        return SecureTemplate(rawValue, lockerKey);
-      }
-    },
-    querySelector: {
-      enumerable: true,
-      value: function(selector) {
-        const { value } = getRawPropertyDescriptor(LElementPrototype, 'querySelector');
-        const node = value.call(this, selector);
-        return getFilteredValue(this, node);
-      }
-    },
-    querySelectorAll: {
-      enumerable: true,
-      value: function(selector) {
-        const { value } = getRawPropertyDescriptor(LElementPrototype, 'querySelector');
-        const rawNodeList = value.call(this, selector);
-        return getFilteredValue(this, rawNodeList);
-      }
-    }
-  });
-
-  lwcElementProtoPropNames.forEach(propName => {
-    if (
-      !SecureLElementPrototype.hasOwnProperty(propName) &&
-      LElementPrototype.hasOwnProperty(propName)
-    ) {
-      const originalDescriptor = getRawPropertyDescriptor(LElementPrototype, propName);
-      const wrappedDescriptor = getWrappedDescriptor(originalDescriptor);
-      defineProperty(SecureLElementPrototype, propName, wrappedDescriptor);
-    }
-  });
-  freeze(SecureLightningElement);
-  freeze(SecureLElementPrototype);
-
-  return SecureLightningElement;
-};
-
-function SecureLWC(lwc, key) {
-  let o = getFromCache(lwc, key);
-  if (o) {
-    return o;
-  }
-
-  o = create$1(null, {
-    LightningElement: {
-      enumerable: true,
-      value: SecureLightningElementFactory(lwc['LightningElement'], key)
-    },
-    readonly: {
-      enumerable: true,
-      value: obj => lwc['readonly'](obj)
-    },
-    // *** EXCEPTION: 'registerTemplate' is not a secure method and cannot be exposed to the user.
-    //                By extension, SecureLWC also cannot be exposed to the user.
-    registerTemplate: {
-      enumerable: true,
-      value: lwc['registerTemplate']
-    },
-    // ***
-    toString: {
-      value: function() {
-        return `SecureLWC: ${lwc}{ key: ${JSON.stringify(key)} }`;
-      }
-    }
-  });
-  freeze(o);
-
-  setRef(o, lwc, key);
-  addToCache(lwc, o, key);
-
-  return o;
-}
-
-// This is a whitelist from Kevin V, this has to be updated if any new wire adapters are introduced
-const internalLibs = [
-  'lightning/navigation',
-  'lightning/uiActionsApi',
-  'lightning/uiListApi',
-  'lightning/uiLookupsApi',
-  'lightning/uiObjectInfoApi',
-  'lightning/uiRecordApi'
-];
-function isWhitelistedLib(libDesc) {
-  return internalLibs.includes(libDesc);
-}
-
-/**
- * Create a wrapped library
- * @param {Object} lib Library being imported
- * @param {Object} key Locker key of the module importing the library
- * @param {Boolean} requireLocker Should the library being imported be lockeried
- */
-function SecureLib(lib, key, requireLocker, desc) {
-  if (isWhitelistedLib(desc)) {
-    return lib;
-  }
-
-  let o = getFromCache(lib, key);
-  if (o) {
-    return o;
-  }
-
-  assert$1.invariant(isPlainObject(lib), 'Expect lib to be a plain object');
-  o = create$1(null, {
-    toString: {
-      value: function() {
-        return `SecureLib: ${lib}{ key: ${JSON.stringify(key)} }`;
-      }
-    }
-  });
-
-  const methodOptions = {
-    defaultKey: key,
-    unfilterEverything: !requireLocker
-      ? function(args) {
-          return deepUnfilterMethodArguments(o, [], args);
-        }
-      : undefined
-  };
-
-  ObjectKeys(lib).forEach(property => {
-    if (typeof lib[property] === 'function') {
-      // only Platform events created in non-lockerized libs will be caught by this condition
-      // TODO: add support for importing lockerized libs that expose events
-      if (lib[property].prototype instanceof Event) {
-        const secureEventCtorDescriptor = createFilteredConstructor(
-          o,
-          lib,
-          property,
-          SecureCustomEventFactory,
-          key
-        );
-        defineProperty(o, property, secureEventCtorDescriptor);
-      } else {
-        addMethodIfSupported(o, lib, property, methodOptions);
-      }
-    } else {
-      addPropertyIfSupported(o, lib, property);
-    }
-  });
-
-  setRef(o, lib, key);
-  addToCache(lib, o, key);
-  registerProxy(o);
-
-  return seal(o);
-}
-
-/**
  * Unwrap a value to allow raw access in system mode
  * This method returns:
  *  a. an unfiltering proxy if the indexed value is a plain object or array
@@ -9776,6 +9380,429 @@ function getUnfilteringDataProxy(st, value) {
   cachedUnfilteringProxy.set(value, unfilteringProxy);
   registerUnfilteringDataProxy(unfilteringProxy, value);
   return unfilteringProxy;
+}
+
+/**
+ * this should return a secure value
+ * @param {*} cmp component instance who is accessing the value
+ * @param {*} rawValue unwrapped value
+ */
+function getFilteredValue(cmp, rawValue) {
+  return filterEverything(cmp, rawValue);
+}
+
+/**
+ * This method accept a value from a lockerized component and provides system mode with raw access.
+ * All public properties and methods of an LWC custom element get proccessed by this method.
+ * 1. If the value returned is a data proxy(@api, @track) that is its own,
+ *    we create an unfiltering proxy and return that
+ * 2. if the value returned is a data proxy that it received from another component,
+ *    we return the unfiltering proxy underneath the wrapped value
+ * 3. If the value returned is a plain object or array, return a deep copy with unwrapped values
+ * 4. If the value is a distorted value from system mode, unwrap it
+ * @param {*} cmp component
+ * @param {*} filteredValue wrapped value
+ */
+function getUnwrappedValue(cmp, filteredValue) {
+  if (filteredValue) {
+    // If the value being returned by the component is a data proxy
+    // Early escape hatch for data proxy. Because the data proxy behaves like a plain object/array,
+    // locker needs to act early and unwrap it in the right shape.
+    // deepUnfilterMethodArguments() works fine for simple arrays/objects, but looses the data proxy behavior
+    if (isDataProxy(filteredValue)) {
+      // If the data proxy was received from a different locker
+      if (isProxy(filteredValue)) {
+        // Unwrap the filtering proxy
+        return unwrap$1(cmp, filteredValue);
+      }
+      return getUnfilteringDataProxy(cmp, filteredValue);
+    } else if (isArray(filteredValue)) {
+      // If the value is a plain array that belongs to this locker
+      return deepUnfilterMethodArguments(cmp, [], filteredValue);
+    } else if (isPlainObject(filteredValue)) {
+      // If the value is a plain object that belongs to this locker
+      return deepUnfilterMethodArguments(cmp, {}, filteredValue);
+    } else if (getKey(filteredValue)) {
+      return unwrap$1(cmp, filteredValue);
+    }
+  }
+  return filteredValue;
+}
+
+const LightningElementPropDescriptorMap = {};
+function getRawPropertyDescriptor(LightningElementPrototype, propName) {
+  let descriptor = LightningElementPropDescriptorMap[propName];
+  if (descriptor) {
+    return descriptor;
+  }
+  descriptor = LightningElementPropDescriptorMap[propName] = getOwnPropertyDescriptor(
+    LightningElementPrototype,
+    propName
+  );
+  return descriptor;
+}
+
+// Hooks to be used by LWC
+function generateInstanceHooks(st) {
+  return {
+    callHook: function(cmp, fn, args) {
+      if (isArray(args)) {
+        args = args.map(rawValue => getFilteredValue(st, rawValue));
+      }
+      const filteredResult = fn.apply(st, args);
+      return getUnwrappedValue(st, filteredResult);
+    },
+    setHook: function(cmp, prop, rawValue) {
+      st[prop] = getFilteredValue(st, rawValue);
+    },
+    getHook: function(cmp, prop) {
+      return getUnwrappedValue(st, st[prop]);
+    }
+  };
+}
+// End of hooks
+
+const lwcElementProtoPropNames = [
+  // Global Properties:
+  'dir',
+  'id',
+  'accessKey',
+  'title',
+  'lang',
+  'hidden',
+  'draggable',
+  'tabIndex',
+  // ARIA Attributes:
+  'ariaAutoComplete',
+  'ariaChecked',
+  'ariaCurrent',
+  'ariaDisabled',
+  'ariaExpanded',
+  'ariaHasPopUp',
+  'ariaHidden',
+  'ariaInvalid',
+  'ariaLabel',
+  'ariaLevel',
+  'ariaMultiLine',
+  'ariaMultiSelectable',
+  'ariaOrientation',
+  'ariaPressed',
+  'ariaReadOnly',
+  'ariaRequired',
+  'ariaSelected',
+  'ariaSort',
+  'ariaValueMax',
+  'ariaValueMin',
+  'ariaValueNow',
+  'ariaValueText',
+  'ariaLive',
+  'ariaRelevant',
+  'ariaAtomic',
+  'ariaBusy',
+  'ariaActiveDescendant',
+  'ariaControls',
+  'ariaDescribedBy',
+  'ariaFlowTo',
+  'ariaLabelledBy',
+  'ariaOwns',
+  'ariaPosInSet',
+  'ariaSetSize',
+  'ariaColCount',
+  'ariaColIndex',
+  'ariaDetails',
+  'ariaErrorMessage',
+  'ariaKeyShortcuts',
+  'ariaModal',
+  'ariaPlaceholder',
+  'ariaRoleDescription',
+  'ariaRowCount',
+  'ariaRowIndex',
+  'ariaRowSpan',
+  'role',
+  // Lightning component properties
+  'accessKeyLabel',
+  'addEventListener',
+  'classList',
+  'className',
+  'contentEditable',
+  'contextMenu',
+  'dataset',
+  'dispatchEvent',
+  'dropzone',
+  'getAttribute',
+  'getAttributeNS',
+  'getBoundingClientRect',
+  'isContentEditable',
+  'itemScope',
+  'itemType',
+  'itemId',
+  'itemRef',
+  'itemProp',
+  'itemValue',
+  'offsetHeight',
+  'offsetLeft',
+  'offsetParent',
+  'offsetTop',
+  'offsetWidth',
+  'properties',
+  'querySelector',
+  'querySelectorAll',
+  'removeAttributeNS',
+  'removeAttribute',
+  'removeEventListener',
+  // 'root', (Deprecated, previous name for template)
+  'setAttribute',
+  'setAttributeNS',
+  // 'shadowRoot', (TODO W-5527917)
+  // 'slot', (experimental property, not supported by all browsers https://developer.mozilla.org/en-US/docs/Web/API/Element/slot, LWC throws error on access)
+  'spellcheck',
+  'style',
+  'template',
+  'toString',
+  'translate'
+];
+
+function SecureLightningElementFactory(LightningElement, key) {
+  let o = getFromCache(LightningElement, key);
+  if (o) {
+    return o;
+  }
+  o = SecureLightningElementFactory.getWrappedLightningElement(LightningElement, key);
+
+  setRef(o, LightningElement, key);
+  addToCache(LightningElement, o, key);
+  freeze(o);
+  return o;
+}
+
+SecureLightningElementFactory.getWrappedLightningElement = function(LightningElement, lockerKey) {
+  function getWrappedDescriptor(rawDescriptor) {
+    const { value, get, set, enumerable, configurable, writable } = rawDescriptor;
+    function wrappedMethod() {
+      const args = filterArguments(this, arguments, { rawArguments: true });
+      const rawResult = value.apply(this, args);
+      return getFilteredValue(this, rawResult);
+    }
+    if (rawDescriptor.hasOwnProperty('value')) {
+      // Wrap if value is a function
+      if (typeof value === 'function') {
+        return {
+          value: wrappedMethod,
+          enumerable,
+          writable,
+          configurable
+        };
+      }
+      // else return a getter descriptor for static values
+      return {
+        get() {
+          return getFilteredValue(this, value);
+        },
+        writable,
+        enumerable,
+        configurable
+      };
+    }
+    // getter and setter
+    return {
+      get() {
+        return getFilteredValue(this, get.call(this));
+      },
+      set(filteredValue) {
+        if (set) {
+          set.call(this, getUnwrappedValue(this, filteredValue));
+        }
+      },
+      enumerable,
+      configurable
+    };
+  }
+
+  function SecureLightningElement() {
+    if (this instanceof SecureLightningElement) {
+      LightningElement.prototype.constructor.call(this, generateInstanceHooks(this));
+
+      /**
+       *  `this` represents the user mode instance. No need to wrap this object or protect it
+       * `pseudoInstance` is used as an instance we are trying to protect.
+       * If this instance ever crosses from one locker to another, a filtering proxy will be placed
+       * around this and there is no risk of leaking.
+       */
+      const pseudoInstance = create$1(null, {
+        toString: {
+          value: function() {
+            return LightningElement.prototype.toString.call(this);
+          }
+        }
+      });
+      freeze(pseudoInstance);
+      setRef(this, pseudoInstance, lockerKey);
+      registerProxy(this);
+    } else {
+      return SecureLightningElement;
+    }
+  }
+
+  // eslint-disable-next-line no-underscore-dangle
+  SecureLightningElement.__circular__ = true;
+  const SecureLElementPrototype = (SecureLightningElement.prototype = getObjectLikeProto());
+  const LElementPrototype = LightningElement.prototype;
+
+  // Special properties
+  defineProperties(SecureLElementPrototype, {
+    toString: {
+      value: function() {
+        return `SecureLightningElement ${LElementPrototype.toString.call(
+          this
+        )}{ key: ${JSON.stringify(lockerKey)} }`;
+      }
+    },
+    template: {
+      enumerable: true,
+      get: function() {
+        const { get } = getRawPropertyDescriptor(LElementPrototype, 'template');
+        const rawValue = get.call(this);
+        return SecureTemplate(rawValue, lockerKey);
+      }
+    },
+    querySelector: {
+      enumerable: true,
+      value: function(selector) {
+        const { value } = getRawPropertyDescriptor(LElementPrototype, 'querySelector');
+        const node = value.call(this, selector);
+        return getFilteredValue(this, node);
+      }
+    },
+    querySelectorAll: {
+      enumerable: true,
+      value: function(selector) {
+        const { value } = getRawPropertyDescriptor(LElementPrototype, 'querySelector');
+        const rawNodeList = value.call(this, selector);
+        return getFilteredValue(this, rawNodeList);
+      }
+    }
+  });
+
+  lwcElementProtoPropNames.forEach(propName => {
+    if (
+      !SecureLElementPrototype.hasOwnProperty(propName) &&
+      LElementPrototype.hasOwnProperty(propName)
+    ) {
+      const originalDescriptor = getRawPropertyDescriptor(LElementPrototype, propName);
+      const wrappedDescriptor = getWrappedDescriptor(originalDescriptor);
+      defineProperty(SecureLElementPrototype, propName, wrappedDescriptor);
+    }
+  });
+  freeze(SecureLightningElement);
+  freeze(SecureLElementPrototype);
+
+  return SecureLightningElement;
+};
+
+function SecureLWC(lwc, key) {
+  let o = getFromCache(lwc, key);
+  if (o) {
+    return o;
+  }
+
+  o = create$1(null, {
+    LightningElement: {
+      enumerable: true,
+      value: SecureLightningElementFactory(lwc['LightningElement'], key)
+    },
+    readonly: {
+      enumerable: true,
+      value: obj => lwc['readonly'](obj)
+    },
+    // *** EXCEPTION: 'registerTemplate' is not a secure method and cannot be exposed to the user.
+    //                By extension, SecureLWC also cannot be exposed to the user.
+    registerTemplate: {
+      enumerable: true,
+      value: lwc['registerTemplate']
+    }
+    // ***
+  });
+  freeze(o);
+
+  setRef(o, lwc, key);
+  addToCache(lwc, o, key);
+
+  return o;
+}
+
+// This is a whitelist from Kevin V, this has to be updated if any new wire adapters are introduced
+const internalLibs = [
+  'lightning/navigation',
+  'lightning/uiActionsApi',
+  'lightning/uiListApi',
+  'lightning/uiLookupsApi',
+  'lightning/uiObjectInfoApi',
+  'lightning/uiRecordApi'
+];
+function isWhitelistedLib(libDesc) {
+  return internalLibs.includes(libDesc);
+}
+
+/**
+ * Create a wrapped library
+ * @param {Object} lib Library being imported
+ * @param {Object} key Locker key of the module importing the library
+ * @param {Boolean} requireLocker Should the library being imported be lockeried
+ */
+function SecureLib(lib, key, requireLocker, desc) {
+  if (isWhitelistedLib(desc)) {
+    return lib;
+  }
+
+  let o = getFromCache(lib, key);
+  if (o) {
+    return o;
+  }
+
+  assert$1.invariant(isPlainObject(lib), 'Expect lib to be a plain object');
+  o = create$1(null, {
+    toString: {
+      value: function() {
+        return `SecureLib: ${lib}{ key: ${JSON.stringify(key)} }`;
+      }
+    }
+  });
+
+  const methodOptions = {
+    defaultKey: key,
+    unfilterEverything: !requireLocker
+      ? function(args) {
+          return deepUnfilterMethodArguments(o, [], args);
+        }
+      : undefined
+  };
+
+  ObjectKeys(lib).forEach(property => {
+    if (typeof lib[property] === 'function') {
+      // only Platform events created in non-lockerized libs will be caught by this condition
+      // TODO: add support for importing lockerized libs that expose events
+      if (lib[property].prototype instanceof Event) {
+        const secureEventCtorDescriptor = createFilteredConstructor(
+          o,
+          lib,
+          property,
+          SecureCustomEventFactory,
+          key
+        );
+        defineProperty(o, property, secureEventCtorDescriptor);
+      } else {
+        addMethodIfSupported(o, lib, property, methodOptions);
+      }
+    } else {
+      addPropertyIfSupported(o, lib, property);
+    }
+  });
+
+  setRef(o, lib, key);
+  addToCache(lib, o, key);
+  registerProxy(o);
+
+  return seal(o);
 }
 
 function SecureAura(AuraInstance, key) {

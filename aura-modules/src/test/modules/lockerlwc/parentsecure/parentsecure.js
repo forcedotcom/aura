@@ -173,6 +173,15 @@ export default class ParentSecure extends LightningElement {
     @api testAura2SLWCApiMethodReceive() {
         return this.getCustomEventData();
     }
+    @api
+    testAura2SLWCApiProp =  {
+        object: {
+            foo: 'bar',
+            bar: {
+                baz: 'foo'
+            }
+        }
+    };
 
     @api testTemplateQuerySelectorReturnsSecureElement() {
         const el = this.template.querySelector('.parent-secure');
@@ -321,6 +330,49 @@ export default class ParentSecure extends LightningElement {
         testUtils.assertTrue(child.assertParamsInPublicMethod instanceof Function, 'Unexpected wrapped value received on child');
         child.assertParamsInPublicMethod(this.getCustomEventData(doneObj, true));
         testUtils.assertTrue(doneObj.triggered, 'Failed to execute callback in child component');
+    }
+    @api
+    testSLWC2SLWCChildApiPropValueIsReadOnly() {
+        const expectedErrorMessage = 'Invalid mutation: Cannot set "foo" on "[object Object]". "[object Object]" is read-only.';
+        const sameNamespaceChild = this.template.querySelector('lockerlwc-childsecure');
+        try {
+            sameNamespaceChild.objProp.foo = 'Immutable?';
+            testUtils.fail('API property value should be immutable');
+        } catch(e) {
+            testUtils.assertEquals(expectedErrorMessage, e.message, 'Api property value of same namespace child should remain readonly');
+        }
+        const crossNamespaceChild = this.template.querySelector('securemoduletest-child');
+        try {
+            crossNamespaceChild.apiProp.object.foo = 'Immutable?';
+            testUtils.fail('API property value should be immutable');
+        } catch(e) {
+            testUtils.assertEquals(expectedErrorMessage, e.message, 'Api property value of cross namespace child should remain readonly');
+        }
+    }
+    @api
+    testSLWC2UnsecureLWCChildApiPropValueIsReadOnly() {
+        const unsecureChild = this.template.querySelector('lockerlwc-parentunsecure');
+        try {
+            unsecureChild.apiProp.object.foo = 'Immutable?';
+            testUtils.fail('API property value should be immutable');
+        } catch(e) {
+            testUtils.assertEquals(
+                'Invalid mutation: Cannot set "foo" on "[object Object]". "[object Object]" is read-only.',
+                e.message,
+                'Api property of an unsecure child should remain readonly'
+            );
+        }
+        const unsecureCrossNamespaceChild = this.template.querySelector('securemoduletest-non-lockerized-cmp');
+        try {
+            unsecureCrossNamespaceChild.apiProp.object.foo = 'Immutable?';
+            testUtils.fail('API property value should be immutable');
+        } catch(e) {
+            testUtils.assertEquals(
+                'Invalid mutation: Cannot set "foo" on "[object Object]". "[object Object]" is read-only.',
+                e.message,
+                'Api property of an unsecure child from cross namespace should remain readonly'
+            );
+        }
     }
     @api testPlatformEventsOnSelf(objDone) {
         this.addEventListener(LockerLWCEventName, (ev) => {

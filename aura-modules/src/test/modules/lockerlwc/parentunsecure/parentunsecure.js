@@ -96,6 +96,35 @@ export default class ParentUnsecure extends LightningElement {
         return this.customEventData;
     }
 
+    @api
+    testUnsecureLWCParent2SLWCApiPropIsReadOnly() {
+        const child = this.template.querySelector('securemoduletest-child');
+        const expectedErrorMessage = 'Invalid mutation: Cannot set "foo" on "[object Object]". "[object Object]" is read-only.';
+        try {
+            child.apiProp.object.foo = 'Immutable?';
+            testUtils.fail('API property value should be immutable');
+        } catch(e) {
+            testUtils.assertEquals(
+                expectedErrorMessage,
+                e.message,
+                'Public property accessed from a parent component should retain read-only behavior'
+            );
+        }
+        const sameNamespaceChild = this.template.querySelector('lockerlwc-childsecure');
+        try {
+            sameNamespaceChild.objProp.foo = 'Immutable?';
+            testUtils.fail('API property value should be immutable');
+        } catch(e) {
+            testUtils.assertEquals(expectedErrorMessage, e.message, 'Api property value of same namespace child should remain readonly');
+        }
+    }
+
+    @api
+    apiProp =  {
+        object: {
+            foo: 'bar'
+        }
+    };
     assertCustomEvent(ev) {
         testUtils.assertEquals(
             '[object CustomEvent]',

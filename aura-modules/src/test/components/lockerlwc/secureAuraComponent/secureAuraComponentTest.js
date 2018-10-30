@@ -122,6 +122,18 @@
             return cmp.testSLWC2SWLCParentCanCallAPIProp();
         }
     },
+    testSLWC2SLWCChildApiPropValueIsReadOnly: {
+        test: function(cmp) {
+            var module = cmp.find('parentSecure');
+            module.testSLWC2SLWCChildApiPropValueIsReadOnly();
+        }
+    },
+    testSLWC2UnsecureLWCChildApiPropValueIsReadOnly: {
+        test: function(cmp) {
+            var module = cmp.find('parentSecure');
+            module.testSLWC2UnsecureLWCChildApiPropValueIsReadOnly();
+        }
+    },
     testAura2SLWCApiMethodCNSend: {
         test: function(cmp) {
             return cmp.testAura2SLWCApiMethodCNSend();

@@ -5,6 +5,13 @@ export default class Simple extends LightningElement {
     @track message = 'Hello Locker!';
 
     @api
+    apiProp =  {
+        object: {
+            foo: 'bar'
+        }
+    };
+
+    @api
     testWindowIsUnsecure() {
         if (window.toString().indexOf("SecureWindow") === -1) {
             this.message = "Bye Locker!";

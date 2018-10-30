@@ -16,7 +16,11 @@
 ({
     render : function(cmp){
         var value = cmp.get("v.value");
-        value = $A.util.sanitizeDOM(value, {FORBID_TAGS: ['style', 'meta', 'script', 'link']});
+        if ($A.util.isUndefinedOrNull(value)) {
+            value = "";
+        } else {
+            value = $A.util.sanitizeDOM(value);
+        }
         var elements=$A.util.createElementsFromMarkup(value);
         if(!elements.length){
             elements=$A.renderingService.renderFacet(cmp,elements);

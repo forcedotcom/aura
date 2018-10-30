@@ -415,7 +415,7 @@ Aura.Utils.Util.prototype.clearNode = function (node) {
 */
 
 Aura.Utils.Util.prototype.sanitizeDOM = function (dirty, config) {
-    return DOMPurify["sanitize"](dirty, config);
+    return $A.lockerService.sanitize(dirty, config);
 };
 
 // -- Sanitize Facade (secure-filters) -----------------------------------------------

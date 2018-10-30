@@ -1,0 +1,27 @@
+<aura:component implements="aura:requireLocker">
+    <aura:attribute name="testUtils" type="Object"/>
+    <secureModuleTest:importLockerizedFromSameNamespaceExportLockerized aura:id="importLockerizedFromSameNamespaceExportLockerized"/>
+    <secureModuleTest:importLockerizedFromSameNamespaceExportNonLockerized aura:id="importLockerizedFromSameNamespaceExportLockerized"/>
+    <secureModuleTest:importNonLockerizedFromSameNamespaceExportNonLockerized aura:id="importNonLockerizedFromSameNamespaceExportLockerized"/>
+    <secureModuleTest:importLockerizedFromDifferentNamespaceExportLockerized aura:id="importLockerizedFromDifferentNamespaceExportLockerized"/>
+    <secureModuleTest:importLockerizedFromDifferentNamespaceExportNonLockerized aura:id="importLockerizedFromDifferentNamespaceExportLockerized"/>
+    <secureModuleTest:importNonLockerizedFromDifferentNamespaceExportNonLockerized aura:id="importNonLockerizedFromDifferentNamespaceExportLockerized"/>
+    <aura:method name="testImportLockerizedFromSameNamespaceExportLockerized">
+        <aura:attribute name="testCase" type="String"/>
+    </aura:method>
+    <aura:method name="testImportLockerizedFromSameNamespaceExportNonLockerized">
+        <aura:attribute name="testCase" type="String"/>
+    </aura:method>
+    <aura:method name="testImportNonLockerizedFromSameNamespaceExportLockerized">
+        <aura:attribute name="testCase" type="String"/>
+    </aura:method>
+    <aura:method name="testImportLockerizedFromDifferentNamespaceExportLockerized">
+        <aura:attribute name="testCase" type="String"/>
+    </aura:method>
+    <aura:method name="testImportLockerizedFromDifferentNamespaceExportNonLockerized">
+        <aura:attribute name="testCase" type="String"/>
+    </aura:method>
+    <aura:method name="testImportNonLockerizedFromDifferentNamespaceExportLockerized">
+        <aura:attribute name="testCase" type="String"/>
+    </aura:method>
+</aura:component>

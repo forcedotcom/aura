@@ -40,21 +40,29 @@ function GlobalValueProviders(gvp, initCallback) {
         "$Global": new Aura.Provider.ContextValueProvider(gvp["$Global"])
     };
 
+    // Append external GVP providers.
+    $A.util.applyNotFromPrototype(this.valueProviders, $A.globalValueProviders);
+
+    var bootstrapGVPData = [];
     for(var type in gvp){
         if (["$Browser", "$Label", "$Locale", "$Global"].indexOf(type) >= 0) {
             continue;
         }
 
-        $A.assert(this.valueProviders[type]==null,"$A.globalValueProviders.ctor(): '"+type+"' has already been registered.");
-        // work around the obfuscation logic to allow external GVPs
-        var valueProvider = gvp[type];
-        valueProvider.getValues = valueProvider.getValues || valueProvider["getValues"];
-        valueProvider.get       = valueProvider.get       || valueProvider["get"];
-        valueProvider.merge     = valueProvider.merge     || valueProvider["merge"];
-        this.valueProviders[type] = valueProvider;
+        var valueProvider = this.valueProviders[type];
+        if(valueProvider) {
+            // work around the obfuscation logic to allow external GVPs
+            valueProvider.getValues = valueProvider.getValues || valueProvider["getValues"];
+            valueProvider.get = valueProvider.get || valueProvider["get"];
+            valueProvider.merge = valueProvider.merge || valueProvider["merge"];
+            this.valueProviders[type] = valueProvider;
+        }
+
+        bootstrapGVPData.push({"type": type, "values": gvp[type]});
     }
 
-    this.load(gvp);
+    this.load(bootstrapGVPData);
+
     if (initCallback) {
         initCallback(this);
     }
@@ -329,14 +337,18 @@ GlobalValueProviders.prototype.loadFromStorage = function() {
 /**
  * Loads GVP config when from context
  *
- * @param {Object} gvp Global Value Providers
+ * @param {Array} gvps an optional serialized GVP to load.
  * @private
  */
 GlobalValueProviders.prototype.load = function(gvp) {
-    if (gvp) {
-        for ( var i = 0; i < gvp.length; i++) {
-            this.merge(gvp[i]);
-        }
+    if(gvp && gvp.length) {
+        Aura["afterBootstrapReady"].push(function () {
+            try {
+                this.merge(gvp, true);
+            } catch (e) {
+                $A.warning("GlobalValueProviders merge failed.");
+            }
+        }.bind(this));
     }
 };
 

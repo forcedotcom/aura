@@ -75,7 +75,8 @@ export default class ParentUnsecure extends LightningElement {
                 data: Object.assign(_this.customEventData, {
                     func: function () {
                         triggered = true;
-                    }
+                    },
+                    isSecure : true
                 })
             }
         });

@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-10-30
- * Version: 0.5.23
+ * Version: 0.5.24
  */
 
 (function (exports) {
@@ -693,6 +693,8 @@ function isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes) {
  * Is the given node a shadowRoot?
  * @param {Node} node
  */
+const isShadowRoot =
+  typeof window.ShadowRoot !== 'undefined' ? node => node instanceof ShadowRoot : () => false;
 
 // Keyed objects can only have one owner. We prevent "null" and "undefined"
 // keys by guarding all set operations.
@@ -2337,11 +2339,62 @@ function isDataProxy(value) {
 }
 
 /**
+ * Determine the host element for a given node and the path to the host
+ * @param {Node} node The node being accessed
+ */
+function getHost(node) {
+  if (!node) {
+    return node;
+  }
+  // Traverse up until we have reached the shadowRoot of the node
+  // or document(this is the case when the given node is host element of an interop component)
+  while (node && !isShadowRoot(node)) {
+    node = node.parentNode;
+  }
+  return node ? node.host : node;
+}
+
+/**
+ * Get the locker key for a given host element's component class
+ * Note: Not using a weak map here to cache this information locally because that would be slower
+ * asking LWC. LWC does a Symbol property lookup directly on the element.
+ * lookup to get the information.
+ * @param {HTMLElement} el
+ */
+function getKeyFromComponentConstructor(el) {
+  const elComponentConstructor = lwcGetComponentConstructor(el);
+  return getKey(elComponentConstructor);
+}
+
+/**
  * Can the given node be accessed with this key
  * @param {Object} key locker key of the thing trying to access the node
  * @param {Node} node
  * @return Boolean
  */
+function isAccessibleLWCNode(key, node) {
+  if (!key) {
+    throw new TypeError(`Unexpected value receved for key: ${key}`);
+  }
+  // Check if the node was created by LWC, this is a fast symbol look up by LWC
+  if (!isAnLWCNode(node)) {
+    return false;
+  }
+
+  // Find the host in whose template the node was declared
+  const host = getHost(node);
+  if (!host) {
+    return false;
+  }
+
+  const hostComponentKey = getKeyFromComponentConstructor(host);
+  // If the host is an instance of a lockerized component class
+  if (hostComponentKey) {
+    // Check if accessor key is same as node's key
+    return hostComponentKey === key;
+  }
+  return false;
+}
 
 const proxyMap = new WeakMap();
 function addProxy(proxy, raw) {
@@ -3579,12 +3632,16 @@ const metadata$2 = {
 function cloneFiltered(el, st) {
   const root = el.cloneNode(false);
   function cloneChildren(parent, parentClone) {
-    const { isAnLWCNode: isAnLWCNode$$1 } = lwcHelpers;
+    const { isAccessibleLWCNode: isAccessibleLWCNode$$1 } = lwcHelpers;
     const childNodes = parent.childNodes;
-    const isParentAnLWCNode = isAnLWCNode$$1(parent);
+    const key = getKey(st);
     for (let i = 0; i < childNodes.length; i++) {
       const child = childNodes[i];
-      if (hasAccess(st, child) || child.nodeType === Node.TEXT_NODE || isParentAnLWCNode) {
+      if (
+        hasAccess(st, child) ||
+        child.nodeType === Node.TEXT_NODE ||
+        isAccessibleLWCNode$$1(key, child)
+      ) {
         const childClone = child.cloneNode(false);
         parentClone.appendChild(childClone);
         trust$1(st, childClone);
@@ -4213,15 +4270,16 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
 
     hasChildNodes: {
       value: function() {
-        const { isAnLWCNode: isAnLWCNode$$1 } = lwcHelpers;
+        const { isAccessibleLWCNode: isAccessibleLWCNode$$1 } = lwcHelpers;
         const raw = getRawThis(this);
         // If this is a shared element, delegate the call to the shared element, no need to check for access
-        if (isSharedElement(raw) || isAnLWCNode$$1(raw)) {
+        if (isSharedElement(raw)) {
           return raw.hasChildNodes();
         }
         const childNodes = raw.childNodes;
+        const key = getKey(this);
         for (let i = 0; i < childNodes.length; i++) {
-          if (hasAccess(this, childNodes[i])) {
+          if (hasAccess(this, childNodes[i]) || isAccessibleLWCNode$$1(key, childNodes[i])) {
             return true;
           }
         }
@@ -4412,11 +4470,11 @@ SecureElement.createAttributeAccessMethodConfig = function(
 
 SecureElement.secureQuerySelector = function(el, key, selector) {
   const rawAll = el.querySelectorAll(selector);
-  const { isAnLWCNode: isAnLWCNode$$1 } = lwcHelpers;
+  const { isAccessibleLWCNode: isAccessibleLWCNode$$1 } = lwcHelpers;
   for (let n = 0; n < rawAll.length; n++) {
     const raw = rawAll[n];
     const rawKey = getKey(raw);
-    if (rawKey === key || isSharedElement(raw) || isAnLWCNode$$1(raw)) {
+    if (rawKey === key || isSharedElement(raw) || isAccessibleLWCNode$$1(key, raw)) {
       return SecureElement(raw, key);
     }
   }
@@ -5026,7 +5084,7 @@ let isUnfilteredTypeHook$1;
 function registerIsUnfilteredTypeHook(hook) {
   isUnfilteredTypeHook$1 = hook;
 }
-const lwcHelpers = { isAnLWCNode: () => false };
+const lwcHelpers = { isAccessibleLWCNode: () => false };
 function registerLWCHelpers(helpers) {
   if (helpers) {
     assign(lwcHelpers, helpers);
@@ -6254,16 +6312,17 @@ function createFilteredProperty(st, raw, propertyName, options) {
   };
 
   descriptor.get = function() {
-    const { isAnLWCNode } = lwcHelpers;
+    const { isAccessibleLWCNode } = lwcHelpers;
     let value = raw[propertyName];
 
     // Continue from the current object until we find an accessible object.
     if (options && options.skipOpaque === true) {
       // skipping opaque elements and traversing up the dom tree, eg: event.target
       const accesorProperty = options.propertyName || propertyName;
+      const key = getKey(st);
       while (value) {
         const hasAccess$$1 = hasAccess(st, value);
-        if (hasAccess$$1 || isSharedElement(value) || isAnLWCNode(value)) {
+        if (hasAccess$$1 || isSharedElement(value) || isAccessibleLWCNode(key, value)) {
           break;
         }
         value = value[accesorProperty];
@@ -6306,7 +6365,8 @@ function createFilteredPropertyStateless(propertyName, prototype, options) {
   descriptor.get = function() {
     const st = this;
     const raw = getRawThis(st);
-
+    const { isAccessibleLWCNode } = lwcHelpers;
+    const key = getKey(st);
     let value = raw[propertyName];
 
     // Continue from the current object until we find an acessible object.
@@ -6318,7 +6378,8 @@ function createFilteredPropertyStateless(propertyName, prototype, options) {
           value === document.body ||
           value === document.head ||
           value === document.documentElement ||
-          value === document
+          value === document ||
+          isAccessibleLWCNode(key, value)
         ) {
           break;
         }
@@ -10380,6 +10441,12 @@ let isLockerInitialized = false;
 
 const namespaceToKey = new Map();
 
+/**
+ * Pre hook to allow aura to filter things with special behavior
+ * @param {*} raw The object being accessed
+ * @param {*} key locker key for the secure thing trying to access the raw object
+ * @param {*} belongsToLocker Does the raw value and secure thing trying to access it belong to the same locker
+ */
 function filterTypeHook(raw, key, belongsToLocker) {
   if (raw instanceof AuraAction) {
     return belongsToLocker ? SecureAuraAction(raw, key) : SecureObject(raw, key);
@@ -10389,9 +10456,8 @@ function filterTypeHook(raw, key, belongsToLocker) {
     return SecureAuraEvent(raw, key);
   } else if (raw instanceof AuraPropertyReferenceValue) {
     return SecureAuraPropertyReferenceValue(raw, key);
-  } else if (isDOMElementOrNode(raw) && isAnLWCNode(raw)) {
-    // DOM elements create by lwc are not subjected to access checks
-    // They will be wrapped using the key of the accessor and directly passed down
+  } else if (isDOMElementOrNode(raw) && isAccessibleLWCNode(key, raw)) {
+    // If the raw thing is an LWC node and it can be accessed with the give key, then wrap it in SecureElement
     return SecureElement(raw, key);
   } else if (belongsToLocker && isUnfilteringDataProxy(raw)) {
     // If value holds a data proxy that belongs to this locker, give access to the real data proxy, no need to filter
@@ -10584,7 +10650,7 @@ function initialize(types, api) {
   registerFilterTypeHook(filterTypeHook);
   registerDeepUnfilteringTypeHook(deepUnfilteringTypeHook);
   registerIsUnfilteredTypeHook(isUnfilteredTypeHook);
-  registerLWCHelpers({ isAnLWCNode: isAnLWCNode });
+  registerLWCHelpers({ isAccessibleLWCNode });
   registerAddPropertiesHook$$1(windowAddPropertiesHook);
   registerAddPropertiesHook$1(navigatorAddPropertiesHook);
   registerCustomElementHook(customElementHook$1);

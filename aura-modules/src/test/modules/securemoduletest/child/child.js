@@ -135,9 +135,9 @@ export default class Child extends LightningElement {
         testUtil.assertEquals(1, ev.detail.data.number, 'Expected number was not received in event data');
         testUtil.assertEquals(true, ev.detail.data.boolean, 'Expected boolean was not received in event data');
         testUtil.assertEquals(
-            'SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }',
+            'SecureObject: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }',
             ev.detail.data.domElement.toString(),
-            'Should receive a SecureElement'
+            'Should receive a SecureObject'
         );
         testUtil.assertEquals(
             'SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }',
@@ -197,11 +197,19 @@ function assertDataObject(data) {
     testUtil.assertEquals(1, data.number, 'Expected number was not received in event data');
     testUtil.assertEquals(true, data.boolean, 'Expected boolean was not received in event data');
 
-    testUtil.assertEquals(
-        'SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }',
-        data.domElement.toString(),
-        'Should receive a SecureElement from an unlockerized environment'
-    );
+    if (data.isSecure) { // If data is coming from another sandbox
+        testUtil.assertEquals(
+            'SecureObject: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }',
+            data.domElement.toString(),
+            'Should receive a SecureObject'
+        );
+    } else {
+        testUtil.assertEquals(
+            'SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }',
+            data.domElement.toString(),
+            'Should receive a SecureElement from an unlockerized environment'
+        );
+    }
 
     testUtil.assertEquals(
         'SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }',

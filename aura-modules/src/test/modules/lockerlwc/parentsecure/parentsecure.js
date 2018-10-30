@@ -218,7 +218,7 @@ export default class ParentSecure extends LightningElement {
 
         const ev = new CustomEvent('customEvent', {
             detail: {
-                data: _this.getCustomEventData(doneObj, true)
+                data: _this.getCustomEventData(doneObj)
             }
         });
 
@@ -328,7 +328,7 @@ export default class ParentSecure extends LightningElement {
         // Access public methods
         testUtils.assertDefined(child.assertParamsInPublicMethod, 'Unable to access @api method on child component');
         testUtils.assertTrue(child.assertParamsInPublicMethod instanceof Function, 'Unexpected wrapped value received on child');
-        child.assertParamsInPublicMethod(this.getCustomEventData(doneObj, true));
+        child.assertParamsInPublicMethod(this.getCustomEventData(doneObj));
         testUtils.assertTrue(doneObj.triggered, 'Failed to execute callback in child component');
     }
     @api
@@ -390,7 +390,7 @@ export default class ParentSecure extends LightningElement {
 
     @api testPlatformEventsOnChild(objDone) {
         const child = this.template.querySelector('lockerlwc-childsecure');
-        child.dispatchEvent(new LockerLWCEvent(this.getCustomEventData(objDone, true)));
+        child.dispatchEvent(new LockerLWCEvent(this.getCustomEventData(objDone)));
     }
 
     @api testPlatformEventsOnChildCrossNamespace(objDone) {

@@ -91,11 +91,11 @@ function assertDataObject(data) {
     testUtils.assertEquals('foobar', data.string, 'Expected string was not received in event data');
     testUtils.assertEquals(1, data.number, 'Expected number was not received in event data');
     testUtils.assertEquals(true, data.boolean, 'Expected boolean was not received in event data');
-    if (data.isSecure) {
+    if (data.isSecure) { // If data is coming from another sandbox
         testUtils.assertEquals(
-            'SecureElement: [object HTMLDivElement]{ key: {"namespace":"lockerlwc"} }',
+            'SecureObject: [object HTMLDivElement]{ key: {"namespace":"lockerlwc"} }',
             data.domElement.toString(),
-            'Should receive a SecureElement'
+            'Should receive a SecureObject'
         );
     } else {
         testUtils.assertEquals(

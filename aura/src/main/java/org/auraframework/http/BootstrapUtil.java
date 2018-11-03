@@ -42,8 +42,7 @@ public class BootstrapUtil {
             ";(function() {\n" +
             "    window.Aura.bootstrap.execBootstrapJs = window.performance && window.performance.now ? window.performance.now() : Date.now();\n" +
             "    window.Aura.appBootstrapStatus = \"loaded\";\n" +
-            "    window.Aura.afterBootstrapReady = window.Aura.afterBootstrapReady || [];\n" +
-            "    if (window.Aura.afterBootstrapReady.length) {\n" +
+            "    if (window.Aura.afterBootstrapReady && window.Aura.afterBootstrapReady.length) {\n" +
             "        var queue = window.Aura.afterBootstrapReady;\n" +
             "        window.Aura.afterBootstrapReady = [];\n" +
             "        for (var i = 0; i < queue.length; i++) {\n" +

@@ -1,3 +1,4 @@
 :host {
 	color: var(--lwc-color);
+	background: var(--background-color, blue);
 }

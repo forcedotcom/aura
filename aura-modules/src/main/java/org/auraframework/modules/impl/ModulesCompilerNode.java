@@ -104,7 +104,7 @@ public final class ModulesCompilerNode implements ModulesCompiler {
     private static StylesheetConfig createStylesheetConfig() {
         Map<String,String> customPropertiesMap = new HashMap<String, String>();
         customPropertiesMap.put("type","module");
-        customPropertiesMap.put("name","@salesforce/css/customProperties");
+        customPropertiesMap.put("name","@salesforce/cssvars/customProperties");
         
         return new StylesheetConfig(new CustomPropertiesConfig(true, customPropertiesMap));
     }

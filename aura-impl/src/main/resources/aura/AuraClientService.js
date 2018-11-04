@@ -2252,9 +2252,9 @@ AuraClientService.prototype.defaultSalesforceImportResolver = function(fullImpor
     switch (key) {
         case 'label': 
             return $A.get("$Label." + parts[1]);
-        case 'css':
-            return function (cssVar) {
-                return $A.clientService.cssVars[cssVar.slice(2)];
+        case 'cssvars':
+            return function (cssVar, fallback) {
+                return $A.clientService.cssVars[cssVar.slice(2)] || fallback || 'inherit';
             };
 
         default: 

@@ -1,20 +1,12 @@
-define('modules/nsmoduletest', ['@salesforce/css/customProperties', 'ns/bar', 'x/foo', 'lwc', 'ns/utils', 'some-module'], function (customProperties, _cBar, _xFoo, lwc, utils, someModule) {
+define('modules/nsmoduletest', ['ns/bar', 'x/foo', 'lwc', 'ns/utils', 'some-module'], function (_cBar, _xFoo, lwc, utils, someModule) {
 
-    function factory(hostSelector, shadowSelector) {
-        return `c-bar${shadowSelector} {
-    color: red;
-}
-
-x-foo${shadowSelector} {
-    color: black;
-}`;
+    function stylesheet(hostSelector, shadowSelector, nativeShadow) {
+      return `
+c-bar${shadowSelector} {color: red;}
+x-foo${shadowSelector} {color: black;}
+`;
     }
-
-    var stylesheet = {
-        factory,
-        hostAttribute: 'modules-nsmoduletest_nsmoduletest-host',
-        shadowAttribute: 'modules-nsmoduletest_nsmoduletest',
-    };
+    var stylesheets = [stylesheet];
 
     function tmpl($api, $cmp, $slotset, $ctx) {
       const {
@@ -30,8 +22,12 @@ x-foo${shadowSelector} {
 
     var _tmpl = lwc.registerTemplate(tmpl);
 
-    if (stylesheet) {
-        tmpl.stylesheet = stylesheet;
+    if (stylesheets) {
+      tmpl.stylesheets = {
+        stylesheets,
+        hostAttribute: "modules-nsmoduletest_nsmoduletest-host",
+        shadowAttribute: "modules-nsmoduletest_nsmoduletest"
+      };
     }
 
     class Test extends lwc.LightningElement {

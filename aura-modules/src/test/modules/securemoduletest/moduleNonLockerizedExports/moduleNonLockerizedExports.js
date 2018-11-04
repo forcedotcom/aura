@@ -16,9 +16,6 @@ export const OBJECT = {
   'winFunction': function() { return window; },
   'docFunction': function() { return document; },
   'elFunction': function() { return document.createElement('DIV'); },
-  'winThisContext': this.win,
-  'docThisContext': this.doc,
-  'elThisContext': this.el,
   'winThisContextFunction': function() { return this.win; },
   'docThisContextFunction': function() { return this.doc; },
   'elThisContextFunction': function() { return this.el; }

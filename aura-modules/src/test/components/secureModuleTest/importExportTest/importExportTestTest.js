@@ -1,22 +1,19 @@
 ({
     browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
 
-    // Enable Tests!
-    _testImportLockerizedFromSameNamespaceExportLockerizedPrimitives: {
+    testImportLockerizedFromSameNamespaceExportLockerizedPrimitives: {
         test: function(cmp) {
             cmp.testImportLockerizedFromSameNamespaceExportLockerized("testPrimitives");
         }
     },
 
-    // Enable Tests!
-    _testImportLockerizedFromSameNamespaceExportLockerizedObjects: {
+    testImportLockerizedFromSameNamespaceExportLockerizedObjects: {
         test: function(cmp) {
             cmp.testImportLockerizedFromSameNamespaceExportLockerized("testObjects");
         }
     },
 
-    // Enable Tests!
-    _testImportLockerizedFromSameNamespaceExportLockerizedFunctions: {
+    testImportLockerizedFromSameNamespaceExportLockerizedFunctions: {
         test: function(cmp) {
             cmp.testImportLockerizedFromSameNamespaceExportLockerized("testFunctions");
         }
@@ -29,8 +26,7 @@
         }
     },
 
-    // Enable Tests!
-    _testImportLockerizedFromSameNamespaceExportNonLockerizedPrimitives: {
+    testImportLockerizedFromSameNamespaceExportNonLockerizedPrimitives: {
         test: function(cmp) {
             cmp.testImportLockerizedFromSameNamespaceExportNonLockerized("testPrimitives");
         }
@@ -43,7 +39,7 @@
         }
     },
 
-    // Enable Tests!
+     // Enable Tests!
     _testImportLockerizedFromSameNamespaceExportNonLockerizedFunctions: {
         test: function(cmp) {
             cmp.testImportLockerizedFromSameNamespaceExportNonLockerized("testFunctions");
@@ -56,9 +52,8 @@
             cmp.testImportLockerizedFromSameNamespaceExportNonLockerized("testDefault");
         }
     },
-
-    // Enable Tests!
-    _testImportNonLockerizedFromSameNamespaceExportLockerizedPrimitives: {
+    
+    testImportNonLockerizedFromSameNamespaceExportLockerizedPrimitives: {
         test: function(cmp) {
             cmp.testImportNonLockerizedFromSameNamespaceExportLockerized("testPrimitives");
         }
@@ -85,8 +80,7 @@
         }
     },
 
-    // Enable Tests!
-    _testImportLockerizedFromDifferentNamespaceExportLockerizedPrimitives: {
+    testImportLockerizedFromDifferentNamespaceExportLockerizedPrimitives: {
         test: function(cmp) {
             cmp.testImportLockerizedFromDifferentNamespaceExportLockerized("testPrimitives");
         }
@@ -113,8 +107,7 @@
         }
     },
 
-    // Enable Tests!
-    _testImportLockerizedFromDifferentNamespaceExportNonLockerizedPrimitives: {
+    testImportLockerizedFromDifferentNamespaceExportNonLockerizedPrimitives: {
         test: function(cmp) {
             cmp.testImportLockerizedFromDifferentNamespaceExportNonLockerized("testPrimitives");
         }
@@ -141,8 +134,7 @@
         }
     },
 
-    // Enable Tests!
-    _testImportNonLockerizedFromDifferentNamespaceExportLockerizedPrimitives: {
+    testImportNonLockerizedFromDifferentNamespaceExportLockerizedPrimitives: {
         test: function(cmp) {
             cmp.testImportNonLockerizedFromDifferentNamespaceExportLockerized("testPrimitives");
         }

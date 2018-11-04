@@ -1,5 +1,5 @@
 import { LightningElement, api } from 'lwc';
-import * as testUtil from 'securemoduletest-test-util';
+import * as testUtil from 'securemoduletest/testUtil';
 import defaultFunction, {
     BOOLEAN,
     NULL,
@@ -25,7 +25,7 @@ import defaultFunction, {
     getWindowReturnFunction,
     getDocumentReturnFunction,
     getElementReturnFunction
-} from 'securemoduletest-module-lockerized-exports';
+} from 'securemoduletest/moduleNonLockerizedExports';
 
 export default class ImportLockerizedFromSameNamespaceExportNonLockerized extends LightningElement {
     @api NAME = 'ImportLockerizedFromSameNamespaceExportNonLockerized { NS: "securemoduletest" }';
@@ -83,9 +83,9 @@ export default class ImportLockerizedFromSameNamespaceExportNonLockerized extend
         testUtil.assertEquals('SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }', getWindowReturn(window).toString());
         testUtil.assertEquals('SecureDocument: [object HTMLDocument]{ key: {"namespace":"secureModuleTest"} }', getDocumentReturn(document).toString());
         testUtil.assertEquals('SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }', getElementReturn(document.createElement('DIV')).toString());
-        testUtil.assertEquals('SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }', getWindowReturnFunction(window).toString());
-        testUtil.assertEquals('SecureDocument: [object HTMLDocument]{ key: {"namespace":"secureModuleTest"} }', getDocumentReturnFunction(document).toString());
-        testUtil.assertEquals('SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }', getElementReturnFunction(document.createElement('DIV')).toString());
+        testUtil.assertEquals('SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }', getWindowReturnFunction(function() { return window; }).toString());
+        testUtil.assertEquals('SecureDocument: [object HTMLDocument]{ key: {"namespace":"secureModuleTest"} }', getDocumentReturnFunction(function() { return document; }).toString());
+        testUtil.assertEquals('SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }', getElementReturnFunction(function() { return document.createElement('DIV'); }).toString());
     }
 
     @api

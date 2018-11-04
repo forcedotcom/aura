@@ -1,5 +1,5 @@
 import { LightningElement, api } from 'lwc';
-import * as testUtil from 'securemoduletest-test-util';
+import * as testUtil from 'securemoduletest/testUtil';
 import defaultFunction, {
     BOOLEAN,
     NULL,
@@ -25,7 +25,7 @@ import defaultFunction, {
     getWindowReturnFunction,
     getDocumentReturnFunction,
     getElementReturnFunction
-} from 'securemoduletest-module-in-same-namespace-non-lockerized-exports';
+} from 'securemoduletest/moduleLockerizedExports';
 
 export default class ImportLockerizedFromSameNamespaceExportLockerized extends LightningElement {
     @api NAME = 'ImportLockerizedFromSameNamespaceExportLockerized { NS: "securemoduletest" }';
@@ -56,9 +56,6 @@ export default class ImportLockerizedFromSameNamespaceExportLockerized extends L
         testUtil.assertEquals('SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }', obj.winFunction().toString());
         testUtil.assertEquals('SecureDocument: [object HTMLDocument]{ key: {"namespace":"secureModuleTest"} }', obj.docFunction().toString());
         testUtil.assertEquals('SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }', obj.elFunction().toString());
-        testUtil.assertEquals('SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }', obj.winThisContext.toString());
-        testUtil.assertEquals('SecureDocument: [object HTMLDocument]{ key: {"namespace":"secureModuleTest"} }', obj.docThisContext.toString());
-        testUtil.assertEquals('SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }', obj.elThisContext.toString());
         testUtil.assertEquals('SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }', obj.winThisContextFunction().toString());
         testUtil.assertEquals('SecureDocument: [object HTMLDocument]{ key: {"namespace":"secureModuleTest"} }', obj.docThisContextFunction().toString());
         testUtil.assertEquals('SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }', obj.elThisContextFunction().toString());
@@ -83,9 +80,9 @@ export default class ImportLockerizedFromSameNamespaceExportLockerized extends L
         testUtil.assertEquals('SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }', getWindowReturn(window).toString());
         testUtil.assertEquals('SecureDocument: [object HTMLDocument]{ key: {"namespace":"secureModuleTest"} }', getDocumentReturn(document).toString());
         testUtil.assertEquals('SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }', getElementReturn(document.createElement('DIV')).toString());
-        testUtil.assertEquals('SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }', getWindowReturnFunction(window).toString());
-        testUtil.assertEquals('SecureDocument: [object HTMLDocument]{ key: {"namespace":"secureModuleTest"} }', getDocumentReturnFunction(document).toString());
-        testUtil.assertEquals('SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }', getElementReturnFunction(document.createElement('DIV')).toString());
+        testUtil.assertEquals('SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }', getWindowReturnFunction(function() { return window; }).toString());
+        testUtil.assertEquals('SecureDocument: [object HTMLDocument]{ key: {"namespace":"secureModuleTest"} }', getDocumentReturnFunction(function() { return document; }).toString());
+        testUtil.assertEquals('SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }', getElementReturnFunction(function() { return document.createElement('DIV'); }).toString());
     }
 
     @api

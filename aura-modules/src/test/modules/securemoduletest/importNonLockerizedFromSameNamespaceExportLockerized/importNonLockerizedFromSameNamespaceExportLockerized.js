@@ -1,5 +1,5 @@
 import { LightningElement, api } from 'lwc';
-import * as testUtil from 'securemoduletest-test-util';
+import * as testUtil from 'securemoduletest/testUtil';
 import defaultFunction, {
     BOOLEAN,
     NULL,
@@ -25,7 +25,7 @@ import defaultFunction, {
     getWindowReturnFunction,
     getDocumentReturnFunction,
     getElementReturnFunction
-} from 'securemoduletest-module-lockerized-exports';
+} from 'securemoduletest/moduleLockerizedExports';
 
 export default class ImportNonLockerizedFromSameNamespaceExportLockerized extends LightningElement {
     @api NAME = 'ImportNonLockerizedFromSameNamespaceExportLockerized { NS: "securemoduletest" }';
@@ -83,9 +83,9 @@ export default class ImportNonLockerizedFromSameNamespaceExportLockerized extend
         testUtil.assertEquals('[object Window]', getWindowReturn(window).toString());
         testUtil.assertEquals('[object HTMLDocument]', getDocumentReturn(document).toString());
         testUtil.assertEquals('[object HTMLDivElement]', getElementReturn(document.createElement('DIV')).toString());
-        testUtil.assertEquals('[object Window]', getWindowReturnFunction(window).toString());
-        testUtil.assertEquals('[object HTMLDocument]', getDocumentReturnFunction(document).toString());
-        testUtil.assertEquals('[object HTMLDivElement]', getElementReturnFunction(document.createElement('DIV')).toString());
+        testUtil.assertEquals('[object Window]', getWindowReturnFunction(function() { return window; }).toString());
+        testUtil.assertEquals('[object HTMLDocument]', getDocumentReturnFunction(function() { return document; }).toString());
+        testUtil.assertEquals('[object HTMLDivElement]', getElementReturnFunction(function() { return document.createElement('DIV'); }).toString());
     }
 
     @api

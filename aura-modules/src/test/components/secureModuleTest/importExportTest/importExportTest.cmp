@@ -1,11 +1,17 @@
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object"/>
-    <secureModuleTest:importLockerizedFromSameNamespaceExportLockerized aura:id="importLockerizedFromSameNamespaceExportLockerized"/>
-    <secureModuleTest:importLockerizedFromSameNamespaceExportNonLockerized aura:id="importLockerizedFromSameNamespaceExportLockerized"/>
-    <secureModuleTest:importNonLockerizedFromSameNamespaceExportNonLockerized aura:id="importNonLockerizedFromSameNamespaceExportLockerized"/>
-    <secureModuleTest:importLockerizedFromDifferentNamespaceExportLockerized aura:id="importLockerizedFromDifferentNamespaceExportLockerized"/>
-    <secureModuleTest:importLockerizedFromDifferentNamespaceExportNonLockerized aura:id="importLockerizedFromDifferentNamespaceExportLockerized"/>
-    <secureModuleTest:importNonLockerizedFromDifferentNamespaceExportNonLockerized aura:id="importNonLockerizedFromDifferentNamespaceExportLockerized"/>
+    <secureModuleTest:importLockerizedFromSameNamespaceExportLockerized aura:id="importLockerizedFromSameNamespaceExportLockerized">
+    </secureModuleTest:importLockerizedFromSameNamespaceExportLockerized>
+    <secureModuleTest:importLockerizedFromSameNamespaceExportNonLockerized aura:id="importLockerizedFromSameNamespaceExportNonLockerized">
+    </secureModuleTest:importLockerizedFromSameNamespaceExportNonLockerized>
+    <secureModuleTest:importNonLockerizedFromSameNamespaceExportLockerized aura:id="importNonLockerizedFromSameNamespaceExportLockerized">
+    </secureModuleTest:importNonLockerizedFromSameNamespaceExportLockerized>
+    <secureModuleTest:importLockerizedFromDifferentNamespaceExportLockerized aura:id="importLockerizedFromDifferentNamespaceExportLockerized">
+    </secureModuleTest:importLockerizedFromDifferentNamespaceExportLockerized>
+    <secureModuleTest:importLockerizedFromDifferentNamespaceExportNonLockerized aura:id="importLockerizedFromDifferentNamespaceExportNonLockerized">
+    </secureModuleTest:importLockerizedFromDifferentNamespaceExportNonLockerized>
+    <secureModuleTest:importNonLockerizedFromDifferentNamespaceExportLockerized aura:id="importNonLockerizedFromDifferentNamespaceExportLockerized">
+    </secureModuleTest:importNonLockerizedFromDifferentNamespaceExportLockerized>
     <aura:method name="testImportLockerizedFromSameNamespaceExportLockerized">
         <aura:attribute name="testCase" type="String"/>
     </aura:method>

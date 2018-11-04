@@ -19,8 +19,7 @@ export default class SecureSlotComponent extends LightningElement {
         testUtils.assertEquals('SecureElement: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }', secureSlotElementAssignedElements[1] + '', 'Expected second assigned elements of named <slot> to be <div>!');
         testUtils.assertEquals(undefined, secureSlotElementAssignedElements[4], 'Expected no more assigned elements to named <slot>!');
 
-        // Due to a bug on LWC, the querySelectorAll is returning 3 nodes https://github.com/salesforce/lwc/issues/766
-        // testUtils.assertEquals(0, secureSlotElement.querySelectorAll('div').length, 'Expected 3 <div> tags to be inside the slot!');
+        testUtils.assertEquals(0, secureSlotElement.querySelectorAll('div').length, 'Expected 3 <div> tags to be inside the slot!');
         testUtils.assertEquals('', secureSlotElement.innerText, 'Expected named <slot> to be an empty string!');
         testUtils.assertEquals('SecureElement: [object HTMLSlotElement]{ key: {"namespace":"secureModuleTest"} }', secureSlotElement + '', 'Expected named <slot> to be a SecureElement!');
         testUtils.assertTrue(secureSlotElement instanceof HTMLSlotElement, 'Expected named <slot> to be an instance of HTMLSlotElement!');
@@ -41,8 +40,7 @@ export default class SecureSlotComponent extends LightningElement {
         testUtils.assertEquals('SecureElement: [object HTMLParagraphElement]{ key: {"namespace":"secureModuleTest"} }', secureSlotElementAssignedElements[1] + '', 'Expected second assigned elements of named <slot> to be <p>!');
         testUtils.assertEquals(undefined, secureSlotElementAssignedElements[4], 'Expected no more assigned elements to named <slot>!');
 
-        // Due to a bug in LWC, the querySelectorAll is returning 3 nodes https://github.com/salesforce/lwc/issues/766
-        // testUtils.assertEquals(0, secureSlotElement.querySelectorAll('p').length, 'Expected 3 <p> tags to be inside the slot!');
+        testUtils.assertEquals(0, secureSlotElement.querySelectorAll('p').length, 'Expected 3 <p> tags to be inside the slot!');
         testUtils.assertEquals('', secureSlotElement.innerText, 'Expected default <slot> to be an empty string!');
         testUtils.assertEquals('SecureElement: [object HTMLSlotElement]{ key: {"namespace":"secureModuleTest"} }', secureSlotElement + '', 'Expected default <slot> to be a SecureElement!');
         testUtils.assertTrue(secureSlotElement instanceof HTMLSlotElement, 'Expected default <slot> to be an instance of HTMLSlotElement!');

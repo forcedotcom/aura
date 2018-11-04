@@ -2,12 +2,13 @@ import { LightningElement, api } from "lwc";
 import * as testUtils from "securemoduletest/testUtil";
 import { LockerLWCEvent, LockerLWCEventName } from "lockerlwc/lockerlwcevent";
 
+const NAMESPACE_KEY = 'lockerlwc';
 export default class ParentSecure extends LightningElement {
     // properties
     @api callback;
 
     // utilities
-    getCustomEventData(doneObj, isSecure = false) {
+    getCustomEventData(doneObj) {
         return {
             object: {
                 foo: 'bar',
@@ -25,7 +26,7 @@ export default class ParentSecure extends LightningElement {
             body: document.body,
             head: document.head,
             func: this.createDoneCallback(doneObj),
-            isSecure
+            NAMESPACE_KEY: NAMESPACE_KEY
         };
     }
 
@@ -140,7 +141,7 @@ export default class ParentSecure extends LightningElement {
         testUtils.assertEquals('foobar', data.string, 'Expected string was not received in event data');
         testUtils.assertEquals(1, data.number, 'Expected number was not received in event data');
         testUtils.assertEquals(true, data.boolean, 'Expected boolean was not received in event data');
-        if (data.isSecure) {
+        if (NAMESPACE_KEY === data.NAMESPACE_KEY) {
             this.assertIsSecureElement(data.domElement);
         } else {
             this.assertIsSecureObjectElement(data.domElement);
@@ -193,7 +194,7 @@ export default class ParentSecure extends LightningElement {
         const _this = this;
         const ev = new CustomEvent('testLWCCustomEventOnSelf', {
             detail: {
-                data: _this.getCustomEventData(doneObj, true)
+                data: _this.getCustomEventData(doneObj)
             }
         });
 
@@ -385,7 +386,7 @@ export default class ParentSecure extends LightningElement {
             ev.evData.func();
         });
 
-        this.dispatchEvent(new LockerLWCEvent(this.getCustomEventData(objDone, true)));
+        this.dispatchEvent(new LockerLWCEvent(this.getCustomEventData(objDone)));
     }
 
     @api testPlatformEventsOnChild(objDone) {
@@ -395,7 +396,7 @@ export default class ParentSecure extends LightningElement {
 
     @api testPlatformEventsOnChildCrossNamespace(objDone) {
         const child = this.template.querySelector('securemoduletest-child');
-        child.dispatchEvent(new LockerLWCEvent(this.getCustomEventData(objDone, true)));
+        child.dispatchEvent(new LockerLWCEvent(this.getCustomEventData(objDone)));
     }
 
 

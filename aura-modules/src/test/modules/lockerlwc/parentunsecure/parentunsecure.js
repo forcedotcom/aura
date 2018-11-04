@@ -1,6 +1,7 @@
 import { LightningElement, api } from "lwc";
 import * as testUtils from "securemoduletest/testUtil";
 
+const NAMESPACE_KEY = undefined; // Since this is a non-lockerized component, the data originating here will not have this property undefined
 export default class ParentUnsecure extends LightningElement {
     @api callback;
 
@@ -25,7 +26,8 @@ export default class ParentUnsecure extends LightningElement {
                 if (cb) {
                     cb();
                 }
-            }
+            },
+            NAMESPACE_KEY: NAMESPACE_KEY
         };
     }
 
@@ -75,8 +77,7 @@ export default class ParentUnsecure extends LightningElement {
                 data: Object.assign(_this.customEventData, {
                     func: function () {
                         triggered = true;
-                    },
-                    isSecure : true
+                    }
                 })
             }
         });

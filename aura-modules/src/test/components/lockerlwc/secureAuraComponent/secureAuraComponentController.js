@@ -40,7 +40,7 @@
                     doc: document,
                     body: document.body,
                     head: document.head,
-                    isSecure: true,
+                    NAMESPACE_KEY: 'lockerlwc'
                 }
             }
         });
@@ -170,7 +170,7 @@
             doc: document,
             body: document.body,
             head: document.head,
-            isSecure: true
+            NAMESPACE_KEY: 'lockerlwc'
         };
 
         var cb = function () { triggered = true; };

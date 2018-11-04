@@ -2,6 +2,7 @@ import { LightningElement, api } from "lwc";
 import * as testUtil from "securemoduletest/testUtil";
 import { LockerLWCEventName } from "lockerlwc/lockerlwcevent";
 
+const NAMESPACE_KEY = 'securemoduletest';
 export default class Child extends LightningElement {
     get interopData() {
         return {
@@ -197,7 +198,7 @@ function assertDataObject(data) {
     testUtil.assertEquals(1, data.number, 'Expected number was not received in event data');
     testUtil.assertEquals(true, data.boolean, 'Expected boolean was not received in event data');
 
-    if (data.isSecure) { // If data is coming from another sandbox
+    if (NAMESPACE_KEY !== data.NAMESPACE_KEY) { // If data is coming from another sandbox
         testUtil.assertEquals(
             'SecureObject: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }',
             data.domElement.toString(),

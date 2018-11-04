@@ -75,7 +75,9 @@ public class InlineJs extends AuraResourceImpl {
         servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
         context.setApplicationDescriptor(defDescriptor);
         definitionService.updateLoaded(defDescriptor);
-        context.setPreloading(true);
+        // When bootstrap is inlined with inline.js, we need to include css code
+        // for component defs that are loaded as part of the bootstrap context.
+        context.setPreloading(!configAdapter.isBootstrapInliningEnabled());
 
         // Knowing the app, we can do the HTTP headers, so of which depend on
         // the app in play, so we couldn't do this earlier.

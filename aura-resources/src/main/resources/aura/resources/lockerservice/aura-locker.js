@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-10-30
- * Version: 0.5.24
+ * Version: 0.5.26
  */
 
 (function (exports) {
@@ -25,6 +25,8 @@
 // improves both consitency and minification. Unused declarations are dropped
 // by the tree shaking process.
 
+const { stringify } = JSON;
+
 const { isArray } = Array;
 
 const {
@@ -32,25 +34,30 @@ const {
   create: create$1,
   defineProperties,
   freeze,
-  defineProperty,
-  getOwnPropertyDescriptor,
   getOwnPropertyDescriptors,
   getOwnPropertyNames,
   getOwnPropertySymbols,
   isFrozen,
+  entries: ObjectEntries,
   keys: ObjectKeys,
-  seal,
-  setPrototypeOf
+  values: ObjectValues,
+  seal
 } = Object;
 
 const {
   apply,
+  construct,
+  defineProperty,
   deleteProperty,
-  has,
+  get,
+  getOwnPropertyDescriptor,
   getPrototypeOf,
+  has,
   isExtensible,
   ownKeys,
-  preventExtensions
+  preventExtensions,
+  set,
+  setPrototypeOf
 } = Reflect;
 
 /**
@@ -83,8 +90,9 @@ const FunctionBind = uncurryThis(Function.prototype.bind);
 const ArrayMap = uncurryThis(Array.prototype.map);
 const ArraySlice = uncurryThis(Array.prototype.slice);
 
+
 function isObject(obj) {
-  return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
+  return typeof obj === 'object' && obj !== null && !isArray(obj);
 }
 
 /**
@@ -551,9 +559,9 @@ const CTOR = { type: '@ctor' };
 const RAW = { type: '@raw' };
 const READ_ONLY_PROPERTY = { writable: false };
 
-function assert(condition) {
+function assert(condition, message) {
   if (!condition) {
-    throw new Error();
+    throw new Error(message);
   }
 }
 
@@ -625,17 +633,9 @@ function isCustomElement(el) {
   return el.tagName && el.tagName.indexOf('-') > 0;
 }
 
-function isDOMElementOrNode(el) {
-  // Its possible that checking el.nodeType on a window in
-  // an iframe will cause an access DOMException.
-  // In that case, its not a DOMElementOrNode, so return false
+function isNode(el) {
   try {
-    return (
-      typeof el === 'object' &&
-      ((typeof HTMLElement === 'object' && el instanceof HTMLElement) ||
-        (typeof Node === 'object' && el instanceof Node) ||
-        (typeof el.nodeType === 'number' && typeof el.nodeName === 'string'))
-    );
+    return el instanceof Node;
   } catch (e) {
     return false;
   }
@@ -695,6 +695,80 @@ function isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes) {
  */
 const isShadowRoot =
   typeof window.ShadowRoot !== 'undefined' ? node => node instanceof ShadowRoot : () => false;
+
+/**
+ * Detect if the parameter is a primitive.
+ * - NaN and Infinity are 'numbers'.
+ * - null is object but we detect it and return early.
+ */
+function isPrimitive(value) {
+  if (value === null || value === undefined) {
+    return true;
+  }
+  switch (typeof value) {
+    case 'boolean':
+    case 'number':
+    case 'string':
+    case 'symbol':
+      return true;
+    case 'object':
+    case 'function':
+      return false;
+    default:
+      throw new TypeError(`Type not supported ${value}`);
+  }
+}
+
+function isKey(key) {
+  // Key is detected by duck typing.
+  return typeof key === 'object' && typeof key.namespace === 'string';
+}
+
+function getProperyValues(obj) {
+  return ObjectValues(getOwnPropertyDescriptors(obj)).map(desc => desc.value);
+}
+
+/**
+ * List of unfiltered objects.
+ */
+// TODO: W-5529670 augment the list of unfiltered types for performance.
+const whitelistedObjects$1 = [
+  // Function, // unsafe
+  Object,
+  Array,
+  Function.prototype,
+  ...getProperyValues(Function.prototype),
+  Object.prototype,
+  ...getProperyValues(Object.prototype),
+  Array.prototype
+];
+
+function isWhitelistedObject(obj) {
+  // Key is detected by duck typing.
+  return whitelistedObjects$1.includes(obj);
+}
+
+var assert$1 = {
+  block: fn => fn(),
+  isTrue: (condition, message) => {
+    if (!condition) {
+      throw new TypeError(`Assertion failed: ${message}`);
+    }
+  },
+  isFalse: (condition, message) => {
+    if (condition) {
+      throw new TypeError(`Assertion failed: ${message}`);
+    }
+  },
+  invariant: (condition, message) => {
+    if (!condition) {
+      throw new TypeError(`Invariant violation: ${message}`);
+    }
+  },
+  fail: message => {
+    throw new TypeError(message);
+  }
+};
 
 // Keyed objects can only have one owner. We prevent "null" and "undefined"
 // keys by guarding all set operations.
@@ -967,6 +1041,84 @@ function getRawArray(arr) {
   return result;
 }
 
+const defaultKey = {
+  namespace: 'default'
+};
+
+const systemKey = {
+  namespace: 'system'
+};
+
+/**
+ * Ensure a value from the source graph is converted to the
+ * destination graph.
+ */
+function convert(value, fromKey, toKey) {
+  assert$1.invariant(isKey(fromKey), `Convert() requires a source key: ${stringify(fromKey)}`);
+  assert$1.invariant(isKey(toKey), `Convert() requires a destination key: ${stringify(toKey)}`);
+  assert$1.invariant(
+    fromKey !== toKey,
+    `Convert() requires two different keys: ${stringify(fromKey)} to ${stringify(toKey)}`
+  );
+
+  if (isPrimitive(value) || isWhitelistedObject(value)) {
+    // Do not proxy primitives.
+    return value;
+  }
+
+  if (secureToRaw.has(value)) {
+    // 1. The value is a secure proxy.
+    const raw = secureToRaw.get(value);
+    const rawKey = keychain.get(raw);
+    if (rawKey === toKey) {
+      // 1a. The raw object belongs to the destination graph.
+      return raw;
+    }
+    // 1b. Create (or reuse) a secure proxy in the destination graph.
+    return toKey === systemKey
+      ? deepUnfilter(fromKey, [], [value])[0]
+      : filter(toKey, value, { useNewSecureFunction: true });
+  }
+
+  // 2. The value is not a proxy.
+  const valueKey = keychain.get(value);
+  if (!valueKey) {
+    // 2a. The value has no key, it's new to the membrane.
+    // It can only come from the source graph.
+    // Assign it to the source graph.
+    keychain.set(value, fromKey);
+  }
+  // 2b. Create a secure proxy in the destination graph.
+  return toKey === systemKey
+    ? deepUnfilter(fromKey, [], [value])[0]
+    : filter(toKey, value, { useNewSecureFunction: true });
+}
+
+/**
+ * Ensure all values in an array (an argument list)
+ * are converted to the destionation namespace.
+ */
+function convertArgs(args, fromKey, toKey) {
+  return args.map(arg => convert(arg, fromKey, toKey));
+}
+
+function convertDescriptor(desc, fromKey, toKey) {
+  if (desc) {
+    if ('value' in desc) {
+      desc.value = convert(desc.value, fromKey, toKey);
+    } else {
+      const { get: get$$1, set: set$$1 } = desc;
+      if (get$$1) {
+        desc.get = convert(get$$1, fromKey, toKey);
+      }
+      if (set$$1) {
+        desc.set = convert(set$$1, fromKey, toKey);
+      }
+    }
+  }
+  return desc;
+}
+
 /* eslint-disable no-use-before-define */
 
 function SecureObject(thing, key) {
@@ -988,6 +1140,223 @@ function SecureObject(thing, key) {
   registerProxy(o);
 
   return seal(o);
+}
+
+/**
+ * Creates an array of unique values from two arrays.
+ * This is 33% faster than Array.concat() on 2x100 arrays.
+ * Dedupe using a Set is 14x slower: Array.from(new Set([...a, ...b])).
+ */
+function ArrayMerge(a, b) {
+  assert$1.invariant(isArray(a), 'ArrayMerge() first parameter should be array');
+  assert$1.invariant(isArray(b), 'ArrayMerge() first parameter should be array');
+
+  const unique = {};
+  const result = [];
+  for (let i = 2; i--; a = b) {
+    for (let j = 0, n = a.length; j < n; j++) {
+      const value = a[j];
+      unique[value] = unique[value] || result.push(value);
+    }
+  }
+  return result;
+}
+
+/* eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_" }] */
+
+function createShadowTarget(raw) {
+  switch (typeof raw) {
+    case 'function':
+      return function() {};
+    case 'object':
+      return isArray(raw) ? [] : {};
+    default:
+      throw new TypeError('Unsupported proxy target type.');
+  }
+}
+
+/**
+ * A generic handler with support for:
+ * - filtered function invocation
+ * - filtered constructor invocation
+ * - read only filtered prototype
+ * - read only filtered properties
+ * - expando for new properties (unfiltered)
+ * Decisions:
+ * - raw properties have authority over expandos
+ */
+class SecureFunctionHandler {
+  constructor(raw, fromKey, toKey) {
+    // The raw value to proxy.
+    this.raw = raw;
+    // The raw value's object graph.
+    this.fromKey = fromKey;
+    // The proxy's object graph.
+    this.toKey = toKey;
+  }
+
+  apply(_shadow, thisArg, args) {
+    // Both 'this' and arguments are filtered from the graph where the
+    // proxy beling sto the graph where the function was originally defined.
+    thisArg = convert(thisArg, this.toKey, this.fromKey);
+    args = convertArgs(args, this.toKey, this.fromKey);
+    // Always try to invoke raw as a function.
+    const value = apply(this.raw, thisArg, args);
+    return convert(value, this.fromKey, this.toKey);
+  }
+
+  construct(_shadow, args, newTarget) {
+    args = convertArgs(args, this.toKey, this.fromKey);
+    newTarget = convert(newTarget, this.toKey, this.fromKey);
+    // Always try to invoke raw as a constructor.
+    const value = construct(this.raw, args, newTarget);
+    return convert(value, this.fromKey, this.toKey);
+  }
+
+  defineProperty(shadow, prop, desc) {
+    // Always invoke raw first.
+    if (has(this.raw, prop)) {
+      // Only set data properties on the raw object.
+      if ('value' in desc) {
+        // Only set existing data properties on the raw object.
+        const descriptor = getOwnPropertyDescriptor(this.raw, prop);
+        if ('value' in descriptor && descriptor.writable) {
+          // Prevent changes to configuration of data properties.
+          descriptor.value = desc.value;
+          return defineProperty(this.raw, prop, descriptor);
+        }
+      }
+
+      throw new TypeError(`Cannot redefine property '${prop}' of ${this.raw}`);
+    }
+    // Expando is unfiltered.
+    return defineProperty(shadow, prop, desc);
+  }
+
+  deleteProperty(shadow, prop) {
+    // Check on shadow first.
+    if (shadow.hasOwnProperty(prop)) {
+      // Expando is unfiltered.
+      return deleteProperty(shadow, prop);
+    }
+    // Never delete a property raw on the raw object.
+    // Behave as if the raw object is frozen.
+    throw new TypeError(`Cannot delete property '${prop}' of ${this.raw}`);
+  }
+
+  get(shadow, prop, receiver) {
+    if (prop === '__proto__') {
+      return getPrototypeOf(receiver);
+    }
+    // Always invoke raw first.
+    if (has(this.raw, prop)) {
+      // Always filter the results returned by the raw object.
+      const value = get(this.raw, prop, receiver);
+      return convert(value, this.fromKey, this.toKey);
+    }
+    // Expando is unfiltered.
+    return get(shadow, prop, receiver);
+  }
+
+  getOwnPropertyDescriptor(shadow, prop) {
+    // Always invoke raw first.
+    const desc = getOwnPropertyDescriptor(this.raw, prop);
+    if (!desc) {
+      return getOwnPropertyDescriptor(shadow, prop);
+    }
+    const wrapped = convertDescriptor(desc, this.fromKey, this.toKey);
+    if (!desc.configurable) {
+      // Proxy invariant: non-configurable properties must exist on target.
+      // If descriptor of raw property is non-configurable,
+      // define the property on the shadow using the wrapped descriptor.
+      defineProperty(shadow, prop, wrapped);
+    }
+    return wrapped;
+  }
+
+  getPrototypeOf(_shadow) {
+    return convert(getPrototypeOf(this.raw), this.fromKey, this.toKey);
+  }
+
+  has(shadow, prop) {
+    if (!isExtensible(shadow)) {
+      // If shadow isn't extensible, it's because raw isn't,
+      // and all properties have already been copied.
+      return shadow.hasOwnProperty(prop);
+    }
+    return has(this.raw, prop) || shadow.hasOwnProperty(prop);
+  }
+
+  isExtensible(shadow) {
+    const extensibleShadow = isExtensible(shadow);
+    if (!extensibleShadow) {
+      // Proxy invariant: must report non-extensibility of target.
+      // If shadow isn't extensible, we must report it.
+      return extensibleShadow;
+    }
+    const extensible = isExtensible(this.raw);
+    if (!extensible) {
+      // TODO copy properties
+      // Proxy invariant: to report non-extensibility, target must be non-extensibile.
+      preventExtensions(shadow);
+    }
+    return extensible;
+  }
+
+  ownKeys(shadow) {
+    if (!isExtensible(shadow)) {
+      // If shadow isn't extensible, it's because raw isn't,
+      // and all properties have already been copied.
+      return ownKeys(shadow);
+    }
+    // Must remove duplicates between raw and shadow.
+    return ArrayMerge(ownKeys(this.raw), ownKeys(shadow));
+  }
+
+  preventExtensions(_shadow) {
+    // Never freeze of change the extensibility of raw objects.
+    // Proxy invariant: can't report non-extensibility of extensible target.
+    // Making shadow non-extensible would prevent the addition of any
+    // non-configurable property of raw which would appear at a later stage.
+    throw new TypeError(`Cannot prevents extensions of ${this.raw}`);
+  }
+
+  set(shadow, prop, value, receiver) {
+    // Always invoke raw first.
+    if (has(this.raw, prop)) {
+      value = convert(value, this.toKey, this.fromKey);
+      return set(this.raw, prop, value, receiver);
+    }
+    // If raw doesn't have the property, define it on shadow.
+    // Expando is unfiltered.
+    return set(shadow, prop, value, receiver);
+  }
+
+  setPrototypeOf(_shadow, proto) {
+    // Never change the prototype of a raw object.
+    // Behave as if the raw object is frozen.
+    if (proto === getPrototypeOf(this.raw)) {
+      // No failure if no change if value, even if property is non-configurable.
+      return true;
+    }
+    throw new TypeError(`Cannot set the prototyope of ${this.raw}`);
+  }
+}
+
+function SecureFunction(raw, fromKey, toKey) {
+  assert$1.invariant(isKey(fromKey), `SecureFunction() requires a raw toKey: ${stringify(fromKey)}`);
+  assert$1.invariant(
+    isKey(toKey),
+    `SecureFunction() requires a destination toKey: ${stringify(toKey)}`
+  );
+  assert$1.invariant(
+    fromKey !== toKey,
+    `SecureFunction() requires two different keys: ${stringify(fromKey)} to ${stringify(toKey)}`
+  );
+
+  const shadow = createShadowTarget(raw);
+  const handler = new SecureFunctionHandler(raw, fromKey, toKey);
+  return new Proxy(shadow, handler);
 }
 
 const metadata$1 = {
@@ -2082,28 +2451,6 @@ const metadata$3 = {
   removeChild: FUNCTION,
   replaceChild: FUNCTION,
   textContent: DEFAULT
-};
-
-const assert$1 = {
-  block: fn => fn(),
-  isTrue: (condition, message) => {
-    if (!condition) {
-      throw new Error(`Assertion failed: ${message}`);
-    }
-  },
-  isFalse: (condition, message) => {
-    if (condition) {
-      throw new Error(`Assertion failed: ${message}`);
-    }
-  },
-  invariant: (condition, message) => {
-    if (!condition) {
-      throw new Error(`Invariant violation: ${message}`);
-    }
-  },
-  fail: message => {
-    throw new Error(message);
-  }
 };
 
 const metadata$4 = {
@@ -5091,10 +5438,6 @@ function registerLWCHelpers(helpers) {
   }
 }
 
-const defaultSecureObjectKey = {
-  defaultSecureObjectKey: true
-};
-
 // TODO:W-5505278 Move add/create to LockerFactory
 
 function filterFunction(key, raw, options) {
@@ -5106,7 +5449,9 @@ function filterFunction(key, raw, options) {
   // Handle already proxied things
   const rawKey = getKey(raw);
   const belongsToLocker = rawKey === key;
-  const defaultKey = options && options.defaultKey ? options.defaultKey : defaultSecureObjectKey;
+  const defaultKey$$1 = options && options.defaultKey ? options.defaultKey : defaultKey;
+  // Set useNewSecureFunction to true to use the new SecureFunction Proxy instead of the legacy FilteringProxy
+  const useNewSecureFunction = options && options.useNewSecureFunction;
 
   if (isProxy(raw)) {
     // - If !belongsToLocker then this is a jump from one locker to another - we just need to unwrap and then reproxy based on the target locker's perspective
@@ -5118,41 +5463,43 @@ function filterFunction(key, raw, options) {
       : filter(key, getRef(raw, rawKey), options);
   }
 
+  if (!rawKey) {
+    setKey(raw, defaultKey$$1);
+  }
+
   // wrapping functions to guarantee that they run in system mode but their
   // returned value complies with user-mode.
-  const swallowed = function SecureFunction() {
-    // TODO: rawKey could be undefined when SecureFunction is created.
-    const rawKey = getKey(raw);
-    // special unfiltering logic to unwrap Proxies passed back to origin.
-    // this could potentially be folded into filterArguments with an option set if needed.
-    const filteredArgs = [];
-    for (let i = 0; i < arguments.length; i++) {
-      let arg = arguments[i];
-      if (isFilteringProxy(arg)) {
-        const unfilteredProxy = getRef(arg, getKey(arg));
-        const unfilteredKey = getKey(unfilteredProxy);
-        arg = unfilteredKey === rawKey ? unfilteredProxy : filter(key, arg);
-      } else {
-        arg = filter(key, arg);
-      }
-      filteredArgs[i] = arg;
-    }
+  const swallowed = useNewSecureFunction
+    ? SecureFunction(raw, rawKey, key)
+    : function SecureFunction$$1() {
+        // TODO: rawKey could be undefined when SecureFunction is created.
+        const rawKey = getKey(raw);
+        // special unfiltering logic to unwrap Proxies passed back to origin.
+        // this could potentially be folded into filterArguments with an option set if needed.
+        const filteredArgs = [];
+        for (let i = 0; i < arguments.length; i++) {
+          let arg = arguments[i];
+          if (isFilteringProxy(arg)) {
+            const unfilteredProxy = getRef(arg, getKey(arg));
+            const unfilteredKey = getKey(unfilteredProxy);
+            arg = unfilteredKey === rawKey ? unfilteredProxy : filter(key, arg);
+          } else {
+            arg = filter(key, arg);
+          }
+          filteredArgs[i] = arg;
+        }
 
-    let self = filter(key, this);
-    if (isFilteringProxy(self) && getKey(self) === key) {
-      self = getRef(self, key);
-    }
+        let self = filter(key, this);
+        if (isFilteringProxy(self) && getKey(self) === key) {
+          self = getRef(self, key);
+        }
 
-    const fnReturnedValue = raw.apply(self, filteredArgs);
+        const fnReturnedValue = raw.apply(self, filteredArgs);
 
-    return filter(key, fnReturnedValue, options);
-  };
+        return filter(key, fnReturnedValue, options);
+      };
 
   setRef(swallowed, raw, key);
-
-  if (!rawKey) {
-    setKey(raw, defaultKey);
-  }
 
   addToCache(raw, swallowed, key);
   registerProxy(swallowed);
@@ -5170,7 +5517,9 @@ function filterObject(key, raw, options) {
   // Handle already proxied things
   const rawKey = getKey(raw);
   const belongsToLocker = rawKey === key;
-  const defaultKey = options && options.defaultKey ? options.defaultKey : defaultSecureObjectKey;
+  const defaultKey$$1 = options && options.defaultKey ? options.defaultKey : defaultKey;
+  // Set useNewSecureFunction to true to use the new SecureFunction Proxy instead of the legacy FilteringProxy
+  const useNewSecureFunction = options && options.useNewSecureFunction;
 
   if (isProxy(raw)) {
     // - If !belongsToLocker then this is a jump from one locker to another - we just need to unwrap and then reproxy based on the target locker's perspective
@@ -5198,7 +5547,7 @@ function filterObject(key, raw, options) {
     if (!belongsToLocker) {
       if (!rawKey) {
         // Array that was created in this locker or system mode but not yet keyed - key it now
-        setKey(raw, defaultKey);
+        setKey(raw, defaultKey$$1);
         return filter(key, raw, options);
       }
       swallowed = createProxyForArrayObjects(raw, key);
@@ -5217,19 +5566,20 @@ function filterObject(key, raw, options) {
     }
     if (swallowed) {
       mutated = raw !== swallowed;
-    } else if (isDOMElementOrNode(raw)) {
+    } else if (isNode(raw)) {
       if (belongsToLocker || isSharedElement(raw)) {
-        swallowed = SecureElement(raw, key);
+        return SecureElement(raw, key);
       } else if (!options) {
-        swallowed = SecureObject(raw, key);
-      } else if (raw instanceof Attr && !rawKey) {
-        setKey(raw, defaultKey);
-        return filter(key, raw, options);
-      } else {
-        swallowed = options.defaultValue;
-        addToCache(raw, swallowed, key);
+        return SecureObject(raw, key);
       }
-      mutated = true;
+
+      if (!rawKey) {
+        setKey(raw, defaultKey$$1);
+        return filter(key, raw);
+      }
+
+      addToCache(raw, options.defaultValue, key);
+      return options.defaultValue;
     } else if (raw instanceof Event) {
       swallowed = SecureDOMEvent(raw, key);
       mutated = true;
@@ -5254,11 +5604,16 @@ function filterObject(key, raw, options) {
       if (!belongsToLocker) {
         if (!rawKey) {
           // Object that was created in this locker or in system mode and not yet keyed - key it now
-          setKey(raw, defaultKey);
+          setKey(raw, defaultKey$$1);
           return filter(key, raw, options);
         }
-        swallowed = createFilteringProxy(raw, key);
-        addToCache(raw, swallowed, key);
+        if (useNewSecureFunction) {
+          swallowed = SecureFunction(raw, rawKey, key);
+          setRef(swallowed, raw, key);
+          addToCache(raw, swallowed, key);
+        } else {
+          swallowed = createFilteringProxy(raw, key);
+        }
         mutated = true;
       }
     }
@@ -6935,9 +7290,7 @@ function addUnfilteredPropertyIfSupported(st, raw, name) {
 }
 
 /**
- * Traverse all entries in the baseObject to unwrap any secure wrappers and wrap any functions as
- * SecureFunction. This ensures any non-Lockerized handlers of the event do not choke on the secure
- * wrappers, but any callbacks back into the original Locker have their arguments properly filtered.
+ * @deprecated
  */
 function deepUnfilterMethodArguments(st, baseObject, members) {
   let value;
@@ -6967,6 +7320,46 @@ function deepUnfilterMethodArguments(st, baseObject, members) {
       } else {
         // For everything else we are not sure how to provide raw access, filter the value
         rawValue = filterEverything(st, value, { defaultKey: getKey(st) });
+      }
+    }
+    baseObject[property] = rawValue;
+  }
+  return baseObject;
+}
+
+/**
+ * Traverse all entries in the baseObject to unwrap any secure wrappers and wrap any functions as
+ * SecureFunction. This ensures any non-Lockerized handlers of the event do not choke on the secure
+ * wrappers, but any callbacks back into the original Locker have their arguments properly filtered.
+ */
+function deepUnfilter(key, baseObject, members) {
+  let value;
+  let rawValue;
+  for (const property in members) {
+    value = members[property];
+    if (deepUnfilteringTypeHook$1) {
+      rawValue = deepUnfilteringTypeHook$1(key, value);
+    }
+    // If the hooks failed to unfilter the value, do the deep copy, unwrapping one item at a time
+    if (rawValue === value) {
+      if (isArray(value)) {
+        rawValue = deepUnfilter(key, [], value);
+      } else if (isPlainObject(value)) {
+        rawValue = deepUnfilter(key, {}, value);
+      } else if (typeof value !== 'function') {
+        if (value) {
+          const key = getKey(value);
+          if (key) {
+            rawValue = getRef(value, key) || value;
+          }
+        }
+        // If value is a plain object, we need to deep unfilter
+        if (isPlainObject(value)) {
+          rawValue = deepUnfilter(key, {}, value);
+        }
+      } else {
+        // For everything else we are not sure how to provide raw access, filter the value
+        rawValue = filter(key, value, { defaultKey: key });
       }
     }
     baseObject[property] = rawValue;
@@ -9143,8 +9536,12 @@ function unwrapValue(st, value) {
     // FilteringProxy and ArrayProxy is covered by this check
     unfilteredValue = getUnfilteringDataProxy(st, value);
   } else if (typeof value === 'function') {
-    // Functions cannot be unwrapped, they will be converted to a SecureFunction
+    // Functions from sandbox cannot be handed over to system, they will be converted to a SecureFunction
     const secureFunction = filterEverything(st, value);
+    // If function does not need to be converted, return the function as is. Eg: Object, Array
+    if (secureFunction === value) {
+      return value;
+    }
     // Return a wrapper function to system mode.
     unfilteredValue = function(...args) {
       // When system mode invokes the wrapper function, locker will invoke the secure function
@@ -9185,16 +9582,16 @@ function getUnwrapDescriptor(st, descriptor) {
       descriptor.value = unwrapValue(st, value);
     }
   } else {
-    const { get, set } = descriptor;
+    const { get: get$$1, set: set$$1 } = descriptor;
     // accessor descriptor
-    if (get) {
+    if (get$$1) {
       descriptor.get = function() {
-        return unwrapValue(st, get.call(st));
+        return unwrapValue(st, get$$1.call(st));
       };
     }
-    if (set) {
+    if (set$$1) {
       descriptor.set = function(newValue) {
-        return set.call(st, filterEverything(st, newValue));
+        return set$$1.call(st, filterEverything(st, newValue));
       };
     }
   }
@@ -9638,7 +10035,7 @@ function SecureLightningElementFactory(LightningElement, key) {
 
 SecureLightningElementFactory.getWrappedLightningElement = function(LightningElement, lockerKey) {
   function getWrappedDescriptor(rawDescriptor) {
-    const { value, get, set, enumerable, configurable, writable } = rawDescriptor;
+    const { value, get: get$$1, set: set$$1, enumerable, configurable, writable } = rawDescriptor;
     function wrappedMethod() {
       const args = filterArguments(this, arguments, { rawArguments: true });
       const rawResult = value.apply(this, args);
@@ -9667,11 +10064,11 @@ SecureLightningElementFactory.getWrappedLightningElement = function(LightningEle
     // getter and setter
     return {
       get() {
-        return getFilteredValue(this, get.call(this));
+        return getFilteredValue(this, get$$1.call(this));
       },
       set(filteredValue) {
-        if (set) {
-          set.call(this, getUnwrappedValue(this, filteredValue));
+        if (set$$1) {
+          set$$1.call(this, getUnwrappedValue(this, filteredValue));
         }
       },
       enumerable,
@@ -9721,8 +10118,8 @@ SecureLightningElementFactory.getWrappedLightningElement = function(LightningEle
     template: {
       enumerable: true,
       get: function() {
-        const { get } = getRawPropertyDescriptor(LElementPrototype, 'template');
-        const rawValue = get.call(this);
+        const { get: get$$1 } = getRawPropertyDescriptor(LElementPrototype, 'template');
+        const rawValue = get$$1.call(this);
         return SecureTemplate(rawValue, lockerKey);
       }
     },
@@ -9811,13 +10208,17 @@ function isWhitelistedLib(libDesc) {
  * @param {Boolean} requireLocker Should the library being imported be lockeried
  */
 function SecureLib(lib, key, requireLocker, desc) {
-  if (isWhitelistedLib(desc)) {
+  if (isPrimitive(lib) || isWhitelistedLib(desc)) {
     return lib;
   }
 
   let o = getFromCache(lib, key);
   if (o) {
     return o;
+  }
+
+  if (typeof lib === 'function') {
+    return lib;
   }
 
   assert$1.invariant(isPlainObject(lib), 'Expect lib to be a plain object');
@@ -9829,20 +10230,13 @@ function SecureLib(lib, key, requireLocker, desc) {
     }
   });
 
-  const methodOptions = {
-    defaultKey: key,
-    unfilterEverything: !requireLocker
-      ? function(args) {
-          return deepUnfilterMethodArguments(o, [], args);
-        }
-      : undefined
-  };
-
-  ObjectKeys(lib).forEach(property => {
-    if (typeof lib[property] === 'function') {
-      // only Platform events created in non-lockerized libs will be caught by this condition
-      // TODO: add support for importing lockerized libs that expose events
-      if (lib[property].prototype instanceof Event) {
+  ObjectEntries(lib).forEach(([property, item]) => {
+    if (isPrimitive(item)) {
+      o[property] = item;
+    } else if (typeof item === 'function') {
+      if (item.prototype instanceof Event) {
+        // only Platform events created in non-lockerized libs will be caught by this condition
+        // TODO: add support for importing lockerized libs that expose events
         const secureEventCtorDescriptor = createFilteredConstructor(
           o,
           lib,
@@ -9852,8 +10246,10 @@ function SecureLib(lib, key, requireLocker, desc) {
         );
         defineProperty(o, property, secureEventCtorDescriptor);
       } else {
-        addMethodIfSupported(o, lib, property, methodOptions);
+        o[property] = SecureFunction(item, requireLocker ? defaultKey : systemKey, key);
       }
+    } else if (typeof item === 'object') {
+      o[property] = SecureFunction(item, requireLocker ? defaultKey : systemKey, key);
     } else {
       addPropertyIfSupported(o, lib, property);
     }
@@ -10456,7 +10852,7 @@ function filterTypeHook(raw, key, belongsToLocker) {
     return SecureAuraEvent(raw, key);
   } else if (raw instanceof AuraPropertyReferenceValue) {
     return SecureAuraPropertyReferenceValue(raw, key);
-  } else if (isDOMElementOrNode(raw) && isAccessibleLWCNode(key, raw)) {
+  } else if (isNode(raw) && isAccessibleLWCNode(key, raw)) {
     // If the raw thing is an LWC node and it can be accessed with the give key, then wrap it in SecureElement
     return SecureElement(raw, key);
   } else if (belongsToLocker && isUnfilteringDataProxy(raw)) {

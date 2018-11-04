@@ -322,10 +322,7 @@ export default class ParentSecure extends LightningElement {
         testUtils.assertFalse(child.booleanProp, 'Unable to access boolean property on child component');
 
         testUtils.assertEqualsValue([91, 92, 93], child.arrayProp, 'Unable to access array on child component');
-        // W-5561136 - Investigate why the deep equals is failing
-        // testUtils.assertEqualsValue(expectedValue, child.objProp, 'Unable to access object property on child component');
-        testUtils.assertEqualsValue(expectedValue.foo, child.objProp.foo, 'Unable to access object property on child component');
-        testUtils.assertEqualsValue(expectedValue.bar.baz, child.objProp.bar.baz, 'Unable to access object property on child component');
+        testUtils.assertEqualsValue(expectedValue, child.objProp, 'Unable to access object property on child component');
         // Access public methods
         testUtils.assertDefined(child.assertParamsInPublicMethod, 'Unable to access @api method on child component');
         testUtils.assertTrue(child.assertParamsInPublicMethod instanceof Function, 'Unexpected wrapped value received on child');

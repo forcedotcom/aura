@@ -582,7 +582,7 @@ AuraLocalizationService.prototype.formatDateTime = function(date, formatString, 
 
         date = date["toDate"]();
     }
-    
+
     return this.formatDateTimeInternal(date, (formatString || $A.get("$Locale.datetimeFormat")), locale);
 };
 
@@ -676,15 +676,15 @@ AuraLocalizationService.prototype.formatDateTimeUTCInternal = function(date, for
         date = this.normalizeDateTimeInput(date);
         date = new Date(date.getTime() + date.getTimezoneOffset() * 6e4);
     }
-    
+
     if (!this.isValidDateObject(date)) {
         return "Invalid Date";
     }
-    
+
     if (!locale) {
         locale = $A.get("$Locale.langLocale");
     }
-    
+
     return this.formatDateTimeToString(date, formatString, locale, true);
 };
 
@@ -2025,7 +2025,7 @@ AuraLocalizationService.prototype.normalizeToIntlLocale = function(locale) {
 /**
  * Get the localized value string for the given field from a date.
  * It can be used only if Intl.DateTimeFormat.formatToParts() is supported.
- * 
+ *
  * @param {!Date} date
  * @param {!Intl.DateTimeFormat} dateTimeFormat
  * @param {!string} field
@@ -2038,7 +2038,7 @@ AuraLocalizationService.prototype.getLocalizedDateTimeField = function(date, dat
 
 /**
  * Get the value of a filed from the parts which is returned from Intl.DateTimeFormat.formatToParts().
- * 
+ *
  * @param {!Array<!{type: !string, value: !string}>} parts
  * @param {!string} type
  * @returns {?string}
@@ -2163,7 +2163,7 @@ AuraLocalizationService.prototype.addSubtract = function(date, num, unit, isSubt
 
 /**
  * Converts datetime input into a Date object. If datetime is a Date object, it returns the original input.
- * 
+ *
  * @param {?string|number|Date} datetime - A datetime string in ISO8601 format, or a timestamp in milliseconds, or a Date object
  * @returns {!Date} A Date object which represents the provided datetime, an invalid Date if the given datetime is not a supported type
  * @private
@@ -2185,7 +2185,7 @@ AuraLocalizationService.prototype.normalizeDateTimeInput = function(datetime) {
 
 /**
  * Get the quarter number of the given date, 1 - 4.
- * 
+ *
  * @param {!Date} date
  * @returns {!number}
  * @private
@@ -2408,7 +2408,7 @@ AuraLocalizationService.prototype.normalizeDateTimeUnit = function(unit) {
  * Adds a datetime unit's aliases (lowercase, lowercase plural, shorthand) to unit alias map.
  * @param {!string} unit
  * @param {!string} short
- * @private 
+ * @private
  */
 AuraLocalizationService.prototype.addDateTimeUnitAlias = function(unit, short) {
     var lowerCase = unit.toLowerCase();

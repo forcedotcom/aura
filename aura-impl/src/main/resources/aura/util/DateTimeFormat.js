@@ -28,7 +28,7 @@ Aura.Utils.DateTimeFormat = function(formatString, locale) {
     $A.assert(!$A.util.isUndefinedOrNull(locale), "[Assertion failed] - 'locale' argument is required; it must not be null or undefined");
     /**
      * Parse the format string into tokens.
-     * 
+     *
      * @return {!Array<!Aura.Utils.DateTimeFormat.Token>}
      * @private
      */
@@ -75,7 +75,7 @@ Aura.Utils.DateTimeFormat = function(formatString, locale) {
 
     /**
      * Get the number value for token from the given date.
-     * 
+     *
      * @param {!Aura.Utils.DateTimeFormat.Token} token The field to find from the date.
      * @param  {!Date} date The date to look at
      * @return {!number} The matching value
@@ -126,7 +126,7 @@ Aura.Utils.DateTimeFormat = function(formatString, locale) {
     /**
      * Determines if the format is for Gregorian calendar or not based on
      * the localeName.
-     * 
+     *
      * @param {!string} localeName
      * @return {!boolean}
      * @private
@@ -142,7 +142,7 @@ Aura.Utils.DateTimeFormat = function(formatString, locale) {
 
     this.tokens = parseFormatStringToTokens();
     this.config = {};
-    
+
     /**
      * Note: we can use DateTimeFormat config to get the value ONLY IF
      *   1) the broswer supports formatToParts()
@@ -571,7 +571,7 @@ Aura.Utils.DateTimeFormat = function(formatString, locale) {
         }
     }
     hydrateTokensAndConfig(this.tokens, this.config, this.localeName);
-    
+
     /**
      * Format date to a localized string.
      *
@@ -589,7 +589,7 @@ Aura.Utils.DateTimeFormat = function(formatString, locale) {
         if (this.supportFormatToParts === true && date.getFullYear() >= 1970) {
             // Initiates the date time format when it gets called for the first time.
             if (this.dateTimeFormat === undefined) {
-                this.dateTimeFormat = Intl["DateTimeFormat"](this.localeName, this.config);
+                this.dateTimeFormat = new Intl["DateTimeFormat"](this.localeName, this.config);
                 this.resolvedOptions = this.dateTimeFormat["resolvedOptions"] && this.dateTimeFormat["resolvedOptions"]();
             }
             parts = this.dateTimeFormat["formatToParts"](date);
@@ -635,7 +635,7 @@ Aura.Utils.DateTimeFormat = function(formatString, locale) {
                         break;
                 }
             } else if (token["type"] === "localizedFormat") {
-                var dateTimeFormat = Intl["DateTimeFormat"](this.localeName, token["config"]);
+                var dateTimeFormat = new Intl["DateTimeFormat"](this.localeName, token["config"]);
                 dateTimeString += $A.localizationService.format(dateTimeFormat, date);
             } else if (token["field"] === "offset") {
                 // if offset is not given, using local offset
@@ -909,7 +909,7 @@ Aura.Utils.DateTimeFormat.prototype.getRegExpPattern = function(tokenString, str
 
 /**
  * Format a token with number type. Used in format().
- * 
+ *
  * @param {!number} num
  * @param {!number} minDigits
  * @param {boolean=} localized
@@ -937,7 +937,7 @@ Aura.Utils.DateTimeFormat.prototype.formatNumberField = function(num, minDigits,
 
 /**
  * Format time zone offset into an ISO 8601 string.
- * 
+ *
  * @param {!number} offsetInMinute
  * @param {boolean=} delimiter
  * @return {!string} formatted offset.

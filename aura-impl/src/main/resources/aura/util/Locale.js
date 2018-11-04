@@ -104,11 +104,11 @@ Aura.Utils.Locale.prototype.getLongMonthPattern = function() {
  * @private
  */
 Aura.Utils.Locale.prototype.createMonthNames = function(style) {
-    var monthFormat = Intl["DateTimeFormat"](this.intlLocale, {
+    var monthFormat = new Intl["DateTimeFormat"](this.intlLocale, {
         "month": style
     });
 
-    var date = new Date(2014);
+    var date = new Date(2014, 0, 1);
     var monthNames = [];
     var monthNamesParse = [];
     for (var i = 0; i < 12; i++) {
@@ -173,7 +173,7 @@ Aura.Utils.Locale.prototype.getMeridiemPattern = function() {
  * @private
  */
 Aura.Utils.Locale.prototype.createMeridiemNames = function() {
-    var meridiemFormat = Intl["DateTimeFormat"](this.intlLocale, {
+    var meridiemFormat = new Intl["DateTimeFormat"](this.intlLocale, {
         "hour12": true,
         "hour": "2-digit",
         "minute": "2-digit"
@@ -261,12 +261,12 @@ Aura.Utils.Locale.prototype.getLongWeekdayPattern = function() {
  * @private
  */
 Aura.Utils.Locale.prototype.createWeekdayNames = function(style) {
-    var weekdayFormat = Intl["DateTimeFormat"](this.intlLocale, {
+    var weekdayFormat = new Intl["DateTimeFormat"](this.intlLocale, {
         "weekday": style
     });
 
     // April 2018
-    var date = new Date(2018, 3);
+    var date = new Date(2018, 3, 1);
     // Sunday - Saturday : 0 - 6
     var weekdayNames = [];
     var weekdayNamesParse = [];

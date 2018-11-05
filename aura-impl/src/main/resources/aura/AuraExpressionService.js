@@ -184,6 +184,7 @@ AuraExpressionService.prototype.create = function(valueProvider, config) {
 };
 
 /**
+ * @deprecated Use <code>component.addValueProvider(String key, Object valueProvider)</code> instead.
  * @export
  */
     // TODO: unify with above create method

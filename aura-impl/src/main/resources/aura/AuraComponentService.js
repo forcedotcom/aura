@@ -442,6 +442,7 @@ AuraComponentService.prototype.createInternalConfig = function (config) {
  *
  * @public
  * @function
+ * @deprecated use <code>createComponent(String type, Object attributes, function callback)</code> instead.
  * @export
  */
 AuraComponentService.prototype.createComponentFromConfig = function(config) {

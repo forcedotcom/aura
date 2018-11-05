@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.impl.java.converter.ConverterServiceImpl;
@@ -59,7 +60,11 @@ public class ConverterServiceIntegrationTest extends IntegrationTestCase {
     public void testForBadConverters() throws Exception {
         ConverterServiceImpl testService = new ConverterServiceImpl(true);
         testService.setConverters(converters);
-        testService.setLocalizationAdapter(Mockito.mock(LocalizationAdapter.class));
+        final LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        @SuppressWarnings("unchecked")
+        final Provider<LocalizationAdapter> localizationAdapterProvider = Mockito.mock(Provider.class);
+        Mockito.when(localizationAdapterProvider.get()).thenReturn(localizationAdapter);
+        testService.setLocalizationAdapter(localizationAdapterProvider);
         testService.setLoggingService(Mockito.mock(LoggingService.class));
         testService.setApplicationContext(applicationContext);
         // The real test is that this should not fail.

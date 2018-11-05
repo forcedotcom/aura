@@ -18,6 +18,8 @@ package org.auraframework.impl.java.converter;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Provider;
+
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.impl.java.type.LocalizedConverter;
 import org.auraframework.service.LoggingService;
@@ -27,14 +29,19 @@ import org.auraframework.util.type.Converter;
 import org.auraframework.util.type.MultiConverter;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ConverterServiceImplUnitTest {
     /////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -42,6 +49,17 @@ public class ConverterServiceImplUnitTest {
     //
     /////////////////////////////////////////////////////////////////////////////////////////////
 
+	@Mock
+	LocalizationAdapter localizationAdapter;
+	
+	@Mock
+    Provider<LocalizationAdapter> localizationAdapterProvider;
+    
+	@Before
+	public void beforeTestCase() {
+		Mockito.when(localizationAdapterProvider.get()).thenReturn(localizationAdapter);
+	}
+	
     public static class Foo {
         private String value;
         public Foo(String value) { this.value = value; };
@@ -140,10 +158,9 @@ public class ConverterServiceImplUnitTest {
     public void testConvertTrimDefault() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseConverter()));
         String input = " expected ";
         String trimmed = "expected";
@@ -160,10 +177,10 @@ public class ConverterServiceImplUnitTest {
     public void testConvertTrimExplicitTrue() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseConverter()));
         String input = " expected ";
         String trimmed = "expected";
@@ -180,10 +197,10 @@ public class ConverterServiceImplUnitTest {
     public void testConvertTrimExplicitFalse() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseConverter()));
         String input = " expected ";
         Foo actual;
@@ -199,10 +216,10 @@ public class ConverterServiceImplUnitTest {
     public void testConvertTrimDefaultWithLocale() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseConverter()));
         String input = " expected ";
         String trimmed = "expected";
@@ -219,10 +236,10 @@ public class ConverterServiceImplUnitTest {
     public void testConvertTrimExplicitTrueWithLocale() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseConverter()));
         String input = " expected ";
         String trimmed = "expected";
@@ -239,10 +256,10 @@ public class ConverterServiceImplUnitTest {
     public void testConvertTrimExplicitFalseWithLocale() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseConverter()));
         String input = " expected ";
         Foo actual;
@@ -258,10 +275,10 @@ public class ConverterServiceImplUnitTest {
     public void testConvertTrimExplicitTrueWithNoHasLocale() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseConverter()));
         String input = " expected ";
         String trimmed = "expected";
@@ -278,10 +295,10 @@ public class ConverterServiceImplUnitTest {
     public void testConvertTrimExplicitTrueWithHasLocale() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseConverter()));
         String input = " expected ";
         String trimmed = "expected";
@@ -393,10 +410,10 @@ public class ConverterServiceImplUnitTest {
     public void testLocalizedConvertTrimDefault() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseLocalizedConverter()));
         String input = " expected ";
         String trimmed = "expected";
@@ -413,10 +430,10 @@ public class ConverterServiceImplUnitTest {
     public void testLocalizedConvertTrimExplicitTrue() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseLocalizedConverter()));
         String input = " expected ";
         String trimmed = "expected";
@@ -433,10 +450,10 @@ public class ConverterServiceImplUnitTest {
     public void testLocalizedConvertTrimExplicitFalse() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseLocalizedConverter()));
         String input = " expected ";
         Foo actual;
@@ -452,10 +469,10 @@ public class ConverterServiceImplUnitTest {
     public void testLocalizedConvertTrimDefaultWithLocale() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseLocalizedConverter()));
         String input = " expected ";
         String trimmedLocalized = "localized:expected";
@@ -472,10 +489,10 @@ public class ConverterServiceImplUnitTest {
     public void testLocalizedConvertTrimExplicitTrueWithLocale() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseLocalizedConverter()));
         String input = " expected ";
         String trimmedLocalized = "localized:expected";
@@ -492,10 +509,10 @@ public class ConverterServiceImplUnitTest {
     public void testLocalizedConvertTrimExplicitFalseWithLocale() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseLocalizedConverter()));
         String input = " expected ";
         String inputLocalized = "localized: expected ";
@@ -512,10 +529,10 @@ public class ConverterServiceImplUnitTest {
     public void testLocalizedConvertTrimExplicitTrueWithNoHasLocale() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseLocalizedConverter()));
         String input = " expected ";
         String trimmed = "expected";
@@ -532,10 +549,10 @@ public class ConverterServiceImplUnitTest {
     public void testLocalizedConvertTrimExplicitTrueWithHasLocale() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ReverseLocalizedConverter()));
         String input = " expected ";
         String trimmedLocalized = "localized:expected";
@@ -625,10 +642,10 @@ public class ConverterServiceImplUnitTest {
     public void testParameterizedMatches() {
         ConverterServiceImpl service = new ConverterServiceImpl(true);
         LoggingService loggingService = Mockito.mock(LoggingService.class);
-        LocalizationAdapter localizationAdapter = Mockito.mock(LocalizationAdapter.class);
+        
         Mockito.doReturn(Mockito.mock(AuraLocale.class)).when(localizationAdapter).getAuraLocale();
         service.setLoggingService(loggingService);
-        service.setLocalizationAdapter(localizationAdapter);
+        service.setLocalizationAdapter(localizationAdapterProvider);
         service.setConverters(Lists.newArrayList(new ParameterizedString(), new ParameterizedInteger(),
                     new ParameterizedIntegerString()));
 

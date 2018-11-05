@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -37,6 +38,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Lazy;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Maps;
 
 @ServiceComponent
@@ -48,7 +51,7 @@ public final class ConverterServiceImpl implements ConverterService, Application
 
     private LoggingService loggingService;
 
-    private LocalizationAdapter localizationAdapter;
+    private Supplier<LocalizationAdapter> localizationAdapterSupplier;
 
     private ApplicationContext applicationContext;
 
@@ -168,7 +171,7 @@ public final class ConverterServiceImpl implements ConverterService, Application
     @Deprecated
     public <F, T> T convert(F value, Class<T> to, String of, boolean trim, boolean hasLocale) {
         if (hasLocale) {
-            return convert(value, to, of, trim, localizationAdapter.getAuraLocale());
+            return convert(value, to, of, trim, localizationAdapterSupplier.get().getAuraLocale());
         } else {
             return convert(value, to, of, trim, null);
         }
@@ -404,12 +407,15 @@ public final class ConverterServiceImpl implements ConverterService, Application
     }
 
     /**
-     * @param localizationAdapter the localizationAdapter to set
+     * {@code localizationAdapter} is a commonly used bean and we use a {@link Provider} for faster performance with the
+     * {@code @lazy} annotation.
+     * 
+     * @param localizationAdapterProvider sets the provider for the localizationAdapter
      */
     @Inject
     @Lazy
-    public void setLocalizationAdapter(LocalizationAdapter localizationAdapter) {
-        this.localizationAdapter = localizationAdapter;
+    public void setLocalizationAdapter(final Provider<LocalizationAdapter> localizationAdapterProvider) {
+    	this.localizationAdapterSupplier = Suppliers.memoize(() ->  localizationAdapterProvider.get());
     }
 
     @Override

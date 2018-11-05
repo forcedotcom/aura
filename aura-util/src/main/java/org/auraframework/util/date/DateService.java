@@ -78,4 +78,10 @@ public interface DateService {
      */
     int getStyle(String style);
 
+
+    /**
+     * An ISO8601 converter for time.
+     */
+    DateConverter getTimeISO8601Converter();
+
 }

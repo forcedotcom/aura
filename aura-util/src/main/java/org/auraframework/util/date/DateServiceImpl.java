@@ -62,6 +62,14 @@ public class DateServiceImpl implements DateService {
     }
 
     /**
+     * Time: HH:mm:ss.SSS
+     */
+    @Override
+    public DateConverter getTimeISO8601Converter() {
+        return ISO_8601_TIME;
+    }
+
+    /**
      * For parsing, tries the following patterns, in order:
      * yyyy-MM-dd'T'HH:mm:ss.SSSZZ yyyy-MM-dd'T'HH:mmZ yyyy-MM-dd
      */
@@ -246,6 +254,14 @@ public class DateServiceImpl implements DateService {
      */
     private static DateConverter ISO_8601_DATE = new ISO8601DateTimeConverter(
             DateTimeFormatter.ISO_LOCAL_DATE
+    );
+
+    /**
+     * Format: HH:mm:ss.SSS
+     * Aligns with html5 spec for input elements of type time followed by out-of-the-box components
+     */
+    private static DateConverter ISO_8601_TIME = new ISO8601DateTimeConverter(
+            DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
     );
 
     /**

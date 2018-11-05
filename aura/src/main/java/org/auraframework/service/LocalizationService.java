@@ -801,4 +801,12 @@ public interface LocalizationService {
     String getCurrencyCode();
 
     String getCurrencySymbol();
+
+    /**
+     * Parses ISO formatted local time (e.g. "01:45:00.000") into a date type
+     *
+     * @param time ISO formatted local time
+     * @return Date representing Local Time
+     */
+    Date parseIsoLocalTime(String time);
 }

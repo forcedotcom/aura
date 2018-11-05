@@ -448,6 +448,11 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
+    public Date parseIsoLocalTime(String time) {
+        return dateService.getTimeISO8601Converter().parse(time);
+    }
+
+    @Override
     public Calendar parseTimeToCalendar(String time, Locale locale, TimeZone timeZone, int timeStyle)
             throws DateTimeParseException {
         if (time == null) {

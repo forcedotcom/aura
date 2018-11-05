@@ -1,1 +1,1 @@
-verify
+verify -Ptest-project

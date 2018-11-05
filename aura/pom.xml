@@ -12,6 +12,12 @@
         <dependency>
             <groupId>org.lwc</groupId>
             <artifactId>lwc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>

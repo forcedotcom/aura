@@ -111,9 +111,13 @@ public class CssVariableWriterTests {
         String actual = sb.toString();
 
         assertEquals("The CSS variable structure is wrong", expected, actual);
+        
+        //pass the tokensDef and assert
+        sb = new StringBuilder();
+        target.write(sb,tokens);
+        assertEquals("The CSS variable structure is wrong", expected, actual);
     }
-
-
+    
     interface ApplicationDefDescriptor extends DefDescriptor<ApplicationDef> {}
     interface TokenDefDescriptor extends DefDescriptor<TokensDef>{}
 

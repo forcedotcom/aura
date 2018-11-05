@@ -74,11 +74,12 @@ public class CssVariableWriter {
         this.definitionService = definitionService;
         this.contextService = contextService;
     }
-
-    public void write(Appendable out) throws QuickFixException, IOException {
+    
+    public void write(Appendable out, List<DefDescriptor<TokensDef>> tokenDefs)
+			throws QuickFixException, IOException {
         StringBuilder cssVariables = new StringBuilder();
         AuraContext context = contextService.getCurrentContext();
-        List<DefDescriptor<TokensDef>> tokenOverrides = getTokenDefs(context, definitionService);
+        List<DefDescriptor<TokensDef>> tokenOverrides = tokenDefs;
 
         if (tokenOverrides != null && tokenOverrides.size() > 0) {
 
@@ -103,6 +104,10 @@ public class CssVariableWriter {
             out.append(cssVariables.toString());
             out.append(" } \n");
         }
+	}
+
+    public void write(Appendable out) throws QuickFixException, IOException {
+        write(out,getTokenDefs(contextService.getCurrentContext(), definitionService));
     }
 
     private static boolean isValidValue(Optional<Object> optionalValue) {

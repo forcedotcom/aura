@@ -2167,6 +2167,16 @@ AuraClientService.prototype.initializeApplication = function() {
         self.runAfterInitDefs(function() {
             Aura.bootstrapMark("runAfterInitDefsReady");
             self.runAfterBootstrapReady(function (bootConfig) {
+                // Ensure bootstrap queues are executed.
+                // When 'bootstrapInlined', bootstrap(part of the app html) is executed before tasks that need to run after context and GVP are initialized.
+                if (Aura["afterBootstrapReady"] && Aura["afterBootstrapReady"].length){
+                    var queue = Aura["afterBootstrapReady"];
+                    Aura["afterBootstrapReady"] = [];
+                    for (var i = 0; i < queue.length; i++) {
+                        queue[i]();
+                    }
+                }
+
                 Aura.bootstrapMark("runAfterBootstrapReady");
                 resolve(bootConfig);
             });

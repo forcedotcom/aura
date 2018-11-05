@@ -134,8 +134,6 @@ Aura.Context.AuraContext.prototype.initGlobalValueProviders = function(gvps, cal
         gvps = {};
     }
 
-    $A.util.applyNotFromPrototype(gvps,$A.globalValueProviders);
-
     this.globalValueProviders = new Aura.Provider.GlobalValueProviders(gvps, callback);
 };
 

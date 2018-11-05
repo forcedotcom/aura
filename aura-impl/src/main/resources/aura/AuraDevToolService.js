@@ -29,6 +29,14 @@ var AuraDevToolService = function() {
      * @private
      */
 
+    function getParentNode(el) {
+        var isShadowRoot = (el.nodeType === 11) && !!el.host;
+        if (isShadowRoot) {
+            return el.host;
+        }
+        return el.parentNode;
+    }
+
     function flattenRegistry(reg){
         var ret = [];
         for(var k in reg){
@@ -470,18 +478,18 @@ var AuraDevToolService = function() {
 
             /**
              * Goes up the tree (until it reaches the body tag) and finds whether the initial tag param is in another sent up tag
-             * @param   tag       - The starting tag that we are going to use to go up the tree
-             * @param   nameOfTag - Name of the tag that we should find should the the starting tags parent
-             * @returns boolean   - Signifies whether or not the tag we want was found or not (found: true, else: false)
+             * @param   tag           - The starting tag that we are going to use to go up the tree
+             * @param   parentTagName - Name of the tag that we should find should the the starting tags parent
+             * @returns boolean       - Signifies whether or not the tag we want was found or not (found: true, else: false)
              */
-            checkParentMatchesTag : function(tag, parentTag){
-                 while($A.util.isString(tag.tagName) && tag.tagName !== "BODY"){
-                      if(tag.tagName.toUpperCase() === parentTag){
-                          return true;
-                      }
-                      tag = tag.parentNode;
-                  }
-                  return false;
+            checkParentMatchesTag : function(tag, parentTagName) {
+                while (tag.tagName !== "BODY") {
+                    if (tag.tagName && tag.tagName.toUpperCase() === parentTagName) {
+                        return true;
+                    }
+                    tag = getParentNode(tag);
+                }
+                return false;
             },
 
             /**
@@ -784,7 +792,7 @@ var AuraDevToolService = function() {
                              }
                          }
                      }
-                     tag = tag.parentNode;
+                     tag = getParentNode(tag);
                  }
 
                  return cmpNameList;
@@ -1077,7 +1085,8 @@ var AuraDevToolService = function() {
                      var startLooking = false;
 
                      for(var index = 0; index< tags.length; index++){
-                        children = tags[index].parentNode.children;
+                        
+                        children = getParentNode(tags[index]).children;
                         currTag = "";
                         startLooking = false;
 

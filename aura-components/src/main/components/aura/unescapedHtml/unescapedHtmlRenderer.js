@@ -19,7 +19,11 @@
         if ($A.util.isUndefinedOrNull(value)) {
             value = "";
         } else {
-            value = $A.util.sanitizeDOM(value);
+            var cfg = {
+                FORBID_TAGS: ["style", "meta", "script", "link"],
+                ADD_TAGS: ["iframe"]
+            };
+            value = $A.util.sanitizeDOM(value, cfg);
         }
         var elements=$A.util.createElementsFromMarkup(value);
         if(!elements.length){

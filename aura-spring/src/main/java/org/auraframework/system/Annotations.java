@@ -72,6 +72,8 @@ public interface Annotations {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
     @interface Controller {
+        // marks controller as system accessible only
+        boolean internal();
     }
 
     @Retention(RetentionPolicy.RUNTIME)

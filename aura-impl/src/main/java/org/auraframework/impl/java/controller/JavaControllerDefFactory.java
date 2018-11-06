@@ -42,9 +42,9 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.ActionGroup;
 import org.auraframework.system.Annotations.BackgroundAction;
 import org.auraframework.system.Annotations.CabooseAction;
+import org.auraframework.system.Annotations;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.Annotations.PublicCachingEnabled;
-import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.DefFactory;
 import org.auraframework.system.DefinitionFactory;
@@ -154,14 +154,13 @@ public class JavaControllerDefFactory implements DefinitionFactory<JavaSourceImp
             actionBuilder.setCacheable(auraEnabledAnnotation.cacheable());
         }
 
-        ActionGroup actionGrouAnnotation = method.getAnnotation(ActionGroup.class);
-        String actionGroup = (actionGrouAnnotation != null && actionGrouAnnotation.value() != null && !(actionGrouAnnotation.value().isEmpty())) ? actionGrouAnnotation.value() : null;
+        ActionGroup actionGroupAnnotation = method.getAnnotation(ActionGroup.class);
+        String actionGroup = (actionGroupAnnotation != null && actionGroupAnnotation.value() != null && !(actionGroupAnnotation.value().isEmpty())) ? actionGroupAnnotation.value() : null;
         actionBuilder.setActionGroup(actionGroup);
         
         PublicCachingEnabled publicCachingAnnotation = method.getAnnotation(PublicCachingEnabled.class);
         actionBuilder.setPublicCachingEnabled(publicCachingAnnotation != null);
-        actionBuilder.setPublicCachingExpiration(publicCachingAnnotation == null ? 
-        		-1 : publicCachingAnnotation.expiration());
+        actionBuilder.setPublicCachingExpiration(publicCachingAnnotation == null ? -1 : publicCachingAnnotation.expiration());
 
         actionBuilder.setAccess(new DefinitionAccessImpl(Access.INTERNAL));
 
@@ -218,7 +217,13 @@ public class JavaControllerDefFactory implements DefinitionFactory<JavaSourceImp
 
         builder.setDescriptor(descriptor);
         builder.setControllerClass(clazz);
-        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
+        builder.setAccess(new DefinitionAccessImpl(Access.PUBLIC));
+        if (clazz.isAnnotationPresent(Annotations.Controller.class)) {
+            Annotations.Controller controllerAnnotation = clazz.getAnnotation(Annotations.Controller.class);
+            if (controllerAnnotation.internal()) {
+                builder.setAccess(new DefinitionAccessImpl(Access.INTERNAL));
+            }
+        }
         builder.setLocation(clazz.getCanonicalName(), -1);
         if (!Controller.class.isAssignableFrom(clazz)) {
             throw new InvalidDefinitionException(String.format(

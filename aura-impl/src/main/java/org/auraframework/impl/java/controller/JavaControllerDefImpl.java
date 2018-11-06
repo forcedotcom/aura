@@ -80,6 +80,9 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
         json.writeMapEntry(ApplicationKey.DESCRIPTOR, getDescriptor());
+        if (!getAccess().isPublic()) {
+            json.writeValue(getAccess());
+        }
         json.writeMapEntry(ApplicationKey.ACTIONDEFS, actionMap.values());
         json.writeMapEnd();
     }

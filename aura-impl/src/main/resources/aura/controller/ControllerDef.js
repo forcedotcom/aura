@@ -22,6 +22,7 @@
  */
 function ControllerDef(config){
     this.descriptor = config[Json.ApplicationKey.DESCRIPTOR];
+    this.access = config[Json.ApplicationKey.ACCESS];
     this.actionDefs = {};
     var actionDefs = config[Json.ApplicationKey.ACTIONDEFS];
 
@@ -62,7 +63,19 @@ ControllerDef.prototype.getActionDef = function(key) {
  * @param {String} key - A action name which is defined on the controller.
  * @returns {Action} A new Action instance
  */
-ControllerDef.prototype.get = function(key){
+ControllerDef.prototype.get = function(key) {
+    if (this.access === 'I') {
+        var currentAccess = $A.clientService.currentAccess;
+        if (currentAccess) {
+            var namespace = currentAccess.getDef().getDescriptor().getNamespace();
+            if (!$A.clientService.isInternalNamespace(namespace)) {
+                if ($A.clientService.logAccessFailures) {
+                    throw new Error(currentAccess.type + " cannot execute " + this.descriptor);
+                }
+                return null;
+            }
+        }
+    }
     return this.getActionDef(key).newInstance();
 };
 

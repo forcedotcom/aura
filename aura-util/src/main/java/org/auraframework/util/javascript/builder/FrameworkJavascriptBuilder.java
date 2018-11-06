@@ -18,6 +18,7 @@ package org.auraframework.util.javascript.builder;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.List;
 
 import org.auraframework.util.javascript.JavascriptProcessingError;
@@ -27,13 +28,23 @@ import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 import com.google.common.io.Files;
 
 public class FrameworkJavascriptBuilder extends JavascriptBuilder {
-    
+
     public FrameworkJavascriptBuilder() {
         super(null);
     }
 
+    /**
+     * closure compiler wraps compressed output in an anonymous function which adds an extra line to the minified output.
+     *
+     * @return number of lines to add to sourcemap offset.
+     */
     @Override
-    public JavascriptResource build(JavascriptGeneratorMode mode, boolean isCompat, String inputContent, String outputFileName) throws IOException {
+    public int getSourcemapLineOffset() {
+        return 1;
+    }
+
+    @Override
+    public List<JavascriptResource> build(JavascriptGeneratorMode mode, boolean isCompat, String inputContent, String outputFileName) throws IOException {
         JavascriptWriter jsWriter = mode.getJavascriptWriter();
 
         StringWriter compressedSourceWriter = new StringWriter();
@@ -42,12 +53,12 @@ public class FrameworkJavascriptBuilder extends JavascriptBuilder {
 
                 final List<JavascriptProcessingError> errors = jsWriter.compress(new StringReader(inputContent), compressedSourceWriter, sourcemapSectionWriter, Files.getNameWithoutExtension(outputFileName) + ".map.js", null);
                 proccessBuildErrorsAndWarnings(errors);
-    
-                return new JavascriptResource(inputContent, compressedSourceWriter.toString(), sourcemapSectionWriter.toString());
+
+                return Arrays.asList(new JavascriptResource(inputContent, compressedSourceWriter.toString(), sourcemapSectionWriter.toString()));
             }
         } else {
             jsWriter.compress(inputContent, compressedSourceWriter, outputFileName);
-            return new JavascriptResource(null, compressedSourceWriter.toString(), null);
+            return Arrays.asList(new JavascriptResource(null, compressedSourceWriter.toString(), null));
         }
     }
 }

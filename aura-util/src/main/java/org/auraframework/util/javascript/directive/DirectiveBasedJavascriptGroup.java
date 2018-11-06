@@ -256,34 +256,34 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                     try (Writer outputWriter = new FileWriter(outputFile)) {
 
                         for(JavascriptBuilder builder : this.javascriptBuilders) {
-                            JavascriptResource resource = builder.build(mode, isCompat, everything, outputFileName);
+                            for (JavascriptResource resource : builder.build(mode, isCompat, everything, outputFileName)) {
 
-                            String sourcemap;
-                            // generate source content and sourcemap only if the "mode" have an associated sourcemap.
-                            if((sourcemap = resource.getSourcemap()) != null) {
-                                if(sourcemapFile == null) {
-                                    sourcemapFile = SourcemapWriter.getSourcemapFile(outputFile);
-                                    sourceContentFile = SourcemapWriter.getSourcContentFile(outputFile);
+                                String sourcemap;
+                                // generate source content and sourcemap only if the "mode" have an associated sourcemap.
+                                if ((sourcemap = resource.getSourcemap()) != null) {
+                                    if (sourcemapFile == null) {
+                                        sourcemapFile = SourcemapWriter.getSourcemapFile(outputFile);
+                                        sourceContentFile = SourcemapWriter.getSourcContentFile(outputFile);
 
-                                    sourcemapWriter = new SourcemapWriter(sourcemapFile);
-                                    sourceContentWriter = new FileWriter(sourceContentFile);
+                                        sourcemapWriter = new SourcemapWriter(sourcemapFile);
+                                        sourceContentWriter = new FileWriter(sourceContentFile);
+                                    }
+
+                                    outputWriter.flush();
+                                    long lineCount = Files.lines(outputFile.toPath()).count() + builder.getSourcemapLineOffset();
+                                    sourcemapWriter.writeSection(outputFileName, lineCount, 0, sourcemap);
+
+                                    String inputContent;
+                                    if ((inputContent = resource.getInput()) != null) {
+                                        sourceContentWriter.append(inputContent).append("\n");
+                                    }
                                 }
 
-                                outputWriter.flush();
-                                long lineCount = Files.lines(outputFile.toPath()).count();
-                                // +1 - closure compiler wraps compressed output in an anonymous function which adds an extra line to the minified output.
-                                sourcemapWriter.writeSection(outputFileName, lineCount + 1, 0, sourcemap);
-
-                                String inputContent;
-                                if((inputContent = resource.getInput()) != null) {
-                                    sourceContentWriter.append(inputContent).append("\n");
+                                // do this after writing sourcemap so that the offset line-count would be calculated before writing this output.
+                                String outputContent;
+                                if ((outputContent = resource.getOutput()) != null) {
+                                    outputWriter.append(outputContent).append("\n");
                                 }
-                            }
-
-                            // do this after writing sourcemap so that the offset line-count would be calculated before writing this output.
-                            String outputContent;
-                            if((outputContent = resource.getOutput()) != null) {
-                                outputWriter.append(outputContent).append("\n");
                             }
                         }
 

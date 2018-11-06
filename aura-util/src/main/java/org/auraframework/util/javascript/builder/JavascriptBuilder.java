@@ -29,9 +29,9 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
 public abstract class JavascriptBuilder {
-    
+
     private final Logger logger = Logger.getLogger(this.getClass().getName());
-    
+
     protected ResourceLoader resourceLoader;
 
     public JavascriptBuilder(ResourceLoader resourceLoader) {
@@ -50,20 +50,25 @@ public abstract class JavascriptBuilder {
         return source;
     }
 
+
+    public int getSourcemapLineOffset() {
+        return 0;
+    }
+
     public void fetchResources() {
 
     }
 
-    public abstract JavascriptResource build(JavascriptGeneratorMode mode, boolean isCompat, String inputContent, String outputFileName) throws IOException;
-    
+    public abstract List<JavascriptResource> build(JavascriptGeneratorMode mode, boolean isCompat, String inputContent, String outputFileName) throws IOException;
+
     /**
      * Takes the passe in errors/warnings and logs them to the logger.
-     * 
+     *
      * @param errors The errors/warnings to process
      */
     protected void proccessBuildErrorsAndWarnings(final List<JavascriptProcessingError> errors) {
         errors.stream().forEach(error -> {
-            switch(error.getLevel()) {
+            switch (error.getLevel()) {
                 case Warning:
                     logger.warn(error.toString());
                     break;

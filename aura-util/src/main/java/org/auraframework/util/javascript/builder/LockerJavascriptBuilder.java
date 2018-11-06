@@ -20,6 +20,8 @@ import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 import org.auraframework.util.resource.ResourceLoader;
 
 import java.net.MalformedURLException;
+import java.util.Arrays;
+import java.util.List;
 
 public class LockerJavascriptBuilder extends JavascriptBuilder {
     private String locker = "";
@@ -33,7 +35,7 @@ public class LockerJavascriptBuilder extends JavascriptBuilder {
     }
 
     @Override
-    public JavascriptResource build(JavascriptGeneratorMode mode, boolean isCompat, String inputContent, String outputFileName) {
+    public List<JavascriptResource> build(JavascriptGeneratorMode mode, boolean isCompat, String inputContent, String outputFileName) {
         boolean minified = mode.getJavascriptWriter() == JavascriptWriter.CLOSURE_AURA_PROD;
 
         String output = null;
@@ -44,7 +46,7 @@ public class LockerJavascriptBuilder extends JavascriptBuilder {
                     (isCompat ? lockerCompat : locker);
         }
 
-        return new JavascriptResource(null, output, null);
+        return Arrays.asList(new JavascriptResource(null, output, null));
     }
 
     @Override

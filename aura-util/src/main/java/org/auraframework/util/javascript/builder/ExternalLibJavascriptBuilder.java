@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -38,7 +39,7 @@ public class ExternalLibJavascriptBuilder extends JavascriptBuilder {
     }
 
     @Override
-    public JavascriptResource build(JavascriptGeneratorMode mode, boolean isCompat, String inputContent, String outputFileName) throws IOException {
+    public List<JavascriptResource> build(JavascriptGeneratorMode mode, boolean isCompat, String inputContent, String outputFileName) throws IOException {
         boolean minified = mode.getJavascriptWriter() == JavascriptWriter.CLOSURE_AURA_PROD;
 
         String libs = minified ?
@@ -50,8 +51,8 @@ public class ExternalLibJavascriptBuilder extends JavascriptBuilder {
         try (StringWriter libsWriter = new StringWriter()) {
             final List<JavascriptProcessingError> errors = libsJsWriter.compress(libs, libsWriter, outputFileName);
             proccessBuildErrorsAndWarnings(errors);
-    
-            return new JavascriptResource(null, libsWriter.toString(), null);
+
+            return Arrays.asList(new JavascriptResource(null, libsWriter.toString(), null));
         }
     }
 

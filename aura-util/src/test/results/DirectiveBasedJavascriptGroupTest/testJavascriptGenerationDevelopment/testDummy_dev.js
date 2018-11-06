@@ -1,4 +1,3 @@
-
 new function() {
 var rrrrr = "ARRRRRRRR";
 function dress() {

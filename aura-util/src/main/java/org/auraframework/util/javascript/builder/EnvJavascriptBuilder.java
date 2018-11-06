@@ -18,6 +18,8 @@ package org.auraframework.util.javascript.builder;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class EnvJavascriptBuilder extends JavascriptBuilder {
 
@@ -27,11 +29,11 @@ public class EnvJavascriptBuilder extends JavascriptBuilder {
     }
 
     @Override
-    public JavascriptResource build(JavascriptGeneratorMode mode, boolean isCompat, String inputContent, String outputFileName) throws IOException {
+    public List<JavascriptResource> build(JavascriptGeneratorMode mode, boolean isCompat, String inputContent, String outputFileName) throws IOException {
         String output = null;
         if (mode != JavascriptGeneratorMode.DOC && mode.isTestingMode()) {
             output = "typeof process === 'undefined' ? (process = { env: { NODE_ENV: 'test' } }) : process.env ? process.env.NODE_ENV = 'test' : process.env = { NODE_ENV: 'test' } ";
         }
-        return new JavascriptResource(null, output, null);
+        return Arrays.asList(new JavascriptResource(null, output, null));
     }
 }

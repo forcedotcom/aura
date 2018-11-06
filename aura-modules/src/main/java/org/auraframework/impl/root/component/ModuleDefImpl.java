@@ -15,21 +15,11 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.def.ActionDef;
 import org.auraframework.def.AttributeDef;
-import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.LibraryDef;
@@ -41,18 +31,14 @@ import org.auraframework.def.module.impl.ModuleDesignDefImpl;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.PlatformDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
-import org.auraframework.impl.util.TypeParser;
-import org.auraframework.impl.util.TypeParser.Type;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraUnhandledException;
-import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -61,17 +47,22 @@ import org.auraframework.util.json.Json.ApplicationKey;
 import org.auraframework.validation.ReferenceValidationContext;
 import org.lwc.metadata.ModuleExport;
 import org.lwc.reference.Reference;
-import org.lwc.reference.ReferenceType;
 import org.lwc.template.TemplateModuleDependencies;
 
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * ModuleDef holds compiled code and serializes for client
  */
 public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleDef {
 
-    private static final long serialVersionUID = -7133749123070388888L;
+    private static final long serialVersionUID = -7133749123070386535L;
 
     private final String path;
     private final Set<String> moduleDependencies;
@@ -83,7 +74,6 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     private final Double minVersion;
     private final List<Reference> sourceReferences;
     private final List<Reference> metadataReferences;
-    private final Set<ImmutablePair<String, String>> controllerReferences;
     private final Boolean requireLocker;
     private final ModuleDesignDef moduleDesignDef;
     private final Set<String> validTags;
@@ -109,7 +99,6 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         this.validTags = AuraUtil.immutableSet(builder.validTags);
         this.sourceReferences = AuraUtil.immutableList(builder.sourceReferences);
         this.metadataReferences = AuraUtil.immutableList(builder.metadataReferences);
-        this.controllerReferences = AuraUtil.immutableSet(builder.controllerReferences);
         this.documentationDef = builder.documentationDef;
         this.auraDocumentationDef = builder.auraDocumentationDef;
         this.wireDecorations = builder.wireDecorations;
@@ -259,8 +248,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         for (String dep : dependencies) {
             if (dep.contains(":")) {
                 // specific reference with ":" indicates aura library dependency in module
-                Type parsedLibrary = TypeParser.parseTagStrict(dep);
-                DefDescriptor<LibraryDef> libraryDefDescriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, parsedLibrary.namespace, parsedLibrary.name, LibraryDef.class);
+                DefDescriptor<LibraryDef> libraryDefDescriptor = definitionService.getDefDescriptor(dep, LibraryDef.class);
                 if (definitionService.exists(libraryDefDescriptor)) {
                     results.add(libraryDefDescriptor);
                 }
@@ -272,14 +260,12 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
                     String name = split[1];
 
                     String descriptor = ModuleDefinitionUtil.convertToAuraDescriptor(namespace, name, configAdapter);
-                    Type parsed = TypeParser.parseTagStrict(descriptor);
-                    DefDescriptor<ModuleDef> moduleDescriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, parsed.namespace, parsed.name, ModuleDef.class);
+                    DefDescriptor<ModuleDef> moduleDescriptor = definitionService.getDefDescriptor(descriptor, ModuleDef.class);
 
                     String namespaceAlias = configAdapter.getModuleNamespaceAliases().get(namespace);
                     if (namespaceAlias != null) {
                         String aliasedDescriptor = ModuleDefinitionUtil.convertToAuraDescriptor(namespaceAlias, name, configAdapter);
-                        Type parsedAlias = TypeParser.parseTagStrict(aliasedDescriptor);
-                        DefDescriptor<ModuleDef> aliasedModuleDescriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, parsedAlias.namespace, parsedAlias.name, ModuleDef.class);
+                        DefDescriptor<ModuleDef> aliasedModuleDescriptor = definitionService.getDefDescriptor(aliasedDescriptor, ModuleDef.class);
                         if (definitionService.exists(aliasedModuleDescriptor)) {
                             // aliased module exists so we reference aliased descriptor
                             moduleDescriptor = aliasedModuleDescriptor;
@@ -289,14 +275,6 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
                 }
             }
         }
-
-        // add controller dependencies
-        for (ImmutablePair<String, String> d : this.controllerReferences) {
-            Type parsedController = TypeParser.parseClass(d.getKey());
-            DefDescriptor<ControllerDef> controllerDescriptor = new DefDescriptorImpl<>(parsedController.prefix, parsedController.namespace, parsedController.name, ControllerDef.class);
-            results.add(controllerDescriptor);
-        }
-
         return results;
     }
 
@@ -324,7 +302,6 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         super.validateReferences(validationContext);
         validateLabels();
         validateTags();
-        validateControllers(validationContext);
     }
 
     /**
@@ -367,54 +344,12 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
             }
         }
     }
-    
-    /**
-     * Validates controllers used in modules for existence and access.
-     * TODO: This should be abstracted out once validation can be injected into validateReferences.
-     *
-     * @param validationContext ValidationContext to get definition
-     * @throws QuickFixException
-     */
-    private void validateControllers(ReferenceValidationContext validationContext) throws QuickFixException {
-        if (!this.controllerReferences.isEmpty()) {
-
-            for (ImmutablePair<String, String> d : this.controllerReferences) {
-                String actionName = d.getValue();
-                String descriptorName = d.getKey();
-                Type parsed = TypeParser.parseClass(descriptorName);
-                DefDescriptor<ControllerDef> controllerDescriptor = new DefDescriptorImpl<>(parsed.prefix, parsed.namespace, parsed.name, ControllerDef.class);
-                ControllerDef controllerDef = validationContext.getAccessibleDefinition(controllerDescriptor);// will throw if controller does not exist
-                String currentNamespace = this.descriptor.getNamespace();
-                String controllerNamespace = controllerDef.getDescriptor().getNamespace();
-                String controllerName = controllerDef.getDescriptor().getName();
-
-                if (controllerDef.getAccess().isPrivate() || (controllerDef.getAccess().isPublic() && !currentNamespace.equalsIgnoreCase(controllerNamespace))) {
-                    throw new NoAccessException(currentNamespace + " namespace cannot use controller " + controllerName + " in " + controllerNamespace);
-                }
-
-                boolean actionFound = false;
-                for (Map.Entry<String, ? extends ActionDef> a : controllerDef.getActionDefs().entrySet()) {
-                    String key = a.getKey();
-                    ActionDef actionDef = a.getValue();
-                    if (key.equals(actionName)) {
-                        actionFound = true;
-                        String actionNamespace = actionDef.getDescriptor().getNamespace();
-                        if (actionDef.getAccess().isPrivate() || (actionDef.getAccess().isPublic() && !currentNamespace.equalsIgnoreCase(actionNamespace))) {
-                            throw new NoAccessException(currentNamespace + " namespace cannot use method " + actionName + " in " + actionNamespace);
-                        }
-                    }
-                }
-                if (!actionFound) {
-                    throw new InvalidDefinitionException("No controller method found: " + descriptorName, getLocation());
-                }
-            }
-        }
-    }
 
     @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
         return this.attributeDefs;
     }
+
     public static final class Builder extends PlatformDefImpl.Builder<ModuleDef> {
 
         private String path;
@@ -425,7 +360,6 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private Set<PropertyReference> labelReferences = new HashSet<>();
         private List<Reference> sourceReferences = Collections.emptyList();
         private List<Reference> metadataReferences = Collections.emptyList();
-        private Set<ImmutablePair<String, String>> controllerReferences = Collections.emptySet();
         private Boolean requireLocker = false;
         private ModuleDesignDef moduleDesignDef = null;
         private Set<String> validTags = Collections.emptySet();
@@ -539,50 +473,11 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
             this.svgDef = svgDef;
         }
 
-        private Set<ImmutablePair<String, String>> getControllerDescriptorNames() throws QuickFixException {
-            Set<ImmutablePair<String, String>> controllerDescriptorDataSet = new HashSet<>();
-            String apexPrefix = "apex://";
-            for (Reference r : this.sourceReferences) {
-                if (r.type == ReferenceType.apexClass || r.type == ReferenceType.apexMethod) {
-                    String namespace;
-                    String controllerName;
-                    String actionName;
-
-                    if (r.namespacedId != null) {
-                        String id = r.namespacedId;
-                        String[] snid = id.split("\\.");
-                        if (snid.length != 3) {
-                            // 3: r.namespacedId = 'namespace.Controller.action'
-                            throw new InvalidDefinitionException("Invalid controller reference: " + id, getLocation());
-                        }
-                        namespace = snid[0];
-                        controllerName = snid[1];
-                        actionName = snid[2];
-                    } else {
-                        // namespacedId is null when no namespace mapping is provided, then use r.id instead
-                        namespace = this.descriptor.getNamespace();
-                        String id = r.id;
-                        String[] snid = id.split("\\.");
-                        if (snid.length != 2) {
-                            // 2: r.id = 'Controller.action'
-                            throw new InvalidDefinitionException("Invalid controller reference: " + id, getLocation());
-                        }
-                        controllerName = snid[0];
-                        actionName = snid[1];
-                    }
-                    String controllerDescriptorName = apexPrefix + namespace + "." + controllerName;
-                    controllerDescriptorDataSet.add(new ImmutablePair(controllerDescriptorName, actionName));
-                }
-            }
-            return controllerDescriptorDataSet.isEmpty() ? Collections.emptySet() : AuraUtil.immutableSet(controllerDescriptorDataSet);
-        }
-
         @Override
         public ModuleDef build() throws QuickFixException {
             if (designBuilder != null) {
                 setModuleDesignDef(designBuilder.build());
             }
-            this.controllerReferences = getControllerDescriptorNames();
             return new ModuleDefImpl(this);
         }
     }

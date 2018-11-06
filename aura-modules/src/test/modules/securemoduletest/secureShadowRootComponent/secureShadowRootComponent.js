@@ -1,14 +1,18 @@
 import { LightningElement, api } from "lwc";
 import * as testUtils from "securemoduletest/testUtil";
 
-const childComponentTagName = "SECUREMODULETEST-SECURE-TEMPLATE-COMPONENT";
-
-export default class SecureTemplateComponent extends LightningElement {
+export default class SecureShadowRootComponent extends LightningElement {
     @api
-    testHost() {
+    testTemplateHost() {
         const host = this.template.host;
-        testUtils.assertEquals(childComponentTagName, host.tagName);
+        testUtils.assertEquals('SECUREMODULETEST-SECURE-SHADOW-ROOT-COMPONENT', host.tagName, 'Expected "tagName" to be "SECUREMODULETEST-SECURE-SHADOW-ROOT-COMPONENT".');
         testUtils.assertEquals('SecureElement: [object HTMLElement]{ key: {"namespace":"secureModuleTest"} }', host.toString(), 'Expected a SecureElement: [object HTMLElement].');
         testUtils.assertEquals('', host.innerText, 'Expected "innerText" to be an empty string.');
+        return host;
+    }
+
+    @api
+    testShadowRoot() {
+        testUtils.assertEquals(null, this.shadowRoot, 'Expected "this.shadowRoot" property to be "null"');
     }
 }

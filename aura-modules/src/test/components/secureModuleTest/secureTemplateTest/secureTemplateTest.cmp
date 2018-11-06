@@ -1,6 +1,0 @@
-<aura:component implements="aura:requireLocker">
-    <secureModuleTest:secureTemplateComponentParent aura:id="secureTemplateComponentParent"/>
-    <aura:method name="secureTemplateTester">
-        <aura:attribute name="testCase" type="String"/>
-    </aura:method>
-</aura:component>

@@ -1,3 +1,0 @@
-<aura:component>
-    <lockerlwc:secureTemplate aura:id="secureTemplate"/>
-</aura:component>

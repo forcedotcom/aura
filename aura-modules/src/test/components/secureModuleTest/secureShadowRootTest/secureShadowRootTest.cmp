@@ -1,0 +1,6 @@
+<aura:component implements="aura:requireLocker">
+    <secureModuleTest:secureShadowRootComponentParent aura:id="secureShadowRootComponentParent"/>
+    <aura:method name="secureShadowRootTester">
+        <aura:attribute name="testCase" type="String"/>
+    </aura:method>
+</aura:component>

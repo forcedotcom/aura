@@ -15,6 +15,10 @@
  */
 package org.auraframework.modules.impl;
 
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -217,9 +221,9 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
             compileModule("modules/errorInJs/errorInJs");
             fail("should report a syntax error");
         } catch (Exception e) {
-            String message = Throwables.getRootCause(e).getMessage();
+            String fullMessage = Throwables.getRootCause(e).toString();
             // since linting is disabled for inernal bundle types, the compiler will throw instead of producing diagnostic
-            assertEquals(message.contains("Unexpected token, expected { (2:4)"), true);
+            assertThat(fullMessage, containsString("Unexpected token, expected { (2:4)"));
         }
     }
 
@@ -248,10 +252,14 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
             modulesCompilerService.compile(entry, sources, BundleType.platform);
             fail("should report a syntax error");
         } catch (Exception e) {
-            String message = Throwables.getRootCause(e).getMessage();
-            assertEquals("Invalid syntax encountered in the 'errorInJs.js' file of the 'modules:errorInJs' component: \n" +
-                    "Do not use $A in LWC code",
-                    message);
+            String fullMessage = Throwables.getRootCause(e).toString();
+            assertThat(
+                fullMessage,
+                allOf(
+                    containsString("Invalid syntax encountered in the 'errorInJs.js' file of the 'modules:errorInJs' component: \n"),
+                    containsString("Do not use $A in LWC code")
+                )
+            );
         }
     }
 

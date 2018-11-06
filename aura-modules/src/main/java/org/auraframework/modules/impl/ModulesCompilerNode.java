@@ -17,7 +17,6 @@ package org.auraframework.modules.impl;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -80,9 +79,9 @@ public final class ModulesCompilerNode implements ModulesCompiler {
             List<Diagnostic> diagnostics = report.diagnostics;
 
             if (report.success == false) {
-                String error = buildDiagnosticsError(bundle, entry, diagnostics, bundleType);
-                loggingService.warn("ModulesCompilerNode: compiler error " + entry + ": " + error);
-                throw new RuntimeException(error);
+                ModulesCompilerException error = buildDiagnosticsError(bundle, entry, diagnostics, bundleType);
+                loggingService.warn("ModulesCompilerNode: compiler error " + entry + ": " + error.toString());
+                throw error;
             }
 
             if(diagnostics.size() > 0) {
@@ -109,16 +108,15 @@ public final class ModulesCompilerNode implements ModulesCompiler {
         return new StylesheetConfig(new CustomPropertiesConfig(true, customPropertiesMap));
     }
 
-    protected String buildDiagnosticsError(Bundle bundle, String entry, List<Diagnostic> diagnostics, BundleType bundleType) {
-        StringBuffer sb = new StringBuffer();
-        sb.append(buildDiagnosticHeader(bundle,entry));
+    protected ModulesCompilerException buildDiagnosticsError(Bundle bundle, String entry, List<Diagnostic> diagnostics, BundleType bundleType) {
+        ModulesCompilerException exception = new ModulesCompilerException(buildDiagnosticHeader(bundle, entry));
+        
         for (Diagnostic diagnostic : diagnostics) {
             if (isDiagnosticError(diagnostic, bundleType)) {
-                sb.append('\n');
-                sb.append(diagnostic.message);
+                exception.addDiagnostic(diagnostic);
             }
         }
-        return sb.toString();
+        return exception;
     }
 
     protected String buildDiagnosticsWarning(Bundle bundle, String entry, List<Diagnostic> diagnostics, BundleType bundleType) {

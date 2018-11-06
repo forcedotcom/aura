@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 function lib() { //eslint-disable-line no-unused-vars
+    function isShadowRoot(node) {
+        return node && node.nodeType === 11; // document fragment means shadowRoot
+    }
+
+    function getParentNode(elem) {
+        var parent = elem.parentNode;
+        return isShadowRoot(parent) ? parent.host : parent;
+    }
+ 
     var getSrollerWrapper = function (element) {
         var parent = element;
         while (parent && !parent._scopedScroll) {
-            parent = parent.parentElement;
+            parent = getParentNode(parent);
         }
-
         return parent;
     };
 
@@ -29,7 +37,7 @@ function lib() { //eslint-disable-line no-unused-vars
             if (parent.scrollHeight !== parent.clientHeight) {
                 return true;
             } else {
-                parent = parent.parentElement;
+                parent = getParentNode(parent);
             }
         }
         return false;

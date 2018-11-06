@@ -247,10 +247,10 @@ public interface ConfigAdapter extends AuraAdapter {
     boolean isSecureRequest(HttpServletRequest request);
 
     /**
-     * Required module services.
-     * @return set of require module services
+     * Default module services.
+     * @return set of default module services
      */
-    Set<String> getRequiredServices();
+    Set<String> getDefaultServices();
 
     /**
      * CSP Report Uri.

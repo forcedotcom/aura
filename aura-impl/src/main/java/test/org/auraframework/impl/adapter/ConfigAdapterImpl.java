@@ -869,7 +869,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
-    public Set<String> getRequiredServices() {
+    public Set<String> getDefaultServices() {
         return Collections.emptySet();
     }
 

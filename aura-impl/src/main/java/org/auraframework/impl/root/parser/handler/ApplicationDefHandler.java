@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -139,12 +140,15 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         }
 
         String servicesAttribute = getAttributeValue(ATTRIBUTE_SERVICES);
-        Set<String> serviceDescriptors = Sets.newHashSet(configAdapter.getRequiredServices());
+        Set<String> serviceDescriptors = new HashSet<>(); 
         if (!StringUtils.isBlank(servicesAttribute)) {
             for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(servicesAttribute)) {
                 serviceDescriptors.add(name);
             }
+        } else {
+            serviceDescriptors.addAll(configAdapter.getDefaultServices());
         }
+
         if (!serviceDescriptors.isEmpty()) {
             Set<DefDescriptor<ModuleDef>> services = serviceDescriptors.stream()
                     .map(service->definitionService.getDefDescriptor(service, ModuleDef.class))
